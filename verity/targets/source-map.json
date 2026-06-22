@@ -1,0 +1,53 @@
+{
+  "schema": "srv3-source-map-v1",
+  "source_revisions": {
+    "lido_pr_1811_commit": "d088bbc2deac9913b68036d73d35c37aa6279b90",
+    "verity_commit": "33722270d996c7a3a520a71ecee42d7d232da100"
+  },
+  "targets": {
+    "SRV3-P1": {
+      "anchors": [
+        "contracts/0.4.24/Lido.sol::_getBufferedEtherAllocation",
+        "contracts/0.4.24/Lido.sol::_getDepositableEther",
+        "contracts/0.4.24/Lido.sol::_spendDepositableEther"
+      ],
+      "property": "verity/src/verity_srv3/properties.py::reserve_separation"
+    },
+    "SRV3-P2": {
+      "anchors": [
+        "contracts/0.8.25/sr/StakingRouter.sol::deposit",
+        "contracts/0.4.24/Lido.sol::withdrawDepositableEther"
+      ],
+      "property": "verity/src/verity_srv3/properties.py::deposit_conservation"
+    },
+    "SRV3-P3": {
+      "anchors": [
+        "contracts/0.8.25/sr/SRLib.sol::_reportValidatorBalancesByStakingModule",
+        "contracts/0.8.25/sr/SRTypes.sol::RouterStateAccounting"
+      ],
+      "property": "verity/src/verity_srv3/properties.py::module_balance_conservation"
+    },
+    "SRV3-P4": {
+      "anchors": [
+        "contracts/0.8.9/oracle/AccountingOracle.sol::submitReportData",
+        "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution"
+      ],
+      "property": "verity/src/verity_srv3/properties.py::report_before_reward_consistency"
+    },
+    "SRV3-P5": {
+      "anchors": [
+        "contracts/0.8.25/sr/StakingRouter.sol::_computeModuleFee",
+        "contracts/0.8.25/sr/SRLib.sol::_reportRewardsMinted"
+      ],
+      "property": "verity/src/verity_srv3/properties.py::reward_correctness"
+    },
+    "SRV3-P6": {
+      "anchors": [
+        "contracts/0.8.25/sr/SRTypes.sol::StakingModuleStatus",
+        "contracts/0.8.25/sr/StakingRouter.sol::deposit",
+        "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution"
+      ],
+      "property": "verity/src/verity_srv3/properties.py::status_gating"
+    }
+  }
+}

@@ -11,15 +11,17 @@
   new deposits.
   \item[CL] Consensus layer, the Ethereum system that records validator
   activity.
-  \item[Lean] The proof checker that verifies theorem statements.
-  \item[Verity] The translation and modeling layer used to connect
-  Solidity-facing structure to Lean proofs.
+  \item[Lean] A proof checker that can verify theorem statements. This package
+  does not ship Lean theorem artifacts.
+  \item[Verity] The modeling reference pinned for this work. This repository
+  ships a local Verity-style executable economic model.
   \item[P0] Highest-priority property class. Here it means an accounting claim
-  important enough that a final delivery should either prove it or clearly say
-  why it remains open.
-  \item[Theorem] A precise statement that Lean checks. In this report, theorem
-  names are handles for tracing prose claims back to proof files.
-  \item[Assumption] A named premise that the theorem may use but does not prove.
+  important enough that the executable package should either check it or clearly
+  say why it remains open.
+  \item[Proof target] A precise executable check tied to source anchors,
+  assumptions, model files, and proof logs.
+  \item[Assumption] A named premise that the executable target may use but does
+  not prove.
   \item[Trust boundary] The edge of the proof: what the model proves, what it
   assumes, and what remains for separate review.
 \end{description}
@@ -28,9 +30,9 @@
 \label{app:certora-map}
 
 \noindent This lane does not replace earlier Certora work. It shows how a
-PR \#1811 proof-closure package would continue from that work: moving from
-bounded or summarized checks toward explicit SRv3 accounting transitions,
-balance-based module reasoning, and named assumptions that a reviewer can audit.
+PR \#1811 proof-closure package continues from that work: moving from bounded or
+summarized checks toward explicit SRv3 accounting transitions, balance-based
+module reasoning, and named assumptions that a reviewer can audit.
 
 \noindent
 \begin{xltabular}{\linewidth}{@{}p{0.24\linewidth}p{0.18\linewidth}X@{}}
@@ -41,10 +43,10 @@ balance-based module reasoning, and named assumptions that a reviewer can audit.
   V2 validator-count accounting & Continued &
   Reframed as module-balance conservation over accepted per-module balances. \\
   \rowsep
-  V2 deposit availability bounds & Strengthened in scope &
+  V2 deposit availability bounds & Re-expressed &
   Expressed as reserve separation plus exact 32 ETH pull accounting. \\
   \rowsep
-  V2/V3 reward distribution checks & Strengthened in scope &
+  V2/V3 reward distribution checks & Re-expressed &
   Expressed as accepted-balance reward computation, fee bounds, and recipient
   alignment. \\
   \rowsep
@@ -52,9 +54,9 @@ balance-based module reasoning, and named assumptions that a reviewer can audit.
   Applied to active, stopped, and deposit-paused gates in the modeled economic
   paths. \\
   \rowsep
-  V3 bounded module-array specs & Generalized &
-  Theorems are stated over arbitrary finite arrays with named well-formedness
-  assumptions. \\
+  V3 bounded module-array specs & Mirrored &
+  Executable checks cover named fixtures and bounded enumerations with named
+  well-formedness assumptions. \\
   \bottomrule
 \end{xltabular}
 
@@ -68,12 +70,12 @@ balance-based module reasoning, and named assumptions that a reviewer can audit.
   \midrule
   \endhead
   Lean axioms introduced by LFG &
-  0 &
-  The final selected theorem namespace should contain no custom axioms. \\
+  N/A &
+  This package does not ship a Lean namespace. \\
   \rowsep
   Admitted theorem bodies &
-  0 &
-  The final selected theorem namespace should contain no \texttt{sorry} or
+  N/A &
+  This package does not ship theorem bodies with \texttt{sorry} or
   \texttt{admit}. \\
   \rowsep
   Named model assumptions &
@@ -84,8 +86,8 @@ balance-based module reasoning, and named assumptions that a reviewer can audit.
   \rowsep
   Selected falsification/regression harness counterexamples &
   0 &
-  A final package should report no selected P0 counterexample trace in the named
-  harness. This is not a claim about unmodeled deployed-system behavior. \\
+  \texttt{make prove} reports no selected P0 counterexample trace in the named
+  bounded harness. This is not a claim about unmodeled deployed-system behavior. \\
   \bottomrule
 \end{xltabular}
 

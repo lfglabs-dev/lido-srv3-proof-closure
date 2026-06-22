@@ -1,62 +1,64 @@
 \section{Reproducibility and handoff}
 \label{sec:reproducibility}
 
-\subsection*{Reviewer command in a real delivery}
+\subsection*{Reviewer command}
 
 A reviewer does not need to trust the PDF alone. The handoff includes the proof
-sources and commands that rebuild the selected theorem set and check that the
-PDF's assumptions match the machine-readable trust-boundary report.
+sources and commands that rebuild the selected executable target set and check
+that the PDF's assumptions match the machine-readable trust-boundary report.
 
 \smallskip
 \noindent The rebuild is the reviewer's receipt. If it succeeds, the reviewer
-learns that the theorem names in the PDF exist, the proof checker accepts them,
-and the listed assumptions match the machine-readable trust report. If it fails,
-the PDF claim is not ready to rely on.
+learns that the target IDs in the PDF exist, the executable checks pass, and the
+listed assumptions match the machine-readable trust report. If it fails, the PDF
+claim is not ready to rely on.
 
 \begin{lstlisting}[language=shell]
 git clone git@github.com:lfglabs-dev/lido-srv3-proof-closure.git
 cd lido-srv3-proof-closure
-lake build SRv3Proofs
-python3 scripts/check_trust_report.py reports/trust-boundary.json
+make bootstrap
+make test
+make prove
+make report
 \end{lstlisting}
 
-\noindent In a production delivery, this command checks all selected theorem
-files, verifies that every matrix row has a matching artifact, and rejects
-unstated trust assumptions in the machine-readable report. In this report package, the
-command is a contract for the handoff package rather than an executable artifact
-shipped in this repository.
+\noindent These commands check all selected model tests, verify every matrix row
+has a matching artifact in \path{proofs/}, emit
+\path{proofs/logs/proof-report.json}, and rebuild the PDF.
 
 \subsection*{Minimum provenance fields}
 
 \noindent
 \begin{tabularx}{\linewidth}{@{}p{0.32\linewidth}X@{}}
   \toprule
-  \thead{Field} & \thead{Expected content} \\
+  \thead{Field} & \thead{Repository content} \\
   \midrule
   PR and source revision & PR \#1811 URL, base branch, audited commit hash,
   and review timestamp. Report package target:
   \path{d088bbc2deac9913b68036d73d35c37aa6279b90}. \\
   \rowsep
-  Proof toolchain & Lean toolchain, Lake manifest, Verity commit, and model
-  generation command. \\
+  Proof toolchain & Standard-library Python executable harness, pinned Verity
+  reference \path{33722270d996c7a3a520a71ecee42d7d232da100}, and
+  \texttt{make test}/\texttt{make prove}. \\
   \rowsep
-  Theorem namespace & Selected theorem modules, expected target names, and the
-  command that fails on \texttt{sorry}, \texttt{admit}, custom axioms, or missing
-  source links. \\
+  Target namespace & Selected proof target files in \path{proofs/}, target names
+  in \path{verity/targets/srv3-proof-targets.json}, and the command that fails
+  on a failed model check. \\
   \rowsep
   Trust allowlist & Machine-readable assumption IDs, out-of-model boundaries,
-  and theorem-to-assumption mapping. \\
+  and target-to-assumption mapping in \path{verity/targets/trust-boundary.json}. \\
   \rowsep
-  Artifact integrity & SHA-256 hashes for the PDF, proof manifest, trust report,
-  and generated model artifacts. \\
+  Artifact integrity & Generated PDF in
+  \path{dist/lido-srv3-formal-methods-report.pdf} and proof output in
+  \path{proofs/logs/proof-report.json}. \\
   \bottomrule
 \end{tabularx}
 
-\subsection*{Source anchor examples for the final manifest}
+\subsection*{Source anchors}
 
-\noindent The matrix uses broad PR \#1811 surfaces to stay readable. A
-production source map should expand those surfaces into exact file/function
-anchors. Examples for the target source revision include:
+\noindent The matrix uses broad PR \#1811 surfaces to stay readable. The exact
+source map is \path{verity/targets/source-map.json}. Anchors for the target
+source revision include:
 
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
   \item Buffer and reserve accounting:
@@ -78,14 +80,16 @@ anchors. Examples for the target source revision include:
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
   \item \textbf{PDF:} \path{dist/lido-srv3-formal-methods-report.pdf}. This
   report package for Lido reviewers.
-  \item \textbf{Certora map:} \path{certora-pr1811-map.md}. Mapping from
-  Certora V2/V3 specs and assumptions to PR \#1811 proof targets.
-  \item \textbf{Trust report:} \path{reports/trust-boundary.json}.
-  Machine-readable theorem, assumption, and boundary register.
-  \item \textbf{Proof sources:} \path{lean/} and \path{verity/}. Source artifacts
-  for proof review and future extension.
-  \item \textbf{Traces:} \path{counterexamples/}. Empty for the selected P0 set;
-  retained for future falsified targets or regression traces.
+  \item \textbf{Lockfile:} \path{proofs/LOCKFILE.md}. Pinned Lido and Verity
+  references.
+  \item \textbf{Trust report:} \path{verity/targets/trust-boundary.json}.
+  Machine-readable assumption and boundary register.
+  \item \textbf{Proof targets:} \path{proofs/}. One target file for each selected
+  P0 property.
+  \item \textbf{Model:} \path{verity/src/verity_srv3/}. Executable SRv3 economic
+  state machine.
+  \item \textbf{Reference tests:} \path{tests/solidity-reference/} and
+  \path{tests/verity/}. Copied Lido references and executable mirrors.
 \end{itemize}
 
 \subsection*{Integrity checks}
@@ -95,17 +99,19 @@ anchors. Examples for the target source revision include:
   \toprule
   \thead{Check} & \thead{Expected result} \\
   \midrule
-  \texttt{lake build SRv3Proofs} &
-  All theorem modules compile with no admitted proof obligations. \\
+  \texttt{make test} &
+  All executable Verity-style mirror tests pass. \\
   \rowsep
-  \texttt{check\_trust\_report.py} &
-  Every theorem, assumption, and declared source anchor in the final evidence
-  manifest has a machine-readable counterpart. \\
+  \texttt{make prove} &
+  Bounded proof harness passes SRV3-P1 through SRV3-P6 and writes
+  \path{proofs/logs/proof-report.json}. \\
   \rowsep
-  \texttt{grep -R "sorry|admit"} &
-  No admitted Lean proofs in the selected theorem namespace. \\
+  \texttt{make report} &
+  Rebuilds \path{dist/lido-srv3-formal-methods-report.pdf}. \\
   \rowsep
-  \texttt{scripts/replay\_verity.sh} &
-  Regenerates the Verity summaries used by the Lean state model. \\
+  \texttt{proofs/LOCKFILE.md} &
+  Contains Lido PR \#1811 commit
+  \path{d088bbc2deac9913b68036d73d35c37aa6279b90} and Verity commit
+  \path{33722270d996c7a3a520a71ecee42d7d232da100}. \\
   \bottomrule
 \end{tabularx}

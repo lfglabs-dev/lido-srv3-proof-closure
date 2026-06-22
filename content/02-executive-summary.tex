@@ -5,19 +5,16 @@
 \noteboxtitle{Question answered by this report}
 If PR \#1811 changes how Lido accounts for deposits, reserves, module balances,
 and rewards, can the selected accounting rules be stated precisely enough that a
-machine can check them for every modeled case, not only for examples? This
-report package shows the intended final-report answer once the companion proof
-repository exists: the answer would be yes for the six selected P0
-(highest-priority) properties, under the named assumptions in
+machine can check them in a reproducible focused model? This report package
+gives an executable local answer for the six selected P0 (highest-priority)
+properties over the focused economic model, under the named assumptions in
 \cref{sec:trust-boundary}.
 \end{notebox}
 
-\noindent In a final report, ``closed'' has a specific meaning: the theorem compiles
-without admitted proof obligations, its Solidity-facing model target is listed,
-all premises not discharged inside the model are registered by assumption ID, and
-the reproducibility command rechecks the theorem namespace from a clean checkout. Because this
-repository is a report package, that sentence is the evidence threshold for a real
-delivery rather than a claim that the proof repository is present here.
+\noindent In this repository, ``executable'' has a specific meaning: the model
+target is listed, all premises not discharged inside the model are registered by
+assumption ID, and \texttt{make test} plus \texttt{make prove} recheck the target
+set from a clean checkout.
 
 \subsection*{The story in one page}
 
@@ -48,37 +45,34 @@ consensus layer.
 
 \begin{notebox}
 \noteboxtitle{Why this is more than testing}
-A test asks, ``does this example work?'' A theorem asks, ``does this rule survive
-every modeled case that satisfies the assumptions?'' That is why the report
-spends so much effort naming the model and assumptions: they define the world in
-which the machine-checked statement is meant to be universal.
+A test asks, ``does this example work?'' An executable model check asks, ``does
+this rule survive the modeled transition and fixture or bounded enumeration that
+the artifact names?'' That is why the report spends so much effort naming the
+model, bounds, and assumptions: they define exactly what the local command
+checks.
 \end{notebox}
 
 \smallskip
-\noindent The final claim this report package is designed to support is:
+\noindent The executable claim this report package supports is:
 
 \begin{quote}
-For all modeled finite module arrays and accepted report arrays satisfying the
-listed well-formedness assumptions, the selected PR \#1811 SRv3 economic state
-machine preserves deposit conservation, reserve separation, module-balance
+For the focused SRv3 economic state machine, the local model tests and bounded
+proof harness preserve deposit conservation, reserve separation, module-balance
 conservation, report-before-reward consistency, reward/fee bounds, and
-flow-specific status gating.
+flow-specific status gating over the named fixtures and enumerated domains.
 \end{quote}
 
-\noindent This would not be a claim that every deployed-system behavior is proved. The
+\noindent This is not a claim that every deployed-system behavior is proved. The
 exact boundary is part of the result: cryptographic witnesses, consensus
 truthfulness, governance configuration, and deployment refinement are named in
 \cref{sec:trust-boundary}.
 
 \subsection*{How to read the proof}
 
-Read each row below as a three-step promise for the final package. First, the
+Read each row below as a three-step trace. First, the
 Solidity-facing model names the transition being studied. Second, the property
-states what must never go wrong for any modeled input. Third, Lean should check
-the resulting theorem against the Verity-generated state model and the explicit
-assumptions. The value of the exercise is not that one test passed; it is that
-the statement leaves no remaining case split for a reviewer to hold in their
-head.
+states what must not go wrong in the focused model. Third, the local harness
+checks the Verity-style model against the explicit assumptions.
 
 \smallskip
 \noindent The matrix answers six plain questions: what ETH is spendable, what
@@ -87,15 +81,14 @@ bounded, and which module states block economic flow.
 
 \subsection*{Proof matrix}
 
-\noindent All six rows below are targets: they show the intended final
-closed state once the corresponding theorem artifact and trust-boundary row are
-present in the companion proof repository.
+\noindent All six rows below have executable artifacts in \path{proofs/},
+\path{verity/}, and \path{tests/verity/}.
 
 \noindent
 \renewcommand{\arraystretch}{1.18}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
   \toprule
-  \thead{ID} & \thead{PR \#1811 surface} & \thead{Intended final property} \\
+  \thead{ID} & \thead{PR \#1811 surface} & \thead{Executable property} \\
   \midrule
   SRV3-P1 & Lido buffer allocation &
   Withdrawal-reserved ETH is excluded from the depositable resource, so deposit
@@ -128,6 +121,6 @@ present in the companion proof repository.
 \subsection*{Review posture}
 
 This report package is written for two readers at once. A protocol reviewer can follow
-the ledgers and the trust boundary without reading Lean. A formal-methods
-reviewer can check whether the theorem IDs, assumptions, and rebuild gates would
-support the advertised claim in a real delivery package.
+the ledgers and the trust boundary without reading code. A formal-methods
+reviewer can check whether the target IDs, assumptions, and rebuild gates support
+the advertised local executable claim.

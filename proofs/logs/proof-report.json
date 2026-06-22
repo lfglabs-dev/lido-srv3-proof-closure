@@ -1,0 +1,127 @@
+{
+  "schema": "srv3-proof-report-v1",
+  "status": "pass",
+  "targets": [
+    {
+      "assumptions": [
+        "A-EXT-01",
+        "A-ARITH-05"
+      ],
+      "details": {
+        "buffered_wei": 96000000000000000000,
+        "depositable_wei": 46000000000000000000,
+        "spend_wei": 32000000000000000000,
+        "withdrawals_reserve_wei": 50000000000000000000
+      },
+      "id": "SRV3-P1",
+      "name": "reserve_separation",
+      "status": "pass"
+    },
+    {
+      "assumptions": [
+        "A-DEP-02",
+        "A-ID-04",
+        "A-ARITH-05"
+      ],
+      "details": {
+        "actual_deposits_count": 2,
+        "pulled_wei": 64000000000000000000,
+        "router_eth_after": 0,
+        "router_eth_before": 0
+      },
+      "id": "SRV3-P2",
+      "name": "deposit_conservation",
+      "status": "pass"
+    },
+    {
+      "assumptions": [
+        "A-ORC-03",
+        "A-ID-04",
+        "A-ARITH-05"
+      ],
+      "details": {
+        "module_sum_gwei": 112000000000,
+        "router_validators_balance_gwei": 112000000000
+      },
+      "id": "SRV3-P3",
+      "name": "module_balance_conservation",
+      "status": "pass"
+    },
+    {
+      "assumptions": [
+        "A-ORC-03",
+        "A-ID-04"
+      ],
+      "details": {
+        "report_sequence": 8,
+        "rewarded_module_ids": [
+          1,
+          2,
+          3
+        ]
+      },
+      "id": "SRV3-P4",
+      "name": "report_before_reward_consistency",
+      "status": "pass"
+    },
+    {
+      "assumptions": [
+        "A-ORC-03",
+        "A-ARITH-05"
+      ],
+      "details": {
+        "rewards_minted_calls": {
+          "1": 2857142857142857142,
+          "2": 1999999999999999999
+        },
+        "rows": [
+          {
+            "module_fee": 2857142857142857142,
+            "module_id": 1,
+            "module_reward_paid": 2857142857142857142,
+            "recipient": "nor",
+            "upper_bound": 5000000000000000000
+          },
+          {
+            "module_fee": 1999999999999999999,
+            "module_id": 2,
+            "module_reward_paid": 1999999999999999999,
+            "recipient": "csm",
+            "upper_bound": 7000000000000000000
+          },
+          {
+            "module_fee": 1142857142857142857,
+            "module_id": 3,
+            "module_reward_paid": 0,
+            "recipient": "legacy",
+            "upper_bound": 8000000000000000000
+          }
+        ]
+      },
+      "id": "SRV3-P5",
+      "name": "reward_correctness",
+      "status": "pass"
+    },
+    {
+      "assumptions": [
+        "A-EXT-01",
+        "A-ID-04"
+      ],
+      "details": {
+        "allocations": {
+          "1": 64000000000000000000,
+          "2": 0,
+          "3": 0
+        },
+        "module_rewards": {
+          "1": 2857142857142857142,
+          "2": 1999999999999999999,
+          "3": 0
+        }
+      },
+      "id": "SRV3-P6",
+      "name": "status_gating",
+      "status": "pass"
+    }
+  ]
+}

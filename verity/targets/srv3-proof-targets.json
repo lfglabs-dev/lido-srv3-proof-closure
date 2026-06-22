@@ -1,0 +1,41 @@
+{
+  "schema": "srv3-proof-targets-v1",
+  "targets": [
+    {
+      "claim": "Deposit spend cannot consume withdrawal-reserved ETH.",
+      "fixture": "p1_reserve_separation.json",
+      "id": "SRV3-P1",
+      "property": "reserve_separation"
+    },
+    {
+      "claim": "Router-pulled wei equals 32 ETH times actual deposits and leaves no router residual.",
+      "fixture": "p2_deposit_conservation.json",
+      "id": "SRV3-P2",
+      "property": "deposit_conservation"
+    },
+    {
+      "claim": "Accepted module reports set router validator balance to the module-balance sum.",
+      "fixture": "p3_module_balance_conservation.json",
+      "id": "SRV3-P3",
+      "property": "module_balance_conservation"
+    },
+    {
+      "claim": "Reward distribution reads the latest accepted module-balance report.",
+      "fixture": "p4_report_before_reward_consistency.json",
+      "id": "SRV3-P4",
+      "property": "report_before_reward_consistency"
+    },
+    {
+      "claim": "Reward fees are bounded by configured basis points and aligned with module recipients.",
+      "fixture": "p5_reward_correctness.json",
+      "id": "SRV3-P5",
+      "property": "reward_correctness"
+    },
+    {
+      "claim": "Non-active or deposit-paused modules receive no deposits; stopped modules receive no module reward payment.",
+      "fixture": "p6_status_gating.json",
+      "id": "SRV3-P6",
+      "property": "status_gating"
+    }
+  ]
+}

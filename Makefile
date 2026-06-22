@@ -4,10 +4,33 @@ ENGINE    := -pdf
 FLAGS     := -interaction=nonstopmode -halt-on-error -file-line-error
 OUT_DIR   := build
 DIST_DIR  := dist
+PYTHON    := python3
+PYTHONPATH := verity/src
+PROOF_LOG := proofs/logs/proof-report.json
 
-.PHONY: all clean distclean
+.PHONY: all bootstrap test prove report clean distclean
 
-all: $(DIST_DIR)/lido-srv3-formal-methods-report.pdf
+all: report
+
+bootstrap:
+	@$(PYTHON) --version
+	@$(PYTHON) -c 'import unittest'
+	@printf '%s\n' 'bootstrap ok: standard-library Python harness is available'
+
+test:
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m unittest discover -s tests/verity -p 'test_*.py'
+
+prove:
+	@mkdir -p proofs/logs
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m verity_srv3.prove > proofs/logs/prove.txt
+	@cat proofs/logs/prove.txt
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m verity_srv3.runner \
+	  --targets verity/targets/srv3-proof-targets.json \
+	  --fixtures tests/verity/fixtures \
+	  --output $(PROOF_LOG)
+	@printf '%s\n' 'proof report written to $(PROOF_LOG)'
+
+report: $(DIST_DIR)/lido-srv3-formal-methods-report.pdf
 
 $(OUT_DIR)/$(MAIN).pdf: $(MAIN).tex $(wildcard content/*.tex) $(wildcard style/*.sty)
 	@mkdir -p $(OUT_DIR)

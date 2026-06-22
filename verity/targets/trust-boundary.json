@@ -1,0 +1,10 @@
+{
+  "assumptions": {
+    "A-ARITH-05": "Wei/Gwei and basis-point arithmetic is interpreted over non-negative bounded integer domains; Solidity overflow checks are represented as rejected states.",
+    "A-DEP-02": "The beacon deposit sink consumes exactly one 32 ETH unit for each modeled initial validator deposit.",
+    "A-EXT-01": "External contract callbacks and sinks mutate no unlisted SRv3 accounting state in the focused economic model.",
+    "A-ID-04": "Module IDs are unique and accepted report arrays align with router module order.",
+    "A-ORC-03": "Accepted reports have already passed SRv3 oracle validation before they enter the economic transition."
+  },
+  "schema": "srv3-trust-boundary-v1"
+}

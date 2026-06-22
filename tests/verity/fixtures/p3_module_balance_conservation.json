@@ -1,0 +1,57 @@
+{
+  "state": {
+    "accepted_report": {
+      "module_ids": [
+        1,
+        2,
+        3
+      ],
+      "sequence": 7,
+      "validator_balances_gwei": [
+        64000000000,
+        32000000000,
+        16000000000
+      ]
+    },
+    "modules": [
+      {
+        "depositable_validators": 4,
+        "max_deposits_per_block": 4,
+        "module_fee_bps": 500,
+        "module_id": 1,
+        "reward_recipient": "nor",
+        "stake_share_limit_bps": 6000,
+        "status": "active",
+        "treasury_fee_bps": 500,
+        "validators_balance_gwei": 0
+      },
+      {
+        "depositable_validators": 4,
+        "max_deposits_per_block": 4,
+        "module_fee_bps": 700,
+        "module_id": 2,
+        "reward_recipient": "csm",
+        "stake_share_limit_bps": 3000,
+        "status": "deposits_paused",
+        "treasury_fee_bps": 300,
+        "validators_balance_gwei": 0
+      },
+      {
+        "depositable_validators": 4,
+        "max_deposits_per_block": 4,
+        "module_fee_bps": 800,
+        "module_id": 3,
+        "reward_recipient": "legacy",
+        "stake_share_limit_bps": 1000,
+        "status": "stopped",
+        "treasury_fee_bps": 200,
+        "validators_balance_gwei": 0
+      }
+    ],
+    "reserves": {
+      "buffered_wei": 128000000000000000000,
+      "stored_deposit_reserve_wei": 64000000000000000000,
+      "unfinalized_withdrawal_wei": 0
+    }
+  }
+}

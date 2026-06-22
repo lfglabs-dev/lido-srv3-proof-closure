@@ -1,19 +1,17 @@
 # Lido SRv3 Proof Closure
 
-Private LaTeX package for the Lido SRv3 accounting proof-closure report.
-The structure and typography are adapted from the `unlink-audit` LaTeX tooling:
-`report.tex`, `content/*.tex`, shared `style/*.sty`, LFG/Verity assets, and a
-`latexmk` Makefile.
-
-This repository is named for the final deliverable shape: report, Verity model,
-Lean proof artifacts, proof register, and reproducibility scripts. The current
-package contains the polished report and build system; the actual Verity/Lean
-artifacts are not included yet.
+Executable evidence package for the Lido SRv3 accounting proof-closure report.
+The repository contains the report, a deterministic Verity-style economic model,
+reference test copies, executable model tests, proof target registers, and local
+reproducibility commands.
 
 ## Build
 
 ```bash
-make
+make bootstrap
+make test
+make prove
+make report
 ```
 
 The compiled PDF is written to:
@@ -25,10 +23,12 @@ dist/lido-srv3-formal-methods-report.pdf
 ## Contents
 
 - `report.tex`: report entrypoint and metadata.
-- `content/`: concise formal-methods report sections.
-- `verity/`: reserved for the SRv3 Verity model.
-- `lean/`: reserved for Lean specifications and proofs.
-- `proofs/`: reserved for proof logs, build manifests, and theorem registers.
+- `content/`: formal-methods report sections.
+- `verity/`: executable SRv3 economic model and target manifests.
+- `tests/solidity-reference/`: relevant Lido reference tests copied from PR
+  #1811 source material.
+- `tests/verity/`: executable tests that mirror the reference behavior.
+- `proofs/`: lockfile, proof target files, and generated proof logs.
 - `style/`: local copy of the Verity/Unlink report style, adjusted for a formal
   methods proof-closure report.
 - `assets/`: LFG Labs and Verity PDF marks.
