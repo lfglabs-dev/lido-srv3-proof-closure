@@ -1,13 +1,13 @@
 % =============================================================================
-%  Lido SRv3 Formal Methods Pilot, LFG Labs report using Verity
+%  Lido SRv3 Formal Methods Report, LFG Labs report using Verity
 % =============================================================================
 \documentclass[11pt,a4paper]{article}
 
 \newcommand{\reportclient}    {Lido}
-\newcommand{\reporttitle}     {SRv3 Formal Methods Pilot}
+\newcommand{\reporttitle}     {SRv3 Accounting Proof Closure Specimen}
 \newcommand{\reportshortname} {SRv3 Proof Closure}
-\newcommand{\reportversion}   {Specimen v1.0}
-\newcommand{\reportcommit}    {PR-1811 / mock-final-artifacts}
+\newcommand{\reportversion}   {Private Specimen v1.1}
+\newcommand{\reportcommit}    {PR-1811 / d088bbc2}
 \newcommand{\reportdate}      {June 2026}
 \newcommand{\reportauthors}   {LFG Labs}
 
@@ -15,10 +15,19 @@
 \usepackage{style/findings}
 \usepackage{longtable}
 
+\newcommand{\wei}{\mathsf{wei}}
+\newcommand{\gwei}{\mathsf{gwei}}
+\newcommand{\uniteth}{\mathsf{ETH}}
+\newcommand{\bal}{\mathsf{bal}}
+\newcommand{\modstatus}{\mathsf{status}}
+\newcommand{\stActive}{\mathsf{active}}
+\newcommand{\stStopped}{\mathsf{stopped}}
+\newcommand{\stPaused}{\mathsf{paused}}
+
 \hypersetup{
   pdftitle={\reportclient: \reporttitle\ (\reportversion)},
   pdfauthor={LFG Labs},
-  pdfsubject={Formal methods report specimen},
+  pdfsubject={Formal methods proof-closure report specimen},
   pdfkeywords={Lido, Staking Router V3, Lean, Verity, formal methods, proof closure}
 }
 

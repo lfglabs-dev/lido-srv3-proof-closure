@@ -1,21 +1,28 @@
-\section*{Confidentiality and status}
-\addcontentsline{toc}{section}{Confidentiality and status}
+\section*{Confidentiality and result status}
+\addcontentsline{toc}{section}{Confidentiality and result status}
 
-This document is a \textbf{mock final-report specimen} prepared to show the
-recommended hierarchy, tone, and visual treatment for a private Lido SRv3 formal
-methods deliverable. It assumes, for presentation purposes only, that the pilot
-artifacts have been completed and that the P0 proof obligations below have all
-been discharged.
+This document is a \textbf{private final-report specimen} for the selected SRv3
+accounting proof-closure lane. It shows the claim structure, reader journey, and
+evidence layout that a final report would use once the companion Lean/Verity
+artifacts exist for PR \#1811 at the commit named on the cover.
 
 \smallskip
-\noindent It should not be represented as an actual Lido audit, assurance
-opinion, or completed verification result. In a production delivery, every theorem
-identifier, commit hash, axiom report, proof command, and counterexample reference
-would be backed by the companion repository and reviewer sign-off.
+\noindent The report is intentionally narrow. It covers the economic state
+machine modeled for deposits, reserves, module balances, accepted reports,
+rewards, fees, and status gates. It does not claim full deployed-system
+equivalence, oracle truthfulness, cryptographic correctness, governance
+correctness, or exact proxy/storage refinement beyond the named assumptions.
+
+\smallskip
+\noindent In a production delivery, every specimen target row would be backed by
+a theorem file, a source-code cross-reference, a trust-boundary entry, and a
+rebuild command. In this specimen, those rows demonstrate the intended final
+shape rather than independently verifiable proof artifacts in this repository.
 
 \begin{notebox}
 \noteboxtitle{Distribution}
 Private review channel for Lido protocol contributors and selected technical
-reviewers. Public release, forum excerpts, or website publication should wait
-until Lido approves the exact claims and redactions.
+reviewers. Public release, forum excerpts, or website publication should use
+strictly weaker language unless the proof repository and evidence manifest are
+available for independent rebuild.
 \end{notebox}

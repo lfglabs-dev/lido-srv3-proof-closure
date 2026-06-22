@@ -1,36 +1,70 @@
 \section{Trust boundary}
 \label{sec:trust-boundary}
 
-The report proves SRv3 accounting invariants over the focused economic state
-machine. It does not claim full deployed-system equivalence. This is intentional:
-the proof is valuable because the boundary is short, named, and reviewable.
+A formal proof is not a proof of ``everything the deployed system can ever do.''
+It is a proof about a specific model. In plain terms, this model checks the
+accounting moves inside the selected SRv3 state machine; it does not prove that
+every outside system feeding that state machine is honest, available, or
+cryptographically sound. The boundary below is therefore part of the result, not
+a footnote.
+
+\subsection*{What is inside the model}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}p{0.32\linewidth}>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  \thead{Inside} & \thead{Why it is modeled} \\
+  \midrule
+  Reserve and buffer arithmetic &
+  This is where depositable ETH must be separated from withdrawal-reserved ETH. \\
+  \rowsep
+  Router deposit accounting &
+  This is where pulled ETH must match actual 32 ETH validator deposits. \\
+  \rowsep
+  Module-balance reports &
+  This is where per-module balances become the router-wide accepted balance. \\
+  \rowsep
+  Rewards, fees, and recipients &
+  This is where amount bounds and recipient alignment matter. \\
+  \rowsep
+  Module status gates &
+  This is where non-active or paused modules stop receiving modeled deposit
+  allocation, and stopped modules stop receiving module-side rewards or fees. \\
+  \bottomrule
+\end{tabularx}
 
 \subsection*{Named assumptions}
 
+\noindent An assumption is not a hidden conclusion. It is a fact this proof is
+allowed to start from. The point of naming assumptions is to show exactly which
+parts still need ordinary audit, deployment review, oracle review, or
+cryptographic review.
+
 \noindent
-\begin{xltabular}{\linewidth}{@{}p{0.16\linewidth}p{0.27\linewidth}X@{}}
+\begin{xltabular}{\linewidth}{@{}p{0.16\linewidth}p{0.27\linewidth}>{\raggedright\arraybackslash}X@{}}
   \toprule
   \thead{ID} & \thead{Assumption} & \thead{Meaning} \\
   \midrule
   \endhead
   A-EXT-01 & External contract summaries &
-  Lido buffer withdrawals, staking module callbacks, and fee recipients conform
-  to the specified interfaces and mutate no unlisted SRv3 accounting state. \\
+  Lido buffer withdrawals, staking module callbacks, fee recipients, and beacon
+  deposit sinks conform to the specified interfaces and mutate no unlisted SRv3
+  accounting state. \\
   \rowsep
   A-DEP-02 & Beacon deposit sink &
-  A modeled beacon deposit of \(n\) validators removes exactly
-  \(n \times 32\,ETH\) from the router-side deposit resource. \\
+  A modeled beacon deposit removes exactly the intended 32 ETH value from the
+  router-side resource. Deposit-root, BLS, and SSZ correctness are not proved. \\
   \rowsep
   A-ORC-03 & Accepted oracle reports &
   Once accepted by SRv3 validation, module-balance reports satisfy the listed
-  shape, alignment, freshness, and range assumptions. Consensus-layer truthfulness
-  is outside this pilot. \\
+  shape, alignment, freshness, and range assumptions. Consensus-layer
+  truthfulness is outside this report. \\
   \rowsep
-  A-ID-04 & Module identity well-formedness &
-  Module IDs are unique in the modeled arrays, and report arrays align with those
-  IDs where the Solidity path requires alignment. \\
+  A-ID-04 & Module identity and ordering well-formedness &
+  Module IDs are unique, report arrays align with those IDs where required, and
+  sortedness obligations are enforced for ordered paths. \\
   \rowsep
-  A-ARITH-05 & Unit conversion domain &
+  A-ARITH-05 & Unit-conversion domain &
   Wei/Gwei and basis-point arithmetic is interpreted over the bounded unsigned
   integer domains used by the modeled transitions. \\
   \bottomrule
@@ -39,7 +73,7 @@ the proof is valuable because the boundary is short, named, and reviewable.
 \subsection*{Explicit non-claims}
 
 \noindent
-\begin{xltabular}{\linewidth}{@{}p{0.34\linewidth}X@{}}
+\begin{xltabular}{\linewidth}{@{}p{0.34\linewidth}>{\raggedright\arraybackslash}X@{}}
   \toprule
   \thead{Boundary} & \thead{Treatment} \\
   \midrule
@@ -52,21 +86,28 @@ the proof is valuable because the boundary is short, named, and reviewable.
   Deferred to a deployment and migration lane; not used as proof evidence here. \\
   \rowsep
   Full governance role graph and parameter admissibility &
-  Configuration is assumed to satisfy the stated range and role assumptions. \\
+  Configuration is assumed to satisfy the stated range and role assumptions;
+  unauthorized governance transitions are not modeled. \\
   \rowsep
-  ExitBus, consolidation, top-up CL witness binding, VaultHub &
-  Recommended follow-on proof lanes, deliberately outside the fixed four-week
-  pilot. \\
+  CL witness soundness and VaultHub &
+  Not proved in this lane. If their values enter an accounting transition, they
+  enter only through named, well-formed input assumptions; otherwise no theorem
+  relies on them. \\
   \rowsep
   Gas, events, revert strings, and exact call-stack shape &
   Engineering and integration review surfaces, not conservation-law premises. \\
   \bottomrule
 \end{xltabular}
 
+\subsection*{Allowed public wording}
+
 \begin{notebox}
-\noteboxtitle{Public wording}
-The safe external sentence is: ``The focused SRv3 economic-state-machine model
-proved the selected P0 accounting properties under named assumptions.'' Avoid
-phrases such as ``SRv3 is fully verified'' or ``oracle and deposit correctness are
-proved.''
+\noteboxtitle{Precise specimen claim}
+This report specimen demonstrates the intended final claim shape: the selected
+PR \#1811 SRv3 accounting invariants would be reported as closed over a focused
+Lean/Verity economic-state-machine model, under explicit assumptions for
+external contracts, accepted oracle inputs, cryptographic witnesses, governance
+configuration, and deployed-system refinement. Use closure language publicly only
+after the companion proof repository and evidence manifest are available for
+independent rebuild.
 \end{notebox}

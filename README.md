@@ -1,13 +1,12 @@
 # Lido SRv3 Formal Methods Report Specimen
 
-Private-repo-style LaTeX package for a Lido SRv3 formal methods pilot report.
+Private-repo-style LaTeX package for a Lido SRv3 final-report specimen.
 The structure and typography are adapted from the `unlink-audit` LaTeX tooling:
 `report.tex`, `content/*.tex`, shared `style/*.sty`, LFG/Verity assets, and a
 `latexmk` Makefile.
 
-This is a mock final report specimen. It assumes the selected P0 properties were
-proved so the hierarchy, tone, and delivery shape can be evaluated before real
-proof artifacts exist.
+This is a mock final report specimen. It shows how selected P0 properties would
+be explained, scoped, and evidenced once real proof artifacts exist.
 
 ## Build
 

@@ -1,56 +1,111 @@
 \section{Reproducibility and handoff}
 \label{sec:reproducibility}
 
-\subsection*{Reviewer command}
+\subsection*{Reviewer command in a real delivery}
+
+A reviewer does not need to trust the PDF alone. The handoff includes the proof
+sources and commands that rebuild the selected theorem set and check that the
+PDF's assumptions match the machine-readable trust-boundary report.
+
+\smallskip
+\noindent The rebuild is the reviewer's receipt. If it succeeds, the reviewer
+learns that the theorem names in the PDF exist, the proof checker accepts them,
+and the listed assumptions match the machine-readable trust report. If it fails,
+the PDF claim is not ready to rely on.
 
 \begin{lstlisting}[language=shell]
-git clone git@github.com:lfglabs-dev/lido-srv3-formal-pilot.git
-cd lido-srv3-formal-pilot
+git clone git@github.com:lfglabs-dev/lido-srv3-proof-closure.git
+cd lido-srv3-proof-closure
 lake build SRv3Proofs
 python3 scripts/check_trust_report.py reports/trust-boundary.json
 \end{lstlisting}
 
-\noindent A successful rebuild checks all P0 theorem files, verifies that every
-property in the public table has a proof artifact, and rejects unstated trust
-assumptions in the machine-readable report.
+\noindent In a production delivery, this command checks all selected theorem
+files, verifies that every matrix row has a matching artifact, and rejects
+unstated trust assumptions in the machine-readable report. In this specimen, the
+command is a contract for the handoff package rather than an executable artifact
+shipped in this repository.
 
-\subsection*{Week-four handoff contents}
+\subsection*{Minimum provenance fields}
 
 \noindent
-\begin{tabularx}{\linewidth}{@{}p{0.30\linewidth}X@{}}
+\begin{tabularx}{\linewidth}{@{}p{0.32\linewidth}X@{}}
   \toprule
-  \thead{Artifact} & \thead{Purpose} \\
+  \thead{Field} & \thead{Expected content} \\
   \midrule
-  \path{report/final.pdf} & Decision-ready report for Lido reviewers. \\
+  PR and source revision & PR \#1811 URL, base branch, audited commit hash,
+  and review timestamp. Specimen target:
+  \path{d088bbc2deac9913b68036d73d35c37aa6279b90}. \\
   \rowsep
-  \path{certora-pr1811-map.md} & Mapping from Certora V2/V3 specs and assumptions to PR \#1811 proof targets. \\
+  Proof toolchain & Lean toolchain, Lake manifest, Verity commit, and model
+  generation command. \\
   \rowsep
-  \path{reports/trust-boundary.json} & Machine-readable theorem, assumption, and boundary register. \\
+  Theorem namespace & Selected theorem modules, expected target names, and the
+  command that fails on \texttt{sorry}, \texttt{admit}, custom axioms, or missing
+  source links. \\
   \rowsep
-  \path{lean/} and \path{verity/} & Source artifacts for proof review and future extension. \\
+  Trust allowlist & Machine-readable assumption IDs, out-of-model boundaries,
+  and theorem-to-assumption mapping. \\
   \rowsep
-  \path{counterexamples/} & Closed development counterexamples retained as regression traces. \\
+  Artifact integrity & SHA-256 hashes for the PDF, proof manifest, trust report,
+  and generated model artifacts. \\
   \bottomrule
 \end{tabularx}
 
-\subsection*{Suggested delivery rhythm}
+\subsection*{Source anchor examples for the final manifest}
+
+\noindent The specimen matrix uses broad PR \#1811 surfaces to stay readable. A
+production source map should expand those surfaces into exact file/function
+anchors. Examples for the target source revision include:
+
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
+  \item Buffer and reserve accounting:
+  \path{Lido.sol::_getBufferedEtherAllocation},
+  \path{getDepositableEther}, and \path{withdrawDepositableEther}.
+  \item Deposit allocation:
+  \path{StakingRouter.sol::deposit} and
+  \path{SRLib.sol::_getDepositAllocations}.
+  \item Reports and rewards:
+  \path{StakingRouter.sol::reportValidatorBalancesByStakingModule},
+  \path{getStakingRewardsDistribution}, and
+  \path{SRLib.sol::_reportRewardsMinted}.
+  \item Oracle validation:
+  \path{AccountingOracle.sol::_checkStakingRouterModuleBalances}.
+\end{itemize}
+
+\subsection*{Handoff contents}
+
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
+  \item \textbf{PDF:} \path{dist/lido-srv3-formal-methods-report.pdf}. This
+  report specimen for Lido reviewers.
+  \item \textbf{Certora map:} \path{certora-pr1811-map.md}. Mapping from
+  Certora V2/V3 specs and assumptions to PR \#1811 proof targets.
+  \item \textbf{Trust report:} \path{reports/trust-boundary.json}.
+  Machine-readable theorem, assumption, and boundary register.
+  \item \textbf{Proof sources:} \path{lean/} and \path{verity/}. Source artifacts
+  for proof review and future extension.
+  \item \textbf{Traces:} \path{counterexamples/}. Empty for the selected P0 set;
+  retained for future falsified targets or regression traces.
+\end{itemize}
+
+\subsection*{Integrity checks}
 
 \noindent
-\begin{tabularx}{\linewidth}{@{}p{0.18\linewidth}p{0.28\linewidth}X@{}}
+\begin{tabularx}{\linewidth}{@{}p{0.30\linewidth}>{\raggedright\arraybackslash}X@{}}
   \toprule
-  \thead{Timing} & \thead{Message} & \thead{Reason} \\
+  \thead{Check} & \thead{Expected result} \\
   \midrule
-  T-3 days & Private heads-up with one-page proof matrix &
-  Lets technical reviewers allocate attention before the repository arrives. \\
+  \texttt{lake build SRv3Proofs} &
+  All theorem modules compile with no admitted proof obligations. \\
   \rowsep
-  T day & Repository invite plus final PDF and rebuild command &
-  Makes the evidence inspectable before any meeting or narrative discussion. \\
+  \texttt{check\_trust\_report.py} &
+  Every theorem, assumption, and declared source anchor in the final evidence
+  manifest has a machine-readable counterpart. \\
   \rowsep
-  T+2 days & Short async note: assumptions needing reviewer confirmation &
-  Moves the conversation from ``is this polished?'' to ``which premises do we
-  endorse?'' \\
+  \texttt{grep -R "sorry|admit"} &
+  No admitted Lean proofs in the selected theorem namespace. \\
   \rowsep
-  T+5 days & Thirty-minute review call &
-  Reserved for property selection, public wording, and follow-on proof lanes. \\
+  \texttt{scripts/replay\_verity.sh} &
+  Regenerates the Verity summaries used by the Lean state model. \\
   \bottomrule
 \end{tabularx}

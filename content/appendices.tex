@@ -1,50 +1,108 @@
-\section{Appendix A: Certora and PR \#1811 map}
+\section{Appendix A: Reader glossary}
+\label{app:glossary}
+
+\begin{description}
+  \item[Router] The SRv3 component that allocates deposit work across staking
+  modules and records aggregate module accounting.
+  \item[Module] A staking-provider lane managed by the router.
+  \item[Accepted report] Oracle balance data that has passed the modeled SRv3
+  validation checks and may update accounting state.
+  \item[Withdrawal reserve] ETH kept aside for withdrawals, not available for
+  new deposits.
+  \item[CL] Consensus layer, the Ethereum system that records validator
+  activity.
+  \item[Lean] The proof checker that verifies theorem statements.
+  \item[Verity] The translation and modeling layer used to connect
+  Solidity-facing structure to Lean proofs.
+  \item[P0] Highest-priority property class. Here it means an accounting claim
+  important enough that a final delivery should either prove it or clearly say
+  why it remains open.
+  \item[Theorem] A precise statement that Lean checks. In this report, theorem
+  names are handles for tracing prose claims back to proof files.
+  \item[Assumption] A named premise that the theorem may use but does not prove.
+  \item[Trust boundary] The edge of the proof: what the model proves, what it
+  assumes, and what remains for separate review.
+\end{description}
+
+\section{Appendix B: Certora delta}
 \label{app:certora-map}
+
+\noindent This lane does not replace earlier Certora work. It shows how a
+PR \#1811 proof-closure package would continue from that work: moving from
+bounded or summarized checks toward explicit SRv3 accounting transitions,
+balance-based module reasoning, and named assumptions that a reviewer can audit.
 
 \noindent
 \begin{xltabular}{\linewidth}{@{}p{0.24\linewidth}p{0.18\linewidth}X@{}}
   \toprule
-  \thead{Legacy coverage class} & \thead{Disposition} & \thead{Pilot treatment} \\
+  \thead{Legacy coverage class} & \thead{Disposition} & \thead{Final treatment} \\
   \midrule
   \endhead
-  Validator-count accounting & Replaced &
-  PR \#1811 moves the proof target to direct per-module balance accounting. \\
+  V2 validator-count accounting & Continued &
+  Reframed as module-balance conservation over accepted per-module balances. \\
   \rowsep
-  Deposit availability bounds & Strengthened &
-  Deposit spend is connected to reserve separation and exact \(32\,ETH\) multiples. \\
+  V2 deposit availability bounds & Strengthened in scope &
+  Expressed as reserve separation plus exact 32 ETH pull accounting. \\
   \rowsep
-  Reward distribution checks & Strengthened &
-  Rewards are tied to accepted module-balance reports and recipient alignment. \\
+  V2/V3 reward distribution checks & Strengthened in scope &
+  Expressed as accepted-balance reward computation, fee bounds, and recipient
+  alignment. \\
   \rowsep
-  Status gating assertions & Reused and extended &
-  Active, stopped, and deposit-paused states gate deposits, top-ups, and fee receipt. \\
+  Router status-gating assertions & Reused and extended &
+  Applied to active, stopped, and deposit-paused gates in the modeled economic
+  paths. \\
   \rowsep
-  Bounded module-array specs & Replaced where feasible &
-  Loop invariants are stated over arbitrary finite arrays with named
-  well-formedness assumptions. \\
+  V3 bounded module-array specs & Generalized &
+  Theorems are stated over arbitrary finite arrays with named well-formedness
+  assumptions. \\
   \bottomrule
 \end{xltabular}
 
-\section{Appendix B: Follow-on lanes}
+\section{Appendix C: Expected axiom and assumption summary}
+\label{app:axiom-summary}
+
+\noindent
+\begin{xltabular}{\linewidth}{@{}p{0.22\linewidth}p{0.18\linewidth}X@{}}
+  \toprule
+  \thead{Class} & \thead{Expected final value} & \thead{Interpretation} \\
+  \midrule
+  \endhead
+  Lean axioms introduced by LFG &
+  0 &
+  The final selected theorem namespace should contain no custom axioms. \\
+  \rowsep
+  Admitted theorem bodies &
+  0 &
+  The final selected theorem namespace should contain no \texttt{sorry} or
+  \texttt{admit}. \\
+  \rowsep
+  Named model assumptions &
+  5 &
+  The specimen assumes this allowance: external summaries, beacon sink behavior,
+  accepted oracle reports, module identity/order well-formedness, and arithmetic
+  domain. \\
+  \rowsep
+  Selected falsification/regression harness counterexamples &
+  0 &
+  A final package should report no selected P0 counterexample trace in the named
+  harness. This is not a claim about unmodeled deployed-system behavior. \\
+  \bottomrule
+\end{xltabular}
+
+\section{Appendix D: Follow-on lanes}
 \label{app:follow-on}
 
-\noindent Recommended sequence after the P0 accounting pilot:
+\noindent These lanes are recommended because they touch adjacent SRv3 risk
+surfaces, not because they are required to support the accounting claims in this
+specimen. Recommended sequence after this P0 accounting closure:
 
 \begin{enumerate}
   \item ExitBus authorization, replay resistance, duplicate prevention, and
   triggerable-exit fee/refund exactness.
-  \item Consolidation fee conservation, source/target binding, and
+  \item Consolidation fee conservation, source and target binding, and
   source-ownership caveats.
   \item Top-up and consensus-layer proof binding.
   \item Oracle sanity limits, drain guards, and second-opinion oracle composition.
   \item Deployment governance, role graph, and exact migration refinement.
   \item VaultHub F-01/F-02/F-03, if still relevant to the active review path.
 \end{enumerate}
-
-\section{Appendix C: Specimen integrity}
-\label{app:specimen-integrity}
-
-This PDF is intentionally styled as a final private report, but the theorem IDs,
-repository paths, commits, and proof outputs are illustrative. Before sending a
-real Lido deliverable, replace every mock identifier with the actual repository
-commit, Lean axiom output, reviewer transcript, and machine-readable trust report.

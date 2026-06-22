@@ -2,67 +2,132 @@
 \label{sec:executive-summary}
 
 \begin{notebox}
-\noteboxtitle{Formal verdict}
-For the modeled SRv3 economic state machine, all six selected P0 property groups
-close as \textbf{machine-checked proofs}. No executable counterexample is present
-in the final register. The result covers balance conservation, deposit
-conservation, reserve separation, reward and fee correctness, report freshness,
-and status gating under the named trust boundary in \cref{sec:trust-boundary}.
+\noteboxtitle{Question answered by this report}
+If PR \#1811 changes how Lido accounts for deposits, reserves, module balances,
+and rewards, can the selected accounting rules be stated precisely enough that a
+machine can check them for every modeled case, not only for examples? This
+specimen shows the intended final-report answer once the companion proof
+repository exists: the answer would be yes for the six selected P0
+(highest-priority) properties, under the named assumptions in
+\cref{sec:trust-boundary}.
 \end{notebox}
 
-\subsection*{What Lido can rely on}
+\noindent In a final report, ``closed'' has a specific meaning: the theorem compiles
+without admitted proof obligations, its Solidity-facing model target is listed,
+all premises not discharged inside the model are registered by assumption ID, and
+the reproducibility command rechecks the theorem namespace from a clean checkout. Because this
+repository is a specimen, that sentence is the evidence threshold for a real
+delivery rather than a claim that the proof repository is present here.
 
-The pilot verifies the accounting transition rules introduced by PR \#1811 at the
-level where fund-safety questions become crisp: ETH moves into the deposit path,
-module validator balances are accepted and aggregated, rewards and fees are
-computed from that accepted state, and inactive or stopped modules are excluded
-from flows that should no longer reach them.
+\subsection*{The story in one page}
+
+The core safety question is simple enough to ask without Solidity or Lean:
+\emph{when ETH and validator balances move through SRv3 accounting, can any
+value be spent from the wrong place, counted twice, rewarded from stale data, or
+sent through a disabled path?} The report answers that question by turning each
+informal concern into a small conservation law.
 
 \smallskip
-\noindent The strongest result is compositional: the proofs do not merely show
-that individual helper functions preserve local facts. They show that the modeled
-pipeline preserves the same conservation story across deposit allocation,
-withdrawal-reserve exclusion, per-module balance updates, and reward distribution.
+\noindent A useful mental model is three ledgers that must agree:
 
-\subsection*{Proof closure matrix}
+\begin{enumerate}
+  \item The \textbf{buffer ledger} says which ETH is depositable and which ETH is
+  reserved for withdrawals.
+  \item The \textbf{router ledger} says how much ETH is pulled for deposits and
+  how validator balances are summed across staking modules.
+  \item The \textbf{reward ledger} says which accepted balances may be used to
+  compute rewards, fees, and recipients.
+\end{enumerate}
+
+\noindent An ``accepted report'' means oracle-provided module-balance data that
+has passed the modeled SRv3 validation checks and is therefore allowed to update
+accounting state. The proof lane checks that PR \#1811 preserves the three
+ledgers through those modeled transitions. It is not trying to prove every
+operational fact about deployment, cryptography, governance, gas, or the
+consensus layer.
+
+\begin{notebox}
+\noteboxtitle{Why this is more than testing}
+A test asks, ``does this example work?'' A theorem asks, ``does this rule survive
+every modeled case that satisfies the assumptions?'' That is why the report
+spends so much effort naming the model and assumptions: they define the world in
+which the machine-checked statement is meant to be universal.
+\end{notebox}
+
+\smallskip
+\noindent The final claim this specimen is designed to support is:
+
+\begin{quote}
+For all modeled finite module arrays and accepted report arrays satisfying the
+listed well-formedness assumptions, the selected PR \#1811 SRv3 economic state
+machine preserves deposit conservation, reserve separation, module-balance
+conservation, report-before-reward consistency, reward/fee bounds, and
+flow-specific status gating.
+\end{quote}
+
+\noindent This would not be a claim that every deployed-system behavior is proved. The
+exact boundary is part of the result: cryptographic witnesses, consensus
+truthfulness, governance configuration, and deployment refinement are named in
+\cref{sec:trust-boundary}.
+
+\subsection*{How to read the proof}
+
+Read each row below as a three-step promise for the final package. First, the
+Solidity-facing model names the transition being studied. Second, the property
+states what must never go wrong for any modeled input. Third, Lean should check
+the resulting theorem against the Verity-generated state model and the explicit
+assumptions. The value of the exercise is not that one test passed; it is that
+the statement leaves no remaining case split for a reviewer to hold in their
+head.
+
+\smallskip
+\noindent The matrix answers six plain questions: what ETH is spendable, what
+deposits consume, what balances add up to, what report rewards use, how fees are
+bounded, and which module states block economic flow.
+
+\subsection*{Proof matrix}
+
+\noindent All six rows below are specimen targets: they show the intended final
+closed state once the corresponding theorem artifact and trust-boundary row are
+present in the companion proof repository.
 
 \noindent
 \renewcommand{\arraystretch}{1.18}
-\begin{tabularx}{\linewidth}{@{}p{0.28\linewidth}p{0.16\linewidth}X@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
   \toprule
-  \thead{P0 property group} & \thead{Final state} & \thead{Decision meaning} \\
+  \thead{ID} & \thead{PR \#1811 surface} & \thead{Intended final property} \\
   \midrule
-  Module balance conservation & \cellcolor{sevoktint}\textbf{Proved} &
-  Router-wide validator balance equals the sum of per-module balances after
-  accepted reports and modeled transitions. \\
+  SRV3-P1 & Lido buffer allocation &
+  Withdrawal-reserved ETH is excluded from the depositable resource, so deposit
+  spending cannot borrow from withdrawal liquidity. \\
   \rowsep
-  Deposit conservation & \cellcolor{sevoktint}\textbf{Proved} &
-  Deposits never spend more ETH than available, and actual deposit value is
-  exactly \(32\,ETH \times depositsCount\). \\
+  SRV3-P2 & Router deposit path &
+  Router-pulled ETH equals 32 ETH times actual deposits and is fully sunk
+  into CL deposits, with no modeled residual held by the router. \\
   \rowsep
-  Reserve separation & \cellcolor{sevoktint}\textbf{Proved} &
-  CL deposits and top-ups cannot consume ETH reserved for withdrawals. \\
+  SRV3-P3 & Module balances &
+  Router-wide validator balance is exactly the sum of accepted per-module
+  balances, so the aggregate cannot drift away from the module ledger. \\
   \rowsep
-  Reward correctness & \cellcolor{sevoktint}\textbf{Proved} &
-  Rewards and fees are computed from valid module balances, remain bounded, and
-  preserve recipient/module/amount alignment. \\
+  SRV3-P4 & Oracle report ordering &
+  Module fee-distribution weights come from the current accepted module-balance
+  state, not from stale or partially applied reports. \\
   \rowsep
-  Report-before-reward consistency & \cellcolor{sevoktint}\textbf{Proved} &
-  Rewards cannot be derived from stale, missing, or internally inconsistent
-  module-balance reports in the modeled state machine. \\
+  SRV3-P5 & Rewards and fees &
+  Module fee-distribution weights and recipient alignment use accepted module
+  balances; total reward and fee magnitude remain accepted report or
+  vault-context inputs under assumptions. \\
   \rowsep
-  Status gating & \cellcolor{sevoktint}\textbf{Proved} &
-  Stopped, inactive, and deposit-paused modules are excluded from deposits,
-  top-ups, and fee receipt according to modeled SRv3 rules. \\
+  SRV3-P6 & Status gates &
+  Non-active or deposit-paused modules receive no modeled deposit allocation;
+  stopped modules receive no module-side reward or fee allocation. \\
   \bottomrule
 \end{tabularx}
 \renewcommand{\arraystretch}{1.0}
 
-\subsection*{Reader guidance}
+\subsection*{Review posture}
 
-Read the report in three passes. First, use the matrix above as the decision
-summary. Second, use \cref{sec:proof-closure} to see the evidence architecture and
-pipeline diagram. Third, use \cref{sec:trust-boundary} before quoting any result:
-the report deliberately separates SRv3 economic-state-machine proof from oracle
-truthfulness, cryptographic witnesses, governance configuration, exact storage
-packing, and full deployed-contract equivalence.
+This specimen is written for two readers at once. A protocol reviewer can follow
+the ledgers and the trust boundary without reading Lean. A formal-methods
+reviewer can check whether the theorem IDs, assumptions, and rebuild gates would
+support the advertised claim in a real delivery package.

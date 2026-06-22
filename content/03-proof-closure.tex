@@ -1,10 +1,22 @@
-\section{Proof closure}
+\section{What the proof closes}
 \label{sec:proof-closure}
 
-\subsection*{Modeled pipeline}
+\newcommand{\theoremid}[2]{\texttt{\footnotesize #1}\newline\texttt{\footnotesize #2}}
+\newcommand{\proofhandle}[3]{\texttt{\footnotesize #1}\newline\theoremid{#2}{#3}}
 
-\noindent The model follows the SRv3 accounting path that matters for the P0
-fund-safety questions.
+\noindent A proof is closed when the theorem checker accepts it without admitted
+proof steps and the remaining premises are named as assumptions. This section
+shows the six accounting claims in three forms: a system map, a plain-language
+story, and specimen theorem rows for the final evidence package.
+
+\subsection*{Modeled architecture}
+
+\noindent The proof model follows the accounting path where PR \#1811 concentrates
+fund-safety risk. In plain terms, the model follows ETH as it moves from the
+Lido buffer, through the router, into staking-module deposits, and then into
+later balance reports and reward calculations. Each proof asks whether that flow
+preserves the accounting rule it is supposed to preserve. External contracts are
+summarized only at the interfaces used by those transitions.
 
 \begin{center}
 \begin{tikzpicture}[
@@ -15,12 +27,12 @@ fund-safety questions.
     text width=23mm, align=center, font=\sffamily\scriptsize},
   arrow/.style={-{Latex[length=2.2mm]}, draw=vaccentdeep, line width=0.45pt}
 ]
-  \node[box] (buffer) {Lido buffer\\available ETH};
-  \node[box, right=of buffer] (reserve) {Deposit reserve\\withdrawal exclusion};
-  \node[box, right=of reserve] (alloc) {Active module\\deposit allocation};
-  \node[box, below=of alloc] (balances) {Accepted module\\balance reports};
+  \node[box] (buffer) {Lido buffer\\reserve split};
+  \node[box, right=of buffer] (reserve) {Depositable ETH\\withdrawal exclusion};
+  \node[box, right=of reserve] (alloc) {Router pull\\module allocation};
+  \node[box, below=of alloc] (balances) {Accepted module\\balances};
   \node[box, left=of balances] (rewards) {Rewards, fees,\\recipient alignment};
-  \node[box, left=of rewards] (router) {Router-wide\\balance invariant};
+  \node[box, left=of rewards] (router) {Status gates\\module state};
 
   \draw[arrow] (buffer) -- (reserve);
   \draw[arrow] (reserve) -- (alloc);
@@ -29,10 +41,10 @@ fund-safety questions.
   \draw[arrow] (rewards) -- (router);
   \draw[arrow] (router) -- (reserve);
 
-  \node[proof, above=7mm of reserve] (p1) {ETH conservation};
-  \node[proof, above=7mm of alloc] (p2) {Status gating};
-  \node[proof, below=7mm of balances] (p3) {Report freshness};
-  \node[proof, below=7mm of rewards] (p4) {Fee bounds};
+  \node[proof, above=7mm of reserve] (p1) {P1 reserve};
+  \node[proof, above=7mm of alloc] (p2) {P2 deposits};
+  \node[proof, below=7mm of balances] (p3) {P3--P4 reports};
+  \node[proof, below=7mm of rewards] (p4) {P5--P6 rewards};
 
   \draw[arrow] (p1) -- (reserve);
   \draw[arrow] (p2) -- (alloc);
@@ -41,81 +53,224 @@ fund-safety questions.
 \end{tikzpicture}
 \end{center}
 
+\subsection*{From intuition to theorem}
+
+\noindent Read the six properties as one accounting story. P1 protects ETH
+reserved for withdrawals. P2 checks that initial deposits pull exactly the ETH
+they should. P3 checks that the router's total balance equals the module balances
+it accepted. P4 makes module fee weights depend on the accepted report, not an
+old or partial one. P5 bounds reward and fee movement. P6 blocks non-active or
+paused modules from deposit allocation and stopped modules from module-side
+reward or fee allocation.
+
+\smallskip
+\noindent Each invariant below has two layers. The first sentence says why the
+property matters in ordinary accounting language. The formula then states the
+same idea in a form that can be checked over all modeled inputs. You can read
+the formulas like receipts: they name the money bucket before and after a move,
+then check that the totals still match. The symbols below only stand for modules,
+balances, reserves, and reports already described in the ledger story.
+
+\smallskip
+\noindent Let \(M\) be the finite set of staking modules in router order. For a
+module \(m \in M\), let \(\bal_m\) be its accepted validator balance in gwei,
+\(\modstatus_m\) its module status, and \(\mathsf{moduleRecipient}_m\) its module
+reward recipient in the modeled reward step. Let \(B_R\) be the router validator balance, \(T\) the buffered ETH,
+\(R_D\) the stored deposit reserve, and \(R_W\) the withdrawal-reserved buffer.
+The theorems are parametric in the finite module count, while each accepted
+report must still cover the current router module set in router order, with
+unique module IDs, matching array lengths, and the freshness and range premises
+named in the theorem signature.
+
+\medskip
+\noindent\textbf{P1: reserve separation.}
+\[
+  d = \min(T,R_D)
+  \qquad
+  w = \min(T-d,R_W)
+  \qquad
+  u = T-d-w
+\]
+\[
+  \mathsf{depositable}(T) = d + u
+\]
+\[
+  \forall a.\quad
+  \mathsf{spendDeposit}(a) \Rightarrow
+  a \leq \mathsf{depositable}(T)
+\]
+\[
+  \mathsf{spendDeposit}(a) \Rightarrow
+  \mathsf{usesWithdrawalReserve}(a,T,R_D,R_W)=0
+\]
+
+\noindent Plain reading: some ETH is saved for withdrawals, and deposits are not
+allowed to spend that saved amount. Deposit spend is bounded by the pre-spend
+deposit reserve plus unreserved allocation and does not consume the pre-spend
+effective withdrawal-reserved bucket. The theorem sketch deliberately avoids a
+raw post-state equality for \(R_W\); any post-state reserve fact belongs to the
+model's explicit reserve-recomputation rule.
+
+\medskip
+\noindent\textbf{P2: exact router pull.}
+\[
+  \mathsf{pulledWei}
+    = 32\,\uniteth \cdot \mathsf{actualDeposits}
+  \qquad
+  \mathsf{routerEthAfter} = \mathsf{routerEthBefore}
+\]
+\[
+  \mathsf{actualDeposits}
+    = \sum_{m \in M} \mathsf{allocatedDeposits}_m
+\]
+
+\noindent Plain reading: across the modeled atomic initial-deposit transition,
+the router pulls exactly one 32 ETH unit per validator and immediately forwards
+it to the beacon deposit sink. Top-ups, if included in a later lane, are a
+separate gwei-aligned allocation theorem and are not instances of this 32 ETH
+exact-pull statement.
+
+\medskip
+\noindent\textbf{P3: module-balance conservation.}
+\[
+  \mathsf{acceptedReport}(M,\vec{b})
+  \Rightarrow
+  B_R' = \sum_{m \in M} \bal_m'
+  = \sum_{i=0}^{|M|-1} \vec{b}_i
+\]
+
+\noindent Plain reading: the router total must equal the sum of the module rows
+after an accepted report. The proof is over arbitrary finite module arrays, with module-ID
+uniqueness and report alignment named as assumptions rather than hidden bounds.
+
+\medskip
+\noindent\textbf{P4: report-before-reward consistency.}
+\[
+  \mathsf{rewardStep}(s,s')
+  \Rightarrow
+  \exists r.\,
+  \mathsf{acceptedAt}(r,s)
+  \land
+  \mathsf{rewardBase}(s)=\mathsf{balances}(r)
+\]
+
+\noindent Plain reading: accepted module balances determine the module
+fee-distribution weights used by the modeled reward step. Total reward magnitude
+and protocol fee inputs are treated as accepted report or vault-context inputs
+subject to the listed range and freshness assumptions. In simpler terms, rewards
+should be split using the report the system just accepted, not a previous
+snapshot and not a half-updated table.
+
+\medskip
+\noindent\textbf{P5: bounded rewards and fee alignment.}
+\[
+  0 \leq \mathsf{moduleFee}_m
+  \leq \mathsf{totalReward}\cdot \mathsf{moduleFeeBps}_m / 10{,}000
+\]
+\[
+  \mathsf{moduleRecipient}_m'=\mathsf{moduleRecipient}_m
+  \land
+  \mathsf{rewardRecipient}(\mathsf{moduleFee}_m)
+    = \mathsf{moduleRecipient}_m
+\]
+
+\noindent Plain reading: fee amounts cannot exceed the configured basis-point
+bound, and each amount remains paired with the recipient for the module that
+earned it.
+
+\medskip
+\noindent\textbf{P6: status gating.}
+\[
+  \modstatus_m \neq \stActive \lor \mathsf{depositsPaused}_m
+  \Rightarrow
+  \mathsf{allocatedDeposits}_m = 0
+\]
+\[
+  \modstatus_m = \stStopped
+  \Rightarrow
+  \mathsf{moduleReward}_m = 0
+\]
+
+\noindent Plain reading: a stopped or paused module is not just marked differently
+in storage; that status changes the allowed flow. Deposit-paused or non-active
+modules receive zero modeled deposit allocation. Stopped modules receive zero
+module-side fee or reward allocation. Any residual protocol-fee treatment is
+stated separately from module recipient payment.
+
+\subsection*{Specimen traceability register}
+
+\noindent The next table is for auditability. The theorem name is the
+handle a reviewer would search for in Lean. The expected artifact says where the
+proof should live. The assumption IDs say which facts the proof is allowed to
+borrow from outside the model. A final report should not ask the reader to trust
+prose alone; every claim should have this chain.
+
+\noindent
+\begin{xltabular}{\linewidth}{@{}p{0.12\linewidth}p{0.30\linewidth}p{0.20\linewidth}>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  \thead{ID} & \thead{Proof handle} & \thead{Assumptions} & \thead{Claim} \\
+  \midrule
+  \endhead
+  SRV3-P1 &
+  \proofhandle{Reserves.lean}{reserve}{separation} &
+  A-EXT-01;\newline A-ARITH-05 &
+  Deposit spend cannot consume withdrawal-reserved ETH. \\
+  \rowsep
+  SRV3-P2 &
+  \proofhandle{Deposits.lean}{deposit\_exact}{pull} &
+  A-DEP-02;\newline A-ID-04;\newline A-ARITH-05 &
+  Pulled wei equals 32 ETH times actual deposits over all allocated modules. \\
+  \rowsep
+  SRV3-P3 &
+  \proofhandle{Balances.lean}{module\_balance}{sum} &
+  A-ORC-03;\newline A-ID-04;\newline A-ARITH-05 &
+  Accepted report application preserves router balance as the module sum. \\
+  \rowsep
+  SRV3-P4 &
+  \proofhandle{Rewards.lean}{reward\_uses}{accepted\_report} &
+  A-ORC-03;\newline A-ID-04 &
+  Module fee-distribution weights read the latest accepted module-balance state. \\
+  \rowsep
+  SRV3-P5 &
+  \proofhandle{Rewards.lean}{reward\_fee}{bounded\_aligned} &
+  A-ORC-03;\newline A-ARITH-05 &
+  Fee amounts are bounded and recipient/module arrays stay aligned. \\
+  \rowsep
+  SRV3-P6 &
+  \proofhandle{Status.lean}{status\_gates}{economic\_flows} &
+  A-EXT-01;\newline A-ID-04 &
+  Non-active or deposit-paused modules receive no modeled deposit allocation;
+  stopped modules receive no module-side reward or fee allocation. \\
+  \bottomrule
+\end{xltabular}
+
 \subsection*{Evidence architecture}
 
 \noindent
-\begin{xltabular}{\linewidth}{@{}p{0.20\linewidth}p{0.20\linewidth}X@{}}
+\begin{xltabular}{\linewidth}{@{}p{0.21\linewidth}p{0.23\linewidth}X@{}}
   \toprule
-  \thead{Layer} & \thead{Artifact} & \thead{Role in the proof} \\
+  \thead{Layer} & \thead{Artifact} & \thead{Role} \\
   \midrule
   \endhead
-  Solidity-facing summaries & \path{verity/SRv3/*.vy} &
-  Preserves the relevant array, loop, and call structure while summarizing
-  external contracts through explicit interfaces. \\
+  Solidity-facing summaries & \texttt{verity/SRv3} &
+  Preserve the relevant array, loop, reserve, and call structure while
+  summarizing external contracts through explicit interfaces. \\
   \rowsep
-  Economic model & \path{lean/SRv3/State.lean} &
+  Economic model & \texttt{State.lean} &
   Defines modules, reserves, Wei/Gwei arithmetic, status flags, accepted reports,
-  rewards, and fee recipients. \\
+  rewards, and fee state. \\
   \rowsep
-  Proof obligations & \path{lean/SRv3/Properties/*.lean} &
-  States each P0 property as a theorem over arbitrary finite module and report
-  arrays, with alignment and uniqueness assumptions named in the theorem
-  signature. \\
+  Proof obligations & \texttt{Properties/*.lean} &
+  States each target over arbitrary finite module/report arrays, with
+  uniqueness, ordering, alignment, and freshness premises named in theorem
+  signatures. \\
   \rowsep
-  Trust report & \path{reports/trust-boundary.json} &
-  Machine-readable list of assumptions, boundaries, theorem IDs, axiom output,
-  and source-to-property links. \\
+  Trust-boundary report & \texttt{trust-boundary.json} &
+  Machine-readable list of assumptions, theorem IDs, axiom output, source links,
+  retained Certora assumptions, and out-of-model claims. \\
   \rowsep
-  Rebuild gate & \path{lake build SRv3Proofs} &
-  Re-checks all theorem files, regenerates the proof register, and fails on any
-  missing P0 theorem. \\
+  Rebuild gate & \texttt{lake build} &
+  Rechecks all selected theorem files and fails if any trusted declaration,
+  admitted theorem, or unmapped assumption appears outside the allowlist. \\
   \bottomrule
 \end{xltabular}
-
-\subsection*{Theorem register}
-
-\noindent
-\begin{xltabular}{\linewidth}{@{}p{0.17\linewidth}p{0.31\linewidth}p{0.14\linewidth}X@{}}
-  \toprule
-  \thead{ID} & \thead{Theorem} & \thead{Status} & \thead{Evidence note} \\
-  \midrule
-  \endhead
-  SRV3-P0-01 & \path{routerBalance_eq_sum_moduleBalances} &
-  \cellcolor{sevoktint}Proved &
-  Induction over accepted module report array; unique module IDs and aligned
-  report lengths are explicit premises. \\
-  \rowsep
-  SRV3-P0-02 & \path{deposit_spend_exact_32eth_multiple} &
-  \cellcolor{sevoktint}Proved &
-  Integer arithmetic proof over Wei, Gwei, and deposit-count conversions; rejects
-  over-allocation before value leaves the modeled router. \\
-  \rowsep
-  SRV3-P0-03 & \path{withdrawal_reserve_not_deposit_spendable} &
-  \cellcolor{sevoktint}Proved &
-  Separates available deposit reserve from withdrawal-reserved ETH in every
-  deposit and top-up transition. \\
-  \rowsep
-  SRV3-P0-04 & \path{rewards_bounded_and_aligned} &
-  \cellcolor{sevoktint}Proved &
-  Shows module, recipient, and amount arrays remain aligned and that computed
-  fee sums do not exceed the valid reward basis. \\
-  \rowsep
-  SRV3-P0-05 & \path{reward_report_freshness_required} &
-  \cellcolor{sevoktint}Proved &
-  Reward transition requires the most recent accepted report epoch and rejects
-  internally inconsistent balance state. \\
-  \rowsep
-  SRV3-P0-06 & \path{stopped_modules_excluded_from_value_flows} &
-  \cellcolor{sevoktint}Proved &
-  Covers active, stopped, and deposits-paused gates for deposits, top-ups, and
-  module-fee receipt. \\
-  \bottomrule
-\end{xltabular}
-
-\begin{notebox}
-\noteboxtitle{Counterexample register}
-Final count: \textbf{0 open counterexamples}. Two development counterexamples
-were retained as regression tests: one stale-report reward trace and one
-withdrawal-reserve consumption trace. Both are expected to fail against the final
-transition guards.
-\end{notebox}
