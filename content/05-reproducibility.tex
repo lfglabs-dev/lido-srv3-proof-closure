@@ -1,0 +1,56 @@
+\section{Reproducibility and handoff}
+\label{sec:reproducibility}
+
+\subsection*{Reviewer command}
+
+\begin{lstlisting}[language=shell]
+git clone git@github.com:lfglabs-dev/lido-srv3-formal-pilot.git
+cd lido-srv3-formal-pilot
+lake build SRv3Proofs
+python3 scripts/check_trust_report.py reports/trust-boundary.json
+\end{lstlisting}
+
+\noindent A successful rebuild checks all P0 theorem files, verifies that every
+property in the public table has a proof artifact, and rejects unstated trust
+assumptions in the machine-readable report.
+
+\subsection*{Week-four handoff contents}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}p{0.30\linewidth}X@{}}
+  \toprule
+  \thead{Artifact} & \thead{Purpose} \\
+  \midrule
+  \path{report/final.pdf} & Decision-ready report for Lido reviewers. \\
+  \rowsep
+  \path{certora-pr1811-map.md} & Mapping from Certora V2/V3 specs and assumptions to PR \#1811 proof targets. \\
+  \rowsep
+  \path{reports/trust-boundary.json} & Machine-readable theorem, assumption, and boundary register. \\
+  \rowsep
+  \path{lean/} and \path{verity/} & Source artifacts for proof review and future extension. \\
+  \rowsep
+  \path{counterexamples/} & Closed development counterexamples retained as regression traces. \\
+  \bottomrule
+\end{tabularx}
+
+\subsection*{Suggested delivery rhythm}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{}p{0.18\linewidth}p{0.28\linewidth}X@{}}
+  \toprule
+  \thead{Timing} & \thead{Message} & \thead{Reason} \\
+  \midrule
+  T-3 days & Private heads-up with one-page proof matrix &
+  Lets technical reviewers allocate attention before the repository arrives. \\
+  \rowsep
+  T day & Repository invite plus final PDF and rebuild command &
+  Makes the evidence inspectable before any meeting or narrative discussion. \\
+  \rowsep
+  T+2 days & Short async note: assumptions needing reviewer confirmation &
+  Moves the conversation from ``is this polished?'' to ``which premises do we
+  endorse?'' \\
+  \rowsep
+  T+5 days & Thirty-minute review call &
+  Reserved for property selection, public wording, and follow-on proof lanes. \\
+  \bottomrule
+\end{tabularx}

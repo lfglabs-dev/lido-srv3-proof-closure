@@ -1,0 +1,68 @@
+\section{Executive summary}
+\label{sec:executive-summary}
+
+\begin{notebox}
+\noteboxtitle{Formal verdict}
+For the modeled SRv3 economic state machine, all six selected P0 property groups
+close as \textbf{machine-checked proofs}. No executable counterexample is present
+in the final register. The result covers balance conservation, deposit
+conservation, reserve separation, reward and fee correctness, report freshness,
+and status gating under the named trust boundary in \cref{sec:trust-boundary}.
+\end{notebox}
+
+\subsection*{What Lido can rely on}
+
+The pilot verifies the accounting transition rules introduced by PR \#1811 at the
+level where fund-safety questions become crisp: ETH moves into the deposit path,
+module validator balances are accepted and aggregated, rewards and fees are
+computed from that accepted state, and inactive or stopped modules are excluded
+from flows that should no longer reach them.
+
+\smallskip
+\noindent The strongest result is compositional: the proofs do not merely show
+that individual helper functions preserve local facts. They show that the modeled
+pipeline preserves the same conservation story across deposit allocation,
+withdrawal-reserve exclusion, per-module balance updates, and reward distribution.
+
+\subsection*{Proof closure matrix}
+
+\noindent
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\linewidth}{@{}p{0.28\linewidth}p{0.16\linewidth}X@{}}
+  \toprule
+  \thead{P0 property group} & \thead{Final state} & \thead{Decision meaning} \\
+  \midrule
+  Module balance conservation & \cellcolor{sevoktint}\textbf{Proved} &
+  Router-wide validator balance equals the sum of per-module balances after
+  accepted reports and modeled transitions. \\
+  \rowsep
+  Deposit conservation & \cellcolor{sevoktint}\textbf{Proved} &
+  Deposits never spend more ETH than available, and actual deposit value is
+  exactly \(32\,ETH \times depositsCount\). \\
+  \rowsep
+  Reserve separation & \cellcolor{sevoktint}\textbf{Proved} &
+  CL deposits and top-ups cannot consume ETH reserved for withdrawals. \\
+  \rowsep
+  Reward correctness & \cellcolor{sevoktint}\textbf{Proved} &
+  Rewards and fees are computed from valid module balances, remain bounded, and
+  preserve recipient/module/amount alignment. \\
+  \rowsep
+  Report-before-reward consistency & \cellcolor{sevoktint}\textbf{Proved} &
+  Rewards cannot be derived from stale, missing, or internally inconsistent
+  module-balance reports in the modeled state machine. \\
+  \rowsep
+  Status gating & \cellcolor{sevoktint}\textbf{Proved} &
+  Stopped, inactive, and deposit-paused modules are excluded from deposits,
+  top-ups, and fee receipt according to modeled SRv3 rules. \\
+  \bottomrule
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+
+\subsection*{Reader guidance}
+
+Read the report in three passes. First, use the matrix above as the decision
+summary. Second, use \cref{sec:proof-closure} to see the evidence architecture and
+pipeline diagram. Third, use \cref{sec:trust-boundary} before quoting any result:
+the report deliberately separates SRv3 economic-state-machine proof from oracle
+truthfulness, cryptographic witnesses, governance configuration, exact storage
+packing, and full deployed-contract equivalence.

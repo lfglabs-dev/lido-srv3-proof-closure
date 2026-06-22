@@ -1,0 +1,50 @@
+\section{Appendix A: Certora and PR \#1811 map}
+\label{app:certora-map}
+
+\noindent
+\begin{xltabular}{\linewidth}{@{}p{0.24\linewidth}p{0.18\linewidth}X@{}}
+  \toprule
+  \thead{Legacy coverage class} & \thead{Disposition} & \thead{Pilot treatment} \\
+  \midrule
+  \endhead
+  Validator-count accounting & Replaced &
+  PR \#1811 moves the proof target to direct per-module balance accounting. \\
+  \rowsep
+  Deposit availability bounds & Strengthened &
+  Deposit spend is connected to reserve separation and exact \(32\,ETH\) multiples. \\
+  \rowsep
+  Reward distribution checks & Strengthened &
+  Rewards are tied to accepted module-balance reports and recipient alignment. \\
+  \rowsep
+  Status gating assertions & Reused and extended &
+  Active, stopped, and deposit-paused states gate deposits, top-ups, and fee receipt. \\
+  \rowsep
+  Bounded module-array specs & Replaced where feasible &
+  Loop invariants are stated over arbitrary finite arrays with named
+  well-formedness assumptions. \\
+  \bottomrule
+\end{xltabular}
+
+\section{Appendix B: Follow-on lanes}
+\label{app:follow-on}
+
+\noindent Recommended sequence after the P0 accounting pilot:
+
+\begin{enumerate}
+  \item ExitBus authorization, replay resistance, duplicate prevention, and
+  triggerable-exit fee/refund exactness.
+  \item Consolidation fee conservation, source/target binding, and
+  source-ownership caveats.
+  \item Top-up and consensus-layer proof binding.
+  \item Oracle sanity limits, drain guards, and second-opinion oracle composition.
+  \item Deployment governance, role graph, and exact migration refinement.
+  \item VaultHub F-01/F-02/F-03, if still relevant to the active review path.
+\end{enumerate}
+
+\section{Appendix C: Specimen integrity}
+\label{app:specimen-integrity}
+
+This PDF is intentionally styled as a final private report, but the theorem IDs,
+repository paths, commits, and proof outputs are illustrative. Before sending a
+real Lido deliverable, replace every mock identifier with the actual repository
+commit, Lean axiom output, reviewer transcript, and machine-readable trust report.

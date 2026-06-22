@@ -1,0 +1,72 @@
+\section{Trust boundary}
+\label{sec:trust-boundary}
+
+The report proves SRv3 accounting invariants over the focused economic state
+machine. It does not claim full deployed-system equivalence. This is intentional:
+the proof is valuable because the boundary is short, named, and reviewable.
+
+\subsection*{Named assumptions}
+
+\noindent
+\begin{xltabular}{\linewidth}{@{}p{0.16\linewidth}p{0.27\linewidth}X@{}}
+  \toprule
+  \thead{ID} & \thead{Assumption} & \thead{Meaning} \\
+  \midrule
+  \endhead
+  A-EXT-01 & External contract summaries &
+  Lido buffer withdrawals, staking module callbacks, and fee recipients conform
+  to the specified interfaces and mutate no unlisted SRv3 accounting state. \\
+  \rowsep
+  A-DEP-02 & Beacon deposit sink &
+  A modeled beacon deposit of \(n\) validators removes exactly
+  \(n \times 32\,ETH\) from the router-side deposit resource. \\
+  \rowsep
+  A-ORC-03 & Accepted oracle reports &
+  Once accepted by SRv3 validation, module-balance reports satisfy the listed
+  shape, alignment, freshness, and range assumptions. Consensus-layer truthfulness
+  is outside this pilot. \\
+  \rowsep
+  A-ID-04 & Module identity well-formedness &
+  Module IDs are unique in the modeled arrays, and report arrays align with those
+  IDs where the Solidity path requires alignment. \\
+  \rowsep
+  A-ARITH-05 & Unit conversion domain &
+  Wei/Gwei and basis-point arithmetic is interpreted over the bounded unsigned
+  integer domains used by the modeled transitions. \\
+  \bottomrule
+\end{xltabular}
+
+\subsection*{Explicit non-claims}
+
+\noindent
+\begin{xltabular}{\linewidth}{@{}p{0.34\linewidth}X@{}}
+  \toprule
+  \thead{Boundary} & \thead{Treatment} \\
+  \midrule
+  \endhead
+  BLS signatures, deposit roots, SSZ, Merkle proofs, EIP-4788 &
+  Named cryptographic and consensus-data boundaries, not part of the P0
+  accounting closure. \\
+  \rowsep
+  Exact packed-storage migration and proxy mechanics &
+  Deferred to a deployment and migration lane; not used as proof evidence here. \\
+  \rowsep
+  Full governance role graph and parameter admissibility &
+  Configuration is assumed to satisfy the stated range and role assumptions. \\
+  \rowsep
+  ExitBus, consolidation, top-up CL witness binding, VaultHub &
+  Recommended follow-on proof lanes, deliberately outside the fixed four-week
+  pilot. \\
+  \rowsep
+  Gas, events, revert strings, and exact call-stack shape &
+  Engineering and integration review surfaces, not conservation-law premises. \\
+  \bottomrule
+\end{xltabular}
+
+\begin{notebox}
+\noteboxtitle{Public wording}
+The safe external sentence is: ``The focused SRv3 economic-state-machine model
+proved the selected P0 accounting properties under named assumptions.'' Avoid
+phrases such as ``SRv3 is fully verified'' or ``oracle and deposit correctness are
+proved.''
+\end{notebox}

@@ -1,0 +1,121 @@
+\section{Proof closure}
+\label{sec:proof-closure}
+
+\subsection*{Modeled pipeline}
+
+\noindent The model follows the SRv3 accounting path that matters for the P0
+fund-safety questions.
+
+\begin{center}
+\begin{tikzpicture}[
+  node distance=8mm and 7mm,
+  box/.style={draw=vrule, fill=vsurface, line width=0.35pt, minimum height=11mm,
+    text width=28mm, align=center, font=\sffamily\footnotesize},
+  proof/.style={draw=sevok, fill=sevoktint, line width=0.35pt, minimum height=9mm,
+    text width=23mm, align=center, font=\sffamily\scriptsize},
+  arrow/.style={-{Latex[length=2.2mm]}, draw=vaccentdeep, line width=0.45pt}
+]
+  \node[box] (buffer) {Lido buffer\\available ETH};
+  \node[box, right=of buffer] (reserve) {Deposit reserve\\withdrawal exclusion};
+  \node[box, right=of reserve] (alloc) {Active module\\deposit allocation};
+  \node[box, below=of alloc] (balances) {Accepted module\\balance reports};
+  \node[box, left=of balances] (rewards) {Rewards, fees,\\recipient alignment};
+  \node[box, left=of rewards] (router) {Router-wide\\balance invariant};
+
+  \draw[arrow] (buffer) -- (reserve);
+  \draw[arrow] (reserve) -- (alloc);
+  \draw[arrow] (alloc) -- (balances);
+  \draw[arrow] (balances) -- (rewards);
+  \draw[arrow] (rewards) -- (router);
+  \draw[arrow] (router) -- (reserve);
+
+  \node[proof, above=7mm of reserve] (p1) {ETH conservation};
+  \node[proof, above=7mm of alloc] (p2) {Status gating};
+  \node[proof, below=7mm of balances] (p3) {Report freshness};
+  \node[proof, below=7mm of rewards] (p4) {Fee bounds};
+
+  \draw[arrow] (p1) -- (reserve);
+  \draw[arrow] (p2) -- (alloc);
+  \draw[arrow] (p3) -- (balances);
+  \draw[arrow] (p4) -- (rewards);
+\end{tikzpicture}
+\end{center}
+
+\subsection*{Evidence architecture}
+
+\noindent
+\begin{xltabular}{\linewidth}{@{}p{0.20\linewidth}p{0.20\linewidth}X@{}}
+  \toprule
+  \thead{Layer} & \thead{Artifact} & \thead{Role in the proof} \\
+  \midrule
+  \endhead
+  Solidity-facing summaries & \path{verity/SRv3/*.vy} &
+  Preserves the relevant array, loop, and call structure while summarizing
+  external contracts through explicit interfaces. \\
+  \rowsep
+  Economic model & \path{lean/SRv3/State.lean} &
+  Defines modules, reserves, Wei/Gwei arithmetic, status flags, accepted reports,
+  rewards, and fee recipients. \\
+  \rowsep
+  Proof obligations & \path{lean/SRv3/Properties/*.lean} &
+  States each P0 property as a theorem over arbitrary finite module and report
+  arrays, with alignment and uniqueness assumptions named in the theorem
+  signature. \\
+  \rowsep
+  Trust report & \path{reports/trust-boundary.json} &
+  Machine-readable list of assumptions, boundaries, theorem IDs, axiom output,
+  and source-to-property links. \\
+  \rowsep
+  Rebuild gate & \path{lake build SRv3Proofs} &
+  Re-checks all theorem files, regenerates the proof register, and fails on any
+  missing P0 theorem. \\
+  \bottomrule
+\end{xltabular}
+
+\subsection*{Theorem register}
+
+\noindent
+\begin{xltabular}{\linewidth}{@{}p{0.17\linewidth}p{0.31\linewidth}p{0.14\linewidth}X@{}}
+  \toprule
+  \thead{ID} & \thead{Theorem} & \thead{Status} & \thead{Evidence note} \\
+  \midrule
+  \endhead
+  SRV3-P0-01 & \path{routerBalance_eq_sum_moduleBalances} &
+  \cellcolor{sevoktint}Proved &
+  Induction over accepted module report array; unique module IDs and aligned
+  report lengths are explicit premises. \\
+  \rowsep
+  SRV3-P0-02 & \path{deposit_spend_exact_32eth_multiple} &
+  \cellcolor{sevoktint}Proved &
+  Integer arithmetic proof over Wei, Gwei, and deposit-count conversions; rejects
+  over-allocation before value leaves the modeled router. \\
+  \rowsep
+  SRV3-P0-03 & \path{withdrawal_reserve_not_deposit_spendable} &
+  \cellcolor{sevoktint}Proved &
+  Separates available deposit reserve from withdrawal-reserved ETH in every
+  deposit and top-up transition. \\
+  \rowsep
+  SRV3-P0-04 & \path{rewards_bounded_and_aligned} &
+  \cellcolor{sevoktint}Proved &
+  Shows module, recipient, and amount arrays remain aligned and that computed
+  fee sums do not exceed the valid reward basis. \\
+  \rowsep
+  SRV3-P0-05 & \path{reward_report_freshness_required} &
+  \cellcolor{sevoktint}Proved &
+  Reward transition requires the most recent accepted report epoch and rejects
+  internally inconsistent balance state. \\
+  \rowsep
+  SRV3-P0-06 & \path{stopped_modules_excluded_from_value_flows} &
+  \cellcolor{sevoktint}Proved &
+  Covers active, stopped, and deposits-paused gates for deposits, top-ups, and
+  module-fee receipt. \\
+  \bottomrule
+\end{xltabular}
+
+\begin{notebox}
+\noteboxtitle{Counterexample register}
+Final count: \textbf{0 open counterexamples}. Two development counterexamples
+were retained as regression tests: one stale-report reward trace and one
+withdrawal-reserve consumption trace. Both are expected to fail against the final
+transition guards.
+\end{notebox}

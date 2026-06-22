@@ -1,0 +1,93 @@
+% findings.sty - Custom finding environment for Verity reports.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{style/findings}[2026/04/23 Verity finding environment]
+
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\RequirePackage{etoolbox}
+\RequirePackage{xparse}
+
+% A finding is a self-contained, citable block.
+%
+% Usage:
+%   \begin{finding}{F-01}{\sevHigh}{\stsResolved}{Reentrancy in withdraw()}
+%     \fdesc{...}
+%     \fimpact{...}
+%     \fpoc{...}
+%     \frec{...}
+%     \fresp{...}
+%   \end{finding}
+
+\newcounter{findingnum}
+
+% Map a severity macro name to its ink colour. Keep in sync with verity.sty.
+% Uses \colorlet to alias `fseveritycolour` to the matching palette ink so
+% the tcolorbox `borderline west` option can resolve a stable colour name
+% without re-expanding a macro at break time.
+\newcommand{\fseverityrule}[1]{%
+  \colorlet{fseveritycolour}{vrule}%
+  \ifx#1\sevCritical\colorlet{fseveritycolour}{sevcrit}\fi%
+  \ifx#1\sevHigh    \colorlet{fseveritycolour}{sevhigh}\fi%
+  \ifx#1\sevMedium  \colorlet{fseveritycolour}{sevmed}\fi%
+  \ifx#1\sevLow     \colorlet{fseveritycolour}{sevlow}\fi%
+  \ifx#1\sevInfo    \colorlet{fseveritycolour}{sevinfo}\fi%
+}
+
+\NewDocumentEnvironment{finding}{m m m m}
+{%
+  \refstepcounter{findingnum}%
+  \fseverityrule{#2}%
+  % Thin centred separator between consecutive findings. Skipped before the
+  % first finding because there is no preceding box to separate from; the
+  % section heading already provides the visual ceiling.
+  \ifnum\value{findingnum}>1
+    \par\addvspace{10pt}%
+    {\centering\textcolor{vrule}{\rule{0.35\linewidth}{0.3pt}}\par}%
+    \addvspace{10pt}%
+  \else
+    \par\addvspace{6pt}%
+  \fi
+  % Heading block: ID  ·  severity  ·  status, then the title on its own line.
+  \noindent
+  \begin{tcolorbox}[
+    enhanced, breakable,
+    colback=vsurface, colframe=vrule,
+    boxrule=0.35pt, arc=0pt,
+    borderline west={3pt}{0pt}{fseveritycolour,line cap=butt},
+    left=16pt, right=12pt, top=10pt, bottom=10pt,
+    before skip=4pt, after skip=10pt,
+    title={%
+      \sffamily\small
+      \textbf{\color{vink}#1}\ \ \color{vmuted}\textbf{·}\ \ #2\ \ \color{vmuted}\textbf{·}\ \ #3%
+      \par\vspace{3pt}%
+      \color{vink}\normalsize\textbf{#4}%
+    },
+    coltitle=vink,
+    colbacktitle=vsurface,
+    fonttitle=\sffamily\small,
+    attach title to upper,
+    after title={\par\vspace{6pt}\hrule height 0.4pt depth 0pt\vspace{8pt}},
+  ]
+  \phantomsection
+  \addcontentsline{toc}{subsection}{\protect\numberline{}#1\ #4}%
+}{%
+  \end{tcolorbox}
+}
+
+% Sub-section headers inside a finding. These are headers only - write the
+% body as ordinary paragraphs (or lstlistings) immediately after.
+\newcommand{\fsection}[1]{%
+  \par\addvspace{6pt}%
+  \noindent{\sffamily\small\bfseries\color{vink}#1}\par\nobreak\smallskip%
+}
+\newcommand{\fdesc}  {\fsection{What breaks}}
+\newcommand{\fimpact}{\fsection{Impact}}
+\newcommand{\fpoc}   {\fsection{Reproduce}}
+\newcommand{\frec}   {\fsection{Fix and verification}}
+\newcommand{\fresp}  {\fsection{Client response}}
+\newcommand{\finvariant}{\fsection{Invariant}}
+\newcommand{\fevidence}{\fsection{Evidence}}
+\newcommand{\ffix}{\fsection{Fix}}
+\newcommand{\fverify}{\fsection{Verification}}
+
+\endinput

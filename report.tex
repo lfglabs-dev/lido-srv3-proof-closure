@@ -1,0 +1,43 @@
+% =============================================================================
+%  Lido SRv3 Formal Methods Pilot, LFG Labs report using Verity
+% =============================================================================
+\documentclass[11pt,a4paper]{article}
+
+\newcommand{\reportclient}    {Lido}
+\newcommand{\reporttitle}     {SRv3 Formal Methods Pilot}
+\newcommand{\reportshortname} {SRv3 Proof Closure}
+\newcommand{\reportversion}   {Specimen v1.0}
+\newcommand{\reportcommit}    {PR-1811 / mock-final-artifacts}
+\newcommand{\reportdate}      {June 2026}
+\newcommand{\reportauthors}   {LFG Labs}
+
+\usepackage{style/verity}
+\usepackage{style/findings}
+\usepackage{longtable}
+
+\hypersetup{
+  pdftitle={\reportclient: \reporttitle\ (\reportversion)},
+  pdfauthor={LFG Labs},
+  pdfsubject={Formal methods report specimen},
+  pdfkeywords={Lido, Staking Router V3, Lean, Verity, formal methods, proof closure}
+}
+
+\begin{document}
+\verityCover
+\pagenumbering{roman}
+\input{content/01-disclaimer}
+\clearpage
+{\hypersetup{linkcolor=vink}\tableofcontents}
+\clearpage
+\pagenumbering{arabic}
+\tocgroup{Decision summary}
+\input{content/02-executive-summary}
+\tocgroup{Proof result}
+\input{content/03-proof-closure}
+\input{content/04-trust-boundary}
+\tocgroup{Delivery record}
+\input{content/05-reproducibility}
+\appendix
+\tocgroup{Appendices}
+\input{content/appendices}
+\end{document}

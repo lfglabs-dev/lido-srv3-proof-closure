@@ -1,0 +1,566 @@
+% verity.sty - LFG Labs report style using Verity formal artifacts
+% Minimalist, research-paper aesthetic. pdflatex-friendly.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{style/verity}[2026/04/23 Verity report style]
+
+% --- Encoding & fonts ---------------------------------------------------------
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+% Body face: XCharter (modern serif, high x-height, audit-firm register).
+% Sans face: Latin Modern Sans (kept for headings / labels - pairs cleanly).
+% Mono face: Inconsolata (legible monospace for code listings).
+\RequirePackage{lmodern}        % provides matching \sffamily / fallback metrics
+\RequirePackage[scaled=1.04]{XCharter}
+\renewcommand{\sfdefault}{lmss}
+\RequirePackage[varqu,varl,scaled=0.97]{inconsolata}
+\RequirePackage[charter]{mathdesign}
+\RequirePackage{microtype}      % crisp typography
+\RequirePackage{textcomp}
+
+% --- Page geometry ------------------------------------------------------------
+\RequirePackage[a4paper,
+                top=1in, bottom=1.1in,
+                left=1.15in, right=1.15in,
+                headheight=22pt, headsep=18pt,
+                footskip=28pt]{geometry}
+
+% --- Color palette ------------------------------------------------------------
+\RequirePackage[dvipsnames,table]{xcolor}
+% Mirrors the public Verity documentation tokens: cool paper, dark green ink,
+% muted rules, and sarcelle accents.
+\definecolor{vpaper}   {HTML}{F7F8F6}
+\definecolor{vside}    {HTML}{ECEEEC}
+\definecolor{vsurface} {HTML}{FFFFFF}
+\definecolor{vink}     {HTML}{1A2422}
+\definecolor{vheading} {HTML}{0B1614}
+\definecolor{vmuted}   {HTML}{5E6E6A}
+\definecolor{vrule}    {HTML}{D3D8D5}
+\definecolor{vrulesoft}{HTML}{DADEDB}
+\definecolor{vaccent}  {HTML}{0F8E7E}
+\definecolor{vaccentdeep}{HTML}{0B6E62}
+\definecolor{vaccentbright}{HTML}{2DD4BF}
+\definecolor{vsoft}    {HTML}{EEF1EE}
+\definecolor{vcodebg}  {HTML}{EEF1EE}
+\definecolor{vcodebd}  {HTML}{D3D8D5}
+
+% Code listing palette, matched to the public Verity documentation's Shiki
+% "Paper Light" theme. Keep the palette restrained: dark green ink, deep teal
+% keywords, muted operators/comments, and rust only for guard/error paths.
+\definecolor{vsyntaxbg}      {HTML}{FBFCFB}
+\definecolor{vsyntaxink}     {HTML}{1A2422}
+\definecolor{vsyntaxmuted}   {HTML}{6F807C}
+\definecolor{vsyntaxkeyword} {HTML}{0B6E62}
+\definecolor{vsyntxtype}     {HTML}{1F5F58}
+\definecolor{vsyntaxident}   {HTML}{3D8579}
+\definecolor{vsyntaxstring}  {HTML}{2A6B61}
+\definecolor{vsyntaxguard}   {HTML}{B14A3A}
+\definecolor{vsyntaxline}    {HTML}{D3D8D5}
+
+% Severity palette - muted editorial tones that sit inside the Verity paper
+% palette. Severity is still legible, but status tables no longer rely on
+% saturated warning fills.
+\definecolor{sevcrit}  {HTML}{8E3430}
+\definecolor{sevhigh}  {HTML}{9A5B2D}
+\definecolor{sevmed}   {HTML}{7E6424}
+\definecolor{sevlow}   {HTML}{2E5E72}
+\definecolor{sevinfo}  {HTML}{66736F}
+\definecolor{sevok}    {HTML}{2F7357}
+
+% Severity fills - retained for diagrams and legacy macros. The main table
+% severity cell uses the softer tint treatment below.
+\definecolor{sevcritfill}{HTML}{B95650}
+\definecolor{sevhighfill}{HTML}{BD7A47}
+\definecolor{sevmedfill} {HTML}{A9893A}
+\definecolor{sevlowfill} {HTML}{557F92}
+\definecolor{sevinfofill}{HTML}{87918D}
+\definecolor{sevokfill}  {HTML}{5D9679}
+
+% Severity row tints - warm, low-chroma surfaces for PDF tables.
+\definecolor{sevcrittint}{HTML}{F3E7E4}
+\definecolor{sevhightint}{HTML}{F3E9DE}
+\definecolor{sevmedtint} {HTML}{F2EEDB}
+\definecolor{sevlowtint} {HTML}{E6ECEF}
+\definecolor{sevinfotint}{HTML}{ECEEEC}
+\definecolor{sevoktint}  {HTML}{E4EEE9}
+
+\AtBeginDocument{\pagecolor{vpaper}\color{vink}\arrayrulecolor{vrule}}
+
+% --- Hyperlinks ---------------------------------------------------------------
+\RequirePackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=vink,
+  citecolor=vaccent,
+  urlcolor=vaccent,
+  pdfborder={0 0 0},
+  bookmarksnumbered=true,
+  bookmarksopen=true
+}
+\RequirePackage[capitalise,noabbrev]{cleveref}
+
+% --- Headings ----------------------------------------------------------------
+\RequirePackage{titlesec}
+\RequirePackage{titletoc}
+% --- TOC styling: airier leaders ----------------------------------------------
+% Replace LaTeX's dense default dotted leaders with sparse muted dots, and
+% give section / subsection entries a bit more vertical breathing room. The
+% pageref colour matches the body ink so the right-aligned numbers feel like
+% a single typographic column.
+\titlecontents{section}[0pt]
+  {\addvspace{4pt}\bfseries\color{vheading}}
+  {\contentslabel{1.6em}}{\hspace*{-1.6em}}
+  {\titlerule*[8pt]{\textcolor{vrule}{.}}\contentspage}
+\titlecontents{subsection}[2.4em]
+  {\addvspace{1pt}\sffamily\color{vmuted}}
+  {\contentslabel{2.4em}}{\hspace*{-2.4em}}
+  {\titlerule*[8pt]{\textcolor{vrule}{.}}\contentspage}
+% --- TOC group dividers -------------------------------------------------------
+% Category separators inside the table of contents so a reader can take in the
+% report's structure at a glance. \tocgroup writes a styled label and hairline
+% at the current body position; place a call before each group's first \input.
+\newcommand{\tocdivider}[1]{%
+  \addvspace{11pt}%
+  {\noindent\sffamily\bfseries\footnotesize\color{vaccent}\MakeUppercase{#1}}\par
+  \vskip 2.5pt%
+  {\noindent\color{vrule}\rule{\linewidth}{0.4pt}}\par
+  \vskip 4pt%
+}
+\newcommand{\tocgroup}[1]{\addtocontents{toc}{\protect\tocdivider{#1}}}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{vheading}}
+  {\sffamily\bfseries\color{vaccent}\thesection}{1em}{}
+  [\vspace{0.25ex}{\color{vrule}\titlerule[0.35pt]}]
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{vheading}}
+  {\thesubsection}{0.8em}{}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{vheading}}
+  {\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{3.2ex plus 1ex minus .2ex}{1.6ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{3.6ex plus 1ex minus .2ex}{0.9ex plus .2ex}
+
+% titlesec hook: start every \section on a fresh page (also covers starred sections).
+\newcommand{\sectionbreak}{\clearpage}
+
+% --- Headers / footers --------------------------------------------------------
+% A faint hairline under the header sets a clear ceiling for the running
+% content. The footer stays ruleless so it doesn't compete with the
+% header rule visually.
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{vrule}\leaders\hrule height 0.3pt\hfill}}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhead[L]{\footnotesize\sffamily\color{vmuted}\reportclient\,\textbf{·}\,\reportshortname}
+\fancyhead[R]{\footnotesize\sffamily\color{vmuted}\reportversion}
+\fancyfoot[L]{\footnotesize\sffamily\color{vmuted}LFG Labs formal methods \textbf{·} Verity model}
+\fancyfoot[R]{\footnotesize\sffamily\color{vmuted}\thepage}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[L]{\footnotesize\sffamily\color{vmuted}LFG Labs formal methods \textbf{·} Verity model}%
+  \fancyfoot[R]{\footnotesize\sffamily\color{vmuted}\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+
+% --- Misc packages ------------------------------------------------------------
+\RequirePackage{enumitem}
+\setlist{itemsep=2pt, topsep=4pt, parsep=0pt}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{array}
+% Page-breakable variant of tabularx. xltabular provides a separate environment
+% and restores the original tabularx, so existing single-page tables are
+% unaffected; only the tall assumption/out-of-model tables opt in.
+\RequirePackage{xltabular}
+% Make X columns vertically centered so short single-line headers (e.g. \thead)
+% align with the baseline of neighboring l/c/r columns. The default p{...}
+% behavior anchors first-line top to the row top, which sinks footnotesize text.
+\renewcommand\tabularxcolumn[1]{>{\arraybackslash}m{#1}}
+% Roomier rows everywhere - keep tables airy and easy to scan.
+\renewcommand{\arraystretch}{1.32}
+% Slightly tighter rule spacing on booktabs so the extra row stretch doesn't
+% leave a floating gap above \midrule.
+\setlength{\aboverulesep}{0.4pt}
+\setlength{\belowrulesep}{1.2pt}
+\setlength{\heavyrulewidth}{0.45pt}
+\setlength{\lightrulewidth}{0.30pt}
+\setlength{\cmidrulewidth}{0.30pt}
+% Soft separator between data rows in multi-row tables. It reads as lighter than the
+% structural top/mid/bottom rules through COLOR (vrulesoft vs vrule), not width: the
+% 0.5pt width is deliberately wider than \lightrulewidth so the line clears one full
+% device pixel and stays visible in tall multi-line rows (a 0.3pt rule is sub-pixel at
+% on-screen DPI and anti-aliases to near-nothing in a lone gap between tall cells).
+\newcommand{\rowsep}{\arrayrulecolor{vrulesoft}\specialrule{0.5pt}{1.5pt}{1.5pt}\arrayrulecolor{vrule}}
+\RequirePackage{graphicx}
+\RequirePackage{caption}
+\captionsetup{font=small, labelfont={sf,bf,color=vink}, textfont=sf}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,calc,fit,positioning}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\RequirePackage{listings}
+\RequirePackage{etoolbox}
+% --- shell / bash listing language --------------------------------------------
+\lstdefinelanguage{shell}{
+  morekeywords={if,then,else,elif,fi,for,while,do,done,case,esac,in,
+                function,return,exit,set,export,local,eval,exec,
+                cat,echo,find,sed,awk,grep,jq,sha256sum,shasum,stat,curl,
+                mkdir,ln,rm,mv,cp,sort,head,tail,touch,read,bash,wc,printf,
+                source,test,trap,xargs,kill,sleep,which,command},
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]",
+  morestring=[b]',
+  alsoletter={-},
+  emph={[2]--version,--output-dir,--artifacts-url,--parallel,--skip-if-complete,
+        --force,--skip-latest,-c,-L,-f,-p,-rf,-fsSL,-e,-r,-Rf},
+  emphstyle={[2]\color{vmuted}\itshape},
+}
+\lstdefinelanguage{auditjson}{
+  morestring=[s]{"}{"},
+  morestring=[s]{'}{'},
+  morecomment=[l]{//},
+}
+\RequirePackage{ifthen}
+
+% --- Inline code --------------------------------------------------------------
+% Source references and identifiers appear frequently in audit findings. Render
+% inline monospace as a quiet pill so anchors like file.sql:11-24 remain visibly
+% distinct from the prose without adding heavy visual noise.
+\let\verityorigtexttt\texttt
+\newtcbox{\veritycodepill}{%
+  enhanced,
+  on line,
+  nobeforeafter,
+  tcbox raise base,
+  colback=vcodebg,
+  colframe=vcodebd,
+  boxrule=0.30pt,
+  arc=0pt,
+  left=2.2pt,
+  right=2.2pt,
+  top=1.1pt,
+  bottom=0.7pt,
+  boxsep=0pt,
+}
+\renewcommand{\texttt}[1]{\veritycodepill{\verityorigtexttt{\footnotesize #1}}}
+
+% \texttts -- "simple texttt", no pill background. Use inside dense
+% tables (issue index, findings overview) where the pill multiplies and
+% adds visual noise, or inside lstlistings where the pill would conflict
+% with the code background.
+\newcommand{\texttts}[1]{{\verityorigtexttt{\footnotesize #1}}}
+
+% NOTE: We considered redirecting \path through the chip macro for visual
+% uniformity, but \path uses verbatim-mode tokenisation so wrapping it in
+% a tcolorbox breaks on file names containing _, %, etc. \path stays as
+% plain \ttfamily; the subtle distinction between chip (\texttt) and bare
+% mono (\path) is acceptable.
+%
+% Let \path{}/\url{} break long camelCase, ALLCAPS, and hex identifiers. url's
+% default \UrlBreaks already covers snake_case (it lists \_); we add both letter
+% cases, digits, and hyphen so names like transferAndWithdrawalVerifyBeforeSpendConcrete,
+% AG-WITHDRAW-SLOT, and lowercase commit hashes like ba2cbbf09d49...c4138c05 wrap
+% inside their column or line instead of bleeding into the right margin. url only
+% takes a break point when a token would otherwise overflow, so adding these can
+% only reduce overflow, never reflow lines that already fit.
+\def\UrlBreaks{\do\.\do\@\do\\\do\/\do\!\do\_\do\|\do\;\do\>\do\]\do\)\do\,\do\?\do\&\do\'\do+\do\=\do\#\do\-%
+  \do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M%
+  \do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z%
+  \do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m%
+  \do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z%
+  \do\0\do\1\do\2\do\3\do\4\do\5\do\6\do\7\do\8\do\9}%
+
+% --- Code listings ------------------------------------------------------------
+\lstdefinelanguage{Cairo}{
+  morekeywords={fn,let,mut,if,else,return,struct,enum,impl,trait,use,mod,
+                pub,const,assert,loop,while,for,match,as,ref,Self,self,
+                felt252,u256,u128,u64,u32,Array,Span,Option,Result,
+                Some,None,Ok,Err,true,false,external,view,storage,event},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+\lstdefinelanguage{Lean}{
+  morekeywords={theorem,lemma,def,structure,inductive,class,instance,
+                example,by,intro,intros,apply,exact,rfl,simp,have,show,
+                fun,let,if,then,else,match,with,end,namespace,open,
+                section,variable,variables,Type,Prop,Sort,True,False},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+}
+\lstdefinelanguage{Verity}{
+  morekeywords={theorem,lemma,def,structure,inductive,class,instance,
+                example,by,intro,intros,apply,exact,rfl,simp,have,show,
+                fun,let,if,then,else,match,with,end,namespace,open,
+                section,variable,variables,Type,Prop,Sort,True,False,
+                do,return},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]",
+  alsoletter={_},
+  emph={[1]Contract,State,Prop,Uint256,Address,Bool,Nat,Unit},
+  emphstyle={[1]\bfseries\color{vsyntxtype}},
+  emph={[2]verifyProof,spendNullifiers,realCommitments,insertLeaves,
+            requireError,requireSomeUint,getMapping,setMapping,getStorage,
+            setStorage,externalCall,emit,onlyOwner,transfer,withdraw,
+            deposit,emergencyWithdraw},
+  emphstyle={[2]\bfseries\color{vsyntaxident}},
+  emph={[3]require,assert,revert,requireSome,throwError},
+  emphstyle={[3]\bfseries\color{vsyntaxguard}},
+}
+\lstdefinelanguage{Solidity}{
+  morekeywords={pragma,solidity,contract,interface,library,function,
+                modifier,event,struct,enum,mapping,public,private,
+                internal,external,view,pure,payable,returns,return,
+                if,else,for,while,do,break,continue,require,assert,
+                revert,emit,memory,storage,calldata,address,uint256,
+                uint,int,bool,bytes,bytes32,string,true,false,this,
+                msg,block,tx,new,delete,using,is,as,immutable,constant},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  alsoletter={_},
+  emph={[1]address,uint256,uint,bool,bytes,bytes32,string},
+  emphstyle={[1]\bfseries\color{vsyntxtype}},
+  emph={[2]_verifyProof,_spendNullifiers,_realCommitments,_insertLeaves,
+            verifyProof,spendNullifiers,realCommitments,insertLeaves,
+            transfer,withdraw,deposit,emergencyWithdraw},
+  emphstyle={[2]\bfseries\color{vsyntaxident}},
+  emph={[3]require,assert,revert},
+  emphstyle={[3]\bfseries\color{vsyntaxguard}},
+}
+\lstset{
+  basicstyle=\footnotesize\ttfamily\color{vsyntaxink},
+  keywordstyle=\bfseries\color{vsyntaxkeyword},
+  commentstyle=\itshape\color{vsyntaxmuted},
+  stringstyle=\color{vsyntaxstring},
+  numbers=none,
+  numberstyle=\tiny\color{vsyntaxmuted},
+  numbersep=8pt,
+  xleftmargin=0pt,
+  framexleftmargin=10pt,
+  framexrightmargin=8pt,
+  framesep=6pt,
+  frame=single,
+  rulecolor=\color{vsyntaxline},
+  framerule=0.30pt,
+  backgroundcolor=\color{vsyntaxbg},
+  breaklines=true,
+  breakatwhitespace=true,
+  breakindent=0pt,
+  postbreak=\mbox{\textcolor{vsyntaxmuted}{\tiny$\hookrightarrow$}\space},
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=b,
+  belowskip=7pt,
+  aboveskip=9pt,
+  literate={©}{{\textcopyright}}1
+           {→}{{$\rightarrow$}}1
+           {⇒}{{$\Rightarrow$}}1
+           {↪}{{\textcolor{vmuted}{$\hookrightarrow$}}}1
+           {–}{{--}}1
+           {…}{{\ldots}}1
+           {≠}{{$\neq$}}1
+           {≤}{{$\leq$}}1
+           {≥}{{$\geq$}}1
+           {×}{{$\times$}}1
+           {✓}{{$\checkmark$}}1
+           {↑}{{$\uparrow$}}1
+           {✗}{{$\times$}}1
+           {∃}{{$\exists$}}1
+           {∀}{{$\forall$}}1
+           {⟨}{{$\langle$}}1
+           {⟩}{{$\rangle$}}1,
+}
+
+% indexField macro: highlights struct field names in Verity reports
+\providecommand{\indexField}[1]{{\ttfamily\scriptsize\color{sevmed}\textbf{#1}}}
+
+% --- Report metadata commands -------------------------------------------------
+% Default - overridden in main file
+\providecommand{\reportclient}{Client}
+\providecommand{\reporttitle}{Security Audit}
+\providecommand{\reportshortname}{Security Audit}
+\providecommand{\reportversion}{v1.0}
+\providecommand{\reportcommit}{0000000}
+\providecommand{\reportdate}{\today}
+\providecommand{\reportauthors}{LFG Labs}
+
+% --- Cover page ---------------------------------------------------------------
+\newcommand{\verityCover}{%
+  \begin{titlepage}
+    \pagestyle{empty}
+    \noindent
+    \begin{minipage}[c]{0.55\linewidth}
+      \raisebox{-0.35\height}{\includegraphics[height=22pt]{assets/lfg-logo.pdf}}%
+      \hspace{10pt}%
+      \raisebox{-0.30\height}{\includegraphics[height=18pt]{assets/verity.pdf}}\par
+    \end{minipage}\hfill
+    \begin{minipage}[c]{0.40\linewidth}\raggedleft
+      {\sffamily\color{vmuted}\footnotesize LFG\,LABS FORMAL METHODS\quad\textbf{·}\quad VERITY MODEL}\par
+    \end{minipage}
+    \vspace{0.8em}
+    {\color{vrule}\rule{\linewidth}{0.4pt}}
+    \vspace{8em}
+
+    \noindent{\sffamily\color{vaccent}\footnotesize\bfseries
+      \MakeUppercase{Formal Methods Report}}\par
+    \vspace{0.8em}
+    \noindent{\color{vheading}\Huge\bfseries \reportclient}\par
+    \vspace{0.5em}
+    \noindent{\color{vheading}\LARGE \reporttitle}\par
+
+    \vspace{3em}
+    \noindent
+    \begin{minipage}{0.9\linewidth}
+      \itshape\color{vmuted}\large
+      Proof-closure report for \reportclient's SRv3 economic accounting state
+      machine. The selected P0 properties are presented as machine-checked Lean
+      proofs over a focused Verity model, under named trust assumptions.
+    \end{minipage}
+
+    \vfill
+
+    {\color{vrule}\rule{\linewidth}{0.4pt}}
+    \vspace{1.0em}
+    \noindent
+    \begin{tabularx}{\linewidth}{@{}l X@{}}
+      \tkey{Version}   & {\sffamily\reportversion} \\[5pt]
+      \tkey{Date}      & {\sffamily\reportdate} \\[5pt]
+      \tkey{Commit}    & {\sffamily\texttts{\reportcommit}} \\[5pt]
+      \tkey{Reviewers} & {\sffamily\reportauthors} \\
+    \end{tabularx}
+
+    \vspace{1.2em}
+    {\color{vrule}\rule{\linewidth}{0.4pt}}
+    \vspace{0.6em}
+    \noindent{\sffamily\color{vmuted}\footnotesize
+      Mathematical proofs of correctness for smart-contract state machines.\\
+      lfglabs.dev}\par
+  \end{titlepage}
+}
+
+% --- Severity swatch ----------------------------------------------------------
+% A small filled square keyed by palette colour. Used in the findings-overview
+% table to give the eye a colour anchor before reading the severity label, and
+% to match the left-rule colour on the finding boxes themselves.
+\newcommand{\sevswatch}[1]{%
+  \tikz[baseline=-0.6ex]\fill[#1] (0,0) rectangle (1.4ex,1.4ex);%
+}
+
+% --- Severity bar -------------------------------------------------------------
+% A short horizontal bar that visualises the count of findings at a severity
+% level. Arg 1 = palette colour, arg 2 = count, arg 3 = the maximum count
+% any row in the same table reaches (the bars share a scale so widths are
+% comparable). When count == 0 we still draw the underline rail so the
+% baseline is visible.
+\newcommand{\sevbar}[3]{%
+  \begin{tikzpicture}[baseline=-0.6ex]
+    \fill[vrule] (0,0) rectangle (1.8cm,0.18cm);%
+    \ifnum#2>0
+      \fill[#1] (0,0) rectangle (\fpeval{1.8*#2/#3}cm,0.18cm);%
+    \fi
+  \end{tikzpicture}%
+}
+
+% --- Severity marks (typographic, no box) -------------------------------------
+% Severity is rendered as small-caps in a muted severity ink - no box, no
+% fill. Critical and High carry bold weight; Medium and Low regular weight;
+% Informational is italic. Signal is carried by color + weight alone, so the
+% marks remain legible in monochrome print (weight/style survive; color
+% washes out harmlessly).
+\newcommand{\sevmark}[2]   {{\color{#1}\scshape #2}}
+\newcommand{\sevmarkbf}[2] {{\color{#1}\bfseries\scshape #2}}
+\newcommand{\sevmarkit}[2] {{\color{#1}\itshape\scshape #2}}
+
+\newcommand{\sevCritical}{\sevmarkbf{sevcrit}{Critical}}
+\newcommand{\sevHigh}    {\sevmarkbf{sevhigh}{High}}
+\newcommand{\sevMedium}  {\sevmark  {sevmed}{Medium}}
+\newcommand{\sevLow}     {\sevmark  {sevlow}{Low}}
+\newcommand{\sevInfo}    {\sevmarkit{sevinfo}{Informational}}
+
+% --- Severity cells -----------------------------------------------------------
+% \sevcell{key} renders a soft table cell: tinted background, compact square
+% colour anchor, and severity-coloured text. This keeps release/blocker tables
+% scannable without introducing aggressive red/orange bands.
+%
+% Usage: place inside a tabular cell:
+%   \sevcell{crit} & MED-01 & ... \\
+%
+% Implementation note: \cellcolor is invoked inside the macro so callers
+% don't have to know about colortbl. Pair with a column spec that supplies
+% the leading/trailing pad you want around the band.
+\newcommand{\sevcell}[1]{%
+  \def\sev@@key{#1}%
+  \ifx\sev@@key\sev@@kCritical
+    \cellcolor{sevcrittint}{\textcolor{sevcrit}{\rule{0.42em}{0.42em}}\hspace{0.25em}{\sffamily\bfseries\scriptsize\color{sevcrit}Critical}}\else
+  \ifx\sev@@key\sev@@kHigh
+    \cellcolor{sevhightint}{\textcolor{sevhigh}{\rule{0.42em}{0.42em}}\hspace{0.25em}{\sffamily\bfseries\scriptsize\color{sevhigh}High}}\else
+  \ifx\sev@@key\sev@@kMedium
+    \cellcolor{sevmedtint}{\textcolor{sevmed}{\rule{0.42em}{0.42em}}\hspace{0.25em}{\sffamily\bfseries\scriptsize\color{sevmed}Medium}}\else
+  \ifx\sev@@key\sev@@kLow
+    \cellcolor{sevlowtint}{\textcolor{sevlow}{\rule{0.42em}{0.42em}}\hspace{0.25em}{\sffamily\bfseries\scriptsize\color{sevlow}Low}}\else
+  \ifx\sev@@key\sev@@kInfo
+    \cellcolor{sevinfotint}{\textcolor{sevinfo}{\rule{0.42em}{0.42em}}\hspace{0.25em}{\sffamily\bfseries\scriptsize\color{sevinfo}Info}}\else
+    \cellcolor{sevinfotint}{\textcolor{sevinfo}{\rule{0.42em}{0.42em}}\hspace{0.25em}{\sffamily\bfseries\scriptsize\color{sevinfo}#1}}%
+  \fi\fi\fi\fi\fi
+}
+\def\sev@@kCritical{crit}
+\def\sev@@kHigh{high}
+\def\sev@@kMedium{med}
+\def\sev@@kLow{low}
+\def\sev@@kInfo{info}
+
+% \sevrowcolor{key} - set the whole table row to the muted tint of the
+% severity. Place at the start of the row, before any cells. Tints carry
+% the same colour family as \sevcell but at low saturation so the row's
+% text remains readable in body ink.
+\newcommand{\sevrowcolor}[1]{%
+  \def\sev@@key{#1}%
+  \ifx\sev@@key\sev@@kCritical \rowcolor{sevcrittint}\else
+  \ifx\sev@@key\sev@@kHigh     \rowcolor{sevhightint}\else
+  \ifx\sev@@key\sev@@kMedium   \rowcolor{sevmedtint}\else
+  \ifx\sev@@key\sev@@kLow      \rowcolor{sevlowtint}\else
+  \ifx\sev@@key\sev@@kInfo     \rowcolor{sevinfotint}%
+  \fi\fi\fi\fi\fi
+}
+
+% --- Status marks (typographic, no box) ---------------------------------------
+% Mirrors the severity treatment: status is small-caps in a muted state ink.
+% Regular weight distinguishes a state from a (bold) severity of the same hue.
+\newcommand{\stsmark}[2]{{\color{#1}\scshape #2}}
+\newcommand{\stsOpen}        {\stsmark{sevcrit}{Open}}
+\newcommand{\stsAcknowledged}{\stsmark{sevmed}{Acknowledged}}
+\newcommand{\stsResolved}    {\stsmark{sevok}{Resolved}}
+\newcommand{\stsProved}      {\stsmark{sevok}{Proved}}
+
+% --- Table helpers ------------------------------------------------------------
+% Wrap header rows with \theadrow{...} to apply muted sans formatting WITHOUT
+% leaking \sffamily into the surrounding paragraph (a known tabularx quirk).
+\newcommand{\thead}[1]{{\sffamily\color{vmuted}\footnotesize #1}}
+% Wrap a metadata cell value with \tkey{...} for the left "label" column.
+\newcommand{\tkey}[1]{{\sffamily\color{vmuted}\footnotesize #1}}
+
+% --- Info / quote panels ------------------------------------------------------
+\newtcolorbox{notebox}{
+  enhanced, breakable,
+  colback=vsurface, colframe=vrule,
+  borderline west={2.2pt}{0pt}{vaccent},
+  boxrule=0.35pt, arc=0pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt,
+  fontupper=\small
+}
+
+% Block heading for callout boxes: own line, sans accent, set off from body text.
+\newcommand{\noteboxtitle}[1]{%
+  {\sffamily\bfseries\color{vaccent}#1}\par\smallskip}
+
+\endinput
