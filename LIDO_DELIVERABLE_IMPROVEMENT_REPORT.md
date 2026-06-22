@@ -1,7 +1,7 @@
 # Lido Deliverable Improvement Report
 
-Status: consolidated review of the current LaTeX report package at
-`lido-private-report-example-latex`.
+Status: consolidated review of the current LaTeX report package now published
+as `lfglabs-dev/lido-srv3-proof-closure`.
 
 Review inputs: four parallel sub-agent reviews were run across proof/evidence
 rigor, SRv3 technical correctness, editorial clarity, and Lido delivery polish.
@@ -15,12 +15,12 @@ The current PDF looks polished, but it is not yet safe to send to Lido as a
 final formal-methods deliverable. The core issue is not typography; it is claim
 calibration. The report body repeatedly states that selected SRv3 accounting
 properties are already machine-checked and closed, while the package README says
-this is a mock final report specimen that assumes proofs exist before real proof
+this is a mock final report package that assumes proofs exist before real proof
 artifacts exist.
 
 To make the deliverable credible for Lido, either attach the actual proof
 repository and reproducibility evidence, or demote the entire document from
-"Private Final v1.0" to a proposal/specimen. Do not leave it halfway: Lido
+"Private Final v1.0" to a proposal/report package. Do not leave it halfway: Lido
 reviewers will treat unsupported "proved" language as the main finding.
 
 ## Top Improvements To Make
@@ -31,7 +31,7 @@ Severity: blocker.
 
 Evidence:
 
-- `README.md` says: "This is a mock final report specimen. It assumes the
+- `README.md` says: "This is a mock final report package. It assumes the
   selected P0 properties were proved so the hierarchy, tone, and delivery shape
   can be evaluated before real proof artifacts exist."
 - `content/01-disclaimer.tex:4-6` says this is a "private final
@@ -50,11 +50,11 @@ Recommended fix:
 
 - If proofs do not exist yet, replace every `\stsProved`, "closed", "proved",
   "machine-checked", "final", and "no counterexample" claim with "proposed",
-  "targeted", or "specimen".
+  "targeted", or "report package".
 - Rename the title/version to `SRv3 Accounting Proof-Closure Proposal` and
   `Private Draft`.
 - Change "What was closed" to "What should be closed first".
-- Keep a single sentence that this is a specimen of the final report shape.
+- Keep a single sentence that this is a report package of the final report shape.
 
 Better phrase:
 
@@ -441,11 +441,11 @@ non-specialist by the hand while preserving formal-methods rigor.
 
 Changes applied:
 
-- Reframed the PDF as a `Private Specimen v1.1` and aligned the disclaimer with
-  the README's mock/specimen status.
+- Reframed the PDF as a `Private Report package v1.1` and aligned the disclaimer with
+  the README's mock/report package status.
 - Updated the cover subtitle and PDF metadata so the first page no longer
   implies final machine-checked proof evidence exists in this repository.
-- Updated the README and executive summary so the specimen describes intended
+- Updated the README and executive summary so the report package describes intended
   final proof evidence rather than assuming selected properties are already
   proved in this repository.
 - Added a short educational note explaining why theorem checking is stronger
@@ -470,8 +470,8 @@ Changes applied:
   modeled reward-recipient path.
 - Added theorem-to-assumption traceability expected in a real delivery package.
 - Collapsed the executive matrix to remove a visually over-strong status column;
-  the text now explains that the rows are specimen targets.
-- Replaced visible `Proved` labels in specimen tables with claim descriptions
+  the text now explains that the rows are targets.
+- Replaced visible `Proved` labels in report package tables with claim descriptions
   and expected traceability.
 - Merged the theorem register and assumption mapping into one traceability table
   with readable proof handles.
@@ -481,7 +481,7 @@ Changes applied:
   list that keeps artifact labels, paths, and purpose readable.
 - Converted the appendix axiom/counterexample counts into expected final-package
   checks rather than factual claims about artifacts present in this repository.
-- Removed top-up wording from the selected six-row specimen claims and kept
+- Removed top-up wording from the selected six-row claims and kept
   top-up work in follow-on lanes.
 - Replaced the P1 post-state reserve equality sketch with a pre-state
   withdrawal-reserve non-consumption condition and split the formula into two
@@ -491,7 +491,7 @@ Changes applied:
 - Tightened P6 everywhere to separate deposit gating for non-active or
   deposit-paused modules from module-side reward/fee gating for stopped modules.
 - Softened the trust-check wording so source anchors are required in the final
-  evidence manifest, without implying this specimen PDF already contains every
+  evidence manifest, without implying this report package PDF already contains every
   concrete source-code link.
 - Rendered the full PR target hash with breakable path formatting in the
   provenance table.
@@ -508,7 +508,7 @@ Build evidence:
 
 Remaining known issues:
 
-- The PDF is still a specimen. A real final deliverable requires the companion
+- The PDF is still a report package. A real final deliverable requires the companion
   proof repository, source map, trust-boundary JSON, and reproducible theorem
   build.
 - LaTeX emits two pre-existing cover-logo overfull warnings, one small

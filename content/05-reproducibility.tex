@@ -22,7 +22,7 @@ python3 scripts/check_trust_report.py reports/trust-boundary.json
 
 \noindent In a production delivery, this command checks all selected theorem
 files, verifies that every matrix row has a matching artifact, and rejects
-unstated trust assumptions in the machine-readable report. In this specimen, the
+unstated trust assumptions in the machine-readable report. In this report package, the
 command is a contract for the handoff package rather than an executable artifact
 shipped in this repository.
 
@@ -34,7 +34,7 @@ shipped in this repository.
   \thead{Field} & \thead{Expected content} \\
   \midrule
   PR and source revision & PR \#1811 URL, base branch, audited commit hash,
-  and review timestamp. Specimen target:
+  and review timestamp. Report package target:
   \path{d088bbc2deac9913b68036d73d35c37aa6279b90}. \\
   \rowsep
   Proof toolchain & Lean toolchain, Lake manifest, Verity commit, and model
@@ -54,7 +54,7 @@ shipped in this repository.
 
 \subsection*{Source anchor examples for the final manifest}
 
-\noindent The specimen matrix uses broad PR \#1811 surfaces to stay readable. A
+\noindent The matrix uses broad PR \#1811 surfaces to stay readable. A
 production source map should expand those surfaces into exact file/function
 anchors. Examples for the target source revision include:
 
@@ -77,7 +77,7 @@ anchors. Examples for the target source revision include:
 
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
   \item \textbf{PDF:} \path{dist/lido-srv3-formal-methods-report.pdf}. This
-  report specimen for Lido reviewers.
+  report package for Lido reviewers.
   \item \textbf{Certora map:} \path{certora-pr1811-map.md}. Mapping from
   Certora V2/V3 specs and assumptions to PR \#1811 proof targets.
   \item \textbf{Trust report:} \path{reports/trust-boundary.json}.

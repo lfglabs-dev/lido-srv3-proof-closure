@@ -6,7 +6,7 @@
 If PR \#1811 changes how Lido accounts for deposits, reserves, module balances,
 and rewards, can the selected accounting rules be stated precisely enough that a
 machine can check them for every modeled case, not only for examples? This
-specimen shows the intended final-report answer once the companion proof
+report package shows the intended final-report answer once the companion proof
 repository exists: the answer would be yes for the six selected P0
 (highest-priority) properties, under the named assumptions in
 \cref{sec:trust-boundary}.
@@ -16,7 +16,7 @@ repository exists: the answer would be yes for the six selected P0
 without admitted proof obligations, its Solidity-facing model target is listed,
 all premises not discharged inside the model are registered by assumption ID, and
 the reproducibility command rechecks the theorem namespace from a clean checkout. Because this
-repository is a specimen, that sentence is the evidence threshold for a real
+repository is a report package, that sentence is the evidence threshold for a real
 delivery rather than a claim that the proof repository is present here.
 
 \subsection*{The story in one page}
@@ -55,7 +55,7 @@ which the machine-checked statement is meant to be universal.
 \end{notebox}
 
 \smallskip
-\noindent The final claim this specimen is designed to support is:
+\noindent The final claim this report package is designed to support is:
 
 \begin{quote}
 For all modeled finite module arrays and accepted report arrays satisfying the
@@ -87,7 +87,7 @@ bounded, and which module states block economic flow.
 
 \subsection*{Proof matrix}
 
-\noindent All six rows below are specimen targets: they show the intended final
+\noindent All six rows below are targets: they show the intended final
 closed state once the corresponding theorem artifact and trust-boundary row are
 present in the companion proof repository.
 
@@ -127,7 +127,7 @@ present in the companion proof repository.
 
 \subsection*{Review posture}
 
-This specimen is written for two readers at once. A protocol reviewer can follow
+This report package is written for two readers at once. A protocol reviewer can follow
 the ledgers and the trust boundary without reading Lean. A formal-methods
 reviewer can check whether the theorem IDs, assumptions, and rebuild gates would
 support the advertised claim in a real delivery package.
