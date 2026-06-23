@@ -1,10 +1,19 @@
 {
   "assumptions": {
     "A-ARITH-05": "Wei/Gwei and basis-point arithmetic is interpreted over non-negative bounded integer domains; Solidity overflow checks are represented as rejected states.",
-    "A-DEP-02": "The beacon deposit sink consumes exactly one 32 ETH unit for each modeled initial validator deposit.",
+    "A-DEP-02": "The beacon deposit sink consumes exactly one 32 ETH unit for each modeled initial validator deposit and exactly the modeled allocation amount for top-ups; deposit-root, BLS, dummy-signature behavior, minimum top-up checks, and SSZ correctness are outside this lane.",
     "A-EXT-01": "External contract callbacks and sinks mutate no unlisted SRv3 accounting state in the focused economic model.",
+    "A-GOV-14": "Governance role authorization, calldata authorship, module contract registration, address/interface validation, and event semantics for module-management updates are outside this lane; the model checks the invoked SRv3 fee, share, config, status, and add-module validation/update loops.",
     "A-ID-04": "Module IDs are unique and accepted report arrays align with router module order.",
-    "A-ORC-03": "Accepted reports have already passed SRv3 oracle validation before they enter the economic transition."
+    "A-LIDO-06": "LIDO.withdrawDepositableEther makes exactly the requested depositable amount available to the router and does not consume withdrawal-reserved ETH.",
+    "A-MOD-07": "IStakingModule.obtainDepositData returns the modeled number of deposit pubkeys and mutates no router accounting fields other than through the explicit SRv3 transition.",
+    "A-MOD-08": "IStakingModule.getStakingModuleSummary returns the deposited-validator count used by SRv3 exited-count validation; node-operator internals and warning-event conditions are outside this lane.",
+    "A-MOD-10": "IStakingModuleV2.allocateDeposits returns the modeled top-up allocation array and mutates no router accounting fields except through the explicit SRv3 transition; key ownership and module internals are outside this lane.",
+    "A-MOD-11": "IStakingModuleV2.getTotalModuleStake returns the modeled total module stake used to compute WC02 allocation equivalents.",
+    "A-MOD-13": "IStakingModule.onRewardsMinted callback effects, low-level revert bytes, event emission, and gas-estimation behavior are outside this lane; the model checks only the SRLib loop guards that decide whether a callback may be attempted.",
+    "A-ORC-03": "Accepted reports have already passed off-chain oracle validation; the modeled SRv3 transition still checks full module-array length, router-order module IDs, and the SRv3 Gwei amount range before applying module balances.",
+    "A-REWARD-09": "Reward fee arithmetic stays within Solidity precision and cast domains, including the final totalFee <= FEE_PRECISION_POINTS assertion.",
+    "A-ALLOC-12": "The external MinFirstAllocationStrategy and governance target-limit admissibility satisfy their documented contracts; this lane models the SRv3-owned current-allocation and capacity array construction before that strategy runs."
   },
   "schema": "srv3-trust-boundary-v1"
 }

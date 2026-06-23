@@ -9,8 +9,10 @@ Source references:
 Model artifact:
 
 - `LidoSRv3/Model.lean::acceptReport`
+- `LidoSRv3/Model.lean::reportValidatorBalancesTransition`
 - `LidoSRv3/Model.lean::rewardsUseAcceptedReport`
 - `LidoSRv3/SpecProofs.lean::P4_report_before_reward_consistency`
+- `LidoSRv3/SpecProofs.lean::P4_report_transition_before_reward_consistency`
 
 Math statement:
 

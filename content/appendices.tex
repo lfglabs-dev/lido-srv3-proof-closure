@@ -79,10 +79,12 @@ module reasoning, and named assumptions that a reviewer can audit.
   The checked theorem files contain no \texttt{sorry} or \texttt{admit}. \\
   \rowsep
   Named model assumptions &
-  5 &
-  The report package assumes this allowance: external summaries, beacon sink behavior,
-  accepted oracle reports, module identity/order well-formedness, and arithmetic
-  domain. \\
+  14 &
+  The report package names each out-of-model interface and domain premise in
+  \path{verity/targets/trust-boundary.json}, covering external summaries,
+  governance/module-management plumbing, beacon sinks, accepted oracle reports,
+  module identity/order well-formedness, arithmetic domains, reward precision,
+  Lido withdrawals, staking-module callbacks, and allocation strategy behavior. \\
   \rowsep
   Selected falsification/regression harness counterexamples &
   0 &
@@ -103,7 +105,7 @@ report package. Recommended sequence after this P0 accounting closure:
   triggerable-exit fee/refund exactness.
   \item Consolidation fee conservation, source and target binding, and
   source-ownership caveats.
-  \item Top-up and consensus-layer proof binding.
+  \item Top-up consensus-layer proof binding beyond allocation accounting.
   \item Oracle sanity limits, drain guards, and second-opinion oracle composition.
   \item Deployment governance, role graph, and exact migration refinement.
   \item VaultHub F-01/F-02/F-03, if still relevant to the active review path.
