@@ -1,4 +1,5 @@
 build/
+.lake/
 *.aux
 *.fdb_latexmk
 *.fls

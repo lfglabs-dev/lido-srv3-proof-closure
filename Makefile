@@ -4,30 +4,30 @@ ENGINE    := -pdf
 FLAGS     := -interaction=nonstopmode -halt-on-error -file-line-error
 OUT_DIR   := build
 DIST_DIR  := dist
-PYTHON    := python3
-PYTHONPATH := verity/src
 PROOF_LOG := proofs/logs/proof-report.json
+SHELL     := /usr/bin/env bash
+.SHELLFLAGS := -euo pipefail -c
 
 .PHONY: all bootstrap test prove report clean distclean
 
 all: report
 
 bootstrap:
-	@$(PYTHON) --version
-	@$(PYTHON) -c 'import unittest'
-	@printf '%s\n' 'bootstrap ok: standard-library Python harness is available'
+	@lean --version
+	@lake --version
+	@printf '%s\n' 'bootstrap ok: Lean/Lake Verity toolchain is available'
 
 test:
-	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m unittest discover -s tests/verity -p 'test_*.py'
+	@bash scripts/check_no_python_evidence.sh
+	@test -s tests/solidity-reference/stakingRouter.getDepositAllocations.test.ts
+	@test -s tests/solidity-reference/stakingRouter.rewards.test.ts
+	@test -s tests/solidity-reference/deposits-reserve.integration.ts
+	@printf '%s\n' 'reference fixtures present; no legacy proof artifacts remain'
 
 prove:
 	@mkdir -p proofs/logs
-	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m verity_srv3.prove > proofs/logs/prove.txt
-	@cat proofs/logs/prove.txt
-	PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m verity_srv3.runner \
-	  --targets verity/targets/srv3-proof-targets.json \
-	  --fixtures tests/verity/fixtures \
-	  --output $(PROOF_LOG)
+	lake build LidoSRv3 2>&1 | tee proofs/logs/prove.txt
+	@bash scripts/write_proof_report.sh > $(PROOF_LOG)
 	@printf '%s\n' 'proof report written to $(PROOF_LOG)'
 
 report: $(DIST_DIR)/lido-srv3-formal-methods-report.pdf

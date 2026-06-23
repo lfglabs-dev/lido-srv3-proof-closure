@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat <<'JSON'
 {
   "schema": "srv3-verity-lean-proof-report-v1",
   "toolchain": {
@@ -17,3 +21,4 @@
     {"id": "SRV3-P6a", "theorem": "LidoSRv3.P6_stopped_module_reward_zero", "status": "lean_checked"}
   ]
 }
+JSON

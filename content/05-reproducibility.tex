@@ -22,8 +22,8 @@ make prove
 make report
 \end{lstlisting}
 
-\noindent These commands check all selected model tests, verify every matrix row
-has a matching artifact in \path{proofs/}, emit
+\noindent These commands check that the source fixtures are present, verify every matrix row
+has a matching Verity/Lean artifact in \path{proofs/}, emit
 \path{proofs/logs/proof-report.json}, and rebuild the PDF.
 
 \subsection*{Minimum provenance fields}
@@ -37,9 +37,9 @@ has a matching artifact in \path{proofs/}, emit
   and review timestamp. Report package target:
   \path{d088bbc2deac9913b68036d73d35c37aa6279b90}. \\
   \rowsep
-  Proof toolchain & Standard-library Python executable harness, pinned Verity
-  reference \path{33722270d996c7a3a520a71ecee42d7d232da100}, and
-  \texttt{make test}/\texttt{make prove}. \\
+  Proof toolchain & Lean/Lake project importing pinned Verity reference
+  \path{33722270d996c7a3a520a71ecee42d7d232da100}; proof command
+  \texttt{lake build LidoSRv3}. \\
   \rowsep
   Target namespace & Selected proof target files in \path{proofs/}, target names
   in \path{verity/targets/srv3-proof-targets.json}, and the command that fails
@@ -86,10 +86,11 @@ source revision include:
   Machine-readable assumption and boundary register.
   \item \textbf{Proof targets:} \path{proofs/}. One target file for each selected
   P0 property.
-  \item \textbf{Model:} \path{verity/src/verity_srv3/}. Executable SRv3 economic
-  state machine.
-  \item \textbf{Reference tests:} \path{tests/solidity-reference/} and
-  \path{tests/verity/}. Copied Lido references and executable mirrors.
+  \item \textbf{Model:} \path{LidoSRv3/Model.lean}. SRv3 economic state machine.
+  \item \textbf{Theorems:} \path{LidoSRv3/SpecProofs.lean}. Checked P0 proof
+  targets.
+  \item \textbf{Reference tests:} \path{tests/solidity-reference/}. Copied Lido
+  references used as source-facing fixtures.
 \end{itemize}
 
 \subsection*{Integrity checks}
@@ -100,10 +101,10 @@ source revision include:
   \thead{Check} & \thead{Expected result} \\
   \midrule
   \texttt{make test} &
-  All executable Verity-style mirror tests pass. \\
+  Source-facing Solidity fixtures are present and no legacy proof artifacts remain. \\
   \rowsep
   \texttt{make prove} &
-  Bounded proof harness passes SRV3-P1 through SRV3-P6 and writes
+  Verity/Lean theorem checking passes SRV3-P1 through SRV3-P6 and writes
   \path{proofs/logs/proof-report.json}. \\
   \rowsep
   \texttt{make report} &

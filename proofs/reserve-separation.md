@@ -8,10 +8,10 @@ Source references:
 
 Model artifact:
 
-- `verity/src/verity_srv3/model.py::buffered_allocation`
-- `verity/src/verity_srv3/model.py::spend_depositable`
-- `verity/src/verity_srv3/properties.py::reserve_separation`
-- `tests/verity/fixtures/p1_reserve_separation.json`
+- `LidoSRv3/Model.lean::depositReserveUsed`
+- `LidoSRv3/Model.lean::withdrawalReserveUsed`
+- `LidoSRv3/Model.lean::depositableEther`
+- `LidoSRv3/SpecProofs.lean::P1_reserve_separation`
 
 Math statement:
 
@@ -26,13 +26,13 @@ spend <= depositable
 Proof command:
 
 ```sh
-PYTHONPATH=verity/src python3 -m verity_srv3.runner --targets verity/targets/srv3-proof-targets.json --fixtures tests/verity/fixtures --output proofs/logs/proof-report.json
+lake build LidoSRv3
 ```
 
 Result:
 
 ```text
-SRV3-P1 pass, recorded in proofs/logs/proof-report.json
+SRV3-P1 Lean-checked, recorded in proofs/logs/proof-report.json
 ```
 
 Assumptions:

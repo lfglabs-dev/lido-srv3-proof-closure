@@ -8,10 +8,11 @@ Source references:
 
 Model artifact:
 
-- `verity/src/verity_srv3/model.py::staking_rewards_distribution`
-- `verity/src/verity_srv3/model.py::report_rewards_minted`
-- `verity/src/verity_srv3/properties.py::reward_correctness`
-- `tests/verity/fixtures/p5_reward_correctness.json`
+- `LidoSRv3/Model.lean::moduleRewardUpperBound`
+- `LidoSRv3/Model.lean::moduleReward`
+- `LidoSRv3/Model.lean::rewardRows`
+- `LidoSRv3/SpecProofs.lean::P5_reward_bound`
+- `LidoSRv3/SpecProofs.lean::P5_reward_recipient_alignment`
 
 Math statement:
 
@@ -25,13 +26,13 @@ nonzero reportRewardsMinted shares require an existing module id
 Proof command:
 
 ```sh
-PYTHONPATH=verity/src python3 -m verity_srv3.runner --targets verity/targets/srv3-proof-targets.json --fixtures tests/verity/fixtures --output proofs/logs/proof-report.json
+lake build LidoSRv3
 ```
 
 Result:
 
 ```text
-SRV3-P5 pass, recorded in proofs/logs/proof-report.json
+SRV3-P5 Lean-checked, recorded in proofs/logs/proof-report.json
 ```
 
 Assumptions:

@@ -1,6 +1,3 @@
-PASS SRV3-P1 reserve separation
-PASS SRV3-P2 deposit conservation
-PASS SRV3-P3 module balance conservation
-PASS SRV3-P4 report-before-reward consistency
-PASS SRV3-P5 reward correctness
-PASS SRV3-P6 status gating
+✔ [13/15] Built LidoSRv3.SpecProofs
+✔ [14/15] Built LidoSRv3
+Build completed successfully.

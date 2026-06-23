@@ -8,9 +8,9 @@ Source references:
 
 Model artifact:
 
-- `verity/src/verity_srv3/model.py::accept_balance_report`
-- `verity/src/verity_srv3/properties.py::module_balance_conservation`
-- `tests/verity/fixtures/p3_module_balance_conservation.json`
+- `LidoSRv3/Model.lean::acceptReport`
+- `LidoSRv3/Model.lean::moduleBalanceSum`
+- `LidoSRv3/SpecProofs.lean::P3_module_balance_conservation`
 
 Math statement:
 
@@ -22,13 +22,13 @@ acceptedReport(M, b) => router.validatorsBalanceGwei' = sum_i b_i
 Proof command:
 
 ```sh
-PYTHONPATH=verity/src python3 -m verity_srv3.runner --targets verity/targets/srv3-proof-targets.json --fixtures tests/verity/fixtures --output proofs/logs/proof-report.json
+lake build LidoSRv3
 ```
 
 Result:
 
 ```text
-SRV3-P3 pass, recorded in proofs/logs/proof-report.json
+SRV3-P3 Lean-checked, recorded in proofs/logs/proof-report.json
 ```
 
 Assumptions:

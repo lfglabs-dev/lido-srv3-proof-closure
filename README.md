@@ -1,8 +1,8 @@
 # Lido SRv3 Proof Closure
 
 Executable evidence package for the Lido SRv3 accounting proof-closure report.
-The repository contains the report, a deterministic Verity-style economic model,
-reference test copies, executable model tests, proof target registers, and local
+The repository contains the report, a Verity/Lean SRv3 economic model,
+reference test copies, proof target registers, and local
 reproducibility commands.
 
 ## Build
@@ -24,11 +24,11 @@ dist/lido-srv3-formal-methods-report.pdf
 
 - `report.tex`: report entrypoint and metadata.
 - `content/`: formal-methods report sections.
-- `verity/`: executable SRv3 economic model and target manifests.
+- `LidoSRv3/`: Verity/Lean SRv3 economic model and checked P0 theorems.
+- `verity/targets/`: source maps and target manifests.
 - `tests/solidity-reference/`: relevant Lido reference tests copied from PR
   #1811 source material.
-- `tests/verity/`: executable tests that mirror the reference behavior.
-- `proofs/`: lockfile, proof target files, and generated proof logs.
+- `proofs/`: lockfile, proof target files, and generated Lean proof logs.
 - `style/`: local copy of the Verity/Unlink report style, adjusted for a formal
   methods proof-closure report.
 - `assets/`: LFG Labs and Verity PDF marks.

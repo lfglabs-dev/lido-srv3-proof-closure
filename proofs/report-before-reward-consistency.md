@@ -8,10 +8,9 @@ Source references:
 
 Model artifact:
 
-- `verity/src/verity_srv3/model.py::accept_balance_report`
-- `verity/src/verity_srv3/model.py::staking_rewards_distribution`
-- `verity/src/verity_srv3/properties.py::report_before_reward_consistency`
-- `tests/verity/fixtures/p4_report_before_reward_consistency.json`
+- `LidoSRv3/Model.lean::acceptReport`
+- `LidoSRv3/Model.lean::rewardsUseAcceptedReport`
+- `LidoSRv3/SpecProofs.lean::P4_report_before_reward_consistency`
 
 Math statement:
 
@@ -23,13 +22,13 @@ rewardStep(state) => exists acceptedReport r:
 Proof command:
 
 ```sh
-PYTHONPATH=verity/src python3 -m verity_srv3.runner --targets verity/targets/srv3-proof-targets.json --fixtures tests/verity/fixtures --output proofs/logs/proof-report.json
+lake build LidoSRv3
 ```
 
 Result:
 
 ```text
-SRV3-P4 pass, recorded in proofs/logs/proof-report.json
+SRV3-P4 Lean-checked, recorded in proofs/logs/proof-report.json
 ```
 
 Assumptions:

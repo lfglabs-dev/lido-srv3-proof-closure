@@ -11,10 +11,10 @@
   new deposits.
   \item[CL] Consensus layer, the Ethereum system that records validator
   activity.
-  \item[Lean] A proof checker that can verify theorem statements. This package
-  does not ship Lean theorem artifacts.
-  \item[Verity] The modeling reference pinned for this work. This repository
-  ships a local Verity-style executable economic model.
+  \item[Lean] A proof checker that verifies the theorem files under
+  \path{LidoSRv3/}.
+  \item[Verity] The modeling framework pinned for this work through
+  \path{lakefile.lean} and imported by the SRv3 Lean package.
   \item[P0] Highest-priority property class. Here it means an accounting claim
   important enough that the executable package should either check it or clearly
   say why it remains open.
@@ -55,7 +55,7 @@ module reasoning, and named assumptions that a reviewer can audit.
   paths. \\
   \rowsep
   V3 bounded module-array specs & Mirrored &
-  Executable checks cover named fixtures and bounded enumerations with named
+  Verity/Lean theorems cover the focused economic model with named
   well-formedness assumptions. \\
   \bottomrule
 \end{xltabular}
@@ -70,13 +70,13 @@ module reasoning, and named assumptions that a reviewer can audit.
   \midrule
   \endhead
   Lean axioms introduced by LFG &
-  N/A &
-  This package does not ship a Lean namespace. \\
+  0 known &
+  The package ships the \path{LidoSRv3} Lean namespace and does not add custom
+  axioms. \\
   \rowsep
   Admitted theorem bodies &
-  N/A &
-  This package does not ship theorem bodies with \texttt{sorry} or
-  \texttt{admit}. \\
+  0 &
+  The checked theorem files contain no \texttt{sorry} or \texttt{admit}. \\
   \rowsep
   Named model assumptions &
   5 &
@@ -86,8 +86,8 @@ module reasoning, and named assumptions that a reviewer can audit.
   \rowsep
   Selected falsification/regression harness counterexamples &
   0 &
-  \texttt{make prove} reports no selected P0 counterexample trace in the named
-  bounded harness. This is not a claim about unmodeled deployed-system behavior. \\
+  \texttt{make prove} checks the selected P0 theorem file. This is not a claim
+  about unmodeled deployed-system behavior. \\
   \bottomrule
 \end{xltabular}
 

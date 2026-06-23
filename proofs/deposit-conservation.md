@@ -8,9 +8,10 @@ Source references:
 
 Model artifact:
 
-- `verity/src/verity_srv3/model.py::deposit`
-- `verity/src/verity_srv3/properties.py::deposit_conservation`
-- `tests/verity/fixtures/p2_deposit_conservation.json`
+- `LidoSRv3/Model.lean::depositPullWei`
+- `LidoSRv3/Model.lean::allocatedDeposits`
+- `LidoSRv3/SpecProofs.lean::P2_deposit_exact_pull`
+- `LidoSRv3/SpecProofs.lean::P2_total_allocated_deposits`
 
 Math statement:
 
@@ -23,13 +24,13 @@ actualDeposits <= maxDepositsCount
 Proof command:
 
 ```sh
-PYTHONPATH=verity/src python3 -m verity_srv3.runner --targets verity/targets/srv3-proof-targets.json --fixtures tests/verity/fixtures --output proofs/logs/proof-report.json
+lake build LidoSRv3
 ```
 
 Result:
 
 ```text
-SRV3-P2 pass, recorded in proofs/logs/proof-report.json
+SRV3-P2 Lean-checked, recorded in proofs/logs/proof-report.json
 ```
 
 Assumptions:

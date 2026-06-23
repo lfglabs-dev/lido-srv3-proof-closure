@@ -45,21 +45,20 @@ consensus layer.
 
 \begin{notebox}
 \noteboxtitle{Why this is more than testing}
-A test asks, ``does this example work?'' An executable model check asks, ``does
-this rule survive the modeled transition and fixture or bounded enumeration that
-the artifact names?'' That is why the report spends so much effort naming the
-model, bounds, and assumptions: they define exactly what the local command
-checks.
+A test asks, ``does this example work?'' A Verity/Lean proof target asks,
+``does this rule follow from the modeled transition for all values covered by
+the theorem statement?'' That is why the report spends so much effort naming the
+model and assumptions: they define exactly what the local command checks.
 \end{notebox}
 
 \smallskip
 \noindent The executable claim this report package supports is:
 
 \begin{quote}
-For the focused SRv3 economic state machine, the local model tests and bounded
-proof harness preserve deposit conservation, reserve separation, module-balance
-conservation, report-before-reward consistency, reward/fee bounds, and
-flow-specific status gating over the named fixtures and enumerated domains.
+For the focused SRv3 economic state machine, the Verity/Lean model preserves
+deposit conservation, reserve separation, module-balance conservation,
+report-before-reward consistency, reward/fee bounds, and flow-specific status
+gating under the named assumptions.
 \end{quote}
 
 \noindent This is not a claim that every deployed-system behavior is proved. The
@@ -70,9 +69,9 @@ truthfulness, governance configuration, and deployment refinement are named in
 \subsection*{How to read the proof}
 
 Read each row below as a three-step trace. First, the
-Solidity-facing model names the transition being studied. Second, the property
-states what must not go wrong in the focused model. Third, the local harness
-checks the Verity-style model against the explicit assumptions.
+Verity/Lean model names the transition being studied. Second, the property
+states what must not go wrong in the focused model. Third, Lake checks the
+theorem file against the explicit assumptions.
 
 \smallskip
 \noindent The matrix answers six plain questions: what ETH is spendable, what
@@ -82,7 +81,7 @@ bounded, and which module states block economic flow.
 \subsection*{Proof matrix}
 
 \noindent All six rows below have executable artifacts in \path{proofs/},
-\path{verity/}, and \path{tests/verity/}.
+\path{LidoSRv3/}, and \path{verity/targets/}.
 
 \noindent
 \renewcommand{\arraystretch}{1.18}

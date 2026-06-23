@@ -11,35 +11,35 @@
         "contracts/0.4.24/Lido.sol::_getDepositableEther",
         "contracts/0.4.24/Lido.sol::_spendDepositableEther"
       ],
-      "property": "verity/src/verity_srv3/properties.py::reserve_separation"
+      "property": "LidoSRv3/SpecProofs.lean::P1_reserve_separation"
     },
     "SRV3-P2": {
       "anchors": [
         "contracts/0.8.25/sr/StakingRouter.sol::deposit",
         "contracts/0.4.24/Lido.sol::withdrawDepositableEther"
       ],
-      "property": "verity/src/verity_srv3/properties.py::deposit_conservation"
+      "property": "LidoSRv3/SpecProofs.lean::P2_deposit_exact_pull"
     },
     "SRV3-P3": {
       "anchors": [
         "contracts/0.8.25/sr/SRLib.sol::_reportValidatorBalancesByStakingModule",
         "contracts/0.8.25/sr/SRTypes.sol::RouterStateAccounting"
       ],
-      "property": "verity/src/verity_srv3/properties.py::module_balance_conservation"
+      "property": "LidoSRv3/SpecProofs.lean::P3_module_balance_conservation"
     },
     "SRV3-P4": {
       "anchors": [
         "contracts/0.8.9/oracle/AccountingOracle.sol::submitReportData",
         "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution"
       ],
-      "property": "verity/src/verity_srv3/properties.py::report_before_reward_consistency"
+      "property": "LidoSRv3/SpecProofs.lean::P4_report_before_reward_consistency"
     },
     "SRV3-P5": {
       "anchors": [
         "contracts/0.8.25/sr/StakingRouter.sol::_computeModuleFee",
         "contracts/0.8.25/sr/SRLib.sol::_reportRewardsMinted"
       ],
-      "property": "verity/src/verity_srv3/properties.py::reward_correctness"
+      "property": "LidoSRv3/SpecProofs.lean::P5_reward_bound"
     },
     "SRV3-P6": {
       "anchors": [
@@ -47,7 +47,7 @@
         "contracts/0.8.25/sr/StakingRouter.sol::deposit",
         "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution"
       ],
-      "property": "verity/src/verity_srv3/properties.py::status_gating"
+      "property": "LidoSRv3/SpecProofs.lean::P6_deposit_status_gating"
     }
   }
 }

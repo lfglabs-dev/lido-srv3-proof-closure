@@ -78,8 +78,7 @@ module \(m \in M\), let \(\bal_m\) be its accepted validator balance in gwei,
 \(\modstatus_m\) its module status, and \(\mathsf{moduleRecipient}_m\) its module
 reward recipient in the modeled reward step. Let \(B_R\) be the router validator balance, \(T\) the buffered ETH,
 \(R_D\) the stored deposit reserve, and \(R_W\) the withdrawal-reserved buffer.
-The executable checks cover the named fixtures and the bounded enumeration in
-\path{verity/src/verity_srv3/prove.py}. Each accepted report must still cover the
+The checked theorems are in \path{LidoSRv3/SpecProofs.lean}. Each accepted report must still cover the
 current router module set in router order, with unique module IDs, matching array
 lengths, and the freshness and range premises named in the target file.
 
@@ -252,15 +251,15 @@ trust prose alone; every claim has this chain.
   \thead{Layer} & \thead{Artifact} & \thead{Role} \\
   \midrule
   \endhead
-  Solidity-facing summaries & \path{verity/src/verity_srv3/model.py} &
+  Solidity-facing summaries & \path{tests/solidity-reference/} &
   Preserve the relevant array, loop, reserve, and call structure while
-  summarizing external contracts through explicit interfaces. \\
+  anchoring the model against copied PR \#1811 test intent. \\
   \rowsep
-  Economic model & \path{verity/src/verity_srv3/model.py} &
+  Economic model & \path{LidoSRv3/Model.lean} &
   Defines modules, reserves, Wei/Gwei arithmetic, status flags, accepted reports,
   rewards, and fee state. \\
   \rowsep
-  Proof obligations & \path{verity/src/verity_srv3/properties.py} &
+  Proof obligations & \path{LidoSRv3/SpecProofs.lean} &
   States each target over the focused transition model, with uniqueness,
   ordering, alignment, and freshness premises named in target files. \\
   \rowsep
@@ -269,7 +268,7 @@ trust prose alone; every claim has this chain.
   retained Certora assumptions, and out-of-model claims. \\
   \rowsep
   Rebuild gate & \texttt{make test; make prove} &
-  Rechecks all selected model tests and proof targets and emits
+  Checks source fixtures, runs the Verity/Lean theorem target, and emits
   \path{proofs/logs/proof-report.json}. \\
   \bottomrule
 \end{xltabular}

@@ -1,8 +1,7 @@
-# Verity Model
+# Verity Targets
 
-`verity/src/verity_srv3/` contains a deterministic, standard-library Python
-translation of the SRv3 economic state machine used by this repository's
-executable proof checks.
+The executable SRv3 model lives in `LidoSRv3/` as Lean files checked through the
+pinned Verity dependency in `lakefile.lean`.
 
 The model covers:
 
@@ -14,8 +13,8 @@ The model covers:
 - active, deposits-paused, and stopped status gating
 - Wei/Gwei and basis-point integer rounding
 
-The external Verity reference is pinned in `proofs/LOCKFILE.md`; this repository
-does not require a Verity binary to run the local evidence commands.
+The external Verity reference is pinned in `proofs/LOCKFILE.md` and
+`lake-manifest.json`.
 
 Run:
 
