@@ -25,7 +25,9 @@ dist/lido-srv3-formal-methods-report.pdf
 - `report.tex`: report entrypoint and metadata.
 - `content/`: formal-methods report sections.
 - `LidoSRv3/`: Verity/Lean SRv3 economic model and checked P0 theorems.
-- `verity/targets/`: source maps and target manifests.
+- `verity/targets/`: source maps and target manifests, including
+  `certora-pr1811-map.md`, the Certora → PR #1811 → Verity property and
+  assumption map (Week-1 pilot deliverable).
 - `tests/solidity-reference/`: relevant Lido reference tests copied from PR
   #1811 source material.
 - `proofs/`: lockfile, proof target files, and generated Lean proof logs.

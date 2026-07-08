@@ -57,7 +57,9 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
 \subsection*{Source anchors}
 
 \noindent The matrix uses broad PR \#1811 surfaces to stay readable. The exact
-source map is \path{verity/targets/source-map.json}. Anchors for the target
+source map is \path{verity/targets/source-map.json}, and the Certora prior-work
+to PR \#1811 property and assumption map is
+\path{verity/targets/certora-pr1811-map.md}. Anchors for the target
 source revision include:
 
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
@@ -84,6 +86,9 @@ source revision include:
   references.
   \item \textbf{Trust report:} \path{verity/targets/trust-boundary.json}.
   Machine-readable assumption and boundary register.
+  \item \textbf{Certora map:} \path{verity/targets/certora-pr1811-map.md}.
+  Certora prior-work to PR \#1811 property and assumption map with disciplined
+  coverage status per surface.
   \item \textbf{Proof targets:} \path{proofs/}. One target file for each selected
   P0 property.
   \item \textbf{Model:} \path{LidoSRv3/Model.lean}. SRv3 economic state machine.
