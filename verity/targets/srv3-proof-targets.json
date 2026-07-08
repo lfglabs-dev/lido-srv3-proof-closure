@@ -2,9 +2,14 @@
   "schema": "srv3-proof-targets-v1",
   "targets": [
     {
-      "claim": "Deposit spend cannot consume withdrawal-reserved ETH.",
+      "claim": "Depositable ETH and the effective withdrawal-reserved bucket partition the buffer exactly (depositable + withdrawalReserveUsed = bufferedEther), derived from the reserve definitions.",
       "id": "SRV3-P1",
       "theorem": "LidoSRv3.P1_reserve_separation"
+    },
+    {
+      "claim": "Depositable ETH is bounded by bufferedEther minus the withdrawal-reserved bucket, so deposit spend cannot draw on withdrawal-reserved ETH.",
+      "id": "SRV3-P1a",
+      "theorem": "LidoSRv3.P1_depositable_excludes_withdrawal_reserve"
     },
     {
       "claim": "Router-pulled wei equals 32 ETH times actual deposits and leaves no router residual.",

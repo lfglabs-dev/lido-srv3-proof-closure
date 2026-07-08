@@ -9,7 +9,7 @@ Source references:
 Model artifact:
 
 - `LidoSRv3/Model.lean::allocatedDeposits`
-- `LidoSRv3/Model.lean::moduleReward`
+- `LidoSRv3/Model.lean::rewardDistributionRow`
 - `LidoSRv3/SpecProofs.lean::P6_deposit_status_gating`
 - `LidoSRv3/SpecProofs.lean::P6_stopped_module_reward_zero`
 

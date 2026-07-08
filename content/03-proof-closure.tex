@@ -106,19 +106,22 @@ lengths, and the freshness and range premises named in the target file.
   \mathsf{depositable}(T) = d + u
 \]
 \[
+  \mathsf{depositable}(T) + w = T
+  \qquad
+  \mathsf{depositable}(T) \leq T - w
+\]
+\[
   \forall a.\quad
   \mathsf{spendDeposit}(a) \Rightarrow
   a \leq \mathsf{depositable}(T)
 \]
-\[
-  \mathsf{spendDeposit}(a) \Rightarrow
-  \mathsf{usesWithdrawalReserve}(a,T,R_D,R_W)=0
-\]
 
 \noindent Plain reading: some ETH is saved for withdrawals, and deposits are not
-allowed to spend that saved amount. Deposit spend is bounded by the pre-spend
-deposit reserve plus unreserved allocation and does not consume the pre-spend
-effective withdrawal-reserved bucket. The executable target deliberately avoids a
+allowed to spend that saved amount. The strengthened target proves the depositable
+bucket and the effective withdrawal-reserved bucket \(w\) partition the buffer
+exactly (\(\mathsf{depositable}(T) + w = T\)), so depositable ETH is bounded by
+\(T - w\) and never includes withdrawal-reserved liquidity. This is derived from the
+reserve definitions rather than assumed. The executable target deliberately avoids a
 raw post-state equality for \(R_W\); any post-state reserve fact belongs to the
 model's explicit reserve-recomputation rule.
 
@@ -131,8 +134,9 @@ model's explicit reserve-recomputation rule.
   \mathsf{routerEthAfter} = \mathsf{routerEthBefore}
 \]
 \[
-  \mathsf{actualDeposits}
-    = \sum_{m \in M} \mathsf{allocatedDeposits}_m
+  \mathsf{totalAllocatedDeposits}(\mathit{rows})
+    = \sum_{(m,c) \in \mathit{rows}} c
+  \quad\text{when only active modules carry a positive count}
 \]
 \[
   \mathsf{actualDeposits} > 0
@@ -284,9 +288,9 @@ snapshot and not a half-updated table.
     \lfloor \mathsf{share}_m \cdot \mathsf{treasuryFeeBps}_m / 10{,}000 \rfloor
 \]
 \[
-  \bal_m = 0 \Rightarrow m \notin \mathsf{rewardRows}
+  \bal_m = 0 \Rightarrow m \notin \mathsf{rewardDistributionRows}
   \qquad
-  \mathsf{row}\in\mathsf{rewardRows}\Rightarrow \mathsf{row.balance}\ne0
+  \mathsf{row}\in\mathsf{rewardDistributionRows}\Rightarrow \mathsf{row.balance}\ne0
 \]
 \[
   \mathsf{paidModuleFee}_m \leq \mathsf{moduleFee}_m
@@ -294,9 +298,9 @@ snapshot and not a half-updated table.
 \[
   \mathsf{totalBalance}=0
   \Rightarrow
-  \mathsf{rewardRows}=[]
+  \mathsf{rewardDistributionRows}=[]
   \land
-  \mathsf{map}(\mathsf{row.moduleId},\mathsf{rewardRows})=[]
+  \mathsf{map}(\mathsf{row.moduleId},\mathsf{rewardDistributionRows})=[]
 \]
 \[
   \modstatus_m = \stStopped
@@ -305,7 +309,7 @@ snapshot and not a half-updated table.
 \]
 \[
   \mathsf{totalFee} =
-    \sum_{\mathsf{row}\in\mathsf{rewardRows}}
+    \sum_{\mathsf{row}\in\mathsf{rewardDistributionRows}}
       (\mathsf{row.moduleFee}+\mathsf{row.treasuryFee})
 \]
 
@@ -328,7 +332,7 @@ every emitted row's module and treasury fee components.
 \[
   \modstatus_m = \stStopped
   \Rightarrow
-  \mathsf{moduleReward}_m = 0
+  \mathsf{paidModuleFee}_m = 0
 \]
 
 \noindent Plain reading: a stopped or paused module is not just marked differently

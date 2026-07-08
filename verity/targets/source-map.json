@@ -12,7 +12,10 @@
         "contracts/0.4.24/Lido.sol::_getDepositableEther",
         "contracts/0.4.24/Lido.sol::_spendDepositableEther"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P1_reserve_separation"
+      "property": "LidoSRv3/SpecProofs.lean::P1_reserve_separation",
+      "supporting_properties": [
+        "LidoSRv3/SpecProofs.lean::P1_depositable_excludes_withdrawal_reserve"
+      ]
     },
     "SRV3-P2": {
       "anchors": [

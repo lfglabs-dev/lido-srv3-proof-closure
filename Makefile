@@ -26,9 +26,16 @@ test:
 
 prove:
 	@mkdir -p proofs/logs
-	lake build LidoSRv3 2>&1 | tee proofs/logs/prove.txt
-	@bash scripts/write_proof_report.sh > $(PROOF_LOG)
-	@printf '%s\n' 'proof report written to $(PROOF_LOG)'
+	@if lake build LidoSRv3 2>&1 | tee proofs/logs/prove.txt; then s=0; else s=$$?; fi; \
+	 if BUILD_STATUS=$$s BUILD_LOG=proofs/logs/prove.txt \
+	      bash scripts/write_proof_report.sh > $(PROOF_LOG).tmp; then \
+	   mv $(PROOF_LOG).tmp $(PROOF_LOG); \
+	   printf '%s\n' 'proof report written to $(PROOF_LOG)'; \
+	 else \
+	   rm -f $(PROOF_LOG).tmp; \
+	   printf '%s\n' 'build did not verify; proof report NOT updated (kept previous $(PROOF_LOG))' >&2; \
+	   exit 1; \
+	 fi
 
 report: $(DIST_DIR)/lido-srv3-formal-methods-report.pdf
 

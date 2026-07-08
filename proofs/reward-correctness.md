@@ -7,9 +7,6 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::moduleRewardUpperBound`
-- `LidoSRv3/Model.lean::moduleReward`
-- `LidoSRv3/Model.lean::rewardRows`
 - `LidoSRv3/Model.lean::RewardDistributionRow`
 - `LidoSRv3/Model.lean::rewardShare`
 - `LidoSRv3/Model.lean::computedModuleFee`
@@ -18,6 +15,7 @@ Model artifact:
 - `LidoSRv3/Model.lean::rewardDistributionLoop`
 - `LidoSRv3/Model.lean::stakingRewardsDistributionRows`
 - `LidoSRv3/Model.lean::rewardDistributionTotalFee`
+- `LidoSRv3/Model.lean::rewardRecipientsAligned`
 - `LidoSRv3/SpecProofs.lean::P5_reward_bound`
 - `LidoSRv3/SpecProofs.lean::P5_reward_recipient_alignment`
 - `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_rows_aligned`

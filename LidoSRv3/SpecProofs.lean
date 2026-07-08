@@ -92,11 +92,32 @@ private theorem roundDownToGwei_le (amount : Wei) :
   unfold roundDownToGwei
   exact Nat.sub_le amount (amount % oneGweiWei)
 
-theorem P1_reserve_separation
-    (s : State) (actualDeposits : Nat)
-    (h : depositAllowed s actualDeposits) :
-    depositPullWei actualDeposits ≤ depositableEther s := by
-  exact h
+/--
+  Reserve separation. The depositable bucket and the effective
+  withdrawal-reserved bucket partition the buffer exactly: their sum is the
+  whole buffer, so depositable ether never includes any withdrawal liquidity.
+  This is derived from the reserve definitions (not assumed), which is why the
+  two Nat subtractions in `unreservedEther` do not truncate.
+-/
+theorem P1_reserve_separation (s : State) :
+    depositableEther s + withdrawalReserveUsed s = s.bufferedEther := by
+  have hDep : depositReserveUsed s ≤ s.bufferedEther := Nat.min_le_left _ _
+  have hWit : withdrawalReserveUsed s ≤ s.bufferedEther - depositReserveUsed s :=
+    Nat.min_le_left _ _
+  unfold depositableEther unreservedEther
+  rw [Nat.add_assoc, Nat.sub_add_cancel hWit, Nat.add_sub_cancel' hDep]
+
+/--
+  Corollary: depositable ether excludes the withdrawal-reserved liquidity, so a
+  deposit spend bounded by `depositableEther` cannot draw on saved withdrawal
+  funds.
+-/
+theorem P1_depositable_excludes_withdrawal_reserve (s : State) :
+    depositableEther s ≤ s.bufferedEther - withdrawalReserveUsed s := by
+  have h := P1_reserve_separation s
+  have heq : s.bufferedEther - withdrawalReserveUsed s = depositableEther s := by
+    rw [← h, Nat.add_sub_cancel]
+  exact Nat.le_of_eq heq.symm
 
 theorem P2_deposit_exact_pull (actualDeposits : Nat) :
     depositPullWei actualDeposits = validatorDepositWei * actualDeposits := by
@@ -478,11 +499,34 @@ theorem P2_deposit_transition_preserves_report_state
         · simp [hLe] at h
     · simp [hActive] at h
 
+/--
+  Deposit-allocation conservation. For a well-formed per-module allocation
+  (only active modules carry a positive count), the total allocated equals the
+  sum of the per-module allocated amounts. The router deposit budget is split
+  across modules; the module deltas sum to the total instead of every active
+  module receiving the full count.
+-/
 theorem P2_total_allocated_deposits
-    (s : State) (count : Nat) :
-    totalAllocatedDeposits s count =
-      (s.modules.map (fun m => allocatedDeposits s m count)).sum := by
-  rfl
+    (rows : List (Module × Nat)) :
+    depositAllocationWellFormed rows →
+      totalAllocatedDeposits rows = (rows.map Prod.snd).sum := by
+  induction rows with
+  | nil => intro _; rfl
+  | cons r rs ih =>
+      intro h
+      have hrow : allocatedDeposits r.fst r.snd = r.snd := by
+        unfold allocatedDeposits
+        by_cases hActive : r.fst.status = ModuleStatus.active
+        · simp [hActive]
+        · have hzero : r.snd = 0 := h r (List.mem_cons_self) hActive
+          simp [hActive, hzero]
+      have hrest : depositAllocationWellFormed rs :=
+        fun row hmem => h row (List.mem_cons_of_mem r hmem)
+      have hcons : totalAllocatedDeposits (r :: rs) =
+          allocatedDeposits r.fst r.snd + totalAllocatedDeposits rs := by
+        simp [totalAllocatedDeposits]
+      rw [hcons, hrow, ih hrest]
+      simp
 
 theorem P9_allocation_capacity_rows_aligned
     (cfg : AllocationConfig) (modules : List Module) (depositsToAllocate : Nat)
@@ -2830,32 +2874,74 @@ theorem P10_report_rewards_minted_zero_rows_skip_module_check
       [{ moduleId := moduleId, totalShares := 0 }] = true := by
   simp [rewardMintedRowsValid]
 
+private theorem module_balance_le_sum
+    (modules : List Module) (m : Module) (h : m ∈ modules) :
+    m.validatorsBalanceGwei ≤ moduleBalanceSum modules := by
+  induction modules with
+  | nil => cases h
+  | cons x xs ih =>
+      have hcons : moduleBalanceSum (x :: xs) =
+          x.validatorsBalanceGwei + moduleBalanceSum xs := by
+        simp [moduleBalanceSum]
+      rw [hcons]
+      rcases List.mem_cons.mp h with heq | hmem
+      · subst heq; exact Nat.le_add_right _ _
+      · exact Nat.le_trans (ih hmem) (Nat.le_add_left _ _)
+
+private theorem reward_share_le_precision
+    (modules : List Module) (m : Module) (h : m ∈ modules)
+    (hTotal : moduleBalanceSum modules ≠ 0) :
+    rewardShare (moduleBalanceSum modules) m ≤ feePrecisionPoints := by
+  unfold rewardShare
+  have hle : m.validatorsBalanceGwei ≤ moduleBalanceSum modules :=
+    module_balance_le_sum modules m h
+  have hpos : 0 < moduleBalanceSum modules := Nat.pos_of_ne_zero hTotal
+  calc
+    m.validatorsBalanceGwei * feePrecisionPoints / moduleBalanceSum modules
+        ≤ moduleBalanceSum modules * feePrecisionPoints / moduleBalanceSum modules :=
+          Nat.div_le_div_right (Nat.mul_le_mul hle (Nat.le_refl _))
+    _ = feePrecisionPoints := Nat.mul_div_cancel_left feePrecisionPoints hpos
+
+/--
+  Reward fee bound (balance-proportional). Each module's computed fee is derived
+  from its share of the total validator balance and is bounded by the
+  precision-scaled module fee. Requires the module to be one of the rewarded
+  modules with a nonzero router total, matching
+  `getStakingRewardsDistribution`.
+-/
 theorem P5_reward_bound
-    (totalReward : Wei) (m : Module) :
-    moduleReward totalReward m ≤ moduleRewardUpperBound totalReward m := by
-  simp [moduleReward]
-  split
-  · exact Nat.zero_le _
-  · exact Nat.le_refl _
+    (modules : List Module) (m : Module)
+    (hMem : m ∈ modules) (hTotal : moduleBalanceSum modules ≠ 0) :
+    computedModuleFee (moduleBalanceSum modules) m ≤
+      feePrecisionPoints * m.moduleFeeBps / bpsDenominator := by
+  unfold computedModuleFee
+  have hshare := reward_share_le_precision modules m hMem hTotal
+  exact Nat.div_le_div_right (Nat.mul_le_mul hshare (Nat.le_refl _))
 
 theorem P5_reward_recipient_alignment
-    (totalReward : Wei) (modules : List Module) :
-    recipientsAligned totalReward modules := by
+    (modules : List Module) :
+    rewardRecipientsAligned modules := by
   intro row hrow
-  simp [rewardRows] at hrow
-  rcases hrow with ⟨m, hm, hrow⟩
-  exact ⟨m, hm, hrow.symm⟩
+  rcases P5_rewards_distribution_rows_aligned modules row hrow with
+    ⟨m, hm, _hNonzero, hrowEq⟩
+  refine ⟨m, hm, ?_⟩
+  cases hrowEq
+  simp [rewardDistributionRow]
 
 theorem P6_deposit_status_gating
-    (s : State) (m : Module) (count : Nat)
+    (m : Module) (allocated : Nat)
     (h : m.status ≠ ModuleStatus.active) :
-    allocatedDeposits s m count = 0 := by
+    allocatedDeposits m allocated = 0 := by
   simp [allocatedDeposits, h]
 
+/--
+  Stopped modules are paid zero module-side fee even though the balance-share
+  computation still produces a `moduleFee` figure for the treasury accumulator.
+-/
 theorem P6_stopped_module_reward_zero
-    (totalReward : Wei) (m : Module)
+    (totalValidatorsBalanceGwei : Gwei) (m : Module)
     (h : m.status = ModuleStatus.stopped) :
-    moduleReward totalReward m = 0 := by
-  simp [moduleReward, h]
+    (rewardDistributionRow totalValidatorsBalanceGwei m).paidModuleFee = 0 := by
+  simp [rewardDistributionRow, h]
 
 end LidoSRv3

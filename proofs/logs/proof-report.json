@@ -5,8 +5,16 @@
     "verity_commit": "33722270d996c7a3a520a71ecee42d7d232da100"
   },
   "command": "lake build LidoSRv3",
+  "build": {
+    "log": "proofs/logs/prove.txt",
+    "log_sha256": "a30d6eefe7ccec7803482bd446c3d48f7cc46ed86ba99cb839fca134dd7a5a3d",
+    "verified_at": "2026-07-08T12:14:28Z",
+    "git_commit": "1142de4720e2f637f8b0c3318de0b0dceeed397c",
+    "exit_status": 0
+  },
   "targets": [
     {"id": "SRV3-P1", "theorem": "LidoSRv3.P1_reserve_separation", "status": "lean_checked"},
+    {"id": "SRV3-P1a", "theorem": "LidoSRv3.P1_depositable_excludes_withdrawal_reserve", "status": "lean_checked"},
     {"id": "SRV3-P2", "theorem": "LidoSRv3.P2_deposit_exact_pull", "status": "lean_checked"},
     {"id": "SRV3-P2a", "theorem": "LidoSRv3.P2_total_allocated_deposits", "status": "lean_checked"},
     {"id": "SRV3-P2b", "theorem": "LidoSRv3.P2_deposit_transition_router_eth_unchanged", "status": "lean_checked"},

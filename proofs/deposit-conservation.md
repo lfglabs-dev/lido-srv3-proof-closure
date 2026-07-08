@@ -12,6 +12,8 @@ Model artifact:
 - `LidoSRv3/Model.lean::depositMaxCount`
 - `LidoSRv3/Model.lean::depositTransition`
 - `LidoSRv3/Model.lean::allocatedDeposits`
+- `LidoSRv3/Model.lean::depositAllocationWellFormed`
+- `LidoSRv3/Model.lean::totalAllocatedDeposits`
 - `LidoSRv3/SpecProofs.lean::P2_deposit_exact_pull`
 - `LidoSRv3/SpecProofs.lean::P2_deposit_transition_router_eth_unchanged`
 - `LidoSRv3/SpecProofs.lean::P2_deposit_transition_beacon_sink_exact`
@@ -32,7 +34,7 @@ Math statement:
 
 ```text
 pulledWei = 32 ETH * actualDeposits
-actualDeposits = sum(allocatedDeposits(module, actualDeposits) for module in modules)
+totalAllocatedDeposits(rows) = sum(count for (module, count) in rows), when the allocation is well-formed (only active modules carry a positive count); the one router deposit budget is split across module rows rather than every active module receiving the full count
 routerEthAfter = routerEthBefore
 pulledWei <= depositableEtherBefore, when actualDeposits > 0
 bufferedEtherAfter = bufferedEtherBefore - pulledWei, when actualDeposits > 0

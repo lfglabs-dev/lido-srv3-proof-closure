@@ -109,11 +109,27 @@ def isDepositEligible (m : Module) : Prop :=
 def isRewardEligible (m : Module) : Prop :=
   m.status ≠ ModuleStatus.stopped
 
-def allocatedDeposits (_s : State) (m : Module) (count : Nat) : Nat :=
-  if m.status = ModuleStatus.active then count else 0
+/-!
+  Router-order deposit allocation.
 
-def totalAllocatedDeposits (s : State) (count : Nat) : Nat :=
-  (s.modules.map (fun m => allocatedDeposits s m count)).sum
+  `_getDepositAllocations`/`MinFirstAllocationStrategy` split one router deposit
+  budget across modules, producing a per-module allocated count. The model
+  represents that result as a list of `(module, allocated)` rows: `allocated` is
+  the amount routed to *that* module, not the router total. Only active modules
+  may receive a positive count, matching the deposit gate. `allocatedDeposits`
+  gates a single row's own amount, and `totalAllocatedDeposits` sums the per-row
+  amounts so the router total is conserved as the sum of module deltas rather
+  than scaling with the active-module count.
+-/
+
+def allocatedDeposits (m : Module) (allocated : Nat) : Nat :=
+  if m.status = ModuleStatus.active then allocated else 0
+
+def depositAllocationWellFormed (rows : List (Module × Nat)) : Prop :=
+  ∀ row ∈ rows, row.fst.status ≠ ModuleStatus.active → row.snd = 0
+
+def totalAllocatedDeposits (rows : List (Module × Nat)) : Nat :=
+  (rows.map (fun row => allocatedDeposits row.fst row.snd)).sum
 
 def depositPullWei (actualDeposits : Nat) : Wei :=
   validatorDepositWei * actualDeposits
@@ -742,12 +758,6 @@ def topUpTransition
       else
         none
 
-def moduleRewardUpperBound (totalReward : Wei) (m : Module) : Wei :=
-  totalReward * m.moduleFeeBps / bpsDenominator
-
-def moduleReward (totalReward : Wei) (m : Module) : Wei :=
-  if m.status ≠ ModuleStatus.stopped then moduleRewardUpperBound totalReward m else 0
-
 /-!
   `StakingRouter.getStakingRewardsDistribution` translation surface.
 
@@ -840,13 +850,9 @@ def reportRewardsMintedTransition
   else
     none
 
-def rewardRows (totalReward : Wei) (modules : List Module) : List (ModuleId × Address × Wei) :=
-  modules.map (fun m => (m.id, m.rewardRecipient, moduleReward totalReward m))
-
-def recipientsAligned (totalReward : Wei) (modules : List Module) : Prop :=
-  ∀ row ∈ rewardRows totalReward modules,
-    ∃ m ∈ modules,
-      row = (m.id, m.rewardRecipient, moduleReward totalReward m)
+def rewardRecipientsAligned (modules : List Module) : Prop :=
+  ∀ row ∈ stakingRewardsDistributionRows modules,
+    ∃ m ∈ modules, row.recipient = m.rewardRecipient
 
 def rewardsUseAcceptedReport (s : State) : Prop :=
   ∃ r, s.lastAcceptedReport = some r ∧ reportBalances r = s.modules.map Module.validatorsBalanceGwei

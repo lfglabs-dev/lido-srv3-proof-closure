@@ -1,7 +1,46 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cat <<'JSON'
+# Emit the SRv3 Lean proof report, but ONLY after verifying that a fresh Lean
+# build actually succeeded. This prevents recording stale or fabricated
+# "lean_checked" claims when `lake build` was never run, failed, or errored.
+#
+# Inputs (from `make prove`):
+#   BUILD_LOG     path to the captured `lake build LidoSRv3` output
+#                 (default: proofs/logs/prove.txt)
+#   BUILD_STATUS  the exit status of that build (default: unknown -> rejected)
+
+BUILD_LOG="${BUILD_LOG:-proofs/logs/prove.txt}"
+BUILD_STATUS="${BUILD_STATUS:-}"
+
+fail() { printf 'write_proof_report: %s\n' "$1" >&2; exit 1; }
+
+# 1. A build log must exist.
+[ -f "$BUILD_LOG" ] || \
+  fail "build log '$BUILD_LOG' not found; run 'make prove' (which runs 'lake build LidoSRv3') first"
+
+# 2. The recorded build exit status must be present and successful.
+[ -n "$BUILD_STATUS" ] || \
+  fail "BUILD_STATUS not provided; refusing to emit a report without a verified build exit code"
+[ "$BUILD_STATUS" = "0" ] || \
+  fail "build exit status was '$BUILD_STATUS' (non-zero); refusing to emit a lean_checked report"
+
+# 3. The log must not contain Lean error lines.
+if grep -Eq '(^|[[:space:]])error:' "$BUILD_LOG"; then
+  fail "build log '$BUILD_LOG' contains error lines; refusing to emit a lean_checked report"
+fi
+
+# 4. The log must record a successful build (either a fresh 'Built LidoSRv3'
+#    target line, or lake's 'Build completed successfully' summary when the
+#    target was already up to date).
+grep -Eq 'Built LidoSRv3|Build completed successfully' "$BUILD_LOG" || \
+  fail "build log '$BUILD_LOG' does not record a successful build; refusing to emit report"
+
+BUILD_SHA256="$(sha256sum "$BUILD_LOG" | awk '{print $1}')"
+VERIFIED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+GIT_COMMIT="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
+
+cat <<JSON
 {
   "schema": "srv3-verity-lean-proof-report-v1",
   "toolchain": {
@@ -9,8 +48,16 @@ cat <<'JSON'
     "verity_commit": "33722270d996c7a3a520a71ecee42d7d232da100"
   },
   "command": "lake build LidoSRv3",
+  "build": {
+    "log": "${BUILD_LOG}",
+    "log_sha256": "${BUILD_SHA256}",
+    "verified_at": "${VERIFIED_AT}",
+    "git_commit": "${GIT_COMMIT}",
+    "exit_status": ${BUILD_STATUS}
+  },
   "targets": [
     {"id": "SRV3-P1", "theorem": "LidoSRv3.P1_reserve_separation", "status": "lean_checked"},
+    {"id": "SRV3-P1a", "theorem": "LidoSRv3.P1_depositable_excludes_withdrawal_reserve", "status": "lean_checked"},
     {"id": "SRV3-P2", "theorem": "LidoSRv3.P2_deposit_exact_pull", "status": "lean_checked"},
     {"id": "SRV3-P2a", "theorem": "LidoSRv3.P2_total_allocated_deposits", "status": "lean_checked"},
     {"id": "SRV3-P2b", "theorem": "LidoSRv3.P2_deposit_transition_router_eth_unchanged", "status": "lean_checked"},
