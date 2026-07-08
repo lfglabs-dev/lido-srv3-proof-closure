@@ -28,6 +28,17 @@ proof-fidelity details; treat `covered-*` rows as "checked in the pinned model,
 subject to in-flight fidelity review" rather than as a final on-chain
 refinement claim.
 
+**Scope tier.** Independently of the status enum above, each in-model target
+group carries a scope tier recorded in
+[`srv3-proof-targets.json`](./srv3-proof-targets.json) (`scope` block). The
+signed P0 economic scope of the 4-week pilot is the economic-conservation core
+SRV3-P1--P6, P8, P9 (matching the executive-summary headline claim). SRV3-P7 and
+SRV3-P10--P15 are executable operational / module-configuration lanes carried as
+follow-on / internal work, not current acceptance commitments. This tiering does
+not change any row's `Status`; it records which checked rows the pilot presents
+as signed acceptance versus follow-on. The P0-boundary review question in §4
+remains open for client confirmation.
+
 ## 1. Source inventory
 
 ### 1.1 Prior Certora assurance (referenced, not vendored)

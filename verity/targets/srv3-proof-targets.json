@@ -1,5 +1,16 @@
 {
   "schema": "srv3-proof-targets-v1",
+  "scope": {
+    "note": "Scope tiers are assigned per target-group prefix (SRV3-P1, SRV3-P2, ...). The signed P0 pilot scope is the economic-conservation core; operational and module-configuration groups are executable follow-on / internal lanes and are not current acceptance commitments.",
+    "signed_p0_economic": {
+      "description": "Signed P0 economic-conservation scope of the 4-week SRv3 pilot. Matches the executive-summary headline executable claim.",
+      "groups": ["SRV3-P1", "SRV3-P2", "SRV3-P3", "SRV3-P4", "SRV3-P5", "SRV3-P6", "SRV3-P8", "SRV3-P9"]
+    },
+    "follow_on_operational": {
+      "description": "Executable operational / module-configuration lanes carried beyond the signed P0 scope. Checked in the pinned model but not part of the current acceptance claim.",
+      "groups": ["SRV3-P7", "SRV3-P10", "SRV3-P11", "SRV3-P12", "SRV3-P13", "SRV3-P14", "SRV3-P15"]
+    }
+  },
   "targets": [
     {
       "claim": "Depositable ETH and the effective withdrawal-reserved bucket partition the buffer exactly (depositable + withdrawalReserveUsed = bufferedEther), derived from the reserve definitions.",

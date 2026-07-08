@@ -6,10 +6,12 @@
 If PR \#1811 changes how Lido accounts for deposit allocation, deposits,
 top-ups, reserves, module balances, and rewards, can the selected accounting
 rules be stated precisely enough that a machine can check them in a reproducible
-focused model? This report package gives an executable local answer for the fifteen
-selected P0 (highest-priority)
-properties over the focused economic model, under the named assumptions in
-\cref{sec:trust-boundary}.
+focused model? This report package gives an executable local answer for the
+signed P0 economic scope of the pilot --- the eight economic-conservation
+target groups listed first below --- over the focused economic model, under the
+named assumptions in \cref{sec:trust-boundary}. The additional operational and
+module-configuration target groups are carried as follow-on / internal lanes,
+not as current acceptance commitments.
 \end{notebox}
 
 \noindent In this repository, ``executable'' has a specific meaning: the model
@@ -62,10 +64,14 @@ allocation-capacity bounds, report-before-reward consistency, reward/fee bounds,
 and flow-specific status gating under the named assumptions.
 \end{quote}
 
-\noindent This is not a claim that every deployed-system behavior is proved. The
-exact boundary is part of the result: cryptographic witnesses, consensus
-truthfulness, governance configuration, and deployment refinement are named in
-\cref{sec:trust-boundary}.
+\noindent That signed claim is exactly the eight economic-conservation target
+groups (SRV3-P1--P6, P8, P9) in the first matrix below. This is not a claim that
+every deployed-system behavior is proved. The exact boundary is part of the
+result: cryptographic witnesses, consensus truthfulness, governance
+configuration, and deployment refinement are named in
+\cref{sec:trust-boundary}. The operational and module-configuration target
+groups (SRV3-P7, P10--P15) in the second matrix are executable follow-on /
+internal lanes; they are not part of the signed P0 acceptance claim.
 
 \subsection*{How to read the proof}
 
@@ -75,15 +81,18 @@ states what must not go wrong in the focused model. Third, Lake checks the
 theorem file against the explicit assumptions.
 
 \smallskip
-\noindent The matrix answers fifteen plain questions: what ETH is spendable, how
-module capacity is bounded, what initial deposits and top-ups consume, what
-balances add up to, what report rewards use, how fees are bounded, and which
-module states block economic flow.
+\noindent The signed economic matrix answers eight plain questions: what ETH is
+spendable, how module capacity is bounded, what initial deposits and top-ups
+consume, what balances add up to, what report rewards use, how fees are bounded,
+and which module states block economic flow. A second matrix lists the
+operational and module-configuration lanes that are carried as executable
+follow-on work rather than signed acceptance rows.
 
-\subsection*{Proof matrix}
+\subsection*{Proof matrix --- signed P0 economic scope}
 
-\noindent All fifteen rows below have executable artifacts in \path{proofs/},
-\path{LidoSRv3/}, and \path{verity/targets/}.
+\noindent The eight rows below are the signed P0 economic-conservation scope of
+the pilot. All have executable artifacts in \path{proofs/}, \path{LidoSRv3/},
+and \path{verity/targets/}.
 
 \noindent
 \begingroup
@@ -132,12 +141,6 @@ module states block economic flow.
   Non-active or deposit-paused modules receive no modeled deposit allocation;
   stopped modules receive no module-side reward or fee allocation. \\
   \rowsep
-  SRV3-P7 & Exited-count updates &
-  Successful exited-count rows name existing modules, cannot decrease the
-  router-stored count, cannot exceed deposited validators, return the exact
-  sequential loop result, and preserve module-array length, module-balance sums,
-  and non-module router state. \\
-  \rowsep
   SRV3-P8 & Router top-up path &
   Top-up allocations are same-length, Gwei-aligned, within per-key limits and
   the rounded module target, which keeps returned sums inside the module
@@ -152,6 +155,32 @@ module states block economic flow.
   order, and derived capacity values preserve router module length; active
   capacity is bounded by target share and available capacity, while inactive
   modules keep current allocation. \\
+  \bottomrule
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+\endgroup
+
+\subsection*{Proof matrix --- follow-on / operational lanes}
+
+\noindent The seven target groups below are executable operational and
+module-configuration lanes carried beyond the signed P0 economic scope. They
+have artifacts in the same locations (\path{proofs/}, \path{LidoSRv3/},
+\path{verity/targets/}) but are \emph{not} part of the current acceptance claim;
+they are follow-on / internal work shown for completeness.
+
+\noindent
+\begingroup
+\footnotesize
+\renewcommand{\arraystretch}{1.06}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  \thead{ID} & \thead{PR \#1811 surface} & \thead{Executable property} \\
+  \midrule
+  SRV3-P7 & Exited-count updates &
+  Successful exited-count rows name existing modules, cannot decrease the
+  router-stored count, cannot exceed deposited validators, return the exact
+  sequential loop result, and preserve module-array length, module-balance sums,
+  and non-module router state. \\
   \rowsep
   SRV3-P10 & Reward-minted reporting &
   Reward-minted report arrays have equal length and return exactly one zipped
