@@ -7,9 +7,11 @@ If PR \#1811 changes how Lido accounts for deposit allocation, deposits,
 top-ups, reserves, module balances, and rewards, can the selected accounting
 rules be stated precisely enough that a machine can check them in a reproducible
 focused model? This report package gives an executable local answer for the
-signed P0 economic scope of the pilot --- the eight economic-conservation
-target groups listed first below --- over the focused economic model, under the
-named assumptions in \cref{sec:trust-boundary}. The additional operational and
+signed P0 economic scope of the pilot --- the six P0 candidate
+economic-conservation properties (SRV3-P1--P6) listed first below, decomposed
+internally into finer executable target groups such as top-up and
+allocation-capacity --- over the focused economic model, under the named
+assumptions in \cref{sec:trust-boundary}. The additional operational and
 module-configuration target groups are carried as follow-on / internal lanes,
 not as current acceptance commitments.
 \end{notebox}
@@ -64,13 +66,16 @@ allocation-capacity bounds, report-before-reward consistency, reward/fee bounds,
 and flow-specific status gating under the named assumptions.
 \end{quote}
 
-\noindent That signed claim is exactly the eight economic-conservation target
-groups (SRV3-P1--P6, P8, P9) in the first matrix below. This is not a claim that
-every deployed-system behavior is proved. The exact boundary is part of the
-result: cryptographic witnesses, consensus truthfulness, governance
-configuration, and deployment refinement are named in
-\cref{sec:trust-boundary}. The operational and module-configuration target
-groups (SRV3-P7, P10--P15) in the second matrix are executable follow-on /
+\noindent That signed claim is the six P0 candidate economic-conservation
+properties (SRV3-P1--P6) in the first matrix below. The model decomposes the
+deposit and allocation surface internally into finer executable target groups
+--- notably top-up (SRV3-P8) and allocation-capacity (SRV3-P9), shown in the
+second matrix --- which support the P0 properties but are not additional signed
+acceptance rows. This is not a claim that every deployed-system behavior is
+proved. The exact boundary is part of the result: cryptographic witnesses,
+consensus truthfulness, governance configuration, and deployment refinement are
+named in \cref{sec:trust-boundary}. The operational and module-configuration
+target groups (SRV3-P7, P10--P15) in the third matrix are executable follow-on /
 internal lanes; they are not part of the signed P0 acceptance claim.
 
 \subsection*{How to read the proof}
@@ -81,18 +86,19 @@ states what must not go wrong in the focused model. Third, Lake checks the
 theorem file against the explicit assumptions.
 
 \smallskip
-\noindent The signed economic matrix answers eight plain questions: what ETH is
-spendable, how module capacity is bounded, what initial deposits and top-ups
-consume, what balances add up to, what report rewards use, how fees are bounded,
-and which module states block economic flow. A second matrix lists the
-operational and module-configuration lanes that are carried as executable
-follow-on work rather than signed acceptance rows.
+\noindent The six P0 candidate properties answer six plain questions: what ETH
+is spendable, what deposits consume, what balances add up to, what report
+rewards use, how fees are bounded, and which module states block economic flow.
+A second matrix lists the internal economic decomposition (top-up and
+allocation-capacity) that refines the deposit and allocation surface, and a
+third matrix lists the operational and module-configuration lanes that are
+carried as executable follow-on work rather than signed acceptance rows.
 
-\subsection*{Proof matrix --- signed P0 economic scope}
+\subsection*{Proof matrix --- six P0 candidate economic properties}
 
-\noindent The eight rows below are the signed P0 economic-conservation scope of
-the pilot. All have executable artifacts in \path{proofs/}, \path{LidoSRv3/},
-and \path{verity/targets/}.
+\noindent The six rows below are the signed P0 candidate economic-conservation
+scope of the pilot. All have executable artifacts in \path{proofs/},
+\path{LidoSRv3/}, and \path{verity/targets/}.
 
 \noindent
 \begingroup
@@ -140,7 +146,26 @@ and \path{verity/targets/}.
   SRV3-P6 & Status gates &
   Non-active or deposit-paused modules receive no modeled deposit allocation;
   stopped modules receive no module-side reward or fee allocation. \\
-  \rowsep
+  \bottomrule
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+\endgroup
+
+\subsection*{Proof matrix --- internal economic decomposition}
+
+\noindent The two rows below decompose the deposit and allocation surface of the
+P0 scope into finer executable target groups. They are checked in the pinned
+model and shown for completeness; they support the six P0 candidate properties
+rather than adding separate signed acceptance rows.
+
+\noindent
+\begingroup
+\footnotesize
+\renewcommand{\arraystretch}{1.06}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  \thead{ID} & \thead{PR \#1811 surface} & \thead{Executable property} \\
+  \midrule
   SRV3-P8 & Router top-up path &
   Top-up allocations are same-length, Gwei-aligned, within per-key limits and
   the rounded module target, which keeps returned sums inside the module

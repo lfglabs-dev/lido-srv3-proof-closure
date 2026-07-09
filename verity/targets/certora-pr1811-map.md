@@ -31,13 +31,16 @@ refinement claim.
 **Scope tier.** Independently of the status enum above, each in-model target
 group carries a scope tier recorded in
 [`srv3-proof-targets.json`](./srv3-proof-targets.json) (`scope` block). The
-signed P0 economic scope of the 4-week pilot is the economic-conservation core
-SRV3-P1--P6, P8, P9 (matching the executive-summary headline claim). SRV3-P7 and
+signed P0 economic scope of the 4-week pilot is the six P0 candidate
+economic-conservation properties SRV3-P1--P6 (matching the executive-summary
+headline claim). SRV3-P8 (top-up) and SRV3-P9 (allocation-capacity) are internal
+economic decomposition of the deposit/allocation surface --- executable
+supporting targets, not additional signed acceptance commitments. SRV3-P7 and
 SRV3-P10--P15 are executable operational / module-configuration lanes carried as
 follow-on / internal work, not current acceptance commitments. This tiering does
 not change any row's `Status`; it records which checked rows the pilot presents
-as signed acceptance versus follow-on. The P0-boundary review question in §4
-remains open for client confirmation.
+as signed acceptance versus decomposition/follow-on. The P0-boundary review
+question in §4 remains open for client confirmation.
 
 ## 1. Source inventory
 

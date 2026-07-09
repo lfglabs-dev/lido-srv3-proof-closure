@@ -25,9 +25,11 @@ dist/lido-srv3-formal-methods-report.pdf
 - `report.tex`: report entrypoint and metadata.
 - `content/`: formal-methods report sections.
 - `LidoSRv3/`: Verity/Lean SRv3 economic model and checked theorems. The signed
-  P0 scope is the eight economic-conservation target groups (SRV3-P1--P6, P8,
-  P9); the operational and module-configuration groups (SRV3-P7, P10--P15) are
-  executable follow-on / internal lanes, not current acceptance commitments.
+  P0 scope is the six P0 candidate economic-conservation properties
+  (SRV3-P1--P6), decomposed internally into finer executable target groups such
+  as top-up (SRV3-P8) and allocation-capacity (SRV3-P9); the operational and
+  module-configuration groups (SRV3-P7, P10--P15) are executable follow-on /
+  internal lanes, not current acceptance commitments.
 - `verity/targets/`: source maps and target manifests, including
   `certora-pr1811-map.md`, the Certora → PR #1811 → Verity property and
   assumption map (Week-1 pilot deliverable).
