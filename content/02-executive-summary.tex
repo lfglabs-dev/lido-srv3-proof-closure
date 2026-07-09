@@ -3,21 +3,23 @@
 
 \begin{notebox}
 \noteboxtitle{Question answered by this report}
-If PR \#1811 changes how Lido accounts for deposits, reserves, module balances,
-and rewards, can the selected accounting rules be stated precisely enough that a
-machine can check them for every modeled case, not only for examples? This
-report package shows the intended final-report answer once the companion proof
-repository exists: the answer would be yes for the six selected P0
-(highest-priority) properties, under the named assumptions in
-\cref{sec:trust-boundary}.
+If PR \#1811 changes how Lido accounts for deposit allocation, deposits,
+top-ups, reserves, module balances, and rewards, can the selected accounting
+rules be stated precisely enough that a machine can check them in a reproducible
+focused model? This report package gives an executable local answer for the
+signed P0 economic scope of the pilot --- the six P0 candidate
+economic-conservation properties (SRV3-P1--P6) listed first below, decomposed
+internally into finer executable target groups such as top-up and
+allocation-capacity --- over the focused economic model, under the named
+assumptions in \cref{sec:trust-boundary}. The additional operational and
+module-configuration target groups are carried as follow-on / internal lanes,
+not as current acceptance commitments.
 \end{notebox}
 
-\noindent In a final report, ``closed'' has a specific meaning: the theorem compiles
-without admitted proof obligations, its Solidity-facing model target is listed,
-all premises not discharged inside the model are registered by assumption ID, and
-the reproducibility command rechecks the theorem namespace from a clean checkout. Because this
-repository is a report package, that sentence is the evidence threshold for a real
-delivery rather than a claim that the proof repository is present here.
+\noindent In this repository, ``executable'' has a specific meaning: the model
+target is listed, all premises not discharged inside the model are registered by
+assumption ID, and \texttt{make test} plus \texttt{make prove} recheck the target
+set from a clean checkout.
 
 \subsection*{The story in one page}
 
@@ -48,54 +50,63 @@ consensus layer.
 
 \begin{notebox}
 \noteboxtitle{Why this is more than testing}
-A test asks, ``does this example work?'' A theorem asks, ``does this rule survive
-every modeled case that satisfies the assumptions?'' That is why the report
-spends so much effort naming the model and assumptions: they define the world in
-which the machine-checked statement is meant to be universal.
+A test asks, ``does this example work?'' A Verity/Lean proof target asks,
+``does this rule follow from the modeled transition for all values covered by
+the theorem statement?'' That is why the report spends so much effort naming the
+model and assumptions: they define exactly what the local command checks.
 \end{notebox}
 
 \smallskip
-\noindent The final claim this report package is designed to support is:
+\noindent The executable claim this report package supports is:
 
 \begin{quote}
-For all modeled finite module arrays and accepted report arrays satisfying the
-listed well-formedness assumptions, the selected PR \#1811 SRv3 economic state
-machine preserves deposit conservation, reserve separation, module-balance
-conservation, report-before-reward consistency, reward/fee bounds, and
-flow-specific status gating.
+For the focused SRv3 economic state machine, the Verity/Lean model preserves
+deposit and top-up conservation, reserve separation, module-balance conservation,
+allocation-capacity bounds, report-before-reward consistency, reward/fee bounds,
+and flow-specific status gating under the named assumptions.
 \end{quote}
 
-\noindent This would not be a claim that every deployed-system behavior is proved. The
-exact boundary is part of the result: cryptographic witnesses, consensus
-truthfulness, governance configuration, and deployment refinement are named in
-\cref{sec:trust-boundary}.
+\noindent That signed claim is the six P0 candidate economic-conservation
+properties (SRV3-P1--P6) in the first matrix below. The model decomposes the
+deposit and allocation surface internally into finer executable target groups
+--- notably top-up (SRV3-P8) and allocation-capacity (SRV3-P9), shown in the
+second matrix --- which support the P0 properties but are not additional signed
+acceptance rows. This is not a claim that every deployed-system behavior is
+proved. The exact boundary is part of the result: cryptographic witnesses,
+consensus truthfulness, governance configuration, and deployment refinement are
+named in \cref{sec:trust-boundary}. The operational and module-configuration
+target groups (SRV3-P7, P10--P15) in the third matrix are executable follow-on /
+internal lanes; they are not part of the signed P0 acceptance claim.
 
 \subsection*{How to read the proof}
 
-Read each row below as a three-step promise for the final package. First, the
-Solidity-facing model names the transition being studied. Second, the property
-states what must never go wrong for any modeled input. Third, Lean should check
-the resulting theorem against the Verity-generated state model and the explicit
-assumptions. The value of the exercise is not that one test passed; it is that
-the statement leaves no remaining case split for a reviewer to hold in their
-head.
+Read each row below as a three-step trace. First, the
+Verity/Lean model names the transition being studied. Second, the property
+states what must not go wrong in the focused model. Third, Lake checks the
+theorem file against the explicit assumptions.
 
 \smallskip
-\noindent The matrix answers six plain questions: what ETH is spendable, what
-deposits consume, what balances add up to, what report rewards use, how fees are
-bounded, and which module states block economic flow.
+\noindent The six P0 candidate properties answer six plain questions: what ETH
+is spendable, what deposits consume, what balances add up to, what report
+rewards use, how fees are bounded, and which module states block economic flow.
+A second matrix lists the internal economic decomposition (top-up and
+allocation-capacity) that refines the deposit and allocation surface, and a
+third matrix lists the operational and module-configuration lanes that are
+carried as executable follow-on work rather than signed acceptance rows.
 
-\subsection*{Proof matrix}
+\subsection*{Proof matrix --- six P0 candidate economic properties}
 
-\noindent All six rows below are targets: they show the intended final
-closed state once the corresponding theorem artifact and trust-boundary row are
-present in the companion proof repository.
+\noindent The six rows below are the signed P0 candidate economic-conservation
+scope of the pilot. All have executable artifacts in \path{proofs/},
+\path{LidoSRv3/}, and \path{verity/targets/}.
 
 \noindent
-\renewcommand{\arraystretch}{1.18}
+\begingroup
+\footnotesize
+\renewcommand{\arraystretch}{1.06}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
   \toprule
-  \thead{ID} & \thead{PR \#1811 surface} & \thead{Intended final property} \\
+  \thead{ID} & \thead{PR \#1811 surface} & \thead{Executable property} \\
   \midrule
   SRV3-P1 & Lido buffer allocation &
   Withdrawal-reserved ETH is excluded from the depositable resource, so deposit
@@ -103,20 +114,34 @@ present in the companion proof repository.
   \rowsep
   SRV3-P2 & Router deposit path &
   Router-pulled ETH equals 32 ETH times actual deposits and is fully sunk
-  into CL deposits, with no modeled residual held by the router. \\
+  into CL deposits after requiring enough depositable ETH and reducing modeled
+  buffered ETH by that exact amount; allocated-deposit sums match actual
+  deposits after an existing active module passes the nonzero-capacity and
+  max-deposit guards. The selected module's last-deposit field records that
+  exact pulled amount through an exact module-array update while preserving
+  module-array length and module-balance sums, with no modeled residual held by
+  the router, no withdrawal-reserve field mutation, a deposit-reserve field
+  reduced by exactly that pulled amount, and no router report-state mutation.
+  Zero-deposit returns still record last-deposit accounting but leave reserves,
+  modeled buffer, and beacon-sink value unmoved. \\
   \rowsep
   SRV3-P3 & Module balances &
   Router-wide validator balance is exactly the sum of accepted per-module
-  balances, so the aggregate cannot drift away from the module ledger. \\
+  balances, the post-state module array is exactly the accepted report
+  update-loop result, the successful report loop preserves module-array length
+  and ETH-side state, and the exact accepted report is stored for later reward
+  reads. \\
   \rowsep
   SRV3-P4 & Oracle report ordering &
   Module fee-distribution weights come from the current accepted module-balance
   state, not from stale or partially applied reports. \\
   \rowsep
   SRV3-P5 & Rewards and fees &
-  Module fee-distribution weights and recipient alignment use accepted module
-  balances; total reward and fee magnitude remain accepted report or
-  vault-context inputs under assumptions. \\
+  Reward distribution returns empty rows and an empty module-id projection when
+  total balance is zero; otherwise rows use accepted nonzero module balances,
+  skip zero-balance modules, keep recipients aligned, bound paid module fees,
+  and pay stopped modules zero module-side fee, with total fee equal to the
+  row-wise module plus treasury fee sum. \\
   \rowsep
   SRV3-P6 & Status gates &
   Non-active or deposit-paused modules receive no modeled deposit allocation;
@@ -124,10 +149,106 @@ present in the companion proof repository.
   \bottomrule
 \end{tabularx}
 \renewcommand{\arraystretch}{1.0}
+\endgroup
+
+\subsection*{Proof matrix --- internal economic decomposition}
+
+\noindent The two rows below decompose the deposit and allocation surface of the
+P0 scope into finer executable target groups. They are checked in the pinned
+model and shown for completeness; they support the six P0 candidate properties
+rather than adding separate signed acceptance rows.
+
+\noindent
+\begingroup
+\footnotesize
+\renewcommand{\arraystretch}{1.06}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  \thead{ID} & \thead{PR \#1811 surface} & \thead{Executable property} \\
+  \midrule
+  SRV3-P8 & Router top-up path &
+  Top-up allocations are same-length, Gwei-aligned, within per-key limits and
+  the rounded module target, which keeps returned sums inside the module
+  allocation budget. Nonzero sums require enough depositable ETH before the
+  modeled Lido pull, reduce modeled buffered ETH by that exact sum, reduce the
+  deposit-reserve field by exactly that sum, and are fully sunk; zero sums
+  return the unchanged state. Both branches leave no modeled router residual and
+  no withdrawal-reserve field mutation, and do not mutate router module or
+  report accounting. \\
+  \rowsep
+  SRV3-P9 & Deposit allocation capacity &
+  SRv3 allocation-capacity rows preserve router module length and module-id
+  order, and derived capacity values preserve router module length; active
+  capacity is bounded by target share and available capacity, while inactive
+  modules keep current allocation. \\
+  \bottomrule
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+\endgroup
+
+\subsection*{Proof matrix --- follow-on / operational lanes}
+
+\noindent The seven target groups below are executable operational and
+module-configuration lanes carried beyond the signed P0 economic scope. They
+have artifacts in the same locations (\path{proofs/}, \path{LidoSRv3/},
+\path{verity/targets/}) but are \emph{not} part of the current acceptance claim;
+they are follow-on / internal work shown for completeness.
+
+\noindent
+\begingroup
+\footnotesize
+\renewcommand{\arraystretch}{1.06}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
+  \toprule
+  \thead{ID} & \thead{PR \#1811 surface} & \thead{Executable property} \\
+  \midrule
+  SRV3-P7 & Exited-count updates &
+  Successful exited-count rows name existing modules, cannot decrease the
+  router-stored count, cannot exceed deposited validators, return the exact
+  sequential loop result, and preserve module-array length, module-balance sums,
+  and non-module router state. \\
+  \rowsep
+  SRV3-P10 & Reward-minted reporting &
+  Reward-minted report arrays have equal length and return exactly one zipped
+  row per module id; zero-share rows are skipped, and every nonzero-share row
+  names an existing module before callback. \\
+  \rowsep
+  SRV3-P11 & All-module fee updates &
+  Fee-update arrays match module count, keep every module/treasury fee sum
+  within total basis points, require a consistent fee sum across modules, set
+  fee projections exactly to the supplied arrays, and preserve module-list
+  length, validator-balance sums, and non-module router state. \\
+  \rowsep
+  SRV3-P12 & Single-module config updates &
+  Single-module updates require an existing module, valid share parameters,
+  bounded and consistent fee sums, uint64 deposit-parameter bounds, exact
+  selected-module field recording, and unchanged module-list length,
+  validator-balance sums, and non-module router state. \\
+  \rowsep
+  SRV3-P13 & Module status updates &
+  Status updates require an existing module and a changed status, record the
+  requested status in the post-state lookup, preserve module-list length, and do
+  not change router-stored module validator-balance sums or non-module router
+  state. \\
+  \rowsep
+  SRV3-P14 & Module addition &
+  Module addition requires a fresh id and valid config, appends exactly the
+  accepted new module, starts it with zero accounting, and preserves
+  router-stored validator-balance sums plus non-module router state. \\
+  \rowsep
+  SRV3-P15 & All-module share updates &
+  Share-update arrays match module count, every row preserves stake-share and
+  priority-exit ordering, share projections are set exactly to the supplied
+  arrays, and the update preserves module-list length and router-stored
+  validator-balance sums plus non-module router state. \\
+  \bottomrule
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+\endgroup
 
 \subsection*{Review posture}
 
 This report package is written for two readers at once. A protocol reviewer can follow
-the ledgers and the trust boundary without reading Lean. A formal-methods
-reviewer can check whether the theorem IDs, assumptions, and rebuild gates would
-support the advertised claim in a real delivery package.
+the ledgers and the trust boundary without reading code. A formal-methods
+reviewer can check whether the target IDs, assumptions, and rebuild gates support
+the advertised local executable claim.

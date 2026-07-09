@@ -4,10 +4,40 @@ ENGINE    := -pdf
 FLAGS     := -interaction=nonstopmode -halt-on-error -file-line-error
 OUT_DIR   := build
 DIST_DIR  := dist
+PROOF_LOG := proofs/logs/proof-report.json
+SHELL     := /usr/bin/env bash
+.SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all clean distclean
+.PHONY: all bootstrap test prove report clean distclean
 
-all: $(DIST_DIR)/lido-srv3-formal-methods-report.pdf
+all: report
+
+bootstrap:
+	@lean --version
+	@lake --version
+	@printf '%s\n' 'bootstrap ok: Lean/Lake Verity toolchain is available'
+
+test:
+	@bash scripts/check_no_python_evidence.sh
+	@test -s tests/solidity-reference/stakingRouter.getDepositAllocations.test.ts
+	@test -s tests/solidity-reference/stakingRouter.rewards.test.ts
+	@test -s tests/solidity-reference/deposits-reserve.integration.ts
+	@printf '%s\n' 'reference fixtures present; no legacy proof artifacts remain'
+
+prove:
+	@mkdir -p proofs/logs
+	@if lake build LidoSRv3 2>&1 | tee proofs/logs/prove.txt; then s=0; else s=$$?; fi; \
+	 if BUILD_STATUS=$$s BUILD_LOG=proofs/logs/prove.txt \
+	      bash scripts/write_proof_report.sh > $(PROOF_LOG).tmp; then \
+	   mv $(PROOF_LOG).tmp $(PROOF_LOG); \
+	   printf '%s\n' 'proof report written to $(PROOF_LOG)'; \
+	 else \
+	   rm -f $(PROOF_LOG).tmp; \
+	   printf '%s\n' 'build did not verify; proof report NOT updated (kept previous $(PROOF_LOG))' >&2; \
+	   exit 1; \
+	 fi
+
+report: $(DIST_DIR)/lido-srv3-formal-methods-report.pdf
 
 $(OUT_DIR)/$(MAIN).pdf: $(MAIN).tex $(wildcard content/*.tex) $(wildcard style/*.sty)
 	@mkdir -p $(OUT_DIR)

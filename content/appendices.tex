@@ -11,15 +11,17 @@
   new deposits.
   \item[CL] Consensus layer, the Ethereum system that records validator
   activity.
-  \item[Lean] The proof checker that verifies theorem statements.
-  \item[Verity] The translation and modeling layer used to connect
-  Solidity-facing structure to Lean proofs.
+  \item[Lean] A proof checker that verifies the theorem files under
+  \path{LidoSRv3/}.
+  \item[Verity] The modeling framework pinned for this work through
+  \path{lakefile.lean} and imported by the SRv3 Lean package.
   \item[P0] Highest-priority property class. Here it means an accounting claim
-  important enough that a final delivery should either prove it or clearly say
-  why it remains open.
-  \item[Theorem] A precise statement that Lean checks. In this report, theorem
-  names are handles for tracing prose claims back to proof files.
-  \item[Assumption] A named premise that the theorem may use but does not prove.
+  important enough that the executable package should either check it or clearly
+  say why it remains open.
+  \item[Proof target] A precise executable check tied to source anchors,
+  assumptions, model files, and proof logs.
+  \item[Assumption] A named premise that the executable target may use but does
+  not prove.
   \item[Trust boundary] The edge of the proof: what the model proves, what it
   assumes, and what remains for separate review.
 \end{description}
@@ -28,9 +30,12 @@
 \label{app:certora-map}
 
 \noindent This lane does not replace earlier Certora work. It shows how a
-PR \#1811 proof-closure package would continue from that work: moving from
-bounded or summarized checks toward explicit SRv3 accounting transitions,
-balance-based module reasoning, and named assumptions that a reviewer can audit.
+PR \#1811 proof-closure package continues from that work: moving from bounded or
+summarized checks toward explicit SRv3 accounting transitions, balance-based
+module reasoning, and named assumptions that a reviewer can audit. The
+row-level Certora prior-work to PR \#1811 map, with per-surface coverage status
+and load-bearing assumption IDs, is
+\path{verity/targets/certora-pr1811-map.md}.
 
 \noindent
 \begin{xltabular}{\linewidth}{@{}p{0.24\linewidth}p{0.18\linewidth}X@{}}
@@ -41,10 +46,10 @@ balance-based module reasoning, and named assumptions that a reviewer can audit.
   V2 validator-count accounting & Continued &
   Reframed as module-balance conservation over accepted per-module balances. \\
   \rowsep
-  V2 deposit availability bounds & Strengthened in scope &
+  V2 deposit availability bounds & Re-expressed &
   Expressed as reserve separation plus exact 32 ETH pull accounting. \\
   \rowsep
-  V2/V3 reward distribution checks & Strengthened in scope &
+  V2/V3 reward distribution checks & Re-expressed &
   Expressed as accepted-balance reward computation, fee bounds, and recipient
   alignment. \\
   \rowsep
@@ -52,9 +57,9 @@ balance-based module reasoning, and named assumptions that a reviewer can audit.
   Applied to active, stopped, and deposit-paused gates in the modeled economic
   paths. \\
   \rowsep
-  V3 bounded module-array specs & Generalized &
-  Theorems are stated over arbitrary finite arrays with named well-formedness
-  assumptions. \\
+  V3 bounded module-array specs & Mirrored &
+  Verity/Lean theorems cover the focused economic model with named
+  well-formedness assumptions. \\
   \bottomrule
 \end{xltabular}
 
@@ -68,24 +73,26 @@ balance-based module reasoning, and named assumptions that a reviewer can audit.
   \midrule
   \endhead
   Lean axioms introduced by LFG &
-  0 &
-  The final selected theorem namespace should contain no custom axioms. \\
+  0 known &
+  The package ships the \path{LidoSRv3} Lean namespace and does not add custom
+  axioms. \\
   \rowsep
   Admitted theorem bodies &
   0 &
-  The final selected theorem namespace should contain no \texttt{sorry} or
-  \texttt{admit}. \\
+  The checked theorem files contain no \texttt{sorry} or \texttt{admit}. \\
   \rowsep
   Named model assumptions &
-  5 &
-  The report package assumes this allowance: external summaries, beacon sink behavior,
-  accepted oracle reports, module identity/order well-formedness, and arithmetic
-  domain. \\
+  14 &
+  The report package names each out-of-model interface and domain premise in
+  \path{verity/targets/trust-boundary.json}, covering external summaries,
+  governance/module-management plumbing, beacon sinks, accepted oracle reports,
+  module identity/order well-formedness, arithmetic domains, reward precision,
+  Lido withdrawals, staking-module callbacks, and allocation strategy behavior. \\
   \rowsep
   Selected falsification/regression harness counterexamples &
   0 &
-  A final package should report no selected P0 counterexample trace in the named
-  harness. This is not a claim about unmodeled deployed-system behavior. \\
+  \texttt{make prove} checks the selected P0 theorem file. This is not a claim
+  about unmodeled deployed-system behavior. \\
   \bottomrule
 \end{xltabular}
 
@@ -101,7 +108,7 @@ report package. Recommended sequence after this P0 accounting closure:
   triggerable-exit fee/refund exactness.
   \item Consolidation fee conservation, source and target binding, and
   source-ownership caveats.
-  \item Top-up and consensus-layer proof binding.
+  \item Top-up consensus-layer proof binding beyond allocation accounting.
   \item Oracle sanity limits, drain guards, and second-opinion oracle composition.
   \item Deployment governance, role graph, and exact migration refinement.
   \item VaultHub F-01/F-02/F-03, if still relevant to the active review path.

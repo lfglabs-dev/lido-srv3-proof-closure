@@ -1,0 +1,550 @@
+{
+  "schema": "srv3-proof-targets-v1",
+  "scope": {
+    "note": "Scope tiers are assigned per target-group prefix (SRV3-P1, SRV3-P2, ...). The signed P0 pilot scope is the six P0 candidate economic-conservation properties (SRV3-P1..P6); top-up and allocation-capacity are internal economic decomposition of that surface; operational and module-configuration groups are executable follow-on / internal lanes. Only the six P0 candidate properties are current acceptance commitments.",
+    "signed_p0_economic": {
+      "description": "Signed P0 economic-conservation scope of the 4-week SRv3 pilot: six P0 candidate properties. Matches the executive-summary headline executable claim.",
+      "groups": ["SRV3-P1", "SRV3-P2", "SRV3-P3", "SRV3-P4", "SRV3-P5", "SRV3-P6"]
+    },
+    "internal_economic_decomposition": {
+      "description": "Internal economic decomposition of the deposit/allocation surface into finer executable target groups (top-up, allocation-capacity). Checked in the pinned model and shown for completeness; supports the six P0 candidate properties but is not an additional signed acceptance commitment.",
+      "groups": ["SRV3-P8", "SRV3-P9"]
+    },
+    "follow_on_operational": {
+      "description": "Executable operational / module-configuration lanes carried beyond the signed P0 scope. Checked in the pinned model but not part of the current acceptance claim.",
+      "groups": ["SRV3-P7", "SRV3-P10", "SRV3-P11", "SRV3-P12", "SRV3-P13", "SRV3-P14", "SRV3-P15"]
+    }
+  },
+  "targets": [
+    {
+      "claim": "Depositable ETH and the effective withdrawal-reserved bucket partition the buffer exactly (depositable + withdrawalReserveUsed = bufferedEther), derived from the reserve definitions.",
+      "id": "SRV3-P1",
+      "theorem": "LidoSRv3.P1_reserve_separation"
+    },
+    {
+      "claim": "Depositable ETH is bounded by bufferedEther minus the withdrawal-reserved bucket, so deposit spend cannot draw on withdrawal-reserved ETH.",
+      "id": "SRV3-P1a",
+      "theorem": "LidoSRv3.P1_depositable_excludes_withdrawal_reserve"
+    },
+    {
+      "claim": "Router-pulled wei equals 32 ETH times actual deposits and leaves no router residual.",
+      "id": "SRV3-P2",
+      "theorem": "LidoSRv3.P2_deposit_exact_pull"
+    },
+    {
+      "claim": "Total modeled allocated deposits is the sum of per-module allocated deposits over the finite router module array.",
+      "id": "SRV3-P2a",
+      "theorem": "LidoSRv3.P2_total_allocated_deposits"
+    },
+    {
+      "claim": "Successful modeled deposit transitions preserve router ETH balance.",
+      "id": "SRV3-P2b",
+      "theorem": "LidoSRv3.P2_deposit_transition_router_eth_unchanged"
+    },
+    {
+      "claim": "Successful nonzero modeled deposit transitions add exactly the pulled value to the beacon sink.",
+      "id": "SRV3-P2c",
+      "theorem": "LidoSRv3.P2_deposit_transition_beacon_sink_exact"
+    },
+    {
+      "claim": "Successful nonzero modeled deposit transitions reduce buffered ETH by exactly the pulled value.",
+      "id": "SRV3-P2k",
+      "theorem": "LidoSRv3.P2_deposit_transition_buffered_exact"
+    },
+    {
+      "claim": "Successful nonzero modeled deposit transitions require the pulled value to be available as depositable ETH before the modeled Lido buffer pull.",
+      "id": "SRV3-P2l",
+      "theorem": "LidoSRv3.P2_deposit_transition_positive_requires_depositable"
+    },
+    {
+      "claim": "Successful zero-deposit transitions do not change modeled buffered ETH or the beacon sink.",
+      "id": "SRV3-P2m",
+      "theorem": "LidoSRv3.P2_deposit_transition_zero_external_value_unchanged"
+    },
+    {
+      "claim": "Successful modeled deposit transitions leave withdrawal-reserved ETH unchanged.",
+      "id": "SRV3-P2d",
+      "theorem": "LidoSRv3.P2_deposit_transition_withdrawal_reserve_unchanged"
+    },
+    {
+      "claim": "Successful modeled deposit transitions require an existing active module, nonzero computed capacity, and actual deposits not exceeding that capacity.",
+      "id": "SRV3-P2e",
+      "theorem": "LidoSRv3.P2_deposit_transition_requires_active_module_and_capacity"
+    },
+    {
+      "claim": "Successful modeled deposit transitions update the module array exactly by recording the selected module last-deposit value.",
+      "id": "SRV3-P2n",
+      "theorem": "LidoSRv3.P2_deposit_transition_modules_exact"
+    },
+    {
+      "claim": "Successful modeled deposit transitions record the selected module last-deposit value as the exact pulled wei amount, including the zero-key return path.",
+      "id": "SRV3-P2f",
+      "theorem": "LidoSRv3.P2_deposit_transition_records_last_deposit"
+    },
+    {
+      "claim": "Successful modeled deposit transitions preserve router module-array length while recording last-deposit accounting.",
+      "id": "SRV3-P2g",
+      "theorem": "LidoSRv3.P2_deposit_transition_preserves_module_length"
+    },
+    {
+      "claim": "Successful modeled deposit transitions preserve the router module-balance sum while recording last-deposit accounting.",
+      "id": "SRV3-P2h",
+      "theorem": "LidoSRv3.P2_deposit_transition_preserves_module_balance_sum"
+    },
+    {
+      "claim": "Successful modeled deposit transitions preserve router report accounting: router balance Gwei and the last accepted report.",
+      "id": "SRV3-P2i",
+      "theorem": "LidoSRv3.P2_deposit_transition_preserves_report_state"
+    },
+    {
+      "claim": "Successful nonzero deposit transitions spend the deposit-reserved ETH bucket by exactly the pulled amount (depositReserve' = depositReserve - depositPullWei actualDeposits, saturating at zero).",
+      "id": "SRV3-P2j",
+      "theorem": "LidoSRv3.P2_deposit_transition_deposit_reserve_spent"
+    },
+    {
+      "claim": "Accepted module reports set router validator balance to the module-balance sum.",
+      "id": "SRV3-P3",
+      "theorem": "LidoSRv3.P3_module_balance_conservation"
+    },
+    {
+      "claim": "Successful modeled module-balance report transitions imply Solidity report shape checks: full length, router order, and Gwei range.",
+      "id": "SRV3-P3a",
+      "theorem": "LidoSRv3.P3_report_transition_requires_well_formed"
+    },
+    {
+      "claim": "Successful modeled module-balance report transitions set router validator balance to the updated module-balance sum.",
+      "id": "SRV3-P3b",
+      "theorem": "LidoSRv3.P3_report_transition_module_balance_conservation"
+    },
+    {
+      "claim": "Successful modeled module-balance report transitions set updated module balances exactly to the accepted report balances.",
+      "id": "SRV3-P3e",
+      "theorem": "LidoSRv3.P3_report_transition_module_balances_match_report"
+    },
+    {
+      "claim": "Successful modeled module-balance report transitions record the exact accepted report for later reward distribution reads.",
+      "id": "SRV3-P3c",
+      "theorem": "LidoSRv3.P3_report_transition_records_accepted_report"
+    },
+    {
+      "claim": "Successful modeled module-balance report transitions preserve router module-array length.",
+      "id": "SRV3-P3d",
+      "theorem": "LidoSRv3.P3_report_transition_preserves_module_length"
+    },
+    {
+      "claim": "Successful modeled module-balance report transitions set the module array exactly to the accepted report update loop result.",
+      "id": "SRV3-P3g",
+      "theorem": "LidoSRv3.P3_report_transition_modules_exact"
+    },
+    {
+      "claim": "Successful modeled module-balance report transitions preserve ETH-side state: buffer, reserves, router ETH balance, and beacon sink.",
+      "id": "SRV3-P3f",
+      "theorem": "LidoSRv3.P3_report_transition_preserves_eth_state"
+    },
+    {
+      "claim": "Reward distribution reads the latest accepted module-balance report.",
+      "id": "SRV3-P4",
+      "theorem": "LidoSRv3.P4_report_before_reward_consistency"
+    },
+    {
+      "claim": "After a successful modeled module-balance report transition, reward distribution reads that accepted report.",
+      "id": "SRV3-P4a",
+      "theorem": "LidoSRv3.P4_report_transition_before_reward_consistency"
+    },
+    {
+      "claim": "Reward fees are bounded by configured basis points and aligned with module recipients.",
+      "id": "SRV3-P5",
+      "theorem": "LidoSRv3.P5_reward_bound"
+    },
+    {
+      "claim": "Reward rows preserve the module id, reward recipient, and computed module reward from the router module array.",
+      "id": "SRV3-P5a",
+      "theorem": "LidoSRv3.P5_reward_recipient_alignment"
+    },
+    {
+      "claim": "Reward distribution rows are produced only from existing nonzero-balance modules and remain aligned with the module recipient.",
+      "id": "SRV3-P5b",
+      "theorem": "LidoSRv3.P5_rewards_distribution_rows_aligned"
+    },
+    {
+      "claim": "Every emitted reward distribution row has nonzero validator balance.",
+      "id": "SRV3-P5f",
+      "theorem": "LidoSRv3.P5_rewards_distribution_row_nonzero_balance"
+    },
+    {
+      "claim": "A reward distribution row's paid module fee cannot exceed its computed module fee.",
+      "id": "SRV3-P5c",
+      "theorem": "LidoSRv3.P5_rewards_distribution_paid_module_fee_bound"
+    },
+    {
+      "claim": "Stopped modules have zero paid module fee in the reward distribution row.",
+      "id": "SRV3-P5d",
+      "theorem": "LidoSRv3.P5_rewards_distribution_stopped_module_zero"
+    },
+    {
+      "claim": "Reward distribution returns no rows when the router total validator balance is zero.",
+      "id": "SRV3-P5e",
+      "theorem": "LidoSRv3.P5_rewards_distribution_zero_total_empty"
+    },
+    {
+      "claim": "Reward distribution returns an empty module-id projection when the router total validator balance is zero.",
+      "id": "SRV3-P5h",
+      "theorem": "LidoSRv3.P5_rewards_distribution_zero_total_empty_module_ids"
+    },
+    {
+      "claim": "Reward distribution total fee is exactly the sum of module plus treasury fee over emitted rows.",
+      "id": "SRV3-P5g",
+      "theorem": "LidoSRv3.P5_rewards_distribution_total_fee_sum"
+    },
+    {
+      "claim": "Non-active or deposit-paused modules receive no deposits.",
+      "id": "SRV3-P6",
+      "theorem": "LidoSRv3.P6_deposit_status_gating"
+    },
+    {
+      "claim": "Stopped modules receive no module reward payment.",
+      "id": "SRV3-P6a",
+      "theorem": "LidoSRv3.P6_stopped_module_reward_zero"
+    },
+    {
+      "claim": "Successful modeled exited-count update rows name existing modules, cannot decrease router-stored exited counts, and cannot exceed deposited validators.",
+      "id": "SRV3-P7",
+      "theorem": "LidoSRv3.P7_exited_count_update_requires_valid_rows"
+    },
+    {
+      "claim": "An empty modeled exited-count update is a no-op and returns zero newly exited validators.",
+      "id": "SRV3-P7a",
+      "theorem": "LidoSRv3.P7_exited_count_update_empty"
+    },
+    {
+      "claim": "Successful modeled exited-count updates preserve router module-array length.",
+      "id": "SRV3-P7b",
+      "theorem": "LidoSRv3.P7_exited_count_update_preserves_module_length"
+    },
+    {
+      "claim": "Successful modeled exited-count updates preserve the router module-balance sum.",
+      "id": "SRV3-P7c",
+      "theorem": "LidoSRv3.P7_exited_count_update_preserves_module_balance_sum"
+    },
+    {
+      "claim": "Successful modeled exited-count transitions return exactly the sequential loop result over router modules and input rows.",
+      "id": "SRV3-P7d",
+      "theorem": "LidoSRv3.P7_exited_count_update_returns_loop_result"
+    },
+    {
+      "claim": "Successful modeled exited-count updates preserve non-module router state: ETH accounting, router report balance, and last accepted report.",
+      "id": "SRV3-P7e",
+      "theorem": "LidoSRv3.P7_exited_count_update_preserves_router_state"
+    },
+    {
+      "claim": "Successful top-up transitions require an active top-up-capable module.",
+      "id": "SRV3-P8",
+      "theorem": "LidoSRv3.P8_topup_transition_requires_active_topup_module"
+    },
+    {
+      "claim": "Successful top-up transitions preserve Solidity input shape: nonempty keys with matching node-operator, top-up-limit, and pubkey lengths.",
+      "id": "SRV3-P8a",
+      "theorem": "LidoSRv3.P8_topup_transition_requires_input_shape"
+    },
+    {
+      "claim": "Successful top-up transitions preserve returned allocation checks: same length, Gwei alignment, per-key limits, and rounded module target bound.",
+      "id": "SRV3-P8d",
+      "theorem": "LidoSRv3.P8_topup_transition_requires_well_formed_allocations"
+    },
+    {
+      "claim": "Successful top-up transitions keep the returned allocation sum within the module allocation budget.",
+      "id": "SRV3-P8l",
+      "theorem": "LidoSRv3.P8_topup_transition_allocation_sum_bounded_by_module_allocation"
+    },
+    {
+      "claim": "Successful top-up transitions leave no router ETH residual.",
+      "id": "SRV3-P8b",
+      "theorem": "LidoSRv3.P8_topup_transition_router_eth_unchanged"
+    },
+    {
+      "claim": "Successful top-up transitions leave router module accounting unchanged.",
+      "id": "SRV3-P8h",
+      "theorem": "LidoSRv3.P8_topup_transition_modules_unchanged"
+    },
+    {
+      "claim": "Successful top-up transitions preserve router report accounting: router balance Gwei and the last accepted report.",
+      "id": "SRV3-P8i",
+      "theorem": "LidoSRv3.P8_topup_transition_preserves_report_state"
+    },
+    {
+      "claim": "Successful nonzero top-up transitions add exactly the allocation sum to the beacon sink.",
+      "id": "SRV3-P8c",
+      "theorem": "LidoSRv3.P8_topup_transition_beacon_sink_exact"
+    },
+    {
+      "claim": "Successful nonzero top-up transitions reduce buffered ETH by exactly the allocation sum.",
+      "id": "SRV3-P8k",
+      "theorem": "LidoSRv3.P8_topup_transition_buffered_exact"
+    },
+    {
+      "claim": "Successful top-up transitions leave withdrawal-reserved ETH unchanged.",
+      "id": "SRV3-P8e",
+      "theorem": "LidoSRv3.P8_topup_transition_withdrawal_reserve_unchanged"
+    },
+    {
+      "claim": "Successful nonzero top-up transitions spend the deposit-reserved ETH bucket by exactly the allocation sum (depositReserve' = depositReserve - sum(allocations), saturating at zero).",
+      "id": "SRV3-P8j",
+      "theorem": "LidoSRv3.P8_topup_transition_deposit_reserve_spent"
+    },
+    {
+      "claim": "Successful nonzero top-up transitions require the allocation sum to be available as depositable ETH before the modeled Lido buffer pull.",
+      "id": "SRV3-P8f",
+      "theorem": "LidoSRv3.P8_topup_transition_positive_requires_depositable"
+    },
+    {
+      "claim": "Successful zero-sum top-up transitions are no-ops after validation and return the unchanged router state.",
+      "id": "SRV3-P8g",
+      "theorem": "LidoSRv3.P8_topup_transition_zero_sum_noop"
+    },
+    {
+      "claim": "Allocation capacity rows stay aligned with router modules.",
+      "id": "SRV3-P9",
+      "theorem": "LidoSRv3.P9_allocation_capacity_rows_aligned"
+    },
+    {
+      "claim": "Allocation capacity arrays preserve router module length.",
+      "id": "SRV3-P9a",
+      "theorem": "LidoSRv3.P9_allocation_capacity_length"
+    },
+    {
+      "claim": "Allocation capacity value arrays preserve router module length.",
+      "id": "SRV3-P9b",
+      "theorem": "LidoSRv3.P9_allocation_capacity_values_length"
+    },
+    {
+      "claim": "Allocation capacity rows preserve router module id order.",
+      "id": "SRV3-P9f",
+      "theorem": "LidoSRv3.P9_allocation_capacity_module_ids_preserved"
+    },
+    {
+      "claim": "Active module capacity is bounded by the module stake-share target.",
+      "id": "SRV3-P9c",
+      "theorem": "LidoSRv3.P9_active_allocation_capacity_target_bound"
+    },
+    {
+      "claim": "Active module capacity is bounded by available module capacity.",
+      "id": "SRV3-P9d",
+      "theorem": "LidoSRv3.P9_active_allocation_capacity_available_bound"
+    },
+    {
+      "claim": "Inactive module capacity remains equal to current allocation.",
+      "id": "SRV3-P9e",
+      "theorem": "LidoSRv3.P9_inactive_allocation_capacity_current"
+    },
+    {
+      "claim": "Successful reward-minted report transitions require equal module-id and share array lengths.",
+      "id": "SRV3-P10",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_requires_equal_lengths"
+    },
+    {
+      "claim": "Successful reward-minted report transitions preserve the Solidity row-validity rule.",
+      "id": "SRV3-P10a",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_requires_valid_rows"
+    },
+    {
+      "claim": "Every nonzero reward-minted report row names an existing module.",
+      "id": "SRV3-P10b",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_nonzero_module_exists"
+    },
+    {
+      "claim": "Zero-share reward-minted rows are skipped before the module-existence check.",
+      "id": "SRV3-P10c",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_zero_rows_skip_module_check"
+    },
+    {
+      "claim": "Successful reward-minted report transitions return exactly the rows generated by zipping module ids with total shares.",
+      "id": "SRV3-P10d",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_returns_generated_rows"
+    },
+    {
+      "claim": "Successful reward-minted report transitions return one generated row per input module id.",
+      "id": "SRV3-P10e",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_preserves_row_length"
+    },
+    {
+      "claim": "Successful reward-minted report transitions preserve module-id order exactly in returned rows.",
+      "id": "SRV3-P10f",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_preserves_module_ids"
+    },
+    {
+      "claim": "Successful reward-minted report transitions preserve total-share order exactly in returned rows.",
+      "id": "SRV3-P10g",
+      "theorem": "LidoSRv3.P10_report_rewards_minted_preserves_total_shares"
+    },
+    {
+      "claim": "Successful all-module fee updates require module-fee and treasury-fee arrays to match router module length.",
+      "id": "SRV3-P11",
+      "theorem": "LidoSRv3.P11_update_all_module_fees_requires_lengths"
+    },
+    {
+      "claim": "Successful all-module fee updates preserve the Solidity consistent-fee-sum validation rule.",
+      "id": "SRV3-P11a",
+      "theorem": "LidoSRv3.P11_update_all_module_fees_requires_consistent_rows"
+    },
+    {
+      "claim": "Successful all-module fee updates preserve router module-list length.",
+      "id": "SRV3-P11b",
+      "theorem": "LidoSRv3.P11_update_all_module_fees_preserves_module_length"
+    },
+    {
+      "claim": "Successful all-module fee updates set module-fee and treasury-fee projections exactly to the supplied arrays.",
+      "id": "SRV3-P11f",
+      "theorem": "LidoSRv3.P11_update_all_module_fees_exact_fee_projections"
+    },
+    {
+      "claim": "After a successful all-module fee update, every updated module fee sum is bounded by total basis points.",
+      "id": "SRV3-P11c",
+      "theorem": "LidoSRv3.P11_update_all_module_fees_bounded_after_success"
+    },
+    {
+      "claim": "Successful all-module fee updates preserve the router module-balance sum.",
+      "id": "SRV3-P11d",
+      "theorem": "LidoSRv3.P11_update_all_module_fees_preserves_module_balance_sum"
+    },
+    {
+      "claim": "Successful all-module fee updates preserve non-module router state: ETH accounting, router report balance, and last accepted report.",
+      "id": "SRV3-P11e",
+      "theorem": "LidoSRv3.P11_update_all_module_fees_preserves_router_state"
+    },
+    {
+      "claim": "Successful single-module parameter updates require the selected module to exist.",
+      "id": "SRV3-P12",
+      "theorem": "LidoSRv3.P12_update_module_params_requires_existing_module"
+    },
+    {
+      "claim": "Successful single-module parameter updates preserve Solidity share, fee-sum, consistency, and uint64-bound validation.",
+      "id": "SRV3-P12a",
+      "theorem": "LidoSRv3.P12_update_module_params_requires_valid_config"
+    },
+    {
+      "claim": "Successful single-module parameter updates preserve router module-list length.",
+      "id": "SRV3-P12b",
+      "theorem": "LidoSRv3.P12_update_module_params_preserves_module_length"
+    },
+    {
+      "claim": "Successful single-module parameter updates record the requested share, fee, max-deposit, and min-distance fields for the selected module.",
+      "id": "SRV3-P12f",
+      "theorem": "LidoSRv3.P12_update_module_params_records_requested_params"
+    },
+    {
+      "claim": "After a successful single-module parameter update, every updated module fee sum is bounded by total basis points.",
+      "id": "SRV3-P12c",
+      "theorem": "LidoSRv3.P12_update_module_params_bounded_after_success"
+    },
+    {
+      "claim": "Successful single-module parameter updates preserve the router module-balance sum.",
+      "id": "SRV3-P12d",
+      "theorem": "LidoSRv3.P12_update_module_params_preserves_module_balance_sum"
+    },
+    {
+      "claim": "Successful single-module parameter updates preserve non-module router state: ETH accounting, router report balance, and last accepted report.",
+      "id": "SRV3-P12e",
+      "theorem": "LidoSRv3.P12_update_module_params_preserves_router_state"
+    },
+    {
+      "claim": "Successful module-status updates require the selected module to exist.",
+      "id": "SRV3-P13",
+      "theorem": "LidoSRv3.P13_update_module_status_requires_existing_module"
+    },
+    {
+      "claim": "Successful module-status updates preserve router module-list length.",
+      "id": "SRV3-P13a",
+      "theorem": "LidoSRv3.P13_update_module_status_preserves_module_length"
+    },
+    {
+      "claim": "Successful module-status updates preserve the router module-balance sum.",
+      "id": "SRV3-P13b",
+      "theorem": "LidoSRv3.P13_update_module_status_preserves_module_balance_sum"
+    },
+    {
+      "claim": "Successful public module-status updates require the requested status to differ from the stored status.",
+      "id": "SRV3-P13c",
+      "theorem": "LidoSRv3.P13_update_module_status_requires_status_change"
+    },
+    {
+      "claim": "Successful module-status updates record the requested status for the selected module.",
+      "id": "SRV3-P13e",
+      "theorem": "LidoSRv3.P13_update_module_status_records_requested_status"
+    },
+    {
+      "claim": "Successful module-status updates preserve non-module router state: ETH accounting, router report balance, and last accepted report.",
+      "id": "SRV3-P13d",
+      "theorem": "LidoSRv3.P13_update_module_status_preserves_router_state"
+    },
+    {
+      "claim": "Successful add-module transitions preserve the Solidity config validation guards.",
+      "id": "SRV3-P14",
+      "theorem": "LidoSRv3.P14_add_module_requires_valid_config"
+    },
+    {
+      "claim": "Successful add-module transitions require a fresh module id.",
+      "id": "SRV3-P14a",
+      "theorem": "LidoSRv3.P14_add_module_requires_fresh_module_id"
+    },
+    {
+      "claim": "Successful add-module transitions preserve share, fee-sum, consistency, and uint64-bound validation.",
+      "id": "SRV3-P14b",
+      "theorem": "LidoSRv3.P14_add_module_preserves_config_guards"
+    },
+    {
+      "claim": "Successful add-module transitions increase router module-list length by one.",
+      "id": "SRV3-P14c",
+      "theorem": "LidoSRv3.P14_add_module_increments_module_length"
+    },
+    {
+      "claim": "Successful add-module transitions append exactly the module built from the accepted config.",
+      "id": "SRV3-P14f",
+      "theorem": "LidoSRv3.P14_add_module_appends_new_module_from_config"
+    },
+    {
+      "claim": "The modeled newly added module starts active with zero accounting fields.",
+      "id": "SRV3-P14d",
+      "theorem": "LidoSRv3.P14_add_module_new_module_zero_accounting"
+    },
+    {
+      "claim": "Successful add-module transitions preserve the router module-balance sum.",
+      "id": "SRV3-P14e",
+      "theorem": "LidoSRv3.P14_add_module_preserves_module_balance_sum"
+    },
+    {
+      "claim": "Successful add-module transitions preserve non-module router state: ETH accounting, router report balance, and last accepted report.",
+      "id": "SRV3-P14g",
+      "theorem": "LidoSRv3.P14_add_module_preserves_router_state"
+    },
+    {
+      "claim": "Successful all-module share updates require stake-share and priority-exit arrays to match router module length.",
+      "id": "SRV3-P15",
+      "theorem": "LidoSRv3.P15_update_all_module_shares_requires_lengths"
+    },
+    {
+      "claim": "Successful all-module share updates preserve the Solidity share-parameter validation rule for every row.",
+      "id": "SRV3-P15a",
+      "theorem": "LidoSRv3.P15_update_all_module_shares_requires_valid_rows"
+    },
+    {
+      "claim": "Successful all-module share updates preserve router module-list length.",
+      "id": "SRV3-P15b",
+      "theorem": "LidoSRv3.P15_update_all_module_shares_preserves_module_length"
+    },
+    {
+      "claim": "Successful all-module share updates set stake-share and priority-exit projections exactly to the supplied arrays.",
+      "id": "SRV3-P15e",
+      "theorem": "LidoSRv3.P15_update_all_module_shares_exact_share_projections"
+    },
+    {
+      "claim": "Successful all-module share updates preserve the router module-balance sum.",
+      "id": "SRV3-P15c",
+      "theorem": "LidoSRv3.P15_update_all_module_shares_preserves_module_balance_sum"
+    },
+    {
+      "claim": "Successful all-module share updates preserve non-module router state: ETH accounting, router report balance, and last accepted report.",
+      "id": "SRV3-P15d",
+      "theorem": "LidoSRv3.P15_update_all_module_shares_preserves_router_state"
+    }
+  ]
+}

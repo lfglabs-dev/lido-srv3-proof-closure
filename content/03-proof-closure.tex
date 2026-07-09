@@ -4,10 +4,11 @@
 \newcommand{\theoremid}[2]{\texttt{\footnotesize #1}\newline\texttt{\footnotesize #2}}
 \newcommand{\proofhandle}[3]{\texttt{\footnotesize #1}\newline\theoremid{#2}{#3}}
 
-\noindent A proof is closed when the theorem checker accepts it without admitted
-proof steps and the remaining premises are named as assumptions. This section
-shows the six accounting claims in three forms: a system map, a plain-language
-story, and theorem rows for the final evidence package.
+\noindent A local proof target is closed in this package when the executable
+model check passes, the model and source anchors are listed, and the remaining
+premises are named as assumptions. This section shows the fifteen accounting claims
+in three forms: a system map, a plain-language story, and artifact rows for the
+evidence package.
 
 \subsection*{Modeled architecture}
 
@@ -42,9 +43,9 @@ summarized only at the interfaces used by those transitions.
   \draw[arrow] (router) -- (reserve);
 
   \node[proof, above=7mm of reserve] (p1) {P1 reserve};
-  \node[proof, above=7mm of alloc] (p2) {P2 deposits};
+  \node[proof, above=7mm of alloc] (p2) {P2/P8 deposits};
   \node[proof, below=7mm of balances] (p3) {P3--P4 reports};
-  \node[proof, below=7mm of rewards] (p4) {P5--P6 rewards};
+  \node[proof, below=7mm of rewards] (p4) {P5/P10 rewards};
 
   \draw[arrow] (p1) -- (reserve);
   \draw[arrow] (p2) -- (alloc);
@@ -53,15 +54,26 @@ summarized only at the interfaces used by those transitions.
 \end{tikzpicture}
 \end{center}
 
-\subsection*{From intuition to theorem}
+\subsection*{From intuition to target}
 
-\noindent Read the six properties as one accounting story. P1 protects ETH
+\noindent Read the fifteen properties as one accounting story. P1 protects ETH
 reserved for withdrawals. P2 checks that initial deposits pull exactly the ETH
 they should. P3 checks that the router's total balance equals the module balances
 it accepted. P4 makes module fee weights depend on the accepted report, not an
 old or partial one. P5 bounds reward and fee movement. P6 blocks non-active or
 paused modules from deposit allocation and stopped modules from module-side
-reward or fee allocation.
+reward or fee allocation. P7 checks exited-count updates. P8 checks that top-up
+allocation arrays are bounded and fully sunk. P9 checks SRv3's per-module
+allocation-capacity rows before the external allocation strategy runs. P10 checks
+the SRLib reward-minted reporting loop before module callbacks are attempted.
+P11 checks the all-module fee-update arrays and module-config update loop.
+P12 checks the single-module config-update guards that feed deposit allocation
+and reward-fee configuration. P13 checks the governance-controlled module-status
+update path that feeds the status-gating rules without changing validator-balance
+accounting. P14 checks the module-creation path that extends the router module
+array with a fresh, zero-accounting module. P15 checks the all-module
+share-update loop that changes target-share and priority-exit thresholds without
+changing module accounting balances.
 
 \smallskip
 \noindent Each invariant below has two layers. The first sentence says why the
@@ -77,10 +89,9 @@ module \(m \in M\), let \(\bal_m\) be its accepted validator balance in gwei,
 \(\modstatus_m\) its module status, and \(\mathsf{moduleRecipient}_m\) its module
 reward recipient in the modeled reward step. Let \(B_R\) be the router validator balance, \(T\) the buffered ETH,
 \(R_D\) the stored deposit reserve, and \(R_W\) the withdrawal-reserved buffer.
-The theorems are parametric in the finite module count, while each accepted
-report must still cover the current router module set in router order, with
-unique module IDs, matching array lengths, and the freshness and range premises
-named in the theorem signature.
+The checked theorems are in \path{LidoSRv3/SpecProofs.lean}. Each accepted report must still cover the
+current router module set in router order, with unique module IDs, matching array
+lengths, and the freshness and range premises named in the target file.
 
 \medskip
 \noindent\textbf{P1: reserve separation.}
@@ -95,19 +106,22 @@ named in the theorem signature.
   \mathsf{depositable}(T) = d + u
 \]
 \[
+  \mathsf{depositable}(T) + w = T
+  \qquad
+  \mathsf{depositable}(T) \leq T - w
+\]
+\[
   \forall a.\quad
   \mathsf{spendDeposit}(a) \Rightarrow
   a \leq \mathsf{depositable}(T)
 \]
-\[
-  \mathsf{spendDeposit}(a) \Rightarrow
-  \mathsf{usesWithdrawalReserve}(a,T,R_D,R_W)=0
-\]
 
 \noindent Plain reading: some ETH is saved for withdrawals, and deposits are not
-allowed to spend that saved amount. Deposit spend is bounded by the pre-spend
-deposit reserve plus unreserved allocation and does not consume the pre-spend
-effective withdrawal-reserved bucket. The theorem sketch deliberately avoids a
+allowed to spend that saved amount. The strengthened target proves the depositable
+bucket and the effective withdrawal-reserved bucket \(w\) partition the buffer
+exactly (\(\mathsf{depositable}(T) + w = T\)), so depositable ETH is bounded by
+\(T - w\) and never includes withdrawal-reserved liquidity. This is derived from the
+reserve definitions rather than assumed. The executable target deliberately avoids a
 raw post-state equality for \(R_W\); any post-state reserve fact belongs to the
 model's explicit reserve-recomputation rule.
 
@@ -120,15 +134,81 @@ model's explicit reserve-recomputation rule.
   \mathsf{routerEthAfter} = \mathsf{routerEthBefore}
 \]
 \[
-  \mathsf{actualDeposits}
-    = \sum_{m \in M} \mathsf{allocatedDeposits}_m
+  \mathsf{totalAllocatedDeposits}(\mathit{rows})
+    = \sum_{(m,c) \in \mathit{rows}} c
+  \quad \mbox{when only active modules carry a positive count}
+\]
+\[
+  \mathsf{actualDeposits} > 0
+  \Rightarrow
+  \mathsf{pulledWei} \le \mathsf{depositableEtherBefore}
+\]
+\[
+  \mathsf{actualDeposits} > 0
+  \Rightarrow
+  \mathsf{bufferedEtherAfter}
+    = \mathsf{bufferedEtherBefore} - \mathsf{pulledWei}
+\]
+\[
+  \mathsf{actualDeposits} = 0
+  \Rightarrow
+  \mathsf{bufferedEtherAfter} = \mathsf{bufferedEtherBefore}
+  \quad\land\quad
+  \mathsf{beaconSinkAfter} = \mathsf{beaconSinkBefore}
+\]
+\[
+  \mathsf{withdrawalReserveAfter} = \mathsf{withdrawalReserveBefore}
+  \qquad
+  \mathsf{depositReserveAfter}
+    = \mathsf{depositReserveBefore} - \mathsf{pulledWei}
+\]
+\[
+  \mathsf{module.status} = \mathsf{active}
+  \quad\land\quad
+  \mathsf{maxDepositsCount} \ne 0
+  \quad\land\quad
+  \mathsf{actualDeposits} \le \mathsf{maxDepositsCount}
+\]
+\[
+  M' =
+    \mathsf{recordModuleLastDeposit}(
+      \mathsf{stakingModuleId},\mathsf{pulledWei},M)
+\]
+\[
+  \mathsf{selectedModule.lastDepositWeiAfter}
+    = \mathsf{depositPullWei}(\mathsf{actualDeposits})
+\]
+\[
+  |M'| = |M|
+\]
+\[
+  \sum_{m\in M'} \bal_m = \sum_{m\in M} \bal_m
+\]
+\[
+  \mathsf{routerBalanceGweiAfter} = \mathsf{routerBalanceGweiBefore}
+  \quad\land\quad
+  \mathsf{lastAcceptedReportAfter} = \mathsf{lastAcceptedReportBefore}
 \]
 
 \noindent Plain reading: across the modeled atomic initial-deposit transition,
-the router pulls exactly one 32 ETH unit per validator and immediately forwards
-it to the beacon deposit sink. Top-ups, if included in a later lane, are a
-separate gwei-aligned allocation theorem and are not instances of this 32 ETH
-exact-pull statement.
+the router pulls exactly one 32 ETH unit per validator only when that value is
+available as depositable ETH, subtracts exactly that amount from modeled
+buffered ETH, and immediately forwards it to the beacon deposit sink without
+consuming the withdrawal-reserved bucket. The stored deposit-reserve bucket is
+reduced by the same spend amount, saturating at zero, matching the Lido buffer
+spend rule.
+The zero-key return path records the selected module's last-deposit field but
+does not move modeled value out of the buffer or into the beacon sink.
+For both branches, the whole module array is exactly the
+\(\mathsf{recordModuleLastDeposit}\) transformation of the pre-state array.
+The successful transition also exposes the Solidity guard facts: the selected
+module exists, is active, has nonzero computed capacity, and the returned deposit
+count is within that capacity. It also checks the side effect that Solidity
+performs before the zero-key return: the selected module's last-deposit field
+records the exact pulled value, including zero, while preserving module-array
+length, the router module-balance sum, and the stored router report state.
+Top-ups are a separate Gwei-aligned allocation target covered by P8, not
+instances of this 32 ETH exact-pull statement.
 
 \medskip
 \noindent\textbf{P3: module-balance conservation.}
@@ -138,10 +218,42 @@ exact-pull statement.
   B_R' = \sum_{m \in M} \bal_m'
   = \sum_{i=0}^{|M|-1} \vec{b}_i
 \]
+\[
+  \mathsf{successfulReportTransition}(r)
+  \Rightarrow
+  \mathsf{moduleBalances}' = \mathsf{reportBalances}(r)
+\]
+\[
+  \mathsf{successfulReportTransition}(r)
+  \Rightarrow
+  M' = \mathsf{applyReportToModules}(M,r)
+\]
+\[
+  \mathsf{successfulReportTransition}(r)
+  \Rightarrow
+  \mathsf{lastAcceptedReport}' = r
+\]
+\[
+  \mathsf{successfulReportTransition}(r)
+  \Rightarrow
+  |M'| = |M|
+\]
+\[
+  \mathsf{successfulReportTransition}(r)
+  \Rightarrow
+  \mathsf{ETHState}' = \mathsf{ETHState}
+\]
 
 \noindent Plain reading: the router total must equal the sum of the module rows
-after an accepted report. The proof is over arbitrary finite module arrays, with module-ID
-uniqueness and report alignment named as assumptions rather than hidden bounds.
+after a successful module-balance report transition. The modeled transition
+preserves the Solidity length, router-order module-ID, and Gwei range checks
+before applying the update loop, writes the submitted balance list into the
+module balance fields exactly, proves the whole post-state module array is the
+accepted report update-loop result, preserves the module-array length and
+ETH-side state after that loop, then records the exact accepted report for the
+reward-distribution read path.
+The proof is over arbitrary finite module arrays; unique module IDs remain a
+named well-formedness assumption rather than a hidden bound on module count.
 
 \medskip
 \noindent\textbf{P4: report-before-reward consistency.}
@@ -162,21 +274,53 @@ should be split using the report the system just accepted, not a previous
 snapshot and not a half-updated table.
 
 \medskip
-\noindent\textbf{P5: bounded rewards and fee alignment.}
+\noindent\textbf{P5: reward-distribution loop and fee alignment.}
 \[
-  0 \leq \mathsf{moduleFee}_m
-  \leq \mathsf{totalReward}\cdot \mathsf{moduleFeeBps}_m / 10{,}000
+  \mathsf{share}_m =
+    \lfloor \bal_m \cdot \mathsf{precision} / \mathsf{totalBalance} \rfloor
 \]
 \[
-  \mathsf{moduleRecipient}_m'=\mathsf{moduleRecipient}_m
+  \mathsf{moduleFee}_m =
+    \lfloor \mathsf{share}_m \cdot \mathsf{moduleFeeBps}_m / 10{,}000 \rfloor
+\]
+\[
+  \mathsf{treasuryFee}_m =
+    \lfloor \mathsf{share}_m \cdot \mathsf{treasuryFeeBps}_m / 10{,}000 \rfloor
+\]
+\[
+  \bal_m = 0 \Rightarrow m \notin \mathsf{rewardDistributionRows}
+  \qquad
+  \mathsf{row}\in\mathsf{rewardDistributionRows}\Rightarrow \mathsf{row.balance}\ne0
+\]
+\[
+  \mathsf{paidModuleFee}_m \leq \mathsf{moduleFee}_m
+\]
+\[
+  \mathsf{totalBalance}=0
+  \Rightarrow
+  \mathsf{rewardDistributionRows}=[]
   \land
-  \mathsf{rewardRecipient}(\mathsf{moduleFee}_m)
-    = \mathsf{moduleRecipient}_m
+  \mathsf{map}(\mathsf{row.moduleId},\mathsf{rewardDistributionRows})=[]
+\]
+\[
+  \modstatus_m = \stStopped
+  \Rightarrow
+  \mathsf{paidModuleFee}_m = 0
+\]
+\[
+  \mathsf{totalFee} =
+    \sum_{\mathsf{row}\in\mathsf{rewardDistributionRows}}
+      (\mathsf{row.moduleFee}+\mathsf{row.treasuryFee})
 \]
 
-\noindent Plain reading: fee amounts cannot exceed the configured basis-point
-bound, and each amount remains paired with the recipient for the module that
-earned it.
+\noindent Plain reading: the modeled
+\texttt{getStakingRewardsDistribution} loop returns no rows when the router
+total validator balance is zero, and the returned module-id projection is empty
+in that branch. Otherwise it emits rows only for modules with nonzero accepted
+validator balance, keeps each row paired with the module's recipient, bounds
+paid module-side fees by the computed module fee, and pays stopped modules zero
+module-side fee. The total fee modeled for the final assertion is the sum of
+every emitted row's module and treasury fee components.
 
 \medskip
 \noindent\textbf{P6: status gating.}
@@ -188,7 +332,7 @@ earned it.
 \[
   \modstatus_m = \stStopped
   \Rightarrow
-  \mathsf{moduleReward}_m = 0
+  \mathsf{paidModuleFee}_m = 0
 \]
 
 \noindent Plain reading: a stopped or paused module is not just marked differently
@@ -197,50 +341,582 @@ modules receive zero modeled deposit allocation. Stopped modules receive zero
 module-side fee or reward allocation. Any residual protocol-fee treatment is
 stated separately from module recipient payment.
 
+\medskip
+\noindent\textbf{P7: exited-count update correctness.}
+\[
+  \mathsf{successfulExitedUpdate}(m,e')
+  \Rightarrow
+  \mathsf{existsModule}(m)
+  \land e_m \leq e'
+  \land e' \leq \mathsf{depositedValidators}_m
+\]
+\[
+  \mathsf{successfulExitedUpdate}(\mathsf{rows})
+  \Rightarrow
+  |M'| = |M|
+\]
+\[
+  \mathsf{successfulExitedUpdate}(\mathsf{rows})
+  \Rightarrow
+  (M',\mathsf{newlyExited})=\mathsf{sequentialExitedLoop}(M,\mathsf{rows})
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulExitedUpdate}(\mathsf{rows},S,S')
+  \Rightarrow \\
+  \qquad
+  \mathsf{nonModuleRouterState}' = \mathsf{nonModuleRouterState}
+  \end{array}
+\]
+
+\noindent Plain reading: an accepted exited-count row cannot invent a module,
+cannot move the router-stored exited count backward, and cannot report more
+exited validators than the staking module summary says were deposited. The model
+preserves Solidity's sequential loop behavior over arbitrary finite row arrays,
+including duplicate module IDs, keeps the module array length unchanged, and
+preserves the router module-balance sum and non-module router state. It also
+proves that successful transitions return exactly the sequential loop result and
+that the empty-row path returns the unchanged state with zero newly exited
+validators.
+
+\medskip
+\noindent\textbf{P8: top-up allocation conservation.}
+\[
+  \mathsf{successfulTopUp}(m,\vec{a},\vec{\ell})
+  \Rightarrow
+  \mathsf{active}(m)
+  \land \mathsf{supportsTopUp}(m)
+\]
+\[
+  \mathsf{keyCount}>0
+  \land
+  |\vec{operatorIds}|=|\vec{\ell}|=|\vec{pubkeys}|=\mathsf{keyCount}
+\]
+\[
+  |\vec{a}| = |\vec{\ell}|
+  \land
+  \forall i.\ \vec{a}_i \equiv 0 \pmod{1\,\mathsf{gwei}}
+  \land
+  \forall i.\ \vec{a}_i \leq \vec{\ell}_i
+\]
+\[
+  \sum_i \vec{a}_i
+  \leq
+  \mathsf{roundDownToGwei}(\mathsf{moduleAllocationWei})
+  \leq
+  \mathsf{moduleAllocationWei}
+\]
+\[
+  \sum_i \vec{a}_i > 0
+  \Rightarrow
+  \sum_i \vec{a}_i \leq \mathsf{depositableEtherBefore}
+\]
+\[
+  \sum_i \vec{a}_i > 0
+  \Rightarrow
+  \mathsf{bufferedEtherAfter}
+    = \mathsf{bufferedEtherBefore} - \sum_i \vec{a}_i
+\]
+\[
+  \sum_i \vec{a}_i > 0
+  \Rightarrow
+  \mathsf{beaconTopUpSink}' =
+    \mathsf{beaconTopUpSink} + \sum_i \vec{a}_i
+\]
+\[
+  \sum_i \vec{a}_i = 0
+  \Rightarrow
+  S' = S
+\]
+\[
+  \sum_i \vec{a}_i > 0
+  \Rightarrow
+  \mathsf{routerEthAfter} = \mathsf{routerEthBefore}
+\]
+\[
+  M' = M
+\]
+\[
+  \mathsf{routerBalanceGwei}' = \mathsf{routerBalanceGwei}
+  \qquad
+  \mathsf{lastAcceptedReport}' = \mathsf{lastAcceptedReport}
+\]
+\[
+  \mathsf{withdrawalReserveAfter} = \mathsf{withdrawalReserveBefore}
+  \qquad
+  \mathsf{depositReserveAfter}
+    = \mathsf{depositReserveBefore} - \sum_i \mathsf{allocation}_i
+\]
+
+\noindent Plain reading: successful modeled top-ups preserve the Solidity
+array checks around \texttt{allocateDeposits}, including nonempty input shape,
+same returned allocation length, Gwei alignment, per-key limits, and the rounded
+module target, which also proves the returned sum stays inside the module
+allocation budget. If the allocation sum is positive, the router pulls exactly
+that amount from Lido only when it is available as depositable ETH, then
+forwards it to the top-up deposit sink after subtracting the same amount from
+modeled buffered ETH and the stored deposit reserve, leaving no modeled router
+ETH residual and no withdrawal-reserve consumption, and without mutating router
+module or report accounting.
+If the checked allocation sum is zero, the modeled transition returns the
+unchanged state after validation.
+
+\medskip
+\noindent\textbf{P9: allocation-capacity rows.}
+\[
+  \mathsf{row} \in
+  \mathsf{modulesAllocationAndCapacity}(M)
+  \Rightarrow
+  \exists m \in M.\ \mathsf{row} = \mathsf{capacityRow}(m)
+\]
+\[
+  |\mathsf{modulesAllocationAndCapacity}(M)| = |M|
+\]
+\[
+  |\mathsf{allocatedCapacityValues}(\mathsf{modulesAllocationAndCapacity}(M))|
+  = |M|
+\]
+\[
+  \mathsf{map}(\mathsf{row.moduleId},
+    \mathsf{modulesAllocationAndCapacity}(M))
+  =
+  \mathsf{map}(\mathsf{module.id},M)
+\]
+\[
+  \mathsf{active}(m)
+  \Rightarrow
+  \mathsf{capacity}_m \leq \mathsf{targetValidators}_m
+  \land
+  \mathsf{capacity}_m \leq \mathsf{availableCapacity}_m
+\]
+\[
+  \neg\mathsf{active}(m)
+  \Rightarrow
+  \mathsf{capacity}_m = \mathsf{currentAllocation}_m
+\]
+
+\noindent Plain reading: the modeled SRv3 allocation-capacity loop emits one row
+per router module, preserves the module-id order in those rows, and keeps the
+capacity-value array length aligned with the module array. Active module
+capacity is bounded by both the stake-share target and the available module
+capacity computed for initial deposit or top-up mode. Inactive modules do not
+gain capacity; their capacity stays equal to their current allocation. The
+external MinFirst strategy that turns these arrays into final deltas remains a
+named assumption.
+
+\medskip
+\noindent\textbf{P10: reward-minted reporting guards.}
+\[
+  \mathsf{successfulRewardMintedReport}(\vec{id},\vec{s},\vec{r})
+  \Rightarrow
+  |\vec{id}| = |\vec{s}|
+\]
+\[
+  \mathsf{successfulRewardMintedReport}(\vec{id},\vec{s},\vec{r})
+  \Rightarrow
+  \vec{r} = \mathsf{zipRows}(\vec{id},\vec{s})
+\]
+\[
+  \mathsf{successfulRewardMintedReport}(\vec{id},\vec{s},\vec{r})
+  \Rightarrow
+  |\vec{r}| = |\vec{id}|
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulRewardMintedReport}(\vec{id},\vec{s},\vec{r})
+  \Rightarrow \\
+  \qquad
+  \mathsf{mapModuleIds}(\vec{r}) = \vec{id}
+  \land
+  \mathsf{mapTotalShares}(\vec{r}) = \vec{s}
+  \end{array}
+\]
+\[
+  row \in \vec{r} \land row.\mathsf{totalShares} \neq 0
+  \Rightarrow
+  \mathsf{existsModule}(row.\mathsf{moduleId})
+\]
+\[
+  row.\mathsf{totalShares} = 0
+  \Rightarrow
+  \mathsf{skipBeforeModuleCheck}(row)
+\]
+
+\noindent Plain reading: the modeled \texttt{\_reportRewardsMinted} loop first
+checks equal calldata-array lengths, constructs exactly one report row per
+zipped module-id/share pair, preserves the module-id and share arrays in the
+returned row projections, skips zero-share rows, and requires an existing module
+id before any nonzero-share callback can be attempted. Callback effects,
+low-level revert bytes, and event behavior remain named assumptions.
+
+\medskip
+\noindent\textbf{P11: all-module fee-update consistency.}
+\[
+  \mathsf{successfulFeeUpdate}(\vec{f},\vec{t},M,M')
+  \Rightarrow
+  |\vec{f}| = |M| \land |\vec{t}| = |M|
+\]
+\[
+  \mathsf{successfulFeeUpdate}(\vec{f},\vec{t},M,M')
+  \Rightarrow
+  \forall i.\ \vec{f}_i + \vec{t}_i \leq 10{,}000
+\]
+\[
+  \mathsf{successfulFeeUpdate}(\vec{f},\vec{t},M,M')
+  \Rightarrow
+  |M'| = |M|
+\]
+\[
+  \mathsf{map}(\mathsf{moduleFeeBps},M') = \vec{f}
+  \qquad
+  \mathsf{map}(\mathsf{treasuryFeeBps},M') = \vec{t}
+\]
+\[
+  \mathsf{successfulFeeUpdate}(\vec{f},\vec{t},M,M')
+  \Rightarrow
+  \sum_{m\in M'}\mathsf{balance}_m = \sum_{m\in M}\mathsf{balance}_m
+\]
+\[
+  \mathsf{successfulFeeUpdate}(\vec{f},\vec{t},S,S')
+  \Rightarrow
+  \mathsf{nonModuleRouterState}' = \mathsf{nonModuleRouterState}
+\]
+
+\noindent Plain reading: the modeled \texttt{\_updateAllModuleFees} loop checks
+that both fee arrays match router module count, accepts the empty-module case,
+requires every row's module-plus-treasury fee sum to fit within total basis
+points, requires all row sums to match the first row's sum, and updates module
+fee and treasury-fee projections exactly to the supplied arrays without
+changing the module-list length or router-stored validator-balance sum. It also
+preserves ETH accounting, router report balance, and the last accepted report.
+
+\medskip
+\noindent\textbf{P12: single-module config-update consistency.}
+\[
+  \mathsf{successfulModuleParamUpdate}(m,p,M,M')
+  \Rightarrow
+  \mathsf{existsModule}(m)
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulModuleParamUpdate}(m,p,M,M')
+  \Rightarrow \\
+  \qquad
+  \mathsf{stakeShareLimit}_p
+  \leq
+  \mathsf{priorityExitShareThreshold}_p
+  \leq
+  10{,}000
+  \end{array}
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulModuleParamUpdate}(m,p,M,M')
+  \Rightarrow \\
+  \qquad
+  \mathsf{moduleFee}_p+\mathsf{treasuryFee}_p \leq 10{,}000
+  \land |M'|=|M|
+  \end{array}
+\]
+\[
+  \mathsf{successfulModuleParamUpdate}(m,p,M,M')
+  \Rightarrow
+  \sum_{m'\in M'}\mathsf{balance}_{m'} = \sum_{m'\in M}\mathsf{balance}_{m'}
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulModuleParamUpdate}(m,p,M,M')
+  \Rightarrow \\
+  \qquad
+  \mathsf{selectedModuleParams}(m,M')
+  = \mathsf{requestedParams}(p)
+  \end{array}
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulModuleParamUpdate}(m,p,S,S')
+  \Rightarrow \\
+  \qquad
+  \mathsf{nonModuleRouterState}' = \mathsf{nonModuleRouterState}
+  \end{array}
+\]
+
+\noindent Plain reading: the modeled \texttt{\_updateModuleParams} path checks
+module existence, stake-share and priority-exit threshold ordering, bounded
+module-plus-treasury fees, fee-sum consistency against every other module,
+nonzero minimum deposit block distance, and uint64 bounds for deposit parameters
+before updating the selected module without changing module-list length or
+router-stored validator-balance sums. The post-state lookup for the selected
+module records exactly the requested share, fee, max-deposit, and min-distance
+fields. It also preserves ETH accounting, router report balance, and the last
+accepted report.
+
+\medskip
+\noindent\textbf{P13: module-status update consistency.}
+\[
+  \mathsf{successfulStatusUpdate}(m,\sigma,M,M')
+  \Rightarrow
+  \mathsf{existsModule}(m)
+  \land
+  \mathsf{oldStatus}_m \neq \sigma
+\]
+\[
+  \mathsf{successfulStatusUpdate}(m,\sigma,M,M')
+  \Rightarrow
+  |M'|=|M|
+\]
+\[
+  \mathsf{successfulStatusUpdate}(m,\sigma,M,M')
+  \Rightarrow
+  \mathsf{statusOf}(m,M')=\sigma
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulStatusUpdate}(m,\sigma,M,M')
+  \Rightarrow \\
+  \qquad
+  \sum_{m'\in M'} \mathsf{validatorsBalanceGwei}_{m'}
+  =
+  \sum_{m\in M} \mathsf{validatorsBalanceGwei}_m
+  \end{array}
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulStatusUpdate}(m,\sigma,S,S')
+  \Rightarrow \\
+  \qquad
+  \mathsf{nonModuleRouterState}' = \mathsf{nonModuleRouterState}
+  \end{array}
+\]
+
+\noindent Plain reading: the modeled \texttt{\_setModuleStatus} path checks
+that the selected module exists, rejects unchanged public status updates, updates
+router-stored module status so the selected module records the requested
+status, and preserves both module-list length and validator-balance accounting.
+It also preserves ETH accounting, router report balance, and the last accepted
+report.
+
+\medskip
+\noindent\textbf{P14: module-addition consistency.}
+\[
+  \mathsf{successfulAddModule}(m,p,M,M')
+  \Rightarrow
+  \neg\mathsf{existsModule}(m,M)
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulAddModule}(m,p,M,M')
+  \Rightarrow \\
+  \qquad
+  \mathsf{shareAndFeeConfigValid}(p,M)
+  \land |M'|=|M|+1
+  \end{array}
+\]
+\[
+  \mathsf{successfulAddModule}(m,p,M,M')
+  \Rightarrow
+  M' = M \mathbin{++} [\mathsf{newModuleFromConfig}(p)]
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulAddModule}(m,p,M,M')
+  \Rightarrow \\
+  \qquad
+  \sum_{m'\in M'} \mathsf{validatorsBalanceGwei}_{m'}
+  =
+  \sum_{m\in M} \mathsf{validatorsBalanceGwei}_m
+  \end{array}
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulAddModule}(m,p,S,S')
+  \Rightarrow \\
+  \qquad
+  \mathsf{nonModuleRouterState}' = \mathsf{nonModuleRouterState}
+  \end{array}
+\]
+
+\noindent Plain reading: the modeled \texttt{\_addModule} path requires a fresh
+module id, validates the new module's share, fee, fee-sum consistency, deposit
+distance, and uint64-bounded deposit parameters, appends exactly the module
+built from that accepted config, starts it active with zero initial accounting
+fields, and leaves the validator-balance sum unchanged. It also preserves ETH
+accounting, router report balance, and the last accepted report.
+
+\medskip
+\noindent\textbf{P15: all-module share-update consistency.}
+\[
+  \mathsf{successfulShareUpdate}(\vec{s},\vec{p},M,M')
+  \Rightarrow
+  |\vec{s}|=|M| \land |\vec{p}|=|M|
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulShareUpdate}(\vec{s},\vec{p},M,M')
+  \Rightarrow \\
+  \qquad
+  \forall i.\ \vec{s}_i \leq \vec{p}_i \leq 10{,}000
+  \end{array}
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulShareUpdate}(\vec{s},\vec{p},M,M')
+  \Rightarrow \\
+  \qquad
+  \mathsf{map}(\mathsf{stakeShareLimitBps},M')=\vec{s}
+  \land
+  \mathsf{map}(\mathsf{priorityExitShareThresholdBps},M')=\vec{p}
+  \end{array}
+\]
+\[
+  \begin{array}{l}
+  \mathsf{successfulShareUpdate}(\vec{s},\vec{p},M,M')
+  \Rightarrow \\
+  \qquad
+  |M'|=|M|
+  \land
+  \sum_{m'\in M'} \mathsf{validatorsBalanceGwei}_{m'}
+  =
+  \sum_{m\in M} \mathsf{validatorsBalanceGwei}_m
+  \end{array}
+\]
+\[
+  \mathsf{successfulShareUpdate}(\vec{s},\vec{p},S,S')
+  \Rightarrow
+  \mathsf{nonModuleRouterState}' = \mathsf{nonModuleRouterState}
+\]
+
+\noindent Plain reading: the modeled \texttt{\_updateModuleShares} loop checks
+that both share arrays match router module count, validates each row's
+stake-share and priority-exit threshold ordering, updates share-field
+projections exactly to the supplied arrays in router order, and preserves both
+module-list length and validator-balance accounting. It also preserves ETH
+accounting, router report balance, and the last accepted report.
+
 \subsection*{Report package traceability register}
 
-\noindent The next table is for auditability. The theorem name is the
-handle a reviewer would search for in Lean. The expected artifact says where the
-proof should live. The assumption IDs say which facts the proof is allowed to
-borrow from outside the model. A final report should not ask the reader to trust
-prose alone; every claim should have this chain.
+\noindent The next table is for auditability. The artifact path is the local file
+a reviewer can inspect or run. The assumption IDs say which facts the check is
+allowed to borrow from outside the model. The report does not ask the reader to
+trust prose alone; every claim has this chain.
 
 \noindent
 \begin{xltabular}{\linewidth}{@{}p{0.12\linewidth}p{0.30\linewidth}p{0.20\linewidth}>{\raggedright\arraybackslash}X@{}}
   \toprule
-  \thead{ID} & \thead{Proof handle} & \thead{Assumptions} & \thead{Claim} \\
+  \thead{ID} & \thead{Executable artifact} & \thead{Assumptions} & \thead{Claim} \\
   \midrule
   \endhead
   SRV3-P1 &
-  \proofhandle{Reserves.lean}{reserve}{separation} &
+  \path{proofs/reserve-separation.md} &
   A-EXT-01;\newline A-ARITH-05 &
   Deposit spend cannot consume withdrawal-reserved ETH. \\
   \rowsep
   SRV3-P2 &
-  \proofhandle{Deposits.lean}{deposit\_exact}{pull} &
-  A-DEP-02;\newline A-ID-04;\newline A-ARITH-05 &
-  Pulled wei equals 32 ETH times actual deposits over all allocated modules. \\
+  \path{proofs/deposit-conservation.md} &
+  A-DEP-02;\newline A-LIDO-06;\newline A-MOD-07;\newline A-ID-04;\newline A-ARITH-05 &
+  Pulled wei equals 32 ETH times actual deposits; allocated-deposit sums,
+  active-module and max-deposit guards, depositable-ETH preconditions, exact
+  nonzero buffered-ETH decrease, zero-key external-value preservation, and
+  exact module-array last-deposit recording are preserved; the deposit-reserve
+  field is reduced by exactly the pulled amount while the withdrawal reserve,
+  module-balance sums, and report state stay unchanged. \\
   \rowsep
   SRV3-P3 &
-  \proofhandle{Balances.lean}{module\_balance}{sum} &
+  \path{proofs/module-balance-conservation.md} &
   A-ORC-03;\newline A-ID-04;\newline A-ARITH-05 &
-  Accepted report application preserves router balance as the module sum. \\
+  Successful report transitions check full length, router order, Gwei range, and
+  write the exact accepted-report update-loop result while preserving
+  module-array length and router balance as the module sum; ETH-side state
+  remains unchanged. \\
   \rowsep
   SRV3-P4 &
-  \proofhandle{Rewards.lean}{reward\_uses}{accepted\_report} &
+  \path{proofs/report-before-reward-consistency.md} &
   A-ORC-03;\newline A-ID-04 &
   Module fee-distribution weights read the latest accepted module-balance state. \\
   \rowsep
   SRV3-P5 &
-  \proofhandle{Rewards.lean}{reward\_fee}{bounded\_aligned} &
-  A-ORC-03;\newline A-ARITH-05 &
-  Fee amounts are bounded and recipient/module arrays stay aligned. \\
+  \path{proofs/reward-correctness.md} &
+  A-ORC-03;\newline A-ARITH-05;\newline A-REWARD-09 &
+  Reward distribution returns no rows and an empty module-id projection at zero
+  total balance; otherwise rows use accepted balances, skip zero-balance
+  modules, keep recipients aligned, and zero stopped-module paid fees; total fee
+  is the row-wise module plus treasury fee sum. \\
   \rowsep
   SRV3-P6 &
-  \proofhandle{Status.lean}{status\_gates}{economic\_flows} &
+  \path{proofs/status-gating.md} &
   A-EXT-01;\newline A-ID-04 &
   Non-active or deposit-paused modules receive no modeled deposit allocation;
   stopped modules receive no module-side reward or fee allocation. \\
+  \rowsep
+  SRV3-P7 &
+  \path{proofs/exited-count-correctness.md} &
+  A-MOD-08;\newline A-ORC-03;\newline A-ARITH-05 &
+  Successful exited-count rows name existing modules, cannot decrease, and
+  cannot exceed deposited validators; successful loops return exactly the
+  sequential loop result while preserving module-array length, the router
+  module-balance sum, and non-module router state. \\
+  \rowsep
+  SRV3-P8 &
+  \path{proofs/topup-conservation.md} &
+  A-LIDO-06;\newline A-DEP-02;\newline A-MOD-10;\newline A-ARITH-05 &
+  Successful top-up transitions preserve allocation shape, keep returned sums
+  inside the module allocation budget, require depositable ETH for nonzero
+  pulls, decrease buffered ETH exactly by nonzero allocation sums, reduce the
+  deposit-reserve field by exactly that sum, fully sink nonzero allocation sums,
+  leave module and report accounting unchanged, leave the withdrawal reserve
+  unchanged, and leave zero-sum transitions unchanged. \\
+  \rowsep
+  SRV3-P9 &
+  \path{proofs/allocation-capacity.md} &
+  A-ID-04;\newline A-MOD-08;\newline A-MOD-11;\newline A-ALLOC-12;\newline A-ARITH-05 &
+  Allocation-capacity rows preserve module length and module-id order, derived
+  capacity values stay module-length aligned, and active/inactive capacity
+  bounds hold before external MinFirst allocation. \\
+  \rowsep
+  SRV3-P10 &
+  \path{proofs/reward-minted-reporting.md} &
+  A-EXT-01;\newline A-MOD-13 &
+  Reward-minted report arrays are equal length and return one zipped row per
+  module id with exact input-array projections; zero-share rows are skipped, and
+  nonzero-share rows name existing modules before callback. \\
+  \rowsep
+  SRV3-P11 &
+  \path{proofs/fee-update-consistency.md} &
+  A-GOV-14;\newline A-ARITH-05 &
+  All-module fee updates require matching array lengths, consistent bounded fee
+  sums, set fee projections exactly to the supplied arrays, and preserve
+  module-list length and validator-balance sums after
+  updating module configs while leaving non-module router state unchanged. \\
+  \rowsep
+  SRV3-P12 &
+  \path{proofs/module-param-update-consistency.md} &
+  A-GOV-14;\newline A-ID-04;\newline A-ARITH-05 &
+  Single-module config updates require an existing module, valid share and
+  deposit parameters, bounded consistent fee sums, record the requested fields
+  for the selected module, and preserve module-list length, validator-balance
+  sums, and non-module router state. \\
+  \rowsep
+  SRV3-P13 &
+  \path{proofs/module-status-update.md} &
+  A-GOV-14;\newline A-ID-04 &
+  Module-status updates require an existing module and changed status, record
+  the requested status, preserve module-list length, and leave router-stored
+  module validator-balance sums and non-module router state unchanged. \\
+  \rowsep
+  SRV3-P14 &
+  \path{proofs/module-addition-consistency.md} &
+  A-GOV-14;\newline A-ID-04;\newline A-ARITH-05 &
+  Module addition requires a fresh id and valid config, appends exactly the
+  accepted new module, starts it with zero accounting, and leaves router-stored
+  validator-balance sums and non-module router state unchanged. \\
+  \rowsep
+  SRV3-P15 &
+  \path{proofs/module-share-update-consistency.md} &
+  A-GOV-14;\newline A-ARITH-05 &
+  All-module share updates require matching array lengths and valid share rows,
+  set share projections exactly to the supplied arrays, then preserve
+  module-list length, router-stored validator-balance sums, and non-module
+  router state. \\
   \bottomrule
 \end{xltabular}
 
@@ -252,25 +928,24 @@ prose alone; every claim should have this chain.
   \thead{Layer} & \thead{Artifact} & \thead{Role} \\
   \midrule
   \endhead
-  Solidity-facing summaries & \texttt{verity/SRv3} &
+  Solidity-facing summaries & \path{tests/solidity-reference/} &
   Preserve the relevant array, loop, reserve, and call structure while
-  summarizing external contracts through explicit interfaces. \\
+  anchoring the model against copied PR \#1811 test intent. \\
   \rowsep
-  Economic model & \texttt{State.lean} &
+  Economic model & \path{LidoSRv3/Model.lean} &
   Defines modules, reserves, Wei/Gwei arithmetic, status flags, accepted reports,
   rewards, and fee state. \\
   \rowsep
-  Proof obligations & \texttt{Properties/*.lean} &
-  States each target over arbitrary finite module/report arrays, with
-  uniqueness, ordering, alignment, and freshness premises named in theorem
-  signatures. \\
+  Proof obligations & \path{LidoSRv3/SpecProofs.lean} &
+  States each target over the focused transition model, with uniqueness,
+  ordering, alignment, and freshness premises named in target files. \\
   \rowsep
-  Trust-boundary report & \texttt{trust-boundary.json} &
-  Machine-readable list of assumptions, theorem IDs, axiom output, source links,
+  Trust-boundary report & \path{verity/targets/trust-boundary.json} &
+  Machine-readable list of assumptions, target IDs, source links,
   retained Certora assumptions, and out-of-model claims. \\
   \rowsep
-  Rebuild gate & \texttt{lake build} &
-  Rechecks all selected theorem files and fails if any trusted declaration,
-  admitted theorem, or unmapped assumption appears outside the allowlist. \\
+  Rebuild gate & \texttt{make test; make prove} &
+  Checks source fixtures, runs the Verity/Lean theorem target, and emits
+  \path{proofs/logs/proof-report.json}. \\
   \bottomrule
 \end{xltabular}

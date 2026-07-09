@@ -1,10 +1,10 @@
 \section*{Confidentiality and result status}
 \addcontentsline{toc}{section}{Confidentiality and result status}
 
-This document is a \textbf{private final-report package} for the selected SRv3
-accounting proof-closure lane. It shows the claim structure, reader journey, and
-evidence layout that a final report would use once the companion Lean/Verity
-artifacts exist for PR \#1811 at the commit named on the cover.
+This document is a \textbf{private executable evidence package} for the selected
+SRv3 accounting proof-closure lane. It connects the report claims to local model
+files, reference tests, proof target files, and reproducibility commands for
+PR \#1811 at the commit named on the cover.
 
 \smallskip
 \noindent The report is intentionally narrow. It covers the economic state
@@ -14,15 +14,15 @@ equivalence, oracle truthfulness, cryptographic correctness, governance
 correctness, or exact proxy/storage refinement beyond the named assumptions.
 
 \smallskip
-\noindent In a production delivery, every target row would be backed by
-a theorem file, a source-code cross-reference, a trust-boundary entry, and a
-rebuild command. In this report package, those rows demonstrate the intended final
-shape rather than independently verifiable proof artifacts in this repository.
+\noindent Every selected target row is backed by a source-code cross-reference,
+trust-boundary entry, Verity/Lean theorem, and rebuild command. These artifacts
+are checked over the focused economic model; they are not full deployed-system
+refinement proofs.
 
 \begin{notebox}
 \noteboxtitle{Distribution}
 Private review channel for Lido protocol contributors and selected technical
-reviewers. Public release, forum excerpts, or website publication should use
-strictly weaker language unless the proof repository and evidence manifest are
-available for independent rebuild.
+reviewers. Public release, forum excerpts, or website publication should keep
+the same bounded-check language unless stronger theorem-checker artifacts are
+added and independently rebuilt.
 \end{notebox}

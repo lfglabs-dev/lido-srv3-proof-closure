@@ -18,8 +18,13 @@ a footnote.
   Reserve and buffer arithmetic &
   This is where depositable ETH must be separated from withdrawal-reserved ETH. \\
   \rowsep
-  Router deposit accounting &
-  This is where pulled ETH must match actual 32 ETH validator deposits. \\
+  Router deposit and top-up accounting &
+  This is where pulled ETH must match actual 32 ETH validator deposits or
+  accepted top-up allocation sums. \\
+  \rowsep
+  Deposit allocation capacity &
+  This is where SRv3 builds current-allocation and capacity arrays before
+  calling the external allocation strategy. \\
   \rowsep
   Module-balance reports &
   This is where per-module balances become the router-wide accepted balance. \\
@@ -27,9 +32,10 @@ a footnote.
   Rewards, fees, and recipients &
   This is where amount bounds and recipient alignment matter. \\
   \rowsep
-  Module status gates &
-  This is where non-active or paused modules stop receiving modeled deposit
-  allocation, and stopped modules stop receiving module-side rewards or fees. \\
+  Module lifecycle and status gates &
+  This is where module creation/config/status updates feed the finite router
+  array, and where non-active or paused modules stop receiving modeled deposit
+  allocation while stopped modules stop receiving module-side rewards or fees. \\
   \bottomrule
 \end{tabularx}
 
@@ -51,14 +57,21 @@ cryptographic review.
   deposit sinks conform to the specified interfaces and mutate no unlisted SRv3
   accounting state. \\
   \rowsep
+  A-GOV-14 & Governance and config-call authorization &
+  Governance role authorization, calldata authorship, and event semantics for
+  module-management updates remain outside this lane. P11--P15 check the SRv3
+  fee, share, config, status, and add-module validation/update loops once invoked;
+  module contract registration and address/interface validation are not proved. \\
+  \rowsep
   A-DEP-02 & Beacon deposit sink &
-  A modeled beacon deposit removes exactly the intended 32 ETH value from the
-  router-side resource. Deposit-root, BLS, and SSZ correctness are not proved. \\
+  A modeled beacon deposit or top-up removes exactly the intended value from the
+  router-side resource. Deposit-root, BLS, dummy-signature behavior, minimum
+  top-up amount checks, and SSZ correctness are not proved. \\
   \rowsep
   A-ORC-03 & Accepted oracle reports &
-  Once accepted by SRv3 validation, module-balance reports satisfy the listed
-  shape, alignment, freshness, and range assumptions. Consensus-layer
-  truthfulness is outside this report. \\
+  Off-chain oracle truthfulness remains assumed. The modeled SRv3 transition
+  still checks full module-array length, router-order module IDs, and the SRv3
+  Gwei amount range before applying module balances. \\
   \rowsep
   A-ID-04 & Module identity and ordering well-formedness &
   Module IDs are unique, report arrays align with those IDs where required, and
@@ -67,6 +80,49 @@ cryptographic review.
   A-ARITH-05 & Unit-conversion domain &
   Wei/Gwei and basis-point arithmetic is interpreted over the bounded unsigned
   integer domains used by the modeled transitions. \\
+  \rowsep
+  A-REWARD-09 & Reward precision and cast bounds &
+  Modeled reward fee arithmetic is assumed to stay within the Solidity
+  \texttt{uint96} and high-precision domains, including the final
+  \texttt{totalFee <= FEE\_PRECISION\_POINTS} assertion. \\
+  \rowsep
+  A-LIDO-06 & Lido buffer withdrawal interface &
+  A modeled \texttt{withdrawDepositableEther} call makes exactly the requested
+  depositable amount available to the router and does not consume
+  withdrawal-reserved ETH. \\
+  \rowsep
+  A-MOD-07 & Staking module deposit-data interface &
+  A modeled staking module returns the specified number of deposit pubkeys and
+  does not mutate router accounting except through the explicit SRv3 transition.
+  Pubkey bytes, signatures, and module internals are outside this lane unless a
+  P0 property names them. \\
+  \rowsep
+  A-MOD-08 & Staking module summary interface &
+  A modeled staking module summary supplies the deposited-validator count used by
+  SRv3 exited-count validation. Node-operator internals and warning-event
+  conditions are outside this lane unless a P0 property names them. \\
+  \rowsep
+  A-MOD-10 & Staking module top-up allocation interface &
+  A modeled \texttt{allocateDeposits} call returns the top-up allocation array
+  used by SRv3 and does not mutate router accounting except through the explicit
+  transition. Key ownership, queue-cursor behavior, and module internals remain
+  outside this lane unless a P0 property names them. \\
+  \rowsep
+  A-MOD-11 & Staking module total-stake interface &
+  A modeled \texttt{getTotalModuleStake} call returns the total module stake
+  used to compute WC02 allocation equivalents. Consensus-layer truthfulness and
+  module-internal stake accounting remain outside this lane. \\
+  \rowsep
+  A-MOD-13 & Reward-minted callback interface &
+  A modeled \texttt{onRewardsMinted} callback is attempted only after the SRLib
+  loop guards checked in P10. Callback effects, low-level revert bytes, event
+  emission, and gas-estimation behavior remain outside this lane. \\
+  \rowsep
+  A-ALLOC-12 & External allocation strategy &
+  The external \texttt{MinFirstAllocationStrategy} and governance admissibility
+  of target limits satisfy their documented contracts. This lane models the
+  SRv3-owned current-allocation and capacity array construction before that
+  strategy runs. \\
   \bottomrule
 \end{xltabular}
 
@@ -103,11 +159,10 @@ cryptographic review.
 
 \begin{notebox}
 \noteboxtitle{Precise claim}
-This report package demonstrates the intended final claim shape: the selected
-PR \#1811 SRv3 accounting invariants would be reported as closed over a focused
-Lean/Verity economic-state-machine model, under explicit assumptions for
-external contracts, accepted oracle inputs, cryptographic witnesses, governance
-configuration, and deployed-system refinement. Use closure language publicly only
-after the companion proof repository and evidence manifest are available for
-independent rebuild.
+This report package demonstrates the executable local claim shape: the selected
+PR \#1811 SRv3 accounting checks pass over a focused economic-state-machine
+model, under explicit assumptions for external contracts, accepted oracle inputs,
+cryptographic witnesses, governance configuration, and deployed-system
+refinement. Use broader theorem or deployed-system proof language publicly only
+after stronger artifacts are added and independently rebuilt.
 \end{notebox}
