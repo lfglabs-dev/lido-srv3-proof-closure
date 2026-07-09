@@ -8,8 +8,8 @@
   "build": {
     "log": "proofs/logs/prove.txt",
     "log_sha256": "a30d6eefe7ccec7803482bd446c3d48f7cc46ed86ba99cb839fca134dd7a5a3d",
-    "verified_at": "2026-07-09T14:30:18Z",
-    "git_commit": "3ba1e8685c2749b46ab5960005dbe1af540fd5a1",
+    "verified_at": "2026-07-09T14:34:41Z",
+    "git_commit": "a94127eb9077ef969fec0e47ca4730d7da3d9f09",
     "exit_status": 0
   },
   "targets": [
