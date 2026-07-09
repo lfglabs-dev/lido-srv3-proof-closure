@@ -120,10 +120,10 @@ scope of the pilot. All have executable artifacts in \path{proofs/},
   max-deposit guards. The selected module's last-deposit field records that
   exact pulled amount through an exact module-array update while preserving
   module-array length and module-balance sums, with no modeled residual held by
-  the router, no deposit- or
-  withdrawal-reserve field mutation, and no router report-state mutation.
-  Zero-deposit returns still record last-deposit accounting but do not move
-  modeled buffer or beacon-sink value. \\
+  the router, no withdrawal-reserve field mutation, a deposit-reserve field
+  reduced by exactly that pulled amount, and no router report-state mutation.
+  Zero-deposit returns still record last-deposit accounting but leave reserves,
+  modeled buffer, and beacon-sink value unmoved. \\
   \rowsep
   SRV3-P3 & Module balances &
   Router-wide validator balance is exactly the sum of accepted per-module
@@ -170,10 +170,11 @@ rather than adding separate signed acceptance rows.
   Top-up allocations are same-length, Gwei-aligned, within per-key limits and
   the rounded module target, which keeps returned sums inside the module
   allocation budget. Nonzero sums require enough depositable ETH before the
-  modeled Lido pull, reduce modeled buffered ETH by that exact sum, and are
-  fully sunk; zero sums return the unchanged state. Both branches leave no
-  modeled router residual or reserve-field mutation, and do not mutate router
-  module or report accounting. \\
+  modeled Lido pull, reduce modeled buffered ETH by that exact sum, reduce the
+  deposit-reserve field by exactly that sum, and are fully sunk; zero sums
+  return the unchanged state. Both branches leave no modeled router residual and
+  no withdrawal-reserve field mutation, and do not mutate router module or
+  report accounting. \\
   \rowsep
   SRV3-P9 & Deposit allocation capacity &
   SRv3 allocation-capacity rows preserve router module length and module-id

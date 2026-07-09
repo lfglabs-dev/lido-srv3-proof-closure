@@ -817,8 +817,9 @@ trust prose alone; every claim has this chain.
   Pulled wei equals 32 ETH times actual deposits; allocated-deposit sums,
   active-module and max-deposit guards, depositable-ETH preconditions, exact
   nonzero buffered-ETH decrease, zero-key external-value preservation, and
-  exact module-array last-deposit recording are preserved while deposit
-  reserves, module-balance sums, and report state stay unchanged. \\
+  exact module-array last-deposit recording are preserved; the deposit-reserve
+  field is reduced by exactly the pulled amount while the withdrawal reserve,
+  module-balance sums, and report state stay unchanged. \\
   \rowsep
   SRV3-P3 &
   \path{proofs/module-balance-conservation.md} &
@@ -860,9 +861,10 @@ trust prose alone; every claim has this chain.
   A-LIDO-06;\newline A-DEP-02;\newline A-MOD-10;\newline A-ARITH-05 &
   Successful top-up transitions preserve allocation shape, keep returned sums
   inside the module allocation budget, require depositable ETH for nonzero
-  pulls, decrease buffered ETH exactly by nonzero allocation sums, fully sink
-  nonzero allocation sums, leave module and report accounting unchanged,
-  preserve reserve fields, and leave zero-sum transitions unchanged. \\
+  pulls, decrease buffered ETH exactly by nonzero allocation sums, reduce the
+  deposit-reserve field by exactly that sum, fully sink nonzero allocation sums,
+  leave module and report accounting unchanged, leave the withdrawal reserve
+  unchanged, and leave zero-sum transitions unchanged. \\
   \rowsep
   SRV3-P9 &
   \path{proofs/allocation-capacity.md} &
