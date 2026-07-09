@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if find verity tests proofs -type f \( -name '*.py' -o -name '*.pyc' \) | grep -q .; then
+if [ -n "$(find verity tests proofs -type f \( -name '*.py' -o -name '*.pyc' \) -print -quit)" ]; then
   echo "Python proof artifacts are not allowed in this branch." >&2
   find verity tests proofs -type f \( -name '*.py' -o -name '*.pyc' \) >&2
   exit 1
