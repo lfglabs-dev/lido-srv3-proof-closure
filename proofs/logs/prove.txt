@@ -1,1 +1,5 @@
-Build completed successfully.
+⚠ [14/16] Replayed LidoSRv3.SpecProofs
+warning: LidoSRv3/SpecProofs.lean:1630:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (16 jobs).

@@ -23,8 +23,7 @@ private theorem report_sum_matches_zipWith
       | nil => simp at hLen
       | cons row rs =>
           have hTail : rs.length = ms.length := Nat.succ.inj hLen
-          simp [reportBalances, moduleBalanceSum, applyReportToModules]
-          exact ih rs hTail
+          simpa [reportBalances, moduleBalanceSum, applyReportToModules] using ih rs hTail
 
 private theorem report_balances_match_zipWith
     (modules : List Module) (r : List (ModuleId × Gwei))
@@ -41,8 +40,7 @@ private theorem report_balances_match_zipWith
       | nil => simp at hLen
       | cons row rs =>
           have hTail : rs.length = ms.length := Nat.succ.inj hLen
-          simp [reportBalances, applyReportToModules]
-          exact ih rs hTail
+          simpa [reportBalances, applyReportToModules] using ih rs hTail
 
 private theorem find_recordModuleLastDeposit_records_value
     (modules : List Module) (moduleId : ModuleId) (depositsValue : Wei)
