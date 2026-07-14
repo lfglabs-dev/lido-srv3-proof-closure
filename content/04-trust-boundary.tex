@@ -61,7 +61,11 @@ cryptographic review.
   Governance role authorization, calldata authorship, and event semantics for
   module-management updates remain outside this lane. P11--P15 check the SRv3
   fee, share, config, status, and add-module validation/update loops once invoked;
-  module contract registration and address/interface validation are not proved. \\
+  module contract registration and address/interface validation are not proved.
+  The router-global per-block top-up cap
+  (\texttt{setMaxTopUpPerBlockGwei}: positive, uint64-bounded) is governance
+  configuration under this assumption; the model takes the configured value as
+  an explicit transition input. \\
   \rowsep
   A-DEP-02 & Beacon deposit sink &
   A modeled beacon deposit or top-up removes exactly the intended value from the
@@ -89,7 +93,10 @@ cryptographic review.
   A-LIDO-06 & Lido buffer withdrawal interface &
   A modeled \texttt{withdrawDepositableEther} call makes exactly the requested
   depositable amount available to the router and does not consume
-  withdrawal-reserved ETH. \\
+  withdrawal-reserved ETH. Its internal \texttt{canDeposit()} protocol-pause
+  require on the positive-amount path, and the truthfulness of the
+  \texttt{LIDO.canDeposit()} value supplied to the modeled top-up zero-target
+  gate, are part of this interface boundary. \\
   \rowsep
   A-MOD-07 & Staking module deposit-data interface &
   A modeled staking module returns the specified number of deposit pubkeys and

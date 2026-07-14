@@ -168,8 +168,10 @@ rather than adding separate signed acceptance rows.
   \midrule
   SRV3-P8 & Router top-up path &
   Top-up allocations are same-length, Gwei-aligned, within per-key limits and
-  the rounded module target, which keeps returned sums inside the module
-  allocation budget. Nonzero sums require enough depositable ETH before the
+  the capped, rounded module target, which keeps returned sums inside both the
+  module allocation budget and the router-global per-block top-up cap; a
+  zero-target queue advancement requires the Lido protocol deposit gate to be
+  open. Nonzero sums require enough depositable ETH before the
   modeled Lido pull, reduce modeled buffered ETH by that exact sum, reduce the
   deposit-reserve field by exactly that sum, and are fully sunk; zero sums
   return the unchanged state. Both branches leave no modeled router residual and
@@ -221,7 +223,8 @@ they are follow-on / internal work shown for completeness.
   \rowsep
   SRV3-P12 & Single-module config updates &
   Single-module updates require an existing module, valid share parameters,
-  bounded and consistent fee sums, uint64 deposit-parameter bounds, exact
+  bounded and consistent fee sums, positive per-block deposit limits, uint64
+  deposit-parameter bounds, exact
   selected-module field recording, and unchanged module-list length,
   validator-balance sums, and non-module router state. \\
   \rowsep

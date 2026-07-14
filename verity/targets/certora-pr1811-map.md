@@ -55,10 +55,23 @@ produced here.
 | Certora V2 (StakingRouter-era FV) | Covered many StakingRouter-style invariants but under bounded-loop assumptions; surfaced issues around duplicate modules and exited/deposited-count consistency. | No — external reference |
 | Certora V3 (stVault/VaultHub FV & security assessment) | Focused on the stVault/VaultHub stack; assumed at most two staking modules with constant parameters; summarized `StakingRouter.deposit()` and `StakingRouter.reportRewardsMinted()` as nondeterministic. | No — external reference |
 
-If Lido shares the V2/V3 report PDFs/specs, they should be pinned here by
-title, date, and commit/hash so this inventory becomes reproducible. Until
-then, the characterizations above are the working baseline agreed for the
-delta, not a re-derivation of Certora's results.
+These baselines are published in `github.com/lidofinance/audits`
+(referenced by filename, not vendored):
+
+- Certora V2: `Certora Lido V2 Audit Report 04-23.pdf`.
+- Certora V3: `Certora Lido V3 Audit Report - 12-2025.pdf`,
+  `Certora Lido V3 Formal Verification Report - 12-2025.pdf`, and
+  `Certora Lido V3 Smart Contracts Security Assessment Report fix review
+  03-26.pdf`.
+
+Additionally, dedicated SRv3 audits of the PR #1811 surface were published in
+July 2026, after this map was first derived:
+`Certora Staking Router v3 Audit Report 07-2026.pdf`,
+`Statemind Staking Router v3 Audit Report 07-2026.pdf`, and
+`MixBytes Staking Router v3 Upgrade Audit Report 07-2026.pdf` (same
+repository). The audit-response fixes from those engagements (PR #1818
+`fix/srv3-statemind`, PR #1820 top-up cap, PR #1823/#1824) are inside the
+`d088bbc2 → af095e48` delta this map's pinned commit now includes.
 
 ### 1.2 Lido PR #1811 pinned source
 
@@ -66,7 +79,8 @@ delta, not a re-derivation of Certora's results.
 | --- | --- |
 | Repository | `lidofinance/core` |
 | PR | #1811 |
-| Pinned commit (source-map + lockfile) | `d088bbc2deac9913b68036d73d35c37aa6279b90` |
+| Pinned commit (source-map + lockfile) | `af095e48bbc1c3841c2c9936219c8461af01056b` |
+| Previous pin (initial Week-1 derivation) | `d088bbc2deac9913b68036d73d35c37aa6279b90` |
 
 Source anchors per target are in
 [`source-map.json`](./source-map.json); line-level correspondence is in
@@ -112,7 +126,11 @@ target(s) → status → load-bearing assumption IDs (see
 Notes on discipline:
 
 - Row 8 (top-up): the SRv3-owned allocation loop, Gwei alignment, per-key
-  limits, budget bound, and exact beacon-sink transfer are checked. Key
+  limits, budget bound, and exact beacon-sink transfer are checked. At
+  `af095e48` the budget bound additionally includes the router-global per-block
+  cap (`P8_topup_transition_respects_per_block_cap`) and the zero-target
+  queue-advancement path is gated on `LIDO.canDeposit()`
+  (`P8_topup_transition_zero_target_requires_lido_can_deposit`). Key
   ownership, the returned allocation array contents, and CL-side witness
   validity are **not** proved — they are assumptions A-MOD-10 / A-MOD-11 and are
   a named follow-on binding (Appendix D, item 3 in the report).
@@ -167,9 +185,12 @@ The following are **out-of-model** and are not asserted by any row above:
 
 ## 4. Review questions for Week-1 confirmation
 
-1. **Target commit**: is `d088bbc2deac9913b68036d73d35c37aa6279b90` still the
-   release commit/branch/tag to target, or should we re-pin to a newer PR #1811
-   head or a tagged release candidate?
+1. **Target commit**: re-pinned to
+   `af095e48bbc1c3841c2c9936219c8461af01056b` (July 1, 2026), absorbing the
+   audit-response delta from `d088bbc2`. Note the PR #1811 branch has continued
+   past this snapshot (e.g. `8f41d779`, the `srv3-mainnet-deployment` merge,
+   whose anchored contract code is byte-identical to `af095e48`); confirm
+   whether a tagged release candidate should supersede this pin.
 2. **P0 set**: should the P0 scope include top-up (row 8), exited-count (row 9),
    consolidation (row 13), and migration (row 14) swaps, or keep those as
    follow-on lanes?
@@ -185,7 +206,9 @@ The following are **out-of-model** and are not asserted by any row above:
 ## 5. Provenance
 
 - Certora baselines: external references, not vendored (see §1.1).
-- PR #1811 source: `lidofinance/core@d088bbc2deac9913b68036d73d35c37aa6279b90`.
+- PR #1811 source: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`
+  (re-pinned from `d088bbc2deac9913b68036d73d35c37aa6279b90`; delta notes in
+  `solidity-correspondence.md`).
 - Verity: `33722270d996c7a3a520a71ecee42d7d232da100`.
 - Rebuild: `make prove` runs `lake build LidoSRv3` and writes
   [`../../proofs/logs/proof-report.json`](../../proofs/logs/proof-report.json).

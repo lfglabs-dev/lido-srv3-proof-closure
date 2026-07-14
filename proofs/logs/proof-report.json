@@ -8,8 +8,8 @@
   "build": {
     "log": "proofs/logs/prove.txt",
     "log_sha256": "a30d6eefe7ccec7803482bd446c3d48f7cc46ed86ba99cb839fca134dd7a5a3d",
-    "verified_at": "2026-07-09T14:34:41Z",
-    "git_commit": "a94127eb9077ef969fec0e47ca4730d7da3d9f09",
+    "verified_at": "2026-07-14T15:00:35Z",
+    "git_commit": "f8aa8fbd42193fda36a22edf08eeec0ff0fa6eb5",
     "exit_status": 0
   },
   "targets": [
@@ -70,6 +70,8 @@
     {"id": "SRV3-P8j", "theorem": "LidoSRv3.P8_topup_transition_deposit_reserve_spent", "status": "lean_checked"},
     {"id": "SRV3-P8f", "theorem": "LidoSRv3.P8_topup_transition_positive_requires_depositable", "status": "lean_checked"},
     {"id": "SRV3-P8g", "theorem": "LidoSRv3.P8_topup_transition_zero_sum_noop", "status": "lean_checked"},
+    {"id": "SRV3-P8m", "theorem": "LidoSRv3.P8_topup_transition_respects_per_block_cap", "status": "lean_checked"},
+    {"id": "SRV3-P8n", "theorem": "LidoSRv3.P8_topup_transition_zero_target_requires_lido_can_deposit", "status": "lean_checked"},
     {"id": "SRV3-P9", "theorem": "LidoSRv3.P9_allocation_capacity_rows_aligned", "status": "lean_checked"},
     {"id": "SRV3-P9a", "theorem": "LidoSRv3.P9_allocation_capacity_length", "status": "lean_checked"},
     {"id": "SRV3-P9b", "theorem": "LidoSRv3.P9_allocation_capacity_values_length", "status": "lean_checked"},
@@ -94,6 +96,7 @@
     {"id": "SRV3-P11e", "theorem": "LidoSRv3.P11_update_all_module_fees_preserves_router_state", "status": "lean_checked"},
     {"id": "SRV3-P12", "theorem": "LidoSRv3.P12_update_module_params_requires_existing_module", "status": "lean_checked"},
     {"id": "SRV3-P12a", "theorem": "LidoSRv3.P12_update_module_params_requires_valid_config", "status": "lean_checked"},
+    {"id": "SRV3-P12g", "theorem": "LidoSRv3.P12_update_module_params_requires_positive_max_deposits", "status": "lean_checked"},
     {"id": "SRV3-P12b", "theorem": "LidoSRv3.P12_update_module_params_preserves_module_length", "status": "lean_checked"},
     {"id": "SRV3-P12f", "theorem": "LidoSRv3.P12_update_module_params_records_requested_params", "status": "lean_checked"},
     {"id": "SRV3-P12c", "theorem": "LidoSRv3.P12_update_module_params_bounded_after_success", "status": "lean_checked"},

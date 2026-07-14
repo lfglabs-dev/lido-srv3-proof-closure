@@ -44,6 +44,7 @@ beaconSinkAfter = beaconSinkBefore, when actualDeposits = 0
 withdrawalReserveAfter = withdrawalReserveBefore
 depositReserveAfter = depositReserveBefore - pulledWei, when actualDeposits > 0
 selectedModule.status = active
+maxDepositsCount = min(maxDepositsPerBlock, moduleAllocationWei / 32 ETH)
 maxDepositsCount != 0
 actualDeposits <= maxDepositsCount
 modulesAfter = recordModuleLastDeposit(stakingModuleId, pulledWei, modulesBefore)

@@ -5,7 +5,7 @@ SRv3 proof-closure artifacts.
 
 | Component | Reference |
 | --- | --- |
-| Lido PR #1811 | `d088bbc2deac9913b68036d73d35c37aa6279b90` |
+| Lido PR #1811 | `af095e48bbc1c3841c2c9936219c8461af01056b` |
 | Verity | `33722270d996c7a3a520a71ecee42d7d232da100` |
 
 The executable harness in this repository is a Lean/Lake project that imports
