@@ -24,26 +24,26 @@ These are still valid **safety objectives**, not inherited proofs.
 1. **Module registry and configuration integrity.** Module ids/indexes, uniqueness, fee/share bounds, and localized lifecycle/configuration updates remain necessary. V2 checked this class of rules and found duplicate-module weaknesses (pp. 24–26). The current artifact checks related update loops in SRV3-P11–P15, but those are follow-on/internal targets rather than the signed P0 claim.
    - **Falsifier:** a valid SRv3 transition duplicates or reorders a module, exceeds a configured bound, or mutates an unrelated module.
 
-2. **Exited-count guards.** Exited counts must remain monotone and must not exceed deposited validators. This still prevents underflow and invalid router state, but it no longer characterizes stake after MaxEB or partial exits. The current model checks the count guard in SRV3-P7 under `A-MOD-08` and `A-ID-04`.
+2. **Exited-count guards.** Exited counts must remain monotone and must not exceed deposited validators. V2's `exited ≤ deposited` router rule was **violated** (M-03), so this is a carried objective—not carried assurance. It no longer characterizes stake after MaxEB or partial exits. The current model checks the count guard in SRV3-P7 under `A-MOD-08` and `A-ID-04`.
    - **Falsifier:** an accepted update decreases exited count or makes `exited > deposited` for a module.
 
-3. **Allocation conservation and capacity bounds.** Allocated value must not exceed available capacity or budget. The objective survives, but SRv3 needs separate forms for 32 ETH initial deposits and variable-value `0x02` top-ups.
+3. **Allocation conservation and capacity bounds.** SRV3-P9 checks initial-deposit allocation under `A-ALLOC-12`; SRv3 still needs a separate form for variable-value `0x02` top-ups.
    - **Falsifier:** allocations exceed the router budget, module capacity, or the top-up per-block cap.
 
 ## 2. What depends on assumptions
 
-1. **Reserve separation and exact initial-deposit transfer (SRV3-P1/P2).** The model checks that withdrawal-reserved ETH is excluded and that a successful initial deposit pulls and sinks exactly `32 ETH × processed validators`. The deployed guarantee still depends on `LIDO.withdrawDepositableEther`, module deposit data, and the beacon sink behaving as modeled (`A-LIDO-06`, `A-MOD-07`, `A-DEP-02`, `A-EXT-01`).
+1. **Reserve separation and exact initial-deposit transfer (SRV3-P1/P2).** The model checks that withdrawal-reserved ETH is excluded and that a successful initial deposit pulls and sinks exactly `32 ETH × processed validators`. The deployed guarantee still depends on `LIDO.withdrawDepositableEther`, module deposit data, arithmetic, and the beacon sink behaving as modeled (`A-LIDO-06`, `A-MOD-07`, `A-DEP-02`, `A-ARITH-05`, `A-EXT-01`).
    - **Falsifier:** the same call spends withdrawal-reserved ETH, pulls a different amount, or leaves/duplicates value at the router.
 
-2. **One accepted report drives balances and fees (SRV3-P3/P4/P5).** The model checks router balance aggregation, report-before-reward ordering, and bounded recipient-aligned fees. This assumes a truthful accepted oracle report, unique module ids in router order, and valid arithmetic/callback behavior (`A-ORC-03`, `A-ID-04`, `A-REWARD-09`, `A-MOD-13`).
+2. **One accepted report drives balances and fees (SRV3-P3/P4/P5).** The model checks router balance aggregation, report-before-reward ordering, and bounded recipient-aligned fees. Reports rely on validation-accepted, structurally re-checked inputs—not oracle truthfulness—under `A-ORC-03` and `A-ID-04`; fees rely on `A-REWARD-09` and `A-ID-04`. `A-MOD-13` applies to P10 callbacks, not P5.
    - **Falsifier:** fees mix report epochs, omit/duplicate/reorder a module, or pair an amount with the wrong recipient.
 
-3. **Lifecycle and top-up enforcement (SRV3-P6/P8).** Deposit/status gates are P0; top-up conservation is supporting evidence, not a signed P0 commitment. The real guarantee depends on governance/configuration and module-returned top-up allocations/stake, plus the external sink (`A-GOV-14`, `A-MOD-10`, `A-MOD-11`, `A-LIDO-06`, `A-DEP-02`).
+3. **Lifecycle and top-up enforcement (SRV3-P6/P8).** Deposit/status gates are P0; top-up conservation is supporting evidence, not a signed P0 commitment. P6 relies on governance/configuration (`A-GOV-14`). P8 additionally relies on module-returned allocations/stake, Lido and sink exactness, and arithmetic (`A-MOD-10`, `A-MOD-11`, `A-LIDO-06`, `A-DEP-02`, `A-ARITH-05`); the mutable cap remains under `A-GOV-14`.
    - **Falsifier:** a paused/stopped module receives a forbidden deposit/reward, or a top-up exceeds its accepted allocations, limits, budget, or per-block cap.
 
 ## 3. What no longer carries over
 
-1. **Validator-count rules do not establish SRv3 balance accounting.** V2 rules such as “deposit increases deposited count by `depositCount`” and router-level max-deposit bounds remain relevant only to initial deposits. They do not cover reported module balances, MaxEB value, or variable top-ups; key-capacity enforcement now also crosses the `obtainDepositData` interface.
+1. **Validator-count rules do not establish SRv3 balance accounting.** The router still computes and enforces `maxDepositsCount`; what disappeared is V2's caller-supplied `depositCount`. The realized count now comes from `obtainDepositData` within the router cap under `A-MOD-07`. None of this covers reported balances, MaxEB value, or variable top-ups.
 
 2. **Bounded or summarized proofs do not generalize.** V2 unrolled loops to at most three modules and replaced the 32 ETH beacon call with an optimistic transfer (pp. 24–26). V3 assumed at most two modules with constant parameters and summarized `deposit()` and `reportRewardsMinted()` as `NONDET` (pp. 27–29). Those results cannot support unbounded dynamic arrays, mutable parameters, or end-to-end deposit/reward claims in SRv3.
 
@@ -76,4 +76,4 @@ Line-level source correspondence is in [`solidity-correspondence.md`](./solidity
 
 The current artifact does **not** establish oracle truthfulness, BLS/SSZ/Merkle correctness, external module honesty, governance/role configuration, packed-storage equivalence, liveness/gas/event behavior, consolidation, full partial-exit economics, or whole-program Solidity refinement.
 
-**Pilot focus:** keep P1–P6 as the signed economic core; treat P7/P8 and configuration proofs as supporting/follow-on evidence until the corresponding interface and refinement gaps above are closed.
+All P1–P15 are Lean-checked; scope still differs: P1–P6 are the signed economic core, P8/P9 are P0 decompositions, and P7/P10–P15 are follow-on lanes until their interface and refinement gaps are closed.
