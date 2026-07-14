@@ -1,214 +1,79 @@
-# Certora → Lido PR #1811 → Verity Mapping
+# Lido SRv3 pilot assumption map
 
-Week-1 deliverable for the *Lido Evergreen Formal Methods Pilot (V3)*: a
-truth-maintenance map from prior Certora assurance and the PR #1811 changed
-surface to the Verity/Lean targets in this repository. It records what is
-already covered, what is covered only under named assumptions, and what remains
-a follow-on lane.
+## Scope and reading rule
 
-This is not marketing. Each row separates four things: what Certora already
-covered, what Certora simplified or summarized, what PR #1811 changes, and what
-the current Verity/Lean model actually checks. Where a real-world guarantee is
-delegated to an external interface, the row names the assumption instead of
-claiming a proof.
+This map compares two assurance baselines with the audited SRv3 snapshot:
 
-## 0. Status enum
+- **Certora Lido V2** (April 2023; final audited commit `e45c4d6`) — the primary StakingRouter-era baseline.
+- **Certora Lido V3 FV** (December 2025; audited commit `b98371488eb9479cf072bd6c2b682a59c5dd71d8`) — a secondary system baseline focused mainly on VaultHub/stVaults.
+- **SRv3 target** — `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+- **Proof toolchain** — `lfglabs-dev/verity@538c4a9ce2baa25b56062bdc727eb0191ad9e67f`.
 
-| Status | Meaning |
-| --- | --- |
-| `covered-by-current-model` | The economic law is a machine-checked theorem in the pinned model; residual premises are generic (arithmetic domain, accepted-report validation). |
-| `covered-under-assumptions` | The theorem is checked, but a load-bearing part of the real guarantee is delegated to a specific named external-interface assumption. |
-| `mapped-not-proved-yet` | Surface is mapped to anchors and a target id, but no checked artifact exists yet. |
-| `follow-on-lane` | Adjacent SRv3 risk surface named in the proposal for a later week/lane; not required to support the P0 accounting claims. |
-| `not-in-pilot` | Out of the current 4-week scope. |
+Three statements must stay separate:
 
-The word `closed` is intentionally not used. Statuses reflect the model at the
-pinned Verity commit below. A concurrent branch task may be refining
-proof-fidelity details; treat `covered-*` rows as "checked in the pinned model,
-subject to in-flight fidelity review" rather than as a final on-chain
-refinement claim.
+1. **Baseline coverage:** an older Certora rule was checked on older code.
+2. **Semantic carry-over:** the same safety objective still makes sense for SRv3.
+3. **Current coverage:** the pinned Lean model checks a claim under the named premises in [`trust-boundary.json`](./trust-boundary.json).
 
-**Scope tier.** Independently of the status enum above, each in-model target
-group carries a scope tier recorded in
-[`srv3-proof-targets.json`](./srv3-proof-targets.json) (`scope` block). The
-signed P0 economic scope of the 4-week pilot is the six P0 candidate
-economic-conservation properties SRV3-P1--P6 (matching the executive-summary
-headline claim). SRV3-P8 (top-up) and SRV3-P9 (allocation-capacity) are internal
-economic decomposition of the deposit/allocation surface --- executable
-supporting targets, not additional signed acceptance commitments. SRV3-P7 and
-SRV3-P10--P15 are executable operational / module-configuration lanes carried as
-follow-on / internal work, not current acceptance commitments. This tiering does
-not change any row's `Status`; it records which checked rows the pilot presents
-as signed acceptance versus decomposition/follow-on. The P0-boundary review
-question in §4 remains open for client confirmation.
+An old proof is never treated as a proof of `af095e48`; a model theorem is never treated as a full Solidity refinement proof.
 
-## 1. Source inventory
+## 1. What remains applicable
 
-### 1.1 Prior Certora assurance (referenced, not vendored)
+These are still valid **safety objectives**, not inherited proofs.
 
-These baselines are **referenced from prior Lido assurance context**, not
-copied into this repository. They frame the delta; they are not evidence
-produced here.
+1. **Module registry and configuration integrity.** Module ids/indexes, uniqueness, fee/share bounds, and localized lifecycle/configuration updates remain necessary. V2 checked this class of rules and found duplicate-module weaknesses (pp. 24–26). The current artifact checks related update loops in SRV3-P11–P15, but those are follow-on/internal targets rather than the signed P0 claim.
+   - **Falsifier:** a valid SRv3 transition duplicates or reorders a module, exceeds a configured bound, or mutates an unrelated module.
 
-| Baseline | Characterization used for this map | In repo? |
-| --- | --- | --- |
-| Certora V2 (StakingRouter-era FV) | Covered many StakingRouter-style invariants but under bounded-loop assumptions; surfaced issues around duplicate modules and exited/deposited-count consistency. | No — external reference |
-| Certora V3 (stVault/VaultHub FV & security assessment) | Focused on the stVault/VaultHub stack; assumed at most two staking modules with constant parameters; summarized `StakingRouter.deposit()` and `StakingRouter.reportRewardsMinted()` as nondeterministic. | No — external reference |
+2. **Exited-count guards.** Exited counts must remain monotone and must not exceed deposited validators. This still prevents underflow and invalid router state, but it no longer characterizes stake after MaxEB or partial exits. The current model checks the count guard in SRV3-P7 under `A-MOD-08` and `A-ID-04`.
+   - **Falsifier:** an accepted update decreases exited count or makes `exited > deposited` for a module.
 
-These baselines are published in `github.com/lidofinance/audits`
-(referenced by filename, not vendored):
+3. **Allocation conservation and capacity bounds.** Allocated value must not exceed available capacity or budget. The objective survives, but SRv3 needs separate forms for 32 ETH initial deposits and variable-value `0x02` top-ups.
+   - **Falsifier:** allocations exceed the router budget, module capacity, or the top-up per-block cap.
 
-- Certora V2: `Certora Lido V2 Audit Report 04-23.pdf`.
-- Certora V3: `Certora Lido V3 Audit Report - 12-2025.pdf`,
-  `Certora Lido V3 Formal Verification Report - 12-2025.pdf`, and
-  `Certora Lido V3 Smart Contracts Security Assessment Report fix review
-  03-26.pdf`.
+## 2. What depends on assumptions
 
-Additionally, dedicated SRv3 audits of the PR #1811 surface were published in
-July 2026, after this map was first derived:
-`Certora Staking Router v3 Audit Report 07-2026.pdf`,
-`Statemind Staking Router v3 Audit Report 07-2026.pdf`, and
-`MixBytes Staking Router v3 Upgrade Audit Report 07-2026.pdf` (same
-repository). The audit-response fixes from those engagements (PR #1818
-`fix/srv3-statemind`, PR #1820 top-up cap, PR #1823/#1824) are inside the
-`d088bbc2 → af095e48` delta this map's pinned commit now includes.
+1. **Reserve separation and exact initial-deposit transfer (SRV3-P1/P2).** The model checks that withdrawal-reserved ETH is excluded and that a successful initial deposit pulls and sinks exactly `32 ETH × processed validators`. The deployed guarantee still depends on `LIDO.withdrawDepositableEther`, module deposit data, and the beacon sink behaving as modeled (`A-LIDO-06`, `A-MOD-07`, `A-DEP-02`, `A-EXT-01`).
+   - **Falsifier:** the same call spends withdrawal-reserved ETH, pulls a different amount, or leaves/duplicates value at the router.
 
-### 1.2 Lido PR #1811 pinned source
+2. **One accepted report drives balances and fees (SRV3-P3/P4/P5).** The model checks router balance aggregation, report-before-reward ordering, and bounded recipient-aligned fees. This assumes a truthful accepted oracle report, unique module ids in router order, and valid arithmetic/callback behavior (`A-ORC-03`, `A-ID-04`, `A-REWARD-09`, `A-MOD-13`).
+   - **Falsifier:** fees mix report epochs, omit/duplicate/reorder a module, or pair an amount with the wrong recipient.
 
-| Field | Value |
-| --- | --- |
-| Repository | `lidofinance/core` |
-| PR | #1811 |
-| Pinned commit (source-map + lockfile) | `af095e48bbc1c3841c2c9936219c8461af01056b` |
-| Previous pin (initial Week-1 derivation) | `d088bbc2deac9913b68036d73d35c37aa6279b90` |
+3. **Lifecycle and top-up enforcement (SRV3-P6/P8).** Deposit/status gates are P0; top-up conservation is supporting evidence, not a signed P0 commitment. The real guarantee depends on governance/configuration and module-returned top-up allocations/stake, plus the external sink (`A-GOV-14`, `A-MOD-10`, `A-MOD-11`, `A-LIDO-06`, `A-DEP-02`).
+   - **Falsifier:** a paused/stopped module receives a forbidden deposit/reward, or a top-up exceeds its accepted allocations, limits, budget, or per-block cap.
 
-Source anchors per target are in
-[`source-map.json`](./source-map.json); line-level correspondence is in
-[`solidity-correspondence.md`](./solidity-correspondence.md).
+## 3. What no longer carries over
 
-### 1.3 Verity / local PR #1 artifacts
+1. **Validator-count rules do not establish SRv3 balance accounting.** V2 rules such as “deposit increases deposited count by `depositCount`” and router-level max-deposit bounds remain relevant only to initial deposits. They do not cover reported module balances, MaxEB value, or variable top-ups; key-capacity enforcement now also crosses the `obtainDepositData` interface.
 
-| Field | Value |
-| --- | --- |
-| Verity pinned commit | `33722270d996c7a3a520a71ecee42d7d232da100` |
-| Model | [`../../LidoSRv3/Model.lean`](../../LidoSRv3/Model.lean) |
-| Theorems | [`../../LidoSRv3/SpecProofs.lean`](../../LidoSRv3/SpecProofs.lean) |
-| Target manifest | [`srv3-proof-targets.json`](./srv3-proof-targets.json) |
-| Trust boundary | [`trust-boundary.json`](./trust-boundary.json) |
-| Proof log | [`../../proofs/logs/proof-report.json`](../../proofs/logs/proof-report.json) |
-| Proof command | `lake build LidoSRv3` (via `make prove`) |
+2. **Bounded or summarized proofs do not generalize.** V2 unrolled loops to at most three modules and replaced the 32 ETH beacon call with an optimistic transfer (pp. 24–26). V3 assumed at most two modules with constant parameters and summarized `deposit()` and `reportRewardsMinted()` as `NONDET` (pp. 27–29). Those results cannot support unbounded dynamic arrays, mutable parameters, or end-to-end deposit/reward claims in SRv3.
 
-## 2. Mapping table
+3. **V3 VaultHub/stVault/PDG properties are adjacent, not router evidence.** They may remain valid for their own components, but they neither prove nor refute SRv3 router accounting, top-ups, exits, or migration.
 
-Columns: prior Certora / assurance area → PR #1811 changed surface → Verity
-target(s) → status → load-bearing assumption IDs (see
-[`trust-boundary.json`](./trust-boundary.json)).
+## 4. What should be verified next
 
-| # | Certora / prior area | PR #1811 changed surface | Verity target(s) | Status | Assumptions |
-| --- | --- | --- | --- | --- | --- |
-| 1 | V2 deposit-availability bounds | Deposit reserve / buffered-ether separation (`Lido.sol::_getBufferedEtherAllocation`, `getDepositableEther`, `_spendDepositableEther`) | SRV3-P1; SRV3-P2d/P2j (reserves unchanged/spent) | `covered-by-current-model` | A-ARITH-05, A-LIDO-06 |
-| 2 | V2 deposit-availability bounds (bounded) | StakingRouter initial deposits, pull-deposit exactness (`StakingRouter.sol::deposit`, `Lido.sol::withdrawDepositableEther`) | SRV3-P2 + P2a–P2n | `covered-under-assumptions` | A-DEP-02, A-MOD-07, A-LIDO-06, A-ARITH-05 |
-| 3 | V2 validator-count accounting | Module balance reports & router-wide balance sum (`SRLib.sol::_reportValidatorBalancesByStakingModule`, `SRTypes.sol::RouterStateAccounting`) | SRV3-P3 + P3a–P3g | `covered-by-current-model` | A-ORC-03, A-ID-04 |
-| 4 | (new PR #1811 ordering) | Report-before-reward consistency (`AccountingOracle.sol::submitReportData` → `getStakingRewardsDistribution`) | SRV3-P4, P4a | `covered-by-current-model` | A-ORC-03 |
-| 5 | V2/V3 reward-distribution checks | Reward / fee distribution over accepted balances (`StakingRouter.sol::getStakingRewardsDistribution`, `_computeModuleFee`) | SRV3-P5 + P5a–P5h | `covered-by-current-model` | A-REWARD-09, A-ID-04 |
-| 6 | Router status-gating assertions | Active / stopped / deposits-paused status gating (`SRTypes.sol::StakingModuleStatus`, `deposit`, `getStakingRewardsDistribution`) | SRV3-P6, P6a | `covered-by-current-model` | A-GOV-14 |
-| 7 | V3 bounded module-array specs (≤2 modules, const params) | Allocation capacity / dynamic module arrays (`SRLib.sol::_getDepositAllocations`, `_getModulesAllocationAndCapacity`) | SRV3-P9 + P9a–P9f | `covered-under-assumptions` | A-ALLOC-12, A-MOD-11, A-ID-04 |
-| 8 | (new PR #1811 surface) | Top-up / 0x02 validator allocation + witness assumptions (`StakingRouter.sol::topUp`, `IStakingModuleV2.allocateDeposits`) | SRV3-P8 + P8a–P8l | `covered-under-assumptions` | A-DEP-02, A-MOD-10, A-MOD-11, A-LIDO-06, A-ARITH-05 |
-| 9 | V2 exited/deposited-count consistency (issue area) | Exited-count correctness / MaxEB-aware exit accounting (`StakingRouter.sol::updateExitedValidatorsCountByStakingModule`, `IStakingModule.getStakingModuleSummary`) | SRV3-P7 + P7a–P7e | `covered-under-assumptions` | A-MOD-08, A-ID-04 |
-| 10 | V3 `reportRewardsMinted()` summarized nondeterministic | reportRewardsMinted ordering / row alignment (`SRLib.sol::_reportRewardsMinted`) | SRV3-P10 + P10a–P10g | `covered-by-current-model` | A-ID-04 |
-| 11 | (module-config plumbing, partly V2) | Module fee / share / status / config update consistency (`updateAllStakingModulesFees`, `updateStakingModule`, `setStakingModuleStatus`, `updateStakingModulesShares`) | SRV3-P11, P12, P13, P15 (+ sub-rows) | `covered-by-current-model` | A-GOV-14, A-ARITH-05 |
-| 12 | (module-config plumbing) | Add-module initialization consistency (`StakingRouter.sol::addStakingModule`, `SRLib.sol::_addModule`) | SRV3-P14 + P14a–P14g | `covered-by-current-model` | A-GOV-14 |
-| 13 | V3 MaxEB / consolidation scope | Consolidation fee conservation, source/target binding (`ConsolidationMigrator.sol` and related) | — | `follow-on-lane` | out of P0 model |
-| 14 | V3 migration/deployment scope | SRv3 storage migration refinement (`SRLib.sol::_migrateStorage`) | — | `follow-on-lane` | out of P0 model |
-| 15 | V3 stVault/VaultHub FV | VaultHub F-01/F-02/F-03 lane | — | `follow-on-lane` / `not-in-pilot` | out of P0 model |
-| 16 | (new PR #1811 surface) | ExitBus authorization, replay/duplicate resistance, triggerable-exit fee/refund exactness (`ValidatorsExitBus*.sol`) | — | `follow-on-lane` | out of P0 model |
+Ordered by risk reduction:
 
-Notes on discipline:
+1. **Bind the model to Solidity at `af095e48`.** Add executable refinement/correspondence checks for P1–P6, including revert branches and state writes; today the correspondence register is reviewed evidence, not a machine-checked refinement.
+2. **Stress the report → balance → reward chain with dynamic modules and mutable parameters.** Prove no stale/mixed snapshot is possible across add/update/status/report/reward sequences.
+3. **Close the top-up interface boundary.** Bind module-returned keys/allocations to ownership and limits, and bind exact value to the real beacon top-up sink, including zero-target and per-block-cap paths.
+4. **Model balance-aware and partial exits.** Extend beyond exited-count monotonicity to MaxEB value conservation, partial-exit accounting, authorization, replay resistance, and fee/refund exactness.
+5. **Cover consolidation and migration.** Prove source/target binding, request/fee conservation, replay/limit handling, and storage/role/accounting preservation.
 
-- Row 8 (top-up): the SRv3-owned allocation loop, Gwei alignment, per-key
-  limits, budget bound, and exact beacon-sink transfer are checked. At
-  `af095e48` the budget bound additionally includes the router-global per-block
-  cap (`P8_topup_transition_respects_per_block_cap`) and the zero-target
-  queue-advancement path is gated on `LIDO.canDeposit()`
-  (`P8_topup_transition_zero_target_requires_lido_can_deposit`). Key
-  ownership, the returned allocation array contents, and CL-side witness
-  validity are **not** proved — they are assumptions A-MOD-10 / A-MOD-11 and are
-  a named follow-on binding (Appendix D, item 3 in the report).
-- Row 9 (exited counts): the model checks that update rows name existing
-  modules, cannot decrease stored exited counts, and cannot exceed the
-  deposited-validator count. The deposited-validator count itself comes from
-  `getStakingModuleSummary` and is assumption A-MOD-08. Full MaxEB
-  balance-partial-exit *economics* (beyond count monotonicity/bounds) is a
-  follow-on lane, not this row.
-- Row 7 (allocation capacity): row alignment, module-order preservation, and
-  the WC01/WC02 capacity bounds are checked. The external
-  `MinFirstAllocationStrategy` that runs *after* these rows is assumption
-  A-ALLOC-12 and is not proved here.
+## Evidence index
 
-## 3. Assumption map
+| Area | Baseline anchor | Audited SRv3 anchor | Current artifact |
+| --- | --- | --- | --- |
+| Registry/status/fees | V2 pp. 24–26 | `SRLib::_addModule`, `_updateModuleParams`, `_setModuleStatus`; `StakingRouter` update entry points | SRV3-P6, P11–P15 |
+| Reserve and initial deposit | V2 `integrityOfDeposit`; optimistic beacon-transfer assumption | `Lido::_getBufferedEtherAllocation`, `_spendDepositableEther`, `withdrawDepositableEther`; `StakingRouter::deposit` | SRV3-P1/P2 |
+| Balance report snapshot | V2 count/report integrity; V3 router calls summarized | `SRLib::_reportValidatorBalancesByStakingModule`; `RouterStateAccounting` | SRV3-P3/P4 |
+| Fee distribution | V2 fee aggregation; V3 accounting fee arithmetic summary | `StakingRouter::getStakingRewardsDistribution`, `_computeModuleFee` | SRV3-P5 |
+| Top-up | Not covered by the router baselines | `StakingRouter::topUp`, `_validateTopUpInputs`; `IStakingModuleV2::allocateDeposits` | SRV3-P8 (supporting) |
+| Exits/consolidation/migration | Older count guards; adjacent V3 scope | exit-bus, consolidation, and storage-migration surfaces | P7 count guard only; remainder follow-on |
 
-Each target above leans on named premises registered in
-[`trust-boundary.json`](./trust-boundary.json). The load-bearing IDs per row
-are in the table's last column. Summary of the 14 assumption IDs:
+Line-level source correspondence is in [`solidity-correspondence.md`](./solidity-correspondence.md); theorem handles are in [`srv3-proof-targets.json`](./srv3-proof-targets.json).
 
-| ID | One-line premise |
-| --- | --- |
-| A-ARITH-05 | Wei/Gwei/bps arithmetic over bounded non-negative integers; overflow → rejected state. |
-| A-DEP-02 | Beacon sink consumes exactly 32 ETH per initial deposit / exact allocation per top-up; deposit-root, BLS, dummy-sig, SSZ out of lane. |
-| A-EXT-01 | External callbacks/sinks mutate no unlisted SRv3 accounting state. |
-| A-GOV-14 | Governance authorization, calldata authorship, registration, address/interface validation, events for module management are out of lane. |
-| A-ID-04 | Module IDs unique; accepted report arrays align with router module order. |
-| A-LIDO-06 | `LIDO.withdrawDepositableEther` makes exactly the requested depositable amount available; does not consume withdrawal-reserved ETH. |
-| A-MOD-07 | `obtainDepositData` returns the modeled pubkey count; mutates no router accounting except via the explicit transition. |
-| A-MOD-08 | `getStakingModuleSummary` returns the deposited-validator count used by exited-count validation; operator internals out of lane. |
-| A-MOD-10 | `IStakingModuleV2.allocateDeposits` returns the modeled top-up allocation array; key ownership / module internals out of lane. |
-| A-MOD-11 | `IStakingModuleV2.getTotalModuleStake` returns the modeled total module stake for WC02 allocation. |
-| A-MOD-13 | `onRewardsMinted` callback effects, revert bytes, events, gas out of lane; only SRLib loop guards modeled. |
-| A-ORC-03 | Accepted reports passed off-chain oracle validation; model still checks array length, router-order IDs, and Gwei range. |
-| A-REWARD-09 | Reward-fee arithmetic stays within Solidity precision/cast domains, incl. `totalFee ≤ FEE_PRECISION_POINTS`. |
-| A-ALLOC-12 | External `MinFirstAllocationStrategy` and governance target-limit admissibility satisfy their contracts; only SRv3-owned array construction modeled. |
+## Explicit non-claims
 
-### 3.1 Explicit non-claims
+The current artifact does **not** establish oracle truthfulness, BLS/SSZ/Merkle correctness, external module honesty, governance/role configuration, packed-storage equivalence, liveness/gas/event behavior, consolidation, full partial-exit economics, or whole-program Solidity refinement.
 
-The following are **out-of-model** and are not asserted by any row above:
-
-- Oracle truthfulness of the underlying beacon-chain state (A-ORC-03 accepts
-  reports post-validation; it does not certify the off-chain data).
-- BLS signatures, SSZ encoding, Merkle proofs, EIP-4788 beacon-root access
-  (folded into A-DEP-02 / general plumbing).
-- External module callbacks beyond listed SRv3 state effects (A-EXT-01,
-  A-MOD-13).
-- Governance / config / deployment authorization and role graph (A-GOV-14).
-- Packed storage layout equivalence and exact cast encoding.
-- Gas accounting, event semantics, revert strings, liveness, and full
-  deployed-system refinement.
-
-## 4. Review questions for Week-1 confirmation
-
-1. **Target commit**: re-pinned to
-   `af095e48bbc1c3841c2c9936219c8461af01056b` (July 1, 2026), absorbing the
-   audit-response delta from `d088bbc2`. Note the PR #1811 branch has continued
-   past this snapshot (e.g. `8f41d779`, the `srv3-mainnet-deployment` merge,
-   whose anchored contract code is byte-identical to `af095e48`); confirm
-   whether a tagged release candidate should supersede this pin.
-2. **P0 set**: should the P0 scope include top-up (row 8), exited-count (row 9),
-   consolidation (row 13), and migration (row 14) swaps, or keep those as
-   follow-on lanes?
-3. **Assumption sign-off**: who signs off the 14 assumptions (Yuri / George /
-   Gregory), and is A-DEP-02 / A-MOD-10 witness delegation acceptable for the
-   Week-1 boundary?
-4. **Certora baselines**: can Lido share the V2 and V3 report artifacts so
-   §1.1 can be pinned by hash instead of characterization?
-5. **Format / cadence**: expected deliverable format and review cadence for
-   Weeks 2–4 (memo + checked artifacts + reproducible command per the
-   proposal)?
-
-## 5. Provenance
-
-- Certora baselines: external references, not vendored (see §1.1).
-- PR #1811 source: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`
-  (re-pinned from `d088bbc2deac9913b68036d73d35c37aa6279b90`; delta notes in
-  `solidity-correspondence.md`).
-- Verity: `33722270d996c7a3a520a71ecee42d7d232da100`.
-- Rebuild: `make prove` runs `lake build LidoSRv3` and writes
-  [`../../proofs/logs/proof-report.json`](../../proofs/logs/proof-report.json).
+**Pilot focus:** keep P1–P6 as the signed economic core; treat P7/P8 and configuration proofs as supporting/follow-on evidence until the corresponding interface and refinement gaps above are closed.
