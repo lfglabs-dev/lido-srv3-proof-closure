@@ -15,6 +15,7 @@ Model artifact:
 - `LidoSRv3/Model.lean::updateModuleParamsTransition`
 - `LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_existing_module`
 - `LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_valid_config`
+- `LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_positive_max_deposits`
 - `LidoSRv3/SpecProofs.lean::P12_update_module_params_preserves_module_length`
 - `LidoSRv3/SpecProofs.lean::P12_update_module_params_records_requested_params`
 - `LidoSRv3/SpecProofs.lean::P12_update_module_params_bounded_after_success`
@@ -32,6 +33,7 @@ successfulModuleParamUpdate(moduleId, params) =>
   every other module has the same moduleFee + treasuryFee
   minDepositBlockDistance != 0
   minDepositBlockDistance <= uint64.max
+  maxDepositsPerBlock != 0
   maxDepositsPerBlock <= uint64.max
 
 successfulModuleParamUpdate(moduleId, params, modules') =>

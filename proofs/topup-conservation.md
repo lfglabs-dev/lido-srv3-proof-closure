@@ -5,12 +5,16 @@ Source references:
 - `contracts/0.8.25/sr/StakingRouter.sol::topUp`
 - `contracts/0.8.25/sr/StakingRouter.sol::_validateTopUpInputs`
 - `contracts/0.8.25/sr/StakingRouter.sol::_getModuleDepositAllocation`
+- `contracts/0.8.25/sr/StakingRouter.sol::setMaxTopUpPerBlockGwei`
+- `contracts/0.4.24/Lido.sol::canDeposit`
 - `contracts/0.8.25/lib/BeaconChainDepositor.sol::makeBeaconChainTopUp`
 - `contracts/common/interfaces/IStakingModuleV2.sol::allocateDeposits`
 
 Model artifact:
 
 - `LidoSRv3/Model.lean::roundDownToGwei`
+- `LidoSRv3/Model.lean::maxTopUpPerBlockWei`
+- `LidoSRv3/Model.lean::topUpTargetWei`
 - `LidoSRv3/Model.lean::allocationsGweiAligned`
 - `LidoSRv3/Model.lean::allocationsWithinLimits`
 - `LidoSRv3/Model.lean::topUpAllocationsWellFormed`
@@ -28,6 +32,8 @@ Model artifact:
 - `LidoSRv3/SpecProofs.lean::P8_topup_transition_deposit_reserve_spent`
 - `LidoSRv3/SpecProofs.lean::P8_topup_transition_positive_requires_depositable`
 - `LidoSRv3/SpecProofs.lean::P8_topup_transition_zero_sum_noop`
+- `LidoSRv3/SpecProofs.lean::P8_topup_transition_respects_per_block_cap`
+- `LidoSRv3/SpecProofs.lean::P8_topup_transition_zero_target_requires_lido_can_deposit`
 
 Math statement:
 
@@ -39,8 +45,11 @@ pubkeyCount = keyCount
 len(allocations) = keyCount
 forall i. allocations[i] % 1 gwei = 0
 forall i. allocations[i] <= topUpLimits[i]
-sum(allocations) <= roundDownToGwei(moduleAllocationWei)
+topUpTarget = roundDownToGwei(min(moduleAllocationWei, maxTopUpPerBlockGwei * 1 gwei))
+sum(allocations) <= topUpTarget
 sum(allocations) <= moduleAllocationWei
+sum(allocations) <= maxTopUpPerBlockGwei * 1 gwei
+topUpTarget = 0 => lidoCanDeposit = true
 sum(allocations) > 0 => sum(allocations) <= depositableEther
 sum(allocations) > 0 => bufferedEther' = bufferedEther - sum(allocations)
 sum(allocations) > 0 => beaconTopUpSink' = beaconTopUpSink + sum(allocations)

@@ -400,11 +400,27 @@ validators.
   \forall i.\ \vec{a}_i \leq \vec{\ell}_i
 \]
 \[
+  \mathsf{topUpTarget}
+  =
+  \mathsf{roundDownToGwei}\bigl(
+    \min(\mathsf{moduleAllocationWei},\,
+         \mathsf{maxTopUpPerBlockGwei}\cdot 1\,\mathsf{gwei})\bigr)
+\]
+\[
   \sum_i \vec{a}_i
   \leq
-  \mathsf{roundDownToGwei}(\mathsf{moduleAllocationWei})
+  \mathsf{topUpTarget}
   \leq
   \mathsf{moduleAllocationWei}
+  \qquad
+  \sum_i \vec{a}_i
+  \leq
+  \mathsf{maxTopUpPerBlockGwei}\cdot 1\,\mathsf{gwei}
+\]
+\[
+  \mathsf{topUpTarget} = 0
+  \Rightarrow
+  \mathsf{lidoCanDeposit} = \mathsf{true}
 \]
 \[
   \sum_i \vec{a}_i > 0
@@ -450,14 +466,19 @@ validators.
 
 \noindent Plain reading: successful modeled top-ups preserve the Solidity
 array checks around \texttt{allocateDeposits}, including nonempty input shape,
-same returned allocation length, Gwei alignment, per-key limits, and the rounded
-module target, which also proves the returned sum stays inside the module
-allocation budget. If the allocation sum is positive, the router pulls exactly
-that amount from Lido only when it is available as depositable ETH, then
-forwards it to the top-up deposit sink after subtracting the same amount from
-modeled buffered ETH and the stored deposit reserve, leaving no modeled router
-ETH residual and no withdrawal-reserve consumption, and without mutating router
-module or report accounting.
+same returned allocation length, Gwei alignment, per-key limits, and the
+capped, rounded module target, which also proves the returned sum stays inside
+both the module allocation budget and the router-global per-block top-up cap
+(\texttt{maxTopUpPerBlockGwei}, introduced at the re-pinned commit by
+PR~\#1820). When the capped, rounded target is zero, the queue-advancement
+no-op additionally requires the Lido protocol deposit gate
+\texttt{LIDO.canDeposit()} to be open, matching the \texttt{LidoDepositsPaused}
+revert added at the re-pinned commit. If the allocation sum is positive, the
+router pulls exactly that amount from Lido only when it is available as
+depositable ETH, then forwards it to the top-up deposit sink after subtracting
+the same amount from modeled buffered ETH and the stored deposit reserve,
+leaving no modeled router ETH residual and no withdrawal-reserve consumption,
+and without mutating router module or report accounting.
 If the checked allocation sum is zero, the modeled transition returns the
 unchanged state after validation.
 
@@ -644,7 +665,10 @@ preserves ETH accounting, router report balance, and the last accepted report.
 \noindent Plain reading: the modeled \texttt{\_updateModuleParams} path checks
 module existence, stake-share and priority-exit threshold ordering, bounded
 module-plus-treasury fees, fee-sum consistency against every other module,
-nonzero minimum deposit block distance, and uint64 bounds for deposit parameters
+nonzero minimum deposit block distance, nonzero maximum deposits per block
+(a precondition added at the re-pinned commit; checked by
+\texttt{P12\_update\_module\_params\_requires\_positive\_max\_deposits}), and
+uint64 bounds for deposit parameters
 before updating the selected module without changing module-list length or
 router-stored validator-balance sums. The post-state lookup for the selected
 module records exactly the requested share, fee, max-deposit, and min-distance
@@ -860,7 +884,9 @@ trust prose alone; every claim has this chain.
   \path{proofs/topup-conservation.md} &
   A-LIDO-06;\newline A-DEP-02;\newline A-MOD-10;\newline A-ARITH-05 &
   Successful top-up transitions preserve allocation shape, keep returned sums
-  inside the module allocation budget, require depositable ETH for nonzero
+  inside the module allocation budget and the router-global per-block cap,
+  gate zero-target queue advancement on the Lido protocol deposit state,
+  require depositable ETH for nonzero
   pulls, decrease buffered ETH exactly by nonzero allocation sums, reduce the
   deposit-reserve field by exactly that sum, fully sink nonzero allocation sums,
   leave module and report accounting unchanged, leave the withdrawal reserve

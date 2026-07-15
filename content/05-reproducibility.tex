@@ -35,10 +35,10 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
   \midrule
   PR and source revision & PR \#1811 URL, base branch, audited commit hash,
   and review timestamp. Report package target:
-  \path{d088bbc2deac9913b68036d73d35c37aa6279b90}. \\
+  \path{af095e48bbc1c3841c2c9936219c8461af01056b}. \\
   \rowsep
   Proof toolchain & Lean/Lake project importing pinned Verity reference
-  \path{33722270d996c7a3a520a71ecee42d7d232da100}; proof command
+  \path{538c4a9ce2baa25b56062bdc727eb0191ad9e67f}; proof command
   \texttt{lake build LidoSRv3}. \\
   \rowsep
   Target namespace & Selected proof target files in \path{proofs/}, target names
@@ -50,7 +50,18 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
   \rowsep
   Artifact integrity & Generated PDF in
   \path{dist/lido-srv3-formal-methods-report.pdf} and proof output in
-  \path{proofs/logs/proof-report.json}. \\
+  \path{proofs/logs/proof-report.json}. The proof report's
+  \texttt{build.verified\_source\_tree} is the deterministic Git tree ID
+  \path{e5286ef92725bbe2ee59432fae996fc27f560565}: a virtual tree of
+  \path{LidoSRv3/}, \path{LidoSRv3.lean}, \path{lakefile.lean}, and
+  \path{lake-manifest.json}, and \path{lean-toolchain}. These inputs must be
+  clean, and no untracked (including ignored) path may exist below
+  \path{LidoSRv3/}; hence Lake's source view is exactly the hashed tree. The
+  successful build log records this tree ID and report generation recomputes and
+  requires an exact match. The logged version of the Lean executable is derived
+  during the build and validated against \path{lean-toolchain}. The tree
+  deliberately excludes generated logs and PDF artifacts, avoiding a
+  self-referential final commit identifier. \\
   \bottomrule
 \end{tabularx}
 
@@ -117,7 +128,7 @@ source revision include:
   \rowsep
   \texttt{proofs/LOCKFILE.md} &
   Contains Lido PR \#1811 commit
-  \path{d088bbc2deac9913b68036d73d35c37aa6279b90} and Verity commit
-  \path{33722270d996c7a3a520a71ecee42d7d232da100}. \\
+  \path{af095e48bbc1c3841c2c9936219c8461af01056b} and Verity commit
+  \path{538c4a9ce2baa25b56062bdc727eb0191ad9e67f}. \\
   \bottomrule
 \end{tabularx}

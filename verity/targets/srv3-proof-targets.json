@@ -302,6 +302,16 @@
       "theorem": "LidoSRv3.P8_topup_transition_zero_sum_noop"
     },
     {
+      "claim": "Successful top-up transitions keep the returned allocation sum within the router-global per-block top-up cap (maxTopUpPerBlockGwei, new at af095e48).",
+      "id": "SRV3-P8m",
+      "theorem": "LidoSRv3.P8_topup_transition_respects_per_block_cap"
+    },
+    {
+      "claim": "Successful zero-target top-up transitions (queue-advancement no-ops) require the Lido protocol deposit gate canDeposit() to be open (new at af095e48).",
+      "id": "SRV3-P8n",
+      "theorem": "LidoSRv3.P8_topup_transition_zero_target_requires_lido_can_deposit"
+    },
+    {
       "claim": "Allocation capacity rows stay aligned with router modules.",
       "id": "SRV3-P9",
       "theorem": "LidoSRv3.P9_allocation_capacity_rows_aligned"
@@ -420,6 +430,11 @@
       "claim": "Successful single-module parameter updates preserve Solidity share, fee-sum, consistency, and uint64-bound validation.",
       "id": "SRV3-P12a",
       "theorem": "LidoSRv3.P12_update_module_params_requires_valid_config"
+    },
+    {
+      "claim": "Successful single-module parameter updates require a positive maxDepositsPerBlock (new precondition at af095e48).",
+      "id": "SRV3-P12g",
+      "theorem": "LidoSRv3.P12_update_module_params_requires_positive_max_deposits"
     },
     {
       "claim": "Successful single-module parameter updates preserve router module-list length.",

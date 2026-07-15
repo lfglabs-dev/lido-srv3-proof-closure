@@ -38,21 +38,38 @@ grep -Eq 'Built LidoSRv3|Build completed successfully' "$BUILD_LOG" || \
 
 BUILD_SHA256="$(sha256sum "$BUILD_LOG" | awk '{print $1}')"
 VERIFIED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-GIT_COMMIT="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
+VERIFIED_SOURCE_TREE="$(bash scripts/verified_source_tree.sh)"
+RECORDED_SOURCE_TREE="$(sed -nE 's/^verified_source_tree=([0-9a-f]{40})$/\1/p' "$BUILD_LOG")"
+LEAN_VERSION_OUTPUT="$(lean --version)"
+LEAN_VERSION="$(printf '%s\n' "$LEAN_VERSION_OUTPUT" | sed -nE 's/^Lean \(version ([^,]+),.*$/\1/p')"
+PINNED_TOOLCHAIN="$(tr -d '\r\n' < lean-toolchain)"
+PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprover/lean4:v([^[:space:]]+)$|\1|p')"
+
+[ -n "$LEAN_VERSION" ] || fail "could not parse the running Lean version"
+[ -n "$PINNED_LEAN_VERSION" ] || \
+  fail "could not parse Lean version from lean-toolchain ('$PINNED_TOOLCHAIN')"
+[ "$LEAN_VERSION" = "$PINNED_LEAN_VERSION" ] || \
+  fail "running Lean version '$LEAN_VERSION' does not match lean-toolchain '$PINNED_LEAN_VERSION'"
+ [ "$(printf '%s\n' "$RECORDED_SOURCE_TREE" | sed '/^$/d' | wc -l | tr -d ' ')" = "1" ] || \
+  fail "build log '$BUILD_LOG' must contain exactly one verified_source_tree=<40-hex-tree-id> line"
+[ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
+  fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
+grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
+  fail "build log '$BUILD_LOG' does not record the running Lean version"
 
 cat <<JSON
 {
-  "schema": "srv3-verity-lean-proof-report-v1",
+  "schema": "srv3-verity-lean-proof-report-v2",
   "toolchain": {
-    "lean": "4.22.0",
-    "verity_commit": "33722270d996c7a3a520a71ecee42d7d232da100"
+    "lean": "${LEAN_VERSION}",
+    "verity_commit": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f"
   },
   "command": "lake build LidoSRv3",
   "build": {
     "log": "${BUILD_LOG}",
     "log_sha256": "${BUILD_SHA256}",
     "verified_at": "${VERIFIED_AT}",
-    "git_commit": "${GIT_COMMIT}",
+    "verified_source_tree": "${VERIFIED_SOURCE_TREE}",
     "exit_status": ${BUILD_STATUS}
   },
   "targets": [
@@ -113,6 +130,8 @@ cat <<JSON
     {"id": "SRV3-P8j", "theorem": "LidoSRv3.P8_topup_transition_deposit_reserve_spent", "status": "lean_checked"},
     {"id": "SRV3-P8f", "theorem": "LidoSRv3.P8_topup_transition_positive_requires_depositable", "status": "lean_checked"},
     {"id": "SRV3-P8g", "theorem": "LidoSRv3.P8_topup_transition_zero_sum_noop", "status": "lean_checked"},
+    {"id": "SRV3-P8m", "theorem": "LidoSRv3.P8_topup_transition_respects_per_block_cap", "status": "lean_checked"},
+    {"id": "SRV3-P8n", "theorem": "LidoSRv3.P8_topup_transition_zero_target_requires_lido_can_deposit", "status": "lean_checked"},
     {"id": "SRV3-P9", "theorem": "LidoSRv3.P9_allocation_capacity_rows_aligned", "status": "lean_checked"},
     {"id": "SRV3-P9a", "theorem": "LidoSRv3.P9_allocation_capacity_length", "status": "lean_checked"},
     {"id": "SRV3-P9b", "theorem": "LidoSRv3.P9_allocation_capacity_values_length", "status": "lean_checked"},
@@ -137,6 +156,7 @@ cat <<JSON
     {"id": "SRV3-P11e", "theorem": "LidoSRv3.P11_update_all_module_fees_preserves_router_state", "status": "lean_checked"},
     {"id": "SRV3-P12", "theorem": "LidoSRv3.P12_update_module_params_requires_existing_module", "status": "lean_checked"},
     {"id": "SRV3-P12a", "theorem": "LidoSRv3.P12_update_module_params_requires_valid_config", "status": "lean_checked"},
+    {"id": "SRV3-P12g", "theorem": "LidoSRv3.P12_update_module_params_requires_positive_max_deposits", "status": "lean_checked"},
     {"id": "SRV3-P12b", "theorem": "LidoSRv3.P12_update_module_params_preserves_module_length", "status": "lean_checked"},
     {"id": "SRV3-P12f", "theorem": "LidoSRv3.P12_update_module_params_records_requested_params", "status": "lean_checked"},
     {"id": "SRV3-P12c", "theorem": "LidoSRv3.P12_update_module_params_bounded_after_success", "status": "lean_checked"},

@@ -19,6 +19,7 @@ bootstrap:
 
 test:
 	@bash scripts/check_no_python_evidence.sh
+	@bash scripts/check_provenance_guards.sh
 	@test -s tests/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s tests/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s tests/solidity-reference/deposits-reserve.integration.ts
@@ -26,7 +27,7 @@ test:
 
 prove:
 	@mkdir -p proofs/logs
-	@if lake build LidoSRv3 2>&1 | tee proofs/logs/prove.txt; then s=0; else s=$$?; fi; \
+	@if { printf 'verified_source_tree='; bash scripts/verified_source_tree.sh; printf 'lean_version='; lean --version; lake build LidoSRv3; } 2>&1 | tee proofs/logs/prove.txt; then s=0; else s=$$?; fi; \
 	 if BUILD_STATUS=$$s BUILD_LOG=proofs/logs/prove.txt \
 	      bash scripts/write_proof_report.sh > $(PROOF_LOG).tmp; then \
 	   mv $(PROOF_LOG).tmp $(PROOF_LOG); \

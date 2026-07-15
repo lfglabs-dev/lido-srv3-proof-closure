@@ -1,8 +1,17 @@
 # Solidity Reference Tests
 
 These files are copied from Lido core at PR #1811 commit
-`d088bbc2deac9913b68036d73d35c37aa6279b90` and are used as source-facing
-reference material for the Verity/Lean model.
+`af095e48bbc1c3841c2c9936219c8461af01056b` and are used as source-facing
+reference material for the Verity/Lean model. (Originally vendored from
+`d088bbc2deac9913b68036d73d35c37aa6279b90`; refreshed at the re-pin.)
+
+Upstream paths at the pinned commit:
+
+- `test/0.8.25/stakingRouter/stakingRouter.getDepositAllocations.test.ts`
+- `test/0.8.25/stakingRouter/stakingRouter.rewards.test.ts`
+- `test/0.8.25/stakingRouter/stakingRouter.status-control.test.ts`
+- `test/integration/core/accounting-oracle-module-balances.integration.ts`
+- `test/integration/core/deposits-reserve.integration.ts`
 
 The copied tests are limited to the SRv3 accounting surfaces modeled in
 `LidoSRv3/`:

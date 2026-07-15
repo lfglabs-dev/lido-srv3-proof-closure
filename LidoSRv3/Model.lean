@@ -166,8 +166,7 @@ def ceilDiv (n d : Nat) : Nat :=
 -/
 
 def depositMaxCount (m : Module) (moduleAllocationWei : Wei) : Nat :=
-  min (min m.maxDepositsPerBlock m.depositableValidators)
-    (moduleAllocationWei / validatorDepositWei)
+  min m.maxDepositsPerBlock (moduleAllocationWei / validatorDepositWei)
 
 def moduleActiveValidators (m : Module) : ValidatorsCount :=
   m.depositedValidatorsCount - m.exitedValidatorsCount
@@ -282,7 +281,8 @@ def singleModuleParamsValid
       otherModulesFeeSumConsistent modules moduleId (moduleFee + treasuryFee) &&
         (minDepositBlockDistance != 0) &&
           (minDepositBlockDistance <= uint64Max) &&
-            (maxDepositsPerBlock <= uint64Max)
+            (maxDepositsPerBlock != 0) &&
+              (maxDepositsPerBlock <= uint64Max)
 
 def updateModuleParamsInModules
     (moduleId : ModuleId) (stakeShareLimit priorityExitShareThreshold : Bps)
@@ -687,6 +687,18 @@ def topUpAllocationsWellFormed
     allocationsWithinLimits allocations limits = true ∧
     allocations.sum ≤ target
 
+def maxTopUpPerBlockWei (maxTopUpPerBlockGwei : Gwei) : Wei :=
+  maxTopUpPerBlockGwei * oneGweiWei
+
+/--
+  The effective top-up budget: the module's target-share allocation capped by
+  the router-global per-block top-up limit, rounded down to Gwei. Mirrors
+  `Math.min(_getModuleDepositAllocation(...), maxTopUpPerBlockWei)` followed by
+  `smDepositableEthAmount - (smDepositableEthAmount % 1 gwei)`.
+-/
+def topUpTargetWei (moduleAllocationWei : Wei) (maxTopUpPerBlockGwei : Gwei) : Wei :=
+  roundDownToGwei (min moduleAllocationWei (maxTopUpPerBlockWei maxTopUpPerBlockGwei))
+
 /-!
   `StakingRouter.topUp` translation surface.
 
@@ -696,8 +708,17 @@ def topUpAllocationsWellFormed
   checks that the original key/operator/limit/pubkey arrays are nonempty and
   equal-length, that the returned allocation array has the same length, that
   each allocation is Gwei-aligned and not above the corresponding top-up limit,
-  and that the allocation sum does not exceed the module target rounded down to
-  Gwei.
+  and that the allocation sum does not exceed the module target capped by the
+  router-global per-block Gwei limit (`maxTopUpPerBlockGwei`) and rounded down
+  to Gwei.
+
+  When the capped, rounded target is zero the Solidity path still calls the
+  module to advance its deposit queue, but only if `LIDO.canDeposit()` holds;
+  otherwise it reverts with `LidoDepositsPaused`. The model represents that
+  Lido protocol gate as the explicit `lidoCanDeposit` interface input: a
+  zero-target transition requires `lidoCanDeposit = true`. On the positive
+  path, `LIDO.withdrawDepositableEther` enforcing the same protocol pause
+  internally remains part of the A-LIDO-06 boundary.
 
   If the allocation sum is positive, `LIDO.withdrawDepositableEther` is modeled
   as making exactly that amount available to the router while subtracting the
@@ -705,12 +726,14 @@ def topUpAllocationsWellFormed
   `BeaconChainDepositor.makeBeaconChainTopUp` is modeled as a value sink
   consuming exactly the same amount. Pubkey ownership, BLS/signature dummy data,
   deposit-data-root construction, minimum deposit enforcement inside the
-  deposit contract, gateway authorization, calldata encoding, and event/revert
-  details remain explicit trust-boundary facts.
+  deposit contract, gateway authorization, per-block cap governance
+  configuration, the `StakingRouterETHTopUp` event, calldata encoding, and
+  event/revert details remain explicit trust-boundary facts.
 -/
 
 def topUpTransition
     (s : State) (stakingModuleId : ModuleId) (moduleAllocationWei : Wei)
+    (maxTopUpPerBlockGwei : Gwei) (lidoCanDeposit : Bool)
     (keyCount nodeOperatorCount pubkeyCount : Nat)
     (topUpLimits allocations : List Wei) : Option State :=
   match s.modules.find? (fun m => m.id = stakingModuleId) with
@@ -724,8 +747,10 @@ def topUpTransition
             if topUpLimits.length = keyCount then
               if pubkeyCount = keyCount then
                 if allocations.length = keyCount then
-                  let target := roundDownToGwei moduleAllocationWei
-                  if allocationsGweiAligned allocations then
+                  let target := topUpTargetWei moduleAllocationWei maxTopUpPerBlockGwei
+                  if target = 0 ∧ lidoCanDeposit = false then
+                    none
+                  else if allocationsGweiAligned allocations then
                     if allocationsWithinLimits allocations topUpLimits then
                       let amount := allocations.sum
                       if amount ≤ target then

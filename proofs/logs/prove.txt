@@ -1,1 +1,7 @@
-Build completed successfully.
+verified_source_tree=e5286ef92725bbe2ee59432fae996fc27f560565
+lean_version=Lean (version 4.24.0, x86_64-unknown-linux-gnu, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b, Release)
+⚠ [14/16] Replayed LidoSRv3.SpecProofs
+warning: LidoSRv3/SpecProofs.lean:1630:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (16 jobs).
