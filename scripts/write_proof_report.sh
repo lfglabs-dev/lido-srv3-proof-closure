@@ -38,11 +38,11 @@ grep -Eq 'Built LidoSRv3|Build completed successfully' "$BUILD_LOG" || \
 
 BUILD_SHA256="$(sha256sum "$BUILD_LOG" | awk '{print $1}')"
 VERIFIED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-GIT_COMMIT="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
+VERIFIED_SOURCE_TREE="$(bash scripts/verified_source_tree.sh)"
 
 cat <<JSON
 {
-  "schema": "srv3-verity-lean-proof-report-v1",
+  "schema": "srv3-verity-lean-proof-report-v2",
   "toolchain": {
     "lean": "4.24.0",
     "verity_commit": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f"
@@ -52,7 +52,7 @@ cat <<JSON
     "log": "${BUILD_LOG}",
     "log_sha256": "${BUILD_SHA256}",
     "verified_at": "${VERIFIED_AT}",
-    "git_commit": "${GIT_COMMIT}",
+    "verified_source_tree": "${VERIFIED_SOURCE_TREE}",
     "exit_status": ${BUILD_STATUS}
   },
   "targets": [

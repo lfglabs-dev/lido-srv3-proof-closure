@@ -50,7 +50,12 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
   \rowsep
   Artifact integrity & Generated PDF in
   \path{dist/lido-srv3-formal-methods-report.pdf} and proof output in
-  \path{proofs/logs/proof-report.json}. \\
+  \path{proofs/logs/proof-report.json}. The proof report's
+  \texttt{build.verified\_source\_tree} is the deterministic Git tree ID
+  \path{b67dd51c45a8037fdd07e71671c30869707d2aa4}: a virtual tree of
+  \path{LidoSRv3/}, \path{LidoSRv3.lean}, \path{lakefile.lean}, and
+  \path{lake-manifest.json}. It deliberately excludes generated logs and PDF
+  artifacts, avoiding a self-referential final commit identifier. \\
   \bottomrule
 \end{tabularx}
 
