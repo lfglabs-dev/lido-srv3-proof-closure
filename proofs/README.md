@@ -23,10 +23,14 @@ SRv3 economic model.
   `LidoSRv3.lean`. Its `build.verified_source_tree` is a Git tree ID for the
   exact checked inputs: `LidoSRv3/`, `LidoSRv3.lean`, `lakefile.lean`,
   `lake-manifest.json`, and `lean-toolchain`. All five must be clean before the
-  build. The reported Lean version is derived from the executable used for the
-  build, recorded in `logs/prove.txt`, and required to match `lean-toolchain`.
-  Generated logs and report artifacts are intentionally excluded, so this
-  identifier is deterministic and non-self-referential.
+  build, and no untracked (including ignored) path may exist under the checked
+  `LidoSRv3/` tree; this ensures Lake's source view exactly matches the hashed
+  tree. The successful build log records that tree ID, and report generation
+  recomputes and requires an exact match before emitting JSON. The reported Lean
+  version is derived from the executable used for the build, recorded in
+  `logs/prove.txt`, and required to match `lean-toolchain`. Generated logs and
+  report artifacts are intentionally excluded, so this identifier is
+  deterministic and non-self-referential.
 
 Run:
 

@@ -55,10 +55,13 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
   \path{e5286ef92725bbe2ee59432fae996fc27f560565}: a virtual tree of
   \path{LidoSRv3/}, \path{LidoSRv3.lean}, \path{lakefile.lean}, and
   \path{lake-manifest.json}, and \path{lean-toolchain}. These inputs must be
-  clean; the logged version of the Lean executable is derived during the build
-  and validated against \path{lean-toolchain}. The tree deliberately excludes
-  generated logs and PDF artifacts, avoiding a self-referential final commit
-  identifier. \\
+  clean, and no untracked (including ignored) path may exist below
+  \path{LidoSRv3/}; hence Lake's source view is exactly the hashed tree. The
+  successful build log records this tree ID and report generation recomputes and
+  requires an exact match. The logged version of the Lean executable is derived
+  during the build and validated against \path{lean-toolchain}. The tree
+  deliberately excludes generated logs and PDF artifacts, avoiding a
+  self-referential final commit identifier. \\
   \bottomrule
 \end{tabularx}
 
