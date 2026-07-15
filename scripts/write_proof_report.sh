@@ -39,12 +39,24 @@ grep -Eq 'Built LidoSRv3|Build completed successfully' "$BUILD_LOG" || \
 BUILD_SHA256="$(sha256sum "$BUILD_LOG" | awk '{print $1}')"
 VERIFIED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 VERIFIED_SOURCE_TREE="$(bash scripts/verified_source_tree.sh)"
+LEAN_VERSION_OUTPUT="$(lean --version)"
+LEAN_VERSION="$(printf '%s\n' "$LEAN_VERSION_OUTPUT" | sed -nE 's/^Lean \(version ([^,]+),.*$/\1/p')"
+PINNED_TOOLCHAIN="$(tr -d '\r\n' < lean-toolchain)"
+PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprover/lean4:v([^[:space:]]+)$|\1|p')"
+
+[ -n "$LEAN_VERSION" ] || fail "could not parse the running Lean version"
+[ -n "$PINNED_LEAN_VERSION" ] || \
+  fail "could not parse Lean version from lean-toolchain ('$PINNED_TOOLCHAIN')"
+[ "$LEAN_VERSION" = "$PINNED_LEAN_VERSION" ] || \
+  fail "running Lean version '$LEAN_VERSION' does not match lean-toolchain '$PINNED_LEAN_VERSION'"
+grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
+  fail "build log '$BUILD_LOG' does not record the running Lean version"
 
 cat <<JSON
 {
   "schema": "srv3-verity-lean-proof-report-v2",
   "toolchain": {
-    "lean": "4.24.0",
+    "lean": "${LEAN_VERSION}",
     "verity_commit": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f"
   },
   "command": "lake build LidoSRv3",
