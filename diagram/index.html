@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lido Architecture: Components & Flows</title>
+</head>
+<body style="margin:0">
+<style>
+  :root{
+    --paper:#faf9f5; --card:#ffffff; --ink:#1f1e1b; --soft:#6e6a60;
+    --line:#e6e2d8; --line2:#f1eee6; --edge:#c7bfae;
+    --accent:#c15f3c;
+    --el:#1a6fb5; --cl:#8b6fd8; --com:#a8721f; --bot:#8a8474; --proof:#3d8a63;
+    --cf1:#1a75c0; --cf2:#0d8a74; --cf3:#67921a; --cf4:#bd7c17; --cf5:#c15f3c; --cf6:#8a5cf6; --cf7:#b44487;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --serif:'Charter','Iowan Old Style',Georgia,'Times New Roman',serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#262624; --card:#30302e; --ink:#f0efea; --soft:#b0aa9e;
+      --line:#413f3a; --line2:#393733; --edge:#5c574c;
+      --accent:#d97757;
+      --el:#5aa8e8; --cl:#ab93f2; --com:#d9a34e; --bot:#a09a8c; --proof:#54bd8e;
+      --cf1:#54a4ea; --cf2:#33b89e; --cf3:#9ec13e; --cf4:#dda43e; --cf5:#e28565; --cf6:#a88af8; --cf7:#e07cba;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#262624; --card:#30302e; --ink:#f0efea; --soft:#b0aa9e;
+    --line:#413f3a; --line2:#393733; --edge:#5c574c;
+    --accent:#d97757;
+    --el:#5aa8e8; --cl:#ab93f2; --com:#d9a34e; --bot:#a09a8c; --proof:#54bd8e;
+    --cf1:#54a4ea; --cf2:#33b89e; --cf3:#9ec13e; --cf4:#dda43e; --cf5:#e28565; --cf6:#a88af8; --cf7:#e07cba;
+  }
+  :root[data-theme="light"]{
+    --paper:#faf9f5; --card:#ffffff; --ink:#1f1e1b; --soft:#6e6a60;
+    --line:#e6e2d8; --line2:#f1eee6; --edge:#c7bfae;
+    --accent:#c15f3c;
+    --el:#1a6fb5; --cl:#8b6fd8; --com:#a8721f; --bot:#8a8474; --proof:#3d8a63;
+    --cf1:#1a75c0; --cf2:#0d8a74; --cf3:#67921a; --cf4:#bd7c17; --cf5:#c15f3c; --cf6:#8a5cf6; --cf7:#b44487;
+  }
+
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Avenir Next","Segoe UI",-apple-system,"Helvetica Neue",sans-serif;
+    font-size:14.5px; line-height:1.5;
+    padding:clamp(14px,3vw,40px) clamp(10px,2.5vw,28px);
+  }
+  .wrap{max-width:1320px;margin:0 auto}
+  .kicker{font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  header h1{font-family:var(--serif);font-size:clamp(1.5rem,3.4vw,2.05rem);font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  header p{color:var(--soft);max-width:76ch;margin-top:7px;font-size:.88rem}
+  header p b{color:var(--ink);font-weight:600}
+
+  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-family:var(--mono);font-size:9.5px}
+  .legend span{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--soft)}
+  .dot{width:7px;height:7px;border-radius:2px;flex:none}
+
+  /* flow pills */
+  .fbar{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 8px}
+  .pill{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--card);border:1.5px solid var(--line);border-radius:999px;
+    padding:6px 13px;cursor:pointer;font:inherit;font-size:.78rem;font-weight:600;color:var(--ink);
+    transition:border-color .12s,background .12s;
+  }
+  .pill i{width:9px;height:9px;border-radius:3px;background:var(--fc);flex:none}
+  .pill b{font-family:var(--mono);font-size:.55rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+          padding:1px 6px;border-radius:99px;background:var(--line2);color:var(--soft)}
+  .pill b.new{background:var(--fc);color:var(--paper)}
+  .pill[aria-pressed="true"]{border-color:var(--fc);background:color-mix(in srgb,var(--fc) 10%,var(--card))}
+  .pill:focus-visible,.reset:focus-visible{outline:2px solid var(--cf1);outline-offset:2px}
+  .reset{background:none;border:1.5px dashed var(--line);border-radius:999px;color:var(--soft);
+         font:inherit;font-size:.75rem;cursor:pointer;padding:6px 13px}
+  .reset:hover{color:var(--ink)}
+  .fcap{min-height:2.6em;font-size:.78rem;color:var(--soft);margin-bottom:10px;max-width:90ch}
+  .fcap b{font-weight:650}
+  @media (prefers-reduced-motion: reduce){ .pill{transition:none} .edge path,.node rect,.node text{transition:none!important} }
+
+  /* diagram */
+  .canvas{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:0 1px 3px rgba(31,30,27,.05)}
+  svg{display:block;min-width:1080px;width:100%;height:auto}
+  .panhint{display:none;font-size:.7rem;color:var(--soft);text-align:center;margin-top:6px}
+  @media (max-width:1120px){ .panhint{display:block} }
+  .sep{stroke:var(--line);stroke-dasharray:3 5}
+  .bandlbl{font:700 9.5px var(--mono);letter-spacing:.18em;fill:var(--soft)}
+
+  .node rect.box{fill:var(--card);stroke:var(--line);transition:opacity .15s}
+  .node rect.top,.node text{transition:opacity .15s}
+  .node .nm{font:650 12.5px "Avenir Next","Segoe UI",sans-serif;fill:var(--ink)}
+  .node .fl{font:600 8.6px var(--mono)}
+  .node .ad{font:500 8.6px var(--mono);fill:var(--soft)}
+  .node.el .fl{fill:var(--el)} .node.com .fl{fill:var(--com)} .node.proof .fl{fill:var(--proof)}
+  .node.bot .fl{fill:var(--bot)} .node.cl .fl{fill:var(--cl)}
+  .node.el rect.top{fill:var(--el)} .node.com rect.top{fill:var(--com)} .node.proof rect.top{fill:var(--proof)}
+  .node.bot rect.top{fill:var(--bot)} .node.cl rect.top{fill:var(--cl)}
+  .node.dim{opacity:.12}
+  .node.on rect.box{stroke:var(--hl,var(--line));stroke-width:1.8}
+
+  .edge path{fill:none;stroke:var(--edge);stroke-width:1.2;transition:opacity .15s,stroke .15s}
+  .edge.da path{stroke-dasharray:5 4}
+  .edge .lbl{display:none;font:600 9.8px var(--mono);fill:var(--hl,var(--soft))}
+  .edge .lbl.show{display:block}
+  .edge.dim{opacity:.08}
+  .edge.on path{stroke:var(--hl);stroke-width:2.2}
+
+  /* component notes */
+  .notes h2{font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--ink);
+     padding-bottom:6px;border-bottom:1px solid var(--line);margin:28px 0 10px}
+  .notes h2 b{font-weight:400;font-style:italic;color:var(--soft);font-size:.88em}
+  .band{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+  .c{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--tc,var(--line));
+     border-radius:9px;padding:9px 12px;display:flex;flex-direction:column;gap:2px}
+  .c.el{--tc:var(--el)} .c.cl{--tc:var(--cl)} .c.com{--tc:var(--com)}
+  .c.bot{--tc:var(--bot)} .c.proof{--tc:var(--proof)}
+  .c .n{font-weight:650;font-size:.83rem}
+  .c .f{font-family:var(--mono);font-size:.63rem;color:var(--tc,var(--soft));word-break:break-all}
+  .c .a{font-family:var(--mono);font-size:.63rem;color:var(--soft)}
+  .c .r{font-size:.72rem;color:var(--soft);margin-top:2px}
+
+  footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);
+         font-family:var(--mono);font-size:.67rem;color:var(--soft);line-height:1.9}
+  footer a{color:var(--accent)}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="kicker">Lido protocol · SRv3 · af095e48</div>
+  <h1>How Lido fits together</h1>
+  <p>Every box is a contract (source file plus mainnet address, hover for the full story) or an off-chain actor,
+  colored by <b>what makes it trustworthy</b>. Edge labels are the real function calls at
+  <b>lidofinance/core@af095e48</b> (SRv3, PR&nbsp;#1811; those contracts are not deployed yet).</p>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--el)"></i>EL contract · held by code</span>
+    <span><i class="dot" style="background:var(--proof)"></i>proof-gated · EIP-4788</span>
+    <span><i class="dot" style="background:var(--com)"></i>committee · quorum</span>
+    <span><i class="dot" style="background:var(--bot)"></i>off-chain · liveness only</span>
+    <span><i class="dot" style="background:var(--cl)"></i>consensus layer</span>
+  </div>
+</header>
+
+<div class="fbar" role="group" aria-label="Flow toggles">
+  <button class="pill" data-flow="f1" style="--fc:var(--cf1)" aria-pressed="false"
+    data-desc="submit() mints stETH against buffered ETH. SRv3 only changes buffer internals (reserve allocation)."><i></i>F1 Stake<b>same</b></button>
+  <button class="pill" data-flow="f2" style="--fc:var(--cf2)" aria-pressed="false"
+    data-desc="Push → pull: DSM guardians attest, then StakingRouter.deposit() pulls exactly 32×N from Lido. V2's caller-supplied depositCount is gone."><i></i>F2 Validator creation<b class="new">changed</b></button>
+  <button class="pill" data-flow="f3" style="--fc:var(--cf3)" aria-pressed="false"
+    data-desc="Variable-amount deposits to existing 0x02 validators; each target proven against the beacon root (Lido WC, active, not slashed) before StakingRouter.topUp()."><i></i>F3 Top-up 0x02<b class="new">new</b></button>
+  <button class="pill" data-flow="f4" style="--fc:var(--cf4)" aria-pressed="false"
+    data-desc="Same request → finalize → claim path; SRv3 adds withdrawalsReserve funding priority and a rewritten OracleReportSanityChecker."><i></i>F4 Withdrawal<b class="new">changed</b></button>
+  <button class="pill" data-flow="f5" style="--fc:var(--cf5)" aria-pressed="false"
+    data-desc="New exit-bus format with ETH-denominated limits; unfulfilled requests forced via triggerExits → WithdrawalVault → EIP-7002. Returned ETH lands in the WithdrawalVault and re-enters the buffer at the next report."><i></i>F5 Validator exit<b class="new">changed</b></button>
+  <button class="pill" data-flow="f6" style="--fc:var(--cf6)" aria-pressed="false"
+    data-desc="Migrator → Bus → Gateway pipeline over EIP-7251: balance moves CMv1 → CMv2 without an exit/re-deposit cycle. The Bus delay is the guardians' veto window; targets proven against EIP-4788."><i></i>F6 Consolidation<b class="new">new</b></button>
+  <button class="pill" data-flow="f7" style="--fc:var(--cf7)" aria-pressed="false"
+    data-desc="Daily report: AccountingOracle writes per-module CL balances straight to the router (new SRv3 surface); Accounting rebases and mints stETH fees to modules, operators, treasury."><i></i>F7 Report &amp; fees<b class="new">changed</b></button>
+  <button class="reset" id="reset">show everything</button>
+  <button class="reset" id="exportPng" title="Download the current view (with active flows) as a PNG">export PNG</button>
+  <button class="reset" id="exportSvg" title="Download the current view (with active flows) as an SVG">export SVG</button>
+</div>
+<p class="fcap" id="fcap">Tap a flow to light up its path and see the real calls. Combine a few to compare.</p>
+
+<div class="canvas">
+<svg viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lido component diagram">
+  <defs>
+    <marker id="mk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--edge)"/></marker>
+    <marker id="mk-f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--cf1)"/></marker>
+    <marker id="mk-f2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--cf2)"/></marker>
+    <marker id="mk-f3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--cf3)"/></marker>
+    <marker id="mk-f4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--cf4)"/></marker>
+    <marker id="mk-f5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--cf5)"/></marker>
+    <marker id="mk-f6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--cf6)"/></marker>
+    <marker id="mk-f7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--cf7)"/></marker>
+  </defs>
+
+  <!-- band separators -->
+  <line class="sep" x1="0" y1="94" x2="1280" y2="94"/>
+  <line class="sep" x1="0" y1="630" x2="1280" y2="630"/>
+  <text class="bandlbl" x="14" y="14">OFF-CHAIN</text>
+  <text class="bandlbl" x="14" y="112">EXECUTION LAYER</text>
+  <text class="bandlbl" x="14" y="650">CONSENSUS LAYER</text>
+
+  <!-- ================= edges ================= -->
+  <g id="edges">
+  <g class="edge" data-flows="f1"><path d="M150,68 L150,138"/><text class="lbl" x="158" y="106">submit() ETH ↓ · stETH ↑</text></g>
+  <g class="edge" data-flows="f4"><path d="M80,68 C25,95 25,180 25,300 L25,410 C25,432 38,438 58,438"/><text class="lbl" transform="rotate(-90 16 300)" x="16" y="300" text-anchor="middle">requestWithdrawals ↓ · claim ↑</text></g>
+  <g class="edge" data-flows="f4"><path d="M100,202 C45,215 45,250 45,300 L45,395 C45,415 52,420 58,420"/><text class="lbl" transform="rotate(-90 38 320)" x="38" y="320" text-anchor="middle">ETH to escrow</text></g>
+  <g class="edge" data-flows="f2"><path d="M460,68 L480,138"/><text class="lbl" x="490" y="102">guardian sigs</text></g>
+  <g class="edge" data-flows="f2"><path d="M495,196 L500,260"/><text class="lbl" x="510" y="232">deposit(moduleId)</text></g>
+  <g class="edge" data-flows="f2 f3"><path d="M400,288 C330,288 300,215 254,182"/><text class="lbl" x="262" y="234">withdrawDepositableEther</text></g>
+  <g class="edge" data-flows="f2 f7"><path d="M455,330 L390,418"/><text class="lbl" data-lf="f2" x="346" y="376">keys ↑</text><text class="lbl" data-lf="f7" x="300" y="398">stETH fees → modules · operators · treasury</text></g>
+  <g class="edge" data-flows="f3 f7"><path d="M520,330 L553,418"/><text class="lbl" data-lf="f3" x="548" y="378">allocateDeposits</text></g>
+  <g class="edge" data-flows="f2 f7"><path d="M565,330 L728,418"/></g>
+  <g class="edge" data-flows="f2 f3"><path d="M400,300 C330,300 282,310 282,340 L282,545 C282,562 300,568 320,568 L396,568"/><text class="lbl" transform="rotate(-90 272 448)" x="272" y="448" text-anchor="middle">32×N · variable top-ups ↓</text></g>
+  <g class="edge" data-flows="f2 f3"><path d="M505,596 L505,648"/><text class="lbl" x="514" y="628">one-way</text></g>
+  <g class="edge" data-flows="f3"><path d="M520,68 C600,90 660,108 702,136"/><text class="lbl" x="574" y="98">Merkle proofs</text></g>
+  <g class="edge da" data-flows="f3"><path d="M655,648 L655,268 C655,235 708,232 708,200"/><text class="lbl" transform="rotate(-90 644 430)" x="644" y="430" text-anchor="middle">prove target: Lido WC · active · not slashed</text></g>
+  <g class="edge" data-flows="f3"><path d="M690,196 C660,225 620,240 588,260"/><text class="lbl" x="600" y="222">topUp()</text></g>
+  <g class="edge" data-flows="f4 f5 f7"><path d="M855,202 C650,245 480,245 256,286"/><text class="lbl" x="452" y="236">handleOracleReport · 5/9 quorum</text></g>
+  <g class="edge" data-flows="f7"><path d="M880,204 C790,244 700,256 614,272"/><text class="lbl" x="640" y="290">per-module CL balances</text></g>
+  <g class="edge" data-flows="f4 f5 f7"><path d="M150,262 L150,206"/><text class="lbl" x="158" y="240">rebase</text></g>
+  <g class="edge" data-flows="f7"><path d="M250,304 C310,314 350,320 396,324"/><text class="lbl" x="266" y="340">reportRewardsMinted</text></g>
+  <g class="edge" data-flows="f4"><path d="M150,318 L150,380"/><text class="lbl" x="158" y="356">finalize</text></g>
+  <g class="edge da" data-flows="f5"><path d="M985,324 C1040,390 1048,430 1048,480 L1048,700 C1048,722 1000,726 968,733"/><text class="lbl" transform="rotate(-90 1060 560)" x="1060" y="560" text-anchor="middle">exit request</text></g>
+  <g class="edge da" data-flows="f5"><path d="M840,760 C700,765 600,745 566,710"/><text class="lbl" x="660" y="782">signs voluntary exit</text></g>
+  <g class="edge da" data-flows="f5"><path d="M880,324 C822,370 820,420 820,470 C820,505 800,525 782,538"/><text class="lbl" transform="rotate(-90 810 428)" x="810" y="428" text-anchor="middle">triggerExits (unfulfilled)</text></g>
+  <g class="edge" data-flows="f5 f6"><path d="M860,602 L872,648"/><text class="lbl" data-lf="f5" x="880" y="634">trigger exit</text><text class="lbl" data-lf="f6" x="878" y="620">source→target + fee</text></g>
+  <g class="edge" data-flows="f5 f6"><path d="M830,706 C760,726 660,722 614,698"/><text class="lbl" data-lf="f5" x="680" y="738">exit processed</text><text class="lbl" data-lf="f6" x="666" y="754">balance merged into target</text></g>
+  <g class="edge" data-flows="f5"><path d="M610,656 C640,615 680,608 712,602"/><text class="lbl" x="622" y="612">exited + skimmed ETH</text></g>
+  <g class="edge" data-flows="f6"><path d="M1157,68 L1157,260"/><text class="lbl" transform="rotate(-90 1147 164)" x="1147" y="164" text-anchor="middle">operator pairs (vetoable)</text></g>
+  <g class="edge da" data-flows="f6"><path d="M782,662 C950,648 1080,480 1126,344"/><text class="lbl" x="1008" y="560">WC proofs</text></g>
+  <g class="edge" data-flows="f6"><path d="M1088,338 C1010,440 930,510 884,538"/><text class="lbl" x="912" y="480">addConsolidationRequests</text></g>
+  </g>
+
+  <!-- ================= nodes ================= -->
+  <g id="nodes">
+  <g class="node bot" data-flows="f1 f4"><rect class="box" x="60" y="20" width="180" height="48" rx="9"/><rect class="top" x="60" y="20" width="180" height="2.5" rx="1.2"/>
+    <text class="nm" x="70" y="41">Staker / stETH holder</text><text class="ad" x="70" y="57">off-chain</text></g>
+  <g class="node bot" data-flows="f2 f3"><rect class="box" x="400" y="20" width="150" height="48" rx="9"/><rect class="top" x="400" y="20" width="150" height="2.5" rx="1.2"/>
+    <text class="nm" x="410" y="41">Depositor Bot</text><text class="ad" x="410" y="57">off-chain</text></g>
+  <g class="node com" data-flows="f6"><title>0xF0211b7660680B49De1A7E9f25C65660F0a13Fea: vetoable DAO motions</title><rect class="box" x="1075" y="20" width="165" height="48" rx="9"/><rect class="top" x="1075" y="20" width="165" height="2.5" rx="1.2"/>
+    <text class="nm" x="1085" y="41">EasyTrack</text><text class="ad" x="1085" y="57">0xF021…3Fea</text></g>
+
+  <g class="node el" data-flows="f1 f2 f3 f4 f7"><title>0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84: stETH token + ETH buffer</title><rect class="box" x="60" y="140" width="190" height="62" rx="9"/><rect class="top" x="60" y="140" width="190" height="2.5" rx="1.2"/>
+    <text class="nm" x="70" y="160">Lido · stETH</text><text class="fl" x="70" y="176">0.4.24/Lido.sol</text><text class="ad" x="70" y="190">0xae7a…fE84</text></g>
+  <g class="node el" data-flows="f4 f5 f7"><title>Applies the oracle report: drains vaults, finalizes, rebases, mints fees</title><rect class="box" x="60" y="262" width="190" height="56" rx="9"/><rect class="top" x="60" y="262" width="190" height="2.5" rx="1.2"/>
+    <text class="nm" x="70" y="282">Accounting</text><text class="fl" x="70" y="298">0.8.9/Accounting.sol</text><text class="ad" x="70" y="311">applies the report</text></g>
+  <g class="node el" data-flows="f4"><title>0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1: FIFO queue + escrow, unstETH NFT</title><rect class="box" x="60" y="384" width="190" height="62" rx="9"/><rect class="top" x="60" y="384" width="190" height="2.5" rx="1.2"/>
+    <text class="nm" x="70" y="404">WithdrawalQueue</text><text class="fl" x="70" y="420">WithdrawalQueueERC721.sol</text><text class="ad" x="70" y="434">0x889e…F9B1 · unstETH</text></g>
+
+  <g class="node com" data-flows="f2"><title>0xF573E9E3de1f86B085417ab294f56E7920B4e9Be: guardian committee, anti front-run</title><rect class="box" x="400" y="140" width="200" height="56" rx="9"/><rect class="top" x="400" y="140" width="200" height="2.5" rx="1.2"/>
+    <text class="nm" x="410" y="160">DepositSecurityModule</text><text class="fl" x="410" y="176">0.8.9/DepositSecurityModule.sol</text><text class="ad" x="410" y="189">0xF573…e9Be · guardians</text></g>
+  <g class="node proof" data-flows="f3"><title>SRv3, not deployed: verifies 0x02 top-up targets against EIP-4788</title><rect class="box" x="640" y="140" width="170" height="56" rx="9"/><rect class="top" x="640" y="140" width="170" height="2.5" rx="1.2"/>
+    <text class="nm" x="650" y="160">TopUpGateway</text><text class="fl" x="650" y="176">0.8.25/TopUpGateway.sol</text><text class="ad" x="650" y="189">SRv3 · not deployed</text></g>
+  <g class="node el" data-flows="f2 f3 f7"><title>proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999: allocates stake, pulls ETH, distributes fees</title><rect class="box" x="400" y="262" width="210" height="68" rx="9"/><rect class="top" x="400" y="262" width="210" height="2.5" rx="1.2"/>
+    <text class="nm" x="410" y="283">StakingRouter · v3</text><text class="fl" x="410" y="299">0.8.25/sr/StakingRouter.sol</text><text class="ad" x="410" y="313">proxy 0xFdDf…2999</text></g>
+
+  <g class="node el" data-flows="f2 f6 f7"><title>0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5: 0x01 keys, consolidation source</title><rect class="box" x="300" y="420" width="160" height="56" rx="9"/><rect class="top" x="300" y="420" width="160" height="2.5" rx="1.2"/>
+    <text class="nm" x="310" y="440">CMv1 · Curated</text><text class="fl" x="310" y="456">nos/NodeOperatorsRegistry.sol</text><text class="ad" x="310" y="469">0x5503…28d5</text></g>
+  <g class="node el" data-flows="f3 f6 f7"><title>IStakingModuleV2 implementation lives outside the core repo; consolidation target</title><rect class="box" x="480" y="420" width="160" height="56" rx="9"/><rect class="top" x="480" y="420" width="160" height="2.5" rx="1.2"/>
+    <text class="nm" x="490" y="440">CMv2 · Curated</text><text class="fl" x="490" y="456">IStakingModuleV2 (ext. repo)</text><text class="ad" x="490" y="469">SRv3 · 0x02 · new</text></g>
+  <g class="node el" data-flows="f2 f7"><title>SDVT 0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433 (Obol/SSV clusters) · CSM 0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F (bonded permissionless)</title><rect class="box" x="660" y="420" width="190" height="56" rx="9"/><rect class="top" x="660" y="420" width="190" height="2.5" rx="1.2"/>
+    <text class="nm" x="670" y="440">SDVT · CSM</text><text class="fl" x="670" y="456">other staking modules</text><text class="ad" x="670" y="469">0xaE7B…b433 · 0xdA7d…A83F</text></g>
+
+  <g class="node el" data-flows="f2 f3"><title>0x00000000219ab540356cBB839Cbe05303d7705Fa: one-way; only the first deposit sets WC</title><rect class="box" x="400" y="540" width="210" height="56" rx="9"/><rect class="top" x="400" y="540" width="210" height="2.5" rx="1.2"/>
+    <text class="nm" x="410" y="560">Beacon DepositContract</text><text class="fl" x="410" y="576">0.6.11/deposit_contract.sol (ref)</text><text class="ad" x="410" y="589">0x0000…05Fa</text></g>
+  <g class="node el" data-flows="f5 f6"><title>0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f: all Lido validator WC point here</title><rect class="box" x="700" y="540" width="200" height="62" rx="9"/><rect class="top" x="700" y="540" width="200" height="2.5" rx="1.2"/>
+    <text class="nm" x="710" y="560">WithdrawalVault</text><text class="fl" x="710" y="576">0.8.9/WithdrawalVault.sol</text><text class="ad" x="710" y="590">0xB9D7…293f</text></g>
+
+  <g class="node com" data-flows="f4 f5 f7"><title>0x852deD011285fe67063a08005c71a85690503Cee: daily report; SRv3 adds per-module CL balances</title><rect class="box" x="840" y="140" width="190" height="62" rx="9"/><rect class="top" x="840" y="140" width="190" height="2.5" rx="1.2"/>
+    <text class="nm" x="850" y="160">AccountingOracle</text><text class="fl" x="850" y="176">oracle/AccountingOracle.sol</text><text class="ad" x="850" y="190">0x852d…3Cee · committee ×9</text></g>
+  <g class="node com" data-flows="f5"><title>0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e: exit requests, ETH-denominated bounds</title><rect class="box" x="840" y="262" width="190" height="62" rx="9"/><rect class="top" x="840" y="262" width="190" height="2.5" rx="1.2"/>
+    <text class="nm" x="850" y="282">ValidatorsExitBus</text><text class="fl" x="850" y="298">oracle/ValidatorsExitBusOracle.sol</text><text class="ad" x="850" y="312">0x0De4…5c6e · committee ×9</text></g>
+  <g class="node bot" data-flows="f5"><title>Hold signing keys only; principal is out of reach</title><rect class="box" x="840" y="735" width="190" height="48" rx="9"/><rect class="top" x="840" y="735" width="190" height="2.5" rx="1.2"/>
+    <text class="nm" x="850" y="755">Node operators</text><text class="ad" x="850" y="771">off-chain · signing keys only</text></g>
+
+  <g class="node proof" data-flows="f6"><title>SRv3, not deployed. Migrator validates EasyTrack pairs; Bus enforces the delay (removeBatches = guardian veto); Gateway verifies target WC proofs against EIP-4788</title><rect class="box" x="1075" y="262" width="165" height="76" rx="9"/><rect class="top" x="1075" y="262" width="165" height="2.5" rx="1.2"/>
+    <text class="nm" x="1085" y="282">Consolidation pipeline</text><text class="fl" x="1085" y="298">Migrator → Bus → Gateway</text><text class="ad" x="1085" y="311">commit · delay (veto) · execute</text><text class="ad" x="1085" y="327">SRv3 · not deployed</text></g>
+
+  <g class="node cl" data-flows="f2 f3 f5 f6"><title>0x01 capped at 32 ETH (excess skimmed); 0x02 compounds to 2048; WC write-once</title><rect class="box" x="400" y="650" width="210" height="56" rx="9"/><rect class="top" x="400" y="650" width="210" height="2.5" rx="1.2"/>
+    <text class="nm" x="410" y="670">Validators 0x01 / 0x02</text><text class="fl" x="410" y="686">consensus layer</text><text class="ad" x="410" y="699">0x01 → 32 · 0x02 → 2048</text></g>
+  <g class="node cl" data-flows="f3 f6"><title>0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02: beacon root readable from EL, ~27 h ring</title><rect class="box" x="620" y="650" width="160" height="56" rx="9"/><rect class="top" x="620" y="650" width="160" height="2.5" rx="1.2"/>
+    <text class="nm" x="630" y="670">EIP-4788</text><text class="fl" x="630" y="686">beacon roots</text><text class="ad" x="630" y="699">0x000F…ac02</text></g>
+  <g class="node cl" data-flows="f5 f6"><title>EIP-7002 0x00000961Ef480Eb55e80D19ad83579A64c007002 (exits &amp; partial withdrawals) · EIP-7251 0x0000BBdDc7CE488642fb579F8B00f3a590007251 (source→target merge); both triggered from the withdrawal address</title><rect class="box" x="800" y="650" width="200" height="56" rx="9"/><rect class="top" x="800" y="650" width="200" height="2.5" rx="1.2"/>
+    <text class="nm" x="810" y="670">EIP-7002 · 7251</text><text class="fl" x="810" y="686">withdrawal &amp; consolidation reqs</text><text class="ad" x="810" y="699">0x0000…7002 · 0x0000…7251</text></g>
+  </g>
+</svg>
+</div>
+<p class="panhint">drag sideways to see the whole map</p>
+
+<div class="notes">
+  <h2>Off-chain actors · <b>they pick when &amp; what: contracts bound how much</b></h2>
+  <div class="band">
+    <div class="c bot"><div class="n">Depositor Bot</div><div class="r">collects guardian signatures, picks module &amp; timing, builds top-up Merkle proofs. Compromise = liveness problem, not funds.</div></div>
+    <div class="c bot"><div class="n">Oracle daemons ×9</div><div class="r">compute reports on a shared reference slot: deterministic and replayable by anyone.</div></div>
+    <div class="c bot"><div class="n">Node operators</div><div class="r">hold signing keys only; withdrawal credentials of every Lido validator point to the WithdrawalVault, so principal is out of reach.</div></div>
+  </div>
+
+  <h2>Governance &amp; committees</h2>
+  <div class="band">
+    <div class="c com"><div class="n">DepositSecurityModule + guardians</div><div class="f">contracts/0.8.9/DepositSecurityModule.sol</div><div class="a">0xF573…e9Be</div><div class="r">attest "deposit root unchanged, keys safe", then call StakingRouter.deposit(); can pause and veto consolidation batches: strictly negative power.</div></div>
+    <div class="c com"><div class="n">EasyTrack</div><div class="a">0xF021…3Fea</div><div class="r">vetoable motions; authorizes the CMv1→CMv2 operator pairs (new SRv3 role).</div></div>
+    <div class="c com"><div class="n">HashConsensus</div><div class="f">contracts/0.8.9/oracle/HashConsensus.sol</div><div class="a">0xD624…B288</div><div class="r">a report is processable only at 5/9 quorum on an identical hash: the protocol's central trust assumption.</div></div>
+    <div class="c com"><div class="n">Lido DAO (Aragon)</div><div class="a">Voting 0x2e59…618e · Agent 0x3e40…9C8c</div><div class="r">votes modules, roles, parameters; treasury receives its fee share.</div></div>
+  </div>
+
+  <h2>Core · <b>stETH and the buffer</b></h2>
+  <div class="band">
+    <div class="c el"><div class="n">Lido · stETH</div><div class="f">contracts/0.4.24/Lido.sol</div><div class="a">0xae7a…fE84</div><div class="r">submit() entrypoint; one pot of ETH, three labels in SRv3: depositsReserve, withdrawalsReserve, unreserved.</div></div>
+    <div class="c el"><div class="n">Accounting</div><div class="f">contracts/0.8.9/Accounting.sol</div><div class="r">applies the oracle report: drains vaults into the buffer, prefinalizes the queue, rebases, mints fees (LIDO.mintShares → reportRewardsMinted).</div></div>
+    <div class="c el"><div class="n">OracleReportSanityChecker</div><div class="f">contracts/0.8.9/sanity_checks/…</div><div class="a">0x147f…7be9</div><div class="r">rewritten for SRv3; bounds every report: it prices what a corrupt quorum can do. Sits at the Accounting boundary (not drawn).</div></div>
+    <div class="c el"><div class="n">WithdrawalQueue (ERC-721)</div><div class="f">contracts/0.8.9/WithdrawalQueueERC721.sol</div><div class="a">0x889e…F9B1</div><div class="r">FIFO queue + escrow: locks stETH, mints unstETH, finalizes at min(request, current) rate, pull-claim. Bunker mode lives here.</div></div>
+  </div>
+
+  <h2>Deposit path &amp; modules · <b>ETH never sits in a module</b></h2>
+  <div class="band">
+    <div class="c el"><div class="n">StakingRouter v3</div><div class="f">contracts/0.8.25/sr/StakingRouter.sol</div><div class="a">proxy 0xFdDf…2999</div><div class="r">pull model: allocates across modules (min-first, target shares), pulls ETH via LIDO.withdrawDepositableEther, deposits, distributes fees.</div></div>
+    <div class="c proof"><div class="n">TopUpGateway</div><div class="f">contracts/0.8.25/TopUpGateway.sol</div><div class="a">SRv3 · not deployed</div><div class="r">verifies each 0x02 target against the beacon root (Lido WC, active, not slashed), then calls StakingRouter.topUp(). Cap = MaxEB − 1.25 − proven balance.</div></div>
+    <div class="c el"><div class="n">CMv1 / SDVT / CSM / CMv2</div><div class="f">nos/NodeOperatorsRegistry.sol · IStakingModuleV2</div><div class="a">0x5503…28d5 · 0xaE7B…b433 · 0xdA7d…A83F</div><div class="r">key registries and operator accounting; CMv2 (0x02, external repo) is the consolidation target, CSM is bonded-permissionless.</div></div>
+    <div class="c el"><div class="n">Beacon DepositContract</div><div class="f">contracts/0.6.11/deposit_contract.sol (ref)</div><div class="a">0x0000…05Fa</div><div class="r">one-way: nothing ever comes back out; only the first deposit sets withdrawal credentials.</div></div>
+  </div>
+
+  <h2>Withdrawal side &amp; oracles</h2>
+  <div class="band">
+    <div class="c el"><div class="n">WithdrawalVault</div><div class="f">contracts/0.8.9/WithdrawalVault.sol</div><div class="a">0xB9D7…293f</div><div class="r">receives CL withdrawals (exits, skimming); relays EIP-7002 forced exits and EIP-7251 consolidations (new in SRv3).</div></div>
+    <div class="c com"><div class="n">AccountingOracle</div><div class="f">contracts/0.8.9/oracle/AccountingOracle.sol</div><div class="a">0x852d…3Cee</div><div class="r">daily report: handleOracleReport to Accounting, plus the new SRv3 surface, reportValidatorBalancesByStakingModule, straight to the router.</div></div>
+    <div class="c com"><div class="n">ValidatorsExitBus(Oracle)</div><div class="f">contracts/0.8.9/oracle/ValidatorsExitBusOracle.sol</div><div class="a">0x0De4…5c6e</div><div class="r">publishes exit requests with ETH-denominated bounds (SRv3 format); unfulfilled requests go through triggerExits.</div></div>
+    <div class="c el"><div class="n">ELRewardsVault · Burner · LidoLocator</div><div class="a">0x388C…9297 · 0xE76c…573a · 0xC1d0…d2Eb</div><div class="r">MEV/priority fees vault (drained at report), stETH burner, and the on-chain address book (not drawn).</div></div>
+  </div>
+
+  <h2>Consolidation pipeline · <b>all new in SRv3</b></h2>
+  <div class="band">
+    <div class="c el"><div class="n">ConsolidationMigrator</div><div class="f">contracts/0.8.25/consolidation/ConsolidationMigrator.sol</div><div class="r">validates requests against EasyTrack pairs, resolves indices → pubkeys, sends the batch to the Bus.</div></div>
+    <div class="c el"><div class="n">ConsolidationBus</div><div class="f">contracts/0.8.25/consolidation/ConsolidationBus.sol</div><div class="r">commit-delay-execute: hash binding, non-replay, and removeBatches: the delay is the guardians' veto window; an executor bot pays the EIP-7251 fee.</div></div>
+    <div class="c proof"><div class="n">ConsolidationGateway</div><div class="f">contracts/0.8.25/consolidation/ConsolidationGateway.sol</div><div class="r">pausable; verifies target WC proofs and limits, checks DSM is not paused, then WithdrawalVault.addConsolidationRequests{value: fee}.</div></div>
+    <div class="c cl"><div class="n">EIP-4788 / 7002 / 7251</div><div class="a">0x000F…ac02 · 0x0000…7002 · 0x0000…7251</div><div class="r">system contracts: beacon-root anchor for every proof; exits and consolidations triggered from the withdrawal address.</div></div>
+  </div>
+</div>
+
+<footer>
+  Pinned source: lidofinance/core@af095e48 (PR #1811 · LIP-35) · addresses: <a href="https://docs.lido.fi/deployed-contracts/">docs.lido.fi/deployed-contracts</a> (July 2026) · hover a node for the full address &amp; role.<br>
+  Official Lido diagrams: <a href="https://hackmd.io/@lido/rJ0dCOVdo">ADR Staking Router</a> · <a href="https://hackmd.io/@lido/SyaJQsZoj">Withdrawals landscape</a> · <a href="https://hackmd.io/@lido/SyagEmMwo">Withdrawals audit scope</a> · <a href="https://hackmd.io/@lido/stVaults-design">stVaults design</a> · <a href="https://lido.fi/how-lido-works/lido-core-staking-user-flow">Core staking user flow</a>
+</footer>
+</div>
+
+<script>
+(function(){
+  var active = new Set();
+  var COLORS = {f1:'var(--cf1)',f2:'var(--cf2)',f3:'var(--cf3)',f4:'var(--cf4)',f5:'var(--cf5)',f6:'var(--cf6)',f7:'var(--cf7)'};
+  var btns = document.querySelectorAll('.pill[data-flow]');
+  var cap = document.getElementById('fcap');
+  var HINT = 'Tap a flow to light up its path and see the real calls. Combine a few to compare.';
+  function render(){
+    document.querySelectorAll('#edges .edge, #nodes .node').forEach(function(el){
+      var flows = (el.getAttribute('data-flows')||'').split(' ');
+      var hit = flows.filter(function(f){ return active.has(f); });
+      var on = active.size>0 && hit.length>0;
+      el.classList.toggle('on', on);
+      el.classList.toggle('dim', active.size>0 && hit.length===0);
+      var p = el.querySelector('path');
+      if(on){
+        el.style.setProperty('--hl', COLORS[hit[0]]);
+        if(p) p.setAttribute('marker-end','url(#mk-'+hit[0]+')');
+      } else {
+        el.style.removeProperty('--hl');
+        if(p) p.setAttribute('marker-end','url(#mk)');
+      }
+      el.querySelectorAll('text.lbl').forEach(function(t){
+        var lf = t.getAttribute('data-lf');
+        t.classList.toggle('show', on && (!lf || hit.indexOf(lf) >= 0));
+      });
+    });
+    var lines = [];
+    btns.forEach(function(b){
+      var isOn = active.has(b.dataset.flow);
+      b.setAttribute('aria-pressed', isOn ? 'true':'false');
+      if(isOn){
+        var name = b.textContent.replace(/(same|changed|new)$/,'').trim();
+        var bEl = document.createElement('b');
+        bEl.style.color = 'var(--c'+b.dataset.flow+')';
+        bEl.textContent = name + ': ';
+        lines.push({b:bEl, txt:b.dataset.desc});
+      }
+    });
+    cap.textContent = '';
+    if(lines.length===0){ cap.textContent = HINT; }
+    else lines.forEach(function(l,i){
+      if(i>0) cap.appendChild(document.createElement('br'));
+      cap.appendChild(l.b); cap.appendChild(document.createTextNode(l.txt));
+    });
+  }
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var f = b.dataset.flow;
+      if(active.has(f)) active.delete(f); else active.add(f);
+      render();
+    });
+  });
+  document.getElementById('reset').addEventListener('click', function(){ active.clear(); render(); });
+
+  /* ------- export current view (active flows included) as PNG / SVG ------- */
+  var SVG_CSS = [
+    'text{font-family:"Avenir Next","Segoe UI",-apple-system,sans-serif}',
+    '.sep{stroke:var(--line);stroke-dasharray:3 5}',
+    '.bandlbl{font:700 9.5px var(--mono);letter-spacing:.18em;fill:var(--soft)}',
+    '.node rect.box{fill:var(--card);stroke:var(--line)}',
+    '.node .nm{font:650 12.5px "Avenir Next","Segoe UI",sans-serif;fill:var(--ink)}',
+    '.node .fl{font:600 8.6px var(--mono)}',
+    '.node .ad{font:500 8.6px var(--mono);fill:var(--soft)}',
+    '.node.el .fl{fill:var(--el)}.node.com .fl{fill:var(--com)}.node.proof .fl{fill:var(--proof)}',
+    '.node.bot .fl{fill:var(--bot)}.node.cl .fl{fill:var(--cl)}',
+    '.node.el rect.top{fill:var(--el)}.node.com rect.top{fill:var(--com)}.node.proof rect.top{fill:var(--proof)}',
+    '.node.bot rect.top{fill:var(--bot)}.node.cl rect.top{fill:var(--cl)}',
+    '.node.dim{opacity:.12}',
+    '.node.on rect.box{stroke:var(--hl,var(--line));stroke-width:1.8}',
+    '.edge path{fill:none;stroke:var(--edge);stroke-width:1.2}',
+    '.edge.da path{stroke-dasharray:5 4}',
+    '.edge .lbl{display:none;font:600 9.8px var(--mono);fill:var(--hl,var(--soft))}',
+    '.edge .lbl.show{display:block}',
+    '.edge.dim{opacity:.08}',
+    '.edge.on path{stroke:var(--hl);stroke-width:2.4}'
+  ].join('\n');
+
+  function buildStandaloneSvg(){
+    var src = document.querySelector('.canvas svg');
+    var clone = src.cloneNode(true);
+    var cs = getComputedStyle(document.documentElement);
+    var names = ['--card','--ink','--soft','--line','--line2','--edge','--el','--cl','--com','--bot','--proof',
+                 '--cf1','--cf2','--cf3','--cf4','--cf5','--cf6','--cf7','--mono'];
+    var vars = names.map(function(n){ return n+':'+cs.getPropertyValue(n).trim(); }).join(';');
+    var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('x','0'); bg.setAttribute('y','0');
+    bg.setAttribute('width','1280'); bg.setAttribute('height','800');
+    bg.setAttribute('fill', cs.getPropertyValue('--card').trim() || '#ffffff');
+    clone.insertBefore(bg, clone.firstChild);
+    var style = document.createElementNS('http://www.w3.org/2000/svg','style');
+    style.textContent = 'svg{'+vars+'}\n'+SVG_CSS;
+    clone.insertBefore(style, clone.firstChild);
+    clone.setAttribute('width','1280'); clone.setAttribute('height','800');
+    return new XMLSerializer().serializeToString(clone);
+  }
+
+  function exportName(){
+    return 'lido-map-' + (active.size ? Array.from(active).sort().join('-') : 'all');
+  }
+
+  function triggerDownload(blob, name){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  }
+
+  document.getElementById('exportSvg').addEventListener('click', function(){
+    triggerDownload(new Blob([buildStandaloneSvg()], {type:'image/svg+xml'}), exportName()+'.svg');
+  });
+
+  document.getElementById('exportPng').addEventListener('click', function(){
+    var url = URL.createObjectURL(new Blob([buildStandaloneSvg()], {type:'image/svg+xml;charset=utf-8'}));
+    var img = new Image();
+    img.onload = function(){
+      var c = document.createElement('canvas');
+      c.width = 2560; c.height = 1600;
+      var ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, 2560, 1600);
+      c.toBlob(function(b){
+        if(b) triggerDownload(b, exportName()+'.png');
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); };
+    img.src = url;
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
