@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <title>Lido Architecture: Components & Flows</title>
 </head>
 <body style="margin:0">
@@ -15,9 +16,14 @@
     --line:#e3e8ef; --line2:#eef1f6; --edge:#c3ccd7;
     --accent:#2dd4bf; --accent-ink:#0d9488;
     --el:#1a6fb5; --cl:#7c5ce0; --com:#b17a1e; --bot:#8b93a1; --proof:#0f9e77;
+    --el-bg:#edf4fa; --el-bd:#c2d8ea; --cl-bg:#f1edfc; --cl-bd:#d6cbf2;
+    --com-bg:#faf3e6; --com-bd:#e6d3ae; --bot-bg:#f1f3f6; --bot-bd:#d5dae1;
+    --proof-bg:#e9f7f2; --proof-bd:#b8e0d2;
     --cf1:#1a75c0; --cf2:#0d9488; --cf3:#67921a; --cf4:#bd7c17; --cf5:#d0523a; --cf6:#8a5cf6; --cf7:#b44487;
     --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
     --sans:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --article:'Source Serif 4',Georgia,'Times New Roman',serif;
+    --article-ink:#1a1a1a;
   }
 
   body{
@@ -32,7 +38,7 @@
           letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);
           background:rgba(45,212,191,.12);border-radius:999px;padding:3px 11px;margin-bottom:10px}
   header h1{font-size:clamp(1.5rem,3.4vw,2rem);font-weight:800;letter-spacing:-.03em;color:var(--heading);text-wrap:balance}
-  header p{color:var(--ink);max-width:76ch;margin-top:7px;font-size:.88rem}
+  header p{font-family:var(--article);letter-spacing:normal;color:var(--article-ink);max-width:74ch;margin-top:8px;font-size:.94rem;line-height:1.6}
   header p b{color:var(--heading);font-weight:700}
 
   .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;font-family:var(--mono);font-size:9.5px}
@@ -56,8 +62,8 @@
   .reset{background:none;border:1.5px dashed var(--line);border-radius:999px;color:var(--soft);
          font:inherit;font-size:.75rem;cursor:pointer;padding:6px 13px}
   .reset:hover{color:var(--heading);border-color:var(--accent)}
-  .fcap{min-height:2.6em;font-size:.78rem;color:var(--soft);margin-bottom:10px;max-width:90ch}
-  .fcap b{font-weight:700}
+  .fcap{font-family:var(--article);letter-spacing:normal;min-height:2.6em;font-size:.84rem;color:var(--ink);margin-bottom:10px;max-width:88ch;line-height:1.55}
+  .fcap b{font-family:var(--sans);font-weight:700;font-size:.92em;letter-spacing:-0.01em}
   @media (prefers-reduced-motion: reduce){ .pill{transition:none} .edge path,.node rect,.node text{transition:none!important} }
 
   /* diagram */
@@ -69,14 +75,17 @@
   .bandlbl{font:700 9.5px var(--mono);letter-spacing:.18em;fill:var(--soft)}
 
   .node rect.box{fill:var(--card);stroke:var(--line);transition:opacity .15s}
-  .node rect.top,.node text{transition:opacity .15s}
+  .node.el rect.box{fill:var(--el-bg);stroke:var(--el-bd)}
+  .node.com rect.box{fill:var(--com-bg);stroke:var(--com-bd)}
+  .node.proof rect.box{fill:var(--proof-bg);stroke:var(--proof-bd)}
+  .node.bot rect.box{fill:var(--bot-bg);stroke:var(--bot-bd)}
+  .node.cl rect.box{fill:var(--cl-bg);stroke:var(--cl-bd)}
+  .node text{transition:opacity .15s}
   .node .nm{font:700 12.5px var(--sans);fill:var(--heading)}
   .node .fl{font:600 8.6px var(--mono)}
   .node .ad{font:500 8.6px var(--mono);fill:var(--soft)}
   .node.el .fl{fill:var(--el)} .node.com .fl{fill:var(--com)} .node.proof .fl{fill:var(--proof)}
   .node.bot .fl{fill:var(--bot)} .node.cl .fl{fill:var(--cl)}
-  .node.el rect.top{fill:var(--el)} .node.com rect.top{fill:var(--com)} .node.proof rect.top{fill:var(--proof)}
-  .node.bot rect.top{fill:var(--bot)} .node.cl rect.top{fill:var(--cl)}
   .node.dim{opacity:.12}
   .node.on rect.box{stroke:var(--hl,var(--line));stroke-width:1.8}
 
@@ -90,16 +99,19 @@
   /* component notes */
   .notes h2{font-size:.98rem;font-weight:700;letter-spacing:-.01em;color:var(--heading);
      padding-bottom:6px;border-bottom:1px solid var(--line);margin:28px 0 10px}
-  .notes h2 b{font-weight:500;color:var(--soft);font-size:.86em}
+  .notes h2 b{font-family:var(--article);font-style:italic;font-weight:400;color:var(--soft);font-size:.9em;letter-spacing:normal}
   .band{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
-  .c{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--tc,var(--line));
+  .c{background:var(--card);border:1px solid var(--line);
      border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-  .c.el{--tc:var(--el)} .c.cl{--tc:var(--cl)} .c.com{--tc:var(--com)}
-  .c.bot{--tc:var(--bot)} .c.proof{--tc:var(--proof)}
+  .c.el{--tc:var(--el);background:var(--el-bg);border-color:var(--el-bd)}
+  .c.cl{--tc:var(--cl);background:var(--cl-bg);border-color:var(--cl-bd)}
+  .c.com{--tc:var(--com);background:var(--com-bg);border-color:var(--com-bd)}
+  .c.bot{--tc:var(--bot);background:var(--bot-bg);border-color:var(--bot-bd)}
+  .c.proof{--tc:var(--proof);background:var(--proof-bg);border-color:var(--proof-bd)}
   .c .n{font-weight:700;font-size:.83rem;color:var(--heading);letter-spacing:-.01em}
   .c .f{font-family:var(--mono);font-size:.63rem;color:var(--tc,var(--soft));word-break:break-all;letter-spacing:0}
   .c .a{font-family:var(--mono);font-size:.63rem;color:var(--soft);letter-spacing:0}
-  .c .r{font-size:.72rem;color:var(--ink);margin-top:2px}
+  .c .r{font-family:var(--article);letter-spacing:normal;font-size:.76rem;color:var(--article-ink);margin-top:2px;line-height:1.5}
 
   footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);
          font-family:var(--mono);font-size:.67rem;color:var(--soft);line-height:1.9;letter-spacing:0}
@@ -205,54 +217,54 @@
 
   <!-- ================= nodes ================= -->
   <g id="nodes">
-  <g class="node bot" data-flows="f1 f4"><rect class="box" x="60" y="20" width="180" height="48" rx="9"/><rect class="top" x="60" y="20" width="180" height="2.5" rx="1.2"/>
+  <g class="node bot" data-flows="f1 f4"><rect class="box" x="60" y="20" width="180" height="48" rx="9"/>
     <text class="nm" x="70" y="41">Staker / stETH holder</text><text class="ad" x="70" y="57">off-chain</text></g>
-  <g class="node bot" data-flows="f2 f3"><rect class="box" x="400" y="20" width="150" height="48" rx="9"/><rect class="top" x="400" y="20" width="150" height="2.5" rx="1.2"/>
+  <g class="node bot" data-flows="f2 f3"><rect class="box" x="400" y="20" width="150" height="48" rx="9"/>
     <text class="nm" x="410" y="41">Depositor Bot</text><text class="ad" x="410" y="57">off-chain</text></g>
-  <g class="node com" data-flows="f6"><title>0xF0211b7660680B49De1A7E9f25C65660F0a13Fea: vetoable DAO motions</title><rect class="box" x="1075" y="20" width="165" height="48" rx="9"/><rect class="top" x="1075" y="20" width="165" height="2.5" rx="1.2"/>
+  <g class="node com" data-flows="f6"><title>0xF0211b7660680B49De1A7E9f25C65660F0a13Fea: vetoable DAO motions</title><rect class="box" x="1075" y="20" width="165" height="48" rx="9"/>
     <text class="nm" x="1085" y="41">EasyTrack</text><text class="ad" x="1085" y="57">0xF021…3Fea</text></g>
 
-  <g class="node el" data-flows="f1 f2 f3 f4 f7"><title>0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84: stETH token + ETH buffer</title><rect class="box" x="60" y="140" width="190" height="62" rx="9"/><rect class="top" x="60" y="140" width="190" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f1 f2 f3 f4 f7"><title>0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84: stETH token + ETH buffer</title><rect class="box" x="60" y="140" width="190" height="62" rx="9"/>
     <text class="nm" x="70" y="160">Lido · stETH</text><text class="fl" x="70" y="176">0.4.24/Lido.sol</text><text class="ad" x="70" y="190">0xae7a…fE84</text></g>
-  <g class="node el" data-flows="f4 f5 f7"><title>Applies the oracle report: drains vaults, finalizes, rebases, mints fees</title><rect class="box" x="60" y="262" width="190" height="56" rx="9"/><rect class="top" x="60" y="262" width="190" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f4 f5 f7"><title>Applies the oracle report: drains vaults, finalizes, rebases, mints fees</title><rect class="box" x="60" y="262" width="190" height="56" rx="9"/>
     <text class="nm" x="70" y="282">Accounting</text><text class="fl" x="70" y="298">0.8.9/Accounting.sol</text><text class="ad" x="70" y="311">applies the report</text></g>
-  <g class="node el" data-flows="f4"><title>0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1: FIFO queue + escrow, unstETH NFT</title><rect class="box" x="60" y="384" width="190" height="62" rx="9"/><rect class="top" x="60" y="384" width="190" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f4"><title>0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1: FIFO queue + escrow, unstETH NFT</title><rect class="box" x="60" y="384" width="190" height="62" rx="9"/>
     <text class="nm" x="70" y="404">WithdrawalQueue</text><text class="fl" x="70" y="420">WithdrawalQueueERC721.sol</text><text class="ad" x="70" y="434">0x889e…F9B1 · unstETH</text></g>
 
-  <g class="node com" data-flows="f2"><title>0xF573E9E3de1f86B085417ab294f56E7920B4e9Be: guardian committee, anti front-run</title><rect class="box" x="400" y="140" width="200" height="56" rx="9"/><rect class="top" x="400" y="140" width="200" height="2.5" rx="1.2"/>
+  <g class="node com" data-flows="f2"><title>0xF573E9E3de1f86B085417ab294f56E7920B4e9Be: guardian committee, anti front-run</title><rect class="box" x="400" y="140" width="200" height="56" rx="9"/>
     <text class="nm" x="410" y="160">DepositSecurityModule</text><text class="fl" x="410" y="176">0.8.9/DepositSecurityModule.sol</text><text class="ad" x="410" y="189">0xF573…e9Be · guardians</text></g>
-  <g class="node proof" data-flows="f3"><title>SRv3, not deployed: verifies 0x02 top-up targets against EIP-4788</title><rect class="box" x="640" y="140" width="170" height="56" rx="9"/><rect class="top" x="640" y="140" width="170" height="2.5" rx="1.2"/>
+  <g class="node proof" data-flows="f3"><title>SRv3, not deployed: verifies 0x02 top-up targets against EIP-4788</title><rect class="box" x="640" y="140" width="170" height="56" rx="9"/>
     <text class="nm" x="650" y="160">TopUpGateway</text><text class="fl" x="650" y="176">0.8.25/TopUpGateway.sol</text><text class="ad" x="650" y="189">SRv3 · not deployed</text></g>
-  <g class="node el" data-flows="f2 f3 f7"><title>proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999: allocates stake, pulls ETH, distributes fees</title><rect class="box" x="400" y="262" width="210" height="68" rx="9"/><rect class="top" x="400" y="262" width="210" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f2 f3 f7"><title>proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999: allocates stake, pulls ETH, distributes fees</title><rect class="box" x="400" y="262" width="210" height="68" rx="9"/>
     <text class="nm" x="410" y="283">StakingRouter · v3</text><text class="fl" x="410" y="299">0.8.25/sr/StakingRouter.sol</text><text class="ad" x="410" y="313">proxy 0xFdDf…2999</text></g>
 
-  <g class="node el" data-flows="f2 f6 f7"><title>0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5: 0x01 keys, consolidation source</title><rect class="box" x="300" y="420" width="160" height="56" rx="9"/><rect class="top" x="300" y="420" width="160" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f2 f6 f7"><title>0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5: 0x01 keys, consolidation source</title><rect class="box" x="300" y="420" width="160" height="56" rx="9"/>
     <text class="nm" x="310" y="440">CMv1 · Curated</text><text class="fl" x="310" y="456">nos/NodeOperatorsRegistry.sol</text><text class="ad" x="310" y="469">0x5503…28d5</text></g>
-  <g class="node el" data-flows="f3 f6 f7"><title>IStakingModuleV2 implementation lives outside the core repo; consolidation target</title><rect class="box" x="480" y="420" width="160" height="56" rx="9"/><rect class="top" x="480" y="420" width="160" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f3 f6 f7"><title>IStakingModuleV2 implementation lives outside the core repo; consolidation target</title><rect class="box" x="480" y="420" width="160" height="56" rx="9"/>
     <text class="nm" x="490" y="440">CMv2 · Curated</text><text class="fl" x="490" y="456">IStakingModuleV2 (ext. repo)</text><text class="ad" x="490" y="469">SRv3 · 0x02 · new</text></g>
-  <g class="node el" data-flows="f2 f7"><title>SDVT 0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433 (Obol/SSV clusters) · CSM 0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F (bonded permissionless)</title><rect class="box" x="660" y="420" width="190" height="56" rx="9"/><rect class="top" x="660" y="420" width="190" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f2 f7"><title>SDVT 0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433 (Obol/SSV clusters) · CSM 0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F (bonded permissionless)</title><rect class="box" x="660" y="420" width="190" height="56" rx="9"/>
     <text class="nm" x="670" y="440">SDVT · CSM</text><text class="fl" x="670" y="456">other staking modules</text><text class="ad" x="670" y="469">0xaE7B…b433 · 0xdA7d…A83F</text></g>
 
-  <g class="node el" data-flows="f2 f3"><title>0x00000000219ab540356cBB839Cbe05303d7705Fa: one-way; only the first deposit sets WC</title><rect class="box" x="400" y="540" width="210" height="56" rx="9"/><rect class="top" x="400" y="540" width="210" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f2 f3"><title>0x00000000219ab540356cBB839Cbe05303d7705Fa: one-way; only the first deposit sets WC</title><rect class="box" x="400" y="540" width="210" height="56" rx="9"/>
     <text class="nm" x="410" y="560">Beacon DepositContract</text><text class="fl" x="410" y="576">0.6.11/deposit_contract.sol (ref)</text><text class="ad" x="410" y="589">0x0000…05Fa</text></g>
-  <g class="node el" data-flows="f5 f6"><title>0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f: all Lido validator WC point here</title><rect class="box" x="700" y="540" width="200" height="62" rx="9"/><rect class="top" x="700" y="540" width="200" height="2.5" rx="1.2"/>
+  <g class="node el" data-flows="f5 f6"><title>0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f: all Lido validator WC point here</title><rect class="box" x="700" y="540" width="200" height="62" rx="9"/>
     <text class="nm" x="710" y="560">WithdrawalVault</text><text class="fl" x="710" y="576">0.8.9/WithdrawalVault.sol</text><text class="ad" x="710" y="590">0xB9D7…293f</text></g>
 
-  <g class="node com" data-flows="f4 f5 f7"><title>0x852deD011285fe67063a08005c71a85690503Cee: daily report; SRv3 adds per-module CL balances</title><rect class="box" x="840" y="140" width="190" height="62" rx="9"/><rect class="top" x="840" y="140" width="190" height="2.5" rx="1.2"/>
+  <g class="node com" data-flows="f4 f5 f7"><title>0x852deD011285fe67063a08005c71a85690503Cee: daily report; SRv3 adds per-module CL balances</title><rect class="box" x="840" y="140" width="190" height="62" rx="9"/>
     <text class="nm" x="850" y="160">AccountingOracle</text><text class="fl" x="850" y="176">oracle/AccountingOracle.sol</text><text class="ad" x="850" y="190">0x852d…3Cee · committee ×9</text></g>
-  <g class="node com" data-flows="f5"><title>0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e: exit requests, ETH-denominated bounds</title><rect class="box" x="840" y="262" width="190" height="62" rx="9"/><rect class="top" x="840" y="262" width="190" height="2.5" rx="1.2"/>
+  <g class="node com" data-flows="f5"><title>0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e: exit requests, ETH-denominated bounds</title><rect class="box" x="840" y="262" width="190" height="62" rx="9"/>
     <text class="nm" x="850" y="282">ValidatorsExitBus</text><text class="fl" x="850" y="298">oracle/ValidatorsExitBusOracle.sol</text><text class="ad" x="850" y="312">0x0De4…5c6e · committee ×9</text></g>
-  <g class="node bot" data-flows="f5"><title>Hold signing keys only; principal is out of reach</title><rect class="box" x="840" y="735" width="190" height="48" rx="9"/><rect class="top" x="840" y="735" width="190" height="2.5" rx="1.2"/>
+  <g class="node bot" data-flows="f5"><title>Hold signing keys only; principal is out of reach</title><rect class="box" x="840" y="735" width="190" height="48" rx="9"/>
     <text class="nm" x="850" y="755">Node operators</text><text class="ad" x="850" y="771">off-chain · signing keys only</text></g>
 
-  <g class="node proof" data-flows="f6"><title>SRv3, not deployed. Migrator validates EasyTrack pairs; Bus enforces the delay (removeBatches = guardian veto); Gateway verifies target WC proofs against EIP-4788</title><rect class="box" x="1075" y="262" width="165" height="76" rx="9"/><rect class="top" x="1075" y="262" width="165" height="2.5" rx="1.2"/>
+  <g class="node proof" data-flows="f6"><title>SRv3, not deployed. Migrator validates EasyTrack pairs; Bus enforces the delay (removeBatches = guardian veto); Gateway verifies target WC proofs against EIP-4788</title><rect class="box" x="1075" y="262" width="165" height="76" rx="9"/>
     <text class="nm" x="1085" y="282">Consolidation pipeline</text><text class="fl" x="1085" y="298">Migrator → Bus → Gateway</text><text class="ad" x="1085" y="311">commit · delay (veto) · execute</text><text class="ad" x="1085" y="327">SRv3 · not deployed</text></g>
 
-  <g class="node cl" data-flows="f2 f3 f5 f6"><title>0x01 capped at 32 ETH (excess skimmed); 0x02 compounds to 2048; WC write-once</title><rect class="box" x="400" y="650" width="210" height="56" rx="9"/><rect class="top" x="400" y="650" width="210" height="2.5" rx="1.2"/>
+  <g class="node cl" data-flows="f2 f3 f5 f6"><title>0x01 capped at 32 ETH (excess skimmed); 0x02 compounds to 2048; WC write-once</title><rect class="box" x="400" y="650" width="210" height="56" rx="9"/>
     <text class="nm" x="410" y="670">Validators 0x01 / 0x02</text><text class="fl" x="410" y="686">consensus layer</text><text class="ad" x="410" y="699">0x01 → 32 · 0x02 → 2048</text></g>
-  <g class="node cl" data-flows="f3 f6"><title>0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02: beacon root readable from EL, ~27 h ring</title><rect class="box" x="620" y="650" width="160" height="56" rx="9"/><rect class="top" x="620" y="650" width="160" height="2.5" rx="1.2"/>
+  <g class="node cl" data-flows="f3 f6"><title>0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02: beacon root readable from EL, ~27 h ring</title><rect class="box" x="620" y="650" width="160" height="56" rx="9"/>
     <text class="nm" x="630" y="670">EIP-4788</text><text class="fl" x="630" y="686">beacon roots</text><text class="ad" x="630" y="699">0x000F…ac02</text></g>
-  <g class="node cl" data-flows="f5 f6"><title>EIP-7002 0x00000961Ef480Eb55e80D19ad83579A64c007002 (exits &amp; partial withdrawals) · EIP-7251 0x0000BBdDc7CE488642fb579F8B00f3a590007251 (source→target merge); both triggered from the withdrawal address</title><rect class="box" x="800" y="650" width="200" height="56" rx="9"/><rect class="top" x="800" y="650" width="200" height="2.5" rx="1.2"/>
+  <g class="node cl" data-flows="f5 f6"><title>EIP-7002 0x00000961Ef480Eb55e80D19ad83579A64c007002 (exits &amp; partial withdrawals) · EIP-7251 0x0000BBdDc7CE488642fb579F8B00f3a590007251 (source→target merge); both triggered from the withdrawal address</title><rect class="box" x="800" y="650" width="200" height="56" rx="9"/>
     <text class="nm" x="810" y="670">EIP-7002 · 7251</text><text class="fl" x="810" y="686">withdrawal &amp; consolidation reqs</text><text class="ad" x="810" y="699">0x0000…7002 · 0x0000…7251</text></g>
   </g>
 </svg>
@@ -375,13 +387,14 @@
     '.sep{stroke:var(--line);stroke-dasharray:3 5}',
     '.bandlbl{font:700 9.5px var(--mono);letter-spacing:.18em;fill:var(--soft)}',
     '.node rect.box{fill:var(--card);stroke:var(--line)}',
+    '.node.el rect.box{fill:var(--el-bg);stroke:var(--el-bd)}.node.com rect.box{fill:var(--com-bg);stroke:var(--com-bd)}',
+    '.node.proof rect.box{fill:var(--proof-bg);stroke:var(--proof-bd)}.node.bot rect.box{fill:var(--bot-bg);stroke:var(--bot-bd)}',
+    '.node.cl rect.box{fill:var(--cl-bg);stroke:var(--cl-bd)}',
     '.node .nm{font:700 12.5px "Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;fill:var(--heading)}',
     '.node .fl{font:600 8.6px var(--mono)}',
     '.node .ad{font:500 8.6px var(--mono);fill:var(--soft)}',
     '.node.el .fl{fill:var(--el)}.node.com .fl{fill:var(--com)}.node.proof .fl{fill:var(--proof)}',
     '.node.bot .fl{fill:var(--bot)}.node.cl .fl{fill:var(--cl)}',
-    '.node.el rect.top{fill:var(--el)}.node.com rect.top{fill:var(--com)}.node.proof rect.top{fill:var(--proof)}',
-    '.node.bot rect.top{fill:var(--bot)}.node.cl rect.top{fill:var(--cl)}',
     '.node.dim{opacity:.12}',
     '.node.on rect.box{stroke:var(--hl,var(--line));stroke-width:1.8}',
     '.edge path{fill:none;stroke:var(--edge);stroke-width:1.2}',
@@ -396,7 +409,7 @@
     var src = document.querySelector('.canvas svg');
     var clone = src.cloneNode(true);
     var cs = getComputedStyle(document.documentElement);
-    var names = ['--card','--ink','--heading','--soft','--line','--line2','--edge','--el','--cl','--com','--bot','--proof',
+    var names = ['--card','--ink','--heading','--soft','--line','--line2','--edge','--el','--cl','--com','--bot','--proof','--el-bg','--el-bd','--cl-bg','--cl-bd','--com-bg','--com-bd','--bot-bg','--bot-bd','--proof-bg','--proof-bd',
                  '--cf1','--cf2','--cf3','--cf4','--cf5','--cf6','--cf7','--mono'];
     var vars = names.map(function(n){ return n+':'+cs.getPropertyValue(n).trim(); }).join(';');
     var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
