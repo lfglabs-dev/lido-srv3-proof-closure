@@ -3,83 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Lido Architecture: Components & Flows</title>
 </head>
 <body style="margin:0">
 <style>
   :root{
-    --paper:#faf9f5; --card:#ffffff; --ink:#1f1e1b; --soft:#6e6a60;
-    --line:#e6e2d8; --line2:#f1eee6; --edge:#c7bfae;
-    --accent:#c15f3c;
-    --el:#1a6fb5; --cl:#8b6fd8; --com:#a8721f; --bot:#8a8474; --proof:#3d8a63;
-    --cf1:#1a75c0; --cf2:#0d8a74; --cf3:#67921a; --cf4:#bd7c17; --cf5:#c15f3c; --cf6:#8a5cf6; --cf7:#b44487;
+    --paper:#ffffff; --card:#f5f7fa; --ink:#404040; --heading:#000000; --soft:#949494;
+    --line:#e3e8ef; --line2:#eef1f6; --edge:#c3ccd7;
+    --accent:#2dd4bf; --accent-ink:#0d9488;
+    --el:#1a6fb5; --cl:#7c5ce0; --com:#b17a1e; --bot:#8b93a1; --proof:#0f9e77;
+    --cf1:#1a75c0; --cf2:#0d9488; --cf3:#67921a; --cf4:#bd7c17; --cf5:#d0523a; --cf6:#8a5cf6; --cf7:#b44487;
     --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-    --serif:'Charter','Iowan Old Style',Georgia,'Times New Roman',serif;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --paper:#262624; --card:#30302e; --ink:#f0efea; --soft:#b0aa9e;
-      --line:#413f3a; --line2:#393733; --edge:#5c574c;
-      --accent:#d97757;
-      --el:#5aa8e8; --cl:#ab93f2; --com:#d9a34e; --bot:#a09a8c; --proof:#54bd8e;
-      --cf1:#54a4ea; --cf2:#33b89e; --cf3:#9ec13e; --cf4:#dda43e; --cf5:#e28565; --cf6:#a88af8; --cf7:#e07cba;
-    }
-  }
-  :root[data-theme="dark"]{
-    --paper:#262624; --card:#30302e; --ink:#f0efea; --soft:#b0aa9e;
-    --line:#413f3a; --line2:#393733; --edge:#5c574c;
-    --accent:#d97757;
-    --el:#5aa8e8; --cl:#ab93f2; --com:#d9a34e; --bot:#a09a8c; --proof:#54bd8e;
-    --cf1:#54a4ea; --cf2:#33b89e; --cf3:#9ec13e; --cf4:#dda43e; --cf5:#e28565; --cf6:#a88af8; --cf7:#e07cba;
-  }
-  :root[data-theme="light"]{
-    --paper:#faf9f5; --card:#ffffff; --ink:#1f1e1b; --soft:#6e6a60;
-    --line:#e6e2d8; --line2:#f1eee6; --edge:#c7bfae;
-    --accent:#c15f3c;
-    --el:#1a6fb5; --cl:#8b6fd8; --com:#a8721f; --bot:#8a8474; --proof:#3d8a63;
-    --cf1:#1a75c0; --cf2:#0d8a74; --cf3:#67921a; --cf4:#bd7c17; --cf5:#c15f3c; --cf6:#8a5cf6; --cf7:#b44487;
+    --sans:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   }
 
   body{
     background:var(--paper); color:var(--ink);
-    font-family:"Avenir Next","Segoe UI",-apple-system,"Helvetica Neue",sans-serif;
-    font-size:14.5px; line-height:1.5;
+    font-family:var(--sans);
+    font-size:14.5px; line-height:1.55; letter-spacing:-0.02em;
     padding:clamp(14px,3vw,40px) clamp(10px,2.5vw,28px);
+    -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:1320px;margin:0 auto}
-  .kicker{font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
-  header h1{font-family:var(--serif);font-size:clamp(1.5rem,3.4vw,2.05rem);font-weight:600;letter-spacing:-.01em;text-wrap:balance}
-  header p{color:var(--soft);max-width:76ch;margin-top:7px;font-size:.88rem}
-  header p b{color:var(--ink);font-weight:600}
+  .kicker{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.62rem;font-weight:700;
+          letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);
+          background:rgba(45,212,191,.12);border-radius:999px;padding:3px 11px;margin-bottom:10px}
+  header h1{font-size:clamp(1.5rem,3.4vw,2rem);font-weight:800;letter-spacing:-.03em;color:var(--heading);text-wrap:balance}
+  header p{color:var(--ink);max-width:76ch;margin-top:7px;font-size:.88rem}
+  header p b{color:var(--heading);font-weight:700}
 
-  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-family:var(--mono);font-size:9.5px}
-  .legend span{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--soft)}
+  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;font-family:var(--mono);font-size:9.5px}
+  .legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;background:var(--card);color:var(--soft)}
   .dot{width:7px;height:7px;border-radius:2px;flex:none}
 
   /* flow pills */
   .fbar{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 8px}
   .pill{
     display:inline-flex;align-items:center;gap:7px;
-    background:var(--card);border:1.5px solid var(--line);border-radius:999px;
-    padding:6px 13px;cursor:pointer;font:inherit;font-size:.78rem;font-weight:600;color:var(--ink);
-    transition:border-color .12s,background .12s;
+    background:#fff;border:1.5px solid var(--line);border-radius:999px;
+    padding:6px 13px;cursor:pointer;font:inherit;font-size:.78rem;font-weight:600;color:var(--heading);
+    letter-spacing:-0.01em;transition:border-color .12s,background .12s;
   }
   .pill i{width:9px;height:9px;border-radius:3px;background:var(--fc);flex:none}
   .pill b{font-family:var(--mono);font-size:.55rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
           padding:1px 6px;border-radius:99px;background:var(--line2);color:var(--soft)}
-  .pill b.new{background:var(--fc);color:var(--paper)}
-  .pill[aria-pressed="true"]{border-color:var(--fc);background:color-mix(in srgb,var(--fc) 10%,var(--card))}
-  .pill:focus-visible,.reset:focus-visible{outline:2px solid var(--cf1);outline-offset:2px}
+  .pill b.new{background:var(--fc);color:#fff}
+  .pill[aria-pressed="true"]{border-color:var(--fc);background:color-mix(in srgb,var(--fc) 9%,#fff)}
+  .pill:focus-visible,.reset:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .reset{background:none;border:1.5px dashed var(--line);border-radius:999px;color:var(--soft);
          font:inherit;font-size:.75rem;cursor:pointer;padding:6px 13px}
-  .reset:hover{color:var(--ink)}
+  .reset:hover{color:var(--heading);border-color:var(--accent)}
   .fcap{min-height:2.6em;font-size:.78rem;color:var(--soft);margin-bottom:10px;max-width:90ch}
-  .fcap b{font-weight:650}
+  .fcap b{font-weight:700}
   @media (prefers-reduced-motion: reduce){ .pill{transition:none} .edge path,.node rect,.node text{transition:none!important} }
 
   /* diagram */
-  .canvas{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:0 1px 3px rgba(31,30,27,.05)}
-  svg{display:block;min-width:1080px;width:100%;height:auto}
+  .canvas{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  svg{display:block;min-width:1080px;width:100%;height:auto;letter-spacing:0}
   .panhint{display:none;font-size:.7rem;color:var(--soft);text-align:center;margin-top:6px}
   @media (max-width:1120px){ .panhint{display:block} }
   .sep{stroke:var(--line);stroke-dasharray:3 5}
@@ -87,7 +70,7 @@
 
   .node rect.box{fill:var(--card);stroke:var(--line);transition:opacity .15s}
   .node rect.top,.node text{transition:opacity .15s}
-  .node .nm{font:650 12.5px "Avenir Next","Segoe UI",sans-serif;fill:var(--ink)}
+  .node .nm{font:700 12.5px var(--sans);fill:var(--heading)}
   .node .fl{font:600 8.6px var(--mono)}
   .node .ad{font:500 8.6px var(--mono);fill:var(--soft)}
   .node.el .fl{fill:var(--el)} .node.com .fl{fill:var(--com)} .node.proof .fl{fill:var(--proof)}
@@ -105,22 +88,22 @@
   .edge.on path{stroke:var(--hl);stroke-width:2.2}
 
   /* component notes */
-  .notes h2{font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--ink);
+  .notes h2{font-size:.98rem;font-weight:700;letter-spacing:-.01em;color:var(--heading);
      padding-bottom:6px;border-bottom:1px solid var(--line);margin:28px 0 10px}
-  .notes h2 b{font-weight:400;font-style:italic;color:var(--soft);font-size:.88em}
+  .notes h2 b{font-weight:500;color:var(--soft);font-size:.86em}
   .band{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
   .c{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--tc,var(--line));
-     border-radius:9px;padding:9px 12px;display:flex;flex-direction:column;gap:2px}
+     border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
   .c.el{--tc:var(--el)} .c.cl{--tc:var(--cl)} .c.com{--tc:var(--com)}
   .c.bot{--tc:var(--bot)} .c.proof{--tc:var(--proof)}
-  .c .n{font-weight:650;font-size:.83rem}
-  .c .f{font-family:var(--mono);font-size:.63rem;color:var(--tc,var(--soft));word-break:break-all}
-  .c .a{font-family:var(--mono);font-size:.63rem;color:var(--soft)}
-  .c .r{font-size:.72rem;color:var(--soft);margin-top:2px}
+  .c .n{font-weight:700;font-size:.83rem;color:var(--heading);letter-spacing:-.01em}
+  .c .f{font-family:var(--mono);font-size:.63rem;color:var(--tc,var(--soft));word-break:break-all;letter-spacing:0}
+  .c .a{font-family:var(--mono);font-size:.63rem;color:var(--soft);letter-spacing:0}
+  .c .r{font-size:.72rem;color:var(--ink);margin-top:2px}
 
   footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);
-         font-family:var(--mono);font-size:.67rem;color:var(--soft);line-height:1.9}
-  footer a{color:var(--accent)}
+         font-family:var(--mono);font-size:.67rem;color:var(--soft);line-height:1.9;letter-spacing:0}
+  footer a{color:var(--accent-ink)}
 </style>
 
 <div class="wrap">
@@ -388,11 +371,11 @@
 
   /* ------- export current view (active flows included) as PNG / SVG ------- */
   var SVG_CSS = [
-    'text{font-family:"Avenir Next","Segoe UI",-apple-system,sans-serif}',
+    'text{font-family:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;letter-spacing:0}',
     '.sep{stroke:var(--line);stroke-dasharray:3 5}',
     '.bandlbl{font:700 9.5px var(--mono);letter-spacing:.18em;fill:var(--soft)}',
     '.node rect.box{fill:var(--card);stroke:var(--line)}',
-    '.node .nm{font:650 12.5px "Avenir Next","Segoe UI",sans-serif;fill:var(--ink)}',
+    '.node .nm{font:700 12.5px "Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;fill:var(--heading)}',
     '.node .fl{font:600 8.6px var(--mono)}',
     '.node .ad{font:500 8.6px var(--mono);fill:var(--soft)}',
     '.node.el .fl{fill:var(--el)}.node.com .fl{fill:var(--com)}.node.proof .fl{fill:var(--proof)}',
@@ -413,7 +396,7 @@
     var src = document.querySelector('.canvas svg');
     var clone = src.cloneNode(true);
     var cs = getComputedStyle(document.documentElement);
-    var names = ['--card','--ink','--soft','--line','--line2','--edge','--el','--cl','--com','--bot','--proof',
+    var names = ['--card','--ink','--heading','--soft','--line','--line2','--edge','--el','--cl','--com','--bot','--proof',
                  '--cf1','--cf2','--cf3','--cf4','--cf5','--cf6','--cf7','--mono'];
     var vars = names.map(function(n){ return n+':'+cs.getPropertyValue(n).trim(); }).join(';');
     var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');

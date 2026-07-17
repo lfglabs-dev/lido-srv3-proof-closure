@@ -15,8 +15,9 @@ Open `index.html` in a browser (no build step, no dependencies, works offline).
   flows are toggled, as a standalone image (`lido-map-f3.png`,
   `lido-map-f2-f3.svg`, ...).
 
-A hosted copy lives at
-<https://claude.ai/code/artifact/18b32b1e-d8ab-4d38-86b9-5de8552ffcfe>.
+Styling follows the lfglabs.dev design system (Plus Jakarta Sans, teal accent
+`#2dd4bf`, `#f5f7fa` cards on white). The webfont loads from Google Fonts and
+falls back to the system stack offline.
 
 ## exports/
 
