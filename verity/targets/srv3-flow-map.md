@@ -57,10 +57,10 @@ invariants that guard several flows at once:
    rewritten report sanity checker.
 
 For each flow we state what SRv3 changes, show the flow on the component map
-(renders from [`diagram/`](../../diagram/), interactive version
-[here](https://claude.ai/code/artifact/18b32b1e-d8ab-4d38-86b9-5de8552ffcfe)),
-list the machine-checked baseline anchors, then four coverage statuses against
-those baselines.
+(renders from [`diagram/exports/`](../../diagram/exports/); open
+[`diagram/index.html`](../../diagram/index.html) for the interactive version
+with per-flow toggles and PNG/SVG export), list the machine-checked baseline
+anchors, then four coverage statuses against those baselines.
 
 ## Cross-reference index
 
