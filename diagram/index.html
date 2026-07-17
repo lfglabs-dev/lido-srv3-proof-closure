@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&display=swap" rel="stylesheet">
 <title>Lido Architecture: Components & Flows</title>
 </head>
 <body style="margin:0">
@@ -37,13 +37,17 @@
   .kicker{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.62rem;font-weight:700;
           letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);
           background:rgba(45,212,191,.12);border-radius:999px;padding:3px 11px;margin-bottom:10px}
-  header h1{font-size:clamp(1.5rem,3.4vw,2rem);font-weight:800;letter-spacing:-.03em;color:var(--heading);text-wrap:balance}
-  header p{font-family:var(--article);letter-spacing:normal;color:var(--article-ink);max-width:74ch;margin-top:8px;font-size:.94rem;line-height:1.6}
+  header h1{font-family:var(--article);font-size:clamp(1.55rem,3.4vw,2.1rem);font-weight:700;letter-spacing:-.01em;color:var(--heading);text-wrap:balance}
+  header p{color:var(--ink);max-width:76ch;margin-top:8px;font-size:.88rem}
   header p b{color:var(--heading);font-weight:700}
 
-  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;font-family:var(--mono);font-size:9.5px}
-  .legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;background:var(--card);color:var(--soft)}
-  .dot{width:7px;height:7px;border-radius:2px;flex:none}
+  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;font-family:var(--mono);font-size:9.5px;font-weight:600}
+  .legend span{display:inline-flex;align-items:center;padding:3px 11px;border-radius:99px;border:1px solid}
+  .legend .el{background:var(--el-bg);border-color:var(--el-bd);color:var(--el)}
+  .legend .proof{background:var(--proof-bg);border-color:var(--proof-bd);color:var(--proof)}
+  .legend .com{background:var(--com-bg);border-color:var(--com-bd);color:var(--com)}
+  .legend .bot{background:var(--bot-bg);border-color:var(--bot-bd);color:var(--bot)}
+  .legend .cl{background:var(--cl-bg);border-color:var(--cl-bd);color:var(--cl)}
 
   /* flow pills */
   .fbar{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 8px}
@@ -62,8 +66,8 @@
   .reset{background:none;border:1.5px dashed var(--line);border-radius:999px;color:var(--soft);
          font:inherit;font-size:.75rem;cursor:pointer;padding:6px 13px}
   .reset:hover{color:var(--heading);border-color:var(--accent)}
-  .fcap{font-family:var(--article);letter-spacing:normal;min-height:2.6em;font-size:.84rem;color:var(--ink);margin-bottom:10px;max-width:88ch;line-height:1.55}
-  .fcap b{font-family:var(--sans);font-weight:700;font-size:.92em;letter-spacing:-0.01em}
+  .fcap{min-height:2.6em;font-size:.78rem;color:var(--ink);margin-bottom:10px;max-width:90ch}
+  .fcap b{font-weight:700}
   @media (prefers-reduced-motion: reduce){ .pill{transition:none} .edge path,.node rect,.node text{transition:none!important} }
 
   /* diagram */
@@ -97,7 +101,7 @@
   .edge.on path{stroke:var(--hl);stroke-width:2.2}
 
   /* component notes */
-  .notes h2{font-size:.98rem;font-weight:700;letter-spacing:-.01em;color:var(--heading);
+  .notes h2{font-family:var(--article);font-size:1.08rem;font-weight:700;letter-spacing:0;color:var(--heading);
      padding-bottom:6px;border-bottom:1px solid var(--line);margin:28px 0 10px}
   .notes h2 b{font-family:var(--article);font-style:italic;font-weight:400;color:var(--soft);font-size:.9em;letter-spacing:normal}
   .band{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
@@ -111,7 +115,7 @@
   .c .n{font-weight:700;font-size:.83rem;color:var(--heading);letter-spacing:-.01em}
   .c .f{font-family:var(--mono);font-size:.63rem;color:var(--tc,var(--soft));word-break:break-all;letter-spacing:0}
   .c .a{font-family:var(--mono);font-size:.63rem;color:var(--soft);letter-spacing:0}
-  .c .r{font-family:var(--article);letter-spacing:normal;font-size:.76rem;color:var(--article-ink);margin-top:2px;line-height:1.5}
+  .c .r{font-size:.72rem;color:var(--ink);margin-top:2px}
 
   footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);
          font-family:var(--mono);font-size:.67rem;color:var(--soft);line-height:1.9;letter-spacing:0}
@@ -126,11 +130,11 @@
   colored by <b>what makes it trustworthy</b>. Edge labels are the real function calls at
   <b>lidofinance/core@af095e48</b> (SRv3, PR&nbsp;#1811; those contracts are not deployed yet).</p>
   <div class="legend">
-    <span><i class="dot" style="background:var(--el)"></i>EL contract · held by code</span>
-    <span><i class="dot" style="background:var(--proof)"></i>proof-gated · EIP-4788</span>
-    <span><i class="dot" style="background:var(--com)"></i>committee · quorum</span>
-    <span><i class="dot" style="background:var(--bot)"></i>off-chain · liveness only</span>
-    <span><i class="dot" style="background:var(--cl)"></i>consensus layer</span>
+    <span class="el">EL contract · held by code</span>
+    <span class="proof">proof-gated · EIP-4788</span>
+    <span class="com">committee · quorum</span>
+    <span class="bot">off-chain · liveness only</span>
+    <span class="cl">consensus layer</span>
   </div>
 </header>
 
