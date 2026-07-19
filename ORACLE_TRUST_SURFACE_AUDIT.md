@@ -29,38 +29,29 @@ This authority affects protocol-fee recipients and module
 steal staker principal, choose arbitrary recipients, or control deposits and
 exits.
 
-## Most important problems
+## Cases and recommendations
 
-Let `C` be the reported global validator balance. At block
-`25,567,397`, `C = 8,500,321.556178167 ETH`.
+At block `25,567,397`, the reported global validator balance `C` was
+`8,500,321.556178167 ETH`.
 
-| Case | Accepted false attribution | Cause |
-| --- | --- | --- |
-| First report after migration | Any partition of `C`; one module can receive all reward weight | The checker returns after verifying only that module balances sum to `C` |
-| Module with zero stored balance and zero exits | The module can be assigned all of `C` | Its positive delta is excluded from the checked sum; decreases elsewhere are not charged |
-| Normal one-day report, with no activations | `95,703.855220870730684931 ETH`, or `1.125885116090%` of `C` | The positive-delta allowance includes `93,375 ETH/day` for consolidations without requiring a real consolidation or identifying its source and target |
-
-The zero-state bypass can recur: a module with zero exits that is reported back
-to zero is treated as uninitialized on the next report.
-
-For established modules, the normal bound is:
-
-~~~text
-B = activation allowance + CL growth allowance + consolidation allowance
-sum of positive module deltas <= B
-~~~
-
-At the snapshot, with no activation allowance:
-
-~~~text
-B = 95,703.855220870730684931 ETH/day
-consolidation part = 93,375 ETH/day, about 97.6% of B
-~~~
-
-If at least `59,648 ETH` of funded pending balance is available, the
-one-day parameter ceiling is
-`155,368.197138678949863013 ETH`. The allowance also grows when
-reports are delayed.
+- **Case - committee-reported weights:** the quorum supplies the balance vector
+  used for rewards. Global checks cannot detect a false partition with the same
+  total `C`. **Recommendation:** `ModuleBalanceVerifier` must accept an
+  aggregate CL validity proof before a new vector can replace reward weights.
+- **Case - first migration report:** the checker verifies only that module
+  balances sum to `C`, so one module can receive all reward weight.
+  **Recommendation:** use a proof-gated migration that sets the completion flag
+  only after `ModuleBalanceVerifier` accepts the migrated vector.
+- **Case - zero-state module:** a module with zero stored balance and zero exits
+  can be assigned all of `C`. Reporting it back to zero reopens the bypass.
+  **Recommendation:** store `balanceInitialized[moduleId]`, set it only after a
+  proved initial balance, and never clear it when the balance returns to zero.
+- **Case - normal report:** with no activations, the accepted positive movement
+  is `95,703.855220870730684931 ETH/day`, or `1.125885116090%` of `C`.
+  `93,375 ETH/day`, about 97.6%, comes from an allowance not tied to a real
+  consolidation. **Recommendation:** use a `ConsolidationLedger` that records
+  the authorized source, target and amount, then releases that exact allowance
+  only after proof of CL completion.
 
 ## Economic impact
 
@@ -99,18 +90,7 @@ Code anchors:
 - [stored balances used for rewards](https://github.com/lidofinance/core/blob/f19aab6d6b3857fa2b9a8a04edd6daf8fe867341/contracts/0.8.25/sr/StakingRouter.sol#L808-L894)
 - [fee shares distributed](https://github.com/lidofinance/core/blob/f19aab6d6b3857fa2b9a8a04edd6daf8fe867341/contracts/0.8.9/Accounting.sol#L265-L357)
 
-## Recommended fixes: one per problem
-
-These fixes are cumulative. Each row closes a different failure.
-
-| Problem | One required Lido-side fix |
-| --- | --- |
-| The quorum supplies the balance vector used for rewards | **`ModuleBalanceVerifier`:** accept new reward weights only with an aggregate validity proof over the complete Lido validator set and its live CL balances. Without a valid proof, weights remain unchanged. |
-| The first migration report skips the delta check | **Proof-gated migration:** set the first-report completion flag only after `ModuleBalanceVerifier` accepts the migrated vector. Remove the early-return bypass. |
-| A zero-balance, zero-exit module is treated as uninitialized | **Explicit initialization state:** store `balanceInitialized[moduleId]`, set it only after a proved initial balance, and never clear it when the balance returns to zero. |
-| The `93,375 ETH/day` consolidation allowance is not tied to a consolidation | **`ConsolidationLedger`:** create a source-module, target-module and amount record when Lido authorizes a consolidation. Release that exact allowance only after a proof of its completed CL transition. |
-
-### Shared CL proof mechanism
+## Shared CL proof mechanism
 
 Lido does not need to change the Consensus Layer. The CL already commits its
 state in SSZ trees, and [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788)
