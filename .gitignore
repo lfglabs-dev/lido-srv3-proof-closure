@@ -6,3 +6,10 @@ build/
 *.log
 *.out
 *.toc
+
+# Local browser and research artifacts
+/.playwright-mcp/
+/tmp/
+
+# Generated diagram exports
+/diagram/exports/

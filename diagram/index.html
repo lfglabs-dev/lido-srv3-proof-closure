@@ -26,22 +26,27 @@
     --article-ink:#1a1a1a;
   }
 
+  *,*::before,*::after{box-sizing:border-box}
+  [hidden]{display:none!important}
+
   body{
     background:var(--paper); color:var(--ink);
     font-family:var(--sans);
     font-size:14.5px; line-height:1.55; letter-spacing:-0.02em;
-    padding:clamp(14px,3vw,40px) clamp(10px,2.5vw,28px);
+    padding:clamp(28px,5vw,72px) clamp(20px,4vw,64px) clamp(52px,7vw,96px);
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1320px;margin:0 auto}
+  .wrap{width:100%;max-width:1180px;margin:0 auto}
+  header{max-width:860px}
   .kicker{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.62rem;font-weight:700;
           letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);
-          background:rgba(45,212,191,.12);border-radius:999px;padding:3px 11px;margin-bottom:10px}
-  header h1{font-family:var(--article);font-size:clamp(1.55rem,3.4vw,2.1rem);font-weight:700;letter-spacing:-.01em;color:var(--heading);text-wrap:balance}
-  header p{color:var(--ink);max-width:76ch;margin-top:8px;font-size:.88rem}
+          background:rgba(45,212,191,.12);border-radius:999px;padding:3px 11px;margin-bottom:12px}
+  header h1{font-family:var(--article);font-size:clamp(1.65rem,3.4vw,2.2rem);font-weight:700;line-height:1.12;
+            letter-spacing:-.01em;color:var(--heading);text-wrap:balance;margin:0}
+  header p{color:var(--ink);max-width:76ch;margin:8px 0 0;font-size:.88rem;text-wrap:pretty}
   header p b{color:var(--heading);font-weight:700}
 
-  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;font-family:var(--mono);font-size:9.5px;font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;font-family:var(--mono);font-size:9.5px;font-weight:600}
   .legend span{display:inline-flex;align-items:center;padding:3px 11px;border-radius:99px;border:1px solid}
   .legend .el{background:var(--el-bg);border-color:var(--el-bd);color:var(--el)}
   .legend .proof{background:var(--proof-bg);border-color:var(--proof-bd);color:var(--proof)}
@@ -50,7 +55,7 @@
   .legend .cl{background:var(--cl-bg);border-color:var(--cl-bd);color:var(--cl)}
 
   /* flow pills */
-  .fbar{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 8px}
+  .fbar{display:flex;flex-wrap:wrap;gap:7px 6px;margin:22px 0 8px}
   .pill{
     display:inline-flex;align-items:center;gap:7px;
     background:#fff;border:1.5px solid var(--line);border-radius:999px;
@@ -62,17 +67,31 @@
           padding:1px 6px;border-radius:99px;background:var(--line2);color:var(--soft)}
   .pill b.new{background:var(--fc);color:#fff}
   .pill[aria-pressed="true"]{border-color:var(--fc);background:color-mix(in srgb,var(--fc) 9%,#fff)}
-  .pill:focus-visible,.reset:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .pill:focus-visible,.reset:focus-visible,.canvas-exit:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .reset{background:none;border:1.5px dashed var(--line);border-radius:999px;color:var(--soft);
          font:inherit;font-size:.75rem;cursor:pointer;padding:6px 13px}
   .reset:hover{color:var(--heading);border-color:var(--accent)}
-  .fcap{min-height:2.6em;font-size:.78rem;color:var(--ink);margin-bottom:10px;max-width:90ch}
+  .fcap{min-height:1.6em;font-size:.78rem;color:var(--ink);margin:0 0 10px;max-width:96ch;text-wrap:pretty}
   .fcap b{font-weight:700}
   @media (prefers-reduced-motion: reduce){ .pill{transition:none} .edge path,.node rect,.node text{transition:none!important} }
 
   /* diagram */
-  .canvas{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .canvas{position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);
+          border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   svg{display:block;min-width:1080px;width:100%;height:auto;letter-spacing:0}
+  .canvas-exit{display:none;position:absolute;z-index:2;top:16px;right:16px;align-items:center;
+               border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.94);color:var(--ink);
+               box-shadow:0 2px 12px rgba(0,0,0,.06);padding:7px 11px;cursor:pointer;
+               font:600 .72rem var(--sans);letter-spacing:-.01em}
+  .canvas-exit:hover{border-color:var(--edge);color:var(--heading)}
+  .canvas:fullscreen,.canvas:-webkit-full-screen{
+    width:100vw;height:100vh;border:0;border-radius:0;padding:24px;overflow:auto;
+    background:#fff;box-shadow:none;display:grid;place-items:center;
+  }
+  .canvas:fullscreen svg,.canvas:-webkit-full-screen svg{
+    min-width:0;width:min(100%,calc((100vh - 48px) * 1.6));max-height:calc(100vh - 48px);height:auto;
+  }
+  .canvas:fullscreen .canvas-exit,.canvas:-webkit-full-screen .canvas-exit{display:inline-flex}
   .panhint{display:none;font-size:.7rem;color:var(--soft);text-align:center;margin-top:6px}
   @media (max-width:1120px){ .panhint{display:block} }
   .sep{stroke:var(--line);stroke-dasharray:3 5}
@@ -102,11 +121,11 @@
 
   /* component notes */
   .notes h2{font-family:var(--article);font-size:1.08rem;font-weight:700;letter-spacing:0;color:var(--heading);
-     padding-bottom:6px;border-bottom:1px solid var(--line);margin:28px 0 10px}
+     padding-bottom:7px;border-bottom:1px solid var(--line);margin:30px 0 11px}
   .notes h2 b{font-family:var(--article);font-style:italic;font-weight:400;color:var(--soft);font-size:.9em;letter-spacing:normal}
-  .band{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+  .band{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
   .c{background:var(--card);border:1px solid var(--line);
-     border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+     border-radius:10px;padding:11px 13px 12px;display:flex;flex-direction:column;gap:2px}
   .c.el{--tc:var(--el);background:var(--el-bg);border-color:var(--el-bd)}
   .c.cl{--tc:var(--cl);background:var(--cl-bg);border-color:var(--cl-bd)}
   .c.com{--tc:var(--com);background:var(--com-bg);border-color:var(--com-bd)}
@@ -118,8 +137,15 @@
   .c .r{font-size:.72rem;color:var(--ink);margin-top:2px}
 
   footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);
-         font-family:var(--mono);font-size:.67rem;color:var(--soft);line-height:1.9;letter-spacing:0}
+         max-width:100ch;font-family:var(--mono);font-size:.67rem;color:var(--soft);line-height:1.9;letter-spacing:0}
   footer a{color:var(--accent-ink)}
+
+  @media (max-width:600px){
+    body{padding:20px 16px 48px}
+    .fbar{margin-top:18px}
+    .band{grid-template-columns:1fr}
+    .notes h2{margin-top:26px}
+  }
 </style>
 
 <div class="wrap">
@@ -154,12 +180,14 @@
   <button class="pill" data-flow="f7" style="--fc:var(--cf7)" aria-pressed="false"
     data-desc="Daily report: AccountingOracle writes per-module CL balances straight to the router (new SRv3 surface); Accounting rebases and mints stETH fees to modules, operators, treasury."><i></i>F7 Report &amp; fees<b class="new">changed</b></button>
   <button class="reset" id="reset">show everything</button>
+  <button class="reset" id="fullscreen" aria-pressed="false" title="Open the diagram without page margins">full screen</button>
   <button class="reset" id="exportPng" title="Download the current view (with active flows) as a PNG">export PNG</button>
   <button class="reset" id="exportSvg" title="Download the current view (with active flows) as an SVG">export SVG</button>
 </div>
 <p class="fcap" id="fcap">Tap a flow to light up its path and see the real calls. Combine a few to compare.</p>
 
-<div class="canvas">
+<div class="canvas" id="diagramCanvas">
+<button class="canvas-exit" id="fullscreenExit" type="button">exit full screen</button>
 <svg viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lido component diagram">
   <defs>
     <marker id="mk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -384,6 +412,38 @@
     });
   });
   document.getElementById('reset').addEventListener('click', function(){ active.clear(); render(); });
+
+  /* ------- focused diagram view ------- */
+  var diagramCanvas = document.getElementById('diagramCanvas');
+  var fullscreenBtn = document.getElementById('fullscreen');
+  var fullscreenExit = document.getElementById('fullscreenExit');
+  var requestFullscreen = diagramCanvas.requestFullscreen || diagramCanvas.webkitRequestFullscreen;
+  var exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
+
+  function fullscreenElement(){
+    return document.fullscreenElement || document.webkitFullscreenElement;
+  }
+
+  function syncFullscreen(){
+    var isFullscreen = fullscreenElement() === diagramCanvas;
+    fullscreenBtn.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+    fullscreenBtn.textContent = isFullscreen ? 'full screen active' : 'full screen';
+  }
+
+  if(!requestFullscreen || !exitFullscreen){
+    fullscreenBtn.hidden = true;
+  } else {
+    fullscreenBtn.addEventListener('click', function(){
+      var result = requestFullscreen.call(diagramCanvas);
+      if(result && result.catch) result.catch(function(){});
+    });
+    fullscreenExit.addEventListener('click', function(){
+      var result = exitFullscreen.call(document);
+      if(result && result.catch) result.catch(function(){});
+    });
+    document.addEventListener('fullscreenchange', syncFullscreen);
+    document.addEventListener('webkitfullscreenchange', syncFullscreen);
+  }
 
   /* ------- export current view (active flows included) as PNG / SVG ------- */
   var SVG_CSS = [
