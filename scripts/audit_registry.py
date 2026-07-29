@@ -367,7 +367,9 @@ def validate_source_inventory(
     for source in inventory["sources"]:
         require(
             isinstance(source, dict)
-            and set(source) == {"repository", "commit", "path", "blob", "sha256"},
+            and set(source) == {
+                "repository", "commit", "path", "blob", "upstream_sha256", "sha256"
+            },
             "target SOURCE.json: invalid source identity",
         )
         require(source["repository"] == "https://github.com/lfglabs-dev/verity.git",
@@ -380,6 +382,10 @@ def validate_source_inventory(
                 "target SOURCE.json: blob mismatch")
         require(re.fullmatch(r"[0-9a-f]{64}", source["sha256"]) is not None,
                 "target SOURCE.json: SHA-256 mismatch")
+        require(
+            re.fullmatch(r"[0-9a-f]{64}", source["upstream_sha256"]) is not None,
+            "target SOURCE.json: upstream SHA-256 mismatch",
+        )
         snapshot = target / source["path"]
         require(snapshot.is_file(),
                 f"target snapshot missing: {source['path']}")
@@ -411,6 +417,16 @@ def validate_source_inventory(
                     and fields[1] == "blob" and fields[2] == source["blob"]
                     and fields[3] == source["path"],
                     "target SOURCE.json: remote blob identity mismatch",
+                )
+                content = subprocess.run(
+                    ["git", "--git-dir", str(git_dir), "cat-file", "blob", source["blob"]],
+                    capture_output=True,
+                )
+                require(
+                    content.returncode == 0
+                    and hashlib.sha256(content.stdout).hexdigest()
+                    == source["upstream_sha256"],
+                    "target SOURCE.json: remote SHA-256 mismatch",
                 )
     require(seen == expected_paths, "target SOURCE.json: missing committed provenance")
 
@@ -1698,6 +1714,29 @@ def negative_tests() -> None:
                        "missing committed provenance")
     finally:
         missing_source_path.unlink()
+    extra_source = load_json(TARGET_SOURCE)
+    extra_source = json.loads(json.dumps(extra_source))
+    extra_source["sources"].append(json.loads(json.dumps(extra_source["sources"][0])))
+    extra_source_path = write_mutant(extra_source)
+    try:
+        expect_failure(
+            "additional committed provenance",
+            lambda: validate_source_inventory(extra_source_path),
+            "path mismatch",
+        )
+    finally:
+        extra_source_path.unlink()
+    with tempfile.TemporaryDirectory() as directory:
+        target_mutant = Path(directory)
+        for source in load_json(TARGET_SOURCE)["sources"]:
+            snapshot = TARGET / source["path"]
+            (target_mutant / source["path"]).write_bytes(snapshot.read_bytes())
+        (target_mutant / "lakefile.lean").unlink()
+        expect_failure(
+            "removed committed target snapshot",
+            lambda: validate_source_inventory(target=target_mutant),
+            "target snapshot missing: lakefile.lean",
+        )
     with tempfile.TemporaryDirectory() as directory:
         target_mutant = Path(directory)
         for source in load_json(TARGET_SOURCE)["sources"]:
