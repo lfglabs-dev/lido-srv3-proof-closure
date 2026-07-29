@@ -22,6 +22,7 @@ REGISTRY = AUDIT / "invariants.yaml"
 SCHEMA = AUDIT / "schema.json"
 LOCK = AUDIT / "dependencies.lock.json"
 EXTERNAL_TARGETS = AUDIT / "external-source-targets.json"
+TRUSTED_AXIOMS = AUDIT / "trusted-axioms.json"
 ARTIFACTS = AUDIT / "artifacts.json"
 EXPECTED_ARTIFACTS = {
     "proof-arithmetic": ("LidoSRv3/Audit/Arithmetic.lean", "LEAN-CHECKED"),
@@ -198,8 +199,85 @@ def source_pins() -> dict[str, str]:
     return pins
 
 
-def external_source_targets(pins: dict[str, str]) -> dict[str, set[str]]:
-    inventory = load_json(EXTERNAL_TARGETS)
+def source_repositories() -> dict[str, tuple[str, str | None]]:
+    lock = load_json(LOCK)
+    repositories = {}
+    for component, key in (
+        ("verity", "verity"),
+        ("evmyullean", "evmyullean"),
+        ("lido-core", "lido_core"),
+    ):
+        repository = lock[key].get("repository")
+        require(
+            isinstance(repository, str)
+            and re.fullmatch(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\.git",
+                             repository) is not None,
+            f"dependencies.lock.json: invalid {key} repository",
+        )
+        ref = lock[key].get("ref")
+        require(ref is None or isinstance(ref, str),
+                f"dependencies.lock.json: invalid {key} ref")
+        repositories[component] = (repository, ref)
+    return repositories
+
+
+def resolve_git_targets(
+    component: str, repository: str, pinned_ref: str | None, commit: str, targets: dict
+) -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        git_dir = Path(directory) / "inventory.git"
+        init = subprocess.run(
+            ["git", "init", "--bare", str(git_dir)], text=True, capture_output=True
+        )
+        require(init.returncode == 0, f"{component}: cannot initialize Git inventory")
+        fetch = subprocess.run(
+            ["git", "--git-dir", str(git_dir), "fetch", "--quiet", "--depth=1",
+             repository, commit],
+            text=True, capture_output=True,
+        )
+        require(
+            fetch.returncode == 0,
+            f"{component}: pinned commit is unavailable from trusted repository: "
+            + (fetch.stderr or fetch.stdout).strip(),
+        )
+        fetched = subprocess.run(
+            ["git", "--git-dir", str(git_dir), "rev-parse", "FETCH_HEAD^{commit}"],
+            text=True, capture_output=True,
+        )
+        require(
+            fetched.returncode == 0 and fetched.stdout.strip() == commit,
+            f"{component}: fetched commit identity differs from dependency pin",
+        )
+        for target, identity in targets.items():
+            if identity["kind"] == "ref":
+                require(
+                    target == pinned_ref
+                    and commit == identity["object"],
+                    f"external-source-targets.json: {component}:{target} ref identity "
+                    "does not match pinned repository ref",
+                )
+                continue
+            result = subprocess.run(
+                ["git", "--git-dir", str(git_dir), "ls-tree", commit, "--", target],
+                text=True, capture_output=True,
+            )
+            require(result.returncode == 0, f"{component}:{target}: Git lookup failed")
+            fields = result.stdout.strip().split(maxsplit=3)
+            expected_type = "blob" if identity["kind"] == "file" else "tree"
+            require(
+                len(fields) == 4
+                and fields[1] == expected_type
+                and fields[2] == identity["object"]
+                and fields[3] == target,
+                f"external-source-targets.json: {component}:{target} identity "
+                "does not match pinned repository object",
+            )
+
+
+def external_source_targets(
+    pins: dict[str, str], inventory_path: Path = EXTERNAL_TARGETS
+) -> dict[str, set[str]]:
+    inventory = load_json(inventory_path)
     require(
         isinstance(inventory, dict)
         and inventory.get("schema") == "external-source-target-inventory-v1",
@@ -211,6 +289,7 @@ def external_source_targets(pins: dict[str, str]) -> dict[str, set[str]]:
         "external-source-targets.json: component inventory differs from dependency pins",
     )
     targets_by_component = {}
+    repositories = source_repositories()
     for component, commit in pins.items():
         entry = components[component]
         require(
@@ -243,6 +322,8 @@ def external_source_targets(pins: dict[str, str]) -> dict[str, set[str]]:
                 and re.fullmatch(r"[0-9a-f]{40}", identity["object"]) is not None,
                 f"external-source-targets.json: invalid {component} target identity",
             )
+        repository, pinned_ref = repositories[component]
+        resolve_git_targets(component, repository, pinned_ref, commit, targets)
         targets_by_component[component] = set(targets)
     return targets_by_component
 
@@ -280,16 +361,48 @@ def validate_source_anchor(
     )
 
 
-def validate_theorems(data: dict) -> None:
-    theorems = sorted(
-        row["theorem"] for row in data["invariants"] if row["theorem"] is not None
+def trusted_axioms() -> set[str]:
+    policy = load_json(TRUSTED_AXIOMS)
+    require(
+        isinstance(policy, dict)
+        and set(policy) == {"schema", "allowed"}
+        and policy["schema"] == "lean-trusted-axioms-v1"
+        and isinstance(policy["allowed"], list)
+        and len(policy["allowed"]) == len(set(policy["allowed"]))
+        and all(isinstance(name, str) and name for name in policy["allowed"]),
+        "trusted-axioms.json: invalid explicit trust allowlist",
     )
+    return set(policy["allowed"])
+
+
+def parse_axiom_report(output: str, theorems: list[str]) -> dict[str, set[str]]:
+    reports: dict[str, set[str]] = {}
+    pattern = re.compile(
+        r"'([^']+)' depends on axioms:\s*\[(.*?)\]", re.DOTALL
+    )
+    for theorem, body in pattern.findall(output):
+        reports[theorem] = {
+            name.strip() for name in body.split(",") if name.strip()
+        }
     for theorem in theorems:
-        require(
-            re.fullmatch(r"[A-Za-z_][A-Za-z0-9_']*(?:\.[A-Za-z_][A-Za-z0-9_']*)+", theorem) is not None,
-            f"invalid fully qualified theorem name: {theorem}",
-        )
-    source = "import LidoSRv3\n" + "".join(f"#check {theorem}\n" for theorem in theorems)
+        if theorem not in reports:
+            no_axioms = re.search(
+                rf"'{re.escape(theorem)}' does not depend on any axioms", output
+            )
+            require(no_axioms is not None, f"missing #print axioms evidence for {theorem}")
+            reports[theorem] = set()
+    return reports
+
+
+def run_theorem_checks(
+    theorems: list[str], proved: list[str], declarations: str = ""
+) -> None:
+    source = (
+        "import LidoSRv3\n"
+        + declarations
+        + "".join(f"#check {theorem}\n" for theorem in theorems)
+        + "".join(f"#print axioms {theorem}\n" for theorem in proved)
+    )
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".lean", encoding="utf-8", dir=ROOT, delete=False
     ) as check_file:
@@ -297,18 +410,17 @@ def validate_theorems(data: dict) -> None:
         check_path = Path(check_file.name)
     check_path.chmod(0o644)
     try:
-        build = subprocess.run(
-            ["lake", "build", "LidoSRv3"],
-            cwd=ROOT,
-            text=True,
-            capture_output=True,
+        lean_sysroot = subprocess.run(
+            ["lake", "env", "printenv", "LEAN_SYSROOT"],
+            cwd=ROOT, text=True, capture_output=True,
         )
+        lean_executable = Path(lean_sysroot.stdout.strip()) / "bin" / "lean"
         require(
-            build.returncode == 0,
-            "cannot build LidoSRv3 theorem surface:\n" + (build.stderr or build.stdout).strip(),
+            lean_sysroot.returncode == 0 and lean_executable.is_file(),
+            "cannot resolve pinned Lean executable",
         )
         result = subprocess.run(
-            ["lake", "env", "lean", str(check_path.relative_to(ROOT))],
+            ["lake", "env", str(lean_executable), str(check_path.relative_to(ROOT))],
             cwd=ROOT,
             text=True,
             capture_output=True,
@@ -320,6 +432,37 @@ def validate_theorems(data: dict) -> None:
         "registry theorem does not exist in LidoSRv3 build surface:\n"
         + (result.stderr or result.stdout).strip(),
     )
+    reports = parse_axiom_report(result.stdout + "\n" + result.stderr, proved)
+    allowed = trusted_axioms()
+    for theorem in proved:
+        undeclared = reports[theorem] - allowed
+        require(
+            not undeclared,
+            f"{theorem}: undeclared transitive axioms: {sorted(undeclared)}",
+        )
+
+
+def validate_theorems(data: dict) -> None:
+    theorems = sorted(
+        row["theorem"] for row in data["invariants"] if row["theorem"] is not None
+    )
+    proved = sorted(
+        row["theorem"] for row in data["invariants"] if row["status"] == "PROVED"
+    )
+    for theorem in theorems:
+        require(
+            re.fullmatch(r"[A-Za-z_][A-Za-z0-9_']*(?:\.[A-Za-z_][A-Za-z0-9_']*)+", theorem) is not None,
+            f"invalid fully qualified theorem name: {theorem}",
+        )
+    build = subprocess.run(
+        ["lake", "build", "LidoSRv3"], cwd=ROOT, text=True, capture_output=True
+    )
+    require(
+        build.returncode == 0,
+        "cannot build LidoSRv3 theorem surface:\n"
+        + (build.stderr or build.stdout).strip(),
+    )
+    run_theorem_checks(theorems, proved)
 
 
 def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
@@ -693,6 +836,20 @@ def negative_tests() -> None:
     data = validate()
     pins = source_pins()
     targets = external_source_targets(pins)
+    fabricated_inventory = load_json(EXTERNAL_TARGETS)
+    fabricated_inventory = json.loads(json.dumps(fabricated_inventory))
+    fabricated_inventory["components"]["lido-core"]["targets"][
+        "contracts/0.8.25/sr/Fabricated.sol"
+    ] = {"kind": "file", "object": "f" * 40}
+    fabricated_path = write_mutant(fabricated_inventory)
+    try:
+        expect_failure(
+            "fabricated external object/path mutant",
+            lambda: external_source_targets(pins, fabricated_path),
+            "identity does not match pinned repository object",
+        )
+    finally:
+        fabricated_path.unlink()
     source_anchor_positive = load_json(require_fixture("source-anchors-safe-positive.json"))
     for anchor in source_anchor_positive:
         validate_source_anchor(anchor, pins, targets)
@@ -757,6 +914,18 @@ def negative_tests() -> None:
         )
     finally:
         regression_path.unlink()
+    expect_failure(
+        "dependency axiom theorem mutant",
+        lambda: run_theorem_checks(
+            ["AuditRegistry.dependsOnAxiom"],
+            ["AuditRegistry.dependsOnAxiom"],
+            "namespace AuditRegistry\n"
+            "axiom dependencyAxiom : True\n"
+            "theorem dependsOnAxiom : True := dependencyAxiom\n"
+            "end AuditRegistry\n",
+        ),
+        "undeclared transitive axioms: ['AuditRegistry.dependencyAxiom']",
+    )
     for assured_status in ("REGRESSION", "PROVED"):
         runtime_mutant = json.loads(json.dumps(data))
         runtime_row = next(
@@ -868,6 +1037,14 @@ def negative_tests() -> None:
             (interpolation_mutant.name, interpolation_mutant.read_text(encoding="utf-8"))
         ])),
         "scanner interpolation fixture: unexpectedly passed",
+    )
+    nested_interpolation_mutant = require_fixture("interpolation-nested-negative.txt")
+    require(
+        len(find_proof_escapes([
+            (nested_interpolation_mutant.name,
+             nested_interpolation_mutant.read_text(encoding="utf-8"))
+        ])) == 2,
+        "scanner direct/nested interpolation fixture: expected both escapes rejected",
     )
     interpolation_safe = require_fixture("interpolation-safe-positive.txt")
     require(

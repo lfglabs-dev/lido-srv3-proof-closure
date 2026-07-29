@@ -1,0 +1,2 @@
+def directInterpolation := s!"{(sorry : Nat)}"
+def nestedInterpolation := s!"{(if true then s!"{(sorry : Nat)}" else "safe")}"

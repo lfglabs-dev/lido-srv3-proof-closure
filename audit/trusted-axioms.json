@@ -1,0 +1,7 @@
+{
+  "schema": "lean-trusted-axioms-v1",
+  "allowed": [
+    "propext",
+    "Quot.sound"
+  ]
+}
