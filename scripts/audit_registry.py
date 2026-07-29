@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter, defaultdict
 import csv
 import hashlib
 import io
@@ -12,8 +13,8 @@ import re
 import subprocess
 import sys
 import tempfile
-from collections import defaultdict
 from pathlib import Path
+from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
@@ -29,15 +30,6 @@ GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
     "ASSUMPTIONS.md", "REPRODUCE.md", "MATRIX.csv",
 )
-LAYERS = ["MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"]
-PRIORITIES = {"P0", "P1", "P2", "STRETCH"}
-STATUSES = {"PROVED", "REGRESSION", "DEV-431-READY", "OPEN", "BLOCKED", "STRETCH"}
-ENGINES = {"LEAN", "VERITY", "EVMYULLEAN", "INTERFACE", "NATIVE-FFI", "NONE"}
-FIELDS = {
-    "id", "family", "priority", "status", "layer", "engine", "source_anchors",
-    "runtime_anchors", "theorem", "assumptions", "trust_boundary", "falsifier",
-    "dependencies", "reproduction",
-}
 MD_HEADER = "<!-- GENERATED from audit/invariants.yaml; NOT EDITABLE TRUTH. -->\n"
 CSV_HEADER = "# GENERATED from audit/invariants.yaml; NOT EDITABLE TRUTH.\n"
 
@@ -58,6 +50,107 @@ def require(condition: bool, message: str) -> None:
         raise RegistryError(message)
 
 
+def json_type_matches(value: object, expected: str) -> bool:
+    return {
+        "array": isinstance(value, list),
+        "null": value is None,
+        "object": isinstance(value, dict),
+        "string": isinstance(value, str),
+    }.get(expected, False)
+
+
+def validate_schema_definition(schema: object) -> dict:
+    require(isinstance(schema, dict), "schema.json: schema root must be an object")
+    require(schema.get("type") == "object", "schema.json: registry root schema must be object")
+    require(schema.get("additionalProperties") is False,
+            "schema.json: registry root schema must be closed")
+    properties = schema.get("properties")
+    required = schema.get("required")
+    require(isinstance(properties, dict) and properties,
+            "schema.json: registry root properties required")
+    require(isinstance(required, list) and set(required) == set(properties),
+            "schema.json: registry root required must equal properties")
+    require({"schema_version", "allowed_layers", "invariants"} <= set(properties),
+            "schema.json: registry root constraints incomplete")
+
+    invariants = properties["invariants"]
+    require(isinstance(invariants, dict) and invariants.get("type") == "array",
+            "schema.json: invariants must be an array schema")
+    require(invariants.get("minItems") == 1,
+            "schema.json: invariants must require at least one item")
+    item = invariants.get("items")
+    require(isinstance(item, dict) and item.get("type") == "object",
+            "schema.json: invariant item must be an object schema")
+    require(item.get("additionalProperties") is False,
+            "schema.json: invariant item schema must be closed")
+    item_properties = item.get("properties")
+    item_required = item.get("required")
+    require(isinstance(item_properties, dict) and item_properties,
+            "schema.json: invariant properties required")
+    require(isinstance(item_required, list) and set(item_required) == set(item_properties),
+            "schema.json: invariant required must equal properties")
+    for field in ("priority", "status", "layer", "engine"):
+        values = item_properties.get(field, {}).get("enum")
+        require(
+            isinstance(values, list)
+            and values
+            and len(values) == len(set(values))
+            and all(isinstance(value, str) for value in values),
+            f"schema.json: {field} enum must contain unique strings",
+        )
+    layers = properties["allowed_layers"].get("const")
+    require(layers == item_properties["layer"]["enum"],
+            "schema.json: allowed_layers const must equal layer enum")
+    return schema
+
+
+def validate_against_schema(value: object, schema: dict, location: str = "registry") -> None:
+    if "const" in schema:
+        require(value == schema["const"], f"{location}: does not match schema const")
+    if "enum" in schema:
+        require(value in schema["enum"], f"{location}: value is not in schema enum")
+    expected_types = schema.get("type")
+    if expected_types is not None:
+        candidates = expected_types if isinstance(expected_types, list) else [expected_types]
+        require(
+            all(isinstance(candidate, str) for candidate in candidates)
+            and any(json_type_matches(value, candidate) for candidate in candidates),
+            f"{location}: does not match schema type",
+        )
+    if isinstance(value, dict):
+        properties = schema.get("properties", {})
+        required = schema.get("required", [])
+        require(all(name in value for name in required),
+                f"{location}: missing required schema field")
+        if schema.get("additionalProperties") is False:
+            require(set(value) <= set(properties),
+                    f"{location}: additional field forbidden by schema")
+        for name, child in value.items():
+            if name in properties:
+                validate_against_schema(child, properties[name], f"{location}.{name}")
+    if isinstance(value, list):
+        if "minItems" in schema:
+            require(len(value) >= schema["minItems"],
+                    f"{location}: fewer items than schema minimum")
+        if schema.get("uniqueItems"):
+            require(len({json.dumps(item, sort_keys=True) for item in value}) == len(value),
+                    f"{location}: duplicate items forbidden by schema")
+        if "items" in schema:
+            for index, child in enumerate(value):
+                validate_against_schema(child, schema["items"], f"{location}[{index}]")
+    if isinstance(value, str):
+        if "minLength" in schema:
+            require(len(value) >= schema["minLength"],
+                    f"{location}: shorter than schema minimum")
+        if "pattern" in schema:
+            require(re.fullmatch(schema["pattern"], value) is not None,
+                    f"{location}: does not match schema pattern")
+
+
+def schema_values(schema: dict, field: str) -> list[str]:
+    return schema["properties"]["invariants"]["items"]["properties"][field]["enum"]
+
+
 def validate_theorems(data: dict) -> None:
     theorems = sorted(
         row["theorem"] for row in data["invariants"] if row["status"] == "PROVED"
@@ -73,6 +166,7 @@ def validate_theorems(data: dict) -> None:
     ) as check_file:
         check_file.write(source)
         check_path = Path(check_file.name)
+    check_path.chmod(0o644)
     try:
         build = subprocess.run(
             ["lake", "build", "LidoSRv3"],
@@ -85,7 +179,7 @@ def validate_theorems(data: dict) -> None:
             "cannot build LidoSRv3 theorem surface:\n" + (build.stderr or build.stdout).strip(),
         )
         result = subprocess.run(
-            ["lake", "env", "lean", str(check_path)],
+            ["lake", "env", "lean", str(check_path.relative_to(ROOT))],
             cwd=ROOT,
             text=True,
             capture_output=True,
@@ -99,47 +193,28 @@ def validate_theorems(data: dict) -> None:
     )
 
 
-def validate(path: Path = REGISTRY) -> dict:
+def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
     data = load_json(path)
-    schema = load_json(SCHEMA)
-    require(isinstance(schema, dict) and schema.get("title"), "schema.json is invalid")
-    require(isinstance(data, dict), "registry root must be an object")
-    require(set(data) == {"schema_version", "allowed_layers", "invariants"}, "unexpected registry root fields")
-    require(data["schema_version"] == 1, "schema_version must be 1")
-    require(data["allowed_layers"] == LAYERS, "allowed_layers must match the canonical ordered list")
-    require(isinstance(data["invariants"], list) and data["invariants"], "invariants must be a nonempty array")
+    schema = validate_schema_definition(load_json(schema_path))
+    validate_against_schema(data, schema)
+    layers = schema_values(schema, "layer")
 
     ids: set[str] = set()
     theorem_owners: dict[str, str] = {}
-    for index, row in enumerate(data["invariants"]):
-        prefix = f"invariants[{index}]"
-        require(isinstance(row, dict), f"{prefix} must be an object")
-        require(set(row) == FIELDS, f"{prefix} fields differ: {sorted(set(row) ^ FIELDS)}")
+    for row in data["invariants"]:
         invariant_id = row["id"]
-        require(isinstance(invariant_id, str) and re.fullmatch(r"[A-Z][A-Z0-9-]*", invariant_id) is not None,
-                f"{prefix}.id is not stable-ID shaped")
         require(invariant_id not in ids, f"duplicate id: {invariant_id}")
         ids.add(invariant_id)
-        require(isinstance(row["family"], str) and row["family"], f"{invariant_id}: family required")
-        require(row["priority"] in PRIORITIES, f"{invariant_id}: invalid priority")
-        require(row["status"] in STATUSES, f"{invariant_id}: invalid status")
-        require(row["layer"] in LAYERS, f"{invariant_id}: invalid layer")
-        require(row["engine"] in ENGINES, f"{invariant_id}: invalid engine")
         for name in ("source_anchors", "runtime_anchors", "assumptions", "trust_boundary", "dependencies"):
             value = row[name]
-            require(isinstance(value, list) and all(isinstance(item, str) and item for item in value),
-                    f"{invariant_id}: {name} must contain nonempty strings")
             require(len(value) == len(set(value)), f"{invariant_id}: duplicate {name}")
-        for name in ("falsifier", "reproduction"):
-            require(isinstance(row[name], str) and row[name], f"{invariant_id}: {name} required")
         theorem = row["theorem"]
-        require(theorem is None or isinstance(theorem, str) and theorem, f"{invariant_id}: invalid theorem")
         if theorem is not None:
             require(theorem not in theorem_owners, f"theorem {theorem} duplicated by {theorem_owners.get(theorem)}")
             theorem_owners[theorem] = invariant_id
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
-        if row["layer"] in {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
+        if row["layer"] in set(layers) & {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
             require(bool(row["runtime_anchors"]), f"{invariant_id}: runtime assurance requires anchors")
 
     graph = {row["id"]: row["dependencies"] for row in data["invariants"]}
@@ -266,17 +341,42 @@ def render_csv(data: dict) -> str:
     return stream.getvalue()
 
 
-def rendered(data: dict) -> dict[str, str]:
-    return {
+def rendered(data: dict, schema: dict | None = None) -> dict[str, str]:
+    schema = schema or validate_schema_definition(load_json(SCHEMA))
+    views = {
         "BY_FAMILY.md": render_grouped(data, "family", "Invariants by family"),
         "BY_STATUS.md": render_grouped(data, "status", "Invariants by status",
-                                       ["PROVED", "REGRESSION", "DEV-431-READY", "OPEN", "BLOCKED", "STRETCH"]),
-        "BY_LAYER.md": render_grouped(data, "layer", "Invariants by layer", LAYERS),
+                                       schema_values(schema, "status")),
+        "BY_LAYER.md": render_grouped(data, "layer", "Invariants by layer",
+                                      schema_values(schema, "layer")),
         "TRUST_BOUNDARIES.md": render_list_view(data, "trust_boundary", "Trust boundaries"),
         "ASSUMPTIONS.md": render_list_view(data, "assumptions", "Assumptions"),
         "REPRODUCE.md": render_reproduce(data),
         "MATRIX.csv": render_csv(data),
     }
+    assert_render_coverage(data, views)
+    return views
+
+
+def assert_render_coverage(data: dict, views: dict[str, str]) -> None:
+    expected = Counter(row["id"] for row in data["invariants"])
+    grouped = ("BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md")
+    headings = ("TRUST_BOUNDARIES.md", "ASSUMPTIONS.md", "REPRODUCE.md")
+    for name in grouped:
+        actual = Counter(
+            value
+            for value in re.findall(
+                r"^\| ([A-Z][A-Z0-9-]*) \|", views[name], re.MULTILINE
+            )
+            if value != "ID"
+        )
+        require(actual == expected, f"{name}: rendered ID coverage differs")
+    for name in headings:
+        actual = Counter(re.findall(r"^## ([A-Z][A-Z0-9-]*)$", views[name], re.MULTILINE))
+        require(actual == expected, f"{name}: rendered ID coverage differs")
+    matrix = views["MATRIX.csv"].removeprefix(CSV_HEADER)
+    actual = Counter(row["id"] for row in csv.DictReader(io.StringIO(matrix)))
+    require(actual == expected, "MATRIX.csv: rendered ID coverage differs")
 
 
 def generate(data: dict) -> None:
@@ -337,46 +437,126 @@ def proof_escape_scan() -> None:
     require(not violations, "proof escape(s):\n" + "\n".join(violations))
 
 
-def negative_tests() -> None:
+def expect_failure(label: str, action: Callable[[], object], expected: str) -> None:
     try:
-        validate(AUDIT / "fixtures" / "invalid-entry.yaml")
-    except RegistryError:
-        pass
+        action()
+    except RegistryError as error:
+        require(expected in str(error),
+                f"{label}: wrong failure: expected {expected!r}, got {str(error)!r}")
     else:
-        raise RegistryError("invalid registry fixture unexpectedly passed")
+        raise RegistryError(f"{label}: unexpectedly passed")
+
+
+def require_fixture(name: str) -> Path:
+    path = AUDIT / "fixtures" / name
+    require(path.is_file(), f"negative fixture missing: audit/fixtures/{name}")
+    return path
+
+
+def write_mutant(data: object, suffix: str = ".json") -> Path:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=suffix, encoding="utf-8", dir=AUDIT, delete=False
+    ) as mutant_file:
+        json.dump(data, mutant_file)
+        return Path(mutant_file.name)
+
+
+def negative_tests() -> None:
+    invalid_entry = require_fixture("invalid-entry.yaml")
+    expect_failure(
+        "invalid registry fixture",
+        lambda: validate(invalid_entry),
+        "registry.invariants[0].layer: value is not in schema enum",
+    )
     data = validate()
     mutant = json.loads(json.dumps(data))
     next(row for row in mutant["invariants"] if row["status"] == "PROVED")["theorem"] = "No.Such.Theorem"
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".yaml", encoding="utf-8", dir=AUDIT, delete=False
-    ) as mutant_file:
-        json.dump(mutant, mutant_file)
-        mutant_path = Path(mutant_file.name)
+    mutant_path = write_mutant(mutant)
     try:
-        try:
-            validate(mutant_path)
-        except RegistryError:
-            pass
-        else:
-            raise RegistryError("nonexistent theorem mutant unexpectedly passed")
+        expect_failure(
+            "nonexistent theorem mutant",
+            lambda: validate(mutant_path),
+            "PROVED theorem does not exist in LidoSRv3 build surface",
+        )
     finally:
         mutant_path.unlink()
-    for fixture in ("empty-artifacts.json", "missing-required-artifact.json"):
-        try:
-            validate_artifacts(AUDIT / "fixtures" / fixture)
-        except RegistryError:
-            pass
-        else:
-            raise RegistryError(f"{fixture} unexpectedly passed")
+    artifact_cases = (
+        ("empty-artifacts.json", "artifacts must be a nonempty array"),
+        ("missing-required-artifact.json", "artifact inventory differs"),
+    )
+    for fixture, expected in artifact_cases:
+        path = require_fixture(fixture)
+        expect_failure(fixture, lambda path=path: validate_artifacts(path), expected)
+
+    schema = load_json(SCHEMA)
+    decorative_schema = {"title": "x"}
+    decorative_path = write_mutant(decorative_schema)
+    try:
+        expect_failure(
+            "decorative schema mutant",
+            lambda: validate(REGISTRY, decorative_path),
+            "schema.json: registry root schema must be object",
+        )
+    finally:
+        decorative_path.unlink()
+    missing_required_schema = json.loads(json.dumps(schema))
+    missing_required_schema["properties"]["invariants"]["items"]["required"].remove("status")
+    missing_required_path = write_mutant(missing_required_schema)
+    try:
+        expect_failure(
+            "schema required-field drift mutant",
+            lambda: validate(REGISTRY, missing_required_path),
+            "schema.json: invariant required must equal properties",
+        )
+    finally:
+        missing_required_path.unlink()
+    inverted_enum_schema = json.loads(json.dumps(schema))
+    inverted_enum_schema["properties"]["invariants"]["items"]["properties"]["status"]["enum"] = ["DISPROVED"]
+    inverted_enum_path = write_mutant(inverted_enum_schema)
+    try:
+        expect_failure(
+            "schema enum drift mutant",
+            lambda: validate(REGISTRY, inverted_enum_path),
+            "registry.invariants[0].status: value is not in schema enum",
+        )
+    finally:
+        inverted_enum_path.unlink()
+
+    coverage_mutant = json.loads(json.dumps(data))
+    coverage_mutant["invariants"][0]["status"] = "DISPROVED"
+    coverage_schema = json.loads(json.dumps(schema))
+    coverage_schema["properties"]["invariants"]["items"]["properties"]["status"]["enum"].append("DISPROVED")
+    coverage_schema_path = write_mutant(coverage_schema)
+    coverage_registry_path = write_mutant(coverage_mutant)
+    try:
+        coverage_data = validate(coverage_registry_path, coverage_schema_path)
+        rendered(coverage_data, coverage_schema)
+        incomplete = {
+            "BY_STATUS.md": render_grouped(
+                coverage_data, "status", "Invariants by status",
+                schema_values(schema, "status"),
+            )
+        }
+        expect_failure(
+            "generated status coverage mutant",
+            lambda: assert_render_coverage(
+                coverage_data,
+                {**rendered(data), **incomplete},
+            ),
+            "BY_STATUS.md: rendered ID coverage differs",
+        )
+    finally:
+        coverage_registry_path.unlink()
+        coverage_schema_path.unlink()
+
     with tempfile.TemporaryDirectory() as directory:
         stale = Path(directory) / "BY_STATUS.md"
         stale.write_text("stale\n", encoding="utf-8")
-        try:
-            assert_fresh(stale, rendered(data)["BY_STATUS.md"], "negative fixture")
-        except RegistryError:
-            pass
-        else:
-            raise RegistryError("stale generated fixture unexpectedly passed")
+        expect_failure(
+            "stale generated fixture",
+            lambda: assert_fresh(stale, rendered(data)["BY_STATUS.md"], "negative fixture"),
+            "stale generated view: negative fixture",
+        )
 
 
 def check() -> None:
