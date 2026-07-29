@@ -1,0 +1,30 @@
+{
+  "schema": "srv3-audit-manifest-v1",
+  "proof_baseline": "7dedaf0d5fb4ce7c8734792d47dbf774ed570c0c",
+  "source_revisions": {
+    "lido": "af095e48bbc1c3841c2c9936219c8461af01056b",
+    "verity": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f",
+    "lean": "v4.24.0"
+  },
+  "layers": {
+    "legacy": {
+      "modules": ["LidoSRv3.Model", "LidoSRv3.SpecProofs"],
+      "trust": "pure-model regression evidence"
+    },
+    "audit": {
+      "modules": [
+        "LidoSRv3.Audit.Arithmetic",
+        "LidoSRv3.Audit.Trace",
+        "LidoSRv3.Audit.Allocation"
+      ],
+      "trust": "Lean-proved predicates over source-shaped audit data; Solidity correspondence remains manual"
+    }
+  },
+  "proof_policy": {
+    "project_axioms": 0,
+    "sorry": 0,
+    "admit": 0,
+    "unsafe_proof_escapes": 0,
+    "report_entrypoint": "LidoSRv3.Audit.Trust"
+  }
+}
