@@ -34,6 +34,7 @@ audit-test-refresh-negative:
 
 test:
 	@$(MAKE) audit-check
+	@$(MAKE) audit-check-lean
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
 	@lake build LidoSRv3.Audit.Vectors

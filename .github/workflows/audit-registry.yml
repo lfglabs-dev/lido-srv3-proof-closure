@@ -18,4 +18,4 @@ jobs:
           python-version: "3.12"
       - uses: leanprover/lean-action@v1
       - name: Validate registry, artifacts, generated views, and negative fixtures
-        run: make audit-check
+        run: make audit-check audit-check-lean
