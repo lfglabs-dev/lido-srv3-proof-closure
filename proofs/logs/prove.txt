@@ -1,7 +1,16 @@
-verified_source_tree=e5286ef92725bbe2ee59432fae996fc27f560565
+verified_source_tree=cd310790de0d66e8d06dc761cb2133a7e4675f66
 lean_version=Lean (version 4.24.0, x86_64-unknown-linux-gnu, commit 797c613eb9b6d4ec95db23e3e00af9ac6657f24b, Release)
-⚠ [14/16] Replayed LidoSRv3.SpecProofs
+⚠ [14/21] Replayed LidoSRv3.SpecProofs
 warning: LidoSRv3/SpecProofs.lean:1630:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-Build completed successfully (16 jobs).
+ℹ [19/21] Replayed LidoSRv3.Audit.Trust
+info: LidoSRv3/Audit/Trust.lean:10:0: 'LidoSRv3.Audit.Quantity.checkedDiv_zero' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:11:0: 'LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:12:0: 'LidoSRv3.Audit.revert_restores_state_value_and_logs' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:13:0: 'LidoSRv3.Audit.revert_may_retain_attempts' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:14:0: 'LidoSRv3.Audit.valid_result_preserves_router_order' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:15:0: 'LidoSRv3.Audit.positive_increment_respects_capacity' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:16:0: 'LidoSRv3.Audit.positive_committed_payment_is_eligible' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:17:0: 'LidoSRv3.Audit.firstOpenModule_deterministic' does not depend on any axioms
+Build completed successfully (21 jobs).

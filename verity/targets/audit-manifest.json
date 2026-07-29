@@ -26,5 +26,47 @@
     "admit": 0,
     "unsafe_proof_escapes": 0,
     "report_entrypoint": "LidoSRv3.Audit.Trust"
-  }
+  },
+  "theorems": [
+    {
+      "name": "Quantity.checkedDiv_zero",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Quantity.saturatingSub_zero_of_le",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "revert_restores_state_value_and_logs",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "revert_may_retain_attempts",
+      "status": "lean_checked",
+      "axioms": []
+    },
+    {
+      "name": "valid_result_preserves_router_order",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "positive_increment_respects_capacity",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "positive_committed_payment_is_eligible",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "firstOpenModule_deterministic",
+      "status": "lean_checked",
+      "axioms": []
+    }
+  ]
 }
