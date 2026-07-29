@@ -1,0 +1,20 @@
+name: Audit registry
+
+on:
+  pull_request:
+  push:
+    branches: [main, "audit/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate registry, artifacts, generated views, and negative fixtures
+        run: make audit-check

@@ -1,0 +1,19 @@
+{
+  "schema": "srv3-artifacts-v1",
+  "trust_levels": {
+    "AUDIT-CERT": "Certified evidence with all declared correspondence and trust obligations closed.",
+    "DEV-431-READY": "Development scaffold pinned for future Lean 4.31 work; never certification.",
+    "LEAN-CHECKED": "Kernel-checked theorem at the declared model layer only.",
+    "REGRESSION": "Legacy or fixture evidence retained to detect change; not correspondence or deployment assurance.",
+    "PROVENANCE-BLOCKED": "Required canonical source/runtime identity evidence is absent."
+  },
+  "artifacts": [
+    {"id": "proof-arithmetic", "path": "LidoSRv3/Audit/Arithmetic.lean", "sha256": "f1016418727da225ef9158f14c32a9ea173975686291f479b18e887d02632978", "trust": "LEAN-CHECKED"},
+    {"id": "proof-trace", "path": "LidoSRv3/Audit/Trace.lean", "sha256": "3f3b4d469905e75a21343ab87ecebac81accbfa08bc11e0becebb1e2e64fd29a", "trust": "LEAN-CHECKED"},
+    {"id": "proof-allocation", "path": "LidoSRv3/Audit/Allocation.lean", "sha256": "0f64b006da40d44e1ca85946c899cc0c38cea2d1aeebf216b9552bce45ed816f", "trust": "LEAN-CHECKED"},
+    {"id": "proof-strategy", "path": "LidoSRv3/Audit/StrategyProofs.lean", "sha256": "f0dc4c70c0e6e35a2d05e8501c7c96dcfc15117655dec9b5d4fabc92aa1e9aec", "trust": "LEAN-CHECKED"},
+    {"id": "legacy-model", "path": "LidoSRv3/Model.lean", "sha256": "d2e28fdd5ffa99e365e539abb98ea7d191a6ec079202b096ccc6dd56e275409d", "trust": "REGRESSION"},
+    {"id": "legacy-proofs", "path": "LidoSRv3/SpecProofs.lean", "sha256": "9f7eb53a70833ef1267b009a5593cec48389c99e4790ec010683d5f2b3f80a00", "trust": "REGRESSION"},
+    {"id": "consolidation-runtime", "path": null, "sha256": null, "trust": "PROVENANCE-BLOCKED", "blocker": "No independently sourced canonical EIP-7251 production runtime/hash/address/fork provenance; current helper uses a Mock build."}
+  ]
+}

@@ -8,7 +8,7 @@ PROOF_LOG := proofs/logs/proof-report.json
 SHELL     := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all bootstrap test prove report clean distclean
+.PHONY: all audit-check audit-generate bootstrap test prove report clean distclean
 
 all: report
 
@@ -17,7 +17,14 @@ bootstrap:
 	@lake --version
 	@printf '%s\n' 'bootstrap ok: Lean/Lake Verity toolchain is available'
 
+audit-check:
+	@bash scripts/check_audit_registry.sh
+
+audit-generate:
+	@python3 scripts/audit_registry.py generate
+
 test:
+	@$(MAKE) audit-check
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
 	@lake build LidoSRv3.Audit.Vectors

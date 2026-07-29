@@ -1,0 +1,28 @@
+{
+  "schema": "srv3-migration-lock-v1",
+  "proof": {
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "ref": "main",
+    "commit": "ee2e65cd807e913ea245ae6fd7987a7f1d962800"
+  },
+  "future_root": {
+    "direct_dependencies": ["verity"],
+    "policy": "Exactly one direct Verity dependency; no direct EVMYulLean dependency."
+  },
+  "verity": {
+    "repository": "https://github.com/lfglabs-dev/verity.git",
+    "ref": "dev/lean-4.31-scaffolding",
+    "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
+    "certification": "DEV-431-READY, not AUDIT-CERT"
+  },
+  "evmyullean": {
+    "repository": "https://github.com/lfglabs-dev/EVMYulLean.git",
+    "ref": "main",
+    "commit": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    "resolution": "transitive through the exact Verity pin; duplicate package instances forbidden"
+  },
+  "lido_core": {
+    "repository": "https://github.com/lidofinance/core.git",
+    "commit": "af095e48bbc1c3841c2c9936219c8461af01056b"
+  }
+}

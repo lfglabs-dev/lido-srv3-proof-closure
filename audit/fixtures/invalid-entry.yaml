@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "allowed_layers": ["MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"],
+  "invariants": [
+    {
+      "id": "BROKEN",
+      "family": "fixture",
+      "priority": "P0",
+      "status": "OPEN",
+      "layer": "NOT-A-LAYER",
+      "engine": "NONE",
+      "source_anchors": [],
+      "runtime_anchors": [],
+      "theorem": null,
+      "assumptions": [],
+      "trust_boundary": [],
+      "falsifier": "schema rejection",
+      "dependencies": ["MISSING"],
+      "reproduction": "false"
+    }
+  ]
+}

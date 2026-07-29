@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lfglabs-dev/lido-srv3-proof-closure/audit/schema.json",
+  "title": "Lido SRv3 audit invariant registry",
+  "type": "object",
+  "required": ["schema_version", "allowed_layers", "invariants"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "allowed_layers": {
+      "const": ["MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"]
+    },
+    "invariants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "family", "priority", "status", "layer", "engine",
+          "source_anchors", "runtime_anchors", "theorem", "assumptions",
+          "trust_boundary", "falsifier", "dependencies", "reproduction"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]*$"},
+          "family": {"type": "string", "minLength": 1},
+          "priority": {"enum": ["P0", "P1", "P2", "STRETCH"]},
+          "status": {"enum": ["PROVED", "REGRESSION", "DEV-431-READY", "OPEN", "BLOCKED", "STRETCH"]},
+          "layer": {"enum": ["MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"]},
+          "engine": {"enum": ["LEAN", "VERITY", "EVMYULLEAN", "INTERFACE", "NATIVE-FFI", "NONE"]},
+          "source_anchors": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "runtime_anchors": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "theorem": {"type": ["string", "null"]},
+          "assumptions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "trust_boundary": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "falsifier": {"type": "string", "minLength": 1},
+          "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "reproduction": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# GENERATED from audit/invariants.yaml; NOT EDITABLE TRUTH.
+id,family,priority,status,layer,engine,theorem,source_anchors,runtime_anchors,dependencies
+SRV3-ALLOC-ORDER,allocation,P0,PROVED,REL,LEAN,LidoSRv3.Audit.valid_result_preserves_router_order,LidoSRv3/Audit/Allocation.lean,,SRV3-ARITH-CHECKED
+SRV3-ARITH-CHECKED,checked-arithmetic,P0,PROVED,ALG,LEAN,LidoSRv3.Audit.Quantity.checkedDiv_zero,LidoSRv3/Audit/Arithmetic.lean,,
+SRV3-CONSOLIDATION-E2E,consolidation,P0,BLOCKED,E2E,INTERFACE,,lido-core@af095e48bbc1c3841c2c9936219c8461af01056b,MISSING: canonical EIP-7251 production consolidation runtime/hash/address/fork provenance,SRV3-EVM-RUNTIME | SRV3-SHA256-PRECOMPILE
+SRV3-EVM-RUNTIME,runtime-correspondence,P0,BLOCKED,EVM,EVMYULLEAN,,lido-core@af095e48bbc1c3841c2c9936219c8461af01056b,MISSING: independently sourced canonical EIP-7251 production consolidation runtime/hash/address/fork provenance,SRV3-YUL-COMP | SRV3-SOLIDITY-CORR
+SRV3-LEGACY-ECON,economic-accounting,P0,REGRESSION,MODEL,LEAN,LidoSRv3.P1_reserve_separation,LidoSRv3/Model.lean | LidoSRv3/SpecProofs.lean | verity/targets/source-map.json,,
+SRV3-MINFIRST-BOUND,allocation,P0,PROVED,ALG,LEAN,LidoSRv3.Audit.MinFirst.totalAllocated_le_requested,LidoSRv3/Audit/Strategy.lean | LidoSRv3/Audit/StrategyProofs.lean | LidoSRv3/Audit/Vectors.lean,,SRV3-ALLOC-ORDER
+SRV3-SHA256-PRECOMPILE,cryptography,STRETCH,STRETCH,CRYPTO,NATIVE-FFI,,evmyullean@f7e4ee0dc8f8d5265ce822a937ab5be771f182e9,EVM SHA-256 precompile,SRV3-YUL-COMP
+SRV3-SOLIDITY-CORR,source-correspondence,P0,OPEN,SRC,VERITY,,lido-core@af095e48bbc1c3841c2c9936219c8461af01056b:contracts/0.8.25/sr/StakingRouter.sol | verity/targets/solidity-correspondence.md,,SRV3-LEGACY-ECON | SRV3-MINFIRST-BOUND
+SRV3-TX-REVERT,transaction-semantics,P0,PROVED,TX,LEAN,LidoSRv3.Audit.revert_restores_state_value_and_logs,LidoSRv3/Audit/Trace.lean,,SRV3-ARITH-CHECKED
+SRV3-VERITY-431,toolchain-readiness,P1,DEV-431-READY,SRC,VERITY,,verity@68f560e66c5de6123061ce5ed60261be162673d1:dev/lean-4.31-scaffolding,,
+SRV3-YUL-COMP,yul-interface,P1,OPEN,YUL,EVMYULLEAN,,evmyullean@f7e4ee0dc8f8d5265ce822a937ab5be771f182e9,,SRV3-VERITY-431
