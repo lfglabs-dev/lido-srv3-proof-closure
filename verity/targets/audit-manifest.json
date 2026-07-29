@@ -1,6 +1,6 @@
 {
   "schema": "srv3-audit-manifest-v1",
-  "proof_baseline": "7dedaf0d5fb4ce7c8734792d47dbf774ed570c0c",
+  "proof_baseline": "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2",
   "source_revisions": {
     "lido": "af095e48bbc1c3841c2c9936219c8461af01056b",
     "verity": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f",
@@ -15,7 +15,10 @@
       "modules": [
         "LidoSRv3.Audit.Arithmetic",
         "LidoSRv3.Audit.Trace",
-        "LidoSRv3.Audit.Allocation"
+        "LidoSRv3.Audit.Allocation",
+        "LidoSRv3.Audit.Strategy",
+        "LidoSRv3.Audit.StrategyProofs",
+        "LidoSRv3.Audit.Vectors"
       ],
       "trust": "Lean-proved predicates over source-shaped audit data; Solidity correspondence remains manual"
     }
@@ -54,19 +57,39 @@
       "axioms": ["propext"]
     },
     {
-      "name": "positive_increment_respects_capacity",
+      "name": "MinFirst.candidate_mem",
       "status": "lean_checked",
       "axioms": ["propext"]
     },
     {
-      "name": "positive_committed_payment_is_eligible",
+      "name": "MinFirst.candidate_open",
       "status": "lean_checked",
       "axioms": ["propext"]
     },
     {
-      "name": "firstOpenModule_deterministic",
+      "name": "MinFirst.candidate_minimal",
       "status": "lean_checked",
-      "axioms": []
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "MinFirst.candidate_router_tie",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "MinFirst.allocate_preserves_length",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "MinFirst.allocate_preserves_module_order",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "MinFirst.totalAllocated_le_requested",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
     }
   ]
 }

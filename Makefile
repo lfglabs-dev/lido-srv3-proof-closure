@@ -20,6 +20,8 @@ bootstrap:
 test:
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
+	@lake build LidoSRv3.Audit.Vectors
+	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
 	@test -s tests/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s tests/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s tests/solidity-reference/deposits-reserve.integration.ts
