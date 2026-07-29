@@ -68,3 +68,6 @@ No theorem in this slice uses `sorry`, `admit`, a project `axiom`, or `unsafe`.
 The removed theorem names `positive_increment_respects_capacity`,
 `positive_committed_payment_is_eligible`, and `firstOpenModule_deterministic`
 were projection/functional-uniqueness overclaims, not executable MinFirst proofs.
+No replacement “determinism” theorem is claimed: `allocate` is an executable
+function on a fixed ordered input, while the substantive selection behavior is
+proved by `candidate_minimal` and `candidate_router_tie`.

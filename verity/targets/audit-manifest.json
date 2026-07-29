@@ -90,11 +90,6 @@
       "name": "MinFirst.totalAllocated_le_requested",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
-    },
-    {
-      "name": "MinFirst.allocate_deterministic",
-      "status": "lean_checked",
-      "axioms": []
     }
   ]
 }

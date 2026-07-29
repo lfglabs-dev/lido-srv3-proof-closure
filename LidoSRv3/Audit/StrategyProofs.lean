@@ -170,10 +170,4 @@ theorem totalAllocated_le_requested (requested : Nat) (rows : List Bucket) :
     totalAllocated requested rows ≤ requested :=
   run_spent_le requested rows
 
-/-- Determinism is for the concrete ordered snapshot, not unordered module sets. -/
-theorem allocate_deterministic (requested : Nat) (rows : List Bucket) :
-    ∀ other, allocate requested rows = other → other = allocate requested rows := by
-  intro other h
-  exact h.symm
-
 end LidoSRv3.Audit.MinFirst
