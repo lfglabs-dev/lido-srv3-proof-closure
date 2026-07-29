@@ -67,6 +67,21 @@ def json_type_matches(value: object, expected: str) -> bool:
     }.get(expected, False)
 
 
+def json_values_equal(left: object, right: object) -> bool:
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, list):
+        return len(left) == len(right) and all(
+            json_values_equal(left_item, right_item)
+            for left_item, right_item in zip(left, right)
+        )
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(
+            json_values_equal(left[key], right[key]) for key in left
+        )
+    return left == right
+
+
 def validate_schema_definition(schema: object) -> dict:
     require(isinstance(schema, dict), "schema.json: schema root must be an object")
     require(schema.get("type") == "object", "schema.json: registry root schema must be object")
@@ -114,7 +129,10 @@ def validate_schema_definition(schema: object) -> dict:
 
 def validate_against_schema(value: object, schema: dict, location: str = "registry") -> None:
     if "const" in schema:
-        require(value == schema["const"], f"{location}: does not match schema const")
+        require(
+            json_values_equal(value, schema["const"]),
+            f"{location}: does not match schema const",
+        )
     if "enum" in schema:
         require(value in schema["enum"], f"{location}: value is not in schema enum")
     expected_types = schema.get("type")
@@ -228,11 +246,18 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 f"{invariant_id}: runtime assurance requires non-missing anchors",
             )
 
-    graph = {row["id"]: row["dependencies"] for row in data["invariants"]}
+    rows = {row["id"]: row for row in data["invariants"]}
+    graph = {row_id: row["dependencies"] for row_id, row in rows.items()}
     for node, dependencies in graph.items():
         for dependency in dependencies:
             require(dependency in graph, f"{node}: unknown dependency {dependency}")
             require(dependency != node, f"{node}: self dependency")
+            if rows[node]["status"] in {"PROVED", "REGRESSION"}:
+                require(
+                    rows[dependency]["status"] in {"PROVED", "REGRESSION"},
+                    f"{node}: assured status {rows[node]['status']} requires assured "
+                    f"dependency {dependency}, got {rows[dependency]['status']}",
+                )
     visiting: set[str] = set()
     visited: set[str] = set()
 
@@ -534,6 +559,30 @@ def negative_tests() -> None:
         "registry.invariants[0].layer: value is not in schema enum",
     )
     data = validate()
+    const_negative = load_json(require_fixture("const-one-negative.json"))
+    expect_failure(
+        "boolean schema const fixture",
+        lambda: validate_against_schema(const_negative, {"const": 1}, "fixture"),
+        "fixture: does not match schema const",
+    )
+    const_positive = load_json(require_fixture("const-one-safe-positive.json"))
+    validate_against_schema(const_positive, {"const": 1}, "fixture")
+    for unresolved_status in ("BLOCKED", "STRETCH"):
+        dependency_mutant = json.loads(json.dumps(data))
+        next(
+            row for row in dependency_mutant["invariants"]
+            if row["id"] == "SRV3-ARITH-CHECKED"
+        )["status"] = unresolved_status
+        dependency_path = write_mutant(dependency_mutant)
+        try:
+            expect_failure(
+                f"assured dependency {unresolved_status} mutant",
+                lambda dependency_path=dependency_path: validate(dependency_path),
+                "SRV3-TX-REVERT: assured status PROVED requires assured dependency "
+                f"SRV3-ARITH-CHECKED, got {unresolved_status}",
+            )
+        finally:
+            dependency_path.unlink()
     mutant = json.loads(json.dumps(data))
     next(row for row in mutant["invariants"] if row["status"] == "PROVED")["theorem"] = "No.Such.Theorem"
     mutant_path = write_mutant(mutant)
