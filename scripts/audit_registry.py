@@ -350,7 +350,9 @@ def refresh_external_provenance(
         )
 
 
-def validate_source_inventory(path: Path = TARGET_SOURCE, online: bool = False) -> None:
+def validate_source_inventory(
+    path: Path = TARGET_SOURCE, online: bool = False, target: Path = TARGET
+) -> None:
     inventory = load_json(path)
     require(
         isinstance(inventory, dict)
@@ -378,6 +380,13 @@ def validate_source_inventory(path: Path = TARGET_SOURCE, online: bool = False) 
                 "target SOURCE.json: blob mismatch")
         require(re.fullmatch(r"[0-9a-f]{64}", source["sha256"]) is not None,
                 "target SOURCE.json: SHA-256 mismatch")
+        snapshot = target / source["path"]
+        require(snapshot.is_file(),
+                f"target snapshot missing: {source['path']}")
+        require(
+            hashlib.sha256(snapshot.read_bytes()).hexdigest() == source["sha256"],
+            f"target snapshot digest mismatch: {source['path']}",
+        )
         seen.add(source["path"])
         if online:
             with tempfile.TemporaryDirectory() as directory:
@@ -402,15 +411,6 @@ def validate_source_inventory(path: Path = TARGET_SOURCE, online: bool = False) 
                     and fields[1] == "blob" and fields[2] == source["blob"]
                     and fields[3] == source["path"],
                     "target SOURCE.json: remote blob identity mismatch",
-                )
-                content = subprocess.run(
-                    ["git", "--git-dir", str(git_dir), "cat-file", "blob", source["blob"]],
-                    capture_output=True,
-                )
-                require(
-                    content.returncode == 0
-                    and hashlib.sha256(content.stdout).hexdigest() == source["sha256"],
-                    "target SOURCE.json: remote SHA-256 mismatch",
                 )
     require(seen == expected_paths, "target SOURCE.json: missing committed provenance")
 
@@ -1698,6 +1698,18 @@ def negative_tests() -> None:
                        "missing committed provenance")
     finally:
         missing_source_path.unlink()
+    with tempfile.TemporaryDirectory() as directory:
+        target_mutant = Path(directory)
+        for source in load_json(TARGET_SOURCE)["sources"]:
+            snapshot = TARGET / source["path"]
+            (target_mutant / source["path"]).write_bytes(snapshot.read_bytes())
+        manifest = target_mutant / "lake-manifest.json"
+        manifest.write_bytes(manifest.read_bytes() + b"\n")
+        expect_failure(
+            "mutated committed target snapshot",
+            lambda: validate_source_inventory(target=target_mutant),
+            "target snapshot digest mismatch: lake-manifest.json",
+        )
     receipt_mutant = load_json(TARGET / "verity.json")
     receipt_mutant = json.loads(json.dumps(receipt_mutant))
     receipt_mutant["print_axioms"]["audit_cert"] = True

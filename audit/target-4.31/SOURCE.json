@@ -6,14 +6,14 @@
       "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
       "path": "lakefile.lean",
       "blob": "8f9ed3876ac1be45682fb6d11a2273a2cf668a1b",
-      "sha256": "829c5b05463ca5ef781c53bc4d645368bc528bc1dd1bf2cc3954179a8c055eb8"
+      "sha256": "bd59c16e651d72a0aa0f92e905e86d5a80b0adbe59202773da7c345bcb22bf1c"
     },
     {
       "repository": "https://github.com/lfglabs-dev/verity.git",
       "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
       "path": "lake-manifest.json",
       "blob": "ea121965446e5a8bd03806ae490fca1cc999fb3a",
-      "sha256": "ae4b6d9fc8f787005515ba1e20c85e2f80fe0446795489fac1641c4ecbc7eff6"
+      "sha256": "2368b0265974a70f9a7eefc2c080ff8ec335b93555d23f524ee833989e94332d"
     },
     {
       "repository": "https://github.com/lfglabs-dev/verity.git",
