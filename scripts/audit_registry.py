@@ -39,8 +39,11 @@ EXPECTED_ARTIFACTS = {
     "consolidation-runtime": (None, "PROVENANCE-BLOCKED"),
 }
 EXPECTED_INVARIANT_THEOREMS = {
+    "SRV3-LEGACY-ECON": "LidoSRv3.P1_reserve_separation",
     "SRV3-ARITH-CHECKED": "LidoSRv3.Audit.Quantity.checkedDiv_zero",
     "SRV3-TX-REVERT": "LidoSRv3.Audit.revert_restores_state_value_and_logs",
+    "SRV3-ALLOC-ORDER": "LidoSRv3.Audit.valid_result_preserves_router_order",
+    "SRV3-MINFIRST-BOUND": "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
 }
 GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
@@ -1358,6 +1361,25 @@ def negative_tests() -> None:
         )
     finally:
         theorem_swap_path.unlink()
+    theorem_swap_mutant = json.loads(json.dumps(data))
+    theorem_rows = {
+        row["id"]: row for row in theorem_swap_mutant["invariants"]
+        if row["id"] in EXPECTED_INVARIANT_THEOREMS
+    }
+    theorem_rows["SRV3-ALLOC-ORDER"]["theorem"], theorem_rows["SRV3-MINFIRST-BOUND"]["theorem"] = (
+        theorem_rows["SRV3-MINFIRST-BOUND"]["theorem"],
+        theorem_rows["SRV3-ALLOC-ORDER"]["theorem"],
+    )
+    theorem_swap_path = write_mutant(theorem_swap_mutant)
+    try:
+        expect_failure(
+            "allocation/min-first theorem swap mutant",
+            lambda: validate(theorem_swap_path),
+            "SRV3-ALLOC-ORDER: theorem must be "
+            "LidoSRv3.Audit.valid_result_preserves_router_order",
+        )
+    finally:
+        theorem_swap_path.unlink()
     dependency_downgrade_mutant = json.loads(json.dumps(data))
     next(
         row for row in dependency_downgrade_mutant["invariants"]
@@ -1397,13 +1419,7 @@ def negative_tests() -> None:
         )
         runtime_row["status"] = assured_status
         if assured_status == "PROVED":
-            theorem_row = next(
-                row for row in runtime_mutant["invariants"]
-                if row["theorem"] == "LidoSRv3.P1_reserve_separation"
-            )
-            theorem_row["status"] = "REGRESSION"
-            theorem_row["theorem"] = None
-            runtime_row["theorem"] = "LidoSRv3.P1_reserve_separation"
+            runtime_row["theorem"] = "LidoSRv3.Audit.revert_may_retain_attempts"
         runtime_path = write_mutant(runtime_mutant)
         try:
             expect_failure(
