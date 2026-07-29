@@ -1138,7 +1138,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     interpolated_prefix = re.compile(
-        r"(?:[A-Za-z_][\w'.]*!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
+        r"(?:!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
         r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
     for name, source in sources:
@@ -1626,6 +1626,18 @@ def negative_tests() -> None:
         "scanner custom interpolated-string macro mutant: unexpectedly passed",
     )
     print("mutant rejected: custom interpolated-string macro proof escape")
+    unicode_interpolation_mutant = (
+        'syntax "λ!" interpolatedStr(term) : term\n'
+        'macro_rules | `(λ! $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := λ!"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("unicode-interpolation-mutant.lean", unicode_interpolation_mutant)
+        ]),
+        "scanner Unicode interpolated-string macro mutant: unexpectedly passed",
+    )
+    print("mutant rejected: Unicode interpolated-string macro proof escape")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
