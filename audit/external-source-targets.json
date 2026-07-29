@@ -1,0 +1,27 @@
+{
+  "schema": "external-source-target-inventory-v1",
+  "components": {
+    "verity": {
+      "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
+      "targets": {
+        "dev/lean-4.31-scaffolding": {
+          "kind": "ref",
+          "object": "68f560e66c5de6123061ce5ed60261be162673d1"
+        }
+      }
+    },
+    "evmyullean": {
+      "commit": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+      "targets": {}
+    },
+    "lido-core": {
+      "commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "targets": {
+        "contracts/0.8.25/sr/StakingRouter.sol": {
+          "kind": "file",
+          "object": "b37af8bfc2948f0edd3f80738e2558a90a222093"
+        }
+      }
+    }
+  }
+}

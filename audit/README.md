@@ -4,6 +4,8 @@
 the JSON-compatible subset of YAML so the validator needs only Python's
 standard library. `schema.json`, `dependencies.lock.json`, and `artifacts.json`
 define its format, exact dependency topology, and available artifact hashes.
+`external-source-targets.json` is the network-independent inventory of external
+suffix targets verified at those exact dependency commits.
 
 Run:
 

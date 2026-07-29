@@ -21,6 +21,7 @@ AUDIT = ROOT / "audit"
 REGISTRY = AUDIT / "invariants.yaml"
 SCHEMA = AUDIT / "schema.json"
 LOCK = AUDIT / "dependencies.lock.json"
+EXTERNAL_TARGETS = AUDIT / "external-source-targets.json"
 ARTIFACTS = AUDIT / "artifacts.json"
 EXPECTED_ARTIFACTS = {
     "proof-arithmetic": ("LidoSRv3/Audit/Arithmetic.lean", "LEAN-CHECKED"),
@@ -197,7 +198,58 @@ def source_pins() -> dict[str, str]:
     return pins
 
 
-def validate_source_anchor(anchor: str, pins: dict[str, str]) -> None:
+def external_source_targets(pins: dict[str, str]) -> dict[str, set[str]]:
+    inventory = load_json(EXTERNAL_TARGETS)
+    require(
+        isinstance(inventory, dict)
+        and inventory.get("schema") == "external-source-target-inventory-v1",
+        "external-source-targets.json: invalid schema",
+    )
+    components = inventory.get("components")
+    require(
+        isinstance(components, dict) and set(components) == set(pins),
+        "external-source-targets.json: component inventory differs from dependency pins",
+    )
+    targets_by_component = {}
+    for component, commit in pins.items():
+        entry = components[component]
+        require(
+            isinstance(entry, dict) and set(entry) == {"commit", "targets"},
+            f"external-source-targets.json: invalid {component} inventory",
+        )
+        require(
+            entry["commit"] == commit,
+            f"external-source-targets.json: {component} commit is not exactly pinned",
+        )
+        targets = entry["targets"]
+        require(
+            isinstance(targets, dict),
+            f"external-source-targets.json: invalid {component} targets",
+        )
+        for target, identity in targets.items():
+            require(
+                isinstance(target, str)
+                and target
+                and not target.startswith("/")
+                and ".." not in Path(target).parts
+                and "//" not in target,
+                f"external-source-targets.json: invalid {component} target",
+            )
+            require(
+                isinstance(identity, dict)
+                and set(identity) == {"kind", "object"}
+                and identity["kind"] in {"file", "directory", "ref"}
+                and isinstance(identity["object"], str)
+                and re.fullmatch(r"[0-9a-f]{40}", identity["object"]) is not None,
+                f"external-source-targets.json: invalid {component} target identity",
+            )
+        targets_by_component[component] = set(targets)
+    return targets_by_component
+
+
+def validate_source_anchor(
+    anchor: str, pins: dict[str, str], targets: dict[str, set[str]]
+) -> None:
     external = re.fullmatch(
         r"([a-z][a-z0-9-]*)@([0-9a-f]{40})(?::([A-Za-z0-9._/-]+))?", anchor
     )
@@ -215,6 +267,10 @@ def validate_source_anchor(anchor: str, pins: dict[str, str]) -> None:
                 and "//" not in suffix
             ),
             f"invalid external source anchor suffix: {anchor}",
+        )
+        require(
+            suffix is None or suffix in targets[component],
+            f"external source anchor target does not exist at pinned commit: {anchor}",
         )
         return
     path = (ROOT / anchor).resolve()
@@ -272,6 +328,7 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
     validate_against_schema(data, schema)
     layers = schema_values(schema, "layer")
     pins = source_pins()
+    targets = external_source_targets(pins)
 
     ids: set[str] = set()
     theorem_owners: dict[str, str] = {}
@@ -283,7 +340,7 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
             value = row[name]
             require(len(value) == len(set(value)), f"{invariant_id}: duplicate {name}")
         for anchor in row["source_anchors"]:
-            validate_source_anchor(anchor, pins)
+            validate_source_anchor(anchor, pins, targets)
         theorem = row["theorem"]
         if theorem is not None:
             require(theorem not in theorem_owners, f"theorem {theorem} duplicated by {theorem_owners.get(theorem)}")
@@ -492,6 +549,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         r"(?<![\w'])(sorryAx|sorry|admit|axiom|constant|unsafe)(?![\w'])"
     )
     violations = []
+    interpolated_prefix = re.compile(
+        r"(?:[sfmv]!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|println!|"
+        r"throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
+    )
     for name, source in sources:
         block_depth = 0
         contexts: list[tuple[str, object]] = [("code", None)]
@@ -569,10 +630,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     else:
                         code_parts.append(line[cursor])
                         cursor += 1
-                elif line.startswith('s!"', cursor):
-                    code_parts.append("s!")
+                elif line[cursor] == '"' and interpolated_prefix.search(line[:cursor]):
+                    code_parts.append("!")
                     contexts.append(("string", (True, False)))
-                    cursor += 3
+                    cursor += 1
                 elif line[cursor] == '"':
                     contexts.append(("string", (False, False)))
                     cursor += 1
@@ -631,17 +692,22 @@ def negative_tests() -> None:
     )
     data = validate()
     pins = source_pins()
+    targets = external_source_targets(pins)
     source_anchor_positive = load_json(require_fixture("source-anchors-safe-positive.json"))
     for anchor in source_anchor_positive:
-        validate_source_anchor(anchor, pins)
+        validate_source_anchor(anchor, pins, targets)
     for fixture, expected in (
         ("nonexistent-local-anchor-negative.json", "local source anchor does not exist"),
         ("invalid-external-anchor-negative.json", "external source anchor is not exactly pinned"),
+        ("nonexistent-external-anchor-negative.json",
+         "external source anchor target does not exist at pinned commit"),
+        ("mistyped-external-anchor-negative.json",
+         "external source anchor target does not exist at pinned commit"),
     ):
         anchor = load_json(require_fixture(fixture))
         expect_failure(
             fixture,
-            lambda anchor=anchor: validate_source_anchor(anchor, pins),
+            lambda anchor=anchor: validate_source_anchor(anchor, pins, targets),
             expected,
         )
     const_negative = load_json(require_fixture("const-one-negative.json"))
@@ -809,6 +875,22 @@ def negative_tests() -> None:
             (interpolation_safe.name, interpolation_safe.read_text(encoding="utf-8"))
         ]),
         "scanner interpolation safe-positive fixture: unexpectedly rejected",
+    )
+    interpolation_forms = require_fixture("interpolation-forms-negative.txt")
+    form_violations = find_proof_escapes([
+        (interpolation_forms.name, interpolation_forms.read_text(encoding="utf-8"))
+    ])
+    require(
+        len(form_violations) == 13,
+        "scanner interpolated forms fixture: expected all forms to be rejected",
+    )
+    interpolation_forms_safe = require_fixture("interpolation-forms-safe-positive.txt")
+    require(
+        not find_proof_escapes([
+            (interpolation_forms_safe.name,
+             interpolation_forms_safe.read_text(encoding="utf-8"))
+        ]),
+        "scanner interpolated forms safe-positive fixture: unexpectedly rejected",
     )
 
     strategy_mutant = load_json(ARTIFACTS)
