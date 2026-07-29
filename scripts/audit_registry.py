@@ -45,6 +45,19 @@ EXPECTED_INVARIANT_THEOREMS = {
     "SRV3-ALLOC-ORDER": "LidoSRv3.Audit.valid_result_preserves_router_order",
     "SRV3-MINFIRST-BOUND": "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
 }
+EXPECTED_INVARIANT_IDS = {
+    "SRV3-LEGACY-ECON",
+    "SRV3-ARITH-CHECKED",
+    "SRV3-TX-REVERT",
+    "SRV3-ALLOC-ORDER",
+    "SRV3-MINFIRST-BOUND",
+    "SRV3-SOLIDITY-CORR",
+    "SRV3-VERITY-431",
+    "SRV3-YUL-COMP",
+    "SRV3-EVM-RUNTIME",
+    "SRV3-SHA256-PRECOMPILE",
+    "SRV3-CONSOLIDATION-E2E",
+}
 GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
     "ASSUMPTIONS.md", "REPRODUCE.md", "MATRIX.csv",
@@ -645,6 +658,8 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
         set(theorem_owners.values()) == set(EXPECTED_INVARIANT_THEOREMS),
         "theorem-bearing invariant ID inventory differs from expected bindings",
     )
+    require(ids == EXPECTED_INVARIANT_IDS,
+            "invariant ID inventory differs from expected obligations")
     rows = {row["id"]: row for row in data["invariants"]}
     graph = {row_id: row["dependencies"] for row_id, row in rows.items()}
     for node, dependencies in graph.items():
@@ -697,6 +712,9 @@ def validate_lock(path: Path = LOCK) -> None:
         "proof: exact repository mismatch",
     )
     require(lock["proof"]["ref"] == "main", "proof: exact ref mismatch")
+    require(lock["evmyullean"]["ref"] == "main", "EVMYulLean: exact ref mismatch")
+    require(lock["current_root"]["plane"] == "active",
+            "current root plane must remain active")
     require(lock["current_root"]["verity"] == "538c4a9ce2baa25b56062bdc727eb0191ad9e67f",
             "current root Verity exact pin mismatch")
     require(lock["current_root"]["evmyullean"] == "38d53df8b4488d5322894619ea8385fcbb2e6f5d",
@@ -1356,6 +1374,20 @@ def negative_tests() -> None:
     )
     const_positive = load_json_fixture("const-one-safe-positive.json")
     validate_against_schema(const_positive, {"const": 1}, "fixture")
+    missing_obligation_mutant = json.loads(json.dumps(data))
+    missing_obligation_mutant["invariants"] = [
+        row for row in missing_obligation_mutant["invariants"]
+        if row["id"] != "SRV3-SOLIDITY-CORR"
+    ]
+    missing_obligation_path = write_mutant(missing_obligation_mutant)
+    try:
+        expect_failure(
+            "missing invariant obligation mutant",
+            lambda: validate(missing_obligation_path),
+            "invariant ID inventory differs from expected obligations",
+        )
+    finally:
+        missing_obligation_path.unlink()
     theorem_swap_mutant = json.loads(json.dumps(data))
     theorem_rows = {
         row["id"]: row for row in theorem_swap_mutant["invariants"]
@@ -1806,6 +1838,24 @@ def negative_tests() -> None:
             )
         finally:
             proof_lock_path.unlink()
+    for component, field, value, expected in (
+        ("evmyullean", "ref", "does-not-exist", "EVMYulLean: exact ref mismatch"),
+        ("current_root", "plane", "audit-only",
+         "current root plane must remain active"),
+    ):
+        lock_mutant = json.loads(json.dumps(lock_data))
+        lock_mutant[component][field] = value
+        lock_mutant_path = write_mutant(lock_mutant)
+        try:
+            expect_failure(
+                f"{component} {field} tampering",
+                lambda lock_mutant_path=lock_mutant_path: validate_lock(
+                    lock_mutant_path
+                ),
+                expected,
+            )
+        finally:
+            lock_mutant_path.unlink()
     for plane, toolchain, expected in (
         ("current_root", "leanprover/lean4:v9.99.0",
          "current root Lean toolchain exact pin mismatch"),
