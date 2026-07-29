@@ -641,6 +641,10 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 f"{invariant_id}: runtime assurance requires non-missing anchors",
             )
 
+    require(
+        set(theorem_owners.values()) == set(EXPECTED_INVARIANT_THEOREMS),
+        "theorem-bearing invariant ID inventory differs from expected bindings",
+    )
     rows = {row["id"]: row for row in data["invariants"]}
     graph = {row_id: row["dependencies"] for row_id, row in rows.items()}
     for node, dependencies in graph.items():
@@ -1380,6 +1384,34 @@ def negative_tests() -> None:
         )
     finally:
         theorem_swap_path.unlink()
+    renamed_theorem_swap_mutant = json.loads(json.dumps(data))
+    renamed_ids = {
+        "SRV3-ALLOC-ORDER": "SRV3-ALLOC-ORDER-RENAMED",
+        "SRV3-MINFIRST-BOUND": "SRV3-MINFIRST-BOUND-RENAMED",
+    }
+    renamed_rows = {
+        row["id"]: row for row in renamed_theorem_swap_mutant["invariants"]
+    }
+    for old_id, new_id in renamed_ids.items():
+        renamed_rows[old_id]["id"] = new_id
+    for row in renamed_theorem_swap_mutant["invariants"]:
+        row["dependencies"] = [
+            renamed_ids.get(dependency, dependency)
+            for dependency in row["dependencies"]
+        ]
+    renamed_rows["SRV3-ALLOC-ORDER"]["theorem"], renamed_rows["SRV3-MINFIRST-BOUND"]["theorem"] = (
+        renamed_rows["SRV3-MINFIRST-BOUND"]["theorem"],
+        renamed_rows["SRV3-ALLOC-ORDER"]["theorem"],
+    )
+    renamed_theorem_swap_path = write_mutant(renamed_theorem_swap_mutant)
+    try:
+        expect_failure(
+            "renamed invariant theorem swap mutant",
+            lambda: validate(renamed_theorem_swap_path),
+            "theorem-bearing invariant ID inventory differs from expected bindings",
+        )
+    finally:
+        renamed_theorem_swap_path.unlink()
     dependency_downgrade_mutant = json.loads(json.dumps(data))
     next(
         row for row in dependency_downgrade_mutant["invariants"]
