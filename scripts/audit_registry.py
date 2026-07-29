@@ -21,6 +21,10 @@ REGISTRY = AUDIT / "invariants.yaml"
 SCHEMA = AUDIT / "schema.json"
 LOCK = AUDIT / "dependencies.lock.json"
 ARTIFACTS = AUDIT / "artifacts.json"
+EXPECTED_ARTIFACTS = {
+    "proof-arithmetic", "proof-trace", "proof-allocation", "proof-strategy",
+    "legacy-model", "legacy-proofs", "consolidation-runtime",
+}
 GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
     "ASSUMPTIONS.md", "REPRODUCE.md", "MATRIX.csv",
@@ -52,6 +56,47 @@ def load_json(path: Path) -> object:
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise RegistryError(message)
+
+
+def validate_theorems(data: dict) -> None:
+    theorems = sorted(
+        row["theorem"] for row in data["invariants"] if row["status"] == "PROVED"
+    )
+    for theorem in theorems:
+        require(
+            re.fullmatch(r"[A-Za-z_][A-Za-z0-9_']*(?:\.[A-Za-z_][A-Za-z0-9_']*)+", theorem) is not None,
+            f"invalid fully qualified theorem name: {theorem}",
+        )
+    source = "import LidoSRv3\n" + "".join(f"#check {theorem}\n" for theorem in theorems)
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".lean", encoding="utf-8", dir=ROOT, delete=False
+    ) as check_file:
+        check_file.write(source)
+        check_path = Path(check_file.name)
+    try:
+        build = subprocess.run(
+            ["lake", "build", "LidoSRv3"],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        require(
+            build.returncode == 0,
+            "cannot build LidoSRv3 theorem surface:\n" + (build.stderr or build.stdout).strip(),
+        )
+        result = subprocess.run(
+            ["lake", "env", "lean", str(check_path)],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+    finally:
+        check_path.unlink()
+    require(
+        result.returncode == 0,
+        "PROVED theorem does not exist in LidoSRv3 build surface:\n"
+        + (result.stderr or result.stdout).strip(),
+    )
 
 
 def validate(path: Path = REGISTRY) -> dict:
@@ -118,6 +163,7 @@ def validate(path: Path = REGISTRY) -> dict:
 
     for node in sorted(graph):
         visit(node)
+    validate_theorems(data)
     return data
 
 
@@ -135,11 +181,18 @@ def validate_lock() -> None:
     require("transitive" in lock["evmyullean"]["resolution"], "EVMYulLean must be transitive")
 
 
-def validate_artifacts() -> None:
-    manifest = load_json(ARTIFACTS)
+def validate_artifacts(path: Path = ARTIFACTS) -> None:
+    manifest = load_json(path)
+    require(isinstance(manifest, dict), "artifact manifest root must be an object")
+    require(set(manifest) == {"schema", "trust_levels", "artifacts"}, "unexpected artifact manifest fields")
+    require(manifest["schema"] == "srv3-artifacts-v1", "invalid artifact manifest schema")
     trust_levels = manifest.get("trust_levels", {})
+    require(isinstance(trust_levels, dict) and trust_levels, "trust_levels must be a nonempty object")
+    artifacts = manifest.get("artifacts")
+    require(isinstance(artifacts, list) and artifacts, "artifacts must be a nonempty array")
     seen: set[str] = set()
-    for artifact in manifest.get("artifacts", []):
+    for artifact in artifacts:
+        require(isinstance(artifact, dict), "artifact entry must be an object")
         artifact_id = artifact.get("id")
         require(artifact_id and artifact_id not in seen, f"invalid/duplicate artifact id: {artifact_id}")
         seen.add(artifact_id)
@@ -153,6 +206,7 @@ def validate_artifacts() -> None:
         require(file_path.is_file(), f"{artifact_id}: missing {path}")
         actual = hashlib.sha256(file_path.read_bytes()).hexdigest()
         require(digest == actual, f"{artifact_id}: sha256 mismatch: expected {digest}, got {actual}")
+    require(seen == EXPECTED_ARTIFACTS, f"artifact inventory differs: {sorted(seen ^ EXPECTED_ARTIFACTS)}")
 
 
 def rows_by(data: dict, key: str) -> dict[str, list[dict]]:
@@ -291,6 +345,29 @@ def negative_tests() -> None:
     else:
         raise RegistryError("invalid registry fixture unexpectedly passed")
     data = validate()
+    mutant = json.loads(json.dumps(data))
+    next(row for row in mutant["invariants"] if row["status"] == "PROVED")["theorem"] = "No.Such.Theorem"
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".yaml", encoding="utf-8", dir=AUDIT, delete=False
+    ) as mutant_file:
+        json.dump(mutant, mutant_file)
+        mutant_path = Path(mutant_file.name)
+    try:
+        try:
+            validate(mutant_path)
+        except RegistryError:
+            pass
+        else:
+            raise RegistryError("nonexistent theorem mutant unexpectedly passed")
+    finally:
+        mutant_path.unlink()
+    for fixture in ("empty-artifacts.json", "missing-required-artifact.json"):
+        try:
+            validate_artifacts(AUDIT / "fixtures" / fixture)
+        except RegistryError:
+            pass
+        else:
+            raise RegistryError(f"{fixture} unexpectedly passed")
     with tempfile.TemporaryDirectory() as directory:
         stale = Path(directory) / "BY_STATUS.md"
         stale.write_text("stale\n", encoding="utf-8")

@@ -1,0 +1,7 @@
+{
+  "schema": "srv3-artifacts-v1",
+  "trust_levels": {
+    "LEAN-CHECKED": "Kernel-checked theorem at the declared model layer only."
+  },
+  "artifacts": []
+}

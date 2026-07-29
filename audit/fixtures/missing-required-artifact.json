@@ -1,0 +1,15 @@
+{
+  "schema": "srv3-artifacts-v1",
+  "trust_levels": {
+    "PROVENANCE-BLOCKED": "Required canonical source/runtime identity evidence is absent."
+  },
+  "artifacts": [
+    {
+      "id": "consolidation-runtime",
+      "path": null,
+      "sha256": null,
+      "trust": "PROVENANCE-BLOCKED",
+      "blocker": "Fixture intentionally omits the required proof artifacts."
+    }
+  ]
+}
