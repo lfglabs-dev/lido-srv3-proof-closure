@@ -11,7 +11,9 @@
     {"id": "proof-arithmetic", "path": "LidoSRv3/Audit/Arithmetic.lean", "sha256": "f1016418727da225ef9158f14c32a9ea173975686291f479b18e887d02632978", "trust": "LEAN-CHECKED"},
     {"id": "proof-trace", "path": "LidoSRv3/Audit/Trace.lean", "sha256": "3f3b4d469905e75a21343ab87ecebac81accbfa08bc11e0becebb1e2e64fd29a", "trust": "LEAN-CHECKED"},
     {"id": "proof-allocation", "path": "LidoSRv3/Audit/Allocation.lean", "sha256": "0f64b006da40d44e1ca85946c899cc0c38cea2d1aeebf216b9552bce45ed816f", "trust": "LEAN-CHECKED"},
+    {"id": "proof-strategy-model", "path": "LidoSRv3/Audit/Strategy.lean", "sha256": "223350ee46ed7822ee94b10a559a0fdc07502d9b8b932b4403e3ea024daf3351", "trust": "LEAN-CHECKED"},
     {"id": "proof-strategy", "path": "LidoSRv3/Audit/StrategyProofs.lean", "sha256": "f0dc4c70c0e6e35a2d05e8501c7c96dcfc15117655dec9b5d4fabc92aa1e9aec", "trust": "LEAN-CHECKED"},
+    {"id": "proof-strategy-vectors", "path": "LidoSRv3/Audit/Vectors.lean", "sha256": "8937e07d9f1900b4c0aef55b4282bc343931d9498cd7fb6fa44a0dc7472b2106", "trust": "LEAN-CHECKED"},
     {"id": "legacy-model", "path": "LidoSRv3/Model.lean", "sha256": "d2e28fdd5ffa99e365e539abb98ea7d191a6ec079202b096ccc6dd56e275409d", "trust": "REGRESSION"},
     {"id": "legacy-proofs", "path": "LidoSRv3/SpecProofs.lean", "sha256": "9f7eb53a70833ef1267b009a5593cec48389c99e4790ec010683d5f2b3f80a00", "trust": "REGRESSION"},
     {"id": "consolidation-runtime", "path": null, "sha256": null, "trust": "PROVENANCE-BLOCKED", "blocker": "No independently sourced canonical EIP-7251 production runtime/hash/address/fork provenance; current helper uses a Mock build."}

@@ -26,7 +26,9 @@ EXPECTED_ARTIFACTS = {
     "proof-arithmetic": ("LidoSRv3/Audit/Arithmetic.lean", "LEAN-CHECKED"),
     "proof-trace": ("LidoSRv3/Audit/Trace.lean", "LEAN-CHECKED"),
     "proof-allocation": ("LidoSRv3/Audit/Allocation.lean", "LEAN-CHECKED"),
+    "proof-strategy-model": ("LidoSRv3/Audit/Strategy.lean", "LEAN-CHECKED"),
     "proof-strategy": ("LidoSRv3/Audit/StrategyProofs.lean", "LEAN-CHECKED"),
+    "proof-strategy-vectors": ("LidoSRv3/Audit/Vectors.lean", "LEAN-CHECKED"),
     "legacy-model": ("LidoSRv3/Model.lean", "REGRESSION"),
     "legacy-proofs": ("LidoSRv3/SpecProofs.lean", "REGRESSION"),
     "consolidation-runtime": (None, "PROVENANCE-BLOCKED"),
@@ -36,7 +38,8 @@ GENERATED = (
     "ASSUMPTIONS.md", "REPRODUCE.md", "MATRIX.csv",
 )
 MD_HEADER = "<!-- GENERATED from audit/invariants.yaml; NOT EDITABLE TRUTH. -->\n"
-CSV_HEADER = "# GENERATED from audit/invariants.yaml; NOT EDITABLE TRUTH.\n"
+CSV_FIELDS = ["id", "family", "priority", "status", "layer", "engine", "theorem",
+              "source_anchors", "runtime_anchors", "dependencies"]
 
 
 class RegistryError(Exception):
@@ -340,10 +343,8 @@ def render_reproduce(data: dict) -> str:
 
 def render_csv(data: dict) -> str:
     stream = io.StringIO(newline="")
-    stream.write(CSV_HEADER)
     writer = csv.writer(stream, lineterminator="\n")
-    writer.writerow(["id", "family", "priority", "status", "layer", "engine", "theorem",
-                     "source_anchors", "runtime_anchors", "dependencies"])
+    writer.writerow(CSV_FIELDS)
     for row in sorted(data["invariants"], key=lambda item: item["id"]):
         writer.writerow([
             row["id"], row["family"], row["priority"], row["status"], row["layer"], row["engine"],
@@ -386,8 +387,9 @@ def assert_render_coverage(data: dict, views: dict[str, str]) -> None:
     for name in headings:
         actual = Counter(re.findall(r"^## ([A-Z][A-Z0-9-]*)$", views[name], re.MULTILINE))
         require(actual == expected, f"{name}: rendered ID coverage differs")
-    matrix = views["MATRIX.csv"].removeprefix(CSV_HEADER)
-    actual = Counter(row["id"] for row in csv.DictReader(io.StringIO(matrix)))
+    matrix = csv.DictReader(io.StringIO(views["MATRIX.csv"]))
+    require(matrix.fieldnames == CSV_FIELDS, "MATRIX.csv: invalid CSV header")
+    actual = Counter(row["id"] for row in matrix)
     require(actual == expected, "MATRIX.csv: rendered ID coverage differs")
 
 
@@ -408,7 +410,7 @@ def assert_fresh(path: Path, expected: str, label: str) -> None:
 
 
 def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
-    patterns = re.compile(r"(^|[^A-Za-z])(sorry|admit|axiom|unsafe)([^A-Za-z]|$)")
+    patterns = re.compile(r"(^|[^A-Za-z])(sorry|admit|axiom|constant|unsafe)([^A-Za-z]|$)")
     violations = []
     for name, source in sources:
         block_depth = 0
@@ -559,6 +561,29 @@ def negative_tests() -> None:
         not find_proof_escapes([("safe-strings.lean", safe_strings)]),
         "scanner safe-string fixture: unexpectedly rejected",
     )
+    constant_mutant = "constant bogus : False\n"
+    require(
+        any(":1:constant bogus : False" in violation for violation in
+            find_proof_escapes([("constant-mutant.lean", constant_mutant)])),
+        "scanner constant-declaration mutant: unexpectedly passed",
+    )
+
+    strategy_mutant = load_json(ARTIFACTS)
+    strategy_mutant = json.loads(json.dumps(strategy_mutant))
+    strategy_model = next(
+        artifact for artifact in strategy_mutant["artifacts"]
+        if artifact["id"] == "proof-strategy-model"
+    )
+    strategy_model["sha256"] = "0" * 64
+    strategy_path = write_mutant(strategy_mutant)
+    try:
+        expect_failure(
+            "MinFirst model digest mutant",
+            lambda: validate_artifacts(strategy_path),
+            "proof-strategy-model: sha256 mismatch",
+        )
+    finally:
+        strategy_path.unlink()
 
     schema = load_json(SCHEMA)
     decorative_schema = {"title": "x"}
@@ -629,6 +654,14 @@ def negative_tests() -> None:
             lambda: assert_fresh(stale, rendered(data)["BY_STATUS.md"], "negative fixture"),
             "stale generated view: negative fixture",
         )
+
+    csv_mutant = dict(rendered(data))
+    csv_mutant["MATRIX.csv"] = "# generated metadata\n" + csv_mutant["MATRIX.csv"]
+    expect_failure(
+        "comment-prefixed CSV mutant",
+        lambda: assert_render_coverage(data, csv_mutant),
+        "MATRIX.csv: invalid CSV header",
+    )
 
 
 def check() -> None:

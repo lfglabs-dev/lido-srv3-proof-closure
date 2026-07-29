@@ -1,4 +1,3 @@
-# GENERATED from audit/invariants.yaml; NOT EDITABLE TRUTH.
 id,family,priority,status,layer,engine,theorem,source_anchors,runtime_anchors,dependencies
 SRV3-ALLOC-ORDER,allocation,P0,PROVED,REL,LEAN,LidoSRv3.Audit.valid_result_preserves_router_order,LidoSRv3/Audit/Allocation.lean,,SRV3-ARITH-CHECKED
 SRV3-ARITH-CHECKED,checked-arithmetic,P0,PROVED,ALG,LEAN,LidoSRv3.Audit.Quantity.checkedDiv_zero,LidoSRv3/Audit/Arithmetic.lean,,
