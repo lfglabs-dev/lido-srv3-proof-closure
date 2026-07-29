@@ -1138,7 +1138,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     interpolated_prefix = re.compile(
-        r"(?:[sfmv]!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|println!|"
+        r"(?:[A-Za-z_][\w'.]*!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
         r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
     for name, source in sources:
@@ -1614,6 +1614,18 @@ def negative_tests() -> None:
         "scanner spaced dbg_trace interpolation mutant: unexpectedly passed",
     )
     print("mutant rejected: dbg_trace interpolation across blank/comment-only lines")
+    custom_interpolation_mutant = (
+        'syntax "x!" interpolatedStr(term) : term\n'
+        'macro_rules | `(x! $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := x!"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("custom-interpolation-mutant.lean", custom_interpolation_mutant)
+        ]),
+        "scanner custom interpolated-string macro mutant: unexpectedly passed",
+    )
+    print("mutant rejected: custom interpolated-string macro proof escape")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
