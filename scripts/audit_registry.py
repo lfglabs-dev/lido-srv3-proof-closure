@@ -664,11 +664,18 @@ def validate_dependency_planes(
     require(root_toolchain.read_text(encoding="utf-8").strip() == current["lean_toolchain"],
             "current plane: Lean toolchain mismatch")
     current_lake = root_lakefile.read_text(encoding="utf-8")
-    require(current_lake.count("require verity from git") == 1,
+    current_verity = re.findall(
+        r'\brequire\s+verity\s+from\s+git\s+"([^"]+)"\s*@\s*"([^"]+)"',
+        current_lake,
+    )
+    require(len(current_verity) == 1,
             "current plane: expected exactly one direct Verity")
     require("require evmyul" not in current_lake.lower(),
             "current plane: direct EVMYulLean forbidden")
-    require(current["verity"] in current_lake, "current plane: Verity lakefile pin mismatch")
+    require(
+        current_verity[0] == (lock["verity"]["repository"], current["verity"]),
+        "current plane: Verity lakefile repository/revision mismatch",
+    )
     current_entries = dependency_entries(load_json(root_manifest), "current plane")
     require_package(current_entries, "current plane", "verity",
                     "https://github.com/lfglabs-dev/verity.git",
@@ -870,7 +877,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     violations = []
     interpolated_prefix = re.compile(
         r"(?:[sfmv]!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|println!|"
-        r"throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
+        r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
     for name, source in sources:
         block_depth = 0
@@ -1205,6 +1212,15 @@ def negative_tests() -> None:
         "scanner direct/nested interpolation fixture: expected both escapes rejected",
     )
     print("mutant rejected: direct/nested interpolated-string proof escapes")
+    dbg_trace_mutant = require_fixture("dbg-trace-interpolation-negative.txt")
+    require(
+        any(":1:" in violation for violation in find_proof_escapes([
+            (dbg_trace_mutant.name,
+             dbg_trace_mutant.read_text(encoding="utf-8"))
+        ])),
+        "scanner dbg_trace interpolation fixture: unexpectedly passed",
+    )
+    print("mutant rejected: dbg_trace interpolated proof escape")
     interpolation_safe = require_fixture("interpolation-safe-positive.txt")
     require(
         not find_proof_escapes([
@@ -1259,6 +1275,19 @@ def negative_tests() -> None:
                            "direct EVMYulLean forbidden")
         finally:
             path.unlink()
+    wrong_current_repository = current_lake.replace(
+        "https://github.com/lfglabs-dev/verity.git",
+        "https://github.com/example/verity.git",
+    )
+    path = write_text_mutant(wrong_current_repository, ".lean")
+    try:
+        expect_failure(
+            "current wrong Verity repository",
+            lambda: validate_dependency_planes(root_lakefile=path),
+            "Verity lakefile repository/revision mismatch",
+        )
+    finally:
+        path.unlink()
     for count, replacement in (
         (0, target_lake.replace("require verity from git", "-- removed")),
         (2, target_lake + "\nrequire verity from git\n  "

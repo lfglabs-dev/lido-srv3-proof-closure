@@ -1,0 +1,1 @@
+def bait : Nat := dbg_trace "hidden {(sorry : Nat)}"; 0
