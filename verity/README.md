@@ -82,8 +82,9 @@ array-and-loop structure for top-ups:
 1. Require nonempty, equal-length key/operator/limit/pubkey inputs.
 2. Require the selected module to be active and top-up capable.
 3. Round the module allocation down to a Gwei boundary before calling the module.
-4. Treat `IStakingModuleV2.allocateDeposits` as an explicit interface returning
-   one allocation per key.
+4. Treat `IStakingModuleV2.allocateDeposits` as an explicit interface whose
+   return may be short only on a successful zero-sum path; long returns and
+   short positive returns reject.
 5. Check returned allocations are Gwei-aligned and do not exceed per-key limits.
 6. Check the allocation sum does not exceed the rounded module target.
 7. Prove every successful top-up allocation sum stays within the module

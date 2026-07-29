@@ -2108,6 +2108,7 @@ theorem P8_topup_transition_requires_well_formed_allocations
   · rename_i m hFind
     by_cases hActive : m.status = ModuleStatus.active
     · simp [hActive] at h
+
       by_cases hTopUp : m.supportsTopUp = true
       · simp [hTopUp] at h
         by_cases hKey : keyCount = 0
@@ -2119,7 +2120,7 @@ theorem P8_topup_transition_requires_well_formed_allocations
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2129,7 +2130,8 @@ theorem P8_topup_transition_requires_well_formed_allocations
                       by_cases hAmount :
                           allocations.sum ≤ topUpTargetWei moduleAllocationWei maxTopUpPerBlockGwei
                       · exact
-                          ⟨hAllocations.trans hLimits.symm, hAligned, hWithin, hAmount⟩
+                          ⟨by simpa [hLimits] using hAllocations,
+                            hAligned, hWithin, hAmount⟩
                       · simp [hAmount] at h
                     · simp [hWithin] at h
                   · simp [hAligned] at h
@@ -2139,6 +2141,124 @@ theorem P8_topup_transition_requires_well_formed_allocations
           · simp [hOperators] at h
       · simp [hTopUp] at h
     · simp [hActive] at h
+
+/--
+  Under every ordinary non-shape precondition, a short zero-sum module return
+  succeeds as the same state. This is the source branch that skips
+  `BeaconChainDepositor.makeBeaconChainTopUp`.
+-/
+theorem P8_topup_transition_short_zero_sum_permitted
+    (s : State) (m : Module) (stakingModuleId : ModuleId)
+    (moduleAllocationWei : Wei) (maxTopUpPerBlockGwei : Gwei)
+    (lidoCanDeposit : Bool) (keyCount nodeOperatorCount pubkeyCount : Nat)
+    (topUpLimits allocations : List Wei)
+    (hFind : s.modules.find? (fun candidate => candidate.id = stakingModuleId) = some m)
+    (hActive : m.status = ModuleStatus.active)
+    (hTopUp : m.supportsTopUp = true)
+    (hKey : keyCount ≠ 0)
+    (hOperators : nodeOperatorCount = keyCount)
+    (hLimits : topUpLimits.length = keyCount)
+    (hPubkeys : pubkeyCount = keyCount)
+    (hShort : allocations.length < keyCount)
+    (hGate :
+      ¬(topUpTargetWei moduleAllocationWei maxTopUpPerBlockGwei = 0 ∧
+        lidoCanDeposit = false))
+    (hAligned : allocationsGweiAligned allocations = true)
+    (hWithin : allocationsWithinLimits allocations topUpLimits = true)
+    (hZero : allocations.sum = 0) :
+    topUpTransition s stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+      lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+      allocations = some s := by
+  unfold topUpTransition
+  simp [hFind, hActive, hTopUp, hKey, hOperators, hLimits, hPubkeys,
+    Nat.le_of_lt hShort, hGate, hAligned, hWithin, hZero]
+
+theorem P8_topup_transition_positive_requires_exact_return_length
+    (s s' : State) (stakingModuleId : ModuleId) (moduleAllocationWei : Wei)
+    (maxTopUpPerBlockGwei : Gwei) (lidoCanDeposit : Bool)
+    (keyCount nodeOperatorCount pubkeyCount : Nat)
+    (topUpLimits allocations : List Wei)
+    (hPositive : allocations.sum ≠ 0)
+    (h :
+      topUpTransition s stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+        lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+        allocations = some s') :
+    allocations.length = pubkeyCount := by
+  by_cases hLength : allocations.length = pubkeyCount
+  · exact hLength
+  unfold topUpTransition at h
+  split at h
+  · cases h
+  · rename_i m hFind
+    by_cases hActive : m.status = ModuleStatus.active <;> simp [hActive] at h
+    by_cases hTopUp : m.supportsTopUp = true <;> simp [hTopUp] at h
+    by_cases hKey : keyCount = 0 <;> simp [hKey] at h
+    by_cases hOperators : nodeOperatorCount = keyCount <;> simp [hOperators] at h
+    by_cases hLimits : topUpLimits.length = keyCount <;> simp [hLimits] at h
+    by_cases hPubkeys : pubkeyCount = keyCount <;> simp [hPubkeys] at h
+    by_cases hAllocations : allocations.length ≤ keyCount <;>
+      simp [hAllocations] at h
+    obtain ⟨_hGate, h⟩ := h
+    by_cases hAligned : allocationsGweiAligned allocations = true <;>
+      simp [hAligned] at h
+    by_cases hWithin : allocationsWithinLimits allocations topUpLimits = true <;>
+      simp [hWithin] at h
+    by_cases hAmount :
+        allocations.sum ≤ topUpTargetWei moduleAllocationWei maxTopUpPerBlockGwei <;>
+      simp [hAmount] at h
+    simp [hPositive] at h
+    exact h.left.trans hPubkeys.symm
+
+theorem P8_topup_transition_short_positive_rejects
+    (s : State) (stakingModuleId : ModuleId) (moduleAllocationWei : Wei)
+    (maxTopUpPerBlockGwei : Gwei) (lidoCanDeposit : Bool)
+    (keyCount nodeOperatorCount pubkeyCount : Nat)
+    (topUpLimits allocations : List Wei)
+    (hShort : allocations.length < pubkeyCount)
+    (hPositive : allocations.sum ≠ 0) :
+    topUpTransition s stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+      lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+      allocations = none := by
+  cases hResult :
+      topUpTransition s stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+        lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+        allocations with
+  | none => rfl
+  | some s' =>
+      have hExact :=
+        P8_topup_transition_positive_requires_exact_return_length s s'
+          stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+          lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+          allocations hPositive hResult
+      omega
+
+theorem P8_topup_transition_long_return_rejects
+    (s : State) (stakingModuleId : ModuleId) (moduleAllocationWei : Wei)
+    (maxTopUpPerBlockGwei : Gwei) (lidoCanDeposit : Bool)
+    (keyCount nodeOperatorCount pubkeyCount : Nat)
+    (topUpLimits allocations : List Wei)
+    (hLong : pubkeyCount < allocations.length) :
+    topUpTransition s stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+      lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+      allocations = none := by
+  cases hResult :
+      topUpTransition s stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+        lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+        allocations with
+  | none => rfl
+  | some s' =>
+      have hInput :=
+        P8_topup_transition_requires_input_shape s s' stakingModuleId
+          moduleAllocationWei maxTopUpPerBlockGwei lidoCanDeposit keyCount
+          nodeOperatorCount pubkeyCount topUpLimits allocations hResult
+      have hWellFormed :=
+        P8_topup_transition_requires_well_formed_allocations s s'
+          stakingModuleId moduleAllocationWei maxTopUpPerBlockGwei
+          lidoCanDeposit keyCount nodeOperatorCount pubkeyCount topUpLimits
+          allocations hResult
+      rcases hInput with ⟨_hKey, _hOperators, hLimits, hPubkeys⟩
+      rcases hWellFormed with ⟨hLength, _hAligned, _hWithin, _hTarget⟩
+      omega
 
 private theorem topUpTargetWei_le_module_allocation
     (moduleAllocationWei : Wei) (maxTopUpPerBlockGwei : Gwei) :
@@ -2225,7 +2345,7 @@ theorem P8_topup_transition_zero_target_requires_lido_can_deposit
               · simp [hLimits] at h
                 by_cases hPubkeys : pubkeyCount = keyCount
                 · simp [hPubkeys] at h
-                  by_cases hAllocations : allocations.length = keyCount
+                  by_cases hAllocations : allocations.length ≤ keyCount
                   · simp [hAllocations, hZeroTarget, hCan] at h
                   · simp [hAllocations] at h
                 · simp [hPubkeys] at h
@@ -2262,7 +2382,7 @@ theorem P8_topup_transition_router_eth_unchanged
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2278,6 +2398,7 @@ theorem P8_topup_transition_router_eth_unchanged
                         · simp [hZero] at h
                           by_cases hAllowed : allocations.sum ≤ depositableEther s
                           · simp [hAllowed] at h
+                            rcases h with ⟨_hPositiveShape, h⟩
                             simpa using congrArg State.routerEthBalanceWei h.symm
                           · simp [hAllowed] at h
                       · simp [hAmount] at h
@@ -2317,7 +2438,7 @@ theorem P8_topup_transition_modules_unchanged
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2333,6 +2454,7 @@ theorem P8_topup_transition_modules_unchanged
                         · simp [hZero] at h
                           by_cases hAllowed : allocations.sum ≤ depositableEther s
                           · simp [hAllowed] at h
+                            rcases h with ⟨_hPositiveShape, h⟩
                             simpa using congrArg State.modules h.symm
                           · simp [hAllowed] at h
                       · simp [hAmount] at h
@@ -2373,7 +2495,7 @@ theorem P8_topup_transition_preserves_report_state
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2391,6 +2513,7 @@ theorem P8_topup_transition_preserves_report_state
                         · simp [hZero] at h
                           by_cases hAllowed : allocations.sum ≤ depositableEther s
                           · simp [hAllowed] at h
+                            rcases h with ⟨_hPositiveShape, h⟩
                             constructor
                             · simpa using congrArg State.routerBalanceGwei h.symm
                             · simpa using congrArg State.lastAcceptedReport h.symm
@@ -2433,7 +2556,7 @@ theorem P8_topup_transition_beacon_sink_exact
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2448,6 +2571,7 @@ theorem P8_topup_transition_beacon_sink_exact
                         · simp [hZero] at h
                           by_cases hAllowed : allocations.sum ≤ depositableEther s
                           · simp [hAllowed] at h
+                            rcases h with ⟨_hPositiveShape, h⟩
                             exact congrArg State.beaconDepositSinkWei h.symm
                           · simp [hAllowed] at h
                       · simp [hAmount] at h
@@ -2488,7 +2612,7 @@ theorem P8_topup_transition_buffered_exact
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2503,6 +2627,7 @@ theorem P8_topup_transition_buffered_exact
                         · simp [hZero] at h
                           by_cases hAllowed : allocations.sum ≤ depositableEther s
                           · simp [hAllowed] at h
+                            rcases h with ⟨_hPositiveShape, h⟩
                             exact congrArg State.bufferedEther h.symm
                           · simp [hAllowed] at h
                       · simp [hAmount] at h
@@ -2543,7 +2668,7 @@ theorem P8_topup_transition_positive_requires_depositable
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2597,7 +2722,7 @@ theorem P8_topup_transition_zero_sum_noop
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2645,7 +2770,7 @@ theorem P8_topup_transition_withdrawal_reserve_unchanged
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2661,6 +2786,7 @@ theorem P8_topup_transition_withdrawal_reserve_unchanged
                         · simp [hZero] at h
                           by_cases hAllowed : allocations.sum ≤ depositableEther s
                           · simp [hAllowed] at h
+                            rcases h with ⟨_hPositiveShape, h⟩
                             simpa using congrArg State.withdrawalReserve h.symm
                           · simp [hAllowed] at h
                       · simp [hAmount] at h
@@ -2701,7 +2827,7 @@ theorem P8_topup_transition_deposit_reserve_spent
             · simp [hLimits] at h
               by_cases hPubkeys : pubkeyCount = keyCount
               · simp [hPubkeys] at h
-                by_cases hAllocations : allocations.length = keyCount
+                by_cases hAllocations : allocations.length ≤ keyCount
                 · simp [hAllocations] at h
                   obtain ⟨_hGate, h⟩ := h
                   by_cases hAligned : allocationsGweiAligned allocations = true
@@ -2716,6 +2842,7 @@ theorem P8_topup_transition_deposit_reserve_spent
                         · simp [hZero] at h
                           by_cases hAllowed : allocations.sum ≤ depositableEther s
                           · simp [hAllowed] at h
+                            rcases h with ⟨_hPositiveShape, h⟩
                             exact congrArg State.depositReserve h.symm
                           · simp [hAllowed] at h
                       · simp [hAmount] at h

@@ -247,7 +247,7 @@
       "theorem": "LidoSRv3.P8_topup_transition_requires_input_shape"
     },
     {
-      "claim": "Successful top-up transitions preserve returned allocation checks: same length, Gwei alignment, per-key limits, and rounded module target bound.",
+      "claim": "Successful top-up transitions preserve returned allocation checks: no longer than the request, Gwei alignment, per-index limits, and rounded module target bound; successful positive returns additionally have exact request/pubkey length.",
       "id": "SRV3-P8d",
       "theorem": "LidoSRv3.P8_topup_transition_requires_well_formed_allocations"
     },

@@ -51,7 +51,7 @@ structure Module where
   moduleFeeBps : Bps
   treasuryFeeBps : Bps
   rewardRecipient : Address
-  deriving Repr
+  deriving DecidableEq, Repr
 
 structure AllocationConfig where
   maxEBType1 : Wei
@@ -89,7 +89,7 @@ structure State where
   routerBalanceGwei : Gwei
   modules : List Module
   lastAcceptedReport : Option (List (ModuleId × Gwei))
-  deriving Repr
+  deriving DecidableEq, Repr
 
 def depositReserveUsed (s : State) : Wei :=
   min s.bufferedEther s.depositReserve
@@ -677,12 +677,12 @@ def allocationsGweiAligned (allocations : List Wei) : Bool :=
   allocations.all (fun allocation => allocation % oneGweiWei = 0)
 
 def allocationsWithinLimits (allocations limits : List Wei) : Bool :=
-  allocations.length == limits.length &&
+  allocations.length ≤ limits.length &&
     (allocations.zip limits).all (fun row => row.fst ≤ row.snd)
 
 def topUpAllocationsWellFormed
     (allocations limits : List Wei) (target : Wei) : Prop :=
-  allocations.length = limits.length ∧
+  allocations.length ≤ limits.length ∧
     allocationsGweiAligned allocations = true ∧
     allocationsWithinLimits allocations limits = true ∧
     allocations.sum ≤ target
@@ -704,13 +704,14 @@ def topUpTargetWei (moduleAllocationWei : Wei) (maxTopUpPerBlockGwei : Gwei) : W
 
   The Solidity path is modeled as a router-local transition around the explicit
   `IStakingModuleV2.allocateDeposits` interface. The interface returns one
-  top-up allocation per key. A successful transition preserves the Solidity
+  top-up allocations. A successful transition preserves the Solidity
   checks that the original key/operator/limit/pubkey arrays are nonempty and
-  equal-length, that the returned allocation array has the same length, that
-  each allocation is Gwei-aligned and not above the corresponding top-up limit,
-  and that the allocation sum does not exceed the module target capped by the
-  router-global per-block Gwei limit (`maxTopUpPerBlockGwei`) and rounded down
-  to Gwei.
+  equal-length. The returned array may be shorter only when its sum is zero:
+  a longer return reverts while indexing `_topUpLimits[i]`, and a shorter
+  positive return reaches `BeaconChainDepositor.makeBeaconChainTopUp` and
+  reverts on its pubkeys/amounts length check. Each returned allocation remains
+  Gwei-aligned and bounded by its corresponding top-up limit, and the sum
+  remains bounded by the capped, Gwei-rounded module target.
 
   When the capped, rounded target is zero the Solidity path still calls the
   module to advance its deposit queue, but only if `LIDO.canDeposit()` holds;
@@ -746,7 +747,7 @@ def topUpTransition
           else if nodeOperatorCount = keyCount then
             if topUpLimits.length = keyCount then
               if pubkeyCount = keyCount then
-                if allocations.length = keyCount then
+                if allocations.length ≤ keyCount then
                   let target := topUpTargetWei moduleAllocationWei maxTopUpPerBlockGwei
                   if target = 0 ∧ lidoCanDeposit = false then
                     none
@@ -756,12 +757,15 @@ def topUpTransition
                       if amount ≤ target then
                         if amount = 0 then
                           some s
-                        else if amount ≤ depositableEther s then
-                          some
-                            { s with
-                              bufferedEther := s.bufferedEther - amount,
-                              depositReserve := s.depositReserve - amount,
-                              beaconDepositSinkWei := s.beaconDepositSinkWei + amount }
+                        else if allocations.length = pubkeyCount then
+                          if amount ≤ depositableEther s then
+                            some
+                              { s with
+                                bufferedEther := s.bufferedEther - amount,
+                                depositReserve := s.depositReserve - amount,
+                                beaconDepositSinkWei := s.beaconDepositSinkWei + amount }
+                          else
+                            none
                         else
                           none
                       else

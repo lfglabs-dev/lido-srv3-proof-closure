@@ -131,6 +131,10 @@
       "supporting_properties": [
         "LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_input_shape",
         "LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_well_formed_allocations",
+        "LidoSRv3/SpecProofs.lean::P8_topup_transition_short_zero_sum_permitted",
+        "LidoSRv3/SpecProofs.lean::P8_topup_transition_positive_requires_exact_return_length",
+        "LidoSRv3/SpecProofs.lean::P8_topup_transition_short_positive_rejects",
+        "LidoSRv3/SpecProofs.lean::P8_topup_transition_long_return_rejects",
         "LidoSRv3/SpecProofs.lean::P8_topup_transition_allocation_sum_bounded_by_module_allocation",
         "LidoSRv3/SpecProofs.lean::P8_topup_transition_router_eth_unchanged",
         "LidoSRv3/SpecProofs.lean::P8_topup_transition_modules_unchanged",

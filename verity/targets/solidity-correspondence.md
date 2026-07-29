@@ -104,9 +104,14 @@ Line correspondence:
 - `717-718`: module allocation is the explicit `allocations` interface result
   (`IStakingModuleV2.allocateDeposits`).
 - `720-734`: the returned allocation loop is modeled over arbitrary finite
-  arrays: Gwei alignment, per-key limit checks, and sum accumulation.
+  arrays: Gwei alignment, per-key limit checks, and sum accumulation. A return
+  longer than the request rejects because `_topUpLimits[i]` is out of bounds.
 - `736-739`: returned sum must not exceed the capped, rounded module target.
-- `741-756`: positive sums pull exact depositable ETH, reduce the Lido buffer
+- `741-750` plus
+  [`BeaconChainDepositor.sol:66-75`](https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L66-L75):
+  a short positive return rejects on pubkeys/amounts length mismatch, whereas a
+  short zero-sum return may succeed because the helper call is skipped.
+- `741-756`: successful positive sums pull exact depositable ETH, reduce the Lido buffer
   and stored deposit reserve, increase the beacon top-up sink by the same
   amount, and preserve router ETH balance.
 - `758`: the `StakingRouterETHTopUp` event is out of lane.
