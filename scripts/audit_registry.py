@@ -261,11 +261,25 @@ def resolve_git_targets(
         )
         for target, identity in targets.items():
             if identity["kind"] == "ref":
+                remote_ref = subprocess.run(
+                    ["git", "ls-remote", "--exit-code", repository,
+                     f"refs/heads/{target}"],
+                    text=True, capture_output=True,
+                )
+                fields = remote_ref.stdout.strip().split()
                 require(
                     target == pinned_ref
                     and commit == identity["object"],
                     f"external-source-targets.json: {component}:{target} ref identity "
                     "does not match pinned repository ref",
+                )
+                require(
+                    remote_ref.returncode == 0
+                    and len(fields) == 2
+                    and fields[0] == commit
+                    and fields[1] == f"refs/heads/{target}",
+                    f"external-source-targets.json: {component}:{target} ref "
+                    "does not resolve to pinned repository commit",
                 )
                 continue
             result = subprocess.run(
@@ -1918,6 +1932,19 @@ def negative_tests() -> None:
 
 def refresh_negative_tests() -> None:
     pins = source_pins()
+    repositories = source_repositories()
+    verity_repository, _ = repositories["verity"]
+    expect_failure(
+        "refresh nonexistent pinned ref",
+        lambda: resolve_git_targets(
+            "verity",
+            verity_repository,
+            "does-not-exist",
+            pins["verity"],
+            {"does-not-exist": {"kind": "ref", "object": pins["verity"]}},
+        ),
+        "ref does not resolve to pinned repository commit",
+    )
     fabricated_inventory = load_json(EXTERNAL_TARGETS)
     fabricated_inventory = json.loads(json.dumps(fabricated_inventory))
     fabricated_inventory["components"]["lido-core"]["targets"][
