@@ -1,0 +1,11 @@
+-- sorryAx False true
+/- sorryAx False true -/
+def ordinary := "sorryAx False true"
+def raw := r#"sorryAx False true"#
+def rawHashes := r##"sorryAx False true"##
+def character : Char := 's'
+def longer := sorryAxle
+def suffixed := sorryAx_implementation
+def numbered := sorryAx2
+def ticked := sorryAx'
+def unicode := sorryAxβ

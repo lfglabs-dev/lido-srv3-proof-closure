@@ -413,7 +413,9 @@ def assert_fresh(path: Path, expected: str, label: str) -> None:
 
 
 def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
-    patterns = re.compile(r"(^|[^A-Za-z])(sorry|admit|axiom|constant|unsafe)([^A-Za-z]|$)")
+    patterns = re.compile(
+        r"(?<![\w'])(sorryAx|sorry|admit|axiom|constant|unsafe)(?![\w'])"
+    )
     violations = []
     for name, source in sources:
         block_depth = 0
@@ -644,6 +646,21 @@ def negative_tests() -> None:
         any(":1:constant bogus : False" in violation for violation in
             find_proof_escapes([("constant-mutant.lean", constant_mutant)])),
         "scanner constant-declaration mutant: unexpectedly passed",
+    )
+    sorryax_mutant = require_fixture("sorryax-negative.txt")
+    require(
+        any(":1:theorem bogus : False := sorryAx False true" in violation
+            for violation in find_proof_escapes([
+                (sorryax_mutant.name, sorryax_mutant.read_text(encoding="utf-8"))
+            ])),
+        "scanner sorryAx fixture: unexpectedly passed",
+    )
+    safe_scanner = require_fixture("proof-escape-safe-positive.txt")
+    require(
+        not find_proof_escapes([
+            (safe_scanner.name, safe_scanner.read_text(encoding="utf-8"))
+        ]),
+        "scanner safe-positive fixture: unexpectedly rejected",
     )
 
     strategy_mutant = load_json(ARTIFACTS)
