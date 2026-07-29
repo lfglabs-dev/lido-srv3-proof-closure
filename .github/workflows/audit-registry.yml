@@ -16,6 +16,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - uses: leanprover/lean4-action@v1
+      - uses: leanprover/lean-action@v1
       - name: Validate registry, artifacts, generated views, and negative fixtures
         run: make audit-check
