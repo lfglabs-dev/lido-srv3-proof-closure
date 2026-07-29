@@ -23,8 +23,13 @@ SCHEMA = AUDIT / "schema.json"
 LOCK = AUDIT / "dependencies.lock.json"
 ARTIFACTS = AUDIT / "artifacts.json"
 EXPECTED_ARTIFACTS = {
-    "proof-arithmetic", "proof-trace", "proof-allocation", "proof-strategy",
-    "legacy-model", "legacy-proofs", "consolidation-runtime",
+    "proof-arithmetic": ("LidoSRv3/Audit/Arithmetic.lean", "LEAN-CHECKED"),
+    "proof-trace": ("LidoSRv3/Audit/Trace.lean", "LEAN-CHECKED"),
+    "proof-allocation": ("LidoSRv3/Audit/Allocation.lean", "LEAN-CHECKED"),
+    "proof-strategy": ("LidoSRv3/Audit/StrategyProofs.lean", "LEAN-CHECKED"),
+    "legacy-model": ("LidoSRv3/Model.lean", "REGRESSION"),
+    "legacy-proofs": ("LidoSRv3/SpecProofs.lean", "REGRESSION"),
+    "consolidation-runtime": (None, "PROVENANCE-BLOCKED"),
 }
 GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
@@ -153,7 +158,7 @@ def schema_values(schema: dict, field: str) -> list[str]:
 
 def validate_theorems(data: dict) -> None:
     theorems = sorted(
-        row["theorem"] for row in data["invariants"] if row["status"] == "PROVED"
+        row["theorem"] for row in data["invariants"] if row["theorem"] is not None
     )
     for theorem in theorems:
         require(
@@ -188,7 +193,7 @@ def validate_theorems(data: dict) -> None:
         check_path.unlink()
     require(
         result.returncode == 0,
-        "PROVED theorem does not exist in LidoSRv3 build surface:\n"
+        "registry theorem does not exist in LidoSRv3 build surface:\n"
         + (result.stderr or result.stdout).strip(),
     )
 
@@ -271,6 +276,12 @@ def validate_artifacts(path: Path = ARTIFACTS) -> None:
         artifact_id = artifact.get("id")
         require(artifact_id and artifact_id not in seen, f"invalid/duplicate artifact id: {artifact_id}")
         seen.add(artifact_id)
+        require(artifact_id in EXPECTED_ARTIFACTS, f"unexpected artifact id: {artifact_id}")
+        expected_path, expected_trust = EXPECTED_ARTIFACTS[artifact_id]
+        require(artifact.get("path") == expected_path,
+                f"{artifact_id}: path must be {expected_path}")
+        require(artifact.get("trust") == expected_trust,
+                f"{artifact_id}: trust must be {expected_trust}")
         require(artifact.get("trust") in trust_levels, f"{artifact_id}: undefined trust level")
         path = artifact.get("path")
         digest = artifact.get("sha256")
@@ -281,7 +292,8 @@ def validate_artifacts(path: Path = ARTIFACTS) -> None:
         require(file_path.is_file(), f"{artifact_id}: missing {path}")
         actual = hashlib.sha256(file_path.read_bytes()).hexdigest()
         require(digest == actual, f"{artifact_id}: sha256 mismatch: expected {digest}, got {actual}")
-    require(seen == EXPECTED_ARTIFACTS, f"artifact inventory differs: {sorted(seen ^ EXPECTED_ARTIFACTS)}")
+    require(seen == set(EXPECTED_ARTIFACTS),
+            f"artifact inventory differs: {sorted(seen ^ set(EXPECTED_ARTIFACTS))}")
 
 
 def rows_by(data: dict, key: str) -> dict[str, list[dict]]:
@@ -395,45 +407,61 @@ def assert_fresh(path: Path, expected: str, label: str) -> None:
     require(path.read_text(encoding="utf-8") == expected, f"stale generated view: {label}")
 
 
-def proof_escape_scan() -> None:
+def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     patterns = re.compile(r"(^|[^A-Za-z])(sorry|admit|axiom|unsafe)([^A-Za-z]|$)")
-    tracked = subprocess.run(
-        ["git", "ls-files", "*.lean"], cwd=ROOT, check=True, text=True, capture_output=True
-    ).stdout.splitlines()
     violations = []
-    for name in tracked:
+    for name, source in sources:
         block_depth = 0
-        for number, line in enumerate((ROOT / name).read_text(encoding="utf-8").splitlines(), 1):
+        in_string = False
+        escaped = False
+        for number, line in enumerate(source.splitlines(), 1):
             code_parts = []
             cursor = 0
             while cursor < len(line):
-                if block_depth:
-                    opening = line.find("/-", cursor)
-                    closing = line.find("-/", cursor)
-                    if closing == -1:
-                        cursor = len(line)
-                    elif opening != -1 and opening < closing:
+                if in_string:
+                    character = line[cursor]
+                    if escaped:
+                        escaped = False
+                    elif character == "\\":
+                        escaped = True
+                    elif character == '"':
+                        in_string = False
+                    cursor += 1
+                elif block_depth:
+                    if line.startswith("/-", cursor):
                         block_depth += 1
-                        cursor = opening + 2
-                    else:
+                        cursor += 2
+                    elif line.startswith("-/", cursor):
                         block_depth -= 1
-                        cursor = closing + 2
-                else:
-                    opening = line.find("/-", cursor)
-                    comment = line.find("--", cursor)
-                    if comment != -1 and (opening == -1 or comment < opening):
-                        code_parts.append(line[cursor:comment])
-                        cursor = len(line)
-                    elif opening == -1:
-                        code_parts.append(line[cursor:])
-                        cursor = len(line)
+                        cursor += 2
                     else:
-                        code_parts.append(line[cursor:opening])
-                        block_depth = 1
-                        cursor = opening + 2
+                        cursor += 1
+                elif line.startswith("--", cursor):
+                    break
+                elif line.startswith("/-", cursor):
+                    block_depth = 1
+                    cursor += 2
+                elif line[cursor] == '"':
+                    in_string = True
+                    escaped = False
+                    cursor += 1
+                else:
+                    code_parts.append(line[cursor])
+                    cursor += 1
+            escaped = False
             code = "".join(code_parts)
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
+    return violations
+
+
+def proof_escape_scan() -> None:
+    tracked = subprocess.run(
+        ["git", "ls-files", "*.lean"], cwd=ROOT, check=True, text=True, capture_output=True
+    ).stdout.splitlines()
+    violations = find_proof_escapes([
+        (name, (ROOT / name).read_text(encoding="utf-8")) for name in tracked
+    ])
     require(not violations, "proof escape(s):\n" + "\n".join(violations))
 
 
@@ -476,10 +504,22 @@ def negative_tests() -> None:
         expect_failure(
             "nonexistent theorem mutant",
             lambda: validate(mutant_path),
-            "PROVED theorem does not exist in LidoSRv3 build surface",
+            "registry theorem does not exist in LidoSRv3 build surface",
         )
     finally:
         mutant_path.unlink()
+    regression_mutant = json.loads(json.dumps(data))
+    next(row for row in regression_mutant["invariants"]
+         if row["status"] == "REGRESSION")["theorem"] = "No.Such.RegressionTheorem"
+    regression_path = write_mutant(regression_mutant)
+    try:
+        expect_failure(
+            "nonexistent REGRESSION theorem mutant",
+            lambda: validate(regression_path),
+            "registry theorem does not exist in LidoSRv3 build surface",
+        )
+    finally:
+        regression_path.unlink()
     artifact_cases = (
         ("empty-artifacts.json", "artifacts must be a nonempty array"),
         ("missing-required-artifact.json", "artifact inventory differs"),
@@ -487,6 +527,38 @@ def negative_tests() -> None:
     for fixture, expected in artifact_cases:
         path = require_fixture(fixture)
         expect_failure(fixture, lambda path=path: validate_artifacts(path), expected)
+    artifact_mutant = load_json(ARTIFACTS)
+    artifact_mutant = json.loads(json.dumps(artifact_mutant))
+    arithmetic = next(
+        artifact for artifact in artifact_mutant["artifacts"]
+        if artifact["id"] == "proof-arithmetic"
+    )
+    arithmetic["path"] = "LidoSRv3/Model.lean"
+    arithmetic["trust"] = "REGRESSION"
+    arithmetic["sha256"] = hashlib.sha256(
+        (ROOT / arithmetic["path"]).read_bytes()
+    ).hexdigest()
+    artifact_path = write_mutant(artifact_mutant)
+    try:
+        expect_failure(
+            "artifact identity binding mutant",
+            lambda: validate_artifacts(artifact_path),
+            "proof-arithmetic: path must be LidoSRv3/Audit/Arithmetic.lean",
+        )
+    finally:
+        artifact_path.unlink()
+
+    scanner_mutant = 'def bait := "escaped quote: \\\\\\" and /-"\naxiom hidden : True\n'
+    violations = find_proof_escapes([("scanner-mutant.lean", scanner_mutant)])
+    require(
+        any(":2:axiom hidden : True" in violation for violation in violations),
+        "scanner string-delimiter mutant: unexpectedly passed",
+    )
+    safe_strings = 'def safe := "sorry admit axiom unsafe /- -- \\\\\\""\n'
+    require(
+        not find_proof_escapes([("safe-strings.lean", safe_strings)]),
+        "scanner safe-string fixture: unexpectedly rejected",
+    )
 
     schema = load_json(SCHEMA)
     decorative_schema = {"title": "x"}
