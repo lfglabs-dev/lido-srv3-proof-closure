@@ -44,6 +44,12 @@ GENERATED = (
 MD_HEADER = "<!-- GENERATED from audit/invariants.yaml; NOT EDITABLE TRUTH. -->\n"
 CSV_FIELDS = ["id", "family", "priority", "status", "layer", "engine", "theorem",
               "source_anchors", "runtime_anchors", "dependencies"]
+EXPECTED_ENUMS = {
+    "priority": ["P0", "P1", "P2", "STRETCH"],
+    "status": ["PROVED", "REGRESSION", "DEV-431-READY", "OPEN", "BLOCKED", "STRETCH"],
+    "layer": ["MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"],
+    "engine": ["LEAN", "VERITY", "EVMYULLEAN", "INTERFACE", "NATIVE-FFI", "NONE"],
+}
 
 
 class RegistryError(Exception):
@@ -125,6 +131,8 @@ def validate_schema_definition(schema: object) -> dict:
             and all(isinstance(value, str) for value in values),
             f"schema.json: {field} enum must contain unique strings",
         )
+        require(values == EXPECTED_ENUMS[field],
+                f"schema.json: {field} enum differs from the executable format")
     layers = properties["allowed_layers"].get("const")
     require(layers == item_properties["layer"]["enum"],
             "schema.json: allowed_layers const must equal layer enum")
@@ -891,6 +899,21 @@ def assert_render_coverage(data: dict, views: dict[str, str]) -> None:
             if value != "ID"
         )
         require(actual == expected, f"{name}: rendered ID coverage differs")
+    expected_status = Counter(
+        (row["status"], row["id"]) for row in data["invariants"]
+    )
+    actual_status: Counter[tuple[str, str]] = Counter()
+    current_status: str | None = None
+    for line in views["BY_STATUS.md"].splitlines():
+        if line.startswith("## "):
+            current_status = line[3:]
+        match = re.match(r"^\| ([A-Z][A-Z0-9-]*) \|", line)
+        if match and match.group(1) != "ID":
+            require(current_status is not None,
+                    "BY_STATUS.md: invariant row appears before status heading")
+            actual_status[(current_status, match.group(1))] += 1
+    require(actual_status == expected_status,
+            "BY_STATUS.md: rendered status classification differs")
     for name in headings:
         actual = Counter(re.findall(r"^## ([A-Z][A-Z0-9-]*)$", views[name], re.MULTILINE))
         require(actual == expected, f"{name}: rendered ID coverage differs")
@@ -1069,7 +1092,16 @@ def expect_failure(label: str, action: Callable[[], object], expected: str) -> N
 def require_fixture(name: str) -> Path:
     path = AUDIT / "fixtures" / name
     require(path.is_file(), f"negative fixture missing: audit/fixtures/{name}")
+    try:
+        mode = path.stat().st_mode
+    except OSError as error:
+        raise RegistryError(f"negative fixture unreadable: audit/fixtures/{name}: {error}") from error
+    require(mode & 0o444 != 0, f"negative fixture unreadable: audit/fixtures/{name}")
     return path
+
+
+def load_json_fixture(name: str) -> object:
+    return load_json(require_fixture(name))
 
 
 def write_mutant(data: object, suffix: str = ".json") -> Path:
@@ -1098,7 +1130,7 @@ def negative_tests() -> None:
     data = validate()
     pins = source_pins()
     targets = external_source_targets(pins)
-    source_anchor_positive = load_json(require_fixture("source-anchors-safe-positive.json"))
+    source_anchor_positive = load_json_fixture("source-anchors-safe-positive.json")
     for anchor in source_anchor_positive:
         validate_source_anchor(anchor, pins, targets)
     for fixture, expected in (
@@ -1109,19 +1141,19 @@ def negative_tests() -> None:
         ("mistyped-external-anchor-negative.json",
          "external source anchor target does not exist at pinned commit"),
     ):
-        anchor = load_json(require_fixture(fixture))
+        anchor = load_json_fixture(fixture)
         expect_failure(
             fixture,
             lambda anchor=anchor: validate_source_anchor(anchor, pins, targets),
             expected,
         )
-    const_negative = load_json(require_fixture("const-one-negative.json"))
+    const_negative = load_json_fixture("const-one-negative.json")
     expect_failure(
         "boolean schema const fixture",
         lambda: validate_against_schema(const_negative, {"const": 1}, "fixture"),
         "fixture: does not match schema const",
     )
-    const_positive = load_json(require_fixture("const-one-safe-positive.json"))
+    const_positive = load_json_fixture("const-one-safe-positive.json")
     validate_against_schema(const_positive, {"const": 1}, "fixture")
     for unresolved_status in ("BLOCKED", "STRETCH"):
         dependency_mutant = json.loads(json.dumps(data))
@@ -1476,37 +1508,97 @@ def negative_tests() -> None:
         expect_failure(
             "schema enum drift mutant",
             lambda: validate(REGISTRY, inverted_enum_path),
-            "registry.invariants[0].status: value is not in schema enum",
+            "schema.json: status enum differs from the executable format",
         )
     finally:
         inverted_enum_path.unlink()
-
-    coverage_mutant = json.loads(json.dumps(data))
-    coverage_mutant["invariants"][0]["status"] = "DISPROVED"
-    coverage_schema = json.loads(json.dumps(schema))
-    coverage_schema["properties"]["invariants"]["items"]["properties"]["status"]["enum"].append("DISPROVED")
-    coverage_schema_path = write_mutant(coverage_schema)
-    coverage_registry_path = write_mutant(coverage_mutant)
+    reversed_enum_schema = json.loads(json.dumps(schema))
+    reversed_enum_schema["properties"]["invariants"]["items"]["properties"]["status"]["enum"].reverse()
+    reversed_enum_path = write_mutant(reversed_enum_schema)
     try:
-        coverage_data = validate(coverage_registry_path, coverage_schema_path)
-        rendered(coverage_data, coverage_schema)
-        incomplete = {
-            "BY_STATUS.md": render_grouped(
-                coverage_data, "status", "Invariants by status",
-                schema_values(schema, "status"),
-            )
-        }
         expect_failure(
-            "generated status coverage mutant",
-            lambda: assert_render_coverage(
-                coverage_data,
-                {**rendered(data), **incomplete},
-            ),
-            "BY_STATUS.md: rendered ID coverage differs",
+            "schema reversed-enum mutant",
+            lambda: validate(REGISTRY, reversed_enum_path),
+            "schema.json: status enum differs from the executable format",
         )
     finally:
-        coverage_registry_path.unlink()
-        coverage_schema_path.unlink()
+        reversed_enum_path.unlink()
+
+    status_views = rendered(data)
+    status_lines = status_views["BY_STATUS.md"].splitlines(keepends=True)
+    proved_heading = status_lines.index("## PROVED\n")
+    next_heading = next(
+        index for index in range(proved_heading + 1, len(status_lines))
+        if status_lines[index].startswith("## ")
+    )
+    proved_row = next(
+        index for index in range(proved_heading + 1, next_heading)
+        if status_lines[index].startswith("| SRV3-")
+    )
+    moved_row = status_lines.pop(proved_row)
+    dropped = dict(status_views)
+    dropped["BY_STATUS.md"] = status_views["BY_STATUS.md"].replace(moved_row, "", 1)
+    expect_failure(
+        "generated status dropped-row mutant",
+        lambda: assert_render_coverage(data, dropped),
+        "BY_STATUS.md: rendered ID coverage differs",
+    )
+    open_heading = status_lines.index("## OPEN\n")
+    open_table = next(
+        index for index in range(open_heading + 1, len(status_lines))
+        if status_lines[index].startswith("| ---")
+    )
+    status_lines.insert(open_table + 1, moved_row)
+    misclassified = dict(status_views)
+    misclassified["BY_STATUS.md"] = "".join(status_lines)
+    expect_failure(
+        "generated status misclassification mutant",
+        lambda: assert_render_coverage(data, misclassified),
+        "BY_STATUS.md: rendered status classification differs",
+    )
+
+    duplicated = dict(status_views)
+    duplicated["BY_STATUS.md"] = status_views["BY_STATUS.md"].replace(
+        moved_row, moved_row + moved_row, 1
+    )
+    expect_failure(
+        "generated status duplication mutant",
+        lambda: assert_render_coverage(data, duplicated),
+        "BY_STATUS.md: rendered ID coverage differs",
+    )
+
+    with tempfile.TemporaryDirectory(dir=AUDIT / "fixtures") as fixture_directory:
+        fixture_root = Path(fixture_directory)
+        missing = fixture_root / "missing.json"
+        expect_failure(
+            "missing negative fixture",
+            lambda: require_fixture(str(missing.relative_to(AUDIT / "fixtures"))),
+            "negative fixture missing",
+        )
+        unreadable = fixture_root / "unreadable.json"
+        unreadable.write_text("{}\n", encoding="utf-8")
+        unreadable.chmod(0)
+        expect_failure(
+            "unreadable negative fixture",
+            lambda: require_fixture(str(unreadable.relative_to(AUDIT / "fixtures"))),
+            "negative fixture unreadable",
+        )
+        malformed = fixture_root / "malformed.json"
+        malformed.write_text("{\n", encoding="utf-8")
+        expect_failure(
+            "malformed negative fixture",
+            lambda: load_json(malformed),
+            "Expecting property name",
+        )
+        semantic = fixture_root / "semantic.json"
+        semantic.write_text('{"const": true}\n', encoding="utf-8")
+        expect_failure(
+            "semantically invalid negative fixture",
+            lambda: validate_against_schema(
+                load_json(semantic), {"const": {"required": True}}, "fixture"
+            ),
+            "fixture: does not match schema const",
+        )
 
     with tempfile.TemporaryDirectory() as directory:
         stale = Path(directory) / "BY_STATUS.md"
