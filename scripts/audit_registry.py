@@ -650,6 +650,47 @@ def require_package(
     return entry
 
 
+def require_direct_dependencies(
+    lakefile: str, entries: list[dict], declared: list[str], label: str
+) -> None:
+    block_depth = 0
+    code_lines = []
+    for line in lakefile.splitlines():
+        code = []
+        cursor = 0
+        while cursor < len(line):
+            if block_depth:
+                if line.startswith("/-", cursor):
+                    block_depth += 1
+                    cursor += 2
+                elif line.startswith("-/", cursor):
+                    block_depth -= 1
+                    cursor += 2
+                else:
+                    cursor += 1
+            elif line.startswith("--", cursor):
+                break
+            elif line.startswith("/-", cursor):
+                block_depth = 1
+                cursor += 2
+            else:
+                code.append(line[cursor])
+                cursor += 1
+        code_lines.append("".join(code))
+    requires = re.findall(
+        r"(?m)^[ \t]*require[ \t]+(?:«([^»]+)»|([A-Za-z_][\w'-]*))(?![\w'])",
+        "\n".join(code_lines),
+    )
+    lake_names = [quoted or plain for quoted, plain in requires]
+    manifest_names = [
+        entry.get("name") for entry in entries if entry.get("inherited") is False
+    ]
+    require(lake_names == declared,
+            f"{label}: direct lakefile dependencies differ from lock declaration")
+    require(manifest_names == declared,
+            f"{label}: direct manifest dependencies differ from lock declaration")
+
+
 def validate_dependency_planes(
     root_lakefile: Path = ROOT / "lakefile.lean",
     root_manifest: Path = ROOT / "lake-manifest.json",
@@ -683,6 +724,9 @@ def validate_dependency_planes(
     require_package(current_entries, "current plane", "evmyul",
                     "https://github.com/lfglabs-dev/EVMYulLean.git",
                     current["evmyullean"], True)
+    require_direct_dependencies(
+        current_lake, current_entries, current["direct_dependencies"], "current plane"
+    )
 
     target = lock["target_root"]
     require(target["plane"] == "audit-only" and target["path"] == "audit/target-4.31",
@@ -701,6 +745,9 @@ def validate_dependency_planes(
                     lock["verity"]["repository"], lock["verity"]["commit"], False)
     require_package(target_entries, "target plane", "evmyul",
                     lock["evmyullean"]["repository"], lock["evmyullean"]["commit"], True)
+    require_direct_dependencies(
+        target_lake, target_entries, target["direct_dependencies"], "target plane"
+    )
     verity = load_json(verity_metadata)
     require(verity["commit"] == lock["verity"]["commit"],
             "target plane: Verity metadata commit mismatch")
@@ -957,7 +1004,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     else:
                         code_parts.append(line[cursor])
                         cursor += 1
-                elif line[cursor] == '"' and interpolated_prefix.search(line[:cursor]):
+                elif line[cursor] == '"' and interpolated_prefix.search(
+                    "\n".join(sanitized_lines[-1:] + ["".join(code_parts)])
+                ):
                     code_parts.append("!")
                     contexts.append(("string", (True, False)))
                     cursor += 1
@@ -1221,6 +1270,19 @@ def negative_tests() -> None:
         "scanner dbg_trace interpolation fixture: unexpectedly passed",
     )
     print("mutant rejected: dbg_trace interpolated proof escape")
+    multiline_dbg_trace_mutant = 'def bait : Nat := dbg_trace\n  "{(sorry : Nat)}"; 0\n'
+    require(
+        any(":2:" in violation for violation in find_proof_escapes([
+            ("multiline-dbg-trace-mutant.lean", multiline_dbg_trace_mutant)
+        ])),
+        "scanner multiline dbg_trace interpolation mutant: unexpectedly passed",
+    )
+    print("mutant rejected: multiline dbg_trace interpolated proof escape")
+    safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
+    require(
+        not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
+        "scanner dbg_trace safe-positive: unexpectedly rejected",
+    )
     interpolation_safe = require_fixture("interpolation-safe-positive.txt")
     require(
         not find_proof_escapes([
@@ -1301,6 +1363,19 @@ def negative_tests() -> None:
                            "expected exactly one direct Verity")
         finally:
             path.unlink()
+    extra_target_dependency = target_lake + (
+        '\nrequire foo from git "https://example.com/foo.git"@'
+        '"0123456789abcdef0123456789abcdef01234567"\n'
+    )
+    path = write_text_mutant(extra_target_dependency, ".lean")
+    try:
+        expect_failure(
+            "target arbitrary extra direct dependency",
+            lambda: validate_dependency_planes(target_lakefile=path),
+            "direct lakefile dependencies differ from lock declaration",
+        )
+    finally:
+        path.unlink()
     target_manifest_data = load_json(TARGET / "lake-manifest.json")
     manifest_mutants = []
     duplicate = json.loads(json.dumps(target_manifest_data))
