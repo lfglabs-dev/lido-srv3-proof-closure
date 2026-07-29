@@ -58,6 +58,11 @@ EXPECTED_INVARIANT_IDS = {
     "SRV3-SHA256-PRECOMPILE",
     "SRV3-CONSOLIDATION-E2E",
 }
+EXPECTED_CURRENT_PACKAGES = {
+    "verity", "evmyul", "mathlib", "plausible", "LeanSearchClient",
+    "importGraph", "proofwidgets", "aesop", "Qq", "batteries", "Cli",
+}
+EXPECTED_TARGET_PACKAGES = {"verity", "evmyul"}
 GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
     "ASSUMPTIONS.md", "REPRODUCE.md", "MATRIX.csv",
@@ -214,8 +219,8 @@ def schema_values(schema: dict, field: str) -> list[str]:
     return schema["properties"]["invariants"]["items"]["properties"][field]["enum"]
 
 
-def source_pins() -> dict[str, str]:
-    lock = load_json(LOCK)
+def source_pins(path: Path = LOCK) -> dict[str, str]:
+    lock = load_json(path)
     require(isinstance(lock, dict), "dependencies.lock.json: root must be an object")
     pins = {}
     for component, key in (
@@ -234,8 +239,8 @@ def source_pins() -> dict[str, str]:
     return pins
 
 
-def source_repositories() -> dict[str, tuple[str, str | None]]:
-    lock = load_json(LOCK)
+def source_repositories(path: Path = LOCK) -> dict[str, tuple[str, str | None]]:
+    lock = load_json(path)
     repositories = {}
     for component, key in (
         ("verity", "verity"),
@@ -376,10 +381,11 @@ def external_source_targets(
 
 
 def refresh_external_provenance(
-    pins: dict[str, str], inventory_path: Path = EXTERNAL_TARGETS
+    pins: dict[str, str], inventory_path: Path = EXTERNAL_TARGETS,
+    lock_path: Path = LOCK,
 ) -> None:
     inventory = load_json(inventory_path)
-    repositories = source_repositories()
+    repositories = source_repositories(lock_path)
     for component, commit in pins.items():
         repository, pinned_ref = repositories[component]
         resolve_git_targets(
@@ -467,6 +473,14 @@ def validate_source_inventory(
                     "target SOURCE.json: remote SHA-256 mismatch",
                 )
     require(seen == expected_paths, "target SOURCE.json: missing committed provenance")
+
+
+def refresh_provenance(lock_path: Path = LOCK) -> None:
+    validate_lock(lock_path)
+    pins = source_pins(lock_path)
+    external_source_targets(pins)
+    refresh_external_provenance(pins, lock_path=lock_path)
+    validate_source_inventory(online=True)
 
 
 def validate_source_anchor(
@@ -753,6 +767,15 @@ def dependency_entries(manifest: object, label: str) -> list[dict]:
     return entries
 
 
+def require_package_inventory(
+    entries: list[dict], label: str, expected: set[str]
+) -> None:
+    require(
+        {entry.get("name") for entry in entries} == expected,
+        f"{label}: complete package inventory mismatch",
+    )
+
+
 def require_package(
     entries: list[dict], label: str, name: str, url: str, rev: str, inherited: bool
 ) -> dict:
@@ -941,6 +964,9 @@ def validate_dependency_planes(
         "current plane: Verity lakefile repository/revision mismatch",
     )
     current_entries = dependency_entries(load_json(root_manifest), "current plane")
+    require_package_inventory(
+        current_entries, "current plane", EXPECTED_CURRENT_PACKAGES
+    )
     require_package(current_entries, "current plane", "verity",
                     "https://github.com/lfglabs-dev/verity.git",
                     current["verity"], False)
@@ -971,6 +997,9 @@ def validate_dependency_planes(
         "target plane: Verity lakefile repository/revision mismatch",
     )
     target_entries = dependency_entries(load_json(target_manifest), "target plane")
+    require_package_inventory(
+        target_entries, "target plane", EXPECTED_TARGET_PACKAGES
+    )
     require_package(target_entries, "target plane", "verity",
                     lock["verity"]["repository"], lock["verity"]["commit"], False)
     require_package(target_entries, "target plane", "evmyul",
@@ -1961,10 +1990,35 @@ def negative_tests() -> None:
         topology_manifest_path.unlink()
     target_manifest_data = load_json(TARGET / "lake-manifest.json")
     manifest_mutants = []
+    rogue_current = json.loads(json.dumps(current_manifest_data))
+    rogue_current_entry = json.loads(json.dumps(
+        next(p for p in rogue_current["packages"] if p["name"] == "evmyul")
+    ))
+    rogue_current_entry["name"] = "rogue"
+    rogue_current["packages"].append(rogue_current_entry)
+    rogue_current_path = write_mutant(rogue_current)
+    try:
+        expect_failure(
+            "current unrecorded inherited package",
+            lambda: validate_dependency_planes(root_manifest=rogue_current_path),
+            "current plane: complete package inventory mismatch",
+        )
+    finally:
+        rogue_current_path.unlink()
     duplicate = json.loads(json.dumps(target_manifest_data))
     duplicate["packages"].append(json.loads(json.dumps(duplicate["packages"][0])))
     manifest_mutants.append(("duplicate package instances", duplicate,
                              "duplicate package instances"))
+    rogue_target = json.loads(json.dumps(target_manifest_data))
+    rogue_target_entry = json.loads(json.dumps(
+        next(p for p in rogue_target["packages"] if p["name"] == "evmyul")
+    ))
+    rogue_target_entry["name"] = "rogue"
+    rogue_target["packages"].append(rogue_target_entry)
+    manifest_mutants.append((
+        "target unrecorded inherited package", rogue_target,
+        "target plane: complete package inventory mismatch",
+    ))
     for field, value, expected in (
         ("rev", "0" * 40, "verity rev mismatch"),
         ("inputRev", "0" * 40, "verity inputRev mismatch"),
@@ -2219,6 +2273,18 @@ def refresh_negative_tests() -> None:
         ),
         "ref does not resolve to pinned repository commit",
     )
+    lock_mutant = load_json(LOCK)
+    lock_mutant = json.loads(json.dumps(lock_mutant))
+    lock_mutant["proof"]["repository"] = "https://github.com/example/proof.git"
+    lock_path = write_mutant(lock_mutant)
+    try:
+        expect_failure(
+            "refresh immutable lock tampering",
+            lambda: refresh_provenance(lock_path),
+            "proof: exact repository mismatch",
+        )
+    finally:
+        lock_path.unlink()
     fabricated_inventory = load_json(EXTERNAL_TARGETS)
     fabricated_inventory = json.loads(json.dumps(fabricated_inventory))
     fabricated_inventory["components"]["lido-core"]["targets"][
@@ -2270,10 +2336,7 @@ def main() -> int:
     args = parser.parse_args()
     try:
         if args.command == "refresh-provenance":
-            pins = source_pins()
-            external_source_targets(pins)
-            refresh_external_provenance(pins)
-            validate_source_inventory(online=True)
+            refresh_provenance()
         elif args.command == "test-refresh-negative":
             refresh_negative_tests()
         elif args.command == "check-lean":
