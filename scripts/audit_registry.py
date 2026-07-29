@@ -808,6 +808,7 @@ def expect_failure(label: str, action: Callable[[], object], expected: str) -> N
     except RegistryError as error:
         require(expected in str(error),
                 f"{label}: wrong failure: expected {expected!r}, got {str(error)!r}")
+        print(f"mutant rejected: {label}")
     else:
         raise RegistryError(f"{label}: unexpectedly passed")
 
@@ -1038,6 +1039,7 @@ def negative_tests() -> None:
         ])),
         "scanner interpolation fixture: unexpectedly passed",
     )
+    print("mutant rejected: direct interpolated-string proof escape")
     nested_interpolation_mutant = require_fixture("interpolation-nested-negative.txt")
     require(
         len(find_proof_escapes([
@@ -1046,6 +1048,7 @@ def negative_tests() -> None:
         ])) == 2,
         "scanner direct/nested interpolation fixture: expected both escapes rejected",
     )
+    print("mutant rejected: direct/nested interpolated-string proof escapes")
     interpolation_safe = require_fixture("interpolation-safe-positive.txt")
     require(
         not find_proof_escapes([

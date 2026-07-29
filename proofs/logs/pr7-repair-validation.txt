@@ -1,0 +1,22 @@
+PR #7 M0 registry repair validation receipts (2026-07-29)
+
+python3 scripts/audit_registry.py test-negative
+exit 0; all negative mutants rejected, including dependency axiom,
+fabricated external object/path, missing local/external/suffix anchors,
+and direct/nested interpolated-string proof escapes.
+
+make audit-check
+exit 0; registry check and negative suite passed.
+
+lake build LidoSRv3
+exit 0; Build completed successfully (26 jobs).
+
+lake build LidoSRv3.Audit.Trust
+exit 0; Build completed successfully (21 jobs); reported only allowlisted
+propext and Quot.sound axioms (or no axioms).
+
+changed-Lean proof-escape scan against origin/main...HEAD
+exit 0; 0 changed Lean files; no proof escapes.
+
+git diff --check
+exit 0.
