@@ -1,0 +1,26 @@
+{
+  "schema": "immutable-git-source-inventory-v1",
+  "sources": [
+    {
+      "repository": "https://github.com/lfglabs-dev/verity.git",
+      "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
+      "path": "lakefile.lean",
+      "blob": "8f9ed3876ac1be45682fb6d11a2273a2cf668a1b",
+      "sha256": "829c5b05463ca5ef781c53bc4d645368bc528bc1dd1bf2cc3954179a8c055eb8"
+    },
+    {
+      "repository": "https://github.com/lfglabs-dev/verity.git",
+      "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
+      "path": "lake-manifest.json",
+      "blob": "ea121965446e5a8bd03806ae490fca1cc999fb3a",
+      "sha256": "ae4b6d9fc8f787005515ba1e20c85e2f80fe0446795489fac1641c4ecbc7eff6"
+    },
+    {
+      "repository": "https://github.com/lfglabs-dev/verity.git",
+      "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
+      "path": "lean-toolchain",
+      "blob": "18640c8b066b182147f324d3aefd8ee48ee45238",
+      "sha256": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
+    }
+  ]
+}

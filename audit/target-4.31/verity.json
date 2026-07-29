@@ -1,0 +1,21 @@
+{
+  "schema": "upstream-lake-topology-v1",
+  "package": "verity",
+  "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
+  "lean_toolchain": "leanprover/lean4:v4.31.0",
+  "direct_dependencies": [
+    {
+      "name": "evmyul",
+      "url": "https://github.com/lfglabs-dev/EVMYulLean.git",
+      "rev": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+      "inputRev": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
+    }
+  ],
+  "print_axioms": {
+    "status": "FAIL",
+    "audit_cert": false,
+    "command": "lake build PrintAxioms && lake env lean PrintAxioms.lean",
+    "location": "Verity 68f560e66c5de6123061ce5ed60261be162673d1",
+    "observation": "Previously observed upstream failure; not freshly independently reproduced by this M0 repair."
+  }
+}

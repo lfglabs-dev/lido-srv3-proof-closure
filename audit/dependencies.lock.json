@@ -5,15 +5,27 @@
     "ref": "main",
     "commit": "ee2e65cd807e913ea245ae6fd7987a7f1d962800"
   },
-  "future_root": {
+  "current_root": {
+    "plane": "active",
+    "lean_toolchain": "leanprover/lean4:v4.24.0",
     "direct_dependencies": ["verity"],
-    "policy": "Exactly one direct Verity dependency; no direct EVMYulLean dependency."
+    "verity": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f",
+    "evmyullean": "38d53df8b4488d5322894619ea8385fcbb2e6f5d"
+  },
+  "target_root": {
+    "plane": "audit-only",
+    "path": "audit/target-4.31",
+    "lean_toolchain": "leanprover/lean4:v4.31.0",
+    "direct_dependencies": ["verity"],
+    "status": "DEV-431-READY",
+    "print_axioms": "FAIL",
+    "audit_cert": false
   },
   "verity": {
     "repository": "https://github.com/lfglabs-dev/verity.git",
     "ref": "dev/lean-4.31-scaffolding",
     "commit": "68f560e66c5de6123061ce5ed60261be162673d1",
-    "certification": "DEV-431-READY, not AUDIT-CERT"
+    "certification": "target DEV-431-READY; target PrintAxioms FAIL; AUDIT-CERT=false"
   },
   "evmyullean": {
     "repository": "https://github.com/lfglabs-dev/EVMYulLean.git",

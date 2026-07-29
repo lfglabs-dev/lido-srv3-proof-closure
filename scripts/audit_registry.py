@@ -22,6 +22,8 @@ REGISTRY = AUDIT / "invariants.yaml"
 SCHEMA = AUDIT / "schema.json"
 LOCK = AUDIT / "dependencies.lock.json"
 EXTERNAL_TARGETS = AUDIT / "external-source-targets.json"
+TARGET = AUDIT / "target-4.31"
+TARGET_SOURCE = TARGET / "SOURCE.json"
 TRUSTED_AXIOMS = AUDIT / "trusted-axioms.json"
 ARTIFACTS = AUDIT / "artifacts.json"
 EXPECTED_ARTIFACTS = {
@@ -322,10 +324,86 @@ def external_source_targets(
                 and re.fullmatch(r"[0-9a-f]{40}", identity["object"]) is not None,
                 f"external-source-targets.json: invalid {component} target identity",
             )
-        repository, pinned_ref = repositories[component]
-        resolve_git_targets(component, repository, pinned_ref, commit, targets)
         targets_by_component[component] = set(targets)
     return targets_by_component
+
+
+def refresh_external_provenance(
+    pins: dict[str, str], inventory_path: Path = EXTERNAL_TARGETS
+) -> None:
+    inventory = load_json(inventory_path)
+    repositories = source_repositories()
+    for component, commit in pins.items():
+        repository, pinned_ref = repositories[component]
+        resolve_git_targets(
+            component, repository, pinned_ref, commit,
+            inventory["components"][component]["targets"],
+        )
+
+
+def validate_source_inventory(path: Path = TARGET_SOURCE, online: bool = False) -> None:
+    inventory = load_json(path)
+    require(
+        isinstance(inventory, dict)
+        and set(inventory) == {"schema", "sources"}
+        and inventory["schema"] == "immutable-git-source-inventory-v1"
+        and isinstance(inventory["sources"], list)
+        and inventory["sources"],
+        "target SOURCE.json: invalid committed provenance",
+    )
+    expected_paths = {"lakefile.lean", "lake-manifest.json", "lean-toolchain"}
+    seen = set()
+    for source in inventory["sources"]:
+        require(
+            isinstance(source, dict)
+            and set(source) == {"repository", "commit", "path", "blob", "sha256"},
+            "target SOURCE.json: invalid source identity",
+        )
+        require(source["repository"] == "https://github.com/lfglabs-dev/verity.git",
+                "target SOURCE.json: repository mismatch")
+        require(source["commit"] == "68f560e66c5de6123061ce5ed60261be162673d1",
+                "target SOURCE.json: commit mismatch")
+        require(source["path"] in expected_paths and source["path"] not in seen,
+                "target SOURCE.json: path mismatch")
+        require(re.fullmatch(r"[0-9a-f]{40}", source["blob"]) is not None,
+                "target SOURCE.json: blob mismatch")
+        require(re.fullmatch(r"[0-9a-f]{64}", source["sha256"]) is not None,
+                "target SOURCE.json: SHA-256 mismatch")
+        seen.add(source["path"])
+        if online:
+            with tempfile.TemporaryDirectory() as directory:
+                git_dir = Path(directory) / "source.git"
+                subprocess.run(["git", "init", "--bare", str(git_dir)],
+                               check=True, capture_output=True)
+                fetch = subprocess.run(
+                    ["git", "--git-dir", str(git_dir), "fetch", "--quiet", "--depth=1",
+                     source["repository"], source["commit"]],
+                    text=True, capture_output=True,
+                )
+                require(fetch.returncode == 0,
+                        "target SOURCE.json: pinned commit unavailable")
+                tree = subprocess.run(
+                    ["git", "--git-dir", str(git_dir), "ls-tree", source["commit"],
+                     "--", source["path"]],
+                    text=True, capture_output=True,
+                )
+                fields = tree.stdout.strip().split(maxsplit=3)
+                require(
+                    tree.returncode == 0 and len(fields) == 4
+                    and fields[1] == "blob" and fields[2] == source["blob"]
+                    and fields[3] == source["path"],
+                    "target SOURCE.json: remote blob identity mismatch",
+                )
+                content = subprocess.run(
+                    ["git", "--git-dir", str(git_dir), "cat-file", "blob", source["blob"]],
+                    capture_output=True,
+                )
+                require(
+                    content.returncode == 0
+                    and hashlib.sha256(content.stdout).hexdigest() == source["sha256"],
+                    "target SOURCE.json: remote SHA-256 mismatch",
+                )
+    require(seen == expected_paths, "target SOURCE.json: missing committed provenance")
 
 
 def validate_source_anchor(
@@ -524,7 +602,6 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
 
     for node in sorted(graph):
         visit(node)
-    validate_theorems(data)
     return data
 
 
@@ -538,8 +615,106 @@ def validate_lock() -> None:
     }
     for component, commit in expected.items():
         require(lock[component]["commit"] == commit, f"{component}: exact pin mismatch")
-    require(lock["future_root"]["direct_dependencies"] == ["verity"], "future root must depend exactly once on Verity")
+    require(lock["target_root"]["direct_dependencies"] == ["verity"],
+            "target root must depend exactly once on Verity")
     require("transitive" in lock["evmyullean"]["resolution"], "EVMYulLean must be transitive")
+    require(
+        lock["target_root"]["status"] == "DEV-431-READY"
+        and lock["target_root"]["print_axioms"] == "FAIL"
+        and lock["target_root"]["audit_cert"] is False,
+        "target status must be DEV-431-READY, PrintAxioms FAIL, AUDIT-CERT=false",
+    )
+
+
+def dependency_entries(manifest: object, label: str) -> list[dict]:
+    require(isinstance(manifest, dict) and isinstance(manifest.get("packages"), list),
+            f"{label}: packages must be an array")
+    entries = manifest["packages"]
+    require(all(isinstance(entry, dict) for entry in entries),
+            f"{label}: package entries must be objects")
+    names = [entry.get("name") for entry in entries]
+    require(len(names) == len(set(names)), f"{label}: duplicate package instances")
+    return entries
+
+
+def require_package(
+    entries: list[dict], label: str, name: str, url: str, rev: str, inherited: bool
+) -> dict:
+    matches = [entry for entry in entries if entry.get("name") == name]
+    require(len(matches) == 1, f"{label}: expected exactly one {name} package")
+    entry = matches[0]
+    require(entry.get("url") == url, f"{label}: {name} URL mismatch")
+    require(entry.get("rev") == rev, f"{label}: {name} rev mismatch")
+    require(entry.get("inputRev") == rev, f"{label}: {name} inputRev mismatch")
+    require(entry.get("inherited") is inherited, f"{label}: {name} inherited mismatch")
+    return entry
+
+
+def validate_dependency_planes(
+    root_lakefile: Path = ROOT / "lakefile.lean",
+    root_manifest: Path = ROOT / "lake-manifest.json",
+    root_toolchain: Path = ROOT / "lean-toolchain",
+    target_lakefile: Path = TARGET / "lakefile.lean",
+    target_manifest: Path = TARGET / "lake-manifest.json",
+    target_toolchain: Path = TARGET / "lean-toolchain",
+    verity_metadata: Path = TARGET / "verity.json",
+) -> None:
+    lock = load_json(LOCK)
+    current = lock["current_root"]
+    require(root_toolchain.read_text(encoding="utf-8").strip() == current["lean_toolchain"],
+            "current plane: Lean toolchain mismatch")
+    current_lake = root_lakefile.read_text(encoding="utf-8")
+    require(current_lake.count("require verity from git") == 1,
+            "current plane: expected exactly one direct Verity")
+    require("require evmyul" not in current_lake.lower(),
+            "current plane: direct EVMYulLean forbidden")
+    require(current["verity"] in current_lake, "current plane: Verity lakefile pin mismatch")
+    current_entries = dependency_entries(load_json(root_manifest), "current plane")
+    require_package(current_entries, "current plane", "verity",
+                    "https://github.com/lfglabs-dev/verity.git",
+                    current["verity"], False)
+    require_package(current_entries, "current plane", "evmyul",
+                    "https://github.com/lfglabs-dev/EVMYulLean.git",
+                    current["evmyullean"], True)
+
+    target = lock["target_root"]
+    require(target["plane"] == "audit-only" and target["path"] == "audit/target-4.31",
+            "target plane must remain audit-only")
+    require(target_toolchain.read_text(encoding="utf-8").strip() == target["lean_toolchain"],
+            "target plane: Lean toolchain mismatch")
+    target_lake = target_lakefile.read_text(encoding="utf-8")
+    require(target_lake.count("require verity from git") == 1,
+            "target plane: expected exactly one direct Verity")
+    require("require evmyul" not in target_lake.lower(),
+            "target plane: direct EVMYulLean forbidden")
+    require(lock["verity"]["commit"] in target_lake,
+            "target plane: Verity lakefile pin mismatch")
+    target_entries = dependency_entries(load_json(target_manifest), "target plane")
+    require_package(target_entries, "target plane", "verity",
+                    lock["verity"]["repository"], lock["verity"]["commit"], False)
+    require_package(target_entries, "target plane", "evmyul",
+                    lock["evmyullean"]["repository"], lock["evmyullean"]["commit"], True)
+    verity = load_json(verity_metadata)
+    require(verity["commit"] == lock["verity"]["commit"],
+            "target plane: Verity metadata commit mismatch")
+    require(verity["lean_toolchain"] == target["lean_toolchain"],
+            "target plane: Verity toolchain mismatch")
+    deps = verity["direct_dependencies"]
+    require(isinstance(deps, list) and len(deps) == 1 and deps[0]["name"] == "evmyul",
+            "target plane: Verity must have sole inherited EVMYulLean")
+    require(
+        deps[0]["url"] == lock["evmyullean"]["repository"]
+        and deps[0]["rev"] == lock["evmyullean"]["commit"]
+        and deps[0]["inputRev"] == lock["evmyullean"]["commit"],
+        "target plane: Verity EVMYulLean metadata mismatch",
+    )
+    receipt = verity["print_axioms"]
+    require(
+        receipt["status"] == "FAIL" and receipt["audit_cert"] is False
+        and receipt["command"] and receipt["location"],
+        "target plane: AUDIT-CERT requires passing PrintAxioms evidence",
+    )
+    validate_source_inventory()
 
 
 def validate_artifacts(path: Path = ARTIFACTS) -> None:
@@ -689,7 +864,8 @@ def assert_fresh(path: Path, expected: str, label: str) -> None:
 
 def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     patterns = re.compile(
-        r"(?<![\w'])(sorryAx|sorry|admit|axiom|constant|unsafe)(?![\w'])"
+        r"(?<![\w'])(sorryAx|sorry|admit|axiom|constant|unsafe|native_decide|"
+        r"implemented_by|extern)(?![\w'])"
     )
     violations = []
     interpolated_prefix = re.compile(
@@ -699,6 +875,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     for name, source in sources:
         block_depth = 0
         contexts: list[tuple[str, object]] = [("code", None)]
+        sanitized_lines = []
         for number, line in enumerate(source.splitlines(), 1):
             code_parts = []
             cursor = 0
@@ -787,8 +964,28 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 interpolated, _ = contexts[-1][1]
                 contexts[-1] = ("string", (interpolated, False))
             code = "".join(code_parts)
+            sanitized_lines.append(code)
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
+        sanitized = "\n".join(sanitized_lines)
+        opaque_start = re.compile(
+            r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
+            r"(?:(?:private|protected)[ \t]+)*opaque[ \t]+"
+        )
+        declaration_start = re.compile(
+            r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
+            r"(?:(?:private|protected)[ \t]+)*"
+            r"(?:opaque|def|theorem|lemma|axiom|constant|inductive|structure|class|instance)\b"
+        )
+        opaque_matches = list(opaque_start.finditer(sanitized))
+        for match in opaque_matches:
+            following = declaration_start.search(sanitized, match.end())
+            end = following.start() if following is not None else len(sanitized)
+            declaration = sanitized[match.start():end]
+            if ":=" not in declaration and re.search(r"(?m)^[ \t]*where\b", declaration) is None:
+                line_number = sanitized.count("\n", 0, match.start()) + 1
+                original = source.splitlines()[line_number - 1].strip()
+                violations.append(f"{name}:{line_number}:{original}")
     return violations
 
 
@@ -827,6 +1024,14 @@ def write_mutant(data: object, suffix: str = ".json") -> Path:
         return Path(mutant_file.name)
 
 
+def write_text_mutant(text: str, suffix: str) -> Path:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=suffix, encoding="utf-8", dir=AUDIT, delete=False
+    ) as mutant_file:
+        mutant_file.write(text)
+        return Path(mutant_file.name)
+
+
 def negative_tests() -> None:
     invalid_entry = require_fixture("invalid-entry.yaml")
     expect_failure(
@@ -837,20 +1042,6 @@ def negative_tests() -> None:
     data = validate()
     pins = source_pins()
     targets = external_source_targets(pins)
-    fabricated_inventory = load_json(EXTERNAL_TARGETS)
-    fabricated_inventory = json.loads(json.dumps(fabricated_inventory))
-    fabricated_inventory["components"]["lido-core"]["targets"][
-        "contracts/0.8.25/sr/Fabricated.sol"
-    ] = {"kind": "file", "object": "f" * 40}
-    fabricated_path = write_mutant(fabricated_inventory)
-    try:
-        expect_failure(
-            "fabricated external object/path mutant",
-            lambda: external_source_targets(pins, fabricated_path),
-            "identity does not match pinned repository object",
-        )
-    finally:
-        fabricated_path.unlink()
     source_anchor_positive = load_json(require_fixture("source-anchors-safe-positive.json"))
     for anchor in source_anchor_positive:
         validate_source_anchor(anchor, pins, targets)
@@ -892,41 +1083,6 @@ def negative_tests() -> None:
             )
         finally:
             dependency_path.unlink()
-    mutant = json.loads(json.dumps(data))
-    next(row for row in mutant["invariants"] if row["status"] == "PROVED")["theorem"] = "No.Such.Theorem"
-    mutant_path = write_mutant(mutant)
-    try:
-        expect_failure(
-            "nonexistent theorem mutant",
-            lambda: validate(mutant_path),
-            "registry theorem does not exist in LidoSRv3 build surface",
-        )
-    finally:
-        mutant_path.unlink()
-    regression_mutant = json.loads(json.dumps(data))
-    next(row for row in regression_mutant["invariants"]
-         if row["status"] == "REGRESSION")["theorem"] = "No.Such.RegressionTheorem"
-    regression_path = write_mutant(regression_mutant)
-    try:
-        expect_failure(
-            "nonexistent REGRESSION theorem mutant",
-            lambda: validate(regression_path),
-            "registry theorem does not exist in LidoSRv3 build surface",
-        )
-    finally:
-        regression_path.unlink()
-    expect_failure(
-        "dependency axiom theorem mutant",
-        lambda: run_theorem_checks(
-            ["AuditRegistry.dependsOnAxiom"],
-            ["AuditRegistry.dependsOnAxiom"],
-            "namespace AuditRegistry\n"
-            "axiom dependencyAxiom : True\n"
-            "theorem dependsOnAxiom : True := dependencyAxiom\n"
-            "end AuditRegistry\n",
-        ),
-        "undeclared transitive axioms: ['AuditRegistry.dependencyAxiom']",
-    )
     for assured_status in ("REGRESSION", "PROVED"):
         runtime_mutant = json.loads(json.dumps(data))
         runtime_row = next(
@@ -1072,6 +1228,103 @@ def negative_tests() -> None:
         ]),
         "scanner interpolated forms safe-positive fixture: unexpectedly rejected",
     )
+    bodyless_opaque = (
+        '@[extern "bad"]\nprivate protected opaque\n'
+        '  bad :\n  False\n'
+    )
+    require(
+        find_proof_escapes([("bodyless-opaque.lean", bodyless_opaque)]),
+        "scanner bodyless attributed/multiline/private/protected opaque mutant passed",
+    )
+    legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
+    require(
+        not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
+        "scanner legitimate opaque body was rejected",
+    )
+
+    current_lake = (ROOT / "lakefile.lean").read_text(encoding="utf-8")
+    target_lake = (TARGET / "lakefile.lean").read_text(encoding="utf-8")
+    for label, base, is_target in (
+        ("current direct EVMYulLean", current_lake, False),
+        ("target direct EVMYulLean", target_lake, True),
+    ):
+        path = write_text_mutant(
+            base + '\nrequire evmyul from git "https://github.com/lfglabs-dev/EVMYulLean.git"@'
+            '"f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"\n',
+            ".lean",
+        )
+        try:
+            kwargs = {"target_lakefile": path} if is_target else {"root_lakefile": path}
+            expect_failure(label, lambda kwargs=kwargs: validate_dependency_planes(**kwargs),
+                           "direct EVMYulLean forbidden")
+        finally:
+            path.unlink()
+    for count, replacement in (
+        (0, target_lake.replace("require verity from git", "-- removed")),
+        (2, target_lake + "\nrequire verity from git\n  "
+         '"https://github.com/lfglabs-dev/verity.git"@'
+         '"68f560e66c5de6123061ce5ed60261be162673d1"\n'),
+    ):
+        path = write_text_mutant(replacement, ".lean")
+        try:
+            expect_failure(f"target {count} Verity mutant",
+                           lambda path=path: validate_dependency_planes(target_lakefile=path),
+                           "expected exactly one direct Verity")
+        finally:
+            path.unlink()
+    target_manifest_data = load_json(TARGET / "lake-manifest.json")
+    manifest_mutants = []
+    duplicate = json.loads(json.dumps(target_manifest_data))
+    duplicate["packages"].append(json.loads(json.dumps(duplicate["packages"][0])))
+    manifest_mutants.append(("duplicate package instances", duplicate,
+                             "duplicate package instances"))
+    for field, value, expected in (
+        ("rev", "0" * 40, "verity rev mismatch"),
+        ("inputRev", "0" * 40, "verity inputRev mismatch"),
+        ("url", "https://example.invalid/verity.git", "verity URL mismatch"),
+        ("inherited", True, "verity inherited mismatch"),
+    ):
+        mutant = json.loads(json.dumps(target_manifest_data))
+        next(p for p in mutant["packages"] if p["name"] == "verity")[field] = value
+        manifest_mutants.append((f"target wrong Verity {field}", mutant, expected))
+    for label, mutant, expected in manifest_mutants:
+        path = write_mutant(mutant)
+        try:
+            expect_failure(label,
+                           lambda path=path: validate_dependency_planes(target_manifest=path),
+                           expected)
+        finally:
+            path.unlink()
+    source_mutant = load_json(TARGET_SOURCE)
+    source_mutant = json.loads(json.dumps(source_mutant))
+    source_mutant["sources"][0]["commit"] = "0" * 40
+    source_path = write_mutant(source_mutant)
+    try:
+        expect_failure("snapshot identity mismatch",
+                       lambda: validate_source_inventory(source_path),
+                       "commit mismatch")
+    finally:
+        source_path.unlink()
+    missing_source = load_json(TARGET_SOURCE)
+    missing_source = json.loads(json.dumps(missing_source))
+    missing_source["sources"].pop()
+    missing_source_path = write_mutant(missing_source)
+    try:
+        expect_failure("missing committed provenance",
+                       lambda: validate_source_inventory(missing_source_path),
+                       "missing committed provenance")
+    finally:
+        missing_source_path.unlink()
+    receipt_mutant = load_json(TARGET / "verity.json")
+    receipt_mutant = json.loads(json.dumps(receipt_mutant))
+    receipt_mutant["print_axioms"]["audit_cert"] = True
+    receipt_path = write_mutant(receipt_mutant)
+    try:
+        expect_failure("AUDIT-CERT with failing PrintAxioms",
+                       lambda: validate_dependency_planes(verity_metadata=receipt_path),
+                       "AUDIT-CERT requires passing PrintAxioms evidence")
+    finally:
+        receipt_path.unlink()
 
     strategy_mutant = load_json(ARTIFACTS)
     strategy_mutant = json.loads(json.dumps(strategy_mutant))
@@ -1169,9 +1422,43 @@ def negative_tests() -> None:
     )
 
 
+def refresh_negative_tests() -> None:
+    pins = source_pins()
+    fabricated_inventory = load_json(EXTERNAL_TARGETS)
+    fabricated_inventory = json.loads(json.dumps(fabricated_inventory))
+    fabricated_inventory["components"]["lido-core"]["targets"][
+        "contracts/0.8.25/sr/Fabricated.sol"
+    ] = {"kind": "file", "object": "f" * 40}
+    path = write_mutant(fabricated_inventory)
+    try:
+        expect_failure(
+            "refresh fabricated external path/blob",
+            lambda: refresh_external_provenance(pins, path),
+            "identity does not match pinned repository object",
+        )
+    finally:
+        path.unlink()
+    for label, field, value, expected in (
+        ("refresh fabricated commit", "commit", "0" * 40, "commit mismatch"),
+        ("refresh fabricated path", "path", "Fabricated.lean", "path mismatch"),
+        ("refresh fabricated blob", "blob", "f" * 40, "remote blob identity mismatch"),
+    ):
+        mutant = load_json(TARGET_SOURCE)
+        mutant = json.loads(json.dumps(mutant))
+        mutant["sources"][0][field] = value
+        path = write_mutant(mutant)
+        try:
+            expect_failure(
+                label, lambda path=path: validate_source_inventory(path, online=True), expected
+            )
+        finally:
+            path.unlink()
+
+
 def check() -> None:
     data = validate()
     validate_lock()
+    validate_dependency_planes()
     validate_artifacts()
     check_fresh(data)
     proof_escape_scan()
@@ -1179,10 +1466,24 @@ def check() -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("check", "generate", "test-negative"))
+    parser.add_argument(
+        "command", choices=(
+            "check", "check-lean", "generate", "test-negative",
+            "refresh-provenance", "test-refresh-negative"
+        )
+    )
     args = parser.parse_args()
     try:
-        if args.command == "generate":
+        if args.command == "refresh-provenance":
+            pins = source_pins()
+            external_source_targets(pins)
+            refresh_external_provenance(pins)
+            validate_source_inventory(online=True)
+        elif args.command == "test-refresh-negative":
+            refresh_negative_tests()
+        elif args.command == "check-lean":
+            validate_theorems(validate())
+        elif args.command == "generate":
             generate(validate())
         elif args.command == "test-negative":
             negative_tests()

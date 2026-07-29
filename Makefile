@@ -8,7 +8,7 @@ PROOF_LOG := proofs/logs/proof-report.json
 SHELL     := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all audit-check audit-generate bootstrap test prove report clean distclean
+.PHONY: all audit-check audit-check-lean audit-generate audit-refresh-provenance audit-test-refresh-negative bootstrap test prove report clean distclean
 
 all: report
 
@@ -20,8 +20,17 @@ bootstrap:
 audit-check:
 	@bash scripts/check_audit_registry.sh
 
+audit-check-lean:
+	@python3 scripts/audit_registry.py check-lean
+
 audit-generate:
 	@python3 scripts/audit_registry.py generate
+
+audit-refresh-provenance:
+	@python3 scripts/audit_registry.py refresh-provenance
+
+audit-test-refresh-negative:
+	@python3 scripts/audit_registry.py test-refresh-negative
 
 test:
 	@$(MAKE) audit-check

@@ -1,6 +1,8 @@
 # Audit migration roadmap
 
-M0 is metadata and audit-control tooling only. It does not migrate Lean, alter a
+M0 is metadata and audit-control tooling only. The active current plane remains
+Lean 4.24 with Verity `538c4a9ce2baa25b56062bdc727eb0191ad9e67f`.
+It does not migrate Lean, alter a
 model or proof, establish Solidity/bytecode correspondence, or certify any
 Lean 4.31 toolchain.
 
@@ -13,8 +15,9 @@ Lean 4.31 toolchain.
    change the future root to depend exactly once on Verity
    `68f560e66c5de6123061ce5ed60261be162673d1`. EVMYulLean
    `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9` must resolve transitively from
-   that Verity pin, with duplicate package instances rejected. The scaffold is
-   `DEV-431-READY`, never `AUDIT-CERT`.
+   that Verity pin, with duplicate package instances rejected. The audit-only
+   target metadata is `DEV-431-READY`; target `PrintAxioms` is `FAIL`, so
+   `AUDIT-CERT=false`.
 3. **Later semantic lanes.** Use Verity only for applicable Solidity/model
    components. Use EVMYulLean Yul/EVM semantics and explicit interface
    composition for handwritten Yul/direct bytecode. Never fabricate a Verity
