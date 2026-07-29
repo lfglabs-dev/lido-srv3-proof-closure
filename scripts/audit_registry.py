@@ -631,8 +631,13 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
             require(dependency in graph, f"{node}: unknown dependency {dependency}")
             require(dependency != node, f"{node}: self dependency")
             if rows[node]["status"] in {"PROVED", "REGRESSION"}:
+                allowed_dependency_statuses = (
+                    {"PROVED"}
+                    if rows[node]["status"] == "PROVED"
+                    else {"PROVED", "REGRESSION"}
+                )
                 require(
-                    rows[dependency]["status"] in {"PROVED", "REGRESSION"},
+                    rows[dependency]["status"] in allowed_dependency_statuses,
                     f"{node}: assured status {rows[node]['status']} requires assured "
                     f"dependency {dependency}, got {rows[dependency]['status']}",
                 )
@@ -1320,6 +1325,21 @@ def negative_tests() -> None:
     )
     const_positive = load_json_fixture("const-one-safe-positive.json")
     validate_against_schema(const_positive, {"const": 1}, "fixture")
+    dependency_downgrade_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in dependency_downgrade_mutant["invariants"]
+        if row["id"] == "SRV3-ALLOC-ORDER"
+    )["status"] = "REGRESSION"
+    dependency_downgrade_path = write_mutant(dependency_downgrade_mutant)
+    try:
+        expect_failure(
+            "PROVED dependency downgrade mutant",
+            lambda: validate(dependency_downgrade_path),
+            "SRV3-MINFIRST-BOUND: assured status PROVED requires assured dependency "
+            "SRV3-ALLOC-ORDER, got REGRESSION",
+        )
+    finally:
+        dependency_downgrade_path.unlink()
     for unresolved_status in ("BLOCKED", "STRETCH"):
         dependency_mutant = json.loads(json.dumps(data))
         next(
