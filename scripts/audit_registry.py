@@ -691,6 +691,12 @@ def validate_lock(path: Path = LOCK) -> None:
     }
     for component, commit in expected.items():
         require(lock[component]["commit"] == commit, f"{component}: exact pin mismatch")
+    require(
+        lock["proof"]["repository"]
+        == "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+        "proof: exact repository mismatch",
+    )
+    require(lock["proof"]["ref"] == "main", "proof: exact ref mismatch")
     require(lock["current_root"]["verity"] == "538c4a9ce2baa25b56062bdc727eb0191ad9e67f",
             "current root Verity exact pin mismatch")
     require(lock["current_root"]["evmyullean"] == "38d53df8b4488d5322894619ea8385fcbb2e6f5d",
@@ -1784,6 +1790,22 @@ def negative_tests() -> None:
 
     lock_data = load_json(LOCK)
     current_manifest_data = load_json(ROOT / "lake-manifest.json")
+    for field, value, expected in (
+        ("repository", "https://example.com/unrelated.git",
+         "proof: exact repository mismatch"),
+        ("ref", "does-not-exist", "proof: exact ref mismatch"),
+    ):
+        proof_lock = json.loads(json.dumps(lock_data))
+        proof_lock["proof"][field] = value
+        proof_lock_path = write_mutant(proof_lock)
+        try:
+            expect_failure(
+                f"proof {field} tampering",
+                lambda proof_lock_path=proof_lock_path: validate_lock(proof_lock_path),
+                expected,
+            )
+        finally:
+            proof_lock_path.unlink()
     for plane, toolchain, expected in (
         ("current_root", "leanprover/lean4:v9.99.0",
          "current root Lean toolchain exact pin mismatch"),
