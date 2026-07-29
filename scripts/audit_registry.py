@@ -695,8 +695,12 @@ def validate_lock(path: Path = LOCK) -> None:
             "current root Verity exact pin mismatch")
     require(lock["current_root"]["evmyullean"] == "38d53df8b4488d5322894619ea8385fcbb2e6f5d",
             "current root EVMYulLean exact pin mismatch")
+    require(lock["current_root"]["lean_toolchain"] == "leanprover/lean4:v4.24.0",
+            "current root Lean toolchain exact pin mismatch")
     require(lock["current_root"]["direct_dependencies"] == ["verity"],
             "current root must depend exactly once on Verity")
+    require(lock["target_root"]["lean_toolchain"] == "leanprover/lean4:v4.31.0",
+            "target root Lean toolchain exact pin mismatch")
     require(lock["target_root"]["direct_dependencies"] == ["verity"],
             "target root must depend exactly once on Verity")
     require("transitive" in lock["evmyullean"]["resolution"], "EVMYulLean must be transitive")
@@ -1756,6 +1760,25 @@ def negative_tests() -> None:
 
     lock_data = load_json(LOCK)
     current_manifest_data = load_json(ROOT / "lake-manifest.json")
+    for plane, toolchain, expected in (
+        ("current_root", "leanprover/lean4:v9.99.0",
+         "current root Lean toolchain exact pin mismatch"),
+        ("target_root", "leanprover/lean4:v9.99.0",
+         "target root Lean toolchain exact pin mismatch"),
+    ):
+        toolchain_lock = json.loads(json.dumps(lock_data))
+        toolchain_lock[plane]["lean_toolchain"] = toolchain
+        toolchain_lock_path = write_mutant(toolchain_lock)
+        try:
+            expect_failure(
+                f"consistent {plane.replace('_', '-')} Lean toolchain tampering",
+                lambda toolchain_lock_path=toolchain_lock_path: validate_lock(
+                    toolchain_lock_path
+                ),
+                expected,
+            )
+        finally:
+            toolchain_lock_path.unlink()
     pin_lock = json.loads(json.dumps(lock_data))
     pin_lock["current_root"]["verity"] = "0" * 40
     pin_lock["current_root"]["evmyullean"] = "1" * 40
