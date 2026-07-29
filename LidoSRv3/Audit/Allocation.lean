@@ -80,7 +80,7 @@ def paymentEligible (mode : AllocationMode) (source : AllocationRow) : Prop :=
 /-- Payment rows are stricter than strategy rows for top-ups. -/
 def committedPaymentsEligible
     (mode : AllocationMode) (snapshot : AllocationSnapshot)
-    (payments : List Validators) : Prop :=
+    (payments : List Wei) : Prop :=
   payments.length = snapshot.rows.length ∧
     ∀ i : Nat, ∀ payment source,
       payments[i]? = some payment →
@@ -123,7 +123,7 @@ theorem positive_increment_respects_capacity
 
 theorem positive_committed_payment_is_eligible
     (h : committedPaymentsEligible mode snapshot payments)
-    (i : Nat) (payment : Validators) (source : AllocationRow)
+    (i : Nat) (payment : Wei) (source : AllocationRow)
     (hPayment : payments[i]? = some payment)
     (hSource : snapshot.rows[i]? = some source)
     (hPositive : payment.value > 0) :
@@ -174,6 +174,6 @@ private def tiedRowTwo : AllocationRow := ⟨word 2, true, .wc02, q 0, q 1⟩
 example :
     firstOpenModule? [tiedRowOne, tiedRowTwo] = some (word 1) ∧
       firstOpenModule? [tiedRowTwo, tiedRowOne] = some (word 2) := by
-  native_decide
+  decide
 
 end LidoSRv3.Audit

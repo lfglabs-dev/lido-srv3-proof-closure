@@ -50,13 +50,13 @@ def checkedMul (a : Quantity unit) (factor : Uint256) : Option (Quantity unit) :
 
 /-- Checked division: unlike EVM `DIV`, a zero divisor is rejected. -/
 def checkedDiv (a : Quantity unit) (divisor : Uint256) : Option (Quantity unit) :=
-  if divisor = 0 then none else some ⟨a.value / divisor⟩
+  (safeDiv a.value divisor).map Quantity.mk
 
 /-- Source-only saturating subtraction (for `Math.max`/headroom expressions). -/
 def saturatingSub (a b : Quantity unit) : Quantity unit :=
   if b.value ≤ a.value then ⟨a.value - b.value⟩ else zero
 
-/-- Checked left-to-right sum. The `Nat` recursion is structural only. -/
+/-- Checked recursive sum. The `Nat` recursion is structural only. -/
 def checkedSum : List (Quantity unit) → Option (Quantity unit)
   | [] => some zero
   | x :: xs => do
@@ -73,7 +73,7 @@ def checkedSum : List (Quantity unit) → Option (Quantity unit)
 
 theorem checkedDiv_zero (a : Quantity unit) :
     checkedDiv a 0 = none := by
-  simp [checkedDiv]
+  simp [checkedDiv, safeDiv]
 
 theorem saturatingSub_zero_of_le {a b : Quantity unit} (h : a.value ≤ b.value) :
     saturatingSub a b = zero := by

@@ -13,7 +13,7 @@ SHELL     := /usr/bin/env bash
 all: report
 
 bootstrap:
-	@lean --version
+	@lake env lean --version
 	@lake --version
 	@printf '%s\n' 'bootstrap ok: Lean/Lake Verity toolchain is available'
 
@@ -27,7 +27,7 @@ test:
 
 prove:
 	@mkdir -p proofs/logs
-	@if { printf 'verified_source_tree='; bash scripts/verified_source_tree.sh; printf 'lean_version='; lean --version; lake build LidoSRv3; } 2>&1 | tee proofs/logs/prove.txt; then s=0; else s=$$?; fi; \
+	@if { printf 'verified_source_tree='; bash scripts/verified_source_tree.sh; printf 'lean_version='; lake env lean --version; lake build LidoSRv3; } 2>&1 | tee proofs/logs/prove.txt; then s=0; else s=$$?; fi; \
 	 if BUILD_STATUS=$$s BUILD_LOG=proofs/logs/prove.txt \
 	      bash scripts/write_proof_report.sh > $(PROOF_LOG).tmp; then \
 	   mv $(PROOF_LOG).tmp $(PROOF_LOG); \

@@ -24,7 +24,7 @@ fi
 rm -f "$untracked"
 
 tree="$(bash scripts/verified_source_tree.sh)"
-lean_version="$(lean --version)"
+lean_version="$(lake env lean --version)"
 printf 'verified_source_tree=%040d\nlean_version=%s\nBuilt LidoSRv3\n' 0 "$lean_version" > "$tmpdir/stale.log"
 if BUILD_STATUS=0 BUILD_LOG="$tmpdir/stale.log" \
   bash scripts/write_proof_report.sh > "$tmpdir/report.json" 2>/dev/null; then
