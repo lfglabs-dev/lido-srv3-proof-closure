@@ -115,21 +115,6 @@ theorem valid_result_preserves_router_order
       snapshot.rows.map AllocationRow.moduleId :=
   rowsCorrespond_moduleIds h.2.1
 
-theorem positive_increment_respects_capacity
-    (h : validAllocationResult snapshot result)
-    (hRow : row ∈ result.rows) (hPositive : row.increment.value > 0) :
-    row.allocationAfter.value ≤ row.capacity.value :=
-  h.2.2.2 row hRow hPositive
-
-theorem positive_committed_payment_is_eligible
-    (h : committedPaymentsEligible mode snapshot payments)
-    (i : Nat) (payment : Wei) (source : AllocationRow)
-    (hPayment : payments[i]? = some payment)
-    (hSource : snapshot.rows[i]? = some source)
-    (hPositive : payment.value > 0) :
-    paymentEligible mode source :=
-  h.2 i payment source hPayment hSource hPositive
-
 /-! ## Regression falsifiers -/
 
 private def word (n : Nat) : Word := Verity.Core.Uint256.ofNat n
@@ -155,25 +140,5 @@ example :
     Verity.Core.Uint256.ofNat,
     Verity.Core.Uint256.modulus, Verity.Core.UINT256_MODULUS,
     paymentEligible]
-
-def firstOpenModule? (rows : List AllocationRow) : Option Word :=
-  (rows.find? fun row => row.current.value < row.capacity.value).map (·.moduleId)
-
-theorem firstOpenModule_deterministic (rows : List AllocationRow) :
-    ∃ selected : Option Word,
-      firstOpenModule? rows = selected ∧
-        ∀ other, firstOpenModule? rows = other → other = selected := by
-  refine ⟨firstOpenModule? rows, rfl, ?_⟩
-  intro other hOther
-  exact hOther.symm
-
-private def tiedRowOne : AllocationRow := ⟨word 1, true, .wc02, q 0, q 1⟩
-private def tiedRowTwo : AllocationRow := ⟨word 2, true, .wc02, q 0, q 1⟩
-
-/-- The same tied module set in a different order selects a different first row. -/
-example :
-    firstOpenModule? [tiedRowOne, tiedRowTwo] = some (word 1) ∧
-      firstOpenModule? [tiedRowTwo, tiedRowOne] = some (word 2) := by
-  decide
 
 end LidoSRv3.Audit

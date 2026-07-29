@@ -1,6 +1,6 @@
 # SRv3 audit foundation
 
-This first slice adds a separate `LidoSRv3.Audit` vocabulary. It does not
+This remediation adds a separate executable `LidoSRv3.Audit.MinFirst` model. It does not
 reinterpret the legacy `Nat`/`Option` model and does not claim that pure Lean
 predicates are faithful to bytecode without a correspondence proof.
 
@@ -33,10 +33,13 @@ All anchors refer to Lido commit
 | allocation row/snapshot/result structures | A1-A6 | implemented | source-shaped data vocabulary |
 | `AllocationSnapshot.sourceDenominator` | A6 | implemented | exact checked requested-plus-current predicate |
 | `valid_result_preserves_router_order` | A3, A4 | proved | Lean theorem from row correspondence |
-| `positive_committed_payment_is_eligible` | A2, A8 | proved | top-up payment eligibility is WC02-only |
-| `positive_increment_respects_capacity` | A5 | proved | only positive increments are required to finish under capacity |
 | `conservesAllocation` | A1 | implemented | checked delta sum and requested-demand bound |
-| `firstOpenModule_deterministic` | A3 | proved | functional uniqueness of the ordered first-open selector; full strategy equivalence pending |
+| `MinFirst.candidate_mem/open/minimal/router_tie` | A3 | proved | executable first least-filled open selector; strict left tie break |
+| `MinFirst.incrementSelected_monotone/eq_of_ne` | A3, A5 | proved | one-step monotonicity and non-selected-row stability |
+| `MinFirst.allocate_preserves_length/module_order` | A3, A4 | proved | fuelled executable allocation preserves the ordered shape |
+| `MinFirst.totalAllocated_le_requested` | A1 | proved | exact requested fuel bounds unit allocation iterations |
+| executable-to-`validAllocationResult` bridge | A1, A5, A6 | incomplete | no assumption is relabeled as a strategy conclusion |
+| committed-payment construction/eligibility bridge | A2, A8 | incomplete | WC01 remains a strategy competitor; WC02 payment filtering remains separate |
 | initial-deposit identity/rollback | A7 | assumed/unsupported | trace vocabulary only; transition correspondence pending |
 | top-up return length/no-wrap | A8 | unsupported here | handled separately by draft PR #4 in the legacy layer |
 | report/growth/consolidation properties | B1-B5 | unsupported | future bounded slices |
@@ -53,11 +56,15 @@ No theorem in this slice uses `sorry`, `admit`, a project `axiom`, or `unsafe`.
 
 ## Falsifier regressions
 
-`LidoSRv3/Audit/Allocation.lean` contains executable examples showing:
+`LidoSRv3/Audit/Vectors.lean` and `Allocation.lean` contain executable examples showing:
 
-1. a result may conserve the requested amount while paying an inactive WC01 row;
-2. reversing two equally open rows preserves the module set but changes the
-   first selected module.
+1. `[5/10],[0/10]` selects row 1, falsifying first-open;
+2. equal minima use the first router index and reversing tied order changes the recipient;
+3. saturated and inactive rows are skipped, while active WC01 rows still compete;
+4. pre-existing over-cap rows stay unchanged;
+5. insufficient headroom leaves demand unallocated;
+6. conservation alone does not imply payment eligibility.
 
-These prevent conservation from being used as a substitute for eligibility and
-prevent unordered module-set equality from being used as tie determinism.
+The removed theorem names `positive_increment_respects_capacity`,
+`positive_committed_payment_is_eligible`, and `firstOpenModule_deterministic`
+were projection/functional-uniqueness overclaims, not executable MinFirst proofs.
