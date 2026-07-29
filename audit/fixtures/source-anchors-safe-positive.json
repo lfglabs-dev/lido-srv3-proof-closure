@@ -1,0 +1,6 @@
+[
+  "LidoSRv3/Audit/Arithmetic.lean",
+  "verity@68f560e66c5de6123061ce5ed60261be162673d1:dev/lean-4.31-scaffolding",
+  "evmyullean@f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+  "lido-core@af095e48bbc1c3841c2c9936219c8461af01056b:contracts/0.8.25/sr/StakingRouter.sol"
+]

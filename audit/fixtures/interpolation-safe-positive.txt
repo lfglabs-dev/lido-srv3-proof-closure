@@ -1,0 +1,1 @@
+def safe := s!"ordinary sorry text {1 + 1} and escaped \{admit}"

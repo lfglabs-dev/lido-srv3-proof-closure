@@ -177,6 +177,53 @@ def schema_values(schema: dict, field: str) -> list[str]:
     return schema["properties"]["invariants"]["items"]["properties"][field]["enum"]
 
 
+def source_pins() -> dict[str, str]:
+    lock = load_json(LOCK)
+    require(isinstance(lock, dict), "dependencies.lock.json: root must be an object")
+    pins = {}
+    for component, key in (
+        ("verity", "verity"),
+        ("evmyullean", "evmyullean"),
+        ("lido-core", "lido_core"),
+    ):
+        entry = lock.get(key)
+        require(isinstance(entry, dict), f"dependencies.lock.json: missing {key}")
+        commit = entry.get("commit")
+        require(
+            isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit) is not None,
+            f"dependencies.lock.json: invalid {key} commit",
+        )
+        pins[component] = commit
+    return pins
+
+
+def validate_source_anchor(anchor: str, pins: dict[str, str]) -> None:
+    external = re.fullmatch(
+        r"([a-z][a-z0-9-]*)@([0-9a-f]{40})(?::([A-Za-z0-9._/-]+))?", anchor
+    )
+    if external is not None:
+        component, commit, suffix = external.groups()
+        require(component in pins, f"unknown external source component: {component}")
+        require(
+            commit == pins[component],
+            f"external source anchor is not exactly pinned: {anchor}",
+        )
+        require(
+            suffix is None or (
+                not suffix.startswith("/")
+                and ".." not in Path(suffix).parts
+                and "//" not in suffix
+            ),
+            f"invalid external source anchor suffix: {anchor}",
+        )
+        return
+    path = (ROOT / anchor).resolve()
+    require(
+        path.is_relative_to(ROOT) and path.is_file(),
+        f"local source anchor does not exist: {anchor}",
+    )
+
+
 def validate_theorems(data: dict) -> None:
     theorems = sorted(
         row["theorem"] for row in data["invariants"] if row["theorem"] is not None
@@ -224,6 +271,7 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
     schema = validate_schema_definition(load_json(schema_path))
     validate_against_schema(data, schema)
     layers = schema_values(schema, "layer")
+    pins = source_pins()
 
     ids: set[str] = set()
     theorem_owners: dict[str, str] = {}
@@ -234,6 +282,8 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
         for name in ("source_anchors", "runtime_anchors", "assumptions", "trust_boundary", "dependencies"):
             value = row[name]
             require(len(value) == len(set(value)), f"{invariant_id}: duplicate {name}")
+        for anchor in row["source_anchors"]:
+            validate_source_anchor(anchor, pins)
         theorem = row["theorem"]
         if theorem is not None:
             require(theorem not in theorem_owners, f"theorem {theorem} duplicated by {theorem_owners.get(theorem)}")
@@ -444,29 +494,33 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     violations = []
     for name, source in sources:
         block_depth = 0
-        in_string = False
-        raw_hashes: int | None = None
-        escaped = False
+        contexts: list[tuple[str, object]] = [("code", None)]
         for number, line in enumerate(source.splitlines(), 1):
             code_parts = []
             cursor = 0
             while cursor < len(line):
-                if raw_hashes is not None:
+                context, state = contexts[-1]
+                if context == "raw":
+                    raw_hashes = int(state)
                     terminator = '"' + "#" * raw_hashes
                     end = line.find(terminator, cursor)
                     if end == -1:
                         cursor = len(line)
                     else:
-                        raw_hashes = None
+                        contexts.pop()
                         cursor = end + len(terminator)
-                elif in_string:
+                elif context == "string":
+                    interpolated, escaped = state
                     character = line[cursor]
                     if escaped:
-                        escaped = False
+                        contexts[-1] = ("string", (interpolated, False))
                     elif character == "\\":
-                        escaped = True
+                        contexts[-1] = ("string", (interpolated, True))
+                    elif interpolated and character == "{":
+                        contexts.append(("interpolation", 1))
+                        code_parts.append(" ")
                     elif character == '"':
-                        in_string = False
+                        contexts.pop()
                     cursor += 1
                 elif block_depth:
                     if line.startswith("/-", cursor):
@@ -482,12 +536,24 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 elif line.startswith("/-", cursor):
                     block_depth = 1
                     cursor += 2
+                elif context == "interpolation" and line[cursor] == "{":
+                    contexts[-1] = ("interpolation", int(state) + 1)
+                    code_parts.append("{")
+                    cursor += 1
+                elif context == "interpolation" and line[cursor] == "}":
+                    if int(state) == 1:
+                        contexts.pop()
+                        code_parts.append(" ")
+                    else:
+                        contexts[-1] = ("interpolation", int(state) - 1)
+                        code_parts.append("}")
+                    cursor += 1
                 elif line[cursor] == "r":
                     delimiter = cursor + 1
                     while delimiter < len(line) and line[delimiter] == "#":
                         delimiter += 1
                     if delimiter < len(line) and line[delimiter] == '"':
-                        raw_hashes = delimiter - cursor - 1
+                        contexts.append(("raw", delimiter - cursor - 1))
                         cursor = delimiter + 1
                     else:
                         code_parts.append(line[cursor])
@@ -503,14 +569,19 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     else:
                         code_parts.append(line[cursor])
                         cursor += 1
+                elif line.startswith('s!"', cursor):
+                    code_parts.append("s!")
+                    contexts.append(("string", (True, False)))
+                    cursor += 3
                 elif line[cursor] == '"':
-                    in_string = True
-                    escaped = False
+                    contexts.append(("string", (False, False)))
                     cursor += 1
                 else:
                     code_parts.append(line[cursor])
                     cursor += 1
-            escaped = False
+            if contexts[-1][0] == "string":
+                interpolated, _ = contexts[-1][1]
+                contexts[-1] = ("string", (interpolated, False))
             code = "".join(code_parts)
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
@@ -559,6 +630,20 @@ def negative_tests() -> None:
         "registry.invariants[0].layer: value is not in schema enum",
     )
     data = validate()
+    pins = source_pins()
+    source_anchor_positive = load_json(require_fixture("source-anchors-safe-positive.json"))
+    for anchor in source_anchor_positive:
+        validate_source_anchor(anchor, pins)
+    for fixture, expected in (
+        ("nonexistent-local-anchor-negative.json", "local source anchor does not exist"),
+        ("invalid-external-anchor-negative.json", "external source anchor is not exactly pinned"),
+    ):
+        anchor = load_json(require_fixture(fixture))
+        expect_failure(
+            fixture,
+            lambda anchor=anchor: validate_source_anchor(anchor, pins),
+            expected,
+        )
     const_negative = load_json(require_fixture("const-one-negative.json"))
     expect_failure(
         "boolean schema const fixture",
@@ -710,6 +795,20 @@ def negative_tests() -> None:
             (safe_scanner.name, safe_scanner.read_text(encoding="utf-8"))
         ]),
         "scanner safe-positive fixture: unexpectedly rejected",
+    )
+    interpolation_mutant = require_fixture("interpolation-negative.txt")
+    require(
+        any(":1:" in violation for violation in find_proof_escapes([
+            (interpolation_mutant.name, interpolation_mutant.read_text(encoding="utf-8"))
+        ])),
+        "scanner interpolation fixture: unexpectedly passed",
+    )
+    interpolation_safe = require_fixture("interpolation-safe-positive.txt")
+    require(
+        not find_proof_escapes([
+            (interpolation_safe.name, interpolation_safe.read_text(encoding="utf-8"))
+        ]),
+        "scanner interpolation safe-positive fixture: unexpectedly rejected",
     )
 
     strategy_mutant = load_json(ARTIFACTS)
