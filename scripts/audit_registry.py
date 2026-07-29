@@ -223,7 +223,10 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
         if row["layer"] in set(layers) & {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
-            require(bool(row["runtime_anchors"]), f"{invariant_id}: runtime assurance requires anchors")
+            require(
+                any(not anchor.startswith("MISSING:") for anchor in row["runtime_anchors"]),
+                f"{invariant_id}: runtime assurance requires non-missing anchors",
+            )
 
     graph = {row["id"]: row["dependencies"] for row in data["invariants"]}
     for node, dependencies in graph.items():
@@ -415,12 +418,21 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     for name, source in sources:
         block_depth = 0
         in_string = False
+        raw_hashes: int | None = None
         escaped = False
         for number, line in enumerate(source.splitlines(), 1):
             code_parts = []
             cursor = 0
             while cursor < len(line):
-                if in_string:
+                if raw_hashes is not None:
+                    terminator = '"' + "#" * raw_hashes
+                    end = line.find(terminator, cursor)
+                    if end == -1:
+                        cursor = len(line)
+                    else:
+                        raw_hashes = None
+                        cursor = end + len(terminator)
+                elif in_string:
                     character = line[cursor]
                     if escaped:
                         escaped = False
@@ -443,6 +455,27 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 elif line.startswith("/-", cursor):
                     block_depth = 1
                     cursor += 2
+                elif line[cursor] == "r":
+                    delimiter = cursor + 1
+                    while delimiter < len(line) and line[delimiter] == "#":
+                        delimiter += 1
+                    if delimiter < len(line) and line[delimiter] == '"':
+                        raw_hashes = delimiter - cursor - 1
+                        cursor = delimiter + 1
+                    else:
+                        code_parts.append(line[cursor])
+                        cursor += 1
+                elif line[cursor] == "'":
+                    end = cursor + 1
+                    if end < len(line) and line[end] == "\\":
+                        end += 2
+                    else:
+                        end += 1
+                    if end < len(line) and line[end] == "'":
+                        cursor = end + 1
+                    else:
+                        code_parts.append(line[cursor])
+                        cursor += 1
                 elif line[cursor] == '"':
                     in_string = True
                     escaped = False
@@ -522,6 +555,30 @@ def negative_tests() -> None:
         )
     finally:
         regression_path.unlink()
+    for assured_status in ("REGRESSION", "PROVED"):
+        runtime_mutant = json.loads(json.dumps(data))
+        runtime_row = next(
+            row for row in runtime_mutant["invariants"]
+            if row["id"] == "SRV3-EVM-RUNTIME"
+        )
+        runtime_row["status"] = assured_status
+        if assured_status == "PROVED":
+            theorem_row = next(
+                row for row in runtime_mutant["invariants"]
+                if row["theorem"] == "LidoSRv3.P1_reserve_separation"
+            )
+            theorem_row["status"] = "REGRESSION"
+            theorem_row["theorem"] = None
+            runtime_row["theorem"] = "LidoSRv3.P1_reserve_separation"
+        runtime_path = write_mutant(runtime_mutant)
+        try:
+            expect_failure(
+                f"sentinel-only runtime {assured_status} mutant",
+                lambda runtime_path=runtime_path: validate(runtime_path),
+                "SRV3-EVM-RUNTIME: runtime assurance requires non-missing anchors",
+            )
+        finally:
+            runtime_path.unlink()
     artifact_cases = (
         ("empty-artifacts.json", "artifacts must be a nonempty array"),
         ("missing-required-artifact.json", "artifact inventory differs"),
@@ -560,6 +617,27 @@ def negative_tests() -> None:
     require(
         not find_proof_escapes([("safe-strings.lean", safe_strings)]),
         "scanner safe-string fixture: unexpectedly rejected",
+    )
+    literal_mutants = (
+        ("character", "def quote : Char := '\\\"'\naxiom hidden : True\n"),
+        ("raw string", 'def raw := r#"sorry /- \\""#\nunsafe def hidden := 0\n'),
+        ("multi-hash raw string", 'def raw := r##"constant -- \\""##\nsorry\n'),
+    )
+    for label, source in literal_mutants:
+        require(
+            any(":2:" in violation for violation in
+                find_proof_escapes([(f"{label}-mutant.lean", source)])),
+            f"scanner {label} mutant: unexpectedly passed",
+        )
+    safe_literals = (
+        "def quote : Char := '\\\"'\n"
+        "def apostrophe : Char := '\\''\n"
+        'def raw := r#"sorry admit axiom constant unsafe /- -- \\""#\n'
+        'def rawHashes := r##"sorry \\"# still raw"##\n'
+    )
+    require(
+        not find_proof_escapes([("safe-literals.lean", safe_literals)]),
+        "scanner safe-literal fixture: unexpectedly rejected",
     )
     constant_mutant = "constant bogus : False\n"
     require(
