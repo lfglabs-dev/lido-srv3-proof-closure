@@ -653,6 +653,8 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 any(not is_missing_runtime_anchor(anchor) for anchor in row["runtime_anchors"]),
                 f"{invariant_id}: runtime assurance requires non-missing anchors",
             )
+        if row["status"] == "REGRESSION":
+            require(theorem is not None, f"{invariant_id}: REGRESSION requires theorem")
 
     require(
         set(theorem_owners.values()) == set(EXPECTED_INVARIANT_THEOREMS),
@@ -712,6 +714,10 @@ def validate_lock(path: Path = LOCK) -> None:
         "proof: exact repository mismatch",
     )
     require(lock["proof"]["ref"] == "main", "proof: exact ref mismatch")
+    require(
+        lock["lido_core"]["repository"] == "https://github.com/lidofinance/core.git",
+        "lido_core: exact repository mismatch",
+    )
     require(lock["evmyullean"]["ref"] == "main", "EVMYulLean: exact ref mismatch")
     require(lock["current_root"]["plane"] == "active",
             "current root plane must remain active")
@@ -1388,6 +1394,20 @@ def negative_tests() -> None:
         )
     finally:
         missing_obligation_path.unlink()
+    evidence_free_regression_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in evidence_free_regression_mutant["invariants"]
+        if row["id"] == "SRV3-SOLIDITY-CORR"
+    )["status"] = "REGRESSION"
+    evidence_free_regression_path = write_mutant(evidence_free_regression_mutant)
+    try:
+        expect_failure(
+            "evidence-free REGRESSION mutant",
+            lambda: validate(evidence_free_regression_path),
+            "SRV3-SOLIDITY-CORR: REGRESSION requires theorem",
+        )
+    finally:
+        evidence_free_regression_path.unlink()
     theorem_swap_mutant = json.loads(json.dumps(data))
     theorem_rows = {
         row["id"]: row for row in theorem_swap_mutant["invariants"]
@@ -1839,6 +1859,8 @@ def negative_tests() -> None:
         finally:
             proof_lock_path.unlink()
     for component, field, value, expected in (
+        ("lido_core", "repository", "https://github.com/example/core.git",
+         "lido_core: exact repository mismatch"),
         ("evmyullean", "ref", "does-not-exist", "EVMYulLean: exact ref mismatch"),
         ("current_root", "plane", "audit-only",
          "current root plane must remain active"),
