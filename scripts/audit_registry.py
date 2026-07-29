@@ -38,6 +38,10 @@ EXPECTED_ARTIFACTS = {
     "legacy-proofs": ("LidoSRv3/SpecProofs.lean", "REGRESSION"),
     "consolidation-runtime": (None, "PROVENANCE-BLOCKED"),
 }
+EXPECTED_INVARIANT_THEOREMS = {
+    "SRV3-ARITH-CHECKED": "LidoSRv3.Audit.Quantity.checkedDiv_zero",
+    "SRV3-TX-REVERT": "LidoSRv3.Audit.revert_restores_state_value_and_logs",
+}
 GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
     "ASSUMPTIONS.md", "REPRODUCE.md", "MATRIX.csv",
@@ -67,6 +71,10 @@ def load_json(path: Path) -> object:
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise RegistryError(message)
+
+
+def is_missing_runtime_anchor(anchor: str) -> bool:
+    return anchor.lstrip().casefold().startswith("missing:")
 
 
 def json_type_matches(value: object, expected: str) -> bool:
@@ -616,11 +624,17 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
         if theorem is not None:
             require(theorem not in theorem_owners, f"theorem {theorem} duplicated by {theorem_owners.get(theorem)}")
             theorem_owners[theorem] = invariant_id
+        expected_theorem = EXPECTED_INVARIANT_THEOREMS.get(invariant_id)
+        if expected_theorem is not None:
+            require(
+                theorem == expected_theorem,
+                f"{invariant_id}: theorem must be {expected_theorem}",
+            )
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
         if row["layer"] in set(layers) & {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
             require(
-                any(not anchor.startswith("MISSING:") for anchor in row["runtime_anchors"]),
+                any(not is_missing_runtime_anchor(anchor) for anchor in row["runtime_anchors"]),
                 f"{invariant_id}: runtime assurance requires non-missing anchors",
             )
 
@@ -1325,6 +1339,25 @@ def negative_tests() -> None:
     )
     const_positive = load_json_fixture("const-one-safe-positive.json")
     validate_against_schema(const_positive, {"const": 1}, "fixture")
+    theorem_swap_mutant = json.loads(json.dumps(data))
+    theorem_rows = {
+        row["id"]: row for row in theorem_swap_mutant["invariants"]
+        if row["id"] in EXPECTED_INVARIANT_THEOREMS
+    }
+    theorem_rows["SRV3-ARITH-CHECKED"]["theorem"], theorem_rows["SRV3-TX-REVERT"]["theorem"] = (
+        theorem_rows["SRV3-TX-REVERT"]["theorem"],
+        theorem_rows["SRV3-ARITH-CHECKED"]["theorem"],
+    )
+    theorem_swap_path = write_mutant(theorem_swap_mutant)
+    try:
+        expect_failure(
+            "invariant theorem swap mutant",
+            lambda: validate(theorem_swap_path),
+            "SRV3-ARITH-CHECKED: theorem must be "
+            "LidoSRv3.Audit.Quantity.checkedDiv_zero",
+        )
+    finally:
+        theorem_swap_path.unlink()
     dependency_downgrade_mutant = json.loads(json.dumps(data))
     next(
         row for row in dependency_downgrade_mutant["invariants"]
@@ -1375,6 +1408,27 @@ def negative_tests() -> None:
         try:
             expect_failure(
                 f"sentinel-only runtime {assured_status} mutant",
+                lambda runtime_path=runtime_path: validate(runtime_path),
+                "SRV3-EVM-RUNTIME: runtime assurance requires non-missing anchors",
+            )
+        finally:
+            runtime_path.unlink()
+    for label, sentinel in (
+        ("leading-whitespace", "  MISSING: canonical runtime"),
+        ("lowercase", "missing: canonical runtime"),
+    ):
+        runtime_mutant = json.loads(json.dumps(data))
+        runtime_row = next(
+            row for row in runtime_mutant["invariants"]
+            if row["id"] == "SRV3-EVM-RUNTIME"
+        )
+        runtime_row["status"] = "REGRESSION"
+        runtime_row["runtime_anchors"] = [sentinel]
+        runtime_row["dependencies"] = []
+        runtime_path = write_mutant(runtime_mutant)
+        try:
+            expect_failure(
+                f"{label} missing runtime sentinel mutant",
                 lambda runtime_path=runtime_path: validate(runtime_path),
                 "SRV3-EVM-RUNTIME: runtime assurance requires non-missing anchors",
             )
