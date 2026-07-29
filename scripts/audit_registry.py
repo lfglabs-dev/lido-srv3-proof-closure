@@ -63,6 +63,44 @@ EXPECTED_CURRENT_PACKAGES = {
     "importGraph", "proofwidgets", "aesop", "Qq", "batteries", "Cli",
 }
 EXPECTED_TARGET_PACKAGES = {"verity", "evmyul"}
+EXPECTED_CURRENT_INHERITED_PACKAGES = {
+    "mathlib": (
+        "https://github.com/leanprover-community/mathlib4.git",
+        "f897ebcf72cd16f89ab4577d0c826cd14afaafc7", "v4.24.0",
+    ),
+    "plausible": (
+        "https://github.com/leanprover-community/plausible",
+        "dfd06ebfe8d0e8fa7faba9cb5e5a2e74e7bd2805", "main",
+    ),
+    "LeanSearchClient": (
+        "https://github.com/leanprover-community/LeanSearchClient",
+        "99657ad92e23804e279f77ea6dbdeebaa1317b98", "main",
+    ),
+    "importGraph": (
+        "https://github.com/leanprover-community/import-graph",
+        "d768126816be17600904726ca7976b185786e6b9", "main",
+    ),
+    "proofwidgets": (
+        "https://github.com/leanprover-community/ProofWidgets4",
+        "556caed0eadb7901e068131d1be208dd907d07a2", "v0.0.74",
+    ),
+    "aesop": (
+        "https://github.com/leanprover-community/aesop",
+        "725ac8cd67acd70a7beaf47c3725e23484c1ef50", "master",
+    ),
+    "Qq": (
+        "https://github.com/leanprover-community/quote4",
+        "dea6a3361fa36d5a13f87333dc506ada582e025c", "master",
+    ),
+    "batteries": (
+        "https://github.com/leanprover-community/batteries",
+        "8da40b72fece29b7d3fe3d768bac4c8910ce9bee", "main",
+    ),
+    "Cli": (
+        "https://github.com/leanprover/lean4-cli",
+        "91c18fa62838ad0ab7384c03c9684d99d306e1da", "main",
+    ),
+}
 GENERATED = (
     "BY_FAMILY.md", "BY_STATUS.md", "BY_LAYER.md", "TRUST_BOUNDARIES.md",
     "ASSUMPTIONS.md", "REPRODUCE.md", "MATRIX.csv",
@@ -789,6 +827,18 @@ def require_package(
     return entry
 
 
+def require_inherited_package(
+    entries: list[dict], label: str, name: str, url: str, rev: str, input_rev: str
+) -> None:
+    matches = [entry for entry in entries if entry.get("name") == name]
+    require(len(matches) == 1, f"{label}: expected exactly one {name} package")
+    entry = matches[0]
+    require(entry.get("url") == url, f"{label}: {name} URL mismatch")
+    require(entry.get("rev") == rev, f"{label}: {name} rev mismatch")
+    require(entry.get("inputRev") == input_rev, f"{label}: {name} inputRev mismatch")
+    require(entry.get("inherited") is True, f"{label}: {name} inherited mismatch")
+
+
 @dataclass(frozen=True)
 class LakeToken:
     kind: str
@@ -973,6 +1023,10 @@ def validate_dependency_planes(
     require_package(current_entries, "current plane", "evmyul",
                     "https://github.com/lfglabs-dev/EVMYulLean.git",
                     current["evmyullean"], True)
+    for name, (url, rev, input_rev) in EXPECTED_CURRENT_INHERITED_PACKAGES.items():
+        require_inherited_package(
+            current_entries, "current plane", name, url, rev, input_rev
+        )
     require_direct_dependencies(
         current_requires, current_entries, current["direct_dependencies"], "current plane"
     )
@@ -2005,6 +2059,24 @@ def negative_tests() -> None:
         )
     finally:
         rogue_current_path.unlink()
+    inherited_identity = json.loads(json.dumps(current_manifest_data))
+    inherited_mathlib = next(
+        p for p in inherited_identity["packages"] if p["name"] == "mathlib"
+    )
+    inherited_mathlib["url"] = "https://github.com/example/mathlib4.git"
+    inherited_mathlib["rev"] = "0" * 40
+    inherited_mathlib["inputRev"] = "0" * 40
+    inherited_identity_path = write_mutant(inherited_identity)
+    try:
+        expect_failure(
+            "current inherited package identity tampering",
+            lambda: validate_dependency_planes(
+                root_manifest=inherited_identity_path
+            ),
+            "current plane: mathlib URL mismatch",
+        )
+    finally:
+        inherited_identity_path.unlink()
     duplicate = json.loads(json.dumps(target_manifest_data))
     duplicate["packages"].append(json.loads(json.dumps(duplicate["packages"][0])))
     manifest_mutants.append(("duplicate package instances", duplicate,
