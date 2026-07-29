@@ -516,8 +516,10 @@ def run_theorem_checks(
 ) -> None:
     source = (
         "import LidoSRv3\n"
+        + "def auditRequireProof {P : Prop} (_ : P) : True := True.intro\n"
         + declarations
         + "".join(f"#check {theorem}\n" for theorem in theorems)
+        + "".join(f"#check auditRequireProof {theorem}\n" for theorem in proved)
         + "".join(f"#print axioms {theorem}\n" for theorem in proved)
     )
     with tempfile.NamedTemporaryFile(
@@ -546,7 +548,8 @@ def run_theorem_checks(
         check_path.unlink()
     require(
         result.returncode == 0,
-        "registry theorem does not exist in LidoSRv3 build surface:\n"
+        "registry theorem does not exist or PROVED reference is not a proof "
+        "in LidoSRv3 build surface:\n"
         + (result.stderr or result.stdout).strip(),
     )
     reports = parse_axiom_report(result.stdout + "\n" + result.stderr, proved)
@@ -580,6 +583,14 @@ def validate_theorems(data: dict) -> None:
         + (build.stderr or build.stdout).strip(),
     )
     run_theorem_checks(theorems, proved)
+    expect_failure(
+        "non-proposition PROVED reference",
+        lambda: run_theorem_checks(
+            ["LidoSRv3.Audit.Quantity.zero"],
+            ["LidoSRv3.Audit.Quantity.zero"],
+        ),
+        "PROVED reference is not a proof",
+    )
 
 
 def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
