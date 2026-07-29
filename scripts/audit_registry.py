@@ -13,6 +13,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
@@ -613,8 +614,8 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
     return data
 
 
-def validate_lock() -> None:
-    lock = load_json(LOCK)
+def validate_lock(path: Path = LOCK) -> None:
+    lock = load_json(path)
     expected = {
         "proof": "ee2e65cd807e913ea245ae6fd7987a7f1d962800",
         "verity": "68f560e66c5de6123061ce5ed60261be162673d1",
@@ -623,6 +624,12 @@ def validate_lock() -> None:
     }
     for component, commit in expected.items():
         require(lock[component]["commit"] == commit, f"{component}: exact pin mismatch")
+    require(lock["current_root"]["verity"] == "538c4a9ce2baa25b56062bdc727eb0191ad9e67f",
+            "current root Verity exact pin mismatch")
+    require(lock["current_root"]["evmyullean"] == "38d53df8b4488d5322894619ea8385fcbb2e6f5d",
+            "current root EVMYulLean exact pin mismatch")
+    require(lock["current_root"]["direct_dependencies"] == ["verity"],
+            "current root must depend exactly once on Verity")
     require(lock["target_root"]["direct_dependencies"] == ["verity"],
             "target root must depend exactly once on Verity")
     require("transitive" in lock["evmyullean"]["resolution"], "EVMYulLean must be transitive")
@@ -658,38 +665,143 @@ def require_package(
     return entry
 
 
-def require_direct_dependencies(
-    lakefile: str, entries: list[dict], declared: list[str], label: str
-) -> None:
+@dataclass(frozen=True)
+class LakeToken:
+    kind: str
+    value: str
+    line: int
+
+
+@dataclass(frozen=True)
+class LakeRequire:
+    name: str
+    repository: str | None
+    revision: str | None
+    line: int
+
+
+def lake_tokens(source: str, label: str) -> list[LakeToken]:
+    """Lex the Lake syntax needed for dependency declarations."""
+    tokens: list[LakeToken] = []
+    cursor = 0
+    line = 1
     block_depth = 0
-    code_lines = []
-    for line in lakefile.splitlines():
-        code = []
-        cursor = 0
-        while cursor < len(line):
-            if block_depth:
-                if line.startswith("/-", cursor):
-                    block_depth += 1
-                    cursor += 2
-                elif line.startswith("-/", cursor):
-                    block_depth -= 1
-                    cursor += 2
-                else:
-                    cursor += 1
-            elif line.startswith("--", cursor):
-                break
-            elif line.startswith("/-", cursor):
-                block_depth = 1
+    while cursor < len(source):
+        if source[cursor] == "\n":
+            line += 1
+            cursor += 1
+        elif block_depth:
+            if source.startswith("/-", cursor):
+                block_depth += 1
+                cursor += 2
+            elif source.startswith("-/", cursor):
+                block_depth -= 1
                 cursor += 2
             else:
-                code.append(line[cursor])
                 cursor += 1
-        code_lines.append("".join(code))
-    requires = re.findall(
-        r"(?m)^[ \t]*require[ \t]+(?:«([^»]+)»|([A-Za-z_][\w'-]*))(?![\w'])",
-        "\n".join(code_lines),
-    )
-    lake_names = [quoted or plain for quoted, plain in requires]
+        elif source.startswith("--", cursor):
+            newline = source.find("\n", cursor)
+            cursor = len(source) if newline == -1 else newline
+        elif source.startswith("/-", cursor):
+            block_depth = 1
+            cursor += 2
+        elif source[cursor].isspace():
+            cursor += 1
+        elif source[cursor] == "r":
+            delimiter = cursor + 1
+            while delimiter < len(source) and source[delimiter] == "#":
+                delimiter += 1
+            if delimiter < len(source) and source[delimiter] == '"':
+                hashes = delimiter - cursor - 1
+                terminator = '"' + "#" * hashes
+                end = source.find(terminator, delimiter + 1)
+                require(end != -1, f"{label}:{line}: unterminated raw string")
+                raw = source[delimiter + 1:end]
+                tokens.append(LakeToken("raw", raw, line))
+                line += raw.count("\n")
+                cursor = end + len(terminator)
+                continue
+            start = cursor
+            while cursor < len(source) and (
+                source[cursor].isalnum() or source[cursor] in "_'-"
+            ):
+                cursor += 1
+            tokens.append(LakeToken("identifier", source[start:cursor], line))
+        elif source[cursor] == '"':
+            token_line = line
+            cursor += 1
+            value = []
+            while cursor < len(source) and source[cursor] != '"':
+                if source[cursor] == "\\":
+                    cursor += 1
+                    require(cursor < len(source), f"{label}:{token_line}: unterminated string")
+                    value.append({
+                        "n": "\n", "r": "\r", "t": "\t", '"': '"', "\\": "\\",
+                    }.get(source[cursor], source[cursor]))
+                else:
+                    if source[cursor] == "\n":
+                        line += 1
+                    value.append(source[cursor])
+                cursor += 1
+            require(cursor < len(source), f"{label}:{token_line}: unterminated string")
+            cursor += 1
+            tokens.append(LakeToken("string", "".join(value), token_line))
+        elif source[cursor] == "«":
+            end = source.find("»", cursor + 1)
+            require(end != -1, f"{label}:{line}: unterminated escaped identifier")
+            tokens.append(LakeToken("identifier", source[cursor + 1:end], line))
+            cursor = end + 1
+        elif source[cursor].isalpha() or source[cursor] == "_":
+            start = cursor
+            while cursor < len(source) and (
+                source[cursor].isalnum() or source[cursor] in "_'-"
+            ):
+                cursor += 1
+            tokens.append(LakeToken("identifier", source[start:cursor], line))
+        else:
+            tokens.append(LakeToken("symbol", source[cursor], line))
+            cursor += 1
+    require(block_depth == 0, f"{label}: unterminated block comment")
+    return tokens
+
+
+def parse_lake_requires(source: str, label: str) -> list[LakeRequire]:
+    tokens = lake_tokens(source, label)
+    declarations = []
+    cursor = 0
+    while cursor < len(tokens):
+        token = tokens[cursor]
+        if token.kind != "identifier" or token.value != "require":
+            cursor += 1
+            continue
+        require(
+            cursor + 1 < len(tokens) and tokens[cursor + 1].kind == "identifier",
+            f"{label}:{token.line}: malformed require declaration",
+        )
+        name = tokens[cursor + 1].value
+        repository = revision = None
+        if (
+            cursor + 6 < len(tokens)
+            and tokens[cursor + 2] == LakeToken("identifier", "from", tokens[cursor + 2].line)
+            and tokens[cursor + 3] == LakeToken("identifier", "git", tokens[cursor + 3].line)
+            and tokens[cursor + 4].kind == "string"
+            and tokens[cursor + 5].kind == "symbol"
+            and tokens[cursor + 5].value == "@"
+            and tokens[cursor + 6].kind == "string"
+        ):
+            repository = tokens[cursor + 4].value
+            revision = tokens[cursor + 6].value
+            cursor += 7
+        else:
+            cursor += 2
+        declarations.append(LakeRequire(name, repository, revision, token.line))
+    return declarations
+
+
+def require_direct_dependencies(
+    declarations: list[LakeRequire], entries: list[dict], declared: list[str], label: str
+) -> None:
+    lake_names = [declaration.name for declaration in declarations]
     manifest_names = [
         entry.get("name") for entry in entries if entry.get("inherited") is False
     ]
@@ -707,22 +819,24 @@ def validate_dependency_planes(
     target_manifest: Path = TARGET / "lake-manifest.json",
     target_toolchain: Path = TARGET / "lean-toolchain",
     verity_metadata: Path = TARGET / "verity.json",
+    lock_path: Path = LOCK,
 ) -> None:
-    lock = load_json(LOCK)
+    lock = load_json(lock_path)
     current = lock["current_root"]
     require(root_toolchain.read_text(encoding="utf-8").strip() == current["lean_toolchain"],
             "current plane: Lean toolchain mismatch")
     current_lake = root_lakefile.read_text(encoding="utf-8")
-    current_verity = re.findall(
-        r'\brequire\s+verity\s+from\s+git\s+"([^"]+)"\s*@\s*"([^"]+)"',
-        current_lake,
-    )
+    current_requires = parse_lake_requires(current_lake, "current plane")
+    current_verity = [declaration for declaration in current_requires
+                      if declaration.name == "verity"]
     require(len(current_verity) == 1,
             "current plane: expected exactly one direct Verity")
-    require("require evmyul" not in current_lake.lower(),
+    require(not any(declaration.name.lower().startswith("evmyul")
+                    for declaration in current_requires),
             "current plane: direct EVMYulLean forbidden")
     require(
-        current_verity[0] == (lock["verity"]["repository"], current["verity"]),
+        (current_verity[0].repository, current_verity[0].revision)
+        == (lock["verity"]["repository"], current["verity"]),
         "current plane: Verity lakefile repository/revision mismatch",
     )
     current_entries = dependency_entries(load_json(root_manifest), "current plane")
@@ -733,7 +847,7 @@ def validate_dependency_planes(
                     "https://github.com/lfglabs-dev/EVMYulLean.git",
                     current["evmyullean"], True)
     require_direct_dependencies(
-        current_lake, current_entries, current["direct_dependencies"], "current plane"
+        current_requires, current_entries, current["direct_dependencies"], "current plane"
     )
 
     target = lock["target_root"]
@@ -742,19 +856,26 @@ def validate_dependency_planes(
     require(target_toolchain.read_text(encoding="utf-8").strip() == target["lean_toolchain"],
             "target plane: Lean toolchain mismatch")
     target_lake = target_lakefile.read_text(encoding="utf-8")
-    require(target_lake.count("require verity from git") == 1,
+    target_requires = parse_lake_requires(target_lake, "target plane")
+    target_verity = [declaration for declaration in target_requires
+                     if declaration.name == "verity"]
+    require(len(target_verity) == 1,
             "target plane: expected exactly one direct Verity")
-    require("require evmyul" not in target_lake.lower(),
+    require(not any(declaration.name.lower().startswith("evmyul")
+                    for declaration in target_requires),
             "target plane: direct EVMYulLean forbidden")
-    require(lock["verity"]["commit"] in target_lake,
-            "target plane: Verity lakefile pin mismatch")
+    require(
+        (target_verity[0].repository, target_verity[0].revision)
+        == (lock["verity"]["repository"], lock["verity"]["commit"]),
+        "target plane: Verity lakefile repository/revision mismatch",
+    )
     target_entries = dependency_entries(load_json(target_manifest), "target plane")
     require_package(target_entries, "target plane", "verity",
                     lock["verity"]["repository"], lock["verity"]["commit"], False)
     require_package(target_entries, "target plane", "evmyul",
                     lock["evmyullean"]["repository"], lock["evmyullean"]["commit"], True)
     require_direct_dependencies(
-        target_lake, target_entries, target["direct_dependencies"], "target plane"
+        target_requires, target_entries, target["direct_dependencies"], "target plane"
     )
     verity = load_json(verity_metadata)
     require(verity["commit"] == lock["verity"]["commit"],
@@ -953,6 +1074,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         block_depth = 0
         contexts: list[tuple[str, object]] = [("code", None)]
         sanitized_lines = []
+        last_significant_code = ""
         for number, line in enumerate(source.splitlines(), 1):
             code_parts = []
             cursor = 0
@@ -1028,7 +1150,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         code_parts.append(line[cursor])
                         cursor += 1
                 elif line[cursor] == '"' and interpolated_prefix.search(
-                    "\n".join(sanitized_lines[-1:] + ["".join(code_parts)])
+                    "\n".join([last_significant_code, "".join(code_parts)])
                 ):
                     code_parts.append("!")
                     contexts.append(("string", (True, False)))
@@ -1044,6 +1166,8 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 contexts[-1] = ("string", (interpolated, False))
             code = "".join(code_parts)
             sanitized_lines.append(code)
+            if code.strip():
+                last_significant_code = code
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
         sanitized = "\n".join(sanitized_lines)
@@ -1310,6 +1434,19 @@ def negative_tests() -> None:
         "scanner multiline dbg_trace interpolation mutant: unexpectedly passed",
     )
     print("mutant rejected: multiline dbg_trace interpolated proof escape")
+    spaced_dbg_trace_mutant = (
+        "def bait : Nat := dbg_trace\n"
+        "  -- comment-only spacer\n"
+        "\n"
+        '  "{(sorry : Nat)}"; 0\n'
+    )
+    require(
+        any(":4:" in violation for violation in find_proof_escapes([
+            ("spaced-dbg-trace-mutant.lean", spaced_dbg_trace_mutant)
+        ])),
+        "scanner spaced dbg_trace interpolation mutant: unexpectedly passed",
+    )
+    print("mutant rejected: dbg_trace interpolation across blank/comment-only lines")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
@@ -1408,6 +1545,116 @@ def negative_tests() -> None:
         )
     finally:
         path.unlink()
+    delimiter_decoy = target_lake + (
+        '\ndef marker := "/-"\n'
+        'require foo from git "https://example.com/foo.git"@'
+        '"0123456789abcdef0123456789abcdef01234567"\n'
+        'def closer := "-/"\n'
+    )
+    path = write_text_mutant(delimiter_decoy, ".lean")
+    try:
+        expect_failure(
+            "target string comment-delimiter decoy",
+            lambda: validate_dependency_planes(target_lakefile=path),
+            "direct lakefile dependencies differ from lock declaration",
+        )
+    finally:
+        path.unlink()
+    escaped_wrong_repository = target_lake.replace(
+        'require verity from git\n  "https://github.com/lfglabs-dev/verity.git"',
+        'require «verity» from git\n  "https://example.com/verity.git"',
+    ) + (
+        '\ndef decoy := r#"require verity from git '
+        '\\"https://github.com/lfglabs-dev/verity.git\\"@'
+        '\\"68f560e66c5de6123061ce5ed60261be162673d1\\""#\n'
+    )
+    path = write_text_mutant(escaped_wrong_repository, ".lean")
+    try:
+        expect_failure(
+            "target escaped Verity with raw-string decoy",
+            lambda: validate_dependency_planes(target_lakefile=path),
+            "Verity lakefile repository/revision mismatch",
+        )
+    finally:
+        path.unlink()
+    wrong_target_repository = target_lake.replace(
+        "https://github.com/lfglabs-dev/verity.git",
+        "https://example.com/verity.git",
+    )
+    path = write_text_mutant(wrong_target_repository, ".lean")
+    try:
+        expect_failure(
+            "target wrong Verity repository with retained revision",
+            lambda: validate_dependency_planes(target_lakefile=path),
+            "Verity lakefile repository/revision mismatch",
+        )
+    finally:
+        path.unlink()
+
+    lock_data = load_json(LOCK)
+    current_manifest_data = load_json(ROOT / "lake-manifest.json")
+    pin_lock = json.loads(json.dumps(lock_data))
+    pin_lock["current_root"]["verity"] = "0" * 40
+    pin_lock["current_root"]["evmyullean"] = "1" * 40
+    pin_lock_path = write_mutant(pin_lock)
+    pin_lake_path = write_text_mutant(
+        current_lake.replace(
+            "538c4a9ce2baa25b56062bdc727eb0191ad9e67f", "0" * 40
+        ),
+        ".lean",
+    )
+    pin_manifest = json.loads(json.dumps(current_manifest_data))
+    for entry in pin_manifest["packages"]:
+        if entry["name"] == "verity":
+            entry["rev"] = entry["inputRev"] = "0" * 40
+        elif entry["name"] == "evmyul":
+            entry["rev"] = entry["inputRev"] = "1" * 40
+    pin_manifest_path = write_mutant(pin_manifest)
+    try:
+        expect_failure(
+            "consistent current-plane pin tampering",
+            lambda: validate_lock(pin_lock_path),
+            "current root Verity exact pin mismatch",
+        )
+    finally:
+        pin_lock_path.unlink()
+        pin_lake_path.unlink()
+        pin_manifest_path.unlink()
+
+    topology_lock = json.loads(json.dumps(lock_data))
+    topology_lock["current_root"]["direct_dependencies"] = ["verity", "foo"]
+    topology_lock_path = write_mutant(topology_lock)
+    topology_lake_path = write_text_mutant(
+        current_lake
+        + '\nrequire foo from git "https://example.com/foo.git"@'
+          '"0123456789abcdef0123456789abcdef01234567"\n',
+        ".lean",
+    )
+    topology_manifest = json.loads(json.dumps(current_manifest_data))
+    topology_manifest["packages"].append({
+        "name": "foo",
+        "scope": "",
+        "rev": "0123456789abcdef0123456789abcdef01234567",
+        "version": "",
+        "inherited": False,
+        "configFile": "lakefile.lean",
+        "inputRev": "0123456789abcdef0123456789abcdef01234567",
+        "gitDir": ".lake/packages/foo",
+        "url": "https://example.com/foo.git",
+        "type": "git",
+        "subDir": None,
+    })
+    topology_manifest_path = write_mutant(topology_manifest)
+    try:
+        expect_failure(
+            "consistent current-root topology tampering",
+            lambda: validate_lock(topology_lock_path),
+            "current root must depend exactly once on Verity",
+        )
+    finally:
+        topology_lock_path.unlink()
+        topology_lake_path.unlink()
+        topology_manifest_path.unlink()
     target_manifest_data = load_json(TARGET / "lake-manifest.json")
     manifest_mutants = []
     duplicate = json.loads(json.dumps(target_manifest_data))
