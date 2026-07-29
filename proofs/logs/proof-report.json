@@ -7,9 +7,9 @@
   "command": "lake build LidoSRv3",
   "build": {
     "log": "proofs/logs/prove.txt",
-    "log_sha256": "a82bdf86185a943139f7cbf23d50a6a62cf9595ae56221a4c2852a3ba4e1f96c",
-    "verified_at": "2026-07-29T08:55:05Z",
-    "verified_source_tree": "75fdab7fdafe88cd28e950eecaf6fc1cc0db4554",
+    "log_sha256": "a7d7c230ea516cd47fada2287c354291ddb3dd40d977f2fceb369d3cfd64a392",
+    "verified_at": "2026-07-29T09:36:08Z",
+    "verified_source_tree": "5bc173a8fc24bcf731c7d154284502da18b21095",
     "exit_status": 0
   },
   "targets": [
