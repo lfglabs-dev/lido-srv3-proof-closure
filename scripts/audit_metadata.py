@@ -175,6 +175,19 @@ EXPECTED_THEOREM_PLANES = [
     [],
     [],
 ]
+EXPECTED_THEOREMS = [
+    "LidoSRv3.P1_reserve_separation",
+    "LidoSRv3.Audit.Quantity.checkedDiv_zero",
+    "LidoSRv3.Audit.revert_restores_state_value_and_logs",
+    "LidoSRv3.Audit.valid_result_preserves_router_order",
+    "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
+    None,
+    None,
+    None,
+    None,
+    None,
+    None,
+]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
     "BLOCKED",
@@ -211,7 +224,46 @@ EXPECTED_COMMON_MODULES = {
     "LidoSRv3.Audit.Common.Atomicity",
     "LidoSRv3.Audit.Common.Bounded",
 }
-EXPECTED_COMMON_THEOREMS = [
+EXPECTED_MANIFEST_THEOREMS = [
+    {"name": "Quantity.checkedDiv_zero", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "Quantity.saturatingSub_zero_of_le", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "revert_restores_state_value_and_logs", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "revert_may_retain_attempts", "status": "lean_checked", "axioms": []},
+    {"name": "valid_result_preserves_router_order", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},
+    {"name": "MinFirst.candidate_open", "status": "lean_checked", "axioms": ["propext"]},
+    {"name": "MinFirst.candidate_none_no_open", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "MinFirst.candidate_minimal", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "MinFirst.candidate_router_tie", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "MinFirst.incrementSelected_moduleId", "status": "lean_checked", "axioms": []},
+    {"name": "MinFirst.incrementSelected_active", "status": "lean_checked", "axioms": []},
+    {"name": "MinFirst.incrementSelected_monotone", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "MinFirst.incrementSelected_eq_of_ne", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "MinFirst.step_preserves_length", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "MinFirst.step_preserves_module_order", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "MinFirst.loop_preserves_length", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "MinFirst.loop_preserves_module_order", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "MinFirst.allocate_preserves_length", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "MinFirst.allocate_preserves_module_order", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "MinFirst.run_spent_le", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "MinFirst.totalAllocated_le_requested", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
     {
         "name": "Common.BoundedAmount.checkedAdd_sound",
         "status": "lean_checked",
@@ -328,11 +380,8 @@ def validate_lock(lock, source_map):
     audit_modules = set(audit_manifest["layers"]["audit"]["modules"])
     require(EXPECTED_COMMON_MODULES <= audit_modules,
             "audit manifest omits canonical Common modules")
-    manifest_theorems = audit_manifest["theorems"]
-    for theorem in EXPECTED_COMMON_THEOREMS:
-        require(manifest_theorems.count(theorem) == 1,
-                f"audit manifest must contain exact Common theorem record: "
-                f"{theorem['name']}")
+    require(audit_manifest.get("theorems") == EXPECTED_MANIFEST_THEOREMS,
+            "audit manifest theorem ledger differs from the canonical records")
     require(
         f'"{verity["repository"]}"@"{verity["commit"]}"' in lakefile,
         "lakefile.lean Verity pin differs from lake-manifest.json",
@@ -363,14 +412,16 @@ def validate():
             "source-map policy differs from the canonical assurance rule")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
-    for row, expected_statuses, expected_theorem_planes, expected_reproduction, expected_links, expected_gate in zip(
-        rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES,
+    for row, expected_statuses, expected_theorem_planes, expected_theorem, expected_reproduction, expected_links, expected_gate in zip(
+        rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
         EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
         theorem_planes = row.get("theorem_planes")
         require(theorem_planes == expected_theorem_planes,
                 f"{row['id']}: theorem planes differ from canonical evidence")
+        require(row.get("theorem") == expected_theorem,
+                f"{row['id']}: theorem differs from canonical evidence")
         require(len(theorem_planes) == len(set(theorem_planes))
                 and set(theorem_planes) <= PLANES,
                 f"{row['id']}: invalid theorem evidence plane")

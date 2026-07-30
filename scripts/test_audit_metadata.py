@@ -151,15 +151,25 @@ def main():
             "generate",
             "audit manifest omits canonical Common modules",
         )
-        missing_common_theorem = copy.deepcopy(audit_manifest)
-        missing_common_theorem["theorems"] = missing_common_theorem["theorems"][:-1]
-        write_json(audit_manifest_path, missing_common_theorem)
-        run(
-            fixture,
-            False,
-            "generate",
-            "audit manifest must contain exact Common theorem record",
-        )
+        for index, theorem in enumerate(audit_manifest["theorems"]):
+            missing_theorem = copy.deepcopy(audit_manifest)
+            del missing_theorem["theorems"][index]
+            write_json(audit_manifest_path, missing_theorem)
+            run(
+                fixture,
+                False,
+                "generate",
+                "audit manifest theorem ledger differs from the canonical records",
+            )
+            mutated_theorem = copy.deepcopy(audit_manifest)
+            mutated_theorem["theorems"][index]["axioms"] = ["False"]
+            write_json(audit_manifest_path, mutated_theorem)
+            run(
+                fixture,
+                False,
+                "generate",
+                "audit manifest theorem ledger differs from the canonical records",
+            )
         write_json(audit_manifest_path, audit_manifest)
 
         for revision in ("verity", "lean"):
@@ -234,6 +244,20 @@ def main():
         malformed["guarantees"][0]["statuses"].pop("crypto")
         write_json(guarantees_path, malformed)
         run(fixture, False, "generate")
+        write_json(guarantees_path, guarantees)
+
+        for index, guarantee in enumerate(guarantees["guarantees"]):
+            theorem_mutant = copy.deepcopy(guarantees)
+            theorem_mutant["guarantees"][index]["theorem"] = (
+                "LidoSRv3.Audit.DoesNotExist"
+            )
+            write_json(guarantees_path, theorem_mutant)
+            run(
+                fixture,
+                False,
+                "generate",
+                f"{guarantee['id']}: theorem differs from canonical evidence",
+            )
         write_json(guarantees_path, guarantees)
 
         for status in ("AUDIT-CERT", "TYPO"):
@@ -355,7 +379,7 @@ def main():
     print(
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
-        "assumption records/links, authority, Common manifest/revisions, "
+        "assumption records/links, authority, full manifest theorem ledger/revisions, "
         "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )
