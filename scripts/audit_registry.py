@@ -60,6 +60,13 @@ EXPECTED_INVARIANT_SOURCE_ANCHORS = {
         "LidoSRv3/Audit/Vectors.lean",
     },
 }
+EXPECTED_INVARIANT_CLASSIFICATIONS = {
+    "SRV3-LEGACY-ECON": ("REGRESSION", "LEAN", "MODEL"),
+    "SRV3-ARITH-CHECKED": ("PROVED", "LEAN", "ALG"),
+    "SRV3-TX-REVERT": ("PROVED", "LEAN", "TX"),
+    "SRV3-ALLOC-ORDER": ("PROVED", "LEAN", "REL"),
+    "SRV3-MINFIRST-BOUND": ("PROVED", "LEAN", "ALG"),
+}
 EXPECTED_THEOREM_TYPES = {
     "LidoSRv3.P1_reserve_separation": (
         "∀ (s : LidoSRv3.State), "
@@ -784,6 +791,11 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 set(row["source_anchors"])
                 == EXPECTED_INVARIANT_SOURCE_ANCHORS[invariant_id],
                 f"{invariant_id}: source anchors differ from expected theorem evidence",
+            )
+            require(
+                (row["status"], row["engine"], row["layer"])
+                == EXPECTED_INVARIANT_CLASSIFICATIONS[invariant_id],
+                f"{invariant_id}: status/engine/layer differ from expected theorem evidence",
             )
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
@@ -1571,11 +1583,6 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
         sanitized = "\n".join(sanitized_lines)
-        opaque_start = re.compile(
-            r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
-            r"(?:set_option\b[^\n]*?\bin[ \t]+)?"
-            r"(?:(?:private|protected)[ \t]+)*opaque[ \t]+"
-        )
         custom_commands = set()
         for declaration in layout_command_spans(
             source, ("syntax", "macro", "elab")
@@ -1590,31 +1597,21 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     continue
                 if command and not any(character.isspace() for character in command):
                     custom_commands.add(command)
-        custom_command_pattern = (
-            "|".join(re.escape(command) for command in sorted(custom_commands))
+        opaque_start = re.compile(
+            r"\A[ \t\r\n]*(?:@\[[\s\S]*?\][ \t\r\n]*)*"
+            r"(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)?"
+            r"(?:(?:private|protected)[ \t\r\n]+)*opaque[ \t]+"
         )
-        command_start = re.compile(
-            r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
-            r"(?:(?:private|protected)[ \t]+)*"
-            r"(?:#\w+|"
-            + (
-                f"(?:{custom_command_pattern})(?=[ \t]|$)|"
-                if custom_command_pattern else ""
-            )
-            +
-            r"opaque|def|theorem|lemma|axiom|constant|inductive|structure|class|"
-            r"instance|abbrev|example|namespace|section|end|open|export|variable|"
-            r"include|omit|universe|set_option|attribute|initialize|"
-            r"builtin_initialize|syntax|macro|macro_rules|elab|elab_rules|"
-            r"command_elab|mutual)\b"
-        )
-        opaque_matches = list(opaque_start.finditer(sanitized))
-        for match in opaque_matches:
-            following = command_start.search(sanitized, match.end())
-            end = following.start() if following is not None else len(sanitized)
-            declaration = sanitized[match.start():end]
+        opaque_search_from = 0
+        for declaration in layout_command_spans(sanitized, ("opaque", "set_option")):
+            declaration_start = sanitized.find(declaration, opaque_search_from)
+            require(declaration_start >= 0, "scanner internal opaque span mismatch")
+            opaque_search_from = declaration_start + len(declaration)
+            match = opaque_start.search(declaration)
+            if match is None:
+                continue
             if ":=" not in declaration and re.search(r"(?m)^[ \t]*where\b", declaration) is None:
-                line_number = sanitized.count("\n", 0, match.start()) + 1
+                line_number = sanitized.count("\n", 0, declaration_start + match.start()) + 1
                 original = source.splitlines()[line_number - 1].strip()
                 violations.append(f"{name}:{line_number}:{original}")
     return violations
@@ -1784,6 +1781,36 @@ def negative_tests() -> None:
         )
     finally:
         source_swap_path.unlink()
+    classification_mutant = json.loads(json.dumps(data))
+    arithmetic_row = next(
+        row for row in classification_mutant["invariants"]
+        if row["id"] == "SRV3-ARITH-CHECKED"
+    )
+    arithmetic_row["engine"] = "VERITY"
+    arithmetic_row["layer"] = "SRC"
+    classification_path = write_mutant(classification_mutant)
+    try:
+        expect_failure(
+            "assured invariant engine/layer swap mutant",
+            lambda: validate(classification_path),
+            "status/engine/layer differ from expected theorem evidence",
+        )
+    finally:
+        classification_path.unlink()
+    promotion_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in promotion_mutant["invariants"]
+        if row["id"] == "SRV3-LEGACY-ECON"
+    )["status"] = "PROVED"
+    promotion_path = write_mutant(promotion_mutant)
+    try:
+        expect_failure(
+            "regression evidence promotion mutant",
+            lambda: validate(promotion_path),
+            "status/engine/layer differ from expected theorem evidence",
+        )
+    finally:
+        promotion_path.unlink()
     theorem_swap_mutant = json.loads(json.dumps(data))
     theorem_rows = {
         row["id"]: row for row in theorem_swap_mutant["invariants"]
@@ -1841,8 +1868,7 @@ def negative_tests() -> None:
         expect_failure(
             "PROVED dependency downgrade mutant",
             lambda: validate(dependency_downgrade_path),
-            "SRV3-MINFIRST-BOUND: assured status PROVED requires assured dependency "
-            "SRV3-ALLOC-ORDER, got REGRESSION",
+            "SRV3-ALLOC-ORDER: status/engine/layer differ from expected theorem evidence",
         )
     finally:
         dependency_downgrade_path.unlink()
@@ -1857,8 +1883,7 @@ def negative_tests() -> None:
             expect_failure(
                 f"assured dependency {unresolved_status} mutant",
                 lambda dependency_path=dependency_path: validate(dependency_path),
-                "SRV3-TX-REVERT: assured status PROVED requires assured dependency "
-                f"SRV3-ARITH-CHECKED, got {unresolved_status}",
+                "SRV3-ARITH-CHECKED: status/engine/layer differ from expected theorem evidence",
             )
         finally:
             dependency_path.unlink()
@@ -2197,6 +2222,39 @@ def negative_tests() -> None:
         "scanner set_option-wrapped bodyless opaque mutant passed",
     )
     print("mutant rejected: set_option-wrapped bodyless opaque")
+    multiline_wrapped_opaque_mutant = (
+        "set_option autoImplicit false in\n"
+        "  /- wrapper trivia\n"
+        "     across lines -/\n"
+        "  opaque hidden : False\n"
+    )
+    require(
+        find_proof_escapes([
+            ("multiline-set-option-wrapped-bodyless-opaque.lean",
+             multiline_wrapped_opaque_mutant)
+        ]),
+        "scanner multiline set_option-wrapped bodyless opaque mutant passed",
+    )
+    print("mutant rejected: multiline set_option-wrapped bodyless opaque")
+    for modifier, following in (
+        ("local", "local def innocent := 1"),
+        ("scoped", 'scoped macro "innocent" : command => '
+                   '`(example : True := by trivial)'),
+    ):
+        modified_boundary_mutant = (
+            "opaque hidden : False\n"
+            "-- comment-only boundary trivia\n"
+            "\n"
+            f"{following}\n"
+        )
+        require(
+            find_proof_escapes([
+                (f"bodyless-opaque-before-{modifier}-command.lean",
+                 modified_boundary_mutant)
+            ]),
+            f"scanner bodyless opaque before {modifier} command mutant passed",
+        )
+        print(f"mutant rejected: bodyless opaque before {modifier} command")
     custom_command_mutant = (
         'syntax "audit-cmd" ":=" term : command\n'
         "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
