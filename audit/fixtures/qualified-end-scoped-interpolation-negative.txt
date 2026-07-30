@@ -1,0 +1,11 @@
+namespace Old.Scope
+end Old.Scope
+
+namespace Real.Scope
+scoped syntax "qbar" interpolatedStr(term) : command
+scoped macro_rules
+  | `(qbar $value) => `(#check s!$value)
+end Real.Scope
+
+open scoped Real.Scope
+qbar "{(sorry : Nat)}"

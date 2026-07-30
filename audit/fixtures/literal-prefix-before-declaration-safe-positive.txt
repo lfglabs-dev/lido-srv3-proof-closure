@@ -1,0 +1,6 @@
+def bar (value : String) : String := value
+#check bar "{sorry}"
+
+syntax "bar" interpolatedStr(term) : command
+macro_rules
+  | `(bar $value) => `(#check s!$value)

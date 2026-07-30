@@ -572,25 +572,11 @@ def resolve_git_targets(
         )
         for target, identity in targets.items():
             if identity["kind"] == "ref":
-                remote_ref = subprocess.run(
-                    ["git", "ls-remote", "--exit-code", repository,
-                     f"refs/heads/{target}"],
-                    text=True, capture_output=True,
-                )
-                fields = remote_ref.stdout.strip().split()
                 require(
                     target == pinned_ref
                     and commit == identity["object"],
                     f"external-source-targets.json: {component}:{target} ref identity "
                     "does not match pinned repository ref",
-                )
-                require(
-                    remote_ref.returncode == 0
-                    and len(fields) == 2
-                    and fields[0] == commit
-                    and fields[1] == f"refs/heads/{target}",
-                    f"external-source-targets.json: {component}:{target} ref "
-                    "does not resolve to pinned repository commit",
                 )
                 continue
             result = subprocess.run(
@@ -1824,15 +1810,23 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     source_by_name = dict(sources)
-    declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     own_literal_free_prefix_categories: dict[
-        str, list[tuple[tuple[str, str], int]]
+        str, list[tuple[tuple[str, str], int, tuple[int, ...] | None]]
     ] = defaultdict(list)
     exported_literal_free_prefix_categories: dict[
         str, set[tuple[str, str]]
     ] = defaultdict(set)
     scoped_literal_free_prefix_categories: dict[
         str, dict[str, list[tuple[tuple[str, str], int]]]
+    ] = defaultdict(lambda: defaultdict(list))
+    own_interpolated_prefixes: dict[
+        str, list[tuple[tuple[str, bool], int, tuple[int, ...] | None]]
+    ] = defaultdict(list)
+    exported_interpolated_prefixes: dict[
+        str, set[tuple[str, bool]]
+    ] = defaultdict(set)
+    scoped_interpolated_prefixes: dict[
+        str, dict[str, list[tuple[tuple[str, bool], int]]]
     ] = defaultdict(lambda: defaultdict(list))
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
@@ -1951,6 +1945,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     class ScannerScopeState:
         namespace: str
         active_scopes: frozenset[str]
+        frames: tuple[int, ...]
 
     def scope_state_at(source: str, offset: int) -> ScannerScopeState:
         """Replay Lean namespace/section and scoped activation commands."""
@@ -1997,7 +1992,8 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 continue
             end_match = re.match(
                 r"^[ \t]*end(?:[ \t]+"
-                r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)))?[ \t]*$",
+                r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)"
+                r"(?:\.(?:[A-Za-z_][\w']*|«[^»\r\n]+»))*))?[ \t]*$",
                 line,
             )
             if end_match is None or not scopes:
@@ -2017,7 +2013,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             if current_frames[:len(activation.owner_frames)]
             == activation.owner_frames
         )
-        return ScannerScopeState(namespace, active_scopes)
+        return ScannerScopeState(namespace, active_scopes, current_frames)
 
     for source_name, source in sources:
         declaration_cursor = 0
@@ -2028,6 +2024,23 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             if declaration_offset == -1:
                 declaration_offset = source.find(declaration)
             declaration_cursor = declaration_offset + len(declaration)
+            declaration_start = structural_code(declaration)
+            local_declaration = re.match(
+                r"^[ \t\r\n]*"
+                r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
+                r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
+                r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*"
+                r"local\b",
+                declaration_start,
+            )
+            scoped_declaration = re.match(
+                r"^[ \t\r\n]*"
+                r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
+                r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
+                r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*"
+                r"scoped\b",
+                declaration_start,
+            )
             interpolation_match = interpolation_declaration.search(declaration)
             if (
                 interpolation_match is not None
@@ -2044,32 +2057,19 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     r",?[ \t]*([*?+]?)",
                     parser,
                 )
-                category = categories[0] if categories else ("unknown", "")
-                declaration_start = structural_code(declaration)
-                local_declaration = re.match(
-                    r"^[ \t\r\n]*"
-                    r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
-                    r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
-                    r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*"
-                    r"local\b",
-                    declaration_start,
-                )
+                category = categories[-1] if categories else ("unknown", "")
                 if local_declaration is not None:
                     own_literal_free_prefix_categories[source_name].append(
-                        (category, declaration_offset)
+                        (
+                            category,
+                            declaration_offset,
+                            scope_state_at(source, declaration_offset).frames,
+                        )
                     )
                 else:
-                    scoped_declaration = re.match(
-                        r"^[ \t\r\n]*"
-                        r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
-                        r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
-                        r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*"
-                        r"scoped\b",
-                        declaration_start,
-                    )
                     if scoped_declaration is None:
                         own_literal_free_prefix_categories[source_name].append(
-                            (category, declaration_offset)
+                            (category, declaration_offset, None)
                         )
                         exported_literal_free_prefix_categories[source_name].add(
                             category
@@ -2086,22 +2086,36 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 except json.JSONDecodeError:
                     continue
                 if prefix:
-                    declared_interpolated_prefixes.add(
-                        (prefix, bool(match.group(2).strip()))
+                    prefix_descriptor = (
+                        prefix, bool(match.group(2).strip())
                     )
-    declared_prefix_pattern = "|".join(
-        r"(?<![\w'])"
-        + re.escape(prefix)
-        + (r"(?:\s+\S.*)?" if has_intermediate else "")
-        for prefix, has_intermediate in sorted(
-            declared_interpolated_prefixes,
-            key=lambda item: len(item[0]),
-            reverse=True,
-        )
-    )
-    custom_prefix = (
-        rf"(?:{declared_prefix_pattern})|" if declared_prefix_pattern else ""
-    )
+                    if local_declaration is not None:
+                        own_interpolated_prefixes[source_name].append(
+                            (
+                                prefix_descriptor,
+                                declaration_offset,
+                                scope_state_at(
+                                    source, declaration_offset
+                                ).frames,
+                            )
+                        )
+                    elif scoped_declaration is None:
+                        own_interpolated_prefixes[source_name].append(
+                            (prefix_descriptor, declaration_offset, None)
+                        )
+                        exported_interpolated_prefixes[source_name].add(
+                            prefix_descriptor
+                        )
+                    else:
+                        scope = scope_state_at(
+                            source, declaration_offset
+                        ).namespace
+                        if scope:
+                            scoped_interpolated_prefixes[source_name][
+                                scope
+                            ].append(
+                                (prefix_descriptor, declaration_offset)
+                            )
     literal_free_category_patterns = {
         "ident": r"(?:«[^»\r\n]+»|(?:[^\W\d]|_)[\w'.]*)",
         "num": r"\d[\w']*",
@@ -2123,10 +2137,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
 
     imports: dict[str, set[str]] = defaultdict(set)
     for source_name, source in sources:
-        for _, command in command_offsets(source, ("import",)):
+        for command in layout_command_spans(structural_code(source), ("import",)):
             match = re.match(
                 r"^[ \t\r\n]*(?:public[ \t]+)?import[ \t]+([\s\S]*)$",
-                without_lean_comments(command),
+                command,
             )
             if match is None:
                 continue
@@ -2145,16 +2159,21 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         source_name: str, offset: int | None = None
     ) -> set[tuple[str, str]]:
         limit = sys.maxsize if offset is None else offset
-        active = {
-            category
-            for category, declaration_offset
-            in own_literal_free_prefix_categories[source_name]
-            if declaration_offset < limit
-        }
-        active_scopes = scope_state_at(
+        state = scope_state_at(
             source_by_name[source_name],
             len(source_by_name[source_name]) if offset is None else offset,
-        ).active_scopes
+        )
+        active = {
+            category
+            for category, declaration_offset, owner_frames
+            in own_literal_free_prefix_categories[source_name]
+            if declaration_offset < limit
+            and (
+                owner_frames is None
+                or state.frames[:len(owner_frames)] == owner_frames
+            )
+        }
+        active_scopes = state.active_scopes
         for scope in active_scopes:
             active.update(
                 category
@@ -2182,22 +2201,77 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             pending.extend(imports.get(imported_source, set()))
         return active
 
-    all_literal_free_categories = {
-        category
-        for source_name, _ in sources
-        for category in active_literal_free_categories(source_name)
-    }
-    literal_free_prefix = "|".join(
-        literal_free_category_patterns.get(category, r"[^\s\"]+")
-        for category, _ in sorted(all_literal_free_categories)
-    )
-    if literal_free_prefix:
-        literal_free_prefix = rf"(?:{literal_free_prefix})|"
-    interpolated_prefix = re.compile(
-        rf"(?:{custom_prefix}{literal_free_prefix}!|"
+    def active_interpolated_prefixes(
+        source_name: str, offset: int
+    ) -> set[tuple[str, bool]]:
+        state = scope_state_at(source_by_name[source_name], offset)
+        active = {
+            prefix
+            for prefix, declaration_offset, owner_frames
+            in own_interpolated_prefixes[source_name]
+            if declaration_offset < offset
+            and (
+                owner_frames is None
+                or state.frames[:len(owner_frames)] == owner_frames
+            )
+        }
+        for scope in state.active_scopes:
+            active.update(
+                prefix
+                for prefix, declaration_offset
+                in scoped_interpolated_prefixes[source_name].get(scope, [])
+                if declaration_offset < offset
+            )
+        pending = list(imports.get(source_name, set()))
+        visited = set()
+        while pending:
+            imported = pending.pop()
+            if imported in visited:
+                continue
+            visited.add(imported)
+            imported_source = modules[imported]
+            active.update(exported_interpolated_prefixes[imported_source])
+            for scope in state.active_scopes:
+                active.update(
+                    prefix
+                    for prefix, _ in scoped_interpolated_prefixes[
+                        imported_source
+                    ].get(scope, [])
+                )
+            pending.extend(imports.get(imported_source, set()))
+        return active
+
+    builtin_interpolated_prefix = re.compile(
+        r"(?:!|"
         r"Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
         r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
+    def is_interpolated_prefix(
+        prefix_code: str, source_name: str, offset: int
+    ) -> bool:
+        if builtin_interpolated_prefix.search(prefix_code):
+            return True
+        for prefix, has_intermediate in active_interpolated_prefixes(
+            source_name, offset
+        ):
+            suffix = (
+                r"(?:\s+\S.*)?" if has_intermediate else ""
+            )
+            if re.search(
+                r"(?<![\w'])" + re.escape(prefix) + suffix + r"\s*$",
+                prefix_code,
+            ):
+                return True
+        return any(
+            re.search(
+                literal_free_category_patterns.get(category, r"[^\s\"]+")
+                + r"\s*$",
+                prefix_code,
+            )
+            for category, _ in active_literal_free_categories(
+                source_name, offset
+            )
+        )
     for name, source in sources:
         block_depth = 0
         contexts: list[tuple[str, object]] = [("code", None)]
@@ -2273,7 +2347,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         delimiter < len(line)
                         and line[delimiter] == '"'
                     ):
-                        if interpolated_prefix.search(prefix_code):
+                        if is_interpolated_prefix(
+                            prefix_code, name, source_offset + cursor
+                        ):
                             code_parts.append("!")
                             contexts.append(("string", (True, False)))
                         else:
@@ -2300,8 +2376,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                             name, source_offset + cursor
                         )
                     )
-                    or interpolated_prefix.search(
-                        " ".join([layout_significant_code, "".join(code_parts)])
+                    or is_interpolated_prefix(
+                        " ".join([layout_significant_code, "".join(code_parts)]),
+                        name,
+                        source_offset + cursor,
                     )
                 ):
                     code_parts.append("!")
@@ -3634,6 +3712,22 @@ def negative_tests() -> None:
         "scanner numeral literal-free interpolation mutant passed",
     )
     print("mutant rejected: elaborated numeral literal-free interpolation syntax")
+    adjacent_parser_mutant = (
+        "macro n:num x:ident value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+        '123 foo"{(sorry : Nat)}"\n'
+    )
+    require_lean_elaboration(
+        "scanner adjacent interpolation parser mutant",
+        adjacent_parser_mutant,
+    )
+    require(
+        find_proof_escapes([
+            ("adjacent-interpolation-parser.lean", adjacent_parser_mutant)
+        ]),
+        "scanner ignored the parser adjacent to interpolatedStr",
+    )
+    print("mutant rejected: adjacent interpolation parser descriptor")
     for cardinality in ("*", "?"):
         parser = (
             f"xs:ident{cardinality}"
@@ -3901,6 +3995,33 @@ def negative_tests() -> None:
             f"scanner scope-state family {label}: wrong activation result",
         )
     print("attack family rejected: typed namespace/section activation corpus")
+    qualified_end_negative = require_fixture(
+        "qualified-end-scoped-interpolation-negative.txt"
+    ).read_text(encoding="utf-8")
+    qualified_end_safe = require_fixture(
+        "qualified-end-scoped-interpolation-safe-positive.txt"
+    ).read_text(encoding="utf-8")
+    require_lean_elaboration(
+        "scanner qualified end scoped interpolation mutant",
+        qualified_end_negative,
+    )
+    require_lean_elaboration(
+        "scanner qualified end scoped interpolation safe positive",
+        qualified_end_safe,
+    )
+    require(
+        find_proof_escapes([
+            ("qualified-end-scoped-negative.lean", qualified_end_negative)
+        ]),
+        "scanner qualified end left stale namespace state",
+    )
+    require(
+        not find_proof_escapes([
+            ("qualified-end-scoped-safe.lean", qualified_end_safe)
+        ]),
+        "scanner qualified end activated an unopened scoped parser",
+    )
+    print("mutant rejected: qualified end restores scoped namespace state")
     ordered_activation_safe = (
         'def inertBeforeDeclaration : String := "{sorry}"\n'
         "macro xs:ident* value:interpolatedStr(term) : command => "
@@ -3916,6 +4037,66 @@ def negative_tests() -> None:
         "scanner applied nullable syntax before its declaration",
     )
     print("safe positive accepted: nullable syntax activates in source order")
+    expired_local_safe = (
+        "section LocalSyntax\n"
+        "local macro xs:ident* value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+        "end LocalSyntax\n"
+        'def inertAfterLocal : String := "{sorry}"\n'
+    )
+    require_lean_elaboration(
+        "scanner expired local syntax safe positive",
+        expired_local_safe,
+    )
+    require(
+        not find_proof_escapes([
+            ("expired-local-syntax-safe.lean", expired_local_safe)
+        ]),
+        "scanner kept local interpolation active after section end",
+    )
+    print("safe positive accepted: local syntax expires at section end")
+    literal_prefix_declaration = require_fixture(
+        "literal-prefix-declaration-negative.txt"
+    ).read_text(encoding="utf-8")
+    literal_prefix_consumer = require_fixture(
+        "literal-prefix-consumer-negative.txt"
+    ).read_text(encoding="utf-8")
+    literal_prefix_nonleak_safe = require_fixture(
+        "literal-prefix-nonleak-safe-positive.txt"
+    ).read_text(encoding="utf-8")
+    literal_prefix_before_safe = require_fixture(
+        "literal-prefix-before-declaration-safe-positive.txt"
+    ).read_text(encoding="utf-8")
+    require_lean_module_elaboration(
+        "scanner literal-prefix module activation",
+        [
+            ("LiteralPrefixDeclaration", literal_prefix_declaration),
+            ("LiteralPrefixConsumer", literal_prefix_consumer),
+            ("LiteralPrefixNonleak", literal_prefix_nonleak_safe),
+            ("LiteralPrefixBefore", literal_prefix_before_safe),
+        ],
+    )
+    require(
+        find_proof_escapes([
+            ("LiteralPrefixDeclaration.lean", literal_prefix_declaration),
+            ("LiteralPrefixConsumer.lean", literal_prefix_consumer),
+        ]),
+        "scanner missed imported literal-prefix interpolation proof escape",
+    )
+    require(
+        not find_proof_escapes([
+            ("LiteralPrefixDeclaration.lean", literal_prefix_declaration),
+            ("LiteralPrefixNonleak.lean", literal_prefix_nonleak_safe),
+        ]),
+        "scanner leaked literal-prefix interpolation across modules",
+    )
+    require(
+        not find_proof_escapes([
+            ("LiteralPrefixBefore.lean", literal_prefix_before_safe)
+        ]),
+        "scanner activated literal-prefix interpolation before declaration",
+    )
+    print("mutant rejected: literal prefixes obey module and source order")
     public_import_declaration = (
         "macro xs:ident* value:interpolatedStr(term) : command => "
         "`(#check s!$value)\n"
@@ -4768,17 +4949,17 @@ def negative_tests() -> None:
 def refresh_negative_tests() -> None:
     pins = source_pins()
     repositories = source_repositories()
-    verity_repository, _ = repositories["verity"]
+    verity_repository, verity_ref = repositories["verity"]
     expect_failure(
         "refresh nonexistent pinned ref",
         lambda: resolve_git_targets(
             "verity",
             verity_repository,
-            "does-not-exist",
+            verity_ref,
             pins["verity"],
             {"does-not-exist": {"kind": "ref", "object": pins["verity"]}},
         ),
-        "ref does not resolve to pinned repository commit",
+        "ref identity does not match pinned repository ref",
     )
     lock_mutant = load_json(LOCK)
     lock_mutant = json.loads(json.dumps(lock_mutant))

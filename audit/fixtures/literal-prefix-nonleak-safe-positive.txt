@@ -1,0 +1,2 @@
+def bar (value : String) : String := value
+#check bar "{sorry}"
