@@ -61,17 +61,33 @@ EXPECTED_INVARIANT_SOURCE_ANCHORS = {
     },
 }
 EXPECTED_INVARIANT_CLASSIFICATIONS = {
-    "SRV3-LEGACY-ECON": ("REGRESSION", "LEAN", "MODEL"),
-    "SRV3-ARITH-CHECKED": ("PROVED", "LEAN", "ALG"),
-    "SRV3-TX-REVERT": ("PROVED", "LEAN", "TX"),
-    "SRV3-ALLOC-ORDER": ("PROVED", "LEAN", "REL"),
-    "SRV3-MINFIRST-BOUND": ("PROVED", "LEAN", "ALG"),
-    "SRV3-SOLIDITY-CORR": ("OPEN", "VERITY", "SRC"),
-    "SRV3-VERITY-431": ("DEV-431-READY", "VERITY", "SRC"),
-    "SRV3-YUL-COMP": ("OPEN", "EVMYULLEAN", "YUL"),
-    "SRV3-EVM-RUNTIME": ("BLOCKED", "EVMYULLEAN", "EVM"),
-    "SRV3-SHA256-PRECOMPILE": ("STRETCH", "NATIVE-FFI", "CRYPTO"),
-    "SRV3-CONSOLIDATION-E2E": ("BLOCKED", "INTERFACE", "E2E"),
+    "SRV3-LEGACY-ECON": ("P0", "REGRESSION", "LEAN", "MODEL"),
+    "SRV3-ARITH-CHECKED": ("P0", "PROVED", "LEAN", "ALG"),
+    "SRV3-TX-REVERT": ("P0", "PROVED", "LEAN", "TX"),
+    "SRV3-ALLOC-ORDER": ("P0", "PROVED", "LEAN", "REL"),
+    "SRV3-MINFIRST-BOUND": ("P0", "PROVED", "LEAN", "ALG"),
+    "SRV3-SOLIDITY-CORR": ("P0", "OPEN", "VERITY", "SRC"),
+    "SRV3-VERITY-431": ("P1", "DEV-431-READY", "VERITY", "SRC"),
+    "SRV3-YUL-COMP": ("P1", "OPEN", "EVMYULLEAN", "YUL"),
+    "SRV3-EVM-RUNTIME": ("P0", "BLOCKED", "EVMYULLEAN", "EVM"),
+    "SRV3-SHA256-PRECOMPILE": ("STRETCH", "STRETCH", "NATIVE-FFI", "CRYPTO"),
+    "SRV3-CONSOLIDATION-E2E": ("P0", "BLOCKED", "INTERFACE", "E2E"),
+}
+EXPECTED_INVARIANT_DEPENDENCIES = {
+    "SRV3-LEGACY-ECON": set(),
+    "SRV3-ARITH-CHECKED": set(),
+    "SRV3-TX-REVERT": {"SRV3-ARITH-CHECKED"},
+    "SRV3-ALLOC-ORDER": {"SRV3-ARITH-CHECKED"},
+    "SRV3-MINFIRST-BOUND": {"SRV3-ALLOC-ORDER"},
+    "SRV3-SOLIDITY-CORR": {"SRV3-LEGACY-ECON", "SRV3-MINFIRST-BOUND"},
+    "SRV3-VERITY-431": set(),
+    "SRV3-YUL-COMP": {"SRV3-VERITY-431"},
+    "SRV3-EVM-RUNTIME": {"SRV3-YUL-COMP", "SRV3-SOLIDITY-CORR"},
+    "SRV3-SHA256-PRECOMPILE": {"SRV3-YUL-COMP"},
+    "SRV3-CONSOLIDATION-E2E": {
+        "SRV3-EVM-RUNTIME",
+        "SRV3-SHA256-PRECOMPILE",
+    },
 }
 EXPECTED_THEOREM_TYPES = {
     "LidoSRv3.P1_reserve_separation": (
@@ -802,9 +818,9 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 f"{invariant_id}: source anchors differ from expected theorem evidence",
             )
         require(
-            (row["status"], row["engine"], row["layer"])
+            (row["priority"], row["status"], row["engine"], row["layer"])
             == EXPECTED_INVARIANT_CLASSIFICATIONS[invariant_id],
-            f"{invariant_id}: status/engine/layer differ from expected classification",
+            f"{invariant_id}: priority/status/engine/layer differ from expected classification",
         )
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
@@ -822,6 +838,11 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
     )
     rows = {row["id"]: row for row in data["invariants"]}
     graph = {row_id: row["dependencies"] for row_id, row in rows.items()}
+    for node, dependencies in graph.items():
+        require(
+            set(dependencies) == EXPECTED_INVARIANT_DEPENDENCIES[node],
+            f"{node}: dependencies differ from expected graph",
+        )
     for node, dependencies in graph.items():
         for dependency in dependencies:
             require(dependency in graph, f"{node}: unknown dependency {dependency}")
@@ -1845,7 +1866,7 @@ def negative_tests() -> None:
         expect_failure(
             "evidence-free REGRESSION mutant",
             lambda: validate(evidence_free_regression_path),
-            "SRV3-SOLIDITY-CORR: status/engine/layer differ from expected classification",
+            "SRV3-SOLIDITY-CORR: priority/status/engine/layer differ from expected classification",
         )
     finally:
         evidence_free_regression_path.unlink()
@@ -1898,7 +1919,7 @@ def negative_tests() -> None:
         expect_failure(
             "assured invariant engine/layer swap mutant",
             lambda: validate(classification_path),
-            "status/engine/layer differ from expected classification",
+            "priority/status/engine/layer differ from expected classification",
         )
     finally:
         classification_path.unlink()
@@ -1912,10 +1933,39 @@ def negative_tests() -> None:
         expect_failure(
             "blocked invariant classification promotion mutant",
             lambda: validate(blocked_classification_path),
-            "SRV3-EVM-RUNTIME: status/engine/layer differ from expected classification",
+            "SRV3-EVM-RUNTIME: priority/status/engine/layer differ from expected classification",
         )
     finally:
         blocked_classification_path.unlink()
+    priority_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in priority_mutant["invariants"]
+        if row["id"] == "SRV3-CONSOLIDATION-E2E"
+    )["priority"] = "STRETCH"
+    priority_path = write_mutant(priority_mutant)
+    try:
+        expect_failure(
+            "critical obligation priority downgrade mutant",
+            lambda: validate(priority_path),
+            "SRV3-CONSOLIDATION-E2E: priority/status/engine/layer differ "
+            "from expected classification",
+        )
+    finally:
+        priority_path.unlink()
+    dependency_graph_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in dependency_graph_mutant["invariants"]
+        if row["id"] == "SRV3-CONSOLIDATION-E2E"
+    )["dependencies"] = []
+    dependency_graph_path = write_mutant(dependency_graph_mutant)
+    try:
+        expect_failure(
+            "required invariant dependency deletion mutant",
+            lambda: validate(dependency_graph_path),
+            "SRV3-CONSOLIDATION-E2E: dependencies differ from expected graph",
+        )
+    finally:
+        dependency_graph_path.unlink()
     promotion_mutant = json.loads(json.dumps(data))
     next(
         row for row in promotion_mutant["invariants"]
@@ -1926,7 +1976,7 @@ def negative_tests() -> None:
         expect_failure(
             "regression evidence promotion mutant",
             lambda: validate(promotion_path),
-            "status/engine/layer differ from expected classification",
+            "priority/status/engine/layer differ from expected classification",
         )
     finally:
         promotion_path.unlink()
@@ -1987,7 +2037,7 @@ def negative_tests() -> None:
         expect_failure(
             "PROVED dependency downgrade mutant",
             lambda: validate(dependency_downgrade_path),
-            "SRV3-ALLOC-ORDER: status/engine/layer differ from expected classification",
+            "SRV3-ALLOC-ORDER: priority/status/engine/layer differ from expected classification",
         )
     finally:
         dependency_downgrade_path.unlink()
@@ -2002,7 +2052,7 @@ def negative_tests() -> None:
             expect_failure(
                 f"assured dependency {unresolved_status} mutant",
                 lambda dependency_path=dependency_path: validate(dependency_path),
-                "SRV3-ARITH-CHECKED: status/engine/layer differ from expected classification",
+                "SRV3-ARITH-CHECKED: priority/status/engine/layer differ from expected classification",
             )
         finally:
             dependency_path.unlink()
@@ -2020,7 +2070,7 @@ def negative_tests() -> None:
             expect_failure(
                 f"sentinel-only runtime {assured_status} mutant",
                 lambda runtime_path=runtime_path: validate(runtime_path),
-                "SRV3-EVM-RUNTIME: status/engine/layer differ from expected classification",
+                "SRV3-EVM-RUNTIME: priority/status/engine/layer differ from expected classification",
             )
         finally:
             runtime_path.unlink()
@@ -2041,7 +2091,7 @@ def negative_tests() -> None:
             expect_failure(
                 f"{label} missing runtime sentinel mutant",
                 lambda runtime_path=runtime_path: validate(runtime_path),
-                "SRV3-EVM-RUNTIME: status/engine/layer differ from expected classification",
+                "SRV3-EVM-RUNTIME: priority/status/engine/layer differ from expected classification",
             )
         finally:
             runtime_path.unlink()
