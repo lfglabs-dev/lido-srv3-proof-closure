@@ -185,6 +185,20 @@ def main():
         write_json(guarantees_path, guarantees)
 
         for index, guarantee in enumerate(guarantees["guarantees"]):
+            gate_mutant = copy.deepcopy(guarantees)
+            gate_mutant["guarantees"][index]["next_gate"] = (
+                "All production guarantees are certified."
+            )
+            write_json(guarantees_path, gate_mutant)
+            run(
+                fixture,
+                False,
+                "generate",
+                f"{guarantee['id']}: next gate differs from canonical roadmap",
+            )
+        write_json(guarantees_path, guarantees)
+
+        for index, guarantee in enumerate(guarantees["guarantees"]):
             missing_link = copy.deepcopy(guarantees)
             missing_link["guarantees"][index]["assumptions"] = []
             write_json(guarantees_path, missing_link)

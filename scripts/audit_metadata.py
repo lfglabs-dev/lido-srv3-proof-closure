@@ -106,6 +106,19 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-SHA256-FFI"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
 ]
+EXPECTED_NEXT_GATES = [
+    "Establish pinned-source correspondence for each claimed economic transition.",
+    "Connect checked quantities to independently verified pinned source spans.",
+    "Refine success/revert and rollback against pinned executable EVM semantics.",
+    "Prove extraction and ordered-row correspondence from pinned Solidity.",
+    "Establish source correspondence and checked-Uint256 execution refinement.",
+    "Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.",
+    "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
+    "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
+    "Obtain independent canonical runtime, codehash, fork, and address provenance.",
+    "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
+    "Close source/Yul/EVM/crypto composition with canonical production provenance.",
+]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
     "exclusions": [
@@ -289,9 +302,9 @@ def validate():
             "assumptions differ from the canonical accepted risk records")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
-    for row, expected_statuses, expected_theorem_planes, expected_reproduction, expected_links in zip(
+    for row, expected_statuses, expected_theorem_planes, expected_reproduction, expected_links, expected_gate in zip(
         rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES,
-        EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS
+        EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
         theorem_planes = row.get("theorem_planes")
@@ -317,7 +330,8 @@ def validate():
             or (mapping["status"] == "MAPPED" and mapping["spans"]),
             f"{row['id']}: source assurance closure requires verified source spans",
         )
-        require(row["next_gate"], f"{row['id']}: missing next gate")
+        require(row["next_gate"] == expected_gate,
+                f"{row['id']}: next gate differs from canonical roadmap")
         require(row["reproduction"] == expected_reproduction,
                 f"{row['id']}: reproduction record differs from canonical evidence")
         require(row["assumptions"] == expected_links,
