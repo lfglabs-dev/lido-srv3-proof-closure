@@ -1930,6 +1930,31 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 cursor += 1
         return "".join(masked)
 
+    def scope_structural_code(text: str) -> str:
+        """Additionally mask syntax quotations before replaying scope commands."""
+        masked = list(structural_code(text))
+        cursor = 0
+        while cursor + 1 < len(masked):
+            if masked[cursor] != "`" or masked[cursor + 1] != "(":
+                cursor += 1
+                continue
+            quotation_start = cursor
+            delimiter_stack = ["("]
+            cursor += 2
+            while cursor < len(masked) and delimiter_stack:
+                character = masked[cursor]
+                if character in "([{":
+                    delimiter_stack.append(character)
+                elif character in ")]}":
+                    expected = {")": "(", "]": "[", "}": "{"}[character]
+                    if delimiter_stack[-1] == expected:
+                        delimiter_stack.pop()
+                cursor += 1
+            for index in range(quotation_start, cursor):
+                if masked[index] not in "\r\n":
+                    masked[index] = " "
+        return "".join(masked)
+
     @dataclass(frozen=True)
     class ScopeFrame:
         identity: int
@@ -1952,7 +1977,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         scopes: list[ScopeFrame] = []
         activations: list[ScopedActivation] = []
         next_identity = 0
-        for line in structural_code(source[:offset]).splitlines():
+        for line in scope_structural_code(source[:offset]).splitlines():
             namespace_match = re.match(
                 r"^[ \t]*namespace[ \t]+"
                 r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)"
@@ -2038,15 +2063,16 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
                 r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
                 r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*"
-                r"scoped\b",
-                declaration_start,
-            )
-            explicit_scoped_name = re.search(
-                r"\bscoped[ \t]*\[[ \t]*"
+                r"scoped(?:[ \t]*\[[ \t]*"
                 r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)"
                 r"(?:\.(?:[A-Za-z_][\w']*|«[^»\r\n]+»))*)"
-                r"[ \t]*\]",
+                r"[ \t]*\])?(?![\w'])",
                 declaration_start,
+            )
+            explicit_scoped_name = (
+                scoped_declaration.group(1)
+                if scoped_declaration is not None
+                else None
             )
             interpolation_match = interpolation_declaration.search(declaration)
             if (
@@ -2083,7 +2109,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         )
                     else:
                         scope = (
-                            explicit_scoped_name.group(1)
+                            explicit_scoped_name
                             if explicit_scoped_name is not None
                             else scope_state_at(
                                 source, declaration_offset
@@ -2121,7 +2147,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         )
                     else:
                         scope = (
-                            explicit_scoped_name.group(1)
+                            explicit_scoped_name
                             if explicit_scoped_name is not None
                             else scope_state_at(
                                 source, declaration_offset
@@ -2432,7 +2458,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?:@\[[\s\S]*?\][ \t\r\n]*)*"
             r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
             r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
-            r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*opaque\b",
+            r"(?:(?:private|protected|noncomputable|local)[ \t\r\n]+)*opaque\b",
             sanitized,
         ):
             line_number = sanitized.count("\n", 0, macro_opaque.start()) + 1
@@ -2456,12 +2482,15 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"\A[ \t\r\n]*(?:@\[[\s\S]*?\][ \t\r\n]*)*"
             r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
             r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
-            r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*opaque[ \t]+"
+            r"(?:(?:private|protected|noncomputable|local)[ \t\r\n]+)*opaque[ \t]+"
         )
         opaque_search_from = 0
         for source_declaration in layout_command_spans(
             source,
-            ("opaque", "set_option", "private", "protected", "noncomputable"),
+            (
+                "opaque", "set_option", "private", "protected",
+                "noncomputable", "local",
+            ),
         ):
             declaration_start = source.find(source_declaration, opaque_search_from)
             require(declaration_start >= 0, "scanner internal opaque span mismatch")
@@ -2487,7 +2516,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         delimiter_stack.pop()
                 elif not delimiter_stack:
                     assignment_match = re.match(
-                        r"(?:let|have)(?![\w'])", declaration[cursor:]
+                        r"(?:let|haveI?)(?![\w'])", declaration[cursor:]
                     )
                     if assignment_match is not None and (
                         cursor == 0 or not re.match(r"[\w']", declaration[cursor - 1])
@@ -3935,6 +3964,49 @@ def negative_tests() -> None:
         "scanner explicit scoped-name literal interpolation mutant passed",
     )
     print("mutant rejected: explicit scoped-name literal interpolation syntax")
+    quoted_scope_mutant = (
+        "namespace QuotationOwner\n"
+        "macro \"quotedSection\" : command => `(command|\n"
+        "  section Fake\n"
+        ")\n"
+        "end QuotationOwner\n"
+        "namespace Real\n"
+        "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+        "end Real\n"
+        "open scoped Real\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require_lean_elaboration(
+        "scanner syntax quotation scope mutant", quoted_scope_mutant
+    )
+    require(
+        find_proof_escapes([
+            ("syntax-quotation-scope.lean", quoted_scope_mutant)
+        ]),
+        "scanner replayed a quoted section as active scope structure",
+    )
+    print("mutant rejected: syntax quotations do not alter scanner scope")
+    quoted_explicit_scope_mutant = (
+        "syntax \"scoped\" \"[\" ident \"]\" : term\n"
+        "macro_rules | `(scoped[$name:ident]) => `(True)\n"
+        "namespace Real\n"
+        "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+        "`(command| #check scoped[Fake])\n"
+        "end Real\n"
+        "open scoped Real\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require_lean_elaboration(
+        "scanner quoted explicit scope mutant", quoted_explicit_scope_mutant
+    )
+    require(
+        find_proof_escapes([
+            ("quoted-explicit-scope.lean", quoted_explicit_scope_mutant)
+        ]),
+        "scanner took an explicit scope name from a quoted expansion",
+    )
+    print("mutant rejected: explicit scope belongs to declaration modifier")
     namespace_section_scoped_mutant = require_fixture(
         "namespace-section-scoped-nullable-negative.txt"
     ).read_text(encoding="utf-8")
@@ -4343,6 +4415,14 @@ def negative_tests() -> None:
         "scanner noncomputable bodyless opaque mutant passed",
     )
     print("mutant rejected: noncomputable bodyless opaque")
+    local_opaque_mutant = "section\nlocal opaque hidden : False\nend\n"
+    require(
+        find_proof_escapes([
+            ("local-bodyless-opaque.lean", local_opaque_mutant)
+        ]),
+        "scanner local bodyless opaque mutant passed",
+    )
+    print("mutant rejected: local bodyless opaque")
     for label, comment in (
         ("block-comment", "/- trivia -/"),
         ("nested-block-comment", "/- outer /- nested -/ trivia -/"),
@@ -4421,6 +4501,22 @@ def negative_tests() -> None:
         "scanner type-level have bodyless opaque mutant passed",
     )
     print("mutant rejected: type-level have bodyless opaque")
+    type_have_instance_opaque_mutant = (
+        "opaque hidden : by "
+        "haveI : Decidable True := inferInstance; exact True\n"
+    )
+    require_lean_elaboration(
+        "scanner type-level haveI bodyless opaque mutant",
+        type_have_instance_opaque_mutant,
+    )
+    require(
+        find_proof_escapes([
+            ("type-haveI-bodyless-opaque.lean",
+             type_have_instance_opaque_mutant)
+        ]),
+        "scanner type-level haveI bodyless opaque mutant passed",
+    )
+    print("mutant rejected: type-level haveI bodyless opaque")
     for label, source in (
         (
             "unparenthesized type-level let",
