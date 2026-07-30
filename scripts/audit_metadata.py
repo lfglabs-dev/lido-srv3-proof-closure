@@ -24,6 +24,10 @@ EXPECTED_IDS = [
     "SRV3-SHA256-PRECOMPILE",
     "SRV3-CONSOLIDATION-E2E",
 ]
+EXPECTED_AUTHORITY = (
+    "Lean theorem statements and proofs are authoritative; this metadata does not "
+    "close a semantic guarantee."
+)
 EXPECTED_WORDING = [
     "Legacy pure model is not a Solidity or deployed-bytecode correspondence proof.",
     "Quantity bounds and units are model inputs; Solidity correspondence remains unproved.",
@@ -199,6 +203,30 @@ REQUIRED_UNAVAILABLE = {
         "sha256_ffi_implementation_identity",
     )
 }
+EXPECTED_COMMON_MODULES = {
+    "LidoSRv3.Audit.Common.Units",
+    "LidoSRv3.Audit.Common.Result",
+    "LidoSRv3.Audit.Common.Trace",
+    "LidoSRv3.Audit.Common.Atomicity",
+    "LidoSRv3.Audit.Common.Bounded",
+}
+EXPECTED_COMMON_THEOREMS = [
+    {
+        "name": "Common.BoundedAmount.checkedAdd_sound",
+        "status": "lean_checked",
+        "axioms": [],
+    },
+    {
+        "name": "Common.revert_rolls_back_state_and_committed_effects",
+        "status": "lean_checked",
+        "axioms": ["propext"],
+    },
+    {
+        "name": "Common.success_exposes_exact_committed_effects",
+        "status": "lean_checked",
+        "axioms": ["propext"],
+    },
+]
 EXPECTED_SOURCE_TARGETS = [
     {"id": "SRV3-LEGACY-ECON", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
@@ -275,6 +303,14 @@ def validate_lock(lock, source_map):
             "artifacts.lock.json pins differ from source-map/toolchain/Lake authorities")
     require(audit_manifest["source_revisions"]["lido"] == lido_commit,
             "source-map Lido pin differs from verity target audit manifest")
+    audit_modules = set(audit_manifest["layers"]["audit"]["modules"])
+    require(EXPECTED_COMMON_MODULES <= audit_modules,
+            "audit manifest omits canonical Common modules")
+    manifest_theorems = audit_manifest["theorems"]
+    for theorem in EXPECTED_COMMON_THEOREMS:
+        require(manifest_theorems.count(theorem) == 1,
+                f"audit manifest must contain exact Common theorem record: "
+                f"{theorem['name']}")
     verity = expected_pins["verity"]
     require(
         f'"{verity["repository"]}"@"{verity["commit"]}"' in lakefile,
@@ -291,6 +327,8 @@ def validate():
     exclusions = load("exclusions.yaml")
     lock = load("artifacts.lock.json")
     source_map = load("source-map.yaml")
+    require(registry.get("authority") == EXPECTED_AUTHORITY,
+            "guarantee registry authority differs from the canonical declaration")
     rows = registry["guarantees"]
     ids = [row["id"] for row in rows]
     require(ids == EXPECTED_IDS, "guarantees must contain the exact ordered minimal-11 IDs")

@@ -123,6 +123,45 @@ def main():
 
         guarantees_path = fixture / "audit/guarantees.yaml"
         guarantees = json.loads(guarantees_path.read_text(encoding="utf-8"))
+        contradictory_authority = copy.deepcopy(guarantees)
+        contradictory_authority["authority"] = (
+            "This metadata closes every semantic guarantee."
+        )
+        write_json(guarantees_path, contradictory_authority)
+        run(
+            fixture,
+            False,
+            "generate",
+            "guarantee registry authority differs from the canonical declaration",
+        )
+        write_json(guarantees_path, guarantees)
+
+        audit_manifest_path = fixture / "verity/targets/audit-manifest.json"
+        audit_manifest = json.loads(
+            audit_manifest_path.read_text(encoding="utf-8")
+        )
+        missing_common_module = copy.deepcopy(audit_manifest)
+        missing_common_module["layers"]["audit"]["modules"].remove(
+            "LidoSRv3.Audit.Common.Atomicity"
+        )
+        write_json(audit_manifest_path, missing_common_module)
+        run(
+            fixture,
+            False,
+            "generate",
+            "audit manifest omits canonical Common modules",
+        )
+        missing_common_theorem = copy.deepcopy(audit_manifest)
+        missing_common_theorem["theorems"] = missing_common_theorem["theorems"][:-1]
+        write_json(audit_manifest_path, missing_common_theorem)
+        run(
+            fixture,
+            False,
+            "generate",
+            "audit manifest must contain exact Common theorem record",
+        )
+        write_json(audit_manifest_path, audit_manifest)
+
         malformed = copy.deepcopy(guarantees)
         malformed["guarantees"][0]["statuses"].pop("crypto")
         write_json(guarantees_path, malformed)
@@ -237,7 +276,7 @@ def main():
     print(
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
-        "assumption records/links, reproduction evidence, "
+        "assumption records/links, authority, Common manifest, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )
 
