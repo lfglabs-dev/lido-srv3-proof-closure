@@ -1690,7 +1690,8 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 violations.append(f"{name}:{number}:{line.strip()}")
         sanitized = "\n".join(sanitized_lines)
         for macro_opaque in re.finditer(
-            r"`\([ \t\r\n]*(?:@\[[\s\S]*?\][ \t\r\n]*)*"
+            r"`\([ \t\r\n]*(?:command[ \t\r\n]*\|[ \t\r\n]*)?"
+            r"(?:@\[[\s\S]*?\][ \t\r\n]*)*"
             r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
             r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
             r"(?:(?:private|protected)[ \t\r\n]+)*opaque\b",
@@ -2620,6 +2621,19 @@ def negative_tests() -> None:
         "scanner wrapped macro-generated bodyless opaque mutant passed",
     )
     print("mutant rejected: wrapped macro-generated bodyless opaque")
+    category_qualified_macro_opaque_mutant = (
+        'macro "mkBad" : command => `(\n'
+        "  command| set_option autoImplicit false in opaque hidden : False)\n"
+        "mkBad\n"
+    )
+    require(
+        find_proof_escapes([
+            ("category-qualified-macro-bodyless-opaque.lean",
+             category_qualified_macro_opaque_mutant)
+        ]),
+        "scanner category-qualified macro-generated bodyless opaque mutant passed",
+    )
+    print("mutant rejected: category-qualified macro-generated bodyless opaque")
     elaborator_generated_axiom_mutant = (
         "import Lean\n"
         "open Lean Elab Command\n"
