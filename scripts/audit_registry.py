@@ -241,6 +241,19 @@ EXPECTED_INVARIANT_REPRODUCTIONS = {
     "SRV3-SHA256-PRECOMPILE": "python3 scripts/audit_registry.py check",
     "SRV3-CONSOLIDATION-E2E": "python3 scripts/audit_registry.py check",
 }
+EXPECTED_INVARIANT_FALSIFIERS = {
+    "SRV3-LEGACY-ECON": "Existing Lean theorem compilation and Solidity reference fixtures; no source-level mutant is claimed.",
+    "SRV3-ARITH-CHECKED": "Change checkedDiv zero handling; the theorem/build must fail.",
+    "SRV3-TX-REVERT": "Retain committed state or logs on revert; the theorem/build must fail.",
+    "SRV3-ALLOC-ORDER": "Permute a valid result row; the relation or theorem must reject it.",
+    "SRV3-MINFIRST-BOUND": "LidoSRv3/Audit/Vectors.lean executable counterexample vectors.",
+    "SRV3-SOLIDITY-CORR": "A source mutant must falsify the corresponding translated property; no such M0 harness exists.",
+    "SRV3-VERITY-431": "Duplicate EVMYulLean package instances or a mismatched exact Verity pin must fail dependency gates.",
+    "SRV3-YUL-COMP": "A Yul mutant must violate an interface postcondition; no M0 semantic harness exists.",
+    "SRV3-EVM-RUNTIME": "Runtime bytecode or fork mismatch must fail an EVM trace; canonical artifact prerequisite is absent.",
+    "SRV3-SHA256-PRECOMPILE": "Differential hash vectors can detect disagreement but do not close the opaque FFI trust boundary.",
+    "SRV3-CONSOLIDATION-E2E": "An end-to-end production trace must reject a wrong runtime hash/address/fork; canonical inputs are absent.",
+}
 EXPECTED_UNAVAILABLE_ARTIFACT_BLOCKERS = {
     "consolidation-runtime": (
         "No independently sourced canonical EIP-7251 production "
@@ -1004,6 +1017,10 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
             row["reproduction"] == EXPECTED_INVARIANT_REPRODUCTIONS[invariant_id],
             f"{invariant_id}: reproduction differs from expected verification command",
         )
+        require(
+            row["falsifier"] == EXPECTED_INVARIANT_FALSIFIERS[invariant_id],
+            f"{invariant_id}: falsifier differs from expected obligation claim",
+        )
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
         if row["layer"] in set(layers) & {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
@@ -1403,10 +1420,35 @@ def validate_dependency_planes(
         "target plane: Verity EVMYulLean metadata mismatch",
     )
     receipt = verity["print_axioms"]
+    expected_receipt = {
+        "status": "FAIL",
+        "audit_cert": False,
+        "command": "lake build PrintAxioms && lake env lean PrintAxioms.lean",
+        "location": "Verity 68f560e66c5de6123061ce5ed60261be162673d1",
+        "observation": (
+            "Previously observed upstream failure; not freshly independently "
+            "reproduced by this M0 repair."
+        ),
+    }
     require(
-        receipt["status"] == "FAIL" and receipt["audit_cert"] is False
-        and receipt["command"] and receipt["location"],
-        "target plane: AUDIT-CERT requires passing PrintAxioms evidence",
+        receipt == expected_receipt,
+        "target plane: PrintAxioms receipt differs from fixed non-certified evidence",
+    )
+    assert_fresh(
+        TARGET / "VALIDATION.md",
+        "# Target 4.31 validation receipt\n\n"
+        "This directory is immutable audit metadata for a proposed future root. It is\n"
+        "not the repository's active Lake configuration.\n\n"
+        "- Target readiness: `DEV-431-READY`\n"
+        "- Target `PrintAxioms`: `FAIL`\n"
+        "- `AUDIT-CERT=false`\n"
+        "- Exact command: `lake build PrintAxioms && lake env lean PrintAxioms.lean`\n"
+        "- Location: Verity `68f560e66c5de6123061ce5ed60261be162673d1`\n"
+        "- Reproduction status: previously observed upstream failure; not freshly\n"
+        "  independently reproduced by this M0 repair.\n\n"
+        "An owner-authorized isolated target checkout must make the target\n"
+        "`PrintAxioms` gate pass before any future certification claim.\n",
+        "audit/target-4.31/VALIDATION.md",
     )
     validate_source_inventory()
 
@@ -1589,7 +1631,7 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
     index = 0
     starter = re.compile(
         r"^([ \t]*)(?:@\[[\s\S]*?\][ \t\r\n]*)*"
-        r"(?:(?:private|protected|local|noncomputable|"
+        r"(?:(?:private|protected|local|noncomputable|public|"
         r"scoped(?:[ \t]*\[[^\]\n]*\])?)[ \t\r\n]+)*"
         r"(?:" + "|".join(re.escape(command) for command in commands) + r")\b"
     )
@@ -1783,14 +1825,14 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     own_literal_free_prefix_categories: dict[
-        str, set[tuple[str, str]]
-    ] = defaultdict(set)
+        str, list[tuple[tuple[str, str], int]]
+    ] = defaultdict(list)
     exported_literal_free_prefix_categories: dict[
         str, set[tuple[str, str]]
     ] = defaultdict(set)
     scoped_literal_free_prefix_categories: dict[
-        str, dict[str, set[tuple[str, str]]]
-    ] = defaultdict(lambda: defaultdict(set))
+        str, dict[str, list[tuple[tuple[str, str], int]]]
+    ] = defaultdict(lambda: defaultdict(list))
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
         r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
@@ -1840,22 +1882,87 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 cursor += 1
         return "".join(uncommented)
 
+    def structural_code(text: str) -> str:
+        """Mask comments and literals while preserving offsets and newlines."""
+        masked = list(without_lean_comments(text))
+        cursor = 0
+        while cursor < len(masked):
+            if masked[cursor] == '"':
+                masked[cursor] = " "
+                cursor += 1
+                escaped = False
+                while cursor < len(masked):
+                    character = masked[cursor]
+                    if character not in "\r\n":
+                        masked[cursor] = " "
+                    cursor += 1
+                    if escaped:
+                        escaped = False
+                    elif character == "\\":
+                        escaped = True
+                    elif character == '"':
+                        break
+            elif masked[cursor] == "'":
+                end = cursor + 1
+                if end < len(masked) and masked[end] == "\\":
+                    end += 2
+                else:
+                    end += 1
+                if end < len(masked) and masked[end] == "'":
+                    for index in range(cursor, end + 1):
+                        if masked[index] not in "\r\n":
+                            masked[index] = " "
+                    cursor = end + 1
+                else:
+                    cursor += 1
+            else:
+                cursor += 1
+        return "".join(masked)
+
+    @dataclass(frozen=True)
+    class ScopeFrame:
+        kind: str
+        name: str | None
+
     def namespace_at(source: str, offset: int) -> str:
-        scopes: list[tuple[str, str]] = []
-        for line in without_lean_comments(source[:offset]).splitlines():
+        scopes: list[ScopeFrame] = []
+        for line in structural_code(source[:offset]).splitlines():
             namespace_match = re.match(
                 r"^[ \t]*namespace[ \t]+([A-Za-z_][\w']*)[ \t]*$", line
             )
             if namespace_match is not None:
-                scopes.append(("namespace", namespace_match.group(1)))
-            elif re.match(
-                r"^[ \t]*section(?:[ \t]+[A-Za-z_][\w']*)?[ \t]*$", line
-            ):
-                scopes.append(("section", ""))
-            elif re.match(r"^[ \t]*end(?:[ \t]+[A-Za-z_][\w']*)?[ \t]*$", line):
-                if scopes:
-                    scopes.pop()
-        return ".".join(name for kind, name in scopes if kind == "namespace")
+                scopes.append(ScopeFrame("namespace", namespace_match.group(1)))
+                continue
+            section_match = re.match(
+                r"^[ \t]*section(?:[ \t]+([A-Za-z_][\w']*))?[ \t]*$", line
+            )
+            if section_match is not None:
+                scopes.append(ScopeFrame("section", section_match.group(1)))
+                continue
+            end_match = re.match(
+                r"^[ \t]*end(?:[ \t]+([A-Za-z_][\w']*))?[ \t]*$", line
+            )
+            if end_match is None or not scopes:
+                continue
+            close_name = end_match.group(1)
+            if close_name is None:
+                scopes.pop()
+                continue
+            matching = next(
+                (
+                    index
+                    for index in range(len(scopes) - 1, -1, -1)
+                    if scopes[index].name == close_name
+                ),
+                None,
+            )
+            if matching is not None:
+                del scopes[matching:]
+        return ".".join(
+            frame.name or ""
+            for frame in scopes
+            if frame.kind == "namespace"
+        )
 
     for source_name, source in sources:
         declaration_cursor = 0
@@ -1883,7 +1990,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     parser,
                 )
                 category = categories[0] if categories else ("unknown", "")
-                declaration_start = without_lean_comments(declaration)
+                declaration_start = structural_code(declaration)
                 local_declaration = re.match(
                     r"^[ \t\r\n]*"
                     r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
@@ -1893,7 +2000,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     declaration_start,
                 )
                 if local_declaration is not None:
-                    own_literal_free_prefix_categories[source_name].add(category)
+                    own_literal_free_prefix_categories[source_name].append(
+                        (category, declaration_offset)
+                    )
                 else:
                     scoped_declaration = re.match(
                         r"^[ \t\r\n]*"
@@ -1904,7 +2013,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         declaration_start,
                     )
                     if scoped_declaration is None:
-                        own_literal_free_prefix_categories[source_name].add(category)
+                        own_literal_free_prefix_categories[source_name].append(
+                            (category, declaration_offset)
+                        )
                         exported_literal_free_prefix_categories[source_name].add(
                             category
                         )
@@ -1913,7 +2024,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         if scope:
                             scoped_literal_free_prefix_categories[source_name][
                                 scope
-                            ].add(category)
+                            ].append((category, declaration_offset))
             for match in syntax_interpolation.finditer(declaration):
                 try:
                     prefix = json.loads(f'"{match.group(1)}"')
@@ -1945,38 +2056,72 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         for source_name, _ in sources
         if source_name.endswith(".lean")
     }
-    imports = {
-        source_name: {
-            imported
-            for line in without_lean_comments(source).splitlines()
-            for match in [re.match(r"^[ \t]*import[ \t]+(.+?)[ \t]*$", line)]
-            if match is not None
-            for imported in re.findall(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*",
-                                       match.group(1))
-            if imported in modules
-        }
-        for source_name, source in sources
-    }
-    opened_scopes = {
-        source_name: {
-            scope
-            for line in without_lean_comments(source).splitlines()
-            for match in [
-                re.match(r"^[ \t]*open[ \t]+scoped[ \t]+(.+?)[ \t]*$", line)
-            ]
-            if match is not None
-            for scope in re.findall(
+    def command_offsets(source: str, commands: tuple[str, ...]) -> list[tuple[int, str]]:
+        result = []
+        cursor = 0
+        for command in layout_command_spans(source, commands):
+            offset = source.find(command, cursor)
+            require(offset >= 0, "scanner internal command span mismatch")
+            result.append((offset, command))
+            cursor = offset + len(command)
+        return result
+
+    imports: dict[str, set[str]] = defaultdict(set)
+    opened_scopes: dict[str, list[tuple[str, int]]] = defaultdict(list)
+    for source_name, source in sources:
+        for _, command in command_offsets(source, ("import",)):
+            match = re.match(
+                r"^[ \t\r\n]*(?:public[ \t]+)?import[ \t]+([\s\S]*)$",
+                without_lean_comments(command),
+            )
+            if match is None:
+                continue
+            tokens = re.findall(
                 r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*", match.group(1)
             )
-        }
-        for source_name, source in sources
-    }
+            index = 0
+            while index < len(tokens):
+                if tokens[index] == "as":
+                    index += 2
+                    continue
+                if tokens[index] in modules:
+                    imports[source_name].add(tokens[index])
+                index += 1
+        for offset, command in command_offsets(source, ("open",)):
+            match = re.match(
+                r"^[ \t\r\n]*open[ \t]+scoped[ \t]+([\s\S]*)$",
+                without_lean_comments(command),
+            )
+            if match is not None:
+                opened_scopes[source_name].extend(
+                    (scope, offset)
+                    for scope in re.findall(
+                        r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*",
+                        match.group(1),
+                    )
+                )
 
-    def active_literal_free_categories(source_name: str) -> set[tuple[str, str]]:
-        active = set(own_literal_free_prefix_categories[source_name])
-        for scope in opened_scopes.get(source_name, set()):
+    def active_literal_free_categories(
+        source_name: str, offset: int | None = None
+    ) -> set[tuple[str, str]]:
+        limit = sys.maxsize if offset is None else offset
+        active = {
+            category
+            for category, declaration_offset
+            in own_literal_free_prefix_categories[source_name]
+            if declaration_offset < limit
+        }
+        active_scopes = {
+            scope
+            for scope, open_offset in opened_scopes.get(source_name, [])
+            if open_offset < limit
+        }
+        for scope in active_scopes:
             active.update(
-                scoped_literal_free_prefix_categories[source_name].get(scope, set())
+                category
+                for category, declaration_offset
+                in scoped_literal_free_prefix_categories[source_name].get(scope, [])
+                if declaration_offset < limit
             )
         pending = list(imports.get(source_name, set()))
         visited = set()
@@ -1987,10 +2132,12 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             visited.add(imported)
             imported_source = modules[imported]
             active.update(exported_literal_free_prefix_categories[imported_source])
-            for scope in opened_scopes.get(source_name, set()):
+            for scope in active_scopes:
                 active.update(
+                    category
+                    for category, _ in
                     scoped_literal_free_prefix_categories[imported_source].get(
-                        scope, set()
+                        scope, []
                     )
                 )
             pending.extend(imports.get(imported_source, set()))
@@ -2013,13 +2160,14 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
     for name, source in sources:
-        active_nullable_categories = active_literal_free_categories(name)
         block_depth = 0
         contexts: list[tuple[str, object]] = [("code", None)]
         sanitized_lines = []
         layout_significant_code = ""
         layout_delimiters: list[str] = []
-        for number, line in enumerate(source.splitlines(), 1):
+        source_offset = 0
+        for number, raw_line in enumerate(source.splitlines(keepends=True), 1):
+            line = raw_line.rstrip("\r\n")
             code_parts = []
             cursor = 0
             while cursor < len(line):
@@ -2109,7 +2257,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 elif line[cursor] == '"' and (
                     any(
                         cardinality in ("*", "?")
-                        for _, cardinality in active_nullable_categories
+                        for _, cardinality in active_literal_free_categories(
+                            name, source_offset + cursor
+                        )
                     )
                     or interpolated_prefix.search(
                         " ".join([layout_significant_code, "".join(code_parts)])
@@ -2141,6 +2291,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     layout_delimiters.pop()
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
+            source_offset += len(raw_line)
         sanitized = "\n".join(sanitized_lines)
         for macro_opaque in re.finditer(
             r"`\([ \t\r\n]*(?:command[ \t\r\n]*\|[ \t\r\n]*)?"
@@ -2616,6 +2767,20 @@ def negative_tests() -> None:
         )
     finally:
         reproduction_path.unlink()
+    falsifier_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in falsifier_mutant["invariants"]
+        if row["id"] == "SRV3-ARITH-CHECKED"
+    )["falsifier"] = "No mutation can falsify this."
+    falsifier_path = write_mutant(falsifier_mutant)
+    try:
+        expect_failure(
+            "invariant falsifier substitution mutant",
+            lambda: validate(falsifier_path),
+            "SRV3-ARITH-CHECKED: falsifier differs from expected obligation claim",
+        )
+    finally:
+        falsifier_path.unlink()
     dependency_graph_mutant = json.loads(json.dumps(data))
     next(
         row for row in dependency_graph_mutant["invariants"]
@@ -3609,6 +3774,70 @@ def negative_tests() -> None:
         "scanner namespace/section scoped nullable interpolation mutant passed",
     )
     print("mutant rejected: section end preserves namespace-scoped activation")
+    ordered_activation_safe = (
+        'def inertBeforeDeclaration : String := "{sorry}"\n'
+        "macro xs:ident* value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+    )
+    require_lean_elaboration(
+        "scanner declaration-order safe positive", ordered_activation_safe
+    )
+    require(
+        not find_proof_escapes([
+            ("declaration-order-safe.lean", ordered_activation_safe)
+        ]),
+        "scanner applied nullable syntax before its declaration",
+    )
+    print("safe positive accepted: nullable syntax activates in source order")
+    public_import_declaration = (
+        "macro xs:ident* value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+    )
+    public_import_bridge = "module\npublic import PublicNullableDeclaration\n"
+    public_import_consumer = (
+        "import PublicNullableBridge\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("PublicNullableDeclaration.lean", public_import_declaration),
+            ("PublicNullableBridge.lean", public_import_bridge),
+            ("PublicNullableConsumer.lean", public_import_consumer),
+        ]),
+        "scanner public-import nullable interpolation mutant passed",
+    )
+    print("mutant rejected: public imports propagate nullable syntax")
+    multiline_import_consumer = (
+        "import Base /- comment\n"
+        "-/ PublicNullableDeclaration\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("Base.lean", "def base : Nat := 0\n"),
+            ("PublicNullableDeclaration.lean", public_import_declaration),
+            ("MultilineImportConsumer.lean", multiline_import_consumer),
+        ]),
+        "scanner multiline-import nullable interpolation mutant passed",
+    )
+    print("mutant rejected: multiline imports preserve module activation")
+    option_string_declaration = (
+        'set_option customName "in local " in '
+        "macro xs:ident* value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+    )
+    option_string_consumer = (
+        "import OptionStringDeclaration\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("OptionStringDeclaration.lean", option_string_declaration),
+            ("OptionStringConsumer.lean", option_string_consumer),
+        ]),
+        "scanner option-string wrapper hid an exported nullable declaration",
+    )
+    print("mutant rejected: wrapper strings cannot spoof local activation")
     import_comment_safe_positive = (
         'import Base -- Decl\n'
         'def inert : String := "{sorry}"\n'
@@ -4186,7 +4415,7 @@ def negative_tests() -> None:
     try:
         expect_failure("AUDIT-CERT with failing PrintAxioms",
                        lambda: validate_dependency_planes(verity_metadata=receipt_path),
-                       "AUDIT-CERT requires passing PrintAxioms evidence")
+                       "PrintAxioms receipt differs from fixed non-certified evidence")
     finally:
         receipt_path.unlink()
 
