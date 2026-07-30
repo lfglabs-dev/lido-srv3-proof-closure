@@ -4,7 +4,7 @@
 
 - `SRV3-LEGACY-ECON`: `lake build LidoSRv3` — successful Lean build; model layer only
 - `SRV3-ARITH-CHECKED`: `lake build LidoSRv3.Audit.Trust` — successful Lean build and declared axiom report
-- `SRV3-TX-REVERT`: `lake build LidoSRv3.Audit.Common.Atomicity` — successful Lean build of common rollback semantics
+- `SRV3-TX-REVERT`: `lake build LidoSRv3.Audit.Trace` — successful Lean build of the module containing the named rollback theorem
 - `SRV3-ALLOC-ORDER`: `lake build LidoSRv3.Audit.Allocation` — successful Lean build; relational model only
 - `SRV3-MINFIRST-BOUND`: `lake build LidoSRv3.Audit.Vectors` — successful theorem and falsifier-vector build
 - `SRV3-SOLIDITY-CORR`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem

@@ -7,6 +7,7 @@ authority; the script only checks and renders declared structured metadata.
 
 import argparse
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,7 +32,7 @@ EXPECTED_WORDING = [
     "Allocation inputs are source-shaped data, not extracted Solidity state.",
     "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
     "Verity 4.31 is a non-certified development scaffold.",
-    "Pinned target is explicitly non-certified and is not used by this Lean 4.24 M0 branch.",
+    "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
     "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
@@ -45,6 +46,86 @@ def load(name):
     return json.loads((AUDIT / name).read_text(encoding="utf-8"))
 
 
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def git_output(*args):
+    return subprocess.run(
+        ["git", "-C", str(ROOT), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+def manifest_package(manifest, name):
+    matches = [package for package in manifest["packages"] if package["name"] == name]
+    require(len(matches) == 1, f"lake-manifest.json: expected exactly one {name} package")
+    return matches[0]
+
+
+def validate_lock(lock, source_map):
+    manifest = json.loads((ROOT / "lake-manifest.json").read_text(encoding="utf-8"))
+    audit_manifest = json.loads(
+        (ROOT / "verity/targets/audit-manifest.json").read_text(encoding="utf-8")
+    )
+    toolchain = (ROOT / "lean-toolchain").read_text(encoding="utf-8").strip()
+    lakefile = (ROOT / "lakefile.lean").read_text(encoding="utf-8")
+    lido_repository, lido_commit = source_map["pinned_source"].split("@", 1)
+    lido_repository = f"https://github.com/{lido_repository}.git"
+
+    expected_pins = {
+        "lido_core": {"repository": lido_repository, "commit": lido_commit},
+        "verity": {
+            "repository": manifest_package(manifest, "verity")["url"],
+            "commit": manifest_package(manifest, "verity")["rev"],
+        },
+        "evmyullean": {
+            "repository": manifest_package(manifest, "evmyul")["url"],
+            "commit": manifest_package(manifest, "evmyul")["rev"],
+        },
+        "lean": {"toolchain": toolchain},
+        "mathlib": {
+            "repository": manifest_package(manifest, "mathlib")["url"],
+            "commit": manifest_package(manifest, "mathlib")["rev"],
+        },
+    }
+    require(lock.get("pins") == expected_pins,
+            "artifacts.lock.json pins differ from source-map/toolchain/Lake authorities")
+    require(audit_manifest["source_revisions"]["lido"] == lido_commit,
+            "source-map Lido pin differs from verity target audit manifest")
+    verity = expected_pins["verity"]
+    require(
+        f'"{verity["repository"]}"@"{verity["commit"]}"' in lakefile,
+        "lakefile.lean Verity pin differs from lake-manifest.json",
+    )
+
+    base = lock.get("campaign_base")
+    require(isinstance(base, dict), "artifacts.lock.json: missing campaign_base")
+    ref = base.get("ref")
+    require(ref == "campaign/lido-minimal-11",
+            "artifacts.lock.json: unexpected campaign_base ref")
+    remote = git_output("remote", "get-url", "origin")
+    require(base.get("repository") == remote,
+            "artifacts.lock.json: campaign_base repository differs from origin")
+    candidates = (f"refs/remotes/origin/{ref}", ref)
+    resolved = None
+    for candidate in candidates:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "--verify", f"{candidate}^{{commit}}"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            resolved = result.stdout.strip()
+            break
+    require(resolved is not None, f"campaign base ref is unavailable locally: {ref}")
+    require(base.get("commit") == resolved,
+            "artifacts.lock.json: campaign_base commit differs from checked-out base")
+
+
 def validate():
     registry = load("guarantees.yaml")
     assumptions = load("assumptions.yaml")
@@ -53,28 +134,38 @@ def validate():
     source_map = load("source-map.yaml")
     rows = registry["guarantees"]
     ids = [row["id"] for row in rows]
-    assert ids == EXPECTED_IDS, "guarantees must contain the exact ordered minimal-11 IDs"
-    assert [row["catalogue_wording"] for row in rows] == EXPECTED_WORDING, \
-        "catalogue wording changed"
+    require(ids == EXPECTED_IDS, "guarantees must contain the exact ordered minimal-11 IDs")
+    require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
+            "catalogue wording changed")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     for row in rows:
-        assert set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ"
-        assert row["next_gate"], f"{row['id']}: missing next gate"
-        assert row["reproduction"]["command"], f"{row['id']}: missing reproduction"
-        assert set(row["assumptions"]) <= assumption_ids, f"{row['id']}: unknown assumption"
-    assert [row["id"] for row in source_map["targets"]] == EXPECTED_IDS
+        require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
+        require(row["next_gate"], f"{row['id']}: missing next gate")
+        require(row["reproduction"]["command"], f"{row['id']}: missing reproduction")
+        require(set(row["assumptions"]) <= assumption_ids,
+                f"{row['id']}: unknown assumption")
+    tx_revert = rows[EXPECTED_IDS.index("SRV3-TX-REVERT")]
+    require(
+        tx_revert["theorem"] == "LidoSRv3.Audit.revert_restores_state_value_and_logs"
+        and tx_revert["reproduction"]["command"] == "lake build LidoSRv3.Audit.Trace",
+        "SRV3-TX-REVERT reproduction must build the module containing its named theorem",
+    )
+    require([row["id"] for row in source_map["targets"]] == EXPECTED_IDS,
+            "source-map targets must contain the exact ordered minimal-11 IDs")
     for row in source_map["targets"]:
-        assert row["status"] == "UNMAPPED" and row["spans"] == []
-    assert assumptions["certification"] == {
+        require(row["status"] == "UNMAPPED" and row["spans"] == [],
+                f"{row['id']}: source mapping must remain explicitly unmapped")
+    require(assumptions["certification"] == {
         "status": "DEV-431-READY",
         "audit_cert": False,
         "statement": "DEV-431-READY is development readiness, not AUDIT-CERT.",
-    }
+    }, "certification status must remain DEV-431-READY, not AUDIT-CERT")
+    validate_lock(lock, source_map)
     unavailable = lock["unavailable"]
-    assert unavailable
+    require(unavailable, "unavailable provenance must be recorded")
     for name, artifact in unavailable.items():
-        assert artifact == {"status": "MISSING", "blocked": True, "value": None}, \
-            f"{name}: unavailable provenance must be explicit"
+        require(artifact == {"status": "MISSING", "blocked": True, "value": None},
+                f"{name}: unavailable provenance must be explicit")
     return rows
 
 
@@ -119,8 +210,8 @@ def main():
         print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md")
     else:
         for name, content in views.items():
-            assert (AUDIT / name).read_text(encoding="utf-8") == content, \
-                f"{name} is stale; run scripts/audit_metadata.py generate"
+            require((AUDIT / name).read_text(encoding="utf-8") == content,
+                    f"{name} is stale; run scripts/audit_metadata.py generate")
         print("audit metadata ok: exact minimal-11, risks, pins, source-map, generated views")
 
 

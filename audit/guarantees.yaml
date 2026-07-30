@@ -27,7 +27,7 @@
       "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX"],
       "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Common.Atomicity", "expected": "successful Lean build of common rollback semantics"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Trace", "expected": "successful Lean build of the module containing the named rollback theorem"}
     },
     {
       "id": "SRV3-ALLOC-ORDER",
@@ -58,7 +58,7 @@
     },
     {
       "id": "SRV3-VERITY-431",
-      "catalogue_wording": "Pinned target is explicitly non-certified and is not used by this Lean 4.24 M0 branch.",
+      "catalogue_wording": "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
       "theorem": null,
       "statuses": {"model": "DEV-431-READY", "source": "DEV-431-READY", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
       "assumptions": ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
