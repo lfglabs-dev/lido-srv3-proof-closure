@@ -1859,7 +1859,16 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 )
                 category = categories[0] if categories else ("unknown", "")
                 own_literal_free_prefix_categories[source_name].add(category)
-                if re.match(r"^[ \t]*local\b", declaration) is None:
+                declaration_start = without_lean_comments(declaration)
+                local_declaration = re.match(
+                    r"^[ \t\r\n]*"
+                    r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
+                    r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
+                    r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*"
+                    r"local\b",
+                    declaration_start,
+                )
+                if local_declaration is None:
                     exported_literal_free_prefix_categories[source_name].add(category)
             for match in syntax_interpolation.finditer(declaration):
                 try:
@@ -1895,7 +1904,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     imports = {
         source_name: {
             imported
-            for line in source.splitlines()
+            for line in without_lean_comments(source).splitlines()
             for match in [re.match(r"^[ \t]*import[ \t]+(.+?)[ \t]*$", line)]
             if match is not None
             for imported in re.findall(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*",
@@ -3457,6 +3466,59 @@ def negative_tests() -> None:
         "scanner unimported nullable interpolation safe positive was rejected",
     )
     print("safe positive accepted: nullable syntax remains import-scoped")
+    wrapped_local_safe_positive = (
+        "set_option hygiene false in local macro "
+        "xs:ident* value:interpolatedStr(term) : command => "
+        "`(example : True := by trivial)\n"
+    )
+    wrapped_local_consumer = (
+        'import WrappedLocal\n'
+        'def inert : String := "{sorry}"\n'
+    )
+    require_lean_module_elaboration(
+        "scanner set_option-wrapped local interpolation safe positive",
+        [
+            ("WrappedLocal", wrapped_local_safe_positive),
+            ("WrappedLocalConsumer", wrapped_local_consumer),
+        ],
+    )
+    require(
+        not find_proof_escapes([
+            ("WrappedLocal.lean", wrapped_local_safe_positive),
+            ("WrappedLocalConsumer.lean", wrapped_local_consumer),
+        ]),
+        "scanner set_option-wrapped local interpolation leaked through import",
+    )
+    print("safe positive accepted: set_option-wrapped local syntax is not exported")
+    import_comment_safe_positive = (
+        'import Base -- Decl\n'
+        'def inert : String := "{sorry}"\n'
+    )
+    require_lean_module_elaboration(
+        "scanner import-comment safe positive",
+        [
+            ("Base", "def base : Nat := 0\n"),
+            (
+                "Decl",
+                "macro xs:ident* value:interpolatedStr(term) : command => "
+                "`(example : True := by trivial)\n",
+            ),
+            ("ImportCommentConsumer", import_comment_safe_positive),
+        ],
+    )
+    require(
+        not find_proof_escapes([
+            ("Base.lean", "def base : Nat := 0\n"),
+            (
+                "Decl.lean",
+                "macro xs:ident* value:interpolatedStr(term) : command => "
+                "`(example : True := by trivial)\n",
+            ),
+            ("ImportCommentConsumer.lean", import_comment_safe_positive),
+        ]),
+        "scanner parsed a Lean import comment as a module name",
+    )
+    print("safe positive accepted: Lean import comments do not add modules")
     separated_nullable_interpolation_mutant = (
         "macro xs:ident,* value:interpolatedStr(term) : command => "
         "`(#check s!$value)\n"
