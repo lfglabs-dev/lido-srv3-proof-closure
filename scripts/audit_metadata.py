@@ -449,7 +449,8 @@ def validate_lock(lock, source_map):
     evmyul = manifest_package(manifest, "evmyul")
     require(
         evmyul["url"] == CANONICAL_EVMYULLEAN_REPOSITORY
-        and evmyul["rev"] == CANONICAL_EVMYULLEAN_COMMIT,
+        and evmyul["rev"] == CANONICAL_EVMYULLEAN_COMMIT
+        and evmyul["inputRev"] == CANONICAL_EVMYULLEAN_COMMIT,
         "Lake EVMYulLean pin differs from the canonical dependency pin",
     )
     require(audit_manifest.get("schema") == EXPECTED_MANIFEST_SCHEMA,

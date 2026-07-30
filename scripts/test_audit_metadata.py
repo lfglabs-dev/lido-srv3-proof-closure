@@ -150,6 +150,22 @@ def main():
         write_json(lake_manifest_path, lake_manifest)
         write_json(lock_path, baseline_lock)
 
+        stale_evmyul_input = copy.deepcopy(lake_manifest)
+        evmyul = next(
+            package
+            for package in stale_evmyul_input["packages"]
+            if package["name"] == "evmyul"
+        )
+        evmyul["inputRev"] = "0" * 40
+        write_json(lake_manifest_path, stale_evmyul_input)
+        run(
+            fixture,
+            False,
+            "check",
+            "Lake EVMYulLean pin differs from the canonical dependency pin",
+        )
+        write_json(lake_manifest_path, lake_manifest)
+
         exclusions_path = fixture / "audit/exclusions.yaml"
         exclusions = json.loads(exclusions_path.read_text(encoding="utf-8"))
         write_json(exclusions_path, {})
