@@ -1,5 +1,7 @@
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.StrategyProofs
+import LidoSRv3.Audit.Common.Atomicity
+import LidoSRv3.Audit.Common.Bounded
 
 /-!
 Machine-readable-in-build axiom report for the first audit slice.
@@ -30,3 +32,6 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirst.allocate_preserves_module_order
 #print axioms LidoSRv3.Audit.MinFirst.run_spent_le
 #print axioms LidoSRv3.Audit.MinFirst.totalAllocated_le_requested
+#print axioms LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound
+#print axioms LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects
+#print axioms LidoSRv3.Audit.Common.success_exposes_exact_committed_effects
