@@ -57,6 +57,13 @@ Commands are run with the Lean 4.31 toolchain `bin` first on `PATH`.
   `axiom`/`unsafe` declarations or `sorry`/`admit` proof terms.
 - Dependency-deduplication scan: passed; exactly one inherited `evmyul` package
   resolves at the required revision.
+- Checked-in report refresh: `make report` passed; extracted PDF text contains
+  Verity `6cfc41fe4129e2c56f130bab9617a0c677ce60ae` and no stale
+  `538c4a9ce2baa25b56062bdc727eb0191ad9e67f`.
+- Final repair validation: `lake build`, `make test`, `make prove`, and
+  `lake build LidoSRv3.Audit.Trust` passed. The trust output contains only
+  documented Lean foundations (`propext`, `Quot.sound`); the forbidden
+  proof-escape scan and `git diff --check` passed.
 
 ## Limitations
 
