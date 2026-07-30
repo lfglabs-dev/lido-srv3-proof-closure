@@ -162,6 +162,19 @@ def main():
         )
         write_json(audit_manifest_path, audit_manifest)
 
+        for revision in ("verity", "lean"):
+            stale_revision = copy.deepcopy(audit_manifest)
+            stale_revision["source_revisions"][revision] = "stale"
+            write_json(audit_manifest_path, stale_revision)
+            run(
+                fixture,
+                False,
+                "generate",
+                f"{('Lake Verity' if revision == 'verity' else 'Lean toolchain')} "
+                "pin differs from verity target audit manifest",
+            )
+        write_json(audit_manifest_path, audit_manifest)
+
         malformed = copy.deepcopy(guarantees)
         malformed["guarantees"][0]["statuses"].pop("crypto")
         write_json(guarantees_path, malformed)
@@ -269,6 +282,17 @@ def main():
         )
         write_json(source_map_path, source_map)
 
+        policy_mutant = copy.deepcopy(source_map)
+        policy_mutant["policy"] = "Fabricated and unverified spans are permitted."
+        write_json(source_map_path, policy_mutant)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source-map policy differs from the canonical assurance rule",
+        )
+        write_json(source_map_path, source_map)
+
         reproduce_path = fixture / "audit/REPRODUCE.md"
         reproduce_path.write_text("stale\n", encoding="utf-8")
         run(fixture, False)
@@ -276,7 +300,8 @@ def main():
     print(
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
-        "assumption records/links, authority, Common manifest, reproduction evidence, "
+        "assumption records/links, authority, Common manifest/revisions, "
+        "source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )
 

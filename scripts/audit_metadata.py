@@ -227,6 +227,10 @@ EXPECTED_COMMON_THEOREMS = [
         "axioms": ["propext"],
     },
 ]
+EXPECTED_SOURCE_POLICY = (
+    "Source spans remain unmapped unless independently verified from pinned source; "
+    "names or legacy anchors are insufficient."
+)
 EXPECTED_SOURCE_TARGETS = [
     {"id": "SRV3-LEGACY-ECON", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
@@ -301,8 +305,14 @@ def validate_lock(lock, source_map):
     }
     require(lock.get("pins") == expected_pins,
             "artifacts.lock.json pins differ from source-map/toolchain/Lake authorities")
+    verity = expected_pins["verity"]
     require(audit_manifest["source_revisions"]["lido"] == lido_commit,
             "source-map Lido pin differs from verity target audit manifest")
+    require(audit_manifest["source_revisions"]["verity"] == verity["commit"],
+            "Lake Verity pin differs from verity target audit manifest")
+    lean_revision = toolchain.rsplit(":", 1)[-1]
+    require(audit_manifest["source_revisions"]["lean"] == lean_revision,
+            "Lean toolchain pin differs from verity target audit manifest")
     audit_modules = set(audit_manifest["layers"]["audit"]["modules"])
     require(EXPECTED_COMMON_MODULES <= audit_modules,
             "audit manifest omits canonical Common modules")
@@ -311,7 +321,6 @@ def validate_lock(lock, source_map):
         require(manifest_theorems.count(theorem) == 1,
                 f"audit manifest must contain exact Common theorem record: "
                 f"{theorem['name']}")
-    verity = expected_pins["verity"]
     require(
         f'"{verity["repository"]}"@"{verity["commit"]}"' in lakefile,
         "lakefile.lean Verity pin differs from lake-manifest.json",
@@ -338,6 +347,8 @@ def validate():
             "exclusions differ from the canonical scope boundary set")
     require(assumptions == EXPECTED_ASSUMPTIONS,
             "assumptions differ from the canonical accepted risk records")
+    require(source_map.get("policy") == EXPECTED_SOURCE_POLICY,
+            "source-map policy differs from the canonical assurance rule")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
     for row, expected_statuses, expected_theorem_planes, expected_reproduction, expected_links, expected_gate in zip(
