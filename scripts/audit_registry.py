@@ -131,6 +131,73 @@ EXPECTED_INVARIANT_FAMILIES = {
     "SRV3-SHA256-PRECOMPILE": "cryptography",
     "SRV3-CONSOLIDATION-E2E": "consolidation",
 }
+EXPECTED_INVARIANT_LIMITATIONS = {
+    "SRV3-LEGACY-ECON": (
+        {"Legacy pure model is not a Solidity or deployed-bytecode correspondence proof."},
+        {"Lean 4.24 kernel", "Pinned Verity dependency", "Manual source mapping"},
+    ),
+    "SRV3-ARITH-CHECKED": (
+        {"Quantity bounds and units are model inputs; Solidity correspondence remains unproved."},
+        {"Lean 4.24 kernel", "Pinned Verity dependency"},
+    ),
+    "SRV3-TX-REVERT": (
+        {"TxObservation is an abstract transaction model, not an EVM execution trace."},
+        {"Lean 4.24 kernel", "Abstract trace model"},
+    ),
+    "SRV3-ALLOC-ORDER": (
+        {"Allocation inputs are source-shaped data, not extracted Solidity state."},
+        {"Lean 4.24 kernel", "Manual source correspondence"},
+    ),
+    "SRV3-MINFIRST-BOUND": (
+        {"The handwritten MinFirst model has no established Solidity/EVM equivalence in M0."},
+        {"Lean 4.24 kernel", "Handwritten algorithm model"},
+    ),
+    "SRV3-SOLIDITY-CORR": (
+        {
+            "Verity 4.31 is a non-certified development scaffold.",
+            "Verity applies only to applicable Solidity/model components.",
+        },
+        {
+            "Future Verity source translation",
+            "Compiler/source provenance",
+            "Manual interface composition for non-Solidity components",
+        },
+    ),
+    "SRV3-VERITY-431": (
+        {
+            "Pinned target is explicitly non-certified and is not used by this "
+            "Lean 4.24 M0 branch."
+        },
+        {"Development scaffold", "Future Lean 4.31 migration"},
+    ),
+    "SRV3-YUL-COMP": (
+        {"Handwritten Yul/direct bytecode must not receive a fabricated Verity projection."},
+        {"EVMYulLean Yul semantics", "Explicit Solidity/Yul interface composition"},
+    ),
+    "SRV3-EVM-RUNTIME": (
+        {
+            "Current consolidation helper uses a Mock build and cannot establish "
+            "production runtime identity."
+        },
+        {
+            "Canonical bytecode acquisition",
+            "Fork configuration",
+            "Address and code-hash provenance",
+        },
+    ),
+    "SRV3-SHA256-PRECOMPILE": (
+        {"SHA-256 precompile hashing currently relies on opaque native FFI."},
+        {"Native FFI implementation", "Host SHA-256 library", "Precompile specification"},
+    ),
+    "SRV3-CONSOLIDATION-E2E": (
+        {"Mock-derived helper evidence is non-production evidence."},
+        {
+            "Solidity/Yul interface composition",
+            "EVM execution",
+            "Canonical production deployment provenance",
+        },
+    ),
+}
 EXPECTED_INVARIANT_CLASSIFICATIONS = {
     "SRV3-LEGACY-ECON": ("P0", "REGRESSION", "LEAN", "MODEL"),
     "SRV3-ARITH-CHECKED": ("P0", "PROVED", "LEAN", "ALG"),
@@ -896,6 +963,17 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
         require(
             row["family"] == EXPECTED_INVARIANT_FAMILIES[invariant_id],
             f"{invariant_id}: family differs from expected obligation family",
+        )
+        expected_assumptions, expected_trust_boundary = (
+            EXPECTED_INVARIANT_LIMITATIONS[invariant_id]
+        )
+        require(
+            set(row["assumptions"]) == expected_assumptions,
+            f"{invariant_id}: assumptions differ from expected obligation limitations",
+        )
+        require(
+            set(row["trust_boundary"]) == expected_trust_boundary,
+            f"{invariant_id}: trust boundary differs from expected obligation limitations",
         )
         require(
             (row["priority"], row["status"], row["engine"], row["layer"])
@@ -1956,6 +2034,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 continue
             body_delimiter = False
             delimiter_stack = []
+            pending_type_let_assignments = 0
             cursor = match.end()
             while cursor < len(declaration):
                 character = declaration[cursor]
@@ -1964,12 +2043,21 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 elif character in ")]}":
                     if delimiter_stack:
                         delimiter_stack.pop()
-                elif (
-                    not delimiter_stack
-                    and declaration.startswith(":=", cursor)
-                ):
-                    body_delimiter = True
-                    break
+                elif not delimiter_stack:
+                    let_match = re.match(r"let(?![\w'])", declaration[cursor:])
+                    if let_match is not None and (
+                        cursor == 0 or not re.match(r"[\w']", declaration[cursor - 1])
+                    ):
+                        pending_type_let_assignments += 1
+                        cursor += len(let_match.group(0))
+                        continue
+                    if declaration.startswith(":=", cursor):
+                        if pending_type_let_assignments:
+                            pending_type_let_assignments -= 1
+                            cursor += 2
+                            continue
+                        body_delimiter = True
+                        break
                 cursor += 1
             if (
                 not body_delimiter
@@ -2215,6 +2303,73 @@ def negative_tests() -> None:
         )
     finally:
         family_path.unlink()
+    cleared_limitations_mutant = json.loads(json.dumps(data))
+    for row in cleared_limitations_mutant["invariants"]:
+        row["assumptions"] = []
+        row["trust_boundary"] = []
+    cleared_limitations_path = write_mutant(cleared_limitations_mutant)
+    try:
+        expect_failure(
+            "all invariant assumptions/trust-boundaries cleared mutant",
+            lambda: validate(cleared_limitations_path),
+            "assumptions differ from expected obligation limitations",
+        )
+    finally:
+        cleared_limitations_path.unlink()
+    for field, replacement, expected_error in (
+        (
+            "assumptions",
+            [],
+            "SRV3-ARITH-CHECKED: assumptions differ from expected obligation limitations",
+        ),
+        (
+            "assumptions",
+            ["Substituted assumption."],
+            "SRV3-ARITH-CHECKED: assumptions differ from expected obligation limitations",
+        ),
+        (
+            "trust_boundary",
+            [],
+            "SRV3-ARITH-CHECKED: trust boundary differs from expected obligation limitations",
+        ),
+        (
+            "trust_boundary",
+            ["Substituted trust boundary."],
+            "SRV3-ARITH-CHECKED: trust boundary differs from expected obligation limitations",
+        ),
+    ):
+        limitation_mutant = json.loads(json.dumps(data))
+        next(
+            row for row in limitation_mutant["invariants"]
+            if row["id"] == "SRV3-ARITH-CHECKED"
+        )[field] = replacement
+        limitation_path = write_mutant(limitation_mutant)
+        try:
+            expect_failure(
+                f"invariant {field} removal/substitution mutant",
+                lambda path=limitation_path: validate(path),
+                expected_error,
+            )
+        finally:
+            limitation_path.unlink()
+    added_limitation_mutant = json.loads(json.dumps(data))
+    added_row = next(
+        row for row in added_limitation_mutant["invariants"]
+        if row["id"] == "SRV3-ARITH-CHECKED"
+    )
+    added_row["assumptions"].append("Added assumption.")
+    added_row["trust_boundary"].append("Added trust boundary.")
+    added_limitation_path = write_mutant(added_limitation_mutant)
+    try:
+        expect_failure(
+            "invariant assumption/trust-boundary addition mutant",
+            lambda: validate(added_limitation_path),
+            "SRV3-ARITH-CHECKED: assumptions differ from expected obligation limitations",
+        )
+    finally:
+        added_limitation_path.unlink()
+    validate()
+    print("safe positive accepted: exact invariant assumptions and trust boundaries")
     classification_mutant = json.loads(json.dumps(data))
     arithmetic_row = next(
         row for row in classification_mutant["invariants"]
@@ -3216,6 +3371,21 @@ def negative_tests() -> None:
         "scanner type-level let bodyless opaque mutant passed",
     )
     print("mutant rejected: type-level let bodyless opaque")
+    for label, source in (
+        (
+            "unparenthesized type-level let",
+            "opaque hidden : let p := False; p\n",
+        ),
+        (
+            "unparenthesized tactic type-level let",
+            "opaque hidden : by let p := False; exact p\n",
+        ),
+    ):
+        require(
+            find_proof_escapes([(f"{label.replace(' ', '-')}.lean", source)]),
+            f"scanner {label} bodyless opaque mutant passed",
+        )
+        print(f"mutant rejected: {label} bodyless opaque")
     legitimate_type_let_opaque = (
         "opaque good : (let p := Nat; p) := 1\n"
     )
@@ -3229,6 +3399,22 @@ def negative_tests() -> None:
         ]),
         "scanner legitimate type-level let opaque body was rejected",
     )
+    for label, source in (
+        (
+            "unparenthesized type-level let opaque body",
+            "opaque good : let p := Nat; p := 1\n",
+        ),
+        (
+            "unparenthesized tactic type-level let opaque body",
+            "opaque good : by let p := Prop; exact p := True\n",
+        ),
+    ):
+        require_lean_elaboration(f"scanner legitimate {label}", source)
+        require(
+            not find_proof_escapes([(f"legitimate-{label.replace(' ', '-')}.lean", source)]),
+            f"scanner legitimate {label} was rejected",
+        )
+        print(f"safe positive accepted: legitimate {label}")
 
     current_lake = (ROOT / "lakefile.lean").read_text(encoding="utf-8")
     target_lake = (TARGET / "lakefile.lean").read_text(encoding="utf-8")
