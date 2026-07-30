@@ -1324,6 +1324,37 @@ def assert_fresh(path: Path, expected: str, label: str) -> None:
     require(path.read_text(encoding="utf-8") == expected, f"stale generated view: {label}")
 
 
+def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
+    """Collect complete layout-delimited commands, including trivia lines."""
+    lines = source.splitlines(keepends=True)
+    spans = []
+    index = 0
+    starter = re.compile(
+        r"^([ \t]*)(?:" + "|".join(re.escape(command) for command in commands)
+        + r")\b"
+    )
+    trivia = re.compile(r"^[ \t]*(?:(?:--.*)?(?:\r?\n)?|/\-.*-\/[ \t]*(?:\r?\n)?)$")
+    while index < len(lines):
+        match = starter.match(lines[index])
+        if match is None:
+            index += 1
+            continue
+        indent = len(match.group(1).expandtabs(8))
+        end = index + 1
+        while end < len(lines):
+            line = lines[end]
+            if trivia.match(line):
+                end += 1
+                continue
+            leading = re.match(r"^[ \t]*", line).group(0)
+            if len(leading.expandtabs(8)) <= indent:
+                break
+            end += 1
+        spans.append("".join(lines[index:end]))
+        index = end
+    return spans
+
+
 def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     patterns = re.compile(
         r"(?<![\w'])(sorryAx|sorry|admit|axiom|constant|unsafe|native_decide|"
@@ -1332,21 +1363,22 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     syntax_interpolation = re.compile(
-        r'\bsyntax(?:\s*\((?:[^\n)]|\n[ \t]+)*\))?'
+        r'\bsyntax(?:\s*\([^)]*\))?'
         r'\s+"((?:\\.|[^"\\])*)"\s+'
-        r'((?:[^\n]|\n[ \t]+)*?)\binterpolatedStr'
-        r'(?:\((?:[^\n)]|\n[ \t]+)*\))?'
+        r'(.*?)\binterpolatedStr(?:\([^)]*\))?',
+        re.DOTALL,
     )
     for _, source in sources:
-        for match in syntax_interpolation.finditer(source):
-            try:
-                prefix = json.loads(f'"{match.group(1)}"')
-            except json.JSONDecodeError:
-                continue
-            if prefix:
-                declared_interpolated_prefixes.add(
-                    (prefix, bool(match.group(2).strip()))
-                )
+        for declaration in layout_command_spans(source, ("syntax",)):
+            for match in syntax_interpolation.finditer(declaration):
+                try:
+                    prefix = json.loads(f'"{match.group(1)}"')
+                except json.JSONDecodeError:
+                    continue
+                if prefix:
+                    declared_interpolated_prefixes.add(
+                        (prefix, bool(match.group(2).strip()))
+                    )
     declared_prefix_pattern = "|".join(
         re.escape(prefix) + (r"(?:\s+\S.*)?" if has_intermediate else "")
         for prefix, has_intermediate in sorted(
@@ -1468,17 +1500,19 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?:(?:private|protected)[ \t]+)*opaque[ \t]+"
         )
         custom_commands = set()
-        for command_match in re.finditer(
-            r'(?m)^[ \t]*(?:syntax|macro|elab)\b(?:[^\n"]|\n[ \t]+)*'
-            r'"((?:\\.|[^"\\])+)"(?:[^\n]|\n[ \t]+)*:[ \t]*command\b',
-            source,
+        for declaration in layout_command_spans(
+            source, ("syntax", "macro", "elab")
         ):
-            try:
-                command = json.loads(f'"{command_match.group(1)}"')
-            except json.JSONDecodeError:
-                continue
-            if command and not any(character.isspace() for character in command):
-                custom_commands.add(command)
+            for command_match in re.finditer(
+                r'"((?:\\.|[^"\\])+)"[\s\S]*:[ \t]*command\b',
+                declaration,
+            ):
+                try:
+                    command = json.loads(f'"{command_match.group(1)}"')
+                except json.JSONDecodeError:
+                    continue
+                if command and not any(character.isspace() for character in command):
+                    custom_commands.add(command)
         custom_command_pattern = (
             "|".join(re.escape(command) for command in sorted(custom_commands))
         )
@@ -1951,6 +1985,8 @@ def negative_tests() -> None:
     print("mutant rejected: intermediate-parser interpolated-string macro proof escape")
     multiline_interpolation_mutant = (
         'syntax "x" ident\n'
+        '-- declaration continuation after trivia\n'
+        '\n'
         '  interpolatedStr(term) : term\n'
         'macro_rules | `(x $name:ident $s:interpolatedStr) => `(s! $s)\n'
         'def bait : String := x foo "{(sorry : Nat)}"\n'
@@ -2017,7 +2053,7 @@ def negative_tests() -> None:
     custom_command_mutant = (
         'syntax "audit-cmd" ":=" term : command\n'
         "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
-        "opaque hidden : False\n"
+        "opaque hidden : Nat\n"
         "audit-cmd := by trivial\n"
     )
     require(
@@ -2029,9 +2065,11 @@ def negative_tests() -> None:
     print("mutant rejected: bodyless opaque before custom command")
     multiline_custom_command_mutant = (
         'syntax "audit-cmd"\n'
+        '-- declaration continuation after trivia\n'
+        '\n'
         '  ":=" term : command\n'
         "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
-        "opaque hidden : False\n"
+        "opaque hidden : Nat\n"
         "audit-cmd := by trivial\n"
     )
     require(
