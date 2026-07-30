@@ -210,10 +210,12 @@ CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_VERITY_REPOSITORY = "https://github.com/lfglabs-dev/verity.git"
 CANONICAL_VERITY_COMMIT = "6cfc41fe4129e2c56f130bab9617a0c677ce60ae"
+CANONICAL_VERITY_INPUT_REV = "6cfc41fe4129e2c56f130bab9617a0c677ce60ae"
 CANONICAL_EVMYULLEAN_REPOSITORY = "https://github.com/lfglabs-dev/EVMYulLean.git"
 CANONICAL_EVMYULLEAN_COMMIT = "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
 CANONICAL_MATHLIB_REPOSITORY = "https://github.com/leanprover-community/mathlib4.git"
 CANONICAL_MATHLIB_COMMIT = "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
+CANONICAL_MATHLIB_INPUT_REV = "v4.31.0"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
 EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v1"
@@ -424,13 +426,14 @@ def validate_lock(lock, source_map):
     require(
         verity["url"] == CANONICAL_VERITY_REPOSITORY
         and verity["rev"] == CANONICAL_VERITY_COMMIT
-        and verity["inputRev"] == CANONICAL_VERITY_COMMIT,
+        and verity["inputRev"] == CANONICAL_VERITY_INPUT_REV,
         "Lake Verity pin differs from the canonical dependency pin",
     )
     mathlib = manifest_package(manifest, "mathlib")
     require(
         mathlib["url"] == CANONICAL_MATHLIB_REPOSITORY
-        and mathlib["rev"] == CANONICAL_MATHLIB_COMMIT,
+        and mathlib["rev"] == CANONICAL_MATHLIB_COMMIT
+        and mathlib["inputRev"] == CANONICAL_MATHLIB_INPUT_REV,
         "Lake mathlib pin differs from the canonical migration receipt",
     )
 

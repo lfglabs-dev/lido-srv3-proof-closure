@@ -175,6 +175,22 @@ def main():
         write_json(lake_manifest_path, lake_manifest)
         write_json(lock_path, baseline_lock)
 
+        stale_mathlib_input = copy.deepcopy(lake_manifest)
+        mathlib = next(
+            package
+            for package in stale_mathlib_input["packages"]
+            if package["name"] == "mathlib"
+        )
+        mathlib["inputRev"] = "v0.0.0"
+        write_json(lake_manifest_path, stale_mathlib_input)
+        run(
+            fixture,
+            False,
+            "check",
+            "Lake mathlib pin differs from the canonical migration receipt",
+        )
+        write_json(lake_manifest_path, lake_manifest)
+
         stale_verity_input = copy.deepcopy(lake_manifest)
         verity = next(
             package
@@ -672,7 +688,8 @@ def main():
         "all pins/base/blockers, source/exclusions, "
         "assumption records/links, authority, full manifest layer/theorem ledgers, "
         "all metadata schemas, proof baseline/revisions, "
-        "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
+        "canonical Lean toolchain and requested revisions, proof policy, "
+        "source-map policy, reproduction evidence, "
         "strict source-span evidence, status vocabulary/plane/closure, stale view"
     )
 
