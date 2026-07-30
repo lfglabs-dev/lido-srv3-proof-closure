@@ -150,6 +150,22 @@ def main():
         write_json(lake_manifest_path, lake_manifest)
         write_json(lock_path, baseline_lock)
 
+        stale_verity_input = copy.deepcopy(lake_manifest)
+        verity = next(
+            package
+            for package in stale_verity_input["packages"]
+            if package["name"] == "verity"
+        )
+        verity["inputRev"] = "0" * 40
+        write_json(lake_manifest_path, stale_verity_input)
+        run(
+            fixture,
+            False,
+            "check",
+            "Lake Verity requested revision differs from the canonical dependency pin",
+        )
+        write_json(lake_manifest_path, lake_manifest)
+
         stale_evmyul_input = copy.deepcopy(lake_manifest)
         evmyul = next(
             package

@@ -467,6 +467,10 @@ def validate_lock(lock, source_map):
         f'"{verity["repository"]}"@"{verity["commit"]}"' in lakefile,
         "lakefile.lean Verity pin differs from lake-manifest.json",
     )
+    require(
+        manifest_package(manifest, "verity")["inputRev"] == verity["commit"],
+        "Lake Verity requested revision differs from the canonical dependency pin",
+    )
 
     require(lock.get("campaign_base") == CAMPAIGN_BASE,
             "artifacts.lock.json campaign_base differs from canonical campaign authority")

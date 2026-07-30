@@ -1,7 +1,7 @@
 PR #9 current-head P2 repair validation
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 2aa7bf0d1155d54ddd9fce2ccf44ef462b436207
+validated-tree: 78eaa3d2b58af419ec66c3f5a1c63144cf1b8346
 
 Receipt semantics: validated-tree is the Git tree produced from the final HEAD
 index after removing only proofs/logs/pr9-validation.txt. This binds every
@@ -10,7 +10,7 @@ SHA of the commit that contains this receipt. Run
 `python3 scripts/check_validation_receipt.py` to recompute and compare it.
 
 python3 scripts/audit_metadata.py check: exit 0
-PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0 (includes inputRev-only EVMYulLean manifest rejection)
+PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0 (includes inputRev-only Verity/EVMYulLean manifest rejection)
 python3 scripts/check_validation_receipt.py: exit 0
 make test: exit 0 (metadata mutants, receipt binding, provenance guards, Lean vectors, fixtures)
 make prove: exit 0 (proof report regenerated from committed source inputs)
