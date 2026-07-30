@@ -419,7 +419,7 @@ def main():
             fixture,
             False,
             "generate",
-            "SRV3-SOLIDITY-CORR: reproduction record differs from canonical evidence",
+            "P-RESERVE-1: reproduction record differs from canonical evidence",
         )
         write_json(guarantees_path, guarantees)
 
@@ -456,6 +456,60 @@ def main():
             run(fixture, False, "generate")
         write_json(lock_path, baseline_lock)
 
+        pinned_sha = source_map["pinned_source"].rsplit("@", 1)[-1]
+        valid_span = {
+            "source_sha": pinned_sha,
+            "path": "contracts/0.8.9/StakingRouter.sol",
+            "function": "deposit",
+            "start_line": 1,
+            "end_line": 2,
+            "permalink": (
+                "https://github.com/lidofinance/core/blob/"
+                f"{pinned_sha}/contracts/0.8.9/StakingRouter.sol#L1-L2"
+            ),
+        }
+        for missing_field in valid_span:
+            malformed_span = copy.deepcopy(source_map)
+            malformed_span["targets"][0] = {
+                "id": source_map["targets"][0]["id"],
+                "status": "MAPPED",
+                "spans": [{key: value for key, value in valid_span.items()
+                           if key != missing_field}],
+            }
+            write_json(source_map_path, malformed_span)
+            run(
+                fixture,
+                False,
+                "generate",
+                "source span requires exact SHA/path/function/lines/permalink",
+            )
+        trust_me_span = copy.deepcopy(source_map)
+        trust_me_span["targets"][0] = {
+            "id": source_map["targets"][0]["id"],
+            "status": "MAPPED",
+            "spans": [{
+                **valid_span,
+                "permalink": "https://example.invalid/trust-me",
+            }],
+        }
+        write_json(source_map_path, trust_me_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source span requires an immutable exact permalink",
+        )
+        unmapped_with_claim = copy.deepcopy(source_map)
+        unmapped_with_claim["targets"][0]["spans"] = [valid_span]
+        write_json(source_map_path, unmapped_with_claim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "UNMAPPED source row must not claim spans",
+        )
+        write_json(source_map_path, source_map)
+
         blocker_mutant = copy.deepcopy(source_map)
         blocker_mutant["targets"][8]["blocker"] = (
             "Canonical production runtime independently verified."
@@ -490,7 +544,7 @@ def main():
         "assumption records/links, authority, full manifest layer/theorem ledgers, "
         "all metadata schemas, proof baseline/revisions, "
         "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
-        "status vocabulary/plane/closure, stale view"
+        "strict source-span evidence, status vocabulary/plane/closure, stale view"
     )
 
 

@@ -2,14 +2,14 @@
 
 # ROADMAP
 
-- `SRV3-LEGACY-ECON`: Establish pinned-source correspondence for each claimed economic transition.
-- `SRV3-ARITH-CHECKED`: Connect checked quantities to independently verified pinned source spans.
-- `SRV3-TX-REVERT`: Refine success/revert and rollback against pinned executable EVM semantics.
-- `SRV3-ALLOC-ORDER`: Prove extraction and ordered-row correspondence from pinned Solidity.
-- `SRV3-MINFIRST-BOUND`: Establish source correspondence and checked-Uint256 execution refinement.
-- `SRV3-SOLIDITY-CORR`: Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.
-- `SRV3-VERITY-431`: Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.
-- `SRV3-YUL-COMP`: Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.
-- `SRV3-EVM-RUNTIME`: Obtain independent canonical runtime, codehash, fork, and address provenance.
-- `SRV3-SHA256-PRECOMPILE`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
-- `SRV3-CONSOLIDATION-E2E`: Close source/Yul/EVM/crypto composition with canonical production provenance.
+- `P-ALLOC-1`: Establish pinned-source correspondence for each claimed economic transition.
+- `P-ALLOC-2`: Connect checked quantities to independently verified pinned source spans.
+- `P-DEPOSIT-1`: Refine success/revert and rollback against pinned executable EVM semantics.
+- `P-TOPUP-1`: Prove extraction and ordered-row correspondence from pinned Solidity.
+- `P-ACCOUNT-1`: Establish source correspondence and checked-Uint256 execution refinement.
+- `P-RESERVE-1`: Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.
+- `P-ETH-1`: Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.
+- `P-ADDRESS-1`: Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.
+- `P-TOPUP-2`: Obtain independent canonical runtime, codehash, fork, and address provenance.
+- `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
+- `P-SSZ-1`: Close source/Yul/EVM/crypto composition with canonical production provenance.

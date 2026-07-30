@@ -2,14 +2,14 @@
 
 # REPRODUCE
 
-- `SRV3-LEGACY-ECON`: `lake build LidoSRv3` — successful Lean build; model layer only
-- `SRV3-ARITH-CHECKED`: `lake build LidoSRv3.Audit.Trust` — successful Lean build and declared axiom report
-- `SRV3-TX-REVERT`: `lake build LidoSRv3.Audit.Trace` — successful Lean build of the module containing the named rollback theorem
-- `SRV3-ALLOC-ORDER`: `lake build LidoSRv3.Audit.Allocation` — successful Lean build; relational model only
-- `SRV3-MINFIRST-BOUND`: `lake build LidoSRv3.Audit.Vectors` — successful theorem and falsifier-vector build
-- `SRV3-SOLIDITY-CORR`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem
-- `SRV3-VERITY-431`: `lake build` — active Lean 4.31 dependency graph builds; not certification
-- `SRV3-YUL-COMP`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
-- `SRV3-EVM-RUNTIME`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
-- `SRV3-SHA256-PRECOMPILE`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
-- `SRV3-CONSOLIDATION-E2E`: `python3 scripts/audit_metadata.py check` — E2E remains blocked; metadata cannot discharge dependencies
+- `P-ALLOC-1`: `lake build LidoSRv3` — successful Lean build; model layer only
+- `P-ALLOC-2`: `lake build LidoSRv3.Audit.Trust` — successful Lean build and declared axiom report
+- `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Trace` — successful Lean build of the module containing the named rollback theorem
+- `P-TOPUP-1`: `lake build LidoSRv3.Audit.Allocation` — successful Lean build; relational model only
+- `P-ACCOUNT-1`: `lake build LidoSRv3.Audit.Vectors` — successful theorem and falsifier-vector build
+- `P-RESERVE-1`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem
+- `P-ETH-1`: `lake build` — active Lean 4.31 dependency graph builds; not certification
+- `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
+- `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
+- `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
+- `P-SSZ-1`: `python3 scripts/audit_metadata.py check` — E2E remains blocked; metadata cannot discharge dependencies

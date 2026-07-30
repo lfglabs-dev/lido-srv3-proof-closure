@@ -7,22 +7,23 @@ authority; the script only checks and renders declared structured metadata.
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 EXPECTED_IDS = [
-    "SRV3-LEGACY-ECON",
-    "SRV3-ARITH-CHECKED",
-    "SRV3-TX-REVERT",
-    "SRV3-ALLOC-ORDER",
-    "SRV3-MINFIRST-BOUND",
-    "SRV3-SOLIDITY-CORR",
-    "SRV3-VERITY-431",
-    "SRV3-YUL-COMP",
-    "SRV3-EVM-RUNTIME",
-    "SRV3-SHA256-PRECOMPILE",
-    "SRV3-CONSOLIDATION-E2E",
+    "P-ALLOC-1",
+    "P-ALLOC-2",
+    "P-DEPOSIT-1",
+    "P-TOPUP-1",
+    "P-ACCOUNT-1",
+    "P-RESERVE-1",
+    "P-ETH-1",
+    "P-ADDRESS-1",
+    "P-TOPUP-2",
+    "P-CONSOLIDATION-1",
+    "P-SSZ-1",
 ]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
@@ -316,27 +317,27 @@ EXPECTED_SOURCE_POLICY = (
     "names or legacy anchors are insufficient."
 )
 EXPECTED_SOURCE_TARGETS = [
-    {"id": "SRV3-LEGACY-ECON", "status": "UNMAPPED", "spans": [],
+    {"id": "P-ALLOC-1", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "SRV3-ARITH-CHECKED", "status": "UNMAPPED", "spans": [],
+    {"id": "P-ALLOC-2", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "SRV3-TX-REVERT", "status": "UNMAPPED", "spans": [],
+    {"id": "P-DEPOSIT-1", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "SRV3-ALLOC-ORDER", "status": "UNMAPPED", "spans": [],
+    {"id": "P-TOPUP-1", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "SRV3-MINFIRST-BOUND", "status": "UNMAPPED", "spans": [],
+    {"id": "P-ACCOUNT-1", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "SRV3-SOLIDITY-CORR", "status": "UNMAPPED", "spans": [],
+    {"id": "P-RESERVE-1", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "SRV3-VERITY-431", "status": "UNMAPPED", "spans": [],
+    {"id": "P-ETH-1", "status": "UNMAPPED", "spans": [],
      "blocker": "Toolchain item; no independently verified Lido source span."},
-    {"id": "SRV3-YUL-COMP", "status": "UNMAPPED", "spans": [],
+    {"id": "P-ADDRESS-1", "status": "UNMAPPED", "spans": [],
      "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "SRV3-EVM-RUNTIME", "status": "UNMAPPED", "spans": [],
+    {"id": "P-TOPUP-2", "status": "UNMAPPED", "spans": [],
      "blocker": "Canonical runtime provenance is MISSING."},
-    {"id": "SRV3-SHA256-PRECOMPILE", "status": "UNMAPPED", "spans": [],
+    {"id": "P-CONSOLIDATION-1", "status": "UNMAPPED", "spans": [],
      "blocker": "Opaque native FFI identity is MISSING."},
-    {"id": "SRV3-CONSOLIDATION-E2E", "status": "UNMAPPED", "spans": [],
+    {"id": "P-SSZ-1", "status": "UNMAPPED", "spans": [],
      "blocker": "Canonical runtime/codehash/fork/address provenance is MISSING."},
 ]
 VIEWS = ("ROADMAP.md", "STATUS.md", "REPRODUCE.md")
@@ -355,6 +356,48 @@ def manifest_package(manifest, name):
     matches = [package for package in manifest["packages"] if package["name"] == name]
     require(len(matches) == 1, f"lake-manifest.json: expected exactly one {name} package")
     return matches[0]
+
+
+def validate_source_targets(source_map):
+    pinned_sha = source_map["pinned_source"].rsplit("@", 1)[-1]
+    require(bool(re.fullmatch(r"[0-9a-f]{40}", pinned_sha)),
+            "source-map pinned_source must end in a 40-character lowercase source SHA")
+    targets = source_map.get("targets")
+    require(isinstance(targets, list), "source-map targets must be a list")
+    for target in targets:
+        target_id = target.get("id", "<missing>")
+        status = target.get("status")
+        spans = target.get("spans")
+        require(status in {"MAPPED", "UNMAPPED"},
+                f"{target_id}: source-map status must be MAPPED or UNMAPPED")
+        require(isinstance(spans, list), f"{target_id}: source-map spans must be a list")
+        if status == "UNMAPPED":
+            require(not spans, f"{target_id}: UNMAPPED source row must not claim spans")
+            require(isinstance(target.get("blocker"), str) and target["blocker"].strip(),
+                    f"{target_id}: UNMAPPED source row requires a blocker")
+            continue
+        require(spans, f"{target_id}: MAPPED source row requires verified spans")
+        require(not target.get("blocker"),
+                f"{target_id}: MAPPED source row must not retain a blocker")
+        for span in spans:
+            require(set(span) == {"source_sha", "path", "function", "start_line", "end_line", "permalink"},
+                    f"{target_id}: source span requires exact SHA/path/function/lines/permalink")
+            require(span["source_sha"] == pinned_sha,
+                    f"{target_id}: source span SHA must equal the pinned source SHA")
+            require(isinstance(span["path"], str) and span["path"].strip()
+                    and not span["path"].startswith("/") and ".." not in Path(span["path"]).parts,
+                    f"{target_id}: source span requires an exact repository-relative path")
+            require(isinstance(span["function"], str) and span["function"].strip(),
+                    f"{target_id}: source span requires an exact function")
+            require(type(span["start_line"]) is int and type(span["end_line"]) is int
+                    and 1 <= span["start_line"] <= span["end_line"],
+                    f"{target_id}: source span requires a valid exact line range")
+            expected_permalink = (
+                f"https://github.com/lidofinance/core/blob/{pinned_sha}/"
+                f"{span['path']}#L{span['start_line']}-L{span['end_line']}"
+            )
+            require(span["permalink"] == expected_permalink,
+                    f"{target_id}: source span requires an immutable exact permalink")
 
 
 def validate_lock(lock, source_map):
@@ -445,6 +488,7 @@ def validate():
             "assumptions differ from the canonical accepted risk records")
     require(source_map.get("policy") == EXPECTED_SOURCE_POLICY,
             "source-map policy differs from the canonical assurance rule")
+    validate_source_targets(source_map)
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
     for row, expected_statuses, expected_theorem_planes, expected_theorem, expected_reproduction, expected_links, expected_gate in zip(
