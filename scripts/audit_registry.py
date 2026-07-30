@@ -1823,6 +1823,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         r"axiomDecl|opaqueDecl|thmDecl)(?![\w'])"
     )
     violations = []
+    source_by_name = dict(sources)
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     own_literal_free_prefix_categories: dict[
         str, list[tuple[tuple[str, str], int]]
@@ -1850,8 +1851,20 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         uncommented = []
         cursor = 0
         block_depth = 0
+        string_escaped = False
+        in_string = False
         while cursor < len(text):
-            if block_depth:
+            if in_string:
+                character = text[cursor]
+                uncommented.append(character)
+                cursor += 1
+                if string_escaped:
+                    string_escaped = False
+                elif character == "\\":
+                    string_escaped = True
+                elif character == '"':
+                    in_string = False
+            elif block_depth:
                 if text.startswith("/-", cursor):
                     block_depth += 1
                     uncommented.extend("  ")
@@ -1877,6 +1890,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 else:
                     uncommented.extend(" " * (line_end - cursor))
                     cursor = line_end
+            elif text[cursor] == '"':
+                in_string = True
+                uncommented.append(text[cursor])
+                cursor += 1
             else:
                 uncommented.append(text[cursor])
                 cursor += 1
@@ -1921,48 +1938,86 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
 
     @dataclass(frozen=True)
     class ScopeFrame:
+        identity: int
         kind: str
         name: str | None
 
-    def namespace_at(source: str, offset: int) -> str:
+    @dataclass(frozen=True)
+    class ScopedActivation:
+        name: str
+        owner_frames: tuple[int, ...]
+
+    @dataclass(frozen=True)
+    class ScannerScopeState:
+        namespace: str
+        active_scopes: frozenset[str]
+
+    def scope_state_at(source: str, offset: int) -> ScannerScopeState:
+        """Replay Lean namespace/section and scoped activation commands."""
         scopes: list[ScopeFrame] = []
+        activations: list[ScopedActivation] = []
+        next_identity = 0
         for line in structural_code(source[:offset]).splitlines():
             namespace_match = re.match(
-                r"^[ \t]*namespace[ \t]+([A-Za-z_][\w']*)[ \t]*$", line
+                r"^[ \t]*namespace[ \t]+"
+                r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)"
+                r"(?:\.(?:[A-Za-z_][\w']*|«[^»\r\n]+»))*)[ \t]*$",
+                line,
             )
             if namespace_match is not None:
-                scopes.append(ScopeFrame("namespace", namespace_match.group(1)))
+                scopes.append(
+                    ScopeFrame(next_identity, "namespace", namespace_match.group(1))
+                )
+                next_identity += 1
                 continue
             section_match = re.match(
-                r"^[ \t]*section(?:[ \t]+([A-Za-z_][\w']*))?[ \t]*$", line
+                r"^[ \t]*section(?:[ \t]+"
+                r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)))?[ \t]*$",
+                line,
             )
             if section_match is not None:
-                scopes.append(ScopeFrame("section", section_match.group(1)))
+                scopes.append(
+                    ScopeFrame(next_identity, "section", section_match.group(1))
+                )
+                next_identity += 1
+                continue
+            open_match = re.match(
+                r"^[ \t]*open[ \t]+scoped[ \t]+(.+?)[ \t]*$", line
+            )
+            if open_match is not None:
+                owner_frames = tuple(frame.identity for frame in scopes)
+                activations.extend(
+                    ScopedActivation(name, owner_frames)
+                    for name in re.findall(
+                        r"(?:[A-Za-z_][\w']*|«[^»\r\n]+»)"
+                        r"(?:\.(?:[A-Za-z_][\w']*|«[^»\r\n]+»))*",
+                        open_match.group(1),
+                    )
+                )
                 continue
             end_match = re.match(
-                r"^[ \t]*end(?:[ \t]+([A-Za-z_][\w']*))?[ \t]*$", line
+                r"^[ \t]*end(?:[ \t]+"
+                r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)))?[ \t]*$",
+                line,
             )
             if end_match is None or not scopes:
                 continue
             close_name = end_match.group(1)
-            if close_name is None:
+            if close_name is None or scopes[-1].name == close_name:
                 scopes.pop()
-                continue
-            matching = next(
-                (
-                    index
-                    for index in range(len(scopes) - 1, -1, -1)
-                    if scopes[index].name == close_name
-                ),
-                None,
-            )
-            if matching is not None:
-                del scopes[matching:]
-        return ".".join(
+        current_frames = tuple(frame.identity for frame in scopes)
+        namespace = ".".join(
             frame.name or ""
             for frame in scopes
             if frame.kind == "namespace"
         )
+        active_scopes = frozenset(
+            activation.name
+            for activation in activations
+            if current_frames[:len(activation.owner_frames)]
+            == activation.owner_frames
+        )
+        return ScannerScopeState(namespace, active_scopes)
 
     for source_name, source in sources:
         declaration_cursor = 0
@@ -2020,7 +2075,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                             category
                         )
                     else:
-                        scope = namespace_at(source, declaration_offset)
+                        scope = scope_state_at(source, declaration_offset).namespace
                         if scope:
                             scoped_literal_free_prefix_categories[source_name][
                                 scope
@@ -2067,7 +2122,6 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         return result
 
     imports: dict[str, set[str]] = defaultdict(set)
-    opened_scopes: dict[str, list[tuple[str, int]]] = defaultdict(list)
     for source_name, source in sources:
         for _, command in command_offsets(source, ("import",)):
             match = re.match(
@@ -2087,20 +2141,6 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 if tokens[index] in modules:
                     imports[source_name].add(tokens[index])
                 index += 1
-        for offset, command in command_offsets(source, ("open",)):
-            match = re.match(
-                r"^[ \t\r\n]*open[ \t]+scoped[ \t]+([\s\S]*)$",
-                without_lean_comments(command),
-            )
-            if match is not None:
-                opened_scopes[source_name].extend(
-                    (scope, offset)
-                    for scope in re.findall(
-                        r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*",
-                        match.group(1),
-                    )
-                )
-
     def active_literal_free_categories(
         source_name: str, offset: int | None = None
     ) -> set[tuple[str, str]]:
@@ -2111,11 +2151,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             in own_literal_free_prefix_categories[source_name]
             if declaration_offset < limit
         }
-        active_scopes = {
-            scope
-            for scope, open_offset in opened_scopes.get(source_name, [])
-            if open_offset < limit
-        }
+        active_scopes = scope_state_at(
+            source_by_name[source_name],
+            len(source_by_name[source_name]) if offset is None else offset,
+        ).active_scopes
         for scope in active_scopes:
             active.update(
                 category
@@ -3774,6 +3813,94 @@ def negative_tests() -> None:
         "scanner namespace/section scoped nullable interpolation mutant passed",
     )
     print("mutant rejected: section end preserves namespace-scoped activation")
+    scope_state_attack_corpus = (
+        (
+            "named-section-preserves-namespace",
+            "namespace ScopeFamily\n"
+            "section First\n"
+            "end First\n"
+            "open scoped ScopeFamily\n"
+            "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+            "`(#check s!$value)\n"
+            '"{(sorry : Nat)}"\n'
+            "end ScopeFamily\n",
+            True,
+        ),
+        (
+            "anonymous-section-preserves-namespace",
+            "namespace ScopeFamily\n"
+            "section\n"
+            "end\n"
+            "open scoped ScopeFamily\n"
+            "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+            "`(#check s!$value)\n"
+            '"{(sorry : Nat)}"\n'
+            "end ScopeFamily\n",
+            True,
+        ),
+        (
+            "section-activation-does-not-leak",
+            "namespace ScopeFamily\n"
+            "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+            "`(#check s!$value)\n"
+            "section Inner\n"
+            "open scoped ScopeFamily\n"
+            "end Inner\n"
+            'def inertAfterSection : String := "{sorry}"\n'
+            "end ScopeFamily\n",
+            False,
+        ),
+        (
+            "outer-activation-survives-inner-section",
+            "namespace ScopeFamily\n"
+            "open scoped ScopeFamily\n"
+            "section Inner\n"
+            "end Inner\n"
+            "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+            "`(#check s!$value)\n"
+            '"{(sorry : Nat)}"\n'
+            "end ScopeFamily\n",
+            True,
+        ),
+        (
+            "nested-namespace-pop-is-typed",
+            "namespace ScopeFamily\n"
+            "namespace Nested\n"
+            "section Inner\n"
+            "end Inner\n"
+            "end Nested\n"
+            "open scoped ScopeFamily\n"
+            "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+            "`(#check s!$value)\n"
+            '"{(sorry : Nat)}"\n'
+            "end ScopeFamily\n",
+            True,
+        ),
+        (
+            "literal-comment-delimiters-do-not-hide-state",
+            'def openMarker : String := "/-"\n'
+            'def closeMarker : String := "-/"\n'
+            "namespace ScopeFamily\n"
+            "section Inner\n"
+            "end Inner\n"
+            "open scoped ScopeFamily\n"
+            "scoped macro xs:ident* value:interpolatedStr(term) : command => "
+            "`(#check s!$value)\n"
+            '"{(sorry : Nat)}"\n'
+            "end ScopeFamily\n",
+            True,
+        ),
+    )
+    for label, attack_source, should_reject in scope_state_attack_corpus:
+        require_lean_elaboration(f"scanner scope-state family {label}", attack_source)
+        rejected = bool(
+            find_proof_escapes([(f"scope-state-{label}.lean", attack_source)])
+        )
+        require(
+            rejected == should_reject,
+            f"scanner scope-state family {label}: wrong activation result",
+        )
+    print("attack family rejected: typed namespace/section activation corpus")
     ordered_activation_safe = (
         'def inertBeforeDeclaration : String := "{sorry}"\n'
         "macro xs:ident* value:interpolatedStr(term) : command => "
@@ -3821,6 +3948,69 @@ def negative_tests() -> None:
         "scanner multiline-import nullable interpolation mutant passed",
     )
     print("mutant rejected: multiline imports preserve module activation")
+    import_attack_declaration = (
+        "macro xs:ident* value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+    )
+    import_attack_corpus = (
+        (
+            "transitive-public-import",
+            [
+                ("ImportAttackDecl.lean", import_attack_declaration),
+                (
+                    "ImportAttackBridge.lean",
+                    "module\npublic import ImportAttackDecl\n",
+                ),
+                (
+                    "ImportAttackConsumer.lean",
+                    "import ImportAttackBridge\n"
+                    '"{(sorry : Nat)}"\n',
+                ),
+            ],
+            True,
+        ),
+        (
+            "commented-alias-decoy",
+            [
+                ("ImportBase.lean", "def base : Nat := 0\n"),
+                ("AliasDecoy.lean", import_attack_declaration),
+                (
+                    "ImportAliasSafe.lean",
+                    "import ImportBase -- as AliasDecoy\n"
+                    'def inertAliasDecoy : String := "{sorry}"\n',
+                ),
+            ],
+            False,
+        ),
+        (
+            "multiline-commented-alias-decoy",
+            [
+                ("ImportBase.lean", "def base : Nat := 0\n"),
+                ("AliasDecoy.lean", import_attack_declaration),
+                (
+                    "ImportAliasMultilineSafe.lean",
+                    "import ImportBase /- as\n AliasDecoy -/\n"
+                    'def inertAliasDecoy : String := "{sorry}"\n',
+                ),
+            ],
+            False,
+        ),
+    )
+    for label, attack_sources, should_reject in import_attack_corpus:
+        if label != "transitive-public-import":
+            require_lean_module_elaboration(
+                f"scanner import family {label}",
+                [
+                    (name.removesuffix(".lean"), text)
+                    for name, text in attack_sources
+                ],
+            )
+        rejected = bool(find_proof_escapes(attack_sources))
+        require(
+            rejected == should_reject,
+            f"scanner import family {label}: wrong activation result",
+        )
+    print("attack family rejected: import/multiline/alias activation corpus")
     option_string_declaration = (
         'set_option customName "in local " in '
         "macro xs:ident* value:interpolatedStr(term) : command => "
