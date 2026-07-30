@@ -2899,7 +2899,7 @@ def negative_tests() -> None:
         ]),
         "scanner separated nonnullable interpolation safe positive was rejected",
     )
-    noncomputable_opaque_mutant = "noncomputable opaque hidden : Nat\n"
+    noncomputable_opaque_mutant = "noncomputable opaque hidden : False\n"
     require(
         find_proof_escapes([
             ("noncomputable-bodyless-opaque.lean",
