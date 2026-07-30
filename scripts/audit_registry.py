@@ -99,6 +99,25 @@ EXPECTED_INVARIANT_SOURCE_ANCHORS = {
         "lido-core@af095e48bbc1c3841c2c9936219c8461af01056b",
     },
 }
+EXPECTED_INVARIANT_RUNTIME_ANCHORS = {
+    "SRV3-LEGACY-ECON": set(),
+    "SRV3-ARITH-CHECKED": set(),
+    "SRV3-TX-REVERT": set(),
+    "SRV3-ALLOC-ORDER": set(),
+    "SRV3-MINFIRST-BOUND": set(),
+    "SRV3-SOLIDITY-CORR": set(),
+    "SRV3-VERITY-431": set(),
+    "SRV3-YUL-COMP": set(),
+    "SRV3-EVM-RUNTIME": {
+        "MISSING: independently sourced canonical EIP-7251 production "
+        "consolidation runtime/hash/address/fork provenance",
+    },
+    "SRV3-SHA256-PRECOMPILE": {"EVM SHA-256 precompile"},
+    "SRV3-CONSOLIDATION-E2E": {
+        "MISSING: canonical EIP-7251 production "
+        "consolidation runtime/hash/address/fork provenance",
+    },
+}
 EXPECTED_INVARIANT_FAMILIES = {
     "SRV3-LEGACY-ECON": "economic-accounting",
     "SRV3-ARITH-CHECKED": "checked-arithmetic",
@@ -868,6 +887,11 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
             set(row["source_anchors"])
             == EXPECTED_INVARIANT_SOURCE_ANCHORS[invariant_id],
             f"{invariant_id}: source anchors differ from expected obligation evidence",
+        )
+        require(
+            set(row["runtime_anchors"])
+            == EXPECTED_INVARIANT_RUNTIME_ANCHORS[invariant_id],
+            f"{invariant_id}: runtime anchors differ from expected obligation provenance",
         )
         require(
             row["family"] == EXPECTED_INVARIANT_FAMILIES[invariant_id],
@@ -1930,7 +1954,27 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             match = opaque_start.search(declaration)
             if match is None:
                 continue
-            if ":=" not in declaration and re.search(r"(?m)^[ \t]*where\b", declaration) is None:
+            body_delimiter = False
+            delimiter_stack = []
+            cursor = match.end()
+            while cursor < len(declaration):
+                character = declaration[cursor]
+                if character in "([{":
+                    delimiter_stack.append(character)
+                elif character in ")]}":
+                    if delimiter_stack:
+                        delimiter_stack.pop()
+                elif (
+                    not delimiter_stack
+                    and declaration.startswith(":=", cursor)
+                ):
+                    body_delimiter = True
+                    break
+                cursor += 1
+            if (
+                not body_delimiter
+                and re.search(r"(?m)^[ \t]*where\b", declaration) is None
+            ):
                 line_number = start_line + declaration.count(
                     "\n", 0, match.start()
                 ) + 1
@@ -2137,6 +2181,26 @@ def negative_tests() -> None:
         )
     finally:
         open_source_path.unlink()
+    fabricated_runtime_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in fabricated_runtime_mutant["invariants"]
+        if row["id"] == "SRV3-EVM-RUNTIME"
+    )["runtime_anchors"] = [
+        "runtime=0x5f5ffd; sha256="
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    ]
+    fabricated_runtime_path = write_mutant(fabricated_runtime_mutant)
+    try:
+        expect_failure(
+            "blocked invariant fabricated runtime provenance mutant",
+            lambda: validate(fabricated_runtime_path),
+            "SRV3-EVM-RUNTIME: runtime anchors differ from expected "
+            "obligation provenance",
+        )
+    finally:
+        fabricated_runtime_path.unlink()
+    validate()
+    print("safe positive accepted: pinned blocked runtime provenance")
     family_mutant = json.loads(json.dumps(data))
     next(
         row for row in family_mutant["invariants"]
@@ -2335,7 +2399,8 @@ def negative_tests() -> None:
             expect_failure(
                 f"{label} missing runtime sentinel mutant",
                 lambda runtime_path=runtime_path: validate(runtime_path),
-                "SRV3-EVM-RUNTIME: priority/status/engine/layer differ from expected classification",
+                "SRV3-EVM-RUNTIME: runtime anchors differ from expected "
+                "obligation provenance",
             )
         finally:
             runtime_path.unlink()
@@ -3142,6 +3207,27 @@ def negative_tests() -> None:
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
         "scanner legitimate opaque body was rejected",
+    )
+    type_let_opaque_mutant = "opaque hidden : (let p := False; p)\n"
+    require(
+        find_proof_escapes([
+            ("type-let-bodyless-opaque.lean", type_let_opaque_mutant)
+        ]),
+        "scanner type-level let bodyless opaque mutant passed",
+    )
+    print("mutant rejected: type-level let bodyless opaque")
+    legitimate_type_let_opaque = (
+        "opaque good : (let p := Nat; p) := 1\n"
+    )
+    require_lean_elaboration(
+        "scanner legitimate type-level let opaque body",
+        legitimate_type_let_opaque,
+    )
+    require(
+        not find_proof_escapes([
+            ("type-let-opaque-body.lean", legitimate_type_let_opaque)
+        ]),
+        "scanner legitimate type-level let opaque body was rejected",
     )
 
     current_lake = (ROOT / "lakefile.lean").read_text(encoding="utf-8")
