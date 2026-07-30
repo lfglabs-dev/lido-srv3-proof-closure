@@ -1332,8 +1332,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     syntax_interpolation = re.compile(
-        r'\bsyntax(?:\s*\([^)\n]*\))?\s+"((?:\\.|[^"\\])*)"\s+'
-        r'([^\n]*?)\binterpolatedStr(?:\([^)\n]*\))?'
+        r'\bsyntax(?:\s*\((?:[^\n)]|\n[ \t]+)*\))?'
+        r'\s+"((?:\\.|[^"\\])*)"\s+'
+        r'((?:[^\n]|\n[ \t]+)*?)\binterpolatedStr'
+        r'(?:\((?:[^\n)]|\n[ \t]+)*\))?'
     )
     for _, source in sources:
         for match in syntax_interpolation.finditer(source):
@@ -1467,8 +1469,8 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         )
         custom_commands = set()
         for command_match in re.finditer(
-            r'(?m)^[ \t]*(?:syntax|macro|elab)\b[^\n"]*'
-            r'"((?:\\.|[^"\\])+)"[^\n]*:[ \t]*command\b',
+            r'(?m)^[ \t]*(?:syntax|macro|elab)\b(?:[^\n"]|\n[ \t]+)*'
+            r'"((?:\\.|[^"\\])+)"(?:[^\n]|\n[ \t]+)*:[ \t]*command\b',
             source,
         ):
             try:
@@ -1947,6 +1949,20 @@ def negative_tests() -> None:
         "scanner intermediate-parser interpolated-string mutant: unexpectedly passed",
     )
     print("mutant rejected: intermediate-parser interpolated-string macro proof escape")
+    multiline_interpolation_mutant = (
+        'syntax "x" ident\n'
+        '  interpolatedStr(term) : term\n'
+        'macro_rules | `(x $name:ident $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := x foo "{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("multiline-interpolation-mutant.lean",
+             multiline_interpolation_mutant)
+        ]),
+        "scanner multiline interpolated-string syntax mutant: unexpectedly passed",
+    )
+    print("mutant rejected: multiline interpolated-string syntax proof escape")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
@@ -2011,6 +2027,21 @@ def negative_tests() -> None:
         "scanner bodyless opaque before custom command mutant passed",
     )
     print("mutant rejected: bodyless opaque before custom command")
+    multiline_custom_command_mutant = (
+        'syntax "audit-cmd"\n'
+        '  ":=" term : command\n'
+        "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
+        "opaque hidden : False\n"
+        "audit-cmd := by trivial\n"
+    )
+    require(
+        find_proof_escapes([
+            ("bodyless-opaque-before-multiline-custom-command.lean",
+             multiline_custom_command_mutant)
+        ]),
+        "scanner bodyless opaque before multiline custom command mutant passed",
+    )
+    print("mutant rejected: bodyless opaque before multiline custom command")
     legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
