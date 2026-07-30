@@ -767,8 +767,17 @@ def validate_lock(path: Path = LOCK) -> None:
     )
     require(lock["proof"]["ref"] == "main", "proof: exact ref mismatch")
     require(
+        lock["verity"]["repository"] == "https://github.com/lfglabs-dev/verity.git",
+        "Verity: exact repository mismatch",
+    )
+    require(
         lock["verity"]["ref"] == "dev/lean-4.31-scaffolding",
         "Verity: exact ref mismatch",
+    )
+    require(
+        lock["evmyullean"]["repository"]
+        == "https://github.com/lfglabs-dev/EVMYulLean.git",
+        "EVMYulLean: exact repository mismatch",
     )
     require(
         lock["lido_core"]["repository"] == "https://github.com/lidofinance/core.git",
@@ -1254,8 +1263,28 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         r"implemented_by|extern)(?![\w'])"
     )
     violations = []
+    declared_interpolated_prefixes: set[str] = set()
+    syntax_interpolation = re.compile(
+        r'\bsyntax(?:\s*\([^)\n]*\))?\s+"((?:\\.|[^"\\])*)"\s+'
+        r'interpolatedStr(?:\([^)\n]*\))?'
+    )
+    for _, source in sources:
+        for match in syntax_interpolation.finditer(source):
+            try:
+                prefix = json.loads(f'"{match.group(1)}"')
+            except json.JSONDecodeError:
+                continue
+            if prefix:
+                declared_interpolated_prefixes.add(prefix)
+    declared_prefix_pattern = "|".join(
+        re.escape(prefix)
+        for prefix in sorted(declared_interpolated_prefixes, key=len, reverse=True)
+    )
+    custom_prefix = (
+        rf"(?:{declared_prefix_pattern})|" if declared_prefix_pattern else ""
+    )
     interpolated_prefix = re.compile(
-        r"(?:!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
+        rf"(?:{custom_prefix}!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
         r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
     for name, source in sources:
@@ -1783,6 +1812,18 @@ def negative_tests() -> None:
         "scanner Unicode interpolated-string macro mutant: unexpectedly passed",
     )
     print("mutant rejected: Unicode interpolated-string macro proof escape")
+    non_bang_interpolation_mutant = (
+        'syntax "x" interpolatedStr(term) : term\n'
+        'macro_rules | `(x $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := x"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("non-bang-interpolation-mutant.lean", non_bang_interpolation_mutant)
+        ]),
+        "scanner non-bang interpolated-string macro mutant: unexpectedly passed",
+    )
+    print("mutant rejected: non-bang interpolated-string macro proof escape")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
@@ -1948,7 +1989,11 @@ def negative_tests() -> None:
     for component, field, value, expected in (
         ("lido_core", "repository", "https://github.com/example/core.git",
          "lido_core: exact repository mismatch"),
+        ("verity", "repository", "https://github.com/example/verity.git",
+         "Verity: exact repository mismatch"),
         ("verity", "ref", "does-not-exist", "Verity: exact ref mismatch"),
+        ("evmyullean", "repository", "https://github.com/example/EVMYulLean.git",
+         "EVMYulLean: exact repository mismatch"),
         ("evmyullean", "ref", "does-not-exist", "EVMYulLean: exact ref mismatch"),
         ("current_root", "plane", "audit-only",
          "current root plane must remain active"),
