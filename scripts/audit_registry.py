@@ -45,6 +45,35 @@ EXPECTED_INVARIANT_THEOREMS = {
     "SRV3-ALLOC-ORDER": "LidoSRv3.Audit.valid_result_preserves_router_order",
     "SRV3-MINFIRST-BOUND": "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
 }
+EXPECTED_THEOREM_TYPES = {
+    "LidoSRv3.P1_reserve_separation": (
+        "∀ (s : LidoSRv3.State), "
+        "LidoSRv3.depositableEther s + LidoSRv3.withdrawalReserveUsed s = "
+        "s.bufferedEther"
+    ),
+    "LidoSRv3.Audit.Quantity.checkedDiv_zero": (
+        "∀ {unit : Type} (a : LidoSRv3.Audit.Quantity unit), "
+        "a.checkedDiv 0 = none"
+    ),
+    "LidoSRv3.Audit.revert_restores_state_value_and_logs": (
+        "∀ {State : Type} (tx : LidoSRv3.Audit.TxObservation State), "
+        "tx.result = LidoSRv3.Audit.TxResult.reverted → "
+        "tx.committedState = tx.before ∧ "
+        "tx.committedTrace.ethMoves = [] ∧ tx.committedTrace.logs = []"
+    ),
+    "LidoSRv3.Audit.valid_result_preserves_router_order": (
+        "∀ {snapshot : LidoSRv3.Audit.AllocationSnapshot} "
+        "{result : LidoSRv3.Audit.AllocationResult}, "
+        "LidoSRv3.Audit.validAllocationResult snapshot result → "
+        "List.map LidoSRv3.Audit.AllocationResultRow.moduleId result.rows = "
+        "List.map LidoSRv3.Audit.AllocationRow.moduleId snapshot.rows"
+    ),
+    "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested": (
+        "∀ (requested : Nat) "
+        "(rows : List LidoSRv3.Audit.MinFirst.Bucket), "
+        "LidoSRv3.Audit.MinFirst.totalAllocated requested rows ≤ requested"
+    ),
+}
 EXPECTED_INVARIANT_IDS = {
     "SRV3-LEGACY-ECON",
     "SRV3-ARITH-CHECKED",
@@ -596,13 +625,19 @@ def parse_axiom_report(output: str, theorems: list[str]) -> dict[str, set[str]]:
 
 
 def run_theorem_checks(
-    theorems: list[str], proved: list[str], declarations: str = ""
+    theorems: list[str], proved: list[str], declarations: str = "",
+    expected_types: dict[str, str] | None = None,
 ) -> None:
+    expected_types = EXPECTED_THEOREM_TYPES if expected_types is None else expected_types
     source = (
         "import LidoSRv3\n"
         + "def auditRequireProof {P : Prop} (_ : P) : True := True.intro\n"
         + declarations
         + "".join(f"#check {theorem}\n" for theorem in theorems)
+        + "".join(
+            f"#check (@{theorem} : {expected_types[theorem]})\n"
+            for theorem in theorems if theorem in expected_types
+        )
         + "".join(f"#check auditRequireProof {theorem}\n" for theorem in proved)
         + "".join(f"#print axioms {theorem}\n" for theorem in proved)
     )
@@ -684,6 +719,20 @@ def validate_theorems(data: dict) -> None:
             ["LidoSRv3.Audit.Quantity.zero"],
         ),
         "assured reference is not a proof",
+    )
+    wrong_type = dict(EXPECTED_THEOREM_TYPES)
+    wrong_type["LidoSRv3.Audit.MinFirst.totalAllocated_le_requested"] = (
+        "∀ (_requested : Nat) "
+        "(_rows : List LidoSRv3.Audit.MinFirst.Bucket), True"
+    )
+    expect_failure(
+        "theorem proposition substitution",
+        lambda: run_theorem_checks(
+            ["LidoSRv3.Audit.MinFirst.totalAllocated_le_requested"],
+            ["LidoSRv3.Audit.MinFirst.totalAllocated_le_requested"],
+            expected_types=wrong_type,
+        ),
+        "registry theorem does not exist or assured reference is not a proof",
     )
 
 
@@ -1410,10 +1459,23 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
             r"(?:(?:private|protected)[ \t]+)*opaque[ \t]+"
         )
+        custom_commands = {
+            command
+            for command in re.findall(
+                r'(?m)^[ \t]*(?:syntax|macro|elab)\b[^\n"]*'
+                r'"([A-Za-z_][A-Za-z0-9_\']*)"[^\n]*:[ \t]*command\b',
+                sanitized,
+            )
+        }
+        custom_command_pattern = (
+            "|".join(re.escape(command) for command in sorted(custom_commands))
+        )
         command_start = re.compile(
             r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
             r"(?:(?:private|protected)[ \t]+)*"
             r"(?:#\w+|"
+            + (f"(?:{custom_command_pattern})|" if custom_command_pattern else "")
+            +
             r"opaque|def|theorem|lemma|axiom|constant|inductive|structure|class|"
             r"instance|abbrev|example|namespace|section|end|open|export|variable|"
             r"include|omit|universe|set_option|attribute|initialize|"
@@ -1910,6 +1972,19 @@ def negative_tests() -> None:
             f"scanner bodyless opaque before {label} command mutant passed",
         )
         print(f"mutant rejected: bodyless opaque before {label} command")
+    custom_command_mutant = (
+        'syntax "auditCmd" term : command\n'
+        "macro_rules | `(auditCmd $term) => `(example : True := $term)\n"
+        "opaque hidden : False\n"
+        "auditCmd by trivial\n"
+    )
+    require(
+        find_proof_escapes([
+            ("bodyless-opaque-before-custom-command.lean", custom_command_mutant)
+        ]),
+        "scanner bodyless opaque before custom command mutant passed",
+    )
+    print("mutant rejected: bodyless opaque before custom command")
     legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
