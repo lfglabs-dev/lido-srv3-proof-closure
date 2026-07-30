@@ -1,12 +1,15 @@
-PR #9 actionable-thread repair validation
+PR #9 current-head schema-thread repair validation
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
-before-head: 0e265e5c58db78a88eb1d697ca8f5b3d0c30a420
+before-head: 97ae6e4d614797304484106a794167632c979abd
+validated-head: 17cc0aeba652ad75633fcfd4e09bffbe92addaf1
 
-lake build: exit 0 (31 jobs)
-make test: exit 0 (metadata mutants, provenance guards, Lean vectors, fixtures)
-python3 scripts/audit_metadata.py generate + freshness diff: exit 0
 python3 scripts/audit_metadata.py check: exit 0
-JSON-compatible audit/*.yaml parse: exit 0 (4 files)
+PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0 (missing and incompatible schemas rejected for all metadata artifacts)
+SPARK_OFFLOAD_ALLOW=disabled make test: exit 0 (metadata mutants, provenance guards, Lean vectors, fixtures)
+lake build: exit 0 (31 jobs)
+lake build LidoSRv3.Audit.Trust: exit 0 (PrintAxioms entrypoint replayed)
+canonical guarantee ID assertion: exit 0 (exact ordered 11)
 changed-Lean forbidden proof-escape scan: exit 0 (sole raw token hit is the documented Trust comment)
-bash scripts/check_provenance_guards.sh: exit 0
 git diff --check: exit 0
+
+infrastructure note: default make test offload exited 126; local pinned-toolchain rerun above passed.
