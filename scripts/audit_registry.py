@@ -66,6 +66,12 @@ EXPECTED_INVARIANT_CLASSIFICATIONS = {
     "SRV3-TX-REVERT": ("PROVED", "LEAN", "TX"),
     "SRV3-ALLOC-ORDER": ("PROVED", "LEAN", "REL"),
     "SRV3-MINFIRST-BOUND": ("PROVED", "LEAN", "ALG"),
+    "SRV3-SOLIDITY-CORR": ("OPEN", "VERITY", "SRC"),
+    "SRV3-VERITY-431": ("DEV-431-READY", "VERITY", "SRC"),
+    "SRV3-YUL-COMP": ("OPEN", "EVMYULLEAN", "YUL"),
+    "SRV3-EVM-RUNTIME": ("BLOCKED", "EVMYULLEAN", "EVM"),
+    "SRV3-SHA256-PRECOMPILE": ("STRETCH", "NATIVE-FFI", "CRYPTO"),
+    "SRV3-CONSOLIDATION-E2E": ("BLOCKED", "INTERFACE", "E2E"),
 }
 EXPECTED_THEOREM_TYPES = {
     "LidoSRv3.P1_reserve_separation": (
@@ -765,6 +771,9 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
     layers = schema_values(schema, "layer")
     pins = source_pins()
     targets = external_source_targets(pins)
+    present_ids = {row["id"] for row in data["invariants"]}
+    require(present_ids == EXPECTED_INVARIANT_IDS,
+            "invariant ID inventory differs from expected obligations")
 
     ids: set[str] = set()
     theorem_owners: dict[str, str] = {}
@@ -792,11 +801,11 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 == EXPECTED_INVARIANT_SOURCE_ANCHORS[invariant_id],
                 f"{invariant_id}: source anchors differ from expected theorem evidence",
             )
-            require(
-                (row["status"], row["engine"], row["layer"])
-                == EXPECTED_INVARIANT_CLASSIFICATIONS[invariant_id],
-                f"{invariant_id}: status/engine/layer differ from expected theorem evidence",
-            )
+        require(
+            (row["status"], row["engine"], row["layer"])
+            == EXPECTED_INVARIANT_CLASSIFICATIONS[invariant_id],
+            f"{invariant_id}: status/engine/layer differ from expected classification",
+        )
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
         if row["layer"] in set(layers) & {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
@@ -811,8 +820,6 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
         set(theorem_owners.values()) == set(EXPECTED_INVARIANT_THEOREMS),
         "theorem-bearing invariant ID inventory differs from expected bindings",
     )
-    require(ids == EXPECTED_INVARIANT_IDS,
-            "invariant ID inventory differs from expected obligations")
     rows = {row["id"]: row for row in data["invariants"]}
     graph = {row_id: row["dependencies"] for row_id, row in rows.items()}
     for node, dependencies in graph.items():
@@ -1371,6 +1378,10 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
         """Return code after whitespace/block-comment trivia, preserving its indent."""
         cursor = 0
         block_depth = 0
+        initial_indent_end = 0
+        while initial_indent_end < len(text) and text[initial_indent_end] in " \t":
+            initial_indent_end += 1
+        initial_indent = text[:initial_indent_end]
         while cursor < len(text):
             if block_depth:
                 if text.startswith("/-", cursor):
@@ -1387,10 +1398,7 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
             elif text[cursor] in " \t\r\n":
                 cursor += 1
             else:
-                indent_start = cursor
-                while indent_start and text[indent_start - 1] in " \t":
-                    indent_start -= 1
-                return text[indent_start:]
+                return initial_indent + text[cursor:]
         return None
 
     def starter_match(text: str) -> re.Match[str] | None:
@@ -1523,7 +1531,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         re.DOTALL,
     )
     for _, source in sources:
-        for declaration in layout_command_spans(source, ("syntax", "macro")):
+        for declaration in layout_command_spans(
+            source, ("syntax", "macro", "set_option")
+        ):
             for match in syntax_interpolation.finditer(declaration):
                 try:
                     prefix = json.loads(f'"{match.group(1)}"')
@@ -1654,7 +1664,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         sanitized = "\n".join(sanitized_lines)
         custom_commands = set()
         for declaration in layout_command_spans(
-            source, ("syntax", "macro", "elab")
+            source, ("syntax", "macro", "elab", "set_option")
         ):
             for command_match in re.finditer(
                 r'"((?:\\.|[^"\\])+)"[\s\S]*:[ \t]*command\b',
@@ -1819,7 +1829,7 @@ def negative_tests() -> None:
         expect_failure(
             "evidence-free REGRESSION mutant",
             lambda: validate(evidence_free_regression_path),
-            "SRV3-SOLIDITY-CORR: REGRESSION requires theorem",
+            "SRV3-SOLIDITY-CORR: status/engine/layer differ from expected classification",
         )
     finally:
         evidence_free_regression_path.unlink()
@@ -1872,10 +1882,24 @@ def negative_tests() -> None:
         expect_failure(
             "assured invariant engine/layer swap mutant",
             lambda: validate(classification_path),
-            "status/engine/layer differ from expected theorem evidence",
+            "status/engine/layer differ from expected classification",
         )
     finally:
         classification_path.unlink()
+    blocked_classification_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in blocked_classification_mutant["invariants"]
+        if row["id"] == "SRV3-EVM-RUNTIME"
+    )["status"] = "DEV-431-READY"
+    blocked_classification_path = write_mutant(blocked_classification_mutant)
+    try:
+        expect_failure(
+            "blocked invariant classification promotion mutant",
+            lambda: validate(blocked_classification_path),
+            "SRV3-EVM-RUNTIME: status/engine/layer differ from expected classification",
+        )
+    finally:
+        blocked_classification_path.unlink()
     promotion_mutant = json.loads(json.dumps(data))
     next(
         row for row in promotion_mutant["invariants"]
@@ -1886,7 +1910,7 @@ def negative_tests() -> None:
         expect_failure(
             "regression evidence promotion mutant",
             lambda: validate(promotion_path),
-            "status/engine/layer differ from expected theorem evidence",
+            "status/engine/layer differ from expected classification",
         )
     finally:
         promotion_path.unlink()
@@ -1933,7 +1957,7 @@ def negative_tests() -> None:
         expect_failure(
             "renamed invariant theorem swap mutant",
             lambda: validate(renamed_theorem_swap_path),
-            "theorem-bearing invariant ID inventory differs from expected bindings",
+            "invariant ID inventory differs from expected obligations",
         )
     finally:
         renamed_theorem_swap_path.unlink()
@@ -1947,7 +1971,7 @@ def negative_tests() -> None:
         expect_failure(
             "PROVED dependency downgrade mutant",
             lambda: validate(dependency_downgrade_path),
-            "SRV3-ALLOC-ORDER: status/engine/layer differ from expected theorem evidence",
+            "SRV3-ALLOC-ORDER: status/engine/layer differ from expected classification",
         )
     finally:
         dependency_downgrade_path.unlink()
@@ -1962,7 +1986,7 @@ def negative_tests() -> None:
             expect_failure(
                 f"assured dependency {unresolved_status} mutant",
                 lambda dependency_path=dependency_path: validate(dependency_path),
-                "SRV3-ARITH-CHECKED: status/engine/layer differ from expected theorem evidence",
+                "SRV3-ARITH-CHECKED: status/engine/layer differ from expected classification",
             )
         finally:
             dependency_path.unlink()
@@ -1980,7 +2004,7 @@ def negative_tests() -> None:
             expect_failure(
                 f"sentinel-only runtime {assured_status} mutant",
                 lambda runtime_path=runtime_path: validate(runtime_path),
-                "SRV3-EVM-RUNTIME: runtime assurance requires non-missing anchors",
+                "SRV3-EVM-RUNTIME: status/engine/layer differ from expected classification",
             )
         finally:
             runtime_path.unlink()
@@ -2001,7 +2025,7 @@ def negative_tests() -> None:
             expect_failure(
                 f"{label} missing runtime sentinel mutant",
                 lambda runtime_path=runtime_path: validate(runtime_path),
-                "SRV3-EVM-RUNTIME: runtime assurance requires non-missing anchors",
+                "SRV3-EVM-RUNTIME: status/engine/layer differ from expected classification",
             )
         finally:
             runtime_path.unlink()
@@ -2195,6 +2219,19 @@ def negative_tests() -> None:
         "scanner leading-parser interpolated-string mutant passed",
     )
     print("mutant rejected: interpolation after leading parser descriptor")
+    wrapped_interpolation_mutant = (
+        'set_option hygiene false in syntax "x" interpolatedStr(term) : term\n'
+        'macro_rules | `(x $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := x"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("set-option-wrapped-interpolation-mutant.lean",
+             wrapped_interpolation_mutant)
+        ]),
+        "scanner set_option-wrapped interpolation declaration passed",
+    )
+    print("mutant rejected: set_option-wrapped interpolation declaration")
     multiline_interpolation_mutant = (
         'syntax "x" ident\n'
         '-- declaration continuation after trivia\n'
@@ -2386,6 +2423,13 @@ def negative_tests() -> None:
         print(f"mutant rejected: bodyless opaque before {modifier} command")
     for label, source in (
         (
+            "indented-same-line-leading-block-comment",
+            "namespace ScannerMutant\n"
+            "  /- leading command trivia -/ opaque hidden : Nat\n"
+            "  def innocent := 1\n"
+            "end ScannerMutant\n",
+        ),
+        (
             "same-line-leading-block-comment",
             "/- leading command trivia -/ opaque hidden : Nat\n",
         ),
@@ -2469,6 +2513,20 @@ def negative_tests() -> None:
         "scanner bodyless opaque before scoped multiline custom command passed",
     )
     print("mutant rejected: bodyless opaque before scoped multiline custom command")
+    wrapped_custom_command_mutant = (
+        'set_option hygiene false in syntax "audit-cmd" ":=" term : command\n'
+        "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
+        "opaque hidden : Nat\n"
+        "audit-cmd := by trivial\n"
+    )
+    require(
+        find_proof_escapes([
+            ("bodyless-opaque-before-wrapped-custom-command.lean",
+             wrapped_custom_command_mutant)
+        ]),
+        "scanner bodyless opaque before set_option-wrapped custom command passed",
+    )
+    print("mutant rejected: bodyless opaque before set_option-wrapped custom command")
     legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
