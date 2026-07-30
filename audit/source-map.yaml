@@ -1,0 +1,18 @@
+{
+  "schema": "lido-srv3-minimal-11-source-map-v1",
+  "pinned_source": "lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b",
+  "policy": "Source spans remain unmapped unless independently verified from pinned source; names or legacy anchors are insufficient.",
+  "targets": [
+    {"id": "SRV3-LEGACY-ECON", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-ARITH-CHECKED", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-TX-REVERT", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-ALLOC-ORDER", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-MINFIRST-BOUND", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-SOLIDITY-CORR", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-VERITY-431", "status": "UNMAPPED", "spans": [], "blocker": "Toolchain item; no independently verified Lido source span."},
+    {"id": "SRV3-YUL-COMP", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-EVM-RUNTIME", "status": "UNMAPPED", "spans": [], "blocker": "Canonical runtime provenance is MISSING."},
+    {"id": "SRV3-SHA256-PRECOMPILE", "status": "UNMAPPED", "spans": [], "blocker": "Opaque native FFI identity is MISSING."},
+    {"id": "SRV3-CONSOLIDATION-E2E", "status": "UNMAPPED", "spans": [], "blocker": "Canonical runtime/codehash/fork/address provenance is MISSING."}
+  ]
+}
