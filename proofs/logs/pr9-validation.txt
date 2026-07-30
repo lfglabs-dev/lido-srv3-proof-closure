@@ -1,7 +1,7 @@
 PR #9 current-head P2 repair validation
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 78eaa3d2b58af419ec66c3f5a1c63144cf1b8346
+validated-tree: 65a4ef1b3fe3903a61de995fb98c82bd04b8bc1f
 
 Receipt semantics: validated-tree is the Git tree produced from the final HEAD
 index after removing only proofs/logs/pr9-validation.txt. This binds every
@@ -10,9 +10,9 @@ SHA of the commit that contains this receipt. Run
 `python3 scripts/check_validation_receipt.py` to recompute and compare it.
 
 python3 scripts/audit_metadata.py check: exit 0
-PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0 (includes inputRev-only Verity/EVMYulLean manifest rejection)
+PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0 (includes Verity inputRev-only and coordinated Lake/lock/manifest/lakefile rejection)
 python3 scripts/check_validation_receipt.py: exit 0
-make test: exit 0 (metadata mutants, receipt binding, provenance guards, Lean vectors, fixtures)
+local pinned-toolchain make test: exit 0 (metadata mutants, receipt binding, provenance guards, Lean vectors, fixtures)
 make prove: exit 0 (proof report regenerated from committed source inputs)
 lake build: exit 0 (31 jobs)
 lake build LidoSRv3.Audit.Trust: exit 0 (PrintAxioms entrypoint replayed)
@@ -21,6 +21,9 @@ forbidden proof-escape scan: exit 0 (only documented Trust comment tokens)
 provenance guards: exit 0 (dirty/untracked Lean inputs and stale tree rejected)
 JSON-compatible YAML and JSON parse checks: exit 0
 git diff --check: exit 0
+
+Infrastructure note: the default remote `lake env lean --version` offload
+exited 126; the same pinned Lean 4.31 toolchain passed locally.
 
 Assurance boundary preserved: exactly 11 public IDs; DEV-431-READY is not
 AUDIT-CERT; two-node transport remains accepted partial/non-blocking evidence;
