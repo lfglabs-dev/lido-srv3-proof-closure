@@ -18,5 +18,8 @@ propext and Quot.sound axioms (or no axioms).
 changed-Lean proof-escape scan against origin/main...HEAD
 exit 0; 0 changed Lean files; no proof escapes.
 
-git diff --check
-exit 0.
+git diff --check ee2e65cd807e913ea245ae6fd7987a7f1d962800..781a5b43812e978488c82f569d3029204443dc79
+exit 2; six generated audit Markdown views had an extra blank line at EOF.
+
+git diff --check ee2e65cd807e913ea245ae6fd7987a7f1d962800..HEAD
+exit 0 after correcting the generated views and their renderers.

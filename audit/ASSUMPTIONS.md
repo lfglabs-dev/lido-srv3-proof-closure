@@ -45,4 +45,3 @@
 ## SRV3-YUL-COMP
 
 - Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.
-

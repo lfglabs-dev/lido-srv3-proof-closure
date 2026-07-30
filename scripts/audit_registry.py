@@ -1250,7 +1250,7 @@ def render_grouped(data: dict, key: str, title: str, order: list[str] | None = N
             theorem = row["theorem"] or "—"
             out.append(f"| {row['id']} | {row['priority']} | {row['status']} | {row['layer']} | {row['engine']} | `{theorem}` |\n")
         out.append("\n")
-    return "".join(out)
+    return "".join(out).rstrip("\n") + "\n"
 
 
 def render_list_view(data: dict, field: str, title: str) -> str:
@@ -1263,14 +1263,14 @@ def render_list_view(data: dict, field: str, title: str) -> str:
         else:
             out.append("- None declared.\n")
         out.append("\n")
-    return "".join(out)
+    return "".join(out).rstrip("\n") + "\n"
 
 
 def render_reproduce(data: dict) -> str:
     out = [MD_HEADER, "# Reproduction commands\n\n"]
     for row in sorted(data["invariants"], key=lambda item: item["id"]):
         out.append(f"## {row['id']}\n\n```sh\n{row['reproduction']}\n```\n\n")
-    return "".join(out)
+    return "".join(out).rstrip("\n") + "\n"
 
 
 def render_csv(data: dict) -> str:

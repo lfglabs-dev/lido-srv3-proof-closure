@@ -66,4 +66,3 @@ python3 scripts/audit_registry.py check
 ```sh
 python3 scripts/audit_registry.py check
 ```
-
