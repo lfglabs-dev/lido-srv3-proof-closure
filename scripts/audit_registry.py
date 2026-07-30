@@ -45,6 +45,21 @@ EXPECTED_INVARIANT_THEOREMS = {
     "SRV3-ALLOC-ORDER": "LidoSRv3.Audit.valid_result_preserves_router_order",
     "SRV3-MINFIRST-BOUND": "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
 }
+EXPECTED_INVARIANT_SOURCE_ANCHORS = {
+    "SRV3-LEGACY-ECON": {
+        "LidoSRv3/Model.lean",
+        "LidoSRv3/SpecProofs.lean",
+        "verity/targets/source-map.json",
+    },
+    "SRV3-ARITH-CHECKED": {"LidoSRv3/Audit/Arithmetic.lean"},
+    "SRV3-TX-REVERT": {"LidoSRv3/Audit/Trace.lean"},
+    "SRV3-ALLOC-ORDER": {"LidoSRv3/Audit/Allocation.lean"},
+    "SRV3-MINFIRST-BOUND": {
+        "LidoSRv3/Audit/Strategy.lean",
+        "LidoSRv3/Audit/StrategyProofs.lean",
+        "LidoSRv3/Audit/Vectors.lean",
+    },
+}
 EXPECTED_THEOREM_TYPES = {
     "LidoSRv3.P1_reserve_separation": (
         "∀ (s : LidoSRv3.State), "
@@ -765,6 +780,11 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 theorem == expected_theorem,
                 f"{invariant_id}: theorem must be {expected_theorem}",
             )
+            require(
+                set(row["source_anchors"])
+                == EXPECTED_INVARIANT_SOURCE_ANCHORS[invariant_id],
+                f"{invariant_id}: source anchors differ from expected theorem evidence",
+            )
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
         if row["layer"] in set(layers) & {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
@@ -1330,25 +1350,81 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
     spans = []
     index = 0
     starter = re.compile(
-        r"^([ \t]*)(?:" + "|".join(re.escape(command) for command in commands)
-        + r")\b"
+        r"^([ \t]*)(?:@\[[^\n]*\][ \t]*)*"
+        r"(?:(?:private|protected|local|scoped(?:[ \t]*\[[^\]\n]*\])?)[ \t]+)*"
+        r"(?:" + "|".join(re.escape(command) for command in commands) + r")\b"
     )
-    trivia = re.compile(r"^[ \t]*(?:(?:--.*)?(?:\r?\n)?|/\-.*-\/[ \t]*(?:\r?\n)?)$")
+
+    def line_layout(
+        line: str, block_depth: int, delimiter_depth: int
+    ) -> tuple[bool, int | None, int, int]:
+        """Return code presence/indent and lexical state after one line."""
+        cursor = 0
+        first_code = None
+        string = False
+        escaped = False
+        while cursor < len(line):
+            if block_depth:
+                if line.startswith("/-", cursor):
+                    block_depth += 1
+                    cursor += 2
+                elif line.startswith("-/", cursor):
+                    block_depth -= 1
+                    cursor += 2
+                else:
+                    cursor += 1
+            elif string:
+                if escaped:
+                    escaped = False
+                elif line[cursor] == "\\":
+                    escaped = True
+                elif line[cursor] == '"':
+                    string = False
+                cursor += 1
+            elif line.startswith("--", cursor):
+                break
+            elif line.startswith("/-", cursor):
+                block_depth = 1
+                cursor += 2
+            elif line[cursor] in " \t\r\n":
+                cursor += 1
+            else:
+                if first_code is None:
+                    first_code = cursor
+                if line[cursor] == '"':
+                    string = True
+                elif line[cursor] in "([{":
+                    delimiter_depth += 1
+                elif line[cursor] in ")]}" and delimiter_depth:
+                    delimiter_depth -= 1
+                cursor += 1
+        indent = (
+            len(line[:first_code].expandtabs(8)) if first_code is not None else None
+        )
+        return first_code is not None, indent, block_depth, delimiter_depth
+
     while index < len(lines):
         match = starter.match(lines[index])
         if match is None:
             index += 1
             continue
         indent = len(match.group(1).expandtabs(8))
+        _, _, block_depth, delimiter_depth = line_layout(lines[index], 0, 0)
         end = index + 1
         while end < len(lines):
             line = lines[end]
-            if trivia.match(line):
+            has_code, line_indent, next_block_depth, next_delimiter_depth = line_layout(
+                line, block_depth, delimiter_depth
+            )
+            if not has_code or block_depth or delimiter_depth:
+                block_depth = next_block_depth
+                delimiter_depth = next_delimiter_depth
                 end += 1
                 continue
-            leading = re.match(r"^[ \t]*", line).group(0)
-            if len(leading.expandtabs(8)) <= indent:
+            if line_indent is not None and line_indent <= indent:
                 break
+            block_depth = next_block_depth
+            delimiter_depth = next_delimiter_depth
             end += 1
         spans.append("".join(lines[index:end]))
         index = end
@@ -1363,13 +1439,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     syntax_interpolation = re.compile(
-        r'\bsyntax(?:\s*\([^)]*\))?'
+        r'\b(?:syntax(?:\s*\([^)]*\))?|macro)'
         r'\s+"((?:\\.|[^"\\])*)"\s+'
         r'(.*?)\binterpolatedStr(?:\([^)]*\))?',
         re.DOTALL,
     )
     for _, source in sources:
-        for declaration in layout_command_spans(source, ("syntax",)):
+        for declaration in layout_command_spans(source, ("syntax", "macro")):
             for match in syntax_interpolation.finditer(declaration):
                 try:
                     prefix = json.loads(f'"{match.group(1)}"')
@@ -1497,6 +1573,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         sanitized = "\n".join(sanitized_lines)
         opaque_start = re.compile(
             r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
+            r"(?:set_option\b[^\n]*?\bin[ \t]+)?"
             r"(?:(?:private|protected)[ \t]+)*opaque[ \t]+"
         )
         custom_commands = set()
@@ -1689,6 +1766,24 @@ def negative_tests() -> None:
         )
     finally:
         theorem_swap_path.unlink()
+    source_swap_mutant = json.loads(json.dumps(data))
+    source_swap_rows = {row["id"]: row for row in source_swap_mutant["invariants"]}
+    (
+        source_swap_rows["SRV3-ARITH-CHECKED"]["source_anchors"],
+        source_swap_rows["SRV3-TX-REVERT"]["source_anchors"],
+    ) = (
+        source_swap_rows["SRV3-TX-REVERT"]["source_anchors"],
+        source_swap_rows["SRV3-ARITH-CHECKED"]["source_anchors"],
+    )
+    source_swap_path = write_mutant(source_swap_mutant)
+    try:
+        expect_failure(
+            "assured invariant source-anchor swap mutant",
+            lambda: validate(source_swap_path),
+            "source anchors differ from expected theorem evidence",
+        )
+    finally:
+        source_swap_path.unlink()
     theorem_swap_mutant = json.loads(json.dumps(data))
     theorem_rows = {
         row["id"]: row for row in theorem_swap_mutant["invariants"]
@@ -1999,6 +2094,48 @@ def negative_tests() -> None:
         "scanner multiline interpolated-string syntax mutant: unexpectedly passed",
     )
     print("mutant rejected: multiline interpolated-string syntax proof escape")
+    block_comment_interpolation_mutant = (
+        'local syntax "x" ident\n'
+        '/- declaration continuation\n'
+        '   after multiline block-comment trivia -/\n'
+        '  interpolatedStr(term) : term\n'
+        'macro_rules | `(x $name:ident $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := x foo "{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("block-comment-interpolation-mutant.lean",
+             block_comment_interpolation_mutant)
+        ]),
+        "scanner local multiline interpolation with block-comment trivia passed",
+    )
+    print("mutant rejected: local multiline interpolation across block-comment trivia")
+    nested_layout_interpolation_mutant = (
+        'local syntax "nested" (\n'
+        '  ident\n'
+        ') interpolatedStr(term) : term\n'
+        'macro_rules | `(nested $name:ident $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := nested foo "{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("nested-layout-interpolation-mutant.lean",
+             nested_layout_interpolation_mutant)
+        ]),
+        "scanner interpolation with nested multiline parser construct passed",
+    )
+    print("mutant rejected: interpolation after nested multiline parser construct")
+    macro_interpolation_mutant = (
+        'local macro "x" s:interpolatedStr : term => `(s! $s)\n'
+        'def bait : String := x"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("macro-interpolation-mutant.lean", macro_interpolation_mutant)
+        ]),
+        "scanner direct macro interpolation declaration passed",
+    )
+    print("mutant rejected: direct macro interpolation declaration")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
@@ -2050,6 +2187,16 @@ def negative_tests() -> None:
             f"scanner bodyless opaque before {label} command mutant passed",
         )
         print(f"mutant rejected: bodyless opaque before {label} command")
+    wrapped_opaque_mutant = (
+        "set_option autoImplicit false in opaque hidden : False\n"
+    )
+    require(
+        find_proof_escapes([
+            ("set-option-wrapped-bodyless-opaque.lean", wrapped_opaque_mutant)
+        ]),
+        "scanner set_option-wrapped bodyless opaque mutant passed",
+    )
+    print("mutant rejected: set_option-wrapped bodyless opaque")
     custom_command_mutant = (
         'syntax "audit-cmd" ":=" term : command\n'
         "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
@@ -2080,6 +2227,26 @@ def negative_tests() -> None:
         "scanner bodyless opaque before multiline custom command mutant passed",
     )
     print("mutant rejected: bodyless opaque before multiline custom command")
+    scoped_custom_command_mutant = (
+        "namespace AuditScannerMutant\n"
+        'scoped syntax "audit-cmd"\n'
+        '/- declaration continuation\n'
+        '   after multiline block-comment trivia -/\n'
+        '  ":=" term : command\n'
+        "scoped macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
+        "end AuditScannerMutant\n"
+        "open scoped AuditScannerMutant\n"
+        "opaque hidden : Nat\n"
+        "audit-cmd := by trivial\n"
+    )
+    require(
+        find_proof_escapes([
+            ("bodyless-opaque-before-scoped-custom-command.lean",
+             scoped_custom_command_mutant)
+        ]),
+        "scanner bodyless opaque before scoped multiline custom command passed",
+    )
+    print("mutant rejected: bodyless opaque before scoped multiline custom command")
     legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
