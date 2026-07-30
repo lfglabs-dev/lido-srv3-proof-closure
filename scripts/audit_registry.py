@@ -2041,6 +2041,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 r"scoped\b",
                 declaration_start,
             )
+            explicit_scoped_name = re.search(
+                r"\bscoped[ \t]*\[[ \t]*"
+                r"((?:[A-Za-z_][\w']*|«[^»\r\n]+»)"
+                r"(?:\.(?:[A-Za-z_][\w']*|«[^»\r\n]+»))*)"
+                r"[ \t]*\]",
+                declaration_start,
+            )
             interpolation_match = interpolation_declaration.search(declaration)
             if (
                 interpolation_match is not None
@@ -2075,7 +2082,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                             category
                         )
                     else:
-                        scope = scope_state_at(source, declaration_offset).namespace
+                        scope = (
+                            explicit_scoped_name.group(1)
+                            if explicit_scoped_name is not None
+                            else scope_state_at(
+                                source, declaration_offset
+                            ).namespace
+                        )
                         if scope:
                             scoped_literal_free_prefix_categories[source_name][
                                 scope
@@ -2107,9 +2120,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                             prefix_descriptor
                         )
                     else:
-                        scope = scope_state_at(
-                            source, declaration_offset
-                        ).namespace
+                        scope = (
+                            explicit_scoped_name.group(1)
+                            if explicit_scoped_name is not None
+                            else scope_state_at(
+                                source, declaration_offset
+                            ).namespace
+                        )
                         if scope:
                             scoped_interpolated_prefixes[source_name][
                                 scope
@@ -3888,6 +3905,36 @@ def negative_tests() -> None:
         "scanner missed open-scoped interpolation proof escape",
     )
     print("mutant rejected: scoped interpolation activates only after open scoped")
+    explicit_scoped_nullable_mutant = (
+        "scoped[Foo] syntax ident* interpolatedStr(term) : command\n"
+        "scoped[Foo] macro_rules | `($[$xs:ident]* "
+        "$value:interpolatedStr) => `(#check s!$value)\n"
+        "open scoped Foo\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("explicit-scoped-nullable.lean",
+             explicit_scoped_nullable_mutant)
+        ]),
+        "scanner explicit scoped-name nullable interpolation mutant passed",
+    )
+    print("mutant rejected: explicit scoped-name nullable interpolation syntax")
+    explicit_scoped_literal_mutant = (
+        'scoped[Foo] syntax "bar" interpolatedStr(term) : command\n'
+        'scoped[Foo] macro_rules | `(bar $s:interpolatedStr) => '
+        '`(#check s!$s)\n'
+        "open scoped Foo\n"
+        'bar "{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("explicit-scoped-literal.lean",
+             explicit_scoped_literal_mutant)
+        ]),
+        "scanner explicit scoped-name literal interpolation mutant passed",
+    )
+    print("mutant rejected: explicit scoped-name literal interpolation syntax")
     namespace_section_scoped_mutant = require_fixture(
         "namespace-section-scoped-nullable-negative.txt"
     ).read_text(encoding="utf-8")
