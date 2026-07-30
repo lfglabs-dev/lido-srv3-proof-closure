@@ -1362,7 +1362,7 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
     spans = []
     index = 0
     starter = re.compile(
-        r"^([ \t]*)(?:@\[[^\n]*\][ \t]*)*"
+        r"^([ \t]*)(?:@\[[\s\S]*?\][ \t\r\n]*)*"
         r"(?:(?:private|protected|local|scoped(?:[ \t]*\[[^\]\n]*\])?)[ \t]+)*"
         r"(?:" + "|".join(re.escape(command) for command in commands) + r")\b"
     )
@@ -1373,6 +1373,8 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
         """Return code presence/indent and lexical state after one line."""
         cursor = 0
         first_code = None
+        leading_indent = 0
+        leading_comment = bool(block_depth)
         string = False
         escaped = False
         while cursor < len(line):
@@ -1396,9 +1398,16 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
             elif line.startswith("--", cursor):
                 break
             elif line.startswith("/-", cursor):
+                if first_code is None:
+                    leading_comment = True
                 block_depth = 1
                 cursor += 2
             elif line[cursor] in " \t\r\n":
+                if first_code is None and not leading_comment:
+                    if line[cursor] == "\t":
+                        leading_indent = (leading_indent // 8 + 1) * 8
+                    elif line[cursor] == " ":
+                        leading_indent += 1
                 cursor += 1
             else:
                 if first_code is None:
@@ -1410,13 +1419,27 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
                 elif line[cursor] in ")]}" and delimiter_depth:
                     delimiter_depth -= 1
                 cursor += 1
-        indent = (
-            len(line[:first_code].expandtabs(8)) if first_code is not None else None
-        )
+        indent = leading_indent if first_code is not None else None
         return first_code is not None, indent, block_depth, delimiter_depth
 
     while index < len(lines):
         match = starter.match(lines[index])
+        if match is None and re.match(r"^[ \t]*@\[", lines[index]):
+            candidate = ""
+            attribute_block_depth = 0
+            attribute_delimiter_depth = 0
+            probe = index
+            while probe < len(lines):
+                candidate += lines[probe]
+                _, _, attribute_block_depth, attribute_delimiter_depth = line_layout(
+                    lines[probe],
+                    attribute_block_depth,
+                    attribute_delimiter_depth,
+                )
+                probe += 1
+                if not attribute_block_depth and not attribute_delimiter_depth:
+                    match = starter.match(candidate)
+                    break
         if match is None:
             index += 1
             continue
@@ -1428,7 +1451,7 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
             has_code, line_indent, next_block_depth, next_delimiter_depth = line_layout(
                 line, block_depth, delimiter_depth
             )
-            if not has_code or block_depth or delimiter_depth:
+            if not has_code or (block_depth and next_block_depth) or delimiter_depth:
                 block_depth = next_block_depth
                 delimiter_depth = next_delimiter_depth
                 end += 1
@@ -1486,7 +1509,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         block_depth = 0
         contexts: list[tuple[str, object]] = [("code", None)]
         sanitized_lines = []
-        last_significant_code = ""
+        layout_significant_code = ""
         for number, line in enumerate(source.splitlines(), 1):
             code_parts = []
             cursor = 0
@@ -1562,7 +1585,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         code_parts.append(line[cursor])
                         cursor += 1
                 elif line[cursor] == '"' and interpolated_prefix.search(
-                    "\n".join([last_significant_code, "".join(code_parts)])
+                    " ".join([layout_significant_code, "".join(code_parts)])
                 ):
                     code_parts.append("!")
                     contexts.append(("string", (True, False)))
@@ -1579,7 +1602,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             code = "".join(code_parts)
             sanitized_lines.append(code)
             if code.strip():
-                last_significant_code = code
+                if code[0].isspace() and layout_significant_code:
+                    layout_significant_code += " " + code.strip()
+                else:
+                    layout_significant_code = code.strip()
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
         sanitized = "\n".join(sanitized_lines)
@@ -1603,15 +1629,24 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?:(?:private|protected)[ \t\r\n]+)*opaque[ \t]+"
         )
         opaque_search_from = 0
-        for declaration in layout_command_spans(sanitized, ("opaque", "set_option")):
-            declaration_start = sanitized.find(declaration, opaque_search_from)
+        for source_declaration in layout_command_spans(
+            source, ("opaque", "set_option")
+        ):
+            declaration_start = source.find(source_declaration, opaque_search_from)
             require(declaration_start >= 0, "scanner internal opaque span mismatch")
-            opaque_search_from = declaration_start + len(declaration)
+            opaque_search_from = declaration_start + len(source_declaration)
+            start_line = source.count("\n", 0, declaration_start)
+            declaration_line_count = len(source_declaration.splitlines())
+            declaration = "\n".join(
+                sanitized_lines[start_line:start_line + declaration_line_count]
+            )
             match = opaque_start.search(declaration)
             if match is None:
                 continue
             if ":=" not in declaration and re.search(r"(?m)^[ \t]*where\b", declaration) is None:
-                line_number = sanitized.count("\n", 0, declaration_start + match.start()) + 1
+                line_number = start_line + declaration.count(
+                    "\n", 0, match.start()
+                ) + 1
                 original = source.splitlines()[line_number - 1].strip()
                 violations.append(f"{name}:{line_number}:{original}")
     return violations
@@ -2161,6 +2196,20 @@ def negative_tests() -> None:
         "scanner direct macro interpolation declaration passed",
     )
     print("mutant rejected: direct macro interpolation declaration")
+    multiline_invocation_mutant = (
+        'syntax "x" ident interpolatedStr(term) : term\n'
+        'macro_rules | `(x $name:ident $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := x\n'
+        '  foo\n'
+        '  "{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("multiline-invocation-mutant.lean", multiline_invocation_mutant)
+        ]),
+        "scanner multiline custom interpolation invocation passed",
+    )
+    print("mutant rejected: multiline custom interpolation invocation")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
@@ -2197,6 +2246,18 @@ def negative_tests() -> None:
         find_proof_escapes([("bodyless-opaque.lean", bodyless_opaque)]),
         "scanner bodyless attributed/multiline/private/protected opaque mutant passed",
     )
+    multiline_attribute_opaque = (
+        "@[extern\n"
+        '  "bad"] opaque hidden : False\n'
+    )
+    require(
+        find_proof_escapes([
+            ("multiline-attribute-bodyless-opaque.lean",
+             multiline_attribute_opaque)
+        ]),
+        "scanner multiline-attribute bodyless opaque mutant passed",
+    )
+    print("mutant rejected: multiline-attribute bodyless opaque")
     for label, following_command in (
         ("example", "example : True := by trivial"),
         ("eval", "#eval (let x := 1; x)"),
@@ -2255,6 +2316,28 @@ def negative_tests() -> None:
             f"scanner bodyless opaque before {modifier} command mutant passed",
         )
         print(f"mutant rejected: bodyless opaque before {modifier} command")
+    for label, source in (
+        (
+            "leading-block-comment",
+            "opaque hidden : False\n"
+            "/- command-boundary trivia -/ def innocent := 1\n",
+        ),
+        (
+            "multiline-block-comment",
+            "opaque hidden : False /- command-boundary trivia\n"
+            "-/ def innocent := 1\n",
+        ),
+        (
+            "nested-multiline-block-comment",
+            "opaque hidden : False /- outer /- nested -/ trivia\n"
+            "-/ def innocent := 1\n",
+        ),
+    ):
+        require(
+            find_proof_escapes([(f"bodyless-opaque-{label}.lean", source)]),
+            f"scanner bodyless opaque before {label} trivia mutant passed",
+        )
+        print(f"mutant rejected: bodyless opaque before {label} trivia")
     custom_command_mutant = (
         'syntax "audit-cmd" ":=" term : command\n'
         "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
