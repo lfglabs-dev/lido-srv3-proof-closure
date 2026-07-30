@@ -150,6 +150,35 @@ def main():
 
         guarantees_path = fixture / "audit/guarantees.yaml"
         guarantees = json.loads(guarantees_path.read_text(encoding="utf-8"))
+        schema_artifacts = (
+            (
+                guarantees_path,
+                guarantees,
+                "guarantee registry schema differs from the canonical version",
+            ),
+            (
+                source_map_path,
+                source_map,
+                "source-map schema differs from the canonical version",
+            ),
+            (
+                lock_path,
+                baseline_lock,
+                "artifacts lock schema differs from the canonical version",
+            ),
+        )
+        for path, artifact, expected_error in schema_artifacts:
+            for schema in (None, "incompatible-v999"):
+                malformed_schema = copy.deepcopy(artifact)
+                if schema is None:
+                    del malformed_schema["schema"]
+                else:
+                    malformed_schema["schema"] = schema
+                write_json(path, malformed_schema)
+                run(fixture, False, "generate", expected_error)
+                run(fixture, False, "check", expected_error)
+            write_json(path, artifact)
+
         contradictory_authority = copy.deepcopy(guarantees)
         contradictory_authority["authority"] = (
             "This metadata closes every semantic guarantee."
@@ -459,7 +488,7 @@ def main():
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
         "assumption records/links, authority, full manifest layer/theorem ledgers, "
-        "manifest schema, proof baseline/revisions, "
+        "all metadata schemas, proof baseline/revisions, "
         "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )

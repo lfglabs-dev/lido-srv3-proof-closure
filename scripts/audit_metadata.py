@@ -209,6 +209,9 @@ CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
+EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v1"
+EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v1"
+EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
     for name in (
@@ -423,6 +426,12 @@ def validate():
     exclusions = load("exclusions.yaml")
     lock = load("artifacts.lock.json")
     source_map = load("source-map.yaml")
+    require(registry.get("schema") == EXPECTED_REGISTRY_SCHEMA,
+            "guarantee registry schema differs from the canonical version")
+    require(source_map.get("schema") == EXPECTED_SOURCE_MAP_SCHEMA,
+            "source-map schema differs from the canonical version")
+    require(lock.get("schema") == EXPECTED_LOCK_SCHEMA,
+            "artifacts lock schema differs from the canonical version")
     require(registry.get("authority") == EXPECTED_AUTHORITY,
             "guarantee registry authority differs from the canonical declaration")
     rows = registry["guarantees"]
