@@ -38,6 +38,30 @@ EXPECTED_WORDING = [
     "Mock-derived helper evidence is non-production evidence.",
 ]
 PLANES = {"model", "source", "tx", "yul", "evm", "crypto"}
+EXPECTED_STATUSES = [
+    {"model": "REGRESSION", "source": "OPEN", "tx": "OPEN",
+     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
+     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN",
+     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN",
+     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "OPEN", "source": "OPEN", "tx": "OPEN",
+     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "DEV-431-READY", "source": "DEV-431-READY", "tx": "OPEN",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
+    {"model": "OPEN", "source": "OPEN", "tx": "OPEN",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "OPEN", "source": "BLOCKED", "tx": "BLOCKED",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "OPEN", "source": "NOT_APPLICABLE", "tx": "OPEN",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "OPEN", "source": "BLOCKED", "tx": "BLOCKED",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
+]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
     "BLOCKED",
@@ -54,6 +78,16 @@ CAMPAIGN_BASE = {
     "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
     "ref": "campaign/lido-minimal-11",
     "commit": "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1",
+}
+REQUIRED_UNAVAILABLE = {
+    name: {"status": "MISSING", "blocked": True, "value": None}
+    for name in (
+        "canonical_eip7251_runtime",
+        "canonical_eip7251_codehash",
+        "canonical_eip7251_fork",
+        "canonical_eip7251_address",
+        "sha256_ffi_implementation_identity",
+    )
 }
 VIEWS = ("ROADMAP.md", "STATUS.md", "REPRODUCE.md")
 
@@ -126,8 +160,10 @@ def validate():
             "catalogue wording changed")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
-    for row in rows:
+    for row, expected_statuses in zip(rows, EXPECTED_STATUSES):
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
+        require(row["statuses"] == expected_statuses,
+                f"{row['id']}: assurance statuses differ from canonical claims")
         for plane, status in row["statuses"].items():
             require(status in STATUS_VALUES,
                     f"{row['id']}: invalid {plane} assurance status: {status}")
@@ -161,11 +197,8 @@ def validate():
         "statement": "DEV-431-READY is development readiness, not AUDIT-CERT.",
     }, "certification status must remain DEV-431-READY, not AUDIT-CERT")
     validate_lock(lock, source_map)
-    unavailable = lock["unavailable"]
-    require(unavailable, "unavailable provenance must be recorded")
-    for name, artifact in unavailable.items():
-        require(artifact == {"status": "MISSING", "blocked": True, "value": None},
-                f"{name}: unavailable provenance must be explicit")
+    require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
+            "unavailable provenance must contain the exact canonical blocker set")
     return rows
 
 

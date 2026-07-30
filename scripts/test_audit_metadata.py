@@ -97,6 +97,12 @@ def main():
         run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
+        wrong_plane = copy.deepcopy(guarantees)
+        wrong_plane["guarantees"][0]["statuses"]["evm"] = "LEAN_CHECKED"
+        write_json(guarantees_path, wrong_plane)
+        run(fixture, False, "generate")
+        write_json(guarantees_path, guarantees)
+
         tx_mutant = copy.deepcopy(guarantees)
         tx_mutant["guarantees"][2]["reproduction"]["command"] = (
             "lake build LidoSRv3.Audit.Common.Atomicity"
@@ -105,13 +111,20 @@ def main():
         run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
+        for blocker in baseline_lock["unavailable"]:
+            missing_blocker = copy.deepcopy(baseline_lock)
+            del missing_blocker["unavailable"][blocker]
+            write_json(lock_path, missing_blocker)
+            run(fixture, False, "generate")
+        write_json(lock_path, baseline_lock)
+
         reproduce_path = fixture / "audit/REPRODUCE.md"
         reproduce_path.write_text("stale\n", encoding="utf-8")
         run(fixture, False)
 
     print(
         "optimized audit metadata mutants rejected: "
-        "all pins/base, status vocabulary/closure, theorem, stale view"
+        "all pins/base/blockers, status vocabulary/plane/closure, theorem, stale view"
     )
 
 
