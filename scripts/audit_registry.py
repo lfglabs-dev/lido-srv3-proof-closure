@@ -554,8 +554,11 @@ def validate_source_anchor(
     )
 
 
-def trusted_axioms() -> set[str]:
-    policy = load_json(TRUSTED_AXIOMS)
+EXPECTED_TRUSTED_AXIOMS = {"propext", "Quot.sound"}
+
+
+def trusted_axioms(policy_path: Path = TRUSTED_AXIOMS) -> set[str]:
+    policy = load_json(policy_path)
     require(
         isinstance(policy, dict)
         and set(policy) == {"schema", "allowed"}
@@ -565,7 +568,12 @@ def trusted_axioms() -> set[str]:
         and all(isinstance(name, str) and name for name in policy["allowed"]),
         "trusted-axioms.json: invalid explicit trust allowlist",
     )
-    return set(policy["allowed"])
+    allowed = set(policy["allowed"])
+    require(
+        allowed == EXPECTED_TRUSTED_AXIOMS,
+        "trusted-axioms.json: allowed axioms differ from fixed foundation",
+    )
+    return allowed
 
 
 def parse_axiom_report(output: str, theorems: list[str]) -> dict[str, set[str]]:
@@ -624,7 +632,7 @@ def run_theorem_checks(
         check_path.unlink()
     require(
         result.returncode == 0,
-        "registry theorem does not exist or PROVED reference is not a proof "
+        "registry theorem does not exist or assured reference is not a proof "
         "in LidoSRv3 build surface:\n"
         + (result.stderr or result.stdout).strip(),
     )
@@ -643,7 +651,9 @@ def validate_theorems(data: dict) -> None:
         row["theorem"] for row in data["invariants"] if row["theorem"] is not None
     )
     proved = sorted(
-        row["theorem"] for row in data["invariants"] if row["status"] == "PROVED"
+        row["theorem"] for row in data["invariants"]
+        if row["theorem"] is not None
+        and row["status"] in {"PROVED", "REGRESSION"}
     )
     for theorem in theorems:
         require(
@@ -665,7 +675,15 @@ def validate_theorems(data: dict) -> None:
             ["LidoSRv3.Audit.Quantity.zero"],
             ["LidoSRv3.Audit.Quantity.zero"],
         ),
-        "PROVED reference is not a proof",
+        "assured reference is not a proof",
+    )
+    expect_failure(
+        "non-proposition REGRESSION reference",
+        lambda: run_theorem_checks(
+            ["LidoSRv3.Audit.Quantity.zero"],
+            ["LidoSRv3.Audit.Quantity.zero"],
+        ),
+        "assured reference is not a proof",
     )
 
 
@@ -1392,14 +1410,19 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
             r"(?:(?:private|protected)[ \t]+)*opaque[ \t]+"
         )
-        declaration_start = re.compile(
+        command_start = re.compile(
             r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
             r"(?:(?:private|protected)[ \t]+)*"
-            r"(?:opaque|def|theorem|lemma|axiom|constant|inductive|structure|class|instance)\b"
+            r"(?:#\w+|"
+            r"opaque|def|theorem|lemma|axiom|constant|inductive|structure|class|"
+            r"instance|abbrev|example|namespace|section|end|open|export|variable|"
+            r"include|omit|universe|set_option|attribute|initialize|"
+            r"builtin_initialize|syntax|macro|macro_rules|elab|elab_rules|"
+            r"command_elab|mutual)\b"
         )
         opaque_matches = list(opaque_start.finditer(sanitized))
         for match in opaque_matches:
-            following = declaration_start.search(sanitized, match.end())
+            following = command_start.search(sanitized, match.end())
             end = following.start() if following is not None else len(sanitized)
             declaration = sanitized[match.start():end]
             if ":=" not in declaration and re.search(r"(?m)^[ \t]*where\b", declaration) is None:
@@ -1496,6 +1519,18 @@ def negative_tests() -> None:
     )
     const_positive = load_json_fixture("const-one-safe-positive.json")
     validate_against_schema(const_positive, {"const": 1}, "fixture")
+    axiom_policy_mutant = load_json(TRUSTED_AXIOMS)
+    axiom_policy_mutant = json.loads(json.dumps(axiom_policy_mutant))
+    axiom_policy_mutant["allowed"].append("Classical.choice")
+    axiom_policy_path = write_mutant(axiom_policy_mutant)
+    try:
+        expect_failure(
+            "expanded trusted axiom allowlist",
+            lambda: trusted_axioms(axiom_policy_path),
+            "allowed axioms differ from fixed foundation",
+        )
+    finally:
+        axiom_policy_path.unlink()
     missing_obligation_mutant = json.loads(json.dumps(data))
     missing_obligation_mutant["invariants"] = [
         row for row in missing_obligation_mutant["invariants"]
@@ -1860,6 +1895,21 @@ def negative_tests() -> None:
         find_proof_escapes([("bodyless-opaque.lean", bodyless_opaque)]),
         "scanner bodyless attributed/multiline/private/protected opaque mutant passed",
     )
+    for label, following_command in (
+        ("example", "example : True := by trivial"),
+        ("eval", "#eval (let x := 1; x)"),
+    ):
+        opaque_boundary_mutant = (
+            "opaque hidden : False\n"
+            f"{following_command}\n"
+        )
+        require(
+            find_proof_escapes([
+                (f"bodyless-opaque-before-{label}.lean", opaque_boundary_mutant)
+            ]),
+            f"scanner bodyless opaque before {label} command mutant passed",
+        )
+        print(f"mutant rejected: bodyless opaque before {label} command")
     legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
