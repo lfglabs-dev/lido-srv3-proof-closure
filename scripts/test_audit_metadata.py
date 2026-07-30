@@ -167,6 +167,19 @@ def main():
         audit_manifest = json.loads(
             audit_manifest_path.read_text(encoding="utf-8")
         )
+        for schema in (None, "srv3-audit-manifest-v999"):
+            malformed_schema = copy.deepcopy(audit_manifest)
+            if schema is None:
+                del malformed_schema["schema"]
+            else:
+                malformed_schema["schema"] = schema
+            write_json(audit_manifest_path, malformed_schema)
+            run(
+                fixture,
+                False,
+                "generate",
+                "audit manifest schema differs from the canonical version",
+            )
         for layer, record in audit_manifest["layers"].items():
             for field in record:
                 missing_field = copy.deepcopy(audit_manifest)
@@ -446,7 +459,7 @@ def main():
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
         "assumption records/links, authority, full manifest layer/theorem ledgers, "
-        "proof baseline/revisions, "
+        "manifest schema, proof baseline/revisions, "
         "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )

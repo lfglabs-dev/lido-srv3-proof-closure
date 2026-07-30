@@ -208,6 +208,7 @@ CAMPAIGN_BASE = {
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
+EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
     for name in (
@@ -397,6 +398,8 @@ def validate_lock(lock, source_map):
     lean_revision = toolchain.rsplit(":", 1)[-1]
     require(audit_manifest["source_revisions"]["lean"] == lean_revision,
             "Lean toolchain pin differs from verity target audit manifest")
+    require(audit_manifest.get("schema") == EXPECTED_MANIFEST_SCHEMA,
+            "audit manifest schema differs from the canonical version")
     require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,
             "audit manifest proof policy differs from the canonical zero-escape policy")
     require(audit_manifest.get("layers") == EXPECTED_MANIFEST_LAYERS,
