@@ -75,6 +75,38 @@ def main():
                 run(fixture, False)
         write_json(lock_path, baseline_lock)
 
+        source_map_path = fixture / "audit/source-map.yaml"
+        source_map = json.loads(source_map_path.read_text(encoding="utf-8"))
+        forked_source = copy.deepcopy(source_map)
+        forked_source["pinned_source"] = forked_source["pinned_source"].replace(
+            "lidofinance/core@", "example/core@"
+        )
+        forked_lock = copy.deepcopy(baseline_lock)
+        forked_lock["pins"]["lido_core"]["repository"] = (
+            "https://github.com/example/core.git"
+        )
+        write_json(source_map_path, forked_source)
+        write_json(lock_path, forked_lock)
+        run(
+            fixture,
+            False,
+            "generate",
+            "pinned_source must use the canonical lidofinance/core repository",
+        )
+        write_json(source_map_path, source_map)
+        write_json(lock_path, baseline_lock)
+
+        exclusions_path = fixture / "audit/exclusions.yaml"
+        exclusions = json.loads(exclusions_path.read_text(encoding="utf-8"))
+        write_json(exclusions_path, {})
+        run(
+            fixture,
+            False,
+            "generate",
+            "exclusions differ from the canonical scope boundary set",
+        )
+        write_json(exclusions_path, exclusions)
+
         guarantees_path = fixture / "audit/guarantees.yaml"
         guarantees = json.loads(guarantees_path.read_text(encoding="utf-8"))
         malformed = copy.deepcopy(guarantees)
@@ -134,7 +166,8 @@ def main():
 
     print(
         "optimized audit metadata mutants rejected: "
-        "all pins/base/blockers, status vocabulary/plane/closure, theorem, stale view"
+        "all pins/base/blockers, source/exclusions, "
+        "status vocabulary/plane/closure, theorem, stale view"
     )
 
 

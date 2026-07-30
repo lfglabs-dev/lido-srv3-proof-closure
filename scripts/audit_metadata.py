@@ -37,6 +37,20 @@ EXPECTED_WORDING = [
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
     "Mock-derived helper evidence is non-production evidence.",
 ]
+EXPECTED_EXCLUSIONS = {
+    "schema": "lido-srv3-exclusions-v1",
+    "exclusions": [
+        {"id": "BLS", "scope": "BLS signature validity and related cryptographic correctness"},
+        {"id": "FULL-REPORT-PIPELINE-REFINEMENT",
+         "scope": "Full report-pipeline source, transaction, and EVM refinement"},
+        {"id": "STVAULT-INTERNALS",
+         "scope": "stVault internal state, accounting, and lifecycle semantics"},
+        {"id": "VALUE-BASED-EXIT-BOUND",
+         "scope": "Value-based exit and consolidation bounds"},
+        {"id": "BROAD-REGISTRY-LIFECYCLE",
+         "scope": "Broad registry, governance, module lifecycle, and role-management behavior"},
+    ],
+}
 PLANES = {"model", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
     {"model": "REGRESSION", "source": "OPEN", "tx": "OPEN",
@@ -128,6 +142,8 @@ def validate_lock(lock, source_map):
     toolchain = (ROOT / "lean-toolchain").read_text(encoding="utf-8").strip()
     lakefile = (ROOT / "lakefile.lean").read_text(encoding="utf-8")
     lido_repository, lido_commit = source_map["pinned_source"].split("@", 1)
+    require(lido_repository == "lidofinance/core",
+            "source-map pinned_source must use the canonical lidofinance/core repository")
     lido_repository = f"https://github.com/{lido_repository}.git"
 
     expected_pins = {
@@ -163,7 +179,7 @@ def validate_lock(lock, source_map):
 def validate():
     registry = load("guarantees.yaml")
     assumptions = load("assumptions.yaml")
-    load("exclusions.yaml")
+    exclusions = load("exclusions.yaml")
     lock = load("artifacts.lock.json")
     source_map = load("source-map.yaml")
     rows = registry["guarantees"]
@@ -171,6 +187,8 @@ def validate():
     require(ids == EXPECTED_IDS, "guarantees must contain the exact ordered minimal-11 IDs")
     require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
             "catalogue wording changed")
+    require(exclusions == EXPECTED_EXCLUSIONS,
+            "exclusions differ from the canonical scope boundary set")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
     for row, expected_statuses, expected_theorem_planes in zip(
