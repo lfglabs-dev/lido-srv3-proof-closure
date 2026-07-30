@@ -1,0 +1,2 @@
+macro xs:num* value:interpolatedStr(term) : command =>
+  `(#check s!$value)

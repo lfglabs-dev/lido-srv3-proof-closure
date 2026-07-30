@@ -9,6 +9,7 @@ import csv
 import hashlib
 import io
 import json
+import os
 import re
 import subprocess
 import sys
@@ -1781,7 +1782,12 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
-    literal_free_prefix_categories: dict[str, set[tuple[str, str]]] = defaultdict(set)
+    own_literal_free_prefix_categories: dict[
+        str, set[tuple[str, str]]
+    ] = defaultdict(set)
+    exported_literal_free_prefix_categories: dict[
+        str, set[tuple[str, str]]
+    ] = defaultdict(set)
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
         r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
@@ -1851,9 +1857,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     r",?[ \t]*([*?+]?)",
                     parser,
                 )
-                literal_free_prefix_categories[source_name].add(
-                    categories[0] if categories else ("unknown", "")
-                )
+                category = categories[0] if categories else ("unknown", "")
+                own_literal_free_prefix_categories[source_name].add(category)
+                if re.match(r"^[ \t]*local\b", declaration) is None:
+                    exported_literal_free_prefix_categories[source_name].add(category)
             for match in syntax_interpolation.finditer(declaration):
                 try:
                     prefix = json.loads(f'"{match.group(1)}"')
@@ -1880,10 +1887,46 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         "ident": r"(?:«[^»\r\n]+»|(?:[^\W\d]|_)[\w'.]*)",
         "num": r"\d[\w']*",
     }
+    modules = {
+        re.sub(r"\.lean$", "", source_name).replace("/", "."): source_name
+        for source_name, _ in sources
+        if source_name.endswith(".lean")
+    }
+    imports = {
+        source_name: {
+            imported
+            for line in source.splitlines()
+            for match in [re.match(r"^[ \t]*import[ \t]+(.+?)[ \t]*$", line)]
+            if match is not None
+            for imported in re.findall(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*",
+                                       match.group(1))
+            if imported in modules
+        }
+        for source_name, source in sources
+    }
+
+    def active_literal_free_categories(source_name: str) -> set[tuple[str, str]]:
+        active = set(own_literal_free_prefix_categories[source_name])
+        pending = list(imports.get(source_name, set()))
+        visited = set()
+        while pending:
+            imported = pending.pop()
+            if imported in visited:
+                continue
+            visited.add(imported)
+            imported_source = modules[imported]
+            active.update(exported_literal_free_prefix_categories[imported_source])
+            pending.extend(imports.get(imported_source, set()))
+        return active
+
+    all_literal_free_categories = {
+        category
+        for source_name, _ in sources
+        for category in active_literal_free_categories(source_name)
+    }
     literal_free_prefix = "|".join(
         literal_free_category_patterns.get(category, r"[^\s\"]+")
-        for categories in literal_free_prefix_categories.values()
-        for category, _ in sorted(categories)
+        for category, _ in sorted(all_literal_free_categories)
     )
     if literal_free_prefix:
         literal_free_prefix = rf"(?:{literal_free_prefix})|"
@@ -1893,6 +1936,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
     for name, source in sources:
+        active_nullable_categories = active_literal_free_categories(name)
         block_depth = 0
         contexts: list[tuple[str, object]] = [("code", None)]
         sanitized_lines = []
@@ -1988,7 +2032,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 elif line[cursor] == '"' and (
                     any(
                         cardinality in ("*", "?")
-                        for _, cardinality in literal_free_prefix_categories[name]
+                        for _, cardinality in active_nullable_categories
                     )
                     or interpolated_prefix.search(
                         " ".join([layout_significant_code, "".join(code_parts)])
@@ -2180,6 +2224,34 @@ def negative_tests() -> None:
             f"{label} must elaborate:\n"
             + (elaborated.stderr or elaborated.stdout).strip(),
         )
+
+    def require_lean_module_elaboration(
+        label: str, modules: list[tuple[str, str]]
+    ) -> None:
+        with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+            module_root = Path(directory)
+            environment = dict(os.environ)
+            environment["LEAN_PATH"] = (
+                str(module_root)
+                + os.pathsep
+                + environment.get("LEAN_PATH", "")
+            )
+            for module_name, source in modules:
+                module_path = module_root / f"{module_name}.lean"
+                module_path.write_text(source, encoding="utf-8")
+                elaborated = subprocess.run(
+                    [
+                        "lake", "env", "lean",
+                        "-o", str(module_root / f"{module_name}.olean"),
+                        str(module_path),
+                    ],
+                    cwd=ROOT, env=environment, text=True, capture_output=True,
+                )
+                require(
+                    elaborated.returncode == 0,
+                    f"{label} must elaborate module {module_name}:\n"
+                    + (elaborated.stderr or elaborated.stdout).strip(),
+                )
 
     invalid_entry = require_fixture("invalid-entry.yaml")
     expect_failure(
@@ -3344,6 +3416,47 @@ def negative_tests() -> None:
         "scanner repository-global nullable interpolation safe-positive was rejected",
     )
     print("safe positive accepted: nullable interpolation remains source-scoped")
+    imported_nullable_declaration = require_fixture(
+        "imported-nullable-declaration-negative.txt"
+    ).read_text(encoding="utf-8")
+    imported_nullable_consumer = require_fixture(
+        "imported-nullable-consumer-negative.txt"
+    ).read_text(encoding="utf-8")
+    require_lean_module_elaboration(
+        "scanner imported nullable interpolation mutant",
+        [
+            ("ImportedNullableDeclaration", imported_nullable_declaration),
+            ("ImportedNullableConsumer", imported_nullable_consumer),
+        ],
+    )
+    require(
+        find_proof_escapes([
+            ("ImportedNullableDeclaration.lean", imported_nullable_declaration),
+            ("ImportedNullableConsumer.lean", imported_nullable_consumer),
+        ]),
+        "scanner imported nullable interpolation mutant passed",
+    )
+    print("mutant rejected: elaborated imported nullable interpolation syntax")
+    unimported_nullable_safe_positive = (
+        imported_nullable_declaration,
+        'def inertUnimportedNullable : String := "{sorry}"\n',
+    )
+    require_lean_module_elaboration(
+        "scanner unimported nullable interpolation safe positive",
+        [
+            ("ImportedNullableDeclaration", unimported_nullable_safe_positive[0]),
+            ("UnimportedNullableSafe", unimported_nullable_safe_positive[1]),
+        ],
+    )
+    require(
+        not find_proof_escapes([
+            ("ImportedNullableDeclaration.lean",
+             unimported_nullable_safe_positive[0]),
+            ("UnimportedNullableSafe.lean", unimported_nullable_safe_positive[1]),
+        ]),
+        "scanner unimported nullable interpolation safe positive was rejected",
+    )
+    print("safe positive accepted: nullable syntax remains import-scoped")
     separated_nullable_interpolation_mutant = (
         "macro xs:ident,* value:interpolatedStr(term) : command => "
         "`(#check s!$value)\n"
