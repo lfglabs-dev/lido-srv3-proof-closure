@@ -7,7 +7,7 @@ This map compares two assurance baselines with the audited SRv3 snapshot:
 - **Certora Lido V2** (April 2023; final audited commit `e45c4d6`) — the primary StakingRouter-era baseline.
 - **Certora Lido V3 FV** (December 2025; audited commit `b98371488eb9479cf072bd6c2b682a59c5dd71d8`) — a secondary system baseline focused mainly on VaultHub/stVaults.
 - **SRv3 target** — `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
-- **Proof toolchain** — `lfglabs-dev/verity@538c4a9ce2baa25b56062bdc727eb0191ad9e67f`.
+- **Proof toolchain** — `lfglabs-dev/verity@6cfc41fe4129e2c56f130bab9617a0c677ce60ae`.
 
 Three statements must stay separate:
 

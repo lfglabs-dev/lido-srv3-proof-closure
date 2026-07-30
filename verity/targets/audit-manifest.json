@@ -3,8 +3,8 @@
   "proof_baseline": "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2",
   "source_revisions": {
     "lido": "af095e48bbc1c3841c2c9936219c8461af01056b",
-    "verity": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f",
-    "lean": "v4.24.0"
+    "verity": "6cfc41fe4129e2c56f130bab9617a0c677ce60ae",
+    "lean": "v4.31.0"
   },
   "layers": {
     "legacy": {
@@ -39,7 +39,7 @@
     {
       "name": "Quantity.saturatingSub_zero_of_le",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": ["propext", "Quot.sound"]
     },
     {
       "name": "revert_restores_state_value_and_logs",
@@ -74,7 +74,7 @@
     {
       "name": "MinFirst.candidate_router_tie",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": ["propext", "Quot.sound"]
     },
     {
       "name": "MinFirst.allocate_preserves_length",
