@@ -1,7 +1,7 @@
 PR #9 current-head P2 repair validation
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 34a305029990e9fa758f79bd6a6ff8e7f40ab2ae
+validated-tree: 14b463478cd22fc8c72dbac4d4f0bde81b4ed5e8
 
 Receipt semantics: validated-tree is the Git tree produced from the final HEAD
 index after removing only proofs/logs/pr9-validation.txt. This binds every
