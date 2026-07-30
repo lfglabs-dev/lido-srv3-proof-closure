@@ -107,6 +107,20 @@ def main():
         )
         write_json(exclusions_path, exclusions)
 
+        assumptions_path = fixture / "audit/assumptions.yaml"
+        assumptions = json.loads(assumptions_path.read_text(encoding="utf-8"))
+        for field, value in (("accepted", False), ("risk", "")):
+            malformed_assumption = copy.deepcopy(assumptions)
+            malformed_assumption["assumptions"][0][field] = value
+            write_json(assumptions_path, malformed_assumption)
+            run(
+                fixture,
+                False,
+                "generate",
+                "assumptions differ from the canonical accepted risk records",
+            )
+        write_json(assumptions_path, assumptions)
+
         guarantees_path = fixture / "audit/guarantees.yaml"
         guarantees = json.loads(guarantees_path.read_text(encoding="utf-8"))
         malformed = copy.deepcopy(guarantees)
@@ -145,12 +159,28 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        tx_mutant = copy.deepcopy(guarantees)
-        tx_mutant["guarantees"][2]["reproduction"]["command"] = (
-            "lake build LidoSRv3.Audit.Common.Atomicity"
-        )
-        write_json(guarantees_path, tx_mutant)
-        run(fixture, False, "generate")
+        for index, guarantee in enumerate(guarantees["guarantees"]):
+            command_mutant = copy.deepcopy(guarantees)
+            command_mutant["guarantees"][index]["reproduction"]["command"] = "true"
+            write_json(guarantees_path, command_mutant)
+            run(
+                fixture,
+                False,
+                "generate",
+                f"{guarantee['id']}: reproduction command differs from canonical evidence",
+            )
+        write_json(guarantees_path, guarantees)
+
+        for index, guarantee in enumerate(guarantees["guarantees"]):
+            missing_link = copy.deepcopy(guarantees)
+            missing_link["guarantees"][index]["assumptions"] = []
+            write_json(guarantees_path, missing_link)
+            run(
+                fixture,
+                False,
+                "generate",
+                f"{guarantee['id']}: assumption links differ from canonical risks",
+            )
         write_json(guarantees_path, guarantees)
 
         for blocker in baseline_lock["unavailable"]:
@@ -167,7 +197,8 @@ def main():
     print(
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
-        "status vocabulary/plane/closure, theorem, stale view"
+        "assumption records/links, reproduction evidence, "
+        "status vocabulary/plane/closure, stale view"
     )
 
 

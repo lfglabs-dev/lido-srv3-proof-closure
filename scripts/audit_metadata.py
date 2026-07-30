@@ -37,6 +37,64 @@ EXPECTED_WORDING = [
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
     "Mock-derived helper evidence is non-production evidence.",
 ]
+EXPECTED_ASSUMPTIONS = {
+    "schema": "lido-srv3-assumptions-v1",
+    "certification": {
+        "status": "DEV-431-READY",
+        "audit_cert": False,
+        "statement": "DEV-431-READY is development readiness, not AUDIT-CERT.",
+    },
+    "assumptions": [
+        {"id": "A-LEGACY-MODEL", "accepted": True,
+         "risk": "Legacy pure-model regression evidence is not source or deployed-bytecode correspondence."},
+        {"id": "A-MODEL-INPUTS", "accepted": True,
+         "risk": "Quantity bounds and units remain model inputs until source refinement is proved."},
+        {"id": "A-ABSTRACT-TX", "accepted": True,
+         "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics."},
+        {"id": "A-SOURCE-SHAPED", "accepted": True,
+         "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans."},
+        {"id": "A-HANDWRITTEN-MINFIRST", "accepted": True,
+         "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence."},
+        {"id": "A-VERITY-SCAFFOLD", "accepted": True,
+         "risk": "The Verity 4.31 scaffold is non-certified."},
+        {"id": "A-DEV-NOT-CERT", "accepted": True,
+         "risk": "DEV-431-READY is explicitly accepted as not AUDIT-CERT."},
+        {"id": "A-MULTI-NODE-TRANSPORT", "accepted": True,
+         "risk": "Multi-node certification transport is accepted as a trust and reproducibility risk; transported results require independent identity and consistency checks."},
+        {"id": "A-YUL-INTERFACE", "accepted": True,
+         "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection."},
+        {"id": "A-SHA256-FFI", "accepted": True,
+         "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk."},
+        {"id": "A-RUNTIME-PROVENANCE", "accepted": True,
+         "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."},
+    ],
+}
+EXPECTED_COMMANDS = [
+    "lake build LidoSRv3",
+    "lake build LidoSRv3.Audit.Trust",
+    "lake build LidoSRv3.Audit.Trace",
+    "lake build LidoSRv3.Audit.Allocation",
+    "lake build LidoSRv3.Audit.Vectors",
+    "python3 scripts/audit_metadata.py check",
+    "lake build",
+    "python3 scripts/audit_metadata.py check",
+    "python3 scripts/audit_metadata.py check",
+    "python3 scripts/audit_metadata.py check",
+    "python3 scripts/audit_metadata.py check",
+]
+EXPECTED_ASSUMPTION_LINKS = [
+    ["A-LEGACY-MODEL"],
+    ["A-MODEL-INPUTS"],
+    ["A-ABSTRACT-TX"],
+    ["A-SOURCE-SHAPED"],
+    ["A-HANDWRITTEN-MINFIRST"],
+    ["A-VERITY-SCAFFOLD", "A-MULTI-NODE-TRANSPORT"],
+    ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
+    ["A-YUL-INTERFACE"],
+    ["A-RUNTIME-PROVENANCE"],
+    ["A-SHA256-FFI"],
+    ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
+]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
     "exclusions": [
@@ -189,10 +247,13 @@ def validate():
             "catalogue wording changed")
     require(exclusions == EXPECTED_EXCLUSIONS,
             "exclusions differ from the canonical scope boundary set")
+    require(assumptions == EXPECTED_ASSUMPTIONS,
+            "assumptions differ from the canonical accepted risk records")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
-    for row, expected_statuses, expected_theorem_planes in zip(
-        rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES
+    for row, expected_statuses, expected_theorem_planes, expected_command, expected_links in zip(
+        rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES,
+        EXPECTED_COMMANDS, EXPECTED_ASSUMPTION_LINKS
     ):
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
         theorem_planes = row.get("theorem_planes")
@@ -219,25 +280,17 @@ def validate():
             f"{row['id']}: source assurance closure requires verified source spans",
         )
         require(row["next_gate"], f"{row['id']}: missing next gate")
-        require(row["reproduction"]["command"], f"{row['id']}: missing reproduction")
+        require(row["reproduction"]["command"] == expected_command,
+                f"{row['id']}: reproduction command differs from canonical evidence")
+        require(row["assumptions"] == expected_links,
+                f"{row['id']}: assumption links differ from canonical risks")
         require(set(row["assumptions"]) <= assumption_ids,
-                f"{row['id']}: unknown assumption")
-    tx_revert = rows[EXPECTED_IDS.index("SRV3-TX-REVERT")]
-    require(
-        tx_revert["theorem"] == "LidoSRv3.Audit.revert_restores_state_value_and_logs"
-        and tx_revert["reproduction"]["command"] == "lake build LidoSRv3.Audit.Trace",
-        "SRV3-TX-REVERT reproduction must build the module containing its named theorem",
-    )
+                f"{row['id']}: canonical assumption link is unknown")
     require([row["id"] for row in source_map["targets"]] == EXPECTED_IDS,
             "source-map targets must contain the exact ordered minimal-11 IDs")
     for row in source_map["targets"]:
         require(row["status"] == "UNMAPPED" and row["spans"] == [],
                 f"{row['id']}: source mapping must remain explicitly unmapped")
-    require(assumptions["certification"] == {
-        "status": "DEV-431-READY",
-        "audit_cert": False,
-        "statement": "DEV-431-READY is development readiness, not AUDIT-CERT.",
-    }, "certification status must remain DEV-431-READY, not AUDIT-CERT")
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")
