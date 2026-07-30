@@ -162,9 +162,54 @@ def main():
             fixture,
             False,
             "check",
-            "Lake Verity requested revision differs from the canonical dependency pin",
+            "Lake Verity pin differs from the canonical dependency pin",
         )
         write_json(lake_manifest_path, lake_manifest)
+
+        coordinated_verity_manifest = copy.deepcopy(lake_manifest)
+        verity = next(
+            package
+            for package in coordinated_verity_manifest["packages"]
+            if package["name"] == "verity"
+        )
+        verity["url"] = "https://github.com/example/verity.git"
+        verity["rev"] = "0" * 40
+        verity["inputRev"] = "0" * 40
+        coordinated_verity_lock = copy.deepcopy(baseline_lock)
+        coordinated_verity_lock["pins"]["verity"] = {
+            "repository": verity["url"],
+            "commit": verity["rev"],
+        }
+        lakefile_path = fixture / "lakefile.lean"
+        baseline_lakefile = lakefile_path.read_text(encoding="utf-8")
+        lakefile_path.write_text(
+            baseline_lakefile.replace(
+                '"https://github.com/lfglabs-dev/verity.git"@'
+                '"6cfc41fe4129e2c56f130bab9617a0c677ce60ae"',
+                f'"{verity["url"]}"@"{verity["rev"]}"',
+            ),
+            encoding="utf-8",
+        )
+        coordinated_audit_manifest = json.loads(
+            coordinated_manifest_path.read_text(encoding="utf-8")
+        )
+        coordinated_audit_manifest["source_revisions"]["verity"] = verity["rev"]
+        write_json(lake_manifest_path, coordinated_verity_manifest)
+        write_json(lock_path, coordinated_verity_lock)
+        write_json(coordinated_manifest_path, coordinated_audit_manifest)
+        run(
+            fixture,
+            False,
+            "check",
+            "Lake Verity pin differs from the canonical dependency pin",
+        )
+        write_json(lake_manifest_path, lake_manifest)
+        write_json(lock_path, baseline_lock)
+        lakefile_path.write_text(baseline_lakefile, encoding="utf-8")
+        shutil.copy2(
+            ROOT / "verity/targets/audit-manifest.json",
+            coordinated_manifest_path,
+        )
 
         stale_evmyul_input = copy.deepcopy(lake_manifest)
         evmyul = next(

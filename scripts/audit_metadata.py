@@ -208,6 +208,8 @@ CAMPAIGN_BASE = {
 }
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
+CANONICAL_VERITY_REPOSITORY = "https://github.com/lfglabs-dev/verity.git"
+CANONICAL_VERITY_COMMIT = "6cfc41fe4129e2c56f130bab9617a0c677ce60ae"
 CANONICAL_EVMYULLEAN_REPOSITORY = "https://github.com/lfglabs-dev/EVMYulLean.git"
 CANONICAL_EVMYULLEAN_COMMIT = "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
@@ -416,6 +418,13 @@ def validate_lock(lock, source_map):
             "source-map Lido pin differs from the canonical source commit")
     require(toolchain == CANONICAL_LEAN_TOOLCHAIN,
             "lean-toolchain must use the canonical Lean 4.31 toolchain")
+    verity = manifest_package(manifest, "verity")
+    require(
+        verity["url"] == CANONICAL_VERITY_REPOSITORY
+        and verity["rev"] == CANONICAL_VERITY_COMMIT
+        and verity["inputRev"] == CANONICAL_VERITY_COMMIT,
+        "Lake Verity pin differs from the canonical dependency pin",
+    )
 
     expected_pins = {
         "lido_core": {
@@ -423,8 +432,8 @@ def validate_lock(lock, source_map):
             "commit": lido_commit,
         },
         "verity": {
-            "repository": manifest_package(manifest, "verity")["url"],
-            "commit": manifest_package(manifest, "verity")["rev"],
+            "repository": CANONICAL_VERITY_REPOSITORY,
+            "commit": CANONICAL_VERITY_COMMIT,
         },
         "evmyullean": {
             "repository": CANONICAL_EVMYULLEAN_REPOSITORY,
@@ -438,10 +447,9 @@ def validate_lock(lock, source_map):
     }
     require(lock.get("pins") == expected_pins,
             "artifacts.lock.json pins differ from source-map/toolchain/Lake authorities")
-    verity = expected_pins["verity"]
     require(audit_manifest["source_revisions"]["lido"] == lido_commit,
             "source-map Lido pin differs from verity target audit manifest")
-    require(audit_manifest["source_revisions"]["verity"] == verity["commit"],
+    require(audit_manifest["source_revisions"]["verity"] == CANONICAL_VERITY_COMMIT,
             "Lake Verity pin differs from verity target audit manifest")
     lean_revision = toolchain.rsplit(":", 1)[-1]
     require(audit_manifest["source_revisions"]["lean"] == lean_revision,
@@ -464,12 +472,8 @@ def validate_lock(lock, source_map):
     require(audit_manifest.get("theorems") == EXPECTED_MANIFEST_THEOREMS,
             "audit manifest theorem ledger differs from the canonical records")
     require(
-        f'"{verity["repository"]}"@"{verity["commit"]}"' in lakefile,
-        "lakefile.lean Verity pin differs from lake-manifest.json",
-    )
-    require(
-        manifest_package(manifest, "verity")["inputRev"] == verity["commit"],
-        "Lake Verity requested revision differs from the canonical dependency pin",
+        f'"{CANONICAL_VERITY_REPOSITORY}"@"{CANONICAL_VERITY_COMMIT}"' in lakefile,
+        "lakefile.lean Verity pin differs from the canonical dependency pin",
     )
 
     require(lock.get("campaign_base") == CAMPAIGN_BASE,
