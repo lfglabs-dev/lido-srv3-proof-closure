@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run(root, expected_success, command="check"):
+def run(root, expected_success, command="check", expected_error=None):
     env = dict(os.environ, PYTHONOPTIMIZE="1")
     result = subprocess.run(
         ["python3", "scripts/audit_metadata.py", command],
@@ -24,6 +24,11 @@ def run(root, expected_success, command="check"):
     if (result.returncode == 0) != expected_success:
         raise RuntimeError(
             f"unexpected audit result ({result.returncode}):\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+    if expected_error is not None and expected_error not in result.stderr:
+        raise RuntimeError(
+            f"missing expected error {expected_error!r}:\n"
             f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
         )
 
@@ -100,7 +105,12 @@ def main():
         wrong_plane = copy.deepcopy(guarantees)
         wrong_plane["guarantees"][0]["statuses"]["evm"] = "LEAN_CHECKED"
         write_json(guarantees_path, wrong_plane)
-        run(fixture, False, "generate")
+        run(
+            fixture,
+            False,
+            "generate",
+            "evm status LEAN_CHECKED requires theorem evidence for that plane",
+        )
         write_json(guarantees_path, guarantees)
 
         tx_mutant = copy.deepcopy(guarantees)

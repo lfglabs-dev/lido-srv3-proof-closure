@@ -62,6 +62,19 @@ EXPECTED_STATUSES = [
     {"model": "OPEN", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
 ]
+EXPECTED_THEOREM_PLANES = [
+    ["model"],
+    ["model"],
+    ["model", "tx"],
+    ["model"],
+    ["model"],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
     "BLOCKED",
@@ -160,15 +173,26 @@ def validate():
             "catalogue wording changed")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
-    for row, expected_statuses in zip(rows, EXPECTED_STATUSES):
+    for row, expected_statuses, expected_theorem_planes in zip(
+        rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES
+    ):
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
-        require(row["statuses"] == expected_statuses,
-                f"{row['id']}: assurance statuses differ from canonical claims")
+        theorem_planes = row.get("theorem_planes")
+        require(theorem_planes == expected_theorem_planes,
+                f"{row['id']}: theorem planes differ from canonical evidence")
+        require(len(theorem_planes) == len(set(theorem_planes))
+                and set(theorem_planes) <= PLANES,
+                f"{row['id']}: invalid theorem evidence plane")
+        require(bool(row["theorem"]) == bool(theorem_planes),
+                f"{row['id']}: theorem and theorem planes must be declared together")
         for plane, status in row["statuses"].items():
             require(status in STATUS_VALUES,
                     f"{row['id']}: invalid {plane} assurance status: {status}")
-            require(status not in THEOREM_BACKED_STATUSES or row["theorem"],
-                    f"{row['id']}: {plane} status {status} requires a named theorem")
+            require(status not in THEOREM_BACKED_STATUSES or plane in theorem_planes,
+                    f"{row['id']}: {plane} status {status} requires theorem evidence "
+                    "for that plane")
+        require(row["statuses"] == expected_statuses,
+                f"{row['id']}: assurance statuses differ from canonical claims")
         source_status = row["statuses"]["source"]
         mapping = source_targets[row["id"]]
         require(
