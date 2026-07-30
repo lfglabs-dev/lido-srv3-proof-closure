@@ -67,6 +67,11 @@
       "axioms": ["propext"]
     },
     {
+      "name": "MinFirst.candidate_none_no_open",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
       "name": "MinFirst.candidate_minimal",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
@@ -77,12 +82,57 @@
       "axioms": ["propext", "Quot.sound"]
     },
     {
+      "name": "MinFirst.incrementSelected_moduleId",
+      "status": "lean_checked",
+      "axioms": []
+    },
+    {
+      "name": "MinFirst.incrementSelected_active",
+      "status": "lean_checked",
+      "axioms": []
+    },
+    {
+      "name": "MinFirst.incrementSelected_monotone",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "MinFirst.incrementSelected_eq_of_ne",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "MinFirst.step_preserves_length",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "MinFirst.step_preserves_module_order",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "MinFirst.loop_preserves_length",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "MinFirst.loop_preserves_module_order",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
       "name": "MinFirst.allocate_preserves_length",
       "status": "lean_checked",
       "axioms": ["propext"]
     },
     {
       "name": "MinFirst.allocate_preserves_module_order",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "MinFirst.run_spent_le",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
     },
