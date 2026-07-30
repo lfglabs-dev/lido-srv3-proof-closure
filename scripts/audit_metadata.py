@@ -7,7 +7,6 @@ authority; the script only checks and renders declared structured metadata.
 
 import argparse
 import json
-import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +38,23 @@ EXPECTED_WORDING = [
     "Mock-derived helper evidence is non-production evidence.",
 ]
 PLANES = {"model", "source", "tx", "yul", "evm", "crypto"}
+STATUS_VALUES = {
+    "ABSTRACT_LEAN_CHECKED",
+    "BLOCKED",
+    "DEV-431-READY",
+    "LEAN_CHECKED",
+    "NOT_APPLICABLE",
+    "OPEN",
+    "REGRESSION",
+    "STRETCH_OPAQUE_FFI",
+}
+THEOREM_BACKED_STATUSES = {"ABSTRACT_LEAN_CHECKED", "LEAN_CHECKED", "REGRESSION"}
+SOURCE_CLOSURE_STATUSES = THEOREM_BACKED_STATUSES | {"AUDIT-CERT"}
+CAMPAIGN_BASE = {
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "ref": "campaign/lido-minimal-11",
+    "commit": "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1",
+}
 VIEWS = ("ROADMAP.md", "STATUS.md", "REPRODUCE.md")
 
 
@@ -49,15 +65,6 @@ def load(name):
 def require(condition, message):
     if not condition:
         raise ValueError(message)
-
-
-def git_output(*args):
-    return subprocess.run(
-        ["git", "-C", str(ROOT), *args],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
 
 
 def manifest_package(manifest, name):
@@ -102,28 +109,8 @@ def validate_lock(lock, source_map):
         "lakefile.lean Verity pin differs from lake-manifest.json",
     )
 
-    base = lock.get("campaign_base")
-    require(isinstance(base, dict), "artifacts.lock.json: missing campaign_base")
-    ref = base.get("ref")
-    require(ref == "campaign/lido-minimal-11",
-            "artifacts.lock.json: unexpected campaign_base ref")
-    remote = git_output("remote", "get-url", "origin")
-    require(base.get("repository") == remote,
-            "artifacts.lock.json: campaign_base repository differs from origin")
-    candidates = (f"refs/remotes/origin/{ref}", ref)
-    resolved = None
-    for candidate in candidates:
-        result = subprocess.run(
-            ["git", "-C", str(ROOT), "rev-parse", "--verify", f"{candidate}^{{commit}}"],
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode == 0:
-            resolved = result.stdout.strip()
-            break
-    require(resolved is not None, f"campaign base ref is unavailable locally: {ref}")
-    require(base.get("commit") == resolved,
-            "artifacts.lock.json: campaign_base commit differs from checked-out base")
+    require(lock.get("campaign_base") == CAMPAIGN_BASE,
+            "artifacts.lock.json campaign_base differs from canonical campaign authority")
 
 
 def validate():
@@ -138,8 +125,21 @@ def validate():
     require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
             "catalogue wording changed")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
+    source_targets = {row["id"]: row for row in source_map["targets"]}
     for row in rows:
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
+        for plane, status in row["statuses"].items():
+            require(status in STATUS_VALUES,
+                    f"{row['id']}: invalid {plane} assurance status: {status}")
+            require(status not in THEOREM_BACKED_STATUSES or row["theorem"],
+                    f"{row['id']}: {plane} status {status} requires a named theorem")
+        source_status = row["statuses"]["source"]
+        mapping = source_targets[row["id"]]
+        require(
+            source_status not in SOURCE_CLOSURE_STATUSES
+            or (mapping["status"] == "MAPPED" and mapping["spans"]),
+            f"{row['id']}: source assurance closure requires verified source spans",
+        )
         require(row["next_gate"], f"{row['id']}: missing next gate")
         require(row["reproduction"]["command"], f"{row['id']}: missing reproduction")
         require(set(row["assumptions"]) <= assumption_ids,

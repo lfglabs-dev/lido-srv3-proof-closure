@@ -12,10 +12,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run(root, expected_success):
+def run(root, expected_success, command="check"):
     env = dict(os.environ, PYTHONOPTIMIZE="1")
     result = subprocess.run(
-        ["python3", "scripts/audit_metadata.py", "check"],
+        ["python3", "scripts/audit_metadata.py", command],
         cwd=root,
         env=env,
         capture_output=True,
@@ -45,38 +45,10 @@ def main():
             fixture / "verity/targets/audit-manifest.json",
         )
 
-        subprocess.run(["git", "init", "-q"], cwd=fixture, check=True)
-        subprocess.run(
-            ["git", "remote", "add", "origin",
-             "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git"],
-            cwd=fixture,
-            check=True,
-        )
-        subprocess.run(["git", "add", "."], cwd=fixture, check=True)
-        subprocess.run(
-            ["git", "-c", "user.name=Audit Test", "-c", "user.email=audit@example.invalid",
-             "commit", "-qm", "fixture"],
-            cwd=fixture,
-            check=True,
-        )
-        head = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=fixture,
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-        subprocess.run(
-            ["git", "branch", "campaign/lido-minimal-11", head],
-            cwd=fixture,
-            check=True,
-        )
-
         lock_path = fixture / "audit/artifacts.lock.json"
         lock = json.loads(lock_path.read_text(encoding="utf-8"))
-        lock["campaign_base"]["commit"] = head
-        write_json(lock_path, lock)
         baseline_lock = copy.deepcopy(lock)
+        # A source archive has no .git directory, remote, or branch refs.
         run(fixture, True)
 
         lock_leaves = [
@@ -103,7 +75,26 @@ def main():
         malformed = copy.deepcopy(guarantees)
         malformed["guarantees"][0]["statuses"].pop("crypto")
         write_json(guarantees_path, malformed)
-        run(fixture, False)
+        run(fixture, False, "generate")
+        write_json(guarantees_path, guarantees)
+
+        for status in ("AUDIT-CERT", "TYPO"):
+            invalid_status = copy.deepcopy(guarantees)
+            invalid_status["guarantees"][5]["statuses"]["source"] = status
+            write_json(guarantees_path, invalid_status)
+            run(fixture, False, "generate")
+        write_json(guarantees_path, guarantees)
+
+        unmapped_closure = copy.deepcopy(guarantees)
+        unmapped_closure["guarantees"][0]["statuses"]["source"] = "LEAN_CHECKED"
+        write_json(guarantees_path, unmapped_closure)
+        run(fixture, False, "generate")
+        write_json(guarantees_path, guarantees)
+
+        unbacked = copy.deepcopy(guarantees)
+        unbacked["guarantees"][5]["statuses"]["model"] = "LEAN_CHECKED"
+        write_json(guarantees_path, unbacked)
+        run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
         tx_mutant = copy.deepcopy(guarantees)
@@ -111,14 +102,17 @@ def main():
             "lake build LidoSRv3.Audit.Common.Atomicity"
         )
         write_json(guarantees_path, tx_mutant)
-        run(fixture, False)
+        run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
         reproduce_path = fixture / "audit/REPRODUCE.md"
         reproduce_path.write_text("stale\n", encoding="utf-8")
         run(fixture, False)
 
-    print("optimized audit metadata mutants rejected: all pins/base, status, theorem, stale view")
+    print(
+        "optimized audit metadata mutants rejected: "
+        "all pins/base, status vocabulary/closure, theorem, stale view"
+    )
 
 
 if __name__ == "__main__":
