@@ -1601,6 +1601,44 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         r'(?P<parser>[\s\S]*?)\binterpolatedStr(?:\([^)]*\))?',
         re.DOTALL,
     )
+
+    def without_lean_comments(text: str) -> str:
+        """Replace nested block and line comments with whitespace."""
+        uncommented = []
+        cursor = 0
+        block_depth = 0
+        while cursor < len(text):
+            if block_depth:
+                if text.startswith("/-", cursor):
+                    block_depth += 1
+                    uncommented.extend("  ")
+                    cursor += 2
+                elif text.startswith("-/", cursor):
+                    block_depth -= 1
+                    uncommented.extend("  ")
+                    cursor += 2
+                else:
+                    uncommented.append(
+                        text[cursor] if text[cursor] in "\r\n" else " "
+                    )
+                    cursor += 1
+            elif text.startswith("/-", cursor):
+                block_depth = 1
+                uncommented.extend("  ")
+                cursor += 2
+            elif text.startswith("--", cursor):
+                line_end = text.find("\n", cursor)
+                if line_end == -1:
+                    uncommented.extend(" " * (len(text) - cursor))
+                    cursor = len(text)
+                else:
+                    uncommented.extend(" " * (line_end - cursor))
+                    cursor = line_end
+            else:
+                uncommented.append(text[cursor])
+                cursor += 1
+        return "".join(uncommented)
+
     for _, source in sources:
         for declaration in layout_command_spans(
             source, ("syntax", "macro", "set_option")
@@ -1612,10 +1650,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     r'"(?:\\.|[^"\\])*"', interpolation_match.group("parser")
                 ) is None
             ):
-                parser = interpolation_match.group("parser")
+                parser = without_lean_comments(
+                    interpolation_match.group("parser")
+                )
                 categories = re.findall(
                     r"(?:[A-Za-z_][\w']*|«[^»\r\n]+»)[ \t]*:[ \t]*"
-                    r"\(?[ \t]*([A-Za-z_][\w']*)[ \t]*\)?[ \t]*([*?+]?)",
+                    r"\(?[ \t]*([A-Za-z_][\w']*)[ \t]*\)?[ \t]*"
+                    r",?[ \t]*([*?+]?)",
                     parser,
                 )
                 literal_free_prefix_categories.add(
@@ -2792,6 +2833,40 @@ def negative_tests() -> None:
             f"mutant rejected: elaborated nullable {cardinality} "
             "interpolation syntax"
         )
+    commented_nullable_interpolation_mutant = (
+        "macro xs:ident /- outer /- nested -/ trivia -/ * "
+        "value:interpolatedStr(term) : command => `(#check s!$value)\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require_lean_elaboration(
+        "scanner commented nullable interpolation mutant",
+        commented_nullable_interpolation_mutant,
+    )
+    require(
+        find_proof_escapes([
+            ("commented-nullable-interpolation.lean",
+             commented_nullable_interpolation_mutant)
+        ]),
+        "scanner commented nullable interpolation mutant passed",
+    )
+    print("mutant rejected: elaborated commented nullable interpolation syntax")
+    separated_nullable_interpolation_mutant = (
+        "macro xs:ident,* value:interpolatedStr(term) : command => "
+        "`(#check s!$value)\n"
+        '"{(sorry : Nat)}"\n'
+    )
+    require_lean_elaboration(
+        "scanner separator-repetition interpolation mutant",
+        separated_nullable_interpolation_mutant,
+    )
+    require(
+        find_proof_escapes([
+            ("separator-repetition-interpolation.lean",
+             separated_nullable_interpolation_mutant)
+        ]),
+        "scanner separator-repetition interpolation mutant passed",
+    )
+    print("mutant rejected: elaborated separator-repetition interpolation syntax")
     nonnullable_interpolation_safe_positive = (
         "macro xs:ident+ "
         "value:interpolatedStr(term) : command => `(#check s!$value)\n"
@@ -2807,6 +2882,22 @@ def negative_tests() -> None:
              nonnullable_interpolation_safe_positive)
         ]),
         "scanner nonnullable interpolation safe positive was rejected",
+    )
+    separated_nonnullable_interpolation_safe_positive = (
+        "macro xs:ident,+ "
+        "value:interpolatedStr(term) : command => `(#check s!$value)\n"
+        'def separatedInterpolationExample := "{(sorry : Nat)}"\n'
+    )
+    require_lean_elaboration(
+        "scanner separated nonnullable interpolation safe positive",
+        separated_nonnullable_interpolation_safe_positive,
+    )
+    require(
+        not find_proof_escapes([
+            ("separated-nonnullable-interpolation-safe.lean",
+             separated_nonnullable_interpolation_safe_positive)
+        ]),
+        "scanner separated nonnullable interpolation safe positive was rejected",
     )
     noncomputable_opaque_mutant = "noncomputable opaque hidden : Nat\n"
     require(
