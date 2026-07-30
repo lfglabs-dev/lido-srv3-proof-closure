@@ -1525,7 +1525,8 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
 def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     patterns = re.compile(
         r"(?<![\w'])(sorryAx|sorry|admit|axiom|constant|unsafe|native_decide|"
-        r"implemented_by|extern)(?![\w'])"
+        r"implemented_by|extern|addDecl|addAndCompile|addDeclCore|mkDecl|"
+        r"axiomDecl|opaqueDecl|thmDecl)(?![\w'])"
     )
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
@@ -1668,7 +1669,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 violations.append(f"{name}:{number}:{line.strip()}")
         sanitized = "\n".join(sanitized_lines)
         for macro_opaque in re.finditer(
-            r"`\([ \t\r\n]*(?:(?:private|protected)[ \t\r\n]+)*opaque\b",
+            r"`\([ \t\r\n]*(?:@\[[\s\S]*?\][ \t\r\n]*)*"
+            r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
+            r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
+            r"(?:(?:private|protected)[ \t\r\n]+)*opaque\b",
             sanitized,
         ):
             line_number = sanitized.count("\n", 0, macro_opaque.start()) + 1
@@ -2551,6 +2555,43 @@ def negative_tests() -> None:
         "scanner macro-generated bodyless opaque mutant passed",
     )
     print("mutant rejected: macro-generated bodyless opaque")
+    wrapped_macro_generated_opaque_mutant = (
+        'macro "mkBad " n:ident : command => `(\n'
+        "  set_option autoImplicit false in\n"
+        "  set_option pp.universes true in\n"
+        "  @[deprecated \"hidden\"] private opaque $n : False)\n"
+        "mkBad hidden\n"
+    )
+    require(
+        find_proof_escapes([
+            ("wrapped-macro-generated-bodyless-opaque.lean",
+             wrapped_macro_generated_opaque_mutant)
+        ]),
+        "scanner wrapped macro-generated bodyless opaque mutant passed",
+    )
+    print("mutant rejected: wrapped macro-generated bodyless opaque")
+    elaborator_generated_axiom_mutant = (
+        "import Lean\n"
+        "open Lean Elab Command\n"
+        'syntax "injectBad" : command\n'
+        "elab_rules : command\n"
+        "  | `(injectBad) => do\n"
+        "      liftCoreM <| addDecl <| Declaration.axiomDecl {\n"
+        "        name := `hidden\n"
+        "        levelParams := []\n"
+        "        type := mkConst ``False\n"
+        "        isUnsafe := false\n"
+        "      }\n"
+        "injectBad\n"
+    )
+    require(
+        find_proof_escapes([
+            ("elaborator-generated-axiom.lean",
+             elaborator_generated_axiom_mutant)
+        ]),
+        "scanner elaborator-generated axiom mutant passed",
+    )
+    print("mutant rejected: elaborator-generated axiom")
     legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
