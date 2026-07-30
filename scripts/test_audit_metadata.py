@@ -167,8 +167,21 @@ def main():
                 fixture,
                 False,
                 "generate",
-                f"{guarantee['id']}: reproduction command differs from canonical evidence",
+                f"{guarantee['id']}: reproduction record differs from canonical evidence",
             )
+        write_json(guarantees_path, guarantees)
+
+        expected_mutant = copy.deepcopy(guarantees)
+        expected_mutant["guarantees"][5]["reproduction"]["expected"] = (
+            "certified source correspondence"
+        )
+        write_json(guarantees_path, expected_mutant)
+        run(
+            fixture,
+            False,
+            "generate",
+            "SRV3-SOLIDITY-CORR: reproduction record differs from canonical evidence",
+        )
         write_json(guarantees_path, guarantees)
 
         for index, guarantee in enumerate(guarantees["guarantees"]):
@@ -189,6 +202,19 @@ def main():
             write_json(lock_path, missing_blocker)
             run(fixture, False, "generate")
         write_json(lock_path, baseline_lock)
+
+        blocker_mutant = copy.deepcopy(source_map)
+        blocker_mutant["targets"][8]["blocker"] = (
+            "Canonical production runtime independently verified."
+        )
+        write_json(source_map_path, blocker_mutant)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source-map targets differ from canonical blocker records",
+        )
+        write_json(source_map_path, source_map)
 
         reproduce_path = fixture / "audit/REPRODUCE.md"
         reproduce_path.write_text("stale\n", encoding="utf-8")

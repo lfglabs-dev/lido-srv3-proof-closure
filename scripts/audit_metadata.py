@@ -69,18 +69,29 @@ EXPECTED_ASSUMPTIONS = {
          "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."},
     ],
 }
-EXPECTED_COMMANDS = [
-    "lake build LidoSRv3",
-    "lake build LidoSRv3.Audit.Trust",
-    "lake build LidoSRv3.Audit.Trace",
-    "lake build LidoSRv3.Audit.Allocation",
-    "lake build LidoSRv3.Audit.Vectors",
-    "python3 scripts/audit_metadata.py check",
-    "lake build",
-    "python3 scripts/audit_metadata.py check",
-    "python3 scripts/audit_metadata.py check",
-    "python3 scripts/audit_metadata.py check",
-    "python3 scripts/audit_metadata.py check",
+EXPECTED_REPRODUCTION = [
+    {"command": "lake build LidoSRv3",
+     "expected": "successful Lean build; model layer only"},
+    {"command": "lake build LidoSRv3.Audit.Trust",
+     "expected": "successful Lean build and declared axiom report"},
+    {"command": "lake build LidoSRv3.Audit.Trace",
+     "expected": "successful Lean build of the module containing the named rollback theorem"},
+    {"command": "lake build LidoSRv3.Audit.Allocation",
+     "expected": "successful Lean build; relational model only"},
+    {"command": "lake build LidoSRv3.Audit.Vectors",
+     "expected": "successful theorem and falsifier-vector build"},
+    {"command": "python3 scripts/audit_metadata.py check",
+     "expected": "metadata consistency only; no source theorem"},
+    {"command": "lake build",
+     "expected": "active Lean 4.31 dependency graph builds; not certification"},
+    {"command": "python3 scripts/audit_metadata.py check",
+     "expected": "pin and blocker validation only; no Yul theorem"},
+    {"command": "python3 scripts/audit_metadata.py check",
+     "expected": "MISSING provenance remains explicit and fails semantic closure"},
+    {"command": "python3 scripts/audit_metadata.py check",
+     "expected": "opaque FFI risk remains recorded; no crypto closure"},
+    {"command": "python3 scripts/audit_metadata.py check",
+     "expected": "E2E remains blocked; metadata cannot discharge dependencies"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL"],
@@ -164,6 +175,7 @@ CAMPAIGN_BASE = {
     "ref": "campaign/lido-minimal-11",
     "commit": "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1",
 }
+CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
     for name in (
@@ -174,6 +186,30 @@ REQUIRED_UNAVAILABLE = {
         "sha256_ffi_implementation_identity",
     )
 }
+EXPECTED_SOURCE_TARGETS = [
+    {"id": "SRV3-LEGACY-ECON", "status": "UNMAPPED", "spans": [],
+     "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-ARITH-CHECKED", "status": "UNMAPPED", "spans": [],
+     "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-TX-REVERT", "status": "UNMAPPED", "spans": [],
+     "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-ALLOC-ORDER", "status": "UNMAPPED", "spans": [],
+     "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-MINFIRST-BOUND", "status": "UNMAPPED", "spans": [],
+     "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-SOLIDITY-CORR", "status": "UNMAPPED", "spans": [],
+     "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-VERITY-431", "status": "UNMAPPED", "spans": [],
+     "blocker": "Toolchain item; no independently verified Lido source span."},
+    {"id": "SRV3-YUL-COMP", "status": "UNMAPPED", "spans": [],
+     "blocker": "No independently verified pinned-source span in this bootstrap."},
+    {"id": "SRV3-EVM-RUNTIME", "status": "UNMAPPED", "spans": [],
+     "blocker": "Canonical runtime provenance is MISSING."},
+    {"id": "SRV3-SHA256-PRECOMPILE", "status": "UNMAPPED", "spans": [],
+     "blocker": "Opaque native FFI identity is MISSING."},
+    {"id": "SRV3-CONSOLIDATION-E2E", "status": "UNMAPPED", "spans": [],
+     "blocker": "Canonical runtime/codehash/fork/address provenance is MISSING."},
+]
 VIEWS = ("ROADMAP.md", "STATUS.md", "REPRODUCE.md")
 
 
@@ -199,13 +235,15 @@ def validate_lock(lock, source_map):
     )
     toolchain = (ROOT / "lean-toolchain").read_text(encoding="utf-8").strip()
     lakefile = (ROOT / "lakefile.lean").read_text(encoding="utf-8")
-    lido_repository, lido_commit = source_map["pinned_source"].split("@", 1)
-    require(lido_repository == "lidofinance/core",
+    lido_source_repository, lido_commit = source_map["pinned_source"].split("@", 1)
+    require(lido_source_repository == "lidofinance/core",
             "source-map pinned_source must use the canonical lidofinance/core repository")
-    lido_repository = f"https://github.com/{lido_repository}.git"
 
     expected_pins = {
-        "lido_core": {"repository": lido_repository, "commit": lido_commit},
+        "lido_core": {
+            "repository": CANONICAL_LIDO_REPOSITORY,
+            "commit": lido_commit,
+        },
         "verity": {
             "repository": manifest_package(manifest, "verity")["url"],
             "commit": manifest_package(manifest, "verity")["rev"],
@@ -251,9 +289,9 @@ def validate():
             "assumptions differ from the canonical accepted risk records")
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
-    for row, expected_statuses, expected_theorem_planes, expected_command, expected_links in zip(
+    for row, expected_statuses, expected_theorem_planes, expected_reproduction, expected_links in zip(
         rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES,
-        EXPECTED_COMMANDS, EXPECTED_ASSUMPTION_LINKS
+        EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS
     ):
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
         theorem_planes = row.get("theorem_planes")
@@ -280,17 +318,14 @@ def validate():
             f"{row['id']}: source assurance closure requires verified source spans",
         )
         require(row["next_gate"], f"{row['id']}: missing next gate")
-        require(row["reproduction"]["command"] == expected_command,
-                f"{row['id']}: reproduction command differs from canonical evidence")
+        require(row["reproduction"] == expected_reproduction,
+                f"{row['id']}: reproduction record differs from canonical evidence")
         require(row["assumptions"] == expected_links,
                 f"{row['id']}: assumption links differ from canonical risks")
         require(set(row["assumptions"]) <= assumption_ids,
                 f"{row['id']}: canonical assumption link is unknown")
-    require([row["id"] for row in source_map["targets"]] == EXPECTED_IDS,
-            "source-map targets must contain the exact ordered minimal-11 IDs")
-    for row in source_map["targets"]:
-        require(row["status"] == "UNMAPPED" and row["spans"] == [],
-                f"{row['id']}: source mapping must remain explicitly unmapped")
+    require(source_map["targets"] == EXPECTED_SOURCE_TARGETS,
+            "source-map targets differ from canonical blocker records")
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")
