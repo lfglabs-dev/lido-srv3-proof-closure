@@ -1,0 +1,7 @@
+namespace ScopedDecl
+
+set_option hygiene false in scoped macro
+  xs:ident* value:interpolatedStr(term) : command =>
+  `(example : True := by trivial)
+
+end ScopedDecl

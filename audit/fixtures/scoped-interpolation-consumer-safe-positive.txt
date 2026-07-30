@@ -1,0 +1,3 @@
+import ScopedDecl
+
+def inertScopedInterpolation : String := "{sorry}"

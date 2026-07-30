@@ -1,0 +1,5 @@
+import ScopedDecl
+
+open scoped ScopedDecl
+
+"{(sorry : Nat)}"

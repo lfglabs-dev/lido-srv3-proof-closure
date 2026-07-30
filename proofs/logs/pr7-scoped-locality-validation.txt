@@ -1,0 +1,22 @@
+PR #7 scoped-locality repair validation
+before=dca38571e15a02d2f7634fed7b24299ab0fabf8f
+
+preflight:
+  gh pr view 7 --json headRefOid => dca38571e15a02d2f7634fed7b24299ab0fabf8f
+  df -h /workspaces => /dev/md3 3.7T 1.1T 2.5T 31%
+  df -ih /workspaces => /dev/md3 239M 13M 226M 6%
+
+commands:
+  python3 scripts/audit_registry.py generate => exit 0 (generated views unchanged)
+  python3 scripts/audit_registry.py check => exit 0
+  python3 scripts/audit_registry.py test-negative => exit 0
+  make test => exit 0
+  lake build LidoSRv3 => exit 0 (26 jobs)
+  python3 scripts/audit_registry.py check-lean => exit 0
+  lake env lean LidoSRv3/Audit/Trust.lean => exit 0
+  changed-file proof-escape token scan => expected fixture/scanner-test hits only
+  git diff --check => exit 0
+
+environment:
+  Lean commands ran locally with SPARK_OFFLOAD_* unset because the remote
+  offloader returned exit 126 for /root/.elan/bin/lake.

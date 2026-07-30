@@ -1788,6 +1788,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     exported_literal_free_prefix_categories: dict[
         str, set[tuple[str, str]]
     ] = defaultdict(set)
+    scoped_literal_free_prefix_categories: dict[
+        str, dict[str, set[tuple[str, str]]]
+    ] = defaultdict(lambda: defaultdict(set))
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
         r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
@@ -1837,10 +1840,28 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 cursor += 1
         return "".join(uncommented)
 
+    def namespace_at(source: str, offset: int) -> str:
+        namespaces: list[str] = []
+        for line in without_lean_comments(source[:offset]).splitlines():
+            namespace_match = re.match(
+                r"^[ \t]*namespace[ \t]+([A-Za-z_][\w']*)[ \t]*$", line
+            )
+            if namespace_match is not None:
+                namespaces.append(namespace_match.group(1))
+            elif re.match(r"^[ \t]*end(?:[ \t]+[A-Za-z_][\w']*)?[ \t]*$", line):
+                if namespaces:
+                    namespaces.pop()
+        return ".".join(namespaces)
+
     for source_name, source in sources:
+        declaration_cursor = 0
         for declaration in layout_command_spans(
             source, ("syntax", "macro", "set_option")
         ):
+            declaration_offset = source.find(declaration, declaration_cursor)
+            if declaration_offset == -1:
+                declaration_offset = source.find(declaration)
+            declaration_cursor = declaration_offset + len(declaration)
             interpolation_match = interpolation_declaration.search(declaration)
             if (
                 interpolation_match is not None
@@ -1858,7 +1879,6 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     parser,
                 )
                 category = categories[0] if categories else ("unknown", "")
-                own_literal_free_prefix_categories[source_name].add(category)
                 declaration_start = without_lean_comments(declaration)
                 local_declaration = re.match(
                     r"^[ \t\r\n]*"
@@ -1868,8 +1888,28 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     r"local\b",
                     declaration_start,
                 )
-                if local_declaration is None:
-                    exported_literal_free_prefix_categories[source_name].add(category)
+                if local_declaration is not None:
+                    own_literal_free_prefix_categories[source_name].add(category)
+                else:
+                    scoped_declaration = re.match(
+                        r"^[ \t\r\n]*"
+                        r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
+                        r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
+                        r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*"
+                        r"scoped\b",
+                        declaration_start,
+                    )
+                    if scoped_declaration is None:
+                        own_literal_free_prefix_categories[source_name].add(category)
+                        exported_literal_free_prefix_categories[source_name].add(
+                            category
+                        )
+                    else:
+                        scope = namespace_at(source, declaration_offset)
+                        if scope:
+                            scoped_literal_free_prefix_categories[source_name][
+                                scope
+                            ].add(category)
             for match in syntax_interpolation.finditer(declaration):
                 try:
                     prefix = json.loads(f'"{match.group(1)}"')
@@ -1913,9 +1953,27 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         }
         for source_name, source in sources
     }
+    opened_scopes = {
+        source_name: {
+            scope
+            for line in without_lean_comments(source).splitlines()
+            for match in [
+                re.match(r"^[ \t]*open[ \t]+scoped[ \t]+(.+?)[ \t]*$", line)
+            ]
+            if match is not None
+            for scope in re.findall(
+                r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*", match.group(1)
+            )
+        }
+        for source_name, source in sources
+    }
 
     def active_literal_free_categories(source_name: str) -> set[tuple[str, str]]:
         active = set(own_literal_free_prefix_categories[source_name])
+        for scope in opened_scopes.get(source_name, set()):
+            active.update(
+                scoped_literal_free_prefix_categories[source_name].get(scope, set())
+            )
         pending = list(imports.get(source_name, set()))
         visited = set()
         while pending:
@@ -1925,6 +1983,12 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             visited.add(imported)
             imported_source = modules[imported]
             active.update(exported_literal_free_prefix_categories[imported_source])
+            for scope in opened_scopes.get(source_name, set()):
+                active.update(
+                    scoped_literal_free_prefix_categories[imported_source].get(
+                        scope, set()
+                    )
+                )
             pending.extend(imports.get(imported_source, set()))
         return active
 
@@ -3490,6 +3554,38 @@ def negative_tests() -> None:
         "scanner set_option-wrapped local interpolation leaked through import",
     )
     print("safe positive accepted: set_option-wrapped local syntax is not exported")
+    scoped_declaration = require_fixture(
+        "scoped-interpolation-declaration.txt"
+    ).read_text(encoding="utf-8")
+    scoped_consumer = require_fixture(
+        "scoped-interpolation-consumer-safe-positive.txt"
+    ).read_text(encoding="utf-8")
+    scoped_open_consumer = require_fixture(
+        "scoped-interpolation-consumer-negative.txt"
+    ).read_text(encoding="utf-8")
+    require_lean_module_elaboration(
+        "scanner scoped interpolation activation",
+        [
+            ("ScopedDecl", scoped_declaration),
+            ("ScopedConsumer", scoped_consumer),
+            ("ScopedOpenConsumer", scoped_open_consumer),
+        ],
+    )
+    require(
+        not find_proof_escapes([
+            ("ScopedDecl.lean", scoped_declaration),
+            ("ScopedConsumer.lean", scoped_consumer),
+        ]),
+        "scanner activated scoped interpolation without open scoped",
+    )
+    require(
+        find_proof_escapes([
+            ("ScopedDecl.lean", scoped_declaration),
+            ("ScopedOpenConsumer.lean", scoped_open_consumer),
+        ]),
+        "scanner missed open-scoped interpolation proof escape",
+    )
+    print("mutant rejected: scoped interpolation activates only after open scoped")
     import_comment_safe_positive = (
         'import Base -- Decl\n'
         'def inert : String := "{sorry}"\n'
