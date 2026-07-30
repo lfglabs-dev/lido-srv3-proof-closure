@@ -44,14 +44,19 @@ Commands are run with the Lean 4.31 toolchain `bin` first on `PATH`.
 - `lake build LidoSRv3`: passed (26 jobs); one existing
   `unnecessarySimpa` linter warning.
 - `lake build`: passed (26 jobs); same warning.
-- `make test`: run after the migration checkpoint commit because its provenance
-  guard intentionally rejects dirty checked inputs.
-- `make prove`: run after the migration checkpoint commit for the same reason.
+- `make test`: passed after the migration checkpoint commit; provenance guards,
+  executable MinFirst vectors, and legacy Solidity reference fixture checks
+  passed.
+- `make prove`: passed after the migration checkpoint commit; rebuilt
+  `LidoSRv3` and emitted the proof report under Lean 4.31.
 - `lake build LidoSRv3.Audit.Trust`: passed; this is the repository's actual
   PrintAxioms entrypoint. Output contains only the documented Lean foundations
   `propext` and `Quot.sound`, with several theorems reporting no axioms.
-- Forbidden proof-escape and dependency-deduplication scans: run after the
-  migration checkpoint commit.
+- Forbidden proof-escape scan: passed after confirming the only raw token hits
+  were explanatory comments in `LidoSRv3/Audit/Trust.lean`; there are no
+  `axiom`/`unsafe` declarations or `sorry`/`admit` proof terms.
+- Dependency-deduplication scan: passed; exactly one inherited `evmyul` package
+  resolves at the required revision.
 
 ## Limitations
 
