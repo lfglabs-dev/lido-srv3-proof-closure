@@ -217,13 +217,20 @@ REQUIRED_UNAVAILABLE = {
         "sha256_ffi_implementation_identity",
     )
 }
-EXPECTED_COMMON_MODULES = {
+EXPECTED_AUDIT_MODULES = [
+    "LidoSRv3.Audit.Arithmetic",
+    "LidoSRv3.Audit.Trace",
+    "LidoSRv3.Audit.Allocation",
+    "LidoSRv3.Audit.Strategy",
+    "LidoSRv3.Audit.StrategyProofs",
+    "LidoSRv3.Audit.Vectors",
     "LidoSRv3.Audit.Common.Units",
     "LidoSRv3.Audit.Common.Result",
     "LidoSRv3.Audit.Common.Trace",
     "LidoSRv3.Audit.Common.Atomicity",
     "LidoSRv3.Audit.Common.Bounded",
-}
+]
+EXPECTED_PROOF_BASELINE = "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2"
 EXPECTED_MANIFEST_THEOREMS = [
     {"name": "Quantity.checkedDiv_zero", "status": "lean_checked",
      "axioms": ["propext"]},
@@ -377,9 +384,10 @@ def validate_lock(lock, source_map):
             "Lean toolchain pin differs from verity target audit manifest")
     require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,
             "audit manifest proof policy differs from the canonical zero-escape policy")
-    audit_modules = set(audit_manifest["layers"]["audit"]["modules"])
-    require(EXPECTED_COMMON_MODULES <= audit_modules,
-            "audit manifest omits canonical Common modules")
+    require(audit_manifest["layers"]["audit"]["modules"] == EXPECTED_AUDIT_MODULES,
+            "audit manifest module ledger differs from the canonical ordered records")
+    require(audit_manifest.get("proof_baseline") == EXPECTED_PROOF_BASELINE,
+            "audit manifest proof baseline differs from the canonical commit")
     require(audit_manifest.get("theorems") == EXPECTED_MANIFEST_THEOREMS,
             "audit manifest theorem ledger differs from the canonical records")
     require(

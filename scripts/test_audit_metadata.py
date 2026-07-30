@@ -140,17 +140,43 @@ def main():
         audit_manifest = json.loads(
             audit_manifest_path.read_text(encoding="utf-8")
         )
-        missing_common_module = copy.deepcopy(audit_manifest)
-        missing_common_module["layers"]["audit"]["modules"].remove(
-            "LidoSRv3.Audit.Common.Atomicity"
-        )
-        write_json(audit_manifest_path, missing_common_module)
-        run(
-            fixture,
-            False,
-            "generate",
-            "audit manifest omits canonical Common modules",
-        )
+        audit_modules = audit_manifest["layers"]["audit"]["modules"]
+        for module in audit_modules:
+            missing_module = copy.deepcopy(audit_manifest)
+            missing_module["layers"]["audit"]["modules"].remove(module)
+            write_json(audit_manifest_path, missing_module)
+            run(
+                fixture,
+                False,
+                "generate",
+                "audit manifest module ledger differs from the canonical ordered records",
+            )
+        for mutate_modules in (
+            lambda modules: modules.append("LidoSRv3.Audit.DoesNotExist"),
+            lambda modules: modules.reverse(),
+        ):
+            malformed_modules = copy.deepcopy(audit_manifest)
+            mutate_modules(malformed_modules["layers"]["audit"]["modules"])
+            write_json(audit_manifest_path, malformed_modules)
+            run(
+                fixture,
+                False,
+                "generate",
+                "audit manifest module ledger differs from the canonical ordered records",
+            )
+        for proof_baseline in (None, "0" * 40):
+            malformed_baseline = copy.deepcopy(audit_manifest)
+            if proof_baseline is None:
+                del malformed_baseline["proof_baseline"]
+            else:
+                malformed_baseline["proof_baseline"] = proof_baseline
+            write_json(audit_manifest_path, malformed_baseline)
+            run(
+                fixture,
+                False,
+                "generate",
+                "audit manifest proof baseline differs from the canonical commit",
+            )
         for index, theorem in enumerate(audit_manifest["theorems"]):
             missing_theorem = copy.deepcopy(audit_manifest)
             del missing_theorem["theorems"][index]
@@ -379,7 +405,8 @@ def main():
     print(
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
-        "assumption records/links, authority, full manifest theorem ledger/revisions, "
+        "assumption records/links, authority, full manifest module/theorem ledgers, "
+        "proof baseline/revisions, "
         "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )
