@@ -911,6 +911,11 @@ def validate_lock(path: Path = LOCK) -> None:
         and lock["target_root"]["audit_cert"] is False,
         "target status must be DEV-431-READY, PrintAxioms FAIL, AUDIT-CERT=false",
     )
+    require(
+        lock["verity"]["certification"]
+        == "target DEV-431-READY; target PrintAxioms FAIL; AUDIT-CERT=false",
+        "Verity certification summary differs from fixed non-certified state",
+    )
 
 
 def dependency_entries(manifest: object, label: str) -> list[dict]:
@@ -1662,6 +1667,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
         sanitized = "\n".join(sanitized_lines)
+        for macro_opaque in re.finditer(
+            r"`\([ \t\r\n]*(?:(?:private|protected)[ \t\r\n]+)*opaque\b",
+            sanitized,
+        ):
+            line_number = sanitized.count("\n", 0, macro_opaque.start()) + 1
+            original = source.splitlines()[line_number - 1].strip()
+            violations.append(f"{name}:{line_number}:{original}")
         custom_commands = set()
         for declaration in layout_command_spans(
             source, ("syntax", "macro", "elab", "set_option")
@@ -2527,6 +2539,18 @@ def negative_tests() -> None:
         "scanner bodyless opaque before set_option-wrapped custom command passed",
     )
     print("mutant rejected: bodyless opaque before set_option-wrapped custom command")
+    macro_generated_opaque_mutant = (
+        'macro "mkBad " n:ident : command => `(opaque $n : False)\n'
+        "mkBad hidden\n"
+    )
+    require(
+        find_proof_escapes([
+            ("macro-generated-bodyless-opaque.lean",
+             macro_generated_opaque_mutant)
+        ]),
+        "scanner macro-generated bodyless opaque mutant passed",
+    )
+    print("mutant rejected: macro-generated bodyless opaque")
     legitimate_opaque = "private opaque good (n : Nat) : Nat := n + 1\n"
     require(
         not find_proof_escapes([("opaque-body.lean", legitimate_opaque)]),
@@ -2653,6 +2677,19 @@ def negative_tests() -> None:
             )
         finally:
             proof_lock_path.unlink()
+    certification_lock = json.loads(json.dumps(lock_data))
+    certification_lock["verity"]["certification"] = (
+        "target DEV-431-READY; target PrintAxioms FAIL; AUDIT-CERT=true"
+    )
+    certification_lock_path = write_mutant(certification_lock)
+    try:
+        expect_failure(
+            "Verity certification summary tampering",
+            lambda: validate_lock(certification_lock_path),
+            "Verity certification summary differs from fixed non-certified state",
+        )
+    finally:
+        certification_lock_path.unlink()
     for component, field, value, expected in (
         ("lido_core", "repository", "https://github.com/example/core.git",
          "lido_core: exact repository mismatch"),
