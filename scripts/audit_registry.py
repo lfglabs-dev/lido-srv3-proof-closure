@@ -1367,6 +1367,36 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
         r"(?:" + "|".join(re.escape(command) for command in commands) + r")\b"
     )
 
+    def after_leading_block_comment_trivia(text: str) -> str | None:
+        """Return code after whitespace/block-comment trivia, preserving its indent."""
+        cursor = 0
+        block_depth = 0
+        while cursor < len(text):
+            if block_depth:
+                if text.startswith("/-", cursor):
+                    block_depth += 1
+                    cursor += 2
+                elif text.startswith("-/", cursor):
+                    block_depth -= 1
+                    cursor += 2
+                else:
+                    cursor += 1
+            elif text.startswith("/-", cursor):
+                block_depth = 1
+                cursor += 2
+            elif text[cursor] in " \t\r\n":
+                cursor += 1
+            else:
+                indent_start = cursor
+                while indent_start and text[indent_start - 1] in " \t":
+                    indent_start -= 1
+                return text[indent_start:]
+        return None
+
+    def starter_match(text: str) -> re.Match[str] | None:
+        candidate = after_leading_block_comment_trivia(text)
+        return starter.match(candidate) if candidate is not None else None
+
     def line_layout(
         line: str, block_depth: int, delimiter_depth: int
     ) -> tuple[bool, int | None, int, int]:
@@ -1423,12 +1453,19 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
         return first_code is not None, indent, block_depth, delimiter_depth
 
     while index < len(lines):
-        match = starter.match(lines[index])
-        if match is None and re.match(r"^[ \t]*@\[", lines[index]):
-            candidate = ""
+        candidate = lines[index]
+        match = starter_match(candidate)
+        starter_end = index + 1
+        leading = after_leading_block_comment_trivia(candidate)
+        if match is None and (
+            leading is None or re.match(r"^[ \t]*@\[", leading)
+        ):
             attribute_block_depth = 0
             attribute_delimiter_depth = 0
-            probe = index
+            _, _, attribute_block_depth, attribute_delimiter_depth = line_layout(
+                lines[index], 0, 0
+            )
+            probe = index + 1
             while probe < len(lines):
                 candidate += lines[probe]
                 _, _, attribute_block_depth, attribute_delimiter_depth = line_layout(
@@ -1438,14 +1475,20 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
                 )
                 probe += 1
                 if not attribute_block_depth and not attribute_delimiter_depth:
-                    match = starter.match(candidate)
+                    match = starter_match(candidate)
+                    if match is not None:
+                        starter_end = probe
                     break
         if match is None:
             index += 1
             continue
         indent = len(match.group(1).expandtabs(8))
-        _, _, block_depth, delimiter_depth = line_layout(lines[index], 0, 0)
-        end = index + 1
+        block_depth = delimiter_depth = 0
+        for starter_line in lines[index:starter_end]:
+            _, _, block_depth, delimiter_depth = line_layout(
+                starter_line, block_depth, delimiter_depth
+            )
+        end = starter_end
         while end < len(lines):
             line = lines[end]
             has_code, line_indent, next_block_depth, next_delimiter_depth = line_layout(
@@ -1474,8 +1517,8 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     syntax_interpolation = re.compile(
-        r'\b(?:syntax(?:\s*\([^)]*\))?|macro)'
-        r'\s+"((?:\\.|[^"\\])*)"\s+'
+        r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
+        r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
         r'(.*?)\binterpolatedStr(?:\([^)]*\))?',
         re.DOTALL,
     )
@@ -1625,7 +1668,8 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     custom_commands.add(command)
         opaque_start = re.compile(
             r"\A[ \t\r\n]*(?:@\[[\s\S]*?\][ \t\r\n]*)*"
-            r"(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)?"
+            r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
+            r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
             r"(?:(?:private|protected)[ \t\r\n]+)*opaque[ \t]+"
         )
         opaque_search_from = 0
@@ -2138,6 +2182,19 @@ def negative_tests() -> None:
         "scanner intermediate-parser interpolated-string mutant: unexpectedly passed",
     )
     print("mutant rejected: intermediate-parser interpolated-string macro proof escape")
+    leading_parser_interpolation_mutant = (
+        'syntax ident "x" interpolatedStr(term) : term\n'
+        'macro_rules | `($name:ident x$s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := foo x"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("leading-parser-interpolation-mutant.lean",
+             leading_parser_interpolation_mutant)
+        ]),
+        "scanner leading-parser interpolated-string mutant passed",
+    )
+    print("mutant rejected: interpolation after leading parser descriptor")
     multiline_interpolation_mutant = (
         'syntax "x" ident\n'
         '-- declaration continuation after trivia\n'
@@ -2283,6 +2340,17 @@ def negative_tests() -> None:
         "scanner set_option-wrapped bodyless opaque mutant passed",
     )
     print("mutant rejected: set_option-wrapped bodyless opaque")
+    attributed_wrapped_opaque_mutant = (
+        "set_option autoImplicit false in @[inline] opaque hidden : Nat\n"
+    )
+    require(
+        find_proof_escapes([
+            ("attributed-set-option-bodyless-opaque.lean",
+             attributed_wrapped_opaque_mutant)
+        ]),
+        "scanner attributed set_option-wrapped bodyless opaque mutant passed",
+    )
+    print("mutant rejected: attributed set_option-wrapped bodyless opaque")
     multiline_wrapped_opaque_mutant = (
         "set_option autoImplicit false in\n"
         "  /- wrapper trivia\n"
@@ -2317,6 +2385,19 @@ def negative_tests() -> None:
         )
         print(f"mutant rejected: bodyless opaque before {modifier} command")
     for label, source in (
+        (
+            "same-line-leading-block-comment",
+            "/- leading command trivia -/ opaque hidden : Nat\n",
+        ),
+        (
+            "same-line-leading-nested-block-comment",
+            "/- outer /- nested -/ trivia -/ opaque hidden : Nat\n",
+        ),
+        (
+            "leading-multiline-block-comment",
+            "/- leading command\n"
+            "   trivia -/ opaque hidden : Nat\n",
+        ),
         (
             "leading-block-comment",
             "opaque hidden : False\n"

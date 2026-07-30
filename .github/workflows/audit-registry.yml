@@ -22,6 +22,10 @@ jobs:
       - name: Check patch whitespace
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: git diff --check "$BASE_SHA"..HEAD
+        run: |
+          if [[ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]]; then
+            BASE_SHA="$(git hash-object -t tree /dev/null)"
+          fi
+          git diff --check "$BASE_SHA"..HEAD
       - name: Validate registry, artifacts, generated views, and negative fixtures
         run: make audit-check audit-check-lean
