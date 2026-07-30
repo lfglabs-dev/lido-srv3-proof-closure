@@ -208,6 +208,8 @@ CAMPAIGN_BASE = {
 }
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
+CANONICAL_EVMYULLEAN_REPOSITORY = "https://github.com/lfglabs-dev/EVMYulLean.git"
+CANONICAL_EVMYULLEAN_COMMIT = "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
 EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v1"
@@ -425,8 +427,8 @@ def validate_lock(lock, source_map):
             "commit": manifest_package(manifest, "verity")["rev"],
         },
         "evmyullean": {
-            "repository": manifest_package(manifest, "evmyul")["url"],
-            "commit": manifest_package(manifest, "evmyul")["rev"],
+            "repository": CANONICAL_EVMYULLEAN_REPOSITORY,
+            "commit": CANONICAL_EVMYULLEAN_COMMIT,
         },
         "lean": {"toolchain": toolchain},
         "mathlib": {
@@ -444,6 +446,12 @@ def validate_lock(lock, source_map):
     lean_revision = toolchain.rsplit(":", 1)[-1]
     require(audit_manifest["source_revisions"]["lean"] == lean_revision,
             "Lean toolchain pin differs from verity target audit manifest")
+    evmyul = manifest_package(manifest, "evmyul")
+    require(
+        evmyul["url"] == CANONICAL_EVMYULLEAN_REPOSITORY
+        and evmyul["rev"] == CANONICAL_EVMYULLEAN_COMMIT,
+        "Lake EVMYulLean pin differs from the canonical dependency pin",
+    )
     require(audit_manifest.get("schema") == EXPECTED_MANIFEST_SCHEMA,
             "audit manifest schema differs from the canonical version")
     require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,

@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""Check that the PR #9 receipt names the final non-self-referential Git tree."""
+
+import re
+import subprocess
+import os
+import tempfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+RECEIPT = Path("proofs/logs/pr9-validation.txt")
+EXPECTED_BASE = "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1"
+
+
+def git(*args, env=None):
+    return subprocess.run(
+        ["git", *args],
+        cwd=ROOT,
+        env=env,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+def receipt_excluded_tree():
+    with tempfile.NamedTemporaryFile(prefix="pr9-receipt-index-", delete=False) as index:
+        index_path = index.name
+    os.unlink(index_path)
+    try:
+        env = dict(os.environ, GIT_INDEX_FILE=index_path)
+        git("read-tree", "HEAD", env=env)
+        git("rm", "--cached", "--quiet", "--", str(RECEIPT), env=env)
+        return git("write-tree", env=env)
+    finally:
+        Path(index_path).unlink(missing_ok=True)
+
+
+def main():
+    text = (ROOT / RECEIPT).read_text(encoding="utf-8")
+    fields = dict(
+        re.findall(r"^(base|validation-subject|validated-tree): (.+)$", text, re.MULTILINE)
+    )
+    if fields.get("base") != EXPECTED_BASE:
+        raise SystemExit("validation receipt base is not the canonical campaign base")
+    if fields.get("validation-subject") != "HEAD tracked tree excluding this receipt":
+        raise SystemExit("validation receipt subject semantics are missing or incompatible")
+    actual = receipt_excluded_tree()
+    if fields.get("validated-tree") != actual:
+        raise SystemExit(
+            f"validation receipt tree is stale: recorded {fields.get('validated-tree')}, "
+            f"actual {actual}"
+        )
+    print(f"validation receipt ok: final tracked content tree excluding receipt {actual}")
+
+
+if __name__ == "__main__":
+    main()

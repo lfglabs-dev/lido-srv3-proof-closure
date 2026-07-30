@@ -123,6 +123,33 @@ def main():
             coordinated_manifest_path,
         )
 
+        lake_manifest_path = fixture / "lake-manifest.json"
+        lake_manifest = json.loads(lake_manifest_path.read_text(encoding="utf-8"))
+        coordinated_evmyul_manifest = copy.deepcopy(lake_manifest)
+        evmyul = next(
+            package
+            for package in coordinated_evmyul_manifest["packages"]
+            if package["name"] == "evmyul"
+        )
+        evmyul["url"] = "https://github.com/example/EVMYulLean.git"
+        evmyul["rev"] = "0" * 40
+        evmyul["inputRev"] = "0" * 40
+        coordinated_evmyul_lock = copy.deepcopy(baseline_lock)
+        coordinated_evmyul_lock["pins"]["evmyullean"] = {
+            "repository": evmyul["url"],
+            "commit": evmyul["rev"],
+        }
+        write_json(lake_manifest_path, coordinated_evmyul_manifest)
+        write_json(lock_path, coordinated_evmyul_lock)
+        run(
+            fixture,
+            False,
+            "check",
+            "artifacts.lock.json pins differ from source-map/toolchain/Lake authorities",
+        )
+        write_json(lake_manifest_path, lake_manifest)
+        write_json(lock_path, baseline_lock)
+
         exclusions_path = fixture / "audit/exclusions.yaml"
         exclusions = json.loads(exclusions_path.read_text(encoding="utf-8"))
         write_json(exclusions_path, {})
