@@ -38,6 +38,24 @@ EXPECTED_ARTIFACTS = {
     "legacy-proofs": ("LidoSRv3/SpecProofs.lean", "REGRESSION"),
     "consolidation-runtime": (None, "PROVENANCE-BLOCKED"),
 }
+EXPECTED_ARTIFACT_TRUST_LEVELS = {
+    "AUDIT-CERT": (
+        "Certified evidence with all declared correspondence and trust "
+        "obligations closed."
+    ),
+    "DEV-431-READY": (
+        "Development scaffold pinned for future Lean 4.31 work; never "
+        "certification."
+    ),
+    "LEAN-CHECKED": "Kernel-checked theorem at the declared model layer only.",
+    "REGRESSION": (
+        "Legacy or fixture evidence retained to detect change; not "
+        "correspondence or deployment assurance."
+    ),
+    "PROVENANCE-BLOCKED": (
+        "Required canonical source/runtime identity evidence is absent."
+    ),
+}
 EXPECTED_INVARIANT_THEOREMS = {
     "SRV3-LEGACY-ECON": "LidoSRv3.P1_reserve_separation",
     "SRV3-ARITH-CHECKED": "LidoSRv3.Audit.Quantity.checkedDiv_zero",
@@ -59,6 +77,40 @@ EXPECTED_INVARIANT_SOURCE_ANCHORS = {
         "LidoSRv3/Audit/StrategyProofs.lean",
         "LidoSRv3/Audit/Vectors.lean",
     },
+    "SRV3-SOLIDITY-CORR": {
+        "lido-core@af095e48bbc1c3841c2c9936219c8461af01056b:"
+        "contracts/0.8.25/sr/StakingRouter.sol",
+        "verity/targets/solidity-correspondence.md",
+    },
+    "SRV3-VERITY-431": {
+        "verity@68f560e66c5de6123061ce5ed60261be162673d1:"
+        "dev/lean-4.31-scaffolding",
+    },
+    "SRV3-YUL-COMP": {
+        "evmyullean@f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    },
+    "SRV3-EVM-RUNTIME": {
+        "lido-core@af095e48bbc1c3841c2c9936219c8461af01056b",
+    },
+    "SRV3-SHA256-PRECOMPILE": {
+        "evmyullean@f7e4ee0dc8f8d5265ce822a937ab5be771f182e9",
+    },
+    "SRV3-CONSOLIDATION-E2E": {
+        "lido-core@af095e48bbc1c3841c2c9936219c8461af01056b",
+    },
+}
+EXPECTED_INVARIANT_FAMILIES = {
+    "SRV3-LEGACY-ECON": "economic-accounting",
+    "SRV3-ARITH-CHECKED": "checked-arithmetic",
+    "SRV3-TX-REVERT": "transaction-semantics",
+    "SRV3-ALLOC-ORDER": "allocation",
+    "SRV3-MINFIRST-BOUND": "allocation",
+    "SRV3-SOLIDITY-CORR": "source-correspondence",
+    "SRV3-VERITY-431": "toolchain-readiness",
+    "SRV3-YUL-COMP": "yul-interface",
+    "SRV3-EVM-RUNTIME": "runtime-correspondence",
+    "SRV3-SHA256-PRECOMPILE": "cryptography",
+    "SRV3-CONSOLIDATION-E2E": "consolidation",
 }
 EXPECTED_INVARIANT_CLASSIFICATIONS = {
     "SRV3-LEGACY-ECON": ("P0", "REGRESSION", "LEAN", "MODEL"),
@@ -812,11 +864,15 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
                 theorem == expected_theorem,
                 f"{invariant_id}: theorem must be {expected_theorem}",
             )
-            require(
-                set(row["source_anchors"])
-                == EXPECTED_INVARIANT_SOURCE_ANCHORS[invariant_id],
-                f"{invariant_id}: source anchors differ from expected theorem evidence",
-            )
+        require(
+            set(row["source_anchors"])
+            == EXPECTED_INVARIANT_SOURCE_ANCHORS[invariant_id],
+            f"{invariant_id}: source anchors differ from expected obligation evidence",
+        )
+        require(
+            row["family"] == EXPECTED_INVARIANT_FAMILIES[invariant_id],
+            f"{invariant_id}: family differs from expected obligation family",
+        )
         require(
             (row["priority"], row["status"], row["engine"], row["layer"])
             == EXPECTED_INVARIANT_CLASSIFICATIONS[invariant_id],
@@ -1262,6 +1318,10 @@ def validate_artifacts(path: Path = ARTIFACTS) -> None:
         require(digest == actual, f"{artifact_id}: sha256 mismatch: expected {digest}, got {actual}")
     require(seen == set(EXPECTED_ARTIFACTS),
             f"artifact inventory differs: {sorted(seen ^ set(EXPECTED_ARTIFACTS))}")
+    require(
+        trust_levels == EXPECTED_ARTIFACT_TRUST_LEVELS,
+        "artifact trust-level meanings differ from expected semantics",
+    )
 
 
 def rows_by(data: dict, key: str) -> dict[str, list[dict]]:
@@ -1672,7 +1732,9 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         (prefix, bool(match.group(2).strip()))
                     )
     declared_prefix_pattern = "|".join(
-        re.escape(prefix) + (r"(?:\s+\S.*)?" if has_intermediate else "")
+        r"(?<![\w'])"
+        + re.escape(prefix)
+        + (r"(?:\s+\S.*)?" if has_intermediate else "")
         for prefix, has_intermediate in sorted(
             declared_interpolated_prefixes,
             key=lambda item: len(item[0]),
@@ -1764,14 +1826,20 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     while delimiter < len(line) and line[delimiter] == "#":
                         delimiter += 1
                     prefix_code = " ".join(
-                        [layout_significant_code, "".join(code_parts) + "r"]
+                        [
+                            layout_significant_code,
+                            "".join(code_parts) + line[cursor:delimiter],
+                        ]
                     )
                     if (
                         delimiter < len(line)
                         and line[delimiter] == '"'
-                        and not interpolated_prefix.search(prefix_code)
                     ):
-                        contexts.append(("raw", delimiter - cursor - 1))
+                        if interpolated_prefix.search(prefix_code):
+                            code_parts.append("!")
+                            contexts.append(("string", (True, False)))
+                        else:
+                            contexts.append(("raw", delimiter - cursor - 1))
                         cursor = delimiter + 1
                     else:
                         code_parts.append(line[cursor])
@@ -1848,7 +1916,8 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         )
         opaque_search_from = 0
         for source_declaration in layout_command_spans(
-            source, ("opaque", "set_option")
+            source,
+            ("opaque", "set_option", "private", "protected", "noncomputable"),
         ):
             declaration_start = source.find(source_declaration, opaque_search_from)
             require(declaration_start >= 0, "scanner internal opaque span mismatch")
@@ -2049,10 +2118,39 @@ def negative_tests() -> None:
         expect_failure(
             "assured invariant source-anchor swap mutant",
             lambda: validate(source_swap_path),
-            "source anchors differ from expected theorem evidence",
+            "source anchors differ from expected obligation evidence",
         )
     finally:
         source_swap_path.unlink()
+    open_source_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in open_source_mutant["invariants"]
+        if row["id"] == "SRV3-SOLIDITY-CORR"
+    )["source_anchors"] = ["Makefile"]
+    open_source_path = write_mutant(open_source_mutant)
+    try:
+        expect_failure(
+            "open invariant source-evidence substitution mutant",
+            lambda: validate(open_source_path),
+            "SRV3-SOLIDITY-CORR: source anchors differ from expected "
+            "obligation evidence",
+        )
+    finally:
+        open_source_path.unlink()
+    family_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in family_mutant["invariants"]
+        if row["id"] == "SRV3-ARITH-CHECKED"
+    )["family"] = "allocation"
+    family_path = write_mutant(family_mutant)
+    try:
+        expect_failure(
+            "invariant family substitution mutant",
+            lambda: validate(family_path),
+            "SRV3-ARITH-CHECKED: family differs from expected obligation family",
+        )
+    finally:
+        family_path.unlink()
     classification_mutant = json.loads(json.dumps(data))
     arithmetic_row = next(
         row for row in classification_mutant["invariants"]
@@ -2248,6 +2346,20 @@ def negative_tests() -> None:
     for fixture, expected in artifact_cases:
         path = require_fixture(fixture)
         expect_failure(fixture, lambda path=path: validate_artifacts(path), expected)
+    trust_meaning_mutant = load_json(ARTIFACTS)
+    trust_meaning_mutant = json.loads(json.dumps(trust_meaning_mutant))
+    trust_meaning_mutant["trust_levels"]["LEAN-CHECKED"] = (
+        "Full certified Solidity and runtime correspondence."
+    )
+    trust_meaning_path = write_mutant(trust_meaning_mutant)
+    try:
+        expect_failure(
+            "artifact trust-level meaning substitution mutant",
+            lambda: validate_artifacts(trust_meaning_path),
+            "artifact trust-level meanings differ from expected semantics",
+        )
+    finally:
+        trust_meaning_path.unlink()
     artifact_mutant = load_json(ARTIFACTS)
     artifact_mutant = json.loads(json.dumps(artifact_mutant))
     arithmetic = next(
@@ -2565,6 +2677,41 @@ def negative_tests() -> None:
         ]),
         "scanner interpolated forms safe-positive fixture: unexpectedly rejected",
     )
+    hash_prefix = require_fixture("interpolation-hash-prefix-negative.txt")
+    hash_prefix_source = hash_prefix.read_text(encoding="utf-8")
+    require_lean_elaboration("scanner hash-suffixed interpolation prefix",
+                             hash_prefix_source)
+    hash_prefix_violations = find_proof_escapes(
+        [(hash_prefix.name, hash_prefix_source)]
+    )
+    require(
+        any(":3:" in violation for violation in hash_prefix_violations),
+        "scanner hash-suffixed interpolation prefix mutant passed",
+    )
+    print("mutant rejected: hash-suffixed interpolation prefix")
+    hash_r_prefix = require_fixture("interpolation-hash-r-prefix-negative.txt")
+    hash_r_prefix_source = hash_r_prefix.read_text(encoding="utf-8")
+    require_lean_elaboration("scanner combined hash/r interpolation prefix",
+                             hash_r_prefix_source)
+    hash_r_prefix_violations = find_proof_escapes(
+        [(hash_r_prefix.name, hash_r_prefix_source)]
+    )
+    require(
+        any(":3:" in violation for violation in hash_r_prefix_violations),
+        "scanner combined hash/r interpolation prefix mutant passed",
+    )
+    print("mutant rejected: combined hash/r interpolation prefix")
+    token_boundary = require_fixture(
+        "interpolation-token-boundary-safe-positive.txt"
+    )
+    token_boundary_source = token_boundary.read_text(encoding="utf-8")
+    require_lean_elaboration("scanner interpolation token-boundary safe positive",
+                             token_boundary_source)
+    require(
+        not find_proof_escapes([(token_boundary.name, token_boundary_source)]),
+        "scanner interpolation token-boundary safe positive was rejected",
+    )
+    print("safe positive accepted: interpolation prefix token boundary")
     bodyless_opaque = (
         '@[extern "bad"]\nprivate protected opaque\n'
         '  bad :\n  False\n'

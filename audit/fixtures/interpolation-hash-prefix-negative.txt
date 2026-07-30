@@ -1,0 +1,3 @@
+syntax "bar#" interpolatedStr(term) : term
+macro_rules | `(bar# $s:interpolatedStr) => `(s! $s)
+def hashPrefixEscape : String := bar#"{(sorry : Nat)}"

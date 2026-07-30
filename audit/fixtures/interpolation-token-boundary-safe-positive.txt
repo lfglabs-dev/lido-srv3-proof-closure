@@ -1,0 +1,4 @@
+syntax "bar" interpolatedStr(term) : term
+macro_rules | `(bar $s:interpolatedStr) => `(s! $s)
+macro "foobar" value:str : term => `($value)
+def tokenBoundarySafe : String := foobar"{sorry}"
