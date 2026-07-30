@@ -29,3 +29,5 @@ jobs:
           git diff --check "$BASE_SHA"..HEAD
       - name: Validate registry, artifacts, generated views, and negative fixtures
         run: make audit-check audit-check-lean
+      - name: Verify immutable external source identities
+        run: make audit-refresh-provenance

@@ -1551,16 +1551,30 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
+    has_literal_free_interpolation = False
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
         r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
         r'(.*?)\binterpolatedStr(?:\([^)]*\))?',
         re.DOTALL,
     )
+    interpolation_declaration = re.compile(
+        r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
+        r'(?P<parser>[\s\S]*?)\binterpolatedStr(?:\([^)]*\))?',
+        re.DOTALL,
+    )
     for _, source in sources:
         for declaration in layout_command_spans(
             source, ("syntax", "macro", "set_option")
         ):
+            interpolation_match = interpolation_declaration.search(declaration)
+            if (
+                interpolation_match is not None
+                and re.search(
+                    r'"(?:\\.|[^"\\])*"', interpolation_match.group("parser")
+                ) is None
+            ):
+                has_literal_free_interpolation = True
             for match in syntax_interpolation.finditer(declaration):
                 try:
                     prefix = json.loads(f'"{match.group(1)}"')
@@ -1581,8 +1595,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     custom_prefix = (
         rf"(?:{declared_prefix_pattern})|" if declared_prefix_pattern else ""
     )
+    literal_free_prefix = (
+        r"(?:«[^»\r\n]+»|(?:[^\W\d]|_)[\w'.]*)|"
+        if has_literal_free_interpolation else ""
+    )
     interpolated_prefix = re.compile(
-        rf"(?:{custom_prefix}!|Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
+        rf"(?:{custom_prefix}{literal_free_prefix}!|"
+        r"Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
         r"dbg_trace|throwError|throwErrorAt\b.+|report(?:Dbg|EMatch)?Issue!)\s*$"
     )
     for name, source in sources:
@@ -2634,6 +2653,18 @@ def negative_tests() -> None:
         "scanner category-qualified macro-generated bodyless opaque mutant passed",
     )
     print("mutant rejected: category-qualified macro-generated bodyless opaque")
+    literal_free_interpolation_mutant = (
+        "macro name:ident value:interpolatedStr(term) : term => `(s!$value)\n"
+        '#check foo"{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("literal-free-interpolation.lean",
+             literal_free_interpolation_mutant)
+        ]),
+        "scanner literal-free interpolation mutant passed",
+    )
+    print("mutant rejected: literal-free interpolation syntax")
     elaborator_generated_axiom_mutant = (
         "import Lean\n"
         "open Lean Elab Command\n"
