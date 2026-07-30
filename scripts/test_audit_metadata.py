@@ -150,6 +150,31 @@ def main():
         write_json(lake_manifest_path, lake_manifest)
         write_json(lock_path, baseline_lock)
 
+        for field, value in (
+            ("url", "https://github.com/example/mathlib4.git"),
+            ("rev", "0" * 40),
+        ):
+            drifted_mathlib_manifest = copy.deepcopy(lake_manifest)
+            mathlib = next(
+                package
+                for package in drifted_mathlib_manifest["packages"]
+                if package["name"] == "mathlib"
+            )
+            mathlib[field] = value
+            drifted_mathlib_lock = copy.deepcopy(baseline_lock)
+            lock_field = "repository" if field == "url" else "commit"
+            drifted_mathlib_lock["pins"]["mathlib"][lock_field] = value
+            write_json(lake_manifest_path, drifted_mathlib_manifest)
+            write_json(lock_path, drifted_mathlib_lock)
+            run(
+                fixture,
+                False,
+                "check",
+                "Lake mathlib pin differs from the canonical migration receipt",
+            )
+        write_json(lake_manifest_path, lake_manifest)
+        write_json(lock_path, baseline_lock)
+
         stale_verity_input = copy.deepcopy(lake_manifest)
         verity = next(
             package
