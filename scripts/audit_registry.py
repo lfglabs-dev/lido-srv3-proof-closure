@@ -1397,7 +1397,7 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
     starter = re.compile(
         r"^([ \t]*)(?:@\[[\s\S]*?\][ \t\r\n]*)*"
         r"(?:(?:private|protected|local|noncomputable|"
-        r"scoped(?:[ \t]*\[[^\]\n]*\])?)[ \t]+)*"
+        r"scoped(?:[ \t]*\[[^\]\n]*\])?)[ \t\r\n]+)*"
         r"(?:" + "|".join(re.escape(command) for command in commands) + r")\b"
     )
 
@@ -1430,7 +1430,44 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
 
     def starter_match(text: str) -> re.Match[str] | None:
         candidate = after_leading_block_comment_trivia(text)
-        return starter.match(candidate) if candidate is not None else None
+        if candidate is None:
+            return None
+        cursor = 0
+        block_depth = 0
+        uncommented = []
+        while cursor < len(candidate):
+            if block_depth:
+                if candidate.startswith("/-", cursor):
+                    block_depth += 1
+                    uncommented.extend("  ")
+                    cursor += 2
+                elif candidate.startswith("-/", cursor):
+                    block_depth -= 1
+                    uncommented.extend("  ")
+                    cursor += 2
+                else:
+                    uncommented.append(
+                        candidate[cursor]
+                        if candidate[cursor] in "\r\n"
+                        else " "
+                    )
+                    cursor += 1
+            elif candidate.startswith("/-", cursor):
+                block_depth = 1
+                uncommented.extend("  ")
+                cursor += 2
+            elif candidate.startswith("--", cursor):
+                line_end = candidate.find("\n", cursor)
+                if line_end == -1:
+                    uncommented.extend(" " * (len(candidate) - cursor))
+                    cursor = len(candidate)
+                else:
+                    uncommented.extend(" " * (line_end - cursor))
+                    cursor = line_end
+            else:
+                uncommented.append(candidate[cursor])
+                cursor += 1
+        return starter.match("".join(uncommented))
 
     def line_layout(
         line: str, block_depth: int, delimiter_depth: int
@@ -1552,7 +1589,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
-    literal_free_prefix_categories: set[str] = set()
+    literal_free_prefix_categories: set[tuple[str, str]] = set()
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
         r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
@@ -1578,11 +1615,11 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 parser = interpolation_match.group("parser")
                 categories = re.findall(
                     r"(?:[A-Za-z_][\w']*|«[^»\r\n]+»)[ \t]*:[ \t]*"
-                    r"([A-Za-z_][\w']*)",
+                    r"\(?[ \t]*([A-Za-z_][\w']*)[ \t]*\)?[ \t]*([*?+]?)",
                     parser,
                 )
                 literal_free_prefix_categories.add(
-                    categories[0] if categories else "unknown"
+                    categories[0] if categories else ("unknown", "")
                 )
             for match in syntax_interpolation.finditer(declaration):
                 try:
@@ -1608,9 +1645,13 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         "ident": r"(?:«[^»\r\n]+»|(?:[^\W\d]|_)[\w'.]*)",
         "num": r"\d[\w']*",
     }
+    nullable_literal_free_prefix = any(
+        cardinality in ("*", "?")
+        for _, cardinality in literal_free_prefix_categories
+    )
     literal_free_prefix = "|".join(
         literal_free_category_patterns.get(category, r"[^\s\"]+")
-        for category in sorted(literal_free_prefix_categories)
+        for category, _ in sorted(literal_free_prefix_categories)
     )
     if literal_free_prefix:
         literal_free_prefix = rf"(?:{literal_free_prefix})|"
@@ -1698,8 +1739,11 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     else:
                         code_parts.append(line[cursor])
                         cursor += 1
-                elif line[cursor] == '"' and interpolated_prefix.search(
-                    " ".join([layout_significant_code, "".join(code_parts)])
+                elif line[cursor] == '"' and (
+                    nullable_literal_free_prefix
+                    or interpolated_prefix.search(
+                        " ".join([layout_significant_code, "".join(code_parts)])
+                    )
                 ):
                     code_parts.append("!")
                     contexts.append(("string", (True, False)))
@@ -1831,6 +1875,25 @@ def write_text_mutant(text: str, suffix: str) -> Path:
 
 
 def negative_tests() -> None:
+    def require_lean_elaboration(label: str, source: str) -> None:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".lean", encoding="utf-8", dir=ROOT, delete=False
+        ) as lean_file:
+            lean_file.write(source)
+            lean_path = Path(lean_file.name)
+        try:
+            elaborated = subprocess.run(
+                ["lake", "env", "lean", str(lean_path.relative_to(ROOT))],
+                cwd=ROOT, text=True, capture_output=True,
+            )
+        finally:
+            lean_path.unlink()
+        require(
+            elaborated.returncode == 0,
+            f"{label} must elaborate:\n"
+            + (elaborated.stderr or elaborated.stdout).strip(),
+        )
+
     invalid_entry = require_fixture("invalid-entry.yaml")
     expect_failure(
         "invalid registry fixture",
@@ -2684,22 +2747,9 @@ def negative_tests() -> None:
         "macro n:num value:interpolatedStr(term) : term => `(s!$value)\n"
         '#check 1 "{(sorry : Nat)}"\n'
     )
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".lean", encoding="utf-8", dir=ROOT, delete=False
-    ) as numeral_file:
-        numeral_file.write(numeral_interpolation_mutant)
-        numeral_path = Path(numeral_file.name)
-    try:
-        elaborated = subprocess.run(
-            ["lake", "env", "lean", str(numeral_path.relative_to(ROOT))],
-            cwd=ROOT, text=True, capture_output=True,
-        )
-    finally:
-        numeral_path.unlink()
-    require(
-        elaborated.returncode == 0,
-        "scanner numeral interpolation mutant must elaborate:\n"
-        + (elaborated.stderr or elaborated.stdout).strip(),
+    require_lean_elaboration(
+        "scanner numeral interpolation mutant",
+        numeral_interpolation_mutant,
     )
     require(
         find_proof_escapes([
@@ -2709,6 +2759,55 @@ def negative_tests() -> None:
         "scanner numeral literal-free interpolation mutant passed",
     )
     print("mutant rejected: elaborated numeral literal-free interpolation syntax")
+    for cardinality in ("*", "?"):
+        parser = (
+            f"xs:ident{cardinality}"
+            if cardinality == "*"
+            else "xs:ident ?"
+        )
+        if cardinality == "*":
+            nullable_interpolation_mutant = (
+                f"macro {parser} "
+                "value:interpolatedStr(term) : command => `(#check s!$value)\n"
+                '"{(sorry : Nat)}"\n'
+            )
+        else:
+            nullable_interpolation_mutant = (
+                f"macro:10000 {parser} "
+                "value:interpolatedStr(term) : term => `(s!$value)\n"
+                '#check "{(sorry : Nat)}"\n'
+            )
+        require_lean_elaboration(
+            f"scanner nullable {cardinality} interpolation mutant",
+            nullable_interpolation_mutant,
+        )
+        require(
+            find_proof_escapes([
+                (f"nullable-{cardinality}-interpolation.lean",
+                 nullable_interpolation_mutant)
+            ]),
+            f"scanner nullable {cardinality} interpolation mutant passed",
+        )
+        print(
+            f"mutant rejected: elaborated nullable {cardinality} "
+            "interpolation syntax"
+        )
+    nonnullable_interpolation_safe_positive = (
+        "macro xs:ident+ "
+        "value:interpolatedStr(term) : command => `(#check s!$value)\n"
+        'def interpolationExample := "{(sorry : Nat)}"\n'
+    )
+    require_lean_elaboration(
+        "scanner nonnullable interpolation safe positive",
+        nonnullable_interpolation_safe_positive,
+    )
+    require(
+        not find_proof_escapes([
+            ("nonnullable-interpolation-safe.lean",
+             nonnullable_interpolation_safe_positive)
+        ]),
+        "scanner nonnullable interpolation safe positive was rejected",
+    )
     noncomputable_opaque_mutant = "noncomputable opaque hidden : Nat\n"
     require(
         find_proof_escapes([
@@ -2718,6 +2817,39 @@ def negative_tests() -> None:
         "scanner noncomputable bodyless opaque mutant passed",
     )
     print("mutant rejected: noncomputable bodyless opaque")
+    for label, comment in (
+        ("block-comment", "/- trivia -/"),
+        ("nested-block-comment", "/- outer /- nested -/ trivia -/"),
+        ("line-comment", "-- trivia\n"),
+    ):
+        comment_opaque_mutant = (
+            f"noncomputable {comment} opaque hidden : Nat\n"
+        )
+        require_lean_elaboration(
+            f"scanner {label} modifier-trivia mutant",
+            comment_opaque_mutant,
+        )
+        require(
+            find_proof_escapes([
+                (f"{label}-modifier-trivia.lean", comment_opaque_mutant)
+            ]),
+            f"scanner {label} modifier-trivia mutant passed",
+        )
+        print(f"mutant rejected: elaborated {label} modifier trivia")
+    legitimate_commented_opaque = (
+        "private /- modifier trivia -/ noncomputable "
+        "/- outer /- nested -/ trivia -/ opaque good : Nat := 1\n"
+    )
+    require_lean_elaboration(
+        "scanner legitimate commented modifier combination",
+        legitimate_commented_opaque,
+    )
+    require(
+        not find_proof_escapes([
+            ("legitimate-commented-opaque.lean", legitimate_commented_opaque)
+        ]),
+        "scanner legitimate commented opaque body was rejected",
+    )
     elaborator_generated_axiom_mutant = (
         "import Lean\n"
         "open Lean Elab Command\n"
