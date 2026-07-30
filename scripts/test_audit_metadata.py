@@ -96,6 +96,33 @@ def main():
         write_json(source_map_path, source_map)
         write_json(lock_path, baseline_lock)
 
+        coordinated_source = copy.deepcopy(source_map)
+        coordinated_source["pinned_source"] = (
+            "lidofinance/core@" + "0" * 40
+        )
+        coordinated_lock = copy.deepcopy(baseline_lock)
+        coordinated_lock["pins"]["lido_core"]["commit"] = "0" * 40
+        write_json(source_map_path, coordinated_source)
+        write_json(lock_path, coordinated_lock)
+        coordinated_manifest_path = fixture / "verity/targets/audit-manifest.json"
+        coordinated_manifest = json.loads(
+            coordinated_manifest_path.read_text(encoding="utf-8")
+        )
+        coordinated_manifest["source_revisions"]["lido"] = "0" * 40
+        write_json(coordinated_manifest_path, coordinated_manifest)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source-map Lido pin differs from the canonical source commit",
+        )
+        write_json(source_map_path, source_map)
+        write_json(lock_path, baseline_lock)
+        shutil.copy2(
+            ROOT / "verity/targets/audit-manifest.json",
+            coordinated_manifest_path,
+        )
+
         exclusions_path = fixture / "audit/exclusions.yaml"
         exclusions = json.loads(exclusions_path.read_text(encoding="utf-8"))
         write_json(exclusions_path, {})
@@ -140,29 +167,42 @@ def main():
         audit_manifest = json.loads(
             audit_manifest_path.read_text(encoding="utf-8")
         )
-        audit_modules = audit_manifest["layers"]["audit"]["modules"]
-        for module in audit_modules:
-            missing_module = copy.deepcopy(audit_manifest)
-            missing_module["layers"]["audit"]["modules"].remove(module)
-            write_json(audit_manifest_path, missing_module)
+        for layer, record in audit_manifest["layers"].items():
+            for field in record:
+                missing_field = copy.deepcopy(audit_manifest)
+                del missing_field["layers"][layer][field]
+                write_json(audit_manifest_path, missing_field)
+                run(
+                    fixture,
+                    False,
+                    "generate",
+                    "audit manifest layers differ from the canonical trust records",
+                )
+                mutated_field = copy.deepcopy(audit_manifest)
+                if field == "modules":
+                    mutated_field["layers"][layer][field].append(
+                        "LidoSRv3.Audit.DoesNotExist"
+                    )
+                else:
+                    mutated_field["layers"][layer][field] = (
+                        "AUDIT-CERT production correspondence"
+                    )
+                write_json(audit_manifest_path, mutated_field)
+                run(
+                    fixture,
+                    False,
+                    "generate",
+                    "audit manifest layers differ from the canonical trust records",
+                )
+        for layer in audit_manifest["layers"]:
+            missing_layer = copy.deepcopy(audit_manifest)
+            del missing_layer["layers"][layer]
+            write_json(audit_manifest_path, missing_layer)
             run(
                 fixture,
                 False,
                 "generate",
-                "audit manifest module ledger differs from the canonical ordered records",
-            )
-        for mutate_modules in (
-            lambda modules: modules.append("LidoSRv3.Audit.DoesNotExist"),
-            lambda modules: modules.reverse(),
-        ):
-            malformed_modules = copy.deepcopy(audit_manifest)
-            mutate_modules(malformed_modules["layers"]["audit"]["modules"])
-            write_json(audit_manifest_path, malformed_modules)
-            run(
-                fixture,
-                False,
-                "generate",
-                "audit manifest module ledger differs from the canonical ordered records",
+                "audit manifest layers differ from the canonical trust records",
             )
         for proof_baseline in (None, "0" * 40):
             malformed_baseline = copy.deepcopy(audit_manifest)
@@ -405,7 +445,7 @@ def main():
     print(
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
-        "assumption records/links, authority, full manifest module/theorem ledgers, "
+        "assumption records/links, authority, full manifest layer/theorem ledgers, "
         "proof baseline/revisions, "
         "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"

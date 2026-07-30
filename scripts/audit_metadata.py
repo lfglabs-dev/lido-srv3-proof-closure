@@ -206,6 +206,7 @@ CAMPAIGN_BASE = {
     "commit": "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1",
 }
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
+CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
@@ -217,19 +218,31 @@ REQUIRED_UNAVAILABLE = {
         "sha256_ffi_implementation_identity",
     )
 }
-EXPECTED_AUDIT_MODULES = [
-    "LidoSRv3.Audit.Arithmetic",
-    "LidoSRv3.Audit.Trace",
-    "LidoSRv3.Audit.Allocation",
-    "LidoSRv3.Audit.Strategy",
-    "LidoSRv3.Audit.StrategyProofs",
-    "LidoSRv3.Audit.Vectors",
-    "LidoSRv3.Audit.Common.Units",
-    "LidoSRv3.Audit.Common.Result",
-    "LidoSRv3.Audit.Common.Trace",
-    "LidoSRv3.Audit.Common.Atomicity",
-    "LidoSRv3.Audit.Common.Bounded",
-]
+EXPECTED_MANIFEST_LAYERS = {
+    "legacy": {
+        "modules": ["LidoSRv3.Model", "LidoSRv3.SpecProofs"],
+        "trust": "pure-model regression evidence",
+    },
+    "audit": {
+        "modules": [
+            "LidoSRv3.Audit.Arithmetic",
+            "LidoSRv3.Audit.Trace",
+            "LidoSRv3.Audit.Allocation",
+            "LidoSRv3.Audit.Strategy",
+            "LidoSRv3.Audit.StrategyProofs",
+            "LidoSRv3.Audit.Vectors",
+            "LidoSRv3.Audit.Common.Units",
+            "LidoSRv3.Audit.Common.Result",
+            "LidoSRv3.Audit.Common.Trace",
+            "LidoSRv3.Audit.Common.Atomicity",
+            "LidoSRv3.Audit.Common.Bounded",
+        ],
+        "trust": (
+            "Lean-proved predicates over source-shaped audit data; "
+            "Solidity correspondence remains manual"
+        ),
+    },
+}
 EXPECTED_PROOF_BASELINE = "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2"
 EXPECTED_MANIFEST_THEOREMS = [
     {"name": "Quantity.checkedDiv_zero", "status": "lean_checked",
@@ -350,6 +363,8 @@ def validate_lock(lock, source_map):
     lido_source_repository, lido_commit = source_map["pinned_source"].split("@", 1)
     require(lido_source_repository == "lidofinance/core",
             "source-map pinned_source must use the canonical lidofinance/core repository")
+    require(lido_commit == CANONICAL_LIDO_COMMIT,
+            "source-map Lido pin differs from the canonical source commit")
     require(toolchain == CANONICAL_LEAN_TOOLCHAIN,
             "lean-toolchain must use the canonical Lean 4.31 toolchain")
 
@@ -384,8 +399,8 @@ def validate_lock(lock, source_map):
             "Lean toolchain pin differs from verity target audit manifest")
     require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,
             "audit manifest proof policy differs from the canonical zero-escape policy")
-    require(audit_manifest["layers"]["audit"]["modules"] == EXPECTED_AUDIT_MODULES,
-            "audit manifest module ledger differs from the canonical ordered records")
+    require(audit_manifest.get("layers") == EXPECTED_MANIFEST_LAYERS,
+            "audit manifest layers differ from the canonical trust records")
     require(audit_manifest.get("proof_baseline") == EXPECTED_PROOF_BASELINE,
             "audit manifest proof baseline differs from the canonical commit")
     require(audit_manifest.get("theorems") == EXPECTED_MANIFEST_THEOREMS,
