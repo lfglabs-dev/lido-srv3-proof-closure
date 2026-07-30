@@ -1763,7 +1763,14 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     delimiter = cursor + 1
                     while delimiter < len(line) and line[delimiter] == "#":
                         delimiter += 1
-                    if delimiter < len(line) and line[delimiter] == '"':
+                    prefix_code = " ".join(
+                        [layout_significant_code, "".join(code_parts) + "r"]
+                    )
+                    if (
+                        delimiter < len(line)
+                        and line[delimiter] == '"'
+                        and not interpolated_prefix.search(prefix_code)
+                    ):
                         contexts.append(("raw", delimiter - cursor - 1))
                         cursor = delimiter + 1
                     else:
@@ -2398,6 +2405,27 @@ def negative_tests() -> None:
         "scanner non-bang interpolated-string macro mutant: unexpectedly passed",
     )
     print("mutant rejected: non-bang interpolated-string macro proof escape")
+    r_suffix_interpolation_mutant = require_fixture(
+        "interpolation-r-suffix-negative.txt"
+    )
+    require(
+        any(":2:" in violation for violation in find_proof_escapes([
+            (r_suffix_interpolation_mutant.name,
+             r_suffix_interpolation_mutant.read_text(encoding="utf-8"))
+        ])),
+        "scanner r-suffix interpolated-string macro mutant: unexpectedly passed",
+    )
+    print("mutant rejected: r-suffix custom interpolated-string proof escape")
+    r_suffix_interpolation_safe = require_fixture(
+        "interpolation-r-suffix-safe-positive.txt"
+    )
+    require(
+        not find_proof_escapes([
+            (r_suffix_interpolation_safe.name,
+             r_suffix_interpolation_safe.read_text(encoding="utf-8"))
+        ]),
+        "scanner r-suffix interpolation safe-positive: unexpectedly rejected",
+    )
     intermediate_interpolation_mutant = (
         'syntax "x" ident interpolatedStr(term) : term\n'
         'macro_rules | `(x $name:ident $s:interpolatedStr) => `(s! $s)\n'

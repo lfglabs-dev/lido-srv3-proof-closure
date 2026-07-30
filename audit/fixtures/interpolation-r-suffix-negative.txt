@@ -1,0 +1,2 @@
+syntax "bar" interpolatedStr(term) : term
+#check bar"{(sorry : Nat)}"

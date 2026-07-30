@@ -1,0 +1,3 @@
+syntax "bar" interpolatedStr(term) : term
+#check bar"ordinary sorry text"
+def raw := r#"sorry admit axiom unsafe"#
