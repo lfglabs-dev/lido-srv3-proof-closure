@@ -227,6 +227,25 @@ EXPECTED_INVARIANT_DEPENDENCIES = {
         "SRV3-SHA256-PRECOMPILE",
     },
 }
+EXPECTED_INVARIANT_REPRODUCTIONS = {
+    "SRV3-LEGACY-ECON": "lake build LidoSRv3",
+    "SRV3-ARITH-CHECKED": "lake env lean LidoSRv3/Audit/Trust.lean",
+    "SRV3-TX-REVERT": "lake env lean LidoSRv3/Audit/Trust.lean",
+    "SRV3-ALLOC-ORDER": "lake env lean LidoSRv3/Audit/Trust.lean",
+    "SRV3-MINFIRST-BOUND": "lake build LidoSRv3.Audit.Vectors",
+    "SRV3-SOLIDITY-CORR": "python3 scripts/audit_registry.py check",
+    "SRV3-VERITY-431": "python3 scripts/audit_registry.py check",
+    "SRV3-YUL-COMP": "python3 scripts/audit_registry.py check",
+    "SRV3-EVM-RUNTIME": "python3 scripts/audit_registry.py check",
+    "SRV3-SHA256-PRECOMPILE": "python3 scripts/audit_registry.py check",
+    "SRV3-CONSOLIDATION-E2E": "python3 scripts/audit_registry.py check",
+}
+EXPECTED_UNAVAILABLE_ARTIFACT_BLOCKERS = {
+    "consolidation-runtime": (
+        "No independently sourced canonical EIP-7251 production "
+        "runtime/hash/address/fork provenance; current helper uses a Mock build."
+    ),
+}
 EXPECTED_THEOREM_TYPES = {
     "LidoSRv3.P1_reserve_separation": (
         "∀ (s : LidoSRv3.State), "
@@ -980,6 +999,10 @@ def validate(path: Path = REGISTRY, schema_path: Path = SCHEMA) -> dict:
             == EXPECTED_INVARIANT_CLASSIFICATIONS[invariant_id],
             f"{invariant_id}: priority/status/engine/layer differ from expected classification",
         )
+        require(
+            row["reproduction"] == EXPECTED_INVARIANT_REPRODUCTIONS[invariant_id],
+            f"{invariant_id}: reproduction differs from expected verification command",
+        )
         if row["status"] == "PROVED":
             require(theorem is not None, f"{invariant_id}: PROVED requires theorem")
         if row["layer"] in set(layers) & {"EVM", "E2E"} and row["status"] in {"PROVED", "REGRESSION"}:
@@ -1397,6 +1420,7 @@ def validate_artifacts(path: Path = ARTIFACTS) -> None:
     artifacts = manifest.get("artifacts")
     require(isinstance(artifacts, list) and artifacts, "artifacts must be a nonempty array")
     seen: set[str] = set()
+    unavailable_blockers: dict[str, object] = {}
     for artifact in artifacts:
         require(isinstance(artifact, dict), "artifact entry must be an object")
         artifact_id = artifact.get("id")
@@ -1413,6 +1437,7 @@ def validate_artifacts(path: Path = ARTIFACTS) -> None:
         digest = artifact.get("sha256")
         if path is None:
             require(digest is None and artifact.get("blocker"), f"{artifact_id}: unavailable artifact needs blocker")
+            unavailable_blockers[artifact_id] = artifact.get("blocker")
             continue
         file_path = ROOT / path
         require(file_path.is_file(), f"{artifact_id}: missing {path}")
@@ -1420,6 +1445,11 @@ def validate_artifacts(path: Path = ARTIFACTS) -> None:
         require(digest == actual, f"{artifact_id}: sha256 mismatch: expected {digest}, got {actual}")
     require(seen == set(EXPECTED_ARTIFACTS),
             f"artifact inventory differs: {sorted(seen ^ set(EXPECTED_ARTIFACTS))}")
+    for artifact_id, expected_blocker in EXPECTED_UNAVAILABLE_ARTIFACT_BLOCKERS.items():
+        require(
+            unavailable_blockers.get(artifact_id) == expected_blocker,
+            f"{artifact_id}: blocker differs from expected unavailable-artifact provenance",
+        )
     require(
         trust_levels == EXPECTED_ARTIFACT_TRUST_LEVELS,
         "artifact trust-level meanings differ from expected semantics",
@@ -1751,7 +1781,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
-    literal_free_prefix_categories: set[tuple[str, str]] = set()
+    literal_free_prefix_categories: dict[str, set[tuple[str, str]]] = defaultdict(set)
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
         r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
@@ -1801,7 +1831,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 cursor += 1
         return "".join(uncommented)
 
-    for _, source in sources:
+    for source_name, source in sources:
         for declaration in layout_command_spans(
             source, ("syntax", "macro", "set_option")
         ):
@@ -1821,7 +1851,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     r",?[ \t]*([*?+]?)",
                     parser,
                 )
-                literal_free_prefix_categories.add(
+                literal_free_prefix_categories[source_name].add(
                     categories[0] if categories else ("unknown", "")
                 )
             for match in syntax_interpolation.finditer(declaration):
@@ -1850,13 +1880,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         "ident": r"(?:«[^»\r\n]+»|(?:[^\W\d]|_)[\w'.]*)",
         "num": r"\d[\w']*",
     }
-    nullable_literal_free_prefix = any(
-        cardinality in ("*", "?")
-        for _, cardinality in literal_free_prefix_categories
-    )
     literal_free_prefix = "|".join(
         literal_free_category_patterns.get(category, r"[^\s\"]+")
-        for category, _ in sorted(literal_free_prefix_categories)
+        for categories in literal_free_prefix_categories.values()
+        for category, _ in sorted(categories)
     )
     if literal_free_prefix:
         literal_free_prefix = rf"(?:{literal_free_prefix})|"
@@ -1870,6 +1897,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         contexts: list[tuple[str, object]] = [("code", None)]
         sanitized_lines = []
         layout_significant_code = ""
+        layout_delimiters: list[str] = []
         for number, line in enumerate(source.splitlines(), 1):
             code_parts = []
             cursor = 0
@@ -1958,7 +1986,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                         code_parts.append(line[cursor])
                         cursor += 1
                 elif line[cursor] == '"' and (
-                    nullable_literal_free_prefix
+                    any(
+                        cardinality in ("*", "?")
+                        for _, cardinality in literal_free_prefix_categories[name]
+                    )
                     or interpolated_prefix.search(
                         " ".join([layout_significant_code, "".join(code_parts)])
                     )
@@ -1978,10 +2009,15 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             code = "".join(code_parts)
             sanitized_lines.append(code)
             if code.strip():
-                if code[0].isspace() and layout_significant_code:
+                if (code[0].isspace() or layout_delimiters) and layout_significant_code:
                     layout_significant_code += " " + code.strip()
                 else:
                     layout_significant_code = code.strip()
+            for character in code:
+                if character in "([{":
+                    layout_delimiters.append(character)
+                elif character in ")]}" and layout_delimiters:
+                    layout_delimiters.pop()
             if patterns.search(code):
                 violations.append(f"{name}:{number}:{line.strip()}")
         sanitized = "\n".join(sanitized_lines)
@@ -2034,7 +2070,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                 continue
             body_delimiter = False
             delimiter_stack = []
-            pending_type_let_assignments = 0
+            pending_type_assignments = 0
             cursor = match.end()
             while cursor < len(declaration):
                 character = declaration[cursor]
@@ -2044,16 +2080,18 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     if delimiter_stack:
                         delimiter_stack.pop()
                 elif not delimiter_stack:
-                    let_match = re.match(r"let(?![\w'])", declaration[cursor:])
-                    if let_match is not None and (
+                    assignment_match = re.match(
+                        r"(?:let|have)(?![\w'])", declaration[cursor:]
+                    )
+                    if assignment_match is not None and (
                         cursor == 0 or not re.match(r"[\w']", declaration[cursor - 1])
                     ):
-                        pending_type_let_assignments += 1
-                        cursor += len(let_match.group(0))
+                        pending_type_assignments += 1
+                        cursor += len(assignment_match.group(0))
                         continue
                     if declaration.startswith(":=", cursor):
-                        if pending_type_let_assignments:
-                            pending_type_let_assignments -= 1
+                        if pending_type_assignments:
+                            pending_type_assignments -= 1
                             cursor += 2
                             continue
                         body_delimiter = True
@@ -2415,6 +2453,20 @@ def negative_tests() -> None:
         )
     finally:
         priority_path.unlink()
+    reproduction_mutant = json.loads(json.dumps(data))
+    next(
+        row for row in reproduction_mutant["invariants"]
+        if row["id"] == "SRV3-ARITH-CHECKED"
+    )["reproduction"] = "true"
+    reproduction_path = write_mutant(reproduction_mutant)
+    try:
+        expect_failure(
+            "trivially-true reproduction command mutant",
+            lambda: validate(reproduction_path),
+            "SRV3-ARITH-CHECKED: reproduction differs from expected verification command",
+        )
+    finally:
+        reproduction_path.unlink()
     dependency_graph_mutant = json.loads(json.dumps(data))
     next(
         row for row in dependency_graph_mutant["invariants"]
@@ -2600,6 +2652,21 @@ def negative_tests() -> None:
         )
     finally:
         artifact_path.unlink()
+    blocker_mutant = load_json(ARTIFACTS)
+    blocker_mutant = json.loads(json.dumps(blocker_mutant))
+    next(
+        artifact for artifact in blocker_mutant["artifacts"]
+        if artifact["id"] == "consolidation-runtime"
+    )["blocker"] = "Canonical runtime verified and production-ready"
+    blocker_path = write_mutant(blocker_mutant)
+    try:
+        expect_failure(
+            "contradictory unavailable-runtime blocker mutant",
+            lambda: validate_artifacts(blocker_path),
+            "consolidation-runtime: blocker differs from expected unavailable-artifact provenance",
+        )
+    finally:
+        blocker_path.unlink()
 
     scanner_mutant = 'def bait := "escaped quote: \\\\\\" and /-"\naxiom hidden : True\n'
     violations = find_proof_escapes([("scanner-mutant.lean", scanner_mutant)])
@@ -2869,6 +2936,25 @@ def negative_tests() -> None:
         "scanner multiline custom interpolation invocation passed",
     )
     print("mutant rejected: multiline custom interpolation invocation")
+    delimiter_contained_interpolation_mutant = (
+        'syntax ident ident interpolatedStr(term) : term\n'
+        'macro_rules | `($x:ident $name:ident $s:interpolatedStr) => `(s! $s)\n'
+        '#check (x\n'
+        'foo\n'
+        '"{(sorry : Nat)}")\n'
+    )
+    require_lean_elaboration(
+        "scanner delimiter-contained multiline interpolation",
+        delimiter_contained_interpolation_mutant,
+    )
+    require(
+        find_proof_escapes([
+            ("delimiter-contained-interpolation.lean",
+             delimiter_contained_interpolation_mutant)
+        ]),
+        "scanner delimiter-contained multiline interpolation mutant passed",
+    )
+    print("mutant rejected: delimiter-contained multiline interpolation context")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
@@ -3245,6 +3331,19 @@ def negative_tests() -> None:
         "scanner commented nullable interpolation mutant passed",
     )
     print("mutant rejected: elaborated commented nullable interpolation syntax")
+    repository_global_nullable_safe = (
+        (
+            "local-nullable.lean",
+            'local macro xs:ident* value:interpolatedStr(term) : command => '
+            '`(example : True := by trivial)\n',
+        ),
+        ("unrelated.lean", 'def inert : String := "{sorry}"\n'),
+    )
+    require(
+        not find_proof_escapes(list(repository_global_nullable_safe)),
+        "scanner repository-global nullable interpolation safe-positive was rejected",
+    )
+    print("safe positive accepted: nullable interpolation remains source-scoped")
     separated_nullable_interpolation_mutant = (
         "macro xs:ident,* value:interpolatedStr(term) : command => "
         "`(#check s!$value)\n"
@@ -3371,6 +3470,16 @@ def negative_tests() -> None:
         "scanner type-level let bodyless opaque mutant passed",
     )
     print("mutant rejected: type-level let bodyless opaque")
+    type_have_opaque_mutant = (
+        "opaque hidden : by have p : Prop := False; exact p\n"
+    )
+    require(
+        find_proof_escapes([
+            ("type-have-bodyless-opaque.lean", type_have_opaque_mutant)
+        ]),
+        "scanner type-level have bodyless opaque mutant passed",
+    )
+    print("mutant rejected: type-level have bodyless opaque")
     for label, source in (
         (
             "unparenthesized type-level let",
