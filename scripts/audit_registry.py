@@ -1841,17 +1841,21 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         return "".join(uncommented)
 
     def namespace_at(source: str, offset: int) -> str:
-        namespaces: list[str] = []
+        scopes: list[tuple[str, str]] = []
         for line in without_lean_comments(source[:offset]).splitlines():
             namespace_match = re.match(
                 r"^[ \t]*namespace[ \t]+([A-Za-z_][\w']*)[ \t]*$", line
             )
             if namespace_match is not None:
-                namespaces.append(namespace_match.group(1))
+                scopes.append(("namespace", namespace_match.group(1)))
+            elif re.match(
+                r"^[ \t]*section(?:[ \t]+[A-Za-z_][\w']*)?[ \t]*$", line
+            ):
+                scopes.append(("section", ""))
             elif re.match(r"^[ \t]*end(?:[ \t]+[A-Za-z_][\w']*)?[ \t]*$", line):
-                if namespaces:
-                    namespaces.pop()
-        return ".".join(namespaces)
+                if scopes:
+                    scopes.pop()
+        return ".".join(name for kind, name in scopes if kind == "namespace")
 
     for source_name, source in sources:
         declaration_cursor = 0
@@ -3586,6 +3590,25 @@ def negative_tests() -> None:
         "scanner missed open-scoped interpolation proof escape",
     )
     print("mutant rejected: scoped interpolation activates only after open scoped")
+    namespace_section_scoped_mutant = require_fixture(
+        "namespace-section-scoped-nullable-negative.txt"
+    ).read_text(encoding="utf-8")
+    require_lean_elaboration(
+        "scanner namespace/section scoped nullable interpolation mutant",
+        namespace_section_scoped_mutant,
+    )
+    require(
+        find_proof_escapes(
+            [
+                (
+                    "namespace-section-scoped-nullable-negative.lean",
+                    namespace_section_scoped_mutant,
+                ),
+            ]
+        ),
+        "scanner namespace/section scoped nullable interpolation mutant passed",
+    )
+    print("mutant rejected: section end preserves namespace-scoped activation")
     import_comment_safe_positive = (
         'import Base -- Decl\n'
         'def inert : String := "{sorry}"\n'

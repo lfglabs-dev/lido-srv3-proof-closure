@@ -1,0 +1,13 @@
+namespace AuditScanner
+
+section Inner
+end Inner
+
+open scoped AuditScanner
+
+scoped macro xs:ident* value:interpolatedStr(term) : command =>
+  `(#check s!$value)
+
+"{(sorry : Nat)}"
+
+end AuditScanner
