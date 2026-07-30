@@ -1,0 +1,12 @@
+PR #9 actionable-thread repair validation
+base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
+before-head: 0e265e5c58db78a88eb1d697ca8f5b3d0c30a420
+
+lake build: exit 0 (31 jobs)
+make test: exit 0 (metadata mutants, provenance guards, Lean vectors, fixtures)
+python3 scripts/audit_metadata.py generate + freshness diff: exit 0
+python3 scripts/audit_metadata.py check: exit 0
+JSON-compatible audit/*.yaml parse: exit 0 (4 files)
+changed-Lean forbidden proof-escape scan: exit 0 (sole raw token hit is the documented Trust comment)
+bash scripts/check_provenance_guards.sh: exit 0
+git diff --check: exit 0

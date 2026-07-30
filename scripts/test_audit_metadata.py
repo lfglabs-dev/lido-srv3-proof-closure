@@ -188,10 +188,47 @@ def main():
             fixture,
             False,
             "generate",
-            "lean-toolchain must use the canonical leanprover/lean4 origin",
+            "lean-toolchain must use the canonical Lean 4.31 toolchain",
         )
         toolchain_path.write_text(canonical_toolchain, encoding="utf-8")
         write_json(lock_path, baseline_lock)
+
+        newer_toolchain = canonical_toolchain.replace("v4.31.0", "v4.32.0")
+        toolchain_path.write_text(newer_toolchain, encoding="utf-8")
+        newer_lock = copy.deepcopy(baseline_lock)
+        newer_lock["pins"]["lean"]["toolchain"] = newer_toolchain.strip()
+        write_json(lock_path, newer_lock)
+        newer_manifest = copy.deepcopy(audit_manifest)
+        newer_manifest["source_revisions"]["lean"] = "v4.32.0"
+        write_json(audit_manifest_path, newer_manifest)
+        run(
+            fixture,
+            False,
+            "generate",
+            "lean-toolchain must use the canonical Lean 4.31 toolchain",
+        )
+        toolchain_path.write_text(canonical_toolchain, encoding="utf-8")
+        write_json(lock_path, baseline_lock)
+        write_json(audit_manifest_path, audit_manifest)
+
+        proof_policy_mutants = {
+            "project_axioms": 1,
+            "sorry": 1,
+            "admit": 1,
+            "unsafe_proof_escapes": 1,
+            "report_entrypoint": "LidoSRv3.Audit.Missing",
+        }
+        for field, value in proof_policy_mutants.items():
+            malformed_policy = copy.deepcopy(audit_manifest)
+            malformed_policy["proof_policy"][field] = value
+            write_json(audit_manifest_path, malformed_policy)
+            run(
+                fixture,
+                False,
+                "generate",
+                "audit manifest proof policy differs from the canonical zero-escape policy",
+            )
+        write_json(audit_manifest_path, audit_manifest)
 
         malformed = copy.deepcopy(guarantees)
         malformed["guarantees"][0]["statuses"].pop("crypto")
@@ -319,7 +356,7 @@ def main():
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
         "assumption records/links, authority, Common manifest/revisions, "
-        "canonical Lean origin, source-map policy, reproduction evidence, "
+        "canonical Lean toolchain, proof policy, source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )
 

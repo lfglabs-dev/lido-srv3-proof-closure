@@ -193,7 +193,7 @@ CAMPAIGN_BASE = {
     "commit": "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1",
 }
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
-CANONICAL_LEAN_TOOLCHAIN_PREFIX = "leanprover/lean4:"
+CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
     for name in (
@@ -228,6 +228,13 @@ EXPECTED_COMMON_THEOREMS = [
         "axioms": ["propext"],
     },
 ]
+EXPECTED_PROOF_POLICY = {
+    "project_axioms": 0,
+    "sorry": 0,
+    "admit": 0,
+    "unsafe_proof_escapes": 0,
+    "report_entrypoint": "LidoSRv3.Audit.Trust",
+}
 EXPECTED_SOURCE_POLICY = (
     "Source spans remain unmapped unless independently verified from pinned source; "
     "names or legacy anchors are insufficient."
@@ -284,8 +291,8 @@ def validate_lock(lock, source_map):
     lido_source_repository, lido_commit = source_map["pinned_source"].split("@", 1)
     require(lido_source_repository == "lidofinance/core",
             "source-map pinned_source must use the canonical lidofinance/core repository")
-    require(toolchain.startswith(CANONICAL_LEAN_TOOLCHAIN_PREFIX),
-            "lean-toolchain must use the canonical leanprover/lean4 origin")
+    require(toolchain == CANONICAL_LEAN_TOOLCHAIN,
+            "lean-toolchain must use the canonical Lean 4.31 toolchain")
 
     expected_pins = {
         "lido_core": {
@@ -316,6 +323,8 @@ def validate_lock(lock, source_map):
     lean_revision = toolchain.rsplit(":", 1)[-1]
     require(audit_manifest["source_revisions"]["lean"] == lean_revision,
             "Lean toolchain pin differs from verity target audit manifest")
+    require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,
+            "audit manifest proof policy differs from the canonical zero-escape policy")
     audit_modules = set(audit_manifest["layers"]["audit"]["modules"])
     require(EXPECTED_COMMON_MODULES <= audit_modules,
             "audit manifest omits canonical Common modules")
