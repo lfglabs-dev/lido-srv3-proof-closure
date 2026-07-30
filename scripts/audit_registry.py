@@ -767,6 +767,10 @@ def validate_lock(path: Path = LOCK) -> None:
     )
     require(lock["proof"]["ref"] == "main", "proof: exact ref mismatch")
     require(
+        lock["verity"]["ref"] == "dev/lean-4.31-scaffolding",
+        "Verity: exact ref mismatch",
+    )
+    require(
         lock["lido_core"]["repository"] == "https://github.com/lidofinance/core.git",
         "lido_core: exact repository mismatch",
     )
@@ -1944,6 +1948,7 @@ def negative_tests() -> None:
     for component, field, value, expected in (
         ("lido_core", "repository", "https://github.com/example/core.git",
          "lido_core: exact repository mismatch"),
+        ("verity", "ref", "does-not-exist", "Verity: exact ref mismatch"),
         ("evmyullean", "ref", "does-not-exist", "EVMYulLean: exact ref mismatch"),
         ("current_root", "plane", "audit-only",
          "current root plane must remain active"),
