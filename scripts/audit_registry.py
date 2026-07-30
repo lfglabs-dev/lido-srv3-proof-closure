@@ -1396,7 +1396,8 @@ def layout_command_spans(source: str, commands: tuple[str, ...]) -> list[str]:
     index = 0
     starter = re.compile(
         r"^([ \t]*)(?:@\[[\s\S]*?\][ \t\r\n]*)*"
-        r"(?:(?:private|protected|local|scoped(?:[ \t]*\[[^\]\n]*\])?)[ \t]+)*"
+        r"(?:(?:private|protected|local|noncomputable|"
+        r"scoped(?:[ \t]*\[[^\]\n]*\])?)[ \t]+)*"
         r"(?:" + "|".join(re.escape(command) for command in commands) + r")\b"
     )
 
@@ -1551,7 +1552,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     )
     violations = []
     declared_interpolated_prefixes: set[tuple[str, bool]] = set()
-    has_literal_free_interpolation = False
+    literal_free_prefix_categories: set[str] = set()
     syntax_interpolation = re.compile(
         r'\b(?:syntax(?:\s*\([^)]*\))?|macro)\b'
         r'[\s\S]*?"((?:\\.|[^"\\])*)"\s+'
@@ -1574,7 +1575,15 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
                     r'"(?:\\.|[^"\\])*"', interpolation_match.group("parser")
                 ) is None
             ):
-                has_literal_free_interpolation = True
+                parser = interpolation_match.group("parser")
+                categories = re.findall(
+                    r"(?:[A-Za-z_][\w']*|«[^»\r\n]+»)[ \t]*:[ \t]*"
+                    r"([A-Za-z_][\w']*)",
+                    parser,
+                )
+                literal_free_prefix_categories.add(
+                    categories[0] if categories else "unknown"
+                )
             for match in syntax_interpolation.finditer(declaration):
                 try:
                     prefix = json.loads(f'"{match.group(1)}"')
@@ -1595,10 +1604,16 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
     custom_prefix = (
         rf"(?:{declared_prefix_pattern})|" if declared_prefix_pattern else ""
     )
-    literal_free_prefix = (
-        r"(?:«[^»\r\n]+»|(?:[^\W\d]|_)[\w'.]*)|"
-        if has_literal_free_interpolation else ""
+    literal_free_category_patterns = {
+        "ident": r"(?:«[^»\r\n]+»|(?:[^\W\d]|_)[\w'.]*)",
+        "num": r"\d[\w']*",
+    }
+    literal_free_prefix = "|".join(
+        literal_free_category_patterns.get(category, r"[^\s\"]+")
+        for category in sorted(literal_free_prefix_categories)
     )
+    if literal_free_prefix:
+        literal_free_prefix = rf"(?:{literal_free_prefix})|"
     interpolated_prefix = re.compile(
         rf"(?:{custom_prefix}{literal_free_prefix}!|"
         r"Macro\.trace\[[^\]]*\]|trace(?:_goal)?\[[^\]]*\]|"
@@ -1713,7 +1728,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?:@\[[\s\S]*?\][ \t\r\n]*)*"
             r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
             r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
-            r"(?:(?:private|protected)[ \t\r\n]+)*opaque\b",
+            r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*opaque\b",
             sanitized,
         ):
             line_number = sanitized.count("\n", 0, macro_opaque.start()) + 1
@@ -1737,7 +1752,7 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"\A[ \t\r\n]*(?:@\[[\s\S]*?\][ \t\r\n]*)*"
             r"(?:(?:set_option\b[\s\S]*?\bin[ \t\r\n]+)"
             r"(?:@\[[\s\S]*?\][ \t\r\n]*)*)*"
-            r"(?:(?:private|protected)[ \t\r\n]+)*opaque[ \t]+"
+            r"(?:(?:private|protected|noncomputable)[ \t\r\n]+)*opaque[ \t]+"
         )
         opaque_search_from = 0
         for source_declaration in layout_command_spans(
@@ -2665,6 +2680,44 @@ def negative_tests() -> None:
         "scanner literal-free interpolation mutant passed",
     )
     print("mutant rejected: literal-free interpolation syntax")
+    numeral_interpolation_mutant = (
+        "macro n:num value:interpolatedStr(term) : term => `(s!$value)\n"
+        '#check 1 "{(sorry : Nat)}"\n'
+    )
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".lean", encoding="utf-8", dir=ROOT, delete=False
+    ) as numeral_file:
+        numeral_file.write(numeral_interpolation_mutant)
+        numeral_path = Path(numeral_file.name)
+    try:
+        elaborated = subprocess.run(
+            ["lake", "env", "lean", str(numeral_path.relative_to(ROOT))],
+            cwd=ROOT, text=True, capture_output=True,
+        )
+    finally:
+        numeral_path.unlink()
+    require(
+        elaborated.returncode == 0,
+        "scanner numeral interpolation mutant must elaborate:\n"
+        + (elaborated.stderr or elaborated.stdout).strip(),
+    )
+    require(
+        find_proof_escapes([
+            ("numeral-literal-free-interpolation.lean",
+             numeral_interpolation_mutant)
+        ]),
+        "scanner numeral literal-free interpolation mutant passed",
+    )
+    print("mutant rejected: elaborated numeral literal-free interpolation syntax")
+    noncomputable_opaque_mutant = "noncomputable opaque hidden : Nat\n"
+    require(
+        find_proof_escapes([
+            ("noncomputable-bodyless-opaque.lean",
+             noncomputable_opaque_mutant)
+        ]),
+        "scanner noncomputable bodyless opaque mutant passed",
+    )
+    print("mutant rejected: noncomputable bodyless opaque")
     elaborator_generated_axiom_mutant = (
         "import Lean\n"
         "open Lean Elab Command\n"
