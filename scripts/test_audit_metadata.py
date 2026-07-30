@@ -175,6 +175,24 @@ def main():
             )
         write_json(audit_manifest_path, audit_manifest)
 
+        toolchain_path = fixture / "lean-toolchain"
+        canonical_toolchain = toolchain_path.read_text(encoding="utf-8")
+        noncanonical_toolchain = canonical_toolchain.replace(
+            "leanprover/lean4:", "example/lean4:"
+        )
+        toolchain_path.write_text(noncanonical_toolchain, encoding="utf-8")
+        noncanonical_lock = copy.deepcopy(baseline_lock)
+        noncanonical_lock["pins"]["lean"]["toolchain"] = noncanonical_toolchain.strip()
+        write_json(lock_path, noncanonical_lock)
+        run(
+            fixture,
+            False,
+            "generate",
+            "lean-toolchain must use the canonical leanprover/lean4 origin",
+        )
+        toolchain_path.write_text(canonical_toolchain, encoding="utf-8")
+        write_json(lock_path, baseline_lock)
+
         malformed = copy.deepcopy(guarantees)
         malformed["guarantees"][0]["statuses"].pop("crypto")
         write_json(guarantees_path, malformed)
@@ -301,7 +319,7 @@ def main():
         "optimized audit metadata mutants rejected: "
         "all pins/base/blockers, source/exclusions, "
         "assumption records/links, authority, Common manifest/revisions, "
-        "source-map policy, reproduction evidence, "
+        "canonical Lean origin, source-map policy, reproduction evidence, "
         "status vocabulary/plane/closure, stale view"
     )
 
