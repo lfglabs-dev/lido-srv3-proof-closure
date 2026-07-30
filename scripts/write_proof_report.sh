@@ -62,7 +62,7 @@ cat <<JSON
   "schema": "srv3-verity-lean-proof-report-v2",
   "toolchain": {
     "lean": "${LEAN_VERSION}",
-    "verity_commit": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f"
+    "verity_commit": "6cfc41fe4129e2c56f130bab9617a0c677ce60ae"
   },
   "command": "lake build LidoSRv3",
   "build": {
