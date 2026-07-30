@@ -1330,10 +1330,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
         r"implemented_by|extern)(?![\w'])"
     )
     violations = []
-    declared_interpolated_prefixes: set[str] = set()
+    declared_interpolated_prefixes: set[tuple[str, bool]] = set()
     syntax_interpolation = re.compile(
         r'\bsyntax(?:\s*\([^)\n]*\))?\s+"((?:\\.|[^"\\])*)"\s+'
-        r'interpolatedStr(?:\([^)\n]*\))?'
+        r'([^\n]*?)\binterpolatedStr(?:\([^)\n]*\))?'
     )
     for _, source in sources:
         for match in syntax_interpolation.finditer(source):
@@ -1342,10 +1342,16 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             except json.JSONDecodeError:
                 continue
             if prefix:
-                declared_interpolated_prefixes.add(prefix)
+                declared_interpolated_prefixes.add(
+                    (prefix, bool(match.group(2).strip()))
+                )
     declared_prefix_pattern = "|".join(
-        re.escape(prefix)
-        for prefix in sorted(declared_interpolated_prefixes, key=len, reverse=True)
+        re.escape(prefix) + (r"(?:\s+\S.*)?" if has_intermediate else "")
+        for prefix, has_intermediate in sorted(
+            declared_interpolated_prefixes,
+            key=lambda item: len(item[0]),
+            reverse=True,
+        )
     )
     custom_prefix = (
         rf"(?:{declared_prefix_pattern})|" if declared_prefix_pattern else ""
@@ -1459,14 +1465,18 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
             r"(?:(?:private|protected)[ \t]+)*opaque[ \t]+"
         )
-        custom_commands = {
-            command
-            for command in re.findall(
-                r'(?m)^[ \t]*(?:syntax|macro|elab)\b[^\n"]*'
-                r'"([A-Za-z_][A-Za-z0-9_\']*)"[^\n]*:[ \t]*command\b',
-                sanitized,
-            )
-        }
+        custom_commands = set()
+        for command_match in re.finditer(
+            r'(?m)^[ \t]*(?:syntax|macro|elab)\b[^\n"]*'
+            r'"((?:\\.|[^"\\])+)"[^\n]*:[ \t]*command\b',
+            source,
+        ):
+            try:
+                command = json.loads(f'"{command_match.group(1)}"')
+            except json.JSONDecodeError:
+                continue
+            if command and not any(character.isspace() for character in command):
+                custom_commands.add(command)
         custom_command_pattern = (
             "|".join(re.escape(command) for command in sorted(custom_commands))
         )
@@ -1474,7 +1484,10 @@ def find_proof_escapes(sources: list[tuple[str, str]]) -> list[str]:
             r"(?m)^[ \t]*(?:@\[[^\n]*\][ \t]*)*"
             r"(?:(?:private|protected)[ \t]+)*"
             r"(?:#\w+|"
-            + (f"(?:{custom_command_pattern})|" if custom_command_pattern else "")
+            + (
+                f"(?:{custom_command_pattern})(?=[ \t]|$)|"
+                if custom_command_pattern else ""
+            )
             +
             r"opaque|def|theorem|lemma|axiom|constant|inductive|structure|class|"
             r"instance|abbrev|example|namespace|section|end|open|export|variable|"
@@ -1921,6 +1934,19 @@ def negative_tests() -> None:
         "scanner non-bang interpolated-string macro mutant: unexpectedly passed",
     )
     print("mutant rejected: non-bang interpolated-string macro proof escape")
+    intermediate_interpolation_mutant = (
+        'syntax "x" ident interpolatedStr(term) : term\n'
+        'macro_rules | `(x $name:ident $s:interpolatedStr) => `(s! $s)\n'
+        'def bait : String := x foo "{(sorry : Nat)}"\n'
+    )
+    require(
+        find_proof_escapes([
+            ("intermediate-interpolation-mutant.lean",
+             intermediate_interpolation_mutant)
+        ]),
+        "scanner intermediate-parser interpolated-string mutant: unexpectedly passed",
+    )
+    print("mutant rejected: intermediate-parser interpolated-string macro proof escape")
     safe_dbg_trace = 'def safe : Nat := dbg_trace "ordinary sorry text {1 + 1}"; 0\n'
     require(
         not find_proof_escapes([("safe-dbg-trace.lean", safe_dbg_trace)]),
@@ -1973,10 +1999,10 @@ def negative_tests() -> None:
         )
         print(f"mutant rejected: bodyless opaque before {label} command")
     custom_command_mutant = (
-        'syntax "auditCmd" term : command\n'
-        "macro_rules | `(auditCmd $term) => `(example : True := $term)\n"
+        'syntax "audit-cmd" ":=" term : command\n'
+        "macro_rules | `(audit-cmd := $term) => `(example : True := $term)\n"
         "opaque hidden : False\n"
-        "auditCmd by trivial\n"
+        "audit-cmd := by trivial\n"
     )
     require(
         find_proof_escapes([
