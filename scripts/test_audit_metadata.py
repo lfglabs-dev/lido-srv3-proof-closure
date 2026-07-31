@@ -320,7 +320,10 @@ def main():
             ),
         )
         for path, artifact, expected_error in schema_artifacts:
-            for schema in (None, "incompatible-v999"):
+            schemas = (None, "incompatible-v999")
+            if path == guarantees_path:
+                schemas += ("lido-srv3-minimal-11-guarantees-v1",)
+            for schema in schemas:
                 malformed_schema = copy.deepcopy(artifact)
                 if schema is None:
                     del malformed_schema["schema"]
@@ -504,6 +507,19 @@ def main():
         malformed["guarantees"][0]["statuses"].pop("crypto")
         write_json(guarantees_path, malformed)
         run(fixture, False, "generate")
+        write_json(guarantees_path, guarantees)
+
+        stale_alloc2_gate = copy.deepcopy(guarantees)
+        stale_alloc2_gate["guarantees"][1]["next_gate"] = (
+            "Connect checked quantities to independently verified pinned source spans."
+        )
+        write_json(guarantees_path, stale_alloc2_gate)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-2: next gate differs from canonical roadmap",
+        )
         write_json(guarantees_path, guarantees)
 
         for index, guarantee in enumerate(guarantees["guarantees"]):
