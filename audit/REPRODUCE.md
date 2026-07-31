@@ -12,4 +12,4 @@
 - `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
 - `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
-- `P-SSZ-1`: `python3 scripts/audit_metadata.py check` — E2E remains blocked; metadata cannot discharge dependencies
+- `P-SSZ-1`: `lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.SszRegression` — successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence

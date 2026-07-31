@@ -95,8 +95,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "MISSING provenance remains explicit and fails semantic closure"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
-    {"command": "python3 scripts/audit_metadata.py check",
-     "expected": "E2E remains blocked; metadata cannot discharge dependencies"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.SszRegression",
+     "expected": "successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL"],
@@ -123,7 +123,7 @@ EXPECTED_NEXT_GATES = [
     "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
-    "Close source/Yul/EVM/crypto composition with canonical production provenance.",
+    "Establish source correspondence, SHA-256/precompile semantics, and canonical production provenance before any Yul/EVM/crypto/E2E composition.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -161,7 +161,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
 ]
 EXPECTED_THEOREM_PLANES = [
@@ -175,7 +175,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     [],
     [],
-    [],
+    ["model"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded",
@@ -188,7 +188,7 @@ EXPECTED_THEOREMS = [
     None,
     None,
     None,
-    None,
+    "LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -245,6 +245,8 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Strategy",
             "LidoSRv3.Audit.StrategyProofs",
             "LidoSRv3.Audit.Vectors",
+            "LidoSRv3.Audit.Ssz",
+            "LidoSRv3.Audit.SszRegression",
             "LidoSRv3.Audit.Common.Units",
             "LidoSRv3.Audit.Common.Result",
             "LidoSRv3.Audit.Common.Trace",
@@ -271,6 +273,8 @@ EXPECTED_MANIFEST_THEOREMS = [
     {"name": "Guarantees.PAlloc1.active_capacity_bounded", "status": "lean_checked",
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc2.selects_least_open_bucket", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "Guarantees.PSsz1.structural_witness_binding_sound", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_open", "status": "lean_checked", "axioms": ["propext"]},

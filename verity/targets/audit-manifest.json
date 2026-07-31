@@ -19,6 +19,8 @@
         "LidoSRv3.Audit.Strategy",
         "LidoSRv3.Audit.StrategyProofs",
         "LidoSRv3.Audit.Vectors",
+        "LidoSRv3.Audit.Ssz",
+        "LidoSRv3.Audit.SszRegression",
         "LidoSRv3.Audit.Common.Units",
         "LidoSRv3.Audit.Common.Result",
         "LidoSRv3.Audit.Common.Trace",
@@ -68,6 +70,11 @@
     },
     {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PSsz1.structural_witness_binding_sound",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
     },
