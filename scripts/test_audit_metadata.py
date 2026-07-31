@@ -685,6 +685,31 @@ def main():
             "source span is not a verified semantic anchor",
         )
 
+        downgraded_verified_target = copy.deepcopy(source_map)
+        downgraded_verified_target["targets"][0] = {
+            "id": source_map["targets"][0]["id"],
+            "status": "UNMAPPED",
+            "spans": [],
+            "blocker": "Deliberate downgrade fixture.",
+        }
+        write_json(source_map_path, downgraded_verified_target)
+        run(
+            fixture,
+            False,
+            "generate",
+            "verified source target must remain MAPPED",
+        )
+
+        duplicate_span = copy.deepcopy(source_map)
+        duplicate_span["targets"][0]["spans"].append(copy.deepcopy(valid_span))
+        write_json(source_map_path, duplicate_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "duplicate source spans are forbidden",
+        )
+
         unmapped_with_claim = copy.deepcopy(source_map)
         unmapped_with_claim["targets"][0]["status"] = "UNMAPPED"
         unmapped_with_claim["targets"][0]["blocker"] = "Deliberate fixture."
@@ -693,7 +718,7 @@ def main():
             fixture,
             False,
             "generate",
-            "UNMAPPED source row must not claim spans",
+            "verified source target must remain MAPPED",
         )
         write_json(source_map_path, source_map)
 

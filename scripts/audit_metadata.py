@@ -448,6 +448,8 @@ def validate_source_targets(source_map):
         require(status in {"MAPPED", "UNMAPPED"},
                 f"{target_id}: source-map status must be MAPPED or UNMAPPED")
         require(isinstance(spans, list), f"{target_id}: source-map spans must be a list")
+        require(status == "MAPPED",
+                f"{target_id}: verified source target must remain MAPPED")
         if status == "UNMAPPED":
             require(not spans, f"{target_id}: UNMAPPED source row must not claim spans")
             require(isinstance(target.get("blocker"), str) and target["blocker"].strip(),
@@ -489,6 +491,8 @@ def validate_source_targets(source_map):
             (span["path"], span["function"], span["start_line"], span["end_line"])
             for span in spans
         }
+        require(len(actual_anchors) == len(spans),
+                f"{target_id}: duplicate source spans are forbidden")
         require(actual_anchors == VERIFIED_SOURCE_ANCHORS[target_id],
                 f"{target_id}: source spans differ from verified semantic anchors")
 
