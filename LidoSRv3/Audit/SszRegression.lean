@@ -27,6 +27,13 @@ def witness : ValidatorWitness :=
 
 def expectedRoot : Node := mix (validatorRoot mix validator) 17
 
+def adversarialPath : List SiblingSide := [.left, .left, .right]
+
+def adversarialBranch : List Node := [17, 18, 19]
+
+def adversarialRoot : Node :=
+  traverseBranch mix (validatorRoot mix validator) adversarialPath adversarialBranch
+
 def relabelledWitness : ValidatorWitness := { witness with operation := .clProofVerifier }
 
 /-- Regression: generalized index 2 selects one right sibling on leaf-to-root traversal. -/
@@ -49,11 +56,14 @@ example : pivot rootIndex = 1 ∧ branchPath rootIndex = [] ∧
     indexFromPivotPath (pivot rootIndex) (branchPath rootIndex) = rootIndex.value := by decide
 
 /-- Negative regression: a path with the wrong low-bit direction misses the index. -/
-example : indexFromPivotPath (pivot indexTen) [.left, .left, .right] ≠ indexTen.value := by decide
+example : indexFromPivotPath (pivot indexTen) adversarialPath ≠ indexTen.value := by decide
 
-/-- Adversarial regression: a supplied path with the wrong low bits is rejected. -/
+/--
+Adversarial regression: even with the correct boundary, depth, arity, and root
+for the supplied path, its wrong low bits make the verifier reject the witness.
+-/
 example : verifyProof mix (validatorRoot mix validator) indexTen (pivot indexTen)
-    [.left, .left, .right] [17, 18, 19] 0 = false := by decide
+    adversarialPath adversarialBranch adversarialRoot = false := by decide
 
 /-- Regression: named wrappers occupy distinct generalized-index structures. -/
 example : operationIndex .clValidatorVerifier ≠ operationIndex .clProofVerifier := by decide
