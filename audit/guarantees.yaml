@@ -1,5 +1,5 @@
 {
-  "schema": "lido-srv3-minimal-11-guarantees-v1",
+  "schema": "lido-srv3-minimal-11-guarantees-v2",
   "authority": "Lean theorem statements and proofs are authoritative; this metadata does not close a semantic guarantee.",
   "guarantees": [
     {
@@ -19,7 +19,7 @@
       "theorem_planes": ["algorithm"],
       "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-HANDWRITTEN-MINFIRST"],
-      "next_gate": "Connect checked quantities to independently verified pinned source spans.",
+      "next_gate": "Establish pinned-source correspondence between MinFirst.candidate? and MinFirstAllocationStrategy.allocateToBestCandidate.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful semantic MinFirst ALG theorem build"}
     },
     {

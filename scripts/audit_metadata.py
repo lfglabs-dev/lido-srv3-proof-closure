@@ -113,7 +113,8 @@ EXPECTED_ASSUMPTION_LINKS = [
 ]
 EXPECTED_NEXT_GATES = [
     "Establish pinned-source correspondence for each claimed economic transition.",
-    "Connect checked quantities to independently verified pinned source spans.",
+    "Establish pinned-source correspondence between MinFirst.candidate? and "
+    "MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Refine success/revert and rollback against pinned executable EVM semantics.",
     "Prove extraction and ordered-row correspondence from pinned Solidity.",
     "Establish source correspondence and checked-Uint256 execution refinement.",
@@ -218,7 +219,7 @@ CANONICAL_MATHLIB_COMMIT = "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
 CANONICAL_MATHLIB_INPUT_REV = "v4.31.0"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
-EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v1"
+EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v2"
 EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v2"
 EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
