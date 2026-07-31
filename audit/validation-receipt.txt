@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 8b59e4eb9a36df8062c45eaef7611e56de130ac2
+validated-tree: c7c2d7c6cf8175d7d9598d1ad1fc3ca4f4c17c83
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -12,3 +12,11 @@ views, and the executable `verity/targets/audit-manifest.json` consumer. The
 legacy-model regression modules are retained under `LidoSRv3.Legacy`; their
 historical dossiers remain because their source references and limitations are
 not all represented in the minimal-11 registry.
+
+P-SSZ-1 structural gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0; `structural_witness_binding_sound`
+  reports only Lean foundations `propext` and `Quot.sound`.
+- `make test`: exit 0, including `LidoSRv3.Audit.SszRegression`.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.

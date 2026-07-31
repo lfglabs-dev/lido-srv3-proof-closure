@@ -4,6 +4,7 @@ import LidoSRv3.Audit.Common.Atomicity
 import LidoSRv3.Audit.Common.Bounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
+import LidoSRv3.Audit.Guarantees.PSsz1
 
 /-!
 Machine-readable-in-build axiom report for the first audit slice.
@@ -19,6 +20,7 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
 #print axioms LidoSRv3.Audit.MinFirst.candidate_open
 #print axioms LidoSRv3.Audit.MinFirst.candidate_none_no_open
