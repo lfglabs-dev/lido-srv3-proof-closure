@@ -1,18 +1,128 @@
 {
-  "schema": "lido-srv3-minimal-11-source-map-v1",
+  "schema": "lido-srv3-minimal-11-source-map-v2",
   "pinned_source": "lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b",
   "policy": "Source spans remain unmapped unless independently verified from pinned source; names or legacy anchors are insufficient.",
+  "scope": {
+    "public_guarantee_count": 11,
+    "transaction_atomicity": "INTERNAL_ONLY",
+    "assurance_layers": ["MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"],
+    "metadata_is_proof_progress": false
+  },
+  "accepted_risks": {
+    "baseline": "DEV-431-READY_NOT_AUDIT-CERT",
+    "two_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
+    "sha256_ffi": "OPAQUE",
+    "production_runtime_codehash_fork_address_provenance": "INCOMPLETE"
+  },
+  "ssz_claim": {
+    "level": "STRUCTURAL_ONLY",
+    "includes": ["structures", "generalized_indices", "pivot_and_branch_traversal", "wrapper_binding", "operation_binding"],
+    "excludes": ["FULL_SSZ", "SHA256_CRYPTOGRAPHIC_CORRECTNESS", "DEPLOYED_PRECOMPILE_EQUIVALENCE", "RUNTIME_CODEHASH_FORK_ADDRESS_PROVENANCE", "EIP_7251_PROVENANCE"]
+  },
   "targets": [
-    {"id": "P-ALLOC-1", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-ALLOC-2", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-DEPOSIT-1", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-TOPUP-1", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-ACCOUNT-1", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-RESERVE-1", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-ETH-1", "status": "UNMAPPED", "spans": [], "blocker": "Toolchain item; no independently verified Lido source span."},
-    {"id": "P-ADDRESS-1", "status": "UNMAPPED", "spans": [], "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-TOPUP-2", "status": "UNMAPPED", "spans": [], "blocker": "Canonical runtime provenance is MISSING."},
-    {"id": "P-CONSOLIDATION-1", "status": "UNMAPPED", "spans": [], "blocker": "Opaque native FFI identity is MISSING."},
-    {"id": "P-SSZ-1", "status": "UNMAPPED", "spans": [], "blocker": "Canonical runtime/codehash/fork/address provenance is MISSING."}
+    {
+      "id": "P-ALLOC-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/StakingRouter.sol", "function": "getDepositAllocations", "start_line": 929, "end_line": 936, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L929-L936"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRLib.sol", "function": "_getDepositAllocations", "start_line": 391, "end_line": 431, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L391-L431"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRLib.sol", "function": "_getModulesAllocationAndCapacity", "start_line": 493, "end_line": 559, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L493-L559"}
+      ]
+    },
+    {
+      "id": "P-ALLOC-2",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/MinFirstAllocationStrategy.sol", "function": "allocate", "start_line": 30, "end_line": 44, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/MinFirstAllocationStrategy.sol", "function": "allocateToBestCandidate", "start_line": 63, "end_line": 107, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L63-L107"}
+      ]
+    },
+    {
+      "id": "P-DEPOSIT-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/StakingRouter.sol", "function": "deposit", "start_line": 942, "end_line": 997, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L942-L997"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "withdrawDepositableEther", "start_line": 869, "end_line": 886, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L869-L886"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol", "function": "makeBeaconChainDeposits32ETH", "start_line": 36, "end_line": 64, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L36-L64"}
+      ]
+    },
+    {
+      "id": "P-TOPUP-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/StakingRouter.sol", "function": "topUp", "start_line": 679, "end_line": 759, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L679-L759"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol", "function": "makeBeaconChainTopUp", "start_line": 66, "end_line": 108, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L66-L108"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_spendDepositableEther", "start_line": 839, "end_line": 859, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"}
+      ]
+    },
+    {
+      "id": "P-ACCOUNT-1",
+      "status": "UNMAPPED",
+      "spans": [],
+      "blocker": "No independently verified pinned-source correspondence for LidoSRv3.Audit.MinFirst.totalAllocated_le_requested."
+    },
+    {
+      "id": "P-RESERVE-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_getBufferedEtherAllocation", "start_line": 576, "end_line": 616, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L576-L616"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_getDepositableEther", "start_line": 823, "end_line": 833, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L823-L833"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_spendDepositableEther", "start_line": 839, "end_line": 859, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"}
+      ]
+    },
+    {
+      "id": "P-ETH-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol", "function": "executeConsolidation", "start_line": 383, "end_line": 406, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol", "function": "preservesEthBalance", "start_line": 118, "end_line": 122, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L118-L122"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol", "function": "_refundFee", "start_line": 295, "end_line": 307, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L295-L307"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.9/WithdrawalVault.sol", "function": "preservesEthBalance", "start_line": 81, "end_line": 85, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L81-L85"}
+      ]
+    },
+    {
+      "id": "P-ADDRESS-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol", "function": "constructor", "start_line": 187, "end_line": 193, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L187-L193"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol", "function": "constructor", "start_line": 124, "end_line": 140, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L124-L140"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol", "function": "_getWithdrawalVaultData", "start_line": 368, "end_line": 378, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L368-L378"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.9/WithdrawalVault.sol", "function": "constructor", "start_line": 61, "end_line": 78, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L61-L78"}
+      ]
+    },
+    {
+      "id": "P-TOPUP-2",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/TopUpGateway.sol", "function": "topUp", "start_line": 160, "end_line": 237, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/TopUpGateway.sol#L160-L237"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/TopUpGateway.sol", "function": "_evaluateTopUpLimit", "start_line": 396, "end_line": 415, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/TopUpGateway.sol#L396-L415"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/CLValidatorVerifier.sol", "function": "_verifyValidator", "start_line": 44, "end_line": 57, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/CLValidatorVerifier.sol#L44-L57"}
+      ]
+    },
+    {
+      "id": "P-CONSOLIDATION-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol", "function": "addConsolidationRequests", "start_line": 325, "end_line": 370, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L325-L370"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol", "function": "executeConsolidation", "start_line": 383, "end_line": 406, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol", "function": "addConsolidationRequests", "start_line": 185, "end_line": 223, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol", "function": "_prepareConsolidationPairs", "start_line": 348, "end_line": 365, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L348-L365"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol", "function": "_callAddConsolidationRequest", "start_line": 113, "end_line": 121, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"}
+      ]
+    },
+    {
+      "id": "P-SSZ-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/BeaconTypes.sol", "function": "Validator declaration", "start_line": 8, "end_line": 17, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/BeaconTypes.sol#L8-L17"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/interfaces/ValidatorWitness.sol", "function": "ValidatorWitness declaration", "start_line": 13, "end_line": 24, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/interfaces/ValidatorWitness.sol#L13-L24"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/GIndex.sol", "function": "concat", "start_line": 72, "end_line": 89, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/GIndex.sol#L72-L89"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/SSZ.sol", "function": "hashTreeRoot(BeaconTypes.Validator)", "start_line": 89, "end_line": 175, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/SSZ.sol#L89-L175"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/SSZ.sol", "function": "verifyProof", "start_line": 179, "end_line": 248, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/SSZ.sol#L179-L248"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/CLValidatorVerifier.sol", "function": "_verifyValidator", "start_line": 44, "end_line": 57, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/CLValidatorVerifier.sol#L44-L57"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol", "function": "_validatePubKeyWCProof", "start_line": 150, "end_line": 175, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol#L150-L175"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol", "function": "addConsolidationRequests", "start_line": 185, "end_line": 223, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"}
+      ]
+    }
   ]
 }

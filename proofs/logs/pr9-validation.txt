@@ -1,34 +1,35 @@
-PR #9 current-head P2 repair validation
+Minimal-11 source-map validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 725e2af1768e8ddbbfdba85cb9f7e11a2234ac6c
+validated-tree: 6498195f333a68ad64f5624c39c98a847afbe517
 
-Receipt semantics: validated-tree is the Git tree produced from the final HEAD
-index after removing only proofs/logs/pr9-validation.txt. This binds every
-validated tracked input and generated artifact without circularly claiming the
-SHA of the commit that contains this receipt. Run
-`python3 scripts/check_validation_receipt.py` to recompute and compare it.
+Receipt semantics: validated-tree is the Git tree produced from HEAD after
+removing only this receipt. It binds the source-map, validator, and negative
+fixtures without circularly claiming the receipt's own commit.
 
-python3 scripts/audit_metadata.py check: exit 0
-PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0 (includes isolated Verity and mathlib inputRev-only rejection)
-python3 scripts/check_validation_receipt.py: exit 0
-local pinned-toolchain make test: exit 0 (metadata mutants, receipt binding, provenance guards, Lean vectors, fixtures)
-make prove: exit 0 (proof report regenerated from committed source inputs)
+pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b:
+38 paths/spans/function-or-declaration tokens checked from a clean detached tree
+
 lake build: exit 0 (31 jobs)
-lake build LidoSRv3.Audit.Trust: exit 0 (PrintAxioms entrypoint replayed)
-canonical guarantee ID assertion: exit 0 (exact ordered P-* minimal-11)
-forbidden proof-escape scan: exit 0 (only documented Trust comment tokens)
-provenance guards: exit 0 (dirty/untracked Lean inputs and stale tree rejected)
-JSON-compatible YAML and JSON parse checks: exit 0
+lake build LidoSRv3.Audit.Trust: exit 0
+lake env lean LidoSRv3/Audit/Trust.lean: exit 0
+python3 scripts/audit_metadata.py check: exit 0
+PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0
+python3 scripts/check_validation_receipt.py: exit 0
+make test: exit 0
+bash scripts/check_no_python_evidence.sh: exit 0
+bash scripts/check_provenance_guards.sh: exit 0
+JSON-compatible audit schema parse: exit 0
+Lean proof-escape scan: exit 0
 git diff --check: exit 0
+intended-diff review: exit 0 (four files only)
 
-Infrastructure note: the default remote `make prove` offload lacked the Git
-checkout needed by the source-tree guard; the exact recipe passed with the
-pinned local Lean 4.31 toolchain.
+Infrastructure note: optional Spark execution failed with exit 126 because its
+/root/.elan/bin/lake path was not executable. The pinned local toolchain then
+passed. Two-node certification remains unavailable/partial and non-blocking.
 
-Assurance boundary preserved: exactly 11 public IDs; DEV-431-READY is not
-AUDIT-CERT; two-node transport remains accepted partial/non-blocking evidence;
-SHA-256 FFI remains opaque; runtime/codehash/fork/address provenance remains
-incomplete. This receipt does not claim semantic closure, allocation/SSZ
-closure, source correspondence, deployed-bytecode identity, or production E2E
-certification.
+Assurance delta: SRC metadata anchors only. No MODEL/ALG/TX/REL/TRACE/YUL/EVM/
+CRYPTO/E2E theorem or status changed. Exactly 11 public guarantees remain;
+transaction atomicity remains internal. DEV-431-READY is not AUDIT-CERT;
+SHA-256 FFI remains opaque; runtime/codehash/fork/address and EIP-7251
+provenance remain incomplete; P-SSZ-1 remains structural only.

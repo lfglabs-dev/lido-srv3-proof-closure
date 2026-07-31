@@ -219,7 +219,7 @@ CANONICAL_MATHLIB_INPUT_REV = "v4.31.0"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
 EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v1"
-EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v1"
+EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v2"
 EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
@@ -324,30 +324,98 @@ EXPECTED_SOURCE_POLICY = (
     "Source spans remain unmapped unless independently verified from pinned source; "
     "names or legacy anchors are insufficient."
 )
-EXPECTED_SOURCE_TARGETS = [
-    {"id": "P-ALLOC-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-ALLOC-2", "status": "UNMAPPED", "spans": [],
-     "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-DEPOSIT-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-TOPUP-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-ACCOUNT-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-RESERVE-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-ETH-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "Toolchain item; no independently verified Lido source span."},
-    {"id": "P-ADDRESS-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "No independently verified pinned-source span in this bootstrap."},
-    {"id": "P-TOPUP-2", "status": "UNMAPPED", "spans": [],
-     "blocker": "Canonical runtime provenance is MISSING."},
-    {"id": "P-CONSOLIDATION-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "Opaque native FFI identity is MISSING."},
-    {"id": "P-SSZ-1", "status": "UNMAPPED", "spans": [],
-     "blocker": "Canonical runtime/codehash/fork/address provenance is MISSING."},
-]
+EXPECTED_SOURCE_SCOPE = {
+    "public_guarantee_count": 11,
+    "transaction_atomicity": "INTERNAL_ONLY",
+    "assurance_layers": [
+        "MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"
+    ],
+    "metadata_is_proof_progress": False,
+}
+EXPECTED_ACCEPTED_RISKS = {
+    "baseline": "DEV-431-READY_NOT_AUDIT-CERT",
+    "two_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
+    "sha256_ffi": "OPAQUE",
+    "production_runtime_codehash_fork_address_provenance": "INCOMPLETE",
+}
+EXPECTED_SSZ_CLAIM = {
+    "level": "STRUCTURAL_ONLY",
+    "includes": [
+        "structures", "generalized_indices", "pivot_and_branch_traversal",
+        "wrapper_binding", "operation_binding",
+    ],
+    "excludes": [
+        "FULL_SSZ", "SHA256_CRYPTOGRAPHIC_CORRECTNESS",
+        "DEPLOYED_PRECOMPILE_EQUIVALENCE",
+        "RUNTIME_CODEHASH_FORK_ADDRESS_PROVENANCE", "EIP_7251_PROVENANCE",
+    ],
+}
+VERIFIED_SOURCE_ANCHORS = {
+    "P-ALLOC-1": {
+        ("contracts/0.8.25/sr/StakingRouter.sol", "getDepositAllocations", 929, 936),
+        ("contracts/0.8.25/sr/SRLib.sol", "_getDepositAllocations", 391, 431),
+        ("contracts/0.8.25/sr/SRLib.sol", "_getModulesAllocationAndCapacity", 493, 559),
+    },
+    "P-ALLOC-2": {
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocate", 30, 44),
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate", 63, 107),
+    },
+    "P-DEPOSIT-1": {
+        ("contracts/0.8.25/sr/StakingRouter.sol", "deposit", 942, 997),
+        ("contracts/0.4.24/Lido.sol", "withdrawDepositableEther", 869, 886),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "makeBeaconChainDeposits32ETH", 36, 64),
+    },
+    "P-TOPUP-1": {
+        ("contracts/0.8.25/sr/StakingRouter.sol", "topUp", 679, 759),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "makeBeaconChainTopUp", 66, 108),
+        ("contracts/0.4.24/Lido.sol", "_spendDepositableEther", 839, 859),
+    },
+    "P-RESERVE-1": {
+        ("contracts/0.4.24/Lido.sol", "_getBufferedEtherAllocation", 576, 616),
+        ("contracts/0.4.24/Lido.sol", "_getDepositableEther", 823, 833),
+        ("contracts/0.4.24/Lido.sol", "_spendDepositableEther", 839, 859),
+    },
+    "P-ETH-1": {
+        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "executeConsolidation", 383, 406),
+        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "preservesEthBalance", 118, 122),
+        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "_refundFee", 295, 307),
+        ("contracts/0.8.9/WithdrawalVault.sol", "preservesEthBalance", 81, 85),
+    },
+    "P-ADDRESS-1": {
+        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "constructor", 187, 193),
+        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "constructor", 124, 140),
+        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "_getWithdrawalVaultData", 368, 378),
+        ("contracts/0.8.9/WithdrawalVault.sol", "constructor", 61, 78),
+    },
+    "P-TOPUP-2": {
+        ("contracts/0.8.25/TopUpGateway.sol", "topUp", 160, 237),
+        ("contracts/0.8.25/TopUpGateway.sol", "_evaluateTopUpLimit", 396, 415),
+        ("contracts/0.8.25/CLValidatorVerifier.sol", "_verifyValidator", 44, 57),
+    },
+    "P-CONSOLIDATION-1": {
+        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "addConsolidationRequests", 325, 370),
+        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "executeConsolidation", 383, 406),
+        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "addConsolidationRequests", 185, 223),
+        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "_prepareConsolidationPairs", 348, 365),
+        ("contracts/0.8.9/WithdrawalVaultEIP7685.sol", "_callAddConsolidationRequest", 113, 121),
+    },
+    "P-SSZ-1": {
+        ("contracts/common/lib/BeaconTypes.sol", "Validator declaration", 8, 17),
+        ("contracts/common/interfaces/ValidatorWitness.sol", "ValidatorWitness declaration", 13, 24),
+        ("contracts/common/lib/GIndex.sol", "concat", 72, 89),
+        ("contracts/common/lib/SSZ.sol", "hashTreeRoot(BeaconTypes.Validator)", 89, 175),
+        ("contracts/common/lib/SSZ.sol", "verifyProof", 179, 248),
+        ("contracts/0.8.25/CLValidatorVerifier.sol", "_verifyValidator", 44, 57),
+        ("contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol", "_validatePubKeyWCProof", 150, 175),
+        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "addConsolidationRequests", 185, 223),
+    },
+}
+UNMAPPED_SOURCE_BLOCKERS = {
+    "P-ACCOUNT-1": (
+        "No independently verified pinned-source correspondence for "
+        "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested."
+    ),
+}
 VIEWS = ("ROADMAP.md", "STATUS.md", "REPRODUCE.md")
 
 
@@ -372,6 +440,8 @@ def validate_source_targets(source_map):
             "source-map pinned_source must end in a 40-character lowercase source SHA")
     targets = source_map.get("targets")
     require(isinstance(targets, list), "source-map targets must be a list")
+    require([target.get("id") for target in targets] == EXPECTED_IDS,
+            "source-map targets must contain the exact ordered minimal-11 IDs")
     for target in targets:
         target_id = target.get("id", "<missing>")
         status = target.get("status")
@@ -379,17 +449,32 @@ def validate_source_targets(source_map):
         require(status in {"MAPPED", "UNMAPPED"},
                 f"{target_id}: source-map status must be MAPPED or UNMAPPED")
         require(isinstance(spans, list), f"{target_id}: source-map spans must be a list")
-        if status == "UNMAPPED":
+        if target_id in UNMAPPED_SOURCE_BLOCKERS:
+            require(status == "UNMAPPED",
+                    f"{target_id}: source target without verified correspondence "
+                    "must remain UNMAPPED")
+            require(set(target) == {"id", "status", "spans", "blocker"},
+                    f"{target_id}: UNMAPPED source row requires exact "
+                    "id/status/spans/blocker fields")
             require(not spans, f"{target_id}: UNMAPPED source row must not claim spans")
-            require(isinstance(target.get("blocker"), str) and target["blocker"].strip(),
-                    f"{target_id}: UNMAPPED source row requires a blocker")
+            require(target.get("blocker") == UNMAPPED_SOURCE_BLOCKERS[target_id],
+                    f"{target_id}: UNMAPPED source blocker differs from canonical record")
             continue
+        require(status == "MAPPED",
+                f"{target_id}: verified source target must remain MAPPED")
+        require(set(target) == {"id", "status", "spans"},
+                f"{target_id}: MAPPED source row requires exact id/status/spans fields")
         require(spans, f"{target_id}: MAPPED source row requires verified spans")
         require(not target.get("blocker"),
                 f"{target_id}: MAPPED source row must not retain a blocker")
         for span in spans:
-            require(set(span) == {"source_sha", "path", "function", "start_line", "end_line", "permalink"},
-                    f"{target_id}: source span requires exact SHA/path/function/lines/permalink")
+            require(set(span) == {
+                "repository", "source_sha", "path", "function",
+                "start_line", "end_line", "permalink",
+            }, f"{target_id}: source span requires exact repository/SHA/path/"
+               "function/lines/permalink")
+            require(span["repository"] == "lidofinance/core",
+                    f"{target_id}: source span repository must be lidofinance/core")
             require(span["source_sha"] == pinned_sha,
                     f"{target_id}: source span SHA must equal the pinned source SHA")
             require(isinstance(span["path"], str) and span["path"].strip()
@@ -406,6 +491,19 @@ def validate_source_targets(source_map):
             )
             require(span["permalink"] == expected_permalink,
                     f"{target_id}: source span requires an immutable exact permalink")
+            anchor = (
+                span["path"], span["function"], span["start_line"], span["end_line"]
+            )
+            require(anchor in VERIFIED_SOURCE_ANCHORS.get(target_id, set()),
+                    f"{target_id}: source span is not a verified semantic anchor")
+        actual_anchors = {
+            (span["path"], span["function"], span["start_line"], span["end_line"])
+            for span in spans
+        }
+        require(len(actual_anchors) == len(spans),
+                f"{target_id}: duplicate source spans are forbidden")
+        require(actual_anchors == VERIFIED_SOURCE_ANCHORS[target_id],
+                f"{target_id}: source spans differ from verified semantic anchors")
 
 
 def validate_lock(lock, source_map):
@@ -516,6 +614,17 @@ def validate():
             "assumptions differ from the canonical accepted risk records")
     require(source_map.get("policy") == EXPECTED_SOURCE_POLICY,
             "source-map policy differs from the canonical assurance rule")
+    require(source_map.get("scope") == EXPECTED_SOURCE_SCOPE,
+            "source-map scope/layer boundary differs from the canonical record")
+    require(source_map.get("accepted_risks") == EXPECTED_ACCEPTED_RISKS,
+            "source-map accepted risks differ from the canonical record")
+    require(source_map.get("ssz_claim") == EXPECTED_SSZ_CLAIM,
+            "source-map SSZ claim exceeds the structural-only boundary")
+    require(set(source_map) == {
+        "schema", "pinned_source", "policy", "scope",
+        "accepted_risks", "ssz_claim", "targets",
+    }, "source-map requires exact schema/pinned_source/policy/scope/"
+       "accepted_risks/ssz_claim/targets fields")
     validate_source_targets(source_map)
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
@@ -557,8 +666,6 @@ def validate():
                 f"{row['id']}: assumption links differ from canonical risks")
         require(set(row["assumptions"]) <= assumption_ids,
                 f"{row['id']}: canonical assumption link is unknown")
-    require(source_map["targets"] == EXPECTED_SOURCE_TARGETS,
-            "source-map targets differ from canonical blocker records")
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")

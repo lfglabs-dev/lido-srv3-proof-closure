@@ -100,6 +100,13 @@ def main():
         coordinated_source["pinned_source"] = (
             "lidofinance/core@" + "0" * 40
         )
+        original_source_sha = source_map["pinned_source"].rsplit("@", 1)[-1]
+        for target in coordinated_source["targets"]:
+            for span in target["spans"]:
+                span["source_sha"] = "0" * 40
+                span["permalink"] = span["permalink"].replace(
+                    original_source_sha, "0" * 40
+                )
         coordinated_lock = copy.deepcopy(baseline_lock)
         coordinated_lock["pins"]["lido_core"]["commit"] = "0" * 40
         write_json(source_map_path, coordinated_source)
@@ -602,17 +609,7 @@ def main():
         write_json(lock_path, baseline_lock)
 
         pinned_sha = source_map["pinned_source"].rsplit("@", 1)[-1]
-        valid_span = {
-            "source_sha": pinned_sha,
-            "path": "contracts/0.8.9/StakingRouter.sol",
-            "function": "deposit",
-            "start_line": 1,
-            "end_line": 2,
-            "permalink": (
-                "https://github.com/lidofinance/core/blob/"
-                f"{pinned_sha}/contracts/0.8.9/StakingRouter.sol#L1-L2"
-            ),
-        }
+        valid_span = copy.deepcopy(source_map["targets"][0]["spans"][0])
         for missing_field in valid_span:
             malformed_span = copy.deepcopy(source_map)
             malformed_span["targets"][0] = {
@@ -626,45 +623,160 @@ def main():
                 fixture,
                 False,
                 "generate",
-                "source span requires exact SHA/path/function/lines/permalink",
+                "source span requires exact repository/SHA/path/function/lines/permalink",
             )
-        trust_me_span = copy.deepcopy(source_map)
-        trust_me_span["targets"][0] = {
-            "id": source_map["targets"][0]["id"],
-            "status": "MAPPED",
-            "spans": [{
-                **valid_span,
-                "permalink": "https://example.invalid/trust-me",
-            }],
-        }
-        write_json(source_map_path, trust_me_span)
+
+        short_sha = copy.deepcopy(source_map)
+        short_sha["targets"][0]["spans"][0]["source_sha"] = pinned_sha[:12]
+        write_json(source_map_path, short_sha)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source span SHA must equal the pinned source SHA",
+        )
+
+        mutable_permalink = copy.deepcopy(source_map)
+        mutable_permalink["targets"][0]["spans"][0]["permalink"] = (
+            "https://github.com/lidofinance/core/blob/master/"
+            "contracts/0.8.25/sr/StakingRouter.sol#L929-L936"
+        )
+        write_json(source_map_path, mutable_permalink)
         run(
             fixture,
             False,
             "generate",
             "source span requires an immutable exact permalink",
         )
+
+        wrong_function = copy.deepcopy(source_map)
+        wrong_function["targets"][0]["spans"][0]["function"] = "deposit"
+        write_json(source_map_path, wrong_function)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source span is not a verified semantic anchor",
+        )
+
+        wrong_span = copy.deepcopy(source_map)
+        wrong_span["targets"][0]["spans"][0]["start_line"] = 930
+        wrong_span["targets"][0]["spans"][0]["permalink"] = (
+            "https://github.com/lidofinance/core/blob/"
+            f"{pinned_sha}/contracts/0.8.25/sr/StakingRouter.sol#L930-L936"
+        )
+        write_json(source_map_path, wrong_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source span is not a verified semantic anchor",
+        )
+
+        unrelated_anchor = copy.deepcopy(source_map)
+        unrelated_anchor["targets"][0]["spans"][0] = copy.deepcopy(
+            source_map["targets"][1]["spans"][0]
+        )
+        write_json(source_map_path, unrelated_anchor)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source span is not a verified semantic anchor",
+        )
+
+        unrelated_accounting_coverage = copy.deepcopy(source_map)
+        unrelated_accounting_coverage["targets"][4] = {
+            "id": "P-ACCOUNT-1",
+            "status": "MAPPED",
+            "spans": [{
+                "repository": "lidofinance/core",
+                "source_sha": pinned_sha,
+                "path": "contracts/0.8.25/sr/StakingRouter.sol",
+                "function": "reportValidatorBalancesByStakingModule",
+                "start_line": 285,
+                "end_line": 290,
+                "permalink": (
+                    "https://github.com/lidofinance/core/blob/"
+                    f"{pinned_sha}/contracts/0.8.25/sr/StakingRouter.sol#L285-L290"
+                ),
+            }],
+        }
+        write_json(source_map_path, unrelated_accounting_coverage)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ACCOUNT-1: source target without verified correspondence "
+            "must remain UNMAPPED",
+        )
+
+        downgraded_verified_target = copy.deepcopy(source_map)
+        downgraded_verified_target["targets"][0] = {
+            "id": source_map["targets"][0]["id"],
+            "status": "UNMAPPED",
+            "spans": [],
+            "blocker": "Deliberate downgrade fixture.",
+        }
+        write_json(source_map_path, downgraded_verified_target)
+        run(
+            fixture,
+            False,
+            "generate",
+            "verified source target must remain MAPPED",
+        )
+
+        duplicate_span = copy.deepcopy(source_map)
+        duplicate_span["targets"][0]["spans"].append(copy.deepcopy(valid_span))
+        write_json(source_map_path, duplicate_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "duplicate source spans are forbidden",
+        )
+
+        undeclared_target_field = copy.deepcopy(source_map)
+        undeclared_target_field["targets"][0]["audit_cert"] = True
+        write_json(source_map_path, undeclared_target_field)
+        run(
+            fixture,
+            False,
+            "generate",
+            "MAPPED source row requires exact id/status/spans fields",
+        )
+
+        undeclared_source_map_field = copy.deepcopy(source_map)
+        undeclared_source_map_field["audit_cert"] = True
+        write_json(source_map_path, undeclared_source_map_field)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source-map requires exact schema/pinned_source/policy/scope/"
+            "accepted_risks/ssz_claim/targets fields",
+        )
+
         unmapped_with_claim = copy.deepcopy(source_map)
-        unmapped_with_claim["targets"][0]["spans"] = [valid_span]
+        unmapped_with_claim["targets"][0]["status"] = "UNMAPPED"
+        unmapped_with_claim["targets"][0]["blocker"] = "Deliberate fixture."
         write_json(source_map_path, unmapped_with_claim)
         run(
             fixture,
             False,
             "generate",
-            "UNMAPPED source row must not claim spans",
+            "verified source target must remain MAPPED",
         )
         write_json(source_map_path, source_map)
 
-        blocker_mutant = copy.deepcopy(source_map)
-        blocker_mutant["targets"][8]["blocker"] = (
-            "Canonical production runtime independently verified."
-        )
-        write_json(source_map_path, blocker_mutant)
+        ssz_overclaim = copy.deepcopy(source_map)
+        ssz_overclaim["ssz_claim"]["level"] = "FULL_SSZ"
+        write_json(source_map_path, ssz_overclaim)
         run(
             fixture,
             False,
             "generate",
-            "source-map targets differ from canonical blocker records",
+            "source-map SSZ claim exceeds the structural-only boundary",
         )
         write_json(source_map_path, source_map)
 
