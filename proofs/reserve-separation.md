@@ -8,11 +8,11 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::depositReserveUsed`
-- `LidoSRv3/Model.lean::withdrawalReserveUsed`
-- `LidoSRv3/Model.lean::depositableEther`
-- `LidoSRv3/SpecProofs.lean::P1_reserve_separation`
-- `LidoSRv3/SpecProofs.lean::P1_depositable_excludes_withdrawal_reserve`
+- `LidoSRv3/Legacy/Model.lean::depositReserveUsed`
+- `LidoSRv3/Legacy/Model.lean::withdrawalReserveUsed`
+- `LidoSRv3/Legacy/Model.lean::depositableEther`
+- `LidoSRv3/Legacy/SpecProofs.lean::P1_reserve_separation`
+- `LidoSRv3/Legacy/SpecProofs.lean::P1_depositable_excludes_withdrawal_reserve`
 
 Math statement:
 

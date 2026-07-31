@@ -1,11 +1,12 @@
-import LidoSRv3.Model
+import LidoSRv3.Legacy.Model
 
 namespace LidoSRv3
 
 /-!
   P0 proof targets. These are Lean-checked theorems over the SRv3 Verity model,
   conditional on the source-correspondence and environment assumptions listed in
-  `verity/targets/trust-boundary.json`.
+  `verity/targets/trust-boundary.json`. The canonical minimal-11 registry is
+  maintained separately under `audit/`.
 -/
 
 private theorem report_sum_matches_zipWith

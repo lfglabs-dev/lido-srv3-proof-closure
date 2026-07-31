@@ -18,7 +18,7 @@ below; refactor-only and event/natspec-only changes are not enumerated.
 
 Source: `contracts/0.8.25/sr/StakingRouter.sol:942-997`.
 
-Model: `LidoSRv3/Model.lean::depositTransition`.
+Model: `LidoSRv3/Legacy/Model.lean::depositTransition`.
 
 Line correspondence:
 
@@ -79,7 +79,7 @@ Source: `contracts/0.8.25/sr/StakingRouter.sol:679-759` (with
 `_validateTopUpInputs` at `761-782` and the per-block cap
 setter/getter at `1019-1034`).
 
-Model: `LidoSRv3/Model.lean::topUpTransition`.
+Model: `LidoSRv3/Legacy/Model.lean::topUpTransition`.
 
 Line correspondence:
 
@@ -118,7 +118,7 @@ Line correspondence:
 
 Source: `contracts/0.8.25/sr/SRLib.sol:493-559`.
 
-Model: `LidoSRv3/Model.lean::modulesAllocationAndCapacity`.
+Model: `LidoSRv3/Legacy/Model.lean::modulesAllocationAndCapacity`.
 
 The model keeps the two Solidity loops: first it builds current allocation rows
 and a cache, then it computes capacity rows. It preserves router module order,

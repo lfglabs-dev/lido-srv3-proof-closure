@@ -13,7 +13,7 @@ SRv3 proof-closure artifacts.
 The executable harness in this repository is a Lean/Lake project that imports
 Verity at the pinned commit above and checks the SRv3 model under `LidoSRv3/`.
 
-`LidoSRv3.Model` and `LidoSRv3.SpecProofs` are retained as legacy
+`LidoSRv3.Legacy.Model` and `LidoSRv3.Legacy.SpecProofs` are retained as legacy
 pure-model regression evidence. New source-shaped claims live under
 `LidoSRv3.Audit`; a proof in either layer is not by itself an end-to-end
 correspondence proof for deployed Solidity.

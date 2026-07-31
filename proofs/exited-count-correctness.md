@@ -9,16 +9,16 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::recordModuleExitedCount`
-- `LidoSRv3/Model.lean::exitedCountUpdateRowsValid`
-- `LidoSRv3/Model.lean::updateExitedCountInModules`
-- `LidoSRv3/Model.lean::updateExitedValidatorsTransition`
-- `LidoSRv3/SpecProofs.lean::P7_exited_count_update_requires_valid_rows`
-- `LidoSRv3/SpecProofs.lean::P7_exited_count_update_empty`
-- `LidoSRv3/SpecProofs.lean::P7_exited_count_update_preserves_module_length`
-- `LidoSRv3/SpecProofs.lean::P7_exited_count_update_preserves_module_balance_sum`
-- `LidoSRv3/SpecProofs.lean::P7_exited_count_update_returns_loop_result`
-- `LidoSRv3/SpecProofs.lean::P7_exited_count_update_preserves_router_state`
+- `LidoSRv3/Legacy/Model.lean::recordModuleExitedCount`
+- `LidoSRv3/Legacy/Model.lean::exitedCountUpdateRowsValid`
+- `LidoSRv3/Legacy/Model.lean::updateExitedCountInModules`
+- `LidoSRv3/Legacy/Model.lean::updateExitedValidatorsTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_requires_valid_rows`
+- `LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_empty`
+- `LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_preserves_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_preserves_module_balance_sum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_returns_loop_result`
+- `LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_preserves_router_state`
 
 Math statement:
 

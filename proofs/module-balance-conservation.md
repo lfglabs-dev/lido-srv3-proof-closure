@@ -9,19 +9,19 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::reportBalancesWithinRange`
-- `LidoSRv3/Model.lean::reportWellFormed`
-- `LidoSRv3/Model.lean::reportValidatorBalancesTransition`
-- `LidoSRv3/Model.lean::acceptReport`
-- `LidoSRv3/Model.lean::moduleBalanceSum`
-- `LidoSRv3/SpecProofs.lean::P3_module_balance_conservation`
-- `LidoSRv3/SpecProofs.lean::P3_report_transition_requires_well_formed`
-- `LidoSRv3/SpecProofs.lean::P3_report_transition_module_balance_conservation`
-- `LidoSRv3/SpecProofs.lean::P3_report_transition_module_balances_match_report`
-- `LidoSRv3/SpecProofs.lean::P3_report_transition_records_accepted_report`
-- `LidoSRv3/SpecProofs.lean::P3_report_transition_preserves_module_length`
-- `LidoSRv3/SpecProofs.lean::P3_report_transition_modules_exact`
-- `LidoSRv3/SpecProofs.lean::P3_report_transition_preserves_eth_state`
+- `LidoSRv3/Legacy/Model.lean::reportBalancesWithinRange`
+- `LidoSRv3/Legacy/Model.lean::reportWellFormed`
+- `LidoSRv3/Legacy/Model.lean::reportValidatorBalancesTransition`
+- `LidoSRv3/Legacy/Model.lean::acceptReport`
+- `LidoSRv3/Legacy/Model.lean::moduleBalanceSum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_module_balance_conservation`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_requires_well_formed`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_module_balance_conservation`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_module_balances_match_report`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_records_accepted_report`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_preserves_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_modules_exact`
+- `LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_preserves_eth_state`
 
 Math statement:
 

@@ -8,15 +8,15 @@
 
 ## Lean artifacts
 
-- `LidoSRv3/Model.lean::allModuleSharesValid`
-- `LidoSRv3/Model.lean::updateAllModuleSharesInModules`
-- `LidoSRv3/Model.lean::updateAllModuleSharesTransition`
-- `LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_requires_lengths`
-- `LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_requires_valid_rows`
-- `LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_preserves_module_length`
-- `LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_exact_share_projections`
-- `LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_preserves_module_balance_sum`
-- `LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_preserves_router_state`
+- `LidoSRv3/Legacy/Model.lean::allModuleSharesValid`
+- `LidoSRv3/Legacy/Model.lean::updateAllModuleSharesInModules`
+- `LidoSRv3/Legacy/Model.lean::updateAllModuleSharesTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_requires_lengths`
+- `LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_requires_valid_rows`
+- `LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_preserves_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_exact_share_projections`
+- `LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_preserves_module_balance_sum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_preserves_router_state`
 
 ## Checked statement
 

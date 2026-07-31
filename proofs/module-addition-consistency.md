@@ -8,17 +8,17 @@
 
 ## Lean artifacts
 
-- `LidoSRv3/Model.lean::addModuleConfigValid`
-- `LidoSRv3/Model.lean::newModuleFromConfig`
-- `LidoSRv3/Model.lean::addModuleTransition`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_requires_valid_config`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_requires_fresh_module_id`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_preserves_config_guards`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_increments_module_length`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_appends_new_module_from_config`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_new_module_zero_accounting`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_preserves_module_balance_sum`
-- `LidoSRv3/SpecProofs.lean::P14_add_module_preserves_router_state`
+- `LidoSRv3/Legacy/Model.lean::addModuleConfigValid`
+- `LidoSRv3/Legacy/Model.lean::newModuleFromConfig`
+- `LidoSRv3/Legacy/Model.lean::addModuleTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_requires_valid_config`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_requires_fresh_module_id`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_preserves_config_guards`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_increments_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_appends_new_module_from_config`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_new_module_zero_accounting`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_preserves_module_balance_sum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_preserves_router_state`
 
 ## Checked statement
 

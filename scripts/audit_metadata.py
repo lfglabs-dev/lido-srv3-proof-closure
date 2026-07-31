@@ -233,7 +233,7 @@ REQUIRED_UNAVAILABLE = {
 }
 EXPECTED_MANIFEST_LAYERS = {
     "legacy": {
-        "modules": ["LidoSRv3.Model", "LidoSRv3.SpecProofs"],
+        "modules": ["LidoSRv3.Legacy.Model", "LidoSRv3.Legacy.SpecProofs"],
         "trust": "pure-model regression evidence",
     },
     "audit": {
