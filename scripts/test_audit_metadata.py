@@ -710,6 +710,16 @@ def main():
             "duplicate source spans are forbidden",
         )
 
+        undeclared_target_field = copy.deepcopy(source_map)
+        undeclared_target_field["targets"][0]["audit_cert"] = True
+        write_json(source_map_path, undeclared_target_field)
+        run(
+            fixture,
+            False,
+            "generate",
+            "MAPPED source row requires exact id/status/spans fields",
+        )
+
         unmapped_with_claim = copy.deepcopy(source_map)
         unmapped_with_claim["targets"][0]["status"] = "UNMAPPED"
         unmapped_with_claim["targets"][0]["blocker"] = "Deliberate fixture."

@@ -450,6 +450,8 @@ def validate_source_targets(source_map):
         require(isinstance(spans, list), f"{target_id}: source-map spans must be a list")
         require(status == "MAPPED",
                 f"{target_id}: verified source target must remain MAPPED")
+        require(set(target) == {"id", "status", "spans"},
+                f"{target_id}: MAPPED source row requires exact id/status/spans fields")
         if status == "UNMAPPED":
             require(not spans, f"{target_id}: UNMAPPED source row must not claim spans")
             require(isinstance(target.get("blocker"), str) and target["blocker"].strip(),
