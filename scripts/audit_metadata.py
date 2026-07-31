@@ -613,6 +613,11 @@ def validate():
             "source-map accepted risks differ from the canonical record")
     require(source_map.get("ssz_claim") == EXPECTED_SSZ_CLAIM,
             "source-map SSZ claim exceeds the structural-only boundary")
+    require(set(source_map) == {
+        "schema", "pinned_source", "policy", "scope",
+        "accepted_risks", "ssz_claim", "targets",
+    }, "source-map requires exact schema/pinned_source/policy/scope/"
+       "accepted_risks/ssz_claim/targets fields")
     validate_source_targets(source_map)
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}

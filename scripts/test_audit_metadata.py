@@ -720,6 +720,17 @@ def main():
             "MAPPED source row requires exact id/status/spans fields",
         )
 
+        undeclared_source_map_field = copy.deepcopy(source_map)
+        undeclared_source_map_field["audit_cert"] = True
+        write_json(source_map_path, undeclared_source_map_field)
+        run(
+            fixture,
+            False,
+            "generate",
+            "source-map requires exact schema/pinned_source/policy/scope/"
+            "accepted_risks/ssz_claim/targets fields",
+        )
+
         unmapped_with_claim = copy.deepcopy(source_map)
         unmapped_with_claim["targets"][0]["status"] = "UNMAPPED"
         unmapped_with_claim["targets"][0]["blocker"] = "Deliberate fixture."

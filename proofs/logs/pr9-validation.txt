@@ -1,7 +1,7 @@
 Minimal-11 source-map validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: aa13f77004e1e054c1a35868c2ddd7bc84b451c8
+validated-tree: 5dd0e3b9b490f780aeec01d3f20877747f0801dc
 
 Receipt semantics: validated-tree is the Git tree produced from HEAD after
 removing only this receipt. It binds the source-map, validator, and negative
