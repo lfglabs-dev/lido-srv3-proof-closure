@@ -14,6 +14,7 @@ This is not a SHA-256, Solidity, EVM, or end-to-end theorem.
 theorem structural_witness_binding_sound
     (h : LidoSRv3.Audit.Ssz.bindOperation operation combine witness expectedRoot = true) :
     witness.operation = operation ∧
+      witness.index = LidoSRv3.Audit.Ssz.operationIndex operation ∧
       witness.branch.length = (LidoSRv3.Audit.Ssz.branchPath witness.index).length ∧
       LidoSRv3.Audit.Ssz.traverseBranch combine
         (LidoSRv3.Audit.Ssz.validatorRoot combine witness.validator)
