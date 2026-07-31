@@ -22,7 +22,8 @@ def indexTen : GeneralizedIndex := ⟨10, by decide⟩
 
 def rootIndex : GeneralizedIndex := ⟨1, by decide⟩
 
-def witness : ValidatorWitness := ⟨.clValidatorVerifier, validator, index, [17]⟩
+def witness : ValidatorWitness :=
+  ⟨.clValidatorVerifier, validator, index, pivot index, branchPath index, [17]⟩
 
 def expectedRoot : Node := mix (validatorRoot mix validator) 17
 
@@ -35,20 +36,24 @@ example : branchPath index = [.right] := by decide
 example : pivot index = 2 := by decide
 
 /-- Regression family: pivot and path rebuild generalized indices at several depths. -/
-example : indexFromPivotPath index = index.value := by decide
+example : indexFromPivotPath (pivot index) (branchPath index) = index.value := by decide
 
-example : indexFromPivotPath indexThree = indexThree.value := by decide
+example : indexFromPivotPath (pivot indexThree) (branchPath indexThree) = indexThree.value := by decide
 
-example : indexFromPivotPath indexFour = indexFour.value := by decide
+example : indexFromPivotPath (pivot indexFour) (branchPath indexFour) = indexFour.value := by decide
 
-example : indexFromPivotPath indexTen = indexTen.value := by decide
+example : indexFromPivotPath (pivot indexTen) (branchPath indexTen) = indexTen.value := by decide
 
 /-- Boundary regression: the root index has its pivot but no traversed branch. -/
 example : pivot rootIndex = 1 ∧ branchPath rootIndex = [] ∧
-    indexFromPivotPath rootIndex = rootIndex.value := by decide
+    indexFromPivotPath (pivot rootIndex) (branchPath rootIndex) = rootIndex.value := by decide
 
 /-- Negative regression: a path with the wrong low-bit direction misses the index. -/
-example : pivot indexTen + pathOffset [.left, .left, .right] ≠ indexTen.value := by decide
+example : indexFromPivotPath (pivot indexTen) [.left, .left, .right] ≠ indexTen.value := by decide
+
+/-- Adversarial regression: a supplied path with the wrong low bits is rejected. -/
+example : verifyProof mix (validatorRoot mix validator) indexTen (pivot indexTen)
+    [.left, .left, .right] [17, 18, 19] 0 = false := by decide
 
 /-- Regression: named wrappers occupy distinct generalized-index structures. -/
 example : operationIndex .clValidatorVerifier ≠ operationIndex .clProofVerifier := by decide
@@ -59,7 +64,8 @@ example : operationIndex .clProofVerifier ≠ operationIndex .consolidationGatew
 example : bindOperation .clValidatorVerifier mix witness expectedRoot = true := by decide
 
 /-- Regression: a missing branch is rejected structurally. -/
-example : verifyProof mix (validatorRoot mix validator) index [] expectedRoot = false := by decide
+example : verifyProof mix (validatorRoot mix validator) index (pivot index) (branchPath index)
+    [] expectedRoot = false := by decide
 
 /-- Regression: a witness cannot be relabeled as a different named operation. -/
 example : bindOperation .clProofVerifier mix witness expectedRoot = false := by decide

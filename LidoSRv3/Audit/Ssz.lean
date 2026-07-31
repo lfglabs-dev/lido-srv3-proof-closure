@@ -70,9 +70,21 @@ def pathOffset : List SiblingSide → Nat
   | .left :: sides => 1 + 2 * pathOffset sides
   | .right :: sides => 2 * pathOffset sides
 
-/-- Reconstruct the generalized index from its pivot boundary and branch path. -/
-def indexFromPivotPath (index : GeneralizedIndex) : Nat :=
-  pivot index + pathOffset (branchPath index)
+/-- Reconstruct a generalized index from independently supplied pivot/path data. -/
+def indexFromPivotPath (pivotBoundary : Nat) (path : List SiblingSide) : Nat :=
+  pivotBoundary + pathOffset path
+
+/--
+An independently supplied pivot/path pair has the structural generalized-index
+meaning claimed for `index`: it uses that index's pivot boundary, has exactly
+the pivot depth, and reconstructs the index value.  This is MODEL-only
+generalized-index arithmetic; it is not an SSZ or cryptographic claim.
+-/
+def HasGeneralizedIndex (index : GeneralizedIndex) (pivotBoundary : Nat)
+    (path : List SiblingSide) : Prop :=
+  pivotBoundary = pivot index ∧
+    path.length = Nat.log2 pivotBoundary ∧
+      indexFromPivotPath pivotBoundary path = index.value
 
 /-- Fold an explicit branch from its leaf towards the generalized-index pivot. -/
 def traverseBranch (combine : Node → Node → Node) (leaf : Node) :
@@ -110,24 +122,30 @@ structure ValidatorWitness where
   operation : Operation
   validator : Validator
   index : GeneralizedIndex
+  pivotBoundary : Nat
+  path : List SiblingSide
   branch : List Node
   deriving DecidableEq, Repr
 
 /--
-Structural verification checks that the consumed path reconstructs the
-generalized index from its pivot boundary, checks branch arity, and reconstructs
-the supplied root.
+Structural verification checks independently supplied pivot/path data against
+the claimed generalized index, checks branch arity, and reconstructs the
+supplied root using that supplied path.
 -/
 def verifyProof (combine : Node → Node → Node) (leaf : Node)
-    (index : GeneralizedIndex) (branch : List Node) (expectedRoot : Node) : Bool :=
-  (indexFromPivotPath index == index.value) &&
-    (branch.length == (branchPath index).length) &&
-      (traverseBranch combine leaf (branchPath index) branch == expectedRoot)
+    (index : GeneralizedIndex) (pivotBoundary : Nat) (path : List SiblingSide)
+    (branch : List Node) (expectedRoot : Node) : Bool :=
+  (pivotBoundary == pivot index) &&
+    (path.length == Nat.log2 pivotBoundary) &&
+      (indexFromPivotPath pivotBoundary path == index.value) &&
+        (branch.length == path.length) &&
+          (traverseBranch combine leaf path branch == expectedRoot)
 
 /-- Bind a witness wrapper to the structural proof helper. -/
 def verifyValidatorWitness (combine : Node → Node → Node) (witness : ValidatorWitness)
     (expectedRoot : Node) : Bool :=
-  verifyProof combine (validatorRoot combine witness.validator) witness.index witness.branch expectedRoot
+  verifyProof combine (validatorRoot combine witness.validator) witness.index
+    witness.pivotBoundary witness.path witness.branch expectedRoot
 
 /-- Bind the structural helper to its source-shaped call-site operations. -/
 def bindOperation (operation : Operation) (combine : Node → Node → Node)
@@ -137,26 +155,23 @@ def bindOperation (operation : Operation) (combine : Node → Node → Node)
     verifyValidatorWitness combine witness expectedRoot
 
 /--
-Successful operation binding proves the generalized index is reconstructed from
-the pivot boundary and consumed branch path, consumes exactly that branch shape,
+Successful operation binding proves that the independently supplied pivot/path
+has the claimed generalized-index meaning, consumes exactly that supplied path,
 and reconstructs the supplied structural root. This is a MODEL-layer theorem
-over the executable structural helper only.
+over the executable structural helper only; it makes no SSZ, SHA-256, Solidity,
+EVM, transaction, source-correspondence, or end-to-end claim.
 -/
 theorem structural_witness_binding_sound
     (h : bindOperation operation combine witness expectedRoot = true) :
     witness.operation = operation ∧
       witness.index = operationIndex operation ∧
-      indexFromPivotPath witness.index = witness.index.value ∧
-      witness.branch.length = (branchPath witness.index).length ∧
+      HasGeneralizedIndex witness.index witness.pivotBoundary witness.path ∧
+      witness.branch.length = witness.path.length ∧
       traverseBranch combine (validatorRoot combine witness.validator)
-        (branchPath witness.index) witness.branch = expectedRoot := by
-  have h' :
-      (witness.operation = operation ∧ witness.index = operationIndex operation) ∧
-        (indexFromPivotPath witness.index = witness.index.value ∧
-          witness.branch.length = (branchPath witness.index).length) ∧
-        traverseBranch combine (validatorRoot combine witness.validator)
-          (branchPath witness.index) witness.branch = expectedRoot := by
-    simpa [bindOperation, verifyValidatorWitness, verifyProof] using h
-  exact ⟨h'.1.1, h'.1.2, h'.2.1.1, h'.2.1.2, h'.2.2⟩
+        witness.path witness.branch = expectedRoot := by
+  simp [bindOperation, verifyValidatorWitness, verifyProof] at h
+  rcases h with ⟨⟨hOperation, hIndex⟩,
+    ⟨⟨⟨hPivot, hDepth⟩, hValue⟩, hArity⟩, hRoot⟩
+  exact ⟨hOperation, hIndex, ⟨hPivot, hDepth, hValue⟩, hArity, hRoot⟩
 
 end LidoSRv3.Audit.Ssz

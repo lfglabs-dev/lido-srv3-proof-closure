@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 8f78299fd18b098e940a7128805f4a4ed08d72a5
+validated-tree: f2e71f338984b1a5f615374d1c8c7b433c9bed9a
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -15,8 +15,8 @@ not all represented in the minimal-11 registry.
 
 P-SSZ-1 structural gate receipt (committed tree):
 - `lake build`: exit 0.
-- `lake build LidoSRv3.Audit.Trust`: exit 0; the new theorem reports only
-  Lean foundations `propext` and `Quot.sound`.
+- `lake build LidoSRv3.Audit.Trust`: exit 0; `structural_witness_binding_sound`
+  reports only Lean foundations `propext` and `Quot.sound`.
 - `make test`: exit 0, including `LidoSRv3.Audit.SszRegression`.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
