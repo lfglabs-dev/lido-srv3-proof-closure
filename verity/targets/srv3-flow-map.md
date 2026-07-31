@@ -56,11 +56,10 @@ invariants that guard several flows at once:
    role configuration, the one-shot v2 to v3 storage migration, and the
    rewritten report sanity checker.
 
-For each flow we state what SRv3 changes, show the flow on the component map
-(renders from [`diagram/exports/`](../../diagram/exports/); open
-[`diagram/index.html`](../../diagram/index.html) for the interactive version
-with per-flow toggles and PNG/SVG export), list the machine-checked baseline
-anchors, then four coverage statuses against those baselines.
+For each flow we state what SRv3 changes and link to the canonical
+[`diagram/index.html`](../../diagram/index.html) component map, which has
+per-flow toggles and on-demand PNG/SVG export. We then list the machine-checked
+baseline anchors and four coverage statuses against those baselines.
 
 ## Cross-reference index
 
@@ -83,7 +82,7 @@ It is the map's index: each cell is expanded in the flow sections below.
 
 ### 1. Stake & buffer
 
-![Flow 1 on the component map](../../diagram/exports/lido-map-f1.png)
+_[Open the component map](../../diagram/index.html) and select F1._
 
 **What changed.** User deposits (submit, stETH mint) are untouched. The buffer
 now has an explicit three-way split: a deposits reserve (per-frame allowance
@@ -111,7 +110,7 @@ ETH from Lido instead of Lido pushing it.
 
 ### 2. Validator creation (32 ETH deposits)
 
-![Flow 2 on the component map](../../diagram/exports/lido-map-f2.png)
+_[Open the component map](../../diagram/index.html) and select F2._
 
 **What changed.** The router pulls exactly 32 ETH × N from the buffer and
 deposits through the module's keys. The caller-supplied deposit count is gone;
@@ -142,7 +141,7 @@ per-block caps and module allocation bound N.
 
 ### 3. Validator top-up (new)
 
-![Flow 3 on the component map](../../diagram/exports/lido-map-f3.png)
+_[Open the component map](../../diagram/index.html) and select F3._
 
 **What changed.** New flow: 0x02 validators can be topped up toward 2048 ETH.
 Each target validator's consensus-layer state (Lido withdrawal credentials,
@@ -168,7 +167,7 @@ root; per-validator ceilings and per-block caps apply.
 
 ### 4. Withdrawal (stETH to ETH)
 
-![Flow 4 on the component map](../../diagram/exports/lido-map-f4.png)
+_[Open the component map](../../diagram/index.html) and select F4._
 
 **What changed.** Queue mechanics (request, FIFO finalization at oracle
 reports, claim) are unchanged. What is new is the interaction with the
@@ -196,7 +195,7 @@ deposits reserve: the finalizable slice is now buffer minus reserve.
 
 ### 5. Validator exit
 
-![Flow 5 on the component map](../../diagram/exports/lido-map-f5.png)
+_[Open the component map](../../diagram/index.html) and select F5._
 
 **What changed.** Exit requests and limits are now denominated in ETH (a
 validator can be worth 32 to 2048 ETH), the VEBO report format carries key
@@ -224,7 +223,7 @@ via EIP-7002 (permissionless execution of bus-named requests).
 
 ### 6. Consolidation CMv1 to CMv2 (new)
 
-![Flow 6 on the component map](../../diagram/exports/lido-map-f6.png)
+_[Open the component map](../../diagram/index.html) and select F6._
 
 **What changed.** New pipeline migrating curated stake to 0x02 validators
 without an exit/re-deposit cycle: EasyTrack-approved pairs, then Migrator,
@@ -247,7 +246,7 @@ Migrator's `sourceModuleId` is never cross-checked.)
 
 ### 7. Oracle report & accounting
 
-![Flow 7 on the component map](../../diagram/exports/lido-map-f7.png)
+_[Open the component map](../../diagram/index.html) and select F7._
 
 **What changed.** The most consequential change: the oracle now reports
 per-module balances (`reportValidatorBalancesByStakingModule`, written by the
@@ -277,7 +276,7 @@ fact to committee-attested data.
 
 ### 8. Cross-cutting
 
-![Structural view of the component map](../../diagram/exports/lido-map-all.png)
+_[Open the component map](../../diagram/index.html) and select “show everything”._
 
 **What changed.** Module lifecycle statuses now gate more paths (deposits,
 top-ups, fees); the storage layout migrates v2 to v3 in a one-shot upgrade;

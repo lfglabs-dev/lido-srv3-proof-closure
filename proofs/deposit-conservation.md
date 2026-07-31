@@ -8,27 +8,27 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::depositPullWei`
-- `LidoSRv3/Model.lean::depositMaxCount`
-- `LidoSRv3/Model.lean::depositTransition`
-- `LidoSRv3/Model.lean::allocatedDeposits`
-- `LidoSRv3/Model.lean::depositAllocationWellFormed`
-- `LidoSRv3/Model.lean::totalAllocatedDeposits`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_exact_pull`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_router_eth_unchanged`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_beacon_sink_exact`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_buffered_exact`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_positive_requires_depositable`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_zero_external_value_unchanged`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_withdrawal_reserve_unchanged`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_deposit_reserve_spent`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_requires_active_module_and_capacity`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_modules_exact`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_records_last_deposit`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_preserves_module_length`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_preserves_module_balance_sum`
-- `LidoSRv3/SpecProofs.lean::P2_deposit_transition_preserves_report_state`
-- `LidoSRv3/SpecProofs.lean::P2_total_allocated_deposits`
+- `LidoSRv3/Legacy/Model.lean::depositPullWei`
+- `LidoSRv3/Legacy/Model.lean::depositMaxCount`
+- `LidoSRv3/Legacy/Model.lean::depositTransition`
+- `LidoSRv3/Legacy/Model.lean::allocatedDeposits`
+- `LidoSRv3/Legacy/Model.lean::depositAllocationWellFormed`
+- `LidoSRv3/Legacy/Model.lean::totalAllocatedDeposits`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_exact_pull`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_router_eth_unchanged`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_beacon_sink_exact`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_buffered_exact`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_positive_requires_depositable`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_zero_external_value_unchanged`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_withdrawal_reserve_unchanged`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_deposit_reserve_spent`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_requires_active_module_and_capacity`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_modules_exact`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_records_last_deposit`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_preserves_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_preserves_module_balance_sum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_preserves_report_state`
+- `LidoSRv3/Legacy/SpecProofs.lean::P2_total_allocated_deposits`
 
 Math statement:
 

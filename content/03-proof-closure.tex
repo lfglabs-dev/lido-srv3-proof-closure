@@ -89,7 +89,7 @@ module \(m \in M\), let \(\bal_m\) be its accepted validator balance in gwei,
 \(\modstatus_m\) its module status, and \(\mathsf{moduleRecipient}_m\) its module
 reward recipient in the modeled reward step. Let \(B_R\) be the router validator balance, \(T\) the buffered ETH,
 \(R_D\) the stored deposit reserve, and \(R_W\) the withdrawal-reserved buffer.
-The checked theorems are in \path{LidoSRv3/SpecProofs.lean}. Each accepted report must still cover the
+The checked theorems are in \path{LidoSRv3/Legacy/SpecProofs.lean}. Each accepted report must still cover the
 current router module set in router order, with unique module IDs, matching array
 lengths, and the freshness and range premises named in the target file.
 
@@ -958,11 +958,11 @@ trust prose alone; every claim has this chain.
   Preserve the relevant array, loop, reserve, and call structure while
   anchoring the model against copied PR \#1811 test intent. \\
   \rowsep
-  Economic model & \path{LidoSRv3/Model.lean} &
+  Economic model & \path{LidoSRv3/Legacy/Model.lean} &
   Defines modules, reserves, Wei/Gwei arithmetic, status flags, accepted reports,
   rewards, and fee state. \\
   \rowsep
-  Proof obligations & \path{LidoSRv3/SpecProofs.lean} &
+  Proof obligations & \path{LidoSRv3/Legacy/SpecProofs.lean} &
   States each target over the focused transition model, with uniqueness,
   ordering, alignment, and freshness premises named in target files. \\
   \rowsep

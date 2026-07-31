@@ -7,24 +7,24 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::RewardDistributionRow`
-- `LidoSRv3/Model.lean::rewardShare`
-- `LidoSRv3/Model.lean::computedModuleFee`
-- `LidoSRv3/Model.lean::computedTreasuryFee`
-- `LidoSRv3/Model.lean::rewardDistributionRow`
-- `LidoSRv3/Model.lean::rewardDistributionLoop`
-- `LidoSRv3/Model.lean::stakingRewardsDistributionRows`
-- `LidoSRv3/Model.lean::rewardDistributionTotalFee`
-- `LidoSRv3/Model.lean::rewardRecipientsAligned`
-- `LidoSRv3/SpecProofs.lean::P5_reward_bound`
-- `LidoSRv3/SpecProofs.lean::P5_reward_recipient_alignment`
-- `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_rows_aligned`
-- `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_zero_total_empty`
-- `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_zero_total_empty_module_ids`
-- `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_row_nonzero_balance`
-- `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_paid_module_fee_bound`
-- `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_stopped_module_zero`
-- `LidoSRv3/SpecProofs.lean::P5_rewards_distribution_total_fee_sum`
+- `LidoSRv3/Legacy/Model.lean::RewardDistributionRow`
+- `LidoSRv3/Legacy/Model.lean::rewardShare`
+- `LidoSRv3/Legacy/Model.lean::computedModuleFee`
+- `LidoSRv3/Legacy/Model.lean::computedTreasuryFee`
+- `LidoSRv3/Legacy/Model.lean::rewardDistributionRow`
+- `LidoSRv3/Legacy/Model.lean::rewardDistributionLoop`
+- `LidoSRv3/Legacy/Model.lean::stakingRewardsDistributionRows`
+- `LidoSRv3/Legacy/Model.lean::rewardDistributionTotalFee`
+- `LidoSRv3/Legacy/Model.lean::rewardRecipientsAligned`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_reward_bound`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_reward_recipient_alignment`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_rows_aligned`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_zero_total_empty`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_zero_total_empty_module_ids`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_row_nonzero_balance`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_paid_module_fee_bound`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_stopped_module_zero`
+- `LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_total_fee_sum`
 
 Math statement:
 

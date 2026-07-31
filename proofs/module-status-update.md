@@ -8,14 +8,14 @@
 
 ## Lean artifacts
 
-- `LidoSRv3/Model.lean::updateModuleStatusInModules`
-- `LidoSRv3/Model.lean::updateModuleStatusTransition`
-- `LidoSRv3/SpecProofs.lean::P13_update_module_status_requires_existing_module`
-- `LidoSRv3/SpecProofs.lean::P13_update_module_status_preserves_module_length`
-- `LidoSRv3/SpecProofs.lean::P13_update_module_status_preserves_module_balance_sum`
-- `LidoSRv3/SpecProofs.lean::P13_update_module_status_requires_status_change`
-- `LidoSRv3/SpecProofs.lean::P13_update_module_status_records_requested_status`
-- `LidoSRv3/SpecProofs.lean::P13_update_module_status_preserves_router_state`
+- `LidoSRv3/Legacy/Model.lean::updateModuleStatusInModules`
+- `LidoSRv3/Legacy/Model.lean::updateModuleStatusTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_requires_existing_module`
+- `LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_preserves_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_preserves_module_balance_sum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_requires_status_change`
+- `LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_records_requested_status`
+- `LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_preserves_router_state`
 
 ## Checked statement
 

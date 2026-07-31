@@ -6,18 +6,18 @@ Source reference:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::RewardMintedReportRow`
-- `LidoSRv3/Model.lean::rewardMintedReportRows`
-- `LidoSRv3/Model.lean::rewardMintedRowsValid`
-- `LidoSRv3/Model.lean::reportRewardsMintedTransition`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_requires_equal_lengths`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_requires_valid_rows`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_nonzero_module_exists`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_zero_rows_skip_module_check`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_returns_generated_rows`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_preserves_row_length`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_preserves_module_ids`
-- `LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_preserves_total_shares`
+- `LidoSRv3/Legacy/Model.lean::RewardMintedReportRow`
+- `LidoSRv3/Legacy/Model.lean::rewardMintedReportRows`
+- `LidoSRv3/Legacy/Model.lean::rewardMintedRowsValid`
+- `LidoSRv3/Legacy/Model.lean::reportRewardsMintedTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_requires_equal_lengths`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_requires_valid_rows`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_nonzero_module_exists`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_zero_rows_skip_module_check`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_returns_generated_rows`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_preserves_row_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_preserves_module_ids`
+- `LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_preserves_total_shares`
 
 Math statement:
 

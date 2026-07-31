@@ -12,28 +12,28 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::roundDownToGwei`
-- `LidoSRv3/Model.lean::maxTopUpPerBlockWei`
-- `LidoSRv3/Model.lean::topUpTargetWei`
-- `LidoSRv3/Model.lean::allocationsGweiAligned`
-- `LidoSRv3/Model.lean::allocationsWithinLimits`
-- `LidoSRv3/Model.lean::topUpAllocationsWellFormed`
-- `LidoSRv3/Model.lean::topUpTransition`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_active_topup_module`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_input_shape`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_well_formed_allocations`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_allocation_sum_bounded_by_module_allocation`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_router_eth_unchanged`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_modules_unchanged`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_preserves_report_state`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_beacon_sink_exact`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_buffered_exact`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_withdrawal_reserve_unchanged`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_deposit_reserve_spent`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_positive_requires_depositable`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_zero_sum_noop`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_respects_per_block_cap`
-- `LidoSRv3/SpecProofs.lean::P8_topup_transition_zero_target_requires_lido_can_deposit`
+- `LidoSRv3/Legacy/Model.lean::roundDownToGwei`
+- `LidoSRv3/Legacy/Model.lean::maxTopUpPerBlockWei`
+- `LidoSRv3/Legacy/Model.lean::topUpTargetWei`
+- `LidoSRv3/Legacy/Model.lean::allocationsGweiAligned`
+- `LidoSRv3/Legacy/Model.lean::allocationsWithinLimits`
+- `LidoSRv3/Legacy/Model.lean::topUpAllocationsWellFormed`
+- `LidoSRv3/Legacy/Model.lean::topUpTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_requires_active_topup_module`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_requires_input_shape`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_requires_well_formed_allocations`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_allocation_sum_bounded_by_module_allocation`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_router_eth_unchanged`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_modules_unchanged`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_preserves_report_state`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_beacon_sink_exact`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_buffered_exact`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_withdrawal_reserve_unchanged`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_deposit_reserve_spent`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_positive_requires_depositable`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_zero_sum_noop`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_respects_per_block_cap`
+- `LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_zero_target_requires_lido_can_deposit`
 
 Math statement:
 

@@ -8,19 +8,19 @@ Source reference:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::shareParamsValid`
-- `LidoSRv3/Model.lean::otherModulesFeeSumConsistent`
-- `LidoSRv3/Model.lean::singleModuleParamsValid`
-- `LidoSRv3/Model.lean::updateModuleParamsInModules`
-- `LidoSRv3/Model.lean::updateModuleParamsTransition`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_existing_module`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_valid_config`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_positive_max_deposits`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_preserves_module_length`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_records_requested_params`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_bounded_after_success`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_preserves_module_balance_sum`
-- `LidoSRv3/SpecProofs.lean::P12_update_module_params_preserves_router_state`
+- `LidoSRv3/Legacy/Model.lean::shareParamsValid`
+- `LidoSRv3/Legacy/Model.lean::otherModulesFeeSumConsistent`
+- `LidoSRv3/Legacy/Model.lean::singleModuleParamsValid`
+- `LidoSRv3/Legacy/Model.lean::updateModuleParamsInModules`
+- `LidoSRv3/Legacy/Model.lean::updateModuleParamsTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_requires_existing_module`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_requires_valid_config`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_requires_positive_max_deposits`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_preserves_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_records_requested_params`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_bounded_after_success`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_preserves_module_balance_sum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_preserves_router_state`
 
 Math statement:
 

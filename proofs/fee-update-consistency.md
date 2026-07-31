@@ -7,17 +7,17 @@ Source reference:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::feeRowsValidFromExpected`
-- `LidoSRv3/Model.lean::allModuleFeesConsistent`
-- `LidoSRv3/Model.lean::updateAllModuleFeesInModules`
-- `LidoSRv3/Model.lean::updateAllModuleFeesTransition`
-- `LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_requires_lengths`
-- `LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_requires_consistent_rows`
-- `LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_preserves_module_length`
-- `LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_exact_fee_projections`
-- `LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_bounded_after_success`
-- `LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_preserves_module_balance_sum`
-- `LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_preserves_router_state`
+- `LidoSRv3/Legacy/Model.lean::feeRowsValidFromExpected`
+- `LidoSRv3/Legacy/Model.lean::allModuleFeesConsistent`
+- `LidoSRv3/Legacy/Model.lean::updateAllModuleFeesInModules`
+- `LidoSRv3/Legacy/Model.lean::updateAllModuleFeesTransition`
+- `LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_requires_lengths`
+- `LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_requires_consistent_rows`
+- `LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_preserves_module_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_exact_fee_projections`
+- `LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_bounded_after_success`
+- `LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_preserves_module_balance_sum`
+- `LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_preserves_router_state`
 
 Math statement:
 

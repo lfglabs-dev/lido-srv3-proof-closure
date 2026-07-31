@@ -9,21 +9,21 @@ Source references:
 
 Model artifact:
 
-- `LidoSRv3/Model.lean::AllocationConfig`
-- `LidoSRv3/Model.lean::AllocationCapacityRow`
-- `LidoSRv3/Model.lean::moduleCurrentAllocationEquivalent`
-- `LidoSRv3/Model.lean::moduleAvailableCapacityEquivalent`
-- `LidoSRv3/Model.lean::allocationTotalValidators`
-- `LidoSRv3/Model.lean::moduleTargetValidators`
-- `LidoSRv3/Model.lean::allocationCapacityRow`
-- `LidoSRv3/Model.lean::modulesAllocationAndCapacity`
-- `LidoSRv3/SpecProofs.lean::P9_allocation_capacity_rows_aligned`
-- `LidoSRv3/SpecProofs.lean::P9_allocation_capacity_length`
-- `LidoSRv3/SpecProofs.lean::P9_allocation_capacity_values_length`
-- `LidoSRv3/SpecProofs.lean::P9_allocation_capacity_module_ids_preserved`
-- `LidoSRv3/SpecProofs.lean::P9_active_allocation_capacity_target_bound`
-- `LidoSRv3/SpecProofs.lean::P9_active_allocation_capacity_available_bound`
-- `LidoSRv3/SpecProofs.lean::P9_inactive_allocation_capacity_current`
+- `LidoSRv3/Legacy/Model.lean::AllocationConfig`
+- `LidoSRv3/Legacy/Model.lean::AllocationCapacityRow`
+- `LidoSRv3/Legacy/Model.lean::moduleCurrentAllocationEquivalent`
+- `LidoSRv3/Legacy/Model.lean::moduleAvailableCapacityEquivalent`
+- `LidoSRv3/Legacy/Model.lean::allocationTotalValidators`
+- `LidoSRv3/Legacy/Model.lean::moduleTargetValidators`
+- `LidoSRv3/Legacy/Model.lean::allocationCapacityRow`
+- `LidoSRv3/Legacy/Model.lean::modulesAllocationAndCapacity`
+- `LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_rows_aligned`
+- `LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_values_length`
+- `LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_module_ids_preserved`
+- `LidoSRv3/Legacy/SpecProofs.lean::P9_active_allocation_capacity_target_bound`
+- `LidoSRv3/Legacy/SpecProofs.lean::P9_active_allocation_capacity_available_bound`
+- `LidoSRv3/Legacy/SpecProofs.lean::P9_inactive_allocation_capacity_current`
 
 Math statement:
 
