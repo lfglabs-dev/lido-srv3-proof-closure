@@ -14,7 +14,7 @@ def validator : Validator := {
 
 def index : GeneralizedIndex := ⟨2, by decide⟩
 
-def witness : ValidatorWitness := ⟨validator, index, [17]⟩
+def witness : ValidatorWitness := ⟨.clValidatorVerifier, validator, index, [17]⟩
 
 def expectedRoot : Node := mix (validatorRoot mix validator) 17
 
@@ -29,5 +29,8 @@ example : bindOperation .clValidatorVerifier mix witness expectedRoot = true := 
 
 /-- Regression: a missing branch is rejected structurally. -/
 example : verifyProof mix (validatorRoot mix validator) index [] expectedRoot = false := by decide
+
+/-- Regression: a witness cannot be relabeled as a different named operation. -/
+example : bindOperation .clProofVerifier mix witness expectedRoot = false := by decide
 
 end LidoSRv3.Audit.SszRegression

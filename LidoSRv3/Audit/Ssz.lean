@@ -74,18 +74,23 @@ def traverseBranch (combine : Node → Node → Node) (leaf : Node) :
       traverseBranch combine (combine leaf sibling) sides siblings
   | _ :: sides, [] => traverseBranch combine leaf sides []
 
-/-- A proof witness has a generalized index and the sibling branch it consumes. -/
-structure ValidatorWitness where
-  validator : Validator
-  index : GeneralizedIndex
-  branch : List Node
-  deriving DecidableEq, Repr
-
 /-- The source-shaped helper entry points that consume validator witnesses. -/
 inductive Operation
   | clValidatorVerifier
   | clProofVerifier
   | consolidationGateway
+  deriving DecidableEq, Repr
+
+/--
+A proof witness declares the named operation it is intended for, together with
+its validator, generalized index, and consumed sibling branch.  The operation
+tag is structural model data, not a claim of source correspondence.
+-/
+structure ValidatorWitness where
+  operation : Operation
+  validator : Validator
+  index : GeneralizedIndex
+  branch : List Node
   deriving DecidableEq, Repr
 
 /-- Structural verification checks branch arity and reconstructs the supplied root. -/
@@ -102,10 +107,7 @@ def verifyValidatorWitness (combine : Node → Node → Node) (witness : Validat
 /-- Bind the structural helper to its source-shaped call-site operations. -/
 def bindOperation (operation : Operation) (combine : Node → Node → Node)
     (witness : ValidatorWitness) (expectedRoot : Node) : Bool :=
-  match operation with
-  | .clValidatorVerifier => verifyValidatorWitness combine witness expectedRoot
-  | .clProofVerifier => verifyValidatorWitness combine witness expectedRoot
-  | .consolidationGateway => verifyValidatorWitness combine witness expectedRoot
+  (witness.operation == operation) && verifyValidatorWitness combine witness expectedRoot
 
 /--
 Successful operation binding consumes exactly the generalized-index branch
@@ -114,12 +116,10 @@ theorem over the executable structural helper only.
 -/
 theorem structural_witness_binding_sound
     (h : bindOperation operation combine witness expectedRoot = true) :
-    witness.branch.length = (branchPath witness.index).length ∧
+    witness.operation = operation ∧
+      witness.branch.length = (branchPath witness.index).length ∧
       traverseBranch combine (validatorRoot combine witness.validator)
         (branchPath witness.index) witness.branch = expectedRoot := by
-  cases operation <;> simp [bindOperation, verifyValidatorWitness, verifyProof] at h ⊢
-  · exact h
-  · exact h
-  · exact h
+  simpa [bindOperation, verifyValidatorWitness, verifyProof] using h
 
 end LidoSRv3.Audit.Ssz
