@@ -9,7 +9,8 @@ namespace LidoSRv3
   The model is intentionally narrower than the deployed system. It captures the
   accounting transitions named in the report: reserve splitting, router deposit
   pulls, accepted module-balance reports, reward composition, and status gates.
-  Solidity correspondence is tracked in `verity/targets/source-map.json`.
+  Legacy source correspondence is retained in `verity/targets/source-map.json`;
+  the canonical minimal-11 registry is `audit/source-map.yaml`.
 -/
 
 abbrev Wei := Nat

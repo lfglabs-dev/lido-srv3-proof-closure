@@ -1,0 +1,14 @@
+Minimal-11 cleanup validation receipt
+base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
+validation-subject: HEAD tracked tree excluding this receipt
+validated-tree: 68b6936c15c3503446e98d4b4b25ea35ae656b4b
+
+Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
+removing only this receipt. It binds the canonical source-map, validator, and
+negative fixtures without circularly claiming the receipt's own commit.
+
+The canonical authorities are `audit/source-map.yaml`, the generated audit
+views, and the executable `verity/targets/audit-manifest.json` consumer. The
+legacy-model regression modules are retained under `LidoSRv3.Legacy`; their
+historical dossiers remain because their source references and limitations are
+not all represented in the minimal-11 registry.

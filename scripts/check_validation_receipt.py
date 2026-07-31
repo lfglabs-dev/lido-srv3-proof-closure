@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check that the PR #9 receipt names the final non-self-referential Git tree."""
+"""Check that the canonical validation receipt names its non-self-referential tree."""
 
 import re
 import subprocess
@@ -8,13 +8,13 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-RECEIPT = Path("proofs/logs/pr9-validation.txt")
+RECEIPT = Path("audit/validation-receipt.txt")
 EXPECTED_BASE = "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1"
 
 
 def git(*args, env=None):
     return subprocess.run(
-        ["git", *args],
+        ["git", "-c", f"safe.directory={ROOT}", *args],
         cwd=ROOT,
         env=env,
         check=True,
@@ -24,7 +24,7 @@ def git(*args, env=None):
 
 
 def receipt_excluded_tree():
-    with tempfile.NamedTemporaryFile(prefix="pr9-receipt-index-", delete=False) as index:
+    with tempfile.NamedTemporaryFile(prefix="validation-receipt-index-", delete=False) as index:
         index_path = index.name
     os.unlink(index_path)
     try:

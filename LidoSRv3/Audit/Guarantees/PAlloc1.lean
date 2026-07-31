@@ -1,4 +1,4 @@
-import LidoSRv3.SpecProofs
+import LidoSRv3.Legacy.SpecProofs
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1
