@@ -8,7 +8,7 @@ removing only this receipt. It binds the source-map, validator, and negative
 fixtures without circularly claiming the receipt's own commit.
 
 pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b:
-41 paths/spans/function-or-declaration tokens checked from a clean detached tree
+38 paths/spans/function-or-declaration tokens checked from a clean detached tree
 
 lake build: exit 0 (31 jobs)
 lake build LidoSRv3.Audit.Trust: exit 0
