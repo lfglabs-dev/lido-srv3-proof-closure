@@ -64,6 +64,16 @@ def pathAux : Nat → Nat → List SiblingSide
 def branchPath (index : GeneralizedIndex) : List SiblingSide :=
   pathAux (Nat.log2 (pivot index)) index.value
 
+/-- The low generalized-index bits encoded by a leaf-to-root branch path. -/
+def pathOffset : List SiblingSide → Nat
+  | [] => 0
+  | .left :: sides => 1 + 2 * pathOffset sides
+  | .right :: sides => 2 * pathOffset sides
+
+/-- Reconstruct the generalized index from its pivot boundary and branch path. -/
+def indexFromPivotPath (index : GeneralizedIndex) : Nat :=
+  pivot index + pathOffset (branchPath index)
+
 /-- Fold an explicit branch from its leaf towards the generalized-index pivot. -/
 def traverseBranch (combine : Node → Node → Node) (leaf : Node) :
     List SiblingSide → List Node → Node
@@ -103,11 +113,16 @@ structure ValidatorWitness where
   branch : List Node
   deriving DecidableEq, Repr
 
-/-- Structural verification checks branch arity and reconstructs the supplied root. -/
+/--
+Structural verification checks that the consumed path reconstructs the
+generalized index from its pivot boundary, checks branch arity, and reconstructs
+the supplied root.
+-/
 def verifyProof (combine : Node → Node → Node) (leaf : Node)
     (index : GeneralizedIndex) (branch : List Node) (expectedRoot : Node) : Bool :=
-  (branch.length == (branchPath index).length) &&
-    (traverseBranch combine leaf (branchPath index) branch == expectedRoot)
+  (indexFromPivotPath index == index.value) &&
+    (branch.length == (branchPath index).length) &&
+      (traverseBranch combine leaf (branchPath index) branch == expectedRoot)
 
 /-- Bind a witness wrapper to the structural proof helper. -/
 def verifyValidatorWitness (combine : Node → Node → Node) (witness : ValidatorWitness)
@@ -122,23 +137,26 @@ def bindOperation (operation : Operation) (combine : Node → Node → Node)
     verifyValidatorWitness combine witness expectedRoot
 
 /--
-Successful operation binding consumes exactly the generalized-index branch
-shape and reconstructs the supplied structural root.  This is a MODEL-layer
-theorem over the executable structural helper only.
+Successful operation binding proves the generalized index is reconstructed from
+the pivot boundary and consumed branch path, consumes exactly that branch shape,
+and reconstructs the supplied structural root. This is a MODEL-layer theorem
+over the executable structural helper only.
 -/
 theorem structural_witness_binding_sound
     (h : bindOperation operation combine witness expectedRoot = true) :
     witness.operation = operation ∧
       witness.index = operationIndex operation ∧
+      indexFromPivotPath witness.index = witness.index.value ∧
       witness.branch.length = (branchPath witness.index).length ∧
       traverseBranch combine (validatorRoot combine witness.validator)
         (branchPath witness.index) witness.branch = expectedRoot := by
   have h' :
       (witness.operation = operation ∧ witness.index = operationIndex operation) ∧
-        witness.branch.length = (branchPath witness.index).length ∧
+        (indexFromPivotPath witness.index = witness.index.value ∧
+          witness.branch.length = (branchPath witness.index).length) ∧
         traverseBranch combine (validatorRoot combine witness.validator)
           (branchPath witness.index) witness.branch = expectedRoot := by
     simpa [bindOperation, verifyValidatorWitness, verifyProof] using h
-  exact ⟨h'.1.1, h'.1.2, h'.2⟩
+  exact ⟨h'.1.1, h'.1.2, h'.2.1.1, h'.2.1.2, h'.2.2⟩
 
 end LidoSRv3.Audit.Ssz

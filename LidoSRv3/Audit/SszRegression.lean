@@ -14,6 +14,14 @@ def validator : Validator := {
 
 def index : GeneralizedIndex := ⟨2, by decide⟩
 
+def indexThree : GeneralizedIndex := ⟨3, by decide⟩
+
+def indexFour : GeneralizedIndex := ⟨4, by decide⟩
+
+def indexTen : GeneralizedIndex := ⟨10, by decide⟩
+
+def rootIndex : GeneralizedIndex := ⟨1, by decide⟩
+
 def witness : ValidatorWitness := ⟨.clValidatorVerifier, validator, index, [17]⟩
 
 def expectedRoot : Node := mix (validatorRoot mix validator) 17
@@ -26,8 +34,21 @@ example : branchPath index = [.right] := by decide
 /-- Regression: the generalized-index pivot is retained as the structural root boundary. -/
 example : pivot index = 2 := by decide
 
-/-- Regression: the pivot determines the traversal depth used by the path. -/
-example : (branchPath index).length = Nat.log2 (pivot index) := by decide
+/-- Regression family: pivot and path rebuild generalized indices at several depths. -/
+example : indexFromPivotPath index = index.value := by decide
+
+example : indexFromPivotPath indexThree = indexThree.value := by decide
+
+example : indexFromPivotPath indexFour = indexFour.value := by decide
+
+example : indexFromPivotPath indexTen = indexTen.value := by decide
+
+/-- Boundary regression: the root index has its pivot but no traversed branch. -/
+example : pivot rootIndex = 1 ∧ branchPath rootIndex = [] ∧
+    indexFromPivotPath rootIndex = rootIndex.value := by decide
+
+/-- Negative regression: a path with the wrong low-bit direction misses the index. -/
+example : pivot indexTen + pathOffset [.left, .left, .right] ≠ indexTen.value := by decide
 
 /-- Regression: named wrappers occupy distinct generalized-index structures. -/
 example : operationIndex .clValidatorVerifier ≠ operationIndex .clProofVerifier := by decide
