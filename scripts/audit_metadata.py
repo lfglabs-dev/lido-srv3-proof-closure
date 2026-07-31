@@ -370,11 +370,6 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "makeBeaconChainTopUp", 66, 108),
         ("contracts/0.4.24/Lido.sol", "_spendDepositableEther", 839, 859),
     },
-    "P-ACCOUNT-1": {
-        ("contracts/0.8.25/sr/StakingRouter.sol", "reportValidatorBalancesByStakingModule", 285, 290),
-        ("contracts/0.8.25/sr/SRLib.sol", "_validateReportValidatorBalancesByStakingModule", 854, 870),
-        ("contracts/0.8.25/sr/SRLib.sol", "_reportValidatorBalancesByStakingModule", 873, 892),
-    },
     "P-RESERVE-1": {
         ("contracts/0.4.24/Lido.sol", "_getBufferedEtherAllocation", 576, 616),
         ("contracts/0.4.24/Lido.sol", "_getDepositableEther", 823, 833),
@@ -415,6 +410,12 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "addConsolidationRequests", 185, 223),
     },
 }
+UNMAPPED_SOURCE_BLOCKERS = {
+    "P-ACCOUNT-1": (
+        "No independently verified pinned-source correspondence for "
+        "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested."
+    ),
+}
 VIEWS = ("ROADMAP.md", "STATUS.md", "REPRODUCE.md")
 
 
@@ -448,15 +449,21 @@ def validate_source_targets(source_map):
         require(status in {"MAPPED", "UNMAPPED"},
                 f"{target_id}: source-map status must be MAPPED or UNMAPPED")
         require(isinstance(spans, list), f"{target_id}: source-map spans must be a list")
+        if target_id in UNMAPPED_SOURCE_BLOCKERS:
+            require(status == "UNMAPPED",
+                    f"{target_id}: source target without verified correspondence "
+                    "must remain UNMAPPED")
+            require(set(target) == {"id", "status", "spans", "blocker"},
+                    f"{target_id}: UNMAPPED source row requires exact "
+                    "id/status/spans/blocker fields")
+            require(not spans, f"{target_id}: UNMAPPED source row must not claim spans")
+            require(target.get("blocker") == UNMAPPED_SOURCE_BLOCKERS[target_id],
+                    f"{target_id}: UNMAPPED source blocker differs from canonical record")
+            continue
         require(status == "MAPPED",
                 f"{target_id}: verified source target must remain MAPPED")
         require(set(target) == {"id", "status", "spans"},
                 f"{target_id}: MAPPED source row requires exact id/status/spans fields")
-        if status == "UNMAPPED":
-            require(not spans, f"{target_id}: UNMAPPED source row must not claim spans")
-            require(isinstance(target.get("blocker"), str) and target["blocker"].strip(),
-                    f"{target_id}: UNMAPPED source row requires a blocker")
-            continue
         require(spans, f"{target_id}: MAPPED source row requires verified spans")
         require(not target.get("blocker"),
                 f"{target_id}: MAPPED source row must not retain a blocker")

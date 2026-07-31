@@ -685,6 +685,32 @@ def main():
             "source span is not a verified semantic anchor",
         )
 
+        unrelated_accounting_coverage = copy.deepcopy(source_map)
+        unrelated_accounting_coverage["targets"][4] = {
+            "id": "P-ACCOUNT-1",
+            "status": "MAPPED",
+            "spans": [{
+                "repository": "lidofinance/core",
+                "source_sha": pinned_sha,
+                "path": "contracts/0.8.25/sr/StakingRouter.sol",
+                "function": "reportValidatorBalancesByStakingModule",
+                "start_line": 285,
+                "end_line": 290,
+                "permalink": (
+                    "https://github.com/lidofinance/core/blob/"
+                    f"{pinned_sha}/contracts/0.8.25/sr/StakingRouter.sol#L285-L290"
+                ),
+            }],
+        }
+        write_json(source_map_path, unrelated_accounting_coverage)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ACCOUNT-1: source target without verified correspondence "
+            "must remain UNMAPPED",
+        )
+
         downgraded_verified_target = copy.deepcopy(source_map)
         downgraded_verified_target["targets"][0] = {
             "id": source_map["targets"][0]["id"],

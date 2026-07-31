@@ -57,12 +57,9 @@
     },
     {
       "id": "P-ACCOUNT-1",
-      "status": "MAPPED",
-      "spans": [
-        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/StakingRouter.sol", "function": "reportValidatorBalancesByStakingModule", "start_line": 285, "end_line": 290, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L285-L290"},
-        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRLib.sol", "function": "_validateReportValidatorBalancesByStakingModule", "start_line": 854, "end_line": 870, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L854-L870"},
-        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRLib.sol", "function": "_reportValidatorBalancesByStakingModule", "start_line": 873, "end_line": 892, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L873-L892"}
-      ]
+      "status": "UNMAPPED",
+      "spans": [],
+      "blocker": "No independently verified pinned-source correspondence for LidoSRv3.Audit.MinFirst.totalAllocated_le_requested."
     },
     {
       "id": "P-RESERVE-1",
