@@ -1,0 +1,34 @@
+PR #9 current-head P2 repair validation
+base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
+validation-subject: HEAD tracked tree excluding this receipt
+validated-tree: 725e2af1768e8ddbbfdba85cb9f7e11a2234ac6c
+
+Receipt semantics: validated-tree is the Git tree produced from the final HEAD
+index after removing only proofs/logs/pr9-validation.txt. This binds every
+validated tracked input and generated artifact without circularly claiming the
+SHA of the commit that contains this receipt. Run
+`python3 scripts/check_validation_receipt.py` to recompute and compare it.
+
+python3 scripts/audit_metadata.py check: exit 0
+PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py: exit 0 (includes isolated Verity and mathlib inputRev-only rejection)
+python3 scripts/check_validation_receipt.py: exit 0
+local pinned-toolchain make test: exit 0 (metadata mutants, receipt binding, provenance guards, Lean vectors, fixtures)
+make prove: exit 0 (proof report regenerated from committed source inputs)
+lake build: exit 0 (31 jobs)
+lake build LidoSRv3.Audit.Trust: exit 0 (PrintAxioms entrypoint replayed)
+canonical guarantee ID assertion: exit 0 (exact ordered P-* minimal-11)
+forbidden proof-escape scan: exit 0 (only documented Trust comment tokens)
+provenance guards: exit 0 (dirty/untracked Lean inputs and stale tree rejected)
+JSON-compatible YAML and JSON parse checks: exit 0
+git diff --check: exit 0
+
+Infrastructure note: the default remote `make prove` offload lacked the Git
+checkout needed by the source-tree guard; the exact recipe passed with the
+pinned local Lean 4.31 toolchain.
+
+Assurance boundary preserved: exactly 11 public IDs; DEV-431-READY is not
+AUDIT-CERT; two-node transport remains accepted partial/non-blocking evidence;
+SHA-256 FFI remains opaque; runtime/codehash/fork/address provenance remains
+incomplete. This receipt does not claim semantic closure, allocation/SSZ
+closure, source correspondence, deployed-bytecode identity, or production E2E
+certification.
