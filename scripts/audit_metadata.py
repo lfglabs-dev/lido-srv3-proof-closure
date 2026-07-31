@@ -30,8 +30,8 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Legacy pure model is not a Solidity or deployed-bytecode correspondence proof.",
-    "Quantity bounds and units are model inputs; Solidity correspondence remains unproved.",
+    "Allocation-capacity inputs are model data, not extracted Solidity state.",
+    "The handwritten MinFirst algorithm has no established Solidity/EVM equivalence.",
     "TxObservation is an abstract transaction model, not an EVM execution trace.",
     "Allocation inputs are source-shaped data, not extracted Solidity state.",
     "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
@@ -75,10 +75,10 @@ EXPECTED_ASSUMPTIONS = {
     ],
 }
 EXPECTED_REPRODUCTION = [
-    {"command": "lake build LidoSRv3",
-     "expected": "successful Lean build; model layer only"},
-    {"command": "lake build LidoSRv3.Audit.Trust",
-     "expected": "successful Lean build and declared axiom report"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1",
+     "expected": "successful semantic allocation-capacity MODEL theorem build"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
+     "expected": "successful semantic MinFirst ALG theorem build"},
     {"command": "lake build LidoSRv3.Audit.Trace",
      "expected": "successful Lean build of the module containing the named rollback theorem"},
     {"command": "lake build LidoSRv3.Audit.Allocation",
@@ -99,8 +99,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "E2E remains blocked; metadata cannot discharge dependencies"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-LEGACY-MODEL"],
     ["A-MODEL-INPUTS"],
+    ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX"],
     ["A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
@@ -140,7 +140,7 @@ EXPECTED_EXCLUSIONS = {
 }
 PLANES = {"model", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "REGRESSION", "source": "OPEN", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -177,8 +177,8 @@ EXPECTED_THEOREM_PLANES = [
     [],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.P1_reserve_separation",
-    "LidoSRv3.Audit.Quantity.checkedDiv_zero",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded",
+    "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket",
     "LidoSRv3.Audit.revert_restores_state_value_and_logs",
     "LidoSRv3.Audit.valid_result_preserves_router_order",
     "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
@@ -267,6 +267,10 @@ EXPECTED_MANIFEST_THEOREMS = [
     {"name": "revert_may_retain_attempts", "status": "lean_checked", "axioms": []},
     {"name": "valid_result_preserves_router_order", "status": "lean_checked",
      "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.active_capacity_bounded", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc2.selects_least_open_bucket", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_open", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_none_no_open", "status": "lean_checked",

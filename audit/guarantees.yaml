@@ -4,23 +4,23 @@
   "guarantees": [
     {
       "id": "P-ALLOC-1",
-      "catalogue_wording": "Legacy pure model is not a Solidity or deployed-bytecode correspondence proof.",
-      "theorem": "LidoSRv3.P1_reserve_separation",
+      "catalogue_wording": "Allocation-capacity inputs are model data, not extracted Solidity state.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded",
       "theorem_planes": ["model"],
-      "statuses": {"model": "REGRESSION", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-LEGACY-MODEL"],
+      "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-MODEL-INPUTS"],
       "next_gate": "Establish pinned-source correspondence for each claimed economic transition.",
-      "reproduction": {"command": "lake build LidoSRv3", "expected": "successful Lean build; model layer only"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1", "expected": "successful semantic allocation-capacity MODEL theorem build"}
     },
     {
       "id": "P-ALLOC-2",
-      "catalogue_wording": "Quantity bounds and units are model inputs; Solidity correspondence remains unproved.",
-      "theorem": "LidoSRv3.Audit.Quantity.checkedDiv_zero",
+      "catalogue_wording": "The handwritten MinFirst algorithm has no established Solidity/EVM equivalence.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket",
       "theorem_planes": ["model"],
       "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-MODEL-INPUTS"],
+      "assumptions": ["A-HANDWRITTEN-MINFIRST"],
       "next_gate": "Connect checked quantities to independently verified pinned source spans.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Trust", "expected": "successful Lean build and declared axiom report"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful semantic MinFirst ALG theorem build"}
     },
     {
       "id": "P-DEPOSIT-1",

@@ -62,6 +62,16 @@
       "axioms": ["propext"]
     },
     {
+      "name": "Guarantees.PAlloc1.active_capacity_bounded",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PAlloc2.selects_least_open_bucket",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
       "name": "MinFirst.candidate_mem",
       "status": "lean_checked",
       "axioms": ["propext"]

@@ -2,8 +2,8 @@
 
 # REPRODUCE
 
-- `P-ALLOC-1`: `lake build LidoSRv3` — successful Lean build; model layer only
-- `P-ALLOC-2`: `lake build LidoSRv3.Audit.Trust` — successful Lean build and declared axiom report
+- `P-ALLOC-1`: `lake build LidoSRv3.Audit.Guarantees.PAlloc1` — successful semantic allocation-capacity MODEL theorem build
+- `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2` — successful semantic MinFirst ALG theorem build
 - `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Trace` — successful Lean build of the module containing the named rollback theorem
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Allocation` — successful Lean build; relational model only
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Audit.Vectors` — successful theorem and falsifier-vector build

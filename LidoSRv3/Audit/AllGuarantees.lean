@@ -13,9 +13,9 @@ import LidoSRv3.Audit.Guarantees.PSsz1
 /-!
 # Canonical minimal-11 public facade
 
-`all` is deliberately the complete public surface.  Its checked layers are
-limited to the source registry's existing model or abstract-transaction
-evidence; empty entries are intentional blockers, not omitted proofs.
+`all` is deliberately the complete public surface. Its checked layers cover
+the existing MODEL, ALG, and abstract-transaction evidence; empty entries are
+intentional blockers, not omitted proofs.
 -/
 
 namespace LidoSRv3.Audit.Guarantees
