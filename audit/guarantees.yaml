@@ -4,20 +4,20 @@
   "guarantees": [
     {
       "id": "P-ALLOC-1",
-      "catalogue_wording": "Allocation-capacity inputs are model data, not extracted Solidity state.",
+      "catalogue_wording": "Legacy pure model is not a Solidity or deployed-bytecode correspondence proof.",
       "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded",
       "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-MODEL-INPUTS"],
+      "statuses": {"model": "REGRESSION", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-LEGACY-MODEL"],
       "next_gate": "Establish pinned-source correspondence for each claimed economic transition.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1", "expected": "successful semantic allocation-capacity MODEL theorem build"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1", "expected": "successful legacy pure-model allocation-capacity regression theorem build; no source/EVM correspondence"}
     },
     {
       "id": "P-ALLOC-2",
       "catalogue_wording": "The handwritten MinFirst algorithm has no established Solidity/EVM equivalence.",
       "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem_planes": ["algorithm"],
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-HANDWRITTEN-MINFIRST"],
       "next_gate": "Connect checked quantities to independently verified pinned source spans.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful semantic MinFirst ALG theorem build"}
@@ -27,7 +27,7 @@
       "catalogue_wording": "TxObservation is an abstract transaction model, not an EVM execution trace.",
       "theorem": "LidoSRv3.Audit.revert_restores_state_value_and_logs",
       "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX"],
       "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Trace", "expected": "successful Lean build of the module containing the named rollback theorem"}
@@ -37,7 +37,7 @@
       "catalogue_wording": "Allocation inputs are source-shaped data, not extracted Solidity state.",
       "theorem": "LidoSRv3.Audit.valid_result_preserves_router_order",
       "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED"],
       "next_gate": "Prove extraction and ordered-row correspondence from pinned Solidity.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Allocation", "expected": "successful Lean build; relational model only"}
@@ -47,7 +47,7 @@
       "catalogue_wording": "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
       "theorem": "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
       "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-HANDWRITTEN-MINFIRST"],
       "next_gate": "Establish source correspondence and checked-Uint256 execution refinement.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Vectors", "expected": "successful theorem and falsifier-vector build"}
@@ -57,7 +57,7 @@
       "catalogue_wording": "Verity 4.31 is a non-certified development scaffold.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "OPEN", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-VERITY-SCAFFOLD", "A-MULTI-NODE-TRANSPORT"],
       "next_gate": "Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.",
       "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "metadata consistency only; no source theorem"}
@@ -67,7 +67,7 @@
       "catalogue_wording": "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "DEV-431-READY", "source": "DEV-431-READY", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
+      "statuses": {"model": "DEV-431-READY", "algorithm": "NOT_APPLICABLE", "source": "DEV-431-READY", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
       "assumptions": ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
       "next_gate": "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
       "reproduction": {"command": "lake build", "expected": "active Lean 4.31 dependency graph builds; not certification"}
@@ -77,7 +77,7 @@
       "catalogue_wording": "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "OPEN", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-YUL-INTERFACE"],
       "next_gate": "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
       "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "pin and blocker validation only; no Yul theorem"}
@@ -87,7 +87,7 @@
       "catalogue_wording": "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "OPEN", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-RUNTIME-PROVENANCE"],
       "next_gate": "Obtain independent canonical runtime, codehash, fork, and address provenance.",
       "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "MISSING provenance remains explicit and fails semantic closure"}
@@ -97,7 +97,7 @@
       "catalogue_wording": "SHA-256 precompile hashing currently relies on opaque native FFI.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "OPEN", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-SHA256-FFI"],
       "next_gate": "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
       "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "opaque FFI risk remains recorded; no crypto closure"}
@@ -107,7 +107,7 @@
       "catalogue_wording": "Mock-derived helper evidence is non-production evidence.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "OPEN", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
       "next_gate": "Close source/Yul/EVM/crypto composition with canonical production provenance.",
       "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "E2E remains blocked; metadata cannot discharge dependencies"}

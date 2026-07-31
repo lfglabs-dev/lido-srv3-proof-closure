@@ -8,7 +8,8 @@ def guarantee : Guarantee := ⟨.pAlloc1, [.model]⟩
 /--
 For an active module, the executable SRv3 allocation-capacity row is bounded
 both by the stake-share target and by the currently available capacity. This is
-a MODEL theorem; the input state and source/EVM refinement remain out of scope.
+a legacy pure-model regression theorem; source and EVM correspondence remain
+explicitly open.
 -/
 theorem active_capacity_bounded
     (cfg : LidoSRv3.AllocationConfig) (modules : List LidoSRv3.Module)

@@ -30,7 +30,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Allocation-capacity inputs are model data, not extracted Solidity state.",
+    "Legacy pure model is not a Solidity or deployed-bytecode correspondence proof.",
     "The handwritten MinFirst algorithm has no established Solidity/EVM equivalence.",
     "TxObservation is an abstract transaction model, not an EVM execution trace.",
     "Allocation inputs are source-shaped data, not extracted Solidity state.",
@@ -76,7 +76,7 @@ EXPECTED_ASSUMPTIONS = {
 }
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1",
-     "expected": "successful semantic allocation-capacity MODEL theorem build"},
+     "expected": "successful legacy pure-model allocation-capacity regression theorem build; no source/EVM correspondence"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful semantic MinFirst ALG theorem build"},
     {"command": "lake build LidoSRv3.Audit.Trace",
@@ -99,7 +99,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "E2E remains blocked; metadata cannot discharge dependencies"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-MODEL-INPUTS"],
+    ["A-LEGACY-MODEL"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX"],
     ["A-SOURCE-SHAPED"],
@@ -138,34 +138,34 @@ EXPECTED_EXCLUSIONS = {
          "scope": "Broad registry, governance, module lifecycle, and role-management behavior"},
     ],
 }
-PLANES = {"model", "source", "tx", "yul", "evm", "crypto"}
+PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN",
+    {"model": "REGRESSION", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
+    {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "source": "OPEN", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "source": "OPEN", "tx": "OPEN",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "DEV-431-READY", "source": "DEV-431-READY", "tx": "OPEN",
+    {"model": "DEV-431-READY", "algorithm": "NOT_APPLICABLE", "source": "DEV-431-READY", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
-    {"model": "OPEN", "source": "OPEN", "tx": "OPEN",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "source": "BLOCKED", "tx": "BLOCKED",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "source": "NOT_APPLICABLE", "tx": "OPEN",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "OPEN", "source": "BLOCKED", "tx": "BLOCKED",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model"],
-    ["model"],
+    ["algorithm"],
     ["model", "tx"],
     ["model"],
     ["model"],
@@ -687,13 +687,13 @@ def rendered(rows):
     status_lines = [
         "# STATUS",
         "",
-        "| ID | Model | Source | TX | Yul | EVM | Crypto |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| ID | Model | ALG | Source | TX | Yul | EVM | Crypto |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for row in rows:
         s = row["statuses"]
         status_lines.append(
-            f"| `{row['id']}` | {s['model']} | {s['source']} | {s['tx']} | "
+            f"| `{row['id']}` | {s['model']} | {s['algorithm']} | {s['source']} | {s['tx']} | "
             f"{s['yul']} | {s['evm']} | {s['crypto']} |"
         )
     status = header + "\n".join(status_lines) + "\n"

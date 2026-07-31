@@ -14,6 +14,10 @@ private def activeEmptyModule : LidoSRv3.Module :=
 
 private def allocationConfig : LidoSRv3.AllocationConfig := ⟨32, 64⟩
 
+/- An active module whose share target exceeds its available capacity. -/
+private def capacityLimitedModule : LidoSRv3.Module :=
+  ⟨1, .active, 10000, 0, 1, 0, 0, 0, 0, 0, 0, 0, false, 0, 0, 0⟩
+
 /- Positive MODEL vector: an active zero-share module has zero capacity. -/
 example :
     (LidoSRv3.allocationCapacityRow allocationConfig [activeEmptyModule] 1 false
@@ -25,6 +29,20 @@ example :
       activeEmptyModule).targetValidators <
       (LidoSRv3.allocationCapacityRow allocationConfig [activeEmptyModule] 1 false
         activeEmptyModule).capacity := by decide
+
+/- This vector independently exercises the available-capacity (not target) arm. -/
+example :
+    let row := LidoSRv3.allocationCapacityRow allocationConfig [capacityLimitedModule] 10 false
+      capacityLimitedModule
+    row.capacity = LidoSRv3.moduleAvailableCapacityEquivalent allocationConfig false
+      capacityLimitedModule ∧
+    row.capacity < row.targetValidators := by decide
+
+/- A row exceeding available capacity is rejected even where the target is larger. -/
+example :
+    ¬ LidoSRv3.moduleAvailableCapacityEquivalent allocationConfig false capacityLimitedModule <
+      (LidoSRv3.allocationCapacityRow allocationConfig [capacityLimitedModule] 10 false
+        capacityLimitedModule).capacity := by decide
 
 example : candidate? [b 0 5 10, b 1 0 10] = some (b 1 0 10) := by decide
 /- A later, fuller bucket is a plausible broken MinFirst choice and is rejected. -/
