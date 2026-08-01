@@ -22,7 +22,7 @@ falls back to the system stack offline.
 ## Exports
 
 PNG and SVG views are generated on demand with the export buttons and are not
-versioned. `verity/targets/srv3-flow-map.md` links to the canonical interactive
+versioned. `archive/legacy-p1-p15/verity-targets/srv3-flow-map.md` links to the canonical interactive
 diagram instead of depending on generated renderings.
 
 ## Provenance

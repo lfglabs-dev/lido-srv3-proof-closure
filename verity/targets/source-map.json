@@ -4,7 +4,7 @@
     "lido_pr_1811_commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
     "verity_commit": "6cfc41fe4129e2c56f130bab9617a0c677ce60ae"
   },
-  "correspondence_register": "verity/targets/solidity-correspondence.md",
+  "correspondence_register": "archive/legacy-p1-p15/verity-targets/solidity-correspondence.md",
   "targets": {
     "SRV3-P1": {
       "anchors": [

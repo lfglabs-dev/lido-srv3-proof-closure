@@ -1,5 +1,5 @@
 # Lean Proofs
 
-This repository does not ship Lean theorem artifacts. The executable evidence
-for this PR lives in the local Verity-style model under `verity/src/verity_srv3/`
-and the proof target files under `proofs/`.
+The Lean facade for the 11 public guarantees is
+`LidoSRv3/Audit/AllGuarantees.lean`; the canonical registry is
+`audit/guarantees.yaml`.
