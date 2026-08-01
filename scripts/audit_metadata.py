@@ -293,6 +293,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PDeposit1.source_reverting_branch_moves_no_ether",
      "status": "lean_checked", "axioms": ["propext"]},
+    {"name": "Guarantees.PDeposit1.source_nonconserving_deployment_reverts",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PSsz1.structural_witness_binding_sound", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},

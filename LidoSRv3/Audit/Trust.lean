@@ -27,6 +27,7 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
 #print axioms LidoSRv3.Audit.MinFirst.candidate_open

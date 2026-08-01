@@ -34,10 +34,41 @@ example : ConservingConfig cfg := by decide
 
 /- The line 996 assert is load-bearing, not decorative: a deployment whose
    `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` (line 972) exceeds `DEPOSIT_SIZE`
-   (`BeaconChainDepositor.sol` line 24) strands 96 wei in the router. -/
+   (`BeaconChainDepositor.sol` line 24) would leave 96 wei in the router, so the
+   assert fails and the whole transaction reverts.  Modelling this branch as a
+   commit -- stranding the 96 wei -- is the plausible mistake, and it is rejected
+   here: `run` must not return `committedDeposits` for a non-conserving config. -/
 example :
-    run cfgSkewed inp = .committedDeposits 3 192 96 1096 ∧
+    run cfgSkewed inp = .revertAssertBalanceUnchanged ∧
       ¬ ConservingConfig cfgSkewed := by decide
+
+/- The mutant that drops the line 996 assert branch and commits instead is caught
+   in both directions: the reverting classification and the absence of any commit
+   for the skewed deployment. -/
+example : (run cfgSkewed inp).reverts = true := by decide
+
+example :
+    ∀ n : Fin 4,
+      run cfgSkewed { inp with publicKeysBatchLength := 48 * (n.val + 1)
+                               signaturesBatchLength := 96 * (n.val + 1) }
+        ≠ .committedDeposits (n.val + 1) (64 * (n.val + 1)) (32 * (n.val + 1))
+            (1000 + 32 * (n.val + 1)) := by decide
+
+/- No wei is stranded on that branch: a failing `assert` is a `Panic(0x01)` that
+   rolls the whole transaction back. -/
+example :
+    (run cfgSkewed inp).pulled = 0 ∧ (run cfgSkewed inp).pushed = 0 := by decide
+
+/- The trace/observation model agrees: the skewed deployment yields `.reverted`,
+   not a commit. -/
+example :
+    (observation (0 : Nat) 1 [] ⟨[], [], []⟩ (run cfgSkewed inp)).result
+      = .reverted := by rfl
+
+/- A push scale that exceeds the pull scale reverts at line 996 as well; the
+   assert is symmetric, not a one-sided "excess" check. -/
+example :
+    run ⟨32, 64, 48, 48, 96⟩ inp = .revertAssertBalanceUnchanged := by decide
 
 /- Status guard, `StakingRouter.sol` line 946. -/
 example : run cfg { inp with moduleActive := false } = .revertStakingModuleNotActive := by decide

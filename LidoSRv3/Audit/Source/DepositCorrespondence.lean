@@ -31,9 +31,12 @@ Three spans make up the pinned deposit path:
 
 `run` below is the source-shaped presentation of that control flow: it returns
 the *first* guard that fires, matching Solidity's sequential evaluation, and
-otherwise the committed push.  `Outcome.pulled` and `Outcome.pushed` are the wei
-actually moved in from Lido (line 983 / `Lido.sol` line 885) and out to the
-deposit contract (`BeaconChainDepositor.sol` line 57).
+otherwise the committed push.  The line 996 `assert` is one of those guards: a
+failing `assert` is a `Panic(0x01)` revert under Solidity 0.8, so a deployment
+that pulls a different amount than it pushes aborts the whole transaction rather
+than stranding the difference in the router.  `Outcome.pulled` and
+`Outcome.pushed` are the wei actually moved in from Lido (line 983 / `Lido.sol`
+line 885) and out to the deposit contract (`BeaconChainDepositor.sol` line 57).
 
 Scope.  This module covers the deposit-path conservation and revert structure
 only.  It makes no claim about the allocation amounts feeding
@@ -54,10 +57,13 @@ of the batches are interface facts, not modelled here.
 Conservation caveat.  `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` is a constructor
 immutable (`StakingRouter.sol` line 65, assigned at line 105), not a compile-time
 constant, while `DEPOSIT_SIZE` is the literal `32 ether`
-(`BeaconChainDepositor.sol` line 24).  Conservation of the pinned path is
-therefore conditional on the deployment-time equality captured by
-`ConservingConfig`, and `pulled_eq_pushed_iff_conserving` shows that condition is
-necessary as well as sufficient: the line 996 assert is load-bearing.
+(`BeaconChainDepositor.sol` line 24).  A deployment that sets them apart is a
+real possibility, and `pulled_eq_pushed_iff_conserving` shows the pull and the
+push agree *exactly when* the deployment satisfies `ConservingConfig`: the line
+996 assert is load-bearing.  Because that assert is modelled as the revert it is,
+a non-conserving deployment never reaches a committed push --
+`committed_implies_conserving` -- so whole-path conservation (`run_conserves`)
+holds for every configuration rather than only under `ConservingConfig`.
 
 Rollback caveat.  The pinned path contains no `try`/`catch` and no failure-
 swallowing low-level call, so every guard listed above aborts the whole
@@ -144,6 +150,11 @@ inductive Outcome
   /-- `revert InvalidSignaturesBatchLength(...)`, `BeaconChainDepositor.sol`
   lines 46--48. -/
   | revertInvalidSignaturesBatchLength
+  /-- `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)`, source
+  lines 993--996.  Under Solidity 0.8 a failing `assert` is a `Panic(0x01)` that
+  aborts the whole transaction, so this is a revert like every guard above it --
+  not a commit that leaves the difference stranded in the router. -/
+  | revertAssertBalanceUnchanged
   /-- The early `return` at source line 978, reached after the committed
   reentrancy-guard write at source line 976.  This is a commit, not a rollback. -/
   | committedNoDeposits
@@ -177,6 +188,12 @@ def loopPushed (cfg : SourceDepositConfig) : Nat → Nat
 def pushedValue (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Nat :=
   loopPushed cfg (actualDepositsCount cfg inp)
 
+/-- `etherBalanceAfterDeposits`, the `address(this).balance` read at source line
+993: the line 980 snapshot, plus the pull at line 983, minus what the loop at
+`BeaconChainDepositor.sol` lines 53--63 sent out. -/
+def routerBalanceAfter (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Nat :=
+  inp.routerBalanceBefore + depositsValue cfg inp - pushedValue cfg inp
+
 /--
 Deployment condition under which the pinned path conserves stake: the router's
 immutable type-1 max effective balance (source line 65) is the deposit
@@ -192,7 +209,16 @@ instance (cfg : SourceDepositConfig) : Decidable (ConservingConfig cfg) :=
 The pinned deposit path, as a first-guard-wins function.  The guard order is the
 source order: `StakingRouter.deposit` lines 946, 959, 966, 969, 978, then the
 `Lido.withdrawDepositableEther` guards reached at line 983, then the
-`BeaconChainDepositor.makeBeaconChainDeposits32ETH` guards reached at line 985.
+`BeaconChainDepositor.makeBeaconChainDeposits32ETH` guards reached at line 985,
+and finally the `assert` at line 996.
+
+That last guard is written as `depositsValue ≠ pushedValue` rather than as a
+comparison of `routerBalanceAfter` with the line 980 snapshot.  The two readings
+coincide whenever the router can cover what the loop sends -- which it always can
+on chain, since a transfer of wei the router does not hold reverts inside the
+loop -- and `balanceAssert_iff_pulled_eq_pushed` proves that equivalence.  The
+pull/push form is preferred here because truncating `Nat` subtraction, unlike a
+real balance, can silently bottom out at zero.
 -/
 def run (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
   if inp.moduleActive = false then
@@ -215,10 +241,11 @@ def run (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
     .revertInvalidPublicKeysBatchLength
   else if inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp then
     .revertInvalidSignaturesBatchLength
+  else if depositsValue cfg inp ≠ pushedValue cfg inp then
+    .revertAssertBalanceUnchanged
   else
     .committedDeposits (actualDepositsCount cfg inp) (depositsValue cfg inp)
-      (pushedValue cfg inp)
-      (inp.routerBalanceBefore + depositsValue cfg inp - pushedValue cfg inp)
+      (pushedValue cfg inp) (routerBalanceAfter cfg inp)
 
 /-- Whether the outcome aborts the whole transaction.  The pinned path has no
 `try`/`catch` and no failure-swallowing low-level call, so every `revert*` guard
@@ -268,43 +295,103 @@ theorem pulled_eq_pushed_iff_conserving {cfg : SourceDepositConfig}
   exact ⟨fun h => Nat.eq_of_mul_eq_mul_left hKeys (by omega), fun h => by rw [h]⟩
 
 /--
-The `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` at source
-line 996 holds on the committed-push branch: the router forwards every pulled wei
-and keeps none.
+The two readings of the line 996 `assert` agree.  Comparing
+`etherBalanceAfterDeposits` (source line 993) with the line 980 snapshot is the
+same test as comparing the pull with the push, provided the router can cover what
+the loop sends -- on chain it always can, because sending wei the router does not
+hold reverts inside the loop at `BeaconChainDepositor.sol` line 57.  The side
+condition is exactly where truncating `Nat` subtraction stops standing in for a
+balance.
 -/
-theorem committed_balance_preserved {cfg : SourceDepositConfig}
+theorem balanceAssert_iff_pulled_eq_pushed (cfg : SourceDepositConfig)
+    (inp : SourceDepositInput)
+    (hCovered : pushedValue cfg inp ≤ inp.routerBalanceBefore + depositsValue cfg inp) :
+    routerBalanceAfter cfg inp = inp.routerBalanceBefore
+      ↔ depositsValue cfg inp = pushedValue cfg inp := by
+  unfold routerBalanceAfter
+  refine ⟨fun h => Nat.add_left_cancel ((Nat.sub_eq_iff_eq_add hCovered).1 h), fun h => ?_⟩
+  rw [h, Nat.add_sub_cancel]
+
+/--
+What a committed push at source lines 980--996 records.  Reaching it means every
+guard passed, including the line 996 `assert`, so the pull and the push agree and
+the router balance is back at its line 980 snapshot -- with no `ConservingConfig`
+hypothesis, because the assert itself rejects the deployments that would violate
+it.
+-/
+theorem committed_deposits_spec {cfg : SourceDepositConfig}
     {inp : SourceDepositInput} {keys pulled pushed balanceAfter : Nat}
-    (hCfg : ConservingConfig cfg)
     (hRun : run cfg inp = .committedDeposits keys pulled pushed balanceAfter) :
-    pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore := by
+    keys = actualDepositsCount cfg inp ∧ 0 < actualDepositsCount cfg inp ∧
+      pulled = depositsValue cfg inp ∧ pushed = pushedValue cfg inp ∧
+      pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore := by
   unfold run at hRun
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
+  rename_i hKeys
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
   split at hRun; · exact absurd hRun (by simp)
-  have hEq := pulled_eq_pushed cfg inp hCfg
+  split at hRun; · exact absurd hRun (by simp)
+  rename_i hAssert
+  have hEq : depositsValue cfg inp = pushedValue cfg inp := Decidable.of_not_not hAssert
   simp only [Outcome.committedDeposits.injEq] at hRun
-  obtain ⟨-, hPulled, hPushed, hBalance⟩ := hRun
-  refine ⟨by rw [← hPulled, ← hPushed, hEq], ?_⟩
-  rw [← hBalance, ← hEq, Nat.add_sub_cancel]
+  obtain ⟨hKeysEq, hPulled, hPushed, hBalance⟩ := hRun
+  refine ⟨hKeysEq.symm, Nat.pos_of_ne_zero hKeys, hPulled.symm, hPushed.symm,
+    by rw [← hPulled, ← hPushed, hEq], ?_⟩
+  rw [← hBalance]
+  unfold routerBalanceAfter
+  rw [hEq, Nat.add_sub_cancel]
+
+/--
+The `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` at source
+line 996 holds on the committed-push branch: the router forwards every pulled wei
+and keeps none.
+-/
+theorem committed_balance_preserved {cfg : SourceDepositConfig}
+    {inp : SourceDepositInput} {keys pulled pushed balanceAfter : Nat}
+    (hRun : run cfg inp = .committedDeposits keys pulled pushed balanceAfter) :
+    pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore :=
+  let ⟨_, _, _, _, hMoved, hBalance⟩ := committed_deposits_spec hRun
+  ⟨hMoved, hBalance⟩
+
+/--
+The line 996 assert is modelled as the gate it is: a non-conserving deployment
+cannot reach the committed push at all, so the excess is never left stranded in
+the router -- the transaction reverts instead.
+-/
+theorem committed_implies_conserving {cfg : SourceDepositConfig}
+    {inp : SourceDepositInput} {keys pulled pushed balanceAfter : Nat}
+    (hRun : run cfg inp = .committedDeposits keys pulled pushed balanceAfter) :
+    ConservingConfig cfg := by
+  obtain ⟨-, hKeys, hPulled, hPushed, hMoved, -⟩ := committed_deposits_spec hRun
+  exact (pulled_eq_pushed_iff_conserving hKeys).1 (by rw [← hPulled, ← hPushed, hMoved])
+
+/-- Contrapositive of `committed_implies_conserving`: a deployment whose pull
+scale differs from `DEPOSIT_SIZE` reverts at source line 996. -/
+theorem not_conserving_reverts {cfg : SourceDepositConfig} {inp : SourceDepositInput}
+    (hCfg : ¬ ConservingConfig cfg) :
+    ∀ keys pulled pushed balanceAfter,
+      run cfg inp ≠ .committedDeposits keys pulled pushed balanceAfter :=
+  fun _ _ _ _ hRun => hCfg (committed_implies_conserving hRun)
 
 /--
 Whole-path stake conservation: on *every* branch of the pinned deposit path --
 each revert, the empty-batch commit, and the full push -- the wei pulled from
-Lido equals the wei pushed to the beacon deposit contract.
+Lido equals the wei pushed to the beacon deposit contract.  No `ConservingConfig`
+hypothesis is needed, because a non-conserving deployment reverts at line 996
+instead of committing.
 -/
-theorem run_conserves (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (hCfg : ConservingConfig cfg) :
+theorem run_conserves (cfg : SourceDepositConfig) (inp : SourceDepositInput) :
     (run cfg inp).pulled = (run cfg inp).pushed := by
   cases hRun : run cfg inp with
   | committedDeposits keys pulled pushed balanceAfter =>
-      exact (committed_balance_preserved hCfg hRun).1
+      exact (committed_balance_preserved hRun).1
   | _ => rfl
 
 /-- No wei crosses either boundary on a reverting branch: the pull at source line
@@ -359,6 +446,7 @@ theorem run_ne_invalidPublicKeysBatchLength {cfg : SourceDepositConfig}
   have hOK : inp.publicKeysBatchLength = cfg.publicKeyLength * actualDepositsCount cfg inp :=
     publicKeysBatchLength_guard_discharged hLengths (by simpa using hAligned)
   rw [if_neg (by simp [hOK])]
+  split; · simp
   split <;> simp
 
 /--

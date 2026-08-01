@@ -108,6 +108,11 @@
       "axioms": ["propext"]
     },
     {
+      "name": "Guarantees.PDeposit1.source_nonconserving_deployment_reverts",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
       "name": "Guarantees.PSsz1.structural_witness_binding_sound",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
