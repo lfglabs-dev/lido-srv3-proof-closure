@@ -543,8 +543,9 @@ def main():
             run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
+        # P-ACCOUNT-1 is the UNMAPPED source row: it may not claim closure.
         unmapped_closure = copy.deepcopy(guarantees)
-        unmapped_closure["guarantees"][0]["statuses"]["source"] = "LEAN_CHECKED"
+        unmapped_closure["guarantees"][4]["statuses"]["source"] = "LEAN_CHECKED"
         write_json(guarantees_path, unmapped_closure)
         run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
