@@ -160,6 +160,9 @@ inductive Outcome
   /-- `revert InvalidSignaturesBatchLength(...)`, `BeaconChainDepositor.sol`
   lines 46--48. -/
   | revertInvalidSignaturesBatchLength
+  /-- The value transfer at `BeaconChainDepositor.sol` line 57 reverts when
+  the router cannot fund the deposit loop. -/
+  | revertInsufficientRouterBalance
   /-- `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)`, source
   lines 993--996.  Under Solidity 0.8 a failing `assert` is a `Panic(0x01)` that
   aborts the whole transaction, so this is a revert like every guard above it --
@@ -255,6 +258,8 @@ def run (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
     .revertInvalidPublicKeysBatchLength
   else if inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp then
     .revertInvalidSignaturesBatchLength
+  else if inp.routerBalanceBefore + depositsValue cfg inp < pushedValue cfg inp then
+    .revertInsufficientRouterBalance
   else if depositsValue cfg inp ≠ pushedValue cfg inp then
     .revertAssertBalanceUnchanged
   else
@@ -377,6 +382,9 @@ theorem committed_deposits_spec {cfg : SourceDepositConfig}
       inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp
   · rw [if_pos hSignatures] at hRun; cases hRun
   rw [if_neg hSignatures] at hRun
+  by_cases hFunded : inp.routerBalanceBefore + depositsValue cfg inp < pushedValue cfg inp
+  · rw [if_pos hFunded] at hRun; cases hRun
+  rw [if_neg hFunded] at hRun
   by_cases hAssert : depositsValue cfg inp ≠ pushedValue cfg inp
   · rw [if_pos hAssert] at hRun; cases hRun
   rw [if_neg hAssert] at hRun
@@ -507,6 +515,7 @@ theorem run_ne_invalidPublicKeysBatchLength {cfg : SourceDepositConfig}
   have hOK : inp.publicKeysBatchLength = cfg.publicKeyLength * actualDepositsCount cfg inp :=
     publicKeysBatchLength_guard_discharged hLengths (Decidable.of_not_not hMisaligned)
   rw [if_neg (by simp [hOK])]
+  split; · simp
   split; · simp
   split <;> simp
 

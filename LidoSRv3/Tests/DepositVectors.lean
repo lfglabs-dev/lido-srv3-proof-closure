@@ -70,6 +70,12 @@ example :
 example :
     run ⟨32, 64, 48, 48, 96⟩ inp = .revertAssertBalanceUnchanged := by decide
 
+/- If the router cannot fund a larger push scale, the value transfer at
+   `BeaconChainDepositor.sol` line 57 reverts before the line 996 assert. -/
+example :
+    run ⟨32, 64, 48, 48, 96⟩ { inp with routerBalanceBefore := 0 }
+      = .revertInsufficientRouterBalance := by decide
+
 /- Status guard, `StakingRouter.sol` line 946. -/
 example : run cfg { inp with moduleActive := false } = .revertStakingModuleNotActive := by decide
 
