@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 57825b473f412847912e65a94448fe2219333e6d
+validated-tree: 19ada9211a174f5a61f6250ce5dbc0cc330d7464
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -47,3 +47,46 @@ P-DEPOSIT-1 pinned-source gate receipt (committed tree):
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
 - Source plane only: `evm` remains OPEN and `tx` remains
   ABSTRACT_LEAN_CHECKED for P-DEPOSIT-1.
+
+P-TOPUP-1 pinned-source gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `Guarantees.PTopup1.source_topup_conserves_and_rolls_back` and its four
+  companions -- `source_router_balance_unchanged`,
+  `source_reverting_branch_moves_no_ether`,
+  `source_balance_guards_discharged`, and
+  `source_pinned_config_discharges_pubkey_guard` -- report only the Lean
+  foundations `propext` and `Quot.sound`.
+- `make test`: exit 0, including `LidoSRv3.Tests.TopupVectors`.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+- Unlike P-DEPOSIT-1, top-up conservation is *unconditional*: the pull
+  accumulated at `StakingRouter.sol` line 732 and the push summed at
+  `BeaconChainDepositor.sol` line 106 are two readings of the same `_amounts`
+  array, not a key count scaled by two separately configured constants. The
+  line 755 balance `assert` is therefore discharged rather than load-bearing,
+  and `source_balance_guards_discharged` states that both the assert failure
+  and the insufficient-router-balance revert are unreachable. Both `Outcome`
+  constructors are retained rather than deleted, because that unreachability
+  is a consequence of the `A-SOURCE-SHAPED` unbounded-`Nat` reading of the
+  `unchecked` block opened at source line 722, not of a bounded-arithmetic
+  proof; a 2^256 wrap there would make them live again.
+- The vectors pin `_checkAppAuth(_getTopUpGateway())` at source line 686 as the
+  *first* guard, so no unauthorized call is classified as a committed outcome
+  whatever the later module status is, and pin the zero-total early commit at
+  source line 741 as a *commit* rather than a revert, which is why
+  `committedNoTopUp_is_not_a_rollback` is stated explicitly.
+- Source plane only: `evm` remains OPEN and `tx` remains
+  ABSTRACT_LEAN_CHECKED for P-TOPUP-1. The per-validator top-up amount
+  computation and limit accounting (P-TOPUP-2), the allocation algorithm
+  producing `_amounts` (P-ALLOC-1/2), and the SSZ deposit-data-root
+  construction at `BeaconChainDepositor.sol` lines 120--146 (P-SSZ-1) stay out
+  of scope.
+- `make prove` was NOT run to completion on this tree: the workspace Lean shim
+  cannot execute `lake env lean --version` (remote exit 126, "Permission
+  denied"), which is the provenance stamp the `prove` recipe emits before
+  `lake build LidoSRv3`. The failure reproduces identically for `make
+  bootstrap` on an unmodified checkout, so it is a toolchain-availability
+  regression rather than a proof regression; the `lake build LidoSRv3` half of
+  the same recipe completed successfully.
