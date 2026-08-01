@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: f7bdd9b31e547923789f11984a02d8919b1c4136
+validated-tree: 57825b473f412847912e65a94448fe2219333e6d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -21,3 +21,29 @@ P-SSZ-1 structural gate receipt (committed tree):
 - `make test`: exit 0, including `LidoSRv3.Tests.SszRegression`.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+
+P-DEPOSIT-1 pinned-source gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` and its three
+  companions -- `source_router_balance_unchanged`,
+  `source_reverting_branch_moves_no_ether`, and
+  `source_nonconserving_deployment_reverts` -- report only the Lean foundation
+  `propext`.
+- `make prove`: exit 0.
+- `make test`: exit 0, including `LidoSRv3.Tests.DepositVectors`, which pins the
+  `StakingRouter.sol` line 996 balance `assert` as the `Panic(0x01)` revert it
+  is: a deployment whose pull scale differs from `DEPOSIT_SIZE` yields
+  `revertAssertBalanceUnchanged`, never a commit stranding the difference. The
+  same vectors pin the `onlyRole(DEPOSIT_ROLE)` modifier at line 942 as the
+  *first* guard -- an unauthorized caller yields `revertUnauthorizedDepositRole`
+  whatever the line 946 module status is, so no unauthorized call is classified
+  as a committed outcome -- and pin the empty-batch early return at line 978 as
+  the one non-reverting escape that never reaches the line 996 assert, which is
+  why `source_nonconserving_deployment_reverts` carries a nonempty-batch
+  hypothesis for its `reverts = true` claim.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+- Source plane only: `evm` remains OPEN and `tx` remains
+  ABSTRACT_LEAN_CHECKED for P-DEPOSIT-1.

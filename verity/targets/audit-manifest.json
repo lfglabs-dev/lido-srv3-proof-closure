@@ -20,16 +20,18 @@
         "LidoSRv3.Audit.StrategyProofs",
         "LidoSRv3.Audit.Source.MinFirstCorrespondence",
         "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
+        "LidoSRv3.Audit.Source.DepositCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
+        "LidoSRv3.Tests.DepositVectors",
         "LidoSRv3.Audit.Common.Units",
         "LidoSRv3.Audit.Common.Result",
         "LidoSRv3.Audit.Common.Trace",
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity and P-ALLOC-2 next-target correspondence are checked against pinned Solidity"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target and P-DEPOSIT-1 deposit conservation/rollback correspondence are checked against pinned Solidity"
     }
   },
   "proof_policy": {
@@ -87,6 +89,26 @@
     },
     {
       "name": "Guarantees.PAlloc2.source_selects_same_next_target",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PDeposit1.source_router_balance_unchanged",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PDeposit1.source_reverting_branch_moves_no_ether",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PDeposit1.source_nonconserving_deployment_reverts",
       "status": "lean_checked",
       "axioms": ["propext"]
     },

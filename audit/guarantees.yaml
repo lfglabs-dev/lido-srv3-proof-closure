@@ -24,13 +24,13 @@
     },
     {
       "id": "P-DEPOSIT-1",
-      "catalogue_wording": "TxObservation is an abstract transaction model, not an EVM execution trace.",
-      "theorem": "LidoSRv3.Audit.revert_restores_state_value_and_logs",
-      "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-ABSTRACT-TX"],
+      "catalogue_wording": "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+      "theorem_planes": ["model", "tx", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
       "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Trace", "expected": "successful Lean build of the module containing the named rollback theorem"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1", "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"}
     },
     {
       "id": "P-TOPUP-1",

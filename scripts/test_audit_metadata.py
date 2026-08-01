@@ -567,6 +567,57 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
+        # P-DEPOSIT-1 closed its source plane in this campaign; the source-plane
+        # claim, its evidence plane, and the evm plane it deliberately did not
+        # close all have to stay pinned to the theorem that actually exists.
+        deposit_source_downgrade = copy.deepcopy(guarantees)
+        deposit_source_downgrade["guarantees"][2]["statuses"]["source"] = "OPEN"
+        write_json(guarantees_path, deposit_source_downgrade)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEPOSIT-1: assurance statuses differ from canonical claims",
+        )
+        write_json(guarantees_path, guarantees)
+
+        deposit_evm_overclaim = copy.deepcopy(guarantees)
+        deposit_evm_overclaim["guarantees"][2]["statuses"]["evm"] = "LEAN_CHECKED"
+        write_json(guarantees_path, deposit_evm_overclaim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEPOSIT-1: evm status LEAN_CHECKED requires theorem evidence "
+            "for that plane",
+        )
+        write_json(guarantees_path, guarantees)
+
+        deposit_evm_plane_overclaim = copy.deepcopy(guarantees)
+        deposit_evm_plane_overclaim["guarantees"][2]["statuses"]["evm"] = "LEAN_CHECKED"
+        deposit_evm_plane_overclaim["guarantees"][2]["theorem_planes"] = [
+            "model", "tx", "source", "evm",
+        ]
+        write_json(guarantees_path, deposit_evm_plane_overclaim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEPOSIT-1: theorem planes differ from canonical evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
+        deposit_unbacked_source_plane = copy.deepcopy(guarantees)
+        deposit_unbacked_source_plane["guarantees"][2]["theorem_planes"] = ["model", "tx"]
+        write_json(guarantees_path, deposit_unbacked_source_plane)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEPOSIT-1: theorem planes differ from canonical evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
         for index, guarantee in enumerate(guarantees["guarantees"]):
             command_mutant = copy.deepcopy(guarantees)
             command_mutant["guarantees"][index]["reproduction"]["command"] = "true"
@@ -786,6 +837,50 @@ def main():
         )
         write_json(source_map_path, source_map)
 
+        # The four P-DEPOSIT-1 spans are the evidence its LEAN_CHECKED source
+        # plane rests on: unmapping or thinning them must fail the gate.
+        deposit_unmapped = copy.deepcopy(source_map)
+        deposit_unmapped["targets"][2] = {
+            "id": "P-DEPOSIT-1",
+            "status": "UNMAPPED",
+            "spans": [],
+            "blocker": "Deliberate unmapping fixture.",
+        }
+        write_json(source_map_path, deposit_unmapped)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEPOSIT-1: verified source target must remain MAPPED",
+        )
+        write_json(source_map_path, source_map)
+
+        deposit_dropped_span = copy.deepcopy(source_map)
+        deposit_dropped_span["targets"][2]["spans"].pop()
+        write_json(source_map_path, deposit_dropped_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEPOSIT-1: source spans differ from verified semantic anchors",
+        )
+        write_json(source_map_path, source_map)
+
+        deposit_shrunk_span = copy.deepcopy(source_map)
+        deposit_shrunk_span["targets"][2]["spans"][0]["end_line"] = 996
+        deposit_shrunk_span["targets"][2]["spans"][0]["permalink"] = (
+            "https://github.com/lidofinance/core/blob/"
+            f"{pinned_sha}/contracts/0.8.25/sr/StakingRouter.sol#L942-L996"
+        )
+        write_json(source_map_path, deposit_shrunk_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEPOSIT-1: source span is not a verified semantic anchor",
+        )
+        write_json(source_map_path, source_map)
+
         ssz_overclaim = copy.deepcopy(source_map)
         ssz_overclaim["ssz_claim"]["level"] = "FULL_SSZ"
         write_json(source_map_path, ssz_overclaim)
@@ -819,7 +914,9 @@ def main():
         "all metadata schemas, proof baseline/revisions, "
         "canonical Lean toolchain and requested revisions, proof policy, "
         "source-map policy, reproduction evidence, "
-        "strict source-span evidence, status vocabulary/plane/closure, stale view"
+        "strict source-span evidence, status vocabulary/plane/closure, "
+        "P-DEPOSIT-1 source-plane downgrade/overclaim and span unmapping, "
+        "stale view"
     )
 
 

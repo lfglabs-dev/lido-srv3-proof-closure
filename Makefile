@@ -33,6 +33,8 @@ test:
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.SszRegression
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
+	@lake build LidoSRv3.Tests.DepositVectors
+	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
