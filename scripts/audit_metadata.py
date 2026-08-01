@@ -30,7 +30,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Legacy pure model is not a Solidity or deployed-bytecode correspondence proof.",
+    "Pinned-source correspondence proves only the allocation-capacity computation; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "TxObservation is an abstract transaction model, not an EVM execution trace.",
     "Allocation inputs are source-shaped data, not extracted Solidity state.",
@@ -76,7 +76,7 @@ EXPECTED_ASSUMPTIONS = {
 }
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1",
-     "expected": "successful legacy pure-model allocation-capacity regression theorem build; no source/EVM correspondence"},
+     "expected": "successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Trace",
@@ -99,7 +99,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-LEGACY-MODEL"],
+    ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX"],
     ["A-SOURCE-SHAPED"],
@@ -112,7 +112,8 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
 ]
 EXPECTED_NEXT_GATES = [
-    "Establish pinned-source correspondence for each claimed economic transition.",
+    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
+    "correspondence for SRLib._getModulesAllocationAndCapacity.",
     "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
     "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Refine success/revert and rollback against pinned executable EVM semantics.",
@@ -141,7 +142,7 @@ EXPECTED_EXCLUSIONS = {
 }
 PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "REGRESSION", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+    {"model": "REGRESSION", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -165,7 +166,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
 ]
 EXPECTED_THEOREM_PLANES = [
-    ["model"],
+    ["model", "source"],
     ["algorithm", "source"],
     ["model", "tx"],
     ["model"],
@@ -178,7 +179,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.revert_restores_state_value_and_logs",
     "LidoSRv3.Audit.valid_result_preserves_router_order",
@@ -245,6 +246,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Strategy",
             "LidoSRv3.Audit.StrategyProofs",
             "LidoSRv3.Audit.Source.MinFirstCorrespondence",
+            "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
@@ -256,7 +258,8 @@ EXPECTED_MANIFEST_LAYERS = {
         ],
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
-            "P-ALLOC-2 next-target correspondence is checked against pinned Solidity"
+            "P-ALLOC-1 allocation-capacity and P-ALLOC-2 next-target correspondence "
+            "are checked against pinned Solidity"
         ),
     },
 }
@@ -273,6 +276,10 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc1.active_capacity_bounded", "status": "lean_checked",
      "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.source_capacities_match_model", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
+    {"name": "Guarantees.PAlloc1.source_active_capacity_bounded", "status": "lean_checked",
+     "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc2.selects_least_open_bucket", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc2.source_selects_same_next_target", "status": "lean_checked",

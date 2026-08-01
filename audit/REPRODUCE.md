@@ -2,7 +2,7 @@
 
 # REPRODUCE
 
-- `P-ALLOC-1`: `lake build LidoSRv3.Audit.Guarantees.PAlloc1` — successful legacy pure-model allocation-capacity regression theorem build; no source/EVM correspondence
+- `P-ALLOC-1`: `lake build LidoSRv3.Audit.Guarantees.PAlloc1` — successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open
 - `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2` — successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open
 - `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Trace` — successful Lean build of the module containing the named rollback theorem
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Allocation` — successful Lean build; relational model only

@@ -4,13 +4,13 @@
   "guarantees": [
     {
       "id": "P-ALLOC-1",
-      "catalogue_wording": "Legacy pure model is not a Solidity or deployed-bytecode correspondence proof.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "REGRESSION", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-LEGACY-MODEL"],
-      "next_gate": "Establish pinned-source correspondence for each claimed economic transition.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1", "expected": "successful legacy pure-model allocation-capacity regression theorem build; no source/EVM correspondence"}
+      "catalogue_wording": "Pinned-source correspondence proves only the allocation-capacity computation; proportional allocation amounts and EVM equivalence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded",
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "REGRESSION", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
+      "next_gate": "Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for SRLib._getModulesAllocationAndCapacity.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1", "expected": "successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open"}
     },
     {
       "id": "P-ALLOC-2",
