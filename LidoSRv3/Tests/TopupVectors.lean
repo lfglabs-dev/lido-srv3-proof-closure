@@ -163,7 +163,7 @@ example :
 
 /- Line 706 rounds the cap *down* to a gwei multiple.  455 rounds to 450 and
    admits the 450-wei top-up; 449 rounds to 440 and rejects it.  Dropping the
-   rounding would wrongly admit the second. -/
+   rounding would wrongly accept the second. -/
 example : run cfg { inp with moduleAllocationEth := 455 } = .committedTopUp 3 450 450 5000 := by
   decide
 
