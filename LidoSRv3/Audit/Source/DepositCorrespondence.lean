@@ -135,8 +135,14 @@ paths that leave state changes behind.
 inductive Outcome
   /-- `revert StakingModuleNotActive()`, source line 946. -/
   | revertStakingModuleNotActive
+  /-- Solidity arithmetic panic from division by a zero
+  `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`, source line 956. -/
+  | revertMaxDepositsDivisionByZero
   /-- `revert ZeroDeposits()`, source line 959. -/
   | revertZeroDeposits
+  /-- Solidity arithmetic panic from modulo by a zero `PUBKEY_LENGTH`, source
+  line 966. -/
+  | revertPubkeyModuloByZero
   /-- `revert WrongPubkeyLength()`, source line 966. -/
   | revertWrongPubkeyLength
   /-- `revert ModuleReturnExceedTarget()`, source line 969. -/
@@ -227,8 +233,12 @@ real balance, can silently bottom out at zero.
 def run (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
   if inp.moduleActive = false then
     .revertStakingModuleNotActive
+  else if cfg.maxEBType1 = 0 then
+    .revertMaxDepositsDivisionByZero
   else if maxDepositsCount cfg inp = 0 then
     .revertZeroDeposits
+  else if cfg.pubkeyLength = 0 then
+    .revertPubkeyModuloByZero
   else if inp.publicKeysBatchLength % cfg.pubkeyLength ≠ 0 then
     .revertWrongPubkeyLength
   else if maxDepositsCount cfg inp < actualDepositsCount cfg inp then
@@ -329,20 +339,47 @@ theorem committed_deposits_spec {cfg : SourceDepositConfig}
     keys = actualDepositsCount cfg inp ∧ 0 < actualDepositsCount cfg inp ∧
       pulled = depositsValue cfg inp ∧ pushed = pushedValue cfg inp ∧
       pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore := by
-  unfold run at hRun
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  rename_i hKeys
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  split at hRun; · exact absurd hRun (by simp)
-  rename_i hAssert
+  by_cases hModule : inp.moduleActive = false
+  · simp only [run, if_pos hModule] at hRun; cases hRun
+  rw [run, if_neg hModule] at hRun
+  by_cases hMaxEB : cfg.maxEBType1 = 0
+  · rw [if_pos hMaxEB] at hRun; cases hRun
+  rw [if_neg hMaxEB] at hRun
+  by_cases hMax : maxDepositsCount cfg inp = 0
+  · rw [if_pos hMax] at hRun; cases hRun
+  rw [if_neg hMax] at hRun
+  by_cases hPubkeyZero : cfg.pubkeyLength = 0
+  · rw [if_pos hPubkeyZero] at hRun; cases hRun
+  rw [if_neg hPubkeyZero] at hRun
+  by_cases hAligned : inp.publicKeysBatchLength % cfg.pubkeyLength ≠ 0
+  · rw [if_pos hAligned] at hRun; cases hRun
+  rw [if_neg hAligned] at hRun
+  by_cases hOver : maxDepositsCount cfg inp < actualDepositsCount cfg inp
+  · rw [if_pos hOver] at hRun; cases hRun
+  rw [if_neg hOver] at hRun
+  by_cases hKeys : actualDepositsCount cfg inp = 0
+  · rw [if_pos hKeys] at hRun; cases hRun
+  rw [if_neg hKeys] at hRun
+  by_cases hCanDeposit : inp.lidoCanDeposit = false
+  · rw [if_pos hCanDeposit] at hRun; cases hRun
+  rw [if_neg hCanDeposit] at hRun
+  by_cases hZeroAmount : depositsValue cfg inp = 0
+  · rw [if_pos hZeroAmount] at hRun; cases hRun
+  rw [if_neg hZeroAmount] at hRun
+  by_cases hLiquidity : inp.lidoDepositableEther < depositsValue cfg inp
+  · rw [if_pos hLiquidity] at hRun; cases hRun
+  rw [if_neg hLiquidity] at hRun
+  by_cases hPublicKeys :
+      inp.publicKeysBatchLength ≠ cfg.publicKeyLength * actualDepositsCount cfg inp
+  · rw [if_pos hPublicKeys] at hRun; cases hRun
+  rw [if_neg hPublicKeys] at hRun
+  by_cases hSignatures :
+      inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp
+  · rw [if_pos hSignatures] at hRun; cases hRun
+  rw [if_neg hSignatures] at hRun
+  by_cases hAssert : depositsValue cfg inp ≠ pushedValue cfg inp
+  · rw [if_pos hAssert] at hRun; cases hRun
+  rw [if_neg hAssert] at hRun
   have hEq : depositsValue cfg inp = pushedValue cfg inp := Decidable.of_not_not hAssert
   simp only [Outcome.committedDeposits.injEq] at hRun
   obtain ⟨hKeysEq, hPulled, hPushed, hBalance⟩ := hRun
@@ -437,18 +474,38 @@ revert. -/
 theorem run_ne_invalidPublicKeysBatchLength {cfg : SourceDepositConfig}
     {inp : SourceDepositInput} (hLengths : cfg.publicKeyLength = cfg.pubkeyLength) :
     run cfg inp ≠ .revertInvalidPublicKeysBatchLength := by
-  unfold run
-  split; · simp
-  split; · simp
-  split; · simp
-  rename_i hAligned
-  split; · simp
-  split; · simp
-  split; · simp
-  split; · simp
-  split; · simp
+  by_cases hModule : inp.moduleActive = false
+  · simp only [run, if_pos hModule]; intro h; cases h
+  rw [run, if_neg hModule]
+  by_cases hMaxEB : cfg.maxEBType1 = 0
+  · rw [if_pos hMaxEB]; intro h; cases h
+  rw [if_neg hMaxEB]
+  by_cases hMax : maxDepositsCount cfg inp = 0
+  · rw [if_pos hMax]; intro h; cases h
+  rw [if_neg hMax]
+  by_cases hPubkeyZero : cfg.pubkeyLength = 0
+  · rw [if_pos hPubkeyZero]; intro h; cases h
+  rw [if_neg hPubkeyZero]
+  by_cases hMisaligned : inp.publicKeysBatchLength % cfg.pubkeyLength ≠ 0
+  · rw [if_pos hMisaligned]; intro h; cases h
+  rw [if_neg hMisaligned]
+  by_cases hOver : maxDepositsCount cfg inp < actualDepositsCount cfg inp
+  · rw [if_pos hOver]; intro h; cases h
+  rw [if_neg hOver]
+  by_cases hKeys : actualDepositsCount cfg inp = 0
+  · rw [if_pos hKeys]; intro h; cases h
+  rw [if_neg hKeys]
+  by_cases hCanDeposit : inp.lidoCanDeposit = false
+  · rw [if_pos hCanDeposit]; intro h; cases h
+  rw [if_neg hCanDeposit]
+  by_cases hZeroAmount : depositsValue cfg inp = 0
+  · rw [if_pos hZeroAmount]; intro h; cases h
+  rw [if_neg hZeroAmount]
+  by_cases hLiquidity : inp.lidoDepositableEther < depositsValue cfg inp
+  · rw [if_pos hLiquidity]; intro h; cases h
+  rw [if_neg hLiquidity]
   have hOK : inp.publicKeysBatchLength = cfg.publicKeyLength * actualDepositsCount cfg inp :=
-    publicKeysBatchLength_guard_discharged hLengths (by simpa using hAligned)
+    publicKeysBatchLength_guard_discharged hLengths (Decidable.of_not_not hMisaligned)
   rw [if_neg (by simp [hOK])]
   split; · simp
   split <;> simp

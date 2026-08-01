@@ -23,13 +23,14 @@ push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997;
 * `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;
+* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;
 * `contracts/0.8.25/lib/BeaconChainDepositor.sol`,
   `makeBeaconChainDeposits32ETH`, lines 36--64.
 
 Two claims, one per half of the guarantee wording.
 
-*Conservation.* On every branch of the source-shaped path -- each of the nine
-`revert` guards, the failing line 996 `assert`, the empty-batch early return at
+*Conservation.* On every branch of the source-shaped path -- each source
+`revert` or arithmetic-panic guard, the failing line 996 `assert`, the empty-batch early return at
 line 978, and the full push -- the wei pulled from Lido at line 983 equals the wei
 pushed to the beacon deposit contract by the loop at `BeaconChainDepositor.sol`
 lines 53--63. This is exactly the invariant the `assert` at line 996 checks, and

@@ -76,6 +76,19 @@ example : run cfg { inp with moduleActive := false } = .revertStakingModuleNotAc
 /- Zero-deposit guard, line 959: a zero block cap aborts before any pull. -/
 example : run cfg { inp with maxDepositsPerBlock := 0 } = .revertZeroDeposits := by decide
 
+/- The division at line 956 panics when the constructor immutable is zero;
+   Lean's total `Nat.div` must not turn that source panic into `ZeroDeposits`. -/
+example : run { cfg with maxEBType1 := 0 } inp = .revertMaxDepositsDivisionByZero := by decide
+
+/- The modulo at line 966 likewise panics when `PUBKEY_LENGTH` is zero;
+   Lean's total `% 0` must not allow the empty-batch commit. -/
+example :
+    run { cfg with pubkeyLength := 0 } inp = .revertPubkeyModuloByZero := by decide
+
+example :
+    run { cfg with pubkeyLength := 0 } { inp with publicKeysBatchLength := 0 }
+      = .revertPubkeyModuloByZero := by decide
+
 /- Alignment guard, line 966: a batch length that is not a multiple of 48
    reverts rather than truncating. -/
 example : run cfg { inp with publicKeysBatchLength := 145 } = .revertWrongPubkeyLength := by decide
