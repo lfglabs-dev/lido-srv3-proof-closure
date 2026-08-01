@@ -251,6 +251,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Tests.MinFirstVectors",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
+            "LidoSRv3.Tests.DepositVectors",
             "LidoSRv3.Audit.Common.Units",
             "LidoSRv3.Audit.Common.Result",
             "LidoSRv3.Audit.Common.Trace",
