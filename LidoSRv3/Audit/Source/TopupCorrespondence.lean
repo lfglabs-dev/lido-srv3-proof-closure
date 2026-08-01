@@ -10,13 +10,18 @@ in `LidoSRv3.Audit.Source.DepositCorrespondence`.  Where that path pushes a fixe
 pushes a *per-key variable amount* through `IDepositContract.deposit` with an
 all-zero signature, topping validator balances above 32 ETH.
 
-Four spans make up the pinned top-up path:
+Five groups of pinned spans make up the top-up path; every one of them is listed
+in `audit/source-map.yaml` under `P-TOPUP-1`, including the transitive helpers
+that carry the guards modelled below:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `topUp`, lines 679--759 -- the entry
   point.  It rejects a caller other than the top-up gateway (line 686, via
-  `_checkAppAuth` at line 1178), validates the input arrays (line 687, body at
+  `_getTopUpGateway` at lines 1169--1171 and `_checkAppAuth` at lines
+  1177--1179), validates the input arrays (line 687, body at
   lines 761--782), rejects an unregistered module (line 689, via
-  `SRUtils._requireModuleIdExists` at `SRUtils.sol` lines 45--47), rejects an
+  `_getModuleState` at lines 1099--1107, which calls
+  `SRUtils._requireModuleIdExists` at `SRUtils.sol` lines 45--47 from line
+  1104), rejects an
   inactive module (line 691), rejects a module whose withdrawal-credentials type
   is not 0x02 (line 694, via `SRUtils._requireWCType2` at `SRUtils.sol` lines
   41--43), computes the per-block cap (line 696), the module allocation (line
@@ -33,6 +38,22 @@ Four spans make up the pinned top-up path:
   769--771), arrays whose lengths disagree with `_keyIndices.length` (lines
   773--775), and any pubkey whose length is not `PUBKEY_LENGTH` (line 57) in the
   loop at lines 777--781.
+* The three `StakingRouter` helpers reached from `topUp`, plus the two `SRUtils`
+  guards they delegate to.  `_getTopUpGateway`, lines 1169--1171, returns
+  `LIDO_LOCATOR.topUpGateway()`; `_checkAppAuth`, lines 1177--1179, reverts
+  `NotAuthorized` when `_msgSender()` differs from that address -- this is the
+  single source site behind `callerIsTopUpGateway` and `revertNotAuthorized`
+  below.  `_getModuleState`, lines 1099--1107, calls
+  `SRUtils._requireModuleIdExists`, `SRUtils.sol` lines 45--47, which reverts
+  `StakingModuleUnregistered` when `SRStorage.isModuleExists(_moduleId)` is
+  false -- the site behind `moduleExists`.  `SRUtils._requireWCType2`,
+  `SRUtils.sol` lines 41--43, reverts `WrongWithdrawalCredentialsType` when
+  `WithdrawalCredentials.isType2(_wcType)` is false -- the site behind
+  `wcTypeIsType2`.  The predicates *inside* those helpers
+  (`LIDO_LOCATOR.topUpGateway()`, `SRStorage.isModuleExists`,
+  `WithdrawalCredentials.isType2`, and the `_msgSender()` comparison) are
+  storage/interface facts and stay abstract: the model takes each helper's
+  boolean verdict as an input field rather than recomputing it.
 * `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886, and
   `_spendDepositableEther`, lines 839--859 -- the pull side, reached from line
   744 with `_seedDepositsCount = 0`.  It rejects a stopped/bunkered protocol
@@ -74,8 +95,20 @@ while the `Nat` reading below is the exact sum.  Under a wrap the pull would be
 `revertAssertBalanceUnchanged` branches -- both unreachable under the `Nat`
 reading -- become the live guards that abort the transaction.  They are retained
 in `Outcome` precisely so the model does not silently assert that no such branch
-exists.  This is the `A-SOURCE-SHAPED` no-overflow reading recorded in
-`audit/assumptions.yaml`; it does *not* claim the `unchecked` block is safe.
+exists.
+
+The bound that rules the wrap out is *not* derivable from the pinned P-TOPUP-1
+spans: line 728 caps each allocation by `_topUpLimits[i]`, whose derivation lives
+in `TopUpGateway` (P-TOPUP-2, out of scope here), and the key count is not
+bounded by any guard on this path.  It is therefore carried explicitly.
+`NoUncheckedWrap` below states it as `totalAllocated inp < 2 ^ 256`, and
+`allocSumUnchecked_eq_allocSum` proves that under exactly that hypothesis the
+source's `unchecked` accumulation and this module's `Nat` sum are the same
+number -- so the guard-discharge theorems transfer to the source reading.  The
+two guard-discharge theorems take the hypothesis as a linked side condition, and
+it is recorded as `A-TOPUP-NOWRAP` in `audit/assumptions.yaml`.  Nothing here
+claims the `unchecked` block is safe; it says which fact the source-plane claim
+rests on.
 
 Rollback.  The pinned path contains no `try`/`catch` and no failure-swallowing
 low-level call, so every guard listed above aborts the whole transaction.  A
@@ -282,6 +315,45 @@ def allocSum : List Nat → Nat
 /-- `amount` at the point source line 737 compares it, and the wei pulled from
 Lido at source line 744. -/
 def totalAllocated (inp : SourceTopupInput) : Nat := allocSum inp.allocations
+
+/-- The `uint256` modulus the `unchecked` block at source line 722 reduces by. -/
+def uint256Modulus : Nat := 2 ^ 256
+
+/-- The on-chain reading of the accumulation at source line 732: the same
+recursion as `allocSum`, but with each `+=` reduced modulo `2 ^ 256` because the
+enclosing block at source line 722 is `unchecked`. -/
+def allocSumUnchecked : List Nat → Nat
+  | [] => 0
+  | a :: as => (a + allocSumUnchecked as) % uint256Modulus
+
+theorem allocSumUnchecked_eq_mod :
+    ∀ as : List Nat, allocSumUnchecked as = allocSum as % uint256Modulus
+  | [] => by simp [allocSumUnchecked, allocSum]
+  | a :: as => by
+      rw [allocSumUnchecked, allocSum, allocSumUnchecked_eq_mod as, Nat.add_mod_mod]
+
+/-- The exact `Nat` sum used throughout this module is a faithful reading of the
+source's `unchecked` accumulation precisely when the sum stays below `2 ^ 256`.
+This is what makes the guard-discharge theorems below transfer from the `Nat`
+model to source line 732. -/
+theorem allocSumUnchecked_eq_allocSum {as : List Nat}
+    (h : allocSum as < uint256Modulus) : allocSumUnchecked as = allocSum as := by
+  rw [allocSumUnchecked_eq_mod, Nat.mod_eq_of_lt h]
+
+/-- The no-wrap side condition on one `topUp` call.
+
+It is *not* provable from the pinned P-TOPUP-1 spans -- the per-index cap at
+source line 728 comes from `TopUpGateway` (P-TOPUP-2) and the key count is
+unbounded on this path -- so it is carried as an explicit hypothesis and recorded
+as `A-TOPUP-NOWRAP` in `audit/assumptions.yaml`. -/
+def NoUncheckedWrap (inp : SourceTopupInput) : Prop :=
+  totalAllocated inp < uint256Modulus
+
+/-- Under `NoUncheckedWrap`, the source's `unchecked` accumulation at line 732
+equals `totalAllocated`, the value every theorem below reasons about. -/
+theorem totalAllocated_faithful {inp : SourceTopupInput} (h : NoUncheckedWrap inp) :
+    allocSumUnchecked inp.allocations = totalAllocated inp :=
+  allocSumUnchecked_eq_allocSum h
 
 /-- The wei the push loop at `BeaconChainDepositor.sol` lines 79--107 sends: one
 transfer of `_amount[i]` per key at line 106, with the `continue` at line 89
@@ -874,12 +946,16 @@ corresponding assert at `StakingRouter.sol` line 996 is the guard that rejects a
 misconfigured deployment.  Here the pull and the push are two readings of the one
 `allocations` array, so there is no configuration that can separate them.
 
-Under the `A-SOURCE-SHAPED` no-overflow reading only: a real `uint256` wrap in
-the `unchecked` accumulation at source line 732 would make this branch live
-again, which is why it is retained in `Outcome`.
+The `NoUncheckedWrap` hypothesis is the recorded side condition (`A-TOPUP-NOWRAP`)
+under which this `Nat` statement is a statement about the source: a real `uint256`
+wrap in the `unchecked` accumulation at source line 732 would make this branch
+live again, which is why it is retained in `Outcome`.  The `Nat` proof does not
+consume the hypothesis -- it holds of the exact sum unconditionally -- it is
+`totalAllocated_faithful` that needs it to carry the result across to line 732,
+so the hypothesis is stated here rather than left implicit at the call site.
 -/
 theorem run_ne_revertAssertBalanceUnchanged (cfg : SourceTopupConfig)
-    (inp : SourceTopupInput) :
+    (inp : SourceTopupInput) (_hNoWrap : NoUncheckedWrap inp) :
     run cfg inp ≠ .revertAssertBalanceUnchanged := by
   intro hRun
   rcases run_inversion hRun with
@@ -908,12 +984,12 @@ theorem run_ne_revertAssertBalanceUnchanged (cfg : SourceTopupConfig)
 
 /--
 The push loop at `BeaconChainDepositor.sol` line 106 can always be funded: the
-router pulled exactly what it is about to send.  Under the `A-SOURCE-SHAPED`
-no-overflow reading only, for the same reason as
+router pulled exactly what it is about to send.  Carries the same recorded
+`NoUncheckedWrap` side condition (`A-TOPUP-NOWRAP`), for the same reason as
 `run_ne_revertAssertBalanceUnchanged`.
 -/
 theorem run_ne_revertInsufficientRouterBalance (cfg : SourceTopupConfig)
-    (inp : SourceTopupInput) :
+    (inp : SourceTopupInput) (_hNoWrap : NoUncheckedWrap inp) :
     run cfg inp ≠ .revertInsufficientRouterBalance := by
   intro hRun
   rcases run_inversion hRun with

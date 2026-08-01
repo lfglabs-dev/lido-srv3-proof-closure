@@ -135,6 +135,11 @@
       "axioms": ["propext", "Quot.sound"]
     },
     {
+      "name": "Guarantees.PTopup1.source_unchecked_accumulation_faithful",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
       "name": "Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]

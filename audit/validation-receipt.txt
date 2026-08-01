@@ -51,10 +51,11 @@ P-DEPOSIT-1 pinned-source gate receipt (committed tree):
 P-TOPUP-1 pinned-source gate receipt (committed tree):
 - `lake build`: exit 0.
 - `lake build LidoSRv3.Audit.Trust`: exit 0;
-  `Guarantees.PTopup1.source_topup_conserves_and_rolls_back` and its four
+  `Guarantees.PTopup1.source_topup_conserves_and_rolls_back` and its five
   companions -- `source_router_balance_unchanged`,
   `source_reverting_branch_moves_no_ether`,
-  `source_balance_guards_discharged`, and
+  `source_balance_guards_discharged`,
+  `source_unchecked_accumulation_faithful`, and
   `source_pinned_config_discharges_pubkey_guard` -- report only the Lean
   foundations `propext` and `Quot.sound`.
 - `make test` was NOT run to completion on this tree: it aborts in
@@ -81,9 +82,32 @@ P-TOPUP-1 pinned-source gate receipt (committed tree):
   and `source_balance_guards_discharged` states that both the assert failure
   and the insufficient-router-balance revert are unreachable. Both `Outcome`
   constructors are retained rather than deleted, because that unreachability
-  is a consequence of the `A-SOURCE-SHAPED` unbounded-`Nat` reading of the
-  `unchecked` block opened at source line 722, not of a bounded-arithmetic
-  proof; a 2^256 wrap there would make them live again.
+  is conditioned on the accumulation in the `unchecked` block opened at source
+  line 722 not wrapping; a 2^256 wrap there would make them live again.
+- That no-wrap fact is carried explicitly, not implicitly: it is the
+  `SolidityTopup.NoUncheckedWrap` hypothesis on
+  `source_balance_guards_discharged`, and it is recorded as `A-TOPUP-NOWRAP` in
+  `audit/assumptions.yaml` and linked from P-TOPUP-1 in `audit/guarantees.yaml`.
+  It is not derivable from the pinned P-TOPUP-1 spans: the per-index cap at
+  source line 728 originates in `TopUpGateway` (P-TOPUP-2) and the key count is
+  unbounded on this path. Its proved half is
+  `source_unchecked_accumulation_faithful`, which shows that under exactly that
+  hypothesis the source's `unchecked` accumulation at line 732 and the model's
+  `Nat` sum are the same number, so the discharge is a statement about the
+  source rather than only about the model. The negative fixture suite rejects
+  dropping `A-TOPUP-NOWRAP` from the P-TOPUP-1 assumption links.
+- The transitive helpers that carry the modelled guards are now pinned in
+  `audit/source-map.yaml` rather than named only in prose:
+  `StakingRouter._checkAppAuth` (lines 1177--1179) and `_getTopUpGateway`
+  (lines 1169--1171) behind the line 686 authorization, `_getModuleState`
+  (lines 1099--1107) and `SRUtils._requireModuleIdExists` (`SRUtils.sol` lines
+  45--47) behind the line 689 module-existence guard, and
+  `SRUtils._requireWCType2` (`SRUtils.sol` lines 41--43) behind the line 694
+  withdrawal-credentials-type guard. The negative fixture suite rejects
+  dropping any one of the five. The predicates inside those helpers
+  (`LIDO_LOCATOR.topUpGateway()`, `SRStorage.isModuleExists`,
+  `WithdrawalCredentials.isType2`, and the `_msgSender()` comparison) remain
+  abstract storage/interface facts taken as model inputs.
 - The vectors pin `_checkAppAuth(_getTopUpGateway())` at source line 686 as the
   *first* guard, so no unauthorized call is classified as a committed outcome
   whatever the later module status is, and pin the zero-total early commit at
