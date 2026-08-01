@@ -545,12 +545,14 @@ length, which the `ArrayLengthMismatch` guard at `BeaconChainDepositor.sol` line
 theorem loopPushed_eq_allocSum :
     ∀ (ps as : List Nat), ps.length = as.length → loopPushed ps as = allocSum as
   | [], [], _ => rfl
-  | [], _ :: _, h => by simp at h
-  | _ :: _, [], h => by simp at h
+  | [], _ :: _, h => Nat.noConfusion h
+  | _ :: _, [], h => Nat.noConfusion h
   | _ :: ps, a :: as, h => by
-      have hLen : ps.length = as.length := by simpa using h
+      have hLen : ps.length = as.length := Nat.succ.inj h
       rw [loopPushed, allocSum, loopPushed_eq_allocSum ps as hLen]
-      by_cases ha : a = 0 <;> simp [ha]
+      by_cases ha : a = 0
+      · rw [if_pos ha, ha]
+      · rw [if_neg ha]
 
 /--
 The pull at source line 744 and the push at `BeaconChainDepositor.sol` line 106
