@@ -19,6 +19,7 @@
         "LidoSRv3.Audit.Strategy",
         "LidoSRv3.Audit.StrategyProofs",
         "LidoSRv3.Audit.Source.MinFirstCorrespondence",
+        "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
@@ -28,7 +29,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-2 next-target correspondence is checked against pinned Solidity"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity and P-ALLOC-2 next-target correspondence are checked against pinned Solidity"
     }
   },
   "proof_policy": {
@@ -68,6 +69,16 @@
       "name": "Guarantees.PAlloc1.active_capacity_bounded",
       "status": "lean_checked",
       "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PAlloc1.source_capacities_match_model",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PAlloc1.source_active_capacity_bounded",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
     },
     {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
