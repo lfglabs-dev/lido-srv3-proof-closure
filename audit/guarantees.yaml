@@ -34,13 +34,13 @@
     },
     {
       "id": "P-TOPUP-1",
-      "catalogue_wording": "Allocation inputs are source-shaped data, not extracted Solidity state.",
-      "theorem": "LidoSRv3.Audit.valid_result_preserves_router_order",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-SOURCE-SHAPED"],
-      "next_gate": "Prove extraction and ordered-row correspondence from pinned Solidity.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Allocation", "expected": "successful Lean build; relational model only"}
+      "catalogue_wording": "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
+      "theorem_planes": ["model", "tx", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
+      "next_gate": "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1", "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"}
     },
     {
       "id": "P-ACCOUNT-1",
