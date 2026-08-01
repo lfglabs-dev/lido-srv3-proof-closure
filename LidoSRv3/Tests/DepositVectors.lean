@@ -22,8 +22,9 @@ private def cfg : SourceDepositConfig := ⟨32, 32, 48, 48, 96⟩
 /- A hypothetical deployment whose pull scale is twice its push scale. -/
 private def cfgSkewed : SourceDepositConfig := ⟨64, 32, 48, 48, 96⟩
 
-/- Three well-formed keys, an ample block cap and ample Lido liquidity. -/
-private def inp : SourceDepositInput := ⟨true, 10, 320, 144, 288, 1000, true, 1000⟩
+/- An authorized caller, three well-formed keys, an ample block cap and ample
+   Lido liquidity. -/
+private def inp : SourceDepositInput := ⟨true, true, 10, 320, 144, 288, 1000, true, 1000⟩
 
 /- Positive vector: three keys are pulled and pushed at 32 each, and the router
    balance at `StakingRouter.sol` line 993 equals the line 980 snapshot. -/
@@ -75,6 +76,30 @@ example :
 example :
     run ⟨32, 64, 48, 48, 96⟩ { inp with routerBalanceBefore := 0 }
       = .revertInsufficientRouterBalance := by decide
+
+/- Access-control modifier, `StakingRouter.sol` line 942.  It runs before the
+   function body, so it must win over the line 946 status guard: modelling it
+   after the status check -- or omitting it, which classifies an unauthorized
+   call as a commit -- is the plausible mistake and is rejected here. -/
+example :
+    run cfg { inp with callerHasDepositRole := false } = .revertUnauthorizedDepositRole := by
+  decide
+
+example :
+    run cfg { inp with callerHasDepositRole := false, moduleActive := false }
+      = .revertUnauthorizedDepositRole := by decide
+
+/- An unauthorized call reverts and moves no wei, on a conserving and a skewed
+   deployment alike. -/
+example :
+    (run cfg { inp with callerHasDepositRole := false }).reverts = true ∧
+      (run cfgSkewed { inp with callerHasDepositRole := false }).reverts = true := by decide
+
+/- An unauthorized call with an empty batch must not slip into the line 978
+   commit either. -/
+example :
+    run cfg { inp with callerHasDepositRole := false, publicKeysBatchLength := 0 }
+      ≠ .committedNoDeposits := by decide
 
 /- Status guard, `StakingRouter.sol` line 946. -/
 example : run cfg { inp with moduleActive := false } = .revertStakingModuleNotActive := by decide
@@ -128,6 +153,22 @@ example :
 example :
     run cfg { inp with publicKeysBatchLength := 0 } = .committedNoDeposits ∧
       (run cfg { inp with publicKeysBatchLength := 0 }).reverts = false := by decide
+
+/- The empty-batch return at line 978 short-circuits *before* the line 996
+   assert, so a skewed deployment does not revert on that path.  This is exactly
+   why `source_nonconserving_deployment_reverts` carries a nonempty-batch
+   hypothesis: without it the revert claim would be false here. -/
+example :
+    run cfgSkewed { inp with publicKeysBatchLength := 0 } = .committedNoDeposits ∧
+      (run cfgSkewed { inp with publicKeysBatchLength := 0 }).reverts = false := by decide
+
+/- With a nonempty batch the skewed deployment does revert, for every key count
+   the block cap admits. -/
+example :
+    ∀ n : Fin 4,
+      (run cfgSkewed { inp with publicKeysBatchLength := 48 * (n.val + 1)
+                                signaturesBatchLength := 96 * (n.val + 1) }).reverts
+        = true := by decide
 
 /- Batches are checked against `PUBLIC_KEY_LENGTH * keysCount`, so the router's
    own alignment check at lines 966--967 already discharges

@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: f5c84af36264b8b5728e838f0767c6e8c03f2288
+validated-tree: 57825b473f412847912e65a94448fe2219333e6d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -34,7 +34,14 @@ P-DEPOSIT-1 pinned-source gate receipt (committed tree):
 - `make test`: exit 0, including `LidoSRv3.Tests.DepositVectors`, which pins the
   `StakingRouter.sol` line 996 balance `assert` as the `Panic(0x01)` revert it
   is: a deployment whose pull scale differs from `DEPOSIT_SIZE` yields
-  `revertAssertBalanceUnchanged`, never a commit stranding the difference.
+  `revertAssertBalanceUnchanged`, never a commit stranding the difference. The
+  same vectors pin the `onlyRole(DEPOSIT_ROLE)` modifier at line 942 as the
+  *first* guard -- an unauthorized caller yields `revertUnauthorizedDepositRole`
+  whatever the line 946 module status is, so no unauthorized call is classified
+  as a committed outcome -- and pin the empty-batch early return at line 978 as
+  the one non-reverting escape that never reaches the line 996 assert, which is
+  why `source_nonconserving_deployment_reverts` carries a nonempty-batch
+  hypothesis for its `reverts = true` claim.
 - `python3 scripts/audit_metadata.py check`: exit 0.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.

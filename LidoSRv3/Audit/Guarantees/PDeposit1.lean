@@ -41,7 +41,13 @@ span contains no `try`/`catch` and no failure-swallowing low-level call, and a
 failing `assert` is a Solidity 0.8 `Panic(0x01)` -- so a reverting outcome maps
 onto the abstract-transaction model's `.reverted` result, and
 `revert_restores_state_value_and_logs` restores the pre-state and erases all
-committed ETH moves and logs.
+committed ETH moves and logs.  That includes the `onlyRole(DEPOSIT_ROLE)`
+modifier at `StakingRouter.sol` line 942, which is modelled as the *first* guard:
+`SolidityDeposit.unauthorized_reverts` shows an unauthorized caller reverts
+before the line 946 module-status check, and
+`SolidityDeposit.committing_implies_authorized` shows neither committing branch
+is reachable without the role.  The branch correspondence therefore covers every
+source execution rather than silently assuming an authorized caller.
 
 Caveats, stated rather than hidden:
 
@@ -95,16 +101,23 @@ theorem source_reverting_branch_moves_no_ether
 
 /--
 A deployment whose `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` (`StakingRouter.sol` line
-65) differs from `DEPOSIT_SIZE` (`BeaconChainDepositor.sol` line 24) never
-reaches the committed push: the `assert` at `StakingRouter.sol` line 996 fails
-and reverts the whole transaction, so the difference is not left stranded in the
-router.
+65) differs from `DEPOSIT_SIZE` (`BeaconChainDepositor.sol` line 24) reverts on a
+nonempty key batch: the `assert` at `StakingRouter.sol` line 996 fails and aborts
+the whole transaction, so the difference is not left stranded in the router.
+
+The nonempty hypothesis is load-bearing and is stated rather than hidden.  With a
+zero-key batch the call returns at line 978 *before* reaching the line 996
+`assert`, and that early return is a commit (`committedNoDeposits`), not a
+revert.  So the revert claim holds exactly where the assert is actually reached;
+the second conjunct records the unconditional part -- no configuration mismatch
+ever produces a committed *push*, batch empty or not.
 -/
 theorem source_nonconserving_deployment_reverts
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (hCfg : ¬ ConservingConfig cfg) :
-    ∀ keys pulled pushed balanceAfter,
-      run cfg inp ≠ .committedDeposits keys pulled pushed balanceAfter :=
-  not_conserving_reverts hCfg
+    (hCfg : ¬ ConservingConfig cfg) (hKeys : 0 < actualDepositsCount cfg inp) :
+    (run cfg inp).reverts = true ∧
+      ∀ keys pulled pushed balanceAfter,
+        run cfg inp ≠ .committedDeposits keys pulled pushed balanceAfter :=
+  ⟨not_conserving_nonempty_reverts hCfg hKeys, not_conserving_reverts hCfg⟩
 
 end LidoSRv3.Audit.Guarantees.PDeposit1
