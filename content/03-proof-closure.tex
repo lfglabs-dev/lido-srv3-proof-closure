@@ -831,12 +831,12 @@ trust prose alone; every claim has this chain.
   \midrule
   \endhead
   SRV3-P1 &
-  \path{proofs/reserve-separation.md} &
+  \path{archive/legacy-p1-p15/proofs/reserve-separation.md} &
   A-EXT-01;\newline A-ARITH-05 &
   Deposit spend cannot consume withdrawal-reserved ETH. \\
   \rowsep
   SRV3-P2 &
-  \path{proofs/deposit-conservation.md} &
+  \path{archive/legacy-p1-p15/proofs/deposit-conservation.md} &
   A-DEP-02;\newline A-LIDO-06;\newline A-MOD-07;\newline A-ID-04;\newline A-ARITH-05 &
   Pulled wei equals 32 ETH times actual deposits; allocated-deposit sums,
   active-module and max-deposit guards, depositable-ETH preconditions, exact
@@ -846,7 +846,7 @@ trust prose alone; every claim has this chain.
   module-balance sums, and report state stay unchanged. \\
   \rowsep
   SRV3-P3 &
-  \path{proofs/module-balance-conservation.md} &
+  \path{archive/legacy-p1-p15/proofs/module-balance-conservation.md} &
   A-ORC-03;\newline A-ID-04;\newline A-ARITH-05 &
   Successful report transitions check full length, router order, Gwei range, and
   write the exact accepted-report update-loop result while preserving
@@ -854,12 +854,12 @@ trust prose alone; every claim has this chain.
   remains unchanged. \\
   \rowsep
   SRV3-P4 &
-  \path{proofs/report-before-reward-consistency.md} &
+  \path{archive/legacy-p1-p15/proofs/report-before-reward-consistency.md} &
   A-ORC-03;\newline A-ID-04 &
   Module fee-distribution weights read the latest accepted module-balance state. \\
   \rowsep
   SRV3-P5 &
-  \path{proofs/reward-correctness.md} &
+  \path{archive/legacy-p1-p15/proofs/reward-correctness.md} &
   A-ORC-03;\newline A-ARITH-05;\newline A-REWARD-09 &
   Reward distribution returns no rows and an empty module-id projection at zero
   total balance; otherwise rows use accepted balances, skip zero-balance
@@ -867,13 +867,13 @@ trust prose alone; every claim has this chain.
   is the row-wise module plus treasury fee sum. \\
   \rowsep
   SRV3-P6 &
-  \path{proofs/status-gating.md} &
+  \path{archive/legacy-p1-p15/proofs/status-gating.md} &
   A-EXT-01;\newline A-ID-04 &
   Non-active or deposit-paused modules receive no modeled deposit allocation;
   stopped modules receive no module-side reward or fee allocation. \\
   \rowsep
   SRV3-P7 &
-  \path{proofs/exited-count-correctness.md} &
+  \path{archive/legacy-p1-p15/proofs/exited-count-correctness.md} &
   A-MOD-08;\newline A-ORC-03;\newline A-ARITH-05 &
   Successful exited-count rows name existing modules, cannot decrease, and
   cannot exceed deposited validators; successful loops return exactly the
@@ -881,7 +881,7 @@ trust prose alone; every claim has this chain.
   module-balance sum, and non-module router state. \\
   \rowsep
   SRV3-P8 &
-  \path{proofs/topup-conservation.md} &
+  \path{archive/legacy-p1-p15/proofs/topup-conservation.md} &
   A-LIDO-06;\newline A-DEP-02;\newline A-MOD-10;\newline A-ARITH-05 &
   Successful top-up transitions preserve allocation shape, keep returned sums
   inside the module allocation budget and the router-global per-block cap,
@@ -893,21 +893,21 @@ trust prose alone; every claim has this chain.
   unchanged, and leave zero-sum transitions unchanged. \\
   \rowsep
   SRV3-P9 &
-  \path{proofs/allocation-capacity.md} &
+  \path{archive/legacy-p1-p15/proofs/allocation-capacity.md} &
   A-ID-04;\newline A-MOD-08;\newline A-MOD-11;\newline A-ALLOC-12;\newline A-ARITH-05 &
   Allocation-capacity rows preserve module length and module-id order, derived
   capacity values stay module-length aligned, and active/inactive capacity
   bounds hold before external MinFirst allocation. \\
   \rowsep
   SRV3-P10 &
-  \path{proofs/reward-minted-reporting.md} &
+  \path{archive/legacy-p1-p15/proofs/reward-minted-reporting.md} &
   A-EXT-01;\newline A-MOD-13 &
   Reward-minted report arrays are equal length and return one zipped row per
   module id with exact input-array projections; zero-share rows are skipped, and
   nonzero-share rows name existing modules before callback. \\
   \rowsep
   SRV3-P11 &
-  \path{proofs/fee-update-consistency.md} &
+  \path{archive/legacy-p1-p15/proofs/fee-update-consistency.md} &
   A-GOV-14;\newline A-ARITH-05 &
   All-module fee updates require matching array lengths, consistent bounded fee
   sums, set fee projections exactly to the supplied arrays, and preserve
@@ -915,7 +915,7 @@ trust prose alone; every claim has this chain.
   updating module configs while leaving non-module router state unchanged. \\
   \rowsep
   SRV3-P12 &
-  \path{proofs/module-param-update-consistency.md} &
+  \path{archive/legacy-p1-p15/proofs/module-param-update-consistency.md} &
   A-GOV-14;\newline A-ID-04;\newline A-ARITH-05 &
   Single-module config updates require an existing module, valid share and
   deposit parameters, bounded consistent fee sums, record the requested fields
@@ -923,21 +923,21 @@ trust prose alone; every claim has this chain.
   sums, and non-module router state. \\
   \rowsep
   SRV3-P13 &
-  \path{proofs/module-status-update.md} &
+  \path{archive/legacy-p1-p15/proofs/module-status-update.md} &
   A-GOV-14;\newline A-ID-04 &
   Module-status updates require an existing module and changed status, record
   the requested status, preserve module-list length, and leave router-stored
   module validator-balance sums and non-module router state unchanged. \\
   \rowsep
   SRV3-P14 &
-  \path{proofs/module-addition-consistency.md} &
+  \path{archive/legacy-p1-p15/proofs/module-addition-consistency.md} &
   A-GOV-14;\newline A-ID-04;\newline A-ARITH-05 &
   Module addition requires a fresh id and valid config, appends exactly the
   accepted new module, starts it with zero accounting, and leaves router-stored
   validator-balance sums and non-module router state unchanged. \\
   \rowsep
   SRV3-P15 &
-  \path{proofs/module-share-update-consistency.md} &
+  \path{archive/legacy-p1-p15/proofs/module-share-update-consistency.md} &
   A-GOV-14;\newline A-ARITH-05 &
   All-module share updates require matching array lengths and valid share rows,
   set share projections exactly to the supplied arrays, then preserve
