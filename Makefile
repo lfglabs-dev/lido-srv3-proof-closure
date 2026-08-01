@@ -33,10 +33,12 @@ test:
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Audit.SszRegression
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
-	@test -s tests/solidity-reference/stakingRouter.getDepositAllocations.test.ts
-	@test -s tests/solidity-reference/stakingRouter.rewards.test.ts
-	@test -s tests/solidity-reference/deposits-reserve.integration.ts
-	@printf '%s\n' 'reference fixtures present; no legacy proof artifacts remain'
+	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
+	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
+	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
+	@test -s fixtures/solidity-reference/deposits-reserve.integration.ts
+	@test -s fixtures/solidity-reference/accounting-oracle-module-balances.integration.ts
+	@printf '%s\n' 'reference fixtures present; all 5 validated'
 
 prove:
 	@mkdir -p proofs/logs
