@@ -57,7 +57,19 @@ P-TOPUP-1 pinned-source gate receipt (committed tree):
   `source_balance_guards_discharged`, and
   `source_pinned_config_discharges_pubkey_guard` -- report only the Lean
   foundations `propext` and `Quot.sound`.
-- `make test`: exit 0, including `LidoSRv3.Tests.TopupVectors`.
+- `make test` was NOT run to completion on this tree: it aborts in
+  `scripts/check_provenance_guards.sh`, which calls `lake env lean --version`
+  and hits the same workspace Lean shim failure (remote exit 126, "Permission
+  denied") recorded for `make prove` below, so the recipe never reaches its
+  Lean vector builds. Every component step was instead run individually and
+  passed: the four script gates preceding the guard check
+  (`audit_metadata.py check`, `test_audit_metadata.py` under `PYTHONOPTIMIZE=1`,
+  `check_validation_receipt.py`, `check_no_python_evidence.sh`), all four vector
+  builds -- `LidoSRv3.Tests.MinFirstVectors`, `.SszRegression`,
+  `.DepositVectors`, and `.TopupVectors`, the last of which pins this gate's
+  top-up conservation and rollback claims -- and all five reference-fixture
+  presence checks. As with `make prove`, this is a toolchain-availability
+  regression rather than a proof or vector regression.
 - `python3 scripts/audit_metadata.py check`: exit 0.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
