@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 57825b473f412847912e65a94448fe2219333e6d
+validated-tree: a11ee6f25a22e89c358ff80b3dcc2bea24d4b698
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -47,3 +47,93 @@ P-DEPOSIT-1 pinned-source gate receipt (committed tree):
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
 - Source plane only: `evm` remains OPEN and `tx` remains
   ABSTRACT_LEAN_CHECKED for P-DEPOSIT-1.
+
+P-TOPUP-1 pinned-source gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `Guarantees.PTopup1.source_topup_conserves_and_rolls_back` and its five
+  companions -- `source_router_balance_unchanged`,
+  `source_reverting_branch_moves_no_ether`,
+  `source_balance_guards_discharged`,
+  `source_unchecked_accumulation_faithful`, and
+  `source_pinned_config_discharges_pubkey_guard` -- report only the Lean
+  foundations `propext` and `Quot.sound`.
+- `make test` was NOT run to completion on this tree: it aborts in
+  `scripts/check_provenance_guards.sh`, which calls `lake env lean --version`
+  and hits the same workspace Lean shim failure (remote exit 126, "Permission
+  denied") recorded for `make prove` below, so the recipe never reaches its
+  Lean vector builds. Every component step was instead run individually and
+  passed: the four script gates preceding the guard check
+  (`audit_metadata.py check`, `test_audit_metadata.py` under `PYTHONOPTIMIZE=1`,
+  `check_validation_receipt.py`, `check_no_python_evidence.sh`), all four vector
+  builds -- `LidoSRv3.Tests.MinFirstVectors`, `.SszRegression`,
+  `.DepositVectors`, and `.TopupVectors`, the last of which pins this gate's
+  top-up conservation and rollback claims -- and all five reference-fixture
+  presence checks. As with `make prove`, this is a toolchain-availability
+  regression rather than a proof or vector regression.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+- Unlike P-DEPOSIT-1, top-up conservation is *unconditional*: the pull
+  accumulated at `StakingRouter.sol` line 732 and the push summed at
+  `BeaconChainDepositor.sol` line 106 are two readings of the same `_amounts`
+  array, not a key count scaled by two separately configured constants. The
+  line 755 balance `assert` is therefore discharged rather than load-bearing,
+  and `source_balance_guards_discharged` states that both the assert failure
+  and the insufficient-router-balance revert are unreachable. Both `Outcome`
+  constructors are retained rather than deleted, because that unreachability
+  is conditioned on the accumulation in the `unchecked` block opened at source
+  line 722 not wrapping; a 2^256 wrap there would make them live again.
+- That no-wrap fact is carried explicitly, not implicitly: it is the
+  `SolidityTopup.NoUncheckedWrap` hypothesis on
+  `source_balance_guards_discharged`, and it is recorded as `A-TOPUP-NOWRAP` in
+  `audit/assumptions.yaml` and linked from P-TOPUP-1 in `audit/guarantees.yaml`.
+  It is not derivable from the pinned P-TOPUP-1 spans: the per-index cap at
+  source line 728 originates in `TopUpGateway` (P-TOPUP-2) and the key count is
+  unbounded on this path. Its proved half is
+  `source_unchecked_accumulation_faithful`, which shows that under exactly that
+  hypothesis the source's `unchecked` accumulation at line 732 and the model's
+  `Nat` sum are the same number, so the discharge is a statement about the
+  source rather than only about the model. The negative fixture suite rejects
+  dropping `A-TOPUP-NOWRAP` from the P-TOPUP-1 assumption links.
+- The transitive helpers that carry the modelled guards are now pinned in
+  `audit/source-map.yaml` rather than named only in prose:
+  `StakingRouter._checkAppAuth` (lines 1177--1179) and `_getTopUpGateway`
+  (lines 1169--1171) behind the line 686 authorization, `_getModuleState`
+  (lines 1099--1107) and `SRUtils._requireModuleIdExists` (`SRUtils.sol` lines
+  45--47) behind the line 689 module-existence guard, and
+  `SRUtils._requireWCType2` (`SRUtils.sol` lines 41--43) behind the line 694
+  withdrawal-credentials-type guard. The negative fixture suite rejects
+  dropping any one of the five. The predicates inside those helpers
+  (`LIDO_LOCATOR.topUpGateway()`, `SRStorage.isModuleExists`,
+  `WithdrawalCredentials.isType2`, and the `_msgSender()` comparison) remain
+  abstract storage/interface facts taken as model inputs.
+- The constant declarations `pinnedConfig` hard-codes are now pinned in
+  `audit/source-map.yaml` as well: `StakingRouter.PUBKEY_LENGTH` (line 57),
+  `BeaconChainDepositor.PUBLIC_KEY_LENGTH` (line 21) and
+  `BeaconChainDepositor.MIN_DEPOSIT` (line 28). Without them the source-map
+  gate stayed green while a change to either pubkey-length constant would have
+  invalidated `source_pinned_config_discharges_pubkey_guard`, which holds only
+  while the two agree. The negative fixture suite rejects dropping any one of
+  the three. `pinnedConfig.gwei` needs no declaration span (it is the Solidity
+  unit literal `1 gwei`) and `pinnedConfig.uint64Max` is `type(uint64).max`,
+  read at `BeaconChainDepositor.sol` line 97 inside the already-pinned lines
+  66--108.
+- The vectors pin `_checkAppAuth(_getTopUpGateway())` at source line 686 as the
+  *first* guard, so no unauthorized call is classified as a committed outcome
+  whatever the later module status is, and pin the zero-total early commit at
+  source line 741 as a *commit* rather than a revert, which is why
+  `committedNoTopUp_is_not_a_rollback` is stated explicitly.
+- Source plane only: `evm` remains OPEN and `tx` remains
+  ABSTRACT_LEAN_CHECKED for P-TOPUP-1. The per-validator top-up amount
+  computation and limit accounting (P-TOPUP-2), the allocation algorithm
+  producing `_amounts` (P-ALLOC-1/2), and the SSZ deposit-data-root
+  construction at `BeaconChainDepositor.sol` lines 120--146 (P-SSZ-1) stay out
+  of scope.
+- `make prove` was NOT run to completion on this tree: the workspace Lean shim
+  cannot execute `lake env lean --version` (remote exit 126, "Permission
+  denied"), which is the provenance stamp the `prove` recipe emits before
+  `lake build LidoSRv3`. The failure reproduces identically for `make
+  bootstrap` on an unmodified checkout, so it is a toolchain-availability
+  regression rather than a proof regression; the `lake build LidoSRv3` half of
+  the same recipe completed successfully.

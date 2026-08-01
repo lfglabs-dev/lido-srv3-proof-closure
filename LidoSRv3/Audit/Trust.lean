@@ -6,6 +6,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PSsz1
+import LidoSRv3.Audit.Guarantees.PTopup1
 
 /-!
 Machine-readable-in-build axiom report for the first audit slice.
@@ -28,6 +29,12 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_router_balance_unchanged
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_reverting_branch_moves_no_ether
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
 #print axioms LidoSRv3.Audit.MinFirst.candidate_open

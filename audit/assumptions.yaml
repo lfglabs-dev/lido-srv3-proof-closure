@@ -10,6 +10,7 @@
     {"id": "A-MODEL-INPUTS", "accepted": true, "risk": "Quantity bounds and units remain model inputs until source refinement is proved."},
     {"id": "A-ABSTRACT-TX", "accepted": true, "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics."},
     {"id": "A-SOURCE-SHAPED", "accepted": true, "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans."},
+    {"id": "A-TOPUP-NOWRAP", "accepted": true, "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans."},
     {"id": "A-HANDWRITTEN-MINFIRST", "accepted": true, "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence."},
     {"id": "A-VERITY-SCAFFOLD", "accepted": true, "risk": "The Verity 4.31 scaffold is non-certified."},
     {"id": "A-DEV-NOT-CERT", "accepted": true, "risk": "DEV-431-READY is explicitly accepted as not AUDIT-CERT."},

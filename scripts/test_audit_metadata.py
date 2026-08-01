@@ -618,6 +618,71 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
+        # P-TOPUP-1 closed its source and tx planes in this campaign.  The
+        # source claim must not be silently downgraded back to the pre-campaign
+        # model-only row, the theorem must stay the top-up correspondence rather
+        # than the allocation-ordering model fact it replaced, and the evm plane
+        # it deliberately did not close must stay open.
+        topup_source_downgrade = copy.deepcopy(guarantees)
+        topup_source_downgrade["guarantees"][3]["statuses"]["source"] = "OPEN"
+        write_json(guarantees_path, topup_source_downgrade)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: assurance statuses differ from canonical claims",
+        )
+        write_json(guarantees_path, guarantees)
+
+        topup_tx_downgrade = copy.deepcopy(guarantees)
+        topup_tx_downgrade["guarantees"][3]["statuses"]["tx"] = "OPEN"
+        write_json(guarantees_path, topup_tx_downgrade)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: assurance statuses differ from canonical claims",
+        )
+        write_json(guarantees_path, guarantees)
+
+        topup_tx_overclaim = copy.deepcopy(guarantees)
+        topup_tx_overclaim["guarantees"][3]["statuses"]["tx"] = "LEAN_CHECKED"
+        write_json(guarantees_path, topup_tx_overclaim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: assurance statuses differ from canonical claims",
+        )
+        write_json(guarantees_path, guarantees)
+
+        topup_evm_plane_overclaim = copy.deepcopy(guarantees)
+        topup_evm_plane_overclaim["guarantees"][3]["statuses"]["evm"] = "LEAN_CHECKED"
+        topup_evm_plane_overclaim["guarantees"][3]["theorem_planes"] = [
+            "model", "tx", "source", "evm",
+        ]
+        write_json(guarantees_path, topup_evm_plane_overclaim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: theorem planes differ from canonical evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
+        topup_stale_theorem = copy.deepcopy(guarantees)
+        topup_stale_theorem["guarantees"][3]["theorem"] = (
+            "LidoSRv3.Audit.valid_result_preserves_router_order"
+        )
+        write_json(guarantees_path, topup_stale_theorem)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: theorem differs from canonical evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
         for index, guarantee in enumerate(guarantees["guarantees"]):
             command_mutant = copy.deepcopy(guarantees)
             command_mutant["guarantees"][index]["reproduction"]["command"] = "true"
@@ -667,6 +732,20 @@ def main():
                 "generate",
                 f"{guarantee['id']}: assumption links differ from canonical risks",
             )
+        write_json(guarantees_path, guarantees)
+
+        topup_dropped_nowrap = copy.deepcopy(guarantees)
+        topup_dropped_nowrap["guarantees"][3]["assumptions"] = [
+            row for row in topup_dropped_nowrap["guarantees"][3]["assumptions"]
+            if row != "A-TOPUP-NOWRAP"
+        ]
+        write_json(guarantees_path, topup_dropped_nowrap)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: assumption links differ from canonical risks",
+        )
         write_json(guarantees_path, guarantees)
 
         for blocker in baseline_lock["unavailable"]:
@@ -881,6 +960,68 @@ def main():
         )
         write_json(source_map_path, source_map)
 
+        # The five P-TOPUP-1 spans are the evidence its LEAN_CHECKED source
+        # plane rests on.  The Lido-side pull span in particular is easy to drop
+        # because the router span alone reads as self-contained.
+        topup_unmapped = copy.deepcopy(source_map)
+        topup_unmapped["targets"][3] = {
+            "id": "P-TOPUP-1",
+            "status": "UNMAPPED",
+            "spans": [],
+            "blocker": "Deliberate unmapping fixture.",
+        }
+        write_json(source_map_path, topup_unmapped)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: verified source target must remain MAPPED",
+        )
+        write_json(source_map_path, source_map)
+
+        topup_dropped_span = copy.deepcopy(source_map)
+        topup_dropped_span["targets"][3]["spans"].pop()
+        write_json(source_map_path, topup_dropped_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: source spans differ from verified semantic anchors",
+        )
+        write_json(source_map_path, source_map)
+
+        for helper in ("_checkAppAuth", "_getTopUpGateway", "_getModuleState",
+                       "_requireWCType2", "_requireModuleIdExists",
+                       "PUBKEY_LENGTH", "PUBLIC_KEY_LENGTH", "MIN_DEPOSIT"):
+            topup_dropped_helper = copy.deepcopy(source_map)
+            topup_dropped_helper["targets"][3]["spans"] = [
+                span for span in topup_dropped_helper["targets"][3]["spans"]
+                if span["function"] != helper
+            ]
+            write_json(source_map_path, topup_dropped_helper)
+            run(
+                fixture,
+                False,
+                "generate",
+                "P-TOPUP-1: source spans differ from verified semantic anchors",
+            )
+        write_json(source_map_path, source_map)
+
+        topup_shrunk_span = copy.deepcopy(source_map)
+        topup_shrunk_span["targets"][3]["spans"][0]["end_line"] = 756
+        topup_shrunk_span["targets"][3]["spans"][0]["permalink"] = (
+            "https://github.com/lidofinance/core/blob/"
+            f"{pinned_sha}/contracts/0.8.25/sr/StakingRouter.sol#L679-L756"
+        )
+        write_json(source_map_path, topup_shrunk_span)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-TOPUP-1: source span is not a verified semantic anchor",
+        )
+        write_json(source_map_path, source_map)
+
         ssz_overclaim = copy.deepcopy(source_map)
         ssz_overclaim["ssz_claim"]["level"] = "FULL_SSZ"
         write_json(source_map_path, ssz_overclaim)
@@ -916,6 +1057,9 @@ def main():
         "source-map policy, reproduction evidence, "
         "strict source-span evidence, status vocabulary/plane/closure, "
         "P-DEPOSIT-1 source-plane downgrade/overclaim and span unmapping, "
+        "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
+        "and span unmapping, P-TOPUP-1 transitive-helper span, "
+        "pinned-constant declaration span and no-wrap assumption drops, "
         "stale view"
     )
 

@@ -21,17 +21,19 @@
         "LidoSRv3.Audit.Source.MinFirstCorrespondence",
         "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
         "LidoSRv3.Audit.Source.DepositCorrespondence",
+        "LidoSRv3.Audit.Source.TopupCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
         "LidoSRv3.Tests.DepositVectors",
+        "LidoSRv3.Tests.TopupVectors",
         "LidoSRv3.Audit.Common.Units",
         "LidoSRv3.Audit.Common.Result",
         "LidoSRv3.Audit.Common.Trace",
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target and P-DEPOSIT-1 deposit conservation/rollback correspondence are checked against pinned Solidity"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback and P-TOPUP-1 top-up conservation/rollback correspondence are checked against pinned Solidity"
     }
   },
   "proof_policy": {
@@ -111,6 +113,36 @@
       "name": "Guarantees.PDeposit1.source_nonconserving_deployment_reverts",
       "status": "lean_checked",
       "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PTopup1.source_router_balance_unchanged",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PTopup1.source_reverting_branch_moves_no_ether",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PTopup1.source_balance_guards_discharged",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PTopup1.source_unchecked_accumulation_faithful",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
     },
     {
       "name": "Guarantees.PSsz1.structural_witness_binding_sound",
