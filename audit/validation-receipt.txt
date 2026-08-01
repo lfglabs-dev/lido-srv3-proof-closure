@@ -21,3 +21,16 @@ P-SSZ-1 structural gate receipt (committed tree):
 - `make test`: exit 0, including `LidoSRv3.Tests.SszRegression`.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+
+P-DEPOSIT-1 pinned-source gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` and its two
+  companions report only the Lean foundation `propext`.
+- `make prove`: exit 0.
+- `make test`: exit 0, including `LidoSRv3.Tests.DepositVectors`.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+- Source plane only: `evm` remains OPEN and `tx` remains
+  ABSTRACT_LEAN_CHECKED for P-DEPOSIT-1.
