@@ -20,6 +20,7 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
 #print axioms LidoSRv3.Audit.MinFirst.candidate_open
