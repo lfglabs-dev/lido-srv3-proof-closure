@@ -29,9 +29,9 @@ test:
 	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
-	@lake build LidoSRv3.Audit.Vectors
+	@lake build LidoSRv3.Tests.MinFirstVectors
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
-	@lake build LidoSRv3.Audit.SszRegression
+	@lake build LidoSRv3.Tests.SszRegression
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts

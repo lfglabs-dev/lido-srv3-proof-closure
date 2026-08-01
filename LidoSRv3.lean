@@ -5,7 +5,6 @@ import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Strategy
 import LidoSRv3.Audit.StrategyProofs
-import LidoSRv3.Audit.Vectors
 import LidoSRv3.Audit.Trust
 import LidoSRv3.Audit.AllGuarantees
 import LidoSRv3.Audit.Common.Units

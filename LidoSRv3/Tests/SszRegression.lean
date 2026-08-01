@@ -1,6 +1,6 @@
 import LidoSRv3.Audit.Ssz
 
-namespace LidoSRv3.Audit.SszRegression
+namespace LidoSRv3.Tests.SszRegression
 
 open LidoSRv3.Audit.Ssz
 
@@ -83,4 +83,4 @@ example : bindOperation .clProofVerifier mix witness expectedRoot = false := by 
 /-- Regression: changing the witness tag alone cannot move it to another wrapper slot. -/
 example : bindOperation .clProofVerifier mix relabelledWitness expectedRoot = false := by decide
 
-end LidoSRv3.Audit.SszRegression
+end LidoSRv3.Tests.SszRegression

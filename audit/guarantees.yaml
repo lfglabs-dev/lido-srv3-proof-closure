@@ -50,7 +50,7 @@
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-HANDWRITTEN-MINFIRST"],
       "next_gate": "Establish source correspondence and checked-Uint256 execution refinement.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Vectors", "expected": "successful theorem and falsifier-vector build"}
+      "reproduction": {"command": "lake build LidoSRv3.Tests.MinFirstVectors", "expected": "successful theorem and falsifier-vector build"}
     },
     {
       "id": "P-RESERVE-1",
@@ -110,7 +110,7 @@
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
       "next_gate": "Establish source correspondence, SHA-256/precompile semantics, and canonical production provenance before any Yul/EVM/crypto/E2E composition.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.SszRegression", "expected": "successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression", "expected": "successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence"}
     }
   ]
 }
