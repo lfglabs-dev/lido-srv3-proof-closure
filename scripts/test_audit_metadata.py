@@ -837,7 +837,7 @@ def main():
         )
         write_json(source_map_path, source_map)
 
-        # The three P-DEPOSIT-1 spans are the evidence its LEAN_CHECKED source
+        # The four P-DEPOSIT-1 spans are the evidence its LEAN_CHECKED source
         # plane rests on: unmapping or thinning them must fail the gate.
         deposit_unmapped = copy.deepcopy(source_map)
         deposit_unmapped["targets"][2] = {

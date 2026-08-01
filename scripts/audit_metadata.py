@@ -392,6 +392,7 @@ VERIFIED_SOURCE_ANCHORS = {
     "P-DEPOSIT-1": {
         ("contracts/0.8.25/sr/StakingRouter.sol", "deposit", 942, 997),
         ("contracts/0.4.24/Lido.sol", "withdrawDepositableEther", 869, 886),
+        ("contracts/0.4.24/Lido.sol", "_spendDepositableEther", 839, 859),
         ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "makeBeaconChainDeposits32ETH", 36, 64),
     },
     "P-TOPUP-1": {

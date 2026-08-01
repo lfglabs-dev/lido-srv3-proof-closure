@@ -42,6 +42,7 @@
       "spans": [
         {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/StakingRouter.sol", "function": "deposit", "start_line": 942, "end_line": 997, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L942-L997"},
         {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "withdrawDepositableEther", "start_line": 869, "end_line": 886, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L869-L886"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_spendDepositableEther", "start_line": 839, "end_line": 859, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"},
         {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol", "function": "makeBeaconChainDeposits32ETH", "start_line": 36, "end_line": 64, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L36-L64"}
       ]
     },

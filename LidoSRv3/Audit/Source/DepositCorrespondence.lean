@@ -4,7 +4,7 @@ import LidoSRv3.Audit.Trace
 Pinned source correspondence for the SRv3 deposit beacon-chain push at
 `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
-Three spans make up the pinned deposit path:
+Four spans make up the pinned deposit path:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997 -- the
   entry point.  It rejects an inactive module (line 946), computes
@@ -20,8 +20,12 @@ Three spans make up the pinned deposit path:
 * `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886 -- the
   pull side.  It rejects a stopped/bunkered protocol (line 870), rejects a zero
   amount (line 873), spends the depositable buffer through
-  `_spendDepositableEther` (line 875, whose `NOT_ENOUGH_ETHER` require sits at
-  line 842), and forwards exactly `_amount` wei to the router (line 885).
+  `_spendDepositableEther` (line 875), and forwards exactly `_amount` wei to the
+  router (line 885).
+* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859 -- the
+  internal buffer update.  It computes the available depositable ether (line
+  841), rejects an amount larger than that buffer (line 842), and applies the
+  accounting update (lines 844--858).
 * `contracts/0.8.25/lib/BeaconChainDepositor.sol`,
   `makeBeaconChainDeposits32ETH`, lines 36--64 -- the push side.  It rejects a
   pubkey batch whose length is not `PUBLIC_KEY_LENGTH * _keysCount` (lines

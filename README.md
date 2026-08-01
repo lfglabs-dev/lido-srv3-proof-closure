@@ -24,7 +24,7 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | --- | --- | --- |
 | 1 | `P-ALLOC-1` | `LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded` |
 | 2 | `P-ALLOC-2` | `LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket` |
-| 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.revert_restores_state_value_and_logs` |
+| 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` |
 | 4 | `P-TOPUP-1` | `LidoSRv3.Audit.valid_result_preserves_router_order` |
 | 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.MinFirst.totalAllocated_le_requested` |
 | 6 | `P-RESERVE-1` | metadata-only; no Lean theorem claimed |
@@ -35,10 +35,10 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 11 | `P-SSZ-1` | `LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound` |
 
 Each guarantee carries per-plane status across the model, algorithm, source,
-transaction, Yul, EVM, and cryptographic planes. A Lean-checked status is a
-claim about the Lean model only: no guarantee in this repository currently
-claims correspondence to pinned Solidity source or to deployed bytecode, and
-several are explicitly blocked on runtime provenance. Read the exact
+transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2, and
+P-DEPOSIT-1 claim Lean-checked correspondence to their pinned Solidity spans;
+no guarantee currently claims correspondence to deployed bytecode, and several
+are explicitly blocked on runtime provenance. Read the exact
 per-guarantee wording, status, assumptions, and next gate from
 `audit/guarantees.yaml` rather than from any prose summary, including this one.
 Generated views of the same data live in `audit/STATUS.md`, `audit/ROADMAP.md`,
