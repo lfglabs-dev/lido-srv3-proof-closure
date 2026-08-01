@@ -6,10 +6,10 @@
 - `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2` — successful semantic MinFirst ALG theorem build
 - `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Trace` — successful Lean build of the module containing the named rollback theorem
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Allocation` — successful Lean build; relational model only
-- `P-ACCOUNT-1`: `lake build LidoSRv3.Audit.Vectors` — successful theorem and falsifier-vector build
+- `P-ACCOUNT-1`: `lake build LidoSRv3.Tests.MinFirstVectors` — successful theorem and falsifier-vector build
 - `P-RESERVE-1`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem
 - `P-ETH-1`: `lake build` — active Lean 4.31 dependency graph builds; not certification
 - `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
 - `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
-- `P-SSZ-1`: `lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.SszRegression` — successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence
+- `P-SSZ-1`: `lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression` — successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence

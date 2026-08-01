@@ -2,7 +2,10 @@ import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
 
-namespace LidoSRv3.Audit.MinFirst.Vectors
+namespace LidoSRv3.Tests.MinFirstVectors
+
+open LidoSRv3.Audit
+open LidoSRv3.Audit.MinFirst
 
 private def word (n : Nat) : Word := Verity.Core.Uint256.ofNat n
 private def b (id allocation capacity : Nat) (active := true)
@@ -57,4 +60,4 @@ example :
     allocate 1 [b 0 0 10, b 1 0 10] = [b 0 1 10, b 1 0 10] ∧
     allocate 1 [b 1 0 10, b 0 0 10] = [b 1 1 10, b 0 0 10] := by decide
 
-end LidoSRv3.Audit.MinFirst.Vectors
+end LidoSRv3.Tests.MinFirstVectors

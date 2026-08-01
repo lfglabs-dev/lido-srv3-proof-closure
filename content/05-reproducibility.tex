@@ -42,7 +42,7 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
   \texttt{lake build LidoSRv3}. \\
   \rowsep
   Target namespace & Selected proof target files in \path{proofs/}, target names
-  in \path{verity/targets/srv3-proof-targets.json}, and the command that fails
+  in \path{archive/legacy-p1-p15/verity-targets/srv3-proof-targets.json}, and the command that fails
   on a failed model check. \\
   \rowsep
   Trust allowlist & Machine-readable assumption IDs, out-of-model boundaries,
@@ -70,7 +70,7 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
 \noindent The matrix uses broad PR \#1811 surfaces to stay readable. The exact
 source map is \path{verity/targets/source-map.json}, and the Certora prior-work
 to PR \#1811 property and assumption map is
-\path{verity/targets/certora-pr1811-map.md}. Anchors for the target
+\path{archive/legacy-p1-p15/verity-targets/certora-pr1811-map.md}. Anchors for the target
 source revision include:
 
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
@@ -97,7 +97,7 @@ source revision include:
   references.
   \item \textbf{Trust report:} \path{verity/targets/trust-boundary.json}.
   Machine-readable assumption and boundary register.
-  \item \textbf{Certora map:} \path{verity/targets/certora-pr1811-map.md}.
+  \item \textbf{Certora map:} \path{archive/legacy-p1-p15/verity-targets/certora-pr1811-map.md}.
   Certora prior-work to PR \#1811 property and assumption map with disciplined
   coverage status per surface.
   \item \textbf{Proof targets:} \path{proofs/}. One target file for each selected
@@ -105,8 +105,8 @@ source revision include:
   \item \textbf{Model:} \path{LidoSRv3/Legacy/Model.lean}. SRv3 economic state machine.
   \item \textbf{Theorems:} \path{LidoSRv3/Legacy/SpecProofs.lean}. Checked P0 proof
   targets.
-  \item \textbf{Reference tests:} \path{tests/solidity-reference/}. Copied Lido
-  references used as source-facing fixtures.
+  \item \textbf{Reference fixtures:} \path{fixtures/solidity-reference/}. Copied
+  Lido references used as source-facing fixtures; never executed.
 \end{itemize}
 
 \subsection*{Integrity checks}
