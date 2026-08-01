@@ -113,8 +113,8 @@ EXPECTED_ASSUMPTION_LINKS = [
 ]
 EXPECTED_NEXT_GATES = [
     "Establish pinned-source correspondence for each claimed economic transition.",
-    "Refine proportional allocation amounts and checked-Uint256 execution for "
-    "MinFirstAllocationStrategy.allocateToBestCandidate.",
+    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
+    "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Refine success/revert and rollback against pinned executable EVM semantics.",
     "Prove extraction and ordered-row correspondence from pinned Solidity.",
     "Establish source correspondence and checked-Uint256 execution refinement.",

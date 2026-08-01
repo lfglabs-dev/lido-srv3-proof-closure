@@ -19,7 +19,7 @@
       "theorem_planes": ["algorithm", "source"],
       "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-HANDWRITTEN-MINFIRST"],
-      "next_gate": "Refine proportional allocation amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate.",
+      "next_gate": "Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"}
     },
     {
