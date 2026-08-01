@@ -3,7 +3,7 @@
   "campaign_base": {"repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git", "ref": "campaign/lido-minimal-11", "commit": "9131f1820f0f5034b3ebc08f4c9decacb49bdcb1"},
   "pins": {
     "lido_core": {"repository": "https://github.com/lidofinance/core.git", "commit": "af095e48bbc1c3841c2c9936219c8461af01056b"},
-    "verity": {"repository": "https://github.com/lfglabs-dev/verity.git", "commit": "6cfc41fe4129e2c56f130bab9617a0c677ce60ae"},
+    "verity": {"repository": "https://github.com/lfglabs-dev/verity.git", "commit": "d2d4a18a4d7021adcd90d4b03e619affe506dd54"},
     "evmyullean": {"repository": "https://github.com/lfglabs-dev/EVMYulLean.git", "commit": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"},
     "lean": {"toolchain": "leanprover/lean4:v4.31.0"},
     "mathlib": {"repository": "https://github.com/leanprover-community/mathlib4.git", "commit": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"}
