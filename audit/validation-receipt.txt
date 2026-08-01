@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: ad4ac659d6445627a10bca09e082a093f46b2aef
+validated-tree: 6dc6822401eadcff7db34afe13854e992e8ebb30
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -25,10 +25,16 @@ P-SSZ-1 structural gate receipt (committed tree):
 P-DEPOSIT-1 pinned-source gate receipt (committed tree):
 - `lake build`: exit 0.
 - `lake build LidoSRv3.Audit.Trust`: exit 0;
-  `Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` and its two
-  companions report only the Lean foundation `propext`.
+  `Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` and its three
+  companions -- `source_router_balance_unchanged`,
+  `source_reverting_branch_moves_no_ether`, and
+  `source_nonconserving_deployment_reverts` -- report only the Lean foundation
+  `propext`.
 - `make prove`: exit 0.
-- `make test`: exit 0, including `LidoSRv3.Tests.DepositVectors`.
+- `make test`: exit 0, including `LidoSRv3.Tests.DepositVectors`, which pins the
+  `StakingRouter.sol` line 996 balance `assert` as the `Panic(0x01)` revert it
+  is: a deployment whose pull scale differs from `DEPOSIT_SIZE` yields
+  `revertAssertBalanceUnchanged`, never a commit stranding the difference.
 - `python3 scripts/audit_metadata.py check`: exit 0.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
