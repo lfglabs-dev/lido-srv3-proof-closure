@@ -10,9 +10,10 @@ in `LidoSRv3.Audit.Source.DepositCorrespondence`.  Where that path pushes a fixe
 pushes a *per-key variable amount* through `IDepositContract.deposit` with an
 all-zero signature, topping validator balances above 32 ETH.
 
-Five groups of pinned spans make up the top-up path; every one of them is listed
+Six groups of pinned spans make up the top-up path; every one of them is listed
 in `audit/source-map.yaml` under `P-TOPUP-1`, including the transitive helpers
-that carry the guards modelled below:
+that carry the guards modelled below and the constant declarations that
+`pinnedConfig` reads:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `topUp`, lines 679--759 -- the entry
   point.  It rejects a caller other than the top-up gateway (line 686, via
@@ -54,6 +55,16 @@ that carry the guards modelled below:
   `WithdrawalCredentials.isType2`, and the `_msgSender()` comparison) are
   storage/interface facts and stay abstract: the model takes each helper's
   boolean verdict as an input field rather than recomputing it.
+* The constant declarations `pinnedConfig` reads: `StakingRouter.PUBKEY_LENGTH`,
+  line 57, `BeaconChainDepositor.PUBLIC_KEY_LENGTH`, line 21, and
+  `BeaconChainDepositor.MIN_DEPOSIT`, line 28.  They are pinned rather than
+  assumed because `pinnedConfig` hard-codes their values, and
+  `source_pinned_config_discharges_pubkey_guard` holds only while the first two
+  agree; registering the declarations makes a change to either one break the
+  source-map gate instead of silently invalidating that theorem.  The remaining
+  two fields need no declaration span: `gwei` is a Solidity unit literal and
+  `uint64Max` is `type(uint64).max`, read at `BeaconChainDepositor.sol` line 97
+  inside the already-pinned lines 66--108.
 * `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886, and
   `_spendDepositableEther`, lines 839--859 -- the pull side, reached from line
   744 with `_seedDepositsCount = 0`.  It rejects a stopped/bunkered protocol

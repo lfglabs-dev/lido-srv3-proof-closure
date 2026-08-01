@@ -108,6 +108,17 @@ P-TOPUP-1 pinned-source gate receipt (committed tree):
   (`LIDO_LOCATOR.topUpGateway()`, `SRStorage.isModuleExists`,
   `WithdrawalCredentials.isType2`, and the `_msgSender()` comparison) remain
   abstract storage/interface facts taken as model inputs.
+- The constant declarations `pinnedConfig` hard-codes are now pinned in
+  `audit/source-map.yaml` as well: `StakingRouter.PUBKEY_LENGTH` (line 57),
+  `BeaconChainDepositor.PUBLIC_KEY_LENGTH` (line 21) and
+  `BeaconChainDepositor.MIN_DEPOSIT` (line 28). Without them the source-map
+  gate stayed green while a change to either pubkey-length constant would have
+  invalidated `source_pinned_config_discharges_pubkey_guard`, which holds only
+  while the two agree. The negative fixture suite rejects dropping any one of
+  the three. `pinnedConfig.gwei` needs no declaration span (it is the Solidity
+  unit literal `1 gwei`) and `pinnedConfig.uint64Max` is `type(uint64).max`,
+  read at `BeaconChainDepositor.sol` line 97 inside the already-pinned lines
+  66--108.
 - The vectors pin `_checkAppAuth(_getTopUpGateway())` at source line 686 as the
   *first* guard, so no unauthorized call is classified as a committed outcome
   whatever the later module status is, and pin the zero-total early commit at

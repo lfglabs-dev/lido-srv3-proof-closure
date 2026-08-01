@@ -38,6 +38,9 @@ top-up push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
 * `contracts/0.8.25/sr/StakingRouter.sol`, `_getModuleState`, lines 1099--1107;
 * `contracts/0.8.25/sr/SRUtils.sol`, `_requireWCType2`, lines 41--43;
 * `contracts/0.8.25/sr/SRUtils.sol`, `_requireModuleIdExists`, lines 45--47;
+* `contracts/0.8.25/sr/StakingRouter.sol`, `PUBKEY_LENGTH`, line 57;
+* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `PUBLIC_KEY_LENGTH`, line 21;
+* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `MIN_DEPOSIT`, line 28;
 * `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;
 * `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;
 * `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `makeBeaconChainTopUp`,

@@ -991,7 +991,8 @@ def main():
         write_json(source_map_path, source_map)
 
         for helper in ("_checkAppAuth", "_getTopUpGateway", "_getModuleState",
-                       "_requireWCType2", "_requireModuleIdExists"):
+                       "_requireWCType2", "_requireModuleIdExists",
+                       "PUBKEY_LENGTH", "PUBLIC_KEY_LENGTH", "MIN_DEPOSIT"):
             topup_dropped_helper = copy.deepcopy(source_map)
             topup_dropped_helper["targets"][3]["spans"] = [
                 span for span in topup_dropped_helper["targets"][3]["spans"]
@@ -1057,8 +1058,8 @@ def main():
         "strict source-span evidence, status vocabulary/plane/closure, "
         "P-DEPOSIT-1 source-plane downgrade/overclaim and span unmapping, "
         "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
-        "and span unmapping, P-TOPUP-1 transitive-helper span and "
-        "no-wrap assumption drops, "
+        "and span unmapping, P-TOPUP-1 transitive-helper span, "
+        "pinned-constant declaration span and no-wrap assumption drops, "
         "stale view"
     )
 
