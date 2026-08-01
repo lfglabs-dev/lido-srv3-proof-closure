@@ -14,13 +14,13 @@
     },
     {
       "id": "P-ALLOC-2",
-      "catalogue_wording": "The handwritten MinFirst algorithm has no established Solidity/EVM equivalence.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket",
-      "theorem_planes": ["algorithm"],
-      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "catalogue_wording": "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
+      "theorem_planes": ["algorithm", "source"],
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-HANDWRITTEN-MINFIRST"],
-      "next_gate": "Establish pinned-source correspondence between MinFirst.candidate? and MinFirstAllocationStrategy.allocateToBestCandidate.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful semantic MinFirst ALG theorem build"}
+      "next_gate": "Refine proportional allocation amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"}
     },
     {
       "id": "P-DEPOSIT-1",

@@ -18,6 +18,7 @@
         "LidoSRv3.Audit.Allocation",
         "LidoSRv3.Audit.Strategy",
         "LidoSRv3.Audit.StrategyProofs",
+        "LidoSRv3.Audit.Source.MinFirstCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
@@ -27,7 +28,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; Solidity correspondence remains manual"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-2 next-target correspondence is checked against pinned Solidity"
     }
   },
   "proof_policy": {
@@ -72,6 +73,11 @@
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PAlloc2.source_selects_same_next_target",
+      "status": "lean_checked",
+      "axioms": ["propext"]
     },
     {
       "name": "Guarantees.PSsz1.structural_witness_binding_sound",

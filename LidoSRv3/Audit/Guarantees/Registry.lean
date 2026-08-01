@@ -29,6 +29,7 @@ def Id.text : Id → String
 inductive CheckedLayer
   | model
   | algorithm
+  | source
   | abstractTx
   deriving DecidableEq, Repr
 
