@@ -32,7 +32,7 @@ EXPECTED_AUTHORITY = (
 EXPECTED_WORDING = [
     "Pinned-source correspondence proves only the allocation-capacity computation; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
-    "TxObservation is an abstract transaction model, not an EVM execution trace.",
+    "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Allocation inputs are source-shaped data, not extracted Solidity state.",
     "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
     "Verity 4.31 is a non-certified development scaffold.",
@@ -79,8 +79,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
-    {"command": "lake build LidoSRv3.Audit.Trace",
-     "expected": "successful Lean build of the module containing the named rollback theorem"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
+     "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"},
     {"command": "lake build LidoSRv3.Audit.Allocation",
      "expected": "successful Lean build; relational model only"},
     {"command": "lake build LidoSRv3.Tests.MinFirstVectors",
@@ -101,7 +101,7 @@ EXPECTED_REPRODUCTION = [
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
-    ["A-ABSTRACT-TX"],
+    ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-VERITY-SCAFFOLD", "A-MULTI-NODE-TRANSPORT"],
@@ -146,7 +146,7 @@ EXPECTED_STATUSES = [
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -168,7 +168,7 @@ EXPECTED_STATUSES = [
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
     ["algorithm", "source"],
-    ["model", "tx"],
+    ["model", "tx", "source"],
     ["model"],
     ["model"],
     [],
@@ -181,7 +181,7 @@ EXPECTED_THEOREM_PLANES = [
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
-    "LidoSRv3.Audit.revert_restores_state_value_and_logs",
+    "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.valid_result_preserves_router_order",
     "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
     None,
@@ -247,6 +247,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.StrategyProofs",
             "LidoSRv3.Audit.Source.MinFirstCorrespondence",
             "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
+            "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
@@ -258,7 +259,8 @@ EXPECTED_MANIFEST_LAYERS = {
         ],
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
-            "P-ALLOC-1 allocation-capacity and P-ALLOC-2 next-target correspondence "
+            "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target and "
+            "P-DEPOSIT-1 deposit conservation/rollback correspondence "
             "are checked against pinned Solidity"
         ),
     },
@@ -284,6 +286,12 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc2.source_selects_same_next_target", "status": "lean_checked",
      "axioms": ["propext"]},
+    {"name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+     "status": "lean_checked", "axioms": ["propext"]},
+    {"name": "Guarantees.PDeposit1.source_router_balance_unchanged",
+     "status": "lean_checked", "axioms": ["propext"]},
+    {"name": "Guarantees.PDeposit1.source_reverting_branch_moves_no_ether",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PSsz1.structural_witness_binding_sound", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},

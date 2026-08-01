@@ -4,7 +4,7 @@
 
 - `P-ALLOC-1`: `lake build LidoSRv3.Audit.Guarantees.PAlloc1` — successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open
 - `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2` — successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open
-- `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Trace` — successful Lean build of the module containing the named rollback theorem
+- `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Guarantees.PDeposit1` — successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Allocation` — successful Lean build; relational model only
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Tests.MinFirstVectors` — successful theorem and falsifier-vector build
 - `P-RESERVE-1`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem
