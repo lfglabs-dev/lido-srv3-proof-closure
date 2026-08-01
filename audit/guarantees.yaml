@@ -104,13 +104,13 @@
     },
     {
       "id": "P-SSZ-1",
-      "catalogue_wording": "Mock-derived helper evidence is non-production evidence.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
+      "catalogue_wording": "Pinned-source correspondence proves only the deposit-data-root control-flow shape and its structural witness binding; SHA-256, precompile, EVM, and production provenance remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Establish source correspondence, SHA-256/precompile semantics, and canonical production provenance before any Yul/EVM/crypto/E2E composition.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression", "expected": "successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence"}
+      "next_gate": "Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression", "expected": "successful pinned-source deposit-data-root control-flow correspondence and structural witness regressions; no SHA-256/precompile/EVM/crypto/E2E correspondence"}
     }
   ]
 }

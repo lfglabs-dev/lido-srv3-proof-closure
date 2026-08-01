@@ -1022,6 +1022,24 @@ def main():
         )
         write_json(source_map_path, source_map)
 
+        # P-SSZ-1's source-plane claim relies on all three deposit-data-root
+        # spans: the data-root chain, signature-root helper, and endian loop.
+        for helper in ("_computeDepositDataRootWithAmount", "_computeSignatureRoot",
+                       "_toLittleEndian64"):
+            ssz_dropped_span = copy.deepcopy(source_map)
+            ssz_dropped_span["targets"][10]["spans"] = [
+                span for span in ssz_dropped_span["targets"][10]["spans"]
+                if span["function"] != helper
+            ]
+            write_json(source_map_path, ssz_dropped_span)
+            run(
+                fixture,
+                False,
+                "generate",
+                "P-SSZ-1: source spans differ from verified semantic anchors",
+            )
+        write_json(source_map_path, source_map)
+
         ssz_overclaim = copy.deepcopy(source_map)
         ssz_overclaim["ssz_claim"]["level"] = "FULL_SSZ"
         write_json(source_map_path, ssz_overclaim)
@@ -1060,6 +1078,7 @@ def main():
         "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
         "and span unmapping, P-TOPUP-1 transitive-helper span, "
         "pinned-constant declaration span and no-wrap assumption drops, "
+        "P-SSZ-1 deposit-data-root span drops, "
         "stale view"
     )
 

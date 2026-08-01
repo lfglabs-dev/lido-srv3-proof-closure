@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: a11ee6f25a22e89c358ff80b3dcc2bea24d4b698
+validated-tree: 7a6cfade0257ce80c92789030670ad95425a6ff7
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -21,6 +21,24 @@ P-SSZ-1 structural gate receipt (committed tree):
 - `make test`: exit 0, including `LidoSRv3.Tests.SszRegression`.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+
+P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed tree):
+- Verified against `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+  `BeaconChainDepositor._computeDepositDataRootWithAmount` lines 120--135,
+  `_computeSignatureRoot` lines 137--146, and `_toLittleEndian64` lines
+  148--153. The source-map negative fixture rejects dropping each span.
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `source_pinned_config_discharges_deposit_data_root` reports only `propext`.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0.
+- `python3 scripts/check_validation_receipt.py`: exit 0 after this receipt's
+  `validated-tree` field is bound to the final tracked tree.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- Scope is source-shaped control flow and the pre-existing structural witness
+  only. SHA-256 correctness, precompile semantics, EVM execution, canonical
+  runtime provenance, and end-to-end cryptographic provenance remain open under
+  `A-SHA256-FFI`, `A-RUNTIME-PROVENANCE`, and `A-MULTI-NODE-TRANSPORT`.
 
 P-DEPOSIT-1 pinned-source gate receipt (committed tree):
 - `lake build`: exit 0.

@@ -1,10 +1,38 @@
 import LidoSRv3.Audit.Ssz
+import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PSsz1
 
 /-- Structural-only SSZ evidence; no full SSZ, crypto, EVM, or E2E claim. -/
-def guarantee : Guarantee := ⟨.pSsz1, [.model]⟩
+def guarantee : Guarantee := ⟨.pSsz1, [.model, .source]⟩
+
+theorem source_pinned_config_discharges_deposit_data_root
+    (input : LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SourceDepositDataRootInput) :
+    LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SHA256_DIGEST_LENGTH
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 32 ∧
+    LidoSRv3.Audit.Source.DepositDataRootCorrespondence.PUBKEY_LENGTH
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 48 ∧
+    LidoSRv3.Audit.Source.DepositDataRootCorrespondence.WITHDRAWAL_CREDENTIALS_LENGTH
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 32 ∧
+    LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SIGNATURE_LENGTH
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 96 ∧
+    LidoSRv3.Audit.Source.DepositDataRootCorrespondence.DEPOSIT_DATA_LENGTH
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 184 ∧
+    LidoSRv3.Audit.Ssz.HasGeneralizedIndex
+      (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).index
+      (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).pivotBoundary
+      (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).path ∧
+    LidoSRv3.Audit.Ssz.traverseBranch
+      (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceCombine input)
+      (LidoSRv3.Audit.Ssz.validatorRoot
+        (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceCombine input)
+        (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).validator)
+      (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).path
+      (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).branch =
+        LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceNode input :=
+  LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
+    input
 
 /--
 The structural helper accepts only witnesses whose independently supplied

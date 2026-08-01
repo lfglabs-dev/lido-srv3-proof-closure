@@ -40,7 +40,7 @@ EXPECTED_WORDING = [
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
     "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
-    "Mock-derived helper evidence is non-production evidence.",
+    "Pinned-source correspondence proves only the deposit-data-root control-flow shape and its structural witness binding; SHA-256, precompile, EVM, and production provenance remain open.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -98,7 +98,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression",
-     "expected": "successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence"},
+     "expected": "successful pinned-source deposit-data-root control-flow correspondence and structural witness regressions; no SHA-256/precompile/EVM/crypto/E2E correspondence"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
@@ -126,7 +126,7 @@ EXPECTED_NEXT_GATES = [
     "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
-    "Establish source correspondence, SHA-256/precompile semantics, and canonical production provenance before any Yul/EVM/crypto/E2E composition.",
+    "Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -164,7 +164,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
 ]
 EXPECTED_THEOREM_PLANES = [
@@ -178,7 +178,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     [],
     [],
-    ["model"],
+    ["model", "source"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded",
@@ -191,7 +191,7 @@ EXPECTED_THEOREMS = [
     None,
     None,
     None,
-    "LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound",
+    "LidoSRv3.Audit.Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -251,6 +251,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
+            "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
@@ -265,8 +266,9 @@ EXPECTED_MANIFEST_LAYERS = {
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
-            "P-DEPOSIT-1 deposit conservation/rollback and "
-            "P-TOPUP-1 top-up conservation/rollback correspondence "
+            "P-DEPOSIT-1 deposit conservation/rollback, "
+            "P-TOPUP-1 top-up conservation/rollback and P-SSZ-1 deposit-data-root "
+            "control-flow correspondence "
             "are checked against pinned Solidity"
         ),
     },
@@ -314,6 +316,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PSsz1.structural_witness_binding_sound", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
+    {"name": "Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_open", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_none_no_open", "status": "lean_checked",
@@ -465,6 +469,9 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/CLValidatorVerifier.sol", "_verifyValidator", 44, 57),
         ("contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol", "_validatePubKeyWCProof", 150, 175),
         ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "addConsolidationRequests", 185, 223),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeDepositDataRootWithAmount", 120, 135),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeSignatureRoot", 137, 146),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_toLittleEndian64", 148, 153),
     },
 }
 UNMAPPED_SOURCE_BLOCKERS = {

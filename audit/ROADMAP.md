@@ -12,4 +12,4 @@
 - `P-ADDRESS-1`: Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.
 - `P-TOPUP-2`: Obtain independent canonical runtime, codehash, fork, and address provenance.
 - `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
-- `P-SSZ-1`: Establish source correspondence, SHA-256/precompile semantics, and canonical production provenance before any Yul/EVM/crypto/E2E composition.
+- `P-SSZ-1`: Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.
