@@ -99,7 +99,7 @@ def depositInput : SourceDepositDataRootInput := {
   amountGweiBounded := by decide }
 
 /-- Negative regression: the deposit-data-root structural combiner is not constant. -/
-example : sourceCombine depositInput 7 11 = 1810 := by decide
+example : sourceCombine depositInput 7 11 = Nat.pair 7 11 := by rfl
 
 /-- Negative regression: incrementing the leaf the witness branch actually carries
 changes the reconstructed root, so a mutated deposit-data-root cannot replay it. -/
@@ -110,11 +110,7 @@ example : traverseBranch (sourceCombine depositInput)
       (sourceLeaf depositInput + 1) ≠ sourceNode depositInput
   rw [structuralRoot_eq]
   simp only [sourceNode]
-  generalize sourceAnchor depositInput = anchor
-  generalize sourceSignatureNode depositInput = signatureNode
-  generalize sourceLeaf depositInput = leaf
-  rw [← Nat.add_assoc]
-  exact Nat.succ_ne_self _
+  simp [structuralEncoding]
 
 /-! ### Digest-binding mutant regressions
 
