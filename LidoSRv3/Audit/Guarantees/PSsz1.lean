@@ -8,7 +8,16 @@ namespace LidoSRv3.Audit.Guarantees.PSsz1
 def guarantee : Guarantee := ⟨.pSsz1, [.model, .source]⟩
 
 theorem source_pinned_config_discharges_deposit_data_root
-    (input : LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SourceDepositDataRootInput) :
+    (input : LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SourceDepositDataRootInput)
+    (hPublicKey : input.publicKey.length =
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.PUBKEY_LENGTH
+        LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig)
+    (hWithdrawalCredentials : input.withdrawalCredentials.length =
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.WITHDRAWAL_CREDENTIALS_LENGTH
+        LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig)
+    (hSignature : input.signature.length =
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SIGNATURE_LENGTH
+        LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig) :
     LidoSRv3.Audit.Source.DepositDataRootCorrespondence.SHA256_DIGEST_LENGTH
       LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 32 ∧
     LidoSRv3.Audit.Source.DepositDataRootCorrespondence.PUBKEY_LENGTH
@@ -19,6 +28,8 @@ theorem source_pinned_config_discharges_deposit_data_root
       LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 96 ∧
     LidoSRv3.Audit.Source.DepositDataRootCorrespondence.DEPOSIT_DATA_LENGTH
       LidoSRv3.Audit.Source.DepositDataRootCorrespondence.pinnedConfig = 184 ∧
+    LidoSRv3.Audit.Source.DepositDataRootCorrespondence.signatureRoot input =
+      LidoSRv3.Audit.Source.DepositDataRootCorrespondence.computeSignatureRoot input.signature ∧
     LidoSRv3.Audit.Ssz.HasGeneralizedIndex
       (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).index
       (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).pivotBoundary
@@ -32,7 +43,7 @@ theorem source_pinned_config_discharges_deposit_data_root
       (LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness input).branch =
         LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceNode input :=
   LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
-    input
+    input hPublicKey hWithdrawalCredentials hSignature
 
 /--
 The structural helper accepts only witnesses whose independently supplied

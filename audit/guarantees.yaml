@@ -104,13 +104,13 @@
     },
     {
       "id": "P-SSZ-1",
-      "catalogue_wording": "Pinned-source correspondence proves only the deposit-data-root control-flow shape and its structural witness binding; SHA-256, precompile, EVM, and production provenance remain open.",
+      "catalogue_wording": "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
       "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
       "theorem_planes": ["model", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
       "next_gate": "Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression", "expected": "successful pinned-source deposit-data-root control-flow correspondence and structural witness regressions; no SHA-256/precompile/EVM/crypto/E2E correspondence"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression", "expected": "successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence"}
     }
   ]
 }

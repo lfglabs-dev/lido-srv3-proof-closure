@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Ssz
+import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 
 namespace LidoSRv3.Tests.SszRegression
 
@@ -82,5 +83,21 @@ example : bindOperation .clProofVerifier mix witness expectedRoot = false := by 
 
 /-- Regression: changing the witness tag alone cannot move it to another wrapper slot. -/
 example : bindOperation .clProofVerifier mix relabelledWitness expectedRoot = false := by decide
+
+open LidoSRv3.Audit.Source.DepositDataRootCorrespondence
+
+def depositInput : SourceDepositDataRootInput := {
+  withdrawalCredentials := [1, 2], publicKey := [3, 4], signature := List.replicate 96 9,
+  amountGwei := 32_000_000_000 }
+
+/-- Negative regression: the deposit-data-root structural combiner is not constant. -/
+example : sourceCombine depositInput 7 11 = 1810 := by decide
+
+/-- Negative regression: replacing the computed-root branch with a wrong root is rejected. -/
+example : traverseBranch (sourceCombine depositInput)
+    (validatorRoot (sourceCombine depositInput) (sourceWitness depositInput).validator)
+    (sourceWitness depositInput).path [sourceNode depositInput + 1] ≠ sourceNode depositInput := by
+  simp [sourceWitness, structuralWitness, sourceCombine, structuralCombine,
+    traverseBranch, validatorRoot]
 
 end LidoSRv3.Tests.SszRegression

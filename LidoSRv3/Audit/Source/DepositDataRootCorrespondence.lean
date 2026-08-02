@@ -6,7 +6,7 @@ import LidoSRv3.Audit.Ssz
 This is a control-flow correspondence for
 `BeaconChainDepositor.sol` at
 `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, functions
-`_computeDepositDataRootWithAmount` (lines 120--135),
+`_computeDepositDataRootWithAmount` (lines 110--135),
 `_computeSignatureRoot` (lines 137--146), and `_toLittleEndian64`
 (lines 148--153).  `sha256` is deliberately an opaque source-shape operation:
 this module establishes neither SHA-256 correctness, precompile behavior, SSZ
@@ -21,7 +21,12 @@ open LidoSRv3.Audit
 
 abbrev Bytes := List Nat
 
-/-- Pinned declarations used by the three source functions. -/
+/--
+Source constants and source-shaped byte-layout literals.  `pubkeyLength` and
+`signatureLength` are pinned declarations; digest, withdrawal, and aggregate
+deposit lengths are documented source-layout assumptions pinned to the hash
+chain span below, not Solidity constant declarations.
+-/
 structure SourceDepositDataRootConfig where
   sha256DigestLength : Nat
   pubkeyLength : Nat
@@ -39,19 +44,23 @@ def SIGNATURE_LENGTH (config : SourceDepositDataRootConfig) : Nat := config.sign
 def DEPOSIT_DATA_LENGTH (config : SourceDepositDataRootConfig) : Nat :=
   config.depositDataLength
 
-/-- The literal constants declared by the pinned source. -/
+/-- Pinned declarations plus documented source-layout literals. -/
 def pinnedConfig : SourceDepositDataRootConfig := ⟨32, 48, 32, 96, 184⟩
 
-/-- The four values read by `_computeDepositDataRootWithAmount`. -/
+/-- The raw values consumed by the public deposit-data-root overload. -/
 structure SourceDepositDataRootInput where
   withdrawalCredentials : Bytes
   publicKey : Bytes
-  signatureRoot : Bytes
+  signature : Bytes
   amountGwei : Nat
   deriving DecidableEq, Repr
 
-/-- Opaque stand-in for the source-level `sha256` call. -/
-def sha256 (input : Bytes) : Bytes := input
+/--
+The SHA-256/precompile boundary is intentionally opaque.  This declaration
+preserves the source hash-chain data flow without asserting a cryptographic or
+precompile implementation; that residual is recorded as `STRETCH_OPAQUE_FFI`.
+-/
+opaque sha256 : Bytes → Bytes
 
 /-- The byte selected by the source's `value >> (8 * i)` loop. -/
 def sourceByteAt (value index : Nat) : Nat := value / 256 ^ index % 256
@@ -67,8 +76,12 @@ def toLittleEndian64 (value : Nat) : Bytes :=
 /-- Source-shaped `_computeSignatureRoot` (lines 137--146). -/
 def computeSignatureRoot (signature : Bytes) : Bytes :=
   let sigPart1 := signature.take 64
-  let sigPart2 := signature.drop 64
+  let sigPart2 := (signature.drop 64).take 32
   sha256 (sha256 sigPart1 ++ sha256 (sigPart2 ++ List.replicate 32 0))
+
+/-- The source's public overload derives, rather than accepts, the signature root. -/
+def signatureRoot (input : SourceDepositDataRootInput) : Bytes :=
+  computeSignatureRoot input.signature
 
 /-- Source-shaped `_computeDepositDataRootWithAmount` (lines 120--135). -/
 def computeDepositDataRootWithAmount (input : SourceDepositDataRootInput) : Bytes :=
@@ -76,50 +89,59 @@ def computeDepositDataRootWithAmount (input : SourceDepositDataRootInput) : Byte
   let amountLE := toLittleEndian64 input.amountGwei
   sha256
     (sha256 (publicKeyRoot ++ input.withdrawalCredentials) ++
-      sha256 (amountLE ++ List.replicate 24 0 ++ input.signatureRoot))
+      sha256 (amountLE ++ List.replicate 24 0 ++ signatureRoot input))
 
 /-- The source root used as every abstract structural leaf for this binding. -/
 def sourceNode (input : SourceDepositDataRootInput) : Ssz.Node :=
   (computeDepositDataRootWithAmount input).length
 
-def structuralCombine (node : Ssz.Node) : Ssz.Node → Ssz.Node → Ssz.Node :=
-  fun _ _ => node
+/-! The structural combiner is deliberately nonconstant: a changed leaf or
+branch changes the reconstructed root.  It is a structural encoding, not a
+SHA-256 model. -/
+def structuralCombine : Ssz.Node → Ssz.Node → Ssz.Node :=
+  fun left right => left * 257 + right
 
-def sourceCombine (input : SourceDepositDataRootInput) : Ssz.Node → Ssz.Node → Ssz.Node :=
-  structuralCombine (sourceNode input)
+def sourceCombine (_input : SourceDepositDataRootInput) : Ssz.Node → Ssz.Node → Ssz.Node :=
+  structuralCombine
 
 /-- The pinned construction emitted into the existing structural witness model. -/
-def structuralWitness (node : Ssz.Node) : Ssz.ValidatorWitness :=
+def structuralWitness (root : Ssz.Node) : Ssz.ValidatorWitness :=
   { operation := .clValidatorVerifier
-    validator := ⟨node, node, node, node, node, node, node, node⟩
+    validator := ⟨0, 0, 0, 0, 0, 0, 0, 0⟩
     index := Ssz.operationIndex .clValidatorVerifier
     pivotBoundary := 2
     path := [.right]
-    branch := [0] }
+    branch := [root] }
 
 def sourceWitness (input : SourceDepositDataRootInput) : Ssz.ValidatorWitness :=
   structuralWitness (sourceNode input)
 
 /--
-With the exact pinned constants, the source-shaped deposit-data-root call emits
-the `validatorRoot`-shaped generalized-index witness consumed by the structural
-model.  This connects only presentation/control-flow shape to that model; it
-does not refine the opaque `sha256`, a precompile, EVM execution, or production
-validator provenance.
+With the exact pinned constants, the public source-shaped call derives a
+signature root from the raw signature and binds the resulting deposit-data-root
+node into a nonconstant structural witness.  This does not refine opaque
+`sha256`, a precompile, EVM execution, or production validator provenance.
 -/
 theorem source_pinned_config_discharges_deposit_data_root
-    (input : SourceDepositDataRootInput) :
+    (input : SourceDepositDataRootInput)
+    (hPublicKey : input.publicKey.length = PUBKEY_LENGTH pinnedConfig)
+    (hWithdrawalCredentials : input.withdrawalCredentials.length =
+      WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig)
+    (hSignature : input.signature.length = SIGNATURE_LENGTH pinnedConfig) :
     SHA256_DIGEST_LENGTH pinnedConfig = 32 ∧ PUBKEY_LENGTH pinnedConfig = 48 ∧
     WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig = 32 ∧ SIGNATURE_LENGTH pinnedConfig = 96 ∧
     DEPOSIT_DATA_LENGTH pinnedConfig = 184 ∧
+    signatureRoot input = computeSignatureRoot input.signature ∧
     Ssz.HasGeneralizedIndex (sourceWitness input).index
       (sourceWitness input).pivotBoundary (sourceWitness input).path ∧
     Ssz.traverseBranch (sourceCombine input)
       (Ssz.validatorRoot (sourceCombine input) (sourceWitness input).validator)
       (sourceWitness input).path (sourceWitness input).branch = sourceNode input := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, ?_, rfl⟩
+  refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, ?_, ?_⟩
   simp [sourceWitness, structuralWitness, Ssz.HasGeneralizedIndex, Ssz.operationIndex,
     Ssz.pivot, Ssz.indexFromPivotPath, Ssz.pathOffset]
   decide
+  simp [sourceWitness, structuralWitness, sourceCombine, structuralCombine,
+    Ssz.traverseBranch, Ssz.validatorRoot]
 
 end LidoSRv3.Audit.Source.DepositDataRootCorrespondence

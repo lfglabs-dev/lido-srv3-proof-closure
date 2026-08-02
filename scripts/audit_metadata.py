@@ -40,7 +40,7 @@ EXPECTED_WORDING = [
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
     "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
-    "Pinned-source correspondence proves only the deposit-data-root control-flow shape and its structural witness binding; SHA-256, precompile, EVM, and production provenance remain open.",
+    "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -98,7 +98,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression",
-     "expected": "successful pinned-source deposit-data-root control-flow correspondence and structural witness regressions; no SHA-256/precompile/EVM/crypto/E2E correspondence"},
+     "expected": "successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
@@ -165,7 +165,7 @@ EXPECTED_STATUSES = [
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -470,8 +470,13 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol", "_validatePubKeyWCProof", 150, 175),
         ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "addConsolidationRequests", 185, 223),
         ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeDepositDataRootWithAmount", 120, 135),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeDepositDataRootWithAmount raw signature overload", 110, 118),
         ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeSignatureRoot", 137, 146),
         ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_toLittleEndian64", 148, 153),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "PUBLIC_KEY_LENGTH", 21, 21),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "SIGNATURE_LENGTH", 22, 22),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "SHA256_DIGEST_LENGTH and zero padding literals", 126, 133),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "DEPOSIT_DATA_LENGTH ABI input shape", 120, 135),
     },
 }
 UNMAPPED_SOURCE_BLOCKERS = {

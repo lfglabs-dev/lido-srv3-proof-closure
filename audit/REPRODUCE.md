@@ -12,4 +12,4 @@
 - `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
 - `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
-- `P-SSZ-1`: `lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression` — successful pinned-source deposit-data-root control-flow correspondence and structural witness regressions; no SHA-256/precompile/EVM/crypto/E2E correspondence
+- `P-SSZ-1`: `lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression` — successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence
