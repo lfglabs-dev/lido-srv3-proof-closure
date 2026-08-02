@@ -32,14 +32,23 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 8 | `P-ADDRESS-1` | metadata-only; no Lean theorem claimed |
 | 9 | `P-TOPUP-2` | metadata-only; no Lean theorem claimed |
 | 10 | `P-CONSOLIDATION-1` | metadata-only; no Lean theorem claimed |
-| 11 | `P-SSZ-1` | `LidoSRv3.Audit.Ssz.structural_witness_binding_sound` (model); source plane OPEN for mapped helper/wrapper scope |
-| 12 | `P-SSZ-1.deposit-data-root` | `LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root` |
+| 11 | `P-SSZ-1` | `LidoSRv3.Audit.Ssz.structural_witness_binding_sound` (model); source plane OPEN for mapped helper/wrapper scope; carries the subordinate `P-SSZ-1.deposit-data-root` child claim noted below |
+
+`P-SSZ-1.deposit-data-root` is a subordinate child claim of row 11, not a
+twelfth public guarantee: it narrows part of P-SSZ-1's scope and is carried by
+`LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`.
+The public claim surface stays at the eleven numbered IDs above, matching the
+checked `AllGuarantees.all.length = 11` facade.
 
 Each guarantee carries per-plane status across the model, algorithm, source,
 transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2,
-P-DEPOSIT-1, P-TOPUP-1, and P-SSZ-1.deposit-data-root claim Lean-checked correspondence to their pinned
-Solidity spans;
-no guarantee currently claims correspondence to deployed bytecode, and several
+P-DEPOSIT-1, and P-TOPUP-1 claim Lean-checked correspondence to their pinned
+Solidity spans. `P-SSZ-1.deposit-data-root` does not: its registry row declares
+`theorem_planes: ["model"]` and `statuses.source: OPEN`, so it claims only a
+structural-witness MODEL-plane correspondence under the existing pinned-source
+assumptions, and its SOURCE-plane correspondence to the pinned Solidity remains
+open.
+No guarantee currently claims correspondence to deployed bytecode, and several
 are explicitly blocked on runtime provenance. Read the exact
 per-guarantee wording, status, assumptions, and next gate from
 `audit/guarantees.yaml` rather than from any prose summary, including this one.

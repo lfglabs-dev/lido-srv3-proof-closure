@@ -93,11 +93,20 @@ def depositInput : SourceDepositDataRootInput := {
 /-- Negative regression: the deposit-data-root structural combiner is not constant. -/
 example : sourceCombine depositInput 7 11 = 1810 := by decide
 
-/-- Negative regression: replacing the computed-root branch with a wrong root is rejected. -/
+/-- Negative regression: incrementing the leaf the witness branch actually carries
+changes the reconstructed root, so a mutated deposit-data-root cannot replay it. -/
 example : traverseBranch (sourceCombine depositInput)
     (validatorRoot (sourceCombine depositInput) (sourceWitness depositInput).validator)
-    (sourceWitness depositInput).path [sourceNode depositInput + 1] ≠ sourceNode depositInput := by
-  exact sourceWitness_rejects_incremented_branch depositInput (sourceNode depositInput)
+    (sourceWitness depositInput).path [sourceLeaf depositInput + 1] ≠ sourceNode depositInput := by
+  show structuralRoot (sourceAnchor depositInput) (sourceSignatureNode depositInput)
+      (sourceLeaf depositInput + 1) ≠ sourceNode depositInput
+  rw [structuralRoot_eq]
+  simp only [sourceNode]
+  generalize sourceAnchor depositInput = anchor
+  generalize sourceSignatureNode depositInput = signatureNode
+  generalize sourceLeaf depositInput = leaf
+  rw [← Nat.add_assoc]
+  exact Nat.succ_ne_self _
 
 /-! ### Digest-binding mutant regressions
 
