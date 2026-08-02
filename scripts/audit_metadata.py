@@ -276,10 +276,12 @@ EXPECTED_MANIFEST_LAYERS = {
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
-            "P-DEPOSIT-1 deposit conservation/rollback, "
-            "P-TOPUP-1 top-up conservation/rollback and P-SSZ-1 deposit-data-root "
-            "control-flow correspondence "
-            "are checked against pinned Solidity"
+            "P-DEPOSIT-1 deposit conservation/rollback and "
+            "P-TOPUP-1 top-up conservation/rollback "
+            "are checked against pinned Solidity; "
+            "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
+            "evidence over source-shaped inputs, and its SOURCE-plane "
+            "correspondence remains OPEN in audit/guarantees.yaml"
         ),
     },
 }

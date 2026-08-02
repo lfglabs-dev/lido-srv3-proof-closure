@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: c7282640f3f779beb49a3362b9074b390ab52437
+validated-tree: 2dc626ae735c63bad7573dce204a6bcd7840bb77
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -49,13 +49,14 @@ P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed t
   `signatureRoot_preimage_length`, `publicKeyRoot_preimage_length`,
   `publicKeyWithdrawal_preimage_length`, `amountSignature_preimage_length`,
   and `depositDataRoot_preimage_length`.
-- The structural leaf `sourceNode` now binds the deposit-data-root *digest
+- The structural leaf `sourceLeaf` now binds the deposit-data-root *digest
   value* through `digestNode`, the positional base-257 encoding of the digest
   bytes, instead of the digest length. `digestBytesFold_injective` and
   `digestNode_injective` prove that encoding injective on pinned-width byte
-  lists, and `sourceNode_injective` carries the consequence: two inputs sharing
-  a source node share the whole deposit-data-root digest, so a mutated root
-  cannot reuse the witness leaf. The constant pinned width is kept as the
+  lists, and `sourceLeaf_injective` carries the consequence at the leaf level:
+  two inputs sharing a witness leaf share the whole deposit-data-root digest,
+  so a mutated root cannot reuse the witness leaf. No injectivity is claimed
+  for the composite `sourceNode`. The constant pinned width is kept as the
   separate `sourceNodeWidth`, discharged by `sourceNodeWidth_pinned`.
 - `LidoSRv3.Tests.SszRegression` carries the corresponding mutant regressions.
   Replacing the value-bearing projection with the constant length projection
