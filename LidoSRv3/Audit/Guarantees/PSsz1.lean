@@ -1,9 +1,25 @@
 import LidoSRv3.Audit.Ssz
+import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PSsz1
 
-/-- Structural-only SSZ evidence; no full SSZ, crypto, EVM, or E2E claim. -/
+/--
+P-SSZ-1 guarantee facade.  Structural-only SSZ evidence.
+
+The single theorem exposed here is `structural_witness_binding_sound`.
+
+What this facade does **not** claim: full SSZ serialization or `hashTreeRoot`
+correctness, SHA-256 cryptographic correctness, deployed-precompile
+equivalence, Solidity or EVM execution semantics, transaction-level behavior,
+runtime/codehash provenance, and end-to-end validator provenance.
+
+The pinned-source deposit-data-root correspondence is deliberately **not**
+re-exported through this facade.  It is stated and proved next to the source
+shape it constrains, as
+`Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`,
+and it is reported from that module by `LidoSRv3.Audit.Trust`.
+-/
 def guarantee : Guarantee := ⟨.pSsz1, [.model]⟩
 
 /--

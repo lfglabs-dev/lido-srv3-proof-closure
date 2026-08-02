@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: a11ee6f25a22e89c358ff80b3dcc2bea24d4b698
+validated-tree: 6133dfbfc772f54f376bb9d0c30e7fa7a01fcd2f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -21,6 +21,75 @@ P-SSZ-1 structural gate receipt (committed tree):
 - `make test`: exit 0, including `LidoSRv3.Tests.SszRegression`.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+
+P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed tree):
+- Verified against `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+  `BeaconChainDepositor._computeDepositDataRootWithAmount` raw-signature
+  overload lines 110--118 and root overload lines 120--135,
+  `_computeSignatureRoot` lines 137--146, `_toLittleEndian64` lines 148--153,
+  `PUBLIC_KEY_LENGTH` line 21, and `SIGNATURE_LENGTH` line 22. The source-map
+  negative fixture rejects dropping the helper spans; source-layout literals
+  are pinned to the hash-chain span.
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `source_pinned_config_discharges_deposit_data_root` reports only Lean
+  foundations `propext` and `Quot.sound`.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0.
+- `python3 scripts/check_validation_receipt.py`: exit 0 after this receipt's
+  `validated-tree` field is bound to the final tracked tree.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- The opaque `sha256` boundary now returns `Sha256Digest`, a wrapper carrying
+  the pinned `bytes32` shape (`widthPinned` and `bytesBounded`) rather than an
+  unconstrained `Bytes`. The cryptographic contents stay unmodelled; what the
+  wrapper pins is only the ABI shape the Solidity source guarantees, and it is
+  what forces every nested `abi.encodePacked` preimage in
+  `_computeSignatureRoot` and `_computeDepositDataRootWithAmount` to the
+  source's 64-byte layout. Those widths are stated and proved as
+  `signaturePart1_length`, `signaturePart2_preimage_length`,
+  `signatureRoot_preimage_length`, `publicKeyRoot_preimage_length`,
+  `publicKeyWithdrawal_preimage_length`, `amountSignature_preimage_length`,
+  and `depositDataRoot_preimage_length`.
+- The structural leaf `sourceLeaf` now binds the deposit-data-root *digest
+  value* through `digestNode`, the positional base-257 encoding of the digest
+  bytes, instead of the digest length. `digestBytesFold_injective` and
+  `digestNode_injective` prove that encoding injective on pinned-width byte
+  lists, and `sourceLeaf_injective` carries the consequence at the leaf level:
+  two inputs sharing a witness leaf share the whole deposit-data-root digest,
+  so a mutated root cannot reuse the witness leaf. No injectivity is claimed
+  for the composite `sourceNode`. The constant pinned width is kept as the
+  separate `sourceNodeWidth`, discharged by `sourceNodeWidth_pinned`.
+- `LidoSRv3.Tests.SszRegression` carries the corresponding mutant regressions.
+  Replacing the value-bearing projection with the constant length projection
+  makes `digestNode (markedDigest 1) ≠ digestNode (markedDigest 2)` fail
+  (verified by mutation, with the injectivity lemma stubbed so the mutant still
+  elaborates), while the length projection cannot tell those two pinned-width
+  digests apart. Weakening the wrapper's `widthPinned` field to an
+  unconstrained result rejects `concatDigests_length`, the six preimage-width
+  lemmas, and the `digest.widthPinned` regression in the test module.
+- The public guarantee surface is narrowed, not widened:
+  `LidoSRv3/Audit/Guarantees/PSsz1.lean` now exposes exactly one theorem,
+  `structural_witness_binding_sound`, alongside `guarantee` and a docstring
+  recording what the facade does not claim. The multi-conjunct
+  `source_pinned_config_discharges_deposit_data_root` is no longer restated
+  through the facade; it is stated and proved once, in
+  `LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean`, next to the source
+  shape it constrains, with each conjunct annotated by the pinned source span it
+  discharges. The statement and the proof are unchanged and the theorem still
+  reports only Lean foundations `propext` and `Quot.sound`.
+  `LidoSRv3.Audit.Trust` and the
+  `verity/targets/audit-manifest.json` theorem ledger now name it at its
+  `Source.DepositDataRootCorrespondence` path instead of the removed
+  `Guarantees.PSsz1` alias. No status, catalogue wording, source-map span,
+  manifest pin, or toolchain revision was changed, and `audit/guarantees.yaml`
+  still carries the `P-SSZ-1.deposit-data-root` row, which already pointed at
+  the `Source.DepositDataRootCorrespondence` theorem.
+- Scope is raw-signature source-shaped control flow and a nonconstant structural
+  witness binding over a value-bearing, fixed-width digest; a wrong bound root
+  is rejected by `SszRegression`. SHA-256 correctness and precompile semantics
+  remain `STRETCH_OPAQUE_FFI`; EVM, canonical runtime provenance, and
+  end-to-end cryptographic provenance remain open under `A-SHA256-FFI`,
+  `A-RUNTIME-PROVENANCE`, and `A-MULTI-NODE-TRANSPORT`.
 
 P-DEPOSIT-1 pinned-source gate receipt (committed tree):
 - `lake build`: exit 0.

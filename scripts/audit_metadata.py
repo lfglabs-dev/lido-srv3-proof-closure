@@ -25,6 +25,7 @@ EXPECTED_IDS = [
     "P-CONSOLIDATION-1",
     "P-SSZ-1",
 ]
+SUBORDINATE_ID = "P-SSZ-1.deposit-data-root"
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -40,7 +41,8 @@ EXPECTED_WORDING = [
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
     "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
-    "Mock-derived helper evidence is non-production evidence.",
+    "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
+    "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -97,8 +99,10 @@ EXPECTED_REPRODUCTION = [
      "expected": "MISSING provenance remains explicit and fails semantic closure"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression",
-     "expected": "successful structural-only Lean model theorem and executable branch regressions; no full SSZ/crypto/EVM/E2E correspondence"},
+    {"command": "lake build LidoSRv3.Audit.Ssz",
+     "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"},
+    {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression",
+     "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
@@ -111,6 +115,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-YUL-INTERFACE"],
     ["A-RUNTIME-PROVENANCE"],
     ["A-SHA256-FFI"],
+    ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
 ]
 EXPECTED_NEXT_GATES = [
@@ -126,7 +131,8 @@ EXPECTED_NEXT_GATES = [
     "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
-    "Establish source correspondence, SHA-256/precompile semantics, and canonical production provenance before any Yul/EVM/crypto/E2E composition.",
+    "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
+    "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -164,8 +170,10 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "BLOCKED"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -179,6 +187,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     [],
     ["model"],
+    ["model"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded",
@@ -191,7 +200,8 @@ EXPECTED_THEOREMS = [
     None,
     None,
     None,
-    "LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound",
+    "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
+    "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -222,7 +232,7 @@ CANONICAL_MATHLIB_COMMIT = "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
 CANONICAL_MATHLIB_INPUT_REV = "v4.31.0"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
-EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v2"
+EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v3"
 EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v2"
 EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
@@ -251,6 +261,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
+            "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
@@ -266,8 +277,11 @@ EXPECTED_MANIFEST_LAYERS = {
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback and "
-            "P-TOPUP-1 top-up conservation/rollback correspondence "
-            "are checked against pinned Solidity"
+            "P-TOPUP-1 top-up conservation/rollback "
+            "are checked against pinned Solidity; "
+            "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
+            "evidence over source-shaped inputs, and its SOURCE-plane "
+            "correspondence remains OPEN in audit/guarantees.yaml"
         ),
     },
 }
@@ -314,6 +328,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PSsz1.structural_witness_binding_sound", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
+    {"name": "Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
+     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_open", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_none_no_open", "status": "lean_checked",
@@ -465,6 +481,14 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/CLValidatorVerifier.sol", "_verifyValidator", 44, 57),
         ("contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol", "_validatePubKeyWCProof", 150, 175),
         ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "addConsolidationRequests", 185, 223),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeDepositDataRootWithAmount", 120, 135),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeDepositDataRootWithAmount raw signature overload", 110, 118),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_computeSignatureRoot", 137, 146),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "_toLittleEndian64", 148, 153),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "PUBLIC_KEY_LENGTH", 21, 21),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "SIGNATURE_LENGTH", 22, 22),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "SHA256_DIGEST_LENGTH and zero padding literals", 126, 133),
+        ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "DEPOSIT_DATA_LENGTH ABI input shape", 120, 135),
     },
 }
 UNMAPPED_SOURCE_BLOCKERS = {
@@ -662,7 +686,8 @@ def validate():
             "guarantee registry authority differs from the canonical declaration")
     rows = registry["guarantees"]
     ids = [row["id"] for row in rows]
-    require(ids == EXPECTED_IDS, "guarantees must contain the exact ordered minimal-11 IDs")
+    require(ids == EXPECTED_IDS + [SUBORDINATE_ID],
+            "guarantees must contain the exact ordered canonical IDs plus subordinate evidence")
     require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
             "catalogue wording changed")
     require(exclusions == EXPECTED_EXCLUSIONS,
@@ -689,6 +714,16 @@ def validate():
         rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
         EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
+        if row["id"] == "P-SSZ-1.deposit-data-root":
+            require(row.get("parent_id") == "P-SSZ-1",
+                    "P-SSZ-1.deposit-data-root must remain subordinate to P-SSZ-1")
+            require(row.get("source_plane_scope") == "deposit-data-root only",
+                    "P-SSZ-1.deposit-data-root: source plane scope must remain deposit-data-root only")
+        else:
+            require("parent_id" not in row,
+                    f"{row['id']}: only deposit-data-root may be subordinate evidence")
+            require("source_plane_scope" not in row,
+                    f"{row['id']}: source plane scope marker is reserved for the narrow deposit-data-root guarantee")
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
         theorem_planes = row.get("theorem_planes")
         require(theorem_planes == expected_theorem_planes,
@@ -709,7 +744,7 @@ def validate():
         require(row["statuses"] == expected_statuses,
                 f"{row['id']}: assurance statuses differ from canonical claims")
         source_status = row["statuses"]["source"]
-        mapping = source_targets[row["id"]]
+        mapping = source_targets["P-SSZ-1"] if row["id"] == "P-SSZ-1.deposit-data-root" else source_targets[row["id"]]
         require(
             source_status not in SOURCE_CLOSURE_STATUSES
             or (mapping["status"] == "MAPPED" and mapping["spans"]),
@@ -726,7 +761,7 @@ def validate():
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")
-    return rows
+    return rows[:len(EXPECTED_IDS)]
 
 
 def rendered(rows):
@@ -761,8 +796,12 @@ def rendered(rows):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=("generate", "check"))
+    parser.add_argument("--expect-canonical-count", type=int)
     args = parser.parse_args()
     rows = validate()
+    if args.expect_canonical_count is not None:
+        require(len(rows) == args.expect_canonical_count,
+                f"canonical guarantee count is {len(rows)}, expected {args.expect_canonical_count}")
     views = rendered(rows)
     if args.command == "generate":
         for name, content in views.items():
@@ -772,7 +811,7 @@ def main():
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content,
                     f"{name} is stale; run scripts/audit_metadata.py generate")
-        print("audit metadata ok: exact minimal-11, risks, pins, source-map, generated views")
+        print(f"audit metadata ok: {len(rows)} canonical guarantees, risks, pins, source-map, generated views")
 
 
 if __name__ == "__main__":
