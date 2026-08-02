@@ -100,4 +100,63 @@ example : traverseBranch (sourceCombine depositInput)
   simp [sourceWitness, structuralWitness, sourceCombine, structuralCombine,
     traverseBranch, validatorRoot]
 
+/-! ### Digest-binding mutant regressions
+
+These vectors fail under the two mutants the pinned wrapper and the
+value-bearing projection rule out: a constant length projection for the witness
+leaf, and an unconstrained-width hash-chain result. -/
+
+/-- A pinned-width digest whose leading byte carries the mutation. -/
+def markedDigest (b : Nat) (hb : b < 256) : Sha256Digest where
+  bytes := b :: List.replicate 31 0
+  widthPinned := by simp [SHA256_DIGEST_LENGTH, pinnedConfig]
+  bytesBounded := by
+    intro x hx
+    rcases List.mem_cons.mp hx with rfl | hx
+    · exact hb
+    · simp [List.eq_of_mem_replicate hx]
+
+/--
+Mutant regression (constant projection): the two digests are indistinguishable
+under the digest *length*, which is what `sourceNode` used to project.
+-/
+example : (markedDigest 1 (by decide)).bytes.length =
+    (markedDigest 2 (by decide)).bytes.length := by decide
+
+/--
+Mutant regression (constant projection): the value-bearing `digestNode` that
+`sourceNode` now uses separates exactly those two digests, so a mutated
+deposit-data-root can no longer reuse the witness leaf.
+-/
+example : digestNode (markedDigest 1 (by decide)) ≠ digestNode (markedDigest 2 (by decide)) := by
+  decide
+
+/-- Regression: the value-bearing projection is injective on pinned digests. -/
+example (left right : Sha256Digest) (h : digestNode left = digestNode right) :
+    left.bytes = right.bytes := digestNode_injective left right h
+
+/-- The unconstrained-width hash-chain result that the pinned wrapper rules out. -/
+def unconstrainedSha256 (_ : Bytes) : Bytes := List.replicate 20 0
+
+/--
+Mutant regression (unconstrained width): an opaque `Bytes → Bytes` result lets
+the source's `abi.encodePacked(bytes32, bytes32)` preimage take a layout that is
+not the pinned 64-byte one.
+-/
+example : (unconstrainedSha256 [] ++ unconstrainedSha256 []).length ≠
+    2 * SHA256_DIGEST_LENGTH pinnedConfig := by decide
+
+/-- Mutant regression (unconstrained width): every digest carries the pinned width. -/
+example (digest : Sha256Digest) :
+    digest.bytes.length = SHA256_DIGEST_LENGTH pinnedConfig := digest.widthPinned
+
+/-- With the pinned wrapper the same preimage is forced to the source layout. -/
+example (left right : Sha256Digest) :
+    (concatDigests left right).length = 2 * SHA256_DIGEST_LENGTH pinnedConfig :=
+  concatDigests_length left right
+
+/-- Regression: the pinned constant width stays a separate computation from the leaf. -/
+example : sourceNodeWidth depositInput = SHA256_DIGEST_LENGTH pinnedConfig :=
+  sourceNodeWidth_pinned depositInput
+
 end LidoSRv3.Tests.SszRegression
