@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 60be05118a8617abdfbc3e418a6d7a9092c01921
+validated-tree: 1363970be412c1129af7201751b8a622f5f1147b
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -38,12 +38,44 @@ P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed t
 - `python3 scripts/check_validation_receipt.py`: exit 0 after this receipt's
   `validated-tree` field is bound to the final tracked tree.
 - `bash scripts/check_no_python_evidence.sh`: exit 0.
+- The opaque `sha256` boundary now returns `Sha256Digest`, a wrapper carrying
+  the pinned `bytes32` shape (`widthPinned` and `bytesBounded`) rather than an
+  unconstrained `Bytes`. The cryptographic contents stay unmodelled; what the
+  wrapper pins is only the ABI shape the Solidity source guarantees, and it is
+  what forces every nested `abi.encodePacked` preimage in
+  `_computeSignatureRoot` and `_computeDepositDataRootWithAmount` to the
+  source's 64-byte layout. Those widths are stated and proved as
+  `signaturePart1_length`, `signaturePart2_preimage_length`,
+  `signatureRoot_preimage_length`, `publicKeyRoot_preimage_length`,
+  `publicKeyWithdrawal_preimage_length`, `amountSignature_preimage_length`,
+  and `depositDataRoot_preimage_length`.
+- The structural leaf `sourceNode` now binds the deposit-data-root *digest
+  value* through `digestNode`, the positional base-257 encoding of the digest
+  bytes, instead of the digest length. `digestBytesFold_injective` and
+  `digestNode_injective` prove that encoding injective on pinned-width byte
+  lists, and `sourceNode_injective` carries the consequence: two inputs sharing
+  a source node share the whole deposit-data-root digest, so a mutated root
+  cannot reuse the witness leaf. The constant pinned width is kept as the
+  separate `sourceNodeWidth`, discharged by `sourceNodeWidth_pinned`.
+- `LidoSRv3.Tests.SszRegression` carries the corresponding mutant regressions.
+  Replacing the value-bearing projection with the constant length projection
+  makes `digestNode (markedDigest 1) ≠ digestNode (markedDigest 2)` fail
+  (verified by mutation, with the injectivity lemma stubbed so the mutant still
+  elaborates), while the length projection cannot tell those two pinned-width
+  digests apart. Weakening the wrapper's `widthPinned` field to an
+  unconstrained result rejects `concatDigests_length`, the six preimage-width
+  lemmas, and the `digest.widthPinned` regression in the test module.
+- The public guarantee surface is unchanged: `LidoSRv3/Audit/Guarantees/PSsz1.lean`
+  is byte-identical to the previous tree, the theorem statement is the same, and
+  `source_pinned_config_discharges_deposit_data_root` still reports only
+  `propext`. No status, catalogue wording, source-map span, manifest pin, or
+  toolchain revision was changed.
 - Scope is raw-signature source-shaped control flow and a nonconstant structural
-  witness binding; a wrong bound root is rejected by `SszRegression`. SHA-256
-  correctness and precompile semantics remain `STRETCH_OPAQUE_FFI`; EVM,
-  canonical runtime provenance, and end-to-end cryptographic provenance remain
-  open under `A-SHA256-FFI`, `A-RUNTIME-PROVENANCE`, and
-  `A-MULTI-NODE-TRANSPORT`.
+  witness binding over a value-bearing, fixed-width digest; a wrong bound root
+  is rejected by `SszRegression`. SHA-256 correctness and precompile semantics
+  remain `STRETCH_OPAQUE_FFI`; EVM, canonical runtime provenance, and
+  end-to-end cryptographic provenance remain open under `A-SHA256-FFI`,
+  `A-RUNTIME-PROVENANCE`, and `A-MULTI-NODE-TRANSPORT`.
 
 P-DEPOSIT-1 pinned-source gate receipt (committed tree):
 - `lake build`: exit 0.
