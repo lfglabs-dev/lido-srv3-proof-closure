@@ -24,8 +24,8 @@ EXPECTED_IDS = [
     "P-TOPUP-2",
     "P-CONSOLIDATION-1",
     "P-SSZ-1",
-    "P-SSZ-1.deposit-data-root",
 ]
+SUBORDINATE_ID = "P-SSZ-1.deposit-data-root"
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -521,7 +521,7 @@ def validate_source_targets(source_map):
             "source-map pinned_source must end in a 40-character lowercase source SHA")
     targets = source_map.get("targets")
     require(isinstance(targets, list), "source-map targets must be a list")
-    require([target.get("id") for target in targets] == EXPECTED_IDS[:-1],
+    require([target.get("id") for target in targets] == EXPECTED_IDS,
             "source-map targets must contain the exact ordered minimal-11 IDs")
     for target in targets:
         target_id = target.get("id", "<missing>")
@@ -686,7 +686,8 @@ def validate():
             "guarantee registry authority differs from the canonical declaration")
     rows = registry["guarantees"]
     ids = [row["id"] for row in rows]
-    require(ids == EXPECTED_IDS, "guarantees must contain the exact ordered guarantee IDs")
+    require(ids == EXPECTED_IDS + [SUBORDINATE_ID],
+            "guarantees must contain the exact ordered canonical IDs plus subordinate evidence")
     require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
             "catalogue wording changed")
     require(exclusions == EXPECTED_EXCLUSIONS,
@@ -714,9 +715,13 @@ def validate():
         EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
         if row["id"] == "P-SSZ-1.deposit-data-root":
+            require(row.get("parent_id") == "P-SSZ-1",
+                    "P-SSZ-1.deposit-data-root must remain subordinate to P-SSZ-1")
             require(row.get("source_plane_scope") == "deposit-data-root only",
                     "P-SSZ-1.deposit-data-root: source plane scope must remain deposit-data-root only")
         else:
+            require("parent_id" not in row,
+                    f"{row['id']}: only deposit-data-root may be subordinate evidence")
             require("source_plane_scope" not in row,
                     f"{row['id']}: source plane scope marker is reserved for the narrow deposit-data-root guarantee")
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
@@ -756,7 +761,7 @@ def validate():
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")
-    return rows
+    return rows[:len(EXPECTED_IDS)]
 
 
 def rendered(rows):
@@ -791,8 +796,12 @@ def rendered(rows):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=("generate", "check"))
+    parser.add_argument("--expect-canonical-count", type=int)
     args = parser.parse_args()
     rows = validate()
+    if args.expect_canonical_count is not None:
+        require(len(rows) == args.expect_canonical_count,
+                f"canonical guarantee count is {len(rows)}, expected {args.expect_canonical_count}")
     views = rendered(rows)
     if args.command == "generate":
         for name, content in views.items():
@@ -802,7 +811,7 @@ def main():
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content,
                     f"{name} is stale; run scripts/audit_metadata.py generate")
-        print("audit metadata ok: exact minimal-11, risks, pins, source-map, generated views")
+        print(f"audit metadata ok: {len(rows)} canonical guarantees, risks, pins, source-map, generated views")
 
 
 if __name__ == "__main__":

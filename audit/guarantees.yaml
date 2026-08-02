@@ -114,6 +114,7 @@
     },
     {
       "id": "P-SSZ-1.deposit-data-root",
+      "parent_id": "P-SSZ-1",
       "catalogue_wording": "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; GIndex.concat, SSZ.verifyProof, and the three wrapper call sites remain excluded, while SHA-256/precompile, EVM, and production provenance are BLOCKED.",
       "source_plane_scope": "deposit-data-root only",
       "theorem": "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",

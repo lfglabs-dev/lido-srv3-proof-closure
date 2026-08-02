@@ -47,13 +47,21 @@ def DEPOSIT_DATA_LENGTH (config : SourceDepositDataRootConfig) : Nat :=
 /-- Pinned declarations plus documented source-layout literals. -/
 def pinnedConfig : SourceDepositDataRootConfig := ⟨32, 48, 32, 96, 184⟩
 
-/-- The raw values consumed by the public deposit-data-root overload. -/
+/--
+The raw values consumed by the public deposit-data-root overload.  Solidity
+`bytes` elements are octets and `amountGwei` is a `uint256`; carrying those
+range invariants here prevents this source-shaped model from admitting
+preimages that the pinned ABI cannot receive.
+-/
 structure SourceDepositDataRootInput where
   withdrawalCredentials : Bytes
   publicKey : Bytes
   signature : Bytes
   amountGwei : Nat
-  deriving DecidableEq, Repr
+  withdrawalCredentialsBounded : ∀ byte ∈ withdrawalCredentials, byte < 256
+  publicKeyBounded : ∀ byte ∈ publicKey, byte < 256
+  signatureBounded : ∀ byte ∈ signature, byte < 256
+  amountGweiBounded : amountGwei < 2 ^ 256
 
 /--
 A pinned-source SHA-256 result.  The cryptographic contents stay unmodelled;
@@ -418,6 +426,12 @@ theorem source_pinned_config_discharges_deposit_data_root
     -- Aggregate deposit-data width: the ABI input shape of
     -- `_computeDepositDataRootWithAmount`, lines 120--135.
     DEPOSIT_DATA_LENGTH pinnedConfig = 184 ∧
+    -- Solidity `bytes` inputs contain octets, not arbitrary natural numbers.
+    (∀ byte ∈ input.withdrawalCredentials, byte < 256) ∧
+    (∀ byte ∈ input.publicKey, byte < 256) ∧
+    (∀ byte ∈ input.signature, byte < 256) ∧
+    -- The amount parameter is Solidity `uint256` gwei.
+    input.amountGwei < 2 ^ 256 ∧
     -- The raw-signature overload (lines 110--118) *derives* the signature root
     -- through `_computeSignatureRoot` (lines 137--146) instead of accepting it.
     signatureRoot input = computeSignatureRoot input.signature ∧
@@ -431,7 +445,8 @@ theorem source_pinned_config_discharges_deposit_data_root
     Ssz.traverseBranch (sourceCombine input)
       (Ssz.validatorRoot (sourceCombine input) (sourceWitness input).validator)
       (sourceWitness input).path (sourceWitness input).branch = sourceNode input := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, ?_, ?_⟩
+  refine ⟨rfl, rfl, rfl, rfl, rfl, input.withdrawalCredentialsBounded,
+    input.publicKeyBounded, input.signatureBounded, input.amountGweiBounded, rfl, ?_, ?_⟩
   · simp [sourceWitness, structuralWitness, Ssz.HasGeneralizedIndex, Ssz.operationIndex,
       Ssz.pivot, Ssz.indexFromPivotPath, Ssz.pathOffset]
     decide

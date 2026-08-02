@@ -88,7 +88,15 @@ open LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 
 def depositInput : SourceDepositDataRootInput := {
   withdrawalCredentials := [1, 2], publicKey := [3, 4], signature := List.replicate 96 9,
-  amountGwei := 32_000_000_000 }
+  amountGwei := 32_000_000_000
+  withdrawalCredentialsBounded := by
+    intro byte h; simp at h; omega
+  publicKeyBounded := by
+    intro byte h; simp at h; omega
+  signatureBounded := by
+    intro byte h
+    simpa using (List.eq_of_mem_replicate h) ▸ (by decide : (9 : Nat) < 256)
+  amountGweiBounded := by decide }
 
 /-- Negative regression: the deposit-data-root structural combiner is not constant. -/
 example : sourceCombine depositInput 7 11 = 1810 := by decide
