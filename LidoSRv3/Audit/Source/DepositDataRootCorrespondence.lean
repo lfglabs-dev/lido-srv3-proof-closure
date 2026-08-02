@@ -227,13 +227,50 @@ theorem digestNode_injective (left right : Sha256Digest)
     (fun b hb => Nat.lt_trans (left.bytesBounded b hb) (by decide))
     (fun b hb => Nat.lt_trans (right.bytesBounded b hb) (by decide)) h
 
+/-! The structural combiner is deliberately nonconstant: a changed leaf or
+branch changes the reconstructed root.  It is a structural encoding, not a
+SHA-256 model. -/
+def structuralCombine : Ssz.Node → Ssz.Node → Ssz.Node :=
+  fun left right => left * 257 + right
+
+/-- Incrementing a branch cannot preserve a root with the same anchor. -/
+@[simp] theorem structuralCombine_rejects_incremented_branch (anchor leaf : Ssz.Node) :
+    structuralCombine anchor (structuralCombine anchor leaf + 1) ≠
+      structuralCombine anchor leaf := by
+  simp [structuralCombine]
+  omega
+
+/-- An incremented structural branch cannot equal its unanchored leaf. -/
+@[simp] theorem structuralCombine_incremented_leaf_ne (anchor leaf : Ssz.Node) :
+    structuralCombine anchor leaf + 1 ≠ leaf := by
+  intro h
+  change anchor * 257 + leaf + 1 = leaf at h
+  have hlt : leaf < anchor * 257 + leaf + 1 :=
+    Nat.lt_succ_of_le (Nat.le_add_left _ _)
+  exact (Nat.ne_of_gt hlt) h
+
+@[simp] theorem anchored_incremented_leaf_ne (anchor leaf : Ssz.Node) :
+    anchor * 257 + leaf + 1 ≠ leaf := by
+  intro h
+  have hlt : leaf < anchor * 257 + leaf + 1 :=
+    Nat.lt_succ_of_le (Nat.le_add_left _ _)
+  exact (Nat.ne_of_gt hlt) h
+
+/-- The value-bearing deposit-data-root leaf used by the structural witness. -/
+def sourceLeaf (input : SourceDepositDataRootInput) : Ssz.Node :=
+  digestNode (computeDepositDataRootWithAmount input)
+
+/-- A separately encoded public-key anchor for the structural witness. -/
+def sourceAnchor (input : SourceDepositDataRootInput) : Ssz.Node :=
+  digestBytesFold input.publicKey
+
 /--
-The source root used as every abstract structural leaf for this binding.  It
-binds the deposit-data-root *digest value*; the constant pinned width is kept
+The structural root combines the independently encoded public key with the
+value-bearing deposit-data-root leaf.  The constant pinned width is kept
 separately in `sourceNodeWidth` so that the two cannot be confused.
 -/
-def sourceNode (input : SourceDepositDataRootInput) : Ssz.Node :=
-  digestNode (computeDepositDataRootWithAmount input)
+@[simp] def sourceNode (input : SourceDepositDataRootInput) : Ssz.Node :=
+  structuralCombine (sourceAnchor input) (sourceLeaf input)
 
 /-- The constant-section computation, deliberately distinct from `sourceNode`. -/
 def sourceNodeWidth (input : SourceDepositDataRootInput) : Nat :=
@@ -245,20 +282,14 @@ theorem sourceNodeWidth_pinned (input : SourceDepositDataRootInput) :
 
 /--
 The leaf bound into the witness is value-bearing: two inputs sharing a source
-node share the whole deposit-data-root digest, so a mutation of the
+leaf share the whole deposit-data-root digest, so a mutation of the
 deposit-data-root contents cannot reuse the same structural witness.
 -/
-theorem sourceNode_injective (left right : SourceDepositDataRootInput)
-    (h : sourceNode left = sourceNode right) :
+theorem sourceLeaf_injective (left right : SourceDepositDataRootInput)
+    (h : sourceLeaf left = sourceLeaf right) :
     (computeDepositDataRootWithAmount left).bytes =
       (computeDepositDataRootWithAmount right).bytes :=
   digestNode_injective _ _ h
-
-/-! The structural combiner is deliberately nonconstant: a changed leaf or
-branch changes the reconstructed root.  It is a structural encoding, not a
-SHA-256 model. -/
-def structuralCombine : Ssz.Node → Ssz.Node → Ssz.Node :=
-  fun left right => left * 257 + right
 
 /-- The digest encoding is the same nonconstant combiner folded over the bytes. -/
 theorem digestBytesFold_cons (b : Nat) (bs : Bytes) :
@@ -269,16 +300,16 @@ def sourceCombine (_input : SourceDepositDataRootInput) : Ssz.Node → Ssz.Node 
   structuralCombine
 
 /-- The pinned construction emitted into the existing structural witness model. -/
-def structuralWitness (root : Ssz.Node) : Ssz.ValidatorWitness :=
+def structuralWitness (anchor leaf : Ssz.Node) : Ssz.ValidatorWitness :=
   { operation := .clValidatorVerifier
-    validator := ⟨0, 0, 0, 0, 0, 0, 0, 0⟩
+    validator := ⟨0, 0, 0, 0, 0, 0, 0, anchor⟩
     index := Ssz.operationIndex .clValidatorVerifier
     pivotBoundary := 2
     path := [.right]
-    branch := [root] }
+    branch := [leaf] }
 
 def sourceWitness (input : SourceDepositDataRootInput) : Ssz.ValidatorWitness :=
-  structuralWitness (sourceNode input)
+  structuralWitness (sourceAnchor input) (sourceLeaf input)
 
 /--
 With the exact pinned constants, the public source-shaped call derives a

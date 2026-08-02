@@ -114,14 +114,14 @@
     },
     {
       "id": "P-SSZ-1.deposit-data-root",
-      "catalogue_wording": "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; it excludes GIndex.concat, SSZ.verifyProof, and the three wrapper call sites.",
+      "catalogue_wording": "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; GIndex.concat, SSZ.verifyProof, and the three wrapper call sites remain excluded, while SHA-256/precompile, EVM, and production provenance are BLOCKED.",
       "source_plane_scope": "deposit-data-root only",
       "theorem": "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
-      "theorem_planes": ["model", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression", "expected": "successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence"}
+      "next_gate": "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression", "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"}
     }
   ]
 }

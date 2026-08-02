@@ -13,4 +13,4 @@
 - `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
 - `P-SSZ-1`: `lake build LidoSRv3.Audit.Ssz` — successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence
-- `P-SSZ-1.deposit-data-root`: `lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression` — successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence
+- `P-SSZ-1.deposit-data-root`: `lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression` — successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open

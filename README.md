@@ -32,7 +32,7 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 8 | `P-ADDRESS-1` | metadata-only; no Lean theorem claimed |
 | 9 | `P-TOPUP-2` | metadata-only; no Lean theorem claimed |
 | 10 | `P-CONSOLIDATION-1` | metadata-only; no Lean theorem claimed |
-| 11 | `P-SSZ-1` | metadata-only public index; source plane OPEN for mapped helper/wrapper scope |
+| 11 | `P-SSZ-1` | `LidoSRv3.Audit.Ssz.structural_witness_binding_sound` (model); source plane OPEN for mapped helper/wrapper scope |
 | 12 | `P-SSZ-1.deposit-data-root` | `LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root` |
 
 Each guarantee carries per-plane status across the model, algorithm, source,

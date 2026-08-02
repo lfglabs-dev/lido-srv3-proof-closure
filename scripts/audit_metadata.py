@@ -42,7 +42,7 @@ EXPECTED_WORDING = [
     "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
-    "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; it excludes GIndex.concat, SSZ.verifyProof, and the three wrapper call sites.",
+    "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; GIndex.concat, SSZ.verifyProof, and the three wrapper call sites remain excluded, while SHA-256/precompile, EVM, and production provenance are BLOCKED.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -102,7 +102,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Ssz",
      "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"},
     {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression",
-     "expected": "successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence"},
+     "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
@@ -132,7 +132,7 @@ EXPECTED_NEXT_GATES = [
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
-    "Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.",
+    "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -172,7 +172,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
 ]
 EXPECTED_THEOREM_PLANES = [
@@ -187,7 +187,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     [],
     ["model"],
-    ["model", "source"],
+    ["model"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded",
