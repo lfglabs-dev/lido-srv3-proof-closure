@@ -1,5 +1,5 @@
 {
-  "schema": "lido-srv3-minimal-11-guarantees-v2",
+  "schema": "lido-srv3-minimal-11-guarantees-v3",
   "authority": "Lean theorem statements and proofs are authoritative; this metadata does not close a semantic guarantee.",
   "guarantees": [
     {
@@ -104,13 +104,24 @@
     },
     {
       "id": "P-SSZ-1",
-      "catalogue_wording": "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
+      "catalogue_wording": "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
+      "theorem": "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+      "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
+      "next_gate": "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Ssz", "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"}
+    },
+    {
+      "id": "P-SSZ-1.deposit-data-root",
+      "catalogue_wording": "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; it excludes GIndex.concat, SSZ.verifyProof, and the three wrapper call sites.",
+      "source_plane_scope": "deposit-data-root only",
+      "theorem": "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
       "theorem_planes": ["model", "source"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
       "next_gate": "Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression", "expected": "successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression", "expected": "successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence"}
     }
   ]
 }

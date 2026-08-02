@@ -32,11 +32,12 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 8 | `P-ADDRESS-1` | metadata-only; no Lean theorem claimed |
 | 9 | `P-TOPUP-2` | metadata-only; no Lean theorem claimed |
 | 10 | `P-CONSOLIDATION-1` | metadata-only; no Lean theorem claimed |
-| 11 | `P-SSZ-1` | `LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound` |
+| 11 | `P-SSZ-1` | metadata-only public index; source plane OPEN for mapped helper/wrapper scope |
+| 12 | `P-SSZ-1.deposit-data-root` | `LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root` |
 
 Each guarantee carries per-plane status across the model, algorithm, source,
 transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2,
-P-DEPOSIT-1, and P-TOPUP-1 claim Lean-checked correspondence to their pinned
+P-DEPOSIT-1, P-TOPUP-1, and P-SSZ-1.deposit-data-root claim Lean-checked correspondence to their pinned
 Solidity spans;
 no guarantee currently claims correspondence to deployed bytecode, and several
 are explicitly blocked on runtime provenance. Read the exact

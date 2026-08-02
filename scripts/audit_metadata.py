@@ -24,6 +24,7 @@ EXPECTED_IDS = [
     "P-TOPUP-2",
     "P-CONSOLIDATION-1",
     "P-SSZ-1",
+    "P-SSZ-1.deposit-data-root",
 ]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
@@ -40,7 +41,8 @@ EXPECTED_WORDING = [
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
     "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
-    "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
+    "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
+    "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a nonconstant structural witness binding; it excludes GIndex.concat, SSZ.verifyProof, and the three wrapper call sites.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -97,7 +99,9 @@ EXPECTED_REPRODUCTION = [
      "expected": "MISSING provenance remains explicit and fails semantic closure"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Tests.SszRegression",
+    {"command": "lake build LidoSRv3.Audit.Ssz",
+     "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"},
+    {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression",
      "expected": "successful raw-signature deposit-data-root correspondence and nonconstant structural-binding regressions; SHA-256/precompile remains STRETCH_OPAQUE_FFI and no EVM/crypto/E2E correspondence"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
@@ -111,6 +115,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-YUL-INTERFACE"],
     ["A-RUNTIME-PROVENANCE"],
     ["A-SHA256-FFI"],
+    ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
 ]
 EXPECTED_NEXT_GATES = [
@@ -126,6 +131,7 @@ EXPECTED_NEXT_GATES = [
     "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
+    "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
     "Refine the pinned SHA-256 chain to precompile semantics and establish canonical production runtime provenance before any Yul/EVM/crypto/E2E composition.",
 ]
 EXPECTED_EXCLUSIONS = {
@@ -164,6 +170,8 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
 ]
@@ -178,6 +186,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     [],
     [],
+    ["model"],
     ["model", "source"],
 ]
 EXPECTED_THEOREMS = [
@@ -191,7 +200,8 @@ EXPECTED_THEOREMS = [
     None,
     None,
     None,
-    "LidoSRv3.Audit.Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
+    "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
+    "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -222,7 +232,7 @@ CANONICAL_MATHLIB_COMMIT = "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
 CANONICAL_MATHLIB_INPUT_REV = "v4.31.0"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
-EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v2"
+EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v3"
 EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v2"
 EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
@@ -509,7 +519,7 @@ def validate_source_targets(source_map):
             "source-map pinned_source must end in a 40-character lowercase source SHA")
     targets = source_map.get("targets")
     require(isinstance(targets, list), "source-map targets must be a list")
-    require([target.get("id") for target in targets] == EXPECTED_IDS,
+    require([target.get("id") for target in targets] == EXPECTED_IDS[:-1],
             "source-map targets must contain the exact ordered minimal-11 IDs")
     for target in targets:
         target_id = target.get("id", "<missing>")
@@ -674,7 +684,7 @@ def validate():
             "guarantee registry authority differs from the canonical declaration")
     rows = registry["guarantees"]
     ids = [row["id"] for row in rows]
-    require(ids == EXPECTED_IDS, "guarantees must contain the exact ordered minimal-11 IDs")
+    require(ids == EXPECTED_IDS, "guarantees must contain the exact ordered guarantee IDs")
     require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
             "catalogue wording changed")
     require(exclusions == EXPECTED_EXCLUSIONS,
@@ -701,6 +711,12 @@ def validate():
         rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
         EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
+        if row["id"] == "P-SSZ-1.deposit-data-root":
+            require(row.get("source_plane_scope") == "deposit-data-root only",
+                    "P-SSZ-1.deposit-data-root: source plane scope must remain deposit-data-root only")
+        else:
+            require("source_plane_scope" not in row,
+                    f"{row['id']}: source plane scope marker is reserved for the narrow deposit-data-root guarantee")
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
         theorem_planes = row.get("theorem_planes")
         require(theorem_planes == expected_theorem_planes,
@@ -721,7 +737,7 @@ def validate():
         require(row["statuses"] == expected_statuses,
                 f"{row['id']}: assurance statuses differ from canonical claims")
         source_status = row["statuses"]["source"]
-        mapping = source_targets[row["id"]]
+        mapping = source_targets["P-SSZ-1"] if row["id"] == "P-SSZ-1.deposit-data-root" else source_targets[row["id"]]
         require(
             source_status not in SOURCE_CLOSURE_STATUSES
             or (mapping["status"] == "MAPPED" and mapping["spans"]),
