@@ -42,7 +42,7 @@ EXPECTED_WORDING = [
     "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
-    "Pinned-source correspondence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; GIndex.concat, SSZ.verifyProof, and the three wrapper call sites remain excluded, while SHA-256/precompile, EVM, and production provenance are BLOCKED.",
+    "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
