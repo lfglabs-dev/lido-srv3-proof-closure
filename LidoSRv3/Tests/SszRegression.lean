@@ -97,8 +97,7 @@ example : sourceCombine depositInput 7 11 = 1810 := by decide
 example : traverseBranch (sourceCombine depositInput)
     (validatorRoot (sourceCombine depositInput) (sourceWitness depositInput).validator)
     (sourceWitness depositInput).path [sourceNode depositInput + 1] ≠ sourceNode depositInput := by
-  simp [sourceWitness, structuralWitness, sourceCombine, structuralCombine,
-    traverseBranch, validatorRoot]
+  exact sourceWitness_rejects_incremented_branch depositInput (sourceNode depositInput)
 
 /-! ### Digest-binding mutant regressions
 

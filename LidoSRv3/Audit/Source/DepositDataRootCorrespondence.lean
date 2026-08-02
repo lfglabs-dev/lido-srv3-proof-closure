@@ -265,12 +265,25 @@ def sourceAnchor (input : SourceDepositDataRootInput) : Ssz.Node :=
   digestBytesFold input.publicKey
 
 /--
-The structural root combines the independently encoded public key with the
-value-bearing deposit-data-root leaf.  The constant pinned width is kept
-separately in `sourceNodeWidth` so that the two cannot be confused.
+A separately encoded node for the *derived* signature root.  It is produced by
+`_computeSignatureRoot` over `input.signature`, a different source field from
+the one behind `sourceAnchor`, so the witness carries two independently sourced
+components in addition to its branch leaf.
+-/
+def sourceSignatureNode (input : SourceDepositDataRootInput) : Ssz.Node :=
+  digestNode (signatureRoot input)
+
+/--
+The expected structural root, written directly as the base-257 positional sum
+of the three value-bearing components (257 is the radix `structuralCombine` and
+`digestBytesFold` fold with).  It is deliberately *not* written through the
+witness's own combiner nesting, so `structuralRoot_eq` below has to reassociate
+the traversed tree instead of restating the witness's definition.  The constant
+pinned width is kept separately in `sourceNodeWidth` so the two cannot be
+confused.
 -/
 @[simp] def sourceNode (input : SourceDepositDataRootInput) : Ssz.Node :=
-  structuralCombine (sourceAnchor input) (sourceLeaf input)
+  sourceAnchor input * (257 * 257) + sourceSignatureNode input * 257 + sourceLeaf input
 
 /-- The constant-section computation, deliberately distinct from `sourceNode`. -/
 def sourceNodeWidth (input : SourceDepositDataRootInput) : Nat :=
@@ -299,17 +312,86 @@ theorem digestBytesFold_cons (b : Nat) (bs : Bytes) :
 def sourceCombine (_input : SourceDepositDataRootInput) : Ssz.Node → Ssz.Node → Ssz.Node :=
   structuralCombine
 
-/-- The pinned construction emitted into the existing structural witness model. -/
-def structuralWitness (anchor leaf : Ssz.Node) : Ssz.ValidatorWitness :=
+/--
+The pinned construction emitted into the existing structural witness model.
+The public-key anchor and the derived signature-root node enter through two
+distinct validator leaves; the value-bearing deposit-data-root leaf enters as
+the traversed branch sibling.  The three components therefore reach the root
+through three different structural positions rather than through the same pair
+the expected root is written from.
+-/
+def structuralWitness (anchor signatureNode leaf : Ssz.Node) : Ssz.ValidatorWitness :=
   { operation := .clValidatorVerifier
-    validator := ⟨0, 0, 0, 0, 0, 0, 0, anchor⟩
+    validator := ⟨0, 0, 0, 0, 0, 0, anchor, signatureNode⟩
     index := Ssz.operationIndex .clValidatorVerifier
     pivotBoundary := 2
     path := [.right]
     branch := [leaf] }
 
 def sourceWitness (input : SourceDepositDataRootInput) : Ssz.ValidatorWitness :=
-  structuralWitness (sourceAnchor input) (sourceLeaf input)
+  structuralWitness (sourceAnchor input) (sourceSignatureNode input) (sourceLeaf input)
+
+/-- The root a consumer reconstructs by traversing the witness built from the
+three supplied components. -/
+def structuralRoot (anchor signatureNode leaf : Ssz.Node) : Ssz.Node :=
+  Ssz.traverseBranch structuralCombine
+    (Ssz.validatorRoot structuralCombine (structuralWitness anchor signatureNode leaf).validator)
+    (structuralWitness anchor signatureNode leaf).path
+    (structuralWitness anchor signatureNode leaf).branch
+
+/--
+Closed form of the traversed witness tree: the container nesting collapses to a
+base-257 positional sum whose three coefficients are exactly the three supplied
+components.  Reaching it requires reassociating the tree, so it is not an
+identity between two spellings of the same construction.
+-/
+theorem structuralRoot_eq (anchor signatureNode leaf : Ssz.Node) :
+    structuralRoot anchor signatureNode leaf =
+      anchor * (257 * 257) + signatureNode * 257 + leaf := by
+  simp [structuralRoot, structuralWitness, structuralCombine, Ssz.traverseBranch,
+    Ssz.validatorRoot, Nat.add_mul, Nat.mul_assoc]
+
+/-- Negative binding: an incremented branch value cannot reconstruct the root
+it is offered against, whatever the two validator slots hold. -/
+@[simp] theorem structuralRoot_incremented_branch_ne (anchor signatureNode leaf : Ssz.Node) :
+    structuralRoot anchor signatureNode (leaf + 1) ≠ leaf := by
+  rw [structuralRoot_eq, ← Nat.add_assoc]
+  intro h
+  have hlt : leaf < anchor * (257 * 257) + signatureNode * 257 + leaf + 1 :=
+    Nat.lt_succ_of_le (Nat.le_add_left _ _)
+  exact (Nat.ne_of_gt hlt) h
+
+/-- The same rejection, stated over the emitted source witness. -/
+theorem sourceWitness_rejects_incremented_branch (input : SourceDepositDataRootInput)
+    (root : Ssz.Node) :
+    Ssz.traverseBranch (sourceCombine input)
+        (Ssz.validatorRoot (sourceCombine input) (sourceWitness input).validator)
+        (sourceWitness input).path [root + 1] ≠ root :=
+  structuralRoot_incremented_branch_ne (sourceAnchor input) (sourceSignatureNode input) root
+
+/--
+Independent binding.  Holding the other two witness slots at their source
+values, the reconstructed root pins each component on its own: a witness cannot
+be replayed with a mutated public-key anchor, a mutated derived signature root,
+or a mutated deposit-data-root leaf and still reconstruct `sourceNode`.  This is
+what makes the reconstruction below a binding rather than a restatement of the
+witness's own definition.
+-/
+theorem sourceNode_binds_components (input : SourceDepositDataRootInput)
+    (anchor signatureNode leaf : Ssz.Node) :
+    (structuralRoot anchor (sourceSignatureNode input) (sourceLeaf input) = sourceNode input →
+        anchor = sourceAnchor input) ∧
+      (structuralRoot (sourceAnchor input) signatureNode (sourceLeaf input) = sourceNode input →
+        signatureNode = sourceSignatureNode input) ∧
+      (structuralRoot (sourceAnchor input) (sourceSignatureNode input) leaf = sourceNode input →
+        leaf = sourceLeaf input) := by
+  refine ⟨fun h => ?_, fun h => ?_, fun h => ?_⟩ <;>
+    rw [structuralRoot_eq] at h <;> simp only [sourceNode] at h
+  · exact Nat.eq_of_mul_eq_mul_right (by decide)
+      (Nat.add_right_cancel (Nat.add_right_cancel h))
+  · exact Nat.eq_of_mul_eq_mul_right (by decide)
+      (Nat.add_left_cancel (Nat.add_right_cancel h))
+  · exact Nat.add_left_cancel h
 
 /--
 With the exact pinned constants, the public source-shaped call derives a
@@ -350,10 +432,12 @@ theorem source_pinned_config_discharges_deposit_data_root
       (Ssz.validatorRoot (sourceCombine input) (sourceWitness input).validator)
       (sourceWitness input).path (sourceWitness input).branch = sourceNode input := by
   refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, ?_, ?_⟩
-  simp [sourceWitness, structuralWitness, Ssz.HasGeneralizedIndex, Ssz.operationIndex,
-    Ssz.pivot, Ssz.indexFromPivotPath, Ssz.pathOffset]
-  decide
-  simp [sourceWitness, structuralWitness, sourceCombine, structuralCombine,
-    Ssz.traverseBranch, Ssz.validatorRoot]
+  · simp [sourceWitness, structuralWitness, Ssz.HasGeneralizedIndex, Ssz.operationIndex,
+      Ssz.pivot, Ssz.indexFromPivotPath, Ssz.pathOffset]
+    decide
+  · show structuralRoot (sourceAnchor input) (sourceSignatureNode input) (sourceLeaf input) =
+      sourceNode input
+    rw [structuralRoot_eq]
+    rfl
 
 end LidoSRv3.Audit.Source.DepositDataRootCorrespondence
