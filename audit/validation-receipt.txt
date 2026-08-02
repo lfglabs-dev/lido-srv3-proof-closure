@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 2dc626ae735c63bad7573dce204a6bcd7840bb77
+validated-tree: d4c935f4e5c73bfea416c407914be080ecc0bf39
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -32,7 +32,8 @@ P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed t
   are pinned to the hash-chain span.
 - `lake build`: exit 0.
 - `lake build LidoSRv3.Audit.Trust`: exit 0;
-  `source_pinned_config_discharges_deposit_data_root` reports only `propext`.
+  `source_pinned_config_discharges_deposit_data_root` reports only Lean
+  foundations `propext` and `Quot.sound`.
 - `python3 scripts/audit_metadata.py check`: exit 0.
 - `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0.
 - `python3 scripts/check_validation_receipt.py`: exit 0 after this receipt's
@@ -75,7 +76,8 @@ P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed t
   `LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean`, next to the source
   shape it constrains, with each conjunct annotated by the pinned source span it
   discharges. The statement and the proof are unchanged and the theorem still
-  reports only `propext`. `LidoSRv3.Audit.Trust` and the
+  reports only Lean foundations `propext` and `Quot.sound`.
+  `LidoSRv3.Audit.Trust` and the
   `verity/targets/audit-manifest.json` theorem ledger now name it at its
   `Source.DepositDataRootCorrespondence` path instead of the removed
   `Guarantees.PSsz1` alias. No status, catalogue wording, source-map span,

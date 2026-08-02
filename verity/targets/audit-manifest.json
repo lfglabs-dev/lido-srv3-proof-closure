@@ -153,7 +153,7 @@
     {
       "name": "Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": ["propext", "Quot.sound"]
     },
     {
       "name": "MinFirst.candidate_mem",

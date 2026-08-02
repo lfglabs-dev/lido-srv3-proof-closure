@@ -20,7 +20,7 @@ shape it constrains, as
 `Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`,
 and it is reported from that module by `LidoSRv3.Audit.Trust`.
 -/
-def guarantee : Guarantee := ⟨.pSsz1, [.model, .source]⟩
+def guarantee : Guarantee := ⟨.pSsz1, [.model]⟩
 
 /--
 The structural helper accepts only witnesses whose independently supplied
