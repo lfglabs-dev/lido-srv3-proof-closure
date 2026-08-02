@@ -292,12 +292,29 @@ theorem source_pinned_config_discharges_deposit_data_root
     (hWithdrawalCredentials : input.withdrawalCredentials.length =
       WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig)
     (hSignature : input.signature.length = SIGNATURE_LENGTH pinnedConfig) :
-    SHA256_DIGEST_LENGTH pinnedConfig = 32 ∧ PUBKEY_LENGTH pinnedConfig = 48 ∧
-    WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig = 32 ∧ SIGNATURE_LENGTH pinnedConfig = 96 ∧
+    -- Digest width: pinned to the hash-chain span, `BeaconChainDepositor.sol`
+    -- lines 126--133.
+    SHA256_DIGEST_LENGTH pinnedConfig = 32 ∧
+    -- Pubkey width: the `PUBLIC_KEY_LENGTH` declaration, line 21.
+    PUBKEY_LENGTH pinnedConfig = 48 ∧
+    -- Withdrawal-credentials width: source-layout literal on the same
+    -- hash-chain span, lines 126--133.
+    WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig = 32 ∧
+    -- Signature width: the `SIGNATURE_LENGTH` declaration, line 22.
+    SIGNATURE_LENGTH pinnedConfig = 96 ∧
+    -- Aggregate deposit-data width: the ABI input shape of
+    -- `_computeDepositDataRootWithAmount`, lines 120--135.
     DEPOSIT_DATA_LENGTH pinnedConfig = 184 ∧
+    -- The raw-signature overload (lines 110--118) *derives* the signature root
+    -- through `_computeSignatureRoot` (lines 137--146) instead of accepting it.
     signatureRoot input = computeSignatureRoot input.signature ∧
+    -- The witness path carries its claimed generalized-index meaning, the
+    -- property `SSZ.sol` `verifyProof` (lines 179--248) relies on.
     Ssz.HasGeneralizedIndex (sourceWitness input).index
       (sourceWitness input).pivotBoundary (sourceWitness input).path ∧
+    -- Branch traversal reconstructs the deposit-data-root node built by
+    -- `_computeDepositDataRootWithAmount` (lines 120--135), the reconstruction
+    -- `SSZ.sol` `verifyProof` (lines 179--248) performs.
     Ssz.traverseBranch (sourceCombine input)
       (Ssz.validatorRoot (sourceCombine input) (sourceWitness input).validator)
       (sourceWitness input).path (sourceWitness input).branch = sourceNode input := by

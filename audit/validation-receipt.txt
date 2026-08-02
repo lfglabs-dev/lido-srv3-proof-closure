@@ -65,11 +65,22 @@ P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed t
   digests apart. Weakening the wrapper's `widthPinned` field to an
   unconstrained result rejects `concatDigests_length`, the six preimage-width
   lemmas, and the `digest.widthPinned` regression in the test module.
-- The public guarantee surface is unchanged: `LidoSRv3/Audit/Guarantees/PSsz1.lean`
-  is byte-identical to the previous tree, the theorem statement is the same, and
-  `source_pinned_config_discharges_deposit_data_root` still reports only
-  `propext`. No status, catalogue wording, source-map span, manifest pin, or
-  toolchain revision was changed.
+- The public guarantee surface is narrowed, not widened:
+  `LidoSRv3/Audit/Guarantees/PSsz1.lean` now exposes exactly one theorem,
+  `structural_witness_binding_sound`, alongside `guarantee` and a docstring
+  recording what the facade does not claim. The multi-conjunct
+  `source_pinned_config_discharges_deposit_data_root` is no longer restated
+  through the facade; it is stated and proved once, in
+  `LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean`, next to the source
+  shape it constrains, with each conjunct annotated by the pinned source span it
+  discharges. The statement and the proof are unchanged and the theorem still
+  reports only `propext`. `LidoSRv3.Audit.Trust` and the
+  `verity/targets/audit-manifest.json` theorem ledger now name it at its
+  `Source.DepositDataRootCorrespondence` path instead of the removed
+  `Guarantees.PSsz1` alias. No status, catalogue wording, source-map span,
+  manifest pin, or toolchain revision was changed, and `audit/guarantees.yaml`
+  still carries the `P-SSZ-1.deposit-data-root` row, which already pointed at
+  the `Source.DepositDataRootCorrespondence` theorem.
 - Scope is raw-signature source-shaped control flow and a nonconstant structural
   witness binding over a value-bearing, fixed-width digest; a wrong bound root
   is rejected by `SszRegression`. SHA-256 correctness and precompile semantics

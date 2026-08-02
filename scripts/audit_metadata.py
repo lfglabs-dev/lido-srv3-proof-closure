@@ -326,7 +326,7 @@ EXPECTED_MANIFEST_THEOREMS = [
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PSsz1.structural_witness_binding_sound", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
-    {"name": "Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
+    {"name": "Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_open", "status": "lean_checked", "axioms": ["propext"]},

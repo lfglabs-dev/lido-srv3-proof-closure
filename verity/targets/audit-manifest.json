@@ -151,7 +151,7 @@
       "axioms": ["propext", "Quot.sound"]
     },
     {
-      "name": "Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root",
+      "name": "Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
       "status": "lean_checked",
       "axioms": ["propext"]
     },

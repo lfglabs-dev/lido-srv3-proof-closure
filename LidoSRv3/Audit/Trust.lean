@@ -36,7 +36,8 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
-#print axioms LidoSRv3.Audit.Guarantees.PSsz1.source_pinned_config_discharges_deposit_data_root
+#print axioms
+  LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
 #print axioms LidoSRv3.Audit.MinFirst.candidate_open
 #print axioms LidoSRv3.Audit.MinFirst.candidate_none_no_open
