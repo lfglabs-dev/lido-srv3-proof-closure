@@ -12,7 +12,6 @@
     "canonical_eip7251_runtime": {"status": "MISSING", "blocked": true, "value": null},
     "canonical_eip7251_codehash": {"status": "MISSING", "blocked": true, "value": null},
     "canonical_eip7251_fork": {"status": "MISSING", "blocked": true, "value": null},
-    "canonical_eip7251_address": {"status": "MISSING", "blocked": true, "value": null},
-    "sha256_ffi_implementation_identity": {"status": "MISSING", "blocked": true, "value": null}
+    "canonical_eip7251_address": {"status": "MISSING", "blocked": true, "value": null}
   }
 }

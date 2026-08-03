@@ -16,7 +16,7 @@
     {"id": "A-DEV-NOT-CERT", "accepted": true, "risk": "DEV-431-READY is explicitly accepted as not AUDIT-CERT."},
     {"id": "A-MULTI-NODE-TRANSPORT", "accepted": true, "risk": "Multi-node certification transport is accepted as a trust and reproducibility risk; transported results require independent identity and consistency checks."},
     {"id": "A-YUL-INTERFACE", "accepted": true, "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection."},
-    {"id": "A-SHA256-FFI", "accepted": true, "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk."},
+    {"id": "A-SHA256-CORRECTNESS", "accepted": true, "risk": "The pinned pure-Lean Sha256Engine is accepted as the SHA-256 reference function; kernel computation plus NIST/EVM differential vectors check implementation, but no universal FIPS-180-4 or deployed-precompile equivalence theorem is claimed."},
     {"id": "A-RUNTIME-PROVENANCE", "accepted": true, "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."}
   ]
 }

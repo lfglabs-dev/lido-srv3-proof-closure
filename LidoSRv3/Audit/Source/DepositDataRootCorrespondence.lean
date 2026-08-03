@@ -12,8 +12,8 @@ This is a control-flow correspondence for
 (lines 148--153).  `sha256` is deliberately an opaque source-shape operation:
 this module establishes neither SHA-256 correctness, precompile behavior, SSZ
 serialization, Solidity execution, nor validator provenance.  Those boundaries
-remain recorded by A-RUNTIME-PROVENANCE, A-SHA256-FFI, and
-A-MULTI-NODE-TRANSPORT.
+remain outside this theorem. SHA-256 functional correctness is accepted under
+A-SHA256-CORRECTNESS; A-MULTI-NODE-TRANSPORT records certification transport.
 -/
 
 namespace LidoSRv3.Audit.Source.DepositDataRootCorrespondence
@@ -104,8 +104,9 @@ instance : Inhabited Sha256Digest where
 /--
 The SHA-256/precompile boundary is intentionally opaque.  This declaration
 preserves the source hash-chain data flow, and now its pinned digest width,
-without asserting a cryptographic or precompile implementation; that residual is
-recorded as `STRETCH_OPAQUE_FFI`.
+without asserting cryptographic correctness or a precompile implementation; the
+functional SHA-256 contract is recorded as the accepted assumption
+`A-SHA256-CORRECTNESS`.
 -/
 opaque sha256 : Bytes → Sha256Digest
 

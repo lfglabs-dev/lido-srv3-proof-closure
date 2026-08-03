@@ -31,18 +31,18 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Pinned-source correspondence proves only the allocation-capacity computation; proportional allocation amounts and EVM equivalence remain open.",
-    "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
-    "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
-    "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
-    "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
+    "Pinned-source correspondence currently proves only the allocation-capacity computation; the canonical non-Legacy model, proportional amounts, and checked-Uint256 Verity execution remain open.",
+    "Pinned-source correspondence proves only the next-target selection rule; proportional amounts and checked-Uint256 Verity execution remain open.",
+    "Pinned-source correspondence proves branch-wise stake conservation and abstract rollback for the deposit push; TxObservation is not yet linked to pinned Verity execution.",
+    "Pinned-source correspondence proves branch-wise value conservation and abstract rollback for the beacon-chain top-up push; allocation extraction and Verity transaction refinement remain open.",
+    "The handwritten MinFirst model has no established pinned Solidity/Verity correspondence in M0.",
     "Verity 4.31 is a non-certified development scaffold.",
     "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
-    "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
-    "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
-    "SHA-256 precompile hashing currently relies on opaque native FFI.",
-    "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
-    "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
+    "Pinned inline Yul must use typed Verity low-level semantics or an explicit local assumption; no standalone bytecode proof is required for Solidity/Verity closure.",
+    "Production EIP-7251 runtime identity is outside Solidity/Verity closure; the pinned source interface remains available for explicit-assumption modeling.",
+    "SHA-256 functional correctness is an accepted audit assumption; the next obligation is to bind pinned request bytes and calls to Verity's pure-Lean Sha256Engine.",
+    "The mapped SSZ helper and wrappers have only MODEL-layer structural evidence; SHA-256 correctness is assumed, while exact byte construction and Verity call/transaction refinement remain open.",
+    "Source-shaped MODEL evidence derives the signature-root data flow from raw bytes; exact pinned memory layout, Sha256Engine binding, and Verity transaction refinement remain open under an accepted SHA-256 correctness assumption.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -72,8 +72,8 @@ EXPECTED_ASSUMPTIONS = {
          "risk": "Multi-node certification transport is accepted as a trust and reproducibility risk; transported results require independent identity and consistency checks."},
         {"id": "A-YUL-INTERFACE", "accepted": True,
          "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection."},
-        {"id": "A-SHA256-FFI", "accepted": True,
-         "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk."},
+        {"id": "A-SHA256-CORRECTNESS", "accepted": True,
+         "risk": "The pinned pure-Lean Sha256Engine is accepted as the SHA-256 reference function; kernel computation plus NIST/EVM differential vectors check implementation, but no universal FIPS-180-4 or deployed-precompile equivalence theorem is claimed."},
         {"id": "A-RUNTIME-PROVENANCE", "accepted": True,
          "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."},
     ],
@@ -84,9 +84,9 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
-     "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"},
+     "expected": "successful pinned-source deposit conservation/abstract-rollback build; Verity transaction refinement remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
-     "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"},
+     "expected": "successful pinned-source top-up conservation/abstract-rollback build; allocation extraction and Verity transaction refinement remain open"},
     {"command": "lake build LidoSRv3.Tests.MinFirstVectors",
      "expected": "successful theorem and falsifier-vector build"},
     {"command": "python3 scripts/audit_metadata.py check",
@@ -94,15 +94,15 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build",
      "expected": "active Lean 4.31 dependency graph builds; not certification"},
     {"command": "python3 scripts/audit_metadata.py check",
-     "expected": "pin and blocker validation only; no Yul theorem"},
+     "expected": "metadata consistency only; no Solidity/Verity address theorem"},
     {"command": "python3 scripts/audit_metadata.py check",
-     "expected": "MISSING provenance remains explicit and fails semantic closure"},
+     "expected": "metadata consistency only; production runtime provenance remains optional and incomplete"},
     {"command": "python3 scripts/audit_metadata.py check",
-     "expected": "opaque FFI risk remains recorded; no crypto closure"},
+     "expected": "accepted SHA-256 correctness assumption remains explicit; Solidity/Verity request construction remains open"},
     {"command": "lake build LidoSRv3.Audit.Ssz",
      "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"},
     {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression",
-     "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"},
+     "expected": "successful raw-signature structural/data-flow regressions only; exact byte construction and Verity transaction refinement remain open under accepted SHA-256 correctness"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
@@ -114,25 +114,23 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
     ["A-YUL-INTERFACE"],
     ["A-RUNTIME-PROVENANCE"],
-    ["A-SHA256-FFI"],
-    ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
-    ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
+    ["A-SHA256-CORRECTNESS"],
+    ["A-SHA256-CORRECTNESS", "A-MULTI-NODE-TRANSPORT"],
+    ["A-SHA256-CORRECTNESS", "A-MULTI-NODE-TRANSPORT"],
 ]
 EXPECTED_NEXT_GATES = [
-    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
-    "correspondence for SRLib._getModulesAllocationAndCapacity.",
-    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
-    "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
-    "Refine success/revert and rollback against pinned executable EVM semantics.",
-    "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
+    "Replace the Legacy model with a canonical Audit model, then refine proportional amounts and checked-Uint256 execution against pinned Verity source semantics.",
+    "Refine proportional amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate against pinned Verity source semantics.",
+    "Prove that pinned Verity deposit execution refines TxObservation on success, revert, committed effects, and rollback.",
+    "Prove allocation extraction from pinned Solidity and that pinned Verity top-up execution refines TxObservation on success, revert, effects, and rollback.",
     "Establish source correspondence and checked-Uint256 execution refinement.",
     "Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.",
     "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
-    "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
-    "Obtain independent canonical runtime, codehash, fork, and address provenance.",
-    "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
-    "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
-    "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
+    "Model the exact pinned Solidity and inline-Yul address derivation with typed Verity low-level semantics and source mutants.",
+    "Model pinned TopUpGateway and verifier execution in Verity with an explicit EIP-7251 external-interface assumption.",
+    "Model pinned consolidation request construction in Verity and bind every hashed byte string to the pinned pure-Lean Sha256Engine.",
+    "Refine GIndex.concat, SSZ.verifyProof, wrapper calls, exact byte construction, and SHA-256 calls against pinned Solidity/Verity semantics.",
+    "Bind exact signature/pubkey/withdrawal-credentials/amount byte layouts and each SHA-256 call to pinned Solidity/Verity semantics and Sha256Engine.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -166,14 +164,14 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "ASSUMED"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "ASSUMED"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "ASSUMED"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -204,6 +202,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
 ]
 STATUS_VALUES = {
+    "ASSUMED",
     "ABSTRACT_LEAN_CHECKED",
     "BLOCKED",
     "DEV-431-READY",
@@ -211,7 +210,6 @@ STATUS_VALUES = {
     "NOT_APPLICABLE",
     "OPEN",
     "REGRESSION",
-    "STRETCH_OPAQUE_FFI",
 }
 THEOREM_BACKED_STATUSES = {"ABSTRACT_LEAN_CHECKED", "LEAN_CHECKED", "REGRESSION"}
 SOURCE_CLOSURE_STATUSES = THEOREM_BACKED_STATUSES | {"AUDIT-CERT"}
@@ -242,7 +240,7 @@ REQUIRED_UNAVAILABLE = {
         "canonical_eip7251_codehash",
         "canonical_eip7251_fork",
         "canonical_eip7251_address",
-        "sha256_ffi_implementation_identity",
+
     )
 }
 EXPECTED_MANIFEST_LAYERS = {
@@ -398,7 +396,7 @@ EXPECTED_SOURCE_SCOPE = {
 EXPECTED_ACCEPTED_RISKS = {
     "baseline": "DEV-431-READY_NOT_AUDIT-CERT",
     "two_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
-    "sha256_ffi": "OPAQUE",
+    "sha256_correctness": "ASSUMED_PINNED_PURE_LEAN_ENGINE",
     "production_runtime_codehash_fork_address_provenance": "INCOMPLETE",
 }
 EXPECTED_SSZ_CLAIM = {

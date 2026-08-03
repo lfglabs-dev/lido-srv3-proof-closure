@@ -4,12 +4,12 @@
 
 - `P-ALLOC-1`: `lake build LidoSRv3.Audit.Guarantees.PAlloc1` — successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open
 - `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2` — successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open
-- `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Guarantees.PDeposit1` — successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
-- `P-TOPUP-1`: `lake build LidoSRv3.Audit.Guarantees.PTopup1` — successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open
+- `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Guarantees.PDeposit1` — successful pinned-source deposit conservation/abstract-rollback build; Verity transaction refinement remains open
+- `P-TOPUP-1`: `lake build LidoSRv3.Audit.Guarantees.PTopup1` — successful pinned-source top-up conservation/abstract-rollback build; allocation extraction and Verity transaction refinement remain open
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Tests.MinFirstVectors` — successful theorem and falsifier-vector build
 - `P-RESERVE-1`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem
 - `P-ETH-1`: `lake build` — active Lean 4.31 dependency graph builds; not certification
-- `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
-- `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
-- `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
+- `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no Solidity/Verity address theorem
+- `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — metadata consistency only; production runtime provenance remains optional and incomplete
+- `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — accepted SHA-256 correctness assumption remains explicit; Solidity/Verity request construction remains open
 - `P-SSZ-1`: `lake build LidoSRv3.Audit.Ssz` — successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence

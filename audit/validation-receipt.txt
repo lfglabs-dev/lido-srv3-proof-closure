@@ -86,10 +86,10 @@ P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed t
   the `Source.DepositDataRootCorrespondence` theorem.
 - Scope is raw-signature source-shaped control flow and a nonconstant structural
   witness binding over a value-bearing, fixed-width digest; a wrong bound root
-  is rejected by `SszRegression`. SHA-256 correctness and precompile semantics
-  remain `STRETCH_OPAQUE_FFI`; EVM, canonical runtime provenance, and
-  end-to-end cryptographic provenance remain open under `A-SHA256-FFI`,
-  `A-RUNTIME-PROVENANCE`, and `A-MULTI-NODE-TRANSPORT`.
+  is rejected by `SszRegression`. SHA-256 functional correctness is accepted
+  under `A-SHA256-CORRECTNESS`; exact byte construction and binding to Verity's
+  pinned pure-Lean `Sha256Engine` remain open. EVM/runtime/deployment equivalence
+  is optional and not part of the Solidity/Verity closure gate.
 
 P-DEPOSIT-1 pinned-source gate receipt (committed tree):
 - `lake build`: exit 0.

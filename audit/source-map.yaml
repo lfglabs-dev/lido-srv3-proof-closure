@@ -11,7 +11,7 @@
   "accepted_risks": {
     "baseline": "DEV-431-READY_NOT_AUDIT-CERT",
     "two_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
-    "sha256_ffi": "OPAQUE",
+    "sha256_correctness": "ASSUMED_PINNED_PURE_LEAN_ENGINE",
     "production_runtime_codehash_fork_address_provenance": "INCOMPLETE"
   },
   "ssz_claim": {

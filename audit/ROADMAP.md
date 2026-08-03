@@ -2,14 +2,14 @@
 
 # ROADMAP
 
-- `P-ALLOC-1`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for SRLib._getModulesAllocationAndCapacity.
-- `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
-- `P-DEPOSIT-1`: Refine success/revert and rollback against pinned executable EVM semantics.
-- `P-TOPUP-1`: Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.
+- `P-ALLOC-1`: Replace the Legacy model with a canonical Audit model, then refine proportional amounts and checked-Uint256 execution against pinned Verity source semantics.
+- `P-ALLOC-2`: Refine proportional amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate against pinned Verity source semantics.
+- `P-DEPOSIT-1`: Prove that pinned Verity deposit execution refines TxObservation on success, revert, committed effects, and rollback.
+- `P-TOPUP-1`: Prove allocation extraction from pinned Solidity and that pinned Verity top-up execution refines TxObservation on success, revert, effects, and rollback.
 - `P-ACCOUNT-1`: Establish source correspondence and checked-Uint256 execution refinement.
 - `P-RESERVE-1`: Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.
 - `P-ETH-1`: Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.
-- `P-ADDRESS-1`: Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.
-- `P-TOPUP-2`: Obtain independent canonical runtime, codehash, fork, and address provenance.
-- `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
-- `P-SSZ-1`: Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.
+- `P-ADDRESS-1`: Model the exact pinned Solidity and inline-Yul address derivation with typed Verity low-level semantics and source mutants.
+- `P-TOPUP-2`: Model pinned TopUpGateway and verifier execution in Verity with an explicit EIP-7251 external-interface assumption.
+- `P-CONSOLIDATION-1`: Model pinned consolidation request construction in Verity and bind every hashed byte string to the pinned pure-Lean Sha256Engine.
+- `P-SSZ-1`: Refine GIndex.concat, SSZ.verifyProof, wrapper calls, exact byte construction, and SHA-256 calls against pinned Solidity/Verity semantics.
