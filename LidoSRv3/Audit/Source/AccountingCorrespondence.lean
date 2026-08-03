@@ -25,11 +25,11 @@ explicit transaction preconditions, not silently proved here.  Authorization
 for the router write is also an input observation because it is storage owned
 by `AccessControlEnumerable`.
 
-No pinned Verity EDSL contract or Solidity-to-Verity executable translation of
-this call chain exists in this repository. Consequently this file proves only
-MODEL -> SOURCE correspondence. Transaction, Yul, EVM, runtime-bytecode, and
-end-to-end report execution remain open; using Verity's `Uint256` and `safeAdd`
-does not itself cross a Verity transaction boundary.
+The transaction plane below is an executable `Verity.Contract` at the pinned
+Verity revision.  `Contract.run` supplies Verity's rollback semantics, and the
+observation projects the committed accounting storage.  This is deliberately
+not a claim that the pinned Solidity was translated or compiled: Yul, EVM,
+runtime-bytecode, crypto, and end-to-end report execution remain open.
 -/
 
 namespace LidoSRv3.Audit.SolidityAccounting
@@ -129,5 +129,117 @@ theorem source_refines_model
     (h : sourceRun before input = .committed after) :
     abstractTransaction before input.report = some after :=
   source_committed_matches_abstract before after input h
+
+/-! ## Pinned Verity transaction execution
+
+The three storage channels are an explicit abstraction boundary: slot-array 0
+is the registered module order, slot-array 1 is the per-module balance array,
+and scalar slot 2 is the router aggregate.  Other AccountingOracle and router
+storage is represented by the two checked input observations above.
+-/
+
+def encodeState (state : AccountingState) : Verity.ContractState :=
+  { Verity.defaultState with
+    storage := fun slot => if slot = 2 then state.routerBalanceGwei else 0
+    storageArray := fun slot =>
+      if slot = 0 then state.moduleIds
+      else if slot = 1 then state.moduleBalancesGwei
+      else [] }
+
+def decodeState (world : Verity.ContractState) : AccountingState :=
+  ⟨world.storageArray 0, world.storageArray 1, world.storage 2⟩
+
+def commitState (world : Verity.ContractState) (state : AccountingState) : Verity.ContractState :=
+  { world with
+    storage := fun slot => if slot = 2 then state.routerBalanceGwei else world.storage slot
+    storageArray := fun slot =>
+      if slot = 0 then state.moduleIds
+      else if slot = 1 then state.moduleBalancesGwei
+      else world.storageArray slot }
+
+/-- Independent executable Verity presentation of the pinned guard/write
+sequence.  In particular it does not call `sourceRun`; equality with that
+source presentation is proved below. -/
+def verityAccountingTx (input : TxInput) : Verity.Contract Unit := fun world =>
+  let before := decodeState world
+  if !input.oraclePrefixSucceeded then .revert "oracle-prefix" world
+  else if input.report.moduleIds.length != before.moduleIds.length ||
+      input.report.balancesGwei.length != before.moduleIds.length then
+    .revert "arrays-length-mismatch" world
+  else if input.report.moduleIds != before.moduleIds then .revert "unexpected-module-id" world
+  else if !allAmountsValid input.report.balancesGwei then .revert "invalid-amount-gwei" world
+  else if input.report.moduleIds.isEmpty then .success () world
+  else if !input.callerAuthorized then .revert "unauthorized-router-write" world
+  else match checkedTotal input.report.balancesGwei with
+    | none => .revert "uint64-total-overflow" world
+    | some total => .success () (commitState world
+        ⟨before.moduleIds, input.report.balancesGwei, total⟩)
+
+structure VerityTxObservation where
+  outcome : TxResult
+  finalState : AccountingState
+  deriving DecidableEq, Repr
+
+def observeVerityTx (before : AccountingState) (input : TxInput) : VerityTxObservation :=
+  match (verityAccountingTx input).run (encodeState before) with
+  | .success _ world => ⟨.committed (decodeState world), decodeState world⟩
+  | .revert reason world =>
+      let typedReason :=
+        if reason = "oracle-prefix" then .oraclePrefix
+        else if reason = "arrays-length-mismatch" then .arraysLengthMismatch
+        else if reason = "unexpected-module-id" then .unexpectedModuleId
+        else if reason = "invalid-amount-gwei" then .invalidAmountGwei
+        else if reason = "unauthorized-router-write" then .unauthorized
+        else .totalBalanceOverflow
+      ⟨.reverted typedReason, decodeState world⟩
+
+@[simp] theorem decode_encode (state : AccountingState) :
+    decodeState (encodeState state) = state := by
+  simp [decodeState, encodeState]
+
+def verityResult (before : AccountingState) : TxResult → Verity.ContractResult Unit
+  | .reverted .oraclePrefix => .revert "oracle-prefix" (encodeState before)
+  | .reverted .arraysLengthMismatch => .revert "arrays-length-mismatch" (encodeState before)
+  | .reverted .unexpectedModuleId => .revert "unexpected-module-id" (encodeState before)
+  | .reverted .invalidAmountGwei => .revert "invalid-amount-gwei" (encodeState before)
+  | .reverted .unauthorized => .revert "unauthorized-router-write" (encodeState before)
+  | .reverted .totalBalanceOverflow => .revert "uint64-total-overflow" (encodeState before)
+  | .committed after => .success () (encodeState after)
+
+theorem verity_run_eq_source (before : AccountingState) (input : TxInput) :
+    (verityAccountingTx input).run (encodeState before) =
+      verityResult before (sourceRun before input) := by
+  simp only [verityAccountingTx, Contract.run, decode_encode]
+  unfold sourceRun
+  repeat' first | split
+  all_goals simp_all [verityResult, encodeState, commitState]
+
+/-- SOURCE -> VERITY_TX: actual pinned `Contract.run` execution produces the
+same result as the independently stated pinned-Solidity guard/write model. -/
+theorem verity_tx_simulates_source (before : AccountingState) (input : TxInput) :
+    (observeVerityTx before input).outcome = sourceRun before input := by
+  rw [observeVerityTx, verity_run_eq_source]
+  cases h : sourceRun before input with
+  | reverted reason => cases reason <;> simp [verityResult, decode_encode]
+  | committed after => simp [verityResult, decode_encode]
+
+theorem verity_tx_final_state (before : AccountingState) (input : TxInput) :
+    (observeVerityTx before input).finalState =
+      match sourceRun before input with
+      | .reverted _ => before
+      | .committed after => after := by
+  rw [observeVerityTx, verity_run_eq_source]
+  cases h : sourceRun before input with
+  | reverted reason => cases reason <;> simp [verityResult, decode_encode]
+  | committed after => simp [verityResult, decode_encode]
+
+/-- MODEL -> SOURCE -> VERITY_TX: every committed pinned Verity observation is
+exactly an abstract accounting transaction result. -/
+theorem verity_tx_refines_model (before after : AccountingState) (input : TxInput)
+    (h : (observeVerityTx before input).outcome = .committed after) :
+    abstractTransaction before input.report = some after := by
+  apply source_refines_model before after input
+  rw [← verity_tx_simulates_source before input]
+  exact h
 
 end LidoSRv3.Audit.SolidityAccounting

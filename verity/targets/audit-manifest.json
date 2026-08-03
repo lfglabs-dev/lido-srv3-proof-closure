@@ -36,7 +36,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation/rollback, and P-ACCOUNT-1 checked validator-balance source correspondence are checked against pinned Solidity; P-ACCOUNT-1 transaction execution remains OPEN because no pinned Verity EDSL executable exists; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation/rollback, and P-ACCOUNT-1 checked validator-balance source correspondence and pinned Verity Contract.run transaction execution are checked; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
     }
   },
   "proof_policy": {
@@ -48,7 +48,7 @@
   },
   "theorems": [
     {
-      "name": "Guarantees.PAccount1.source_refines_model",
+      "name": "Guarantees.PAccount1.verity_tx_refines_model",
       "status": "lean_checked",
       "axioms": ["propext", "Classical.choice", "Quot.sound"]
     },
