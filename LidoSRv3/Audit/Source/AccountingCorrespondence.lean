@@ -4,8 +4,8 @@ import LidoSRv3.Audit.Arithmetic
 Pinned source correspondence for the report-before-reward path at
 `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
-The real external entry point is `AccountingOracle.submitReportData`, not a
-fabricated `Accounting.submitOracleReport`.  Its main-data helper writes the
+The real external entry point is `AccountingOracle.submitReportData`. Its
+main-data helper writes the
 module balance vector through StakingRouter before calling
 `Accounting.handleOracleReport`.  Accounting obtains the reward distribution
 from that router state and calls `reportRewardsMinted` only after fee shares are

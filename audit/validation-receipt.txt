@@ -20,8 +20,8 @@ P-ACCOUNT-1 faithful Verity transaction gate receipt (committed tree):
 - Pinned source was inspected at
   `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. The real
   external entry points are `AccountingOracle.submitReportData` and
-  `Accounting.handleOracleReport`; there is no invented
-  `Accounting.submitOracleReport` entry point.
+  `Accounting.handleOracleReport`; no alternate accounting entry point is
+  assumed.
 - `lake build LidoSRv3`: exit 0 (492 jobs). The trust report records only Lean
   foundations `propext` and `Quot.sound` for
   `PAccount1.source_report_before_reward` and `PAccount1.source_to_verityTx`.
