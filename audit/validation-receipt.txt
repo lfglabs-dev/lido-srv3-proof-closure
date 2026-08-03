@@ -7,6 +7,25 @@ Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
+P-ACCOUNT-1 pinned-source blocker receipt:
+- MODEL and pinned Solidity SOURCE are `LEAN_CHECKED`; transaction and EVM are
+  `OPEN`. No local handwritten `Contract.run` construction is evidence of a
+  Solidity-to-Verity transaction boundary.
+- The reproducible focused gate is
+  `lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors`;
+  the full gate is `lake build` and the metadata gates are
+  `python3 scripts/audit_metadata.py check`,
+  `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`,
+  `python3 scripts/check_validation_receipt.py`, and
+  `bash scripts/check_no_python_evidence.sh`.
+- The smallest missing primitive is a pinned Verity EDSL executable or an
+  independently verified Solidity-to-Verity executable translation for the
+  `AccountingOracle -> StakingRouter -> SRLib -> SRUtils` call chain, followed
+  by a proof that its transaction observations refine the checked source model.
+- Yul, EVM, runtime-bytecode, cryptographic, and end-to-end report-processing
+  provenance remain open; this receipt makes no faithful transaction-closure
+  claim.
+
 The canonical authorities are `audit/source-map.yaml`, the generated audit
 views, and the executable `verity/targets/audit-manifest.json` consumer. The
 legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
