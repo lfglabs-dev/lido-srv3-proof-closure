@@ -14,10 +14,12 @@ minted and distributed.  The source spans are registered in
 
 This module models exactly the accounting-relevant guards in the transitive
 router write: array lengths and module order, `MAX_VALUE_GWEI`, the uint64 cast,
-and the checked uint64 accumulation. External-call authorization and the
-truthfulness of oracle calldata remain interface assumptions.  Yul, EVM,
-runtime identity, cryptography, and end-to-end deployment composition are not
-claimed.
+and the checked uint64 accumulation.  Those partial guards do not establish
+that the rest of the pinned report avoids a later revert.  Trace construction
+therefore requires an independent `fullReportSucceeds` premise supplied by the
+caller.  External-call authorization, the truthfulness of oracle calldata, and
+that full-success premise remain interface assumptions.  Yul, EVM, runtime
+identity, cryptography, and end-to-end deployment composition are not claimed.
 -/
 
 namespace LidoSRv3.Audit.SolidityAccounting
@@ -72,10 +74,37 @@ def accept (i : ReportInput) : Option AcceptedReport := do
   let total ← checkedTotal64 i.balancesGwei
   pure ⟨i.reportedModuleIds, i.balancesGwei, total⟩
 
-def sourceTrace (i : ReportInput) : Option (List Step) := do
+/-- Successful source steps after the validated balance write.  The pinned
+`Accounting.sol:403-413` call is conditional on strictly positive fee shares. -/
+def successfulSteps (accepted : AcceptedReport) (sharesToMintAsFees : Nat) : List Step :=
+  [.balancesWritten accepted.balancesGwei, .accountingCalled,
+    .rewardsRead accepted.balancesGwei] ++
+  if 0 < sharesToMintAsFees then [.rewardsMinted] else []
+
+/-- Trace projection gated by independently established successful execution
+of the *full* pinned report.  `accept` deliberately proves only the earlier
+router validation and checked accumulation; it cannot manufacture this premise. -/
+def sourceTrace (fullReportSucceeds : ReportInput → Nat → Prop)
+    (i : ReportInput) (sharesToMintAsFees : Nat)
+    (_ : fullReportSucceeds i sharesToMintAsFees) : Option (List Step) := do
   let accepted ← accept i
-  pure [.balancesWritten accepted.balancesGwei, .accountingCalled,
-        .rewardsRead accepted.balancesGwei, .rewardsMinted]
+  pure (successfulSteps accepted sharesToMintAsFees)
+
+/-- Result supplied by an independent full-source executor or validator. -/
+inductive FullReportResult (successful : Prop) : Type
+  | reverted
+  | succeeded (evidence : successful)
+
+/-- Boundary adapter for a source executor/validator that may fail to provide
+the full-success evidence.  A later-reverted report has no trace. -/
+def sourceTraceFromResult (fullReportSucceeds : ReportInput → Nat → Prop)
+    (i : ReportInput) (sharesToMintAsFees : Nat)
+    (result : FullReportResult (fullReportSucceeds i sharesToMintAsFees)) :
+    Option (List Step) :=
+  match result with
+  | .reverted => none
+  | .succeeded evidence =>
+      sourceTrace fullReportSucceeds i sharesToMintAsFees evidence
 
 theorem checkedTotal256_refines_source (xs : List Nat) (n : Nat)
     (h : checkedTotal64 xs = some n) :
@@ -89,20 +118,28 @@ theorem checkedTotal256_refines_source (xs : List Nat) (n : Nat)
   simp [Verity.Core.Uint256.modulus] at hw ⊢
   exact (Nat.mod_eq_of_lt hw).symm
 
-theorem source_report_before_reward (i : ReportInput) (trace : List Step)
-    (h : sourceTrace i = some trace) :
+theorem source_report_before_reward
+    (fullReportSucceeds : ReportInput → Nat → Prop)
+    (i : ReportInput) (sharesToMintAsFees : Nat)
+    (hSuccess : fullReportSucceeds i sharesToMintAsFees)
+    (hFees : 0 < sharesToMintAsFees) (trace : List Step)
+    (h : sourceTrace fullReportSucceeds i sharesToMintAsFees hSuccess = some trace) :
     ∃ balances, trace = [.balancesWritten balances, .accountingCalled,
       .rewardsRead balances, .rewardsMinted] := by
-  simp [sourceTrace, Option.bind_eq_some_iff] at h
+  simp [sourceTrace, successfulSteps, hFees, Option.bind_eq_some_iff] at h
   rcases h with ⟨accepted, hAccepted, rfl⟩
   exact ⟨accepted.balancesGwei, rfl⟩
 
-/-- Critical SOURCE -> VERITY_TX refinement for every accepting report. -/
-theorem source_to_verityTx (i : ReportInput) (accepted : AcceptedReport)
-    (hAccept : accept i = some accepted) :
+/-- Critical SOURCE -> VERITY_TX refinement for every fully successful report
+whose earlier router validation and checked accumulation also accept. -/
+theorem source_to_verityTx
+    (fullReportSucceeds : ReportInput → Nat → Prop)
+    (i : ReportInput) (sharesToMintAsFees : Nat)
+    (hSuccess : fullReportSucceeds i sharesToMintAsFees)
+    (accepted : AcceptedReport) (hAccept : accept i = some accepted) :
     checkedTotal256 accepted.balancesGwei = some (Verity.Core.Uint256.ofNat accepted.totalBalanceGwei) ∧
-    sourceTrace i = some [.balancesWritten accepted.balancesGwei, .accountingCalled,
-      .rewardsRead accepted.balancesGwei, .rewardsMinted] := by
+    sourceTrace fullReportSucceeds i sharesToMintAsFees hSuccess =
+      some (successfulSteps accepted sharesToMintAsFees) := by
   simp [accept, Option.bind_eq_some_iff] at hAccept
   rcases hAccept with ⟨hValid, total, hTotal, rfl⟩
   constructor

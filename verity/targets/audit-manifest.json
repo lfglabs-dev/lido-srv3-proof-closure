@@ -36,7 +36,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation/rollback, and P-ACCOUNT-1 report-before-reward MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement are checked against pinned Solidity; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation/rollback, and P-ACCOUNT-1 full-success-gated and positive-fee-conditional MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is checked against pinned Solidity, while later guards remain an explicit interface premise; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
     }
   },
   "proof_policy": {

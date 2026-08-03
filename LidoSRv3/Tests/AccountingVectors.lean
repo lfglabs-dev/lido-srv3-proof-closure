@@ -22,8 +22,25 @@ example : accept ⟨[1], [1], [maxValueGwei + 1]⟩ = none := by native_decide
 example :
     checkedTotal64 (List.replicate 19 maxValueGwei) = none := by native_decide
 
-example : sourceTrace valid = some [
+private def fullReportSucceeds (_ : ReportInput) (_ : Nat) : Prop := True
+
+example : sourceTrace fullReportSucceeds valid 1 trivial = some [
     .balancesWritten [10, 20], .accountingCalled,
     .rewardsRead [10, 20], .rewardsMinted] := by native_decide
+
+/-- Regression: a full successful report with zero fee shares does not call
+`reportRewardsMinted` at pinned Accounting.sol:403-413. -/
+example : sourceTrace fullReportSucceeds valid 0 trivial = some [
+    .balancesWritten [10, 20], .accountingCalled,
+    .rewardsRead [10, 20]] := by native_decide
+
+/-- Mutant: the early router guards can accept even though an independent full
+source execution rejects later; absent success evidence, no trace is projected. -/
+private def rejectedLater (_ : ReportInput) (_ : Nat) : Prop := False
+
+example : accept valid = some ⟨[1, 2], [10, 20], 30⟩ := by native_decide
+
+example : sourceTraceFromResult rejectedLater valid 1 .reverted = none := by
+  rfl
 
 end LidoSRv3.Tests.AccountingVectors

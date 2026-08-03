@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 4d7d152551fffed0d43e9b5c73bed6eef4532f05
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: ccc52f5d9afbbd3f267997e131b7757442dd3634
+validated-tree: c59a3b46086b3467cd5ea4eb1c0099d971c77483
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -22,11 +22,23 @@ P-ACCOUNT-1 faithful Verity transaction gate receipt (committed tree):
   external entry points are `AccountingOracle.submitReportData` and
   `Accounting.handleOracleReport`; no alternate accounting entry point is
   assumed.
-- `lake build LidoSRv3`: exit 0 (492 jobs). The trust report records only Lean
-  foundations `propext` and `Quot.sound` for
-  `PAccount1.source_report_before_reward` and `PAccount1.source_to_verityTx`.
+- Trace construction now requires a caller-supplied proof that the full pinned
+  report succeeded. The earlier router checks prove only module order/length,
+  MAX_VALUE_GWEI, and checked Uint256/uint64 accumulation; they cannot fabricate
+  that premise or erase a later revert.
+- The `Accounting.sol:403-413` branch is modeled exactly: a successful report
+  emits `rewardsMinted` iff `sharesToMintAsFees > 0`; zero fee shares retain the
+  balance-write/read ordering without a mint step.
+- `lake build`: exit 0 (492 jobs). `lake build LidoSRv3.Audit.Trust`: exit 0
+  (474 jobs). The trust report records only Lean foundations `propext` and
+  `Quot.sound` for `PAccount1.source_report_before_reward` and
+  `PAccount1.source_to_verityTx`.
 - `LidoSRv3.Tests.AccountingVectors` rejects module-order, vector-length,
-  MAX_VALUE_GWEI, and checked uint64-total overflow mutants.
+  MAX_VALUE_GWEI, and checked uint64-total overflow mutants, and covers both a
+  later-rejected partially accepted report and a successful zero-fee report.
+- `python3 scripts/audit_metadata.py check`: exit 0. With a workspace-local
+  `TMPDIR`, `python3 scripts/test_audit_metadata.py`: exit 0. The host `/tmp`
+  tmpfs was full and was treated as infrastructure only.
 - The critical chain is MODEL -> SOURCE -> VERITY_TX. Yul, EVM, runtime,
   cryptography, and E2E are not claimed and remain OPEN or NOT_APPLICABLE in
   the canonical registry.

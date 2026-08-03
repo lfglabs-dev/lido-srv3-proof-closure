@@ -43,8 +43,11 @@ checked `AllGuarantees.all.length = 11` facade.
 Each guarantee carries per-plane status across the model, algorithm, source,
 transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2,
 P-DEPOSIT-1, P-TOPUP-1, and P-ACCOUNT-1 claim Lean-checked correspondence to
-their pinned Solidity spans; P-ACCOUNT-1 additionally closes the checked
-VERITY_TX plane, while Yul/EVM/runtime/crypto/E2E remain open or not applicable.
+their pinned Solidity spans. P-ACCOUNT-1 additionally closes the checked
+VERITY_TX plane under an explicit independently established full-report-success
+premise, and models `reportRewardsMinted` only for positive fee shares. Later
+report guards, Yul/EVM/runtime/crypto/E2E remain unmodeled, open, or not
+applicable.
 `P-SSZ-1.deposit-data-root` does not: its registry row declares
 `theorem_planes: ["model"]` and `statuses.source: OPEN`, so it claims only a
 structural-witness MODEL-plane correspondence under the existing pinned-source

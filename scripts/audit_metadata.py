@@ -35,7 +35,7 @@ EXPECTED_WORDING = [
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
-    "Pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and reports minted shares; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while Yul, EVM, runtime, crypto, and E2E remain open or not applicable.",
+    "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
     "Verity 4.31 is a non-certified development scaffold.",
     "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
@@ -87,8 +87,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
      "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1",
-     "expected": "successful MODEL-to-SOURCE-to-VERITY_TX report-before-reward correspondence and checked-Uint256 refinement build; Yul/EVM/runtime/crypto/E2E remain open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
+     "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "metadata consistency only; no source theorem"},
     {"command": "lake build",
@@ -280,8 +280,10 @@ EXPECTED_MANIFEST_LAYERS = {
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
             "P-TOPUP-1 top-up conservation/rollback, and "
-            "P-ACCOUNT-1 report-before-reward MODEL-to-SOURCE-to-VERITY_TX "
-            "checked-Uint256 refinement are checked against pinned Solidity; "
+            "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
+            "MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is "
+            "checked against pinned Solidity, while later guards remain an "
+            "explicit interface premise; "
             "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
             "evidence over source-shaped inputs, and its SOURCE-plane "
             "correspondence remains OPEN in audit/guarantees.yaml"

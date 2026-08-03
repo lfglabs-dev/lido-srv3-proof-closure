@@ -7,24 +7,37 @@ def guarantee : Guarantee := ⟨.pAccount1, [.model, .source, .verityTx]⟩
 
 /-- MODEL -> SOURCE: an accepted report has one balance snapshot for rewards. -/
 theorem source_report_before_reward
+    (fullReportSucceeds :
+      LidoSRv3.Audit.SolidityAccounting.ReportInput → Nat → Prop)
     (i : LidoSRv3.Audit.SolidityAccounting.ReportInput)
+    (sharesToMintAsFees : Nat)
+    (hSuccess : fullReportSucceeds i sharesToMintAsFees)
+    (hFees : 0 < sharesToMintAsFees)
     (trace : List LidoSRv3.Audit.SolidityAccounting.Step)
-    (h : LidoSRv3.Audit.SolidityAccounting.sourceTrace i = some trace) :
+    (h : LidoSRv3.Audit.SolidityAccounting.sourceTrace fullReportSucceeds i
+      sharesToMintAsFees hSuccess = some trace) :
     ∃ balances, trace = [
       .balancesWritten balances, .accountingCalled,
       .rewardsRead balances, .rewardsMinted] :=
-  LidoSRv3.Audit.SolidityAccounting.source_report_before_reward i trace h
+  LidoSRv3.Audit.SolidityAccounting.source_report_before_reward
+    fullReportSucceeds i sharesToMintAsFees hSuccess hFees trace h
 
 /-- SOURCE -> VERITY_TX, including checked-word refinement. -/
 theorem source_to_verityTx
+    (fullReportSucceeds :
+      LidoSRv3.Audit.SolidityAccounting.ReportInput → Nat → Prop)
     (i : LidoSRv3.Audit.SolidityAccounting.ReportInput)
+    (sharesToMintAsFees : Nat)
+    (hSuccess : fullReportSucceeds i sharesToMintAsFees)
     (accepted : LidoSRv3.Audit.SolidityAccounting.AcceptedReport)
     (h : LidoSRv3.Audit.SolidityAccounting.accept i = some accepted) :
     LidoSRv3.Audit.SolidityAccounting.checkedTotal256 accepted.balancesGwei =
         some (Verity.Core.Uint256.ofNat accepted.totalBalanceGwei) ∧
-      LidoSRv3.Audit.SolidityAccounting.sourceTrace i = some [
-        .balancesWritten accepted.balancesGwei, .accountingCalled,
-        .rewardsRead accepted.balancesGwei, .rewardsMinted] :=
-  LidoSRv3.Audit.SolidityAccounting.source_to_verityTx i accepted h
+      LidoSRv3.Audit.SolidityAccounting.sourceTrace fullReportSucceeds i
+        sharesToMintAsFees hSuccess = some
+          (LidoSRv3.Audit.SolidityAccounting.successfulSteps accepted
+            sharesToMintAsFees) :=
+  LidoSRv3.Audit.SolidityAccounting.source_to_verityTx
+    fullReportSucceeds i sharesToMintAsFees hSuccess accepted h
 
 end LidoSRv3.Audit.Guarantees.PAccount1
