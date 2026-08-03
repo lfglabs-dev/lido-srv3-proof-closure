@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
-base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
+base: 4d7d152551fffed0d43e9b5c73bed6eef4532f05
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 6133dfbfc772f54f376bb9d0c30e7fa7a01fcd2f
+validated-tree: ac319473c6b3a8c9397ce9fc27431031ba8a4019
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,6 +13,23 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
+
+P-ACCOUNT-1 faithful Verity transaction gate receipt (committed tree):
+- Live campaign head was re-read before branching and remained
+  `4d7d152551fffed0d43e9b5c73bed6eef4532f05`; no campaign merge was needed.
+- Pinned source was inspected at
+  `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. The real
+  external entry points are `AccountingOracle.submitReportData` and
+  `Accounting.handleOracleReport`; there is no invented
+  `Accounting.submitOracleReport` entry point.
+- `lake build LidoSRv3`: exit 0 (492 jobs). The trust report records only Lean
+  foundations `propext` and `Quot.sound` for
+  `PAccount1.source_report_before_reward` and `PAccount1.source_to_verityTx`.
+- `LidoSRv3.Tests.AccountingVectors` rejects module-order, vector-length,
+  MAX_VALUE_GWEI, and checked uint64-total overflow mutants.
+- The critical chain is MODEL -> SOURCE -> VERITY_TX. Yul, EVM, runtime,
+  cryptography, and E2E are not claimed and remain OPEN or NOT_APPLICABLE in
+  the canonical registry.
 
 P-SSZ-1 structural gate receipt (committed tree):
 - `lake build`: exit 0.

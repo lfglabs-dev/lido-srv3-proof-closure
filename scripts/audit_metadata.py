@@ -310,7 +310,7 @@ EXPECTED_MANIFEST_THEOREMS = [
     {"name": "Guarantees.PAlloc2.source_selects_same_next_target", "status": "lean_checked",
      "axioms": ["propext"]},
     {"name": "Guarantees.PAccount1.source_report_before_reward", "status": "lean_checked",
-     "axioms": ["propext"]},
+     "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAccount1.source_to_verityTx", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",

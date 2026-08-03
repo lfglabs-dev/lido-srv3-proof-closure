@@ -100,7 +100,7 @@
     {
       "name": "Guarantees.PAccount1.source_report_before_reward",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": ["propext", "Quot.sound"]
     },
     {
       "name": "Guarantees.PAccount1.source_to_verityTx",
