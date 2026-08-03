@@ -6,7 +6,6 @@
     "statement": "DEV-431-READY is development readiness, not AUDIT-CERT."
   },
   "assumptions": [
-    {"id": "A-LEGACY-MODEL", "accepted": true, "risk": "Legacy pure-model regression evidence is not source or deployed-bytecode correspondence."},
     {"id": "A-MODEL-INPUTS", "accepted": true, "risk": "Quantity bounds and units remain model inputs until source refinement is proved."},
     {"id": "A-ABSTRACT-TX", "accepted": true, "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics."},
     {"id": "A-SOURCE-SHAPED", "accepted": true, "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans."},

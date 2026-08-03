@@ -21,8 +21,9 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.revert_may_retain_attempts
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
-#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_model
-#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back

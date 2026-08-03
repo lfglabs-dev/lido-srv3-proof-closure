@@ -19,11 +19,14 @@
         "LidoSRv3.Audit.Strategy",
         "LidoSRv3.Audit.StrategyProofs",
         "LidoSRv3.Audit.Source.MinFirstCorrespondence",
+        "LidoSRv3.Audit.Model.AllocCapacity",
         "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
+        "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
         "LidoSRv3.Audit.Source.DepositCorrespondence",
         "LidoSRv3.Audit.Source.TopupCorrespondence",
         "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
+        "LidoSRv3.Tests.AllocCapacityRegression",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
         "LidoSRv3.Tests.DepositVectors",
@@ -76,14 +79,19 @@
       "axioms": ["propext"]
     },
     {
-      "name": "Guarantees.PAlloc1.source_capacities_match_model",
+      "name": "Guarantees.PAlloc1.source_capacities_match_canonical",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PAlloc1.router_order_preserved",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
     },
     {
-      "name": "Guarantees.PAlloc1.source_active_capacity_bounded",
+      "name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": ["propext"]
     },
     {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",

@@ -206,3 +206,21 @@ P-TOPUP-1 pinned-source gate receipt (committed tree):
   bootstrap` on an unmodified checkout, so it is a toolchain-availability
   regression rather than a proof regression; the `lake build LidoSRv3` half of
   the same recipe completed successfully.
+P-ALLOC-1 canonical-model refresh (2026-08-03)
+------------------------------------------------
+
+- Immutable campaign base: `campaign/lido-minimal-11@4d7d152551fffed0d43e9b5c73bed6eef4532f05`.
+- Lido source pin: `af095e48bbc1c3841c2c9936219c8461af01056b`.
+- Focused canonical, regression bridge, and mutant build:
+  `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Regression.AllocCapacityLegacy LidoSRv3.Tests.AllocCapacityRegression`: exit 0.
+- Full `lake build`: exit 0 (489 jobs).
+- `lake env lean LidoSRv3/Audit/Trust.lean`: exit 0; P-ALLOC-1 reports only
+  Lean foundations (`propext`, and `Quot.sound` where listed), with no project axiom.
+- Project proof-escape scan for line-leading `axiom`, `sorry`, or `admit`: no match.
+- Public P-ALLOC-1 facade/source import scan for `LidoSRv3.Legacy.Model`: no match.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all optimized metadata mutants rejected.
+- Canonical negative mutants for min/clamp, active-status guard, router order,
+  and checked-uint256 overflow: build exit 0.
+- `git diff --check`: exit 0.
+- `git diff -- lakefile.lean lake-manifest.json`: empty; Verity and EVMYul pins unchanged.
