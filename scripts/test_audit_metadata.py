@@ -543,11 +543,11 @@ def main():
             run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
-        # P-ACCOUNT-1 is the UNMAPPED source row: it may not claim closure.
-        unmapped_closure = copy.deepcopy(guarantees)
-        unmapped_closure["guarantees"][4]["statuses"]["source"] = "LEAN_CHECKED"
-        write_json(guarantees_path, unmapped_closure)
-        run(fixture, False, "generate")
+        # P-ACCOUNT-1 closes MODEL -> SOURCE -> VERITY_TX; a downgrade is stale.
+        account_source_downgrade = copy.deepcopy(guarantees)
+        account_source_downgrade["guarantees"][4]["statuses"]["source"] = "OPEN"
+        write_json(guarantees_path, account_source_downgrade)
+        run(fixture, False, "generate", "P-ACCOUNT-1: assurance statuses differ")
         write_json(guarantees_path, guarantees)
 
         unbacked = copy.deepcopy(guarantees)
@@ -833,29 +833,16 @@ def main():
         )
 
         unrelated_accounting_coverage = copy.deepcopy(source_map)
-        unrelated_accounting_coverage["targets"][4] = {
-            "id": "P-ACCOUNT-1",
-            "status": "MAPPED",
-            "spans": [{
-                "repository": "lidofinance/core",
-                "source_sha": pinned_sha,
-                "path": "contracts/0.8.25/sr/StakingRouter.sol",
-                "function": "reportValidatorBalancesByStakingModule",
-                "start_line": 285,
-                "end_line": 290,
-                "permalink": (
-                    "https://github.com/lidofinance/core/blob/"
-                    f"{pinned_sha}/contracts/0.8.25/sr/StakingRouter.sol#L285-L290"
-                ),
-            }],
-        }
+        unrelated_accounting_coverage["targets"][4]["spans"] = [
+            span for span in unrelated_accounting_coverage["targets"][4]["spans"]
+            if span["function"] != "_handleConsensusReportData"
+        ]
         write_json(source_map_path, unrelated_accounting_coverage)
         run(
             fixture,
             False,
             "generate",
-            "P-ACCOUNT-1: source target without verified correspondence "
-            "must remain UNMAPPED",
+            "P-ACCOUNT-1: source spans differ from verified semantic anchors",
         )
 
         downgraded_verified_target = copy.deepcopy(source_map)
@@ -1078,6 +1065,7 @@ def main():
         "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
         "and span unmapping, P-TOPUP-1 transitive-helper span, "
         "pinned-constant declaration span and no-wrap assumption drops, "
+        "P-ACCOUNT-1 source/tx downgrade and transitive-helper span drops, "
         "P-SSZ-1 deposit-data-root span drops, "
         "stale view"
     )
