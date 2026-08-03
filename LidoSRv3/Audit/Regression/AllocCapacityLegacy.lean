@@ -83,10 +83,9 @@ theorem map_capacity_agrees {oldCfg : LidoSRv3.AllocationConfig} {newCfg : Confi
             · simp [hActive, hRows.1.current]
           · exact ih hRows.2
 
-theorem legacy_capacities_eq_canonical {oldCfg : LidoSRv3.AllocationConfig}
+theorem legacy_capacities_eq_math {oldCfg : LidoSRv3.AllocationConfig}
     {newCfg : Config} {olds : List LidoSRv3.Module} {news : List AllocCapacity.Module}
     (deposits : Uint256) (isTopUp : Bool)
-    (_hBounds : CheckedBounds newCfg news deposits isTopUp)
     (hRows : RowsAgree oldCfg newCfg olds news) :
     LidoSRv3.allocatedCapacityValues
         (LidoSRv3.modulesAllocationAndCapacity oldCfg olds (deposits : Nat) isTopUp) =
@@ -97,5 +96,21 @@ theorem legacy_capacities_eq_canonical {oldCfg : LidoSRv3.AllocationConfig}
     rw [sum_current_agrees hRows]
     omega
   exact map_capacity_agrees hTotal hRows
+
+/-- Under the canonical checked bounds, the former Legacy capacity column is
+exactly the capacity column returned by checked canonical execution. -/
+theorem legacy_capacities_eq_canonical {oldCfg : LidoSRv3.AllocationConfig}
+    {newCfg : Config} {olds : List LidoSRv3.Module} {news : List AllocCapacity.Module}
+    (deposits : Uint256) (isTopUp : Bool)
+    (hBounds : CheckedBounds newCfg news deposits isTopUp)
+    (hRows : RowsAgree oldCfg newCfg olds news) :
+    ∃ rows, AllocCapacity.execute newCfg news deposits isTopUp = some rows ∧
+      LidoSRv3.allocatedCapacityValues
+          (LidoSRv3.modulesAllocationAndCapacity oldCfg olds (deposits : Nat) isTopUp) =
+        rows.map (fun row => (row.capacity : Nat)) := by
+  obtain ⟨rows, hExec, hCaps⟩ := AllocCapacity.execute_refines_math
+    newCfg news deposits isTopUp hBounds
+  refine ⟨rows, hExec, ?_⟩
+  rw [legacy_capacities_eq_math deposits isTopUp hRows, hCaps]
 
 end LidoSRv3.Audit.Regression.AllocCapacityLegacy

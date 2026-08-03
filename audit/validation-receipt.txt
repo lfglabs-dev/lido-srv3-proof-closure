@@ -224,3 +224,28 @@ P-ALLOC-1 canonical-model refresh (2026-08-03)
   and checked-uint256 overflow: build exit 0.
 - `git diff --check`: exit 0.
 - `git diff -- lakefile.lean lake-manifest.json`: empty; Verity and EVMYul pins unchanged.
+
+P-ALLOC-1 exact-head review corrections (2026-08-03)
+-----------------------------------------------------
+
+- Starting PR head: `23ff80a54999e07c4ed592208b67df235138cd75`.
+- Focused execution-refinement, checked Legacy bridge, and execute-mutant build:
+  `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Regression.AllocCapacityLegacy LidoSRv3.Tests.AllocCapacityRegression`: exit 0 (20 jobs).
+- Full `lake build`: exit 0 (489 jobs), including `LidoSRv3.Audit.Trust`; the
+  P-ALLOC-1 execution theorem reports only `propext` and `Quot.sound`.
+- Isolated `lake env lean LidoSRv3/Audit/Trust.lean`: exit 126 in the remote
+  Spark wrapper (`/root/.elan/bin/lake: Permission denied`); treated as
+  infrastructure-only because the authoritative full build compiled and ran
+  the same trust entrypoint successfully.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all
+  optimized metadata mutants rejected.
+- Changed-Lean scan for `sorry`, `admit`, or `unsafe`: no match (exit 0 after
+  normalizing ripgrep's no-match exit 1).
+- Public P-ALLOC-1 facade/source/model scan for `LidoSRv3.Legacy.Model`: no
+  match (exit 0 after normalizing ripgrep's no-match exit 1).
+- Registry assertion: 12 rows, exactly 11 canonical guarantees and only
+  subordinate `P-SSZ-1.deposit-data-root`: exit 0.
+- `git diff --check`: exit 0.
+- `git diff --quiet -- lake-manifest.json lean-toolchain`: exit 0; dependency
+  pins and the Lean toolchain are unchanged.

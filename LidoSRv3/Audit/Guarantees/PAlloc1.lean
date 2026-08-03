@@ -36,21 +36,14 @@ theorem router_order_preserved {cfg : Config} {modules : List Module}
     rows.map Row.moduleId = modules.map Module.moduleId :=
   SolidityAllocCapacity.router_order_preserved h
 
-/-- The checked operations used by canonical execution refine their natural
-number meanings exactly at the named Solidity bounds; no unbounded arithmetic
-is substituted into execution. -/
-theorem checked_uint256_execution_refines_math :
-    (∀ a b c : Uint256, (b : Nat) ≤ (a : Nat) → safeSub a b = some c →
-      (c : Nat) = (a : Nat) - (b : Nat)) ∧
-    (∀ a b c : Uint256, (a : Nat) + (b : Nat) ≤ Verity.Stdlib.Math.MAX_UINT256 →
-      safeAdd a b = some c → (c : Nat) = (a : Nat) + (b : Nat)) ∧
-    (∀ a b c : Uint256, (a : Nat) * (b : Nat) ≤ Verity.Stdlib.Math.MAX_UINT256 →
-      safeMul a b = some c → (c : Nat) = (a : Nat) * (b : Nat)) ∧
-    (∀ a b c : Uint256, b ≠ 0 → safeDiv a b = some c →
-      (c : Nat) = (a : Nat) / (b : Nat)) := by
-  exact ⟨LidoSRv3.Audit.AllocCapacity.safeSub_refines_nat,
-    LidoSRv3.Audit.AllocCapacity.safeAdd_refines_nat,
-    LidoSRv3.Audit.AllocCapacity.safeMul_refines_nat,
-    LidoSRv3.Audit.AllocCapacity.safeDiv_refines_nat⟩
+/-- The whole checked executor, not merely its arithmetic primitives, succeeds
+under the named Solidity bounds and returns the mathematical capacities. -/
+theorem checked_uint256_execution_refines_math
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256)
+    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, AllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  AllocCapacity.execute_refines_math cfg modules depositsToAllocate isTopUp hBounds
 
 end LidoSRv3.Audit.Guarantees.PAlloc1

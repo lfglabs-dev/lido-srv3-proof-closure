@@ -24,23 +24,29 @@ def inactiveModule : Module := {
 
 /-- Mutant: remove `Math.min` and retain the available-capacity operand. -/
 theorem min_clamp_mutant_rejected :
-    MathView.capacity cfg [activeModule] 10 false activeModule ≠
-      MathView.availableCapacity cfg false activeModule := by native_decide
+    (execute cfg [activeModule] 10 false).map
+      (fun rows => rows.map Row.capacity) = some [10] ∧
+    (execute cfg [activeModule] 10 false).map
+      (fun rows => rows.map Row.capacity) ≠ some [100] := by native_decide
 
 /-- Mutant: run the active branch for an inactive module. -/
 theorem active_guard_mutant_rejected :
-    MathView.capacity cfg [inactiveModule] 10 false inactiveModule ≠
-      min (MathView.targetValidators cfg [inactiveModule] 10 inactiveModule)
-        (MathView.availableCapacity cfg false inactiveModule) := by native_decide
+    (execute cfg [inactiveModule] 10 false).map
+      (fun rows => rows.map Row.capacity) = some [10] ∧
+    (execute cfg [inactiveModule] 10 false).map
+      (fun rows => rows.map Row.capacity) ≠ some [2] := by native_decide
 
 /-- Mutant: reverse the router-provided module order. -/
 theorem router_order_mutant_rejected :
-    ([activeModule, inactiveModule].map Module.moduleId) ≠
-      ([activeModule, inactiveModule].reverse.map Module.moduleId) := by native_decide
+    (execute cfg [activeModule, inactiveModule] 10 false).map
+      (fun rows => rows.map Row.moduleId) = some [7, 8] ∧
+    (execute cfg [activeModule, inactiveModule] 10 false).map
+      (fun rows => rows.map Row.moduleId) ≠ some [8, 7] := by native_decide
 
 /-- Mutant: replace Solidity checked addition by wrapping word addition. -/
 theorem uint256_bound_mutant_rejected :
-    safeAdd (Verity.Core.Uint256.ofNat MAX_UINT256) 1 = none ∧
-      (Verity.Core.Uint256.ofNat MAX_UINT256 + 1 : Uint256) = 0 := by native_decide
+    execute cfg [activeModule]
+      (Verity.Core.Uint256.ofNat MAX_UINT256) false = none ∧
+    (Verity.Core.Uint256.ofNat MAX_UINT256 + 10 : Uint256) = 9 := by native_decide
 
 end LidoSRv3.Tests.AllocCapacityRegression
