@@ -7,7 +7,7 @@
 - `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Guarantees.PDeposit1` — successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Guarantees.PTopup1` — successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Tests.MinFirstVectors` — successful theorem and falsifier-vector build
-- `P-RESERVE-1`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem
+- `P-RESERVE-1`: `lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants` — successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build
 - `P-ETH-1`: `lake build` — active Lean 4.31 dependency graph builds; not certification
 - `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
 - `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure

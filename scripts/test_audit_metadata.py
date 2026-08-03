@@ -551,7 +551,7 @@ def main():
         write_json(guarantees_path, guarantees)
 
         unbacked = copy.deepcopy(guarantees)
-        unbacked["guarantees"][5]["statuses"]["model"] = "LEAN_CHECKED"
+        unbacked["guarantees"][5]["theorem_planes"] = ["source", "tx"]
         write_json(guarantees_path, unbacked)
         run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
