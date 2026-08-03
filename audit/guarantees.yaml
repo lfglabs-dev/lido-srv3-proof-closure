@@ -44,13 +44,13 @@
     },
     {
       "id": "P-ACCOUNT-1",
-      "catalogue_wording": "Pinned-source correspondence and pinned Verity Contract.run transaction execution refine the validator-balance accounting update with exact uint256 input bounds, checked uint64 aggregation, committed-storage observations, and rollback; Yul, EVM, runtime bytecode, crypto, and end-to-end report processing remain open or not applicable.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_refines_model",
-      "theorem_planes": ["model", "tx", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-      "next_gate": "Refine the checked Verity transaction execution against pinned Yul/EVM/runtime-bytecode semantics and compose the excluded full AccountingOracle report pipeline.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors", "expected": "successful pinned-source and pinned-Verity Contract.run accounting transaction refinement with positive and mutant-sensitive fixtures; Yul/EVM/runtime-bytecode and full-report composition remain open"}
+      "catalogue_wording": "Pinned-source correspondence models the validator-balance accounting update with exact uint256 input bounds and checked uint64 aggregation; no pinned Verity EDSL executable exists for the mapped call chain, so transaction, Yul, EVM, runtime bytecode, crypto, and end-to-end report processing remain open or not applicable.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_refines_model",
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED"],
+      "next_gate": "Provide a pinned Verity EDSL executable for the AccountingOracle -> StakingRouter -> SRLib -> SRUtils call chain and prove its transaction observations refine the checked source model.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors", "expected": "successful pinned-source checked accounting correspondence and mutant-sensitive fixture build; pinned Verity transaction execution remains absent and OPEN"}
     },
     {
       "id": "P-RESERVE-1",
