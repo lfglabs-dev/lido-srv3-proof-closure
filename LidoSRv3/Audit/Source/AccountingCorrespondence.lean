@@ -25,11 +25,11 @@ explicit transaction preconditions, not silently proved here.  Authorization
 for the router write is also an input observation because it is storage owned
 by `AccessControlEnumerable`.
 
-No handwritten Yul, precompile, hash, runtime bytecode, or cryptographic
-operation is crossed by this guarantee, so those planes remain open or not
-applicable.  `verityExecute` is an executable transaction semantics over the
-pinned Verity `Uint256` and `safeAdd`; `simulateVerityTx` is the refinement into
-the independently stated abstract accounting transaction.
+No pinned Verity EDSL contract or Solidity-to-Verity executable translation of
+this call chain exists in this repository. Consequently this file proves only
+MODEL -> SOURCE correspondence. Transaction, Yul, EVM, runtime-bytecode, and
+end-to-end report execution remain open; using Verity's `Uint256` and `safeAdd`
+does not itself cross a Verity transaction boundary.
 -/
 
 namespace LidoSRv3.Audit.SolidityAccounting
@@ -116,29 +116,6 @@ def sourceRun (before : AccountingState) (input : TxInput) : TxResult :=
     | some total => .committed
         { before with moduleBalancesGwei := input.report.balancesGwei, routerBalanceGwei := total }
 
-/-- Verity transaction observables at the boundary used by P-ACCOUNT-1. -/
-structure VerityTxObservation where
-  success : Bool
-  finalState : AccountingState
-  revertReason : Option RevertReason
-  deriving DecidableEq, Repr
-
-/-- Executable pinned-Verity transaction semantics. Reverts restore the input
-state; successful execution exposes the committed accounting storage. -/
-def verityExecute (before : AccountingState) (input : TxInput) : VerityTxObservation :=
-  match sourceRun before input with
-  | .reverted reason => ⟨false, before, some reason⟩
-  | .committed after => ⟨true, after, none⟩
-
-def refinesAbstract (before : AccountingState) (input : TxInput)
-    (obs : VerityTxObservation) : Prop :=
-  if input.oraclePrefixSucceeded &&
-      (input.report.moduleIds.isEmpty || input.callerAuthorized) then
-    match abstractTransaction before input.report with
-    | some after => obs = ⟨true, after, none⟩
-    | none => obs.success = false ∧ obs.finalState = before
-  else obs.success = false ∧ obs.finalState = before
-
 theorem source_committed_matches_abstract
     (before after : AccountingState) (input : TxInput)
     (h : sourceRun before input = .committed after) :
@@ -152,11 +129,5 @@ theorem source_refines_model
     (h : sourceRun before input = .committed after) :
     abstractTransaction before input.report = some after :=
   source_committed_matches_abstract before after input h
-
-/-- SOURCE → VERITY_TX: simulation from executable pinned-Verity observables
-into the abstract transaction, including rollback on every rejected branch. -/
-theorem simulateVerityTx (before : AccountingState) (input : TxInput) :
-    refinesAbstract before input (verityExecute before input) := by
-  grind [refinesAbstract, verityExecute, sourceRun, abstractTransaction]
 
 end LidoSRv3.Audit.SolidityAccounting

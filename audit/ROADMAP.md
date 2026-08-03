@@ -6,7 +6,7 @@
 - `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
 - `P-DEPOSIT-1`: Refine success/revert and rollback against pinned executable EVM semantics.
 - `P-TOPUP-1`: Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.
-- `P-ACCOUNT-1`: Refine the checked transaction observation against pinned executable EVM/runtime-bytecode semantics and compose the excluded full AccountingOracle report pipeline.
+- `P-ACCOUNT-1`: Provide a pinned Verity EDSL executable for the AccountingOracle -> StakingRouter -> SRLib -> SRUtils call chain and prove its transaction observations refine the checked source model.
 - `P-RESERVE-1`: Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.
 - `P-ETH-1`: Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.
 - `P-ADDRESS-1`: Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.
