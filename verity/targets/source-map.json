@@ -62,7 +62,13 @@
     "SRV3-P4": {
       "anchors": [
         "contracts/0.8.9/oracle/AccountingOracle.sol::submitReportData",
+        "contracts/0.8.9/oracle/AccountingOracle.sol::_checkStakingRouterModuleBalances",
+        "contracts/0.8.9/oracle/AccountingOracle.sol::_processStakingRouterValidatorBalancesByModule",
+        "contracts/0.8.25/sr/StakingRouter.sol::validateReportValidatorBalancesByStakingModule",
+        "contracts/0.8.25/sr/StakingRouter.sol::reportValidatorBalancesByStakingModule",
+        "contracts/0.8.25/sr/SRLib.sol::_validateReportValidatorBalancesByStakingModule",
         "contracts/0.8.25/sr/SRLib.sol::_reportValidatorBalancesByStakingModule",
+        "contracts/0.8.25/sr/SRUtils.sol::_ensureAmountGwei",
         "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution"
       ],
       "property": "LidoSRv3/Legacy/SpecProofs.lean::P4_report_before_reward_consistency",

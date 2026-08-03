@@ -543,11 +543,11 @@ def main():
             run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
-        # P-ACCOUNT-1 is the UNMAPPED source row: it may not claim closure.
-        unmapped_closure = copy.deepcopy(guarantees)
-        unmapped_closure["guarantees"][4]["statuses"]["source"] = "LEAN_CHECKED"
-        write_json(guarantees_path, unmapped_closure)
-        run(fixture, False, "generate")
+        # P-ACCOUNT-1 closed source and abstract transaction planes together.
+        accounting_source_downgrade = copy.deepcopy(guarantees)
+        accounting_source_downgrade["guarantees"][4]["statuses"]["source"] = "OPEN"
+        write_json(guarantees_path, accounting_source_downgrade)
+        run(fixture, False, "generate", "P-ACCOUNT-1: assurance statuses differ")
         write_json(guarantees_path, guarantees)
 
         unbacked = copy.deepcopy(guarantees)
@@ -833,29 +833,17 @@ def main():
         )
 
         unrelated_accounting_coverage = copy.deepcopy(source_map)
-        unrelated_accounting_coverage["targets"][4] = {
-            "id": "P-ACCOUNT-1",
-            "status": "MAPPED",
-            "spans": [{
-                "repository": "lidofinance/core",
-                "source_sha": pinned_sha,
-                "path": "contracts/0.8.25/sr/StakingRouter.sol",
-                "function": "reportValidatorBalancesByStakingModule",
-                "start_line": 285,
-                "end_line": 290,
-                "permalink": (
-                    "https://github.com/lidofinance/core/blob/"
-                    f"{pinned_sha}/contracts/0.8.25/sr/StakingRouter.sol#L285-L290"
-                ),
-            }],
-        }
+        unrelated_accounting_coverage["targets"][4]["spans"][0]["start_line"] = 361
+        unrelated_accounting_coverage["targets"][4]["spans"][0]["permalink"] = (
+            "https://github.com/lidofinance/core/blob/"
+            f"{pinned_sha}/contracts/0.8.9/oracle/AccountingOracle.sol#L361-L366"
+        )
         write_json(source_map_path, unrelated_accounting_coverage)
         run(
             fixture,
             False,
             "generate",
-            "P-ACCOUNT-1: source target without verified correspondence "
-            "must remain UNMAPPED",
+            "P-ACCOUNT-1: source span is not a verified semantic anchor",
         )
 
         downgraded_verified_target = copy.deepcopy(source_map)

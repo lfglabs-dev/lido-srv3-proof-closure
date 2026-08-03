@@ -26,7 +26,7 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 2 | `P-ALLOC-2` | `LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket` |
 | 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` |
 | 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back` |
-| 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.MinFirst.totalAllocated_le_requested` |
+| 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.simulateVerityTx` |
 | 6 | `P-RESERVE-1` | metadata-only; no Lean theorem claimed |
 | 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
 | 8 | `P-ADDRESS-1` | metadata-only; no Lean theorem claimed |

@@ -23,18 +23,20 @@
         "LidoSRv3.Audit.Source.DepositCorrespondence",
         "LidoSRv3.Audit.Source.TopupCorrespondence",
         "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
+        "LidoSRv3.Audit.Source.AccountingCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
         "LidoSRv3.Tests.DepositVectors",
         "LidoSRv3.Tests.TopupVectors",
+        "LidoSRv3.Tests.AccountingVectors",
         "LidoSRv3.Audit.Common.Units",
         "LidoSRv3.Audit.Common.Result",
         "LidoSRv3.Audit.Common.Trace",
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback and P-TOPUP-1 top-up conservation/rollback are checked against pinned Solidity; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation/rollback, and P-ACCOUNT-1 checked validator-balance transaction simulation are checked against pinned Solidity; P-ACCOUNT-1 remains abstract rather than EVM/runtime-bytecode evidence; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
     }
   },
   "proof_policy": {
@@ -45,6 +47,16 @@
     "report_entrypoint": "LidoSRv3.Audit.Trust"
   },
   "theorems": [
+    {
+      "name": "Guarantees.PAccount1.source_refines_model",
+      "status": "lean_checked",
+      "axioms": ["propext", "Classical.choice", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PAccount1.simulateVerityTx",
+      "status": "lean_checked",
+      "axioms": ["propext", "Classical.choice", "Quot.sound"]
+    },
     {
       "name": "Quantity.checkedDiv_zero",
       "status": "lean_checked",

@@ -44,13 +44,13 @@
     },
     {
       "id": "P-ACCOUNT-1",
-      "catalogue_wording": "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
-      "theorem": "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-HANDWRITTEN-MINFIRST"],
-      "next_gate": "Establish source correspondence and checked-Uint256 execution refinement.",
-      "reproduction": {"command": "lake build LidoSRv3.Tests.MinFirstVectors", "expected": "successful theorem and falsifier-vector build"}
+      "catalogue_wording": "Pinned-source correspondence and executable Verity transaction observables refine the validator-balance accounting update with exact uint256 input bounds, checked uint64 aggregation, and rollback; Yul, EVM, runtime bytecode, crypto, and end-to-end report processing remain open or not applicable.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.simulateVerityTx",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "next_gate": "Refine the checked transaction observation against pinned executable EVM/runtime-bytecode semantics and compose the excluded full AccountingOracle report pipeline.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors", "expected": "successful pinned-source checked accounting transaction simulation and mutant-sensitive fixture build; EVM/runtime-bytecode and full-report composition remain open"}
     },
     {
       "id": "P-RESERVE-1",

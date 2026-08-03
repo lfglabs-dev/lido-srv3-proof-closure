@@ -35,7 +35,7 @@ EXPECTED_WORDING = [
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
-    "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
+    "Pinned-source correspondence and executable Verity transaction observables refine the validator-balance accounting update with exact uint256 input bounds, checked uint64 aggregation, and rollback; Yul, EVM, runtime bytecode, crypto, and end-to-end report processing remain open or not applicable.",
     "Verity 4.31 is a non-certified development scaffold.",
     "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
@@ -87,8 +87,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
      "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"},
-    {"command": "lake build LidoSRv3.Tests.MinFirstVectors",
-     "expected": "successful theorem and falsifier-vector build"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
+     "expected": "successful pinned-source checked accounting transaction simulation and mutant-sensitive fixture build; EVM/runtime-bytecode and full-report composition remain open"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "metadata consistency only; no source theorem"},
     {"command": "lake build",
@@ -109,7 +109,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
-    ["A-HANDWRITTEN-MINFIRST"],
+    ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-VERITY-SCAFFOLD", "A-MULTI-NODE-TRANSPORT"],
     ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
     ["A-YUL-INTERFACE"],
@@ -125,7 +125,7 @@ EXPECTED_NEXT_GATES = [
     "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Refine success/revert and rollback against pinned executable EVM semantics.",
     "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
-    "Establish source correspondence and checked-Uint256 execution refinement.",
+    "Refine the checked transaction observation against pinned executable EVM/runtime-bytecode semantics and compose the excluded full AccountingOracle report pipeline.",
     "Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.",
     "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
     "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
@@ -158,7 +158,7 @@ EXPECTED_STATUSES = [
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -180,7 +180,7 @@ EXPECTED_THEOREM_PLANES = [
     ["algorithm", "source"],
     ["model", "tx", "source"],
     ["model", "tx", "source"],
-    ["model"],
+    ["model", "source", "tx"],
     [],
     [],
     [],
@@ -194,7 +194,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
-    "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
+    "LidoSRv3.Audit.Guarantees.PAccount1.simulateVerityTx",
     None,
     None,
     None,
@@ -262,11 +262,13 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
             "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
+            "LidoSRv3.Audit.Source.AccountingCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
             "LidoSRv3.Tests.DepositVectors",
             "LidoSRv3.Tests.TopupVectors",
+            "LidoSRv3.Tests.AccountingVectors",
             "LidoSRv3.Audit.Common.Units",
             "LidoSRv3.Audit.Common.Result",
             "LidoSRv3.Audit.Common.Trace",
@@ -276,9 +278,11 @@ EXPECTED_MANIFEST_LAYERS = {
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
-            "P-DEPOSIT-1 deposit conservation/rollback and "
-            "P-TOPUP-1 top-up conservation/rollback "
-            "are checked against pinned Solidity; "
+            "P-DEPOSIT-1 deposit conservation/rollback, "
+            "P-TOPUP-1 top-up conservation/rollback, and "
+            "P-ACCOUNT-1 checked validator-balance transaction simulation "
+            "are checked against pinned Solidity; P-ACCOUNT-1 remains abstract "
+            "rather than EVM/runtime-bytecode evidence; "
             "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
             "evidence over source-shaped inputs, and its SOURCE-plane "
             "correspondence remains OPEN in audit/guarantees.yaml"
@@ -287,6 +291,10 @@ EXPECTED_MANIFEST_LAYERS = {
 }
 EXPECTED_PROOF_BASELINE = "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2"
 EXPECTED_MANIFEST_THEOREMS = [
+    {"name": "Guarantees.PAccount1.source_refines_model", "status": "lean_checked",
+     "axioms": ["propext", "Classical.choice", "Quot.sound"]},
+    {"name": "Guarantees.PAccount1.simulateVerityTx", "status": "lean_checked",
+     "axioms": ["propext", "Classical.choice", "Quot.sound"]},
     {"name": "Quantity.checkedDiv_zero", "status": "lean_checked",
      "axioms": ["propext"]},
     {"name": "Quantity.saturatingSub_zero_of_le", "status": "lean_checked",
@@ -443,6 +451,21 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.4.24/Lido.sol", "_spendDepositableEther", 839, 859),
         ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "makeBeaconChainTopUp", 66, 108),
     },
+    "P-ACCOUNT-1": {
+        ("contracts/0.8.9/oracle/AccountingOracle.sol", "submitReportData", 360, 366),
+        ("contracts/0.8.9/oracle/AccountingOracle.sol", "_handleConsensusReportData", 477, 558),
+        ("contracts/0.8.9/oracle/AccountingOracle.sol", "_processStakingRouterValidatorBalancesByModule", 609, 619),
+        ("contracts/0.8.9/oracle/AccountingOracle.sol", "_checkStakingRouterModuleBalances", 711, 740),
+        ("contracts/0.8.9/oracle/AccountingOracle.sol", "_normalizeStakingRouterValidatorBalancesToWei", 742, 752),
+        ("contracts/0.8.25/sr/StakingRouter.sol", "reportValidatorBalancesByStakingModule", 283, 290),
+        ("contracts/0.8.25/sr/StakingRouter.sol", "validateReportValidatorBalancesByStakingModule", 292, 298),
+        ("contracts/0.8.25/sr/SRLib.sol", "_validateReportValidatorBalancesByStakingModule", 853, 870),
+        ("contracts/0.8.25/sr/SRLib.sol", "_reportValidatorBalancesByStakingModule", 872, 892),
+        ("contracts/0.8.25/sr/SRUtils.sol", "MAX_VALUE_GWEI", 23, 23),
+        ("contracts/0.8.25/sr/SRUtils.sol", "_ensureAmountGwei", 75, 83),
+        ("contracts/0.8.25/sr/SRTypes.sol", "ModuleStateAccounting", 157, 164),
+        ("contracts/0.8.25/sr/SRTypes.sol", "RouterStateAccounting", 166, 171),
+    },
     "P-RESERVE-1": {
         ("contracts/0.4.24/Lido.sol", "_getBufferedEtherAllocation", 576, 616),
         ("contracts/0.4.24/Lido.sol", "_getDepositableEther", 823, 833),
@@ -491,12 +514,7 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/lib/BeaconChainDepositor.sol", "DEPOSIT_DATA_LENGTH ABI input shape", 120, 135),
     },
 }
-UNMAPPED_SOURCE_BLOCKERS = {
-    "P-ACCOUNT-1": (
-        "No independently verified pinned-source correspondence for "
-        "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested."
-    ),
-}
+UNMAPPED_SOURCE_BLOCKERS = {}
 VIEWS = ("ROADMAP.md", "STATUS.md", "REPRODUCE.md")
 
 

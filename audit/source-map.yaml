@@ -67,9 +67,22 @@
     },
     {
       "id": "P-ACCOUNT-1",
-      "status": "UNMAPPED",
-      "spans": [],
-      "blocker": "No independently verified pinned-source correspondence for LidoSRv3.Audit.MinFirst.totalAllocated_le_requested."
+      "status": "MAPPED",
+      "spans": [
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.9/oracle/AccountingOracle.sol","function":"submitReportData","start_line":360,"end_line":366,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L360-L366"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.9/oracle/AccountingOracle.sol","function":"_handleConsensusReportData","start_line":477,"end_line":558,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L477-L558"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.9/oracle/AccountingOracle.sol","function":"_processStakingRouterValidatorBalancesByModule","start_line":609,"end_line":619,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L609-L619"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.9/oracle/AccountingOracle.sol","function":"_checkStakingRouterModuleBalances","start_line":711,"end_line":740,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L711-L740"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.9/oracle/AccountingOracle.sol","function":"_normalizeStakingRouterValidatorBalancesToWei","start_line":742,"end_line":752,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L742-L752"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/StakingRouter.sol","function":"reportValidatorBalancesByStakingModule","start_line":283,"end_line":290,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L283-L290"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/StakingRouter.sol","function":"validateReportValidatorBalancesByStakingModule","start_line":292,"end_line":298,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L292-L298"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/SRLib.sol","function":"_validateReportValidatorBalancesByStakingModule","start_line":853,"end_line":870,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L853-L870"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/SRLib.sol","function":"_reportValidatorBalancesByStakingModule","start_line":872,"end_line":892,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L872-L892"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/SRUtils.sol","function":"MAX_VALUE_GWEI","start_line":23,"end_line":23,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L23-L23"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/SRUtils.sol","function":"_ensureAmountGwei","start_line":75,"end_line":83,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L75-L83"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/SRTypes.sol","function":"ModuleStateAccounting","start_line":157,"end_line":164,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRTypes.sol#L157-L164"},
+        {"repository":"lidofinance/core","source_sha":"af095e48bbc1c3841c2c9936219c8461af01056b","path":"contracts/0.8.25/sr/SRTypes.sol","function":"RouterStateAccounting","start_line":166,"end_line":171,"permalink":"https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRTypes.sol#L166-L171"}
+      ]
     },
     {
       "id": "P-RESERVE-1",
