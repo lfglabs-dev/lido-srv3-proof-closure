@@ -35,7 +35,7 @@ EXPECTED_WORDING = [
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
-    "Pinned-source correspondence models the validator-balance accounting update with exact uint256 input bounds and checked uint64 aggregation; no pinned Verity EDSL executable exists for the mapped call chain, so transaction, Yul, EVM, runtime bytecode, crypto, and end-to-end report processing remain open or not applicable.",
+    "Pinned-source correspondence and pinned Verity Contract.run transaction execution refine the validator-balance accounting update with exact uint256 input bounds, checked uint64 aggregation, committed-storage observations, and rollback; Yul, EVM, runtime bytecode, crypto, and end-to-end report processing remain open or not applicable.",
     "Verity 4.31 is a non-certified development scaffold.",
     "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
     "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
@@ -88,7 +88,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
      "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
-     "expected": "successful pinned-source checked accounting correspondence and mutant-sensitive fixture build; pinned Verity transaction execution remains absent and OPEN"},
+     "expected": "successful pinned-source and pinned-Verity Contract.run accounting transaction refinement with positive and mutant-sensitive fixtures; Yul/EVM/runtime-bytecode and full-report composition remain open"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "metadata consistency only; no source theorem"},
     {"command": "lake build",
@@ -109,7 +109,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
-    ["A-SOURCE-SHAPED"],
+    ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-VERITY-SCAFFOLD", "A-MULTI-NODE-TRANSPORT"],
     ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
     ["A-YUL-INTERFACE"],
@@ -125,7 +125,7 @@ EXPECTED_NEXT_GATES = [
     "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Refine success/revert and rollback against pinned executable EVM semantics.",
     "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
-    "Provide a pinned Verity EDSL executable for the AccountingOracle -> StakingRouter -> SRLib -> SRUtils call chain and prove its transaction observations refine the checked source model.",
+    "Refine the checked Verity transaction execution against pinned Yul/EVM/runtime-bytecode semantics and compose the excluded full AccountingOracle report pipeline.",
     "Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.",
     "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
     "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
@@ -158,7 +158,7 @@ EXPECTED_STATUSES = [
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -180,7 +180,7 @@ EXPECTED_THEOREM_PLANES = [
     ["algorithm", "source"],
     ["model", "tx", "source"],
     ["model", "tx", "source"],
-    ["model", "source"],
+    ["model", "tx", "source"],
     [],
     [],
     [],
@@ -194,7 +194,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
-    "LidoSRv3.Audit.Guarantees.PAccount1.source_refines_model",
+    "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_refines_model",
     None,
     None,
     None,
@@ -280,9 +280,8 @@ EXPECTED_MANIFEST_LAYERS = {
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
             "P-TOPUP-1 top-up conservation/rollback, and "
-            "P-ACCOUNT-1 checked validator-balance source correspondence "
-            "are checked against pinned Solidity; P-ACCOUNT-1 transaction "
-            "execution remains OPEN because no pinned Verity EDSL executable exists; "
+            "P-ACCOUNT-1 checked validator-balance source correspondence and pinned "
+            "Verity Contract.run transaction execution are checked; "
             "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
             "evidence over source-shaped inputs, and its SOURCE-plane "
             "correspondence remains OPEN in audit/guarantees.yaml"
@@ -291,7 +290,7 @@ EXPECTED_MANIFEST_LAYERS = {
 }
 EXPECTED_PROOF_BASELINE = "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2"
 EXPECTED_MANIFEST_THEOREMS = [
-    {"name": "Guarantees.PAccount1.source_refines_model", "status": "lean_checked",
+    {"name": "Guarantees.PAccount1.verity_tx_refines_model", "status": "lean_checked",
      "axioms": ["propext", "Classical.choice", "Quot.sound"]},
     {"name": "Quantity.checkedDiv_zero", "status": "lean_checked",
      "axioms": ["propext"]},
