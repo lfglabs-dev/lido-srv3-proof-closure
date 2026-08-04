@@ -44,7 +44,7 @@ All anchors refer to Lido commit
 | top-up return length/no-wrap | A8 | unsupported here | handled separately by draft PR #4 in the legacy layer |
 | report/growth/consolidation properties | B1-B5 | unsupported | future bounded slices |
 | address equivariance | B6-B7 | unsupported | future bounded slice |
-| cryptographic validity | stretch | unsupported | never a must-set assumption |
+| bounded SHA-256 primitive correctness | stretch | assumed | explicit `A-SHA256-CORRECTNESS`; exact bytes, lengths, offsets, order, padding, calls, and digest composition remain obligations |
 
 The exact theorem axiom report entrypoint is:
 
