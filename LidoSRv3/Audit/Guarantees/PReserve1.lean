@@ -8,11 +8,12 @@ open LidoSRv3.Audit.SolidityReserve
 
 def guarantee : Guarantee := ⟨.pReserve1, [.model, .source, .abstractTx]⟩
 
-/-- The source-shaped spend cannot write the withdrawal-demand reserve. -/
+/-- The source-shaped spend preserves the effective withdrawals-reserve
+partition while consuming only depositable ether. -/
 theorem source_spend_preserves_withdrawal_reserve
     (before after : ReserveState) (amount : Word)
     (h : spendDepositableEther before amount = .committed after) :
-    after.unfinalizedStETH = before.unfinalizedStETH :=
+    withdrawalPartitionSpendInvariant before after amount :=
   committed_preserves_withdrawal_reserve before after amount h
 
 /--
@@ -30,17 +31,19 @@ theorem verity_tx_simulates_reserve_spec (inputs : WithdrawInputs)
     (state : ContractState) (amount : Word) :
     observeVerity state ((verityWithdraw inputs amount).run state) =
       specTx inputs (decode state) amount ∧
-    ∀ reason, (verityWithdraw inputs amount).run state = .revert reason state →
-      ((verityWithdraw inputs amount).run state).snd = state :=
+    ∀ reason rollback,
+      (verityWithdraw inputs amount).run state = .revert reason rollback →
+      rollback = state :=
   ⟨verity_execution_simulates_spec state amount inputs,
-    fun reason h => verity_revert_rolls_back inputs state amount reason h⟩
+    fun reason rollback h =>
+      verity_revert_rolls_back inputs state amount reason rollback h⟩
 
 /-- On a committing executable Verity transition, the prohibited reserve state
 is observationally unchanged. -/
 theorem verity_tx_preserves_withdrawal_reserve
     (inputs : WithdrawInputs) (state after : ContractState) (amount : Word)
     (h : (verityWithdraw inputs amount).run state = .success () after) :
-    (decode after).unfinalizedStETH = (decode state).unfinalizedStETH :=
+    withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
 
 end LidoSRv3.Audit.Guarantees.PReserve1

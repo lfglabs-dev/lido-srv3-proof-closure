@@ -254,18 +254,31 @@ theorem verity_execution_simulates_spec (state : ContractState) (amount : Word) 
     simp [h, observeVerity, specTx]
 
 theorem verity_revert_rolls_back (inputs : WithdrawInputs) (state : ContractState) (amount : Word)
-    (reason : String)
-    (h : (verityWithdraw inputs amount).run state = .revert reason state) :
-    ((verityWithdraw inputs amount).run state).snd = state := by
-  simp [h]
+    (reason : String) (rollback : ContractState)
+    (h : (verityWithdraw inputs amount).run state = .revert reason rollback) :
+    rollback = state := by
+  simp only [verityWithdraw, Contract.run] at h
+  cases hs : sourceWithdrawDepositableEther inputs (decode state) amount <;>
+    simp [hs] at h
+  exact h.2.symm
 
-/- The prohibited state transition is changing the withdrawal demand while
-spending depositable ether. The effective bucket is recomputed from that demand
-and the remaining buffer; the underlying reserve input itself is untouched. -/
+/- Explicit partition/spend invariant: the pre-state allocation is retained as
+the witness, the amount is bounded by its depositable partitions, and the
+committed buffer is exactly the checked subtraction from the allocation total.
+Together these exclude consuming the allocation's withdrawals reserve. -/
+def withdrawalPartitionSpendInvariant
+    (before after : ReserveState) (amount : Word) : Prop :=
+  ∃ allocation depositable,
+    getBufferedEtherAllocation before = some allocation ∧
+    getDepositableEther allocation = some depositable ∧
+    amount ≤ depositable ∧
+    safeSub allocation.total amount = some after.buffered ∧
+    after.unfinalizedStETH = before.unfinalizedStETH
+
 theorem committed_preserves_withdrawal_reserve
     (before after : ReserveState) (amount : Word)
     (h : spendDepositableEther before amount = .committed after) :
-    after.unfinalizedStETH = before.unfinalizedStETH := by
+    withdrawalPartitionSpendInvariant before after amount := by
   unfold spendDepositableEther at h
   cases ha : getBufferedEtherAllocation before with
   | none => simp [ha] at h
@@ -290,14 +303,14 @@ theorem committed_preserves_withdrawal_reserve
                     | some depositedNextReportAdjusted =>
                         simp [hn] at h
                         subst after
-                        rfl
+                        exact ⟨allocation, depositable, ha, hd, henough, hb, rfl⟩
           · simp [henough] at h
 
 /-- Observable non-interference at the actual Verity boundary. -/
 theorem verity_commit_preserves_withdrawal_reserve
     (inputs : WithdrawInputs) (state after : ContractState) (amount : Word)
     (h : (verityWithdraw inputs amount).run state = .success () after) :
-    (decode after).unfinalizedStETH = (decode state).unfinalizedStETH := by
+    withdrawalPartitionSpendInvariant (decode state) (decode after) amount := by
   have hBody : verityWithdraw inputs amount state = .success () after :=
     Contract.eq_of_run_success h
   unfold verityWithdraw at hBody

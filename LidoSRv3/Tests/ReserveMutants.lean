@@ -24,6 +24,13 @@ private def reserveChangingMutant (before : ReserveState) (amount : Word) : Sour
   | .committed after => .committed { after with
       unfinalizedStETH := after.unfinalizedStETH - amount }
 
+/-- A subtler forbidden mutant consumes withdrawals-reserved buffer while
+leaving withdrawal demand untouched. -/
+private def withdrawalPartitionMutant (before : ReserveState) (amount : Word) : SourceOutcome :=
+  match spendDepositableEther before amount with
+  | .reverted reason => .reverted reason
+  | .committed after => .committed { after with buffered := after.storedDepositsReserve }
+
 example : spendDepositableEther vector (word 10) = .committed
     { vector with
       buffered := word 90
@@ -42,6 +49,21 @@ example : reserveChangingMutant vector (word 10) = .committed
 
 example : reserveChangingMutant vector (word 10) ≠
     spendDepositableEther vector (word 10) := by decide
+
+example : withdrawalPartitionMutant vector (word 10) = .committed
+    { vector with
+      buffered := word 10
+      storedDepositsReserve := word 10
+      depositedPostReport := word 13
+      depositedNextReportAdjusted := word 12 } := by decide
+
+example : effectiveWithdrawalsReserve
+      { vector with
+        buffered := word 10
+        storedDepositsReserve := word 10
+        depositedPostReport := word 13
+        depositedNextReportAdjusted := word 12 } ≠
+    effectiveWithdrawalsReserve vector := by decide
 
 /-- A checked-Uint256 overflow after the source-ordered buffer work is still a
 whole Verity transaction rollback. -/
