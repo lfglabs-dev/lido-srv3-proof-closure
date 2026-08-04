@@ -152,6 +152,15 @@ def nextLevel? (rs : List Row) (least : Word) : Option Word :=
     if hasFreeSpace r && decide (least < r.allocation) then some r.allocation else none).foldl
       (fun found value => some (found.map (minWord value) |>.getD value)) none
 
+/-- Update the first row equal to the selected candidate.  Keeping this
+operation source-local prevents the SOURCE transition from accepting an
+arbitrary array with merely the same sum and bounds. -/
+def replaceFirst (target : Row) (updatedAllocation : Word) : List Row → List Row
+  | [] => []
+  | r :: rs =>
+      if r = target then { r with allocation := updatedAllocation } :: rs
+      else r :: replaceFirst target updatedAllocation rs
+
 /-- Source arithmetic for lines 102--106.  Every Solidity-checked operation
 which can fail is represented by `Option`; no wrapping arithmetic is admitted. -/
 def checkedAmount (rs : List Row) (allocationSize : Word) (best : Row) : Option Word := do
@@ -179,7 +188,11 @@ inductive Execute : Input → Outcome → Prop
   | mutate (i) (best) (hLen : i.buckets.length = i.capacities.length)
       (hBest : candidate? (rows i) = some best) (allocated : Word)
       (hAmount : checkedAmount (rows i) i.allocationSize best = some allocated)
-      (hPositive : allocated ≠ 0) (after : List Word)
+      (hPositive : allocated ≠ 0) (updatedAllocation : Word)
+      (hBucketAdd : safeAdd best.allocation allocated = some updatedAllocation)
+      (after : List Word)
+      (hAfter : after =
+        (replaceFirst best updatedAllocation (rows i)).map Row.allocation)
       (hMutation : (after.map (fun w => w.val)).sum =
         (i.buckets.map fun w => w.val).sum + allocated.val)
       (hBounds : (after.zip i.capacities).all
