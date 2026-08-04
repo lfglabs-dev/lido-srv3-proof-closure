@@ -25,7 +25,10 @@ EXPECTED_IDS = [
     "P-CONSOLIDATION-1",
     "P-SSZ-1",
 ]
-SUBORDINATE_ID = "P-SSZ-1.deposit-data-root"
+SUBORDINATE_IDS = [
+    "P-SSZ-1.deposit-data-root",
+    "P-ALLOC-1.eugene-bound",
+]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -43,6 +46,7 @@ EXPECTED_WORDING = [
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
+    "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -101,6 +105,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"},
     {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression",
      "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
+     "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED"],
@@ -115,6 +121,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-SHA256-FFI"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
+    ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
 ]
 EXPECTED_NEXT_GATES = [
     "Refine proportional allocation amounts and EVM "
@@ -131,6 +138,7 @@ EXPECTED_NEXT_GATES = [
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
     "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
+    "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -162,7 +170,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "DEV-431-READY", "algorithm": "NOT_APPLICABLE", "source": "DEV-431-READY", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "LEAN_CHECKED",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
@@ -172,6 +180,8 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
+     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -186,6 +196,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     ["model"],
     ["model"],
+    ["model", "algorithm"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
@@ -200,6 +211,7 @@ EXPECTED_THEOREMS = [
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
     "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
+    "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -735,7 +747,7 @@ def validate():
             "guarantee registry authority differs from the canonical declaration")
     rows = registry["guarantees"]
     ids = [row["id"] for row in rows]
-    require(ids == EXPECTED_IDS + [SUBORDINATE_ID],
+    require(ids == EXPECTED_IDS + SUBORDINATE_IDS,
             "guarantees must contain the exact ordered canonical IDs plus subordinate evidence")
     require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
             "catalogue wording changed")
@@ -768,11 +780,16 @@ def validate():
                     "P-SSZ-1.deposit-data-root must remain subordinate to P-SSZ-1")
             require(row.get("source_plane_scope") == "deposit-data-root only",
                     "P-SSZ-1.deposit-data-root: source plane scope must remain deposit-data-root only")
+        elif row["id"] == "P-ALLOC-1.eugene-bound":
+            require(row.get("parent_id") == "P-ALLOC-1",
+                    "P-ALLOC-1.eugene-bound must remain subordinate to P-ALLOC-1")
+            require(row.get("source_plane_scope") == "operator bond bound only",
+                    "P-ALLOC-1.eugene-bound: source plane scope must remain operator bond bound only")
         else:
             require("parent_id" not in row,
-                    f"{row['id']}: only deposit-data-root may be subordinate evidence")
+                    f"{row['id']}: only declared subordinate evidence may have a parent")
             require("source_plane_scope" not in row,
-                    f"{row['id']}: source plane scope marker is reserved for the narrow deposit-data-root guarantee")
+                    f"{row['id']}: source plane scope marker is reserved for subordinate evidence")
         require(set(row["statuses"]) == PLANES, f"{row['id']}: assurance planes differ")
         theorem_planes = row.get("theorem_planes")
         require(theorem_planes == expected_theorem_planes,
@@ -793,7 +810,12 @@ def validate():
         require(row["statuses"] == expected_statuses,
                 f"{row['id']}: assurance statuses differ from canonical claims")
         source_status = row["statuses"]["source"]
-        mapping = source_targets["P-SSZ-1"] if row["id"] == "P-SSZ-1.deposit-data-root" else source_targets[row["id"]]
+        if row["id"] == "P-SSZ-1.deposit-data-root":
+            mapping = source_targets["P-SSZ-1"]
+        elif row["id"] == "P-ALLOC-1.eugene-bound":
+            mapping = source_targets["P-ALLOC-1"]
+        else:
+            mapping = source_targets[row["id"]]
         require(
             source_status not in SOURCE_CLOSURE_STATUSES
             or (mapping["status"] == "MAPPED" and mapping["spans"]),

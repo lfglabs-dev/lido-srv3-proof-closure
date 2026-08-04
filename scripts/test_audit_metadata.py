@@ -509,6 +509,43 @@ def main():
         run(fixture, False, "generate")
         write_json(guarantees_path, guarantees)
 
+        missing_eugene = copy.deepcopy(guarantees)
+        missing_eugene["guarantees"] = [
+            row for row in missing_eugene["guarantees"]
+            if row["id"] != "P-ALLOC-1.eugene-bound"
+        ]
+        write_json(guarantees_path, missing_eugene)
+        run(
+            fixture,
+            False,
+            "generate",
+            "guarantees must contain the exact ordered canonical IDs plus subordinate evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
+        promoted_eugene = copy.deepcopy(guarantees)
+        eugene = promoted_eugene["guarantees"][-1]
+        del eugene["parent_id"]
+        write_json(guarantees_path, promoted_eugene)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.eugene-bound must remain subordinate to P-ALLOC-1",
+        )
+        write_json(guarantees_path, guarantees)
+
+        wrong_eugene_parent = copy.deepcopy(guarantees)
+        wrong_eugene_parent["guarantees"][-1]["parent_id"] = "P-ALLOC-2"
+        write_json(guarantees_path, wrong_eugene_parent)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.eugene-bound must remain subordinate to P-ALLOC-1",
+        )
+        write_json(guarantees_path, guarantees)
+
         stale_alloc2_gate = copy.deepcopy(guarantees)
         stale_alloc2_gate["guarantees"][1]["next_gate"] = (
             "Connect checked quantities to independently verified pinned source spans."
@@ -1081,6 +1118,7 @@ def main():
         "P-ACCOUNT-1 source/tx downgrade, transitive-helper and "
         "MAX_VALUE_GWEI declaration span drops, "
         "P-SSZ-1 deposit-data-root span drops, "
+        "P-ALLOC-1 Eugene subordinate-row omission/promotion/wrong-parent, "
         "stale view"
     )
 

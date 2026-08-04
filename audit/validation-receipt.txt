@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
-base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
+base: 1b614fcd0d9136e5e1e96ced840ae17cd1fb58a4
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: c3ec349c714ca93d5b00501203f29165583f09dc
+validated-tree: 95705ea7bcdf122176a60f95dc83b21b83421133
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -249,3 +249,25 @@ P-ALLOC-1 exact-head review corrections (2026-08-03)
 - `git diff --check`: exit 0.
 - `git diff --quiet -- lake-manifest.json lean-toolchain`: exit 0; dependency
   pins and the Lean toolchain are unchanged.
+
+P-ALLOC-1.eugene-bound subordinate evidence (2026-08-05)
+----------------------------------------------------------
+
+- Live campaign base: `campaign/lido-minimal-11@1b614fcd0d9136e5e1e96ced840ae17cd1fb58a4`.
+- Previous validation receipt tree: `c3ec349c714ca93d5b00501203f29165583f09dc`.
+- Current validation receipt tree: `95705ea7bcdf122176a60f95dc83b21b83421133`.
+- Focused Eugene theorem and vectors build: exit 0.
+- Audit metadata check (exactly 11 canonical guarantees plus two subordinate
+  evidence rows): exit 0.
+- Optimized metadata mutants, including Eugene omission, promotion, and
+  wrong-parent mutations: exit 0.
+- Full `lake build LidoSRv3`: exit 0.
+- `make test`: exit 0.
+- `git diff --check`: exit 0.
+- Added-line forbidden-token scan over
+  `git diff origin/campaign/lido-minimal-11...HEAD -- '*.lean'`: no matches,
+  exit 0 after normalizing ripgrep's no-match exit 1.
+- The row remains subordinate to public `P-ALLOC-1`; the canonical public
+  registry remains exactly 11 guarantees. The proof composes the canonical
+  checked SRLib allocation row with the MinFirst checked mutation and does not
+  import `LidoSRv3.Legacy.Model`.

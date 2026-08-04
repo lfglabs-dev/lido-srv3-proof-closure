@@ -31,6 +31,8 @@ test:
 	@bash scripts/check_provenance_guards.sh
 	@lake build LidoSRv3.Tests.MinFirstVectors
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.PAlloc1EugeneBoundVectors
+	@printf '%s\n' 'executable Eugene operator-bond vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.SszRegression
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositVectors
