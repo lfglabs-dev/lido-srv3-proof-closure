@@ -27,6 +27,13 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_conservation
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_capacity
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Model.failure_rolls_back
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_conservation
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
