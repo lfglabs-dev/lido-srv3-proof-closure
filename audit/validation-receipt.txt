@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 4d7d152551fffed0d43e9b5c73bed6eef4532f05
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 95c137ec5502463d3d6e6a1015f8c64823f44475
+validated-tree: a87e1296a072e47e0c4e86d822afd9e7eebe8f2a
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -31,6 +31,9 @@ P-RESERVE-1 faithful Verity transaction boundary (committed tree):
   source guard reverts.
 - `ReserveMutants` rejects a swapped-reserve source transcription and proves a
   withdrawal-demand mutant of the MODEL does not silently mutate SOURCE.
+- The public partition invariant pins both the checked buffer subtraction and
+  the exact post-spend stored-deposits-reserve update, so an incorrect reserve
+  post-state cannot erase the effective withdrawals reserve.
 - Trust output for all three new public theorems contains only Lean foundations
   `propext` and `Quot.sound`; no project axioms or proof escapes are introduced.
 - Yul, EVM/runtime bytecode, deployed storage/call semantics, crypto, and E2E
