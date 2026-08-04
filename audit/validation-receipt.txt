@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 6133dfbfc772f54f376bb9d0c30e7fa7a01fcd2f
+validated-tree: d7ddc0aa7d204c527a826ff2c07a5cddb85df677
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -249,3 +249,23 @@ P-ALLOC-1 exact-head review corrections (2026-08-03)
 - `git diff --check`: exit 0.
 - `git diff --quiet -- lake-manifest.json lean-toolchain`: exit 0; dependency
   pins and the Lean toolchain are unchanged.
+
+P-ALLOC-1 independent-source correspondence correction (2026-08-04)
+---------------------------------------------------------------------
+
+- Starting PR head: `69ff2c3b85f156897c08e22b27445a368797efd4`.
+- `SolidityAllocCapacity.execute` is now an independent checked-`Uint256`
+  interpretation of both pinned SRLib loops; `source_execute_eq_canonical` is
+  a structural correspondence proof through separate first- and second-loop
+  lemmas, not a definitional alias.
+- The min/clamp, active-status, router-order, and checked-overflow negative
+  regressions execute against the independent source interpretation.
+- Focused build (canonical facade, Legacy regression bridge, source mutants):
+  exit 0 (20 jobs).
+- Full `lake build`: exit 0 (493 jobs), including `LidoSRv3.Audit.Trust`; the
+  P-ALLOC-1 source theorem reports only `propext` and `Quot.sound`.
+- Isolated trust command: exit 126 in the remote Spark wrapper (`lake:
+  Permission denied`); infrastructure-only because the full build compiled
+  and ran the identical trust entrypoint successfully.
+- Metadata, optimized mutants, provenance/forbidden-token guards, exact
+  11-plus-1 registry assertion, and `make test`: exit 0.

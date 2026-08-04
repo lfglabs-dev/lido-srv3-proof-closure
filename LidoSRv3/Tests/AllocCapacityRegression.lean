@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Model.AllocCapacity
+import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
 
 /-! Concrete negative mutants for the canonical P-ALLOC-1 semantics. Each
 regression becomes false if the named source construct is replaced by its
@@ -9,6 +9,7 @@ namespace LidoSRv3.Tests.AllocCapacityRegression
 open Verity
 open Verity.Stdlib.Math
 open LidoSRv3.Audit.AllocCapacity
+open LidoSRv3.Audit.SolidityAllocCapacity
 
 def cfg : Config := ⟨32, 64⟩
 
@@ -24,28 +25,28 @@ def inactiveModule : Module := {
 
 /-- Mutant: remove `Math.min` and retain the available-capacity operand. -/
 theorem min_clamp_mutant_rejected :
-    (execute cfg [activeModule] 10 false).map
+    (LidoSRv3.Audit.SolidityAllocCapacity.execute cfg [activeModule] 10 false).map
       (fun rows => rows.map Row.capacity) = some [10] ∧
-    (execute cfg [activeModule] 10 false).map
+    (LidoSRv3.Audit.SolidityAllocCapacity.execute cfg [activeModule] 10 false).map
       (fun rows => rows.map Row.capacity) ≠ some [100] := by native_decide
 
 /-- Mutant: run the active branch for an inactive module. -/
 theorem active_guard_mutant_rejected :
-    (execute cfg [inactiveModule] 10 false).map
+    (LidoSRv3.Audit.SolidityAllocCapacity.execute cfg [inactiveModule] 10 false).map
       (fun rows => rows.map Row.capacity) = some [10] ∧
-    (execute cfg [inactiveModule] 10 false).map
+    (LidoSRv3.Audit.SolidityAllocCapacity.execute cfg [inactiveModule] 10 false).map
       (fun rows => rows.map Row.capacity) ≠ some [2] := by native_decide
 
 /-- Mutant: reverse the router-provided module order. -/
 theorem router_order_mutant_rejected :
-    (execute cfg [activeModule, inactiveModule] 10 false).map
+    (LidoSRv3.Audit.SolidityAllocCapacity.execute cfg [activeModule, inactiveModule] 10 false).map
       (fun rows => rows.map Row.moduleId) = some [7, 8] ∧
-    (execute cfg [activeModule, inactiveModule] 10 false).map
+    (LidoSRv3.Audit.SolidityAllocCapacity.execute cfg [activeModule, inactiveModule] 10 false).map
       (fun rows => rows.map Row.moduleId) ≠ some [8, 7] := by native_decide
 
 /-- Mutant: replace Solidity checked addition by wrapping word addition. -/
 theorem uint256_bound_mutant_rejected :
-    execute cfg [activeModule]
+    LidoSRv3.Audit.SolidityAllocCapacity.execute cfg [activeModule]
       (Verity.Core.Uint256.ofNat MAX_UINT256) false = none ∧
     (Verity.Core.Uint256.ofNat MAX_UINT256 + 10 : Uint256) = 9 := by native_decide
 

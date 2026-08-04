@@ -34,7 +34,8 @@ theorem router_order_preserved {cfg : Config} {modules : List Module}
     {depositsToAllocate : Uint256} {isTopUp : Bool} {rows : List Row}
     (h : AllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows) :
     rows.map Row.moduleId = modules.map Module.moduleId :=
-  SolidityAllocCapacity.router_order_preserved h
+  SolidityAllocCapacity.router_order_preserved
+    (SolidityAllocCapacity.source_execute_eq_canonical cfg modules depositsToAllocate isTopUp ▸ h)
 
 /-- The whole checked executor, not merely its arithmetic primitives, succeeds
 under the named Solidity bounds and returns the mathematical capacities. -/
