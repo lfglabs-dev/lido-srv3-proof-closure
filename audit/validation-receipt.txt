@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 4d7d152551fffed0d43e9b5c73bed6eef4532f05
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 20c5d30edf484ecd81160320ed95755a4017e325
+validated-tree: 53c0bfa79c1934a766adec8be4d0748c1b76d415
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,31 +13,6 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
-
-P-RESERVE-1 faithful Verity transaction boundary (committed tree):
-- Verified exact pinned `Lido.sol` spans at
-  `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
-  `_getBufferedEtherAllocation` lines 605--616, `getDepositableEther` lines
-  823--825, `_getDepositableEther` lines 831--833,
-  `_spendDepositableEther` lines 839--859, and its external caller
-  `withdrawDepositableEther` lines 869--886.
-- `lake build`: exit 0 (488 jobs).
-- Focused P-RESERVE-1 and `ReserveMutants` builds: exit 0.
-- `verity_tx_simulates_reserve_spec` starts from executable
-  `Verity.Contract.run` over a separately defined pinned-source interpreter;
-  `source_spend_matches_model` and `source_withdraw_matches_model` establish the
-  independent MODEL to SOURCE correspondence before the SOURCE to VERITY_TX
-  observable refinement. Whole-state rollback covers checked-Uint256 and
-  source guard reverts.
-- `ReserveMutants` rejects a swapped-reserve source transcription and proves a
-  withdrawal-demand mutant of the MODEL does not silently mutate SOURCE.
-- The public partition invariant pins both the checked buffer subtraction and
-  the exact post-spend stored-deposits-reserve update, so an incorrect reserve
-  post-state cannot erase the effective withdrawals reserve.
-- Trust output for all three new public theorems contains only Lean foundations
-  `propext` and `Quot.sound`; no project axioms or proof escapes are introduced.
-- Yul, EVM/runtime bytecode, deployed storage/call semantics, crypto, and E2E
-  remain outside this closure and are not claimed.
 
 P-ALLOC-2 minimum-first mutation slice receipt:
 - Live campaign head at branch creation was
@@ -290,3 +265,66 @@ P-TOPUP-1 pinned-source gate receipt (committed tree):
   bootstrap` on an unmodified checkout, so it is a toolchain-availability
   regression rather than a proof regression; the `lake build LidoSRv3` half of
   the same recipe completed successfully.
+P-ALLOC-1 canonical-model refresh (2026-08-03)
+------------------------------------------------
+
+- Immutable campaign base: `campaign/lido-minimal-11@4d7d152551fffed0d43e9b5c73bed6eef4532f05`.
+- Lido source pin: `af095e48bbc1c3841c2c9936219c8461af01056b`.
+- Focused canonical, regression bridge, and mutant build:
+  `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Regression.AllocCapacityLegacy LidoSRv3.Tests.AllocCapacityRegression`: exit 0.
+- Full `lake build`: exit 0 (489 jobs).
+- `lake env lean LidoSRv3/Audit/Trust.lean`: exit 0; P-ALLOC-1 reports only
+  Lean foundations (`propext`, and `Quot.sound` where listed), with no project axiom.
+- Project proof-escape scan for line-leading `axiom`, `sorry`, or `admit`: no match.
+- Public P-ALLOC-1 facade/source import scan for `LidoSRv3.Legacy.Model`: no match.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all optimized metadata mutants rejected.
+- Canonical negative mutants for min/clamp, active-status guard, router order,
+  and checked-uint256 overflow: build exit 0.
+- `git diff --check`: exit 0.
+- `git diff -- lakefile.lean lake-manifest.json`: empty; Verity and EVMYul pins unchanged.
+
+P-ALLOC-1 exact-head review corrections (2026-08-03)
+-----------------------------------------------------
+
+- Starting PR head: `23ff80a54999e07c4ed592208b67df235138cd75`.
+- Focused execution-refinement, checked Legacy bridge, and execute-mutant build:
+  `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Regression.AllocCapacityLegacy LidoSRv3.Tests.AllocCapacityRegression`: exit 0 (20 jobs).
+- Full `lake build`: exit 0 (489 jobs), including `LidoSRv3.Audit.Trust`; the
+  P-ALLOC-1 execution theorem reports only `propext` and `Quot.sound`.
+- Isolated `lake env lean LidoSRv3/Audit/Trust.lean`: exit 126 in the remote
+  Spark wrapper (`/root/.elan/bin/lake: Permission denied`); treated as
+  infrastructure-only because the authoritative full build compiled and ran
+  the same trust entrypoint successfully.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all
+  optimized metadata mutants rejected.
+- Changed-Lean scan for `sorry`, `admit`, or `unsafe`: no match (exit 0 after
+  normalizing ripgrep's no-match exit 1).
+- Public P-ALLOC-1 facade/source/model scan for `LidoSRv3.Legacy.Model`: no
+  match (exit 0 after normalizing ripgrep's no-match exit 1).
+- Registry assertion: 12 rows, exactly 11 canonical guarantees and only
+  subordinate `P-SSZ-1.deposit-data-root`: exit 0.
+- `git diff --check`: exit 0.
+- `git diff --quiet -- lake-manifest.json lean-toolchain`: exit 0; dependency
+  pins and the Lean toolchain are unchanged.
+
+P-ALLOC-1 independent-source correspondence correction (2026-08-04)
+---------------------------------------------------------------------
+
+- Starting PR head: `69ff2c3b85f156897c08e22b27445a368797efd4`.
+- `SolidityAllocCapacity.execute` is now an independent checked-`Uint256`
+  interpretation of both pinned SRLib loops; `source_execute_eq_canonical` is
+  a structural correspondence proof through separate first- and second-loop
+  lemmas, not a definitional alias.
+- The min/clamp, active-status, router-order, and checked-overflow negative
+  regressions execute against the independent source interpretation.
+- Focused build (canonical facade, Legacy regression bridge, source mutants):
+  exit 0 (20 jobs).
+- Full `lake build`: exit 0 (493 jobs), including `LidoSRv3.Audit.Trust`; the
+  P-ALLOC-1 source theorem reports only `propext` and `Quot.sound`.
+- Isolated trust command: exit 126 in the remote Spark wrapper (`lake:
+  Permission denied`); infrastructure-only because the full build compiled
+  and ran the identical trust entrypoint successfully.
+- Metadata, optimized mutants, provenance/forbidden-token guards, exact
+  11-plus-1 registry assertion, and `make test`: exit 0.

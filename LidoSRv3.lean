@@ -1,4 +1,3 @@
-import LidoSRv3.Legacy.Model
 import LidoSRv3.Audit.Arithmetic
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Allocation

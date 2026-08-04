@@ -2,7 +2,7 @@
 
 # REPRODUCE
 
-- `P-ALLOC-1`: `lake build LidoSRv3.Audit.Guarantees.PAlloc1` — successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open
+- `P-ALLOC-1`: `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression` — successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open
 - `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2` — successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open
 - `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Guarantees.PDeposit1` — successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Guarantees.PTopup1` — successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open

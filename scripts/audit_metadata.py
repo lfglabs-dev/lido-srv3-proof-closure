@@ -31,7 +31,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Pinned-source correspondence proves only the allocation-capacity computation; proportional allocation amounts and EVM equivalence remain open.",
+    "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
@@ -52,8 +52,6 @@ EXPECTED_ASSUMPTIONS = {
         "statement": "DEV-431-READY is development readiness, not AUDIT-CERT.",
     },
     "assumptions": [
-        {"id": "A-LEGACY-MODEL", "accepted": True,
-         "risk": "Legacy pure-model regression evidence is not source or deployed-bytecode correspondence."},
         {"id": "A-MODEL-INPUTS", "accepted": True,
          "risk": "Quantity bounds and units remain model inputs until source refinement is proved."},
         {"id": "A-ABSTRACT-TX", "accepted": True,
@@ -79,8 +77,8 @@ EXPECTED_ASSUMPTIONS = {
     ],
 }
 EXPECTED_REPRODUCTION = [
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1",
-     "expected": "successful pinned-source allocation-capacity correspondence build; proportional amount correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression",
+     "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -105,7 +103,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-LEGACY-MODEL", "A-SOURCE-SHAPED"],
+    ["A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
@@ -119,7 +117,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
 ]
 EXPECTED_NEXT_GATES = [
-    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
+    "Refine proportional allocation amounts and EVM "
     "correspondence for SRLib._getModulesAllocationAndCapacity.",
     "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
     "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
@@ -150,7 +148,7 @@ EXPECTED_EXCLUSIONS = {
 }
 PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "REGRESSION", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -190,7 +188,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
@@ -258,13 +256,16 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Strategy",
             "LidoSRv3.Audit.StrategyProofs",
             "LidoSRv3.Audit.Source.MinFirstCorrespondence",
+            "LidoSRv3.Audit.Model.AllocCapacity",
             "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
+            "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
             "LidoSRv3.Audit.Source.AccountingCorrespondence",
             "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
             "LidoSRv3.Audit.Source.ReserveCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
+            "LidoSRv3.Tests.AllocCapacityRegression",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
             "LidoSRv3.Tests.DepositVectors",
@@ -309,10 +310,12 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc1.active_capacity_bounded", "status": "lean_checked",
      "axioms": ["propext"]},
-    {"name": "Guarantees.PAlloc1.source_capacities_match_model", "status": "lean_checked",
+    {"name": "Guarantees.PAlloc1.source_capacities_match_canonical", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.router_order_preserved", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
-    {"name": "Guarantees.PAlloc1.source_active_capacity_bounded", "status": "lean_checked",
-     "axioms": ["propext", "Quot.sound"]},
+    {"name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math", "status": "lean_checked",
+     "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc2.selects_least_open_bucket", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc2.source_selects_same_next_target", "status": "lean_checked",
@@ -441,6 +444,16 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/sr/StakingRouter.sol", "getDepositAllocations", 929, 936),
         ("contracts/0.8.25/sr/SRLib.sol", "_getDepositAllocations", 391, 431),
         ("contracts/0.8.25/sr/SRLib.sol", "_getModulesAllocationAndCapacity", 493, 559),
+        ("contracts/0.8.25/sr/SRLib.sol", "_getStakingModuleSummary", 372, 379),
+        ("contracts/0.8.25/sr/SRStorage.sol", "getModuleState", 30, 32),
+        ("contracts/0.8.25/sr/SRStorage.sol", "getIStakingModule helpers", 34, 47),
+        ("contracts/0.8.25/sr/SRStorage.sol", "getModulesCount", 54, 56),
+        ("contracts/0.8.25/sr/SRStorage.sol", "getModuleIdAt", 62, 64),
+        ("contracts/common/lib/WithdrawalCredentials.sol", "isType2(uint256)", 47, 49),
+        ("contracts/0.8.25/sr/SRUtils.sol", "TOTAL_BASIS_POINTS", 17, 17),
+        ("contracts/common/interfaces/IStakingModule.sol", "getStakingModuleSummary", 71, 81),
+        ("contracts/common/interfaces/IStakingModuleV2.sol", "getTotalModuleStake", 28, 29),
+        ("package.json", "@openzeppelin/contracts-v5.2 dependency pin", 143, 143),
     },
     "P-ALLOC-2": {
         ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate candidate search", 76, 86),
