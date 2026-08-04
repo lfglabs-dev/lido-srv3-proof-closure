@@ -44,13 +44,13 @@
     },
     {
       "id": "P-ACCOUNT-1",
-      "catalogue_wording": "The handwritten MinFirst model has no established Solidity/EVM equivalence in M0.",
-      "theorem": "LidoSRv3.Audit.MinFirst.totalAllocated_le_requested",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-HANDWRITTEN-MINFIRST"],
-      "next_gate": "Establish source correspondence and checked-Uint256 execution refinement.",
-      "reproduction": {"command": "lake build LidoSRv3.Tests.MinFirstVectors", "expected": "successful theorem and falsifier-vector build"}
+      "catalogue_wording": "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "next_gate": "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors", "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open"}
     },
     {
       "id": "P-RESERVE-1",

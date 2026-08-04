@@ -6,7 +6,7 @@
 - `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
 - `P-DEPOSIT-1`: Refine success/revert and rollback against pinned executable EVM semantics.
 - `P-TOPUP-1`: Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.
-- `P-ACCOUNT-1`: Establish source correspondence and checked-Uint256 execution refinement.
+- `P-ACCOUNT-1`: Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.
 - `P-RESERVE-1`: Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.
 - `P-ETH-1`: Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.
 - `P-ADDRESS-1`: Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.
