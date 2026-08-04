@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Source.MinFirstCorrespondence
+import LidoSRv3.Audit.MinFirstAllocation
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc2
@@ -31,5 +32,15 @@ theorem source_selects_same_next_target
     (hRows : SolidityMinFirst.RowsCorrespond rows) :
     SolidityMinFirst.candidate? rows = MinFirst.candidate? rows :=
   SolidityMinFirst.selects_same_next_target hRows
+
+/-- Full pinned-source candidate scan correspondence for the independent
+MODEL/SOURCE representations used by the proportional mutation slice. -/
+theorem full_candidate_correspondence
+    (hRows : MinFirstAllocation.RowsCorrespond model source) :
+    Option.map (fun b => (b.allocation, b.capacity))
+        (MinFirstAllocation.Model.candidate? model) =
+      Option.map (fun r => (r.allocation.val, r.capacity.val))
+        (MinFirstAllocation.Source.candidate? source) :=
+  MinFirstAllocation.candidate_correspondence hRows
 
 end LidoSRv3.Audit.Guarantees.PAlloc2
