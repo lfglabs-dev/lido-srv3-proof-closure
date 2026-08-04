@@ -4,15 +4,17 @@ import LidoSRv3.Audit.Common.Atomicity
 import LidoSRv3.Audit.Common.Bounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
+import LidoSRv3.Audit.Guarantees.PAccount1
+import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
 
 /-!
-Machine-readable-in-build axiom report for the first audit slice.
+Machine-readable-in-build trust report for the first audit slice.
 
 Expected output is only Lean foundations (`propext`, `Quot.sound`) where used;
-there are no project axioms, `sorry`, or proof escapes.
+there are no project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
@@ -25,6 +27,16 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_conservation
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_capacity
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Model.failure_rolls_back
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_conservation
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
+#print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
