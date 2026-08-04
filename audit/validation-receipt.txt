@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 4d7d152551fffed0d43e9b5c73bed6eef4532f05
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 9e5ec4da235e65aa4c8e2c00df26e6b05bfbe868
+validated-tree: 40d90af6f8083b4567b73eba3cc769265d08c535
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,6 +13,21 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
+
+P-ALLOC-2 minimum-first mutation slice receipt:
+- Live campaign head at branch creation was
+  `458bf6404968c1857c6635e507dba57a51df1031`.
+- `lake build LidoSRv3.Audit.Guarantees.PAlloc2`,
+  `lake build LidoSRv3.Tests.MinFirstVectors LidoSRv3.Audit.Trust`, and
+  `lake build LidoSRv3` completed successfully with a mission-private
+  `LAKE_HOME` and checkout-local `.lake/build`.
+- `python3 scripts/audit_metadata.py check` and optimized metadata mutants
+  passed. The axiom report lists only Lean foundations (`propext`,
+  `Quot.sound`) for the new obligations.
+- Verity PR #2231 remained open at
+  `2a380049fb7033c6b7bd2154b7f4becf62bf7e5e`; the pinned Verity revision
+  `d2d4a18a4d7021adcd90d4b03e619affe506dd54` has no official loop simulation,
+  so no official-semantics bridge is claimed.
 
 P-ACCOUNT-1 faithful Verity transaction gate receipt (committed tree):
 - Live campaign head was re-read before branching and remained
