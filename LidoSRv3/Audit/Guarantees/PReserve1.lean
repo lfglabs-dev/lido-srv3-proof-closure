@@ -26,20 +26,21 @@ This is not an EVM theorem: storage-slot numbers are a model-local projection,
 and no Solidity compiler, Yul, runtime bytecode, proxy layout, deployed code,
 or external-call semantics is claimed.
 -/
-theorem verity_tx_simulates_reserve_spec (state : ContractState) (amount : Word) :
-    observeVerity state ((veritySpend amount).run state) =
-      specTx (decode state) amount ∧
-    ∀ reason, (veritySpend amount).run state = .revert reason state →
-      ((veritySpend amount).run state).snd = state :=
-  ⟨verity_execution_simulates_spec state amount,
-    fun reason h => verity_revert_rolls_back state amount reason h⟩
+theorem verity_tx_simulates_reserve_spec (inputs : WithdrawInputs)
+    (state : ContractState) (amount : Word) :
+    observeVerity state ((verityWithdraw inputs amount).run state) =
+      specTx inputs (decode state) amount ∧
+    ∀ reason, (verityWithdraw inputs amount).run state = .revert reason state →
+      ((verityWithdraw inputs amount).run state).snd = state :=
+  ⟨verity_execution_simulates_spec state amount inputs,
+    fun reason h => verity_revert_rolls_back inputs state amount reason h⟩
 
 /-- On a committing executable Verity transition, the prohibited reserve state
 is observationally unchanged. -/
 theorem verity_tx_preserves_withdrawal_reserve
-    (state after : ContractState) (amount : Word)
-    (h : (veritySpend amount).run state = .success () after) :
+    (inputs : WithdrawInputs) (state after : ContractState) (amount : Word)
+    (h : (verityWithdraw inputs amount).run state = .success () after) :
     (decode after).unfinalizedStETH = (decode state).unfinalizedStETH :=
-  verity_commit_preserves_withdrawal_reserve state after amount h
+  verity_commit_preserves_withdrawal_reserve inputs state after amount h
 
 end LidoSRv3.Audit.Guarantees.PReserve1

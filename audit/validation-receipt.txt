@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 9131f1820f0f5034b3ebc08f4c9decacb49bdcb1
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 193b2180699f20085a6c1e56aabe9457fbc9aaa1
+validated-tree: 0cec58b860efc47d3727fd89d9aa2272db9da0b0
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -24,8 +24,13 @@ P-RESERVE-1 faithful Verity transaction boundary (committed tree):
 - `lake build`: exit 0 (488 jobs).
 - Focused P-RESERVE-1 and `ReserveMutants` builds: exit 0.
 - `verity_tx_simulates_reserve_spec` starts from executable
-  `Verity.Contract.run`, simulates the abstract transaction/spec, and carries
-  whole-state rollback on checked-Uint256 and source guard reverts.
+  `Verity.Contract.run` over a separately defined pinned-source interpreter;
+  `source_spend_matches_model` and `source_withdraw_matches_model` establish the
+  independent MODEL to SOURCE correspondence before the SOURCE to VERITY_TX
+  observable refinement. Whole-state rollback covers checked-Uint256 and
+  source guard reverts.
+- `ReserveMutants` rejects a swapped-reserve source transcription and proves a
+  withdrawal-demand mutant of the MODEL does not silently mutate SOURCE.
 - Trust output for all three new public theorems contains only Lean foundations
   `propext` and `Quot.sound`; no project axioms or proof escapes are introduced.
 - Yul, EVM/runtime bytecode, deployed storage/call semantics, crypto, and E2E

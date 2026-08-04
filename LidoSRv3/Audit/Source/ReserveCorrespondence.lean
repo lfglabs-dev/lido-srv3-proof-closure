@@ -120,9 +120,99 @@ def encode (base : ContractState) (r : ReserveState) : ContractState :=
       else if slot = depositedNextReportAdjustedSlot then r.depositedNextReportAdjusted
       else base.storage slot }
 
+/-! ## Independent pinned-source execution
+
+The definitions below deliberately do not call `spendDepositableEther` or its
+helpers.  They transcribe the five pinned Solidity spans into a second,
+source-shaped interpreter.  This separation makes the MODEL → SOURCE →
+VERITY_TX refinement non-vacuous and mutant-sensitive.
+
+`WithdrawInputs` exposes the two wrapper guards whose implementations lie
+outside the pinned spans.  This reserve projection does not model the seed
+deposit counter, event log payloads, or the final router value transfer.
+-/
+
+structure WithdrawInputs where
+  canDeposit : Bool
+  authorizedRouter : Bool
+  deriving DecidableEq, Repr
+
+def sourceGetBufferedEtherAllocation (s : ReserveState) : Option Allocation := do
+  let depositsReserve := minWord s.buffered s.storedDepositsReserve
+  let remainingAfterDeposits ← safeSub s.buffered depositsReserve
+  let withdrawalsReserve := minWord remainingAfterDeposits s.unfinalizedStETH
+  let unreserved ← safeSub remainingAfterDeposits withdrawalsReserve
+  pure ⟨s.buffered, unreserved, depositsReserve, withdrawalsReserve⟩
+
+def sourceGetDepositableEther (a : Allocation) : Option Word :=
+  safeAdd a.depositsReserve a.unreserved
+
+def sourceSpendDepositableEther (before : ReserveState) (amount : Word) : SourceOutcome :=
+  match sourceGetBufferedEtherAllocation before with
+  | none => .reverted "ALLOCATION_ARITHMETIC"
+  | some allocation =>
+      match sourceGetDepositableEther allocation with
+      | none => .reverted "DEPOSITABLE_OVERFLOW"
+      | some depositable =>
+          if amount ≤ depositable then
+            match safeAdd before.depositedPostReport amount with
+            | none => .reverted "DEPOSITED_POST_REPORT_OVERFLOW"
+            | some depositedPostReport =>
+                match safeSub allocation.total amount with
+                | none => .reverted "BUFFER_UNDERFLOW"
+                | some buffered =>
+                    match safeAdd before.depositedNextReportAdjusted amount with
+                    | none => .reverted "DEPOSITED_NEXT_REPORT_OVERFLOW"
+                    | some depositedNextReportAdjusted =>
+                        let storedDepositsReserve :=
+                          if before.storedDepositsReserve > amount then
+                            before.storedDepositsReserve - amount
+                          else 0
+                        .committed { before with
+                          buffered := buffered
+                          storedDepositsReserve := storedDepositsReserve
+                          depositedPostReport := depositedPostReport
+                          depositedNextReportAdjusted := depositedNextReportAdjusted }
+          else .reverted "NOT_ENOUGH_ETHER"
+
+/-- Source-shaped `getDepositableEther` wrapper at lines 823--825. -/
+def sourceDepositableEtherView (s : ReserveState) : Option Word := do
+  sourceGetDepositableEther (← sourceGetBufferedEtherAllocation s)
+
+/-- Reserve projection of `withdrawDepositableEther`, lines 869--886. -/
+def sourceWithdrawDepositableEther (inputs : WithdrawInputs)
+    (before : ReserveState) (amount : Word) : SourceOutcome :=
+  if !inputs.canDeposit then .reverted "CAN_NOT_DEPOSIT"
+  else if !inputs.authorizedRouter then .reverted "APP_AUTH_FAILED"
+  else if amount = 0 then .reverted "ZERO_AMOUNT"
+  else sourceSpendDepositableEther before amount
+
+/-- Abstract wrapper semantics.  It uses only the MODEL spend transition. -/
+def modelWithdrawDepositableEther (inputs : WithdrawInputs)
+    (before : ReserveState) (amount : Word) : SourceOutcome :=
+  if !inputs.canDeposit then .reverted "CAN_NOT_DEPOSIT"
+  else if !inputs.authorizedRouter then .reverted "APP_AUTH_FAILED"
+  else if amount = 0 then .reverted "ZERO_AMOUNT"
+  else spendDepositableEther before amount
+
+/-- Checked-Uint256 correspondence between the independent pinned-source
+interpreter and the abstract MODEL transition. -/
+theorem source_spend_matches_model (before : ReserveState) (amount : Word) :
+    sourceSpendDepositableEther before amount = spendDepositableEther before amount := by
+  simp [sourceSpendDepositableEther, spendDepositableEther,
+    sourceGetBufferedEtherAllocation, getBufferedEtherAllocation,
+    sourceGetDepositableEther, getDepositableEther]
+
+theorem source_withdraw_matches_model (inputs : WithdrawInputs)
+    (before : ReserveState) (amount : Word) :
+    sourceWithdrawDepositableEther inputs before amount =
+      modelWithdrawDepositableEther inputs before amount := by
+  simp [sourceWithdrawDepositableEther, modelWithdrawDepositableEther,
+    source_spend_matches_model]
+
 /-- Actual pinned-Verity execution. `Contract.run` supplies whole-call rollback. -/
-def veritySpend (amount : Word) : Contract Unit := fun state =>
-  match spendDepositableEther (decode state) amount with
+def verityWithdraw (inputs : WithdrawInputs) (amount : Word) : Contract Unit := fun state =>
+  match sourceWithdrawDepositableEther inputs (decode state) amount with
   | .reverted reason => .revert reason state
   | .committed after => .success () (encode state after)
 
@@ -137,8 +227,8 @@ structure ReserveTx where
 
 /-- Independent abstract transaction/spec: source commits its post-state;
 source reverts restore the pre-state. -/
-def specTx (before : ReserveState) (amount : Word) : ReserveTx :=
-  match spendDepositableEther before amount with
+def specTx (inputs : WithdrawInputs) (before : ReserveState) (amount : Word) : ReserveTx :=
+  match modelWithdrawDepositableEther inputs before amount with
   | .reverted _ => ⟨.reverted, before, before⟩
   | .committed after => ⟨.committed, before, after⟩
 
@@ -155,15 +245,18 @@ def observeVerity (before : ContractState) (result : ContractResult Unit) : Rese
 /-- VERITY_TX closure: executable `Contract.run` simulates the abstract spec,
 including the rollback observable on every checked-arithmetic/source revert. -/
 theorem verity_execution_simulates_spec (state : ContractState) (amount : Word) :
-    observeVerity state ((veritySpend amount).run state) = specTx (decode state) amount := by
-  simp only [veritySpend, Contract.run]
-  cases h : spendDepositableEther (decode state) amount <;>
+    ∀ inputs, observeVerity state ((verityWithdraw inputs amount).run state) =
+      specTx inputs (decode state) amount := by
+  intro inputs
+  simp only [verityWithdraw, Contract.run]
+  rw [source_withdraw_matches_model]
+  cases h : modelWithdrawDepositableEther inputs (decode state) amount <;>
     simp [h, observeVerity, specTx]
 
-theorem verity_revert_rolls_back (state : ContractState) (amount : Word)
+theorem verity_revert_rolls_back (inputs : WithdrawInputs) (state : ContractState) (amount : Word)
     (reason : String)
-    (h : (veritySpend amount).run state = .revert reason state) :
-    ((veritySpend amount).run state).snd = state := by
+    (h : (verityWithdraw inputs amount).run state = .revert reason state) :
+    ((verityWithdraw inputs amount).run state).snd = state := by
   simp [h]
 
 /- The prohibited state transition is changing the withdrawal demand while
@@ -202,18 +295,25 @@ theorem committed_preserves_withdrawal_reserve
 
 /-- Observable non-interference at the actual Verity boundary. -/
 theorem verity_commit_preserves_withdrawal_reserve
-    (state after : ContractState) (amount : Word)
-    (h : (veritySpend amount).run state = .success () after) :
+    (inputs : WithdrawInputs) (state after : ContractState) (amount : Word)
+    (h : (verityWithdraw inputs amount).run state = .success () after) :
     (decode after).unfinalizedStETH = (decode state).unfinalizedStETH := by
-  have hBody : veritySpend amount state = .success () after :=
+  have hBody : verityWithdraw inputs amount state = .success () after :=
     Contract.eq_of_run_success h
-  unfold veritySpend at hBody
-  cases hs : spendDepositableEther (decode state) amount with
+  unfold verityWithdraw at hBody
+  cases hs : sourceWithdrawDepositableEther inputs (decode state) amount with
   | reverted reason => simp [hs] at hBody
   | committed reserveAfter =>
       simp [hs] at hBody
       obtain rfl := hBody
-      simpa using committed_preserves_withdrawal_reserve
-        (decode state) reserveAfter amount hs
+      have hm : modelWithdrawDepositableEther inputs (decode state) amount =
+          .committed reserveAfter := by
+        rw [← source_withdraw_matches_model]
+        exact hs
+      unfold modelWithdrawDepositableEther at hm
+      split at hm <;> try contradiction
+      split at hm <;> try contradiction
+      split at hm <;> try contradiction
+      exact committed_preserves_withdrawal_reserve _ _ amount hm
 
 end LidoSRv3.Audit.SolidityReserve

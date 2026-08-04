@@ -14,6 +14,8 @@ private def vector : ReserveState :=
     depositedPostReport := word 3
     depositedNextReportAdjusted := word 2 }
 
+private def allowed : WithdrawInputs := ⟨true, true⟩
+
 /-- Meaningful source mutant: a deposit spend illegally decrements withdrawal
 demand as well as the deposits reserve. -/
 private def reserveChangingMutant (before : ReserveState) (amount : Word) : SourceOutcome :=
@@ -43,11 +45,31 @@ example : reserveChangingMutant vector (word 10) ≠
 
 /-- A checked-Uint256 overflow after the source-ordered buffer work is still a
 whole Verity transaction rollback. -/
-example : specTx
+example : specTx allowed
     { vector with depositedNextReportAdjusted := (Verity.Core.MAX_UINT256 : Word) }
     (word 1) =
     ⟨TxOutcome.reverted,
       { vector with depositedNextReportAdjusted := (Verity.Core.MAX_UINT256 : Word) },
       { vector with depositedNextReportAdjusted := (Verity.Core.MAX_UINT256 : Word) }⟩ := by decide
+
+/-- Correspondence mutant: the source transcription swaps the two reserve
+inputs before allocation.  The vector makes that source drift observable. -/
+private def swappedReserveSourceMutant (before : ReserveState) (amount : Word) : SourceOutcome :=
+  sourceSpendDepositableEther
+    { before with
+      storedDepositsReserve := before.unfinalizedStETH
+      unfinalizedStETH := before.storedDepositsReserve }
+    amount
+
+example : sourceWithdrawDepositableEther allowed vector (word 10) =
+    modelWithdrawDepositableEther allowed vector (word 10) := by decide
+
+example : swappedReserveSourceMutant vector (word 30) ≠
+    spendDepositableEther vector (word 30) := by decide
+
+/-- Independence regression: mutating the MODEL transition does not silently
+mutate the separately defined pinned-source execution transition. -/
+example : reserveChangingMutant vector (word 10) ≠
+    sourceSpendDepositableEther vector (word 10) := by decide
 
 end LidoSRv3.Tests.ReserveMutants
