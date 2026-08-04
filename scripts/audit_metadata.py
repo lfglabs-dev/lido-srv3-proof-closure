@@ -460,6 +460,7 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.25/sr/SRLib.sol", "_validateReportValidatorBalancesByStakingModule", 853, 870),
         ("contracts/0.8.25/sr/SRLib.sol", "_reportValidatorBalancesByStakingModule", 872, 892),
         ("contracts/0.8.25/sr/SRUtils.sol", "_ensureAmountGwei", 75, 83),
+        ("contracts/0.8.25/sr/SRUtils.sol", "MAX_VALUE_GWEI", 23, 23),
         ("contracts/0.8.9/Accounting.sol", "handleOracleReport", 135, 144),
         ("contracts/0.8.9/Accounting.sol", "_calculateProtocolFees", 263, 303),
         ("contracts/0.8.9/Accounting.sol", "_applyOracleReportContext", 359, 428),

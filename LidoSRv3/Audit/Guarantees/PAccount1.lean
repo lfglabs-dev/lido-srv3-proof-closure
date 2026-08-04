@@ -33,10 +33,11 @@ theorem source_to_verityTx
     (h : LidoSRv3.Audit.SolidityAccounting.accept i = some accepted) :
     LidoSRv3.Audit.SolidityAccounting.checkedTotal256 accepted.balancesGwei =
         some (Verity.Core.Uint256.ofNat accepted.totalBalanceGwei) ∧
-      LidoSRv3.Audit.SolidityAccounting.sourceTrace fullReportSucceeds i
-        sharesToMintAsFees hSuccess = some
-          (LidoSRv3.Audit.SolidityAccounting.successfulSteps accepted
-            sharesToMintAsFees) :=
+      LidoSRv3.Audit.SolidityAccounting.verityTxAccept i = some accepted ∧
+      LidoSRv3.Audit.SolidityAccounting.verityTxTrace fullReportSucceeds i
+        sharesToMintAsFees hSuccess =
+          LidoSRv3.Audit.SolidityAccounting.sourceTrace fullReportSucceeds i
+            sharesToMintAsFees hSuccess :=
   LidoSRv3.Audit.SolidityAccounting.source_to_verityTx
     fullReportSucceeds i sharesToMintAsFees hSuccess accepted h
 

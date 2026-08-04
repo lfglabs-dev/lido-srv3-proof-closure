@@ -845,6 +845,19 @@ def main():
             "P-ACCOUNT-1: source spans differ from verified semantic anchors",
         )
 
+        missing_accounting_constant = copy.deepcopy(source_map)
+        missing_accounting_constant["targets"][4]["spans"] = [
+            span for span in missing_accounting_constant["targets"][4]["spans"]
+            if span["function"] != "MAX_VALUE_GWEI"
+        ]
+        write_json(source_map_path, missing_accounting_constant)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ACCOUNT-1: source spans differ from verified semantic anchors",
+        )
+
         downgraded_verified_target = copy.deepcopy(source_map)
         downgraded_verified_target["targets"][0] = {
             "id": source_map["targets"][0]["id"],
@@ -1065,7 +1078,8 @@ def main():
         "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
         "and span unmapping, P-TOPUP-1 transitive-helper span, "
         "pinned-constant declaration span and no-wrap assumption drops, "
-        "P-ACCOUNT-1 source/tx downgrade and transitive-helper span drops, "
+        "P-ACCOUNT-1 source/tx downgrade, transitive-helper and "
+        "MAX_VALUE_GWEI declaration span drops, "
         "P-SSZ-1 deposit-data-root span drops, "
         "stale view"
     )

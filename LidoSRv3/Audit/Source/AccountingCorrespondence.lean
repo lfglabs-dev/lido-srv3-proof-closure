@@ -57,7 +57,8 @@ def idsAndBalancesValid (i : ReportInput) : Bool :=
   i.balancesGwei.all (· ≤ maxValueGwei)
 
 /-- Verity-word execution of the checked `+=` at SRLib.sol line 888, followed
-by the uint64 destination bound. -/
+by the uint64 destination bound.  This is deliberately separate from
+`checkedTotal64`, the pinned Solidity source semantics below. -/
 def checkedTotal256 : List Nat → Option Word
   | [] => some 0
   | x :: xs => do
@@ -65,9 +66,15 @@ def checkedTotal256 : List Nat → Option Word
       let next ← safeAdd tail (Verity.Core.Uint256.ofNat x)
       if next.val ≤ uint64Max then some next else none
 
-/-- Natural-number source view of the same checked Verity execution. -/
-def checkedTotal64 (xs : List Nat) : Option Nat :=
-  (checkedTotal256 xs).map (·.val)
+/-- Independent pinned-source semantics for Solidity's checked uint64 `+=`.
+It uses only natural-number addition and the uint64 bound: it does not call,
+project, or otherwise depend on the Verity execution. -/
+def checkedTotal64 : List Nat → Option Nat
+  | [] => some 0
+  | x :: xs => do
+      let tail ← checkedTotal64 xs
+      let next := x + tail
+      if next ≤ uint64Max then some next else none
 
 def accept (i : ReportInput) : Option AcceptedReport := do
   if idsAndBalancesValid i then pure () else none
@@ -80,6 +87,21 @@ def successfulSteps (accepted : AcceptedReport) (sharesToMintAsFees : Nat) : Lis
   [.balancesWritten accepted.balancesGwei, .accountingCalled,
     .rewardsRead accepted.balancesGwei] ++
   if 0 < sharesToMintAsFees then [.rewardsMinted] else []
+
+/-- Independently defined observable transaction steps.  Keeping this target
+projection separate makes an ordering mutation on either side falsifiable. -/
+def verityTxSuccessfulSteps (accepted : AcceptedReport)
+    (sharesToMintAsFees : Nat) : List Step :=
+  [.balancesWritten accepted.balancesGwei, .accountingCalled,
+    .rewardsRead accepted.balancesGwei] ++
+  if 0 < sharesToMintAsFees then [.rewardsMinted] else []
+
+/-- Verity transaction acceptance, executing `safeAdd`/Uint256 independently
+and exposing the checked uint64 result as the transaction observation. -/
+def verityTxAccept (i : ReportInput) : Option AcceptedReport := do
+  if idsAndBalancesValid i then pure () else none
+  let total ← checkedTotal256 i.balancesGwei
+  pure ⟨i.reportedModuleIds, i.balancesGwei, total.val⟩
 
 /-- Trace projection gated by independently established successful execution
 of the *full* pinned report.  `accept` deliberately proves only the earlier
@@ -106,17 +128,55 @@ def sourceTraceFromResult (fullReportSucceeds : ReportInput → Nat → Prop)
   | .succeeded evidence =>
       sourceTrace fullReportSucceeds i sharesToMintAsFees evidence
 
+/-- Observable Verity transaction, separately executed from `sourceTrace`. -/
+def verityTxTrace (fullReportSucceeds : ReportInput → Nat → Prop)
+    (i : ReportInput) (sharesToMintAsFees : Nat)
+    (_ : fullReportSucceeds i sharesToMintAsFees) : Option (List Step) := do
+  let accepted ← verityTxAccept i
+  pure (verityTxSuccessfulSteps accepted sharesToMintAsFees)
+
+theorem checkedTotal64_le (xs : List Nat) (n : Nat)
+    (h : checkedTotal64 xs = some n) : n ≤ uint64Max := by
+  induction xs with
+  | nil => simp [checkedTotal64] at h; omega
+  | cons x xs ih =>
+      simp [checkedTotal64, Option.bind_eq_some_iff] at h
+      rcases h with ⟨tail, hTail, hNext⟩
+      exact hNext.2 ▸ hNext.1
+
 theorem checkedTotal256_refines_source (xs : List Nat) (n : Nat)
     (h : checkedTotal64 xs = some n) :
     checkedTotal256 xs = some (Verity.Core.Uint256.ofNat n) := by
-  simp [checkedTotal64, Option.map_eq_some_iff] at h
-  rcases h with ⟨word, hWord, rfl⟩
-  rw [hWord]
-  congr 1
-  apply Verity.Core.Uint256.ext
-  have hw := word.isLt
-  simp [Verity.Core.Uint256.modulus] at hw ⊢
-  exact (Nat.mod_eq_of_lt hw).symm
+  induction xs generalizing n with
+  | nil => simp [checkedTotal64, checkedTotal256] at h ⊢; exact h.symm ▸ rfl
+  | cons x xs ih =>
+      simp [checkedTotal64, Option.bind_eq_some_iff] at h
+      rcases h with ⟨tail, hTail, hNext⟩
+      rcases hNext with ⟨hFit, rfl⟩
+      have h64mod : uint64Max < Verity.Core.Uint256.modulus := by decide
+      have hx : x < Verity.Core.Uint256.modulus :=
+        Nat.lt_of_le_of_lt (Nat.le_add_right x tail)
+          (Nat.lt_of_le_of_lt hFit h64mod)
+      have ht : tail < Verity.Core.Uint256.modulus :=
+        Nat.lt_of_le_of_lt (Nat.le_add_left tail x)
+          (Nat.lt_of_le_of_lt hFit h64mod)
+      have hsum : x + tail ≤ Verity.Core.MAX_UINT256 := by
+        have hmax : uint64Max ≤ Verity.Core.MAX_UINT256 := by decide
+        exact Nat.le_trans hFit hmax
+      have hsumlt : x + tail < Verity.Core.Uint256.modulus :=
+        Nat.lt_of_le_of_lt hFit h64mod
+      have hSafe : safeAdd (Verity.Core.Uint256.ofNat tail)
+          (Verity.Core.Uint256.ofNat x) =
+          some (Verity.Core.Uint256.ofNat (x + tail)) := by
+        simp [safeAdd, Nat.mod_eq_of_lt hx, Nat.mod_eq_of_lt ht,
+          Nat.not_lt.mpr hsum, Nat.add_comm, Verity.Core.Uint256.ofNat_add]
+      have hVal : (Verity.Core.Uint256.ofNat x +
+          Verity.Core.Uint256.ofNat tail).val = x + tail := by
+        simp [HAdd.hAdd, Verity.Core.Uint256.add, Nat.mod_eq_of_lt hx,
+          Nat.mod_eq_of_lt ht]
+        exact Nat.mod_eq_of_lt hsumlt
+      simp [checkedTotal256, ih tail hTail, hSafe, hVal, hFit,
+        Verity.Core.Uint256.ofNat_add]
 
 theorem source_report_before_reward
     (fullReportSucceeds : ReportInput → Nat → Prop)
@@ -138,12 +198,21 @@ theorem source_to_verityTx
     (hSuccess : fullReportSucceeds i sharesToMintAsFees)
     (accepted : AcceptedReport) (hAccept : accept i = some accepted) :
     checkedTotal256 accepted.balancesGwei = some (Verity.Core.Uint256.ofNat accepted.totalBalanceGwei) ∧
-    sourceTrace fullReportSucceeds i sharesToMintAsFees hSuccess =
-      some (successfulSteps accepted sharesToMintAsFees) := by
+    verityTxAccept i = some accepted ∧
+    verityTxTrace fullReportSucceeds i sharesToMintAsFees hSuccess =
+      sourceTrace fullReportSucceeds i sharesToMintAsFees hSuccess := by
   simp [accept, Option.bind_eq_some_iff] at hAccept
   rcases hAccept with ⟨hValid, total, hTotal, rfl⟩
   constructor
   · exact checkedTotal256_refines_source _ _ hTotal
-  · simp [sourceTrace, accept, hValid, hTotal]
+  · have hWord := checkedTotal256_refines_source _ _ hTotal
+    have hTotalLe := checkedTotal64_le _ _ hTotal
+    have h64mod : uint64Max < Verity.Core.Uint256.modulus := by decide
+    have hTotalLt : total < Verity.Core.Uint256.modulus :=
+      Nat.lt_of_le_of_lt hTotalLe h64mod
+    constructor
+    · simp [verityTxAccept, hValid, hWord, Nat.mod_eq_of_lt hTotalLt]
+    · simp [verityTxTrace, sourceTrace, verityTxAccept, accept, hValid,
+        hWord, hTotal, verityTxSuccessfulSteps, successfulSteps]
 
 end LidoSRv3.Audit.SolidityAccounting
