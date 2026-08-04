@@ -75,12 +75,12 @@
     {
       "id": "P-ADDRESS-1",
       "catalogue_wording": "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
-      "theorem": null,
-      "theorem_planes": [],
-      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance",
+      "theorem_planes": ["tx"],
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-YUL-INTERFACE"],
       "next_gate": "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
-      "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "pin and blocker validation only; no Yul theorem"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance", "expected": "abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem"}
     },
     {
       "id": "P-TOPUP-2",

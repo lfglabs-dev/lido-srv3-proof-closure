@@ -9,7 +9,7 @@
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors` — successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open
 - `P-RESERVE-1`: `python3 scripts/audit_metadata.py check` — metadata consistency only; no source theorem
 - `P-ETH-1`: `lake build` — active Lean 4.31 dependency graph builds; not certification
-- `P-ADDRESS-1`: `python3 scripts/audit_metadata.py check` — pin and blocker validation only; no Yul theorem
+- `P-ADDRESS-1`: `lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance` — abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem
 - `P-TOPUP-2`: `python3 scripts/audit_metadata.py check` — MISSING provenance remains explicit and fails semantic closure
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
 - `P-SSZ-1`: `lake build LidoSRv3.Audit.Ssz` — successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence
