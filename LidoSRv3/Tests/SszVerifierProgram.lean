@@ -12,6 +12,13 @@ example : scratchOffset = 0 ∧ rightScratchOffset = 32 ∧
 
 example : depositDataRootCalls.length = 7 := by decide
 
+/-- Validator call sources are bound to the pinned semantic field order. -/
+example : (validatorRootCalls.map (fun call => call.preimage.map Piece.source))[1]? =
+    some [.digest 0, .validatorField .withdrawalCredentials] := by decide
+
+example : (validatorRootCalls.map (fun call => call.preimage.map Piece.source))[4]? =
+    some [.validatorField .exitEpoch, .validatorField .withdrawableEpoch] := by decide
+
 example : (verifierPair 2 0).map Piece.source =
     [.verifierLeaf, .proofElement 0] := by decide
 
@@ -64,6 +71,10 @@ example : observeDepositDataRoot allCapabilityFlags ⟨48, 32, 96, 184⟩
 /-- Empty proof is the pinned verifier's first rejection. -/
 example : observeVerifierControl allCapabilityFlags ⟨0, 1, [], true⟩ =
     .reverted .invalidProof [] := by decide
+
+/-- A generalized index outside Solidity `uint256` is not source-reachable. -/
+example : observeVerifierControl allCapabilityFlags ⟨256, 2 ^ 256, List.replicate 256 true, true⟩ =
+    .reverted .invalidIndex [] := by decide
 
 /-- Shifting index one to zero rejects an extra item before calling SHA. -/
 example : observeVerifierControl allCapabilityFlags ⟨1, 1, [true], true⟩ =

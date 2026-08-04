@@ -32,10 +32,16 @@ def signatureBytes : Nat := 96
 def amountBytes : Nat := 8
 def depositDataBytes : Nat := 184
 
+/-- Field order at `SSZ.sol` lines 110--119 / `BeaconTypes.sol` lines 8--17. -/
+inductive ValidatorField
+  | publicKey | withdrawalCredentials | effectiveBalance | slashed
+  | activationEligibilityEpoch | activationEpoch | exitEpoch | withdrawableEpoch
+  deriving DecidableEq, Repr
+
 /-- Byte sources are names, offsets, and lengths, not byte contents. -/
 inductive SliceSource
   | publicKey | withdrawalCredentials | signature | amountLittleEndian
-  | zeroPadding | digest (call : Nat) | validatorField (slot : Nat)
+  | zeroPadding | digest (call : Nat) | validatorField (field : ValidatorField)
   | verifierLeaf | proofElement (step : Nat)
   deriving DecidableEq, Repr
 
@@ -89,12 +95,6 @@ theorem deposit_call_boundaries_exact :
     ∀ call ∈ depositDataRootCalls,
       call.boundary = pairBoundary := by decide
 
-/-- Field order at `SSZ.sol` lines 110--119 / `BeaconTypes.sol` lines 8--17. -/
-inductive ValidatorField
-  | publicKey | withdrawalCredentials | effectiveBalance | slashed
-  | activationEligibilityEpoch | activationEpoch | exitEpoch | withdrawableEpoch
-  deriving DecidableEq, Repr
-
 def validatorFieldOrder : List ValidatorField := [
   .publicKey, .withdrawalCredentials, .effectiveBalance, .slashed,
   .activationEligibilityEpoch, .activationEpoch, .exitEpoch, .withdrawableEpoch
@@ -104,15 +104,18 @@ theorem validator_has_eight_ordered_fields : validatorFieldOrder.length = 8 := b
 
 /--
 Exact validator-root composition: pubkey padding, four bottom pairs, two middle
-pairs, and the root pair. Slots 1--7 follow `validatorFieldOrder`; slot 0 is
-replaced by call 0's padded pubkey digest.
+pairs, and the root pair. Each source carries its semantic `ValidatorField`;
+the public-key field is replaced by call 0's padded pubkey digest.
 -/
 def validatorRootCalls : List ShaCallSpec := [
   ⟨0, [piece .publicKey 0 48, piece .zeroPadding 0 16], pairBoundary⟩,
-  ⟨1, [piece (.digest 0) 0 32, piece (.validatorField 1) 0 32], pairBoundary⟩,
-  ⟨2, [piece (.validatorField 2) 0 32, piece (.validatorField 3) 0 32], pairBoundary⟩,
-  ⟨3, [piece (.validatorField 4) 0 32, piece (.validatorField 5) 0 32], pairBoundary⟩,
-  ⟨4, [piece (.validatorField 6) 0 32, piece (.validatorField 7) 0 32], pairBoundary⟩,
+  ⟨1, [piece (.digest 0) 0 32, piece (.validatorField .withdrawalCredentials) 0 32], pairBoundary⟩,
+  ⟨2, [piece (.validatorField .effectiveBalance) 0 32,
+        piece (.validatorField .slashed) 0 32], pairBoundary⟩,
+  ⟨3, [piece (.validatorField .activationEligibilityEpoch) 0 32,
+        piece (.validatorField .activationEpoch) 0 32], pairBoundary⟩,
+  ⟨4, [piece (.validatorField .exitEpoch) 0 32,
+        piece (.validatorField .withdrawableEpoch) 0 32], pairBoundary⟩,
   ⟨5, [piece (.digest 1) 0 32, piece (.digest 2) 0 32], pairBoundary⟩,
   ⟨6, [piece (.digest 3) 0 32, piece (.digest 4) 0 32], pairBoundary⟩,
   ⟨7, [piece (.digest 5) 0 32, piece (.digest 6) 0 32], pairBoundary⟩
@@ -140,7 +143,8 @@ theorem verifier_pair_preimage_exact (index step : Nat) :
   split <;> simp [piece]
 
 inductive RevertObservation
-  | invalidAbi | invalidRoot | invalidProof | branchHasExtraItem | branchHasMissingItem | shaCallFailed
+  | invalidAbi | invalidRoot | invalidIndex | invalidProof
+  | branchHasExtraItem | branchHasMissingItem | shaCallFailed
   | officialSemanticsUnavailable
   deriving DecidableEq, Repr
 
@@ -227,7 +231,8 @@ def observeVerifierControlAux : Nat → Nat → List Bool → List ShaCallSpec �
 def observeVerifierControl (caps : OfficialVerityCapabilities)
     (input : VerifierControlInput) : ProgramObservation :=
   gateOfficialSemantics caps <|
-    if input.proofLength = 0 then .reverted .invalidProof []
+    if input.generalizedIndex >= 2 ^ 256 then .reverted .invalidIndex []
+    else if input.proofLength = 0 then .reverted .invalidProof []
     else if input.shaSucceeded.length != input.proofLength then
       .reverted .shaCallFailed []
     else
