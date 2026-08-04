@@ -5,6 +5,7 @@ import LidoSRv3.Audit.Common.Bounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAccount1
+import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
@@ -35,6 +36,7 @@ there are no project axioms, `sorry`, or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether

@@ -30,6 +30,8 @@
         "LidoSRv3.Tests.DepositVectors",
         "LidoSRv3.Tests.TopupVectors",
         "LidoSRv3.Tests.AccountingVectors",
+        "LidoSRv3.Audit.AddressEquivariance",
+        "LidoSRv3.Tests.AddressEquivariance",
         "LidoSRv3.Audit.Common.Units",
         "LidoSRv3.Audit.Common.Result",
         "LidoSRv3.Audit.Common.Trace",
@@ -106,6 +108,11 @@
       "name": "Guarantees.PAccount1.source_to_verityTx",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PAddress1.abstract_address_equivariance",
+      "status": "lean_checked",
+      "axioms": []
     },
     {
       "name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
