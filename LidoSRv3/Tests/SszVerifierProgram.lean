@@ -18,6 +18,13 @@ example : (verifierPair 2 0).map Piece.source =
 example : (verifierPair 3 0).map Piece.source =
     [.proofElement 0, .verifierLeaf] := by decide
 
+/-- Later calls consume the preceding digest, rather than reusing the input leaf. -/
+example : (verifierPair 2 1).map Piece.source =
+    [.digest 0, .proofElement 1] := by decide
+
+example : (verifierPair 3 2).map Piece.source =
+    [.proofElement 2, .digest 1] := by decide
+
 def noCapabilities : OfficialVerityCapabilities := ⟨false, false, false⟩
 
 /-- No official memory/ABI/SHA semantics means no fabricated success. -/
@@ -39,11 +46,20 @@ example : gateOfficialSemantics ⟨true, false, true⟩ (.verified []) =
 evidence that the pinned Verity revision supplies those semantics. -/
 def allCapabilityFlags : OfficialVerityCapabilities := ⟨true, true, true⟩
 
-example : observeDepositDataRoot allCapabilityFlags ⟨48, 32, 96, 184⟩ [] =
-    .returnedDepositRoot [] depositDataRootCalls := by decide
+def zeroDigest : Bytes := List.replicate 32 0
 
-example : observeDepositDataRoot allCapabilityFlags ⟨47, 32, 96, 184⟩ [] =
+example : observeDepositDataRoot allCapabilityFlags ⟨48, 32, 96, 184⟩ zeroDigest =
+    .returnedDepositRoot zeroDigest depositDataRootCalls := by decide
+
+example : observeDepositDataRoot allCapabilityFlags ⟨47, 32, 96, 184⟩ zeroDigest =
     .reverted .invalidAbi [] := by decide
+
+/-- A candidate SHA observation cannot fabricate a non-`bytes32` result. -/
+example : observeDepositDataRoot allCapabilityFlags ⟨48, 32, 96, 184⟩ [] =
+    .reverted .invalidRoot [] := by decide
+
+example : observeDepositDataRoot allCapabilityFlags ⟨48, 32, 96, 184⟩
+    (256 :: List.replicate 31 0) = .reverted .invalidRoot [] := by decide
 
 /-- Empty proof is the pinned verifier's first rejection. -/
 example : observeVerifierControl allCapabilityFlags ⟨0, 1, [], true⟩ =
@@ -56,6 +72,10 @@ example : observeVerifierControl allCapabilityFlags ⟨1, 1, [true], true⟩ =
 /-- A failed precompile call records no completed call. -/
 example : observeVerifierControl allCapabilityFlags ⟨1, 2, [false], true⟩ =
     .reverted .shaCallFailed [] := by decide
+
+/-- A later SHA failure retains exactly the calls that completed before it. -/
+example : observeVerifierControl allCapabilityFlags ⟨2, 4, [true, false], true⟩ =
+    .reverted .shaCallFailed [verifierShaCall 0 4] := by decide
 
 /-- Consuming too short a branch leaves an index other than one. -/
 example : observeVerifierControl allCapabilityFlags ⟨1, 4, [true], true⟩ =

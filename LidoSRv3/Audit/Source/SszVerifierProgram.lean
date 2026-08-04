@@ -123,12 +123,16 @@ theorem validator_root_has_eight_sha_calls : validatorRootCalls.length = 8 := by
 theorem validator_root_preimages_exact :
     validatorRootCalls.map preimageLength = [64, 64, 64, 64, 64, 64, 64, 64] := by decide
 
+/-- The value carried in `leaf`: the input leaf initially, then the prior digest. -/
+def verifierAccumulator (step : Nat) : SliceSource :=
+  if step = 0 then .verifierLeaf else .digest (step - 1)
+
 /-- The verifier scratch ordering selected before `index := index >> 1`. -/
 def verifierPair (index step : Nat) : List Piece :=
   if index % 2 = 0 then
-    [piece .verifierLeaf 0 32, piece (.proofElement step) 0 32]
+    [piece (verifierAccumulator step) 0 32, piece (.proofElement step) 0 32]
   else
-    [piece (.proofElement step) 0 32, piece .verifierLeaf 0 32]
+    [piece (.proofElement step) 0 32, piece (verifierAccumulator step) 0 32]
 
 theorem verifier_pair_preimage_exact (index step : Nat) :
     ((verifierPair index step).map Piece.length).sum = 64 := by
@@ -136,7 +140,7 @@ theorem verifier_pair_preimage_exact (index step : Nat) :
   split <;> simp [piece]
 
 inductive RevertObservation
-  | invalidAbi | invalidProof | branchHasExtraItem | branchHasMissingItem | shaCallFailed
+  | invalidAbi | invalidRoot | invalidProof | branchHasExtraItem | branchHasMissingItem | shaCallFailed
   | officialSemanticsUnavailable
   deriving DecidableEq, Repr
 
@@ -176,6 +180,10 @@ def depositAbiExact (abi : DepositAbiObservation) : Bool :=
   abi.signatureLength == signatureBytes &&
   abi.encodedFieldBytes == depositDataBytes
 
+/-- Solidity `bytes32` output shape: exactly 32 octets. -/
+def digestExact (bytes : Bytes) : Bool :=
+  bytes.length == digestBytes && bytes.all (fun byte => byte < 256)
+
 /--
 Program-facing deposit observation.  `candidateRoot` is an observation to be
 provided by future official SHA semantics; this interface does not compute or
@@ -184,8 +192,10 @@ validate its cryptographic contents.
 def observeDepositDataRoot (caps : OfficialVerityCapabilities)
     (abi : DepositAbiObservation) (candidateRoot : Bytes) : ProgramObservation :=
   gateOfficialSemantics caps <|
-    if depositAbiExact abi then .returnedDepositRoot candidateRoot depositDataRootCalls
-    else .reverted .invalidAbi []
+    if !depositAbiExact abi then .reverted .invalidAbi []
+    else if digestExact candidateRoot then
+      .returnedDepositRoot candidateRoot depositDataRootCalls
+    else .reverted .invalidRoot []
 
 def verifierShaCall (step index : Nat) : ShaCallSpec :=
   ⟨step, verifierPair index step, pairBoundary⟩
