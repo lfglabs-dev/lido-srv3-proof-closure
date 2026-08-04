@@ -26,7 +26,7 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 2 | `P-ALLOC-2` | `LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket` |
 | 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` |
 | 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back` |
-| 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.MinFirst.totalAllocated_le_requested` |
+| 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx` |
 | 6 | `P-RESERVE-1` | `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` (independent MODEL → pinned source-shaped semantics → Verity transaction refinement) |
 | 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
 | 8 | `P-ADDRESS-1` | metadata-only; no Lean theorem claimed |
@@ -42,8 +42,13 @@ checked `AllGuarantees.all.length = 11` facade.
 
 Each guarantee carries per-plane status across the model, algorithm, source,
 transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2,
-P-DEPOSIT-1, and P-TOPUP-1 claim Lean-checked correspondence to their pinned
-Solidity spans. `P-SSZ-1.deposit-data-root` does not: its registry row declares
+P-DEPOSIT-1, P-TOPUP-1, and P-ACCOUNT-1 claim Lean-checked correspondence to
+their pinned Solidity spans. P-ACCOUNT-1 additionally closes the checked
+VERITY_TX plane under an explicit independently established full-report-success
+premise, and models `reportRewardsMinted` only for positive fee shares. Later
+report guards, Yul/EVM/runtime/crypto/E2E remain unmodeled, open, or not
+applicable.
+`P-SSZ-1.deposit-data-root` does not: its registry row declares
 `theorem_planes: ["model"]` and `statuses.source: OPEN`, so it claims only a
 structural-witness MODEL-plane correspondence under the existing pinned-source
 assumptions, and its SOURCE-plane correspondence to the pinned Solidity remains

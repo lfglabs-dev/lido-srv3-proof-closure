@@ -31,6 +31,7 @@ inductive CheckedLayer
   | algorithm
   | source
   | abstractTx
+  | verityTx
   deriving DecidableEq, Repr
 
 structure Guarantee where
