@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 4d7d152551fffed0d43e9b5c73bed6eef4532f05
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: c59a3b46086b3467cd5ea4eb1c0099d971c77483
+validated-tree: 9e5ec4da235e65aa4c8e2c00df26e6b05bfbe868
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -26,16 +26,31 @@ P-ACCOUNT-1 faithful Verity transaction gate receipt (committed tree):
   report succeeded. The earlier router checks prove only module order/length,
   MAX_VALUE_GWEI, and checked Uint256/uint64 accumulation; they cannot fabricate
   that premise or erase a later revert.
+- `checkedTotal64` is now an independent natural-number implementation of the
+  pinned Solidity checked uint64 accumulation. It does not call or project
+  `checkedTotal256`; `checkedTotal256_refines_source` instead proves that the
+  separate Verity `safeAdd`/Uint256 execution refines the source result.
+- `verityTxAccept`, `verityTxSuccessfulSteps`, and `verityTxTrace` separately
+  execute and expose the Verity transaction result. `source_to_verityTx` proves
+  both checked-total acceptance and equality of the independently defined
+  source and transaction observations.
+- The authoritative `SRUtils.MAX_VALUE_GWEI` declaration at pinned line 23 is
+  a required semantic anchor. The optimized metadata mutants reject removing
+  that declaration span.
 - The `Accounting.sol:403-413` branch is modeled exactly: a successful report
   emits `rewardsMinted` iff `sharesToMintAsFees > 0`; zero fee shares retain the
   balance-write/read ordering without a mint step.
 - `lake build`: exit 0 (492 jobs). `lake build LidoSRv3.Audit.Trust`: exit 0
-  (474 jobs). The trust report records only Lean foundations `propext` and
+  (479 jobs). `lake env lean --version` alone returned exit 126 because the
+  offload environment could not execute `/root/.elan/bin/lake`; the successful
+  full local build establishes the toolchain despite that infrastructure-only
+  bootstrap failure. The trust report records only Lean foundations `propext` and
   `Quot.sound` for `PAccount1.source_report_before_reward` and
   `PAccount1.source_to_verityTx`.
 - `LidoSRv3.Tests.AccountingVectors` rejects module-order, vector-length,
-  MAX_VALUE_GWEI, and checked uint64-total overflow mutants, and covers both a
-  later-rejected partially accepted report and a successful zero-fee report.
+  MAX_VALUE_GWEI, checked uint64-total overflow, missing uint64 destination
+  guard, and reordered-observation mutants, and covers both a later-rejected
+  partially accepted report and a successful zero-fee report.
 - `python3 scripts/audit_metadata.py check`: exit 0. With a workspace-local
   `TMPDIR`, `python3 scripts/test_audit_metadata.py`: exit 0. The host `/tmp`
   tmpfs was full and was treated as infrastructure only.
