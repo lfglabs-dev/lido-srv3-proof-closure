@@ -4,13 +4,13 @@
   "guarantees": [
     {
       "id": "P-ALLOC-1",
-      "catalogue_wording": "Pinned-source correspondence uses the canonical checked-Uint256 allocation-capacity model; proportional allocation amounts and EVM equivalence remain open.",
+      "catalogue_wording": "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
       "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
       "theorem_planes": ["model", "source"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED"],
       "next_gate": "Refine proportional allocation amounts and EVM correspondence for SRLib._getModulesAllocationAndCapacity.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression", "expected": "successful canonical checked-Uint256 allocation-capacity and negative-mutant build; proportional amount correspondence remains open"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression", "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open"}
     },
     {
       "id": "P-ALLOC-2",

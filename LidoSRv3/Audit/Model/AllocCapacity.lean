@@ -1,14 +1,16 @@
 import Verity.Stdlib.Math
 
 /-!
-# Canonical P-ALLOC-1 model
+# P-ALLOC-1 checked source semantics and independent Audit model
 
-This is the minimal audit model of
+This module supplies the common narrow records, the checked source semantics of
 `SRLib._getModulesAllocationAndCapacity` at Lido core commit
 `af095e48bbc1c3841c2c9936219c8461af01056b`. Economic values are Verity
 `Uint256` words. Every Solidity-checked `+`, `-`, and `*`, and every checked
 division, is represented by the corresponding Verity `safe*` operation.
-`Nat` is used only for list recursion and for the proved mathematical view.
+`Nat` is used only for list recursion and for the independent mathematical
+Audit view.  `MathView.capacities` is the canonical Audit model: it is a direct
+list map with no source loop state, checked-word operations, or failure monad.
 -/
 
 namespace LidoSRv3.Audit.AllocCapacity
@@ -115,7 +117,8 @@ def secondLoop (cfg : Config) (isTopUp : Bool) (total : Uint256) :
         } : Row) :: rows)
   | _, _ => none
 
-/-- Exact checked-`uint256` execution of source lines 493--559. -/
+/-- Exact checked-`uint256` source semantics of lines 493--559.  This is not the
+independent Audit model; that model is `MathView.capacities` below. -/
 def execute (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256)
     (isTopUp : Bool) : Option (List Row) := do
   let (entries, total) ← firstLoop cfg modules depositsToAllocate
@@ -490,8 +493,8 @@ theorem secondLoop_refines (cfg : Config) (allModules : List Module)
             · simp [secondLoop, hIsActive, hTail]
             · simp [MathView.capacity, hIsActive, hAlloc.1, hTailCaps]
 
-/-- Under the exact checked-arithmetic bounds, the canonical source-shaped
-executor succeeds and its capacity column equals the mathematical model. -/
+/-- Under the exact checked-arithmetic bounds, the source-shaped interpreter
+succeeds and its capacity column equals the independent Audit model. -/
 theorem execute_refines_math (cfg : Config) (modules : List Module)
     (deposits : Uint256) (isTopUp : Bool) (hBounds : CheckedBounds cfg modules deposits isTopUp) :
     ∃ rows, execute cfg modules deposits isTopUp = some rows ∧

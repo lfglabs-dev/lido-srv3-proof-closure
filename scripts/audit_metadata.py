@@ -31,7 +31,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Pinned-source correspondence uses the canonical checked-Uint256 allocation-capacity model; proportional allocation amounts and EVM equivalence remain open.",
+    "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
@@ -78,7 +78,7 @@ EXPECTED_ASSUMPTIONS = {
 }
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression",
-     "expected": "successful canonical checked-Uint256 allocation-capacity and negative-mutant build; proportional amount correspondence remains open"},
+     "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -216,7 +216,7 @@ SOURCE_CLOSURE_STATUSES = THEOREM_BACKED_STATUSES | {"AUDIT-CERT"}
 CAMPAIGN_BASE = {
     "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
     "ref": "campaign/lido-minimal-11",
-    "commit": "4d7d152551fffed0d43e9b5c73bed6eef4532f05",
+    "commit": "458bf6404968c1857c6635e507dba57a51df1031",
 }
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"

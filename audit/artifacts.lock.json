@@ -1,6 +1,6 @@
 {
   "schema": "lido-srv3-artifacts-lock-v1",
-  "campaign_base": {"repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git", "ref": "campaign/lido-minimal-11", "commit": "4d7d152551fffed0d43e9b5c73bed6eef4532f05"},
+  "campaign_base": {"repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git", "ref": "campaign/lido-minimal-11", "commit": "458bf6404968c1857c6635e507dba57a51df1031"},
   "pins": {
     "lido_core": {"repository": "https://github.com/lidofinance/core.git", "commit": "af095e48bbc1c3841c2c9936219c8461af01056b"},
     "verity": {"repository": "https://github.com/lfglabs-dev/verity.git", "commit": "d2d4a18a4d7021adcd90d4b03e619affe506dd54"},

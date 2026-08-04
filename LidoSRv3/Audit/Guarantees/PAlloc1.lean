@@ -21,30 +21,32 @@ theorem active_capacity_bounded
         MathView.availableCapacity cfg isTopUp module :=
   AllocCapacity.active_capacity_bounded cfg modules depositsToAllocate isTopUp module hActive
 
-/-- The pinned source execution is the canonical checked audit execution. -/
+/-- Under the exact checked-`uint256` bounds, the pinned source interpreter
+succeeds and its capacity column equals the independent Audit model. -/
 theorem source_capacities_match_canonical
     (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256)
-    (isTopUp : Bool) :
-    SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp =
-      AllocCapacity.execute cfg modules depositsToAllocate isTopUp :=
-  SolidityAllocCapacity.source_execute_eq_canonical cfg modules depositsToAllocate isTopUp
+    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  SolidityAllocCapacity.source_execute_refines_audit_model
+    cfg modules depositsToAllocate isTopUp hBounds
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
     {depositsToAllocate : Uint256} {isTopUp : Bool} {rows : List Row}
-    (h : AllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows) :
+    (h : SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows) :
     rows.map Row.moduleId = modules.map Module.moduleId :=
-  SolidityAllocCapacity.router_order_preserved
-    (SolidityAllocCapacity.source_execute_eq_canonical cfg modules depositsToAllocate isTopUp ▸ h)
+  SolidityAllocCapacity.router_order_preserved h
 
 /-- The whole checked executor, not merely its arithmetic primitives, succeeds
 under the named Solidity bounds and returns the mathematical capacities. -/
 theorem checked_uint256_execution_refines_math
     (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256)
     (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
-    ∃ rows, AllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
       rows.map (fun row => (row.capacity : Nat)) =
         MathView.capacities cfg modules depositsToAllocate isTopUp :=
-  AllocCapacity.execute_refines_math cfg modules depositsToAllocate isTopUp hBounds
+  source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds
 
 end LidoSRv3.Audit.Guarantees.PAlloc1
