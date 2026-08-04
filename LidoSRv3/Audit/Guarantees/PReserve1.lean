@@ -6,7 +6,7 @@ namespace LidoSRv3.Audit.Guarantees.PReserve1
 open Verity
 open LidoSRv3.Audit.SolidityReserve
 
-def guarantee : Guarantee := ⟨.pReserve1, [.model, .source, .abstractTx]⟩
+def guarantee : Guarantee := ⟨.pReserve1, [.model, .source, .verityTx]⟩
 
 /-- The source-shaped spend preserves the effective withdrawals-reserve
 partition while consuming only depositable ether. -/

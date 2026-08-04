@@ -263,9 +263,10 @@ theorem verity_revert_rolls_back (inputs : WithdrawInputs) (state : ContractStat
   exact h.2.symm
 
 /- Explicit partition/spend invariant: the pre-state allocation is retained as
-the witness, the amount is bounded by its depositable partitions, and the
-committed buffer is exactly the checked subtraction from the allocation total.
-Together these exclude consuming the allocation's withdrawals reserve. -/
+the witness, the amount is bounded by its depositable partitions, the committed
+buffer is exactly the checked subtraction from the allocation total, and the
+stored deposits reserve follows the pinned source update. Together these
+exclude consuming the allocation's withdrawals reserve. -/
 def withdrawalPartitionSpendInvariant
     (before after : ReserveState) (amount : Word) : Prop :=
   ∃ allocation depositable,
@@ -273,6 +274,10 @@ def withdrawalPartitionSpendInvariant
     getDepositableEther allocation = some depositable ∧
     amount ≤ depositable ∧
     safeSub allocation.total amount = some after.buffered ∧
+    after.storedDepositsReserve =
+      (if before.storedDepositsReserve > amount then
+        before.storedDepositsReserve - amount
+      else 0) ∧
     after.unfinalizedStETH = before.unfinalizedStETH
 
 theorem committed_preserves_withdrawal_reserve
@@ -303,7 +308,7 @@ theorem committed_preserves_withdrawal_reserve
                     | some depositedNextReportAdjusted =>
                         simp [hn] at h
                         subst after
-                        exact ⟨allocation, depositable, ha, hd, henough, hb, rfl⟩
+                        exact ⟨allocation, depositable, ha, hd, henough, hb, rfl, rfl⟩
           · simp [henough] at h
 
 /-- Observable non-interference at the actual Verity boundary. -/
