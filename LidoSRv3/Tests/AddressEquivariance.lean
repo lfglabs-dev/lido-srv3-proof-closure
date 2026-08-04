@@ -36,4 +36,12 @@ theorem rejects_dropped_attempt_mutant (rho : Renaming) (before : State)
       (⟨before, [call], .reverted⟩ : TxObservation State)).attemptedCalls ≠ [] := by
   simp [renameObservation]
 
+/-- A committed singleton call is retained and its address is renamed. -/
+theorem committed_call_trace_vector (rho : Renaming) (before after : State)
+    (target : Address) (value : Wei) (selector : Uint256) :
+    (renameObservation rho id
+      (⟨before, [], .committed after ⟨[⟨target, value, selector⟩], [], []⟩⟩ :
+        TxObservation State)).committedTrace.calls =
+      [⟨rho target, value, selector⟩] := rfl
+
 end LidoSRv3.Tests.AddressEquivariance

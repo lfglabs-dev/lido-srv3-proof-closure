@@ -11,10 +11,10 @@ import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
 
 /-!
-Machine-readable-in-build axiom report for the first audit slice.
+Machine-readable-in-build trust report for the first audit slice.
 
 Expected output is only Lean foundations (`propext`, `Quot.sound`) where used;
-there are no project axioms, `sorry`, or proof escapes.
+there are no project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
