@@ -40,6 +40,11 @@ BUILD_SHA256="$(sha256sum "$BUILD_LOG" | awk '{print $1}')"
 VERIFIED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 VERIFIED_SOURCE_TREE="$(bash scripts/verified_source_tree.sh)"
 RECORDED_SOURCE_TREE="$(sed -nE 's/^verified_source_tree=([0-9a-f]{40})$/\1/p' "$BUILD_LOG")"
+ [ "$(printf '%s\n' "$RECORDED_SOURCE_TREE" | sed '/^$/d' | wc -l | tr -d ' ')" = "1" ] || \
+  fail "build log '$BUILD_LOG' must contain exactly one verified_source_tree=<40-hex-tree-id> line"
+[ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
+  fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
+
 LEAN_VERSION_OUTPUT="$(lake env lean --version)"
 LEAN_VERSION="$(printf '%s\n' "$LEAN_VERSION_OUTPUT" | sed -nE 's/^Lean \(version ([^,]+),.*$/\1/p')"
 PINNED_TOOLCHAIN="$(tr -d '\r\n' < lean-toolchain)"
@@ -50,10 +55,6 @@ PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprove
   fail "could not parse Lean version from lean-toolchain ('$PINNED_TOOLCHAIN')"
 [ "$LEAN_VERSION" = "$PINNED_LEAN_VERSION" ] || \
   fail "running Lean version '$LEAN_VERSION' does not match lean-toolchain '$PINNED_LEAN_VERSION'"
- [ "$(printf '%s\n' "$RECORDED_SOURCE_TREE" | sed '/^$/d' | wc -l | tr -d ' ')" = "1" ] || \
-  fail "build log '$BUILD_LOG' must contain exactly one verified_source_tree=<40-hex-tree-id> line"
-[ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
-  fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
 grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
   fail "build log '$BUILD_LOG' does not record the running Lean version"
 
