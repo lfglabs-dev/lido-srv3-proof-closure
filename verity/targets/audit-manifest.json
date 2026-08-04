@@ -24,11 +24,13 @@
         "LidoSRv3.Audit.Source.TopupCorrespondence",
         "LidoSRv3.Audit.Source.AccountingCorrespondence",
         "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
+        "LidoSRv3.Audit.Source.ReserveCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
         "LidoSRv3.Tests.DepositVectors",
         "LidoSRv3.Tests.TopupVectors",
+        "LidoSRv3.Tests.ReserveMutants",
         "LidoSRv3.Tests.AccountingVectors",
         "LidoSRv3.Audit.AddressEquivariance",
         "LidoSRv3.Tests.AddressEquivariance",
@@ -38,7 +40,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation/rollback, and P-ACCOUNT-1 full-success-gated and positive-fee-conditional MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is checked against pinned Solidity, while later guards remain an explicit interface premise; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation/rollback, and P-ACCOUNT-1 full-success-gated and positive-fee-conditional MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus executable Verity transaction simulation is checked against pinned Solidity, while later guards remain an explicit interface premise; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
     }
   },
   "proof_policy": {
@@ -161,6 +163,21 @@
     },
     {
       "name": "Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
+      "status": "lean_checked",
+      "axioms": ["propext", "Quot.sound"]
+    },
+    {
+      "name": "Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
     },

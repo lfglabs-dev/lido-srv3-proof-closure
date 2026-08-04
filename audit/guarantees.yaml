@@ -54,13 +54,13 @@
     },
     {
       "id": "P-RESERVE-1",
-      "catalogue_wording": "Verity 4.31 is a non-certified development scaffold.",
-      "theorem": null,
-      "theorem_planes": [],
-      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-VERITY-SCAFFOLD", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Produce source-mutant-sensitive refinement proofs from independently verified pinned spans.",
-      "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "metadata consistency only; no source theorem"}
+      "catalogue_wording": "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "next_gate": "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants", "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"}
     },
     {
       "id": "P-ETH-1",

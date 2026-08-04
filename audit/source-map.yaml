@@ -89,9 +89,11 @@
       "id": "P-RESERVE-1",
       "status": "MAPPED",
       "spans": [
-        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_getBufferedEtherAllocation", "start_line": 576, "end_line": 616, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L576-L616"},
-        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_getDepositableEther", "start_line": 823, "end_line": 833, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L823-L833"},
-        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_spendDepositableEther", "start_line": 839, "end_line": 859, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"}
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_getBufferedEtherAllocation", "start_line": 605, "end_line": 616, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L605-L616"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "getDepositableEther", "start_line": 823, "end_line": 825, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L823-L825"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_getDepositableEther", "start_line": 831, "end_line": 833, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L831-L833"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "_spendDepositableEther", "start_line": 839, "end_line": 859, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.4.24/Lido.sol", "function": "withdrawDepositableEther", "start_line": 869, "end_line": 886, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L869-L886"}
       ]
     },
     {

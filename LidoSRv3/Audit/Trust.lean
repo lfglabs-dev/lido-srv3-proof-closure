@@ -9,6 +9,7 @@ import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Guarantees.PReserve1
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -47,6 +48,9 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec
+#print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
 #print axioms
   LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
