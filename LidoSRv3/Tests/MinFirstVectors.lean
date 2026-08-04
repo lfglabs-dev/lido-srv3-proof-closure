@@ -24,4 +24,27 @@ example :
     allocate 1 [b 0 0 10, b 1 0 10] = [b 0 1 10, b 1 0 10] ∧
     allocate 1 [b 1 0 10, b 0 0 10] = [b 1 1 10, b 0 0 10] := by decide
 
+/- Full proportional-amount vectors for the pinned Solidity example.  These
+reject unit-step, missing-next-level-cap, and last-equal-candidate mutants. -/
+private def fullRows : List MinFirstAllocation.Model.Bucket :=
+  [⟨9998, 10000⟩, ⟨70, 101⟩, ⟨0, 100⟩]
+
+example :
+    MinFirstAllocation.Model.candidate? fullRows = some ⟨0, 100⟩ ∧
+    MinFirstAllocation.Model.amount fullRows 101 ⟨0, 100⟩ = 70 := by decide
+
+private def equalRows : List MinFirstAllocation.Model.Bucket :=
+  [⟨9998, 10000⟩, ⟨70, 101⟩, ⟨70, 100⟩]
+
+example :
+    MinFirstAllocation.Model.candidate? equalRows = some ⟨70, 101⟩ ∧
+    MinFirstAllocation.Model.amount equalRows 31 ⟨70, 101⟩ = 16 := by decide
+
+private def sourceRows : List MinFirstAllocation.Source.Row :=
+  [⟨word 9998, word 10000⟩, ⟨word 70, word 101⟩, ⟨word 0, word 100⟩]
+
+example :
+    MinFirstAllocation.Source.checkedAmount sourceRows (word 101) ⟨word 0, word 100⟩ =
+      some (word 70) := by decide
+
 end LidoSRv3.Tests.MinFirstVectors

@@ -37,6 +37,8 @@ test:
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupVectors
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.AccountingVectors
+	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
