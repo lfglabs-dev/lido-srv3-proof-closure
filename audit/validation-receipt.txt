@@ -1,5 +1,5 @@
 Minimal-11 cleanup validation receipt
-base: 1b614fcd0d9136e5e1e96ced840ae17cd1fb58a4
+base: 40b353ff5a932a66b1c2c2549a0f1ff2f372237b
 validation-subject: HEAD tracked tree excluding this receipt
 validated-tree: 94ec852336ea2148785943d48c96a7d0248ea99f
 
@@ -271,3 +271,29 @@ P-ALLOC-1.eugene-bound subordinate evidence (2026-08-05)
   registry remains exactly 11 guarantees. The proof composes the canonical
   checked SRLib allocation row with the MinFirst checked mutation and does not
   import `LidoSRv3.Legacy.Model`.
+
+Campaign advancement to 10/11 public + 2/11 subordinate (2026-08-05)
+-------------------------------------------------------------------
+
+- Post-merge live campaign head: `campaign/lido-minimal-11@40b353ff5a932a66b1c2c2549a0f1ff2f372237b`
+  (fast-forward of PR #31; no merge commit added; campaign and PR head share SHA).
+- Pre-merge live campaign head: `campaign/lido-minimal-11@1b614fcd0d9136e5e1e96ced840ae17cd1fb58a4`.
+- Pre-merge PR head: `40b353ff5a932a66b1c2c2549a0f1ff2f372237b` (certifier-v2 CLEAN).
+- Net new commits merged: 3 (`64f83f2f`, `2c0725e8f`, `40b353f`) all in PR #31.
+- Post-merge `validated-tree` is `94ec852336ea2148785943d48c96a7d0248ea99f` (unchanged
+  because only the receipt itself was rewritten by `40b353f`); the receipt binds
+  the canonical source-map, validator, and negative fixtures of the new HEAD.
+- Registry assertion: exactly 11 canonical public guarantees + 2 subordinate rows
+  (`P-SSZ-1.deposit-data-root`, `P-ALLOC-1.eugene-bound`). `audit_metadata.py check`
+  exits 0; the optimized mutants that promote, drop, or re-parent `P-ALLOC-1.eugene-bound`
+  are all rejected.
+- No NEW forbidden proof-escape (`sorry`, `admit`, `axiom`, `unsafe`) introduced
+  by the merge; the PR's net Lean diff contains none, and the merge-base is the
+  pre-receipt-refresh campaign head, so the receipt refresh inside the PR does
+  not introduce escape tokens either.
+- PR #31 is closed by fast-forward on the campaign branch; no branch deletion,
+  no force-push, no rebase.
+- This campaign has now landed 10 of the 11 public guarantees on
+  `campaign/lido-minimal-11` plus 2 subordinate evidence rows; the only
+  outstanding public guarantee is `P-DEPOSIT-1` (deep Verity transaction
+  closure, blocked on Verity PR #2231/#2233).
