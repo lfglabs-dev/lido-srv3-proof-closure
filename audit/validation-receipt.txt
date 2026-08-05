@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
-base: 40b353ff5a932a66b1c2c2549a0f1ff2f372237b
+base: ebe9abc64e1f195fab12a37ad8d141b1f5d1561d
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 7154952d0b9a9fe71c2f39838adeb120bef434d8
+validated-tree: e01564646c5d2868fc9114fec3d57165bba4b49f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -331,3 +331,25 @@ P-SSZ-1 abstract-digest refinement (2026-08-05)
   `P-SSZ-1.abstract-digest`, and `P-ALLOC-1.eugene-bound`.
 - Net-Lean literal-word scan for the four forbidden proof-escape words: no
   matches.
+
+P-ADDRESS-1 Yul interface harness subordinate evidence (2026-08-05)
+------------------------------------------------------------------
+
+- Campaign input head and receipt base:
+  `ebe9abc64e1f195fab12a37ad8d141b1f5d1561d`.
+- EVMYulLean remains pinned exactly at
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`; Lean remains 4.31.0 and the
+  Mathlib pin is unchanged.
+- The bounded typed AST contains `mstore-address`, `calldataload-address`,
+  `sload-address`, and `calldatacopy-source-target` roles and reuses the
+  abstract P-ADDRESS-1 address-renaming theorem. It makes no EVM execution
+  refinement claim and introduces no runtime/precompile interface.
+- Identity, identity-plus-rename, address-stomp build, and zero-byte vectors
+  compile; a distinct 20-byte target stomp is rejected by the abstract
+  address-renaming relation.
+- Full `lake build`: exit 0 (1187 jobs).
+- `python3 scripts/audit_metadata.py check` and `make audit-check`: exit 0,
+  reporting exactly 11 canonical guarantees plus five subordinate rows.
+- The new row remains subordinate to `P-ADDRESS-1`; its theorem plane is only
+  `yul`, the inherited abstract `tx` status is not promoted, and EVM remains
+  open.

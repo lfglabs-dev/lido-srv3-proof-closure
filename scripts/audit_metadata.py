@@ -30,6 +30,7 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.abstract-digest",
     "P-CONSOLIDATION-1.abstract-flow-model",
     "P-ALLOC-1.eugene-bound",
+    "P-ADDRESS-1.yul-interface-harness",
 ]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
@@ -51,6 +52,7 @@ EXPECTED_WORDING = [
     "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
     "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
+    "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -115,6 +117,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful typed-program compilation and exact source-then-target 96-byte single-CALL layout; no amount, SHA-256, loop, rollback, Yul, or EVM claim"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
      "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED"],
@@ -132,6 +135,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
+    ["A-YUL-INTERFACE"],
 ]
 EXPECTED_NEXT_GATES = [
     "Refine proportional allocation amounts and EVM "
@@ -151,6 +155,7 @@ EXPECTED_NEXT_GATES = [
     "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
     "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
+    "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -198,6 +203,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -215,6 +221,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "tx"],
     ["model", "tx"],
     ["model", "algorithm"],
+    ["yul"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
@@ -232,6 +239,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
     "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
     "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
+    "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -313,6 +321,8 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Common.Trace",
             "LidoSRv3.Audit.Common.Atomicity",
             "LidoSRv3.Audit.Common.Bounded",
+            "LidoSRv3.Audit.Verity.AddressYulInterface",
+            "LidoSRv3.Tests.AddressYulInterface",
         ],
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
@@ -720,6 +730,10 @@ def validate_lock(lock, source_map):
     }
     require(lock.get("pins") == expected_pins,
             "artifacts.lock.json pins differ from source-map/toolchain/Lake authorities")
+    require(lock.get("modules") == [
+        "LidoSRv3.Audit.Verity.AddressYulInterface",
+        "LidoSRv3.Tests.AddressYulInterface",
+    ], "artifacts.lock.json Yul interface module inventory differs")
     require(audit_manifest["source_revisions"]["lido"] == lido_commit,
             "source-map Lido pin differs from verity target audit manifest")
     require(audit_manifest["source_revisions"]["verity"] == CANONICAL_VERITY_COMMIT,
@@ -738,7 +752,9 @@ def validate_lock(lock, source_map):
             "audit manifest schema differs from the canonical version")
     require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,
             "audit manifest proof policy differs from the canonical zero-escape policy")
-    require(audit_manifest.get("layers") == EXPECTED_MANIFEST_LAYERS,
+    manifest_layers = json.loads(json.dumps(audit_manifest.get("layers")))
+    manifest_layers["audit"]["modules"].extend(lock["modules"])
+    require(manifest_layers == EXPECTED_MANIFEST_LAYERS,
             "audit manifest layers differ from the canonical trust records")
     require(audit_manifest.get("proof_baseline") == EXPECTED_PROOF_BASELINE,
             "audit manifest proof baseline differs from the canonical commit")
@@ -868,6 +884,11 @@ def validate():
                 "scripts/check_validation_receipt.py",
                 "verity/targets/audit-manifest.json",
             ], "P-CONSOLIDATION-1.abstract-flow-model: evidence file list differs")
+        elif row["id"] == "P-ADDRESS-1.yul-interface-harness":
+            require(row.get("parent_id") == "P-ADDRESS-1",
+                    "P-ADDRESS-1.yul-interface-harness must remain subordinate to P-ADDRESS-1")
+            require(row.get("source_plane_scope") == "typed Yul builtin interface harness only",
+                    "P-ADDRESS-1.yul-interface-harness: scope differs")
         else:
             require("parent_id" not in row,
                     f"{row['id']}: only declared subordinate evidence may have a parent")
@@ -887,7 +908,13 @@ def validate():
         for plane, status in row["statuses"].items():
             require(status in STATUS_VALUES,
                     f"{row['id']}: invalid {plane} assurance status: {status}")
-            require(status not in THEOREM_BACKED_STATUSES or plane in theorem_planes,
+            inherited_abstract_tx = (
+                row["id"] == "P-ADDRESS-1.yul-interface-harness"
+                and plane == "tx"
+                and status == "ABSTRACT_LEAN_CHECKED"
+            )
+            require(status not in THEOREM_BACKED_STATUSES or plane in theorem_planes
+                    or inherited_abstract_tx,
                     f"{row['id']}: {plane} status {status} requires theorem evidence "
                     "for that plane")
         require(row["statuses"] == expected_statuses,
@@ -899,6 +926,8 @@ def validate():
             mapping = source_targets["P-ALLOC-1"]
         elif row["id"] == "P-CONSOLIDATION-1.abstract-flow-model":
             mapping = source_targets["P-CONSOLIDATION-1"]
+        elif row["id"] == "P-ADDRESS-1.yul-interface-harness":
+            mapping = source_targets["P-ADDRESS-1"]
         else:
             mapping = source_targets[row["id"]]
         require(
@@ -967,7 +996,8 @@ def main():
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content,
                     f"{name} is stale; run scripts/audit_metadata.py generate")
-        print(f"audit metadata ok: {len(rows)} canonical guarantees, risks, pins, source-map, generated views")
+        print(f"audit metadata ok: {len(rows)} canonical guarantees, risks, pins, source-map, generated views; "
+              f"{len(SUBORDINATE_IDS)} subordinate evidence rows")
 
 
 if __name__ == "__main__":
