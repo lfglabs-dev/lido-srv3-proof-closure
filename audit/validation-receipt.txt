@@ -1,7 +1,8 @@
 Minimal-11 cleanup validation receipt
 base: 40b353ff5a932a66b1c2c2549a0f1ff2f372237b
+head: baa130deaa22f9b2fbf2a850abf470e9d63b5197
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 512b637208ee6ae89a51f0a4e2708b71588bdcb1
+validated-tree: cf18f55a024d86f0921ef189208a6cd02a1baba9
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -21,6 +22,18 @@ P-SSZ-1 structural gate receipt (committed tree):
 - `make test`: exit 0, including `LidoSRv3.Tests.SszRegression`.
 - Changed-Lean forbidden proof-escape scan: exit 0, with no new
   `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+
+P-CONSOLIDATION-1 abstract-flow-model subordinate receipt:
+- Pinned Lido core `af095e48bbc1c3841c2c9936219c8461af01056b`
+  confirms a 48-byte source public key followed immediately by a 48-byte
+  target public key, producing a 96-byte payload with no padding.
+- The typed Verity program copies those two exact intervals and issues one
+  value-bearing CALL to the consolidation request contract.
+- The bounded helper contains no amount, SHA-256 call, loop, or rollback
+  composition. SHA-256 functional correctness and Verity simulation
+  interfaces remain campaign assumptions and are not promoted by this row.
+- The canonical P-CONSOLIDATION-1 row is unchanged; this is the fourth
+  subordinate row alongside the two P-SSZ-1 rows and P-ALLOC-1 Eugene bound.
 
 P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed tree):
 - Verified against `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:

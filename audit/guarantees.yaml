@@ -142,6 +142,25 @@
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszAbstractDigest", "expected": "successful typed-program compilation and exact seven-call pure-Lean digest composition; no Verity execution simulation or SHA-256 functional proof"}
     },
     {
+      "id": "P-CONSOLIDATION-1.abstract-flow-model",
+      "parent_id": "P-CONSOLIDATION-1",
+      "catalogue_wording": "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
+      "source_plane_scope": "abstract 96-byte consolidation flow only",
+      "campaign_head_sha": "1ae66a0477eb0769b0cc4c0c21d39f62d572d4b9",
+      "verity_loop_simulation_sha": "18a9bda2355b091e2857e5ad9ba1686798daea05",
+      "verity_sha256_sha": "1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6",
+      "verity_external_calls_sha": "7dba916d99b14ed30613ad9579eee9b49b876bc6",
+      "validated_tree_sha": "512b637208ee6ae89a51f0a4e2708b71588bdcb1",
+      "files": ["LidoSRv3.lean", "LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean", "audit/artifacts.lock.json", "audit/guarantees.yaml", "audit/validation-receipt.txt", "lake-manifest.json", "lakefile.lean", "scripts/audit_metadata.py", "scripts/check_validation_receipt.py", "verity/targets/audit-manifest.json"],
+      "no_new_forbidden_lean_tokens": true,
+      "theorem": "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
+      "theorem_planes": ["model", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+      "next_gate": "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel", "expected": "successful typed-program compilation and exact source-then-target 96-byte single-CALL layout; no amount, SHA-256, loop, rollback, Yul, or EVM claim"}
+    },
+    {
       "id": "P-ALLOC-1.eugene-bound",
       "parent_id": "P-ALLOC-1",
       "catalogue_wording": "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
