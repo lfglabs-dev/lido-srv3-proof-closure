@@ -27,6 +27,7 @@ EXPECTED_IDS = [
 ]
 SUBORDINATE_IDS = [
     "P-SSZ-1.deposit-data-root",
+    "P-SSZ-1.abstract-digest",
     "P-ALLOC-1.eugene-bound",
 ]
 EXPECTED_AUTHORITY = (
@@ -46,6 +47,7 @@ EXPECTED_WORDING = [
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
+    "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
 ]
 EXPECTED_ASSUMPTIONS = {
@@ -105,6 +107,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"},
     {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression",
      "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Verity.SszAbstractDigest",
+     "expected": "successful typed-program compilation and exact seven-call pure-Lean digest composition; no Verity execution simulation or SHA-256 functional proof"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
      "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
 ]
@@ -119,6 +123,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-YUL-INTERFACE"],
     ["A-RUNTIME-PROVENANCE"],
     ["A-SHA256-FFI"],
+    ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
@@ -138,6 +143,7 @@ EXPECTED_NEXT_GATES = [
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
     "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
+    "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
     "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
 ]
 EXPECTED_EXCLUSIONS = {
@@ -180,6 +186,8 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
@@ -196,6 +204,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     ["model"],
     ["model"],
+    ["model", "tx"],
     ["model", "algorithm"],
 ]
 EXPECTED_THEOREMS = [
@@ -211,6 +220,7 @@ EXPECTED_THEOREMS = [
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
     "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
+    "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
     "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
 ]
 STATUS_VALUES = {
@@ -233,8 +243,8 @@ CAMPAIGN_BASE = {
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_VERITY_REPOSITORY = "https://github.com/lfglabs-dev/verity.git"
-CANONICAL_VERITY_COMMIT = "d2d4a18a4d7021adcd90d4b03e619affe506dd54"
-CANONICAL_VERITY_INPUT_REV = "d2d4a18a4d7021adcd90d4b03e619affe506dd54"
+CANONICAL_VERITY_COMMIT = "1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6"
+CANONICAL_VERITY_INPUT_REV = "1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6"
 CANONICAL_EVMYULLEAN_REPOSITORY = "https://github.com/lfglabs-dev/EVMYulLean.git"
 CANONICAL_EVMYULLEAN_COMMIT = "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
 CANONICAL_MATHLIB_REPOSITORY = "https://github.com/leanprover-community/mathlib4.git"
@@ -275,6 +285,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Source.TopupCorrespondence",
             "LidoSRv3.Audit.Source.AccountingCorrespondence",
             "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
+            "LidoSRv3.Audit.Verity.SszAbstractDigest",
             "LidoSRv3.Audit.Source.ReserveCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
             "LidoSRv3.Tests.AllocCapacityRegression",
@@ -780,6 +791,33 @@ def validate():
                     "P-SSZ-1.deposit-data-root must remain subordinate to P-SSZ-1")
             require(row.get("source_plane_scope") == "deposit-data-root only",
                     "P-SSZ-1.deposit-data-root: source plane scope must remain deposit-data-root only")
+        elif row["id"] == "P-SSZ-1.abstract-digest":
+            require(row.get("parent_id") == "P-SSZ-1",
+                    "P-SSZ-1.abstract-digest must remain subordinate to P-SSZ-1")
+            require(row.get("source_plane_scope") == "abstract SHA-256 digest only",
+                    "P-SSZ-1.abstract-digest: scope must remain abstract SHA-256 digest only")
+            require(row.get("campaign_head_sha") ==
+                    "52b6db9d5f59bbfbd2d6d5932295f8e850e8079a",
+                    "P-SSZ-1.abstract-digest: campaign head differs")
+            require(row.get("verity_sha") ==
+                    "1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6",
+                    "P-SSZ-1.abstract-digest: Verity gate differs")
+            require(row.get("validated_tree_sha") ==
+                    "94ec852336ea2148785943d48c96a7d0248ea99f",
+                    "P-SSZ-1.abstract-digest: parent validated tree differs")
+            require(row.get("no_new_forbidden_lean_tokens") is True,
+                    "P-SSZ-1.abstract-digest: forbidden-token assertion is missing")
+            require(row.get("files") == [
+                "LidoSRv3.lean",
+                "LidoSRv3/Audit/Verity/SszAbstractDigest.lean",
+                "audit/artifacts.lock.json",
+                "audit/guarantees.yaml",
+                "audit/validation-receipt.txt",
+                "lake-manifest.json",
+                "lakefile.lean",
+                "scripts/audit_metadata.py",
+                "verity/targets/audit-manifest.json",
+            ], "P-SSZ-1.abstract-digest: evidence file list differs")
         elif row["id"] == "P-ALLOC-1.eugene-bound":
             require(row.get("parent_id") == "P-ALLOC-1",
                     "P-ALLOC-1.eugene-bound must remain subordinate to P-ALLOC-1")
@@ -810,7 +848,7 @@ def validate():
         require(row["statuses"] == expected_statuses,
                 f"{row['id']}: assurance statuses differ from canonical claims")
         source_status = row["statuses"]["source"]
-        if row["id"] == "P-SSZ-1.deposit-data-root":
+        if row["id"] in {"P-SSZ-1.deposit-data-root", "P-SSZ-1.abstract-digest"}:
             mapping = source_targets["P-SSZ-1"]
         elif row["id"] == "P-ALLOC-1.eugene-bound":
             mapping = source_targets["P-ALLOC-1"]

@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: 40b353ff5a932a66b1c2c2549a0f1ff2f372237b
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 94ec852336ea2148785943d48c96a7d0248ea99f
+validated-tree: 512b637208ee6ae89a51f0a4e2708b71588bdcb1
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -297,3 +297,25 @@ Campaign advancement to 10/11 public + 2/11 subordinate (2026-08-05)
   `campaign/lido-minimal-11` plus 2 subordinate evidence rows; the only
   outstanding public guarantee is `P-DEPOSIT-1` (deep Verity transaction
   closure, blocked on Verity PR #2231/#2233).
+
+P-SSZ-1 abstract-digest refinement (2026-08-05)
+------------------------------------------------
+
+- Campaign input head: `campaign/lido-minimal-11@52b6db9d5f59bbfbd2d6d5932295f8e850e8079a`.
+- Upstream Verity gate: PR #2232 merged at
+  `1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6`.
+- The typed low-level Verity program stages seven exact 64-byte preimages with
+  `Stmt.calldatacopy` and `Stmt.mstore`; every result is 32 bytes. The nested
+  composition binds signature chunks 64/32+32, public key 48+16, withdrawal
+  credentials 32, amount 8+24, and the final two-digest pair.
+- `Compiler/Sha256/Engine.lean` is the reference digest implementation.
+  Functional SHA-256 correctness remains assumed; this slice contains no
+  Verity execution simulation.
+- Full `lake build`: exit 0 (703 jobs).
+- `make audit_metadata` and `make audit-check`: exit 0, reporting exactly 11
+  canonical public guarantees plus three subordinate rows.
+- The row remains subordinate to `P-SSZ-1`; the public registry stays exactly
+  11 guarantees. The subordinate rows are `P-SSZ-1.deposit-data-root`,
+  `P-SSZ-1.abstract-digest`, and `P-ALLOC-1.eugene-bound`.
+- Net-Lean literal-word scan for the four forbidden proof-escape words: no
+  matches.
