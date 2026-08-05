@@ -31,6 +31,7 @@ SUBORDINATE_IDS = [
     "P-CONSOLIDATION-1.abstract-flow-model",
     "P-ALLOC-1.eugene-bound",
     "P-ADDRESS-1.yul-interface-harness",
+    "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
 ]
 EXPECTED_AUTHORITY = (
@@ -54,6 +55,7 @@ EXPECTED_WORDING = [
     "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
     "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
+    "Concrete Verity transaction-plane evidence compiles the typed StakingRouter.deposit path and refines commit conservation plus whole-transaction snapshot rollback to the canonical P-DEPOSIT-1 abstract guarantee; source, Yul, EVM, and production provenance remain open.",
     "Concrete Verity transaction-plane evidence proves that consolidation debits exactly one fee per source/target public-key request, preserves the validator public-key mapping, and restores the registry snapshot on rollback; consolidation moves no ETH amount, while Yul, EVM, and production provenance remain open.",
 ]
 EXPECTED_ASSUMPTIONS = {
@@ -120,6 +122,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
      "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
     {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"},
+    {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful typed compilation, commit conservation, CallProgram snapshot rollback, external-call denotation, bounded-loop invariant, and mutant-sensitive vector build"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee LidoSRv3.Audit.Verity.Tests.ConsolidationFee", "expected": "successful fee debit, public-key mapping preservation, insufficient-balance guard, and CallProgram snapshot rollback proofs with mutant-sensitive vectors"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
@@ -139,6 +142,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
     ["A-YUL-INTERFACE"],
+    ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
 ]
 EXPECTED_NEXT_GATES = [
@@ -160,6 +164,7 @@ EXPECTED_NEXT_GATES = [
     "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
     "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
+    "Certify the pending transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
     "Certify the pending transaction-plane evidence, then refine it through generated Yul/EVM semantics and independently verified production runtime provenance.",
 ]
 EXPECTED_EXCLUSIONS = {
@@ -209,6 +214,7 @@ EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
@@ -228,6 +234,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "tx"],
     ["model", "algorithm"],
     ["yul"],
+    ["model", "tx"],
     ["tx"],
 ]
 EXPECTED_THEOREMS = [
@@ -247,6 +254,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
     "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
     "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
+    "LidoSRv3.Audit.Verity.DepositRollback.deposit_tx_refines_abstract",
     "LidoSRv3.Audit.Verity.ConsolidationFee.consolidation_fee_tx_ok",
 ]
 STATUS_VALUES = {
@@ -898,6 +906,13 @@ def validate():
                     "P-ADDRESS-1.yul-interface-harness must remain subordinate to P-ADDRESS-1")
             require(row.get("source_plane_scope") == "typed Yul builtin interface harness only",
                     "P-ADDRESS-1.yul-interface-harness: scope differs")
+        elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
+            require(row.get("parent_id") == "P-DEPOSIT-1",
+                    "P-DEPOSIT-1.verity-tx-rollback.tx must remain subordinate to P-DEPOSIT-1")
+            require(row.get("source_plane_scope") == "deposit conservation and whole-transaction rollback only",
+                    "P-DEPOSIT-1.verity-tx-rollback.tx: scope differs")
+            require(row.get("no_new_forbidden_lean_tokens") is True,
+                    "P-DEPOSIT-1.verity-tx-rollback.tx: forbidden-token assertion is missing")
         elif row["id"] == "P-CONSOLIDATION-1.fee-refinement.tx":
             require(row.get("parent_id") == "P-CONSOLIDATION-1",
                     "P-CONSOLIDATION-1.fee-refinement.tx must remain subordinate to P-CONSOLIDATION-1")
@@ -942,6 +957,8 @@ def validate():
             mapping = source_targets["P-CONSOLIDATION-1"]
         elif row["id"] == "P-ADDRESS-1.yul-interface-harness":
             mapping = source_targets["P-ADDRESS-1"]
+        elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
+            mapping = source_targets["P-DEPOSIT-1"]
         elif row["id"] == "P-CONSOLIDATION-1.fee-refinement.tx":
             mapping = source_targets["P-CONSOLIDATION-1"]
         else:
