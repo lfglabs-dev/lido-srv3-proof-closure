@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
-base: 40b353ff5a932a66b1c2c2549a0f1ff2f372237b
+base: 1ae66a0477eb0769b0cc4c0c21d39f62d572d4b9
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: 512b637208ee6ae89a51f0a4e2708b71588bdcb1
+validated-tree: 17f2caf2c443259d3aef318ef6c1f05c8bf99c63
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -257,7 +257,7 @@ P-ALLOC-1.eugene-bound subordinate evidence (2026-08-05)
 - Previous validation receipt tree: `c3ec349c714ca93d5b00501203f29165583f09dc`.
 - Current validation receipt tree: `95705ea7bcdf122176a60f95dc83b21b83421133`.
 - Focused Eugene theorem and vectors build: exit 0.
-- Audit metadata check (exactly 11 canonical guarantees plus two subordinate
+- Audit metadata check (exactly 11 canonical guarantees plus three subordinate
   evidence rows): exit 0.
 - Optimized metadata mutants, including Eugene omission, promotion, and
   wrong-parent mutations: exit 0.
@@ -319,3 +319,26 @@ P-SSZ-1 abstract-digest refinement (2026-08-05)
   `P-SSZ-1.abstract-digest`, and `P-ALLOC-1.eugene-bound`.
 - Net-Lean literal-word scan for the four forbidden proof-escape words: no
   matches.
+
+Campaign advancement to 10/11 public + 3/11 subordinate (2026-08-05)
+-------------------------------------------------------------------
+
+- Post-merge live campaign head: `campaign/lido-minimal-11@1ae66a0477eb0769b0cc4c0c21d39f62d572d4b9`
+  (merge of the certified PR head into the campaign branch).
+- Pre-merge live campaign head: `campaign/lido-minimal-11@52b6db9d5f59bbfbd2d6d5932295f8e850e8079a`.
+- Pre-merge PR head: `bba0dd9af922cf290d6b184438144878ac034dea` (certifier 53c997c6 CLEAN).
+- Net new commits merged: `bba0dd9af922cf290d6b184438144878ac034dea`
+  (`P-SSZ-1: refine abstract SHA-256 digest chain`) and
+  `1ae66a0477eb0769b0cc4c0c21d39f62d572d4b9` (`Merge P-SSZ-1 abstract-digest
+  subordinate evidence row (certifier 53c997c6 CLEAN at bba0dd9a)`).
+- Post-merge `validated-tree` is `17f2caf2c443259d3aef318ef6c1f05c8bf99c63`; the receipt binds
+  the canonical source-map, validator, and negative fixtures of the new HEAD.
+- Registry assertion: exactly 11 canonical public guarantees + 3 subordinate rows
+  (`P-SSZ-1.deposit-data-root`, `P-SSZ-1.abstract-digest`,
+  `P-ALLOC-1.eugene-bound`). `audit_metadata.py check` exits 0.
+- No NEW forbidden proof-escape (`sorry`, `admit`, `axiom`, `unsafe`) introduced
+  by the merge; the campaign's changed-Lean diff contains none.
+- The campaign merge used no rebase or force-push, and no branch was deleted.
+- The 3 subordinate rows now present are `P-SSZ-1.deposit-data-root`,
+  `P-SSZ-1.abstract-digest`, and `P-ALLOC-1.eugene-bound`;
+  `P-SSZ-1.abstract-digest` is the third.
