@@ -29,6 +29,7 @@
       "theorem_planes": ["model", "tx", "source"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
+      "note": "abstract lean-checked retained; verity-tx-rollback sub-row provides tx: LEAN_CHECKED",
       "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1", "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"}
     },
@@ -183,6 +184,19 @@
       "assumptions": ["A-YUL-INTERFACE"],
       "next_gate": "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"}
+    },
+    {
+      "id": "P-DEPOSIT-1.verity-tx-rollback.tx",
+      "parent_id": "P-DEPOSIT-1",
+      "catalogue_wording": "Concrete Verity transaction-plane evidence compiles the typed StakingRouter.deposit path and refines commit conservation plus whole-transaction snapshot rollback to the canonical P-DEPOSIT-1 abstract guarantee; source, Yul, EVM, and production provenance remain open.",
+      "source_plane_scope": "deposit conservation and whole-transaction rollback only",
+      "theorem": "LidoSRv3.Audit.Verity.DepositRollback.deposit_tx_refines_abstract",
+      "theorem_planes": ["model", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+      "no_new_forbidden_lean_tokens": true,
+      "next_gate": "Certify the pending transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful typed compilation, commit conservation, CallProgram snapshot rollback, external-call denotation, bounded-loop invariant, and mutant-sensitive vector build"}
     },
     {
       "id": "P-CONSOLIDATION-1.fee-refinement.tx",
