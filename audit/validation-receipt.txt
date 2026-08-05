@@ -1,8 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: ebe9abc64e1f195fab12a37ad8d141b1f5d1561d
-head: 6b0ab4aca93ffa67b055946fbb3d2ba616e6f9b2
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: ece6406c1bb63471243755c3e2a920a2bf9045a3
+validated-tree: 4aadfd57307538fe2521e4046a961d2c473a6502
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -332,3 +331,37 @@ P-SSZ-1 abstract-digest refinement (2026-08-05)
   `P-SSZ-1.abstract-digest`, and `P-ALLOC-1.eugene-bound`.
 - Net-Lean literal-word scan for the four forbidden proof-escape words: no
   matches.
+
+P-ADDRESS-1 Yul interface harness subordinate evidence (2026-08-05)
+------------------------------------------------------------------
+
+- Campaign input head and receipt base:
+  `ebe9abc64e1f195fab12a37ad8d141b1f5d1561d`.
+- EVMYulLean remains pinned exactly at
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`; Lean remains 4.31.0 and the
+  Mathlib pin is unchanged.
+- The bounded typed AST contains `mstore-address`, `calldataload-address`,
+  `sload-address`, and `calldatacopy-source-target` roles and reuses the
+  abstract P-ADDRESS-1 address-renaming theorem. It makes no EVM execution
+  refinement claim and introduces no runtime/precompile interface.
+- Identity, identity-plus-rename, address-stomp build, and zero-byte vectors
+  compile; a distinct 20-byte target stomp is rejected by the abstract
+  address-renaming relation.
+- Full `lake build`: exit 0 (1187 jobs).
+- `python3 scripts/audit_metadata.py check` and `make audit-check`: exit 0,
+  reporting exactly 11 canonical guarantees plus five subordinate rows.
+- The new row remains subordinate to `P-ADDRESS-1`; its theorem plane is only
+  `yul`, the inherited abstract `tx` status is not promoted, and EVM remains
+  open.
+
+PR #34 re-pin resolution (2026-08-05)
+---------------------------------------
+
+This commit resolves the textual conflict between PR #34 (campaign infra:
+re-pin Verity to 066f1bf5 post-#2235) and the campaign at 4c8e79b1
+(post-PR #33 merge). Resolution follows the canonical pattern from PR
+#32's ebe9abc6 rebind: drops the strict head_present + EXPECTED_HEAD
+checker and the receipt head: field; retains base:, validation-subject:,
+and validated-tree:. Campaign-side rebind is owed after this merge to bind
+the new head and refresh validated-tree: to the receipt-excluded tree of
+the post-merge campaign commit (following the ebe9abc6 pattern).

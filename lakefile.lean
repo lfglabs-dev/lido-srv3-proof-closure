@@ -9,4 +9,8 @@ require verity from git
 
 @[default_target]
 lean_lib «LidoSRv3» where
-  globs := #[.andSubmodules `LidoSRv3]
+  globs := #[
+    .andSubmodules `LidoSRv3,
+    .one `LidoSRv3.Audit.Verity.AddressYulInterface,
+    .one `LidoSRv3.Tests.AddressYulInterface
+  ]
