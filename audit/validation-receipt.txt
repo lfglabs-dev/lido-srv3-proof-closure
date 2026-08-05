@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: ebe9abc64e1f195fab12a37ad8d141b1f5d1561d
 validation-subject: HEAD tracked tree excluding this receipt
-validated-tree: e01564646c5d2868fc9114fec3d57165bba4b49f
+validated-tree: 4aadfd57307538fe2521e4046a961d2c473a6502
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -353,3 +353,15 @@ P-ADDRESS-1 Yul interface harness subordinate evidence (2026-08-05)
 - The new row remains subordinate to `P-ADDRESS-1`; its theorem plane is only
   `yul`, the inherited abstract `tx` status is not promoted, and EVM remains
   open.
+
+PR #34 re-pin resolution (2026-08-05)
+---------------------------------------
+
+This commit resolves the textual conflict between PR #34 (campaign infra:
+re-pin Verity to 066f1bf5 post-#2235) and the campaign at 4c8e79b1
+(post-PR #33 merge). Resolution follows the canonical pattern from PR
+#32's ebe9abc6 rebind: drops the strict head_present + EXPECTED_HEAD
+checker and the receipt head: field; retains base:, validation-subject:,
+and validated-tree:. Campaign-side rebind is owed after this merge to bind
+the new head and refresh validated-tree: to the receipt-excluded tree of
+the post-merge campaign commit (following the ebe9abc6 pattern).

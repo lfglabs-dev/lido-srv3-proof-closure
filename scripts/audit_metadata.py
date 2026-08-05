@@ -261,8 +261,8 @@ CAMPAIGN_BASE = {
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_VERITY_REPOSITORY = "https://github.com/lfglabs-dev/verity.git"
-CANONICAL_VERITY_COMMIT = "18a9bda2355b091e2857e5ad9ba1686798daea05"
-CANONICAL_VERITY_INPUT_REV = "18a9bda2355b091e2857e5ad9ba1686798daea05"
+CANONICAL_VERITY_COMMIT = "066f1bf5772ebc6cc218902b8f05ad70cbf36866"
+CANONICAL_VERITY_INPUT_REV = "066f1bf5772ebc6cc218902b8f05ad70cbf36866"
 CANONICAL_EVMYULLEAN_REPOSITORY = "https://github.com/lfglabs-dev/EVMYulLean.git"
 CANONICAL_EVMYULLEAN_COMMIT = "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
 CANONICAL_MATHLIB_REPOSITORY = "https://github.com/leanprover-community/mathlib4.git"
@@ -859,7 +859,7 @@ def validate():
                     "1ae66a0477eb0769b0cc4c0c21d39f62d572d4b9",
                     "P-CONSOLIDATION-1.abstract-flow-model: campaign head differs")
             require(row.get("verity_loop_simulation_sha") ==
-                    "18a9bda2355b091e2857e5ad9ba1686798daea05",
+                    "066f1bf5772ebc6cc218902b8f05ad70cbf36866",
                     "P-CONSOLIDATION-1.abstract-flow-model: LoopSimulation gate differs")
             require(row.get("verity_sha256_sha") ==
                     "1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6",
