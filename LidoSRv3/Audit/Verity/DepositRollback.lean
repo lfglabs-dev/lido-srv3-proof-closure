@@ -60,12 +60,15 @@ def depositEntry : FunctionSpec :=
     body :=
       [ .require (.eq (.param "callerHasDepositRole") (.literal 1))
           "AccessControl: missing DEPOSIT_ROLE"
+      , .calldatacopy (.literal 0) (.literal 4)
+          (.mul (.param "actualDepositsCount") (.literal 48))
       , .letVar "maxEffectiveBalance" (.immutable "MAX_EFFECTIVE_BALANCE_WC_TYPE_01")
       , .require (.le (.param "actualDepositsCount") (.param "maxDepositsPerRequest"))
           "ModuleReturnExceedTarget"
       , .letVar "pulled"
           (.mul (.param "actualDepositsCount") (.localVar "maxEffectiveBalance"))
       , .letVar "iter_total" (.literal 0)
+      , .mstore (.literal 96) (.literal 0)
       , .forEach "i" (.param "actualDepositsCount")
           [ .letVar "deposit_ok"
               (.call (.literal Verity.Core.MAX_UINT256)

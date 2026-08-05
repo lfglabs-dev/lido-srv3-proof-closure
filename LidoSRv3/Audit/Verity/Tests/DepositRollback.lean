@@ -24,39 +24,44 @@ def nominal : SourceDepositInput :=
     lidoCanDeposit := true
     lidoDepositableEther := 2 * depositSize32ETH }
 
-theorem test_deposit_commit_conserves_wei :
-    (run cfg nominal).pulled = 2 * depositSize32ETH ∧
-      (run cfg nominal).pushed = 2 * depositSize32ETH ∧
-      (run cfg nominal).pulled = (run cfg nominal).pushed := by
-  native_decide
+def test_deposit_commit_conserves_wei : Bool :=
+  decide ((run cfg nominal).pulled = 2 * depositSize32ETH ∧
+    (run cfg nominal).pushed = 2 * depositSize32ETH ∧
+    (run cfg nominal).pulled = (run cfg nominal).pushed)
 
-theorem test_deposit_revert_rolls_back_state :
-    let unauthorized := { nominal with callerHasDepositRole := false }
-    let tx := transactionObservation (depositProgram cfg unauthorized 17) 999 []
-      { calls := [], ethMoves := [{ sender := 1, recipient := 2, amount := ⟨3⟩ }], logs := [] }
-    tx.committedState = 17 ∧ tx.committedTrace.ethMoves = [] := by
-  native_decide
+#guard test_deposit_commit_conserves_wei
 
-theorem test_deposit_assert_failure_rolls_back :
-    let badCfg := { cfg with maxEBType1 := depositSize32ETH + 1 }
-    let badInp := { nominal with
-      moduleDepositableEth := 2 * (depositSize32ETH + 1)
-      lidoDepositableEther := 2 * (depositSize32ETH + 1) }
-    let tx := transactionObservation (depositProgram badCfg badInp 41) 100 []
-      { calls := [], ethMoves := [{ sender := 1, recipient := 2, amount := ⟨1⟩ }], logs := [] }
-    (run badCfg badInp = .revertAssertBalanceUnchanged) ∧
-      tx.committedState = 41 ∧ tx.committedTrace.ethMoves = [] := by
-  native_decide
+def test_deposit_revert_rolls_back_state : Bool :=
+  let unauthorized := { nominal with callerHasDepositRole := false }
+  let tx := transactionObservation (depositProgram cfg unauthorized 17) 999 []
+    { calls := [], ethMoves := [{ sender := 1, recipient := 2, amount := ⟨3⟩ }], logs := [] }
+  decide (tx.committedState = 17 ∧ tx.committedTrace.ethMoves = [])
 
-theorem test_deposit_max_effective_balance_misconfig_reverts :
-    let badCfg := { cfg with maxEBType1 := depositSize32ETH + 1 }
-    ¬ ConservingConfig badCfg ∧ (run badCfg nominal).reverts = true ∧
-      (run badCfg nominal).pulled = 0 ∧ (run badCfg nominal).pushed = 0 := by
-  native_decide
+#guard test_deposit_revert_rolls_back_state
+
+def test_deposit_assert_failure_rolls_back : Bool :=
+  let badCfg := { cfg with maxEBType1 := depositSize32ETH + 1 }
+  let badInp := { nominal with
+    moduleDepositableEth := 2 * (depositSize32ETH + 1)
+    lidoDepositableEther := 2 * (depositSize32ETH + 1) }
+  let tx := transactionObservation (depositProgram badCfg badInp (41 : Nat)) 100 []
+    { calls := [], ethMoves := [{ sender := 1, recipient := 2, amount := ⟨1⟩ }], logs := [] }
+  decide (run badCfg badInp = .revertAssertBalanceUnchanged ∧
+    tx.committedState = 41 ∧ tx.committedTrace.ethMoves = [])
+
+#guard test_deposit_assert_failure_rolls_back
+
+def test_deposit_max_effective_balance_misconfig_reverts : Bool :=
+  let badCfg := { cfg with maxEBType1 := depositSize32ETH + 1 }
+  decide (¬ ConservingConfig badCfg ∧ (run badCfg nominal).reverts = true ∧
+    (run badCfg nominal).pulled = 0 ∧ (run badCfg nominal).pushed = 0)
+
+#guard test_deposit_max_effective_balance_misconfig_reverts
 
 /-- Negative mutant: changing the per-iteration amount is detected. -/
-theorem test_deposit_wrong_conservation_claim_fails :
-    (run cfg nominal).pushed ≠ 2 * (depositSize32ETH + 1) := by
-  native_decide
+def test_deposit_wrong_conservation_claim_fails : Bool :=
+  decide ((run cfg nominal).pushed ≠ 2 * (depositSize32ETH + 1))
+
+#guard test_deposit_wrong_conservation_claim_fails
 
 end LidoSRv3.Audit.Verity.Tests.DepositRollback
