@@ -1,5 +1,6 @@
 Minimal-11 cleanup validation receipt
 base: ebe9abc64e1f195fab12a37ad8d141b1f5d1561d
+head: 6b0ab4aca93ffa67b055946fbb3d2ba616e6f9b2
 validation-subject: HEAD tracked tree excluding this receipt
 validated-tree: ece6406c1bb63471243755c3e2a920a2bf9045a3
 
