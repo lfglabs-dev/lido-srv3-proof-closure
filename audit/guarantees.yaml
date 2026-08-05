@@ -183,6 +183,18 @@
       "assumptions": ["A-YUL-INTERFACE"],
       "next_gate": "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"}
+    },
+    {
+      "id": "P-CONSOLIDATION-1.fee-refinement.tx",
+      "parent_id": "P-CONSOLIDATION-1",
+      "catalogue_wording": "Concrete Verity transaction-plane evidence proves that consolidation debits exactly one fee per source/target public-key request, preserves the validator public-key mapping, and restores the registry snapshot on rollback; consolidation moves no ETH amount, while Yul, EVM, and production provenance remain open.",
+      "source_plane_scope": "consolidation fee, public-key mapping, and rollback only",
+      "theorem": "LidoSRv3.Audit.Verity.ConsolidationFee.consolidation_fee_tx_ok",
+      "theorem_planes": ["tx"],
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+      "next_gate": "Certify the pending transaction-plane evidence, then refine it through generated Yul/EVM semantics and independently verified production runtime provenance.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee LidoSRv3.Audit.Verity.Tests.ConsolidationFee", "expected": "successful fee debit, public-key mapping preservation, insufficient-balance guard, and CallProgram snapshot rollback proofs with mutant-sensitive vectors"}
     }
   ]
 }
