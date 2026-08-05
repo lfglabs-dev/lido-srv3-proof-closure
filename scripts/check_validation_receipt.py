@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = Path("audit/validation-receipt.txt")
-EXPECTED_BASE = "ebe9abc64e1f195fab12a37ad8d141b1f5d1561d"
+EXPECTED_BASE = "1b76e4b0c1fb5fcc6eb8f1031709b7d4c083e329"
 
 
 def git(*args, env=None):
