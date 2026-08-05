@@ -11,3 +11,4 @@ import LidoSRv3.Audit.Common.Result
 import LidoSRv3.Audit.Common.Trace
 import LidoSRv3.Audit.Common.Atomicity
 import LidoSRv3.Audit.Source.AccountingCorrespondence
+import LidoSRv3.Audit.Verity.SszAbstractDigest

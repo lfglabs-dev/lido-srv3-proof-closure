@@ -125,6 +125,23 @@
       "reproduction": {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression", "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"}
     },
     {
+      "id": "P-SSZ-1.abstract-digest",
+      "parent_id": "P-SSZ-1",
+      "catalogue_wording": "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
+      "source_plane_scope": "abstract SHA-256 digest only",
+      "campaign_head_sha": "52b6db9d5f59bbfbd2d6d5932295f8e850e8079a",
+      "verity_sha": "1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6",
+      "validated_tree_sha": "94ec852336ea2148785943d48c96a7d0248ea99f",
+      "files": ["LidoSRv3.lean", "LidoSRv3/Audit/Verity/SszAbstractDigest.lean", "audit/artifacts.lock.json", "audit/guarantees.yaml", "audit/validation-receipt.txt", "lake-manifest.json", "lakefile.lean", "scripts/audit_metadata.py", "verity/targets/audit-manifest.json"],
+      "no_new_forbidden_lean_tokens": true,
+      "theorem": "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
+      "theorem_planes": ["model", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+      "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
+      "next_gate": "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszAbstractDigest", "expected": "successful typed-program compilation and exact seven-call pure-Lean digest composition; no Verity execution simulation or SHA-256 functional proof"}
+    },
+    {
       "id": "P-ALLOC-1.eugene-bound",
       "parent_id": "P-ALLOC-1",
       "catalogue_wording": "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
