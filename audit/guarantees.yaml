@@ -171,6 +171,18 @@
       "assumptions": ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
       "next_gate": "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors", "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"}
+    },
+    {
+      "id": "P-ADDRESS-1.yul-interface-harness",
+      "parent_id": "P-ADDRESS-1",
+      "catalogue_wording": "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
+      "source_plane_scope": "typed Yul builtin interface harness only",
+      "theorem": "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
+      "theorem_planes": ["yul"],
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-YUL-INTERFACE"],
+      "next_gate": "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"}
     }
   ]
 }
