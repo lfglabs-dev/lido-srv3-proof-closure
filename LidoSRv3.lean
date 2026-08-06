@@ -12,4 +12,5 @@ import LidoSRv3.Audit.Common.Trace
 import LidoSRv3.Audit.Common.Atomicity
 import LidoSRv3.Audit.Source.AccountingCorrespondence
 import LidoSRv3.Audit.Verity.SszAbstractDigest
+import LidoSRv3.Audit.Verity.SszTxSimulation
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
