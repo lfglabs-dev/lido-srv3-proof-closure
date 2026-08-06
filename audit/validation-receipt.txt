@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: aec22029de400555aac191a438d824975fd00610
+validated-tree: a944892aea1a2952f161c992cb223965785663d6
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,6 +13,36 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
+
+PR #48 source-fidelity repair receipt (non-receipt tree `a944892aea1a2952f161c992cb223965785663d6`):
+- Re-read the exact pinned functions at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+  `StakingRouter.deposit` 942--997, `Lido.withdrawDepositableEther` 869--886,
+  `Lido._spendDepositableEther` 839--859, and
+  `BeaconChainDepositor.makeBeaconChainDeposits32ETH` 36--64, plus their
+  directly invoked authentication, storage, allocation, queue, oracle, and
+  deposit-root helpers.
+- Removed caller-supplied allocation and deposit-data-root inputs, artificial
+  calldata offsets for module-returned memory, the unchanged deposits-word
+  write, hard-coded Lido/DepositContract targets, the bit-240 status read,
+  failure swallowing, the aliased Solidity extraction witness, and abstract
+  conservation/rollback theorems presented as FunctionSpec execution.
+- The compiled checked prefix now uses locator-derived DSM caller equality,
+  EnumerableSet module membership, status bits 224--231, WC type bits
+  232--239, the actual module address, source `setType` conversion, and the
+  immutable LIDO target for `getDepositableEther`, with call failure forwarded.
+- Allocation and the entire multi-contract suffix are explicitly OPEN in both
+  Lean and metadata. The OPEN list covers capacity/summary/MinFirst/indexing,
+  module-returned memory, timestamp/block write and event, Lido gate/auth/spend,
+  withdrawal queue/oracle/reserve/packed writes/logs, per-validator free-memory
+  and 420-byte beacon calldata, per-validator deposit-data-root, call-failure
+  propagation, conservation, rollback, nested loops, and contract-separated
+  allocation extraction.
+- `lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback`: exit 0.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- Changed repair Lean contains no `sorry`, `sorryAx`, `admit`, or
+  `Classical.choice`.
 
 P-SSZ-1 structural gate receipt (committed tree):
 - `lake build`: exit 0.
