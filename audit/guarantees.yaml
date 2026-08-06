@@ -26,21 +26,21 @@
       "id": "P-DEPOSIT-1",
       "catalogue_wording": "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
       "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
-      "theorem_planes": ["model", "tx", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
       "note": "abstract lean-checked retained; verity-tx-rollback sub-row provides tx: LEAN_CHECKED",
-      "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics.",
+      "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics. The abstract transaction observation theorem lives in the model plane; tx-plane requires Verity execution simulation.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1", "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"}
     },
     {
       "id": "P-TOPUP-1",
       "catalogue_wording": "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
       "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
-      "theorem_planes": ["model", "tx", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
-      "next_gate": "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
+      "next_gate": "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity. The abstract transaction observation theorem lives in the model plane; tx-plane requires Verity execution simulation.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1", "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"}
     },
     {
@@ -77,10 +77,10 @@
       "id": "P-ADDRESS-1",
       "catalogue_wording": "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
       "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance",
-      "theorem_planes": ["tx"],
-      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem_planes": ["model"],
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-YUL-INTERFACE"],
-      "next_gate": "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
+      "next_gate": "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin. The abstract transaction observation theorem lives in the model plane; tx-plane requires Verity execution simulation.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance", "expected": "abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem"}
     },
     {
@@ -136,10 +136,10 @@
       "files": ["LidoSRv3.lean", "LidoSRv3/Audit/Verity/SszAbstractDigest.lean", "audit/artifacts.lock.json", "audit/guarantees.yaml", "audit/validation-receipt.txt", "lake-manifest.json", "lakefile.lean", "scripts/audit_metadata.py", "verity/targets/audit-manifest.json"],
       "no_new_forbidden_lean_tokens": true,
       "theorem": "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
-      "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
+      "next_gate": "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions. The abstract transaction observation theorem lives in the model plane; tx-plane requires Verity execution simulation.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszAbstractDigest", "expected": "successful typed-program compilation and exact seven-call pure-Lean digest composition; no Verity execution simulation or SHA-256 functional proof"}
     },
     {
@@ -155,10 +155,10 @@
       "files": ["LidoSRv3.lean", "LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean", "audit/artifacts.lock.json", "audit/guarantees.yaml", "audit/validation-receipt.txt", "lake-manifest.json", "lakefile.lean", "scripts/audit_metadata.py", "scripts/check_validation_receipt.py", "verity/targets/audit-manifest.json"],
       "no_new_forbidden_lean_tokens": true,
       "theorem": "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
-      "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
-      "next_gate": "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
+      "next_gate": "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance. The abstract transaction observation theorem lives in the model plane; tx-plane requires Verity execution simulation.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel", "expected": "successful typed-program compilation and exact source-then-target 96-byte single-CALL layout; no amount, SHA-256, loop, rollback, Yul, or EVM claim"}
     },
     {
@@ -180,9 +180,9 @@
       "source_plane_scope": "typed Yul builtin interface harness only",
       "theorem": "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
       "theorem_planes": ["yul"],
-      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-YUL-INTERFACE"],
-      "next_gate": "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
+      "next_gate": "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open. The abstract transaction observation theorem lives in the model plane; tx-plane requires Verity execution simulation.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"}
     },
     {
