@@ -128,37 +128,125 @@ structure Request where
 def ValidRequest (request : Request) : Prop :=
   request.source.length = 48 ∧ request.target.length = 48
 
-def validRequest (request : Request) : Bool :=
-  request.source.length == 48 && request.target.length == 48
+def abiWord (value : Nat) : Word :=
+  fun index => ⟨(value / 256 ^ (31 - index.val)) % 256, Nat.mod_lt _ (by decide)⟩
 
-def payloadBytes (request : Request) : List Byte := request.source ++ request.target
+def decodeWordBytes (bytes : List Byte) : Nat :=
+  bytes.foldl (fun value byte => value * 256 + byte.val) 0
 
-def payload (request : Request) : List Nat := (payloadBytes request).map (·.val)
+def decodeMemoryWord (memory : Memory) (offset : Nat) : Nat :=
+  decodeWordBytes (List.ofFn (fun index : Fin 32 => memory.bytes (offset + index)))
 
-/-- 1H byte memory corresponding to the two `calldatacopy` operations in the
-typed loop: source at `[0,48)` and target at `[48,96)`. -/
-def requestMemory (request : Request) : Memory :=
+/-- Exact ABI tail of one dynamic `bytes[]` element: the 32-byte big-endian
+length followed by its bytes at the offset returned by the dynamic loader. -/
+def encodeDynamicElement (bytes : Pubkey) : Memory :=
+  (Memory.empty.writeWord 0 (abiWord bytes.length)).copyFrom
+    (listByte bytes) 32 0 bytes.length
+
+def decodeDynamicElement (memory : Memory) : Pubkey :=
+  memory.slice 32 (decodeMemoryWord memory 0)
+
+structure MemoryRequest where
+  sourceElement : Memory
+  targetElement : Memory
+
+def encodeRequest (request : Request) : MemoryRequest :=
+  { sourceElement := encodeDynamicElement request.source
+    targetElement := encodeDynamicElement request.target }
+
+def decodeRequest (encoded : MemoryRequest) : Request :=
+  { source := decodeDynamicElement encoded.sourceElement
+    target := decodeDynamicElement encoded.targetElement }
+
+/-- Validation consumes only lengths decoded from byte memory. -/
+def validRequest (encoded : MemoryRequest) : Bool :=
+  (decodeDynamicElement encoded.sourceElement).length == 48 &&
+    (decodeDynamicElement encoded.targetElement).length == 48
+
+/-- Execution memory for the two typed `calldatacopy` operations.  Both copy
+sources are decoded ABI element memories, not the original request lists. -/
+def requestMemory (encoded : MemoryRequest) : Memory :=
+  let request := decodeRequest encoded
   (Memory.empty.copyFrom (listByte request.source) 0 0 48).copyFrom
     (listByte request.target) 48 0 48
 
-theorem payload_length (request : Request) (h : ValidRequest request) :
-    (payload request).length = 96 := by
-  simp [payload, payloadBytes, h.1, h.2]
+/-- The external request call reads its exact `[0,96)` calldata from memory. -/
+def payloadBytes (encoded : MemoryRequest) : List Byte :=
+  (requestMemory encoded).slice 0 96
 
-theorem requestMemory_target_byte (request : Request) (index : Fin 48) :
-    (requestMemory request).bytes (48 + index) = listByte request.target index := by
+def payload (encoded : MemoryRequest) : List Nat :=
+  (payloadBytes encoded).map (·.val)
+
+theorem abiWord_48_decodes :
+    decodeWordBytes (List.ofFn (abiWord 48)) = 48 := by native_decide
+
+theorem encodeDynamicElement_length_48 (bytes : Pubkey) (h : bytes.length = 48) :
+    decodeMemoryWord (encodeDynamicElement bytes) 0 = 48 := by
+  unfold decodeMemoryWord
+  rw [show List.ofFn (fun index : Fin 32 =>
+      (encodeDynamicElement bytes).bytes (0 + index)) = List.ofFn (abiWord 48) by
+    congr 1
+    funext index
+    simp only [encodeDynamicElement, h, Memory.copyFrom]
+    split
+    · omega
+    · simp [Memory.readByte, Memory.writeWord, Memory.expand, Memory.empty,
+        expandedLength] <;> omega]
+  exact abiWord_48_decodes
+
+theorem encode_decode_dynamic_48 (bytes : Pubkey) (h : bytes.length = 48) :
+    decodeDynamicElement (encodeDynamicElement bytes) = bytes := by
+  rw [decodeDynamicElement, encodeDynamicElement_length_48 bytes h]
+  apply List.ext_get
+  · simpa [Memory.slice] using h.symm
+  · intro index hleft hright
+    have hi : index < 48 := by omega
+    have hi80 : 32 + index < 80 := by omega
+    have hi96 : 32 + index < 96 := by omega
+    simp [Memory.slice, encodeDynamicElement, h, Memory.readByte, Memory.copyFrom,
+      Memory.writeWord, Memory.expand, Memory.empty, expandedLength, listByte,
+      List.getD_eq_getElem?_getD, hi, hi80, hi96]
+
+theorem encode_decode_request (request : Request) (h : ValidRequest request) :
+    decodeRequest (encodeRequest request) = request := by
+  cases request
+  simp only [decodeRequest, encodeRequest, ValidRequest] at h ⊢
+  simp [encode_decode_dynamic_48 _ h.1, encode_decode_dynamic_48 _ h.2]
+
+theorem payload_length (encoded : MemoryRequest) :
+    (payload encoded).length = 96 := by
+  simp [payload, payloadBytes, Memory.slice]
+
+theorem requestMemory_source_byte (encoded : MemoryRequest) (index : Fin 48) :
+    (requestMemory encoded).bytes index =
+      listByte (decodeRequest encoded).source index := by
+  simp only [requestMemory, Memory.copyFrom]
+  split
+  · omega
+  · simp [Memory.readByte, Memory.expand, expandedLength, Memory.empty] <;> omega
+
+theorem requestMemory_target_byte (encoded : MemoryRequest) (index : Fin 48) :
+    (requestMemory encoded).bytes (48 + index) =
+      listByte (decodeRequest encoded).target index := by
   simpa [requestMemory] using
     Memory.copyFrom_at
-      (Memory.empty.copyFrom (listByte request.source) 0 0 48)
-      (listByte request.target) 48 0 48 index
+      (Memory.empty.copyFrom (listByte (decodeRequest encoded).source) 0 0 48)
+      (listByte (decodeRequest encoded).target) 48 0 48 index
+
+theorem validRequest_encode_of_valid (request : Request) (h : ValidRequest request) :
+    validRequest (encodeRequest request) = true := by
+  change ((decodeRequest (encodeRequest request)).source.length == 48 &&
+    (decodeRequest (encodeRequest request)).target.length == 48) = true
+  rw [encode_decode_request request h]
+  simp [h.1, h.2]
 
 def feeSite (consolidationRequest : Nat) : CallSite :=
   { siteId := 0, kind := .staticcall, target := consolidationRequest,
     value := 0, calldata := [], gas := Verity.Core.MAX_UINT256 }
 
-def requestSite (consolidationRequest fee index : Nat) (request : Request) : CallSite :=
+def requestSite (consolidationRequest fee index : Nat) (encoded : MemoryRequest) : CallSite :=
   { siteId := index + 1, kind := .call, target := consolidationRequest,
-    value := fee, calldata := payload request, gas := Verity.Core.MAX_UINT256 }
+    value := fee, calldata := payload encoded, gas := Verity.Core.MAX_UINT256 }
 
 def decodeWord (bytes : List Nat) : Nat :=
   bytes.foldl (fun value byte => value * 256 + byte) 0
@@ -180,8 +268,9 @@ def batchCalls (caller gateway consolidationRequest msgValue : Nat)
           let count := sources.length
           if caller = gateway ∧ count > 0 ∧ count = targets.length ∧
               count * fee ≤ Verity.Core.MAX_UINT256 ∧ msgValue = count * fee then
-            let requests := List.zipWith (fun source target => ({ source, target } : Request)) sources targets
-            let rec loop (index : Nat) : List Request → CallProgram BatchStatus
+            let requests := List.zipWith
+              (fun source target => encodeRequest ({ source, target } : Request)) sources targets
+            let rec loop (index : Nat) : List MemoryRequest → CallProgram BatchStatus
               | [] => .pure .succeeded
               | request :: rest =>
                   if validRequest request then
