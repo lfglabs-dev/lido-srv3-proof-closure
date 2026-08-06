@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Check that the canonical validation receipt names its non-self-referential tree."""
 
+import os
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = Path("audit/validation-receipt.txt")
-EXPECTED_BASE = "9cfb87a3b4728a5eb70ae90d9997a02b5ec408b7"
-EXPECTED_HEAD = "c9868757da8db1e0d31423f8925a15ca6fe95fd0"
+EXPECTED_BASE = "c418551251404063793322beaf3b559967a69563"
+EXPECTED_HEAD = "4fd94e459f6e4dc206ebd5be52c911f6d5a4fc22"
 
 
 def git(*args, env=None):
@@ -37,7 +39,12 @@ def main():
         raise SystemExit("validation receipt head is not the canonical campaign head")
     if fields.get("validation-subject") != "HEAD tracked tree excluding this receipt":
         raise SystemExit("validation receipt subject semantics are missing or incompatible")
-    actual = git("rev-parse", f"{EXPECTED_HEAD}^{{tree}}")
+    with tempfile.TemporaryDirectory() as tmp:
+        env = os.environ.copy()
+        env["GIT_INDEX_FILE"] = str(Path(tmp) / "index")
+        git("read-tree", EXPECTED_HEAD, env=env)
+        git("rm", "--cached", "--quiet", "--", str(RECEIPT), env=env)
+        actual = git("write-tree", env=env)
     if fields.get("validated-tree") != actual:
         raise SystemExit(
             f"validation receipt tree is stale: recorded {fields.get('validated-tree')}, "
