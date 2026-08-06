@@ -85,13 +85,13 @@
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
-      "theorem": null,
-      "theorem_planes": [],
-      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "catalogue_wording": "Per-validator top-up headroom and aggregate budget conservation are proved on an abstract model; verifier-binding (SSZ proof that the accepted proof binds the intended validator) remains BLOCKED on runtime provenance.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.topup_batch_sound",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-RUNTIME-PROVENANCE"],
       "next_gate": "Obtain independent canonical runtime, codehash, fork, and address provenance.",
-      "reproduction": {"command": "python3 scripts/audit_metadata.py check", "expected": "MISSING provenance remains explicit and fails semantic closure"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2", "expected": "successful abstract per-validator headroom and aggregate budget conservation build; verifier-binding remains blocked on runtime provenance"}
     },
     {
       "id": "P-CONSOLIDATION-1",
