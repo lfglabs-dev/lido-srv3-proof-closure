@@ -122,7 +122,7 @@
       "axioms": ["propext", "Quot.sound"]
     },
     {
-      "name": "Guarantees.PAddress1.abstract_address_equivariance",
+      "name": "Guarantees.PAddress1.admission_and_post_state_equivariance",
       "status": "lean_checked",
       "axioms": []
     },

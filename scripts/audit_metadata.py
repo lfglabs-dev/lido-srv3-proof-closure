@@ -34,8 +34,10 @@ SUBORDINATE_IDS = [
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
     "P-SSZ-1.tx-execution-simulation",
-    "P-TOPUP-1.verity-tx-rollback.tx",
+    "P-ETH-1a",
+    "P-ETH-1b",
 ]
+SOURCE_TARGET_IDS = EXPECTED_IDS[:6] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -47,10 +49,10 @@ EXPECTED_WORDING = [
     "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
     "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
-    "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
-    "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
-    "The abstract top-up transition enforces configurable targetBalanceGwei/minTopUpGwei evaluation, WC type 0x02, activation, non-slashed/non-exiting status, strictly increasing validator indices with unique pubkeys, aligned arrays, max validators per call, fresh beacon root, Gwei-aligned call value, per-module allocation limit, and per-block cap; aggregate conservation is derived from the transition. Verifier binding remains BLOCKED on runtime provenance.",
-    "SHA-256 precompile hashing currently relies on opaque native FFI.",
+    "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
+    "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
+    "Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.",
+    "Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
     "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
@@ -60,7 +62,8 @@ EXPECTED_WORDING = [
     "Concrete Verity transaction-plane evidence compiles the typed StakingRouter.deposit path and refines commit conservation plus whole-transaction snapshot rollback to the canonical P-DEPOSIT-1 abstract guarantee; source, Yul, EVM, and production provenance remain open.",
     "Concrete Verity transaction-plane evidence proves that consolidation debits exactly one fee per source/target public-key request, preserves the validator public-key mapping, and restores the registry snapshot on rollback; consolidation moves no ETH amount, while Yul, EVM, and production provenance remain open.",
     "Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
-    "Concrete Verity transaction-plane evidence models the pinned StakingRouter.topUp allocation and push loops, proves successful post-state equivalence and whole-transaction snapshot rollback, and applies Verity A.3 allocation extraction at the typed pinned-source boundary; Yul, EVM, and production provenance remain open.",
+    "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
+    "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -107,10 +110,10 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
      "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"},
-    {"command": "lake build",
-     "expected": "active Lean 4.31 dependency graph builds; not certification"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance",
-     "expected": "abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
+     "expected": "successful bounded child-model proofs only; parent P-ETH-1 remains OPEN"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1",
+     "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2",
      "expected": "successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance"},
     {"command": "python3 scripts/audit_metadata.py check",
@@ -129,7 +132,10 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful typed compilation, commit conservation, CallProgram snapshot rollback, external-call denotation, bounded-loop invariant, and mutant-sensitive vector build"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee LidoSRv3.Audit.Verity.Tests.ConsolidationFee", "expected": "successful fee debit, public-key mapping preservation, insufficient-balance guard, and CallProgram snapshot rollback proofs with mutant-sensitive vectors"},
     {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"},
-    {"command": "lake build LidoSRv3.Audit.Verity.TopupRollback LidoSRv3.Audit.Verity.Tests.TopupRollback", "expected": "successful typed top-up compilation, post-state refinement, allocation extraction, bounded-loop sum, external-call denotation, snapshot rollback, and mutant-sensitive vector build"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
+     "expected": "successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
+     "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED"],
@@ -138,8 +144,8 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-    ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
-    ["A-YUL-INTERFACE"],
+    [],
+    ["A-ABSTRACT-TX"],
     ["A-RUNTIME-PROVENANCE"],
     ["A-SHA256-FFI"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
@@ -151,7 +157,8 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
-    ["A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+    [],
+    [],
 ]
 EXPECTED_NEXT_GATES = [
     "Refine proportional allocation amounts and EVM "
@@ -162,8 +169,8 @@ EXPECTED_NEXT_GATES = [
     "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
     "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
     "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
-    "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
-    "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
+    "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
+    "Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.",
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
@@ -175,7 +182,8 @@ EXPECTED_NEXT_GATES = [
     "Certify the pending transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
     "Certify the pending transaction-plane evidence, then refine it through generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
-    "Certify the pending top-up transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
+    "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
+    "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -197,17 +205,17 @@ EXPECTED_STATUSES = [
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "DEV-431-READY", "algorithm": "NOT_APPLICABLE", "source": "DEV-431-READY", "tx": "OPEN",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
@@ -217,27 +225,30 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
     ["algorithm", "source"],
-    ["model", "tx", "source"],
-    ["model", "tx", "source"],
+    ["model", "source"],
+    ["model", "source"],
     ["model", "source", "tx"],
     ["model", "source", "tx"],
     [],
-    ["tx"],
+    ["model", "tx"],
     ["model"],
     [],
     ["model"],
@@ -249,7 +260,8 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "tx"],
     ["tx"],
     ["model", "tx"],
-    ["model", "tx"],
+    ["model"],
+    ["model"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
@@ -259,7 +271,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
     None,
-    "LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance",
+    "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
     "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
@@ -271,7 +283,8 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.DepositRollback.deposit_tx_refines_abstract",
     "LidoSRv3.Audit.Verity.ConsolidationFee.consolidation_fee_tx_ok",
     "LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct",
-    "LidoSRv3.Audit.Verity.TopupRollback.topup_tx_refines_abstract",
+    "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
+    "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -401,7 +414,7 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAccount1.source_to_verityTx", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
-    {"name": "Guarantees.PAddress1.abstract_address_equivariance",
+    {"name": "Guarantees.PAddress1.admission_and_post_state_equivariance",
      "status": "lean_checked", "axioms": []},
     {"name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
      "status": "lean_checked", "axioms": ["propext"]},
@@ -579,17 +592,19 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.4.24/Lido.sol", "_spendDepositableEther", 839, 859),
         ("contracts/0.4.24/Lido.sol", "withdrawDepositableEther", 869, 886),
     },
-    "P-ETH-1": {
-        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "executeConsolidation", 383, 406),
+    "P-ETH-1a": {
         ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "preservesEthBalance", 118, 122),
         ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "_refundFee", 295, 307),
         ("contracts/0.8.9/WithdrawalVault.sol", "preservesEthBalance", 81, 85),
     },
+    "P-ETH-1b": {
+        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "executeConsolidation", 383, 406),
+    },
     "P-ADDRESS-1": {
-        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "constructor", 187, 193),
-        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "constructor", 124, 140),
-        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "_getWithdrawalVaultData", 368, 378),
-        ("contracts/0.8.9/WithdrawalVault.sol", "constructor", 61, 78),
+        ("contracts/0.8.9/WithdrawalQueueERC721.sol", "transferFrom", 218, 220),
+        ("contracts/0.8.9/WithdrawalQueue.sol", "requestWithdrawals", 125, 142),
+        ("contracts/0.8.9/WithdrawalQueue.sol", "claimWithdrawalsTo", 244, 264),
+        ("contracts/0.6.12/WstETH.sol", "unwrap", 69, 80),
     },
     "P-TOPUP-2": {
         ("contracts/0.8.25/TopUpGateway.sol", "topUp", 160, 237),
@@ -647,7 +662,7 @@ def validate_source_targets(source_map):
             "source-map pinned_source must end in a 40-character lowercase source SHA")
     targets = source_map.get("targets")
     require(isinstance(targets, list), "source-map targets must be a list")
-    require([target.get("id") for target in targets] == EXPECTED_IDS,
+    require([target.get("id") for target in targets] == SOURCE_TARGET_IDS,
             "source-map targets must contain the exact ordered minimal-11 IDs")
     for target in targets:
         target_id = target.get("id", "<missing>")
@@ -846,7 +861,25 @@ def validate():
         rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
         EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
-        if row["id"] == "P-SSZ-1.deposit-data-root":
+        if row["id"] == "P-ETH-1a":
+            require(row.get("parent_id") == "P-ETH-1",
+                    "P-ETH-1a must remain subordinate to P-ETH-1")
+            require(row.get("source_plane_scope") ==
+                    "protocol-controlled stVault rebalance/redemption interface only",
+                    "P-ETH-1a: scope must exclude raw owner-controlled withdrawals")
+            require(row.get("note") ==
+                    "Scope assumption: owner-controlled StakingVault.withdraw permits any nonzero recipient and is excluded from this child property.",
+                    "P-ETH-1a: owner-withdrawal scope assumption differs")
+        elif row["id"] == "P-ETH-1b":
+            require(row.get("parent_id") == "P-ETH-1",
+                    "P-ETH-1b must remain subordinate to P-ETH-1")
+            require(row.get("source_plane_scope") ==
+                    "configured immutable consolidation-request fee target only",
+                    "P-ETH-1b: configurable-target scope differs")
+            require(row.get("note") ==
+                    "Deployment-provenance assumption: Solidity uses nonzero immutable CONSOLIDATION_REQUEST, but proving its deployed value is 0x00...007251 is outside this source theorem.",
+                    "P-ETH-1b: deployment-provenance assumption differs")
+        elif row["id"] == "P-SSZ-1.deposit-data-root":
             require(row.get("parent_id") == "P-SSZ-1",
                     "P-SSZ-1.deposit-data-root must remain subordinate to P-SSZ-1")
             require(row.get("source_plane_scope") == "deposit-data-root only",
@@ -941,14 +974,6 @@ def validate():
                     "P-SSZ-1.tx-execution-simulation: scope differs")
             require(row.get("no_new_forbidden_lean_tokens") is True,
                     "P-SSZ-1.tx-execution-simulation: forbidden-token assertion is missing")
-        elif row["id"] == "P-TOPUP-1.verity-tx-rollback.tx":
-            require(row.get("parent_id") == "P-TOPUP-1",
-                    "P-TOPUP-1.verity-tx-rollback.tx must remain subordinate to P-TOPUP-1")
-            require(row.get("source_plane_scope") ==
-                    "top-up post-state, allocation extraction, and whole-transaction rollback only",
-                    "P-TOPUP-1.verity-tx-rollback.tx: scope differs")
-            require(row.get("no_new_forbidden_lean_tokens") is True,
-                    "P-TOPUP-1.verity-tx-rollback.tx: forbidden-token assertion is missing")
         else:
             require("parent_id" not in row,
                     f"{row['id']}: only declared subordinate evidence may have a parent")
@@ -968,13 +993,7 @@ def validate():
         for plane, status in row["statuses"].items():
             require(status in STATUS_VALUES,
                     f"{row['id']}: invalid {plane} assurance status: {status}")
-            inherited_abstract_tx = (
-                row["id"] == "P-ADDRESS-1.yul-interface-harness"
-                and plane == "tx"
-                and status == "ABSTRACT_LEAN_CHECKED"
-            )
-            require(status not in THEOREM_BACKED_STATUSES or plane in theorem_planes
-                    or inherited_abstract_tx,
+            require(status not in THEOREM_BACKED_STATUSES or plane in theorem_planes,
                     f"{row['id']}: {plane} status {status} requires theorem evidence "
                     "for that plane")
         require(row["statuses"] == expected_statuses,
@@ -991,10 +1010,12 @@ def validate():
             mapping = source_targets["P-ADDRESS-1"]
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             mapping = source_targets["P-DEPOSIT-1"]
-        elif row["id"] == "P-TOPUP-1.verity-tx-rollback.tx":
-            mapping = source_targets["P-TOPUP-1"]
         elif row["id"] == "P-CONSOLIDATION-1.fee-refinement.tx":
             mapping = source_targets["P-CONSOLIDATION-1"]
+        elif row["id"] == "P-ETH-1":
+            # The open parent spans both child source-map targets; no source
+            # closure is inferred from either mapping.
+            mapping = source_targets["P-ETH-1a"]
         else:
             mapping = source_targets[row["id"]]
         require(

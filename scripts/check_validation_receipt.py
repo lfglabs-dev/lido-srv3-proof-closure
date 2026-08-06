@@ -3,13 +3,12 @@
 
 import re
 import subprocess
-import os
-import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = Path("audit/validation-receipt.txt")
 EXPECTED_BASE = "9cfb87a3b4728a5eb70ae90d9997a02b5ec408b7"
+EXPECTED_HEAD = "c9868757da8db1e0d31423f8925a15ca6fe95fd0"
 
 
 def git(*args, env=None):
@@ -34,14 +33,11 @@ def main():
     )
     if fields.get("base") != EXPECTED_BASE:
         raise SystemExit("validation receipt base is not the canonical predecessor")
+    if fields.get("head") != EXPECTED_HEAD:
+        raise SystemExit("validation receipt head is not the canonical campaign head")
     if fields.get("validation-subject") != "HEAD tracked tree excluding this receipt":
         raise SystemExit("validation receipt subject semantics are missing or incompatible")
-    with tempfile.NamedTemporaryFile() as index:
-        env = os.environ.copy()
-        env["GIT_INDEX_FILE"] = index.name
-        git("read-tree", "HEAD", env=env)
-        git("rm", "--cached", "--quiet", str(RECEIPT), env=env)
-        actual = git("write-tree", env=env)
+    actual = git("rev-parse", f"{EXPECTED_HEAD}^{{tree}}")
     if fields.get("validated-tree") != actual:
         raise SystemExit(
             f"validation receipt tree is stale: recorded {fields.get('validated-tree')}, "

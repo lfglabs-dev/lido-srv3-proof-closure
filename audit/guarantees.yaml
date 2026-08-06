@@ -26,8 +26,8 @@
       "id": "P-DEPOSIT-1",
       "catalogue_wording": "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
       "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
-      "theorem_planes": ["model", "tx", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
       "note": "abstract lean-checked retained; verity-tx-rollback sub-row provides tx: LEAN_CHECKED",
       "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics.",
@@ -37,8 +37,8 @@
       "id": "P-TOPUP-1",
       "catalogue_wording": "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
       "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
-      "theorem_planes": ["model", "tx", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
       "next_gate": "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1", "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"}
@@ -65,27 +65,28 @@
     },
     {
       "id": "P-ETH-1",
-      "catalogue_wording": "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
+      "catalogue_wording": "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "DEV-431-READY", "algorithm": "NOT_APPLICABLE", "source": "DEV-431-READY", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
-      "assumptions": ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
-      "reproduction": {"command": "lake build", "expected": "active Lean 4.31 dependency graph builds; not certification"}
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "next_gate": "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful bounded child-model proofs only; parent P-ETH-1 remains OPEN"}
     },
     {
       "id": "P-ADDRESS-1",
-      "catalogue_wording": "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance",
-      "theorem_planes": ["tx"],
-      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-YUL-INTERFACE"],
-      "next_gate": "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance", "expected": "abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem"}
+      "catalogue_wording": "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
+      "theorem_planes": ["model", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-ABSTRACT-TX"],
+      "note": "Admission compares success/failure only; successful post-states are compared modulo the caller swap. Singleton-actor functions requiring Lido, TriggerableWithdrawalsGateway, or ConsolidationGateway are excluded and belong to authentication-integrity properties.",
+      "next_gate": "Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1", "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"}
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "The abstract top-up transition enforces configurable targetBalanceGwei/minTopUpGwei evaluation, WC type 0x02, activation, non-slashed/non-exiting status, strictly increasing validator indices with unique pubkeys, aligned arrays, max validators per call, fresh beacon root, Gwei-aligned call value, per-module allocation limit, and per-block cap; aggregate conservation is derived from the transition. Verifier binding remains BLOCKED on runtime provenance.",
+      "catalogue_wording": "Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.",
       "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
       "theorem_planes": ["model"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
@@ -95,7 +96,7 @@
     },
     {
       "id": "P-CONSOLIDATION-1",
-      "catalogue_wording": "SHA-256 precompile hashing currently relies on opaque native FFI.",
+      "catalogue_wording": "Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.",
       "theorem": null,
       "theorem_planes": [],
       "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
@@ -137,7 +138,7 @@
       "no_new_forbidden_lean_tokens": true,
       "theorem": "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
       "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
       "next_gate": "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszAbstractDigest", "expected": "successful typed-program compilation and exact seven-call pure-Lean digest composition; no Verity execution simulation or SHA-256 functional proof"}
@@ -156,7 +157,7 @@
       "no_new_forbidden_lean_tokens": true,
       "theorem": "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
       "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
       "next_gate": "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel", "expected": "successful typed-program compilation and exact source-then-target 96-byte single-CALL layout; no amount, SHA-256, loop, rollback, Yul, or EVM claim"}
@@ -180,7 +181,7 @@
       "source_plane_scope": "typed Yul builtin interface harness only",
       "theorem": "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
       "theorem_planes": ["yul"],
-      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-YUL-INTERFACE"],
       "next_gate": "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"}
@@ -224,17 +225,30 @@
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"}
     },
     {
-      "id": "P-TOPUP-1.verity-tx-rollback.tx",
-      "parent_id": "P-TOPUP-1",
-      "catalogue_wording": "Concrete Verity transaction-plane evidence models the pinned StakingRouter.topUp allocation and push loops, proves successful post-state equivalence and whole-transaction snapshot rollback, and applies Verity A.3 allocation extraction at the typed pinned-source boundary; Yul, EVM, and production provenance remain open.",
-      "source_plane_scope": "top-up post-state, allocation extraction, and whole-transaction rollback only",
-      "theorem": "LidoSRv3.Audit.Verity.TopupRollback.topup_tx_refines_abstract",
-      "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
-      "no_new_forbidden_lean_tokens": true,
-      "next_gate": "Certify the pending top-up transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.TopupRollback LidoSRv3.Audit.Verity.Tests.TopupRollback", "expected": "successful typed top-up compilation, post-state refinement, allocation extraction, bounded-loop sum, external-call denotation, snapshot rollback, and mutant-sensitive vector build"}
+      "id": "P-ETH-1a",
+      "parent_id": "P-ETH-1",
+      "catalogue_wording": "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
+      "source_plane_scope": "protocol-controlled stVault rebalance/redemption interface only",
+      "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "note": "Scope assumption: owner-controlled StakingVault.withdraw permits any nonzero recipient and is excluded from this child property.",
+      "next_gate": "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open"}
+    },
+    {
+      "id": "P-ETH-1b",
+      "parent_id": "P-ETH-1",
+      "catalogue_wording": "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
+      "source_plane_scope": "configured immutable consolidation-request fee target only",
+      "theorem": "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "note": "Deployment-provenance assumption: Solidity uses nonzero immutable CONSOLIDATION_REQUEST, but proving its deployed value is 0x00...007251 is outside this source theorem.",
+      "next_gate": "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"}
     }
   ]
 }

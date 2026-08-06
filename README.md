@@ -29,7 +29,7 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx` |
 | 6 | `P-RESERVE-1` | `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` (independent MODEL → pinned source-shaped semantics → Verity transaction refinement) |
 | 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
-| 8 | `P-ADDRESS-1` | `LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance` (abstract transaction only) |
+| 8 | `P-ADDRESS-1` | `LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance` (abstract transaction only) |
 | 9 | `P-TOPUP-2` | metadata-only; no Lean theorem claimed |
 | 10 | `P-CONSOLIDATION-1` | metadata-only; no Lean theorem claimed |
 | 11 | `P-SSZ-1` | `LidoSRv3.Audit.Ssz.structural_witness_binding_sound` (model); source plane OPEN for mapped helper/wrapper scope; carries the subordinate `P-SSZ-1.deposit-data-root` child claim noted below |
