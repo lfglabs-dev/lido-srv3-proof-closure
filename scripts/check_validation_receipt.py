@@ -7,8 +7,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = Path("audit/validation-receipt.txt")
-EXPECTED_BASE = "f9358e6df5e8c6ed4eed15d31054e490601efc1e"
-EXPECTED_HEAD = "f9358e6df5e8c6ed4eed15d31054e490601efc1e"
+EXPECTED_BASE = "129cc52c67a765fb9e8696be0661f382d155005c"
+EXPECTED_HEAD = "129cc52c67a765fb9e8696be0661f382d155005c"
 
 
 def git(*args, env=None):
