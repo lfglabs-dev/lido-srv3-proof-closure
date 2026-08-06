@@ -4,6 +4,7 @@ import Compiler.CompilationModel
 import Compiler.Modules.Precompiles
 import Verity.Core.Model.CallProgramRollback
 import Verity.Core.Model.DenoteExternalCalls
+import Verity.Core.Model.DenoteMemory
 import Verity.Core.Model.DenoteSha256
 
 /-!
@@ -22,6 +23,7 @@ namespace LidoSRv3.Audit.Verity.SszTxSimulation
 open Compiler
 open Compiler.CompilationModel
 open Compiler.CompilationModel.DenoteExternalCalls
+open Compiler.CompilationModel.DenoteMemory
 open Compiler.CompilationModel.Denote.Sha256
 open LidoSRv3.Audit
 open LidoSRv3.Audit.Verity.SszAbstractDigest
@@ -161,6 +163,109 @@ def digestPreimages (input : Inputs) : List Bytes :=
   , amountSignatureRoot
   , Sha256Engine.sha256 publicKeyWithdrawalRoot ++
       Sha256Engine.sha256 amountSignatureRoot ]
+
+/-! ## Faithful byte-memory and SHA-256 precompile denotation
+
+The source function first owns one contiguous scratch allocation.  The first
+304 bytes bind the three dynamic inputs (including their zero-filled tails),
+and byte 304 begins the seven 64-byte SHA-256 preimages.  Keeping the preimages
+in disjoint slots makes the exact bytes consumed by every call independently
+inspectable; it is observationally equivalent to the Solidity/Yul reuse of a
+64-byte scratch pair.
+-/
+
+def pubkeyOffset : Nat := 0
+def withdrawalCredentialsOffset : Nat := 48
+def signatureOffset : Nat := 96
+def depositPreimageOffset : Nat := 304
+def preimageOffset (index : Nat) : Nat := depositPreimageOffset + index * pairBytes
+
+private def memoryByte (byte : UInt8) : Byte :=
+  ⟨byte.toNat, UInt8.toNat_lt byte⟩
+
+def zeroWord : Word := fun _ => zeroByte
+
+def writeBytesFrom : Memory → Nat → List UInt8 → Memory
+  | memory, _, [] => memory
+  | memory, offset, byte :: rest =>
+      writeBytesFrom (memory.writeByte offset (memoryByte byte)) (offset + 1) rest
+
+def writeBytes (memory : Memory) (offset : Nat) (bytes : Bytes) : Memory :=
+  writeBytesFrom memory offset bytes.toList
+
+def writeZeros (memory : Memory) (offset count : Nat) : Memory :=
+  writeBytes memory offset (zeros count)
+
+/-- Byte-for-byte source input allocation: pubkey at 0--47, withdrawal
+credentials plus its 16-byte zero tail at 48--95, and signature plus its
+112-byte scratch tail at 96--303.  The initial `writeWord` records the EVM
+word allocation primitive; the following `writeByte`s refine overlapping
+partial words exactly. -/
+def inputMemory (input : Inputs) : Memory :=
+  let memory := Memory.empty.writeWord pubkeyOffset zeroWord
+  let memory := writeBytes memory pubkeyOffset input.publicKey
+  let memory := writeBytes memory withdrawalCredentialsOffset input.withdrawalCredentials
+  let memory := writeZeros memory (withdrawalCredentialsOffset + 32) 16
+  let memory := writeBytes memory signatureOffset input.signature
+  writeZeros memory (signatureOffset + 96) 112
+
+def writePreimagesFrom : Memory → Nat → List Bytes → Memory
+  | memory, _, [] => memory
+  | memory, index, preimage :: rest =>
+      writePreimagesFrom (writeBytes memory (preimageOffset index) preimage)
+        (index + 1) rest
+
+/-- Complete memory image used by the faithful model.  The deposit-data-root
+preimage area starts at 304 and contains the nested digest pairs in call order. -/
+def sha256Memory (input : Inputs) : Memory :=
+  writePreimagesFrom (inputMemory input) 0 (digestPreimages input)
+
+private def wordNat (word : Word) : Nat :=
+  (List.ofFn word).foldl (fun value byte => value * 256 + byte.val) 0
+
+/-- Embed byte-precise `DenoteMemory` in the canonical word-addressed world
+consumed by `DenoteSha256`.  Each word is obtained through `Memory.readWord`. -/
+def memoryWorld (base : Verity.ContractState) (memory : Memory) : Verity.ContractState :=
+  { base with memory := fun offset => wordNat (memory.readWord offset) }
+
+structure Sha256Input where
+  oracle : StaticCallOracle
+  world : Verity.ContractState
+  memory : Memory
+  inputOffset : Nat
+  inputSize : Nat := pairBytes
+  outputOffset : Nat := digestOutputOffset
+
+/-- Typed address-2 precompile denotation used at every one of the seven sites. -/
+def denoteSha256 (input : Sha256Input) : Outcome :=
+  Compiler.CompilationModel.Denote.Sha256.denote input.oracle
+    (memoryWorld input.world input.memory) input.inputOffset input.inputSize
+    input.outputOffset
+
+def denotedSha256Calls (oracle : StaticCallOracle) (world : Verity.ContractState)
+    (input : Inputs) : List Outcome :=
+  (List.range 7).map fun index => denoteSha256
+    { oracle := oracle
+      world := world
+      memory := sha256Memory input
+      inputOffset := preimageOffset index }
+
+@[simp] theorem denoted_sha256_calls_length (oracle : StaticCallOracle)
+    (world : Verity.ContractState) (input : Inputs) :
+    (denotedSha256Calls oracle world input).length = 7 := by
+  simp [denotedSha256Calls]
+
+theorem sha256_site_is_address_two_staticcall (index : Nat) (preimage : Bytes) :
+    (sha256Site index preimage).kind = .staticcall ∧
+      (sha256Site index preimage).target = precompileAddress := by
+  constructor <;> rfl
+
+/-- Phase 1G bridge: the external-call observation for each typed SHA-256 site
+is obtained with `denoteCall`, and static-call semantics preserve the world. -/
+theorem sha256_denoteCall_preserves_world (index : Nat) (preimage : Bytes)
+    (adversary : AdversaryModel) (state : CallState) :
+    (denoteCall adversary (sha256Site index preimage) state).state.world = state.world := by
+  exact denoteCall_staticcall_world adversary (sha256Site index preimage) state rfl
 
 def sha256CallsFrom (preimages : List Bytes) (index : Nat) : CallProgram Unit :=
   match preimages with

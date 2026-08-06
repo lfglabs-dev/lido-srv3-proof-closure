@@ -51,8 +51,8 @@ EXPECTED_WORDING = [
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
     "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
     "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
-    "The abstract top-up transition enforces configurable targetBalanceGwei/minTopUpGwei evaluation, WC type 0x02, activation, non-slashed/non-exiting status, strictly increasing validator indices with unique pubkeys, aligned arrays, max validators per call, fresh beacon root, Gwei-aligned call value, per-module allocation limit, and per-block cap; aggregate conservation is derived from the transition. Verifier binding remains BLOCKED on runtime provenance.",
-    "SHA-256 precompile hashing currently relies on opaque native FFI.",
+    "Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.",
+    "Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
     "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
@@ -205,9 +205,9 @@ EXPECTED_STATUSES = [
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -215,7 +215,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
@@ -225,13 +225,13 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
@@ -243,8 +243,8 @@ EXPECTED_STATUSES = [
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
     ["algorithm", "source"],
-    ["model", "tx", "source"],
-    ["model", "tx", "source"],
+    ["model", "source"],
+    ["model", "source"],
     ["model", "source", "tx"],
     ["model", "source", "tx"],
     [],
@@ -801,7 +801,10 @@ def validate_lock(lock, source_map):
     require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,
             "audit manifest proof policy differs from the canonical zero-escape policy")
     manifest_layers = json.loads(json.dumps(audit_manifest.get("layers")))
-    manifest_layers["audit"]["modules"].extend(lock["modules"])
+    if (isinstance(manifest_layers, dict)
+            and isinstance(manifest_layers.get("audit"), dict)
+            and isinstance(manifest_layers["audit"].get("modules"), list)):
+        manifest_layers["audit"]["modules"].extend(lock["modules"])
     require(manifest_layers == EXPECTED_MANIFEST_LAYERS,
             "audit manifest layers differ from the canonical trust records")
     require(audit_manifest.get("proof_baseline") == EXPECTED_PROOF_BASELINE,
@@ -993,13 +996,7 @@ def validate():
         for plane, status in row["statuses"].items():
             require(status in STATUS_VALUES,
                     f"{row['id']}: invalid {plane} assurance status: {status}")
-            inherited_abstract_tx = (
-                row["id"] == "P-ADDRESS-1.yul-interface-harness"
-                and plane == "tx"
-                and status == "ABSTRACT_LEAN_CHECKED"
-            )
-            require(status not in THEOREM_BACKED_STATUSES or plane in theorem_planes
-                    or inherited_abstract_tx,
+            require(status not in THEOREM_BACKED_STATUSES or plane in theorem_planes,
                     f"{row['id']}: {plane} status {status} requires theorem evidence "
                     "for that plane")
         require(row["statuses"] == expected_statuses,
