@@ -222,6 +222,19 @@
       "no_new_forbidden_lean_tokens": true,
       "next_gate": "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"}
+    },
+    {
+      "id": "P-TOPUP-1.verity-tx-rollback.tx",
+      "parent_id": "P-TOPUP-1",
+      "catalogue_wording": "Concrete Verity transaction-plane evidence models the pinned StakingRouter.topUp allocation and push loops, proves successful post-state equivalence and whole-transaction snapshot rollback, and applies Verity A.3 allocation extraction at the typed pinned-source boundary; Yul, EVM, and production provenance remain open.",
+      "source_plane_scope": "top-up post-state, allocation extraction, and whole-transaction rollback only",
+      "theorem": "LidoSRv3.Audit.Verity.TopupRollback.topup_tx_refines_abstract",
+      "theorem_planes": ["model", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+      "no_new_forbidden_lean_tokens": true,
+      "next_gate": "Certify the pending top-up transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.TopupRollback LidoSRv3.Audit.Verity.Tests.TopupRollback", "expected": "successful typed top-up compilation, post-state refinement, allocation extraction, bounded-loop sum, external-call denotation, snapshot rollback, and mutant-sensitive vector build"}
     }
   ]
 }

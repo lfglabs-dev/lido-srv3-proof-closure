@@ -34,6 +34,7 @@ SUBORDINATE_IDS = [
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
     "P-SSZ-1.tx-execution-simulation",
+    "P-TOPUP-1.verity-tx-rollback.tx",
 ]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
@@ -59,6 +60,7 @@ EXPECTED_WORDING = [
     "Concrete Verity transaction-plane evidence compiles the typed StakingRouter.deposit path and refines commit conservation plus whole-transaction snapshot rollback to the canonical P-DEPOSIT-1 abstract guarantee; source, Yul, EVM, and production provenance remain open.",
     "Concrete Verity transaction-plane evidence proves that consolidation debits exactly one fee per source/target public-key request, preserves the validator public-key mapping, and restores the registry snapshot on rollback; consolidation moves no ETH amount, while Yul, EVM, and production provenance remain open.",
     "Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
+    "Concrete Verity transaction-plane evidence models the pinned StakingRouter.topUp allocation and push loops, proves successful post-state equivalence and whole-transaction snapshot rollback, and applies Verity A.3 allocation extraction at the typed pinned-source boundary; Yul, EVM, and production provenance remain open.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -127,6 +129,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful typed compilation, commit conservation, CallProgram snapshot rollback, external-call denotation, bounded-loop invariant, and mutant-sensitive vector build"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee LidoSRv3.Audit.Verity.Tests.ConsolidationFee", "expected": "successful fee debit, public-key mapping preservation, insufficient-balance guard, and CallProgram snapshot rollback proofs with mutant-sensitive vectors"},
     {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"},
+    {"command": "lake build LidoSRv3.Audit.Verity.TopupRollback LidoSRv3.Audit.Verity.Tests.TopupRollback", "expected": "successful typed top-up compilation, post-state refinement, allocation extraction, bounded-loop sum, external-call denotation, snapshot rollback, and mutant-sensitive vector build"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED"],
@@ -148,6 +151,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
+    ["A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
 ]
 EXPECTED_NEXT_GATES = [
     "Refine proportional allocation amounts and EVM "
@@ -171,6 +175,7 @@ EXPECTED_NEXT_GATES = [
     "Certify the pending transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
     "Certify the pending transaction-plane evidence, then refine it through generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
+    "Certify the pending top-up transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -222,6 +227,7 @@ EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -242,6 +248,7 @@ EXPECTED_THEOREM_PLANES = [
     ["yul"],
     ["model", "tx"],
     ["tx"],
+    ["model", "tx"],
     ["model", "tx"],
 ]
 EXPECTED_THEOREMS = [
@@ -264,6 +271,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.DepositRollback.deposit_tx_refines_abstract",
     "LidoSRv3.Audit.Verity.ConsolidationFee.consolidation_fee_tx_ok",
     "LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct",
+    "LidoSRv3.Audit.Verity.TopupRollback.topup_tx_refines_abstract",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -933,6 +941,14 @@ def validate():
                     "P-SSZ-1.tx-execution-simulation: scope differs")
             require(row.get("no_new_forbidden_lean_tokens") is True,
                     "P-SSZ-1.tx-execution-simulation: forbidden-token assertion is missing")
+        elif row["id"] == "P-TOPUP-1.verity-tx-rollback.tx":
+            require(row.get("parent_id") == "P-TOPUP-1",
+                    "P-TOPUP-1.verity-tx-rollback.tx must remain subordinate to P-TOPUP-1")
+            require(row.get("source_plane_scope") ==
+                    "top-up post-state, allocation extraction, and whole-transaction rollback only",
+                    "P-TOPUP-1.verity-tx-rollback.tx: scope differs")
+            require(row.get("no_new_forbidden_lean_tokens") is True,
+                    "P-TOPUP-1.verity-tx-rollback.tx: forbidden-token assertion is missing")
         else:
             require("parent_id" not in row,
                     f"{row['id']}: only declared subordinate evidence may have a parent")
@@ -975,6 +991,8 @@ def validate():
             mapping = source_targets["P-ADDRESS-1"]
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             mapping = source_targets["P-DEPOSIT-1"]
+        elif row["id"] == "P-TOPUP-1.verity-tx-rollback.tx":
+            mapping = source_targets["P-TOPUP-1"]
         elif row["id"] == "P-CONSOLIDATION-1.fee-refinement.tx":
             mapping = source_targets["P-CONSOLIDATION-1"]
         else:
