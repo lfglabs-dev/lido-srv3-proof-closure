@@ -27,6 +27,7 @@ def Id.text : Id → String
   | .pSsz1 => "P-SSZ-1"
 
 inductive CheckedLayer
+  /-- An abstract semantic model with machine-checked properties. -/
   | model
   | algorithm
   | source

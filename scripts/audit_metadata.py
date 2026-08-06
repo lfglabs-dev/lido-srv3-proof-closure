@@ -47,8 +47,8 @@ EXPECTED_WORDING = [
     "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
     "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
-    "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
-    "Current consolidation helper uses a Mock build and cannot establish production runtime identity.",
+    "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
+    "The abstract top-up transition enforces configurable targetBalanceGwei/minTopUpGwei evaluation, WC type 0x02, activation, non-slashed/non-exiting status, strictly increasing validator indices with unique pubkeys, aligned arrays, max validators per call, fresh beacon root, Gwei-aligned call value, per-module allocation limit, and per-block cap; aggregate conservation is derived from the transition. Verifier binding remains BLOCKED on runtime provenance.",
     "SHA-256 precompile hashing currently relies on opaque native FFI.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
@@ -107,10 +107,10 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"},
     {"command": "lake build",
      "expected": "active Lean 4.31 dependency graph builds; not certification"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1",
-     "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"},
-    {"command": "python3 scripts/audit_metadata.py check",
-     "expected": "MISSING provenance remains explicit and fails semantic closure"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance",
+     "expected": "abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2",
+     "expected": "successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
     {"command": "lake build LidoSRv3.Audit.Ssz",
@@ -204,7 +204,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
@@ -231,8 +231,8 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
     ["model", "source", "tx"],
     [],
-    ["model", "tx"],
-    [],
+    ["tx"],
+    ["model"],
     [],
     ["model"],
     ["model"],
@@ -252,8 +252,8 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
     None,
-    "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
-    None,
+    "LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance",
+    "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
     "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
@@ -286,8 +286,8 @@ CAMPAIGN_BASE = {
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_VERITY_REPOSITORY = "https://github.com/lfglabs-dev/verity.git"
-CANONICAL_VERITY_COMMIT = "066f1bf5772ebc6cc218902b8f05ad70cbf36866"
-CANONICAL_VERITY_INPUT_REV = "066f1bf5772ebc6cc218902b8f05ad70cbf36866"
+CANONICAL_VERITY_COMMIT = "f485b2ca7502793ce227ede0076b7d070a0697b7"
+CANONICAL_VERITY_INPUT_REV = "f485b2ca7502793ce227ede0076b7d070a0697b7"
 CANONICAL_EVMYULLEAN_REPOSITORY = "https://github.com/lfglabs-dev/EVMYulLean.git"
 CANONICAL_EVMYULLEAN_COMMIT = "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
 CANONICAL_MATHLIB_REPOSITORY = "https://github.com/leanprover-community/mathlib4.git"
