@@ -10,6 +10,6 @@
 - `P-RESERVE-1`: `lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants` — successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build
 - `P-ETH-1`: `lake build` — active Lean 4.31 dependency graph builds; not certification
 - `P-ADDRESS-1`: `lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance` — abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem
-- `P-TOPUP-2`: `lake build LidoSRv3.Audit.Guarantees.PTopup2` — successful abstract per-validator headroom and aggregate budget conservation build; verifier-binding remains blocked on runtime provenance
+- `P-TOPUP-2`: `lake build LidoSRv3.Audit.Guarantees.PTopup2` — successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
 - `P-SSZ-1`: `lake build LidoSRv3.Audit.Ssz` — successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence

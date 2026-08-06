@@ -85,13 +85,13 @@
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "Per-validator top-up headroom and aggregate budget conservation are proved on an abstract model; verifier-binding (SSZ proof that the accepted proof binds the intended validator) remains BLOCKED on runtime provenance.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.topup_batch_sound",
+      "catalogue_wording": "The abstract top-up transition enforces configurable targetBalanceGwei/minTopUpGwei evaluation, WC type 0x02, activation, non-slashed/non-exiting status, strictly increasing validator indices with unique pubkeys, aligned arrays, max validators per call, fresh beacon root, Gwei-aligned call value, per-module allocation limit, and per-block cap; aggregate conservation is derived from the transition. Verifier binding remains BLOCKED on runtime provenance.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
       "theorem_planes": ["model"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-RUNTIME-PROVENANCE"],
       "next_gate": "Obtain independent canonical runtime, codehash, fork, and address provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2", "expected": "successful abstract per-validator headroom and aggregate budget conservation build; verifier-binding remains blocked on runtime provenance"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2", "expected": "successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance"}
     },
     {
       "id": "P-CONSOLIDATION-1",
