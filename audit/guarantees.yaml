@@ -64,14 +64,24 @@
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants", "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"}
     },
     {
-      "id": "P-ETH-1",
-      "catalogue_wording": "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
-      "theorem": null,
-      "theorem_planes": [],
-      "statuses": {"model": "DEV-431-READY", "algorithm": "NOT_APPLICABLE", "source": "DEV-431-READY", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
-      "assumptions": ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
-      "reproduction": {"command": "lake build", "expected": "active Lean 4.31 dependency graph builds; not certification"}
+      "id": "P-ETH-1a",
+      "catalogue_wording": "The abstract stVault return model confines every committed ETH outflow to Lido or the WithdrawalQueue; source and executable transaction correspondence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "next_gate": "Refine the abstract stVault return trace against the pinned Solidity and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful abstract stVault return-confinement proof build; source and EVM correspondence remain open"}
+    },
+    {
+      "id": "P-ETH-1b",
+      "catalogue_wording": "The abstract consolidation-fee model confines the sole committed fee-bearing CALL to the EIP-7251 consolidation contract; source and executable transaction correspondence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "next_gate": "Refine the abstract consolidation-fee trace against the pinned Solidity and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful abstract consolidation-fee path-confinement proof build; source and EVM correspondence remain open"}
     },
     {
       "id": "P-ADDRESS-1",

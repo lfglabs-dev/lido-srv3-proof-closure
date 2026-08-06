@@ -8,7 +8,8 @@
 - `P-TOPUP-1`: Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.
 - `P-ACCOUNT-1`: Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.
 - `P-RESERVE-1`: Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.
-- `P-ETH-1`: Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.
+- `P-ETH-1a`: Refine the abstract stVault return trace against the pinned Solidity and executable EVM semantics.
+- `P-ETH-1b`: Refine the abstract consolidation-fee trace against the pinned Solidity and executable EVM semantics.
 - `P-ADDRESS-1`: Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.
 - `P-TOPUP-2`: Obtain independent canonical runtime, codehash, fork, and address provenance.
 - `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
