@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 077ea08435784f5228b690e9119b2e1f85eea17b
+validated-tree: e507fff6792807badc8e810e0e1e24d103197613
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,6 +13,28 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
+
+P-CONSOLIDATION-1 PR #46 final bounded repair (2026-08-06)
+----------------------------------------------------------
+
+- `lake build LidoSRv3.Audit.Verity.ConsolidationFee`: exit 0.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all
+  optimized metadata mutants rejected.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- Focused scan found no `sorry`, `admit`, `axiom`, or `unsafe` token in the
+  consolidation scaffold; `git diff --check`: exit 0.
+- The FunctionSpec now includes nonzero constructor guards for the gateway and
+  consolidation-request immutables and the final `preservesEthBalance`
+  Panic(0x01)-shaped assertion from the pinned WithdrawalVault path.
+- The dynamic ABI local obligation is `unchecked`; the fee-refinement child row
+  has no registered theorem and every substantive plane is OPEN.
+- The requested call/event/memory adequacy mutants were not represented as
+  proof evidence.  Verity lacks the FunctionSpec-to-CallProgram/DenoteMemory
+  and event-trace connections needed to make those mutants source-sensitive.
+  The exact framework gaps are in `audit/P-CONSOLIDATION-1-VERITY-GAPS.md`.
+- Rollback of earlier successful mutable calls/logs after a later failure and
+  rollback induced by the final balance assertion remain explicitly OPEN.
 
 P-SSZ-1 structural gate receipt (committed tree):
 - `lake build`: exit 0.

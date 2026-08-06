@@ -5,7 +5,7 @@ import Verity.Core.Model.DenoteMemory
 /-!
 # WithdrawalVault consolidation requests
 
-Faithful bounded model of `WithdrawalVault.addConsolidationRequests` and
+Source-shaped bounded scaffold for `WithdrawalVault.addConsolidationRequests` and
 `WithdrawalVaultEIP7685._addConsolidationRequests` at Lido core pin
 `af095e48bbc1c3841c2c9936219c8461af01056b`.  The gateway's grouped witness,
 quota, and refund path is deliberately outside this vault-entrypoint model.
@@ -69,12 +69,15 @@ def addConsolidationRequests : FunctionSpec :=
     localObligations :=
       [{ name := "bytes_array_offsets_and_lengths"
          obligation := "Verity dynamic ABI loaders follow each bytes[] element offset and length."
-         proofStatus := .proved },
+         proofStatus := .unchecked },
        { name := "whole_transaction_rollback_after_prior_success"
          obligation := "EVM transaction rollback removes successful earlier request calls and logs when any later request fails."
          proofStatus := .unchecked }]
     body :=
-      [ .require (.eq .caller (.immutable "CONSOLIDATION_GATEWAY"))
+      [ .letVar "balanceBeforeCall" (.sub .selfBalance .msgValue)
+      , .require (.ge .selfBalance .msgValue)
+          "Panic(0x11): preservesEthBalance pre-call subtraction underflow"
+      , .require (.eq .caller (.immutable "CONSOLIDATION_GATEWAY"))
           "NotConsolidationGateway"
       , .letVar "requestsCount" (.arrayLength "sourcePubkeys")
       , .require (.gt (.localVar "requestsCount") (.literal 0)) "ZeroArgument(sourcePubkeys)"
@@ -93,6 +96,9 @@ def addConsolidationRequests : FunctionSpec :=
           "Panic(0x11): checked multiplication overflow"
       , .require (.eq .msgValue (.localVar "requiredFee")) "IncorrectFee"
       , .forEach "i" (.localVar "requestsCount") consolidationLoopBody
+      -- Solidity `assert` is Panic(0x01), not a recoverable custom-error guard.
+      , .ite (.eq .selfBalance (.localVar "balanceBeforeCall")) []
+          [.panicCode (.literal 0x01)]
       , .stop ] }
 
 def spec : CompilationModel :=
@@ -106,11 +112,13 @@ def spec : CompilationModel :=
           [{ name := "consolidationGateway", ty := .address },
            { name := "consolidationRequest", ty := .address }]
         body :=
-          [.setImmutable "CONSOLIDATION_GATEWAY" (.param "consolidationGateway"),
+          [.require (.gt (.param "consolidationGateway") (.literal 0)) "ZeroAddress",
+           .require (.gt (.param "consolidationRequest") (.literal 0)) "ZeroAddress",
+           .setImmutable "CONSOLIDATION_GATEWAY" (.param "consolidationGateway"),
            .setImmutable "CONSOLIDATION_REQUEST" (.param "consolidationRequest")] }
     functions := [addConsolidationRequests] }
 
-theorem function_is_actual_entrypoint :
+theorem function_scaffold_entrypoint :
     spec.functions = [addConsolidationRequests] := rfl
 
 theorem function_spec_compiles :
@@ -254,7 +262,7 @@ def decodeWord (bytes : List Nat) : Nat :=
 inductive BatchStatus where | reverted | succeeded
   deriving DecidableEq
 
-/-- The actual fee-staticcall followed by the request-call batch.  No request
+/-- A handwritten fee-staticcall followed by a request-call batch.  No request
 call is constructed unless the fee call succeeds with exactly 32 return bytes,
 authorization/ABI validation succeeds, checked multiplication does not wrap,
 and `msg.value` is exactly the product. -/
@@ -283,11 +291,11 @@ def batchCalls (caller gateway consolidationRequest msgValue : Nat)
         else .pure .reverted
     | .failure _ | .revert _ => .pure .reverted
 
-/-- A.1 is connected to the dynamically observed calls of the same vault
-batch program.  It proves the exact available Verity guarantee: if every
-observed site is static/fails/reverts, the complete batch preserves the initial
-external world. -/
-theorem batch_all_observed_calls_rollback
+/-- This theorem applies only to the separate handwritten `CallProgram`; there
+is currently no Verity theorem connecting it to the `FunctionSpec` above.  If
+every observed site is static/fails/reverts, this program preserves its initial
+external world.  It is intentionally not registered as A.1 evidence. -/
+theorem handwritten_batch_all_observed_calls_rollback
     (caller gateway consolidationRequest msgValue : Nat)
     (sources targets : List Pubkey) (adversary : AdversaryModel) (state : CallState)
     (h : ∀ entry ∈ ObservedCalls

@@ -202,14 +202,14 @@
     {
       "id": "P-CONSOLIDATION-1.fee-refinement.tx",
       "parent_id": "P-CONSOLIDATION-1",
-      "catalogue_wording": "Concrete Verity model evidence represents the pinned WithdrawalVault consolidation entrypoint: immutable-target fee STATICCALL, exact dynamic bytes[] validation, checked exact fee, 96-byte request calls, and post-success events. A.1 proves rollback only when every observed call rolls back; rollback of earlier successful calls after a later failure remains explicitly open.",
+      "catalogue_wording": "Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.",
       "source_plane_scope": "WithdrawalVault consolidation request model only; gateway grouping, quota, proof validation, and refund are excluded",
-      "theorem": "LidoSRv3.Audit.Verity.ConsolidationFee.batch_all_observed_calls_rollback",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "theorem": null,
+      "theorem_planes": [],
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
-      "next_gate": "Add a Verity transaction-frame denotation that rolls back earlier successful mutable calls and logs after any later failure; then refine generated Yul/EVM and runtime provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee", "expected": "successful typed FunctionSpec compilation, bytes[]/96-byte memory proofs, exact fee call program, and the bounded A.1 observed-call rollback theorem"}
+      "next_gate": "Close the FunctionSpec-to-CallProgram/DenoteMemory/event-trace gaps listed in audit/P-CONSOLIDATION-1-VERITY-GAPS.md, then add transaction-frame rollback and source refinement.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee", "expected": "successful source-shaped FunctionSpec scaffold build; dynamic ABI, call/event trace, balance rollback, and source/tx adequacy remain OPEN"}
     },
     {
       "id": "P-SSZ-1.tx-execution-simulation",
