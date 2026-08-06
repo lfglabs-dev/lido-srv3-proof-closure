@@ -620,6 +620,7 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.9/WithdrawalVault.sol", "preservesEthBalance", 81, 85),
         ("contracts/0.8.9/WithdrawalVault.sol", "addConsolidationRequests", 199, 208),
         ("contracts/0.8.9/WithdrawalVaultEIP7685.sol", "constructor", 34, 40),
+        ("contracts/0.8.9/WithdrawalVaultEIP7685.sol", "_addConsolidationRequests", 56, 73),
         ("contracts/0.8.9/WithdrawalVaultEIP7685.sol", "_callAddConsolidationRequest", 113, 121),
     },
     "P-SSZ-1": {

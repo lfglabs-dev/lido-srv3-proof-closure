@@ -33,13 +33,17 @@ returns the first data byte; the preceding word is its byte length. -/
 def elementLength (array : String) (index : Expr) : Expr :=
   .calldataload (.sub (.arrayElementDynamicDataOffset array index) (.literal 32))
 
-def consolidationLoopBody : List Stmt :=
+def consolidationValidationLoopBody : List Stmt :=
   [ .letVar "sourceOffset" (.arrayElementDynamicDataOffset "sourcePubkeys" (.localVar "i"))
   , .letVar "targetOffset" (.arrayElementDynamicDataOffset "targetPubkeys" (.localVar "i"))
   , .require (.eq (elementLength "sourcePubkeys" (.localVar "i")) (.literal 48))
       "InvalidPublicKeyLength(sourcePubkey)"
   , .require (.eq (elementLength "targetPubkeys" (.localVar "i")) (.literal 48))
-      "InvalidPublicKeyLength(targetPubkey)"
+      "InvalidPublicKeyLength(targetPubkey)" ]
+
+def consolidationRequestLoopBody : List Stmt :=
+  [ .letVar "sourceOffset" (.arrayElementDynamicDataOffset "sourcePubkeys" (.localVar "i"))
+  , .letVar "targetOffset" (.arrayElementDynamicDataOffset "targetPubkeys" (.localVar "i"))
   , .calldatacopy (.literal 0) (.localVar "sourceOffset") (.literal 48)
   , .calldatacopy (.literal 48) (.localVar "targetOffset") (.literal 48)
   , .letVar "request_ok"
@@ -83,6 +87,8 @@ def addConsolidationRequests : FunctionSpec :=
       , .require (.gt (.localVar "requestsCount") (.literal 0)) "ZeroArgument(sourcePubkeys)"
       , .require (.eq (.localVar "requestsCount") (.arrayLength "targetPubkeys"))
           "ArraysLengthMismatch"
+      -- Validate the complete calldata shape before either external-call phase.
+      , .forEach "i" (.localVar "requestsCount") consolidationValidationLoopBody
       , .letVar "fee_read_ok"
           (.staticcall (.literal Verity.Core.MAX_UINT256)
             (.immutable "CONSOLIDATION_REQUEST") (.literal 0) (.literal 0)
@@ -95,7 +101,7 @@ def addConsolidationRequests : FunctionSpec :=
           (.eq (.div (.localVar "requiredFee") (.localVar "requestsCount")) (.localVar "fee"))
           "Panic(0x11): checked multiplication overflow"
       , .require (.eq .msgValue (.localVar "requiredFee")) "IncorrectFee"
-      , .forEach "i" (.localVar "requestsCount") consolidationLoopBody
+      , .forEach "i" (.localVar "requestsCount") consolidationRequestLoopBody
       -- Solidity `assert` is Panic(0x01), not a recoverable custom-error guard.
       , .ite (.eq .selfBalance (.localVar "balanceBeforeCall")) []
           [.panicCode (.literal 0x01)]
@@ -262,34 +268,71 @@ def decodeWord (bytes : List Nat) : Nat :=
 inductive BatchStatus where | reverted | succeeded
   deriving DecidableEq
 
-/-- A handwritten fee-staticcall followed by a request-call batch.  No request
-call is constructed unless the fee call succeeds with exactly 32 return bytes,
-authorization/ABI validation succeeds, checked multiplication does not wrap,
-and `msg.value` is exactly the product. -/
+/-- A handwritten guarded fee-staticcall followed by a request-call batch.
+Authorization, both array-shape guards, and every key-length guard are resolved
+before the fee site is constructed.  No request call is constructed unless the
+fee call then succeeds with exactly 32 return bytes, checked multiplication does
+not wrap, and `msg.value` is exactly the product. -/
 def batchCalls (caller gateway consolidationRequest msgValue : Nat)
     (sources targets : List Pubkey) : CallProgram BatchStatus :=
-  .bind (feeSite consolidationRequest) fun feeObservation =>
-    match feeObservation.result with
-    | .success data =>
-        if data.length = 32 then
-          let fee := decodeWord data
-          let count := sources.length
-          if caller = gateway ∧ count > 0 ∧ count = targets.length ∧
-              count * fee ≤ Verity.Core.MAX_UINT256 ∧ msgValue = count * fee then
-            let requests := List.zipWith
-              (fun source target => encodeRequest ({ source, target } : Request)) sources targets
-            let rec loop (index : Nat) : List MemoryRequest → CallProgram BatchStatus
-              | [] => .pure .succeeded
-              | request :: rest =>
-                  if validRequest request then
+  let count := sources.length
+  let requests := List.zipWith
+    (fun source target => encodeRequest ({ source, target } : Request)) sources targets
+  if caller = gateway ∧ count > 0 ∧ count = targets.length ∧
+      requests.all validRequest then
+    .bind (feeSite consolidationRequest) fun feeObservation =>
+      match feeObservation.result with
+      | .success data =>
+          if data.length = 32 then
+            let fee := decodeWord data
+            if count * fee ≤ Verity.Core.MAX_UINT256 ∧ msgValue = count * fee then
+              let rec loop (index : Nat) : List MemoryRequest → CallProgram BatchStatus
+                | [] => .pure .succeeded
+                | request :: rest =>
                     .bind (requestSite consolidationRequest fee index request) fun observation =>
                       if observation.result.succeeded then loop (index + 1) rest
                       else .pure .reverted
-                  else .pure .reverted
-            loop 0 requests
+              loop 0 requests
+            else .pure .reverted
           else .pure .reverted
-        else .pure .reverted
-    | .failure _ | .revert _ => .pure .reverted
+      | .failure _ | .revert _ => .pure .reverted
+  else .pure .reverted
+
+theorem caller_guard_precedes_all_external_calls
+    (caller gateway consolidationRequest msgValue : Nat)
+    (sources targets : List Pubkey) (adversary : AdversaryModel) (state : CallState)
+    (hcaller : caller ≠ gateway) :
+    ObservedCalls
+      (batchCalls caller gateway consolidationRequest msgValue sources targets)
+      adversary state = [] := by
+  simp [batchCalls, hcaller]
+  rfl
+
+theorem array_shape_guards_precede_all_external_calls
+    (gateway consolidationRequest msgValue : Nat)
+    (sources targets : List Pubkey) (adversary : AdversaryModel) (state : CallState)
+    (hshape : sources = [] ∨ sources.length ≠ targets.length) :
+    ObservedCalls
+      (batchCalls gateway gateway consolidationRequest msgValue sources targets)
+      adversary state = [] := by
+  rcases hshape with rfl | hlength
+  · simp [batchCalls]
+    rfl
+  · simp [batchCalls, hlength]
+    rfl
+
+theorem key_length_guards_precede_all_external_calls
+    (gateway consolidationRequest msgValue : Nat)
+    (sources targets : List Pubkey) (adversary : AdversaryModel) (state : CallState)
+    (hlength : sources.length = targets.length)
+    (hkeys : (List.zipWith
+      (fun source target => encodeRequest ({ source, target } : Request)) sources targets).all
+        validRequest = false) :
+    ObservedCalls
+      (batchCalls gateway gateway consolidationRequest msgValue sources targets)
+      adversary state = [] := by
+  simp [batchCalls, hlength, hkeys]
+  rfl
 
 /-- This theorem applies only to the separate handwritten `CallProgram`; there
 is currently no Verity theorem connecting it to the `FunctionSpec` above.  If

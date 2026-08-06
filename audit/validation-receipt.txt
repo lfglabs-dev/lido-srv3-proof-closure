@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: e507fff6792807badc8e810e0e1e24d103197613
+validated-tree: fa7fc15b5135f16161fc06e73c9014d024b52fab
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -27,6 +27,12 @@ P-CONSOLIDATION-1 PR #46 final bounded repair (2026-08-06)
 - The FunctionSpec now includes nonzero constructor guards for the gateway and
   consolidation-request immutables and the final `preservesEthBalance`
   Panic(0x01)-shaped assertion from the pinned WithdrawalVault path.
+- Caller, nonempty/equal-array, and all key-length guards now precede the fee
+  STATICCALL and request CALLs in both the FunctionSpec and handwritten trace;
+  invalid guard inputs have checked empty-observed-call-trace theorems.
+- The P-CONSOLIDATION-1 source map now pins
+  `WithdrawalVaultEIP7685._addConsolidationRequests` at lines 56--73 of the
+  exact `af095e48` source file used by the scaffold.
 - The dynamic ABI local obligation is `unchecked`; the fee-refinement child row
   has no registered theorem and every substantive plane is OPEN.
 - The requested call/event/memory adequacy mutants were not represented as
