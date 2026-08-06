@@ -59,7 +59,7 @@ EXPECTED_WORDING = [
     "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
     "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
-    "Concrete Verity evidence compiles only the source-faithful StakingRouter.deposit prefix through locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, and immutable LIDO.getDepositableEther; allocation, module-returned memory, Lido spending, beacon calldata/root construction, conservation, and whole-transaction rollback remain explicitly OPEN.",
+    "Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.",
     "Concrete Verity transaction-plane evidence proves that consolidation debits exactly one fee per source/target public-key request, preserves the validator public-key mapping, and restores the registry snapshot on rollback; consolidation moves no ETH amount, while Yul, EVM, and production provenance remain open.",
     "Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
     "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
@@ -129,7 +129,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
      "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
     {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"},
-    {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful checked-prefix compilation, actual FunctionSpec malformed-ABI rollback, independent expected-footprint comparison, and OPEN-component guards; no full-path transaction or conservation claim"},
+    {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and syntax-sensitive guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee LidoSRv3.Audit.Verity.Tests.ConsolidationFee", "expected": "successful fee debit, public-key mapping preservation, insufficient-balance guard, and CallProgram snapshot rollback proofs with mutant-sensitive vectors"},
     {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
@@ -179,7 +179,7 @@ EXPECTED_NEXT_GATES = [
     "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
     "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
-    "Add faithful multi-contract composition for allocation, dynamic module-returned memory, Lido/queue/oracle state, per-validator root/calldata construction, and propagating rollback before making any conservation or transaction claim.",
+    "Add multi-contract composition for allocation, dynamic module-returned memory, Lido/queue/oracle state, per-validator root/calldata construction, and propagating rollback before making any conservation or transaction claim.",
     "Certify the pending transaction-plane evidence, then refine it through generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
     "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
@@ -961,7 +961,7 @@ def validate():
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             require(row.get("parent_id") == "P-DEPOSIT-1",
                     "P-DEPOSIT-1.verity-tx-rollback.tx must remain subordinate to P-DEPOSIT-1")
-            require(row.get("source_plane_scope") == "deposit checked prefix only; allocation and transaction suffix explicitly OPEN",
+            require(row.get("source_plane_scope") == "source-shaped deposit prefix scaffold (OPEN); allocation and multi-contract suffix explicitly OPEN",
                     "P-DEPOSIT-1.verity-tx-rollback.tx: scope differs")
             require(row.get("no_new_forbidden_lean_tokens") is True,
                     "P-DEPOSIT-1.verity-tx-rollback.tx: forbidden-token assertion is missing")

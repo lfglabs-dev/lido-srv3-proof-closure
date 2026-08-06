@@ -4,7 +4,7 @@ import Verity.Core.Model.Denote
 import Verity.Core.Model.DenoteExternalCalls
 
 /-!
-# P-DEPOSIT-1: source-faithful checked prefix and explicit open boundary
+# P-DEPOSIT-1: source-shaped deposit prefix scaffold (OPEN)
 
 Pinned source: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
@@ -75,6 +75,7 @@ def checkedPrefix : FunctionSpec :=
           (.staticcall (.literal Verity.Core.MAX_UINT256) (.immutable "LIDO_LOCATOR")
             (.literal 0) (.literal 4) (.literal 0) (.literal 32))
       , .ite (.eq (.localVar "locatorOk") (.literal 0)) [.revertReturndata] []
+      , .require (.le (.literal 32) .returndataSize) "LocatorShortReturndata"
       , .letVar "depositSecurityModule" (.mload (.literal 0))
       , .require (.eq .caller (.localVar "depositSecurityModule")) "NotAuthorized"
 
@@ -101,6 +102,7 @@ def checkedPrefix : FunctionSpec :=
           (.staticcall (.literal Verity.Core.MAX_UINT256) (.immutable "LIDO")
             (.literal 0) (.literal 4) (.literal 0) (.literal 32))
       , .ite (.eq (.localVar "lidoOk") (.literal 0)) [.revertReturndata] []
+      , .require (.le (.literal 32) .returndataSize) "LidoShortReturndata"
       , .letVar "depositableEther" (.mload (.literal 0))
       , .stop
       ] }
@@ -129,7 +131,7 @@ def spec : CompilationModel :=
           ] }
     functions := [checkedPrefix] }
 
-def checkedPrefixSelector : Nat := 0x8dbdbe6d
+def checkedPrefixSelector : Nat := 0x5d303519
 
 theorem checked_prefix_is_actual_function_spec : spec.functions = [checkedPrefix] := rfl
 
@@ -139,13 +141,15 @@ theorem checked_prefix_compiles :
 
 /-! The expected footprint is independently written from the pinned source
 prefix.  It is not obtained by aliasing `checkedPrefix` to a second name. -/
-def sourceDerivedExpectedFootprint : List (ContractId × Nat × AllocKind) :=
-  [ (0, routerStateSlot + 2, .read)
-  , (0, routerStateSlot, .read)
-  , (0, routerStateSlot + 4, .read)
+def sourceDerivedExpectedFootprint :
+    List (Compiler.Proofs.Storage.ContractId × Nat × AllocKind) :=
+  [ (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d002, .read)
+  , (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000, .read)
+  , (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d004, .read)
   ]
 
-def extractedFootprint : List (ContractId × Nat × AllocKind) :=
+def extractedFootprint :
+    List (Compiler.Proofs.Storage.ContractId × Nat × AllocKind) :=
   (extractAllocation spec checkedPrefix).slots.map fun entry =>
     (entry.contract, entry.slot, entry.kind)
 
@@ -153,17 +157,18 @@ theorem allocation_extraction_matches_source_derived_prefix :
     extractedFootprint = sourceDerivedExpectedFootprint := by
   native_decide
 
-/-! Actual FunctionSpec execution: malformed ABI input reverts before any body
-statement and the denotation returns the transaction-context snapshot.  This
-is intentionally only a prefix rollback theorem, not A.1 for the full path. -/
+/-! Actual FunctionSpec execution rejects malformed ABI input before any body
+statement. `DenoteResult` exposes encoded final storage but this artifact does
+not prove snapshot equality, so rollback remains OPEN below. -/
 def zeroOracle : Denote.DenoteOracle :=
   { mappingSlot := fun _ _ => 0, keccakMemorySlice := fun _ _ _ => 0 }
 
 def malformedTx : Denote.DenoteTransaction :=
   { sender := 7, thisAddress := 9, functionSelector := checkedPrefixSelector, args := [] }
 
-theorem malformed_actual_function_spec_reverts :
-    (Denote.denoteFunction zeroOracle spec checkedPrefix malformedTx Verity.defaultState).reverted = true := by
+theorem malformed_actual_function_spec_rejects :
+    (Denote.denoteFunction zeroOracle spec checkedPrefix malformedTx
+      Verity.defaultState).success = false := by
   native_decide
 
 def openComponents : List String :=
@@ -174,7 +179,7 @@ def openComponents : List String :=
   , "OPEN Lido spend: buffered allocation, withdrawalQueue bunker/unfinalized calls, reserves, packed buffered/post-report and next-report/nonce writes, accountingOracle frame call, and all logs"
   , "OPEN beacon memory/calldata: module-returned memory slicing, free-memory allocation, exact per-validator 420-byte ABI payload, and immutable DEPOSIT_CONTRACT call"
   , "OPEN deposit-data-root: per-validator SHA-256 composition from that validator's pubkey/signature, withdrawal credentials, and 32 ETH amount"
-  , "OPEN transaction proof: propagating module/Lido/queue/oracle/beacon failures, full nested-loop execution, conservation, and whole-world rollback"
+  , "OPEN rollback/transaction proof: malformed-ABI snapshot equality, propagating module/Lido/queue/oracle/beacon failures, full nested-loop execution, conservation, and whole-world rollback"
   , "OPEN multi-contract allocation extraction: Verity AllocationExtraction currently assigns contract id zero"
   ]
 

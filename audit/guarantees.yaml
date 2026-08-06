@@ -189,15 +189,15 @@
     {
       "id": "P-DEPOSIT-1.verity-tx-rollback.tx",
       "parent_id": "P-DEPOSIT-1",
-      "catalogue_wording": "Concrete Verity evidence compiles only the source-faithful StakingRouter.deposit prefix through locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, and immutable LIDO.getDepositableEther; allocation, module-returned memory, Lido spending, beacon calldata/root construction, conservation, and whole-transaction rollback remain explicitly OPEN.",
-      "source_plane_scope": "deposit checked prefix only; allocation and transaction suffix explicitly OPEN",
+      "catalogue_wording": "Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.",
+      "source_plane_scope": "source-shaped deposit prefix scaffold (OPEN); allocation and multi-contract suffix explicitly OPEN",
       "theorem": "LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix",
       "theorem_planes": ["model"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "OPEN", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
       "no_new_forbidden_lean_tokens": true,
-      "next_gate": "Add faithful multi-contract composition for allocation, dynamic module-returned memory, Lido/queue/oracle state, per-validator root/calldata construction, and propagating rollback before making any conservation or transaction claim.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful checked-prefix compilation, actual FunctionSpec malformed-ABI rollback, independent expected-footprint comparison, and OPEN-component guards; no full-path transaction or conservation claim"}
+      "next_gate": "Add multi-contract composition for allocation, dynamic module-returned memory, Lido/queue/oracle state, per-validator root/calldata construction, and propagating rollback before making any conservation or transaction claim.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and syntax-sensitive guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"}
     },
     {
       "id": "P-CONSOLIDATION-1.fee-refinement.tx",
