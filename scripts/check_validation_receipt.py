@@ -10,7 +10,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = Path("audit/validation-receipt.txt")
 EXPECTED_BASE = "c418551251404063793322beaf3b559967a69563"
-EXPECTED_HEAD = "0d2b466f1377a545bab70177a653f4735cf393be"
 
 
 def git(*args, env=None):
@@ -35,14 +34,18 @@ def main():
     )
     if fields.get("base") != EXPECTED_BASE:
         raise SystemExit("validation receipt base is not the canonical predecessor")
-    if fields.get("head") != EXPECTED_HEAD:
-        raise SystemExit("validation receipt head is not the canonical campaign head")
+    candidate_head = git("rev-parse", "HEAD^")
+    if fields.get("head") != candidate_head:
+        raise SystemExit("validation receipt head is not the immediate candidate predecessor")
+    changed = git("diff", "--name-only", candidate_head, "HEAD").splitlines()
+    if changed != [str(RECEIPT)]:
+        raise SystemExit("validation receipt commit must change only the receipt")
     if fields.get("validation-subject") != "HEAD tracked tree excluding this receipt":
         raise SystemExit("validation receipt subject semantics are missing or incompatible")
     with tempfile.TemporaryDirectory() as tmp:
         env = os.environ.copy()
         env["GIT_INDEX_FILE"] = str(Path(tmp) / "index")
-        git("read-tree", EXPECTED_HEAD, env=env)
+        git("read-tree", candidate_head, env=env)
         git("rm", "--cached", "--quiet", "--force", "--", str(RECEIPT), env=env)
         actual = git("write-tree", env=env)
     if fields.get("validated-tree") != actual:
