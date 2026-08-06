@@ -65,13 +65,13 @@
     },
     {
       "id": "P-ETH-1",
-      "catalogue_wording": "Pinned Verity target is active on this Lean 4.31 branch but remains non-certified.",
+      "catalogue_wording": "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
       "theorem": null,
       "theorem_planes": [],
-      "statuses": {"model": "DEV-431-READY", "algorithm": "NOT_APPLICABLE", "source": "DEV-431-READY", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "OPEN"},
-      "assumptions": ["A-DEV-NOT-CERT", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Complete certification gates; DEV-431-READY must never be interpreted as AUDIT-CERT.",
-      "reproduction": {"command": "lake build", "expected": "active Lean 4.31 dependency graph builds; not certification"}
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "next_gate": "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful bounded child-model proofs only; parent P-ETH-1 remains OPEN"}
     },
     {
       "id": "P-ADDRESS-1",
@@ -222,6 +222,32 @@
       "no_new_forbidden_lean_tokens": true,
       "next_gate": "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"}
+    },
+    {
+      "id": "P-ETH-1a",
+      "parent_id": "P-ETH-1",
+      "catalogue_wording": "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
+      "source_plane_scope": "protocol-controlled stVault rebalance/redemption interface only",
+      "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "note": "Scope assumption: owner-controlled StakingVault.withdraw permits any nonzero recipient and is excluded from this child property.",
+      "next_gate": "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open"}
+    },
+    {
+      "id": "P-ETH-1b",
+      "parent_id": "P-ETH-1",
+      "catalogue_wording": "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
+      "source_plane_scope": "configured immutable consolidation-request fee target only",
+      "theorem": "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": [],
+      "note": "Deployment-provenance assumption: Solidity uses nonzero immutable CONSOLIDATION_REQUEST, but proving its deployed value is 0x00...007251 is outside this source theorem.",
+      "next_gate": "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"}
     }
   ]
 }
