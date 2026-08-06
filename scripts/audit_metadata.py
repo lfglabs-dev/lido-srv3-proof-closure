@@ -33,6 +33,7 @@ SUBORDINATE_IDS = [
     "P-ADDRESS-1.yul-interface-harness",
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
+    "P-SSZ-1.tx-execution-simulation",
 ]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
@@ -57,6 +58,7 @@ EXPECTED_WORDING = [
     "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
     "Concrete Verity transaction-plane evidence compiles the typed StakingRouter.deposit path and refines commit conservation plus whole-transaction snapshot rollback to the canonical P-DEPOSIT-1 abstract guarantee; source, Yul, EVM, and production provenance remain open.",
     "Concrete Verity transaction-plane evidence proves that consolidation debits exactly one fee per source/target public-key request, preserves the validator public-key mapping, and restores the registry snapshot on rollback; consolidation moves no ETH amount, while Yul, EVM, and production provenance remain open.",
+    "Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -124,6 +126,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"},
     {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful typed compilation, commit conservation, CallProgram snapshot rollback, external-call denotation, bounded-loop invariant, and mutant-sensitive vector build"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee LidoSRv3.Audit.Verity.Tests.ConsolidationFee", "expected": "successful fee debit, public-key mapping preservation, insufficient-balance guard, and CallProgram snapshot rollback proofs with mutant-sensitive vectors"},
+    {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED"],
@@ -144,6 +147,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-YUL-INTERFACE"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+    ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
 ]
 EXPECTED_NEXT_GATES = [
     "Refine proportional allocation amounts and EVM "
@@ -166,6 +170,7 @@ EXPECTED_NEXT_GATES = [
     "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
     "Certify the pending transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
     "Certify the pending transaction-plane evidence, then refine it through generated Yul/EVM semantics and independently verified production runtime provenance.",
+    "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -216,6 +221,7 @@ EXPECTED_STATUSES = [
     {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -236,6 +242,7 @@ EXPECTED_THEOREM_PLANES = [
     ["yul"],
     ["model", "tx"],
     ["tx"],
+    ["model", "tx"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
@@ -256,6 +263,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
     "LidoSRv3.Audit.Verity.DepositRollback.deposit_tx_refines_abstract",
     "LidoSRv3.Audit.Verity.ConsolidationFee.consolidation_fee_tx_ok",
+    "LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -918,6 +926,13 @@ def validate():
                     "P-CONSOLIDATION-1.fee-refinement.tx must remain subordinate to P-CONSOLIDATION-1")
             require(row.get("source_plane_scope") == "consolidation fee, public-key mapping, and rollback only",
                     "P-CONSOLIDATION-1.fee-refinement.tx: scope differs")
+        elif row["id"] == "P-SSZ-1.tx-execution-simulation":
+            require(row.get("parent_id") == "P-SSZ-1",
+                    "P-SSZ-1.tx-execution-simulation must remain subordinate to P-SSZ-1")
+            require(row.get("source_plane_scope") == "SSZ transaction execution simulation only",
+                    "P-SSZ-1.tx-execution-simulation: scope differs")
+            require(row.get("no_new_forbidden_lean_tokens") is True,
+                    "P-SSZ-1.tx-execution-simulation: forbidden-token assertion is missing")
         else:
             require("parent_id" not in row,
                     f"{row['id']}: only declared subordinate evidence may have a parent")
@@ -949,7 +964,8 @@ def validate():
         require(row["statuses"] == expected_statuses,
                 f"{row['id']}: assurance statuses differ from canonical claims")
         source_status = row["statuses"]["source"]
-        if row["id"] in {"P-SSZ-1.deposit-data-root", "P-SSZ-1.abstract-digest"}:
+        if row["id"] in {"P-SSZ-1.deposit-data-root", "P-SSZ-1.abstract-digest",
+                          "P-SSZ-1.tx-execution-simulation"}:
             mapping = source_targets["P-SSZ-1"]
         elif row["id"] == "P-ALLOC-1.eugene-bound":
             mapping = source_targets["P-ALLOC-1"]
@@ -1029,7 +1045,7 @@ def main():
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content,
                     f"{name} is stale; run scripts/audit_metadata.py generate")
-        print(f"audit metadata ok: {len(rows)} canonical guarantees, risks, pins, source-map, generated views; "
+        print(f"audit metadata ok: {len(EXPECTED_IDS)} canonical guarantees + "
               f"{len(SUBORDINATE_IDS)} subordinate evidence rows")
 
 
