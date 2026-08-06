@@ -122,9 +122,9 @@
       "axioms": ["propext", "Quot.sound"]
     },
     {
-      "name": "Guarantees.PAddress1.equivariance_implies_not_blocked",
+      "name": "Guarantees.PAddress1.admission_and_post_state_equivariance",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": []
     },
     {
       "name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",

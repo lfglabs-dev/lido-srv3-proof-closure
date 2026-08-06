@@ -3,122 +3,134 @@ import LidoSRv3.Audit.AddressEquivariance
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
-/-- Abstract-transaction evidence only; no Yul, bytecode, or Verity projection. -/
+open Verity
+
+/-- Abstract-model evidence only; source and EVM correspondence remain open. -/
 def guarantee : Guarantee := ⟨.pAddress1, [.model, .abstractTx]⟩
 
-/-- The bounded observation renamer satisfies the exact abstract equivariance relation. -/
-theorem abstract_address_equivariance
-    (rho : LidoSRv3.Audit.AddressEquivariance.Renaming)
-    (renameState : State → State) (tx : LidoSRv3.Audit.TxObservation State) :
-    LidoSRv3.Audit.AddressEquivariance.Equivariant rho renameState tx
-      (LidoSRv3.Audit.AddressEquivariance.renameObservation rho renameState tx) :=
-  LidoSRv3.Audit.AddressEquivariance.rename_is_equivariant rho renameState tx
-
 /-!
-## Role-indexed non-discrimination model
+# P-ADDRESS-1: permissionless caller non-discrimination
 
-`onlyRole` is deliberately not an ordinary precondition here.  Caller identity
-is represented only by the role assignment: callers in the same role must have
-the same result for the same ordinary input.
+The property compares arbitrary eligible users, not protocol-role holders.  The
+right execution receives the complete environment of the left execution with
+the two callers swapped.  Admission compares only success/failure.  A successful
+post-state may contain the caller (for example as publisher or refund recipient),
+so post-states are compared only after applying the same address swap.
+
+Singleton-actor functions are excluded from address-equivariance; they are
+covered by authentication-integrity properties.  In particular this excludes
+`WithdrawalVault.withdrawWithdrawals`, `addWithdrawalRequests`, and
+`addConsolidationRequests`, whose callers must respectively be Lido,
+TriggerableWithdrawalsGateway, and ConsolidationGateway.
 -/
 
-open Verity
-open LidoSRv3.Audit
-open LidoSRv3.Audit.AddressEquivariance
+/-- A bijective rename which swaps two callers and fixes every other address. -/
+def address_renaming (a₁ a₂ x : Address) : Address :=
+  if x = a₁ then a₂ else if x = a₂ then a₁ else x
 
-/-- Human-readable role identifiers used by the pinned contracts. -/
-abbrev Role := String
+theorem address_renaming_involutive (a₁ a₂ : Address) :
+    ∀ x, address_renaming a₁ a₂ (address_renaming a₁ a₂ x) = x := by
+  intro x
+  by_cases h₁ : x = a₁
+  · subst x
+    by_cases h : a₁ = a₂
+    · simp [address_renaming]
+    · simp [address_renaming]
+  · by_cases h₂ : x = a₂
+    · subst x
+      simp [address_renaming, h₁]
+    · simp [address_renaming, h₁, h₂]
 
-/-- The role (if any) assigned to each caller address. -/
-def RoleAssignment := Address → Option Role
+theorem address_renaming_injective (a₁ a₂ : Address) :
+    Function.Injective (address_renaming a₁ a₂) := by
+  intro x y h
+  have h' := congrArg (address_renaming a₁ a₂) h
+  simpa only [address_renaming_involutive] using h'
 
-/-- Inputs shared by the abstract transfer and redemption operations. -/
+theorem address_renaming_surjective (a₁ a₂ : Address) :
+    Function.Surjective (address_renaming a₁ a₂) := by
+  intro x
+  exact ⟨address_renaming a₁ a₂ x, address_renaming_involutive a₁ a₂ x⟩
+
+theorem address_renaming_bijective (a₁ a₂ : Address) :
+    Function.Injective (address_renaming a₁ a₂) ∧
+      Function.Surjective (address_renaming a₁ a₂) :=
+  ⟨address_renaming_injective a₁ a₂, address_renaming_surjective a₁ a₂⟩
+
+/-- Address-indexed state relevant to permissionless admission. -/
 structure Input where
   amount : Nat
-  recipient : Option Address
+  recipient : Address
   deadline : Nat
   blockTimestamp : Nat
+  balances : Address → Nat
+  allowances : Address → Address → Nat
+  ownership : Nat → Option Address
+  requestState : Address → Nat
+  externalCallEnvironment : Address → Bool
 
-/-- The only global switch relevant to this bounded model. -/
+/-- Rename every address position in the caller-dependent input environment. -/
+def rename_input (rho : Address → Address) (inp : Input) : Input where
+  amount := inp.amount
+  recipient := rho inp.recipient
+  deadline := inp.deadline
+  blockTimestamp := inp.blockTimestamp
+  balances := fun a => inp.balances (rho a)
+  allowances := fun owner spender => inp.allowances (rho owner) (rho spender)
+  ownership := fun requestId => (inp.ownership requestId).map rho
+  requestState := fun a => inp.requestState (rho a)
+  externalCallEnvironment := fun a => inp.externalCallEnvironment (rho a)
+
 structure Config where
   paused : Bool
 
-/-- Transfer/redemption outcomes use the campaign's existing transaction observation. -/
-abbrev Outcome (State : Type) := TxObservation State
+def globally_active (cfg : Config) : Prop := cfg.paused = false
 
-/-- Two callers are role-equivalent when both carry the same assigned role. -/
-def same_role (roles : RoleAssignment) (a₁ a₂ : Address) : Prop :=
-  roles a₁ = roles a₂ ∧ (roles a₁).isSome
+/-- Ordinary validity checks contain no privileged-role or singleton-actor test. -/
+def ordinary_preconditions (caller : Address) (inp : Input) : Prop :=
+  inp.amount > 0 ∧
+  inp.deadline > inp.blockTimestamp ∧
+  inp.balances caller ≥ inp.amount ∧
+  inp.allowances caller inp.recipient ≥ inp.amount ∧
+  inp.externalCallEnvironment caller = true
 
-/-- Preconditions which do not inspect or otherwise depend on caller identity. -/
-def ordinary_preconditions (inp : Input) : Prop :=
-  inp.amount > 0 ∧ inp.recipient.isSome ∧ inp.deadline > inp.blockTimestamp
+/-- The result shape deliberately separates admission from the successful state. -/
+structure Outcome (State : Type) where
+  succeeded : Prop
+  postState : State
 
-/-- Same role and same ordinary inputs cannot produce selectively different outcomes. -/
-def not_selectively_blocked (fn : Address → Input → Outcome State)
-    (roles : RoleAssignment) (cfg : Config) : Prop :=
+/-- Property A: equivalent address-renamed users are admitted or rejected together. -/
+def admission_nondiscriminatory (cfg : Config)
+    (fn : Address → Input → Outcome State) : Prop :=
   ∀ (a₁ a₂ : Address) (inp : Input),
-    same_role roles a₁ a₂ →
-    ordinary_preconditions inp →
-    cfg.paused = false →
-    fn a₁ inp = fn a₂ inp
+    ordinary_preconditions a₁ inp →
+    globally_active cfg →
+    (fn a₁ inp).succeeded ↔
+      (fn a₂ (rename_input (address_renaming a₁ a₂) inp)).succeeded
 
-/-- The operation commutes with the existing abstract address-renaming relation. -/
-def address_equivariant (fn : Address → Input → Outcome State) : Prop :=
-  ∀ (rho : Renaming) (renameState : State → State) (a : Address) (inp : Input),
-    Equivariant rho renameState (fn a inp) (fn (rho a) inp)
-
-/-- Ordinary behavior is invariant under a role-compatible caller renaming. -/
-def role_invariant_on_ordinary_inputs (fn : Address → Input → Outcome State)
-    (roles : RoleAssignment) : Prop :=
+/-- Property B: successful post-states commute with the caller swap. -/
+def post_state_equivariant (cfg : Config) (rename_state : (Address → Address) → State → State)
+    (fn : Address → Input → Outcome State) : Prop :=
   ∀ (a₁ a₂ : Address) (inp : Input),
-    same_role roles a₁ a₂ → ordinary_preconditions inp →
-    ∃ rho : Renaming,
-      rho a₁ = a₂ ∧ renameObservation rho id (fn a₁ inp) = fn a₁ inp
+    ordinary_preconditions a₁ inp →
+    globally_active cfg →
+    (fn a₁ inp).succeeded →
+    rename_state (address_renaming a₁ a₂) (fn a₁ inp).postState =
+      (fn a₂ (rename_input (address_renaming a₁ a₂) inp)).postState
 
-/-- Existing address equivariance, restricted to ordinary role-invariant behavior,
-rules out selective blocking by the concrete caller address. -/
-theorem equivariance_implies_not_blocked
+/-- The repaired P-ADDRESS-1 model is exactly the conjunction of A and B. -/
+def address_nondiscrimination (cfg : Config)
+    (rename_state : (Address → Address) → State → State)
+    (fn : Address → Input → Outcome State) : Prop :=
+  admission_nondiscriminatory cfg fn ∧ post_state_equivariant cfg rename_state fn
+
+/-- Independent proofs of admission and renamed post-state behavior compose the guarantee. -/
+theorem admission_and_post_state_equivariance
+    (cfg : Config) (rename_state : (Address → Address) → State → State)
     (fn : Address → Input → Outcome State)
-    (roles : RoleAssignment) (cfg : Config)
-    (h_equiv : address_equivariant fn)
-    (h_ordinary : role_invariant_on_ordinary_inputs fn roles) :
-    not_selectively_blocked fn roles cfg := by
-  intro a₁ a₂ inp hrole hord _
-  obtain ⟨rho, hrho, hinvariant⟩ := h_ordinary a₁ a₂ inp hrole hord
-  have hcanonical :
-      Equivariant rho id (fn a₁ inp) (renameObservation rho id (fn a₁ inp)) :=
-    abstract_address_equivariance rho id (fn a₁ inp)
-  have hrenamed : fn (rho a₁) inp = renameObservation rho id (fn a₁ inp) :=
-    h_equiv rho id a₁ inp
-  rw [← hrho, hrenamed, hinvariant]
-
-/-- A transaction observation records success exactly when it committed. -/
-def succeeds (out : Outcome State) : Prop :=
-  ∃ after trace, out.result = .committed after trace
-
-/-- Every assigned role has a caller for which an ordinary active call succeeds. -/
-def representative_success (fn : Address → Input → Outcome State)
-    (roles : RoleAssignment) (cfg : Config) : Prop :=
-  ∀ (a : Address) (inp : Input),
-    (roles a).isSome → ordinary_preconditions inp → cfg.paused = false →
-    ∃ representative : Address,
-      same_role roles representative a ∧ succeeds (fn representative inp)
-
-/-- While globally active, valid transfer/redemption inputs succeed for every
-caller in an assigned role, not merely for a favored representative address. -/
-theorem global_active_preservation
-    (fn : Address → Input → Outcome State)
-    (roles : RoleAssignment) (cfg : Config)
-    (hnotblocked : not_selectively_blocked fn roles cfg)
-    (hrepresentative : representative_success fn roles cfg) :
-    ∀ (a : Address) (inp : Input),
-      (roles a).isSome → ordinary_preconditions inp → cfg.paused = false →
-      succeeds (fn a inp) := by
-  intro a inp hrole hord hactive
-  obtain ⟨representative, hsame, hsuccess⟩ :=
-    hrepresentative a inp hrole hord hactive
-  rw [hnotblocked representative a inp hsame hord hactive] at hsuccess
-  exact hsuccess
+    (hAdmission : admission_nondiscriminatory cfg fn)
+    (hPostState : post_state_equivariant cfg rename_state fn) :
+    address_nondiscrimination cfg rename_state fn := by
+  exact ⟨hAdmission, hPostState⟩
 
 end LidoSRv3.Audit.Guarantees.PAddress1

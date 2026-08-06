@@ -100,7 +100,6 @@ theorem mutant_sensitive_harness : MutantSensitiveHarness := by
   intro State rho renameState before addressWord
   constructor
   · rfl
-  · exact LidoSRv3.Audit.Guarantees.PAddress1.abstract_address_equivariance
-      rho renameState before
+  · exact rename_is_equivariant rho renameState before
 
 end LidoSRv3.Audit.Verity.AddressYulInterface

@@ -75,13 +75,14 @@
     },
     {
       "id": "P-ADDRESS-1",
-      "catalogue_wording": "Handwritten Yul/direct bytecode must not receive a fabricated Verity projection.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.equivariance_implies_not_blocked",
+      "catalogue_wording": "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
       "theorem_planes": ["model", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-YUL-INTERFACE"],
-      "next_gate": "Build a mutant-sensitive Yul interface harness at the exact EVMYulLean pin.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance", "expected": "abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem"}
+      "assumptions": ["A-ABSTRACT-TX"],
+      "note": "Admission compares success/failure only; successful post-states are compared modulo the caller swap. Singleton-actor functions requiring Lido, TriggerableWithdrawalsGateway, or ConsolidationGateway are excluded and belong to authentication-integrity properties.",
+      "next_gate": "Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1", "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"}
     },
     {
       "id": "P-TOPUP-2",
