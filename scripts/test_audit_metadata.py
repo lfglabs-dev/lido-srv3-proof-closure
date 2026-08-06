@@ -524,7 +524,10 @@ def main():
         write_json(guarantees_path, guarantees)
 
         promoted_eugene = copy.deepcopy(guarantees)
-        eugene = promoted_eugene["guarantees"][-1]
+        eugene = next(
+            row for row in promoted_eugene["guarantees"]
+            if row["id"] == "P-ALLOC-1.eugene-bound"
+        )
         del eugene["parent_id"]
         write_json(guarantees_path, promoted_eugene)
         run(
@@ -536,7 +539,11 @@ def main():
         write_json(guarantees_path, guarantees)
 
         wrong_eugene_parent = copy.deepcopy(guarantees)
-        wrong_eugene_parent["guarantees"][-1]["parent_id"] = "P-ALLOC-2"
+        eugene = next(
+            row for row in wrong_eugene_parent["guarantees"]
+            if row["id"] == "P-ALLOC-1.eugene-bound"
+        )
+        eugene["parent_id"] = "P-ALLOC-2"
         write_json(guarantees_path, wrong_eugene_parent)
         run(
             fixture,
@@ -655,11 +662,11 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        # P-TOPUP-1 closed its source and tx planes in this campaign.  The
+        # P-TOPUP-1 closed its source plane in this campaign.  The
         # source claim must not be silently downgraded back to the pre-campaign
         # model-only row, the theorem must stay the top-up correspondence rather
         # than the allocation-ordering model fact it replaced, and the evm plane
-        # it deliberately did not close must stay open.
+        # tx and evm planes it deliberately did not close must stay open.
         topup_source_downgrade = copy.deepcopy(guarantees)
         topup_source_downgrade["guarantees"][3]["statuses"]["source"] = "OPEN"
         write_json(guarantees_path, topup_source_downgrade)
@@ -671,9 +678,9 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_tx_downgrade = copy.deepcopy(guarantees)
-        topup_tx_downgrade["guarantees"][3]["statuses"]["tx"] = "OPEN"
-        write_json(guarantees_path, topup_tx_downgrade)
+        topup_tx_blocked = copy.deepcopy(guarantees)
+        topup_tx_blocked["guarantees"][3]["statuses"]["tx"] = "BLOCKED"
+        write_json(guarantees_path, topup_tx_blocked)
         run(
             fixture,
             False,
@@ -689,7 +696,7 @@ def main():
             fixture,
             False,
             "generate",
-            "P-TOPUP-1: assurance statuses differ from canonical claims",
+            "P-TOPUP-1: tx status LEAN_CHECKED requires theorem evidence for that plane",
         )
         write_json(guarantees_path, guarantees)
 
@@ -761,7 +768,10 @@ def main():
 
         for index, guarantee in enumerate(guarantees["guarantees"]):
             missing_link = copy.deepcopy(guarantees)
-            missing_link["guarantees"][index]["assumptions"] = []
+            assumptions = missing_link["guarantees"][index]["assumptions"]
+            missing_link["guarantees"][index]["assumptions"] = (
+                [] if assumptions else ["A-SOURCE-SHAPED"]
+            )
             write_json(guarantees_path, missing_link)
             run(
                 fixture,
@@ -1064,8 +1074,12 @@ def main():
         for helper in ("_computeDepositDataRootWithAmount", "_computeSignatureRoot",
                        "_toLittleEndian64"):
             ssz_dropped_span = copy.deepcopy(source_map)
-            ssz_dropped_span["targets"][10]["spans"] = [
-                span for span in ssz_dropped_span["targets"][10]["spans"]
+            ssz_target = next(
+                target for target in ssz_dropped_span["targets"]
+                if target["id"] == "P-SSZ-1"
+            )
+            ssz_target["spans"] = [
+                span for span in ssz_target["spans"]
                 if span["function"] != helper
             ]
             write_json(source_map_path, ssz_dropped_span)
