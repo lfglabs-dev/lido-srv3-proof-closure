@@ -801,7 +801,10 @@ def validate_lock(lock, source_map):
     require(audit_manifest.get("proof_policy") == EXPECTED_PROOF_POLICY,
             "audit manifest proof policy differs from the canonical zero-escape policy")
     manifest_layers = json.loads(json.dumps(audit_manifest.get("layers")))
-    manifest_layers["audit"]["modules"].extend(lock["modules"])
+    if (isinstance(manifest_layers, dict)
+            and isinstance(manifest_layers.get("audit"), dict)
+            and isinstance(manifest_layers["audit"].get("modules"), list)):
+        manifest_layers["audit"]["modules"].extend(lock["modules"])
     require(manifest_layers == EXPECTED_MANIFEST_LAYERS,
             "audit manifest layers differ from the canonical trust records")
     require(audit_manifest.get("proof_baseline") == EXPECTED_PROOF_BASELINE,
