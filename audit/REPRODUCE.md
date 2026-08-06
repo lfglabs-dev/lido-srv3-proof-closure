@@ -8,7 +8,7 @@
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Guarantees.PTopup1` — successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors` — successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open
 - `P-RESERVE-1`: `lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants` — successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build
-- `P-ETH-1`: `lake build` — active Lean 4.31 dependency graph builds; not certification
+- `P-ETH-1`: `lake build LidoSRv3.Audit.Guarantees.PEth1` — successful bounded child-model proofs only; parent P-ETH-1 remains OPEN
 - `P-ADDRESS-1`: `lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressEquivariance` — abstract address-renaming relation and mutant-sensitive vectors compile; no Yul or EVM theorem
 - `P-TOPUP-2`: `lake build LidoSRv3.Audit.Guarantees.PTopup2` — successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
