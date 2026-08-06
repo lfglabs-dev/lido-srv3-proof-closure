@@ -33,17 +33,13 @@ returns the first data byte; the preceding word is its byte length. -/
 def elementLength (array : String) (index : Expr) : Expr :=
   .calldataload (.sub (.arrayElementDynamicDataOffset array index) (.literal 32))
 
-def consolidationValidationLoopBody : List Stmt :=
+def consolidationRequestLoopBody : List Stmt :=
   [ .letVar "sourceOffset" (.arrayElementDynamicDataOffset "sourcePubkeys" (.localVar "i"))
   , .letVar "targetOffset" (.arrayElementDynamicDataOffset "targetPubkeys" (.localVar "i"))
   , .require (.eq (elementLength "sourcePubkeys" (.localVar "i")) (.literal 48))
       "InvalidPublicKeyLength(sourcePubkey)"
   , .require (.eq (elementLength "targetPubkeys" (.localVar "i")) (.literal 48))
-      "InvalidPublicKeyLength(targetPubkey)" ]
-
-def consolidationRequestLoopBody : List Stmt :=
-  [ .letVar "sourceOffset" (.arrayElementDynamicDataOffset "sourcePubkeys" (.localVar "i"))
-  , .letVar "targetOffset" (.arrayElementDynamicDataOffset "targetPubkeys" (.localVar "i"))
+      "InvalidPublicKeyLength(targetPubkey)"
   , .calldatacopy (.literal 0) (.localVar "sourceOffset") (.literal 48)
   , .calldatacopy (.literal 48) (.localVar "targetOffset") (.literal 48)
   , .letVar "request_ok"
@@ -87,8 +83,6 @@ def addConsolidationRequests : FunctionSpec :=
       , .require (.gt (.localVar "requestsCount") (.literal 0)) "ZeroArgument(sourcePubkeys)"
       , .require (.eq (.localVar "requestsCount") (.arrayLength "targetPubkeys"))
           "ArraysLengthMismatch"
-      -- Validate the complete calldata shape before either external-call phase.
-      , .forEach "i" (.localVar "requestsCount") consolidationValidationLoopBody
       , .letVar "fee_read_ok"
           (.staticcall (.literal Verity.Core.MAX_UINT256)
             (.immutable "CONSOLIDATION_REQUEST") (.literal 0) (.literal 0)
@@ -254,6 +248,23 @@ theorem validRequest_encode_of_valid (request : Request) (h : ValidRequest reque
   rw [encode_decode_request request h]
   simp [h.1, h.2]
 
+/-- For every valid request, the 96-byte request payload retains the source
+key in bytes `[0,48)` and the target key in bytes `[48,96)`. -/
+theorem valid_request_payload_preserves_source_order (request : Request)
+    (h : ValidRequest request) :
+    (∀ index : Fin 48,
+      (requestMemory (encodeRequest request)).bytes index = listByte request.source index) ∧
+    (∀ index : Fin 48,
+      (requestMemory (encodeRequest request)).bytes (48 + index) =
+        listByte request.target index) := by
+  constructor
+  · intro index
+    simpa [encode_decode_request request h] using
+      requestMemory_source_byte (encodeRequest request) index
+  · intro index
+    simpa [encode_decode_request request h] using
+      requestMemory_target_byte (encodeRequest request) index
+
 def feeSite (consolidationRequest : Nat) : CallSite :=
   { siteId := 0, kind := .staticcall, target := consolidationRequest,
     value := 0, calldata := [], gas := Verity.Core.MAX_UINT256 }
@@ -269,17 +280,15 @@ inductive BatchStatus where | reverted | succeeded
   deriving DecidableEq
 
 /-- A handwritten guarded fee-staticcall followed by a request-call batch.
-Authorization, both array-shape guards, and every key-length guard are resolved
-before the fee site is constructed.  No request call is constructed unless the
-fee call then succeeds with exactly 32 return bytes, checked multiplication does
-not wrap, and `msg.value` is exactly the product. -/
+Authorization and both array-shape guards precede the fee site.  After a valid
+fee result and exact `msg.value` check, each request is decoded and length-
+checked immediately before its request call, in the pinned source order. -/
 def batchCalls (caller gateway consolidationRequest msgValue : Nat)
     (sources targets : List Pubkey) : CallProgram BatchStatus :=
   let count := sources.length
   let requests := List.zipWith
     (fun source target => encodeRequest ({ source, target } : Request)) sources targets
-  if caller = gateway ∧ count > 0 ∧ count = targets.length ∧
-      requests.all validRequest then
+  if caller = gateway ∧ count > 0 ∧ count = targets.length then
     .bind (feeSite consolidationRequest) fun feeObservation =>
       match feeObservation.result with
       | .success data =>
@@ -289,9 +298,11 @@ def batchCalls (caller gateway consolidationRequest msgValue : Nat)
               let rec loop (index : Nat) : List MemoryRequest → CallProgram BatchStatus
                 | [] => .pure .succeeded
                 | request :: rest =>
-                    .bind (requestSite consolidationRequest fee index request) fun observation =>
-                      if observation.result.succeeded then loop (index + 1) rest
-                      else .pure .reverted
+                    if validRequest request then
+                      .bind (requestSite consolidationRequest fee index request) fun observation =>
+                        if observation.result.succeeded then loop (index + 1) rest
+                        else .pure .reverted
+                    else .pure .reverted
               loop 0 requests
             else .pure .reverted
           else .pure .reverted
@@ -321,18 +332,79 @@ theorem array_shape_guards_precede_all_external_calls
   · simp [batchCalls, hlength]
     rfl
 
-theorem key_length_guards_precede_all_external_calls
+theorem fee_failure_trace_contains_only_staticcall
     (gateway consolidationRequest msgValue : Nat)
-    (sources targets : List Pubkey) (adversary : AdversaryModel) (state : CallState)
-    (hlength : sources.length = targets.length)
-    (hkeys : (List.zipWith
-      (fun source target => encodeRequest ({ source, target } : Request)) sources targets).all
-        validRequest = false) :
+    (source : Pubkey) (sources targets : List Pubkey)
+    (adversary : AdversaryModel) (state : CallState) (data : List Nat)
+    (hlength : (source :: sources).length = targets.length)
+    (hfee : adversary.result (feeSite consolidationRequest) state.world = .failure data) :
     ObservedCalls
-      (batchCalls gateway gateway consolidationRequest msgValue sources targets)
-      adversary state = [] := by
-  simp [batchCalls, hlength, hkeys]
-  rfl
+      (batchCalls gateway gateway consolidationRequest msgValue (source :: sources) targets)
+      adversary state =
+        [{ site := feeSite consolidationRequest, preWorld := state.world }] := by
+  have hpositive : 0 < targets.length := by
+    cases targets with
+    | nil => simp at hlength
+    | cons => simp
+  simp [batchCalls, hlength, hpositive, ObservedCalls, denoteCall, hfee]
+
+theorem invalid_fee_data_trace_contains_only_staticcall
+    (gateway consolidationRequest msgValue : Nat)
+    (source : Pubkey) (sources targets : List Pubkey) (feeData : List Nat)
+    (adversary : AdversaryModel) (state : CallState)
+    (hlength : (source :: sources).length = targets.length)
+    (hfee : adversary.result (feeSite consolidationRequest) state.world =
+      .success feeData)
+    (hsize : feeData.length ≠ 32) :
+    ObservedCalls
+      (batchCalls gateway gateway consolidationRequest msgValue (source :: sources) targets)
+      adversary state =
+        [{ site := feeSite consolidationRequest, preWorld := state.world }] := by
+  have hpositive : 0 < targets.length := by
+    cases targets with
+    | nil => simp at hlength
+    | cons => simp
+  simp [batchCalls, hlength, hpositive, ObservedCalls, denoteCall, hfee, hsize]
+
+/-- If the first decoded pair has an invalid key length, a successful fee read
+is still observable, but no request CALL is made for that invalid pair. -/
+theorem first_key_length_failure_trace_contains_only_fee_staticcall
+    (gateway consolidationRequest fee : Nat) (feeData : List Nat)
+    (source target : Pubkey) (adversary : AdversaryModel) (state : CallState)
+    (hfee : adversary.result (feeSite consolidationRequest) state.world =
+      .success feeData)
+    (hsize : feeData.length = 32) (hdecode : decodeWord feeData = fee)
+    (hvalue : fee ≤ Verity.Core.MAX_UINT256)
+    (hkey : validRequest (encodeRequest ({ source, target } : Request)) = false) :
+    ObservedCalls
+      (batchCalls gateway gateway consolidationRequest fee [source] [target]) adversary state =
+        [{ site := feeSite consolidationRequest, preWorld := state.world }] := by
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+    hvalue, hkey]
+
+/-- A later invalid pair yields a partial trace: the fee STATICCALL and the
+preceding valid request CALL are present, while the invalid request is absent. -/
+theorem second_key_length_failure_trace_is_partial
+    (gateway consolidationRequest fee : Nat) (feeData requestData : List Nat)
+    (source₀ source₁ target₀ target₁ : Pubkey)
+    (adversary : AdversaryModel) (state : CallState)
+    (hfee : adversary.result (feeSite consolidationRequest) state.world = .success feeData)
+    (hsize : feeData.length = 32) (hdecode : decodeWord feeData = fee)
+    (hbound : 2 * fee ≤ Verity.Core.MAX_UINT256)
+    (hvalid₀ : validRequest (encodeRequest ({ source := source₀, target := target₀ } : Request)) = true)
+    (hinvalid₁ : validRequest (encodeRequest ({ source := source₁, target := target₁ } : Request)) = false)
+    (hrequest : adversary.result
+      (requestSite consolidationRequest fee 0
+        (encodeRequest ({ source := source₀, target := target₀ } : Request))) state.world =
+      .success requestData) :
+    (ObservedCalls
+      (batchCalls gateway gateway consolidationRequest (2 * fee)
+        [source₀, source₁] [target₀, target₁]) adversary state).map (·.site) =
+      [feeSite consolidationRequest,
+       requestSite consolidationRequest fee 0
+         (encodeRequest ({ source := source₀, target := target₀ } : Request))] := by
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+    hbound, hvalid₀, hinvalid₁, hrequest]
 
 /-- This theorem applies only to the separate handwritten `CallProgram`; there
 is currently no Verity theorem connecting it to the `FunctionSpec` above.  If

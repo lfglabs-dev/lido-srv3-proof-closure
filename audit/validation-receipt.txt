@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: fa7fc15b5135f16161fc06e73c9014d024b52fab
+validated-tree: bde5457877084bae04eb28bbfbe370523cefbedd
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -27,9 +27,11 @@ P-CONSOLIDATION-1 PR #46 final bounded repair (2026-08-06)
 - The FunctionSpec now includes nonzero constructor guards for the gateway and
   consolidation-request immutables and the final `preservesEthBalance`
   Panic(0x01)-shaped assertion from the pinned WithdrawalVault path.
-- Caller, nonempty/equal-array, and all key-length guards now precede the fee
-  STATICCALL and request CALLs in both the FunctionSpec and handwritten trace;
-  invalid guard inputs have checked empty-observed-call-trace theorems.
+- Caller and nonempty/equal-array guards precede the fee STATICCALL. Fee-call
+  and fee-result failures have fee-only traces. After a successful fee read and
+  exact-value check, each pair is decoded and length-checked inside the request
+  loop; an invalid pair has no request CALL, while prior valid pairs remain in
+  source order. The FunctionSpec and handwritten trace now match this ordering.
 - The P-CONSOLIDATION-1 source map now pins
   `WithdrawalVaultEIP7685._addConsolidationRequests` at lines 56--73 of the
   exact `af095e48` source file used by the scaffold.
