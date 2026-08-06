@@ -43,7 +43,7 @@ def main():
         env = os.environ.copy()
         env["GIT_INDEX_FILE"] = str(Path(tmp) / "index")
         git("read-tree", EXPECTED_HEAD, env=env)
-        git("rm", "--cached", "--quiet", "--", str(RECEIPT), env=env)
+        git("rm", "--cached", "--quiet", "--force", "--", str(RECEIPT), env=env)
         actual = git("write-tree", env=env)
     if fields.get("validated-tree") != actual:
         raise SystemExit(
