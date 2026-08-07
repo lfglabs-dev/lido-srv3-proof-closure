@@ -7,9 +7,8 @@ Pinned source correspondence for the SRv3 deposit beacon-chain push at
 Four spans make up the pinned deposit path:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997 -- the
-  entry point.  Its `onlyRole(DEPOSIT_ROLE)` modifier (line 942) runs before any
-  statement in the body, so an unauthorized caller is rejected *before* the
-  module-status check.  The body then rejects an inactive module (line 946), computes
+  entry point. It first authenticates the caller against the locator-derived
+  DepositSecurityModule at lines 943 and 1173--1179, then rejects an inactive module (line 946), computes
   `maxDepositsCount` (lines 954--957) and rejects zero (line 959), obtains the
   key batch (lines 962--963), rejects a misaligned pubkey batch (line 966),
   derives `actualDepositsCount` (line 967) and rejects an over-target module
@@ -37,9 +36,8 @@ Four spans make up the pinned deposit path:
 
 `run` below is the source-shaped presentation of that control flow: it returns
 the *first* guard that fires, matching Solidity's sequential evaluation, and
-otherwise the committed push.  The first guard is the access-control modifier,
-not the module-status check: a caller without `DEPOSIT_ROLE` reverts at line 942
-whatever the module status is, and `unauthorized_reverts` records that.  The line 996 `assert` is one of those guards: a
+otherwise the committed push. Caller authentication is an external locator/app
+fact outside this data-only model; the line 996 `assert` is one of the modelled guards: a
 failing `assert` is a `Panic(0x01)` revert under Solidity 0.8, so a deployment
 that pulls a different amount than it pushes aborts the whole transaction rather
 than stranding the difference in the router.  `Outcome.pulled` and
@@ -53,11 +51,9 @@ top-up path `makeBeaconChainTopUp` (`BeaconChainDepositor.sol` lines 66--108,
 P-TOPUP-1), about SSZ deposit-data roots (P-SSZ-1), or about Yul or
 deployed-bytecode behaviour.
 
-Arithmetic.  Solidity `uint256` `+`, `-`, `*`, and `/` are modelled by unbounded
-`Nat` operations.  Whether `msg.sender` actually holds `DEPOSIT_ROLE` is an
-`AccessControlEnumerable` storage fact, so it enters as the input bit
-`callerHasDepositRole` rather than being derived here; only the *ordering* of
-the modifier relative to the body guards is claimed.  `Nat` division truncates exactly as EVM `DIV` does, but the
+Arithmetic. Solidity `uint256` `+`, `-`, `*`, and `/` are modelled by unbounded
+`Nat` operations. Locator-derived DSM authentication is not represented in this
+data-only model. `Nat` division truncates exactly as EVM `DIV` does, but the
 `Nat` encoding cannot observe `uint256` overflow, so this is a correspondence
 under the no-overflow reading of the pinned spans, recorded as `A-SOURCE-SHAPED`
 in `audit/assumptions.yaml`.  Storage reads, the `IStakingModule.obtainDepositData`
@@ -114,10 +110,6 @@ Per-call data the pinned deposit path reads.  Each field names the exact source
 expression it stands for.
 -/
 structure SourceDepositInput where
-  /-- Whether `msg.sender` holds `DEPOSIT_ROLE`, as the `onlyRole(DEPOSIT_ROLE)`
-  modifier on `deposit` reads it at source line 942.  The modifier body precedes
-  every statement of the function, so this is the first thing the call tests. -/
-  callerHasDepositRole : Bool
   /-- `stateConfig.status == StakingModuleStatus.Active`, source line 946. -/
   moduleActive : Bool
   /-- `state.deposits.maxDepositsPerBlock`, source line 955. -/
@@ -144,10 +136,6 @@ exact source revert it stands for; the two `committed*` constructors are the two
 paths that leave state changes behind.
 -/
 inductive Outcome
-  /-- The `onlyRole(DEPOSIT_ROLE)` modifier on `deposit`, source line 942: an
-  `AccessControlEnumerable` unauthorized-account revert.  It fires before the
-  function body, so it precedes the line 946 module-status check. -/
-  | revertUnauthorizedDepositRole
   /-- `revert StakingModuleNotActive()`, source line 946. -/
   | revertStakingModuleNotActive
   /-- Solidity arithmetic panic from division by a zero
@@ -235,8 +223,8 @@ instance (cfg : SourceDepositConfig) : Decidable (ConservingConfig cfg) :=
 
 /--
 The pinned deposit path, as a first-guard-wins function.  The guard order is the
-source order: the `onlyRole(DEPOSIT_ROLE)` modifier at `StakingRouter.deposit`
-line 942, then the body guards at lines 946, 959, 966, 969, 978, then the
+source order after locator-derived DSM authentication: the body guards at
+lines 946, 959, 966, 969, 978, then the
 `Lido.withdrawDepositableEther` guards reached at line 983, then the
 `BeaconChainDepositor.makeBeaconChainDeposits32ETH` guards reached at line 985,
 and finally the `assert` at line 996.
@@ -250,9 +238,7 @@ pull/push form is preferred here because truncating `Nat` subtraction, unlike a
 real balance, can silently bottom out at zero.
 -/
 def run (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
-  if inp.callerHasDepositRole = false then
-    .revertUnauthorizedDepositRole
-  else if inp.moduleActive = false then
+  if inp.moduleActive = false then
     .revertStakingModuleNotActive
   else if cfg.maxEBType1 = 0 then
     .revertMaxDepositsDivisionByZero
@@ -362,9 +348,7 @@ theorem committed_deposits_spec {cfg : SourceDepositConfig}
     keys = actualDepositsCount cfg inp ∧ 0 < actualDepositsCount cfg inp ∧
       pulled = depositsValue cfg inp ∧ pushed = pushedValue cfg inp ∧
       pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore := by
-  by_cases hAuth : inp.callerHasDepositRole = false
-  · simp only [run, if_pos hAuth] at hRun; cases hRun
-  rw [run, if_neg hAuth] at hRun
+  rw [run] at hRun
   by_cases hModule : inp.moduleActive = false
   · rw [if_pos hModule] at hRun; cases hRun
   rw [if_neg hModule] at hRun
@@ -451,29 +435,6 @@ theorem not_conserving_reverts {cfg : SourceDepositConfig} {inp : SourceDepositI
   fun _ _ _ _ hRun => hCfg (committed_implies_conserving hRun)
 
 /--
-The `onlyRole(DEPOSIT_ROLE)` modifier at source line 942 is the *first* guard, not
-one hidden behind the module-status check at line 946: a caller without the role
-reverts whatever the rest of the per-call data says.
--/
-theorem unauthorized_reverts (cfg : SourceDepositConfig) {inp : SourceDepositInput}
-    (hAuth : inp.callerHasDepositRole = false) :
-    run cfg inp = .revertUnauthorizedDepositRole := by
-  simp only [run, if_pos hAuth]
-
-/--
-Contrapositive: neither committing branch is reachable without `DEPOSIT_ROLE`, so
-the access-control revert is inside the rollback implication rather than being
-classified as a committed outcome.
--/
-theorem committing_implies_authorized {cfg : SourceDepositConfig}
-    {inp : SourceDepositInput} (hCommit : (run cfg inp).reverts = false) :
-    inp.callerHasDepositRole = true := by
-  by_cases hAuth : inp.callerHasDepositRole = false
-  · rw [unauthorized_reverts cfg hAuth] at hCommit
-    simp [Outcome.reverts] at hCommit
-  · simpa using hAuth
-
-/--
 The empty-batch early return at source line 978 is reachable only for a zero key
 count -- it is the one non-reverting escape that never reaches the line 996
 `assert`.
@@ -481,9 +442,7 @@ count -- it is the one non-reverting escape that never reaches the line 996
 theorem committedNoDeposits_implies_empty_batch {cfg : SourceDepositConfig}
     {inp : SourceDepositInput} (hRun : run cfg inp = .committedNoDeposits) :
     actualDepositsCount cfg inp = 0 := by
-  by_cases hAuth : inp.callerHasDepositRole = false
-  · simp only [run, if_pos hAuth] at hRun; cases hRun
-  rw [run, if_neg hAuth] at hRun
+  rw [run] at hRun
   by_cases hModule : inp.moduleActive = false
   · rw [if_pos hModule] at hRun; cases hRun
   rw [if_neg hModule] at hRun
@@ -600,9 +559,7 @@ revert. -/
 theorem run_ne_invalidPublicKeysBatchLength {cfg : SourceDepositConfig}
     {inp : SourceDepositInput} (hLengths : cfg.publicKeyLength = cfg.pubkeyLength) :
     run cfg inp ≠ .revertInvalidPublicKeysBatchLength := by
-  by_cases hAuth : inp.callerHasDepositRole = false
-  · simp only [run, if_pos hAuth]; intro h; cases h
-  rw [run, if_neg hAuth]
+  rw [run]
   by_cases hModule : inp.moduleActive = false
   · rw [if_pos hModule]; intro h; cases h
   rw [if_neg hModule]

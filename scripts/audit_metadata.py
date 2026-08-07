@@ -59,7 +59,7 @@ EXPECTED_WORDING = [
     "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
     "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
-    "Concrete Verity transaction-plane evidence compiles the typed StakingRouter.deposit path and refines commit conservation plus whole-transaction snapshot rollback to the canonical P-DEPOSIT-1 abstract guarantee; source, Yul, EVM, and production provenance remain open.",
+    "Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.",
     "Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.",
     "Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
     "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
@@ -129,7 +129,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
      "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
     {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"},
-    {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful typed compilation, commit conservation, CallProgram snapshot rollback, external-call denotation, bounded-loop invariant, and mutant-sensitive vector build"},
+    {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee", "expected": "successful source-shaped FunctionSpec scaffold build; dynamic ABI, call/event trace, balance rollback, and source/tx adequacy remain OPEN"},
     {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
@@ -179,7 +179,7 @@ EXPECTED_NEXT_GATES = [
     "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
     "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
-    "Certify the pending transaction-plane evidence, then refine generated code against pinned executable EVM semantics and independently verified production runtime provenance.",
+    "Add multi-contract composition for allocation, dynamic module-returned memory, Lido/queue/oracle state, per-validator root/calldata construction, and propagating rollback before making any conservation or transaction claim.",
     "Close the FunctionSpec-to-CallProgram/DenoteMemory/event-trace gaps listed in audit/P-CONSOLIDATION-1-VERITY-GAPS.md, then add transaction-frame rollback and source refinement.",
     "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
     "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
@@ -232,7 +232,7 @@ EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "OPEN", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
@@ -257,7 +257,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "tx"],
     ["model", "algorithm"],
     ["yul"],
-    ["model", "tx"],
+    ["model"],
     [],
     ["model", "tx"],
     ["model"],
@@ -280,7 +280,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
     "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
     "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
-    "LidoSRv3.Audit.Verity.DepositRollback.deposit_tx_refines_abstract",
+    "LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix",
     None,
     "LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct",
     "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
@@ -307,8 +307,8 @@ CAMPAIGN_BASE = {
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
 CANONICAL_VERITY_REPOSITORY = "https://github.com/lfglabs-dev/verity.git"
-CANONICAL_VERITY_COMMIT = "f485b2ca7502793ce227ede0076b7d070a0697b7"
-CANONICAL_VERITY_INPUT_REV = "f485b2ca7502793ce227ede0076b7d070a0697b7"
+CANONICAL_VERITY_COMMIT = "54f1e002e2b85825fad6be69a32cfd5d9452469d"
+CANONICAL_VERITY_INPUT_REV = "54f1e002e2b85825fad6be69a32cfd5d9452469d"
 CANONICAL_EVMYULLEAN_REPOSITORY = "https://github.com/lfglabs-dev/EVMYulLean.git"
 CANONICAL_EVMYULLEAN_COMMIT = "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
 CANONICAL_MATHLIB_REPOSITORY = "https://github.com/leanprover-community/mathlib4.git"
@@ -966,7 +966,7 @@ def validate():
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             require(row.get("parent_id") == "P-DEPOSIT-1",
                     "P-DEPOSIT-1.verity-tx-rollback.tx must remain subordinate to P-DEPOSIT-1")
-            require(row.get("source_plane_scope") == "deposit conservation and whole-transaction rollback only",
+            require(row.get("source_plane_scope") == "source-shaped deposit prefix scaffold (OPEN); allocation and multi-contract suffix explicitly OPEN",
                     "P-DEPOSIT-1.verity-tx-rollback.tx: scope differs")
             require(row.get("no_new_forbidden_lean_tokens") is True,
                     "P-DEPOSIT-1.verity-tx-rollback.tx: forbidden-token assertion is missing")

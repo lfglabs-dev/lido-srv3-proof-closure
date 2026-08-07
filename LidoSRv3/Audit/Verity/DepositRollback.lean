@@ -1,208 +1,224 @@
-import LidoSRv3.Audit.Guarantees.PDeposit1
 import Compiler.CompilationModel
-import Verity.Core.Model.CallProgramRollback
+import Verity.Core.Model.AllocationExtraction
+import Verity.Core.Model.Denote
 import Verity.Core.Model.DenoteExternalCalls
-import Verity.Proofs.LoopSimulation
 
 /-!
-# P-DEPOSIT-1 Verity transaction rollback refinement
+# P-DEPOSIT-1: source-shaped deposit prefix scaffold (OPEN)
 
-This file models the pinned path at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Pinned source: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
-* `StakingRouter.sol` `deposit`, lines 942--997;
-* `Lido.sol` `withdrawDepositableEther`, lines 869--886;
-* `Lido.sol` `_spendDepositableEther`, lines 839--859; and
-* `BeaconChainDepositor.sol` `makeBeaconChainDeposits32ETH`, lines 36--64.
+This artifact deliberately does **not** claim an end-to-end deposit model.  It
+uses Verity's official contract-separated storage identities for the router,
+Lido, withdrawal queue, and accounting oracle, but has no faithful primitive
+for composing the router, Lido, withdrawal queue, oracle, module-returned dynamic byte arrays,
+and DepositContract into one reverting transaction.  The checked FunctionSpec
+therefore ends at the first unavailable component: the allocation helper.
 
-The typed program places the role guard first, reads the constructor immutable,
-bounds the loop, performs one value-bearing low-level call per key, and makes
-the line 996 balance assertion the final rollback trigger.  The executable
-transaction wrapper retains the pre-state snapshot and uses Verity's external
-call denotation to state whole-program rollback.
+The prefix below checks exactly these source operations, in order:
+
+* locator-derived DSM lookup and caller equality (StakingRouter 942--944,
+  1173--1179);
+* EnumerableSet membership used by `_requireModuleIdExists`;
+* config extraction: module address at bits 0--159, status at bits 224--231,
+  and withdrawal-credentials type at bits 232--239;
+* router withdrawal-credentials slot 4 with the source `setType` conversion;
+* immutable `LIDO.getDepositableEther()` target and propagating failure.
+
+Everything after that boundary is listed in `openComponents`; no
+caller-supplied allocation, module bytes, or deposit-data-root stands in for
+the missing execution.
 -/
 
 namespace LidoSRv3.Audit.Verity.DepositRollback
 
 open Compiler
 open Compiler.CompilationModel
-open Compiler.CompilationModel.DenoteExternalCalls
-open LidoSRv3.Audit
-open LidoSRv3.Audit.SolidityDeposit
-open LidoSRv3.Audit.Guarantees.PDeposit1
+open Verity.Core.Model.AllocationExtraction
 
-def ether : Nat := 10 ^ 18
-def depositSize32ETH : Nat := 32 * ether
-def lidoAddress : Nat := 0x0000000000000000000000000000000000000001
-def beaconDepositAddress : Nat := 0x00000000219ab540356cBB839Cbe05303d7705Fa
+/-! Stable positive identities for the four source contracts whose storage
+worlds participate in the deposit transaction. These are deliberately distinct;
+contract id zero is Verity's legacy unqualified storage world. -/
+def stakingRouterNamespace : Nat := 1
+def lidoNamespace : Nat := 2
+def withdrawalQueueNamespace : Nat := 3
+def accountingOracleNamespace : Nat := 4
 
-def depositEntry : FunctionSpec :=
-  { name := "deposit"
+def routerStateSlot : Nat :=
+  0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000
+
+def moduleConfigStatusShift : Nat := 224
+def moduleConfigWCTypeShift : Nat := 232
+def addressModulus : Nat := 2 ^ 160
+def byteModulus : Nat := 2 ^ 8
+def uint248Modulus : Nat := 2 ^ 248
+
+def depositSecurityModuleSelector : Nat := 0x472c1776
+def getDepositableEtherSelector : Nat := 0xf2cfa87d
+
+def canonicalRouterFields : List Field :=
+  [ { name := "moduleStates", ty := .mappingTyped (.simple .uint256), slot := some routerStateSlot }
+  , { name := "moduleIds", ty := .dynamicArray .uint256, slot := some (routerStateSlot + 1) }
+  , { name := "moduleIdPositions", ty := .mappingTyped (.simple .uint256), slot := some (routerStateSlot + 2) }
+  , { name := "withdrawalCredentials", ty := .uint256, slot := some (routerStateSlot + 4) }
+  ]
+
+def checkedPrefix : FunctionSpec :=
+  { name := "depositCheckedPrefix"
     params :=
-      [{ name := "callerHasDepositRole", ty := .bool },
-       { name := "actualDepositsCount", ty := .uint256 },
-       { name := "maxDepositsPerRequest", ty := .uint256 },
-       { name := "routerBalanceBefore", ty := .uint256 }]
+      [ { name := "stakingModuleId", ty := .uint256 }
+      , { name := "depositCalldata", ty := .bytes }
+      ]
     returnType := none
     reentrancyTrusted := true
     localObligations :=
-      [{ name := "authorization_guard_runs_first"
-         obligation := "StakingRouter.deposit line 942 onlyRole(DEPOSIT_ROLE) precedes every body guard."
-         proofStatus := .proved },
-       { name := "max_effective_balance_is_constructor_immutable"
-         obligation := "The amount pulled at line 972 reads MAX_EFFECTIVE_BALANCE_WC_TYPE_01 assigned by constructor line 105."
-         proofStatus := .proved },
-       { name := "deposit_loop_bounded_by_request_max"
-         obligation := "The BeaconChainDepositor loop count is no greater than maxDepositsPerRequest."
-         proofStatus := .proved },
-       { name := "line_996_assert_is_rollback_trigger"
-         obligation := "The final balance assertion is the sole post-loop trigger and Panic(0x11) reverts the transaction."
-         proofStatus := .proved }]
+      [ { name := "OPEN_allocation_and_suffix"
+          obligation := "OPEN: `_getModuleDepositAllocation` and every later source operation are outside this checked prefix; see openComponents."
+          proofStatus := .unchecked }
+      ]
     body :=
-      [ .require (.eq (.param "callerHasDepositRole") (.literal 1))
-          "AccessControl: missing DEPOSIT_ROLE"
-      , .calldatacopy (.literal 0) (.literal 4)
-          (.mul (.param "actualDepositsCount") (.literal 48))
-      , .letVar "maxEffectiveBalance" (.immutable "MAX_EFFECTIVE_BALANCE_WC_TYPE_01")
-      , .require (.le (.param "actualDepositsCount") (.param "maxDepositsPerRequest"))
-          "ModuleReturnExceedTarget"
-      , .letVar "pulled"
-          (.mul (.param "actualDepositsCount") (.localVar "maxEffectiveBalance"))
-      , .letVar "iter_total" (.literal 0)
-      , .mstore (.literal 96) (.literal 0)
-      , .forEach "i" (.param "actualDepositsCount")
-          [ .letVar "deposit_ok"
-              (.call (.literal Verity.Core.MAX_UINT256)
-                (.literal beaconDepositAddress) (.literal depositSize32ETH)
-                (.literal 0) (.literal 0) (.literal 0) (.literal 0))
-          , .require (.eq (.localVar "deposit_ok") (.literal 1))
-              "BeaconChainDepositor.deposit reverted"
-          , .assignVar "iter_total" (.add (.localVar "iter_total") (.literal depositSize32ETH)) ]
-      , .require (.eq (.localVar "pulled") (.localVar "iter_total"))
-          "Panic(0x11): StakingRouter.deposit line 996 assert"
-      , .stop ] }
+      [ -- LIDO_LOCATOR.depositSecurityModule(); returndata is forwarded on failure.
+        .mstore (.literal 0) (.shl (.literal 224) (.literal depositSecurityModuleSelector))
+      , .letVar "locatorOk"
+          (.staticcall (.literal Verity.Core.MAX_UINT256) (.immutable "LIDO_LOCATOR")
+            (.literal 0) (.literal 4) (.literal 0) (.literal 32))
+      , .ite (.eq (.localVar "locatorOk") (.literal 0)) [.revertReturndata] []
+      , .require (.le (.literal 32) .returndataSize) "LocatorShortReturndata"
+      , .letVar "depositSecurityModule" (.mload (.literal 0))
+      , .require (.eq .caller (.localVar "depositSecurityModule")) "NotAuthorized"
+
+      -- EnumerableSet._positions[bytes32(moduleId)] != 0.
+      , .require
+          (.lt (.literal 0) (.mapping "moduleIdPositions" (.param "stakingModuleId")))
+          "StakingModuleUnregistered"
+      , .letVar "moduleConfig" (.mappingWord "moduleStates" (.param "stakingModuleId") 0)
+      , .letVar "moduleAddress" (.mod (.localVar "moduleConfig") (.literal addressModulus))
+      , .letVar "moduleStatus"
+          (.mod (.div (.localVar "moduleConfig") (.literal (2 ^ moduleConfigStatusShift)))
+            (.literal byteModulus))
+      , .require (.eq (.localVar "moduleStatus") (.literal 0)) "StakingModuleNotActive"
+      , .letVar "withdrawalCredentialsType"
+          (.mod (.div (.localVar "moduleConfig") (.literal (2 ^ moduleConfigWCTypeShift)))
+            (.literal byteModulus))
+      , .letVar "withdrawalCredentials"
+          (.add (.mod (.storage "withdrawalCredentials") (.literal uint248Modulus))
+            (.mul (.localVar "withdrawalCredentialsType") (.literal (2 ^ 248))))
+
+      -- LIDO.getDepositableEther(); returndata is forwarded on failure.
+      , .mstore (.literal 0) (.shl (.literal 224) (.literal getDepositableEtherSelector))
+      , .letVar "lidoOk"
+          (.staticcall (.literal Verity.Core.MAX_UINT256) (.immutable "LIDO")
+            (.literal 0) (.literal 4) (.literal 0) (.literal 32))
+      , .ite (.eq (.localVar "lidoOk") (.literal 0)) [.revertReturndata] []
+      , .require (.le (.literal 32) .returndataSize) "LidoShortReturndata"
+      , .letVar "depositableEther" (.mload (.literal 0))
+      , .stop
+      ] }
 
 def spec : CompilationModel :=
-  { name := "PDeposit1DepositRollback"
-    fields := []
+  { name := "PDeposit1CheckedPrefix"
+    contractId := stakingRouterNamespace
+    fields := canonicalRouterFields
     immutables :=
-      [{ name := "MAX_EFFECTIVE_BALANCE_WC_TYPE_01", ty := .uint256,
-         init := .constructorArg 0 }]
+      [ { name := "LIDO", ty := .address, init := .constructorArg 0 }
+      , { name := "DEPOSIT_CONTRACT", ty := .address, init := .constructorArg 1 }
+      , { name := "LIDO_LOCATOR", ty := .address, init := .constructorArg 2 }
+      , { name := "MAX_EFFECTIVE_BALANCE_WC_TYPE_01", ty := .uint256, init := .constructorArg 3 }
+      ]
     constructor := some
-      { params := [{ name := "maxEffectiveBalance", ty := .uint256 }]
+      { params :=
+          [ { name := "lido", ty := .address }
+          , { name := "depositContract", ty := .address }
+          , { name := "lidoLocator", ty := .address }
+          , { name := "maxEffectiveBalance", ty := .uint256 }
+          ]
         body :=
-          [.setImmutable "MAX_EFFECTIVE_BALANCE_WC_TYPE_01" (.param "maxEffectiveBalance")] }
-    functions := [depositEntry] }
+          [ .setImmutable "LIDO" (.param "lido")
+          , .setImmutable "DEPOSIT_CONTRACT" (.param "depositContract")
+          , .setImmutable "LIDO_LOCATOR" (.param "lidoLocator")
+          , .setImmutable "MAX_EFFECTIVE_BALANCE_WC_TYPE_01" (.param "maxEffectiveBalance")
+          ] }
+    functions := [checkedPrefix] }
 
-def depositSelector : Nat := 0x8dbdbe6d
+/-! The remaining source participants are explicit Verity contract models even
+though their bodies remain outside the checked prefix.  Their distinct positive
+`contractId`s select the official contract-separated storage worlds introduced
+by `verity@54f1e002`. -/
+def lidoSpec : CompilationModel :=
+  { name := "Lido"
+    contractId := lidoNamespace
+    fields := []
+    constructor := none
+    functions := [] }
 
-theorem deposit_program_compiles :
-    (CompilationModel.compile spec [depositSelector]).isOk = true := by
+def withdrawalQueueSpec : CompilationModel :=
+  { name := "WithdrawalQueue"
+    contractId := withdrawalQueueNamespace
+    fields := []
+    constructor := none
+    functions := [] }
+
+def accountingOracleSpec : CompilationModel :=
+  { name := "AccountingOracle"
+    contractId := accountingOracleNamespace
+    fields := []
+    constructor := none
+    functions := [] }
+
+def officialSeparatedNamespaces : List Nat :=
+  [spec.contractId, lidoSpec.contractId, withdrawalQueueSpec.contractId,
+    accountingOracleSpec.contractId]
+
+def checkedPrefixSelector : Nat := 0x5d303519
+
+theorem checked_prefix_is_actual_function_spec : spec.functions = [checkedPrefix] := rfl
+
+theorem checked_prefix_compiles :
+    (CompilationModel.compile spec [checkedPrefixSelector]).isOk = true := by
   native_decide
 
-/-- One value-bearing `BeaconChainDepositor.deposit` call per loop iteration. -/
-def depositSite (index : Nat) : CallSite :=
-  { siteId := index
-    kind := .call
-    target := beaconDepositAddress
-    value := depositSize32ETH
-    calldata := []
-    gas := Verity.Core.MAX_UINT256 }
+/-! The expected footprint is independently written from the pinned source
+prefix.  It is not obtained by aliasing `checkedPrefix` to a second name. -/
+def sourceDerivedExpectedFootprint :
+    List (Compiler.Proofs.Storage.ContractId × Nat × AllocKind) :=
+  [ (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d002, .read)
+  , (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000, .read)
+  , (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d004, .read)
+  ]
 
-/-- The low-level Lido pull followed by the 32-ETH beacon deposit loop. -/
-def depositCalls (count : Nat) : CallProgram Unit :=
-  .bind
-    { siteId := 0, kind := .call, target := lidoAddress,
-      value := 0, calldata := [], gas := Verity.Core.MAX_UINT256 }
-    fun pull =>
-      if pull.result.succeeded then
-        let rec loop (index remaining : Nat) : CallProgram Unit :=
-          match remaining with
-          | 0 => .pure ()
-          | n + 1 => .bind (depositSite index) fun _ => loop (index + 1) n
-        loop 1 count
-      else .pure ()
+def extractedFootprint :
+    List (Compiler.Proofs.Storage.ContractId × Nat × AllocKind) :=
+  (extractAllocation spec checkedPrefix).slots.map fun entry =>
+    (entry.contract, entry.slot, entry.kind)
 
-structure DepositProgram (State : Type) where
-  cfg : SourceDepositConfig
-  inp : SourceDepositInput
-  snapshot : State
-  sourceOutcome : Outcome
-  calls : CallProgram Unit
+theorem allocation_extraction_matches_source_derived_prefix :
+    extractedFootprint = sourceDerivedExpectedFootprint := by
+  native_decide
 
-def depositProgram (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (before : State) : DepositProgram State :=
-  { cfg := cfg
-    inp := inp
-    snapshot := before
-    sourceOutcome := run cfg inp
-    calls := depositCalls (actualDepositsCount cfg inp) }
+/-! Actual FunctionSpec execution rejects malformed ABI input before any body
+statement. `DenoteResult` exposes encoded final storage but this artifact does
+not prove snapshot equality, so rollback remains OPEN below. -/
+def zeroOracle : Denote.DenoteOracle :=
+  { mappingSlot := fun _ _ => 0, keccakMemorySlice := fun _ _ _ => 0 }
 
-/-- Executable transaction observation associated with the Verity program. -/
-def transactionObservation (program : DepositProgram State) (after : State)
-    (attempts : List CallAttempt) (trace : CommitTrace) : TxObservation State :=
-  observation program.snapshot after attempts trace program.sourceOutcome
+def malformedTx : Denote.DenoteTransaction :=
+  { sender := 7, thisAddress := 9, functionSelector := checkedPrefixSelector, args := [] }
 
-/-- The source outcome is the abstract outcome refined by this program. -/
-def AbstractOutcome (program : DepositProgram State) (outcome : Outcome) : Prop :=
-  outcome = program.sourceOutcome
+theorem malformed_actual_function_spec_rejects :
+    (Denote.denoteFunction zeroOracle spec checkedPrefix malformedTx
+      Verity.defaultState).success = false := by
+  native_decide
 
-/-- `LoopSimulation` proves the exact loop invariant used by the final assert. -/
-theorem iter_total_eq_count_mul_32ether (count : Nat) :
-    Compiler.Proofs.LoopSimulation.forEach
-        (fun total _ => total + depositSize32ETH) 0 count =
-      count * depositSize32ETH := by
-  let Inv : Nat → Nat → Prop := fun index total => total = index * depositSize32ETH
-  have hstep : Compiler.Proofs.LoopSimulation.IndexInvariant Inv
-      (fun total _ => total + depositSize32ETH) := by
-    intro index total h
-    simp only [Inv] at h ⊢
-    rw [h, Nat.succ_mul]
-  exact Compiler.Proofs.LoopSimulation.forEach_preserves_indexInvariant
-    hstep 0 count (by simp [Inv])
-
-theorem loop_count_le_maxDepositsPerRequest
-    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (h : actualDepositsCount cfg inp ≤ maxDepositsCount cfg inp) :
-    actualDepositsCount cfg inp ≤ inp.maxDepositsPerBlock :=
-  le_trans h (min_le_left _ _)
-
-/-- Bridge from the typed Verity transaction program to the canonical abstract
-P-DEPOSIT-1 theorem.  The premise pins the execution outcome to the same
-source-shaped branch; commit conservation and revert rollback are then exactly
-the two conjuncts of the canonical theorem. -/
-theorem deposit_tx_refines_abstract {State : Type}
-    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
-    (hOutcome : AbstractOutcome (depositProgram cfg inp before) (run cfg inp)) :
-    (run cfg inp).pulled = (run cfg inp).pushed ∧
-      ((run cfg inp).reverts = true →
-        (transactionObservation (depositProgram cfg inp before) after attempts trace).committedState = before ∧
-        (transactionObservation (depositProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] ∧
-        (transactionObservation (depositProgram cfg inp before) after attempts trace).committedTrace.logs = []) := by
-  have _ := hOutcome
-  simpa [transactionObservation, depositProgram] using
-    source_deposit_conserves_and_rolls_back cfg inp before after attempts trace
-
-/-- Snapshot rollback restores the entire transaction state and commits no ETH
-movement.  This is the exact whole-transaction property of the abstract
-observation selected by the executable Verity program. -/
-theorem deposit_rollback_restores_state {State : Type}
-    (cfg : SourceDepositConfig) (inp : SourceDepositInput) (before after : State)
-    (attempts : List CallAttempt) (trace : CommitTrace)
-    (hRevert : (depositProgram cfg inp before).sourceOutcome.reverts = true) :
-    (transactionObservation (depositProgram cfg inp before) after attempts trace).committedState = before ∧
-      (transactionObservation (depositProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] := by
-  have hRollback := reverting_outcome_rolls_back before after attempts trace hRevert
-  simpa [transactionObservation, depositProgram] using
-    And.intro hRollback.1 hRollback.2.1
-
-/-- Verity's `CallProgramRollback` theorem restores the exact external-world
-snapshot when every dynamically observed low-level call rolls back. -/
-theorem deposit_call_world_rollback
-    (program : DepositProgram State) (adversary : AdversaryModel) (state : CallState)
-    (h : ∀ entry ∈ ObservedCalls program.calls adversary state,
-      RollsBack adversary entry) :
-    (denote program.calls adversary state).2.world = state.world := by
-  exact denoteCallProgram_all_revert_preserves_world program.calls adversary state h
+def openComponents : List String :=
+  [ "OPEN allocation: module capacity/summary calls, type-2 total stake, MinFirst.allocate, module-index lookup, zero-module branch, and all arithmetic/array bounds"
+  , "OPEN module ABI: IStakingModule(moduleAddress).obtainDepositData and its two returned memory byte arrays/revert propagation"
+  , "OPEN router suffix: max-deposit arithmetic, returned-array validation, exact timestamp/block-number low-128-bit write, StakingRouterETHDeposited log, and zero-key return"
+  , "OPEN Lido authorization/gate: canDeposit, locator->stakingRouter caller equality, nonzero amount, seed counter/log, and nested payable receiveDepositableEther"
+  , "OPEN Lido spend: buffered allocation, withdrawalQueue bunker/unfinalized calls, reserves, packed buffered/post-report and next-report/nonce writes, accountingOracle frame call, and all logs"
+  , "OPEN beacon memory/calldata: module-returned memory slicing, free-memory allocation, exact per-validator 420-byte ABI payload, and immutable DEPOSIT_CONTRACT call"
+  , "OPEN deposit-data-root: per-validator SHA-256 composition from that validator's pubkey/signature, withdrawal credentials, and 32 ETH amount"
+  , "OPEN rollback/transaction proof: malformed-ABI snapshot equality, propagating module/Lido/queue/oracle/beacon failures, full nested-loop execution, conservation, and whole-world rollback"
+  , "OPEN multi-contract execution: storage namespaces are separated, but the checked prefix does not execute Lido, withdrawal queue, or accounting oracle bodies"
+  ]
 
 end LidoSRv3.Audit.Verity.DepositRollback
