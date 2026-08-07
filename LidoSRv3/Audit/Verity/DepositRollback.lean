@@ -8,10 +8,10 @@ import Verity.Core.Model.DenoteExternalCalls
 
 Pinned source: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
-This artifact deliberately does **not** claim an end-to-end deposit model.  The
-current Verity `CompilationModel` is single-contract (`AllocationExtraction`
-assigns contract id zero), and it has no faithful primitive for composing the
-router, Lido, withdrawal queue, oracle, module-returned dynamic byte arrays,
+This artifact deliberately does **not** claim an end-to-end deposit model.  It
+uses Verity's official contract-separated storage identities for the router,
+Lido, withdrawal queue, and accounting oracle, but has no faithful primitive
+for composing the router, Lido, withdrawal queue, oracle, module-returned dynamic byte arrays,
 and DepositContract into one reverting transaction.  The checked FunctionSpec
 therefore ends at the first unavailable component: the allocation helper.
 
@@ -35,6 +35,14 @@ namespace LidoSRv3.Audit.Verity.DepositRollback
 open Compiler
 open Compiler.CompilationModel
 open Verity.Core.Model.AllocationExtraction
+
+/-! Stable positive identities for the four source contracts whose storage
+worlds participate in the deposit transaction. These are deliberately distinct;
+contract id zero is Verity's legacy unqualified storage world. -/
+def stakingRouterNamespace : Nat := 1
+def lidoNamespace : Nat := 2
+def withdrawalQueueNamespace : Nat := 3
+def accountingOracleNamespace : Nat := 4
 
 def routerStateSlot : Nat :=
   0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000
@@ -109,6 +117,7 @@ def checkedPrefix : FunctionSpec :=
 
 def spec : CompilationModel :=
   { name := "PDeposit1CheckedPrefix"
+    contractId := stakingRouterNamespace
     fields := canonicalRouterFields
     immutables :=
       [ { name := "LIDO", ty := .address, init := .constructorArg 0 }
@@ -131,6 +140,35 @@ def spec : CompilationModel :=
           ] }
     functions := [checkedPrefix] }
 
+/-! The remaining source participants are explicit Verity contract models even
+though their bodies remain outside the checked prefix.  Their distinct positive
+`contractId`s select the official contract-separated storage worlds introduced
+by `verity@54f1e002`. -/
+def lidoSpec : CompilationModel :=
+  { name := "Lido"
+    contractId := lidoNamespace
+    fields := []
+    constructor := none
+    functions := [] }
+
+def withdrawalQueueSpec : CompilationModel :=
+  { name := "WithdrawalQueue"
+    contractId := withdrawalQueueNamespace
+    fields := []
+    constructor := none
+    functions := [] }
+
+def accountingOracleSpec : CompilationModel :=
+  { name := "AccountingOracle"
+    contractId := accountingOracleNamespace
+    fields := []
+    constructor := none
+    functions := [] }
+
+def officialSeparatedNamespaces : List Nat :=
+  [spec.contractId, lidoSpec.contractId, withdrawalQueueSpec.contractId,
+    accountingOracleSpec.contractId]
+
 def checkedPrefixSelector : Nat := 0x5d303519
 
 theorem checked_prefix_is_actual_function_spec : spec.functions = [checkedPrefix] := rfl
@@ -143,9 +181,9 @@ theorem checked_prefix_compiles :
 prefix.  It is not obtained by aliasing `checkedPrefix` to a second name. -/
 def sourceDerivedExpectedFootprint :
     List (Compiler.Proofs.Storage.ContractId × Nat × AllocKind) :=
-  [ (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d002, .read)
-  , (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000, .read)
-  , (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d004, .read)
+  [ (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d002, .read)
+  , (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000, .read)
+  , (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d004, .read)
   ]
 
 def extractedFootprint :
@@ -180,7 +218,7 @@ def openComponents : List String :=
   , "OPEN beacon memory/calldata: module-returned memory slicing, free-memory allocation, exact per-validator 420-byte ABI payload, and immutable DEPOSIT_CONTRACT call"
   , "OPEN deposit-data-root: per-validator SHA-256 composition from that validator's pubkey/signature, withdrawal credentials, and 32 ETH amount"
   , "OPEN rollback/transaction proof: malformed-ABI snapshot equality, propagating module/Lido/queue/oracle/beacon failures, full nested-loop execution, conservation, and whole-world rollback"
-  , "OPEN multi-contract allocation extraction: Verity AllocationExtraction currently assigns contract id zero"
+  , "OPEN multi-contract execution: storage namespaces are separated, but the checked prefix does not execute Lido, withdrawal queue, or accounting oracle bodies"
   ]
 
 end LidoSRv3.Audit.Verity.DepositRollback

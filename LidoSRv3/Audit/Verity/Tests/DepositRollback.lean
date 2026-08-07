@@ -9,6 +9,11 @@ open LidoSRv3.Audit.Verity.DepositRollback
 #guard checkedPrefixSelector == 0x5d303519
 #guard sourceDerivedExpectedFootprint.length == 3
 #guard openComponents.length == 9
+#guard officialSeparatedNamespaces == [1, 2, 3, 4]
+#guard spec.contractId == stakingRouterNamespace
+#guard lidoSpec.contractId == lidoNamespace
+#guard withdrawalQueueSpec.contractId == withdrawalQueueNamespace
+#guard accountingOracleSpec.contractId == accountingOracleNamespace
 
 def bodyUsesPinnedSelectorAndAbiChecks : Bool :=
   let selectors := checkedPrefix.body.filterMap fun
@@ -42,13 +47,41 @@ def bodyUsesImmutableCallTargets : Bool :=
 def independentlyPinnedFootprint :
     List (Compiler.Proofs.Storage.ContractId × Nat ×
       Verity.Core.Model.AllocationExtraction.AllocKind) :=
-  [ (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d002,
+  [ (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d002,
       Verity.Core.Model.AllocationExtraction.AllocKind.read)
-  , (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000,
+  , (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d000,
       Verity.Core.Model.AllocationExtraction.AllocKind.read)
-  , (0, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d004,
+  , (stakingRouterNamespace, 0x5648d366b9f342bdcc64be95cdcf5f05da808509be70eaa548a8795901d5d004,
       Verity.Core.Model.AllocationExtraction.AllocKind.read) ]
 #guard extractedFootprint == independentlyPinnedFootprint
+
+def namespacesArePairwiseSeparated : Bool :=
+  stakingRouterNamespace != lidoNamespace &&
+  stakingRouterNamespace != withdrawalQueueNamespace &&
+  stakingRouterNamespace != accountingOracleNamespace &&
+  lidoNamespace != withdrawalQueueNamespace &&
+  lidoNamespace != accountingOracleNamespace &&
+  withdrawalQueueNamespace != accountingOracleNamespace
+#guard namespacesArePairwiseSeparated
+
+theorem stakingRouterWriteIsInvisibleToOtherDepositContracts
+    (state : Verity.ContractState) (slot : Nat) (value : Verity.Uint256) :
+    (state.writeContractSlot spec.contractId slot value).readContractSlot
+        lidoSpec.contractId slot = state.readContractSlot lidoSpec.contractId slot ∧
+    (state.writeContractSlot spec.contractId slot value).readContractSlot
+        withdrawalQueueSpec.contractId slot =
+          state.readContractSlot withdrawalQueueSpec.contractId slot ∧
+    (state.writeContractSlot spec.contractId slot value).readContractSlot
+        accountingOracleSpec.contractId slot =
+          state.readContractSlot accountingOracleSpec.contractId slot := by
+  constructor
+  · apply Verity.ContractState.readContractSlot_writeContractSlot_other_contract
+    decide
+  constructor
+  · apply Verity.ContractState.readContractSlot_writeContractSlot_other_contract
+    decide
+  · apply Verity.ContractState.readContractSlot_writeContractSlot_other_contract
+    decide
 
 def wrongStatusShiftMutantRejected : Bool := moduleConfigStatusShift != 240
 #guard wrongStatusShiftMutantRejected
