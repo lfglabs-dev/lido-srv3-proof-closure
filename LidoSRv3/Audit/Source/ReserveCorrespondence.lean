@@ -1,9 +1,12 @@
 import LidoSRv3.Audit.Arithmetic
 import Verity.Core
+import Verity.EVM.Uint256
+import Verity.Macro
 
 namespace LidoSRv3.Audit.SolidityReserve
 
 open Verity
+open Verity.EVM.Uint256
 open Verity.Stdlib.Math
 
 /-!
@@ -48,6 +51,8 @@ structure Allocation where
   deriving DecidableEq, Repr
 
 def minWord (a b : Word) : Word := if a ≤ b then a else b
+
+private def min (a b : Word) : Word := minWord a b
 
 def getBufferedEtherAllocation (s : ReserveState) : Option Allocation := do
   let depositsReserve := minWord s.buffered s.storedDepositsReserve
@@ -98,27 +103,52 @@ def effectiveWithdrawalsReserve (s : ReserveState) : Word :=
 
 /- Concrete Verity storage projection. These are model-local slots, not a claim
 about the proxy's deployed keccak-derived storage positions. -/
-def bufferedSlot : Nat := 0
-def storedDepositsReserveSlot : Nat := 1
-def unfinalizedStETHSlot : Nat := 2
-def depositedPostReportSlot : Nat := 3
-def depositedNextReportAdjustedSlot : Nat := 4
+verity_contract ReserveContract where
+  storage
+    buffered : Uint256 := slot 0
+    storedDepositsReserve : Uint256 := slot 1
+    unfinalizedStETH : Uint256 := slot 2
+    depositedPostReport : Uint256 := slot 3
+    depositedNextReportAdjusted : Uint256 := slot 4
+
+  function withdraw (amount : Uint256) : Unit := do
+    let currentBuffered ← getStorage buffered
+    let currentStoredDepositsReserve ← getStorage storedDepositsReserve
+    let currentUnfinalizedStETH ← getStorage unfinalizedStETH
+    let currentDepositedPostReport ← getStorage depositedPostReport
+    let currentDepositedNextReportAdjusted ← getStorage depositedNextReportAdjusted
+
+    let depositsReserve := min currentBuffered currentStoredDepositsReserve
+    let remaining ← requireSomeUint
+      (safeSub currentBuffered depositsReserve) "ALLOCATION_ARITHMETIC"
+    let withdrawalsReserve := min remaining currentUnfinalizedStETH
+    let unreserved ← requireSomeUint
+      (safeSub remaining withdrawalsReserve) "ALLOCATION_ARITHMETIC"
+    let depositable ← requireSomeUint
+      (safeAdd depositsReserve unreserved) "DEPOSITABLE_OVERFLOW"
+    require (amount ≤ depositable) "NOT_ENOUGH_ETHER"
+
+    let nextDepositedPostReport ← requireSomeUint
+      (safeAdd currentDepositedPostReport amount) "DEPOSITED_POST_REPORT_OVERFLOW"
+    let nextBuffered ← requireSomeUint
+      (safeSub currentBuffered amount) "BUFFER_UNDERFLOW"
+    let nextDepositedNextReportAdjusted ← requireSomeUint
+      (safeAdd currentDepositedNextReportAdjusted amount) "DEPOSITED_NEXT_REPORT_OVERFLOW"
+    let nextStoredDepositsReserve :=
+      ite (currentStoredDepositsReserve > amount)
+        (sub currentStoredDepositsReserve amount) 0
+
+    setStorage buffered nextBuffered
+    setStorage storedDepositsReserve nextStoredDepositsReserve
+    setStorage depositedPostReport nextDepositedPostReport
+    setStorage depositedNextReportAdjusted nextDepositedNextReportAdjusted
 
 def decode (s : ContractState) : ReserveState :=
-  { buffered := s.storage bufferedSlot
-    storedDepositsReserve := s.storage storedDepositsReserveSlot
-    unfinalizedStETH := s.storage unfinalizedStETHSlot
-    depositedPostReport := s.storage depositedPostReportSlot
-    depositedNextReportAdjusted := s.storage depositedNextReportAdjustedSlot }
-
-def encode (base : ContractState) (r : ReserveState) : ContractState :=
-  { base with storage := fun slot =>
-      if slot = bufferedSlot then r.buffered
-      else if slot = storedDepositsReserveSlot then r.storedDepositsReserve
-      else if slot = unfinalizedStETHSlot then r.unfinalizedStETH
-      else if slot = depositedPostReportSlot then r.depositedPostReport
-      else if slot = depositedNextReportAdjustedSlot then r.depositedNextReportAdjusted
-      else base.storage slot }
+  { buffered := s.storage ReserveContract.buffered.slot
+    storedDepositsReserve := s.storage ReserveContract.storedDepositsReserve.slot
+    unfinalizedStETH := s.storage ReserveContract.unfinalizedStETH.slot
+    depositedPostReport := s.storage ReserveContract.depositedPostReport.slot
+    depositedNextReportAdjusted := s.storage ReserveContract.depositedNextReportAdjusted.slot }
 
 /-! ## Independent pinned-source execution
 
@@ -210,11 +240,17 @@ theorem source_withdraw_matches_model (inputs : WithdrawInputs)
   simp [sourceWithdrawDepositableEther, modelWithdrawDepositableEther,
     source_spend_matches_model]
 
-/-- Actual pinned-Verity execution. `Contract.run` supplies whole-call rollback. -/
-def verityWithdraw (inputs : WithdrawInputs) (amount : Word) : Contract Unit := fun state =>
-  match sourceWithdrawDepositableEther inputs (decode state) amount with
-  | .reverted reason => .revert reason state
-  | .committed after => .success () (encode state after)
+namespace ReserveContract
+
+/-- The wrapper guards live outside the pinned reserve-spend spans. Once they
+pass, execution delegates to the typed `verity_contract` entrypoint. -/
+def withdrawWithGuards (inputs : WithdrawInputs) (amount : Word) : Contract Unit := do
+  require inputs.canDeposit "CAN_NOT_DEPOSIT"
+  require inputs.authorizedRouter "APP_AUTH_FAILED"
+  require (amount != 0) "ZERO_AMOUNT"
+  withdraw amount
+
+end ReserveContract
 
 inductive TxOutcome where | committed | reverted
   deriving DecidableEq, Repr
@@ -237,29 +273,152 @@ def observeVerity (before : ContractState) (result : ContractResult Unit) : Rese
   | .revert _ rollback => ⟨.reverted, decode before, decode rollback⟩
   | .success _ after => ⟨.committed, decode before, decode after⟩
 
-@[simp] theorem decode_encode (base : ContractState) (r : ReserveState) :
-    decode (encode base r) = r := by
-  simp [decode, encode, bufferedSlot, storedDepositsReserveSlot,
-    unfinalizedStETHSlot, depositedPostReportSlot, depositedNextReportAdjustedSlot]
-
 /-- VERITY_TX closure: executable `Contract.run` simulates the abstract spec,
 including the rollback observable on every checked-arithmetic/source revert. -/
 theorem verity_execution_simulates_spec (state : ContractState) (amount : Word) :
-    ∀ inputs, observeVerity state ((verityWithdraw inputs amount).run state) =
+    ∀ inputs, observeVerity state ((ReserveContract.withdrawWithGuards inputs amount).run state) =
       specTx inputs (decode state) amount := by
-  intro inputs
-  simp only [verityWithdraw, Contract.run]
-  rw [source_withdraw_matches_model]
-  cases h : modelWithdrawDepositableEther inputs (decode state) amount <;>
-    simp [h, observeVerity, specTx]
+  rintro ⟨canDeposit, authorizedRouter⟩
+  cases canDeposit <;> cases authorizedRouter <;> try rfl
+  by_cases hzero : amount = 0
+  · subst amount
+    rfl
+  · by_cases hdeposits :
+        (state.storage ReserveContract.buffered.slot).val ≤
+          (state.storage ReserveContract.storedDepositsReserve.slot).val
+    all_goals
+      let depositsReserve :=
+        minWord (state.storage ReserveContract.buffered.slot)
+          (state.storage ReserveContract.storedDepositsReserve.slot)
+      cases hremaining : safeSub (state.storage ReserveContract.buffered.slot) depositsReserve with
+    | none =>
+        simp [depositsReserve, minWord, hdeposits] at hremaining
+        simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+          observeVerity, specTx, modelWithdrawDepositableEther,
+          spendDepositableEther, getBufferedEtherAllocation, decode,
+          min, minWord, requireSomeUint, getStorage, setStorage,
+          ContractState.readSlot, ContractState.writeSlot, Verity.require,
+          Verity.bind, Bind.bind, Pure.pure, Contract.run,
+          hzero, hdeposits, depositsReserve, hremaining]
+    | some remaining =>
+        simp [depositsReserve, minWord, hdeposits] at hremaining
+        by_cases hwithdrawals : remaining.val ≤
+            (state.storage ReserveContract.unfinalizedStETH.slot).val
+        all_goals
+          let withdrawalsReserve :=
+            minWord remaining (state.storage ReserveContract.unfinalizedStETH.slot)
+          cases hunreserved : safeSub remaining withdrawalsReserve with
+        | none =>
+            simp [withdrawalsReserve, minWord, hwithdrawals] at hunreserved
+            simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+              observeVerity, specTx, modelWithdrawDepositableEther,
+              spendDepositableEther, getBufferedEtherAllocation, decode,
+              min, minWord, requireSomeUint, getStorage, setStorage,
+              ContractState.readSlot, ContractState.writeSlot, Verity.require,
+              Verity.bind, Bind.bind, Pure.pure, Contract.run,
+              hzero, hdeposits, hwithdrawals, depositsReserve,
+              withdrawalsReserve, hremaining, hunreserved]
+        | some unreserved =>
+            simp [withdrawalsReserve, minWord, hwithdrawals] at hunreserved
+            cases hdepositable : safeAdd depositsReserve unreserved with
+            | none =>
+                simp [depositsReserve, minWord, hdeposits] at hdepositable
+                simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+                  observeVerity, specTx, modelWithdrawDepositableEther,
+                  spendDepositableEther, getBufferedEtherAllocation,
+                  getDepositableEther, decode, min, minWord, requireSomeUint,
+                  getStorage, setStorage, ContractState.readSlot,
+                  ContractState.writeSlot, Verity.require, Verity.bind,
+                  Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+                  hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
+                  hunreserved, hdepositable]
+            | some depositable =>
+                simp [depositsReserve, minWord, hdeposits] at hdepositable
+                by_cases henough : amount.val ≤ depositable.val
+                · cases hpost : safeAdd
+                      (state.storage ReserveContract.depositedPostReport.slot) amount with
+                  | none =>
+                      simp [ReserveContract.withdrawWithGuards,
+                        ReserveContract.withdraw, observeVerity, specTx,
+                        modelWithdrawDepositableEther, spendDepositableEther,
+                        getBufferedEtherAllocation, getDepositableEther, decode,
+                        min, minWord, requireSomeUint, getStorage, setStorage,
+                        ContractState.readSlot, ContractState.writeSlot,
+                        Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                        Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+                        withdrawalsReserve, hremaining, hunreserved,
+                        hdepositable, henough, hpost]
+                  | some depositedPostReport =>
+                      cases hbuffered : safeSub
+                          (state.storage ReserveContract.buffered.slot) amount with
+                      | none =>
+                          simp [ReserveContract.withdrawWithGuards,
+                            ReserveContract.withdraw, observeVerity, specTx,
+                            modelWithdrawDepositableEther, spendDepositableEther,
+                            getBufferedEtherAllocation, getDepositableEther, decode,
+                            min, minWord, requireSomeUint, getStorage, setStorage,
+                            ContractState.readSlot, ContractState.writeSlot,
+                            Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                            Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+                            withdrawalsReserve, hremaining, hunreserved,
+                            hdepositable, henough, hpost, hbuffered]
+                      | some buffered =>
+                          cases hnext : safeAdd
+                              (state.storage ReserveContract.depositedNextReportAdjusted.slot)
+                              amount with
+                          | none =>
+                              simp [ReserveContract.withdrawWithGuards,
+                                ReserveContract.withdraw, observeVerity, specTx,
+                                modelWithdrawDepositableEther,
+                                spendDepositableEther, getBufferedEtherAllocation,
+                                getDepositableEther, decode, min, minWord,
+                                requireSomeUint, getStorage, setStorage,
+                                ContractState.readSlot, ContractState.writeSlot,
+                                Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                                Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+                                withdrawalsReserve, hremaining, hunreserved,
+                                hdepositable, henough, hpost, hbuffered, hnext]
+                          | some depositedNextReportAdjusted =>
+                              simp only [ReserveContract.buffered,
+                                ReserveContract.storedDepositsReserve,
+                                ReserveContract.unfinalizedStETH,
+                                ReserveContract.depositedPostReport,
+                                ReserveContract.depositedNextReportAdjusted] at hdeposits hwithdrawals hremaining hunreserved hdepositable hpost hbuffered hnext
+                              simp [ReserveContract.withdrawWithGuards,
+                                ReserveContract.withdraw, observeVerity, specTx,
+                                ReserveContract.buffered,
+                                ReserveContract.storedDepositsReserve,
+                                ReserveContract.unfinalizedStETH,
+                                ReserveContract.depositedPostReport,
+                                ReserveContract.depositedNextReportAdjusted,
+                                modelWithdrawDepositableEther,
+                                spendDepositableEther, getBufferedEtherAllocation,
+                                getDepositableEther, decode, min, minWord,
+                                requireSomeUint, getStorage, setStorage,
+                                ContractState.readSlot, ContractState.writeSlot,
+                                Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                                Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+                                withdrawalsReserve, hremaining, hunreserved,
+                                hdepositable, henough, hpost, hbuffered, hnext]
+                              rfl
+                · simp [ReserveContract.withdrawWithGuards,
+                    ReserveContract.withdraw, observeVerity, specTx,
+                    modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode,
+                    min, minWord, requireSomeUint, getStorage, setStorage,
+                    ContractState.readSlot, ContractState.writeSlot,
+                    Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                    Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+                    withdrawalsReserve, hremaining, hunreserved,
+                    hdepositable, henough]
 
 theorem verity_revert_rolls_back (inputs : WithdrawInputs) (state : ContractState) (amount : Word)
     (reason : String) (rollback : ContractState)
-    (h : (verityWithdraw inputs amount).run state = .revert reason rollback) :
+    (h : (ReserveContract.withdrawWithGuards inputs amount).run state = .revert reason rollback) :
     rollback = state := by
-  simp only [verityWithdraw, Contract.run] at h
-  cases hs : sourceWithdrawDepositableEther inputs (decode state) amount <;>
-    simp [hs] at h
+  unfold Contract.run at h
+  cases hc : ReserveContract.withdrawWithGuards inputs amount state <;>
+    simp [hc] at h
   exact h.2.symm
 
 /- Explicit partition/spend invariant: the pre-state allocation is retained as
@@ -314,24 +473,21 @@ theorem committed_preserves_withdrawal_reserve
 /-- Observable non-interference at the actual Verity boundary. -/
 theorem verity_commit_preserves_withdrawal_reserve
     (inputs : WithdrawInputs) (state after : ContractState) (amount : Word)
-    (h : (verityWithdraw inputs amount).run state = .success () after) :
+    (h : (ReserveContract.withdrawWithGuards inputs amount).run state = .success () after) :
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount := by
-  have hBody : verityWithdraw inputs amount state = .success () after :=
-    Contract.eq_of_run_success h
-  unfold verityWithdraw at hBody
-  cases hs : sourceWithdrawDepositableEther inputs (decode state) amount with
-  | reverted reason => simp [hs] at hBody
+  have hsim := verity_execution_simulates_spec state amount inputs
+  rw [h] at hsim
+  cases hm : modelWithdrawDepositableEther inputs (decode state) amount with
+  | reverted reason => simp [observeVerity, specTx, hm] at hsim
   | committed reserveAfter =>
-      simp [hs] at hBody
-      obtain rfl := hBody
-      have hm : modelWithdrawDepositableEther inputs (decode state) amount =
-          .committed reserveAfter := by
-        rw [← source_withdraw_matches_model]
-        exact hs
-      unfold modelWithdrawDepositableEther at hm
-      split at hm <;> try contradiction
-      split at hm <;> try contradiction
-      split at hm <;> try contradiction
-      exact committed_preserves_withdrawal_reserve _ _ amount hm
+      simp [observeVerity, specTx, hm] at hsim
+      have hspend : spendDepositableEther (decode state) amount = .committed reserveAfter := by
+        unfold modelWithdrawDepositableEther at hm
+        split at hm <;> try contradiction
+        split at hm <;> try contradiction
+        split at hm <;> try contradiction
+        exact hm
+      rw [hsim]
+      exact committed_preserves_withdrawal_reserve _ _ amount hspend
 
 end LidoSRv3.Audit.SolidityReserve

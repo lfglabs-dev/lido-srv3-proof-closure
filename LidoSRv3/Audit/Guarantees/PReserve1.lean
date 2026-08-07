@@ -29,10 +29,10 @@ or external-call semantics is claimed.
 -/
 theorem verity_tx_simulates_reserve_spec (inputs : WithdrawInputs)
     (state : ContractState) (amount : Word) :
-    observeVerity state ((verityWithdraw inputs amount).run state) =
+    observeVerity state ((ReserveContract.withdrawWithGuards inputs amount).run state) =
       specTx inputs (decode state) amount ∧
     ∀ reason rollback,
-      (verityWithdraw inputs amount).run state = .revert reason rollback →
+      (ReserveContract.withdrawWithGuards inputs amount).run state = .revert reason rollback →
       rollback = state :=
   ⟨verity_execution_simulates_spec state amount inputs,
     fun reason rollback h =>
@@ -42,7 +42,7 @@ theorem verity_tx_simulates_reserve_spec (inputs : WithdrawInputs)
 is observationally unchanged. -/
 theorem verity_tx_preserves_withdrawal_reserve
     (inputs : WithdrawInputs) (state after : ContractState) (amount : Word)
-    (h : (verityWithdraw inputs amount).run state = .success () after) :
+    (h : (ReserveContract.withdrawWithGuards inputs amount).run state = .success () after) :
     withdrawalPartitionSpendInvariant (decode state) (decode after) amount :=
   verity_commit_preserves_withdrawal_reserve inputs state after amount h
 
