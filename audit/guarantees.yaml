@@ -202,14 +202,14 @@
     {
       "id": "P-CONSOLIDATION-1.fee-refinement.tx",
       "parent_id": "P-CONSOLIDATION-1",
-      "catalogue_wording": "Concrete Verity transaction-plane evidence proves that consolidation debits exactly one fee per source/target public-key request, preserves the validator public-key mapping, and restores the registry snapshot on rollback; consolidation moves no ETH amount, while Yul, EVM, and production provenance remain open.",
-      "source_plane_scope": "consolidation fee, public-key mapping, and rollback only",
-      "theorem": "LidoSRv3.Audit.Verity.ConsolidationFee.consolidation_fee_tx_ok",
-      "theorem_planes": ["tx"],
-      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+      "catalogue_wording": "Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.",
+      "source_plane_scope": "WithdrawalVault consolidation request model only; gateway grouping, quota, proof validation, and refund are excluded",
+      "theorem": null,
+      "theorem_planes": [],
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
-      "next_gate": "Certify the pending transaction-plane evidence, then refine it through generated Yul/EVM semantics and independently verified production runtime provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee LidoSRv3.Audit.Verity.Tests.ConsolidationFee", "expected": "successful fee debit, public-key mapping preservation, insufficient-balance guard, and CallProgram snapshot rollback proofs with mutant-sensitive vectors"}
+      "next_gate": "Close the FunctionSpec-to-CallProgram/DenoteMemory/event-trace gaps listed in audit/P-CONSOLIDATION-1-VERITY-GAPS.md, then add transaction-frame rollback and source refinement.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee", "expected": "successful source-shaped FunctionSpec scaffold build; dynamic ABI, call/event trace, balance rollback, and source/tx adequacy remain OPEN"}
     },
     {
       "id": "P-SSZ-1.tx-execution-simulation",

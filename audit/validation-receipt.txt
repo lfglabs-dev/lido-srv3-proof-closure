@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: aec22029de400555aac191a438d824975fd00610
+validated-tree: b580f653c940ad06b6bdd5c1d58edb630e36d672
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,6 +13,40 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
+
+P-CONSOLIDATION-1 PR #46 final bounded repair (2026-08-06)
+----------------------------------------------------------
+
+- `lake build LidoSRv3.Audit.Verity.ConsolidationFee
+  LidoSRv3.Audit.Verity.Tests.ConsolidationFee`: exit 0. The regression covers
+  exact 48-byte key acceptance, malformed-length rejection, source-then-target
+  payload order, exact call kind/target/value/length, and pre-call entry guards
+  without claiming closure of the scaffold's unchecked obligations.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all
+  optimized metadata mutants rejected.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- Focused scan found no `sorry`, `admit`, `axiom`, or `unsafe` token in the
+  consolidation scaffold; `git diff --check`: exit 0.
+- The FunctionSpec now includes nonzero constructor guards for the gateway and
+  consolidation-request immutables and the final `preservesEthBalance`
+  Panic(0x01)-shaped assertion from the pinned WithdrawalVault path.
+- Caller and nonempty/equal-array guards precede the fee STATICCALL. Fee-call
+  and fee-result failures have fee-only traces. After a successful fee read and
+  exact-value check, each pair is decoded and length-checked inside the request
+  loop; an invalid pair has no request CALL, while prior valid pairs remain in
+  source order. The FunctionSpec and handwritten trace now match this ordering.
+- The P-CONSOLIDATION-1 source map now pins
+  `WithdrawalVaultEIP7685._addConsolidationRequests` at lines 56--73 of the
+  exact `af095e48` source file used by the scaffold.
+- The dynamic ABI local obligation is `unchecked`; the fee-refinement child row
+  has no registered theorem and every substantive plane is OPEN.
+- The requested call/event/memory adequacy mutants were not represented as
+  proof evidence.  Verity lacks the FunctionSpec-to-CallProgram/DenoteMemory
+  and event-trace connections needed to make those mutants source-sensitive.
+  The exact framework gaps are in `audit/P-CONSOLIDATION-1-VERITY-GAPS.md`.
+- Rollback of earlier successful mutable calls/logs after a later failure and
+  rollback induced by the final balance assertion remain explicitly OPEN.
 
 P-SSZ-1 structural gate receipt (committed tree):
 - `lake build`: exit 0.
