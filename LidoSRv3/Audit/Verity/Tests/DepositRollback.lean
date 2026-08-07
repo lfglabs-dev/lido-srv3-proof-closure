@@ -8,7 +8,7 @@ open LidoSRv3.Audit.Verity.DepositRollback
 #guard moduleConfigWCTypeShift == 232
 #guard checkedPrefixSelector == 0x5d303519
 #guard sourceDerivedExpectedFootprint.length == 3
-#guard openComponents.length == 9
+#guard openComponents.length == 10
 #guard officialSeparatedNamespaces == [1, 2, 3, 4]
 #guard spec.contractId == stakingRouterNamespace
 #guard lidoSpec.contractId == lidoNamespace
@@ -25,6 +25,13 @@ def bodyUsesPinnedSelectorAndAbiChecks : Bool :=
   selectors == [0x472c1776, 0xf2cfa87d] &&
     shortReturnReasons == ["LocatorShortReturndata", "LidoShortReturndata"]
 #guard bodyUsesPinnedSelectorAndAbiChecks
+
+def bodyStartsWithDepositRoleGuard : Bool :=
+  match checkedPrefix.body with
+  | .require (.eq (.param "callerHasDepositRole") (.literal 1))
+      "AccessControl: missing DEPOSIT_ROLE" :: _ => true
+  | _ => false
+#guard bodyStartsWithDepositRoleGuard
 
 def bodyUsesPinnedStatusShift : Bool :=
   checkedPrefix.body.any fun
@@ -87,9 +94,7 @@ def wrongStatusShiftMutantRejected : Bool := moduleConfigStatusShift != 240
 #guard wrongStatusShiftMutantRejected
 
 def literalTargetMutantRejected : Bool :=
-  let immutableNames := spec.immutables.map (fun immutable => immutable.name)
-  immutableNames.contains "LIDO" && immutableNames.contains "DEPOSIT_CONTRACT" &&
-    immutableNames.contains "LIDO_LOCATOR"
+  bodyUsesImmutableCallTargets
 #guard literalTargetMutantRejected
 
 end LidoSRv3.Audit.Verity.Tests.DepositRollback
