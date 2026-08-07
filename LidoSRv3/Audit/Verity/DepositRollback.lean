@@ -17,9 +17,6 @@ therefore ends at the first unavailable component: the allocation helper.
 
 The prefix below checks exactly these source operations, in order:
 
-* the leading `onlyRole(DEPOSIT_ROLE)` guard, represented by the same
-  `callerHasDepositRole` interface fact used by the pinned source
-  correspondence (derivation from AccessControl storage remains OPEN);
 * locator-derived DSM lookup and caller equality (StakingRouter 942--944,
   1173--1179);
 * EnumerableSet membership used by `_requireModuleIdExists`;
@@ -69,8 +66,7 @@ def canonicalRouterFields : List Field :=
 def checkedPrefix : FunctionSpec :=
   { name := "depositCheckedPrefix"
     params :=
-      [ { name := "callerHasDepositRole", ty := .bool }
-      , { name := "stakingModuleId", ty := .uint256 }
+      [ { name := "stakingModuleId", ty := .uint256 }
       , { name := "depositCalldata", ty := .bytes }
       ]
     returnType := none
@@ -79,17 +75,10 @@ def checkedPrefix : FunctionSpec :=
       [ { name := "OPEN_allocation_and_suffix"
           obligation := "OPEN: `_getModuleDepositAllocation` and every later source operation are outside this checked prefix; see openComponents."
           proofStatus := .unchecked }
-      , { name := "OPEN_deposit_role_storage_derivation"
-          obligation := "OPEN: callerHasDepositRole is the AccessControlEnumerable interface fact used by Source.DepositCorrespondence; this FunctionSpec does not derive it from nested AccessControl storage."
-          proofStatus := .unchecked }
       ]
     body :=
-      [ -- StakingRouter.deposit line 942 onlyRole(DEPOSIT_ROLE) modifier.
-        .require (.eq (.param "callerHasDepositRole") (.literal 1))
-          "AccessControl: missing DEPOSIT_ROLE"
-
-        -- LIDO_LOCATOR.depositSecurityModule(); returndata is forwarded on failure.
-      , .mstore (.literal 0) (.shl (.literal 224) (.literal depositSecurityModuleSelector))
+      [ -- LIDO_LOCATOR.depositSecurityModule(); returndata is forwarded on failure.
+        .mstore (.literal 0) (.shl (.literal 224) (.literal depositSecurityModuleSelector))
       , .letVar "locatorOk"
           (.staticcall (.literal Verity.Core.MAX_UINT256) (.immutable "LIDO_LOCATOR")
             (.literal 0) (.literal 4) (.literal 0) (.literal 32))
@@ -221,8 +210,7 @@ theorem malformed_actual_function_spec_rejects :
   native_decide
 
 def openComponents : List String :=
-  [ "OPEN authorization storage derivation: callerHasDepositRole models the leading modifier as an interface fact but is not derived from nested AccessControlEnumerable storage"
-  , "OPEN allocation: module capacity/summary calls, type-2 total stake, MinFirst.allocate, module-index lookup, zero-module branch, and all arithmetic/array bounds"
+  [ "OPEN allocation: module capacity/summary calls, type-2 total stake, MinFirst.allocate, module-index lookup, zero-module branch, and all arithmetic/array bounds"
   , "OPEN module ABI: IStakingModule(moduleAddress).obtainDepositData and its two returned memory byte arrays/revert propagation"
   , "OPEN router suffix: max-deposit arithmetic, returned-array validation, exact timestamp/block-number low-128-bit write, StakingRouterETHDeposited log, and zero-key return"
   , "OPEN Lido authorization/gate: canDeposit, locator->stakingRouter caller equality, nonzero amount, seed counter/log, and nested payable receiveDepositableEther"

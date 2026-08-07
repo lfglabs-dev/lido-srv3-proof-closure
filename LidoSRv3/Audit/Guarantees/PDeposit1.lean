@@ -41,13 +41,9 @@ span contains no `try`/`catch` and no failure-swallowing low-level call, and a
 failing `assert` is a Solidity 0.8 `Panic(0x01)` -- so a reverting outcome maps
 onto the abstract-transaction model's `.reverted` result, and
 `revert_restores_state_value_and_logs` restores the pre-state and erases all
-committed ETH moves and logs.  That includes the `onlyRole(DEPOSIT_ROLE)`
-modifier at `StakingRouter.sol` line 942, which is modelled as the *first* guard:
-`SolidityDeposit.unauthorized_reverts` shows an unauthorized caller reverts
-before the line 946 module-status check, and
-`SolidityDeposit.committing_implies_authorized` shows neither committing branch
-is reachable without the role.  The branch correspondence therefore covers every
-source execution rather than silently assuming an authorized caller.
+committed ETH moves and logs. Locator-derived DSM authentication at lines 943
+and 1173--1179 remains an interface fact outside this data-only model, so this
+is not a claim about every possible caller.
 
 Caveats, stated rather than hidden:
 
