@@ -107,7 +107,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
      "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
-     "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open"},
+     "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, typed-storage Contract.run commit for accepted accounting prefixes, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; external calls and later guards/Yul/EVM/runtime/crypto/E2E remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
      "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",

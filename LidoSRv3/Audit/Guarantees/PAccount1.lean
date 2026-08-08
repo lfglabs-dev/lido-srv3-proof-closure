@@ -41,4 +41,23 @@ theorem source_to_verityTx
   LidoSRv3.Audit.SolidityAccounting.source_to_verityTx
     fullReportSucceeds i sharesToMintAsFees hSuccess accepted h
 
+/-- SOURCE -> actual typed-storage `verity_contract` execution for the
+accounting-relevant prefix. Full-report success and external calls remain
+outside this narrower executable theorem. -/
+theorem verity_contract_run_commits_accepted
+    (state : Verity.ContractState)
+    (i : LidoSRv3.Audit.SolidityAccounting.ReportInput)
+    (accepted : LidoSRv3.Audit.SolidityAccounting.AcceptedReport)
+    (h : LidoSRv3.Audit.SolidityAccounting.accept i = some accepted) :
+    ∃ after,
+      (LidoSRv3.Audit.SolidityAccounting.AccountingContract.submitReportBalances i).run state =
+        .success accepted after ∧
+      after.storage
+          LidoSRv3.Audit.SolidityAccounting.AccountingContract.lastTotalBalanceGwei.slot =
+        Verity.Core.Uint256.ofNat accepted.totalBalanceGwei ∧
+      after.storage
+          LidoSRv3.Audit.SolidityAccounting.AccountingContract.lastModuleCount.slot =
+        Verity.Core.Uint256.ofNat accepted.moduleIds.length :=
+  LidoSRv3.Audit.SolidityAccounting.accounting_run_commits_accepted state i accepted h
+
 end LidoSRv3.Audit.Guarantees.PAccount1
