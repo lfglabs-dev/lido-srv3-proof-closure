@@ -192,27 +192,56 @@ def allocationReceiptState : ContractState :=
       else if storageSlot = AllocationContract.moduleEnabled.slot then [1, 0]
       else [] }
 
-def allocationReceipt : Bool :=
+def conservationReceipt : Bool :=
   match (AllocationContract.allocate 60).run allocationReceiptState with
   | .success total after =>
+      let finalSum := ((after.storageArray AllocationContract.stakeRatios.slot).map
+        (fun word => word.val)).sum
       total = 60 &&
-      after.storageArray AllocationContract.stakeRatios.slot = [60, 0] &&
-      -- Conservation: the allocation column increased by exactly `total`.
-      (60 + 0 = 0 + 0 + total.val) &&
-      -- Per-module effective capacities are respected.
-      (60 ≤ 100 && 0 ≤ 40) &&
-      -- The disabled second module is unchanged and receives no allocation.
-      (after.storageArray AllocationContract.stakeRatios.slot)[1]? = some 0
+      decide (finalSum = 0 + 0 + total.val) &&
+      -- Mutant: attributing one extra unit to the post-state is rejected.
+      !(decide (finalSum = 0 + 0 + total.val + 1))
   | .revert _ _ => false
 
-theorem run_conservation_capacity_disabled : allocationReceipt = true := by decide
+def capacityReceipt : Bool :=
+  match (AllocationContract.allocate 60).run allocationReceiptState with
+  | .success _ after =>
+      let allocations := after.storageArray AllocationContract.stakeRatios.slot
+      allocations[0]? = some 60 && allocations[1]? = some 0 &&
+      decide (60 ≤ min 100 100) && decide (0 ≤ min 40 40) &&
+      -- Mutant: the first allocation cannot be raised above its effective cap.
+      !(decide (101 ≤ min 100 100))
+  | .revert _ _ => false
 
-def conservationMutant : Bool := decide (55 + 0 + 55 = 0 + 0 + 50 + 59)
-def capacityMutant : Bool := decide (101 ≤ 100)
-def disabledModuleMutant : Bool := decide ((1 : Nat) = 0)
+def disabledExclusionReceipt : Bool :=
+  match (AllocationContract.allocate 60).run allocationReceiptState with
+  | .success _ after =>
+      let allocations := after.storageArray AllocationContract.stakeRatios.slot
+      allocations[1]? = some 0 &&
+      -- Mutant: crediting the disabled module is rejected by the observation.
+      !(allocations[1]? == some 1)
+  | .revert _ _ => false
 
-theorem conservation_mutant_rejected : conservationMutant = false := by decide
-theorem capacity_mutant_rejected : capacityMutant = false := by decide
-theorem disabled_module_mutant_rejected : disabledModuleMutant = false := by decide
+def abstractSourceBridgeReceipt : Bool :=
+  let modelRows : List MinFirstAllocation.Model.Bucket := [
+    { allocation := 0, capacity := 100 }]
+  let sourceRows : List MinFirstAllocation.Source.Row := [
+    { allocation := 0, capacity := 100 }]
+  match (AllocationContract.allocate 60).run allocationReceiptState with
+  | .success total after =>
+      MinFirstAllocation.Model.candidate? modelRows = some modelRows[0] &&
+      MinFirstAllocation.Source.candidate? sourceRows = some sourceRows[0] &&
+      MinFirstAllocation.Source.checkedAmount sourceRows 60 sourceRows[0] = some total &&
+      (after.storageArray AllocationContract.stakeRatios.slot)[0]? =
+        some (Verity.Core.Uint256.ofNat
+          (MinFirstAllocation.Model.amount modelRows 60 modelRows[0])) &&
+      -- Mutant: a source amount one unit below the executed result is rejected.
+      !(MinFirstAllocation.Source.checkedAmount sourceRows 59 sourceRows[0] == some total)
+  | .revert _ _ => false
+
+theorem run_conservation_mutant_sensitive : conservationReceipt = true := by decide
+theorem run_capacity_mutant_sensitive : capacityReceipt = true := by decide
+theorem run_disabled_exclusion_mutant_sensitive : disabledExclusionReceipt = true := by decide
+theorem run_abstract_source_bridge_mutant_sensitive : abstractSourceBridgeReceipt = true := by decide
 
 end LidoSRv3.Audit.SolidityMinFirst
