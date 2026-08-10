@@ -233,7 +233,7 @@ def main():
         lakefile_path.write_text(
             baseline_lakefile.replace(
                 '"https://github.com/lfglabs-dev/verity.git"@'
-                '"d2d4a18a4d7021adcd90d4b03e619affe506dd54"',
+                '"ef1685eafd268d1e7179357e36dee8a89283f3e8"',
                 f'"{verity["url"]}"@"{verity["rev"]}"',
             ),
             encoding="utf-8",

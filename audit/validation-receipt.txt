@@ -1,11 +1,30 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 70e876ccf0f4b3dde55f798afd807d53d37c12c8
+validated-tree: 415e95bb7b7d442b8eb3831df87e75730a2bae0d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+PR #51 exact-head Verity provenance repair (2026-08-10)
+--------------------------------------------------------
+
+- Live `lfglabs-dev/verity` main was resolved immediately before editing to
+  `ef1685eafd268d1e7179357e36dee8a89283f3e8`, six commits ahead of the prior
+  `4369b1dfbc42c65ceb76a668f748e9336f0d948f` pin.
+- The Lake request/resolution, canonical artifacts lock, executable audit
+  manifest, legacy source manifest, proof lockfile, and metadata constants all
+  carry that exact Verity commit.
+- `scripts/write_proof_report.sh` now obtains `verity_commit` from the resolved
+  Lake manifest, rejects unequal `rev`/`inputRev` or a non-exact SHA, and the
+  provenance regression asserts that an emitted report equals the manifest.
+- Complete-source remote `lake build`: exit 0; job
+  `e68b7143-294b-4118-8ea0-aefbe6071532`, node `old-agent`, source bundle
+  SHA-256 `0f2430d1c3e314a1618cf343cec2af79e57c5478c532083a94b382b11f66e320`,
+  1,336 jobs, exact Verity checkout `ef1685eafd268d1e7179357e36dee8a89283f3e8`.
+- `make check`, canonical metadata, optimized mutants, validation-receipt,
+  provenance, no-Python-evidence, generator equality, and diff gates: exit 0.
 
 The canonical authorities are `audit/source-map.yaml`, the generated audit
 views, and the executable `verity/targets/audit-manifest.json` consumer. The
