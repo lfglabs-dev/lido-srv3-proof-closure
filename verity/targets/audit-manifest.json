@@ -102,24 +102,24 @@
       "axioms": ["propext"]
     },
     {
-      "name": "SolidityMinFirst.run_conservation_capacity_disabled",
+      "name": "SolidityMinFirst.run_conservation_mutant_sensitive",
       "status": "lean_checked",
-      "axioms": []
+      "axioms": ["propext"]
     },
     {
-      "name": "SolidityMinFirst.conservation_mutant_rejected",
+      "name": "SolidityMinFirst.run_capacity_mutant_sensitive",
       "status": "lean_checked",
-      "axioms": []
+      "axioms": ["propext"]
     },
     {
-      "name": "SolidityMinFirst.capacity_mutant_rejected",
+      "name": "SolidityMinFirst.run_disabled_exclusion_mutant_sensitive",
       "status": "lean_checked",
-      "axioms": []
+      "axioms": ["propext"]
     },
     {
-      "name": "SolidityMinFirst.disabled_module_mutant_rejected",
+      "name": "SolidityMinFirst.run_abstract_source_bridge_mutant_sensitive",
       "status": "lean_checked",
-      "axioms": []
+      "axioms": ["propext"]
     },
     {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
