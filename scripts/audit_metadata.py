@@ -414,6 +414,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAccount1.source_to_verityTx", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
+    {"name": "Guarantees.PAccount1.verity_contract_run_commits_accepted",
+     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAddress1.admission_and_post_state_equivariance",
      "status": "lean_checked", "axioms": []},
     {"name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",

@@ -42,6 +42,7 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_contract_run_commits_accepted
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
