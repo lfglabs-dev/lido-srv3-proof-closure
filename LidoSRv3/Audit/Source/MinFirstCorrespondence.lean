@@ -133,6 +133,95 @@ verity_contract AllocationContract where
           total := total)
     return total
 
+/-!
+Executable negative implementation for the receipts below. It intentionally
+copies the audited transition instead of replacing it with arithmetic
+predicates: `allocateWithoutCapacityOrEnabledGuards` drops the final capacity
+clamp and also lets disabled rows participate in every
+candidate scan. Orthogonal receipt vectors make the capacity and enabled guards
+non-binding one at a time, so each mutation changes an observed `Contract.run`
+post-state for its advertised reason.
+-/
+
+verity_contract AllocationMutants where
+  storage
+    stakeRatios : Array Uint256 := slot 0
+    moduleLimits : Array Uint256 := slot 1
+    allocationBuffers : Array Uint256 := slot 2
+    moduleEnabled : Array Bool := slot 3
+
+  constants
+    MAX_WORD : Uint256 := 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+  function allocateWithoutCapacityOrEnabledGuards (deposits : Uint256) : Uint256 := do
+    let count ← getStorageArrayLength stakeRatios
+    let limitsCount ← getStorageArrayLength moduleLimits
+    let buffersCount ← getStorageArrayLength allocationBuffers
+    let enabledCount ← getStorageArrayLength moduleEnabled
+    require (count == limitsCount) "LENGTH_MISMATCH"
+    require (count == buffersCount) "LENGTH_MISMATCH"
+    require (count == enabledCount) "LENGTH_MISMATCH"
+    let mut total := 0
+    forEach "round" deposits (do
+      let available ← requireSomeUint (safeSub deposits total) "DEMAND_UNDERFLOW"
+      if available == 0 then
+        total := total
+      else
+        let mut bestIndex := count
+        let mut bestAllocation := MAX_WORD
+        forEach "i" count (do
+          let allocation ← getStorageArrayElement stakeRatios i
+          let limit ← getStorageArrayElement moduleLimits i
+          let buffer ← getStorageArrayElement allocationBuffers i
+          let effectiveLimit := min limit buffer
+          if allocation < effectiveLimit && allocation < bestAllocation then
+            bestIndex := i
+            bestAllocation := allocation
+          else
+            bestIndex := bestIndex)
+        if bestIndex < count then
+          let mut bestCount := 0
+          forEach "i" count (do
+            let allocation ← getStorageArrayElement stakeRatios i
+            let limit ← getStorageArrayElement moduleLimits i
+            let buffer ← getStorageArrayElement allocationBuffers i
+            let effectiveLimit := min limit buffer
+            if allocation < effectiveLimit && allocation == bestAllocation then
+              let nextBestCount ← requireSomeUint (safeAdd bestCount 1) "COUNT_OVERFLOW"
+              bestCount := nextBestCount
+            else
+              bestCount := bestCount)
+          let mut nextLevel := MAX_WORD
+          forEach "i" count (do
+            let allocation ← getStorageArrayElement stakeRatios i
+            let limit ← getStorageArrayElement moduleLimits i
+            let buffer ← getStorageArrayElement allocationBuffers i
+            let effectiveLimit := min limit buffer
+            if allocation < effectiveLimit &&
+                bestAllocation < allocation && allocation < nextLevel then
+              nextLevel := allocation
+            else
+              nextLevel := nextLevel)
+          let mut share := available
+          if 1 < bestCount then
+            share := ceilDiv available bestCount
+          else
+            share := share
+          let mut levelHeadroom := share
+          if nextLevel < MAX_WORD then
+            levelHeadroom := sub nextLevel bestAllocation
+          else
+            levelHeadroom := levelHeadroom
+          -- Mutation: omit `capacityHeadroom` from the source-shaped minimum.
+          let amount := min share levelHeadroom
+          let updated ← requireSomeUint (safeAdd bestAllocation amount) "BUCKET_OVERFLOW"
+          let nextTotal ← requireSomeUint (safeAdd total amount) "TOTAL_OVERFLOW"
+          setStorageArrayElement stakeRatios bestIndex updated
+          total := nextTotal
+        else
+          total := total)
+    return total
+
 /-- Solidity's free-space condition at source lines 76--79 and 94--97. -/
 def hasFreeSpace (b : MinFirst.Bucket) : Bool :=
   decide (b.allocation < b.capacity)
@@ -192,35 +281,50 @@ def allocationReceiptState : ContractState :=
       else if storageSlot = AllocationContract.moduleEnabled.slot then [1, 0]
       else [] }
 
+def disabledFirstReceiptState : ContractState :=
+  { defaultState with
+    storageArray := fun storageSlot =>
+      if storageSlot = AllocationContract.stakeRatios.slot then [0, 0]
+      else if storageSlot = AllocationContract.moduleLimits.slot then [40, 100]
+      else if storageSlot = AllocationContract.allocationBuffers.slot then [40, 100]
+      else if storageSlot = AllocationContract.moduleEnabled.slot then [0, 1]
+      else [] }
+
 def conservationReceipt : Bool :=
-  match (AllocationContract.allocate 60).run allocationReceiptState with
+  match (AllocationContract.allocate 130).run allocationReceiptState with
   | .success total after =>
       let finalSum := ((after.storageArray AllocationContract.stakeRatios.slot).map
         (fun word => word.val)).sum
-      total = 60 &&
+      total = 100 &&
       decide (finalSum = 0 + 0 + total.val) &&
       -- Mutant: attributing one extra unit to the post-state is rejected.
       !(decide (finalSum = 0 + 0 + total.val + 1))
   | .revert _ _ => false
 
 def capacityReceipt : Bool :=
-  match (AllocationContract.allocate 60).run allocationReceiptState with
-  | .success _ after =>
+  match (AllocationContract.allocate 130).run allocationReceiptState,
+      (AllocationMutants.allocateWithoutCapacityOrEnabledGuards 130).run
+        allocationReceiptState with
+  | .success total after, .success mutantTotal mutantAfter =>
       let allocations := after.storageArray AllocationContract.stakeRatios.slot
-      allocations[0]? = some 60 && allocations[1]? = some 0 &&
-      decide (60 ≤ min 100 100) && decide (0 ≤ min 40 40) &&
-      -- Mutant: the first allocation cannot be raised above its effective cap.
-      !(decide (101 ≤ min 100 100))
-  | .revert _ _ => false
+      let mutantAllocations := mutantAfter.storageArray AllocationMutants.stakeRatios.slot
+      total = 100 && allocations[0]? = some 100 && allocations[1]? = some 0 &&
+      mutantTotal = 130 && mutantAllocations[0]? = some 130 &&
+      mutantAllocations != allocations
+  | _, _ => false
 
 def disabledExclusionReceipt : Bool :=
-  match (AllocationContract.allocate 60).run allocationReceiptState with
-  | .success _ after =>
+  match (AllocationContract.allocate 30).run disabledFirstReceiptState,
+      (AllocationMutants.allocateWithoutCapacityOrEnabledGuards 30).run
+        disabledFirstReceiptState with
+  | .success total after, .success mutantTotal mutantAfter =>
       let allocations := after.storageArray AllocationContract.stakeRatios.slot
-      allocations[1]? = some 0 &&
-      -- Mutant: crediting the disabled module is rejected by the observation.
-      !(allocations[1]? == some 1)
-  | .revert _ _ => false
+      let mutantAllocations := mutantAfter.storageArray AllocationMutants.stakeRatios.slot
+      total = 0 && allocations[0]? = some 0 && allocations[1]? = some 0 &&
+      mutantTotal = 30 && mutantAllocations[0]? = some 30 &&
+      mutantAllocations[1]? = some 0 &&
+      mutantAllocations != allocations
+  | _, _ => false
 
 def abstractSourceBridgeReceipt : Bool :=
   let modelRows : List MinFirstAllocation.Model.Bucket := [
