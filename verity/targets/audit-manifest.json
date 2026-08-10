@@ -102,6 +102,26 @@
       "axioms": ["propext"]
     },
     {
+      "name": "SolidityMinFirst.run_conservation_capacity_disabled",
+      "status": "lean_checked",
+      "axioms": []
+    },
+    {
+      "name": "SolidityMinFirst.conservation_mutant_rejected",
+      "status": "lean_checked",
+      "axioms": []
+    },
+    {
+      "name": "SolidityMinFirst.capacity_mutant_rejected",
+      "status": "lean_checked",
+      "axioms": []
+    },
+    {
+      "name": "SolidityMinFirst.disabled_module_mutant_rejected",
+      "status": "lean_checked",
+      "axioms": []
+    },
+    {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]

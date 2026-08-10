@@ -40,6 +40,10 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_conservation
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
+#print axioms LidoSRv3.Audit.SolidityMinFirst.run_conservation_capacity_disabled
+#print axioms LidoSRv3.Audit.SolidityMinFirst.conservation_mutant_rejected
+#print axioms LidoSRv3.Audit.SolidityMinFirst.capacity_mutant_rejected
+#print axioms LidoSRv3.Audit.SolidityMinFirst.disabled_module_mutant_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_contract_run_commits_accepted
