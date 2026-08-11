@@ -90,13 +90,15 @@ theorem generated_layout_exact :
   decide
 
 theorem target_setter_reader_run (state : ContractState) (value : Uint64) :
-    (((do GatewayPackedContract.setTarget value.toUint256
-           GatewayPackedContract.getTarget) : Contract Uint64).run state).fst = value := by
+    (((do
+      GatewayPackedContract.setTarget value.toUint256
+      GatewayPackedContract.getTarget) : Contract Uint64).run state).fst = value := by
   rfl
 
 theorem minimum_setter_reader_run (state : ContractState) (value : Uint64) :
-    (((do GatewayPackedContract.setMinimum value.toUint256
-           GatewayPackedContract.getMinimum) : Contract Uint64).run state).fst = value := by
+    (((do
+      GatewayPackedContract.setMinimum value.toUint256
+      GatewayPackedContract.getMinimum) : Contract Uint64).run state).fst = value := by
   rfl
 
 /-- SOURCE -> VERITY_TX for the exact checked headroom value. The validator
