@@ -23,8 +23,7 @@ budget at SOURCE/VERITY_TX, not verifier, SSZ, Yul, EVM, or deployment planes.
 
 namespace LidoSRv3.Audit.Verity.TopupPackedStorage
 
-open _root_.Verity
-open _root_.Contracts
+open _root_.Verity hiding pure
 open _root_.Verity.Stdlib.Math
 
 def GATEWAY_STORAGE_POSITION : Nat :=
@@ -73,19 +72,22 @@ verity_contract GatewayPackedContract where
     require (aggregate <= budget) "AGGREGATE_OVER_BUDGET"
     setStorage lastAggregateBudget aggregate
 
-def layoutTuple (name : String) :=
-  GatewayPackedContract.spec.fields.find? (fun f => f.name == name) |>.map
-    (fun f => (f.slot, f.packedBits))
-
 theorem generated_layout_exact :
-    layoutTuple "maxValidatorsPerTopUp" = some (some GATEWAY_STORAGE_POSITION, some ⟨0, 64⟩) ∧
-    layoutTuple "lastTopUpTimestamp" = some (some GATEWAY_STORAGE_POSITION, some ⟨64, 32⟩) ∧
-    layoutTuple "lastTopUpBlock" = some (some GATEWAY_STORAGE_POSITION, some ⟨96, 32⟩) ∧
-    layoutTuple "minBlockDistance" = some (some GATEWAY_STORAGE_POSITION, some ⟨128, 16⟩) ∧
-    layoutTuple "maxRootAge" = some (some GATEWAY_STORAGE_POSITION, some ⟨144, 16⟩) ∧
-    layoutTuple "targetBalanceGwei" = some (some GATEWAY_STORAGE_POSITION, some ⟨160, 64⟩) ∧
-    layoutTuple "minTopUpGwei" = some (some (GATEWAY_STORAGE_POSITION + 1), some ⟨0, 64⟩) := by
-  native_decide
+    GatewayPackedContract.spec.fields.any (fun f => f.name == "maxValidatorsPerTopUp" &&
+      f.slot == some GATEWAY_STORAGE_POSITION && f.packedBits == some ⟨0, 64⟩) &&
+    GatewayPackedContract.spec.fields.any (fun f => f.name == "lastTopUpTimestamp" &&
+      f.slot == some GATEWAY_STORAGE_POSITION && f.packedBits == some ⟨64, 32⟩) &&
+    GatewayPackedContract.spec.fields.any (fun f => f.name == "lastTopUpBlock" &&
+      f.slot == some GATEWAY_STORAGE_POSITION && f.packedBits == some ⟨96, 32⟩) &&
+    GatewayPackedContract.spec.fields.any (fun f => f.name == "minBlockDistance" &&
+      f.slot == some GATEWAY_STORAGE_POSITION && f.packedBits == some ⟨128, 16⟩) &&
+    GatewayPackedContract.spec.fields.any (fun f => f.name == "maxRootAge" &&
+      f.slot == some GATEWAY_STORAGE_POSITION && f.packedBits == some ⟨144, 16⟩) &&
+    GatewayPackedContract.spec.fields.any (fun f => f.name == "targetBalanceGwei" &&
+      f.slot == some GATEWAY_STORAGE_POSITION && f.packedBits == some ⟨160, 64⟩) &&
+    GatewayPackedContract.spec.fields.any (fun f => f.name == "minTopUpGwei" &&
+      f.slot == some (GATEWAY_STORAGE_POSITION + 1) && f.packedBits == some ⟨0, 64⟩) = true := by
+  decide
 
 theorem target_setter_reader_run (state : ContractState) (value : Uint64) :
     (((do GatewayPackedContract.setTarget value.toUint256
@@ -102,6 +104,6 @@ theorem record_budget_rejects_over_budget (state : ContractState)
     (GatewayPackedContract.recordBudget aggregate budget).run state =
       .revert "AGGREGATE_OVER_BUDGET" state := by
   simp [GatewayPackedContract.recordBudget, Verity.require, h, Contract.run,
-    Verity.bind, Bind.bind, Pure.pure]
+    Verity.bind, Bind.bind]
 
 end LidoSRv3.Audit.Verity.TopupPackedStorage
