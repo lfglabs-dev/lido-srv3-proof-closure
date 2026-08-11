@@ -10,6 +10,10 @@
   },
   "modules": ["LidoSRv3.Audit.Verity.AddressYulInterface", "LidoSRv3.Tests.AddressYulInterface", "LidoSRv3.Audit.Verity.TopupPackedStorage", "LidoSRv3.Tests.Topup2Mutants"],
   "unavailable": {
+    "canonical_eip7251_runtime": {"status": "MISSING", "blocked": true, "value": null},
+    "canonical_eip7251_codehash": {"status": "MISSING", "blocked": true, "value": null},
+    "canonical_eip7251_fork": {"status": "MISSING", "blocked": true, "value": null},
+    "canonical_eip7251_address": {"status": "MISSING", "blocked": true, "value": null},
     "eip4788_anchor_runtime": {"status": "MISSING", "blocked": true, "value": null},
     "eip4788_anchor_codehash": {"status": "MISSING", "blocked": true, "value": null},
     "sha256_ffi_implementation_identity": {"status": "MISSING", "blocked": true, "value": null}

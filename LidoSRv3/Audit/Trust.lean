@@ -77,6 +77,7 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_module_limit
 #print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.generated_layout_exact
 #print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.target_setter_reader_run
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.target_setter_preserves_nonzero_neighbors
 #print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.minimum_setter_reader_run
 #print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.source_headroom_materially_runs
 #print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.record_budget_rejects_over_budget

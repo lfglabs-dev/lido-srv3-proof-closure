@@ -96,6 +96,16 @@ theorem target_setter_reader_run :
       GatewayPackedContract.getTarget) : Contract Uint64).run defaultState).fst = (42 : Uint64) := by
   native_decide
 
+/-- The generated target setter is a masked RMW operation: nonzero bits below
+and above the 160..223 target field survive the actual Contract.run write. -/
+theorem target_setter_preserves_nonzero_neighbors :
+    let seeded := defaultState.writeSlot GATEWAY_STORAGE_POSITION
+      (Verity.Core.Uint256.ofNat (2 ^ 240 + 2 ^ 100 + 7))
+    ((GatewayPackedContract.setTarget (42 : Uint64).toUint256).run seeded).snd.storage
+      GATEWAY_STORAGE_POSITION = Verity.Core.Uint256.ofNat
+        (2 ^ 240 + 42 * 2 ^ 160 + 2 ^ 100 + 7) := by
+  native_decide
+
 theorem minimum_setter_reader_run :
     (((do
       GatewayPackedContract.setMinimum (42 : Uint64).toUint256

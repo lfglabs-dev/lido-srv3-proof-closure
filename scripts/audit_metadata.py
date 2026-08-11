@@ -332,6 +332,10 @@ EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
     for name in (
+        "canonical_eip7251_runtime",
+        "canonical_eip7251_codehash",
+        "canonical_eip7251_fork",
+        "canonical_eip7251_address",
         "eip4788_anchor_runtime",
         "eip4788_anchor_codehash",
         "sha256_ffi_implementation_identity",
