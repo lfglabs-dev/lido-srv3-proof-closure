@@ -1,11 +1,63 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 02b1cc2b6526862fb868defb6f6fc2cbf515aa05
+validated-tree: 17ec375fff0fbdc0e2988acc21066d8d27dab23c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ADDRESS-1 exact-head review correction (2026-08-11)
+------------------------------------------------------
+
+- Starting PR head: `7576fcc58629343a52ee8335a3707d629882330b`; live base:
+  `campaign/lido-minimal-11@a40a1044298d6977980d4f97858c5b66ad8a6804`.
+- Re-read the pinned `_transfer`, withdrawal request, `_claim`, and `unwrap`
+  paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+- Added the missing `_from == request.owner` and `msg.sender == request.owner`
+  guards and transported request ownership together with caller, sender, and
+  recipient under address renaming.
+- The closure theorem now includes the complete successful source post-state
+  equivariance equation. The official Verity transaction materially executes
+  owner, recipient, debit-key, and credit-key address writes through
+  `verity_contract`, with commit/revert behavior observed through `Contract.run`.
+- Privileged-caller and address-stomp counterexamples both witness successful,
+  eligible executions and are therefore non-vacuous.
+- Focused closure/mutant builds and the complete Trust build passed. The new
+  registered theorems use only `propext` and `Quot.sound` (or only `propext`).
+
+P-ADDRESS-1 closure-v2 SOURCE/VERITY_TX receipt (2026-08-11)
+-----------------------------------------------------------
+
+- Exact live base verified before work:
+  `campaign/lido-closure-v2@4b96af1094c691afee9f7013e4623a2b128a6421`.
+- Canonical catalogue wording is byte-for-byte unchanged. The existing
+  `LEAN_CHECKED` abstract model and the subordinate typed-Yul harness are
+  retained; the only harness edit renames the Lean pattern variable `slot` to
+  `storageSlot`, with identical EVMYulLean AST output.
+- Pinned source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+  The source map now includes the transitive caller/address guards and writes
+  in `_transfer`, `_requestWithdrawal`, `_claim`, and the claim hint checks.
+- `LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx` composes
+  the canonical model theorem, the single-item pinned-source caller-swap
+  simulation, and an official `verity_contract`/`Contract.run` transaction
+  simulation. Batch iteration, generated Yul/EVM, runtime bytecode, external
+  contract denotation, and deployment provenance remain open.
+- Caller-allowlist and successful-address-stomp mutants have checked explicit
+  counterexamples in `LidoSRv3.Tests.AddressSourceMutants`.
+- Verity remains exactly `c41757164e9e8230536d7af29d81a2961b30e482`;
+  EVMYulLean remains transitively pinned exactly at
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9` and is used only by the retained
+  subordinate harness.
+- Focused P-ADDRESS-1/source/Verity/mutant build: exit 0 (93 jobs).
+- Trust build: exit 0 (1253 jobs); new theorems report only `propext` and
+  `Quot.sound`, with no project axiom.
+- Full `lake build`: exit 0 (1339 jobs).
+- `python3 scripts/audit_metadata.py check`, `make audit-check`, optimized
+  metadata mutants, `check_no_python_evidence.sh`, `git diff --check`, exact
+  pin check, and canonical-wording equality check: exit 0.
+- Net-new and new-file forbidden scans found no `sorry`, `admit`,
+  `native_decide`, `axiom`, `unsafeYul`, or `runVerity` proof escape.
 
 P-TOPUP-1 closure-v2 hybrid receipt (2026-08-11)
 -------------------------------------------------

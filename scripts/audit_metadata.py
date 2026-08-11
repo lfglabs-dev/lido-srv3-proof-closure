@@ -114,8 +114,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
      "expected": "successful bounded child-model proofs only; parent P-ETH-1 remains OPEN"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1",
-     "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants",
+     "expected": "successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2",
      "expected": "successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance"},
     {"command": "python3 scripts/audit_metadata.py check",
@@ -147,7 +147,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     [],
-    ["A-ABSTRACT-TX"],
+    ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-RUNTIME-PROVENANCE"],
     ["A-SHA256-FFI"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
@@ -172,7 +172,7 @@ EXPECTED_NEXT_GATES = [
     "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
     "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
     "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
-    "Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.",
+    "Refine the checked official Verity transaction through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance; the existing subordinate Yul interface harness remains syntax-level evidence only.",
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
@@ -217,7 +217,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
@@ -250,7 +250,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
     ["model", "source", "tx"],
     [],
-    ["model", "tx"],
+    ["model", "source", "tx"],
     ["model"],
     [],
     ["model"],
@@ -273,7 +273,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
     None,
-    "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
+    "LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx",
     "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
@@ -365,6 +365,9 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Tests.ReserveMutants",
             "LidoSRv3.Tests.AccountingVectors",
             "LidoSRv3.Audit.AddressEquivariance",
+            "LidoSRv3.Audit.Source.AddressCorrespondence",
+            "LidoSRv3.Audit.Verity.AddressTx",
+            "LidoSRv3.Tests.AddressSourceMutants",
             "LidoSRv3.Tests.AddressEquivariance",
             "LidoSRv3.Audit.Common.Units",
             "LidoSRv3.Audit.Common.Result",
@@ -378,13 +381,13 @@ EXPECTED_MANIFEST_LAYERS = {
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
-            "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, and "
+            "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, "
+            "P-ADDRESS-1 caller-renaming MODEL-to-SOURCE-to-VERITY_TX simulation, and "
             "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
-            "MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is "
+            "MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement are "
             "checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus "
             "executable Verity transaction simulation is checked against pinned Solidity, "
-            "while later guards remain an "
-            "explicit interface premise; "
+            "while Yul/EVM/runtime semantics remain open; "
             "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
             "evidence over source-shaped inputs, and its SOURCE-plane "
             "correspondence remains OPEN in audit/guarantees.yaml"
@@ -430,6 +433,12 @@ EXPECTED_MANIFEST_THEOREMS = [
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAddress1.admission_and_post_state_equivariance",
      "status": "lean_checked", "axioms": []},
+    {"name": "Guarantees.PAddress1.model_to_source_to_verity_tx",
+     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
+    {"name": "SolidityAddress.source_success_post_state_equivariant",
+     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
+    {"name": "Verity.AddressTx.verity_tx_simulates_source",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PDeposit1.source_router_balance_unchanged",
@@ -625,8 +634,12 @@ VERIFIED_SOURCE_ANCHORS = {
     },
     "P-ADDRESS-1": {
         ("contracts/0.8.9/WithdrawalQueueERC721.sol", "transferFrom", 218, 220),
+        ("contracts/0.8.9/WithdrawalQueueERC721.sol", "_transfer", 230, 254),
         ("contracts/0.8.9/WithdrawalQueue.sol", "requestWithdrawals", 125, 142),
+        ("contracts/0.8.9/WithdrawalQueue.sol", "_requestWithdrawal and amount guards", 373, 402),
         ("contracts/0.8.9/WithdrawalQueue.sol", "claimWithdrawalsTo", 244, 264),
+        ("contracts/0.8.9/WithdrawalQueueBase.sol", "_claim", 460, 480),
+        ("contracts/0.8.9/WithdrawalQueueBase.sol", "_calculateClaimableEther hint guards", 482, 504),
         ("contracts/0.6.12/WstETH.sol", "unwrap", 69, 80),
     },
     "P-TOPUP-2": {
