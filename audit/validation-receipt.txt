@@ -1,11 +1,28 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 02b1cc2b6526862fb868defb6f6fc2cbf515aa05
+validated-tree: ef9f2f02fa7cd3aaaaeefe0ca6f6cb9d3b6b78d9
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 post-Verity-main rollback blocker receipt (2026-08-11)
+-----------------------------------------------------------------
+
+- Base: `campaign/lido-closure-v2@4b96af1094c691afee9f7013e4623a2b128a6421`.
+- Verity main was rechecked at the campaign pin
+  `c41757164e9e8230536d7af29d81a2961b30e482`, containing #2245/#2247/#2249.
+- `callProgram_later_revert_does_not_restore_entry_snapshot` is a concrete
+  kernel-reduced counterexample: after a successful mutable Lido-shaped call,
+  a reverting beacon-shaped call preserves the earlier mutation instead of
+  restoring the transaction-entry world.
+- `AllocationExtraction.extractAllocationFromSource` remains an identity
+  `FunctionSpec` alias, and `DenoteMemory` remains separate from a complete
+  FunctionSpec/call evaluator. Exact source allocation, dynamic calldata, and
+  whole-batch rollback therefore remain OPEN; no tx promotion is made.
+- Focused build, full build, metadata/audit tests, receipt binding, and the
+  net-change forbidden-token scan are recorded by the final branch validation.
 
 P-TOPUP-1 closure-v2 hybrid receipt (2026-08-11)
 -------------------------------------------------
