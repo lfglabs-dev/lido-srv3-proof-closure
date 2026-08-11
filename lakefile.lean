@@ -5,7 +5,7 @@ package «lido-srv3-proof-closure» where
   version := v!"0.1.0"
 
 require verity from git
-  "https://github.com/lfglabs-dev/verity.git"@"54f1e002e2b85825fad6be69a32cfd5d9452469d"
+  "https://github.com/lfglabs-dev/verity.git"@"c41757164e9e8230536d7af29d81a2961b30e482"
 
 @[default_target]
 lean_lib «LidoSRv3» where
