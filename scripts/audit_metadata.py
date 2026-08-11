@@ -101,7 +101,7 @@ EXPECTED_ASSUMPTIONS = {
 }
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression",
-     "expected": "successful checked-source/capacity correspondence plus bounded official Verity Contract.run conservation refinement, positive receipt, and sensitive overwrite/capacity/disabled mutants; general proportional allocation and Yul/EVM/runtime/deployment remain open"},
+     "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -140,7 +140,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+    ["A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
@@ -203,7 +203,7 @@ EXPECTED_EXCLUSIONS = {
 }
 PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -243,7 +243,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
-    ["model", "source", "tx"],
+    ["model", "source"],
     ["algorithm", "source"],
     ["model", "source"],
     ["model", "source", "tx"],
@@ -266,7 +266,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1.allocation_capacity_and_tx_closure",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
@@ -415,8 +415,6 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
      "status": "lean_checked", "axioms": ["propext"]},
-    {"name": "Guarantees.PAlloc1.allocation_capacity_and_tx_closure",
-     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "SolidityMinFirst.run_conservation_mutant_sensitive",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_capacity_mutant_sensitive",
