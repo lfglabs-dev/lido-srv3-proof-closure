@@ -99,6 +99,29 @@ theorem minimum_setter_reader_run (state : ContractState) (value : Uint64) :
            GatewayPackedContract.getMinimum) : Contract Uint64).run state).fst = value := by
   rfl
 
+/-- SOURCE -> VERITY_TX for the exact checked headroom value. The validator
+proof and surrounding batch guards are the documented boundary, not premises
+manufactured by this theorem. -/
+def executeSourceHeadroom
+    (v : LidoSRv3.Audit.Guarantees.PTopup2.Validator)
+    (cfg : LidoSRv3.Audit.Guarantees.PTopup2.TopupConfig) :
+    Contract Unit :=
+  GatewayPackedContract.recordHeadroom
+    (Verity.Core.Uint256.ofNat
+      (LidoSRv3.Audit.Guarantees.PTopup2.evaluated_topup_limit v cfg))
+
+theorem source_headroom_materially_runs
+    (state : ContractState) (v : LidoSRv3.Audit.Guarantees.PTopup2.Validator)
+    (cfg : LidoSRv3.Audit.Guarantees.PTopup2.TopupConfig) :
+    ∃ after,
+      (executeSourceHeadroom v cfg).run state = .success () after ∧
+      after.storage (GATEWAY_STORAGE_POSITION + 2) =
+        Verity.Core.Uint256.ofNat
+          (LidoSRv3.Audit.Guarantees.PTopup2.evaluated_topup_limit v cfg) := by
+  refine ⟨(executeSourceHeadroom v cfg).run state |>.snd, ?_, ?_⟩
+  · rfl
+  · rfl
+
 theorem record_budget_rejects_over_budget (state : ContractState)
     (aggregate budget : Uint256) (h : ¬ aggregate <= budget) :
     (GatewayPackedContract.recordBudget aggregate budget).run state =

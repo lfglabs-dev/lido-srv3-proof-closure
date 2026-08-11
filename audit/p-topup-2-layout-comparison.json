@@ -1,0 +1,20 @@
+{
+  "schema": "p-topup-2-packed-layout-comparison-v1",
+  "lido_commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
+  "compiler": {"solc": "0.8.25", "optimizer": true, "optimizer_runs": 200, "via_ir": true, "evm_version": "cancun"},
+  "method": "Pinned TopUpGateway compiles successfully; namespaced assembly storage is absent from standard storageLayout, so struct order/width comes from the solc AST and the ERC-7201 base from the compiled source literal. Verity values are checked by generated_layout_exact over GatewayPackedContract.spec.fields.",
+  "erc7201_base": "0x22e512057841e2bc1e6d80030c8bb8b4935377af2e64ba9bf8e6a3e88fb32200",
+  "storage_layout_direct_entries": 0,
+  "matches": true,
+  "members": [
+    {"name":"maxValidatorsPerTopUp","solidity_type":"uint64","word":0,"bit_offset":0,"width":64},
+    {"name":"lastTopUpTimestamp","solidity_type":"uint32","word":0,"bit_offset":64,"width":32},
+    {"name":"lastTopUpBlock","solidity_type":"uint32","word":0,"bit_offset":96,"width":32},
+    {"name":"minBlockDistance","solidity_type":"uint16","word":0,"bit_offset":128,"width":16},
+    {"name":"maxRootAge","solidity_type":"uint16","word":0,"bit_offset":144,"width":16},
+    {"name":"targetBalanceGwei","solidity_type":"uint64","word":0,"bit_offset":160,"width":64},
+    {"name":"minTopUpGwei","solidity_type":"uint64","word":1,"bit_offset":0,"width":64}
+  ],
+  "verity_theorem": "LidoSRv3.Audit.Verity.TopupPackedStorage.generated_layout_exact"
+}
+

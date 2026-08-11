@@ -32,6 +32,8 @@ test:
 	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
+	@forge test -vv
+	@bash scripts/check_p_topup2_layout.sh
 	@lake build LidoSRv3.Tests.MinFirstVectors
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.PAlloc1EugeneBoundVectors

@@ -37,3 +37,9 @@ definition/member order and elementary widths from the solc AST/types, and
 independently asserts the literal ERC-7201 base from the source. The comparison
 receipt matches those derived base/word/bit offsets against
 `GatewayPackedContract.spec.fields`.
+
+The committed machine evidence is
+`audit/p-topup-2-pinned-storage-ast.json` plus
+`audit/p-topup-2-layout-comparison.json`; `scripts/check_p_topup2_layout.sh`
+recompiles the exact pinned checkout and checks these records. The empty direct
+storage layout is recorded as a finding, not treated as evidence of no storage.

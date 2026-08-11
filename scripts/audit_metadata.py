@@ -525,6 +525,11 @@ EXPECTED_MANIFEST_THEOREMS = [
         "status": "lean_checked",
         "axioms": ["propext"],
     },
+    {
+        "name": "Verity.TopupPackedStorage.source_headroom_materially_runs",
+        "status": "lean_checked",
+        "axioms": [],
+    },
 ]
 EXPECTED_PROOF_POLICY = {
     "project_axioms": 0,

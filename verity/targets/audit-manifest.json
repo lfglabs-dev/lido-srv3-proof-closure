@@ -350,6 +350,11 @@
       "name": "Common.success_exposes_exact_committed_effects",
       "status": "lean_checked",
       "axioms": ["propext"]
+    },
+    {
+      "name": "Verity.TopupPackedStorage.source_headroom_materially_runs",
+      "status": "lean_checked",
+      "axioms": []
     }
   ]
 }
