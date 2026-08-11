@@ -89,6 +89,7 @@ theorem generated_layout_exact :
       f.slot == some (GATEWAY_STORAGE_POSITION + 1) && f.packedBits == some ⟨0, 64⟩) = true := by
   decide
 
+set_option maxRecDepth 100000 in
 theorem target_setter_reader_run (value : Uint64) :
     (((do
       GatewayPackedContract.setTarget value.toUint256
@@ -101,6 +102,7 @@ theorem target_setter_reader_run (value : Uint64) :
     Verity.Core.UIntN.ofUint256, Verity.Core.UIntN.ofNat,
     Verity.Core.Uint256.ofNat, value.isLt]
 
+set_option maxRecDepth 100000 in
 theorem minimum_setter_reader_run (value : Uint64) :
     (((do
       GatewayPackedContract.setMinimum value.toUint256
