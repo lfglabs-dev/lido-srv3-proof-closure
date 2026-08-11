@@ -102,6 +102,26 @@
       "axioms": ["propext"]
     },
     {
+      "name": "SolidityMinFirst.run_conservation_mutant_sensitive",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "SolidityMinFirst.run_capacity_mutant_sensitive",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "SolidityMinFirst.run_disabled_exclusion_mutant_sensitive",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "SolidityMinFirst.run_abstract_source_bridge_mutant_sensitive",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
