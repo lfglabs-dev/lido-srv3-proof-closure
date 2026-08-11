@@ -43,6 +43,7 @@ structure Input where
   caller : Address
   senderFrom : Address
   recipient : Address
+  requestOwner : Address
   amount : Nat
   requestId : Nat
   paused : Bool
@@ -50,7 +51,6 @@ structure Input where
   requestClaimed : Bool
   requestFinalized : Bool
   hintValid : Bool
-  callerIsOwner : Bool
   callerIsApprovedForAll : Bool
   callerIsTokenApproved : Bool
   amountInRange : Bool
@@ -80,14 +80,15 @@ def admitted (inp : Input) : Bool :=
   match inp.entryPoint with
   | .transferFrom =>
       decide (inp.recipient ≠ 0) && decide (inp.recipient ≠ inp.senderFrom) &&
-        inp.requestExists && !inp.requestClaimed &&
-        (inp.callerIsOwner || inp.callerIsApprovedForAll || inp.callerIsTokenApproved)
+        inp.requestExists && !inp.requestClaimed && decide (inp.senderFrom = inp.requestOwner) &&
+        (decide (inp.caller = inp.requestOwner) || inp.callerIsApprovedForAll ||
+          inp.callerIsTokenApproved)
   | .requestWithdrawals =>
       !inp.paused && inp.amountInRange && inp.callerBalanceSufficient &&
         inp.callerAllowanceSufficient && inp.externalCallSucceeds
   | .claimWithdrawalsTo =>
       decide (inp.recipient ≠ 0) && inp.requestExists && !inp.requestClaimed &&
-        inp.requestFinalized && inp.hintValid && inp.callerIsOwner &&
+        inp.requestFinalized && inp.hintValid && decide (inp.caller = inp.requestOwner) &&
         inp.externalCallSucceeds
   | .unwrap =>
       decide (inp.amount ≠ 0) && inp.callerBalanceSufficient && inp.externalCallSucceeds
@@ -108,7 +109,8 @@ def renameInput (a₁ a₂ : Address) (inp : Input) : Input :=
   { inp with
     caller := renameAddress a₁ a₂ inp.caller
     senderFrom := renameAddress a₁ a₂ inp.senderFrom
-    recipient := renameAddress a₁ a₂ inp.recipient }
+    recipient := renameAddress a₁ a₂ inp.recipient
+    requestOwner := renameAddress a₁ a₂ inp.requestOwner }
 
 def renamePost (a₁ a₂ : Address) (post : PostState) : PostState :=
   { owner := renameAddress a₁ a₂ post.owner
@@ -117,6 +119,21 @@ def renamePost (a₁ a₂ : Address) (post : PostState) : PostState :=
     callerBalanceCredited := renameAddress a₁ a₂ post.callerBalanceCredited }
 
 def Eligible (inp : Input) : Prop := run inp ≠ .reverted
+
+/-- Caller-indexed balance/allowance/approval observations and the request and
+pause facts are transported unchanged when every address key is renamed. -/
+theorem renameInput_preserves_indexed_facts (a₁ a₂ : Address) (inp : Input) :
+    let renamed := renameInput a₁ a₂ inp
+    renamed.callerBalanceSufficient = inp.callerBalanceSufficient ∧
+    renamed.callerAllowanceSufficient = inp.callerAllowanceSufficient ∧
+    renamed.callerIsApprovedForAll = inp.callerIsApprovedForAll ∧
+    renamed.callerIsTokenApproved = inp.callerIsTokenApproved ∧
+    renamed.requestExists = inp.requestExists ∧
+    renamed.requestClaimed = inp.requestClaimed ∧
+    renamed.requestFinalized = inp.requestFinalized ∧
+    renamed.paused = inp.paused ∧
+    renamed.requestOwner = renameAddress a₁ a₂ inp.requestOwner := by
+  simp [renameInput]
 
 /-- A swap away from the zero address preserves all source address guards. -/
 theorem run_rename (a₁ a₂ : Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0) (inp : Input) :

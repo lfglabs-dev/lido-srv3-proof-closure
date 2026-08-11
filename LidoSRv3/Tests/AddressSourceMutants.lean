@@ -6,11 +6,11 @@ open Verity
 open LidoSRv3.Audit.SolidityAddress
 
 private def eligibleUnwrap (caller : Address) : Input :=
-  { entryPoint := .unwrap, caller := caller, senderFrom := caller, recipient := caller
+  { entryPoint := .unwrap, caller := caller, senderFrom := caller, recipient := caller,
+    requestOwner := caller
     amount := 1, requestId := 0, paused := false, requestExists := true
     requestClaimed := false, requestFinalized := true, hintValid := true
-    callerIsOwner := true, callerIsApprovedForAll := false
-    callerIsTokenApproved := false, amountInRange := true
+    callerIsApprovedForAll := false, callerIsTokenApproved := false, amountInRange := true
     callerBalanceSufficient := true, callerAllowanceSufficient := true
     externalCallSucceeds := true }
 
@@ -25,7 +25,8 @@ theorem privileged_caller_mutant_counterexample :
 theorem address_stomp_mutant_counterexample :
     let inp := eligibleUnwrap 1
     let stomp : PostState := ⟨1, 1, 1, 1⟩
-    run (renameInput 1 2 inp) ≠ .committed stomp := by
+    run inp = .committed stomp ∧ succeeds (run (renameInput 1 2 inp)) = true ∧
+      run (renameInput 1 2 inp) ≠ .committed stomp := by
   decide
 
 #check LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source

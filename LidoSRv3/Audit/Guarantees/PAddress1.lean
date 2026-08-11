@@ -153,11 +153,18 @@ theorem model_to_source_to_verity_tx
             (LidoSRv3.Audit.SolidityAddress.renameInput a₁ a₂ sourceInput)) =
         LidoSRv3.Audit.SolidityAddress.succeeds
           (LidoSRv3.Audit.SolidityAddress.run sourceInput) ∧
+      (LidoSRv3.Audit.SolidityAddress.run
+          (LidoSRv3.Audit.SolidityAddress.renameInput a₁ a₂ sourceInput) =
+        match LidoSRv3.Audit.SolidityAddress.run sourceInput with
+        | .reverted => .reverted
+        | .committed post => .committed
+            (LidoSRv3.Audit.SolidityAddress.renamePost a₁ a₂ post)) ∧
       LidoSRv3.Audit.Verity.AddressTx.observeVerity verityState
           ((LidoSRv3.Audit.Verity.AddressTx.executeSource sourceInput).run verityState) =
         LidoSRv3.Audit.Verity.AddressTx.sourceTx sourceInput verityState := by
   exact ⟨admission_and_post_state_equivariance cfg rename_state fn hAdmission hPostState,
     LidoSRv3.Audit.SolidityAddress.source_admission_nondiscriminatory a₁ a₂ h₁ h₂ sourceInput,
+    LidoSRv3.Audit.SolidityAddress.run_rename a₁ a₂ h₁ h₂ sourceInput,
     LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source sourceInput verityState⟩
 
 end LidoSRv3.Audit.Guarantees.PAddress1

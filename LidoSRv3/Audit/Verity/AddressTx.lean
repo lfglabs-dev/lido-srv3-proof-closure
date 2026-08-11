@@ -18,9 +18,18 @@ open LidoSRv3.Audit.SolidityAddress
 
 verity_contract AddressTxContract where
   storage
+    owner : Address := slot 0
+    recipient : Address := slot 1
+    callerBalanceDebited : Address := slot 2
+    callerBalanceCredited : Address := slot 3
 
-  function no_external_calls execute (sourceSucceeds : Bool) : Unit := do
+  function no_external_calls execute (sourceSucceeds : Bool, newOwner : Address,
+      newRecipient : Address, debited : Address, credited : Address) : Unit := do
     require sourceSucceeds "SOURCE_ADDRESS_REVERTED"
+    setStorageAddr owner newOwner
+    setStorageAddr recipient newRecipient
+    setStorageAddr callerBalanceDebited debited
+    setStorageAddr callerBalanceCredited credited
 
 inductive TxStatus where
   | committed | reverted
@@ -33,8 +42,13 @@ structure TxView where
   deriving Repr
 
 def sourceTx (inp : Input) (before : ContractState) : TxView :=
-  if succeeds (run inp) then ⟨.committed, before, before⟩
-  else ⟨.reverted, before, before⟩
+  match run inp with
+  | .reverted => ⟨.reverted, before, before⟩
+  | .committed post =>
+      ⟨.committed, before,
+        (((before.writeAddrSlot 0 post.owner).writeAddrSlot 1 post.recipient)
+          |>.writeAddrSlot 2 post.callerBalanceDebited)
+          |>.writeAddrSlot 3 post.callerBalanceCredited⟩
 
 def observeVerity (before : ContractState) (result : ContractResult Unit) : TxView :=
   match result with
@@ -42,13 +56,20 @@ def observeVerity (before : ContractState) (result : ContractResult Unit) : TxVi
   | .revert _ rollback => ⟨.reverted, before, rollback⟩
 
 def executeSource (inp : Input) : Contract Unit :=
-  AddressTxContract.execute (succeeds (run inp))
+  match run inp with
+  | .reverted => AddressTxContract.execute false 0 0 0 0
+  | .committed post => AddressTxContract.execute true post.owner post.recipient
+      post.callerBalanceDebited post.callerBalanceCredited
 
 theorem verity_tx_simulates_source (inp : Input) (state : ContractState) :
     observeVerity state ((executeSource inp).run state) = sourceTx inp state := by
   cases h : run inp <;>
     simp [executeSource, sourceTx, observeVerity, AddressTxContract.execute,
-      succeeds, h, _root_.Verity.require, _root_.Verity.Contract.run]
+      h, _root_.Verity.require, _root_.Verity.Contract.run,
+      _root_.Verity.setStorageAddr, ContractState.writeAddrSlot,
+      AddressTxContract.owner, AddressTxContract.recipient,
+      AddressTxContract.callerBalanceDebited, AddressTxContract.callerBalanceCredited,
+      _root_.Verity.bind, Bind.bind]
 
 theorem verity_revert_restores_snapshot (inp : Input) (state rollback : ContractState)
     (reason : String) (h : (executeSource inp).run state = .revert reason rollback) :
