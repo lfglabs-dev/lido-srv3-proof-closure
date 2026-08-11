@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 41d9f1b748feade211029288a8ce1bf04c9de4fb
+validated-tree: a4cff07c3ddec6cadf821fb3108fd2087c3a2e96
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -29,6 +29,8 @@ P-ETH-1 closure-v2 hybrid writer receipt (2026-08-11)
   Verity trace projection, and full-state rollback for represented rejects.
 - Named scope assumptions are A-SOURCE-GROUP-COUNT, A-VALIDATED-PAIRS, and
   A-REQUEST-TARGET-PROVENANCE. Yul/EVM/runtime identity remain OPEN.
+- The bounded writer does not close the canonical P-ETH-1 parent: its public
+  MODEL/SOURCE/TX statuses remain OPEN and its registry has no parent theorem.
 - Negative mutants cover duplicated value, lateral refund destination,
   insufficient fee, and missing zero-recipient fallback.
 - `lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Tests.EthFlowMutants`:
