@@ -8,7 +8,7 @@ PROOF_LOG := proofs/logs/proof-report.json
 SHELL     := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all bootstrap audit-generate audit-check audit_metadata check test prove report clean distclean
+.PHONY: all bootstrap audit-generate audit-check audit_metadata check test prove p-topup2-runtime-provenance report clean distclean
 
 all: report
 
@@ -35,6 +35,8 @@ test:
 	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
+	@forge test -vv
+	@bash scripts/check_p_topup2_layout.sh
 	@lake build LidoSRv3.Tests.MinFirstVectors
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.PAlloc1EugeneBoundVectors
@@ -63,6 +65,11 @@ test:
 	@test -s fixtures/solidity-reference/deposits-reserve.integration.ts
 	@test -s fixtures/solidity-reference/accounting-oracle-module-balances.integration.ts
 	@printf '%s\n' 'reference fixtures present; all 5 validated'
+
+# Deliberately separate from `test`: without MAINNET_RPC_URL this performs the
+# full local reconstruction, reports SKIPPED_NO_RPC, and exits 2 (never green).
+p-topup2-runtime-provenance:
+	@bash scripts/check_p_topup2_runtime_provenance.sh
 
 prove:
 	@mkdir -p proofs/logs

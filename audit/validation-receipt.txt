@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: a12d05aabce64bce6f41cfbda324c13e2f93ceec
+validated-tree: 4a35267b201d910bbba5185b7a5d23be293e9f87
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -555,3 +555,66 @@ Verity f485b2ca re-pin validation (2026-08-06)
   Mathlib pin unchanged.
 - Full `lake build`: exit 0 (`Build completed successfully (1300 jobs).`).
 - No Lido-side API compatibility changes were required.
+
+P-TOPUP-2 packed-storage evidence and parent-scope correction (2026-08-11)
+---------------------------------------------------------------------
+
+- Exact branch point: `campaign/lido-minimal-11@c32f4dd89752c7b8ae8a1003b96d433d7a7ee32f`;
+  validated feature head: `b3316dee7a018c95d23928865bcefc0e9699664a`.
+- Pinned Lido source: `af095e48bbc1c3841c2c9936219c8461af01056b`.
+  The namespaced gateway base and member layout are derived on every gate run
+  from a fresh solc 0.8.25 AST and pinned source literal because standard
+  `storageLayout` omits ERC-7201 namespaced structs;
+  `scripts/check_p_topup2_layout.sh` does not trust committed AST data or a
+  committed `matches` boolean.
+- Complete-source remote Lean focused + full build on Babylon: job
+  `58d52671-368c-4c92-883c-9cff14f96e59`, source bundle
+  `6ba6468e591a406d05b7f8258bdb8ca4b4eb7a44d0c1438d7a5bcb1cbfb9946d`,
+  command `lake build LidoSRv3 LidoSRv3.Tests.Topup2Mutants`, exit 0,
+  `Build completed successfully (1348 jobs).`
+- Complete-source Nippur full-build trial job
+  `18449e89-1e7c-4ebc-ab3c-a26d39b529f3` exercised the full graph but failed
+  at the superseded `8786176` proof head; it is retained as a negative receipt,
+  not represented as successful final-head evidence.
+- `forge test -vv`: 5 passed, 0 failed, including 256 runs each for evaluator
+  differential, target-field RMW, and minimum-field RMW, with arbitrary
+  nonzero neighbor sentinels plus a deterministic checked-addition overflow
+  revert. Pinned `forge build TopUpGateway.sol --force` under solc
+  0.8.25/optimizer 200/viaIR/Cancun exits 0.
+- Metadata check, optimized metadata mutants, provenance guards, no-Python
+  evidence gate, `git diff --check`, and the layout comparison all exit 0.
+- Independent review found that the Nat evaluator does not model checked
+  uint256-addition rollback and that `recordBudget` consumes unrelated
+  caller-supplied values rather than the pinned batch transition. Accordingly
+  P-TOPUP-2 is MODEL-only: SOURCE and TX remain OPEN, and packed storage plus
+  runtime identity are subordinate evidence. Batch/order/role/resume/root-age,
+  EIP-4788 anchor behavior, SHA-256, verifier/SSZ binding, linked external-call
+  summaries, compiler lowering beyond the declared Verity fragment,
+  solc Yul-to-bytecode, EVM/runtime, and optional deployment provenance remain
+  explicit assumptions or OPEN planes. No P-SSZ-1 or runtime closure is claimed.
+
+P-TOPUP-2 source-artifact to deployed-runtime identity (2026-08-11)
+-------------------------------------------------------------------
+
+- Machine receipt: `audit/p-topup-2-runtime-provenance.json`; deterministic
+  gate: `scripts/check_p_topup2_runtime_provenance.sh`.
+- The audited pin and release `v4.0.0` resolve to identical Git blobs for
+  SSZ.sol, GIndex.sol, BLS.sol, CLValidatorVerifier.sol, and TopUpGateway.sol.
+  SSZ.sol blob `0008c18c4a2ee99e6fbaed59c21cdf0dda41424b` has SHA-256
+  `91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b`.
+- Repository Hardhat compile covers 478 unique Solidity sources using solc
+  0.8.25, optimizer 200, viaIR, Cancun. Local deployment with the recorded
+  mainnet constructor arguments produces 9,868 runtime bytes with keccak256
+  `0x2b9cce4868b60e874f60387f61ebbaceaf20f074dc78bec5564c8477319aa6e4`.
+- The supplied independent mainnet observation at chainId 1/block 25,730,798
+  binds proxy `0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374`, its EIP-1967 implementation
+  slot, implementation `0xb08dBc68C521cD7A4318dc4C807a42bEB20f1106`, and byte-identical runtime.
+- Local gate execution: `LOCAL PASS`; with no credential-bearing RPC configured,
+  the live portion reports `SKIPPED_NO_RPC` and exits 2. Public archive trials
+  were not recorded as green because they did not serve both historical slot
+  and historical code. A reviewer supplies `MAINNET_RPC_URL` to reproduce the
+  complete live gate; credentials are neither embedded nor written.
+- This closes only pinned Solidity source-artifact to deployed-runtime identity
+  for that implementation and block. It does not claim Solidity-to-Verity
+  semantic correspondence, Verity model refinement, verifier/SSZ correctness,
+  or Yul/EVM semantics.

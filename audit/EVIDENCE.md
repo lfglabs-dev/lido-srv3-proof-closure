@@ -180,15 +180,15 @@ Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a s
 
 ## P-TOPUP-2
 
-Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.
+The mathematical headroom and aggregate-budget bounds are checked at MODEL only. Packed ERC-7201 layout/RMW and exact pinned-artifact-to-mainnet-runtime identity are subordinate evidence; checked-overflow rollback and the actual topUp batch transition are not connected to an official Verity transaction, so parent SOURCE/TX closure remains open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=BLOCKED; tx=BLOCKED; yul=OPEN; evm=BLOCKED; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L141)
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L165)
 - Theorem planes: `model`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup2.lean:141`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L141)
-- Assumptions: `A-RUNTIME-PROVENANCE`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup2`
-- Expected scope: successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance
+- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup2.lean:165`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L165)
+- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-EIP4788-ANCHOR`, `A-SHA256-FFI`, `A-TOPUP-EXTERNAL-SUMMARIES`, `A-DEPLOYMENT-PROVENANCE-OPTIONAL`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants`
+- Expected scope: successful MODEL bounds plus subordinate packed layout/RMW and material Contract.run evidence; parent SOURCE/TX and verifier/Yul/EVM semantics remain open
 
 ## P-CONSOLIDATION-1
 
