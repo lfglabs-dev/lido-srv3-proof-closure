@@ -136,11 +136,11 @@ verity_contract AllocationContract where
 /-!
 Executable negative implementation for the receipts below. It intentionally
 copies the audited transition instead of replacing it with arithmetic
-predicates: `allocateWithoutCapacityOrEnabledGuards` drops the final capacity
-clamp and also lets disabled rows participate in every
-candidate scan. Orthogonal receipt vectors make the capacity and enabled guards
-non-binding one at a time, so each mutation changes an observed `Contract.run`
-post-state for its advertised reason.
+predicates: `allocateWithThreeMutants` overwrites rather than adds the selected
+allocation, drops the final effective-capacity clamp, and lets disabled rows
+participate in every candidate scan.  Three orthogonal receipt vectors make the
+other two mutations non-binding, so each mutation independently changes an
+observed `Contract.run` post-state for its advertised reason.
 -/
 
 verity_contract AllocationMutants where
@@ -153,7 +153,7 @@ verity_contract AllocationMutants where
   constants
     MAX_WORD : Uint256 := 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 
-  function allocateWithoutCapacityOrEnabledGuards (deposits : Uint256) : Uint256 := do
+  function allocateWithThreeMutants (deposits : Uint256) : Uint256 := do
     let count ← getStorageArrayLength stakeRatios
     let limitsCount ← getStorageArrayLength moduleLimits
     let buffersCount ← getStorageArrayLength allocationBuffers
@@ -214,7 +214,8 @@ verity_contract AllocationMutants where
             levelHeadroom := levelHeadroom
           -- Mutation: omit `capacityHeadroom` from the source-shaped minimum.
           let amount := min share levelHeadroom
-          let updated ← requireSomeUint (safeAdd bestAllocation amount) "BUCKET_OVERFLOW"
+          -- Mutation: overwrite the existing allocation instead of adding to it.
+          let updated := amount
           let nextTotal ← requireSomeUint (safeAdd total amount) "TOTAL_OVERFLOW"
           setStorageArrayElement stakeRatios bestIndex updated
           total := nextTotal
@@ -288,6 +289,33 @@ def allocationReceiptState : ContractState :=
       else if storageSlot = AllocationContract.moduleEnabled.slot then [1, 0]
       else [] }
 
+def conservationReceiptState : ContractState :=
+  { defaultState with
+    storageArray := fun storageSlot =>
+      if storageSlot = AllocationContract.stakeRatios.slot then [10]
+      else if storageSlot = AllocationContract.moduleLimits.slot then [100]
+      else if storageSlot = AllocationContract.allocationBuffers.slot then [100]
+      else if storageSlot = AllocationContract.moduleEnabled.slot then [1]
+      else [] }
+
+def bufferCapacityReceiptState : ContractState :=
+  { defaultState with
+    storageArray := fun storageSlot =>
+      if storageSlot = AllocationContract.stakeRatios.slot then [0]
+      else if storageSlot = AllocationContract.moduleLimits.slot then [100]
+      else if storageSlot = AllocationContract.allocationBuffers.slot then [40]
+      else if storageSlot = AllocationContract.moduleEnabled.slot then [1]
+      else [] }
+
+def limitCapacityReceiptState : ContractState :=
+  { defaultState with
+    storageArray := fun storageSlot =>
+      if storageSlot = AllocationContract.stakeRatios.slot then [0]
+      else if storageSlot = AllocationContract.moduleLimits.slot then [40]
+      else if storageSlot = AllocationContract.allocationBuffers.slot then [100]
+      else if storageSlot = AllocationContract.moduleEnabled.slot then [1]
+      else [] }
+
 def disabledReceiptState : ContractState :=
   { defaultState with
     storageArray := fun storageSlot =>
@@ -298,31 +326,38 @@ def disabledReceiptState : ContractState :=
       else [] }
 
 def conservationReceipt : Bool :=
-  match (AllocationContract.allocate 130).run allocationReceiptState with
-  | .success total after =>
+  match (AllocationContract.allocate 60).run conservationReceiptState,
+      (AllocationMutants.allocateWithThreeMutants 60).run conservationReceiptState with
+  | .success total after, .success mutantTotal mutantAfter =>
       let finalSum := ((after.storageArray AllocationContract.stakeRatios.slot).map
         (fun word => word.val)).sum
-      total = 100 &&
-      decide (finalSum = 0 + 0 + total.val) &&
-      -- Mutant: attributing one extra unit to the post-state is rejected.
-      !(decide (finalSum = 0 + 0 + total.val + 1))
-  | .revert _ _ => false
+      let mutantAllocations := mutantAfter.storageArray AllocationMutants.stakeRatios.slot
+      total = 60 && finalSum = 10 + total.val &&
+      after.storageArray AllocationContract.stakeRatios.slot = [70] &&
+      mutantTotal = 60 && mutantAllocations = [60] &&
+      mutantAllocations != after.storageArray AllocationContract.stakeRatios.slot
+  | _, _ => false
 
 def capacityReceipt : Bool :=
-  match (AllocationContract.allocate 130).run allocationReceiptState,
-      (AllocationMutants.allocateWithoutCapacityOrEnabledGuards 130).run
-        allocationReceiptState with
-  | .success total after, .success mutantTotal mutantAfter =>
-      let allocations := after.storageArray AllocationContract.stakeRatios.slot
-      let mutantAllocations := mutantAfter.storageArray AllocationMutants.stakeRatios.slot
-      total = 100 && allocations[0]? = some 100 && allocations[1]? = some 0 &&
-      mutantTotal = 130 && mutantAllocations[0]? = some 130 &&
-      mutantAllocations != allocations
-  | _, _ => false
+  match (AllocationContract.allocate 70).run bufferCapacityReceiptState,
+      (AllocationMutants.allocateWithThreeMutants 70).run bufferCapacityReceiptState,
+      (AllocationContract.allocate 70).run limitCapacityReceiptState,
+      (AllocationMutants.allocateWithThreeMutants 70).run limitCapacityReceiptState with
+  | .success bufferTotal bufferAfter, .success bufferMutantTotal bufferMutantAfter,
+      .success limitTotal limitAfter, .success limitMutantTotal limitMutantAfter =>
+      bufferTotal = 40 &&
+      bufferAfter.storageArray AllocationContract.stakeRatios.slot = [40] &&
+      bufferMutantTotal = 70 &&
+      bufferMutantAfter.storageArray AllocationMutants.stakeRatios.slot = [70] &&
+      limitTotal = 40 &&
+      limitAfter.storageArray AllocationContract.stakeRatios.slot = [40] &&
+      limitMutantTotal = 70 &&
+      limitMutantAfter.storageArray AllocationMutants.stakeRatios.slot = [70]
+  | _, _, _, _ => false
 
 def disabledExclusionReceipt : Bool :=
   match (AllocationContract.allocate 30).run disabledReceiptState,
-      (AllocationMutants.allocateWithoutCapacityOrEnabledGuards 30).run
+      (AllocationMutants.allocateWithThreeMutants 30).run
         disabledReceiptState with
   | .success total after, .success mutantTotal mutantAfter =>
       let allocations := after.storageArray AllocationContract.stakeRatios.slot
