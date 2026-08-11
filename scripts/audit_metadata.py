@@ -36,8 +36,10 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.tx-execution-simulation",
     "P-ETH-1a",
     "P-ETH-1b",
+    "P-DEREF-1",
 ]
 SOURCE_TARGET_IDS = EXPECTED_IDS[:6] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
+SOURCE_TARGET_IDS = SOURCE_TARGET_IDS + ["P-DEREF-1"]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -534,6 +536,13 @@ EXPECTED_SSZ_CLAIM = {
     ],
 }
 VERIFIED_SOURCE_ANCHORS = {
+    "P-DEREF-1": {
+        ("contracts/0.8.25/sr/SRStorage.sol", "ROUTER_STORAGE_POSITION, module address access, and membership", 12, 78),
+        ("contracts/0.8.25/sr/SRUtils.sol", "_requireModuleIdExists membership guard", 45, 47),
+        ("contracts/0.8.25/sr/SRTypes.sol", "ModuleStateConfig moduleAddress declaration", 117, 136),
+        ("contracts/0.8.25/sr/SRLib.sol", "_migrateStorage registry writers", 51, 155),
+        ("contracts/0.8.25/sr/SRLib.sol", "_addModule registry writer", 183, 232),
+    },
     "P-ALLOC-1": {
         ("contracts/0.8.25/sr/StakingRouter.sol", "getDepositAllocations", 929, 936),
         ("contracts/0.8.25/sr/SRLib.sol", "_getDepositAllocations", 391, 431),
@@ -847,7 +856,7 @@ def validate():
     ids = [row["id"] for row in rows]
     require(ids == EXPECTED_IDS + SUBORDINATE_IDS,
             "guarantees must contain the exact ordered canonical IDs plus subordinate evidence")
-    require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
+    require([row["catalogue_wording"] for row in rows[:-1]] == EXPECTED_WORDING,
             "catalogue wording changed")
     require(exclusions == EXPECTED_EXCLUSIONS,
             "exclusions differ from the canonical scope boundary set")
@@ -870,7 +879,7 @@ def validate():
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
     for row, expected_statuses, expected_theorem_planes, expected_theorem, expected_reproduction, expected_links, expected_gate in zip(
-        rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
+        rows[:-1], EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
         EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
         if row["id"] == "P-ETH-1a":
@@ -1043,6 +1052,34 @@ def validate():
                 f"{row['id']}: assumption links differ from canonical risks")
         require(set(row["assumptions"]) <= assumption_ids,
                 f"{row['id']}: canonical assumption link is unknown")
+    pderef = rows[-1]
+    require(pderef["id"] == "P-DEREF-1", "supplemental dereference row is missing")
+    require(pderef.get("catalogue_wording") ==
+            "Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.",
+            "P-DEREF-1: catalogue wording differs from canonical bounded claim")
+    require(pderef.get("source_plane_scope") ==
+            "registry address binding only; migration old-layout contents are explicit inputs",
+            "P-DEREF-1: source plane scope differs from canonical boundary")
+    require(pderef.get("theorem") == "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source",
+            "P-DEREF-1: theorem differs from canonical evidence")
+    require(pderef.get("theorem_planes") == ["model", "source", "tx"],
+            "P-DEREF-1: theorem planes differ from canonical evidence")
+    require(pderef.get("statuses") == {
+        "model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE",
+        "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN",
+        "evm": "OPEN", "crypto": "NOT_APPLICABLE",
+    }, "P-DEREF-1: assurance statuses differ from canonical claims")
+    require(pderef.get("assumptions") == [
+        "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-YUL-INTERFACE",
+        "A-RUNTIME-PROVENANCE",
+    ], "P-DEREF-1: assumption links differ from canonical risks")
+    require(pderef.get("next_gate") ==
+            "Establish independently checked ROUTER_STORAGE_POSITION, Solidity mapping layout, compiler-emitted SLOAD execution, and deployed runtime provenance before claiming Yul/EVM closure.",
+            "P-DEREF-1: next gate differs from canonical roadmap")
+    require(pderef.get("reproduction") == {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants",
+        "expected": "reachable nonzero derivation, source-to-executable-Verity mapping refinement, and guard/address-writer mutants compile; Yul/EVM provenance remains OPEN",
+    }, "P-DEREF-1: reproduction record differs from canonical evidence")
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")

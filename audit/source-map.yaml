@@ -178,6 +178,17 @@
         ,{"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol", "function": "SHA256_DIGEST_LENGTH and zero padding literals", "start_line": 126, "end_line": 133, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L126-L133"}
         ,{"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol", "function": "DEPOSIT_DATA_LENGTH ABI input shape", "start_line": 120, "end_line": 135, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"}
       ]
+    },
+    {
+      "id": "P-DEREF-1",
+      "status": "MAPPED",
+      "spans": [
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRStorage.sol", "function": "ROUTER_STORAGE_POSITION, module address access, and membership", "start_line": 12, "end_line": 78, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRStorage.sol#L12-L78"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRUtils.sol", "function": "_requireModuleIdExists membership guard", "start_line": 45, "end_line": 47, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L45-L47"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRTypes.sol", "function": "ModuleStateConfig moduleAddress declaration", "start_line": 117, "end_line": 136, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRTypes.sol#L117-L136"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRLib.sol", "function": "_migrateStorage registry writers", "start_line": 51, "end_line": 155, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L51-L155"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/0.8.25/sr/SRLib.sol", "function": "_addModule registry writer", "start_line": 183, "end_line": 232, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L183-L232"}
+      ]
     }
   ]
 }

@@ -580,6 +580,32 @@ def main():
             )
         write_json(guarantees_path, guarantees)
 
+        pderef_wording = copy.deepcopy(guarantees)
+        pderef_wording["guarantees"][-1]["catalogue_wording"] = (
+            "Production dereference behavior is fully certified."
+        )
+        write_json(guarantees_path, pderef_wording)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEREF-1: catalogue wording differs from canonical bounded claim",
+        )
+        write_json(guarantees_path, guarantees)
+
+        pderef_scope = copy.deepcopy(guarantees)
+        pderef_scope["guarantees"][-1]["source_plane_scope"] = (
+            "deployed runtime and exact Solidity storage layout"
+        )
+        write_json(guarantees_path, pderef_scope)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEREF-1: source plane scope differs from canonical boundary",
+        )
+        write_json(guarantees_path, guarantees)
+
         for status in ("AUDIT-CERT", "TYPO"):
             invalid_status = copy.deepcopy(guarantees)
             invalid_status["guarantees"][5]["statuses"]["source"] = status
