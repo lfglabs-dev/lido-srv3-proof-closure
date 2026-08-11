@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 63fd1e8d92cc69e8b7cd232faf37f88f4ac5191d
+validated-tree: 2d5df832f7ef2905c59279237d206d7f12677c0f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -553,3 +553,29 @@ P-TOPUP-2 faithful packed source-to-transaction closure (2026-08-11)
   summaries, compiler lowering beyond the declared Verity fragment,
   solc Yul-to-bytecode, EVM/runtime, and optional deployment provenance remain
   explicit assumptions or OPEN planes. No P-SSZ-1 or runtime closure is claimed.
+
+P-TOPUP-2 source-artifact to deployed-runtime identity (2026-08-11)
+-------------------------------------------------------------------
+
+- Machine receipt: `audit/p-topup-2-runtime-provenance.json`; deterministic
+  gate: `scripts/check_p_topup2_runtime_provenance.sh`.
+- The audited pin and release `v4.0.0` resolve to identical Git blobs for
+  SSZ.sol, GIndex.sol, BLS.sol, CLValidatorVerifier.sol, and TopUpGateway.sol.
+  SSZ.sol blob `0008c18c4a2ee99e6fbaed59c21cdf0dda41424b` has SHA-256
+  `91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b`.
+- Repository Hardhat compile covers 478 unique Solidity sources using solc
+  0.8.25, optimizer 200, viaIR, Cancun. Local deployment with the recorded
+  mainnet constructor arguments produces 9,868 runtime bytes with keccak256
+  `0x2b9cce4868b60e874f60387f61ebbaceaf20f074dc78bec5564c8477319aa6e4`.
+- The supplied independent mainnet observation at chainId 1/block 25,730,798
+  binds proxy `0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374`, its EIP-1967 implementation
+  slot, implementation `0xb08dBc68C521cD7A4318dc4C807a42bEB20f1106`, and byte-identical runtime.
+- Local gate execution: `LOCAL PASS`; with no credential-bearing RPC configured,
+  the live portion reports `SKIPPED_NO_RPC` and exits 2. Public archive trials
+  were not recorded as green because they did not serve both historical slot
+  and historical code. A reviewer supplies `MAINNET_RPC_URL` to reproduce the
+  complete live gate; credentials are neither embedded nor written.
+- This closes only pinned Solidity source-artifact to deployed-runtime identity
+  for that implementation and block. It does not claim Solidity-to-Verity
+  semantic correspondence, Verity model refinement, verifier/SSZ correctness,
+  or Yul/EVM semantics.
