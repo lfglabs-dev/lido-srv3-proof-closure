@@ -3,7 +3,7 @@
   "proof_baseline": "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2",
   "source_revisions": {
     "lido": "af095e48bbc1c3841c2c9936219c8461af01056b",
-    "verity": "c41757164e9e8230536d7af29d81a2961b30e482",
+    "verity": "1fe0218863a4c8d6113e6cdd4de3766a54df81c7",
     "lean": "v4.31.0"
   },
   "layers": {
