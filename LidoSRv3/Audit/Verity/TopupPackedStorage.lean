@@ -93,13 +93,21 @@ theorem target_setter_reader_run (state : ContractState) (value : Uint64) :
     (((do
       GatewayPackedContract.setTarget value.toUint256
       GatewayPackedContract.getTarget) : Contract Uint64).run state).fst = value := by
-  rfl
+  apply Verity.Core.UIntN.ext
+  simp [GatewayPackedContract.setTarget, GatewayPackedContract.getTarget,
+    Verity.setPackedStorage, Verity.getPackedStorage, Contract.run,
+    Verity.bind, Bind.bind, Verity.pure]
+  omega
 
 theorem minimum_setter_reader_run (state : ContractState) (value : Uint64) :
     (((do
       GatewayPackedContract.setMinimum value.toUint256
       GatewayPackedContract.getMinimum) : Contract Uint64).run state).fst = value := by
-  rfl
+  apply Verity.Core.UIntN.ext
+  simp [GatewayPackedContract.setMinimum, GatewayPackedContract.getMinimum,
+    Verity.setPackedStorage, Verity.getPackedStorage, Contract.run,
+    Verity.bind, Bind.bind, Verity.pure]
+  omega
 
 /-- SOURCE -> VERITY_TX for the exact checked headroom value. The validator
 proof and surrounding batch guards are the documented boundary, not premises
