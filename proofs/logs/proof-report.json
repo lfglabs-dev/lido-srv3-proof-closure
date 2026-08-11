@@ -2,14 +2,14 @@
   "schema": "srv3-verity-lean-proof-report-v2",
   "toolchain": {
     "lean": "4.31.0",
-    "verity_commit": "c41757164e9e8230536d7af29d81a2961b30e482"
+    "verity_commit": "1fe0218863a4c8d6113e6cdd4de3766a54df81c7"
   },
   "command": "lake build LidoSRv3",
   "build": {
     "log": "proofs/logs/prove.txt",
-    "log_sha256": "313cd2464688c2b6b17029ac10a554f00233a52c84a2e4a7b82244c8ef51f543",
-    "verified_at": "2026-08-11T10:21:53Z",
-    "verified_source_tree": "49da3c35b241c6ed570c9e1aafd339df537c598a",
+    "log_sha256": "bd0b070a221ad716e0b4c9a31aa460ab3b8dcbdde7079505013c3d06c8833605",
+    "verified_at": "2026-08-11T14:10:00Z",
+    "verified_source_tree": "edb6ad549998a0b35edc4d35caa3367e8c17f68c",
     "exit_status": 0
   },
   "targets": [
