@@ -2,6 +2,7 @@ import Compiler.CompilationModel
 import Verity.Core.Model.AllocationExtraction
 import Verity.Core.Model.Denote
 import Verity.Core.Model.DenoteExternalCalls
+import Verity.Core.Model.CallProgramRollback
 
 /-!
 # P-DEPOSIT-1: source-shaped deposit prefix scaffold (OPEN)
@@ -208,6 +209,63 @@ theorem malformed_actual_function_spec_rejects :
     (Denote.denoteFunction zeroOracle spec checkedPrefix malformedTx
       Verity.defaultState).success = false := by
   native_decide
+
+/-!
+## Reproducible Verity transaction blocker
+
+`CallProgram` rolls back a failing call to that call's immediate pre-world.  It
+does not expose a transaction frame that restores the world from before earlier
+successful calls.  The two-call witness below is the deposit-shaped failure
+case: a successful Lido-side mutation is followed by a reverting beacon call.
+The first mutation remains committed.  Consequently the current Verity main
+cannot justify whole-batch rollback for the deposit loop.
+-/
+open Compiler.CompilationModel.DenoteExternalCalls
+
+def rollbackWitnessContract : Nat := 17
+def rollbackWitnessSlot : Nat := 23
+
+def successfulLidoCall : CallSite :=
+  { siteId := 1, kind := .call, target := 101, value := 32, gas := 100000 }
+
+def revertingBeaconCall : CallSite :=
+  { siteId := 2, kind := .call, target := 102, value := 32, gas := 100000 }
+
+def wholeBatchRollbackCounterexample : CallProgram Unit :=
+  .bind successfulLidoCall fun _ =>
+    .bind revertingBeaconCall fun _ =>
+      .pure ()
+
+def rollbackCounterexampleAdversary : AdversaryModel :=
+  { stateTransition := fun site world =>
+      if site.siteId = 1 then
+        world.writeContractSlot rollbackWitnessContract rollbackWitnessSlot
+          (1 : Verity.Core.Uint256)
+      else world
+    result := fun site _ =>
+      if site.siteId = 1 then .success [] else .revert []
+    gasUsed := fun _ _ => 0 }
+
+def rollbackCounterexampleInitial : CallState :=
+  { world := Verity.defaultState, gasRemaining := 1000000 }
+
+/-- Kernel-reduced witness: the later revert keeps the earlier successful
+mutation instead of restoring the transaction-entry snapshot. -/
+theorem callProgram_later_revert_does_not_restore_entry_snapshot :
+    (denote wholeBatchRollbackCounterexample rollbackCounterexampleAdversary
+      rollbackCounterexampleInitial).2.world.readContractSlot
+        rollbackWitnessContract rollbackWitnessSlot = (1 : Verity.Core.Uint256) := by
+  rfl
+
+theorem callProgram_later_revert_world_differs_from_entry_snapshot :
+    (denote wholeBatchRollbackCounterexample rollbackCounterexampleAdversary
+      rollbackCounterexampleInitial).2.world ≠ rollbackCounterexampleInitial.world := by
+  intro h
+  have hslot := congrArg
+    (fun world => world.readContractSlot rollbackWitnessContract rollbackWitnessSlot) h
+  change (1 : Verity.Core.Uint256) = 0 at hslot
+  have hone : (1 : Verity.Core.Uint256) ≠ 0 := by decide
+  exact hone hslot
 
 def openComponents : List String :=
   [ "OPEN allocation: module capacity/summary calls, type-2 total stake, MinFirst.allocate, module-index lookup, zero-module branch, and all arithmetic/array bounds"

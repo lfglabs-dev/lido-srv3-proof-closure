@@ -15,6 +15,9 @@ open LidoSRv3.Audit.Verity.DepositRollback
 #guard withdrawalQueueSpec.contractId == withdrawalQueueNamespace
 #guard accountingOracleSpec.contractId == accountingOracleNamespace
 
+#check callProgram_later_revert_does_not_restore_entry_snapshot
+#check callProgram_later_revert_world_differs_from_entry_snapshot
+
 def bodyUsesPinnedSelectorAndAbiChecks : Bool :=
   let selectors := checkedPrefix.body.filterMap fun
     | .mstore (.literal 0) (.shl (.literal 224) (.literal selector)) => some selector
