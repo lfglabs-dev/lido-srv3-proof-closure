@@ -6,13 +6,26 @@ open LidoSRv3.Audit.SolidityDereference
 
 private def registeredOne : RegistryState :=
   { lastModuleId := 1
-    registered := fun id => id = 1
+    registered := fun id => if id = 1 then true else false
     moduleAddress := fun id => if id = 1 then 0xBEEF else 0 }
+
+private theorem registeredOne_reachable : Reachable registeredOne := by
+  apply Reachable.migrated registeredOne
+  constructor
+  · decide
+  · intro id hid
+    simp only [registeredOne] at hid ⊢
+    split at hid <;> simp_all [addressModulus]
 
 theorem concrete_positive_vector :
     sourceDeref (runInterleavings registeredOne
       [.staticCallback, .setStatus 1 2, .updateAccounting 1 99,
        .addFreshModule 2 0xCAFE]) 1 = some 0xBEEF := by decide
+
+theorem positive_vector_is_nonzero_by_reachability :
+    registeredOne.moduleAddress 1 ≠ 0 := by
+  exact LidoSRv3.Audit.Guarantees.PDeref1.closure registeredOne registeredOne_reachable 1
+    (by simp [Dereferenceable, registeredOne]) [] |>.2
 
 /-- Mutant: omitting `_requireModuleIdExists` aliases an absent id to address 0. -/
 def uncheckedDeref (s : RegistryState) (id : ModuleId) : ModuleAddress :=

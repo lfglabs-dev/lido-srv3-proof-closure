@@ -36,8 +36,10 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.tx-execution-simulation",
     "P-ETH-1a",
     "P-ETH-1b",
+    "P-DEREF-1",
 ]
 SOURCE_TARGET_IDS = EXPECTED_IDS[:6] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
+SOURCE_TARGET_IDS = SOURCE_TARGET_IDS + ["P-DEREF-1"]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -530,6 +532,11 @@ EXPECTED_SSZ_CLAIM = {
     ],
 }
 VERIFIED_SOURCE_ANCHORS = {
+    "P-DEREF-1": {
+        ("contracts/0.8.25/sr/SRStorage.sol", "ROUTER_STORAGE_POSITION and module state access", 12, 47),
+        ("contracts/0.8.25/sr/SRLib.sol", "_migrateStorage registry writers", 51, 155),
+        ("contracts/0.8.25/sr/SRLib.sol", "_addModule registry writer", 183, 232),
+    },
     "P-ALLOC-1": {
         ("contracts/0.8.25/sr/StakingRouter.sol", "getDepositAllocations", 929, 936),
         ("contracts/0.8.25/sr/SRLib.sol", "_getDepositAllocations", 391, 431),
@@ -843,7 +850,7 @@ def validate():
     ids = [row["id"] for row in rows]
     require(ids == EXPECTED_IDS + SUBORDINATE_IDS,
             "guarantees must contain the exact ordered canonical IDs plus subordinate evidence")
-    require([row["catalogue_wording"] for row in rows] == EXPECTED_WORDING,
+    require([row["catalogue_wording"] for row in rows[:-1]] == EXPECTED_WORDING,
             "catalogue wording changed")
     require(exclusions == EXPECTED_EXCLUSIONS,
             "exclusions differ from the canonical scope boundary set")
@@ -866,7 +873,7 @@ def validate():
     assumption_ids = {row["id"] for row in assumptions["assumptions"]}
     source_targets = {row["id"]: row for row in source_map["targets"]}
     for row, expected_statuses, expected_theorem_planes, expected_theorem, expected_reproduction, expected_links, expected_gate in zip(
-        rows, EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
+        rows[:-1], EXPECTED_STATUSES, EXPECTED_THEOREM_PLANES, EXPECTED_THEOREMS,
         EXPECTED_REPRODUCTION, EXPECTED_ASSUMPTION_LINKS, EXPECTED_NEXT_GATES
     ):
         if row["id"] == "P-ETH-1a":

@@ -249,6 +249,17 @@
       "note": "Deployment-provenance assumption: Solidity uses nonzero immutable CONSOLIDATION_REQUEST, but proving its deployed value is 0x00...007251 is outside this source theorem.",
       "next_gate": "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"}
+    },
+    {
+      "id": "P-DEREF-1",
+      "catalogue_wording": "Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.",
+      "source_plane_scope": "registry address binding only; migration old-layout contents are explicit inputs",
+      "theorem": "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-YUL-INTERFACE", "A-RUNTIME-PROVENANCE"],
+      "next_gate": "Establish independently checked ROUTER_STORAGE_POSITION, Solidity mapping layout, compiler-emitted SLOAD execution, and deployed runtime provenance before claiming Yul/EVM closure.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants", "expected": "reachable nonzero derivation, source-to-executable-Verity mapping refinement, and guard/address-writer mutants compile; Yul/EVM provenance remains OPEN"}
     }
   ]
 }
