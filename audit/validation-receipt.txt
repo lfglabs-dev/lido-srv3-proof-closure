@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: e7866d43a4c2885e98a486d029798af814b6d4e5
+validated-tree: 6009e70dfcc2fbe6ad02ee0ba059a5c070023d68
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
