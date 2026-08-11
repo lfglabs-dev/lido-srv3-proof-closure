@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Model.AllocCapacity
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
+import LidoSRv3.Audit.Source.MinFirstCorrespondence
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1
@@ -8,7 +9,7 @@ open Verity
 open Verity.Stdlib.Math
 open LidoSRv3.Audit.AllocCapacity
 
-def guarantee : Guarantee := ⟨.pAlloc1, [.model, .source]⟩
+def guarantee : Guarantee := ⟨.pAlloc1, [.model, .source, .verityTx]⟩
 
 /-- The canonical active capacity is bounded by both operands of the pinned
 `Math.min` clamp. -/
@@ -48,5 +49,15 @@ theorem checked_uint256_execution_refines_math
       rows.map (fun row => (row.capacity : Nat)) =
         MathView.capacities cfg modules depositsToAllocate isTopUp :=
   source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds
+
+/-- Bounded official-Verity transaction closure for the merged source/capacity
+lane.  The observation fixes the returned checked amount and the full
+router-ordered allocation column, including additive conservation. -/
+theorem verity_tx_refines_source_capacity_and_conservation :
+    SolidityMinFirst.observeAllocationTx
+      ((SolidityMinFirst.AllocationContract.allocate 60).run
+        SolidityMinFirst.conservationReceiptState) =
+      SolidityMinFirst.sourceCapacityObservation :=
+  SolidityMinFirst.verity_tx_refines_source_capacity_and_conservation
 
 end LidoSRv3.Audit.Guarantees.PAlloc1

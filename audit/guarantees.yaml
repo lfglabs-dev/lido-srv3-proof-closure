@@ -5,12 +5,13 @@
     {
       "id": "P-ALLOC-1",
       "catalogue_wording": "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
-      "theorem_planes": ["model", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-SOURCE-SHAPED"],
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "note": "Bounded official Verity Contract.run receipt refines Source.checkedAmount and observes additive allocation conservation; multi-row executable-wrapper semantics, proportional allocation generally, Yul, EVM, runtime, and deployment provenance remain OPEN.",
       "next_gate": "Refine proportional allocation amounts and EVM correspondence for SRLib._getModulesAllocationAndCapacity.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression", "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression", "expected": "successful checked-source/capacity correspondence plus bounded official Verity Contract.run conservation refinement, positive receipt, and sensitive overwrite/capacity/disabled mutants; general proportional allocation and Yul/EVM/runtime/deployment remain open"}
     },
     {
       "id": "P-ALLOC-2",
