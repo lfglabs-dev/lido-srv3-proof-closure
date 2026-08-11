@@ -37,7 +37,7 @@ SUBORDINATE_IDS = [
     "P-ETH-1a",
     "P-ETH-1b",
 ]
-SOURCE_TARGET_IDS = EXPECTED_IDS[:7] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
+SOURCE_TARGET_IDS = EXPECTED_IDS[:6] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -49,7 +49,7 @@ EXPECTED_WORDING = [
     "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
     "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
-    "Pinned-source consolidation ETH routing is value-conserving and confined to the WithdrawalVault/EIP-7251 request route plus the explicit refund recipient (caller fallback for zero recipient); executable Verity transaction semantics prove the successful trace projection and full snapshot rollback for represented failures.",
+    "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; checked theorems cover only bounded interfaces.",
     "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
     "Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.",
     "Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.",
@@ -111,7 +111,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
      "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Tests.EthFlowMutants",
-     "expected": "successful pinned-source value conservation, destination confinement, executable Verity success/rollback refinement, and negative mutants"},
+     "expected": "successful bounded consolidation-route proofs and mutants only; parent P-ETH-1 remains OPEN"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1",
      "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2",
@@ -144,7 +144,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+    [],
     ["A-ABSTRACT-TX"],
     ["A-RUNTIME-PROVENANCE"],
     ["A-SHA256-FFI"],
@@ -169,7 +169,7 @@ EXPECTED_NEXT_GATES = [
     "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
     "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
     "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
-    "Refine the linked external-call surface through generated Yul/EVM and independently prove deployed request-target identity; compose separately owned ETH guarantees without widening this writer.",
+    "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
     "Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.",
     "Obtain independent canonical runtime, codehash, fork, and address provenance.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
@@ -213,7 +213,7 @@ EXPECTED_STATUSES = [
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -247,7 +247,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
     ["model", "source", "tx"],
     ["model", "source", "tx"],
-    ["model", "source", "tx"],
+    [],
     ["model", "tx"],
     ["model"],
     [],
@@ -270,7 +270,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
-    "LidoSRv3.Audit.Guarantees.PEth1.hybrid_source_verity_closure",
+    None,
     "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
     "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
     None,
@@ -591,14 +591,6 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.4.24/Lido.sol", "_getDepositableEther", 831, 833),
         ("contracts/0.4.24/Lido.sol", "_spendDepositableEther", 839, 859),
         ("contracts/0.4.24/Lido.sol", "withdrawDepositableEther", 869, 886),
-    },
-    "P-ETH-1": {
-        ("contracts/0.8.25/consolidation/ConsolidationBus.sol", "executeConsolidation value-forwarding suffix", 383, 406),
-        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "addConsolidationRequests value-routing suffix", 185, 223),
-        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "_checkFee", 286, 293),
-        ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "_refundFee", 295, 307),
-        ("contracts/0.8.9/WithdrawalVault.sol", "addConsolidationRequests", 199, 208),
-        ("contracts/0.8.9/WithdrawalVaultEIP7685.sol", "_addConsolidationRequests", 56, 73),
     },
     "P-ETH-1a": {
         ("contracts/0.8.25/consolidation/ConsolidationGateway.sol", "preservesEthBalance", 118, 122),

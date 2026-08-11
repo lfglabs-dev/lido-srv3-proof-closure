@@ -30,7 +30,7 @@ def approvedReturnMoves (moves : List EthMove) : List EthMove :=
 
 /-- The canonical parent remains open; the theorems below are subordinate
 evidence for its two bounded child rows, not additional public guarantees. -/
-def guarantee : Guarantee := ⟨.pEth1, [.model, .source, .verityTx]⟩
+def guarantee : Guarantee := ⟨.pEth1, []⟩
 
 /-- Every committed move made through the protocol-controlled stVault
 rebalance/redemption interface is retained by the approved-path filter, so its
