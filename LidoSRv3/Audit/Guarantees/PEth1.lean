@@ -85,11 +85,11 @@ theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall
   simp [ethTrace, hTarget] at hMem
   simp [hMem]
 
-/-- Hybrid P-ETH-1 writer theorem. The first conjunct is the independent
-pinned-source value guarantee. The second conjunct ties every successful
-execution to the actual `Verity.Contract.run` result; the third records full
-snapshot rollback for every represented revert. -/
-theorem hybrid_source_verity_closure
+/-- Bounded handwritten route-model theorem. It proves value arithmetic,
+refund-recipient selection, and rollback for `abstractRouteExec`; it does not
+execute the declared Verity function, constrain the fee call target, or close
+the canonical P-ETH-1 parent. -/
+theorem bounded_route_model
     (scope : SolidityEthFlow.ScopeAssumptions)
     (state : Verity.ContractState)
     (count fee : SolidityEthFlow.Word)
@@ -97,7 +97,7 @@ theorem hybrid_source_verity_closure
     scope.sourceGroupCount → scope.validatedPairs →
     scope.requestTargetProvenance →
     (∀ after,
-      (SolidityEthFlow.routeExec count fee recipient).run state = .success () after →
+      (SolidityEthFlow.abstractRouteExec count fee recipient).run state = .success () after →
       ∃ route,
         SolidityEthFlow.sourceRoute state.sender state.msgValue count fee recipient =
           .committed route ∧
@@ -106,18 +106,18 @@ theorem hybrid_source_verity_closure
         route.refundRecipient =
           SolidityEthFlow.effectiveRefundRecipient state.sender recipient) ∧
     ∀ reason rollback,
-      (SolidityEthFlow.routeExec count fee recipient).run state =
+      (SolidityEthFlow.abstractRouteExec count fee recipient).run state =
         .revert reason rollback → rollback = state := by
   intro _ _ _
   constructor
   · intro after hSuccess
-    have hSource := SolidityEthFlow.verity_route_success_matches_source
+    have hSource := SolidityEthFlow.abstract_route_success_matches_source
       state after count fee recipient hSuccess
     refine ⟨SolidityEthFlow.decodeRoute after, hSource, rfl, ?_, ?_⟩
     · exact SolidityEthFlow.source_route_conserves _ _ _ _ _ _ hSource
-    · exact SolidityEthFlow.source_route_confined _ _ _ _ _ _ hSource
+    · exact SolidityEthFlow.source_refund_recipient_matches _ _ _ _ _ _ hSource
   · intro reason rollback hRevert
-    exact SolidityEthFlow.verity_route_revert_rolls_back
+    exact SolidityEthFlow.abstract_route_revert_rolls_back
       state rollback count fee recipient reason hRevert
 
 /-!

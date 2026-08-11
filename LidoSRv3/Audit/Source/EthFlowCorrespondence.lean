@@ -27,10 +27,12 @@ This module transcribes the value-routing suffix of `lidofinance/core` at
 The cryptographic witness checks, request-limit accounting, dynamic-array
 flattening, deployment addresses, and callee implementations are explicitly
 outside this writer.  They are named assumptions below, not silent premises.
-The proved property is exact value conservation and destination confinement
-for the successful consolidation route, plus snapshot rollback for every
-represented failure.  It is VERITY_TX evidence linked to the pinned Verity /
-EVMYulLean toolchain; it is not runtime-bytecode equivalence.
+The proved property is exact value conservation and refund-recipient selection
+for a handwritten bounded route model, plus snapshot rollback for every
+represented failure. The declared Verity contract below is a compiler-surface
+scaffold only: the proof-facing interpreter does not execute its linked
+external calls. Fee-target confinement, generated-code correspondence, and
+runtime-bytecode equivalence remain open.
 -/
 
 abbrev Word := Verity.Core.Uint256
@@ -101,11 +103,10 @@ def decodeRoute (state : ContractState) : Route :=
     refundValue := state.storage EthRouteContract.routedRefundValue.slot
     refundRecipient := state.storageAddr EthRouteContract.routedRefundRecipient.slot }
 
-/-- Transparent executable Verity transaction semantics for the pinned route.
-The companion `verity_contract` above supplies the compiler-linked external-call
-surface; this interpreter supplies the proof-facing rollback and trace
-projection without assigning effects to the abstract linked-call oracle. -/
-def routeExec (count fee : Word) (recipient : Address) : Contract Unit :=
+/-- Handwritten abstract transaction model for the bounded route. It deliberately
+does not execute `EthRouteContract.route` or its `externalCallBind` operations,
+so it supplies no VERITY_TX or fee-target-confinement evidence. -/
+def abstractRouteExec (count fee : Word) (recipient : Address) : Contract Unit :=
   fun state =>
     match sourceRoute state.sender state.msgValue count fee recipient with
     | .reverted reason => .revert reason state
@@ -144,10 +145,10 @@ theorem source_route_conserves (sender : Address) (value count fee : Word)
     rw [Verity.Core.Uint256.sub_eq_of_le (Nat.le_of_not_gt hfee)]
     exact Nat.add_sub_of_le (Nat.le_of_not_gt hfee)
 
-/-- P-ETH-1 destination theorem: the only successful destinations are the
-configured request target and the explicit refund recipient (or sender when
-that recipient is zero). -/
-theorem source_route_confined (sender : Address) (value count fee : Word)
+/-- The source-shaped model selects the explicit refund recipient, falling back
+to the sender when that recipient is zero. The model does not observe or
+constrain the separate fee-bearing call target. -/
+theorem source_refund_recipient_matches (sender : Address) (value count fee : Word)
     (recipient : Address) (route : Route)
     (h : sourceRoute sender value count fee recipient = .committed route) :
     route.refundRecipient = effectiveRefundRecipient sender recipient := by
@@ -158,28 +159,27 @@ theorem source_route_confined (sender : Address) (value count fee : Word)
   split at h <;> try contradiction
   next totalFee hmul hfee => cases h; rfl
 
-/-- Executable Verity rollback: all represented rejects restore the complete
+/-- Abstract-model rollback: all represented rejects restore the complete
 pre-call state, not merely the three route slots. -/
-theorem verity_route_revert_rolls_back (state rollback : ContractState)
+theorem abstract_route_revert_rolls_back (state rollback : ContractState)
     (count fee : Word) (recipient : Address) (reason : String)
-    (h : (routeExec count fee recipient).run state =
+    (h : (abstractRouteExec count fee recipient).run state =
       .revert reason rollback) : rollback = state := by
-  simp [routeExec, Contract.run] at h
+  simp [abstractRouteExec, Contract.run] at h
   split at h <;> simp_all
 
-/-- Successful executable routing writes exactly the source-shaped route.
-External calls are represented by Verity linked externals; the runtime identity
-of their targets remains A-REQUEST-TARGET-PROVENANCE. -/
-theorem verity_route_success_matches_source (state after : ContractState)
+/-- A successful abstract route-model transition writes exactly the
+source-shaped route. This is not execution of the declared Verity function. -/
+theorem abstract_route_success_matches_source (state after : ContractState)
     (count fee : Word) (recipient : Address)
-    (h : (routeExec count fee recipient).run state =
+    (h : (abstractRouteExec count fee recipient).run state =
       .success () after) :
     sourceRoute state.sender state.msgValue count fee recipient =
       .committed (decodeRoute after) := by
   cases hs : sourceRoute state.sender state.msgValue count fee recipient with
-  | reverted reason => simp [routeExec, Contract.run, hs] at h
+  | reverted reason => simp [abstractRouteExec, Contract.run, hs] at h
   | committed route =>
-      simp [routeExec, Contract.run, hs] at h
+      simp [abstractRouteExec, Contract.run, hs] at h
       subst after
       have hSlots : EthRouteContract.routedVaultValue.slot ≠
           EthRouteContract.routedRefundValue.slot := by decide
