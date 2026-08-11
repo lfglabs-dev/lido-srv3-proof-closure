@@ -404,15 +404,15 @@
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.",
+      "catalogue_wording": "The mathematical headroom and aggregate-budget bounds are checked at MODEL only. Packed ERC-7201 layout/RMW and exact pinned-artifact-to-mainnet-runtime identity are subordinate evidence; checked-overflow rollback and the actual topUp batch transition are not connected to an official Verity transaction, so parent SOURCE/TX closure remains open.",
       "scope": null,
       "statuses": {
         "model": "LEAN_CHECKED",
         "algorithm": "NOT_APPLICABLE",
-        "source": "BLOCKED",
-        "tx": "BLOCKED",
+        "source": "OPEN",
+        "tx": "OPEN",
         "yul": "OPEN",
-        "evm": "BLOCKED",
+        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
@@ -420,15 +420,20 @@
         "model"
       ],
       "assumptions": [
-        "A-RUNTIME-PROVENANCE"
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-EIP4788-ANCHOR",
+        "A-SHA256-FFI",
+        "A-TOPUP-EXTERNAL-SUMMARIES",
+        "A-DEPLOYMENT-PROVENANCE-OPTIONAL"
       ],
       "source": {
         "source": "LidoSRv3/Audit/Guarantees/PTopup2.lean",
-        "line": 141
+        "line": 165
       },
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2",
-        "expected": "successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants",
+        "expected": "successful MODEL bounds plus subordinate packed layout/RMW and material Contract.run evidence; parent SOURCE/TX and verifier/Yul/EVM semantics remain open"
       },
       "children": []
     },
