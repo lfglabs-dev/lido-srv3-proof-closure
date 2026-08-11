@@ -57,7 +57,8 @@ theorem accepted_gap_branch (v : Validator) (cfg : TopupConfig)
       (v.effectiveBalanceGwei + v.pendingBalanceGwei)) :
     evaluated_topup_limit v cfg = cfg.targetBalanceGwei -
       (v.effectiveBalanceGwei + v.pendingBalanceGwei) := by
-  simp [evaluated_topup_limit, hexit, hslash, hbelow, Nat.not_lt.mpr hmin]
+  simp [evaluated_topup_limit, hexit, hslash, Nat.not_le.mpr hbelow,
+    Nat.not_lt.mpr hmin]
 
 /-- Strict ordering is the source's duplicate-validator exclusion rule. -/
 def strictlyIncreasing : List Nat → Prop
