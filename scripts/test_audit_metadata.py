@@ -580,6 +580,32 @@ def main():
             )
         write_json(guarantees_path, guarantees)
 
+        pderef_wording = copy.deepcopy(guarantees)
+        pderef_wording["guarantees"][-1]["catalogue_wording"] = (
+            "Production dereference behavior is fully certified."
+        )
+        write_json(guarantees_path, pderef_wording)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEREF-1: catalogue wording differs from canonical bounded claim",
+        )
+        write_json(guarantees_path, guarantees)
+
+        pderef_scope = copy.deepcopy(guarantees)
+        pderef_scope["guarantees"][-1]["source_plane_scope"] = (
+            "deployed runtime and exact Solidity storage layout"
+        )
+        write_json(guarantees_path, pderef_scope)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEREF-1: source plane scope differs from canonical boundary",
+        )
+        write_json(guarantees_path, guarantees)
+
         for status in ("AUDIT-CERT", "TYPO"):
             invalid_status = copy.deepcopy(guarantees)
             invalid_status["guarantees"][5]["statuses"]["source"] = status
@@ -662,11 +688,9 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        # P-TOPUP-1 closed its source plane in this campaign.  The
-        # source claim must not be silently downgraded back to the pre-campaign
-        # model-only row, the theorem must stay the top-up correspondence rather
-        # than the allocation-ordering model fact it replaced, and the evm plane
-        # tx and evm planes it deliberately did not close must stay open.
+        # P-TOPUP-1 closes source plus the explicitly bounded hybrid Verity
+        # transaction suffix. Neither plane may be silently downgraded, the
+        # theorem must stay the hybrid adequacy theorem, and EVM stays open.
         topup_source_downgrade = copy.deepcopy(guarantees)
         topup_source_downgrade["guarantees"][3]["statuses"]["source"] = "OPEN"
         write_json(guarantees_path, topup_source_downgrade)
@@ -689,14 +713,14 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_tx_overclaim = copy.deepcopy(guarantees)
-        topup_tx_overclaim["guarantees"][3]["statuses"]["tx"] = "LEAN_CHECKED"
-        write_json(guarantees_path, topup_tx_overclaim)
+        topup_tx_downgrade = copy.deepcopy(guarantees)
+        topup_tx_downgrade["guarantees"][3]["statuses"]["tx"] = "OPEN"
+        write_json(guarantees_path, topup_tx_downgrade)
         run(
             fixture,
             False,
             "generate",
-            "P-TOPUP-1: tx status LEAN_CHECKED requires theorem evidence for that plane",
+            "P-TOPUP-1: assurance statuses differ from canonical claims",
         )
         write_json(guarantees_path, guarantees)
 

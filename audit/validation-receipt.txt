@@ -1,11 +1,41 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 28d786a14fa53e42b87b17a28fa9d339e1ec9046
+validated-tree: 02b1cc2b6526862fb868defb6f6fc2cbf515aa05
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-TOPUP-1 closure-v2 hybrid receipt (2026-08-11)
+-------------------------------------------------
+
+- Base: `campaign/lido-closure-v2@25c82e137236131c037a45618e44382547efebe2`;
+  `campaign/lido-minimal-11` was not moved or modified.
+- Verity: `c41757164e9e8230536d7af29d81a2961b30e482` (main containing
+  #2249/#2245/#2247/#2248); EVMYulLean remains
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`.
+- `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source` connects the
+  independent pinned-source interpreter to an actual `Verity.Contract.run`
+  suffix. Positive commits declare the Lido pull and beacon top-up push;
+  zero-top-up commits use the call-free entrypoint; reverts restore the exact
+  pre-call snapshot.
+- Negative mutants reject an ignored pre-call source revert, pull-side and
+  downstream/push-side reverts, unequal pull/push values, and a changed
+  router-balance observation. The staged suffix reaches only the calls attempted
+  before each source failure and then checks exact snapshot rollback.
+- Verity #2242 packed TopUpGateway storage is explicitly not treated as the
+  complete P-TOPUP-1 guarantee. Linked-external effects, Yul, EVM, runtime
+  bytecode, deployment provenance, and the P-TOPUP-2 amount computation remain
+  open.
+- `lake build LidoSRv3.Audit.Guarantees.PTopup1
+  LidoSRv3.Tests.TopupHybridMutants`: exit 0.
+- `make prove`: exit 0; full `LidoSRv3` build completed successfully.
+- `make test`: exit 0 after binding this receipt to the receipt-excluded tree.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Forbidden-token scan of the net changed Lean files found no `sorry`,
+  `admit`, `native_decide`, line-leading `axiom`/`unsafe`, `unsafeYul`, or
+  `runVerity`.
 
 The canonical authorities are `audit/source-map.yaml`, the generated audit
 views, and the executable `verity/targets/audit-manifest.json` consumer. The

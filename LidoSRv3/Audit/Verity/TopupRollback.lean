@@ -93,7 +93,7 @@ def topUpEntry : FunctionSpec :=
 def spec : CompilationModel :=
   { name := "PTopup1TopupRollback"
     fields := []
-    constructor := none
+    «constructor» := none
     functions := [topUpEntry] }
 
 def topUpSelector : Nat := 0x0f6b3d8b

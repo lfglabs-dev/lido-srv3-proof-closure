@@ -42,10 +42,14 @@ test:
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupVectors
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.TopupHybridMutants
+	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveMutants
 	@printf '%s\n' 'executable reserve non-interference and rollback mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors
 	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.DereferenceMutants
+	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
