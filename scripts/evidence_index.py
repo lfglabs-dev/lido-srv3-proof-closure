@@ -147,15 +147,28 @@ def evidence_data(rows, resolved):
             "reproduction": row["reproduction"],
         }
 
+    parents = [
+        {**item(row), "children": [item(child) for child in children.get(row["id"], [])]}
+        for row in rows
+        if row.get("parent_id") is None and row.get("source_plane_scope") is None
+    ]
+    supplemental = [
+        item(row)
+        for row in rows
+        if row.get("parent_id") is None and row.get("source_plane_scope") is not None
+    ]
+    represented = {row["id"] for row in parents + supplemental}
+    represented.update(child["id"] for parent in parents for child in parent["children"])
+    if represented != {row["id"] for row in rows}:
+        missing = sorted({row["id"] for row in rows} - represented)
+        raise EvidenceError(f"evidence rows were not represented: {', '.join(missing)}")
+
     return {
         "schema": "lido-srv3-theorem-scoped-evidence-v1",
         "campaign_commit": CAMPAIGN_COMMIT,
         "authority": "Catalogue target is not theorem scope; Lean theorem statements are authority.",
-        "parents": [
-            {**item(row), "children": [item(child) for child in children.get(row["id"], [])]}
-            for row in rows
-            if row.get("parent_id") is None and row.get("source_plane_scope") is None
-        ],
+        "parents": parents,
+        "supplemental": supplemental,
     }
 
 
@@ -203,6 +216,23 @@ def render_markdown(data):
                     f"- Expected scope: {child['reproduction']['expected']}", "",
                 ]
         lines.append("")
+    if data["supplemental"]:
+        lines += [
+            "## Standalone supplemental evidence",
+            "",
+            "These scoped rows are not public parent guarantees and are not subordinate to one of the eleven public guarantees.",
+            "",
+        ]
+        for row in data["supplemental"]:
+            lines += [
+                f"### {row['id']}", "", row["catalogue_wording"], "",
+                f"- Scope: {row['scope']}",
+                f"- Plane statuses: {_statuses(row['statuses'])}",
+                _theorem_block(row).replace("Parent theorem", "Theorem"),
+                f"- Assumptions: {', '.join(f'`{a}`' for a in row['assumptions']) or 'none'}",
+                f"- Reproduce: `{row['reproduction']['command']}`",
+                f"- Expected scope: {row['reproduction']['expected']}", "",
+            ]
     return "\n".join(lines).rstrip() + "\n"
 
 

@@ -281,3 +281,21 @@ Concrete Verity transaction-plane evidence stages the exact DepositData calldata
 - Assumptions: `A-VERITY-SCAFFOLD`, `A-SHA256-FFI`, `A-RUNTIME-PROVENANCE`
 - Reproduce: `lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation`
 - Expected scope: successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs
+
+
+## Standalone supplemental evidence
+
+These scoped rows are not public parent guarantees and are not subordinate to one of the eleven public guarantees.
+
+### P-DEREF-1
+
+Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.
+
+- Scope: registry address binding only; migration old-layout contents are explicit inputs
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source`](../LidoSRv3/Audit/Source/DereferenceCorrespondence.lean#L195)
+- Theorem planes: `model`, `source`, `tx`
+- Lean source: [`LidoSRv3/Audit/Source/DereferenceCorrespondence.lean:195`](../LidoSRv3/Audit/Source/DereferenceCorrespondence.lean#L195)
+- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-YUL-INTERFACE`, `A-RUNTIME-PROVENANCE`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants`
+- Expected scope: reachable nonzero derivation, source-to-executable-Verity mapping refinement, and guard/address-writer mutants compile; Yul/EVM provenance remains OPEN

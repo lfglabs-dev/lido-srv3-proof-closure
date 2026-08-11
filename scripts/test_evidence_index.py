@@ -67,6 +67,10 @@ def main():
             row("P-CHECKED", "LidoSRv3.Audit.Guarantees.PChecked.checked_parent"),
             row("P-ETH-1a", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined", "P-ETH-1"),
             row("P-ETH-1b", "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined", "P-ETH-1"),
+            {
+                **row("P-SUPPLEMENTAL", "LidoSRv3.Audit.Guarantees.PChecked.checked_parent"),
+                "source_plane_scope": "standalone bounded supplemental scope",
+            },
         ]
         resolved = validate_and_resolve(rows, root)
         rendered = render_markdown(evidence_data(rows, resolved))
@@ -74,6 +78,9 @@ def main():
         assert "P-ETH-1a" in rendered and "P-ETH-1b" in rendered
         assert "Subordinate evidence (does not prove the parent)" in rendered
         assert "PChecked.lean#L2" in rendered
+        assert "Standalone supplemental evidence" in rendered
+        assert "P-SUPPLEMENTAL" in rendered
+        assert evidence_data(rows, resolved)["supplemental"][0]["id"] == "P-SUPPLEMENTAL"
 
         missing = copy.deepcopy(rows)
         missing[2]["theorem"] = "LidoSRv3.Audit.Guarantees.PChecked.missing"
