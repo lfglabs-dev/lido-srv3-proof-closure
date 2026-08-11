@@ -1,6 +1,6 @@
 verified_source_tree=edb6ad549998a0b35edc4d35caa3367e8c17f68c
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
-⚠ [1180/1254] Replayed Conform.Wheels
+⚠ [1180/1317] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -13,7 +13,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1181/1254] Replayed EvmYul.Pretty
+⚠ [1181/1317] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -26,15 +26,15 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1228/1254] Replayed EvmYul.Semantics
+⚠ [1228/1317] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1229/1254] Replayed EvmYul.EVM.Semantics
+⚠ [1229/1317] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1244/1254] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+⚠ [1244/1317] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:299:53: This simp argument is unused:
   setStorage
 
@@ -432,7 +432,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1250/1339] Replayed LidoSRv3.Audit.Trust
+ℹ [1246/1317] Replayed LidoSRv3.Audit.Trust
 info: LidoSRv3/Audit/Trust.lean:23:0: 'LidoSRv3.Audit.Quantity.checkedDiv_zero' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:24:0: 'LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:25:0: 'LidoSRv3.Audit.revert_restores_state_value_and_logs' depends on axioms: [propext]
@@ -509,7 +509,7 @@ info: LidoSRv3/Audit/Trust.lean:91:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_le
 info: LidoSRv3/Audit/Trust.lean:92:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
 info: LidoSRv3/Audit/Trust.lean:93:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:94:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
-⚠ [1262/1339] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+⚠ [1261/1317] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
 warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -529,7 +529,17 @@ info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationMode
   Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
     Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
       (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-ℹ [1310/1339] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
+ℹ [1308/1317] Replayed LidoSRv3.Tests.TopupHybridMutants
+info: LidoSRv3/Tests/TopupHybridMutants.lean:44:0: LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source (cfg : Audit.SolidityTopup.SourceTopupConfig)
+  (inp : Audit.SolidityTopup.SourceTopupInput) (state : ContractState) :
+  observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state
+info: LidoSRv3/Tests/TopupHybridMutants.lean:45:0: LidoSRv3.Audit.Verity.TopupHybrid.verity_revert_restores_snapshot (cfg : Audit.SolidityTopup.SourceTopupConfig)
+  (inp : Audit.SolidityTopup.SourceTopupInput) (state rollback : ContractState) (reason : String)
+  (h : (executeSource cfg inp).run state = ContractResult.revert reason rollback) : rollback = state
+info: LidoSRv3/Tests/TopupHybridMutants.lean:46:0: LidoSRv3.Audit.Verity.TopupHybrid.source_value_observation_adequate (cfg : Audit.SolidityTopup.SourceTopupConfig)
+  (inp : Audit.SolidityTopup.SourceTopupInput) :
+  (Audit.SolidityTopup.run cfg inp).pulled = (Audit.SolidityTopup.run cfg inp).pushed
+ℹ [1313/1339] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
 info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:41:0: LidoSRv3.Audit.Verity.TopupRollback.topup_program_declared : spec.functions = [topUpEntry]
 info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:42:0: LidoSRv3.Audit.Verity.TopupRollback.topup_success_post_state_equiv (cfg : SourceTopupConfig) (inp : SourceTopupInput)
   {keys pulled pushed balanceAfter : ℕ} (hRun : run cfg inp = Outcome.committedTopUp keys pulled pushed balanceAfter) :
@@ -552,16 +562,6 @@ info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:46:0: LidoSRv3.Audit.Verity
     ∀ entry ∈ Compiler.CompilationModel.DenoteExternalCalls.ObservedCalls program.calls adversary state,
       Compiler.CompilationModel.DenoteExternalCalls.RollsBack adversary entry) :
   (Compiler.CompilationModel.DenoteExternalCalls.denote program.calls adversary state).2.world = state.world
-ℹ [1311/1339] Replayed LidoSRv3.Tests.TopupHybridMutants
-info: LidoSRv3/Tests/TopupHybridMutants.lean:44:0: LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source (cfg : Audit.SolidityTopup.SourceTopupConfig)
-  (inp : Audit.SolidityTopup.SourceTopupInput) (state : ContractState) :
-  observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state
-info: LidoSRv3/Tests/TopupHybridMutants.lean:45:0: LidoSRv3.Audit.Verity.TopupHybrid.verity_revert_restores_snapshot (cfg : Audit.SolidityTopup.SourceTopupConfig)
-  (inp : Audit.SolidityTopup.SourceTopupInput) (state rollback : ContractState) (reason : String)
-  (h : (executeSource cfg inp).run state = ContractResult.revert reason rollback) : rollback = state
-info: LidoSRv3/Tests/TopupHybridMutants.lean:46:0: LidoSRv3.Audit.Verity.TopupHybrid.source_value_observation_adequate (cfg : Audit.SolidityTopup.SourceTopupConfig)
-  (inp : Audit.SolidityTopup.SourceTopupInput) :
-  (Audit.SolidityTopup.run cfg inp).pulled = (Audit.SolidityTopup.run cfg inp).pushed
 ⚠ [1316/1339] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
 
