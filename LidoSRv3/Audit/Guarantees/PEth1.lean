@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.EthFlowCorrespondence
 
 namespace LidoSRv3.Audit.Guarantees.PEth1
 
@@ -83,6 +84,41 @@ theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall
   intro hTarget other hMem addr
   simp [ethTrace, hTarget] at hMem
   simp [hMem]
+
+/-- Bounded handwritten route-model theorem. It proves value arithmetic,
+refund-recipient selection, and rollback for `abstractRouteExec`; it does not
+execute the declared Verity function, constrain the fee call target, or close
+the canonical P-ETH-1 parent. -/
+theorem bounded_route_model
+    (scope : SolidityEthFlow.ScopeAssumptions)
+    (state : Verity.ContractState)
+    (count fee : SolidityEthFlow.Word)
+    (recipient : Verity.Address) :
+    scope.sourceGroupCount → scope.validatedPairs →
+    scope.requestTargetProvenance →
+    (∀ after,
+      (SolidityEthFlow.abstractRouteExec count fee recipient).run state = .success () after →
+      ∃ route,
+        SolidityEthFlow.sourceRoute state.sender state.msgValue count fee recipient =
+          .committed route ∧
+        route = SolidityEthFlow.decodeRoute after ∧
+        route.vaultValue.val + route.refundValue.val = state.msgValue.val ∧
+        route.refundRecipient =
+          SolidityEthFlow.effectiveRefundRecipient state.sender recipient) ∧
+    ∀ reason rollback,
+      (SolidityEthFlow.abstractRouteExec count fee recipient).run state =
+        .revert reason rollback → rollback = state := by
+  intro _ _ _
+  constructor
+  · intro after hSuccess
+    have hSource := SolidityEthFlow.abstract_route_success_matches_source
+      state after count fee recipient hSuccess
+    refine ⟨SolidityEthFlow.decodeRoute after, hSource, rfl, ?_, ?_⟩
+    · exact SolidityEthFlow.source_route_conserves _ _ _ _ _ _ hSource
+    · exact SolidityEthFlow.source_refund_recipient_matches _ _ _ _ _ _ hSource
+  · intro reason rollback hRevert
+    exact SolidityEthFlow.abstract_route_revert_rolls_back
+      state rollback count fee recipient reason hRevert
 
 /-!
 ## ETH-bearing call-site inventory

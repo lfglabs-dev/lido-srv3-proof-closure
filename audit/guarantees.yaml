@@ -65,13 +65,14 @@
     },
     {
       "id": "P-ETH-1",
-      "catalogue_wording": "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
+      "catalogue_wording": "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; checked theorems cover only bounded interfaces.",
       "theorem": null,
       "theorem_planes": [],
       "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": [],
+      "note": "The bounded consolidation-route writer proves value conservation, refund-recipient confinement, and rollback for its handwritten source-shaped/Verity transaction model under named assumptions; it does not close the canonical parent or establish generated-code/runtime equivalence.",
       "next_gate": "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful bounded child-model proofs only; parent P-ETH-1 remains OPEN"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Tests.EthFlowMutants", "expected": "successful bounded consolidation-route proofs and mutants only; parent P-ETH-1 remains OPEN"}
     },
     {
       "id": "P-ADDRESS-1",
