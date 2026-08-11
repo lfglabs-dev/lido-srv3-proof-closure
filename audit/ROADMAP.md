@@ -2,14 +2,14 @@
 
 # ROADMAP
 
-- `P-ALLOC-1`: Refine proportional allocation amounts and EVM correspondence for SRLib._getModulesAllocationAndCapacity.
-- `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
-- `P-DEPOSIT-1`: Refine success/revert and rollback against pinned executable EVM semantics.
-- `P-TOPUP-1`: Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.
-- `P-ACCOUNT-1`: Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.
-- `P-RESERVE-1`: Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.
-- `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.
-- `P-ADDRESS-1`: Refine the checked official Verity transaction through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance; the existing subordinate Yul interface harness remains syntax-level evidence only.
+- `P-ALLOC-1`: Refine proportional allocation amounts for SRLib._getModulesAllocationAndCapacity.
+- `P-ALLOC-2`: Refine proportional allocation amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate.
+- `P-DEPOSIT-1`: Connect the pinned deposit conservation/rollback correspondence to an official Verity transaction.
+- `P-TOPUP-1`: Discharge the declared linked-external call summaries and establish independently verified deployment provenance.
+- `P-ACCOUNT-1`: Extend the checked Verity transaction beyond the accepted accounting prefix (later source guards, external calls) and establish independently verified deployment provenance.
+- `P-RESERVE-1`: Optionally establish deployed storage/call provenance; semantic closure ends at the proved Verity transaction under the solc trust assumption.
+- `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity and deployment provenance.
+- `P-ADDRESS-1`: Establish independently verified deployment provenance; semantic closure ends at the checked official Verity transaction under the solc trust assumption.
 - `P-TOPUP-2`: Model checked uint256 addition and rollback, then connect the pinned topUp batch transition and post-state to an official Verity Contract.run transaction before claiming SOURCE/TX closure.
 - `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
 - `P-SSZ-1`: Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.

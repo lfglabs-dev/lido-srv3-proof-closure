@@ -32,7 +32,6 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.abstract-digest",
     "P-CONSOLIDATION-1.abstract-flow-model",
     "P-ALLOC-1.eugene-bound",
-    "P-ADDRESS-1.yul-interface-harness",
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
     "P-SSZ-1.tx-execution-simulation",
@@ -62,7 +61,6 @@ EXPECTED_WORDING = [
     "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
     "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
-    "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
     "Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.",
     "Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.",
     "Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
@@ -105,6 +103,8 @@ EXPECTED_ASSUMPTIONS = {
          "risk": "Exact TopUpGateway pinned-artifact-to-mainnet-runtime identity is evidenced only at chainId 1/block 25730798 and remains separate from Solidity-to-Verity correspondence and Verity refinement."},
         {"id": "A-RUNTIME-PROVENANCE", "accepted": True,
          "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."},
+        {"id": "A-SOLC-TRUSTED", "accepted": True,
+         "risk": "The solc compilation pipeline (pinned Solidity/Yul to deployed EVM bytecode) is trusted rather than verified; assurance closes at model/source/transaction fidelity to pinned source plus recorded deployment provenance, and assembly-bearing source (SSZ Merkle-proof verification) remains tracked under the crypto plane."},
     ],
 }
 EXPECTED_REPRODUCTION = [
@@ -138,7 +138,6 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful typed-program compilation and exact source-then-target 96-byte single-CALL layout; no amount, SHA-256, loop, rollback, Yul, or EVM claim"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
      "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
-    {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"},
     {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee", "expected": "successful source-shaped FunctionSpec scaffold build; dynamic ABI, call/event trace, balance rollback, and source/tx adequacy remain OPEN"},
     {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"},
@@ -163,7 +162,6 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
-    ["A-YUL-INTERFACE"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
@@ -171,29 +169,28 @@ EXPECTED_ASSUMPTION_LINKS = [
     [],
 ]
 EXPECTED_NEXT_GATES = [
-    "Refine proportional allocation amounts and EVM "
-    "correspondence for SRLib._getModulesAllocationAndCapacity.",
-    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
-    "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
-    "Refine success/revert and rollback against pinned executable EVM semantics.",
-    "Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.",
-    "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
-    "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
-    "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
-    "Refine the checked official Verity transaction through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance; the existing subordinate Yul interface harness remains syntax-level evidence only.",
+    "Refine proportional allocation amounts for "
+    "SRLib._getModulesAllocationAndCapacity.",
+    "Refine proportional allocation amounts and checked-Uint256 execution "
+    "for MinFirstAllocationStrategy.allocateToBestCandidate.",
+    "Connect the pinned deposit conservation/rollback correspondence to an official Verity transaction.",
+    "Discharge the declared linked-external call summaries and establish independently verified deployment provenance.",
+    "Extend the checked Verity transaction beyond the accepted accounting prefix (later source guards, external calls) and establish independently verified deployment provenance.",
+    "Optionally establish deployed storage/call provenance; semantic closure ends at the proved Verity transaction under the solc trust assumption.",
+    "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity and deployment provenance.",
+    "Establish independently verified deployment provenance; semantic closure ends at the checked official Verity transaction under the solc trust assumption.",
     "Model checked uint256 addition and rollback, then connect the pinned topUp batch transition and post-state to an official Verity Contract.run transaction before claiming SOURCE/TX closure.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
-    "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
+    "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any crypto/E2E composition.",
     "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
-    "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
-    "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
-    "Independent Yul/EVM interface proof beyond this harness; runtime/production provenance and full EVM equivalence remain open.",
+    "Refine the typed 96-byte single-call program against independently verified production runtime provenance.",
+    "Compose the checked SRLib/MinFirst operator-bound evidence with the parent allocation source correspondence.",
     "Add multi-contract composition for allocation, dynamic module-returned memory, Lido/queue/oracle state, per-validator root/calldata construction, and propagating rollback before making any conservation or transaction claim.",
     "Close the FunctionSpec-to-CallProgram/DenoteMemory/event-trace gaps listed in audit/P-CONSOLIDATION-1-VERITY-GAPS.md, then add transaction-frame rollback and source refinement.",
-    "Certify the pending SSZ transaction-plane evidence, then refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
-    "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
-    "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
+    "Certify the pending SSZ transaction-plane evidence and establish independently verified production runtime provenance without closing the SHA-256 assumption.",
+    "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity.",
+    "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -209,46 +206,28 @@ EXPECTED_EXCLUSIONS = {
          "scope": "Broad registry, governance, module lifecycle, and role-management behavior"},
     ],
 }
-PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
+PLANES = {"model", "algorithm", "source", "tx", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "yul": "LEAN_CHECKED", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "OPEN", "source": "OPEN", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
-     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "OPEN", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "PENDING", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
@@ -266,7 +245,6 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "tx"],
     ["model", "tx"],
     ["model", "algorithm"],
-    ["yul"],
     ["model"],
     [],
     ["model", "tx"],
@@ -289,7 +267,6 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
     "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
     "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
-    "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
     "LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix",
     None,
     "LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct",
@@ -326,8 +303,8 @@ CANONICAL_MATHLIB_COMMIT = "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
 CANONICAL_MATHLIB_INPUT_REV = "v4.31.0"
 CANONICAL_LEAN_TOOLCHAIN = "leanprover/lean4:v4.31.0"
 EXPECTED_MANIFEST_SCHEMA = "srv3-audit-manifest-v1"
-EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v3"
-EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v2"
+EXPECTED_REGISTRY_SCHEMA = "lido-srv3-minimal-11-guarantees-v4"
+EXPECTED_SOURCE_MAP_SCHEMA = "lido-srv3-minimal-11-source-map-v3"
 EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
@@ -554,7 +531,7 @@ EXPECTED_SOURCE_SCOPE = {
     "public_guarantee_count": 11,
     "transaction_atomicity": "INTERNAL_ONLY",
     "assurance_layers": [
-        "MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "YUL", "EVM", "CRYPTO", "E2E"
+        "MODEL", "ALG", "TX", "REL", "TRACE", "SRC", "CRYPTO", "E2E"
     ],
     "metadata_is_proof_progress": False,
 }
@@ -1018,11 +995,6 @@ def validate():
                 "scripts/check_validation_receipt.py",
                 "verity/targets/audit-manifest.json",
             ], "P-CONSOLIDATION-1.abstract-flow-model: evidence file list differs")
-        elif row["id"] == "P-ADDRESS-1.yul-interface-harness":
-            require(row.get("parent_id") == "P-ADDRESS-1",
-                    "P-ADDRESS-1.yul-interface-harness must remain subordinate to P-ADDRESS-1")
-            require(row.get("source_plane_scope") == "typed Yul builtin interface harness only",
-                    "P-ADDRESS-1.yul-interface-harness: scope differs")
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             require(row.get("parent_id") == "P-DEPOSIT-1",
                     "P-DEPOSIT-1.verity-tx-rollback.tx must remain subordinate to P-DEPOSIT-1")
@@ -1074,8 +1046,6 @@ def validate():
             mapping = source_targets["P-ALLOC-1"]
         elif row["id"] == "P-CONSOLIDATION-1.abstract-flow-model":
             mapping = source_targets["P-CONSOLIDATION-1"]
-        elif row["id"] == "P-ADDRESS-1.yul-interface-harness":
-            mapping = source_targets["P-ADDRESS-1"]
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             mapping = source_targets["P-DEPOSIT-1"]
         elif row["id"] == "P-CONSOLIDATION-1.fee-refinement.tx":
@@ -1113,15 +1083,14 @@ def validate():
             "P-DEREF-1: theorem planes differ from canonical evidence")
     require(pderef.get("statuses") == {
         "model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE",
-        "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN",
-        "evm": "OPEN", "crypto": "NOT_APPLICABLE",
+        "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE",
     }, "P-DEREF-1: assurance statuses differ from canonical claims")
     require(pderef.get("assumptions") == [
         "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-YUL-INTERFACE",
         "A-RUNTIME-PROVENANCE",
     ], "P-DEREF-1: assumption links differ from canonical risks")
     require(pderef.get("next_gate") ==
-            "Establish independently checked ROUTER_STORAGE_POSITION, Solidity mapping layout, compiler-emitted SLOAD execution, and deployed runtime provenance before claiming Yul/EVM closure.",
+            "Establish independently checked ROUTER_STORAGE_POSITION and Solidity mapping-layout correspondence plus deployed runtime provenance; compiler-emitted execution is covered by the solc trust assumption.",
             "P-DEREF-1: next gate differs from canonical roadmap")
     require(pderef.get("reproduction") == {
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants",
@@ -1177,14 +1146,14 @@ def rendered(rows, all_rows):
         "[EVIDENCE.md](EVIDENCE.md). Catalogue target is not theorem scope; "
         "Lean theorem statements are authority.",
         "",
-        "| ID | Model | ALG | Source | TX | Yul | EVM | Crypto |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| ID | Model | ALG | Source | TX | Crypto |",
+        "| --- | --- | --- | --- | --- | --- |",
     ]
     for row in rows:
         s = row["statuses"]
         status_lines.append(
             f"| `{row['id']}` | {s['model']} | {s['algorithm']} | {s['source']} | {s['tx']} | "
-            f"{s['yul']} | {s['evm']} | {s['crypto']} |"
+            f"{s['crypto']} |"
         )
     status = header + "\n".join(status_lines) + "\n"
     reproduce = header + "# REPRODUCE\n\n" + "\n".join(

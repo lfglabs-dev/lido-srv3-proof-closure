@@ -1,11 +1,33 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 4a35267b201d910bbba5185b7a5d23be293e9f87
+validated-tree: 40a215fdf4de48f107a50eacd98c78f68971f830
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Yul/EVM assurance-plane retirement receipt (2026-08-11)
+-------------------------------------------------------
+
+- The `yul` and `evm` assurance planes are removed from the guarantee
+  registry schema (`lido-srv3-minimal-11-guarantees-v4`,
+  `lido-srv3-minimal-11-source-map-v3`).
+- Rationale: the deployed contracts are compiled from pinned Solidity by
+  solc, not from the Verity models, so no Yul/EVM refinement of solc output
+  was ever going to close those planes. The boundary is now the explicit
+  accepted assumption `A-SOLC-TRUSTED`: assurance closes at
+  model/source/transaction fidelity to pinned source plus recorded
+  deployment provenance.
+- Deployment provenance obligations are unchanged (`A-RUNTIME-PROVENANCE`,
+  `A-DEPLOYMENT-PROVENANCE-OPTIONAL`, P-TOPUP-2 pinned-block runtime lock).
+- Assembly-bearing source (SSZ Merkle-proof verification) remains tracked
+  under the `crypto` plane and `A-SHA256-FFI`/`A-YUL-INTERFACE`.
+- The subordinate registry row `P-ADDRESS-1.yul-interface-harness` is
+  retired with its plane; the Lean harness modules
+  (`LidoSRv3.Audit.Verity.AddressYulInterface`,
+  `LidoSRv3.Tests.AddressYulInterface`) remain built and inventoried in
+  `audit/artifacts.lock.json`.
 
 Verity external-call DSL re-pin receipt (2026-08-11)
 ----------------------------------------------------

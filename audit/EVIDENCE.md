@@ -10,7 +10,7 @@ Campaign commit: `4649ba55052fa29132b016dc443ac738134c332f`
 
 Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; yul=NOT_APPLICABLE; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
 - Theorem planes: `model`, `source`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:27`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
@@ -25,7 +25,7 @@ Checked pinned-source execution refines the independent allocation-capacity Audi
 Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.
 
 - Scope: operator bond bound only
-- Plane statuses: model=LEAN_CHECKED; algorithm=LEAN_CHECKED; source=OPEN; tx=NOT_APPLICABLE; yul=NOT_APPLICABLE; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=LEAN_CHECKED; source=OPEN; tx=NOT_APPLICABLE; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond`](../LidoSRv3/Audit/Guarantees/PAlloc1EugeneBound.lean#L56)
 - Theorem planes: `model`, `algorithm`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1EugeneBound.lean:56`](../LidoSRv3/Audit/Guarantees/PAlloc1EugeneBound.lean#L56)
@@ -38,7 +38,7 @@ Canonical checked SRLib rows composed with the MinFirst mutation prove that one 
 
 Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.
 
-- Plane statuses: model=NOT_APPLICABLE; algorithm=LEAN_CHECKED; source=LEAN_CHECKED; tx=NOT_APPLICABLE; yul=NOT_APPLICABLE; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=NOT_APPLICABLE; algorithm=LEAN_CHECKED; source=LEAN_CHECKED; tx=NOT_APPLICABLE; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target`](../LidoSRv3/Audit/Guarantees/PAlloc2.lean#L31)
 - Theorem planes: `algorithm`, `source`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc2.lean:31`](../LidoSRv3/Audit/Guarantees/PAlloc2.lean#L31)
@@ -50,7 +50,7 @@ Pinned-source correspondence proves only the next-target selection rule; proport
 
 Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; yul=NOT_APPLICABLE; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L66)
 - Theorem planes: `model`, `source`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:66`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L66)
@@ -65,7 +65,7 @@ Pinned-source correspondence proves branch-wise stake conservation and whole-tra
 Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.
 
 - Scope: source-shaped deposit prefix scaffold (OPEN); allocation and multi-contract suffix explicitly OPEN
-- Plane statuses: model=LEAN_CHECKED; algorithm=OPEN; source=OPEN; tx=OPEN; yul=NOT_APPLICABLE; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=OPEN; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix`](../LidoSRv3/Audit/Verity/DepositRollback.lean#L194)
 - Theorem planes: `model`
 - Lean source: [`LidoSRv3/Audit/Verity/DepositRollback.lean:194`](../LidoSRv3/Audit/Verity/DepositRollback.lean#L194)
@@ -78,7 +78,7 @@ Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles l
 
 Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L194)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PTopup1.lean:194`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L194)
@@ -90,7 +90,7 @@ Pinned-source correspondence proves branch-wise top-up value conservation; an ac
 
 Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; yul=NOT_APPLICABLE; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L26)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAccount1.lean:26`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L26)
@@ -102,7 +102,7 @@ Under an explicit independently established full-success premise, pinned-source 
 
 Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec`](../LidoSRv3/Audit/Guarantees/PReserve1.lean#L30)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PReserve1.lean:30`](../LidoSRv3/Audit/Guarantees/PReserve1.lean#L30)
@@ -114,7 +114,7 @@ Pinned source-shaped reserve spending is simulated by executable Verity Contract
 
 The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.
 
-- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - **Parent theorem: NO PARENT THEOREM**
 - Proof link: none (a file is not proof of this parent claim)
 - Assumptions: none
@@ -128,7 +128,7 @@ The complete ETH-flow guarantee remains open across ConsolidationBus, Consolidat
 The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.
 
 - Scope: protocol-controlled stVault rebalance/redemption interface only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L41)
 - Theorem planes: `model`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PEth1.lean:41`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L41)
@@ -141,7 +141,7 @@ The bounded abstract model confines ETH returned through the protocol-controlled
 The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.
 
 - Scope: configured immutable consolidation-request fee target only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L79)
 - Theorem planes: `model`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PEth1.lean:79`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L79)
@@ -154,7 +154,7 @@ The bounded abstract consolidation-fee model confines its fee-bearing call to cf
 
 Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx`](../LidoSRv3/Audit/Guarantees/PAddress1.lean#L142)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAddress1.lean:142`](../LidoSRv3/Audit/Guarantees/PAddress1.lean#L142)
@@ -162,27 +162,11 @@ Permissionless transfer, request, claim, and redemption entrypoints must admit a
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants`
 - Expected scope: successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open
 
-### Subordinate evidence (does not prove the parent)
-
-#### P-ADDRESS-1.yul-interface-harness
-
-Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.
-
-- Scope: typed Yul builtin interface harness only
-- Plane statuses: model=NOT_APPLICABLE; algorithm=NOT_APPLICABLE; source=NOT_APPLICABLE; tx=OPEN; yul=LEAN_CHECKED; evm=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness`](../LidoSRv3/Audit/Verity/AddressYulInterface.lean#L99)
-- Theorem planes: `yul`
-- Lean source: [`LidoSRv3/Audit/Verity/AddressYulInterface.lean:99`](../LidoSRv3/Audit/Verity/AddressYulInterface.lean#L99)
-- Assumptions: `A-YUL-INTERFACE`
-- Reproduce: `lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface`
-- Expected scope: successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem
-
-
 ## P-TOPUP-2
 
 The mathematical headroom and aggregate-budget bounds are checked at MODEL only. Packed ERC-7201 layout/RMW and exact pinned-artifact-to-mainnet-runtime identity are subordinate evidence; checked-overflow rollback and the actual topUp batch transition are not connected to an official Verity transaction, so parent SOURCE/TX closure remains open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L165)
 - Theorem planes: `model`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PTopup2.lean:165`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L165)
@@ -194,7 +178,7 @@ The mathematical headroom and aggregate-budget bounds are checked at MODEL only.
 
 Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.
 
-- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=NOT_APPLICABLE; tx=OPEN; yul=OPEN; evm=OPEN; crypto=STRETCH_OPAQUE_FFI
+- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=NOT_APPLICABLE; tx=OPEN; crypto=STRETCH_OPAQUE_FFI
 - **Parent theorem: NO PARENT THEOREM**
 - Proof link: none (a file is not proof of this parent claim)
 - Assumptions: `A-SHA256-FFI`
@@ -208,7 +192,7 @@ Consolidation requests must be eligible, correctly bound, value-conserving and a
 Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.
 
 - Scope: abstract 96-byte consolidation flow only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=BLOCKED; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement`](../LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean#L120)
 - Theorem planes: `model`, `tx`
 - Lean source: [`LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean:120`](../LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean#L120)
@@ -221,7 +205,7 @@ Typed low-level Verity statements bind the exact 48-byte source key followed by 
 Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.
 
 - Scope: WithdrawalVault consolidation request model only; gateway grouping, quota, proof validation, and refund are excluded
-- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - **Theorem: NO PARENT THEOREM**
 - Proof link: none (a file is not proof of this parent claim)
 - Assumptions: `A-VERITY-SCAFFOLD`, `A-RUNTIME-PROVENANCE`
@@ -233,7 +217,7 @@ Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault conso
 
 The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=BLOCKED; yul=OPEN; evm=BLOCKED; crypto=STRETCH_OPAQUE_FFI
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=BLOCKED; crypto=STRETCH_OPAQUE_FFI
 - Theorem: [`LidoSRv3.Audit.Ssz.structural_witness_binding_sound`](../LidoSRv3/Audit/Ssz.lean#L164)
 - Theorem planes: `model`
 - Lean source: [`LidoSRv3/Audit/Ssz.lean:164`](../LidoSRv3/Audit/Ssz.lean#L164)
@@ -248,7 +232,7 @@ The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyP
 Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.
 
 - Scope: deposit-data-root only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=BLOCKED; yul=OPEN; evm=BLOCKED; crypto=STRETCH_OPAQUE_FFI
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=BLOCKED; crypto=STRETCH_OPAQUE_FFI
 - Theorem: [`LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`](../LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean#L431)
 - Theorem planes: `model`
 - Lean source: [`LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean:431`](../LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean#L431)
@@ -261,7 +245,7 @@ Source-shaped MODEL-plane evidence derives the signature root from raw signature
 Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.
 
 - Scope: abstract SHA-256 digest only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; yul=OPEN; evm=BLOCKED; crypto=STRETCH_OPAQUE_FFI
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=STRETCH_OPAQUE_FFI
 - Theorem: [`LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement`](../LidoSRv3/Audit/Verity/SszAbstractDigest.lean#L161)
 - Theorem planes: `model`, `tx`
 - Lean source: [`LidoSRv3/Audit/Verity/SszAbstractDigest.lean:161`](../LidoSRv3/Audit/Verity/SszAbstractDigest.lean#L161)
@@ -274,7 +258,7 @@ Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte pr
 Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.
 
 - Scope: SSZ transaction execution simulation only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PENDING; yul=OPEN; evm=BLOCKED; crypto=STRETCH_OPAQUE_FFI
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PENDING; crypto=STRETCH_OPAQUE_FFI
 - Theorem: [`LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct`](../LidoSRv3/Audit/Verity/SszTxSimulation.lean#L332)
 - Theorem planes: `model`, `tx`
 - Lean source: [`LidoSRv3/Audit/Verity/SszTxSimulation.lean:332`](../LidoSRv3/Audit/Verity/SszTxSimulation.lean#L332)
@@ -292,7 +276,7 @@ These scoped rows are not public parent guarantees and are not subordinate to on
 Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.
 
 - Scope: registry address binding only; migration old-layout contents are explicit inputs
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; yul=OPEN; evm=OPEN; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source`](../LidoSRv3/Audit/Source/DereferenceCorrespondence.lean#L195)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Source/DereferenceCorrespondence.lean:195`](../LidoSRv3/Audit/Source/DereferenceCorrespondence.lean#L195)

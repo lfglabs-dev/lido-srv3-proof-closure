@@ -627,13 +627,13 @@ def main():
         write_json(guarantees_path, guarantees)
 
         wrong_plane = copy.deepcopy(guarantees)
-        wrong_plane["guarantees"][0]["statuses"]["evm"] = "LEAN_CHECKED"
+        wrong_plane["guarantees"][0]["statuses"]["crypto"] = "LEAN_CHECKED"
         write_json(guarantees_path, wrong_plane)
         run(
             fixture,
             False,
             "generate",
-            "evm status LEAN_CHECKED requires theorem evidence for that plane",
+            "crypto status LEAN_CHECKED requires theorem evidence for that plane",
         )
         write_json(guarantees_path, guarantees)
 
@@ -651,24 +651,24 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        deposit_evm_overclaim = copy.deepcopy(guarantees)
-        deposit_evm_overclaim["guarantees"][2]["statuses"]["evm"] = "LEAN_CHECKED"
-        write_json(guarantees_path, deposit_evm_overclaim)
+        deposit_crypto_overclaim = copy.deepcopy(guarantees)
+        deposit_crypto_overclaim["guarantees"][2]["statuses"]["crypto"] = "LEAN_CHECKED"
+        write_json(guarantees_path, deposit_crypto_overclaim)
         run(
             fixture,
             False,
             "generate",
-            "P-DEPOSIT-1: evm status LEAN_CHECKED requires theorem evidence "
+            "P-DEPOSIT-1: crypto status LEAN_CHECKED requires theorem evidence "
             "for that plane",
         )
         write_json(guarantees_path, guarantees)
 
-        deposit_evm_plane_overclaim = copy.deepcopy(guarantees)
-        deposit_evm_plane_overclaim["guarantees"][2]["statuses"]["evm"] = "LEAN_CHECKED"
-        deposit_evm_plane_overclaim["guarantees"][2]["theorem_planes"] = [
-            "model", "tx", "source", "evm",
+        deposit_crypto_plane_overclaim = copy.deepcopy(guarantees)
+        deposit_crypto_plane_overclaim["guarantees"][2]["statuses"]["crypto"] = "LEAN_CHECKED"
+        deposit_crypto_plane_overclaim["guarantees"][2]["theorem_planes"] = [
+            "model", "tx", "source", "crypto",
         ]
-        write_json(guarantees_path, deposit_evm_plane_overclaim)
+        write_json(guarantees_path, deposit_crypto_plane_overclaim)
         run(
             fixture,
             False,
@@ -724,12 +724,12 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_evm_plane_overclaim = copy.deepcopy(guarantees)
-        topup_evm_plane_overclaim["guarantees"][3]["statuses"]["evm"] = "LEAN_CHECKED"
-        topup_evm_plane_overclaim["guarantees"][3]["theorem_planes"] = [
-            "model", "tx", "source", "evm",
+        topup_crypto_plane_overclaim = copy.deepcopy(guarantees)
+        topup_crypto_plane_overclaim["guarantees"][3]["statuses"]["crypto"] = "LEAN_CHECKED"
+        topup_crypto_plane_overclaim["guarantees"][3]["theorem_planes"] = [
+            "model", "tx", "source", "crypto",
         ]
-        write_json(guarantees_path, topup_evm_plane_overclaim)
+        write_json(guarantees_path, topup_crypto_plane_overclaim)
         run(
             fixture,
             False,

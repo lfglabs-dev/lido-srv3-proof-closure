@@ -6,19 +6,80 @@
     "statement": "DEV-431-READY is development readiness, not AUDIT-CERT."
   },
   "assumptions": [
-    {"id": "A-MODEL-INPUTS", "accepted": true, "risk": "Quantity bounds and units remain model inputs until source refinement is proved."},
-    {"id": "A-ABSTRACT-TX", "accepted": true, "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics."},
-    {"id": "A-SOURCE-SHAPED", "accepted": true, "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans."},
-    {"id": "A-TOPUP-NOWRAP", "accepted": true, "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans."},
-    {"id": "A-HANDWRITTEN-MINFIRST", "accepted": true, "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence."},
-    {"id": "A-VERITY-SCAFFOLD", "accepted": true, "risk": "The Verity 4.31 scaffold is non-certified."},
-    {"id": "A-DEV-NOT-CERT", "accepted": true, "risk": "DEV-431-READY is explicitly accepted as not AUDIT-CERT."},
-    {"id": "A-MULTI-NODE-TRANSPORT", "accepted": true, "risk": "Multi-node certification transport is accepted as a trust and reproducibility risk; transported results require independent identity and consistency checks."},
-    {"id": "A-YUL-INTERFACE", "accepted": true, "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection."},
-    {"id": "A-SHA256-FFI", "accepted": true, "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk."},
-    {"id": "A-EIP4788-ANCHOR", "accepted": true, "risk": "The headroom/budget slice does not prove EIP-4788 BEACON_ROOTS anchor lookup or fork-history behavior."},
-    {"id": "A-TOPUP-EXTERNAL-SUMMARIES", "accepted": true, "risk": "Role/resume/root-age/batch/order and linked StakingRouter behavior are explicit summaries outside the headroom/budget transaction."},
-    {"id": "A-DEPLOYMENT-PROVENANCE-OPTIONAL", "accepted": true, "risk": "Exact TopUpGateway pinned-artifact-to-mainnet-runtime identity is evidenced only at chainId 1/block 25730798 and remains separate from Solidity-to-Verity correspondence and Verity refinement."},
-    {"id": "A-RUNTIME-PROVENANCE", "accepted": true, "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."}
+    {
+      "id": "A-MODEL-INPUTS",
+      "accepted": true,
+      "risk": "Quantity bounds and units remain model inputs until source refinement is proved."
+    },
+    {
+      "id": "A-ABSTRACT-TX",
+      "accepted": true,
+      "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics."
+    },
+    {
+      "id": "A-SOURCE-SHAPED",
+      "accepted": true,
+      "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans."
+    },
+    {
+      "id": "A-TOPUP-NOWRAP",
+      "accepted": true,
+      "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans."
+    },
+    {
+      "id": "A-HANDWRITTEN-MINFIRST",
+      "accepted": true,
+      "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "accepted": true,
+      "risk": "The Verity 4.31 scaffold is non-certified."
+    },
+    {
+      "id": "A-DEV-NOT-CERT",
+      "accepted": true,
+      "risk": "DEV-431-READY is explicitly accepted as not AUDIT-CERT."
+    },
+    {
+      "id": "A-MULTI-NODE-TRANSPORT",
+      "accepted": true,
+      "risk": "Multi-node certification transport is accepted as a trust and reproducibility risk; transported results require independent identity and consistency checks."
+    },
+    {
+      "id": "A-YUL-INTERFACE",
+      "accepted": true,
+      "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection."
+    },
+    {
+      "id": "A-SHA256-FFI",
+      "accepted": true,
+      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk."
+    },
+    {
+      "id": "A-EIP4788-ANCHOR",
+      "accepted": true,
+      "risk": "The headroom/budget slice does not prove EIP-4788 BEACON_ROOTS anchor lookup or fork-history behavior."
+    },
+    {
+      "id": "A-TOPUP-EXTERNAL-SUMMARIES",
+      "accepted": true,
+      "risk": "Role/resume/root-age/batch/order and linked StakingRouter behavior are explicit summaries outside the headroom/budget transaction."
+    },
+    {
+      "id": "A-DEPLOYMENT-PROVENANCE-OPTIONAL",
+      "accepted": true,
+      "risk": "Exact TopUpGateway pinned-artifact-to-mainnet-runtime identity is evidenced only at chainId 1/block 25730798 and remains separate from Solidity-to-Verity correspondence and Verity refinement."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "accepted": true,
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "accepted": true,
+      "risk": "The solc compilation pipeline (pinned Solidity/Yul to deployed EVM bytecode) is trusted rather than verified; assurance closes at model/source/transaction fidelity to pinned source plus recorded deployment provenance, and assembly-bearing source (SSZ Merkle-proof verification) remains tracked under the crypto plane."
+    }
   ]
 }

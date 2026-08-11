@@ -12,8 +12,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
         "tx": "OPEN",
-        "yul": "NOT_APPLICABLE",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
@@ -42,8 +40,6 @@
             "algorithm": "LEAN_CHECKED",
             "source": "OPEN",
             "tx": "NOT_APPLICABLE",
-            "yul": "NOT_APPLICABLE",
-            "evm": "OPEN",
             "crypto": "NOT_APPLICABLE"
           },
           "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
@@ -75,8 +71,6 @@
         "algorithm": "LEAN_CHECKED",
         "source": "LEAN_CHECKED",
         "tx": "NOT_APPLICABLE",
-        "yul": "NOT_APPLICABLE",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
@@ -106,8 +100,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
         "tx": "OPEN",
-        "yul": "NOT_APPLICABLE",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
@@ -137,8 +129,6 @@
             "algorithm": "OPEN",
             "source": "OPEN",
             "tx": "OPEN",
-            "yul": "NOT_APPLICABLE",
-            "evm": "OPEN",
             "crypto": "NOT_APPLICABLE"
           },
           "theorem": "LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix",
@@ -169,8 +159,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
         "tx": "LEAN_CHECKED",
-        "yul": "OPEN",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
@@ -203,8 +191,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
         "tx": "LEAN_CHECKED",
-        "yul": "NOT_APPLICABLE",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
@@ -236,8 +222,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
         "tx": "LEAN_CHECKED",
-        "yul": "OPEN",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
@@ -269,8 +253,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "OPEN",
         "tx": "OPEN",
-        "yul": "OPEN",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": null,
@@ -291,8 +273,6 @@
             "algorithm": "NOT_APPLICABLE",
             "source": "OPEN",
             "tx": "OPEN",
-            "yul": "OPEN",
-            "evm": "OPEN",
             "crypto": "NOT_APPLICABLE"
           },
           "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
@@ -318,8 +298,6 @@
             "algorithm": "NOT_APPLICABLE",
             "source": "OPEN",
             "tx": "OPEN",
-            "yul": "OPEN",
-            "evm": "OPEN",
             "crypto": "NOT_APPLICABLE"
           },
           "theorem": "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
@@ -347,8 +325,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
         "tx": "LEAN_CHECKED",
-        "yul": "OPEN",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx",
@@ -370,37 +346,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants",
         "expected": "successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open"
       },
-      "children": [
-        {
-          "id": "P-ADDRESS-1.yul-interface-harness",
-          "catalogue_wording": "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; one mutant vector is exercised and proven NOT to build, demonstrating mutant sensitivity, and no EVM execution refinement is claimed.",
-          "scope": "typed Yul builtin interface harness only",
-          "statuses": {
-            "model": "NOT_APPLICABLE",
-            "algorithm": "NOT_APPLICABLE",
-            "source": "NOT_APPLICABLE",
-            "tx": "OPEN",
-            "yul": "LEAN_CHECKED",
-            "evm": "OPEN",
-            "crypto": "NOT_APPLICABLE"
-          },
-          "theorem": "LidoSRv3.Audit.Verity.AddressYulInterface.mutant_sensitive_harness",
-          "theorem_planes": [
-            "yul"
-          ],
-          "assumptions": [
-            "A-YUL-INTERFACE"
-          ],
-          "source": {
-            "source": "LidoSRv3/Audit/Verity/AddressYulInterface.lean",
-            "line": 99
-          },
-          "reproduction": {
-            "command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface",
-            "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and mutant-sensitive vector set; mutant-vector failure proof and abstract address-rename relation reuse only; no EVM theorem"
-          }
-        }
-      ]
+      "children": []
     },
     {
       "id": "P-TOPUP-2",
@@ -411,8 +357,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "OPEN",
         "tx": "OPEN",
-        "yul": "OPEN",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
@@ -446,8 +390,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "NOT_APPLICABLE",
         "tx": "OPEN",
-        "yul": "OPEN",
-        "evm": "OPEN",
         "crypto": "STRETCH_OPAQUE_FFI"
       },
       "theorem": null,
@@ -470,8 +412,6 @@
             "algorithm": "NOT_APPLICABLE",
             "source": "OPEN",
             "tx": "OPEN",
-            "yul": "OPEN",
-            "evm": "BLOCKED",
             "crypto": "NOT_APPLICABLE"
           },
           "theorem": "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
@@ -501,8 +441,6 @@
             "algorithm": "NOT_APPLICABLE",
             "source": "OPEN",
             "tx": "OPEN",
-            "yul": "OPEN",
-            "evm": "OPEN",
             "crypto": "NOT_APPLICABLE"
           },
           "theorem": null,
@@ -528,8 +466,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "OPEN",
         "tx": "BLOCKED",
-        "yul": "OPEN",
-        "evm": "BLOCKED",
         "crypto": "STRETCH_OPAQUE_FFI"
       },
       "theorem": "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
@@ -559,8 +495,6 @@
             "algorithm": "NOT_APPLICABLE",
             "source": "OPEN",
             "tx": "BLOCKED",
-            "yul": "OPEN",
-            "evm": "BLOCKED",
             "crypto": "STRETCH_OPAQUE_FFI"
           },
           "theorem": "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
@@ -590,8 +524,6 @@
             "algorithm": "NOT_APPLICABLE",
             "source": "OPEN",
             "tx": "OPEN",
-            "yul": "OPEN",
-            "evm": "BLOCKED",
             "crypto": "STRETCH_OPAQUE_FFI"
           },
           "theorem": "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
@@ -622,8 +554,6 @@
             "algorithm": "NOT_APPLICABLE",
             "source": "OPEN",
             "tx": "PENDING",
-            "yul": "OPEN",
-            "evm": "BLOCKED",
             "crypto": "STRETCH_OPAQUE_FFI"
           },
           "theorem": "LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct",
@@ -658,8 +588,6 @@
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
         "tx": "LEAN_CHECKED",
-        "yul": "OPEN",
-        "evm": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "theorem": "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source",

@@ -5,7 +5,7 @@ import json
 import re
 from pathlib import Path
 
-PLANES = ("model", "algorithm", "source", "tx", "yul", "evm", "crypto")
+PLANES = ("model", "algorithm", "source", "tx", "crypto")
 THEOREM_BACKED_STATUSES = {"ABSTRACT_LEAN_CHECKED", "LEAN_CHECKED", "REGRESSION"}
 CAMPAIGN_COMMIT = "4649ba55052fa29132b016dc443ac738134c332f"
 DECLARATION = re.compile(
