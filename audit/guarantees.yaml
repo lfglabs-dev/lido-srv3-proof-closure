@@ -65,13 +65,14 @@
     },
     {
       "id": "P-ETH-1",
-      "catalogue_wording": "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
-      "theorem": null,
-      "theorem_planes": [],
-      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": [],
-      "next_gate": "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful bounded child-model proofs only; parent P-ETH-1 remains OPEN"}
+      "catalogue_wording": "Pinned-source consolidation ETH routing is value-conserving and confined to the WithdrawalVault/EIP-7251 request route plus the explicit refund recipient (caller fallback for zero recipient); executable Verity transaction semantics prove the successful trace projection and full snapshot rollback for represented failures.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PEth1.hybrid_source_verity_closure",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
+      "note": "Scope assumptions are named in ScopeAssumptions: A-SOURCE-GROUP-COUNT, A-VALIDATED-PAIRS, and A-REQUEST-TARGET-PROVENANCE. Linked external calls compile at Verity c4175716 / EVMYulLean f7e4ee0; no runtime-bytecode equivalence is claimed.",
+      "next_gate": "Refine the linked external-call surface through generated Yul/EVM and independently prove deployed request-target identity; compose separately owned ETH guarantees without widening this writer.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Tests.EthFlowMutants", "expected": "successful pinned-source value conservation, destination confinement, executable Verity success/rollback refinement, and negative mutants"}
     },
     {
       "id": "P-ADDRESS-1",

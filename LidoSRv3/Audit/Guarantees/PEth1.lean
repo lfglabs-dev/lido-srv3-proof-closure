@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Source.EthFlowCorrespondence
 
 namespace LidoSRv3.Audit.Guarantees.PEth1
 
@@ -29,7 +30,7 @@ def approvedReturnMoves (moves : List EthMove) : List EthMove :=
 
 /-- The canonical parent remains open; the theorems below are subordinate
 evidence for its two bounded child rows, not additional public guarantees. -/
-def guarantee : Guarantee := ⟨.pEth1, []⟩
+def guarantee : Guarantee := ⟨.pEth1, [.model, .source, .verityTx]⟩
 
 /-- Every committed move made through the protocol-controlled stVault
 rebalance/redemption interface is retained by the approved-path filter, so its
@@ -83,6 +84,41 @@ theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall
   intro hTarget other hMem addr
   simp [ethTrace, hTarget] at hMem
   simp [hMem]
+
+/-- Hybrid P-ETH-1 writer theorem. The first conjunct is the independent
+pinned-source value guarantee. The second conjunct ties every successful
+execution to the actual `Verity.Contract.run` result; the third records full
+snapshot rollback for every represented revert. -/
+theorem hybrid_source_verity_closure
+    (scope : SolidityEthFlow.ScopeAssumptions)
+    (state : Verity.ContractState)
+    (count fee : SolidityEthFlow.Word)
+    (recipient : Verity.Address) :
+    scope.sourceGroupCount → scope.validatedPairs →
+    scope.requestTargetProvenance →
+    (∀ after,
+      (SolidityEthFlow.routeExec count fee recipient).run state = .success () after →
+      ∃ route,
+        SolidityEthFlow.sourceRoute state.sender state.msgValue count fee recipient =
+          .committed route ∧
+        route = SolidityEthFlow.decodeRoute after ∧
+        route.vaultValue.val + route.refundValue.val = state.msgValue.val ∧
+        route.refundRecipient =
+          SolidityEthFlow.effectiveRefundRecipient state.sender recipient) ∧
+    ∀ reason rollback,
+      (SolidityEthFlow.routeExec count fee recipient).run state =
+        .revert reason rollback → rollback = state := by
+  intro _ _ _
+  constructor
+  · intro after hSuccess
+    have hSource := SolidityEthFlow.verity_route_success_matches_source
+      state after count fee recipient hSuccess
+    refine ⟨SolidityEthFlow.decodeRoute after, hSource, rfl, ?_, ?_⟩
+    · exact SolidityEthFlow.source_route_conserves _ _ _ _ _ _ hSource
+    · exact SolidityEthFlow.source_route_confined _ _ _ _ _ _ hSource
+  · intro reason rollback hRevert
+    exact SolidityEthFlow.verity_route_revert_rolls_back
+      state rollback count fee recipient reason hRevert
 
 /-!
 ## ETH-bearing call-site inventory

@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 7b7ab48cc773c64e1e6716e61ec2f1b22ac01a78
+validated-tree: 2196a5d4eddb29c4d14e2e8967e2992cbc66215e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,6 +13,32 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
+
+P-ETH-1 closure-v2 hybrid writer receipt (2026-08-11)
+------------------------------------------------------
+
+- Dedicated base `closure-v2/p-eth-1-base` is exactly
+  `25c82e137236131c037a45618e44382547efebe2`; the campaign branch was not
+  modified.
+- Verity is pinned to `c41757164e9e8230536d7af29d81a2961b30e482`, whose
+  main history contains #2249, #2245, #2247, and #2248; inherited
+  EVMYulLean is `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`.
+- The source-shaped route pins `lidofinance/core@af095e48` and proves checked
+  fee multiplication, exact vault/refund conservation, caller fallback for a
+  zero refund recipient, destination confinement, successful executable
+  Verity trace projection, and full-state rollback for represented rejects.
+- Named scope assumptions are A-SOURCE-GROUP-COUNT, A-VALIDATED-PAIRS, and
+  A-REQUEST-TARGET-PROVENANCE. Yul/EVM/runtime identity remain OPEN.
+- Negative mutants cover duplicated value, lateral refund destination,
+  insufficient fee, and missing zero-recipient fallback.
+- `lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Tests.EthFlowMutants`:
+  exit 0.
+- `lake build`: exit 0 (1332 jobs).
+- `python3 scripts/audit_metadata.py check`: exit 0; `make audit-check`: exit 0;
+  optimized metadata mutant tests: exit 0; no-Python evidence scan: exit 0;
+  `git diff --check`: exit 0.
+- Changed Lean has no `sorry`, `admit`, `native_decide`, opaque `axiom`,
+  `unsafeYul`, or `runVerity` token.
 
 PR #48 source-shaped deposit prefix scaffold (OPEN) repair receipt (non-receipt tree recorded above):
 - Re-read the exact pinned functions at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
