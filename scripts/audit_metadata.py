@@ -533,7 +533,9 @@ EXPECTED_SSZ_CLAIM = {
 }
 VERIFIED_SOURCE_ANCHORS = {
     "P-DEREF-1": {
-        ("contracts/0.8.25/sr/SRStorage.sol", "ROUTER_STORAGE_POSITION and module state access", 12, 47),
+        ("contracts/0.8.25/sr/SRStorage.sol", "ROUTER_STORAGE_POSITION, module address access, and membership", 12, 78),
+        ("contracts/0.8.25/sr/SRUtils.sol", "_requireModuleIdExists membership guard", 45, 47),
+        ("contracts/0.8.25/sr/SRTypes.sol", "ModuleStateConfig moduleAddress declaration", 117, 136),
         ("contracts/0.8.25/sr/SRLib.sol", "_migrateStorage registry writers", 51, 155),
         ("contracts/0.8.25/sr/SRLib.sol", "_addModule registry writer", 183, 232),
     },
@@ -1050,9 +1052,24 @@ def validate():
     require(pderef["id"] == "P-DEREF-1", "supplemental dereference row is missing")
     require(pderef.get("theorem") == "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source",
             "P-DEREF-1: theorem differs from canonical evidence")
-    require(pderef.get("statuses", {}).get("yul") == "OPEN"
-            and pderef.get("statuses", {}).get("evm") == "OPEN",
-            "P-DEREF-1: Yul/EVM boundary must remain OPEN")
+    require(pderef.get("theorem_planes") == ["model", "source", "tx"],
+            "P-DEREF-1: theorem planes differ from canonical evidence")
+    require(pderef.get("statuses") == {
+        "model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE",
+        "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN",
+        "evm": "OPEN", "crypto": "NOT_APPLICABLE",
+    }, "P-DEREF-1: assurance statuses differ from canonical claims")
+    require(pderef.get("assumptions") == [
+        "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-YUL-INTERFACE",
+        "A-RUNTIME-PROVENANCE",
+    ], "P-DEREF-1: assumption links differ from canonical risks")
+    require(pderef.get("next_gate") ==
+            "Establish independently checked ROUTER_STORAGE_POSITION, Solidity mapping layout, compiler-emitted SLOAD execution, and deployed runtime provenance before claiming Yul/EVM closure.",
+            "P-DEREF-1: next gate differs from canonical roadmap")
+    require(pderef.get("reproduction") == {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants",
+        "expected": "reachable nonzero derivation, source-to-executable-Verity mapping refinement, and guard/address-writer mutants compile; Yul/EVM provenance remains OPEN",
+    }, "P-DEREF-1: reproduction record differs from canonical evidence")
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")
