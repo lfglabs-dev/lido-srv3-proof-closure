@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: a4cff07c3ddec6cadf821fb3108fd2087c3a2e96
+validated-tree: a4bb6f02ccbe0ea2e4003f65bd19f3492b3cc6e1
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -25,8 +25,9 @@ P-ETH-1 closure-v2 hybrid writer receipt (2026-08-11)
   EVMYulLean is `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`.
 - The source-shaped route pins `lidofinance/core@af095e48` and proves checked
   fee multiplication, exact vault/refund conservation, caller fallback for a
-  zero refund recipient, destination confinement, successful executable
-  Verity trace projection, and full-state rollback for represented rejects.
+  zero refund recipient, and full-state rollback for its handwritten abstract
+  route model. The declared Verity function, fee target, and linked-call
+  behavior are not connected to this proof.
 - Named scope assumptions are A-SOURCE-GROUP-COUNT, A-VALIDATED-PAIRS, and
   A-REQUEST-TARGET-PROVENANCE. Yul/EVM/runtime identity remain OPEN.
 - The bounded writer does not close the canonical P-ETH-1 parent: its public
