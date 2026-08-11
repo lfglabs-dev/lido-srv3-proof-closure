@@ -40,7 +40,7 @@ def write_json(path, value):
 def main():
     with tempfile.TemporaryDirectory(prefix="audit-metadata-") as directory:
         fixture = Path(directory)
-        for name in ("audit", "scripts"):
+        for name in ("audit", "scripts", "LidoSRv3"):
             shutil.copytree(ROOT / name, fixture / name)
         for name in ("lakefile.lean", "lake-manifest.json", "lean-toolchain"):
             shutil.copy2(ROOT / name, fixture / name)
@@ -233,7 +233,7 @@ def main():
         lakefile_path.write_text(
             baseline_lakefile.replace(
                 '"https://github.com/lfglabs-dev/verity.git"@'
-                '"d2d4a18a4d7021adcd90d4b03e619affe506dd54"',
+                '"c41757164e9e8230536d7af29d81a2961b30e482"',
                 f'"{verity["url"]}"@"{verity["rev"]}"',
             ),
             encoding="utf-8",
@@ -1137,8 +1137,8 @@ def main():
         )
         write_json(source_map_path, source_map)
 
-        reproduce_path = fixture / "audit/REPRODUCE.md"
-        reproduce_path.write_text("stale\n", encoding="utf-8")
+        evidence_path = fixture / "audit/EVIDENCE.md"
+        evidence_path.write_text("stale\n", encoding="utf-8")
         run(fixture, False)
 
     print(

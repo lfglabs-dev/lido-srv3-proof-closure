@@ -55,5 +55,13 @@ contract PTopup2DifferentialTest {
         require(harness.referenceEvaluate(61, FAR_FUTURE_EPOCH, false, 0) == 0, "below min");
         require(harness.referenceEvaluate(50, FAR_FUTURE_EPOCH, false, 10) == 4, "accepted gap/pending");
     }
-}
 
+    function test_checkedAdditionOverflowReverts() public {
+        harness.setTarget(type(uint64).max);
+        (bool ok,) = address(harness).call(abi.encodeCall(
+            harness.referenceEvaluate,
+            (uint64(1), FAR_FUTURE_EPOCH, false, type(uint256).max)
+        ));
+        require(!ok, "checked uint256 addition must revert");
+    }
+}

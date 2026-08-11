@@ -16,9 +16,10 @@ and materially execute `Contract.run`.
 The transaction deliberately starts after the source guards and validator
 proof call. Batch length/alignment, order, TOP_UP_ROLE, resumed state, root age,
 withdrawal credentials, activation, EIP-4788 anchor lookup, SSZ/SHA-256 proof
-binding, and the linked StakingRouter call are explicit correspondence
-assumptions; they are not fabricated here.  Thus this closes only headroom and
-budget at SOURCE/VERITY_TX, not verifier, SSZ, Yul, EVM, or deployment planes.
+binding, and the linked StakingRouter call are not represented here. Thus this
+is bounded packed-storage and transaction evidence only. It does not close the
+parent SOURCE/VERITY_TX claim: checked-addition rollback and the actual batch
+transition are not connected here.
 -/
 
 namespace LidoSRv3.Audit.Verity.TopupPackedStorage
@@ -63,8 +64,8 @@ verity_contract GatewayPackedContract where
     let value ← getStorage minTopUpGwei
     return value
 
-  /- The checked source result is supplied at the explicit proof/external-call
-  boundary and committed by an actual Verity transaction. -/
+  /- A caller-supplied model result is committed by an actual Verity
+  transaction. This is not a source-correspondence boundary. -/
   function recordHeadroom (limit : Uint256) : Unit := do
     setStorage lastEvaluatedLimit limit
 
@@ -101,9 +102,8 @@ theorem minimum_setter_reader_run :
       GatewayPackedContract.getMinimum) : Contract Uint64).run defaultState).fst = (42 : Uint64) := by
   native_decide
 
-/-- SOURCE -> VERITY_TX for the exact checked headroom value. The validator
-proof and surrounding batch guards are the documented boundary, not premises
-manufactured by this theorem. -/
+/-- Execute storage of the mathematical headroom model. No theorem here says
+that the pinned Solidity execution succeeds or returns this value. -/
 def executeSourceHeadroom
     (v : LidoSRv3.Audit.Guarantees.PTopup2.Validator)
     (cfg : LidoSRv3.Audit.Guarantees.PTopup2.TopupConfig) :

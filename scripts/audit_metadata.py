@@ -10,6 +10,8 @@ import json
 import re
 from pathlib import Path
 
+from evidence_index import evidence_data, render_json, render_markdown, validate_and_resolve
+
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 EXPECTED_IDS = [
@@ -53,7 +55,7 @@ EXPECTED_WORDING = [
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
     "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
     "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
-    "Pinned-source headroom and aggregate-budget correspondence plus executable Verity packed-storage transactions are checked; exact pinned-artifact-to-mainnet-runtime identity is separately checked at block 25730798, while verifier/SSZ and EVM semantic closure remain open.",
+    "The mathematical headroom and aggregate-budget bounds are checked at MODEL only. Packed ERC-7201 layout/RMW and exact pinned-artifact-to-mainnet-runtime identity are subordinate evidence; checked-overflow rollback and the actual topUp batch transition are not connected to an official Verity transaction, so parent SOURCE/TX closure remains open.",
     "Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
@@ -123,7 +125,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants",
      "expected": "successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants",
-     "expected": "successful pinned-source headroom/budget correspondence, exact packed layout, material Contract.run execution, and mutant-sensitive build; verifier/SSZ/Yul/EVM/deployment remain open"},
+     "expected": "successful MODEL bounds plus subordinate packed layout/RMW and material Contract.run evidence; parent SOURCE/TX and verifier/Yul/EVM semantics remain open"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
     {"command": "lake build LidoSRv3.Audit.Ssz",
@@ -179,7 +181,7 @@ EXPECTED_NEXT_GATES = [
     "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
     "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
     "Refine the checked official Verity transaction through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance; the existing subordinate Yul interface harness remains syntax-level evidence only.",
-    "Bind the separate EIP-4788/GIndex/SSZ/SHA-256 verifier path, then establish Yul/EVM semantic refinement; deployed runtime identity is separately evidenced only for chainId 1/block 25730798.",
+    "Model checked uint256 addition and rollback, then connect the pinned topUp batch transition and post-state to an official Verity Contract.run transaction before claiming SOURCE/TX closure.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
     "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
@@ -225,7 +227,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
@@ -257,7 +259,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
     [],
     ["model", "source", "tx"],
-    ["model", "source", "tx"],
+    ["model"],
     [],
     ["model"],
     ["model"],
@@ -280,7 +282,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
     None,
     "LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx",
-    "LidoSRv3.Audit.Verity.TopupPackedStorage.record_budget_rejects_over_budget",
+    "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
     "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
@@ -388,7 +390,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
             "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, "
-            "P-TOPUP-2 headroom/budget plus packed Verity transaction, "
+            "P-TOPUP-2 MODEL-only headroom/budget bounds plus subordinate packed-storage evidence, "
             "P-ADDRESS-1 caller-renaming MODEL-to-SOURCE-to-VERITY_TX simulation, and "
             "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
             "MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement are "
@@ -422,6 +424,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math", "status": "lean_checked",
      "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_conservation_mutant_sensitive",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_capacity_mutant_sensitive",
@@ -1150,10 +1154,11 @@ def validate():
     require("Solidity-to-Verity semantic correspondence" in exclusions
             and "Verity model refinement" in exclusions,
             "P-TOPUP-2 runtime receipt overclaims Verity correspondence")
-    return rows[:len(EXPECTED_IDS)]
+    validate_and_resolve(rows, ROOT)
+    return rows[:len(EXPECTED_IDS)], rows
 
 
-def rendered(rows):
+def rendered(rows, all_rows):
     header = (
         "<!-- GENERATED by scripts/audit_metadata.py; edit structured metadata, "
         "not this view. Lean is theorem authority. -->\n\n"
@@ -1163,6 +1168,10 @@ def rendered(rows):
     ) + "\n"
     status_lines = [
         "# STATUS",
+        "",
+        "Status-only view. For theorem scope and exact evidence links, read "
+        "[EVIDENCE.md](EVIDENCE.md). Catalogue target is not theorem scope; "
+        "Lean theorem statements are authority.",
         "",
         "| ID | Model | ALG | Source | TX | Yul | EVM | Crypto |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
@@ -1179,7 +1188,15 @@ def rendered(rows):
         f"{row['reproduction']['expected']}"
         for row in rows
     ) + "\n"
-    return {"ROADMAP.md": roadmap, "STATUS.md": status, "REPRODUCE.md": reproduce}
+    resolved = validate_and_resolve(all_rows, ROOT)
+    evidence = evidence_data(all_rows, resolved)
+    return {
+        "ROADMAP.md": roadmap,
+        "STATUS.md": status,
+        "REPRODUCE.md": reproduce,
+        "EVIDENCE.md": render_markdown(evidence),
+        "evidence.json": render_json(evidence),
+    }
 
 
 def main():
@@ -1187,15 +1204,16 @@ def main():
     parser.add_argument("command", choices=("generate", "check"))
     parser.add_argument("--expect-canonical-count", type=int)
     args = parser.parse_args()
-    rows = validate()
+    rows, all_rows = validate()
     if args.expect_canonical_count is not None:
         require(len(rows) == args.expect_canonical_count,
                 f"canonical guarantee count is {len(rows)}, expected {args.expect_canonical_count}")
-    views = rendered(rows)
+    views = rendered(rows, all_rows)
     if args.command == "generate":
         for name, content in views.items():
             (AUDIT / name).write_text(content, encoding="utf-8")
-        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md")
+        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md "
+              "audit/EVIDENCE.md audit/evidence.json")
     else:
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content,

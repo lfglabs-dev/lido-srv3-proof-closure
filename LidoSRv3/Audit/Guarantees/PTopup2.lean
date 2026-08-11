@@ -28,7 +28,9 @@ structure TopupConfig where
   moduleAllocationLimitGwei : Nat
   maxRootAge : Nat
 
-/-- Faithful Gwei reading of pinned `_evaluateTopUpLimit`. -/
+/-- Mathematical Gwei reading of pinned `_evaluateTopUpLimit` after the
+checked `uint256` addition has succeeded. It is not source correspondence for
+inputs where `effectiveBalanceGwei + pendingBalanceGwei` overflows uint256. -/
 def evaluated_topup_limit (v : Validator) (cfg : TopupConfig) : Nat :=
   if v.exiting || v.slashed then 0
   else
@@ -177,8 +179,10 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
   exact Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
 
-/-- Corrected budget/headroom model is checked at MODEL. -/
-def guarantee : Guarantee := ⟨.pTopup2, [.model, .source, .verityTx]⟩
+/-- The budget/headroom mathematics is checked at MODEL. The pinned source and
+an official Verity transaction remain open until checked-addition rollback and
+the actual batch transition are connected end to end. -/
+def guarantee : Guarantee := ⟨.pTopup2, [.model]⟩
 
 /- Verifier binding remains separate: EIP-4788 anchor behavior at BEACON_ROOTS,
 SSZ/GIndex correspondence, SHA-256 correctness, linked external summaries, Yul,

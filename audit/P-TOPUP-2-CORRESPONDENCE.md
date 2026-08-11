@@ -5,18 +5,22 @@ The checked slice is `TopUpGateway.topUp` lines 160--237,
 `_evaluateTopUpLimit` lines 396--415, and the call boundary at
 `CLValidatorVerifier._verifyValidator` lines 44--57.
 
-## Closed slice
+## Checked and open slices
 
-The Lean source transcription preserves the exit/slash early return, checked
-`effectiveBalance + pendingBalanceGwei`, target-reached return, checked target
-subtraction, strict `gap < minTopUpGwei` threshold, accepted gap, left-to-right
-headroom capping, and aggregate block/module budget. The Verity contract uses
-#2249 `UIntN` packed lowering at the exact ERC-7201 base and executes masked
-setters/readers plus a fail-closed aggregate budget transaction through `.run`.
+The Lean MODEL preserves the exit/slash early return, target-reached return,
+strict `gap < minTopUpGwei` threshold, accepted gap, left-to-right headroom
+capping, and aggregate block/module budget after the Solidity checked addition
+has succeeded. The pinned source reverts when `effectiveBalance +
+pendingBalanceGwei` overflows uint256; that rollback is not represented in the
+Nat model. The Verity contract uses #2249 `UIntN` packed lowering at the exact
+ERC-7201 base and executes masked setters/readers plus a synthetic fail-closed
+budget transaction through `.run`. `recordBudget` is not connected to the
+pinned `topUp` batch transition or post-state. Parent SOURCE and TX therefore
+remain OPEN.
 
 ## Explicit boundaries
 
-The source theorem assumes the earlier guards retain their pinned behavior:
+No source theorem connects the earlier guards and full execution:
 batch non-emptiness and aligned lengths, length cap, strict validator-index
 order, TOP_UP_ROLE, resumed state, block-distance/root-age checks, type-0x02
 withdrawal credentials, pubkey length, activation, and call ordering. It also
@@ -41,11 +45,13 @@ independently asserts the literal ERC-7201 base from the source. The comparison
 receipt matches those derived base/word/bit offsets against
 `GatewayPackedContract.spec.fields`.
 
-The committed machine evidence is
-`audit/p-topup-2-pinned-storage-ast.json` plus
+The committed comparison target is
 `audit/p-topup-2-layout-comparison.json`; `scripts/check_p_topup2_layout.sh`
-recompiles the exact pinned checkout and checks these records. The empty direct
-storage layout is recorded as a finding, not treated as evidence of no storage.
+recompiles the exact pinned checkout with AST output, locates the compiled
+`Storage` declaration, recomputes packing offsets from its types, extracts the
+ERC-7201 literal from pinned source, and compares every derived field. The
+committed `matches` boolean is not trusted. The empty direct storage layout is
+recorded as a finding, not treated as evidence of no storage.
 
 ## Optional mainnet runtime-provenance gate
 

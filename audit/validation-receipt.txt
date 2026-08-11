@@ -1,11 +1,30 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2d5df832f7ef2905c59279237d206d7f12677c0f
+validated-tree: 5340ade3e1f5d913a0e9b0719c6b1ad61a50dd7a
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ALLOC-1 closure-v2 bounded Verity transaction receipt (2026-08-11)
+---------------------------------------------------------------------
+
+- Base: `campaign/lido-closure-v2@4b96af1094c691afee9f7013e4623a2b128a6421`.
+- Verity: `c41757164e9e8230536d7af29d81a2961b30e482`; the executable
+  `AllocationContract.allocate` crosses the actual `Verity.Contract.run`
+  boundary and is observed through the returned checked amount plus the full
+  router-ordered allocation column.
+- `PAlloc1.verity_tx_refines_source_capacity_and_conservation` equates that
+  observation with the merged `MinFirstAllocation.Source.checkedAmount`
+  capacity specification.  The positive vector observes `70 = 10 + 60`.
+- Executed overwrite, effective-capacity-clamp, and disabled-row mutants are
+  distinguished by their actual post-states. Checked `safeSub`/`safeAdd`
+  operations guard demand, capacity, bucket, and total arithmetic.
+- The scope is the official bounded index-zero executable receipt documented in
+  the Lean source. General multi-row executable-wrapper semantics, proportional
+  allocation, Yul, EVM, runtime bytecode, and deployment provenance remain open.
+- `P-ALLOC-1.eugene-bound` remains unchanged and subordinate.
 
 P-ADDRESS-1 exact-head review correction (2026-08-11)
 ------------------------------------------------------
@@ -522,16 +541,17 @@ Verity f485b2ca re-pin validation (2026-08-06)
 - Full `lake build`: exit 0 (`Build completed successfully (1300 jobs).`).
 - No Lido-side API compatibility changes were required.
 
-P-TOPUP-2 faithful packed source-to-transaction closure (2026-08-11)
+P-TOPUP-2 packed-storage evidence and parent-scope correction (2026-08-11)
 ---------------------------------------------------------------------
 
 - Exact branch point: `campaign/lido-minimal-11@c32f4dd89752c7b8ae8a1003b96d433d7a7ee32f`;
   validated feature head: `b3316dee7a018c95d23928865bcefc0e9699664a`.
 - Pinned Lido source: `af095e48bbc1c3841c2c9936219c8461af01056b`.
-  The namespaced gateway base and member layout were independently derived
-  from the solc 0.8.25 AST because standard `storageLayout` omits ERC-7201
-  namespaced structs; `scripts/check_p_topup2_layout.sh` exits 0 against the
-  pinned checkout and the checked-in AST/layout comparison.
+  The namespaced gateway base and member layout are derived on every gate run
+  from a fresh solc 0.8.25 AST and pinned source literal because standard
+  `storageLayout` omits ERC-7201 namespaced structs;
+  `scripts/check_p_topup2_layout.sh` does not trust committed AST data or a
+  committed `matches` boolean.
 - Complete-source remote Lean focused + full build on Babylon: job
   `58d52671-368c-4c92-883c-9cff14f96e59`, source bundle
   `6ba6468e591a406d05b7f8258bdb8ca4b4eb7a44d0c1438d7a5bcb1cbfb9946d`,
@@ -541,14 +561,18 @@ P-TOPUP-2 faithful packed source-to-transaction closure (2026-08-11)
   `18449e89-1e7c-4ebc-ab3c-a26d39b529f3` exercised the full graph but failed
   at the superseded `8786176` proof head; it is retained as a negative receipt,
   not represented as successful final-head evidence.
-- `forge test -vv`: 4 passed, 0 failed, including 256 runs each for evaluator
+- `forge test -vv`: 5 passed, 0 failed, including 256 runs each for evaluator
   differential, target-field RMW, and minimum-field RMW, with arbitrary
-  nonzero neighbor sentinels. Pinned `forge build TopUpGateway.sol --force`
-  under solc 0.8.25/optimizer 200/viaIR/Cancun exits 0.
+  nonzero neighbor sentinels plus a deterministic checked-addition overflow
+  revert. Pinned `forge build TopUpGateway.sol --force` under solc
+  0.8.25/optimizer 200/viaIR/Cancun exits 0.
 - Metadata check, optimized metadata mutants, provenance guards, no-Python
   evidence gate, `git diff --check`, and the layout comparison all exit 0.
-- Closure is intentionally limited to the checked headroom and aggregate
-  budget SOURCE/VERITY_TX slice. Batch/order/role/resume/root-age boundaries,
+- Independent review found that the Nat evaluator does not model checked
+  uint256-addition rollback and that `recordBudget` consumes unrelated
+  caller-supplied values rather than the pinned batch transition. Accordingly
+  P-TOPUP-2 is MODEL-only: SOURCE and TX remain OPEN, and packed storage plus
+  runtime identity are subordinate evidence. Batch/order/role/resume/root-age,
   EIP-4788 anchor behavior, SHA-256, verifier/SSZ binding, linked external-call
   summaries, compiler lowering beyond the declared Verity fragment,
   solc Yul-to-bytecode, EVM/runtime, and optional deployment provenance remain

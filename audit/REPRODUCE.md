@@ -10,6 +10,6 @@
 - `P-RESERVE-1`: `lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants` — successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build
 - `P-ETH-1`: `lake build LidoSRv3.Audit.Guarantees.PEth1` — successful bounded child-model proofs only; parent P-ETH-1 remains OPEN
 - `P-ADDRESS-1`: `lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants` — successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open
-- `P-TOPUP-2`: `lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants` — successful pinned-source headroom/budget correspondence, exact packed layout, material Contract.run execution, and mutant-sensitive build; verifier/SSZ/Yul/EVM/deployment remain open
+- `P-TOPUP-2`: `lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants` — successful MODEL bounds plus subordinate packed layout/RMW and material Contract.run evidence; parent SOURCE/TX and verifier/Yul/EVM semantics remain open
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
 - `P-SSZ-1`: `lake build LidoSRv3.Audit.Ssz` — successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence
