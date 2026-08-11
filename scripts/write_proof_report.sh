@@ -58,8 +58,25 @@ PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprove
 grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
   fail "build log '$BUILD_LOG' does not record the running Lean version"
 
-VERITY_COMMIT="$(python3 -c 'import json; d=json.load(open("lake-manifest.json")); print(next(p["rev"] for p in d["packages"] if p["name"] == "verity"))')"
-[ -n "$VERITY_COMMIT" ] || fail "could not read the pinned Verity revision from lake-manifest.json"
+# The report pin is read from Lake's resolved dependency manifest instead of
+# being duplicated here.  The metadata gate separately proves that this value
+# agrees with lakefile.lean and every canonical audit lock/manifest.
+VERITY_COMMIT="$(python3 - <<'PY'
+import json
+from pathlib import Path
+
+manifest = json.loads(Path("lake-manifest.json").read_text(encoding="utf-8"))
+matches = [package for package in manifest["packages"] if package["name"] == "verity"]
+if len(matches) != 1:
+    raise SystemExit("lake-manifest.json must contain exactly one Verity package")
+package = matches[0]
+if package.get("rev") != package.get("inputRev"):
+    raise SystemExit("Verity resolved rev and requested inputRev differ")
+print(package["rev"])
+PY
+)" || fail "could not read the resolved Verity pin from lake-manifest.json"
+[[ "$VERITY_COMMIT" =~ ^[0-9a-f]{40}$ ]] || \
+  fail "resolved Verity pin '$VERITY_COMMIT' is not an exact 40-hex commit"
 
 cat <<JSON
 {
