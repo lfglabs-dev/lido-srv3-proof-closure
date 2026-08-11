@@ -40,7 +40,7 @@ def write_json(path, value):
 def main():
     with tempfile.TemporaryDirectory(prefix="audit-metadata-") as directory:
         fixture = Path(directory)
-        for name in ("audit", "scripts"):
+        for name in ("audit", "scripts", "LidoSRv3"):
             shutil.copytree(ROOT / name, fixture / name)
         for name in ("lakefile.lean", "lake-manifest.json", "lean-toolchain"):
             shutil.copy2(ROOT / name, fixture / name)
@@ -1137,8 +1137,8 @@ def main():
         )
         write_json(source_map_path, source_map)
 
-        reproduce_path = fixture / "audit/REPRODUCE.md"
-        reproduce_path.write_text("stale\n", encoding="utf-8")
+        evidence_path = fixture / "audit/EVIDENCE.md"
+        evidence_path.write_text("stale\n", encoding="utf-8")
         run(fixture, False)
 
     print(

@@ -30,6 +30,7 @@ check: test
 
 test:
 	@python3 scripts/audit_metadata.py check
+	@python3 scripts/test_evidence_index.py
 	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
 	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh

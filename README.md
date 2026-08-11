@@ -5,10 +5,13 @@ Lean model of the SRv3 economic surface, the eleven public guarantees claimed
 over it, the source and pin evidence those guarantees rest on, and the commands
 that reproduce all of it locally.
 
-The registry is the authority. Lean theorem statements and their proofs are what
-actually close a guarantee; the metadata in `audit/` describes and constrains
-them but does not itself prove anything.
+Start with the generated [theorem-scoped evidence index](audit/EVIDENCE.md).
+The catalogue target is not the theorem scope: a compiling Lean file does not
+prove a broad natural-language parent guarantee. Lean theorem statements and
+their proofs are the authority; metadata describes and constrains them but does
+not itself prove anything. `audit/STATUS.md` is status-only.
 
+- Evidence index: `audit/EVIDENCE.md` (machine-readable: `audit/evidence.json`)
 - Canonical registry: `audit/guarantees.yaml`
 - Lean facade: `LidoSRv3/Audit/AllGuarantees.lean`
 - Source mapping: `audit/source-map.yaml`
@@ -28,10 +31,10 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source` |
 | 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx` |
 | 6 | `P-RESERVE-1` | `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` (independent MODEL → pinned source-shaped semantics → Verity transaction refinement) |
-| 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
+| 7 | `P-ETH-1` | **NO PARENT THEOREM**; bounded child evidence only |
 | 8 | `P-ADDRESS-1` | `LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx` (MODEL → pinned SOURCE → official VERITY_TX) |
 | 9 | `P-TOPUP-2` | metadata-only; no Lean theorem claimed |
-| 10 | `P-CONSOLIDATION-1` | metadata-only; no Lean theorem claimed |
+| 10 | `P-CONSOLIDATION-1` | **NO PARENT THEOREM**; bounded child evidence only |
 | 11 | `P-SSZ-1` | `LidoSRv3.Audit.Ssz.structural_witness_binding_sound` (model); source plane OPEN for mapped helper/wrapper scope; carries the subordinate `P-SSZ-1.deposit-data-root` child claim noted below |
 
 `P-SSZ-1.deposit-data-root` is a subordinate child claim of row 11, not a
@@ -62,8 +65,10 @@ No guarantee currently claims correspondence to deployed bytecode, and several
 are explicitly blocked on runtime provenance. Read the exact
 per-guarantee wording, status, assumptions, and next gate from
 `audit/guarantees.yaml` rather than from any prose summary, including this one.
-Generated views of the same data live in `audit/STATUS.md`, `audit/ROADMAP.md`,
-and `audit/REPRODUCE.md`; regenerate them with `make audit-generate`.
+Generated views live in `audit/EVIDENCE.md`, `audit/evidence.json`,
+`audit/STATUS.md`, `audit/ROADMAP.md`, and `audit/REPRODUCE.md`; regenerate them
+with `make audit-generate`. Evidence links exist only for non-null theorem rows
+and resolve to the exact Lean declaration, never merely to a compiling file.
 
 ## Reproducing
 
@@ -74,7 +79,8 @@ make prove         # Lean theorem checking; writes proofs/logs/proof-report.json
 ```
 
 `make audit-check` is fail-closed: it rejects a registry that has drifted from
-the eleven IDs, that loses a pin, or whose generated views are stale.
+the eleven IDs, loses a pin, names a missing or ambiguous Lean theorem, violates
+parent/child or theorem-plane constraints, or has stale generated views.
 `make test` additionally runs the metadata validator against deliberate mutants
 and re-derives the validation receipt, so a silent edit to the evidence tree
 fails the build.

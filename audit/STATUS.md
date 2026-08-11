@@ -2,6 +2,8 @@
 
 # STATUS
 
+Status-only view. For theorem scope and exact evidence links, read [EVIDENCE.md](EVIDENCE.md). Catalogue target is not theorem scope; Lean theorem statements are authority.
+
 | ID | Model | ALG | Source | TX | Yul | EVM | Crypto |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `P-ALLOC-1` | LEAN_CHECKED | NOT_APPLICABLE | LEAN_CHECKED | OPEN | NOT_APPLICABLE | OPEN | NOT_APPLICABLE |
