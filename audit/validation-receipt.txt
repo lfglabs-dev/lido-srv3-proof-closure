@@ -1,11 +1,30 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 17ec375fff0fbdc0e2988acc21066d8d27dab23c
+validated-tree: e3b7a2df2acafa7ecdd5ffeb7feb00b8ae8a052c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ALLOC-1 closure-v2 bounded Verity transaction receipt (2026-08-11)
+---------------------------------------------------------------------
+
+- Base: `campaign/lido-closure-v2@4b96af1094c691afee9f7013e4623a2b128a6421`.
+- Verity: `c41757164e9e8230536d7af29d81a2961b30e482`; the executable
+  `AllocationContract.allocate` crosses the actual `Verity.Contract.run`
+  boundary and is observed through the returned checked amount plus the full
+  router-ordered allocation column.
+- `PAlloc1.verity_tx_refines_source_capacity_and_conservation` equates that
+  observation with the merged `MinFirstAllocation.Source.checkedAmount`
+  capacity specification.  The positive vector observes `70 = 10 + 60`.
+- Executed overwrite, effective-capacity-clamp, and disabled-row mutants are
+  distinguished by their actual post-states. Checked `safeSub`/`safeAdd`
+  operations guard demand, capacity, bucket, and total arithmetic.
+- The scope is the official bounded index-zero executable receipt documented in
+  the Lean source. General multi-row executable-wrapper semantics, proportional
+  allocation, Yul, EVM, runtime bytecode, and deployment provenance remain open.
+- `P-ALLOC-1.eugene-bound` remains unchanged and subordinate.
 
 P-ADDRESS-1 exact-head review correction (2026-08-11)
 ------------------------------------------------------

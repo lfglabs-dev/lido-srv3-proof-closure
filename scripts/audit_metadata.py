@@ -413,6 +413,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math", "status": "lean_checked",
      "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_conservation_mutant_sensitive",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_capacity_mutant_sensitive",
