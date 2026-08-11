@@ -270,7 +270,14 @@ theorem selects_same_next_target
   candidate?_eq_minFirst_candidate? hRows
 
 /-! The executable receipt below crosses the actual `Contract.run` boundary.
-It is intentionally a falsifier vector, not an EVM or production E2E claim. -/
+It is intentionally a falsifier vector, not an EVM or production E2E claim.
+
+The pinned Verity macro's executable wrapper rewrites each `forEach` body once
+with its loop variable fixed to zero; it is not the compilation-model loop
+semantics.  Consequently these receipts deliberately use states whose relevant
+row is index zero.  Multi-row scanning, including skipping a disabled first row,
+is covered only by the source/model correspondence above and remains OPEN at the
+`Contract.run` executable-wrapper boundary. -/
 
 def allocationReceiptState : ContractState :=
   { defaultState with
@@ -281,13 +288,13 @@ def allocationReceiptState : ContractState :=
       else if storageSlot = AllocationContract.moduleEnabled.slot then [1, 0]
       else [] }
 
-def disabledFirstReceiptState : ContractState :=
+def disabledReceiptState : ContractState :=
   { defaultState with
     storageArray := fun storageSlot =>
-      if storageSlot = AllocationContract.stakeRatios.slot then [0, 0]
-      else if storageSlot = AllocationContract.moduleLimits.slot then [40, 100]
-      else if storageSlot = AllocationContract.allocationBuffers.slot then [40, 100]
-      else if storageSlot = AllocationContract.moduleEnabled.slot then [0, 1]
+      if storageSlot = AllocationContract.stakeRatios.slot then [0]
+      else if storageSlot = AllocationContract.moduleLimits.slot then [40]
+      else if storageSlot = AllocationContract.allocationBuffers.slot then [40]
+      else if storageSlot = AllocationContract.moduleEnabled.slot then [0]
       else [] }
 
 def conservationReceipt : Bool :=
@@ -314,15 +321,14 @@ def capacityReceipt : Bool :=
   | _, _ => false
 
 def disabledExclusionReceipt : Bool :=
-  match (AllocationContract.allocate 30).run disabledFirstReceiptState,
+  match (AllocationContract.allocate 30).run disabledReceiptState,
       (AllocationMutants.allocateWithoutCapacityOrEnabledGuards 30).run
-        disabledFirstReceiptState with
+        disabledReceiptState with
   | .success total after, .success mutantTotal mutantAfter =>
       let allocations := after.storageArray AllocationContract.stakeRatios.slot
       let mutantAllocations := mutantAfter.storageArray AllocationMutants.stakeRatios.slot
-      total = 0 && allocations[0]? = some 0 && allocations[1]? = some 0 &&
+      total = 0 && allocations[0]? = some 0 &&
       mutantTotal = 30 && mutantAllocations[0]? = some 30 &&
-      mutantAllocations[1]? = some 0 &&
       mutantAllocations != allocations
   | _, _ => false
 
