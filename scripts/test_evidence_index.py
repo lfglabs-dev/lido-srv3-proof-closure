@@ -86,6 +86,17 @@ def main():
         missing[2]["theorem"] = "LidoSRv3.Audit.Guarantees.PChecked.missing"
         expect_error(missing, root, "declared theorem not found")
 
+        # These public rows have historically shared short theorem names with
+        # nearby evidence.  A bare short name must never resolve by accident.
+        for row_id, short_name in (
+            ("P-TOPUP-1", "verity_tx_simulates_source"),
+            ("P-ACCOUNT-1", "source_to_verityTx"),
+            ("P-SSZ-1", "structural_witness_binding_sound"),
+        ):
+            short = copy.deepcopy(rows)
+            short.append(row(row_id, short_name))
+            expect_error(short, root, "declared theorem not found")
+
         duplicate = source / "Duplicate.lean"
         duplicate.write_text((source / "PChecked.lean").read_text(encoding="utf-8"), encoding="utf-8")
         expect_error(rows, root, "declared theorem is ambiguous")
