@@ -1,11 +1,26 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 17ec375fff0fbdc0e2988acc21066d8d27dab23c
+validated-tree: 9cae068a0fbbc0b4b068d82e814003624f1135eb
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Verity external-call DSL re-pin receipt (2026-08-11)
+----------------------------------------------------
+
+- Re-pin base: `campaign/lido-minimal-11@c32f4dd89752c7b8ae8a1003b96d433d7a7ee32f`.
+- Previous Verity pin: `c41757164e9e8230536d7af29d81a2961b30e482`.
+- New Verity pin: `1fe0218863a4c8d6113e6cdd4de3766a54df81c7`.
+- The exact Verity delta is the single merged commit `1fe02188`,
+  `feat(macro): support external calls in contract bodies (#2245) (#2252)`.
+  It extends macro syntax and translation for external calls in contract
+  bodies and adds focused Solidity/Lean smoke coverage; no additional commits
+  were present on live Verity `main` when the pin was selected.
+- `lake update verity` resolved both manifest `rev` and `inputRev` to the new
+  exact 40-hex commit. Existing proof-report generation remains manifest-driven;
+  PR #59's concurrent provenance-derivation work is not duplicated here.
 
 P-ADDRESS-1 exact-head review correction (2026-08-11)
 ------------------------------------------------------
