@@ -58,12 +58,15 @@ PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprove
 grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
   fail "build log '$BUILD_LOG' does not record the running Lean version"
 
+VERITY_COMMIT="$(python3 -c 'import json; d=json.load(open("lake-manifest.json")); print(next(p["rev"] for p in d["packages"] if p["name"] == "verity"))')"
+[ -n "$VERITY_COMMIT" ] || fail "could not read the pinned Verity revision from lake-manifest.json"
+
 cat <<JSON
 {
   "schema": "srv3-verity-lean-proof-report-v2",
   "toolchain": {
     "lean": "${LEAN_VERSION}",
-    "verity_commit": "d2d4a18a4d7021adcd90d4b03e619affe506dd54"
+    "verity_commit": "${VERITY_COMMIT}"
   },
   "command": "lake build LidoSRv3",
   "build": {

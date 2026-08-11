@@ -26,6 +26,16 @@ call sites by the balance observation. -/
 #guard revertedWith "ROUTER_BALANCE_CHANGED"
   ((TopupTxContract.executeTopup false 7 7 false).run state)
 
+/- A pull-side source failure reaches the pull call and reverts before the
+beacon suffix. -/
+#guard revertedWith "SOURCE_TOPUP_REVERTED_DURING_PULL"
+  ((TopupTxContract.executePullRevert 7).run state)
+
+/- A downstream source failure reaches both value-bearing calls before the
+transaction snapshot is restored. -/
+#guard revertedWith "SOURCE_TOPUP_REVERTED_DURING_PUSH"
+  ((TopupTxContract.executePushRevert 7 7).run state)
+
 /- The zero-top-up commit uses the call-free entrypoint. -/
 #guard match (TopupTxContract.executeNoTopup false 0 0).run state with
   | .success _ after => after.sender == state.sender

@@ -61,6 +61,20 @@ verity_contract TopupTxContract where
     require (sourceReverts == false) "SOURCE_TOPUP_REVERTED"
     require (pulled == pushed) "TOPUP_VALUE_MISMATCH"
 
+  /- A revert raised by `Lido.withdrawDepositableEther`: the value-bearing
+  pull site is reached, but the beacon suffix is not. -/
+  function reentrancy_trusted executePullRevert (pulled : Uint256) : Unit := do
+    externalCallBind [] "withdrawDepositableEther" [pulled]
+    require false "SOURCE_TOPUP_REVERTED_DURING_PULL"
+
+  /- A revert raised after the Lido pull succeeded, while executing the
+  beacon-depositor suffix.  Both call sites are reached before rollback. -/
+  function reentrancy_trusted executePushRevert
+      (pulled : Uint256, pushed : Uint256) : Unit := do
+    externalCallBind [] "withdrawDepositableEther" [pulled]
+    externalCallBind [] "makeBeaconChainTopUp" [pushed]
+    require false "SOURCE_TOPUP_REVERTED_DURING_PUSH"
+
 inductive TxStatus where
   | committed
   | reverted
@@ -87,12 +101,19 @@ def observeVerity (before : ContractState) (result : ContractResult Unit) : TxVi
 /-- The actual executable Verity transaction fed by the independent source
 interpreter.  The suffix is observational: it has no local storage writes. -/
 def executeSource (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Contract Unit :=
-  if (run cfg inp).pulled = 0 then
-    TopupTxContract.executeNoTopup
-      (run cfg inp).reverts (run cfg inp).pulled (run cfg inp).pushed
-  else
-    TopupTxContract.executeTopup
-      (run cfg inp).reverts (run cfg inp).pulled (run cfg inp).pushed true
+  match run cfg inp with
+  | .revertLidoCannotDeposit | .revertLidoZeroAmount | .revertLidoNotEnoughEther =>
+      TopupTxContract.executePullRevert (totalAllocated inp)
+  | .revertArrayLengthMismatch | .revertInvalidPublicKeyLength
+  | .revertDepositAmountTooLow | .revertAmountTooLarge
+  | .revertInsufficientRouterBalance =>
+      TopupTxContract.executePushRevert (totalAllocated inp) (pushedValue inp)
+  | .revertAssertBalanceUnchanged =>
+      TopupTxContract.executeTopup false (totalAllocated inp) (pushedValue inp) false
+  | .committedTopUp _ pulled pushed _ =>
+      TopupTxContract.executeTopup false pulled pushed true
+  | .committedNoTopUp => TopupTxContract.executeNoTopup false 0 0
+  | _ => TopupTxContract.executeNoTopup true 0 0
 
 /-- Adequacy of the hybrid boundary: source conservation discharges the typed
 program's equality guard, and every source revert is normalized by
@@ -100,14 +121,20 @@ program's equality guard, and every source revert is normalized by
 theorem verity_tx_simulates_source
     (cfg : SourceTopupConfig) (inp : SourceTopupInput) (state : ContractState) :
     observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state := by
-  have hconserves : (run cfg inp).pulled = (run cfg inp).pushed := run_conserves cfg inp
-  cases hrevert : (run cfg inp).reverts <;>
-    by_cases hzero : (run cfg inp).pushed = 0 <;>
+  have hconserves := run_conserves cfg inp
+  cases hrun : run cfg inp <;>
     simp [executeSource, sourceTx, observeVerity, TopupTxContract.executeTopup,
-      TopupTxContract.executeNoTopup, _root_.Verity.require,
+      TopupTxContract.executeNoTopup, TopupTxContract.executePullRevert,
+      TopupTxContract.executePushRevert, _root_.Verity.require,
       _root_.Contracts.externalCallBind, _root_.Verity.Contract.run,
       _root_.Verity.bind, _root_.Verity.pure, Bind.bind, Pure.pure,
-      hrevert, hconserves, hzero]
+      Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
+  case revertAssertBalanceUnchanged =>
+    by_cases heq : Core.Uint256.ofNat (totalAllocated inp) =
+        Core.Uint256.ofNat (pushedValue inp) <;> simp [heq]
+  case committedTopUp =>
+    subst_vars
+    simp
 
 /-- Explicit rollback half, stated directly on `Contract.run`. -/
 theorem verity_revert_restores_snapshot
