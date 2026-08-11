@@ -642,5 +642,41 @@
         }
       ]
     }
+  ],
+  "supplemental": [
+    {
+      "id": "P-DEREF-1",
+      "catalogue_wording": "Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.",
+      "scope": "registry address binding only; migration old-layout contents are explicit inputs",
+      "statuses": {
+        "model": "LEAN_CHECKED",
+        "algorithm": "NOT_APPLICABLE",
+        "source": "LEAN_CHECKED",
+        "tx": "LEAN_CHECKED",
+        "yul": "OPEN",
+        "evm": "OPEN",
+        "crypto": "NOT_APPLICABLE"
+      },
+      "theorem": "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source",
+      "theorem_planes": [
+        "model",
+        "source",
+        "tx"
+      ],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-YUL-INTERFACE",
+        "A-RUNTIME-PROVENANCE"
+      ],
+      "source": {
+        "source": "LidoSRv3/Audit/Source/DereferenceCorrespondence.lean",
+        "line": 195
+      },
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants",
+        "expected": "reachable nonzero derivation, source-to-executable-Verity mapping refinement, and guard/address-writer mutants compile; Yul/EVM provenance remains OPEN"
+      }
+    }
   ]
 }
