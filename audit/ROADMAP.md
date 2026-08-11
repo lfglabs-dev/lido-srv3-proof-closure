@@ -5,7 +5,7 @@
 - `P-ALLOC-1`: Refine proportional allocation amounts for SRLib._getModulesAllocationAndCapacity.
 - `P-ALLOC-2`: Refine proportional allocation amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate.
 - `P-DEPOSIT-1`: Connect the pinned deposit conservation/rollback correspondence to an official Verity transaction.
-- `P-TOPUP-1`: Discharge the declared linked-external call summaries and establish independently verified deployment provenance.
+- `P-TOPUP-1`: Strengthen independently reproducible deployment-provenance receipts without changing the guarantees-v4/source-map-v3 green boundary.
 - `P-ACCOUNT-1`: Extend the checked Verity transaction beyond the accepted accounting prefix (later source guards, external calls) and establish independently verified deployment provenance.
 - `P-RESERVE-1`: Optionally establish deployed storage/call provenance; semantic closure ends at the proved Verity transaction under the solc trust assumption.
 - `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity and deployment provenance.

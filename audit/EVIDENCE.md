@@ -76,15 +76,15 @@ Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles l
 
 ## P-TOPUP-1
 
-Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.
+The complete public topUp parent transaction is simulated by executable Verity Contract.run from authentication through allocation, wrapped uint256 accumulation, empty commit, Lido pull, Beacon push, assertion, commit/revert, and snapshot rollback; arbitrary callees expose control, value, returndata, and caller-frame preservation, while solc and deployment provenance remain separately trusted/recorded under A-SOLC-TRUSTED.
 
 - Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L194)
+- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L195)
 - Theorem planes: `model`, `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup1.lean:194`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L194)
-- Assumptions: `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants`
-- Expected scope: successful pinned-source conservation plus actual Verity Contract.run transaction simulation, snapshot rollback, declared-call program, and negative-mutant build; linked-external/Yul/EVM/runtime/deployment semantics remain open
+- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup1.lean:195`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L195)
+- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupParentMutants`
+- Expected scope: successful whole-parent pinned-source to Verity Contract.run simulation with wrapped uint256 accumulation, explicit call observations, snapshot rollback, and high-risk negative mutants; Yul/EVM are outside the registry plane under A-SOLC-TRUSTED
 
 ## P-ACCOUNT-1
 

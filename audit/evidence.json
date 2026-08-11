@@ -152,7 +152,7 @@
     },
     {
       "id": "P-TOPUP-1",
-      "catalogue_wording": "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
+      "catalogue_wording": "The complete public topUp parent transaction is simulated by executable Verity Contract.run from authentication through allocation, wrapped uint256 accumulation, empty commit, Lido pull, Beacon push, assertion, commit/revert, and snapshot rollback; arbitrary callees expose control, value, returndata, and caller-frame preservation, while solc and deployment provenance remain separately trusted/recorded under A-SOLC-TRUSTED.",
       "scope": null,
       "statuses": {
         "model": "LEAN_CHECKED",
@@ -161,7 +161,7 @@
         "tx": "LEAN_CHECKED",
         "crypto": "NOT_APPLICABLE"
       },
-      "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
+      "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure",
       "theorem_planes": [
         "model",
         "source",
@@ -169,16 +169,16 @@
       ],
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-TOPUP-NOWRAP",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED"
       ],
       "source": {
         "source": "LidoSRv3/Audit/Guarantees/PTopup1.lean",
-        "line": 194
+        "line": 195
       },
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants",
-        "expected": "successful pinned-source conservation plus actual Verity Contract.run transaction simulation, snapshot rollback, declared-call program, and negative-mutant build; linked-external/Yul/EVM/runtime/deployment semantics remain open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupParentMutants",
+        "expected": "successful whole-parent pinned-source to Verity Contract.run simulation with wrapped uint256 accumulation, explicit call observations, snapshot rollback, and high-risk negative mutants; Yul/EVM are outside the registry plane under A-SOLC-TRUSTED"
       },
       "children": []
     },

@@ -24,7 +24,7 @@
     {
       "id": "A-TOPUP-NOWRAP",
       "accepted": true,
-      "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans."
+      "risk": "Legacy subordinate Nat top-up lemmas read line 732 under a no-wrap premise; the canonical P-TOPUP-1 parent theorem does not consume this assumption and executes allocSumUnchecked modulo 2^256."
     },
     {
       "id": "A-HANDWRITTEN-MINFIRST",

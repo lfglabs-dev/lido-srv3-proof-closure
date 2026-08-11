@@ -688,9 +688,9 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        # P-TOPUP-1 closes source plus the explicitly bounded hybrid Verity
-        # transaction suffix. Neither plane may be silently downgraded, the
-        # theorem must stay the hybrid adequacy theorem, and EVM stays open.
+        # P-TOPUP-1 closes the complete public parent source/Verity transaction.
+        # Neither plane may be silently downgraded, the theorem must stay the
+        # parent proposition, and Yul/EVM remain outside the registry planes.
         topup_source_downgrade = copy.deepcopy(guarantees)
         topup_source_downgrade["guarantees"][3]["statuses"]["source"] = "OPEN"
         write_json(guarantees_path, topup_source_downgrade)
@@ -805,12 +805,12 @@ def main():
             )
         write_json(guarantees_path, guarantees)
 
-        topup_dropped_nowrap = copy.deepcopy(guarantees)
-        topup_dropped_nowrap["guarantees"][3]["assumptions"] = [
-            row for row in topup_dropped_nowrap["guarantees"][3]["assumptions"]
-            if row != "A-TOPUP-NOWRAP"
+        topup_dropped_solc = copy.deepcopy(guarantees)
+        topup_dropped_solc["guarantees"][3]["assumptions"] = [
+            row for row in topup_dropped_solc["guarantees"][3]["assumptions"]
+            if row != "A-SOLC-TRUSTED"
         ]
-        write_json(guarantees_path, topup_dropped_nowrap)
+        write_json(guarantees_path, topup_dropped_solc)
         run(
             fixture,
             False,
@@ -1152,7 +1152,7 @@ def main():
         "P-DEPOSIT-1 source-plane downgrade/overclaim and span unmapping, "
         "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
         "and span unmapping, P-TOPUP-1 transitive-helper span, "
-        "pinned-constant declaration span and no-wrap assumption drops, "
+        "pinned-constant declaration span and solc-boundary assumption drops, "
         "P-ACCOUNT-1 source/tx downgrade, transitive-helper and "
         "MAX_VALUE_GWEI declaration span drops, "
         "P-SSZ-1 deposit-data-root span drops, "
