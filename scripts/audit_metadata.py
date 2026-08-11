@@ -1046,6 +1046,13 @@ def validate():
                 f"{row['id']}: assumption links differ from canonical risks")
         require(set(row["assumptions"]) <= assumption_ids,
                 f"{row['id']}: canonical assumption link is unknown")
+    pderef = rows[-1]
+    require(pderef["id"] == "P-DEREF-1", "supplemental dereference row is missing")
+    require(pderef.get("theorem") == "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source",
+            "P-DEREF-1: theorem differs from canonical evidence")
+    require(pderef.get("statuses", {}).get("yul") == "OPEN"
+            and pderef.get("statuses", {}).get("evm") == "OPEN",
+            "P-DEREF-1: Yul/EVM boundary must remain OPEN")
     validate_lock(lock, source_map)
     require(lock.get("unavailable") == REQUIRED_UNAVAILABLE,
             "unavailable provenance must contain the exact canonical blocker set")

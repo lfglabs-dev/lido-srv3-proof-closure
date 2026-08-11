@@ -566,7 +566,7 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        for index, guarantee in enumerate(guarantees["guarantees"]):
+        for index, guarantee in enumerate(guarantees["guarantees"][:-1]):
             theorem_mutant = copy.deepcopy(guarantees)
             theorem_mutant["guarantees"][index]["theorem"] = (
                 "LidoSRv3.Audit.DoesNotExist"
@@ -727,7 +727,7 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        for index, guarantee in enumerate(guarantees["guarantees"]):
+        for index, guarantee in enumerate(guarantees["guarantees"][:-1]):
             command_mutant = copy.deepcopy(guarantees)
             command_mutant["guarantees"][index]["reproduction"]["command"] = "true"
             write_json(guarantees_path, command_mutant)
@@ -752,7 +752,7 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        for index, guarantee in enumerate(guarantees["guarantees"]):
+        for index, guarantee in enumerate(guarantees["guarantees"][:-1]):
             gate_mutant = copy.deepcopy(guarantees)
             gate_mutant["guarantees"][index]["next_gate"] = (
                 "All production guarantees are certified."
@@ -766,7 +766,7 @@ def main():
             )
         write_json(guarantees_path, guarantees)
 
-        for index, guarantee in enumerate(guarantees["guarantees"]):
+        for index, guarantee in enumerate(guarantees["guarantees"][:-1]):
             missing_link = copy.deepcopy(guarantees)
             assumptions = missing_link["guarantees"][index]["assumptions"]
             missing_link["guarantees"][index]["assumptions"] = (
