@@ -1050,6 +1050,12 @@ def validate():
                 f"{row['id']}: canonical assumption link is unknown")
     pderef = rows[-1]
     require(pderef["id"] == "P-DEREF-1", "supplemental dereference row is missing")
+    require(pderef.get("catalogue_wording") ==
+            "Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.",
+            "P-DEREF-1: catalogue wording differs from canonical bounded claim")
+    require(pderef.get("source_plane_scope") ==
+            "registry address binding only; migration old-layout contents are explicit inputs",
+            "P-DEREF-1: source plane scope differs from canonical boundary")
     require(pderef.get("theorem") == "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source",
             "P-DEREF-1: theorem differs from canonical evidence")
     require(pderef.get("theorem_planes") == ["model", "source", "tx"],
