@@ -20,8 +20,10 @@ P-TOPUP-1 closure-v2 hybrid receipt (2026-08-11)
   suffix. Positive commits declare the Lido pull and beacon top-up push;
   zero-top-up commits use the call-free entrypoint; reverts restore the exact
   pre-call snapshot.
-- Negative mutants reject an ignored source revert, unequal pull/push values,
-  and a changed router-balance observation.
+- Negative mutants reject an ignored pre-call source revert, pull-side and
+  downstream/push-side reverts, unequal pull/push values, and a changed
+  router-balance observation. The staged suffix reaches only the calls attempted
+  before each source failure and then checks exact snapshot rollback.
 - Verity #2242 packed TopUpGateway storage is explicitly not treated as the
   complete P-TOPUP-1 guarantee. Linked-external effects, Yul, EVM, runtime
   bytecode, deployment provenance, and the P-TOPUP-2 amount computation remain
