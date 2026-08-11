@@ -46,4 +46,13 @@ theorem concrete_address_replacement_counterexample :
 theorem concrete_uint24_bound_counterexample :
     uint24Modulus % uint24Modulus = 0 ∧ uint24Modulus ≠ 0 := by decide
 
+/-- EnumerableSet positions are one-based and every nonzero position is a member. -/
+theorem accepts_later_enumerable_set_position :
+    ((2 : Verity.Core.Uint256) ≠ 0 ↔ registeredOne.registered 1 = true) := by decide
+
+/-- Upper packed config fields do not change the low-160-bit module address. -/
+theorem packed_config_upper_fields_do_not_change_address :
+    Verity.wordToAddress ((7 * addressModulus + 0xBEEF : Nat) : Verity.Core.Uint256) =
+      Verity.Core.Address.ofNat 0xBEEF := by decide
+
 end LidoSRv3.Tests.DereferenceMutants

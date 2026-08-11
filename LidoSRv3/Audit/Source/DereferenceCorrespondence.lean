@@ -178,9 +178,10 @@ def observeDeref (id : Uint256) : Contract Address := fun state =>
 /-- Model-local storage relation.  It deliberately does not claim Solidity's
 keccak mapping encoding, ROUTER_STORAGE_POSITION, or emitted SLOAD semantics. -/
 def VerityRepresents (s : RegistryState) (state : ContractState) (id : ModuleId) : Prop :=
-  (state.storageMapUint moduleIdPositionsSlot (id : Uint256) =
-      (if s.registered id then 1 else 0)) ∧
-  state.storageMapUint moduleStatesSlot (id : Uint256) = (s.moduleAddress id : Uint256)
+  (state.storageMapUint moduleIdPositionsSlot (id : Uint256) ≠ 0 ↔
+      s.registered id = true) ∧
+  wordToAddress (state.storageMapUint moduleStatesSlot (id : Uint256)) =
+    Verity.Core.Address.ofNat (s.moduleAddress id)
 
 theorem address_word_roundtrip (address : Nat) (h : address < addressModulus) :
     wordToAddress (address : Uint256) = Verity.Core.Address.ofNat address := by
@@ -205,9 +206,9 @@ theorem verity_observe_refines_source (s : RegistryState) (hs : Reachable s)
       else state.storageMapUint slot key }, ?_, ?_, ?_⟩
   · change s.registered id = true at hmember
     have hbound := reachable_registered_address_bound s hs id hmember
+    have hposition := hpos.mpr hmember
     simp only [observeDeref]
-    rw [show state.storageMapUint moduleIdPositionsSlot (id : Uint256) = 1 by simpa [hmember] using hpos]
-    rw [haddr, address_word_roundtrip _ hbound]
+    rw [if_neg hposition, haddr]
     change s.moduleAddress id < Verity.Core.ADDRESS_MODULUS at hbound
     have hmod : s.moduleAddress id % Verity.Core.Address.modulus = s.moduleAddress id := by
       exact Nat.mod_eq_of_lt (by simpa [Verity.Core.Address.modulus] using hbound)
@@ -215,8 +216,7 @@ theorem verity_observe_refines_source (s : RegistryState) (hs : Reachable s)
       intro heq
       have := congrArg Verity.Core.Address.val heq
       exact hnonzero (by simpa [Verity.Core.Address.ofNat, hmod] using this)
-    have hone : (1 : Uint256) ≠ 0 := by decide
-    simp [hone, haddress, hmod]
+    simp [haddress, hmod]
   · exact (source_deref_exact_reachable s hs id hmember).1
   · simp
 
