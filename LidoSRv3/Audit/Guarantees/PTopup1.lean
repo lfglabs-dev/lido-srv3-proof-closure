@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.TopupCorrespondence
+import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PTopup1
@@ -8,7 +9,7 @@ namespace LidoSRv3.Audit.Guarantees.PTopup1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityTopup
 
-def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source]⟩
+def guarantee : Guarantee := ⟨.pTopup1, [.model, .source, .verityTx]⟩
 
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order
@@ -185,5 +186,17 @@ is a real falsifier and is not papered over.
 theorem source_pinned_config_discharges_pubkey_guard (inp : SourceTopupInput) :
     run pinnedConfig inp ≠ .revertInvalidPublicKeyLength :=
   run_ne_revertInvalidPublicKeyLength pinnedConfig_pubkey_lengths_agree
+
+/-- Hybrid SOURCE-to-VERITY_TX closure.  The independent source interpreter
+supplies the full guard/loop outcome; the typed Verity suffix contains the two
+value-bearing call sites and `Contract.run` supplies snapshot rollback.  Yul,
+EVM and deployed multi-contract call semantics remain explicitly open. -/
+theorem verity_tx_simulates_source
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (state : _root_.Verity.ContractState) :
+    LidoSRv3.Audit.Verity.TopupHybrid.observeVerity state
+        ((LidoSRv3.Audit.Verity.TopupHybrid.executeSource cfg inp).run state) =
+      LidoSRv3.Audit.Verity.TopupHybrid.sourceTx cfg inp state :=
+  LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source cfg inp state
 
 end LidoSRv3.Audit.Guarantees.PTopup1

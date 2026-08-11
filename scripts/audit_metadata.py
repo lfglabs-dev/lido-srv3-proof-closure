@@ -48,7 +48,7 @@ EXPECTED_WORDING = [
     "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
-    "Pinned-source correspondence proves branch-wise value conservation and whole-transaction rollback for the beacon-chain top-up push; allocation extraction and EVM equivalence remain open.",
+    "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
     "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
     "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
@@ -106,8 +106,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
      "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
-     "expected": "successful pinned-source top-up conservation/rollback correspondence build; allocation extraction and EVM-level revert semantics remain open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants",
+     "expected": "successful pinned-source conservation plus actual Verity Contract.run transaction simulation, snapshot rollback, declared-call program, and negative-mutant build; linked-external/Yul/EVM/runtime/deployment semantics remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
      "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
@@ -143,7 +143,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
-    ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
+    ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     [],
@@ -168,7 +168,7 @@ EXPECTED_NEXT_GATES = [
     "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
     "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Refine success/revert and rollback against pinned executable EVM semantics.",
-    "Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.",
+    "Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.",
     "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
     "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
     "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
@@ -209,8 +209,8 @@ EXPECTED_STATUSES = [
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
@@ -246,7 +246,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "source"],
     ["algorithm", "source"],
     ["model", "source"],
-    ["model", "source"],
+    ["model", "source", "tx"],
     ["model", "source", "tx"],
     ["model", "source", "tx"],
     [],
@@ -269,7 +269,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
-    "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
+    "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
     "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
     None,
@@ -349,6 +349,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
+            "LidoSRv3.Audit.Verity.TopupHybrid",
             "LidoSRv3.Audit.Source.AccountingCorrespondence",
             "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
             "LidoSRv3.Audit.Verity.SszAbstractDigest",
@@ -360,6 +361,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Tests.SszRegression",
             "LidoSRv3.Tests.DepositVectors",
             "LidoSRv3.Tests.TopupVectors",
+            "LidoSRv3.Tests.TopupHybridMutants",
             "LidoSRv3.Tests.ReserveMutants",
             "LidoSRv3.Tests.AccountingVectors",
             "LidoSRv3.Audit.AddressEquivariance",
@@ -376,7 +378,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
-            "P-TOPUP-1 top-up conservation/rollback, and "
+            "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, and "
             "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
             "MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is "
             "checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus "
@@ -438,6 +440,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard",
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
+    {"name": "Guarantees.PTopup1.verity_tx_simulates_source",
+     "status": "lean_checked", "axioms": ["propext", "Classical.choice", "Quot.sound"]},
     {"name": "Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve",
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PReserve1.verity_tx_simulates_reserve_spec",

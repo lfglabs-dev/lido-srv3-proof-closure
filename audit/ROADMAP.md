@@ -5,7 +5,7 @@
 - `P-ALLOC-1`: Refine proportional allocation amounts and EVM correspondence for SRLib._getModulesAllocationAndCapacity.
 - `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
 - `P-DEPOSIT-1`: Refine success/revert and rollback against pinned executable EVM semantics.
-- `P-TOPUP-1`: Refine top-up success/revert and rollback against pinned executable EVM semantics, and prove allocation extraction from pinned Solidity.
+- `P-TOPUP-1`: Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.
 - `P-ACCOUNT-1`: Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.
 - `P-RESERVE-1`: Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.
 - `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.
