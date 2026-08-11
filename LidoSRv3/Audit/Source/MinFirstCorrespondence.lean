@@ -384,6 +384,39 @@ def abstractSourceBridgeReceipt : Bool :=
       !(MinFirstAllocation.Source.checkedAmount sourceRows 59 sourceRows[0] == some total)
   | .revert _ _ => false
 
+/-- Official observation for the bounded transaction slice.  It exposes the
+returned allocation amount and the complete router-ordered allocation column;
+reverts have no committing observation. -/
+structure AllocationTxObservation where
+  total : Uint256
+  allocations : List Uint256
+  deriving DecidableEq, Repr
+
+def observeAllocationTx : ContractResult Uint256 → Option AllocationTxObservation
+  | .success total after => some {
+      total := total
+      allocations := after.storageArray AllocationContract.stakeRatios.slot }
+  | .revert _ _ => none
+
+/-- The independently defined source/capacity specification for the positive
+one-row receipt.  This deliberately reuses `Source.checkedAmount`; it is not a
+second transaction interpreter. -/
+def sourceCapacityObservation : Option AllocationTxObservation :=
+  let rows : List MinFirstAllocation.Source.Row := [
+    { allocation := 10, capacity := 100 }]
+  match MinFirstAllocation.Source.checkedAmount rows 60 rows[0] with
+  | some amount => some { total := amount, allocations := [10 + amount] }
+  | none => none
+
+/-- A genuine `Verity.Contract.run` transaction refines the already checked
+source capacity/amount specification on the bounded official receipt.  The
+post-state equation simultaneously records conservation: final allocation is
+the initial `10` plus the returned amount. -/
+theorem verity_tx_refines_source_capacity_and_conservation :
+    observeAllocationTx
+      ((AllocationContract.allocate 60).run conservationReceiptState) =
+      sourceCapacityObservation := by decide
+
 theorem run_conservation_mutant_sensitive : conservationReceipt = true := by decide
 theorem run_capacity_mutant_sensitive : capacityReceipt = true := by decide
 theorem run_disabled_exclusion_mutant_sensitive : disabledExclusionReceipt = true := by decide
