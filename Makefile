@@ -28,6 +28,7 @@ audit_metadata: audit-check
 
 test:
 	@python3 scripts/audit_metadata.py check
+	@python3 scripts/test_evidence_index.py
 	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
 	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh
@@ -52,6 +53,8 @@ test:
 	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
+	@lake build LidoSRv3.Tests.AddressSourceMutants
+	@printf '%s\n' 'P-ADDRESS-1 source caller/address mutants and official Verity transaction compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts

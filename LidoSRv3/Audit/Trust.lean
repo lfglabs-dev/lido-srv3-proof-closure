@@ -29,6 +29,7 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
@@ -48,6 +49,10 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_contract_run_commits_accepted
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx
+#print axioms LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant
+#print axioms LidoSRv3.Audit.SolidityAddress.renameInput_preserves_indexed_facts
+#print axioms LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether

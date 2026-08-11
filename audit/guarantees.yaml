@@ -77,13 +77,13 @@
     {
       "id": "P-ADDRESS-1",
       "catalogue_wording": "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
-      "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-ABSTRACT-TX"],
-      "note": "Admission compares success/failure only; successful post-states are compared modulo the caller swap. Singleton-actor functions requiring Lido, TriggerableWithdrawalsGateway, or ConsolidationGateway are excluded and belong to authentication-integrity properties.",
-      "next_gate": "Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1", "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"}
+      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "note": "Admission compares success/failure only; successful post-states are compared modulo the caller swap. The checked source interpreter is single-item (batch iteration only is erased) and its non-address arithmetic and external-call results remain explicit inputs. Singleton-actor functions requiring Lido, TriggerableWithdrawalsGateway, or ConsolidationGateway are excluded and belong to authentication-integrity properties.",
+      "next_gate": "Refine the checked official Verity transaction through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance; the existing subordinate Yul interface harness remains syntax-level evidence only.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants", "expected": "successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open"}
     },
     {
       "id": "P-TOPUP-2",
