@@ -266,7 +266,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.allocation_capacity_and_tx_closure",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
@@ -412,6 +412,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
      "status": "lean_checked", "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.allocation_capacity_and_tx_closure",
+     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "SolidityMinFirst.run_conservation_mutant_sensitive",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_capacity_mutant_sensitive",

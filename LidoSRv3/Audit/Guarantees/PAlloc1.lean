@@ -60,4 +60,20 @@ theorem verity_tx_refines_source_capacity_and_conservation :
       SolidityMinFirst.sourceCapacityObservation :=
   SolidityMinFirst.verity_tx_refines_source_capacity_and_conservation
 
+/-- Authoritative hybrid closure: the general checked source capacity executor
+refines the independent mathematical view, and the bounded official Verity
+transaction executes that checked capacity lane with additive conservation. -/
+theorem allocation_capacity_and_tx_closure
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256)
+    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
+    (∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp) ∧
+    SolidityMinFirst.observeAllocationTx
+      ((SolidityMinFirst.AllocationContract.allocate 60).run
+        SolidityMinFirst.conservationReceiptState) =
+      SolidityMinFirst.sourceCapacityObservation :=
+  ⟨checked_uint256_execution_refines_math cfg modules depositsToAllocate isTopUp hBounds,
+    verity_tx_refines_source_capacity_and_conservation⟩
+
 end LidoSRv3.Audit.Guarantees.PAlloc1

@@ -5,7 +5,7 @@
     {
       "id": "P-ALLOC-1",
       "catalogue_wording": "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.allocation_capacity_and_tx_closure",
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
