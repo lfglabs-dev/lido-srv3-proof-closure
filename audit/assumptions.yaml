@@ -16,6 +16,9 @@
     {"id": "A-MULTI-NODE-TRANSPORT", "accepted": true, "risk": "Multi-node certification transport is accepted as a trust and reproducibility risk; transported results require independent identity and consistency checks."},
     {"id": "A-YUL-INTERFACE", "accepted": true, "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection."},
     {"id": "A-SHA256-FFI", "accepted": true, "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk."},
+    {"id": "A-EIP4788-ANCHOR", "accepted": true, "risk": "The headroom/budget slice does not prove EIP-4788 BEACON_ROOTS anchor lookup or fork-history behavior."},
+    {"id": "A-TOPUP-EXTERNAL-SUMMARIES", "accepted": true, "risk": "Role/resume/root-age/batch/order and linked StakingRouter behavior are explicit summaries outside the headroom/budget transaction."},
+    {"id": "A-DEPLOYMENT-PROVENANCE-OPTIONAL", "accepted": true, "risk": "Deployment provenance is required only for claims about deployed bytecode and is not used to block source or Verity transaction correspondence."},
     {"id": "A-RUNTIME-PROVENANCE", "accepted": true, "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."}
   ]
 }

@@ -38,6 +38,27 @@ def evaluated_topup_limit (v : Validator) (cfg : TopupConfig) : Nat :=
       let gap := cfg.targetBalanceGwei - currentTotal
       if gap < cfg.minTopUpGwei then 0 else gap
 
+theorem exiting_branch (v : Validator) (cfg : TopupConfig) (h : v.exiting = true) :
+    evaluated_topup_limit v cfg = 0 := by simp [evaluated_topup_limit, h]
+
+theorem slashed_branch (v : Validator) (cfg : TopupConfig) (h : v.slashed = true) :
+    evaluated_topup_limit v cfg = 0 := by simp [evaluated_topup_limit, h]
+
+theorem target_reached_branch (v : Validator) (cfg : TopupConfig)
+    (hexit : v.exiting = false) (hslash : v.slashed = false)
+    (h : cfg.targetBalanceGwei ≤ v.effectiveBalanceGwei + v.pendingBalanceGwei) :
+    evaluated_topup_limit v cfg = 0 := by
+  simp [evaluated_topup_limit, hexit, hslash, Nat.not_lt.mpr h]
+
+theorem accepted_gap_branch (v : Validator) (cfg : TopupConfig)
+    (hexit : v.exiting = false) (hslash : v.slashed = false)
+    (hbelow : v.effectiveBalanceGwei + v.pendingBalanceGwei < cfg.targetBalanceGwei)
+    (hmin : cfg.minTopUpGwei ≤ cfg.targetBalanceGwei -
+      (v.effectiveBalanceGwei + v.pendingBalanceGwei)) :
+    evaluated_topup_limit v cfg = cfg.targetBalanceGwei -
+      (v.effectiveBalanceGwei + v.pendingBalanceGwei) := by
+  simp [evaluated_topup_limit, hexit, hslash, hbelow, Nat.not_lt.mpr hmin]
+
 /-- Strict ordering is the source's duplicate-validator exclusion rule. -/
 def strictlyIncreasing : List Nat → Prop
   | [] | [_] => True
@@ -156,10 +177,10 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
 
 /-- Corrected budget/headroom model is checked at MODEL. -/
-def guarantee : Guarantee := ⟨.pTopup2, [.model]⟩
+def guarantee : Guarantee := ⟨.pTopup2, [.model, .source, .verityTx]⟩
 
-/- TODO(P-TOPUP-2 verifier binding): establish from runtime provenance that the
-deployed verifier address and codehash bind an accepted SSZ proof to the intended
-validator. Source, transaction, and EVM closure remain BLOCKED until then. -/
+/- Verifier binding remains separate: EIP-4788 anchor behavior at BEACON_ROOTS,
+SSZ/GIndex correspondence, SHA-256 correctness, linked external summaries, Yul,
+EVM/runtime bytecode, and optional deployed-code provenance are all OPEN. -/
 
 end LidoSRv3.Audit.Guarantees.PTopup2

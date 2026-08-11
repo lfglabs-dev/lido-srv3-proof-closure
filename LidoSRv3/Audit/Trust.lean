@@ -11,6 +11,8 @@ import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Guarantees.PTopup2
+import LidoSRv3.Audit.Verity.TopupPackedStorage
 import LidoSRv3.Audit.Guarantees.PReserve1
 
 /-!
@@ -65,6 +67,17 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.exiting_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.slashed_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.target_reached_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.accepted_gap_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_individual
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_module_limit
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.generated_layout_exact
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.target_setter_reader_run
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.minimum_setter_reader_run
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.record_budget_rejects_over_budget
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve

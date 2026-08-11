@@ -53,7 +53,7 @@ EXPECTED_WORDING = [
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
     "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
     "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
-    "Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.",
+    "Pinned-source headroom and aggregate-budget correspondence plus executable Verity packed-storage transactions are checked; verifier/SSZ/deployment closure remains open.",
     "Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
@@ -95,6 +95,12 @@ EXPECTED_ASSUMPTIONS = {
          "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection."},
         {"id": "A-SHA256-FFI", "accepted": True,
          "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk."},
+        {"id": "A-EIP4788-ANCHOR", "accepted": True,
+         "risk": "The headroom/budget slice does not prove EIP-4788 BEACON_ROOTS anchor lookup or fork-history behavior."},
+        {"id": "A-TOPUP-EXTERNAL-SUMMARIES", "accepted": True,
+         "risk": "Role/resume/root-age/batch/order and linked StakingRouter behavior are explicit summaries outside the headroom/budget transaction."},
+        {"id": "A-DEPLOYMENT-PROVENANCE-OPTIONAL", "accepted": True,
+         "risk": "Deployment provenance is required only for claims about deployed bytecode and is not used to block source or Verity transaction correspondence."},
         {"id": "A-RUNTIME-PROVENANCE", "accepted": True,
          "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence."},
     ],
@@ -116,8 +122,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful bounded child-model proofs only; parent P-ETH-1 remains OPEN"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants",
      "expected": "successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2",
-     "expected": "successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants",
+     "expected": "successful pinned-source headroom/budget correspondence, exact packed layout, material Contract.run execution, and mutant-sensitive build; verifier/SSZ/Yul/EVM/deployment remain open"},
     {"command": "python3 scripts/audit_metadata.py check",
      "expected": "opaque FFI risk remains recorded; no crypto closure"},
     {"command": "lake build LidoSRv3.Audit.Ssz",
@@ -148,7 +154,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     [],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-    ["A-RUNTIME-PROVENANCE"],
+    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-EIP4788-ANCHOR", "A-SHA256-FFI", "A-TOPUP-EXTERNAL-SUMMARIES", "A-DEPLOYMENT-PROVENANCE-OPTIONAL"],
     ["A-SHA256-FFI"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
@@ -173,7 +179,7 @@ EXPECTED_NEXT_GATES = [
     "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
     "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.",
     "Refine the checked official Verity transaction through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance; the existing subordinate Yul interface harness remains syntax-level evidence only.",
-    "Obtain independent canonical runtime, codehash, fork, and address provenance.",
+    "Bind the separate EIP-4788/GIndex/SSZ/SHA-256 verifier path, then optionally establish deployed-bytecode provenance and Yul/EVM refinement.",
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
     "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
@@ -219,8 +225,8 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED",
-     "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
@@ -251,7 +257,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
     [],
     ["model", "source", "tx"],
-    ["model"],
+    ["model", "source", "tx"],
     [],
     ["model"],
     ["model"],
@@ -274,7 +280,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
     None,
     "LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx",
-    "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
+    "LidoSRv3.Audit.Verity.TopupPackedStorage.record_budget_rejects_over_budget",
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
     "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
@@ -304,7 +310,7 @@ SOURCE_CLOSURE_STATUSES = THEOREM_BACKED_STATUSES | {"AUDIT-CERT"}
 CAMPAIGN_BASE = {
     "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
     "ref": "campaign/lido-minimal-11",
-    "commit": "4d7d152551fffed0d43e9b5c73bed6eef4532f05",
+    "commit": "c32f4dd89752c7b8ae8a1003b96d433d7a7ee32f",
 }
 CANONICAL_LIDO_REPOSITORY = "https://github.com/lidofinance/core.git"
 CANONICAL_LIDO_COMMIT = "af095e48bbc1c3841c2c9936219c8461af01056b"
@@ -324,10 +330,10 @@ EXPECTED_LOCK_SCHEMA = "lido-srv3-artifacts-lock-v1"
 REQUIRED_UNAVAILABLE = {
     name: {"status": "MISSING", "blocked": True, "value": None}
     for name in (
-        "canonical_eip7251_runtime",
-        "canonical_eip7251_codehash",
-        "canonical_eip7251_fork",
-        "canonical_eip7251_address",
+        "eip4788_anchor_runtime",
+        "eip4788_anchor_codehash",
+        "topup_gateway_deployed_runtime_optional",
+        "topup_gateway_deployed_codehash_optional",
         "sha256_ffi_implementation_identity",
     )
 }
@@ -376,18 +382,21 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Common.Bounded",
             "LidoSRv3.Audit.Verity.AddressYulInterface",
             "LidoSRv3.Tests.AddressYulInterface",
+            "LidoSRv3.Audit.Verity.TopupPackedStorage",
+            "LidoSRv3.Tests.Topup2Mutants",
         ],
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
             "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, "
+            "P-TOPUP-2 headroom/budget plus packed Verity transaction, "
             "P-ADDRESS-1 caller-renaming MODEL-to-SOURCE-to-VERITY_TX simulation, and "
             "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
             "MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement are "
             "checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus "
             "executable Verity transaction simulation is checked against pinned Solidity, "
-            "while Yul/EVM/runtime semantics remain open; "
+            "while verifier/SSZ/Yul/EVM/runtime/deployment semantics remain open; "
             "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
             "evidence over source-shaped inputs, and its SOURCE-plane "
             "correspondence remains OPEN in audit/guarantees.yaml"
@@ -822,7 +831,9 @@ def validate_lock(lock, source_map):
     require(lock.get("modules") == [
         "LidoSRv3.Audit.Verity.AddressYulInterface",
         "LidoSRv3.Tests.AddressYulInterface",
-    ], "artifacts.lock.json Yul interface module inventory differs")
+        "LidoSRv3.Audit.Verity.TopupPackedStorage",
+        "LidoSRv3.Tests.Topup2Mutants",
+    ], "artifacts.lock.json checked module inventory differs")
     require(audit_manifest["source_revisions"]["lido"] == lido_commit,
             "source-map Lido pin differs from verity target audit manifest")
     require(audit_manifest["source_revisions"]["verity"] == CANONICAL_VERITY_COMMIT,

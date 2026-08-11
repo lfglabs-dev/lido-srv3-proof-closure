@@ -87,13 +87,14 @@
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "Per-validator top-up headroom and aggregate budget conservation are proved; verifier-binding remains BLOCKED.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
-      "theorem_planes": ["model"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "BLOCKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-RUNTIME-PROVENANCE"],
-      "next_gate": "Obtain independent canonical runtime, codehash, fork, and address provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2", "expected": "successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance"}
+      "catalogue_wording": "Pinned-source headroom and aggregate-budget correspondence plus executable Verity packed-storage transactions are checked; verifier/SSZ/deployment closure remains open.",
+      "theorem": "LidoSRv3.Audit.Verity.TopupPackedStorage.record_budget_rejects_over_budget",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-EIP4788-ANCHOR", "A-SHA256-FFI", "A-TOPUP-EXTERNAL-SUMMARIES", "A-DEPLOYMENT-PROVENANCE-OPTIONAL"],
+      "note": "Closure is limited to headroom, packed setters/readers, and aggregate budget. Batch/order/role/resume/root-age and linked calls are explicit summaries. EIP-4788, SSZ, SHA-256, generated Yul, solc Yul-to-bytecode, EVM/runtime, and deployed-bytecode provenance remain open.",
+      "next_gate": "Bind the separate EIP-4788/GIndex/SSZ/SHA-256 verifier path, then optionally establish deployed-bytecode provenance and Yul/EVM refinement.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants", "expected": "successful pinned-source headroom/budget correspondence, exact packed layout, material Contract.run execution, and mutant-sensitive build; verifier/SSZ/Yul/EVM/deployment remain open"}
     },
     {
       "id": "P-CONSOLIDATION-1",
