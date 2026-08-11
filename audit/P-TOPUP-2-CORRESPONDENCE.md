@@ -24,8 +24,11 @@ assumes linked StakingRouter summaries. Validator proof acceptance is not a
 premise silently converted into truth: EIP-4788 `BEACON_ROOTS` behavior at
 `0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02`, GIndex/SSZ binding, and the
 SHA-256 oracle remain separate assumptions. Generated Yul, solc Yul-to-bytecode,
-EVM/runtime equivalence, and optional deployed-bytecode provenance remain OPEN.
-P-SSZ-1 and EVM/runtime are not closed.
+and EVM semantic equivalence remain OPEN. A separate reproducible gate closes
+identity between the pinned Solidity build artifact and the exact deployed
+TopUpGateway runtime at mainnet block 25,730,798; it does not establish
+Solidity-to-Verity correspondence or Verity model refinement. P-SSZ-1 and
+EVM/runtime semantics are not closed.
 
 ## Solidity layout method
 
@@ -43,3 +46,22 @@ The committed machine evidence is
 `audit/p-topup-2-layout-comparison.json`; `scripts/check_p_topup2_layout.sh`
 recompiles the exact pinned checkout and checks these records. The empty direct
 storage layout is recorded as a finding, not treated as evidence of no storage.
+
+## Optional mainnet runtime-provenance gate
+
+`audit/p-topup-2-runtime-provenance.json` pins the five source blobs shared by
+the audited commit and `v4.0.0`, compiler settings, constructor arguments,
+proxy/implementation addresses, EIP-1967 slot, reference block, runtime length,
+and code hash. Run:
+
+```sh
+LIDO_CORE_DIR=../lido-core MAINNET_RPC_URL="$YOUR_MAINNET_RPC" \
+  make p-topup2-runtime-provenance
+```
+
+The script rebuilds all 478 Solidity sources with the repository Hardhat
+configuration, deploys the exact constructor locally, and compares local and
+mainnet runtime bytes. It also checks `chainId == 1` and reads the proxy slot and
+implementation code at block 25,730,798. No credential is embedded. With no
+`MAINNET_RPC_URL`, local reconstruction still runs, but the script explicitly
+reports `SKIPPED_NO_RPC` and exits 2; absence cannot appear as a green live gate.

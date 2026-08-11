@@ -8,7 +8,7 @@ PROOF_LOG := proofs/logs/proof-report.json
 SHELL     := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all bootstrap audit-generate audit-check audit_metadata test prove report clean distclean
+.PHONY: all bootstrap audit-generate audit-check audit_metadata test p-topup2-runtime-provenance report clean distclean
 
 all: report
 
@@ -62,6 +62,11 @@ test:
 	@test -s fixtures/solidity-reference/deposits-reserve.integration.ts
 	@test -s fixtures/solidity-reference/accounting-oracle-module-balances.integration.ts
 	@printf '%s\n' 'reference fixtures present; all 5 validated'
+
+# Deliberately separate from `test`: without MAINNET_RPC_URL this performs the
+# full local reconstruction, reports SKIPPED_NO_RPC, and exits 2 (never green).
+p-topup2-runtime-provenance:
+	@bash scripts/check_p_topup2_runtime_provenance.sh
 
 prove:
 	@mkdir -p proofs/logs

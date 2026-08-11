@@ -87,14 +87,15 @@
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "Pinned-source headroom and aggregate-budget correspondence plus executable Verity packed-storage transactions are checked; verifier/SSZ/deployment closure remains open.",
+      "catalogue_wording": "Pinned-source headroom and aggregate-budget correspondence plus executable Verity packed-storage transactions are checked; exact pinned-artifact-to-mainnet-runtime identity is separately checked at block 25730798, while verifier/SSZ and EVM semantic closure remain open.",
       "theorem": "LidoSRv3.Audit.Verity.TopupPackedStorage.record_budget_rejects_over_budget",
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-EIP4788-ANCHOR", "A-SHA256-FFI", "A-TOPUP-EXTERNAL-SUMMARIES", "A-DEPLOYMENT-PROVENANCE-OPTIONAL"],
-      "note": "Closure is limited to headroom, packed setters/readers, and aggregate budget. Batch/order/role/resume/root-age and linked calls are explicit summaries. EIP-4788, SSZ, SHA-256, generated Yul, solc Yul-to-bytecode, EVM/runtime, and deployed-bytecode provenance remain open.",
-      "next_gate": "Bind the separate EIP-4788/GIndex/SSZ/SHA-256 verifier path, then optionally establish deployed-bytecode provenance and Yul/EVM refinement.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants", "expected": "successful pinned-source headroom/budget correspondence, exact packed layout, material Contract.run execution, and mutant-sensitive build; verifier/SSZ/Yul/EVM/deployment remain open"}
+      "note": "Closure is limited to headroom, packed setters/readers, and aggregate budget. Batch/order/role/resume/root-age and linked calls are explicit summaries. EIP-4788, SSZ, SHA-256, generated Yul, solc Yul-to-bytecode, and EVM semantics remain open. The separate runtime receipt proves only exact pinned-artifact-to-mainnet-runtime identity at chainId 1/block 25730798; it does not prove Solidity-to-Verity correspondence or Verity model refinement.",
+      "next_gate": "Bind the separate EIP-4788/GIndex/SSZ/SHA-256 verifier path, then establish Yul/EVM semantic refinement; deployed runtime identity is separately evidenced only for chainId 1/block 25730798.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants", "expected": "successful pinned-source headroom/budget correspondence, exact packed layout, material Contract.run execution, and mutant-sensitive build; verifier/SSZ/Yul/EVM/deployment remain open"},
+      "runtime_provenance": {"receipt": "audit/p-topup-2-runtime-provenance.json", "gate": "MAINNET_RPC_URL=<credential-free-url> make p-topup2-runtime-provenance", "scope": "source artifact to exact deployed runtime bytes only"}
     },
     {
       "id": "P-CONSOLIDATION-1",
