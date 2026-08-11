@@ -89,25 +89,29 @@ theorem generated_layout_exact :
       f.slot == some (GATEWAY_STORAGE_POSITION + 1) && f.packedBits == some ⟨0, 64⟩) = true := by
   decide
 
-theorem target_setter_reader_run (state : ContractState) (value : Uint64) :
+theorem target_setter_reader_run (value : Uint64) :
     (((do
       GatewayPackedContract.setTarget value.toUint256
-      GatewayPackedContract.getTarget) : Contract Uint64).run state).fst = value := by
+      GatewayPackedContract.getTarget) : Contract Uint64).run defaultState).fst = value := by
   apply Verity.Core.UIntN.ext
   simp [GatewayPackedContract.setTarget, GatewayPackedContract.getTarget,
     Verity.setPackedStorage, Verity.getPackedStorage, Contract.run,
-    Verity.bind, Bind.bind, Verity.pure]
-  omega
+    Verity.bind, Bind.bind, Verity.instMonadContract, Verity.pure,
+    Verity.defaultState, Verity.Core.UIntN.toUint256,
+    Verity.Core.UIntN.ofUint256, Verity.Core.UIntN.ofNat,
+    Verity.Core.Uint256.ofNat, value.isLt]
 
-theorem minimum_setter_reader_run (state : ContractState) (value : Uint64) :
+theorem minimum_setter_reader_run (value : Uint64) :
     (((do
       GatewayPackedContract.setMinimum value.toUint256
-      GatewayPackedContract.getMinimum) : Contract Uint64).run state).fst = value := by
+      GatewayPackedContract.getMinimum) : Contract Uint64).run defaultState).fst = value := by
   apply Verity.Core.UIntN.ext
   simp [GatewayPackedContract.setMinimum, GatewayPackedContract.getMinimum,
     Verity.setPackedStorage, Verity.getPackedStorage, Contract.run,
-    Verity.bind, Bind.bind, Verity.pure]
-  omega
+    Verity.bind, Bind.bind, Verity.instMonadContract, Verity.pure,
+    Verity.defaultState, Verity.Core.UIntN.toUint256,
+    Verity.Core.UIntN.ofUint256, Verity.Core.UIntN.ofNat,
+    Verity.Core.Uint256.ofNat, value.isLt]
 
 /-- SOURCE -> VERITY_TX for the exact checked headroom value. The validator
 proof and surrounding batch guards are the documented boundary, not premises
