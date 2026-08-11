@@ -106,12 +106,15 @@ if test -z "${MAINNET_RPC_URL:-}"; then
   exit 2
 fi
 
-chain_id=$(cast chain-id --rpc-url "$MAINNET_RPC_URL")
+# Pass the credential-bearing endpoint through the standard environment rather
+# than argv so process listings and shell error rendering cannot expose it.
+rpc_cast() { ETH_RPC_URL="$MAINNET_RPC_URL" cast "$@"; }
+chain_id=$(rpc_cast chain-id)
 test "$chain_id" = 1 || fail "RPC chainId is $chain_id, expected 1"
-slot=$(cast storage "$PROXY" "$IMPLEMENTATION_SLOT" --block "$REFERENCE_BLOCK" --rpc-url "$MAINNET_RPC_URL")
+slot=$(rpc_cast storage "$PROXY" "$IMPLEMENTATION_SLOT" --block "$REFERENCE_BLOCK")
 slot_impl=0x${slot: -40}
 test "${slot_impl,,}" = "$IMPLEMENTATION_LOWER" || fail "proxy implementation slot mismatch at block $REFERENCE_BLOCK"
-chain_code=$(cast code "$IMPLEMENTATION" --block "$REFERENCE_BLOCK" --rpc-url "$MAINNET_RPC_URL")
+chain_code=$(rpc_cast code "$IMPLEMENTATION" --block "$REFERENCE_BLOCK")
 chain_length=$(( (${#chain_code} - 2) / 2 ))
 chain_hash=$(printf '%s' "$chain_code" | cast keccak)
 test "$chain_length" -eq "$EXPECTED_LENGTH" || fail "mainnet runtime length mismatch"
