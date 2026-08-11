@@ -1,11 +1,30 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 17265eebdbe71e0d6735e2c09c8e6c4851bd3df6
+validated-tree: 17ec375fff0fbdc0e2988acc21066d8d27dab23c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ADDRESS-1 exact-head review correction (2026-08-11)
+------------------------------------------------------
+
+- Starting PR head: `7576fcc58629343a52ee8335a3707d629882330b`; live base:
+  `campaign/lido-minimal-11@a40a1044298d6977980d4f97858c5b66ad8a6804`.
+- Re-read the pinned `_transfer`, withdrawal request, `_claim`, and `unwrap`
+  paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+- Added the missing `_from == request.owner` and `msg.sender == request.owner`
+  guards and transported request ownership together with caller, sender, and
+  recipient under address renaming.
+- The closure theorem now includes the complete successful source post-state
+  equivariance equation. The official Verity transaction materially executes
+  owner, recipient, debit-key, and credit-key address writes through
+  `verity_contract`, with commit/revert behavior observed through `Contract.run`.
+- Privileged-caller and address-stomp counterexamples both witness successful,
+  eligible executions and are therefore non-vacuous.
+- Focused closure/mutant builds and the complete Trust build passed. The new
+  registered theorems use only `propext` and `Quot.sound` (or only `propext`).
 
 P-ADDRESS-1 closure-v2 SOURCE/VERITY_TX receipt (2026-08-11)
 -----------------------------------------------------------
