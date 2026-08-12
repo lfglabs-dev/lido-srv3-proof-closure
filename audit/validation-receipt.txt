@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 523768782b7d0201808c25f19ae25578e3817e06
+validated-tree: 847d079ec125dde854eb0f04d0e45a15f4534255
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -19,6 +19,28 @@ P-ADDRESS-1 review correction (2026-08-12)
   removed, and the address-renaming relation remains a specification helper.
 - Restoring MODEL closure requires instantiating eligible permissionless
   entrypoints and proving both properties without assuming them.
+
+Closure-v2 immutable-boundary and review repair (2026-08-12)
+--------------------------------------------------------------
+
+- This successor is a normal child of PR #65's reviewed head
+  `85dfb291cede752d4b17e8a35796aa8dfa19222f`. Its closure-v2 content remains
+  on the ancestry path beginning at immutable milestone
+  `25c82e137236131c037a45618e44382547efebe2`; `git merge-base --is-ancestor`
+  returns success for that milestone and the PR head. The accidentally advanced
+  `campaign/lido-minimal-11` ref `b6c94920604074a3d1630106bf8d8b99f40983c3`
+  is not an ancestor of the PR head and is not an integration target.
+- P-TOPUP-1's canonical SOURCE-to-VERITY_TX theorem now requires the explicit
+  `NoUncheckedWrap inp` premise. That premise is the required boundary between
+  the source's unchecked `uint256` accumulation at StakingRouter line 732 and
+  the model's natural-number accumulation; the theorem no longer admits a
+  wrapping input while claiming faithful source simulation.
+- `proofs/logs/proof-report.json` is labeled as a superseded SRV3-P1--P15
+  compatibility report. The current eleven guarantees remain governed solely
+  by `audit/guarantees.yaml` and the named Lean evidence there.
+- The P-ADDRESS-1 Yul harness receipt now truthfully says that its address-stomp
+  vector rejects an abstract relation, rather than claiming a modified Yul
+  program fails to build.
 
 Certified Verity re-pin receipt (2026-08-12)
 ------------------------------------------------
