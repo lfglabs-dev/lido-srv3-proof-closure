@@ -1,11 +1,24 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2d6ea83aefafe2227cdd467d82f2524a7b758ecf
+validated-tree: 523768782b7d0201808c25f19ae25578e3817e06
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ADDRESS-1 review correction (2026-08-12)
+-------------------------------------------
+
+- Independent review found that
+  `admission_and_post_state_equivariance` only conjoined admission and
+  post-state properties supplied as hypotheses; it did not prove either
+  property for a modeled permissionless entrypoint.
+- P-ADDRESS-1 is therefore no longer recorded as MODEL- or transaction-checked.
+  Its registry checked-layer list is empty, its metadata theorem evidence is
+  removed, and the address-renaming relation remains a specification helper.
+- Restoring MODEL closure requires instantiating eligible permissionless
+  entrypoints and proving both properties without assuming them.
 
 Certified Verity re-pin receipt (2026-08-12)
 ------------------------------------------------
