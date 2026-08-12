@@ -30,4 +30,16 @@ if BUILD_STATUS=0 BUILD_LOG="$tmpdir/stale.log" \
   fail 'emitted a report from a successful-looking log for a different source tree'
 fi
 
-printf '%s\n' "provenance guards ok: untracked/ignored Lean inputs and stale-tree logs rejected (current tree $tree)"
+# A successful report must carry the exact resolved Verity manifest pin.  This
+# is a narrow positive generator regression, using the current source tree and
+# toolchain while avoiding a redundant build in this guard script.
+printf 'verified_source_tree=%s\nlean_version=%s\nBuilt LidoSRv3\n' \
+  "$tree" "$(lake env lean --version)" > "$tmpdir/current.log"
+BUILD_STATUS=0 BUILD_LOG="$tmpdir/current.log" \
+  bash scripts/write_proof_report.sh > "$tmpdir/report.json"
+manifest_pin="$(python3 -c 'import json; print(next(p for p in json.load(open("lake-manifest.json"))["packages"] if p["name"] == "verity")["rev"])')"
+report_pin="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["toolchain"]["verity_commit"])' "$tmpdir/report.json")"
+[ "$report_pin" = "$manifest_pin" ] || \
+  fail "proof report Verity pin '$report_pin' differs from manifest '$manifest_pin'"
+
+printf '%s\n' "provenance guards ok: untracked/ignored Lean inputs and stale-tree logs rejected; emitted Verity pin equals manifest $manifest_pin (current tree $tree)"
