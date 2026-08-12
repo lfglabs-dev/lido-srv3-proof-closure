@@ -60,6 +60,14 @@ grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
 
 VERITY_COMMIT="$(python3 -c 'import json; d=json.load(open("lake-manifest.json")); print(next(p["rev"] for p in d["packages"] if p["name"] == "verity"))')"
 [ -n "$VERITY_COMMIT" ] || fail "could not read the pinned Verity revision from lake-manifest.json"
+VERITY_DIR=".lake/packages/verity"
+[ -d "$VERITY_DIR" ] || fail "resolved Verity checkout '$VERITY_DIR' not found"
+VERITY_HEAD="$(git -C "$VERITY_DIR" rev-parse HEAD 2>/dev/null)" || \
+  fail "could not read resolved Verity checkout revision from '$VERITY_DIR'"
+[ "$VERITY_HEAD" = "$VERITY_COMMIT" ] || \
+  fail "resolved Verity checkout revision '$VERITY_HEAD' does not match manifest '$VERITY_COMMIT'"
+[ -z "$(git -C "$VERITY_DIR" status --porcelain --untracked-files=all)" ] || \
+  fail "resolved Verity checkout '$VERITY_DIR' is dirty"
 
 cat <<JSON
 {
