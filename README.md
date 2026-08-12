@@ -25,7 +25,7 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 1 | `P-ALLOC-1` | `LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded` |
 | 2 | `P-ALLOC-2` | `LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket` |
 | 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` |
-| 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source` |
+| 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source` (hybrid MODEL → pinned source-shaped semantics → declared Verity `Contract.run` suffix, under `NoUncheckedWrap`) |
 | 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx` |
 | 6 | `P-RESERVE-1` | `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` (independent MODEL → pinned source-shaped semantics → Verity transaction refinement) |
 | 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
@@ -42,12 +42,16 @@ checked `AllGuarantees.all.length = 11` facade.
 
 Each guarantee carries per-plane status across the model, algorithm, source,
 transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2,
-P-DEPOSIT-1, P-TOPUP-1, and P-ACCOUNT-1 claim Lean-checked correspondence to
-their pinned Solidity spans. P-ACCOUNT-1 additionally closes the checked
-VERITY_TX plane under an explicit independently established full-report-success
-premise, and models `reportRewardsMinted` only for positive fee shares. Later
-report guards, Yul/EVM/runtime/crypto/E2E remain unmodeled, open, or not
-applicable.
+P-DEPOSIT-1, and P-ACCOUNT-1 claim Lean-checked correspondence to their pinned
+Solidity spans. P-TOPUP-1 is narrower: under `NoUncheckedWrap`, its checked
+chain is MODEL → pinned source-shaped semantics → a declared Verity
+`Contract.run` suffix. That suffix observes only the declared Lido-pull and
+beacon-push calls plus snapshot rollback; linked-external effects, generated
+Yul, EVM/runtime bytecode, and deployment provenance remain open. P-ACCOUNT-1
+additionally closes the checked VERITY_TX plane under an explicit independently
+established full-report-success premise, and models `reportRewardsMinted` only
+for positive fee shares. Later report guards, Yul/EVM/runtime/crypto/E2E remain
+unmodeled, open, or not applicable.
 P-ADDRESS-1 currently specifies an abstract address-renaming relation, but its
 composition helper assumes both admission and post-state properties and is not
 evidence for a modeled entrypoint. MODEL, transaction, source, Yul, bytecode,
