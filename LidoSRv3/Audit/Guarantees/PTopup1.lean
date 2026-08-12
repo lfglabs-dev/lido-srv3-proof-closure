@@ -187,16 +187,18 @@ theorem source_pinned_config_discharges_pubkey_guard (inp : SourceTopupInput) :
     run pinnedConfig inp ≠ .revertInvalidPublicKeyLength :=
   run_ne_revertInvalidPublicKeyLength pinnedConfig_pubkey_lengths_agree
 
-/-- Hybrid SOURCE-to-VERITY_TX closure.  The independent source interpreter
-supplies the full guard/loop outcome; the typed Verity suffix contains the two
-value-bearing call sites and `Contract.run` supplies snapshot rollback.  Yul,
+/-- Hybrid SOURCE-to-VERITY_TX closure under the explicit source-line-732
+no-wrap premise. The independent source interpreter then supplies the full
+faithful guard/loop outcome; the typed Verity suffix contains the two
+value-bearing call sites and `Contract.run` supplies snapshot rollback. Yul,
 EVM and deployed multi-contract call semantics remain explicitly open. -/
 theorem verity_tx_simulates_source
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hNoWrap : NoUncheckedWrap inp)
     (state : _root_.Verity.ContractState) :
     LidoSRv3.Audit.Verity.TopupHybrid.observeVerity state
         ((LidoSRv3.Audit.Verity.TopupHybrid.executeSource cfg inp).run state) =
       LidoSRv3.Audit.Verity.TopupHybrid.sourceTx cfg inp state :=
-  LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source cfg inp state
+  LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source cfg inp hNoWrap state
 
 end LidoSRv3.Audit.Guarantees.PTopup1

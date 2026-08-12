@@ -64,6 +64,7 @@ VERITY_COMMIT="$(python3 -c 'import json; d=json.load(open("lake-manifest.json")
 cat <<JSON
 {
   "schema": "srv3-verity-lean-proof-report-v2",
+  "target_scope": "legacy-srv3-p1-p15-superseded",
   "toolchain": {
     "lean": "${LEAN_VERSION}",
     "verity_commit": "${VERITY_COMMIT}"

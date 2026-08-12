@@ -69,7 +69,7 @@ and `audit/REPRODUCE.md`; regenerate them with `make audit-generate`.
 ```bash
 make audit-check   # validate the registry, pins, source map, and generated views
 make test          # metadata mutants, receipt, guards, executable regressions
-make prove         # Lean theorem checking; writes proofs/logs/proof-report.json
+make prove         # Lean theorem checking; writes a legacy SRV3-P1--P15 compatibility report
 ```
 
 `make audit-check` is fail-closed: it rejects a registry that has drifted from
@@ -77,6 +77,11 @@ the eleven IDs, that loses a pin, or whose generated views are stale.
 `make test` additionally runs the metadata validator against deliberate mutants
 and re-derives the validation receipt, so a silent edit to the evidence tree
 fails the build.
+
+`proofs/logs/proof-report.json` is a build receipt for the superseded
+SRV3-P1--P15 lane only (`target_scope: legacy-srv3-p1-p15-superseded`). It is
+not evidence for the eleven current guarantees; their authoritative theorem
+names, statuses, and reproduction commands are the canonical registry above.
 
 To check a single guarantee, use its reproduction command from
 `audit/guarantees.yaml`, for example:
