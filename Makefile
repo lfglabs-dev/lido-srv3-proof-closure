@@ -8,7 +8,7 @@ PROOF_LOG := proofs/logs/proof-report.json
 SHELL     := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all bootstrap audit-generate audit-check audit_metadata test prove report clean distclean
+.PHONY: all bootstrap audit-generate audit-check audit_metadata check test prove report clean distclean
 
 all: report
 
@@ -25,6 +25,9 @@ audit-check:
 
 audit_metadata: audit-check
 	@printf '%s\n' 'audit_metadata alias: see audit-check'
+
+check: test
+	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
 
 test:
 	@python3 scripts/audit_metadata.py check

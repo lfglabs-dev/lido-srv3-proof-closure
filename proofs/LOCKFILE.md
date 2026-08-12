@@ -7,7 +7,7 @@ SRv3 proof-closure artifacts.
 | --- | --- |
 | Proof baseline (`origin/main`) | `7dedaf0d5fb4ce7c8734792d47dbf774ed570c0c` |
 | Lido PR #1811 | `af095e48bbc1c3841c2c9936219c8461af01056b` |
-| Verity | `d2d4a18a4d7021adcd90d4b03e619affe506dd54` |
+| Verity | `bfa13e715d2a11d476e5d90f9264e87676ff7594` |
 | Lean | `v4.31.0` |
 
 The executable harness in this repository is a Lean/Lake project that imports
