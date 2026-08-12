@@ -11,11 +11,11 @@ allocation path.  It binds the scalar `depositable` input, the router-local
 capacity call.  It is not a claim about a deployed Yul/EVM program or about the
 multi-module allocation loop.
 
-The deep `FunctionSpec` is the source-shaped operation.  `CallProgram` is the
-canonical external-call boundary for the one `staticcall`; it is independently
-constructed from the pinned scalar ABI shape rather than by aliasing the
-function body.  The executable no-call prefix is denoted by `Denote`, while
-`DenoteMemory` witnesses the word written to the canonical memory surface.
+The deep `FunctionSpec` is the source-shaped operation.  The bridge below
+checks the compiled function body's call, calldata materialisation, and
+storage write as one concrete source surface before using the canonical
+`CallProgram` boundary.  The executable no-call prefix is denoted by `Denote`,
+while `DenoteMemory` witnesses the uint256 word written to canonical memory.
 -/
 
 namespace LidoSRv3.Audit.Verity.AllocCapacityPhase3
@@ -44,6 +44,20 @@ module's current capacity, copies the returned word to canonical memory, and
 returns it after the typed success bit.  The router-local storage word is
 written before the read-only interaction, so a revert keeps ordinary CEI
 ordering and rolls that write back at the transaction boundary. -/
+def consumedCapacityBody : List Stmt :=
+  [ .mstore (.literal 0) (.shl (.literal 224) (.literal capacitySelector))
+  , .mstore (.literal 4) (.param "moduleId")
+  , .setStorage "lastCapacity" (.param "depositable")
+  , .letVar "capacityOk"
+      (.staticcall (.literal Verity.Core.MAX_UINT256) (.literal moduleAddress)
+        (.literal 0) (.literal 36) (.literal 32) (.literal 32))
+  , .require (.eq (.localVar "capacityOk") (.literal 1))
+      "ModuleCapacityCallFailed"
+  , .letVar "capacity" (.mload (.literal 32))
+  , .require (.le (.localVar "capacity") (.param "depositable"))
+      "CapacityExceedsDepositable"
+  , .return (.localVar "capacity") ]
+
 def consumedCapacityEntry : FunctionSpec :=
   { name := "consumeOneModuleCapacity"
     params := sourceScalarParameters
@@ -53,19 +67,7 @@ def consumedCapacityEntry : FunctionSpec :=
       [ { name := "consumed_static_capacity_call"
           obligation := "The single typed staticcall is represented by consumedCapacityProgram and discharged by the Phase-3 success/revert theorems."
           proofStatus := .proved } ]
-    body :=
-      [ .mstore (.literal 0) (.shl (.literal 224) (.literal capacitySelector))
-      , .mstore (.literal 4) (.param "moduleId")
-      , .setStorage "lastCapacity" (.param "depositable")
-      , .letVar "capacityOk"
-          (.staticcall (.literal Verity.Core.MAX_UINT256) (.literal moduleAddress)
-            (.literal 0) (.literal 36) (.literal 32) (.literal 32))
-      , .require (.eq (.localVar "capacityOk") (.literal 1))
-          "ModuleCapacityCallFailed"
-      , .letVar "capacity" (.mload (.literal 32))
-      , .require (.le (.localVar "capacity") (.param "depositable"))
-          "CapacityExceedsDepositable"
-      , .return (.localVar "capacity") ] }
+    body := consumedCapacityBody }
 
 def spec : CompilationModel :=
   { name := "PAlloc1ConsumedCapacityPhase3"
@@ -107,16 +109,31 @@ def consumedCapacityProgram (moduleId : Nat) : CallProgram Bool :=
 def canonicalCallState : CallState :=
   { world := Verity.defaultState, gasRemaining := Verity.Core.MAX_UINT256 }
 
-def canonicalMemoryWord (moduleId : Nat) : Word :=
+def abiUint256Word (value : Nat) : Word :=
   fun index =>
-    if index = 31 then
-      ⟨moduleId % 256, Nat.mod_lt _ (by decide)⟩
-    else zeroByte
+    ⟨(value / 256 ^ (31 - index.val)) % 256, Nat.mod_lt _ (by decide)⟩
+
+/-- The full big-endian ABI word written by `mstore(4, moduleId)`.  In
+particular values such as 256 occupy more than the last byte. -/
+def canonicalMemoryWord (moduleId : Nat) : Word := abiUint256Word moduleId
+
+theorem canonicalMemoryWord_256_uses_high_byte :
+    canonicalMemoryWord 256 ⟨30, by decide⟩ = ⟨1, by decide⟩ := by
+  native_decide
+
+/-- This is the source-to-VERITY relation: it is intentionally a relation on
+the function that is compiled, rather than a collection of independently
+handwritten call facts.  The four source statements pin selector memory,
+full-word module-id materialisation, the pre-call storage write, and the exact
+typed `staticcall` shape. -/
+def SourceCallStorageABI (fn : FunctionSpec) : Prop :=
+  fn.body = consumedCapacityBody
 
 /-- The canonical state relation used by the consumed slice: scalar input is
 materialized in memory at ABI offset four and the designated storage field is
 the only router-local post-call target. -/
 def CanonicalSliceState (moduleId : Nat) : Prop :=
+  SourceCallStorageABI consumedCapacityEntry ∧
   consumedCapacityEntry.params = sourceScalarParameters ∧
   spec.fields = canonicalFields ∧
   sourceDerivedCapacitySite moduleId =
@@ -136,14 +153,15 @@ theorem consumed_capacity_phase3_bridge (moduleId : Nat) :
               result := fun _ _ => .success []
               gasUsed := fun _ _ => 0 }) canonicalCallState =
       [sourceDerivedCapacitySite moduleId] ∧
-    (Memory.empty.writeWord 4 (canonicalMemoryWord moduleId)).readWord 4 31 =
-      canonicalMemoryWord moduleId 31 := by
+    (Memory.empty.writeWord 4 (canonicalMemoryWord moduleId)).readWord 4 =
+      canonicalMemoryWord moduleId := by
   constructor
-  · exact ⟨rfl, rfl, rfl⟩
+  · exact ⟨rfl, rfl, rfl, rfl⟩
   constructor
   · rfl
-  · rw [Memory.readWord, Memory.readByte, if_pos]
-    · exact Memory.writeWord_at Memory.empty 4 (canonicalMemoryWord moduleId) 31
+  · funext index
+    rw [Memory.readWord, Memory.readByte, if_pos]
+    · exact Memory.writeWord_at Memory.empty 4 (canonicalMemoryWord moduleId) index
     · simp [Memory.writeWord, Memory.expand, expandedLength, Memory.empty]
       omega
 
@@ -162,20 +180,48 @@ theorem consumed_capacity_staticcall_success
   · exact denoteCall_staticcall_world adversary (sourceDerivedCapacitySite moduleId)
       canonicalCallState rfl
 
-/-- A typed external revert is a rollback outcome: the whole consumed-call
-program restores the canonical world. -/
+/-- State after the source body's pre-call `setStorage lastCapacity depositable`.
+`writeUintSlots` is the canonical Denote storage update at its resolved slot. -/
+def preCallWorld (depositable : Nat) : Verity.ContractState :=
+  writeUintSlots Verity.defaultState [lastCapacitySlot] depositable
+
+def preCallState (depositable : Nat) : CallState :=
+  { canonicalCallState with world := preCallWorld depositable }
+
+/-- The bounded transaction frame.  It deliberately retains the intermediate
+post-write state long enough for the call to observe it, then restores the
+pre-transaction state when the typed call reports failure/revert. -/
+def runConsumedCapacityTransaction (adversary : AdversaryModel)
+    (depositable moduleId : Nat) : Bool × CallState :=
+  let observed := denote (consumedCapacityProgram moduleId) adversary
+    (preCallState depositable)
+  if observed.1 then observed else (false, canonicalCallState)
+
+theorem pre_call_last_capacity_write (depositable : Nat) :
+    (preCallState depositable).world.storage lastCapacitySlot =
+      (depositable : Verity.Core.Uint256) := by
+  simp [preCallState, preCallWorld, writeUintSlots,
+    lastCapacitySlot, wordNormalize]
+
+/-- A typed external revert is a transaction rollback from the intermediate
+post-write state, not merely preservation by a read-only call. -/
 theorem consumed_capacity_revert_rolls_back
-    (adversary : AdversaryModel) (moduleId : Nat)
-    (h : adversary.result (sourceDerivedCapacitySite moduleId) canonicalCallState.world =
+    (adversary : AdversaryModel) (depositable moduleId : Nat)
+    (h : adversary.result (sourceDerivedCapacitySite moduleId) (preCallState depositable).world =
       .revert [0xde, 0xad]) :
-    (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).1 = false ∧
-    (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).2.world =
-      canonicalCallState.world := by
+    (denote (consumedCapacityProgram moduleId) adversary (preCallState depositable)).1 = false ∧
+    (denote (consumedCapacityProgram moduleId) adversary (preCallState depositable)).2.world =
+      (preCallState depositable).world ∧
+    runConsumedCapacityTransaction adversary depositable moduleId =
+      (false, canonicalCallState) := by
   constructor
   · simp [consumedCapacityProgram, denote, denoteCall, h,
       ExternalCallResult.succeeded]
+  constructor
   · exact denoteCall_staticcall_world adversary (sourceDerivedCapacitySite moduleId)
-      canonicalCallState rfl
+      (preCallState depositable) rfl
+  · simp [runConsumedCapacityTransaction, consumedCapacityProgram, denote,
+      denoteCall, h, ExternalCallResult.succeeded]
 
 theorem consumed_capacity_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
@@ -195,27 +241,29 @@ theorem consumed_capacity_phase3_transaction (moduleId : Nat) :
               result := fun _ _ => .success []
               gasUsed := fun _ _ => 0 }) canonicalCallState =
       [sourceDerivedCapacitySite moduleId] ∧
-    (Memory.empty.writeWord 4 (canonicalMemoryWord moduleId)).readWord 4 31 =
-      canonicalMemoryWord moduleId 31 ∧
+    (Memory.empty.writeWord 4 (canonicalMemoryWord moduleId)).readWord 4 =
+      canonicalMemoryWord moduleId ∧
     (∀ adversary,
       adversary.result (sourceDerivedCapacitySite moduleId) canonicalCallState.world =
         .success [7] →
       (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).1 = true ∧
       (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).2.world =
         canonicalCallState.world) ∧
-    (∀ adversary,
-      adversary.result (sourceDerivedCapacitySite moduleId) canonicalCallState.world =
+    (∀ adversary depositable,
+      adversary.result (sourceDerivedCapacitySite moduleId) (preCallState depositable).world =
         .revert [0xde, 0xad] →
-      (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).1 = false ∧
-      (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).2.world =
-        canonicalCallState.world) := by
+      (denote (consumedCapacityProgram moduleId) adversary (preCallState depositable)).1 = false ∧
+      (denote (consumedCapacityProgram moduleId) adversary (preCallState depositable)).2.world =
+        (preCallState depositable).world ∧
+      runConsumedCapacityTransaction adversary depositable moduleId =
+        (false, canonicalCallState)) := by
   refine ⟨consumed_capacity_function_spec_compiles, ?_, ?_, ?_, ?_, ?_⟩
   · exact (consumed_capacity_phase3_bridge moduleId).1
   · exact (consumed_capacity_phase3_bridge moduleId).2.1
   · exact (consumed_capacity_phase3_bridge moduleId).2.2
   · intro adversary hsuccess
     exact consumed_capacity_staticcall_success adversary moduleId hsuccess
-  · intro adversary hrevert
-    exact consumed_capacity_revert_rolls_back adversary moduleId hrevert
+  · intro adversary depositable hrevert
+    exact consumed_capacity_revert_rolls_back adversary depositable moduleId hrevert
 
 end LidoSRv3.Audit.Verity.AllocCapacityPhase3
