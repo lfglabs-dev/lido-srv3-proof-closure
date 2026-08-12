@@ -1,11 +1,35 @@
-Minimal-11 cleanup validation receipt
+Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 02b1cc2b6526862fb868defb6f6fc2cbf515aa05
+validated-tree: 01c203437f7064ffba58011ee58a745b5a37e1c2
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Certified Verity re-pin receipt (2026-08-12)
+------------------------------------------------
+
+- Closure-v2 remains rooted at immutable milestone
+  `25c82e137236131c037a45618e44382547efebe2`; the divergent
+  `campaign/lido-minimal-11` ref was neither modified nor merged.
+- The resolved and requested Verity revision is exactly
+  `bfa13e715d2a11d476e5d90f9264e87676ff7594`; Lake's `rev` and `inputRev`,
+  `lakefile.lean`, artifact lock, source map, audit manifest, and proof report
+  agree on that SHA.
+- `lake update verity`: exit 0; exact upstream commit fetched and resolved.
+- `lake build LidoSRv3`: exit 0; `Build completed successfully (1336 jobs)`.
+- `make prove`: exit 0; proof report records source tree
+  `4e407c79f5e7f33d881b9f43243ac404567b9ca0`, log SHA-256
+  `2709c4747b857a92eda191b9ef69f168880925458caf6bf664e21293da17fa2c`,
+  and the certified Verity revision.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical guarantees
+  and 11 subordinate rows). The #51-derived `make check` target is restored;
+  its long metadata-mutant subprocess is separately exercised by the same
+  test suite.
+- Scope remains MODEL → SOURCE → VERITY_TX. The updated P-ALLOC-2 note records
+  that the certified Verity pin contains `LoopSimulation`, but no new
+  source-to-official-loop, Yul, EVM, runtime, or deployment closure is claimed.
 
 P-TOPUP-1 closure-v2 hybrid receipt (2026-08-11)
 -------------------------------------------------
