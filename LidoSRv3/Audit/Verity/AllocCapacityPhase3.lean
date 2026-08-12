@@ -181,4 +181,41 @@ theorem consumed_capacity_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
   native_decide
 
+/-- The consumed P-ALLOC-1 transaction guarantee for this bounded slice.  It
+ties the compiled typed function, scalar/storage canonical state, exact
+`CallProgram` observation, byte-memory materialization, and the two typed
+external outcomes into one theorem.  The success and revert clauses are
+universally quantified over the adversary, rather than assuming a convenient
+world transition. -/
+theorem consumed_capacity_phase3_transaction (moduleId : Nat) :
+    (CompilationModel.compile spec [entrySelector]).isOk = true ∧
+    CanonicalSliceState moduleId ∧
+    CallsIn (consumedCapacityProgram moduleId) (by
+      exact { stateTransition := fun _ world => world
+              result := fun _ _ => .success []
+              gasUsed := fun _ _ => 0 }) canonicalCallState =
+      [sourceDerivedCapacitySite moduleId] ∧
+    (Memory.empty.writeWord 4 (canonicalMemoryWord moduleId)).readWord 4 31 =
+      canonicalMemoryWord moduleId 31 ∧
+    (∀ adversary,
+      adversary.result (sourceDerivedCapacitySite moduleId) canonicalCallState.world =
+        .success [7] →
+      (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).1 = true ∧
+      (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).2.world =
+        canonicalCallState.world) ∧
+    (∀ adversary,
+      adversary.result (sourceDerivedCapacitySite moduleId) canonicalCallState.world =
+        .revert [0xde, 0xad] →
+      (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).1 = false ∧
+      (denote (consumedCapacityProgram moduleId) adversary canonicalCallState).2.world =
+        canonicalCallState.world) := by
+  refine ⟨consumed_capacity_function_spec_compiles, ?_, ?_, ?_, ?_, ?_⟩
+  · exact (consumed_capacity_phase3_bridge moduleId).1
+  · exact (consumed_capacity_phase3_bridge moduleId).2.1
+  · exact (consumed_capacity_phase3_bridge moduleId).2.2
+  · intro adversary hsuccess
+    exact consumed_capacity_staticcall_success adversary moduleId hsuccess
+  · intro adversary hrevert
+    exact consumed_capacity_revert_rolls_back adversary moduleId hrevert
+
 end LidoSRv3.Audit.Verity.AllocCapacityPhase3
