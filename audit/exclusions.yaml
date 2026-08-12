@@ -1,0 +1,10 @@
+{
+  "schema": "lido-srv3-exclusions-v1",
+  "exclusions": [
+    {"id": "BLS", "scope": "BLS signature validity and related cryptographic correctness"},
+    {"id": "FULL-REPORT-PIPELINE-REFINEMENT", "scope": "Full report-pipeline source, transaction, and EVM refinement"},
+    {"id": "STVAULT-INTERNALS", "scope": "stVault internal state, accounting, and lifecycle semantics"},
+    {"id": "VALUE-BASED-EXIT-BOUND", "scope": "Value-based exit and consolidation bounds"},
+    {"id": "BROAD-REGISTRY-LIFECYCLE", "scope": "Broad registry, governance, module lifecycle, and role-management behavior"}
+  ]
+}

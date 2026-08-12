@@ -19,11 +19,11 @@ Styling follows the lfglabs.dev design system (Plus Jakarta Sans, teal accent
 `#2dd4bf`, `#f5f7fa` cards on white). The webfont loads from Google Fonts and
 falls back to the system stack offline.
 
-## exports/
+## Exports
 
-Pre-rendered PNGs of the structural view (`lido-map-all.png`) and of each flow
-in isolation (`lido-map-f1.png` ... `lido-map-f7.png`), generated with the
-export button. Referenced by `verity/targets/srv3-flow-map.md`.
+PNG and SVG views are generated on demand with the export buttons and are not
+versioned. `archive/legacy-p1-p15/verity-targets/srv3-flow-map.md` links to the canonical interactive
+diagram instead of depending on generated renderings.
 
 ## Provenance
 

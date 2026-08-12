@@ -2,9 +2,9 @@
   "schema": "srv3-source-map-v1",
   "source_revisions": {
     "lido_pr_1811_commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
-    "verity_commit": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f"
+    "verity_commit": "bfa13e715d2a11d476e5d90f9264e87676ff7594"
   },
-  "correspondence_register": "verity/targets/solidity-correspondence.md",
+  "correspondence_register": "archive/legacy-p1-p15/verity-targets/solidity-correspondence.md",
   "targets": {
     "SRV3-P1": {
       "anchors": [
@@ -12,9 +12,9 @@
         "contracts/0.4.24/Lido.sol::_getDepositableEther",
         "contracts/0.4.24/Lido.sol::_spendDepositableEther"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P1_reserve_separation",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P1_reserve_separation",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P1_depositable_excludes_withdrawal_reserve"
+        "LidoSRv3/Legacy/SpecProofs.lean::P1_depositable_excludes_withdrawal_reserve"
       ]
     },
     "SRV3-P2": {
@@ -22,23 +22,23 @@
         "contracts/0.8.25/sr/StakingRouter.sol::deposit",
         "contracts/0.4.24/Lido.sol::withdrawDepositableEther"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P2_deposit_exact_pull",
-      "transition": "LidoSRv3/Model.lean::depositTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_exact_pull",
+      "transition": "LidoSRv3/Legacy/Model.lean::depositTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P2_total_allocated_deposits",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_router_eth_unchanged",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_beacon_sink_exact",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_buffered_exact",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_positive_requires_depositable",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_zero_external_value_unchanged",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_withdrawal_reserve_unchanged",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_requires_active_module_and_capacity",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_modules_exact",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_records_last_deposit",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_preserves_module_length",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_preserves_module_balance_sum",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_preserves_report_state",
-        "LidoSRv3/SpecProofs.lean::P2_deposit_transition_deposit_reserve_spent"
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_total_allocated_deposits",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_router_eth_unchanged",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_beacon_sink_exact",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_buffered_exact",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_positive_requires_depositable",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_zero_external_value_unchanged",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_withdrawal_reserve_unchanged",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_requires_active_module_and_capacity",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_modules_exact",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_records_last_deposit",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_preserves_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_preserves_module_balance_sum",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_preserves_report_state",
+        "LidoSRv3/Legacy/SpecProofs.lean::P2_deposit_transition_deposit_reserve_spent"
       ]
     },
     "SRV3-P3": {
@@ -47,16 +47,16 @@
         "contracts/0.8.25/sr/SRLib.sol::_reportValidatorBalancesByStakingModule",
         "contracts/0.8.25/sr/SRTypes.sol::RouterStateAccounting"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P3_module_balance_conservation",
-      "transition": "LidoSRv3/Model.lean::reportValidatorBalancesTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P3_module_balance_conservation",
+      "transition": "LidoSRv3/Legacy/Model.lean::reportValidatorBalancesTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P3_report_transition_requires_well_formed",
-        "LidoSRv3/SpecProofs.lean::P3_report_transition_module_balance_conservation",
-        "LidoSRv3/SpecProofs.lean::P3_report_transition_module_balances_match_report",
-        "LidoSRv3/SpecProofs.lean::P3_report_transition_records_accepted_report",
-        "LidoSRv3/SpecProofs.lean::P3_report_transition_preserves_module_length",
-        "LidoSRv3/SpecProofs.lean::P3_report_transition_modules_exact",
-        "LidoSRv3/SpecProofs.lean::P3_report_transition_preserves_eth_state"
+        "LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_requires_well_formed",
+        "LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_module_balance_conservation",
+        "LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_module_balances_match_report",
+        "LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_records_accepted_report",
+        "LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_preserves_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_modules_exact",
+        "LidoSRv3/Legacy/SpecProofs.lean::P3_report_transition_preserves_eth_state"
       ]
     },
     "SRV3-P4": {
@@ -65,9 +65,9 @@
         "contracts/0.8.25/sr/SRLib.sol::_reportValidatorBalancesByStakingModule",
         "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P4_report_before_reward_consistency",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P4_report_before_reward_consistency",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P4_report_transition_before_reward_consistency"
+        "LidoSRv3/Legacy/SpecProofs.lean::P4_report_transition_before_reward_consistency"
       ]
     },
     "SRV3-P5": {
@@ -75,17 +75,17 @@
         "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution",
         "contracts/0.8.25/sr/StakingRouter.sol::_computeModuleFee"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P5_reward_bound",
-      "transition": "LidoSRv3/Model.lean::stakingRewardsDistributionRows",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P5_reward_bound",
+      "transition": "LidoSRv3/Legacy/Model.lean::stakingRewardsDistributionRows",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P5_reward_recipient_alignment",
-        "LidoSRv3/SpecProofs.lean::P5_rewards_distribution_rows_aligned",
-        "LidoSRv3/SpecProofs.lean::P5_rewards_distribution_zero_total_empty",
-        "LidoSRv3/SpecProofs.lean::P5_rewards_distribution_zero_total_empty_module_ids",
-        "LidoSRv3/SpecProofs.lean::P5_rewards_distribution_row_nonzero_balance",
-        "LidoSRv3/SpecProofs.lean::P5_rewards_distribution_paid_module_fee_bound",
-        "LidoSRv3/SpecProofs.lean::P5_rewards_distribution_stopped_module_zero",
-        "LidoSRv3/SpecProofs.lean::P5_rewards_distribution_total_fee_sum"
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_reward_recipient_alignment",
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_rows_aligned",
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_zero_total_empty",
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_zero_total_empty_module_ids",
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_row_nonzero_balance",
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_paid_module_fee_bound",
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_stopped_module_zero",
+        "LidoSRv3/Legacy/SpecProofs.lean::P5_rewards_distribution_total_fee_sum"
       ]
     },
     "SRV3-P6": {
@@ -94,9 +94,9 @@
         "contracts/0.8.25/sr/StakingRouter.sol::deposit",
         "contracts/0.8.25/sr/StakingRouter.sol::getStakingRewardsDistribution"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P6_deposit_status_gating",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P6_deposit_status_gating",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P6_stopped_module_reward_zero"
+        "LidoSRv3/Legacy/SpecProofs.lean::P6_stopped_module_reward_zero"
       ]
     },
     "SRV3-P7": {
@@ -106,14 +106,14 @@
         "contracts/common/interfaces/IStakingModule.sol::getStakingModuleSummary",
         "contracts/0.8.25/sr/SRTypes.sol::ModuleStateAccounting"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P7_exited_count_update_requires_valid_rows",
-      "transition": "LidoSRv3/Model.lean::updateExitedValidatorsTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_requires_valid_rows",
+      "transition": "LidoSRv3/Legacy/Model.lean::updateExitedValidatorsTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P7_exited_count_update_empty",
-        "LidoSRv3/SpecProofs.lean::P7_exited_count_update_preserves_module_length",
-        "LidoSRv3/SpecProofs.lean::P7_exited_count_update_preserves_module_balance_sum",
-        "LidoSRv3/SpecProofs.lean::P7_exited_count_update_returns_loop_result",
-        "LidoSRv3/SpecProofs.lean::P7_exited_count_update_preserves_router_state"
+        "LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_empty",
+        "LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_preserves_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_preserves_module_balance_sum",
+        "LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_returns_loop_result",
+        "LidoSRv3/Legacy/SpecProofs.lean::P7_exited_count_update_preserves_router_state"
       ]
     },
     "SRV3-P8": {
@@ -126,23 +126,23 @@
         "contracts/0.8.25/lib/BeaconChainDepositor.sol::makeBeaconChainTopUp",
         "contracts/common/interfaces/IStakingModuleV2.sol::allocateDeposits"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_active_topup_module",
-      "transition": "LidoSRv3/Model.lean::topUpTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_requires_active_topup_module",
+      "transition": "LidoSRv3/Legacy/Model.lean::topUpTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_input_shape",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_requires_well_formed_allocations",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_allocation_sum_bounded_by_module_allocation",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_router_eth_unchanged",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_modules_unchanged",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_preserves_report_state",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_beacon_sink_exact",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_buffered_exact",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_positive_requires_depositable",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_zero_sum_noop",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_withdrawal_reserve_unchanged",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_deposit_reserve_spent",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_respects_per_block_cap",
-        "LidoSRv3/SpecProofs.lean::P8_topup_transition_zero_target_requires_lido_can_deposit"
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_requires_input_shape",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_requires_well_formed_allocations",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_allocation_sum_bounded_by_module_allocation",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_router_eth_unchanged",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_modules_unchanged",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_preserves_report_state",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_beacon_sink_exact",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_buffered_exact",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_positive_requires_depositable",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_zero_sum_noop",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_withdrawal_reserve_unchanged",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_deposit_reserve_spent",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_respects_per_block_cap",
+        "LidoSRv3/Legacy/SpecProofs.lean::P8_topup_transition_zero_target_requires_lido_can_deposit"
       ]
     },
     "SRV3-P9": {
@@ -152,31 +152,31 @@
         "contracts/0.8.25/sr/SRLib.sol::_getModuleDepositAllocation",
         "contracts/0.8.25/sr/SRLib.sol::_getModulesAllocationAndCapacity"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P9_allocation_capacity_rows_aligned",
-      "transition": "LidoSRv3/Model.lean::modulesAllocationAndCapacity",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_rows_aligned",
+      "transition": "LidoSRv3/Legacy/Model.lean::modulesAllocationAndCapacity",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P9_allocation_capacity_length",
-        "LidoSRv3/SpecProofs.lean::P9_allocation_capacity_values_length",
-        "LidoSRv3/SpecProofs.lean::P9_allocation_capacity_module_ids_preserved",
-        "LidoSRv3/SpecProofs.lean::P9_active_allocation_capacity_target_bound",
-        "LidoSRv3/SpecProofs.lean::P9_active_allocation_capacity_available_bound",
-        "LidoSRv3/SpecProofs.lean::P9_inactive_allocation_capacity_current"
+        "LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_values_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P9_allocation_capacity_module_ids_preserved",
+        "LidoSRv3/Legacy/SpecProofs.lean::P9_active_allocation_capacity_target_bound",
+        "LidoSRv3/Legacy/SpecProofs.lean::P9_active_allocation_capacity_available_bound",
+        "LidoSRv3/Legacy/SpecProofs.lean::P9_inactive_allocation_capacity_current"
       ]
     },
     "SRV3-P10": {
       "anchors": [
         "contracts/0.8.25/sr/SRLib.sol::_reportRewardsMinted"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_requires_equal_lengths",
-      "transition": "LidoSRv3/Model.lean::reportRewardsMintedTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_requires_equal_lengths",
+      "transition": "LidoSRv3/Legacy/Model.lean::reportRewardsMintedTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_requires_valid_rows",
-        "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_returns_generated_rows",
-        "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_preserves_row_length",
-        "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_preserves_module_ids",
-        "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_preserves_total_shares",
-        "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_nonzero_module_exists",
-        "LidoSRv3/SpecProofs.lean::P10_report_rewards_minted_zero_rows_skip_module_check"
+        "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_requires_valid_rows",
+        "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_returns_generated_rows",
+        "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_preserves_row_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_preserves_module_ids",
+        "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_preserves_total_shares",
+        "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_nonzero_module_exists",
+        "LidoSRv3/Legacy/SpecProofs.lean::P10_report_rewards_minted_zero_rows_skip_module_check"
       ]
     },
     "SRV3-P11": {
@@ -184,15 +184,15 @@
         "contracts/0.8.25/sr/StakingRouter.sol::updateAllStakingModulesFees",
         "contracts/0.8.25/sr/SRLib.sol::_updateAllModuleFees"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_requires_lengths",
-      "transition": "LidoSRv3/Model.lean::updateAllModuleFeesTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_requires_lengths",
+      "transition": "LidoSRv3/Legacy/Model.lean::updateAllModuleFeesTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_requires_consistent_rows",
-        "LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_preserves_module_length",
-        "LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_exact_fee_projections",
-        "LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_bounded_after_success",
-        "LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_preserves_module_balance_sum",
-        "LidoSRv3/SpecProofs.lean::P11_update_all_module_fees_preserves_router_state"
+        "LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_requires_consistent_rows",
+        "LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_preserves_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_exact_fee_projections",
+        "LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_bounded_after_success",
+        "LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_preserves_module_balance_sum",
+        "LidoSRv3/Legacy/SpecProofs.lean::P11_update_all_module_fees_preserves_router_state"
       ]
     },
     "SRV3-P12": {
@@ -201,16 +201,16 @@
         "contracts/0.8.25/sr/SRLib.sol::_updateModuleParams",
         "contracts/0.8.25/sr/SRLib.sol::_requireConsistentFeeSum"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_existing_module",
-      "transition": "LidoSRv3/Model.lean::updateModuleParamsTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_requires_existing_module",
+      "transition": "LidoSRv3/Legacy/Model.lean::updateModuleParamsTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_valid_config",
-        "LidoSRv3/SpecProofs.lean::P12_update_module_params_requires_positive_max_deposits",
-        "LidoSRv3/SpecProofs.lean::P12_update_module_params_preserves_module_length",
-        "LidoSRv3/SpecProofs.lean::P12_update_module_params_records_requested_params",
-        "LidoSRv3/SpecProofs.lean::P12_update_module_params_bounded_after_success",
-        "LidoSRv3/SpecProofs.lean::P12_update_module_params_preserves_module_balance_sum",
-        "LidoSRv3/SpecProofs.lean::P12_update_module_params_preserves_router_state"
+        "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_requires_valid_config",
+        "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_requires_positive_max_deposits",
+        "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_preserves_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_records_requested_params",
+        "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_bounded_after_success",
+        "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_preserves_module_balance_sum",
+        "LidoSRv3/Legacy/SpecProofs.lean::P12_update_module_params_preserves_router_state"
       ]
     },
     "SRV3-P13": {
@@ -219,14 +219,14 @@
         "contracts/0.8.25/sr/SRLib.sol::_setModuleStatus",
         "contracts/0.8.25/sr/SRTypes.sol::StakingModuleStatus"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P13_update_module_status_requires_existing_module",
-      "transition": "LidoSRv3/Model.lean::updateModuleStatusTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_requires_existing_module",
+      "transition": "LidoSRv3/Legacy/Model.lean::updateModuleStatusTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P13_update_module_status_preserves_module_length",
-        "LidoSRv3/SpecProofs.lean::P13_update_module_status_preserves_module_balance_sum",
-        "LidoSRv3/SpecProofs.lean::P13_update_module_status_requires_status_change",
-        "LidoSRv3/SpecProofs.lean::P13_update_module_status_records_requested_status",
-        "LidoSRv3/SpecProofs.lean::P13_update_module_status_preserves_router_state"
+        "LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_preserves_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_preserves_module_balance_sum",
+        "LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_requires_status_change",
+        "LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_records_requested_status",
+        "LidoSRv3/Legacy/SpecProofs.lean::P13_update_module_status_preserves_router_state"
       ]
     },
     "SRV3-P14": {
@@ -235,16 +235,16 @@
         "contracts/0.8.25/sr/SRLib.sol::_addModule",
         "contracts/0.8.25/sr/SRLib.sol::_requireConsistentFeeSum"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P14_add_module_requires_valid_config",
-      "transition": "LidoSRv3/Model.lean::addModuleTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_requires_valid_config",
+      "transition": "LidoSRv3/Legacy/Model.lean::addModuleTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P14_add_module_requires_fresh_module_id",
-        "LidoSRv3/SpecProofs.lean::P14_add_module_preserves_config_guards",
-        "LidoSRv3/SpecProofs.lean::P14_add_module_increments_module_length",
-        "LidoSRv3/SpecProofs.lean::P14_add_module_appends_new_module_from_config",
-        "LidoSRv3/SpecProofs.lean::P14_add_module_new_module_zero_accounting",
-        "LidoSRv3/SpecProofs.lean::P14_add_module_preserves_module_balance_sum",
-        "LidoSRv3/SpecProofs.lean::P14_add_module_preserves_router_state"
+        "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_requires_fresh_module_id",
+        "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_preserves_config_guards",
+        "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_increments_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_appends_new_module_from_config",
+        "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_new_module_zero_accounting",
+        "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_preserves_module_balance_sum",
+        "LidoSRv3/Legacy/SpecProofs.lean::P14_add_module_preserves_router_state"
       ]
     },
     "SRV3-P15": {
@@ -253,14 +253,14 @@
         "contracts/0.8.25/sr/SRLib.sol::_updateModuleShares",
         "contracts/0.8.25/sr/SRTypes.sol::StakingModule"
       ],
-      "property": "LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_requires_lengths",
-      "transition": "LidoSRv3/Model.lean::updateAllModuleSharesTransition",
+      "property": "LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_requires_lengths",
+      "transition": "LidoSRv3/Legacy/Model.lean::updateAllModuleSharesTransition",
       "supporting_properties": [
-        "LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_requires_valid_rows",
-        "LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_preserves_module_length",
-        "LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_exact_share_projections",
-        "LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_preserves_module_balance_sum",
-        "LidoSRv3/SpecProofs.lean::P15_update_all_module_shares_preserves_router_state"
+        "LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_requires_valid_rows",
+        "LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_preserves_module_length",
+        "LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_exact_share_projections",
+        "LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_preserves_module_balance_sum",
+        "LidoSRv3/Legacy/SpecProofs.lean::P15_update_all_module_shares_preserves_router_state"
       ]
     }
   }

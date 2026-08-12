@@ -37,12 +37,12 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
   and review timestamp. Report package target:
   \path{af095e48bbc1c3841c2c9936219c8461af01056b}. \\
   \rowsep
-  Proof toolchain & Lean/Lake project importing pinned Verity reference
-  \path{538c4a9ce2baa25b56062bdc727eb0191ad9e67f}; proof command
+  Proof toolchain & Lean v4.31.0/Lake project importing pinned Verity reference
+  \path{bfa13e715d2a11d476e5d90f9264e87676ff7594}; proof command
   \texttt{lake build LidoSRv3}. \\
   \rowsep
   Target namespace & Selected proof target files in \path{proofs/}, target names
-  in \path{verity/targets/srv3-proof-targets.json}, and the command that fails
+  in \path{archive/legacy-p1-p15/verity-targets/srv3-proof-targets.json}, and the command that fails
   on a failed model check. \\
   \rowsep
   Trust allowlist & Machine-readable assumption IDs, out-of-model boundaries,
@@ -52,7 +52,7 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
   \path{dist/lido-srv3-formal-methods-report.pdf} and proof output in
   \path{proofs/logs/proof-report.json}. The proof report's
   \texttt{build.verified\_source\_tree} is the deterministic Git tree ID
-  \path{e5286ef92725bbe2ee59432fae996fc27f560565}: a virtual tree of
+  \path{0b495e5a67e90cd2ad0dae3e2db9feebd911043a}: a virtual tree of
   \path{LidoSRv3/}, \path{LidoSRv3.lean}, \path{lakefile.lean}, and
   \path{lake-manifest.json}, and \path{lean-toolchain}. These inputs must be
   clean, and no untracked (including ignored) path may exist below
@@ -70,7 +70,7 @@ has a matching Verity/Lean artifact in \path{proofs/}, emit
 \noindent The matrix uses broad PR \#1811 surfaces to stay readable. The exact
 source map is \path{verity/targets/source-map.json}, and the Certora prior-work
 to PR \#1811 property and assumption map is
-\path{verity/targets/certora-pr1811-map.md}. Anchors for the target
+\path{archive/legacy-p1-p15/verity-targets/certora-pr1811-map.md}. Anchors for the target
 source revision include:
 
 \begin{itemize}[leftmargin=1.4em,itemsep=2pt,topsep=2pt]
@@ -97,16 +97,16 @@ source revision include:
   references.
   \item \textbf{Trust report:} \path{verity/targets/trust-boundary.json}.
   Machine-readable assumption and boundary register.
-  \item \textbf{Certora map:} \path{verity/targets/certora-pr1811-map.md}.
+  \item \textbf{Certora map:} \path{archive/legacy-p1-p15/verity-targets/certora-pr1811-map.md}.
   Certora prior-work to PR \#1811 property and assumption map with disciplined
   coverage status per surface.
   \item \textbf{Proof targets:} \path{proofs/}. One target file for each selected
   P0 property.
-  \item \textbf{Model:} \path{LidoSRv3/Model.lean}. SRv3 economic state machine.
-  \item \textbf{Theorems:} \path{LidoSRv3/SpecProofs.lean}. Checked P0 proof
+  \item \textbf{Model:} \path{LidoSRv3/Legacy/Model.lean}. SRv3 economic state machine.
+  \item \textbf{Theorems:} \path{LidoSRv3/Legacy/SpecProofs.lean}. Checked P0 proof
   targets.
-  \item \textbf{Reference tests:} \path{tests/solidity-reference/}. Copied Lido
-  references used as source-facing fixtures.
+  \item \textbf{Reference fixtures:} \path{fixtures/solidity-reference/}. Copied
+  Lido references used as source-facing fixtures; never executed.
 \end{itemize}
 
 \subsection*{Integrity checks}
@@ -129,6 +129,6 @@ source revision include:
   \texttt{proofs/LOCKFILE.md} &
   Contains Lido PR \#1811 commit
   \path{af095e48bbc1c3841c2c9936219c8461af01056b} and Verity commit
-  \path{538c4a9ce2baa25b56062bdc727eb0191ad9e67f}. \\
+  \path{bfa13e715d2a11d476e5d90f9264e87676ff7594}. \\
   \bottomrule
 \end{tabularx}

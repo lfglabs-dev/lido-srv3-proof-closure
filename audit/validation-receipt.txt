@@ -1,0 +1,530 @@
+Closure-v2 validation receipt
+base: c418551251404063793322beaf3b559967a69563
+validation-subject: current tracked tree excluding this receipt
+validated-tree: 62ac43a11f7727f176dedf64b1f6da9a687681fe
+
+Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
+removing only this receipt. It binds the canonical source-map, validator, and
+negative fixtures without circularly claiming the receipt's own commit.
+
+P-ADDRESS-1 review correction (2026-08-12)
+-------------------------------------------
+
+- Independent review found that
+  `admission_and_post_state_equivariance` only conjoined admission and
+  post-state properties supplied as hypotheses; it did not prove either
+  property for a modeled permissionless entrypoint.
+- P-ADDRESS-1 is therefore no longer recorded as MODEL- or transaction-checked.
+  Its registry checked-layer list is empty, its metadata theorem evidence is
+  removed, and the address-renaming relation remains a specification helper.
+- Restoring MODEL closure requires instantiating eligible permissionless
+  entrypoints and proving both properties without assuming them.
+
+Closure-v2 immutable-boundary and review repair (2026-08-12)
+--------------------------------------------------------------
+
+- This successor is a normal child of PR #65's reviewed head
+  `85dfb291cede752d4b17e8a35796aa8dfa19222f`. Its closure-v2 content remains
+  on the ancestry path beginning at immutable milestone
+  `25c82e137236131c037a45618e44382547efebe2`; `git merge-base --is-ancestor`
+  returns success for that milestone and the PR head. The accidentally advanced
+  `campaign/lido-minimal-11` ref `b6c94920604074a3d1630106bf8d8b99f40983c3`
+  is not an ancestor of the PR head and is not an integration target.
+- P-TOPUP-1's canonical SOURCE-to-VERITY_TX theorem now requires the explicit
+  `NoUncheckedWrap inp` premise. That premise is the required boundary between
+  the source's unchecked `uint256` accumulation at StakingRouter line 732 and
+  the model's natural-number accumulation; the theorem no longer admits a
+  wrapping input while claiming faithful source simulation.
+- `proofs/logs/proof-report.json` is labeled as a superseded SRV3-P1--P15
+  compatibility report. The current eleven guarantees remain governed solely
+  by `audit/guarantees.yaml` and the named Lean evidence there.
+- The P-ADDRESS-1 Yul harness receipt now truthfully says that its address-stomp
+  vector rejects an abstract relation, rather than claiming a modified Yul
+  program fails to build.
+
+Certified Verity re-pin receipt (2026-08-12)
+------------------------------------------------
+
+- Closure-v2 remains rooted at immutable milestone
+  `25c82e137236131c037a45618e44382547efebe2`; the divergent
+  `campaign/lido-minimal-11` ref was neither modified nor merged.
+- The resolved and requested Verity revision is exactly
+  `bfa13e715d2a11d476e5d90f9264e87676ff7594`; Lake's `rev` and `inputRev`,
+  `lakefile.lean`, artifact lock, source map, audit manifest, and proof report
+  agree on that SHA.
+- `lake update verity`: exit 0; exact upstream commit fetched and resolved.
+- `lake build LidoSRv3`: exit 0; `Build completed successfully (1336 jobs)`.
+- `make prove`: exit 0; proof report records source tree
+  `4e407c79f5e7f33d881b9f43243ac404567b9ca0`, log SHA-256
+  `2709c4747b857a92eda191b9ef69f168880925458caf6bf664e21293da17fa2c`,
+  and the certified Verity revision.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical guarantees
+  and 11 subordinate rows). The #51-derived `make check` target is restored;
+  its long metadata-mutant subprocess is separately exercised by the same
+  test suite.
+- Scope remains MODEL → SOURCE → VERITY_TX. The updated P-ALLOC-2 note records
+  that the certified Verity pin contains `LoopSimulation`, but no new
+  source-to-official-loop, Yul, EVM, runtime, or deployment closure is claimed.
+
+P-TOPUP-1 closure-v2 hybrid receipt (2026-08-11)
+-------------------------------------------------
+
+- Base: `campaign/lido-closure-v2@25c82e137236131c037a45618e44382547efebe2`;
+  `campaign/lido-minimal-11` was not moved or modified.
+- Verity: `c41757164e9e8230536d7af29d81a2961b30e482` (main containing
+  #2249/#2245/#2247/#2248); EVMYulLean remains
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`.
+- `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source` connects the
+  independent pinned-source interpreter to an actual `Verity.Contract.run`
+  suffix. Positive commits declare the Lido pull and beacon top-up push;
+  zero-top-up commits use the call-free entrypoint; reverts restore the exact
+  pre-call snapshot.
+- Negative mutants reject an ignored pre-call source revert, pull-side and
+  downstream/push-side reverts, unequal pull/push values, and a changed
+  router-balance observation. The staged suffix reaches only the calls attempted
+  before each source failure and then checks exact snapshot rollback.
+- Verity #2242 packed TopUpGateway storage is explicitly not treated as the
+  complete P-TOPUP-1 guarantee. Linked-external effects, Yul, EVM, runtime
+  bytecode, deployment provenance, and the P-TOPUP-2 amount computation remain
+  open.
+- `lake build LidoSRv3.Audit.Guarantees.PTopup1
+  LidoSRv3.Tests.TopupHybridMutants`: exit 0.
+- `make prove`: exit 0; full `LidoSRv3` build completed successfully.
+- `make test`: exit 0 after binding this receipt to the receipt-excluded tree.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Forbidden-token scan of the net changed Lean files found no `sorry`,
+  `admit`, `native_decide`, line-leading `axiom`/`unsafe`, `unsafeYul`, or
+  `runVerity`.
+
+The canonical authorities are `audit/source-map.yaml`, the generated audit
+views, and the executable `verity/targets/audit-manifest.json` consumer. The
+legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
+historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
+because their source references and limitations are not all represented in the
+minimal-11 registry, and which no gate validates.
+
+PR #48 source-shaped deposit prefix scaffold (OPEN) repair receipt (non-receipt tree recorded above):
+- Re-read the exact pinned functions at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+  `StakingRouter.deposit` 942--997, `Lido.withdrawDepositableEther` 869--886,
+  `Lido._spendDepositableEther` 839--859, and
+  `BeaconChainDepositor.makeBeaconChainDeposits32ETH` 36--64, plus their
+  directly invoked authentication, storage, allocation, queue, oracle, and
+  deposit-root helpers.
+- Removed caller-supplied allocation and deposit-data-root inputs, artificial
+  calldata offsets for module-returned memory, the unchanged deposits-word
+  write, hard-coded Lido/DepositContract targets, the bit-240 status read,
+  failure swallowing, the aliased Solidity extraction witness, and abstract
+  conservation/rollback theorems presented as FunctionSpec execution.
+- The compiled OPEN prefix scaffold uses selector `0x5d303519` and checks locator-derived DSM caller equality,
+  EnumerableSet module membership, status bits 224--231, WC type bits
+  232--239, the actual module address, source `setType` conversion, and the
+  immutable LIDO target for `getDepositableEther`, with call failure forwarded
+  and successful typed calls rejected when returndata is shorter than 32 bytes.
+- Allocation and the entire multi-contract suffix are explicitly OPEN in both
+  Lean and metadata. The OPEN list covers capacity/summary/MinFirst/indexing,
+  module-returned memory, timestamp/block write and event, Lido gate/auth/spend,
+  withdrawal queue/oracle/reserve/packed writes/logs, per-validator free-memory
+  and 420-byte beacon calldata, per-validator deposit-data-root, call-failure
+  propagation, conservation, malformed-ABI snapshot rollback, whole-path rollback, nested loops, and contract-separated
+  allocation extraction.
+- `lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback`: exit 0.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- Changed repair Lean contains no `sorry`, `sorryAx`, `admit`, or
+  `Classical.choice`.
+
+P-CONSOLIDATION-1 PR #46 final bounded repair (2026-08-06)
+----------------------------------------------------------
+
+- `lake build LidoSRv3.Audit.Verity.ConsolidationFee
+  LidoSRv3.Audit.Verity.Tests.ConsolidationFee`: exit 0. The regression covers
+  exact 48-byte key acceptance, malformed-length rejection, source-then-target
+  payload order, exact call kind/target/value/length, and pre-call entry guards
+  without claiming closure of the scaffold's unchecked obligations.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all
+  optimized metadata mutants rejected.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- Focused scan found no `sorry`, `admit`, `axiom`, or `unsafe` token in the
+  consolidation scaffold; `git diff --check`: exit 0.
+- The FunctionSpec now includes nonzero constructor guards for the gateway and
+  consolidation-request immutables and the final `preservesEthBalance`
+  Panic(0x01)-shaped assertion from the pinned WithdrawalVault path.
+- Caller and nonempty/equal-array guards precede the fee STATICCALL. Fee-call
+  and fee-result failures have fee-only traces. After a successful fee read and
+  exact-value check, each pair is decoded and length-checked inside the request
+  loop; an invalid pair has no request CALL, while prior valid pairs remain in
+  source order. The FunctionSpec and handwritten trace now match this ordering.
+- The P-CONSOLIDATION-1 source map now pins
+  `WithdrawalVaultEIP7685._addConsolidationRequests` at lines 56--73 of the
+  exact `af095e48` source file used by the scaffold.
+- The dynamic ABI local obligation is `unchecked`; the fee-refinement child row
+  has no registered theorem and every substantive plane is OPEN.
+- The requested call/event/memory adequacy mutants were not represented as
+  proof evidence. Verity lacks the FunctionSpec-to-CallProgram/DenoteMemory
+  and event-trace connections needed to make those mutants source-sensitive.
+  The exact framework gaps are in `audit/P-CONSOLIDATION-1-VERITY-GAPS.md`.
+- Rollback of earlier successful mutable calls/logs after a later failure and
+  rollback induced by the final balance assertion remain explicitly OPEN.
+
+P-SSZ-1 structural gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0; `structural_witness_binding_sound`
+  reports only Lean foundations `propext` and `Quot.sound`.
+- `make test`: exit 0, including `LidoSRv3.Tests.SszRegression`.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+
+P-CONSOLIDATION-1 abstract-flow-model subordinate receipt:
+- Pinned Lido core `af095e48bbc1c3841c2c9936219c8461af01056b`
+  confirms a 48-byte source public key followed immediately by a 48-byte
+  target public key, producing a 96-byte payload with no padding.
+- The typed Verity program copies those two exact intervals and issues one
+  value-bearing CALL to the consolidation request contract.
+- The bounded helper contains no amount, SHA-256 call, loop, or rollback
+  composition. SHA-256 functional correctness and Verity simulation
+  interfaces remain campaign assumptions and are not promoted by this row.
+- The canonical P-CONSOLIDATION-1 row is unchanged; this is the fourth
+  subordinate row alongside the two P-SSZ-1 rows and P-ALLOC-1 Eugene bound.
+
+P-SSZ-1 pinned-source deposit-data-root correspondence gate receipt (committed tree):
+- Verified against `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+  `BeaconChainDepositor._computeDepositDataRootWithAmount` raw-signature
+  overload lines 110--118 and root overload lines 120--135,
+  `_computeSignatureRoot` lines 137--146, `_toLittleEndian64` lines 148--153,
+  `PUBLIC_KEY_LENGTH` line 21, and `SIGNATURE_LENGTH` line 22. The source-map
+  negative fixture rejects dropping the helper spans; source-layout literals
+  are pinned to the hash-chain span.
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `source_pinned_config_discharges_deposit_data_root` reports only Lean
+  foundations `propext` and `Quot.sound`.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0.
+- `python3 scripts/check_validation_receipt.py`: exit 0 after this receipt's
+  `validated-tree` field is bound to the final tracked tree.
+- `bash scripts/check_no_python_evidence.sh`: exit 0.
+- The opaque `sha256` boundary now returns `Sha256Digest`, a wrapper carrying
+  the pinned `bytes32` shape (`widthPinned` and `bytesBounded`) rather than an
+  unconstrained `Bytes`. The cryptographic contents stay unmodelled; what the
+  wrapper pins is only the ABI shape the Solidity source guarantees, and it is
+  what forces every nested `abi.encodePacked` preimage in
+  `_computeSignatureRoot` and `_computeDepositDataRootWithAmount` to the
+  source's 64-byte layout. Those widths are stated and proved as
+  `signaturePart1_length`, `signaturePart2_preimage_length`,
+  `signatureRoot_preimage_length`, `publicKeyRoot_preimage_length`,
+  `publicKeyWithdrawal_preimage_length`, `amountSignature_preimage_length`,
+  and `depositDataRoot_preimage_length`.
+- The structural leaf `sourceLeaf` now binds the deposit-data-root *digest
+  value* through `digestNode`, the positional base-257 encoding of the digest
+  bytes, instead of the digest length. `digestBytesFold_injective` and
+  `digestNode_injective` prove that encoding injective on pinned-width byte
+  lists, and `sourceLeaf_injective` carries the consequence at the leaf level:
+  two inputs sharing a witness leaf share the whole deposit-data-root digest,
+  so a mutated root cannot reuse the witness leaf. No injectivity is claimed
+  for the composite `sourceNode`. The constant pinned width is kept as the
+  separate `sourceNodeWidth`, discharged by `sourceNodeWidth_pinned`.
+- `LidoSRv3.Tests.SszRegression` carries the corresponding mutant regressions.
+  Replacing the value-bearing projection with the constant length projection
+  makes `digestNode (markedDigest 1) ≠ digestNode (markedDigest 2)` fail
+  (verified by mutation, with the injectivity lemma stubbed so the mutant still
+  elaborates), while the length projection cannot tell those two pinned-width
+  digests apart. Weakening the wrapper's `widthPinned` field to an
+  unconstrained result rejects `concatDigests_length`, the six preimage-width
+  lemmas, and the `digest.widthPinned` regression in the test module.
+- The public guarantee surface is narrowed, not widened:
+  `LidoSRv3/Audit/Guarantees/PSsz1.lean` now exposes exactly one theorem,
+  `structural_witness_binding_sound`, alongside `guarantee` and a docstring
+  recording what the facade does not claim. The multi-conjunct
+  `source_pinned_config_discharges_deposit_data_root` is no longer restated
+  through the facade; it is stated and proved once, in
+  `LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean`, next to the source
+  shape it constrains, with each conjunct annotated by the pinned source span it
+  discharges. The statement and the proof are unchanged and the theorem still
+  reports only Lean foundations `propext` and `Quot.sound`.
+  `LidoSRv3.Audit.Trust` and the
+  `verity/targets/audit-manifest.json` theorem ledger now name it at its
+  `Source.DepositDataRootCorrespondence` path instead of the removed
+  `Guarantees.PSsz1` alias. No status, catalogue wording, source-map span,
+  manifest pin, or toolchain revision was changed, and `audit/guarantees.yaml`
+  still carries the `P-SSZ-1.deposit-data-root` row, which already pointed at
+  the `Source.DepositDataRootCorrespondence` theorem.
+- Scope is raw-signature source-shaped control flow and a nonconstant structural
+  witness binding over a value-bearing, fixed-width digest; a wrong bound root
+  is rejected by `SszRegression`. SHA-256 correctness and precompile semantics
+  remain `STRETCH_OPAQUE_FFI`; EVM, canonical runtime provenance, and
+  end-to-end cryptographic provenance remain open under `A-SHA256-FFI`,
+  `A-RUNTIME-PROVENANCE`, and `A-MULTI-NODE-TRANSPORT`.
+
+P-DEPOSIT-1 pinned-source gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` and its three
+  companions -- `source_router_balance_unchanged`,
+  `source_reverting_branch_moves_no_ether`, and
+  `source_nonconserving_deployment_reverts` -- report only the Lean foundation
+  `propext`.
+- `make prove`: exit 0.
+- `make test`: exit 0, including `LidoSRv3.Tests.DepositVectors`, which pins the
+  `StakingRouter.sol` line 996 balance `assert` as the `Panic(0x01)` revert it
+  is: a deployment whose pull scale differs from `DEPOSIT_SIZE` yields
+  `revertAssertBalanceUnchanged`, never a commit stranding the difference. The
+  same vectors pin the empty-batch early return at line 978 as
+  the one non-reverting escape that never reaches the line 996 assert, which is
+  why `source_nonconserving_deployment_reverts` carries a nonempty-batch
+  hypothesis for its `reverts = true` claim.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+- Source plane only: `evm` remains OPEN and `tx` remains
+  ABSTRACT_LEAN_CHECKED for P-DEPOSIT-1.
+
+P-TOPUP-1 pinned-source gate receipt (committed tree):
+- `lake build`: exit 0.
+- `lake build LidoSRv3.Audit.Trust`: exit 0;
+  `Guarantees.PTopup1.source_topup_conserves_and_rolls_back` and its five
+  companions -- `source_router_balance_unchanged`,
+  `source_reverting_branch_moves_no_ether`,
+  `source_balance_guards_discharged`,
+  `source_unchecked_accumulation_faithful`, and
+  `source_pinned_config_discharges_pubkey_guard` -- report only the Lean
+  foundations `propext` and `Quot.sound`.
+- `make test` was NOT run to completion on this tree: it aborts in
+  `scripts/check_provenance_guards.sh`, which calls `lake env lean --version`
+  and hits the same workspace Lean shim failure (remote exit 126, "Permission
+  denied") recorded for `make prove` below, so the recipe never reaches its
+  Lean vector builds. Every component step was instead run individually and
+  passed: the four script gates preceding the guard check
+  (`audit_metadata.py check`, `test_audit_metadata.py` under `PYTHONOPTIMIZE=1`,
+  `check_validation_receipt.py`, `check_no_python_evidence.sh`), all four vector
+  builds -- `LidoSRv3.Tests.MinFirstVectors`, `.SszRegression`,
+  `.DepositVectors`, and `.TopupVectors`, the last of which pins this gate's
+  top-up conservation and rollback claims -- and all five reference-fixture
+  presence checks. As with `make prove`, this is a toolchain-availability
+  regression rather than a proof or vector regression.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- Changed-Lean forbidden proof-escape scan: exit 0, with no new
+  `sorry`, `admit`, `axiom`, or `unsafe` declaration/tactic.
+- Unlike P-DEPOSIT-1, top-up conservation is *unconditional*: the pull
+  accumulated at `StakingRouter.sol` line 732 and the push summed at
+  `BeaconChainDepositor.sol` line 106 are two readings of the same `_amounts`
+  array, not a key count scaled by two separately configured constants. The
+  line 755 balance `assert` is therefore discharged rather than load-bearing,
+  and `source_balance_guards_discharged` states that both the assert failure
+  and the insufficient-router-balance revert are unreachable. Both `Outcome`
+  constructors are retained rather than deleted, because that unreachability
+  is conditioned on the accumulation in the `unchecked` block opened at source
+  line 722 not wrapping; a 2^256 wrap there would make them live again.
+- That no-wrap fact is carried explicitly, not implicitly: it is the
+  `SolidityTopup.NoUncheckedWrap` hypothesis on
+  `source_balance_guards_discharged`, and it is recorded as `A-TOPUP-NOWRAP` in
+  `audit/assumptions.yaml` and linked from P-TOPUP-1 in `audit/guarantees.yaml`.
+  It is not derivable from the pinned P-TOPUP-1 spans: the per-index cap at
+  source line 728 originates in `TopUpGateway` (P-TOPUP-2) and the key count is
+  unbounded on this path. Its proved half is
+  `source_unchecked_accumulation_faithful`, which shows that under exactly that
+  hypothesis the source's `unchecked` accumulation at line 732 and the model's
+  `Nat` sum are the same number, so the discharge is a statement about the
+  source rather than only about the model. The negative fixture suite rejects
+  dropping `A-TOPUP-NOWRAP` from the P-TOPUP-1 assumption links.
+- The transitive helpers that carry the modelled guards are now pinned in
+  `audit/source-map.yaml` rather than named only in prose:
+  `StakingRouter._checkAppAuth` (lines 1177--1179) and `_getTopUpGateway`
+  (lines 1169--1171) behind the line 686 authorization, `_getModuleState`
+  (lines 1099--1107) and `SRUtils._requireModuleIdExists` (`SRUtils.sol` lines
+  45--47) behind the line 689 module-existence guard, and
+  `SRUtils._requireWCType2` (`SRUtils.sol` lines 41--43) behind the line 694
+  withdrawal-credentials-type guard. The negative fixture suite rejects
+  dropping any one of the five. The predicates inside those helpers
+  (`LIDO_LOCATOR.topUpGateway()`, `SRStorage.isModuleExists`,
+  `WithdrawalCredentials.isType2`, and the `_msgSender()` comparison) remain
+  abstract storage/interface facts taken as model inputs.
+- The constant declarations `pinnedConfig` hard-codes are now pinned in
+  `audit/source-map.yaml` as well: `StakingRouter.PUBKEY_LENGTH` (line 57),
+  `BeaconChainDepositor.PUBLIC_KEY_LENGTH` (line 21) and
+  `BeaconChainDepositor.MIN_DEPOSIT` (line 28). Without them the source-map
+  gate stayed green while a change to either pubkey-length constant would have
+  invalidated `source_pinned_config_discharges_pubkey_guard`, which holds only
+  while the two agree. The negative fixture suite rejects dropping any one of
+  the three. `pinnedConfig.gwei` needs no declaration span (it is the Solidity
+  unit literal `1 gwei`) and `pinnedConfig.uint64Max` is `type(uint64).max`,
+  read at `BeaconChainDepositor.sol` line 97 inside the already-pinned lines
+  66--108.
+- The vectors pin `_checkAppAuth(_getTopUpGateway())` at source line 686 as the
+  *first* guard, so no unauthorized call is classified as a committed outcome
+  whatever the later module status is, and pin the zero-total early commit at
+  source line 741 as a *commit* rather than a revert, which is why
+  `committedNoTopUp_is_not_a_rollback` is stated explicitly.
+- Source plane only: `evm` remains OPEN and `tx` remains
+  ABSTRACT_LEAN_CHECKED for P-TOPUP-1. The per-validator top-up amount
+  computation and limit accounting (P-TOPUP-2), the allocation algorithm
+  producing `_amounts` (P-ALLOC-1/2), and the SSZ deposit-data-root
+  construction at `BeaconChainDepositor.sol` lines 120--146 (P-SSZ-1) stay out
+  of scope.
+- `make prove` was NOT run to completion on this tree: the workspace Lean shim
+  cannot execute `lake env lean --version` (remote exit 126, "Permission
+  denied"), which is the provenance stamp the `prove` recipe emits before
+  `lake build LidoSRv3`. The failure reproduces identically for `make
+  bootstrap` on an unmodified checkout, so it is a toolchain-availability
+  regression rather than a proof regression; the `lake build LidoSRv3` half of
+  the same recipe completed successfully.
+P-ALLOC-1 canonical-model refresh (2026-08-03)
+------------------------------------------------
+
+- Immutable campaign base: `campaign/lido-minimal-11@4d7d152551fffed0d43e9b5c73bed6eef4532f05`.
+- Lido source pin: `af095e48bbc1c3841c2c9936219c8461af01056b`.
+- Focused canonical, regression bridge, and mutant build:
+  `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Regression.AllocCapacityLegacy LidoSRv3.Tests.AllocCapacityRegression`: exit 0.
+- Full `lake build`: exit 0 (489 jobs).
+- `lake env lean LidoSRv3/Audit/Trust.lean`: exit 0; P-ALLOC-1 reports only
+  Lean foundations (`propext`, and `Quot.sound` where listed), with no project axiom.
+- Project proof-escape scan for line-leading `axiom`, `sorry`, or `admit`: no match.
+- Public P-ALLOC-1 facade/source import scan for `LidoSRv3.Legacy.Model`: no match.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all optimized metadata mutants rejected.
+- Canonical negative mutants for min/clamp, active-status guard, router order,
+  and checked-uint256 overflow: build exit 0.
+- `git diff --check`: exit 0.
+- `git diff -- lakefile.lean lake-manifest.json`: empty; Verity and EVMYul pins unchanged.
+
+P-ALLOC-1 exact-head review corrections (2026-08-03)
+-----------------------------------------------------
+
+- Starting PR head: `23ff80a54999e07c4ed592208b67df235138cd75`.
+- Focused execution-refinement, checked Legacy bridge, and execute-mutant build:
+  `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Regression.AllocCapacityLegacy LidoSRv3.Tests.AllocCapacityRegression`: exit 0 (20 jobs).
+- Full `lake build`: exit 0 (489 jobs), including `LidoSRv3.Audit.Trust`; the
+  P-ALLOC-1 execution theorem reports only `propext` and `Quot.sound`.
+- Isolated `lake env lean LidoSRv3/Audit/Trust.lean`: exit 126 in the remote
+  Spark wrapper (`/root/.elan/bin/lake: Permission denied`); treated as
+  infrastructure-only because the authoritative full build compiled and ran
+  the same trust entrypoint successfully.
+- `python3 scripts/audit_metadata.py check`: exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`: exit 0; all
+  optimized metadata mutants rejected.
+- Changed-Lean scan for `sorry`, `admit`, or `unsafe`: no match (exit 0 after
+  normalizing ripgrep's no-match exit 1).
+- Public P-ALLOC-1 facade/source/model scan for `LidoSRv3.Legacy.Model`: no
+  match (exit 0 after normalizing ripgrep's no-match exit 1).
+- Registry assertion: 12 rows, exactly 11 canonical guarantees and only
+  subordinate `P-SSZ-1.deposit-data-root`: exit 0.
+- `git diff --check`: exit 0.
+- `git diff --quiet -- lake-manifest.json lean-toolchain`: exit 0; dependency
+  pins and the Lean toolchain are unchanged.
+
+P-ALLOC-1.eugene-bound subordinate evidence (2026-08-05)
+----------------------------------------------------------
+
+- Live campaign base: `campaign/lido-minimal-11@1b614fcd0d9136e5e1e96ced840ae17cd1fb58a4`.
+- Previous validation receipt tree: `c3ec349c714ca93d5b00501203f29165583f09dc`.
+- Current validation receipt tree: `95705ea7bcdf122176a60f95dc83b21b83421133`.
+- Focused Eugene theorem and vectors build: exit 0.
+- Audit metadata check (exactly 11 canonical guarantees plus two subordinate
+  evidence rows): exit 0.
+- Optimized metadata mutants, including Eugene omission, promotion, and
+  wrong-parent mutations: exit 0.
+- Full `lake build LidoSRv3`: exit 0.
+- `make test`: exit 0.
+- `git diff --check`: exit 0.
+- Added-line forbidden-token scan over
+  `git diff origin/campaign/lido-minimal-11...HEAD -- '*.lean'`: no matches,
+  exit 0 after normalizing ripgrep's no-match exit 1.
+- The row remains subordinate to public `P-ALLOC-1`; the canonical public
+  registry remains exactly 11 guarantees. The proof composes the canonical
+  checked SRLib allocation row with the MinFirst checked mutation and does not
+  import `LidoSRv3.Legacy.Model`.
+
+Campaign advancement to 10/11 public + 2/11 subordinate (2026-08-05)
+-------------------------------------------------------------------
+
+- Post-merge live campaign head: `campaign/lido-minimal-11@40b353ff5a932a66b1c2c2549a0f1ff2f372237b`
+  (fast-forward of PR #31; no merge commit added; campaign and PR head share SHA).
+- Pre-merge live campaign head: `campaign/lido-minimal-11@1b614fcd0d9136e5e1e96ced840ae17cd1fb58a4`.
+- Pre-merge PR head: `40b353ff5a932a66b1c2c2549a0f1ff2f372237b` (certifier-v2 CLEAN).
+- Net new commits merged: 3 (`64f83f2f`, `2c0725e8f`, `40b353f`) all in PR #31.
+- Post-merge `validated-tree` is `94ec852336ea2148785943d48c96a7d0248ea99f` (unchanged
+  because only the receipt itself was rewritten by `40b353f`); the receipt binds
+  the canonical source-map, validator, and negative fixtures of the new HEAD.
+- Registry assertion: exactly 11 canonical public guarantees + 2 subordinate rows
+  (`P-SSZ-1.deposit-data-root`, `P-ALLOC-1.eugene-bound`). `audit_metadata.py check`
+  exits 0; the optimized mutants that promote, drop, or re-parent `P-ALLOC-1.eugene-bound`
+  are all rejected.
+- No NEW forbidden proof-escape (`sorry`, `admit`, `axiom`, `unsafe`) introduced
+  by the merge; the PR's net Lean diff contains none, and the merge-base is the
+  pre-receipt-refresh campaign head, so the receipt refresh inside the PR does
+  not introduce escape tokens either.
+- PR #31 is closed by fast-forward on the campaign branch; no branch deletion,
+  no force-push, no rebase.
+- This campaign has now landed 10 of the 11 public guarantees on
+  `campaign/lido-minimal-11` plus 2 subordinate evidence rows; the only
+  outstanding public guarantee is `P-DEPOSIT-1` (deep Verity transaction
+  closure, blocked on Verity PR #2231/#2233).
+
+P-SSZ-1 abstract-digest refinement (2026-08-05)
+------------------------------------------------
+
+- Campaign input head: `campaign/lido-minimal-11@52b6db9d5f59bbfbd2d6d5932295f8e850e8079a`.
+- Upstream Verity gate: PR #2232 merged at
+  `1348e19634b52ffd8f2ceaf5c1a21dc7b7a076d6`.
+- The typed low-level Verity program stages seven exact 64-byte preimages with
+  `Stmt.calldatacopy` and `Stmt.mstore`; every result is 32 bytes. The nested
+  composition binds signature chunks 64/32+32, public key 48+16, withdrawal
+  credentials 32, amount 8+24, and the final two-digest pair.
+- `Compiler/Sha256/Engine.lean` is the reference digest implementation.
+  Functional SHA-256 correctness remains assumed; this slice contains no
+  Verity execution simulation.
+- Full `lake build`: exit 0 (703 jobs).
+- `make audit_metadata` and `make audit-check`: exit 0, reporting exactly 11
+  canonical public guarantees plus three subordinate rows.
+- The row remains subordinate to `P-SSZ-1`; the public registry stays exactly
+  11 guarantees. The subordinate rows are `P-SSZ-1.deposit-data-root`,
+  `P-SSZ-1.abstract-digest`, and `P-ALLOC-1.eugene-bound`.
+- Net-Lean literal-word scan for the four forbidden proof-escape words: no
+  matches.
+
+P-ADDRESS-1 Yul interface harness subordinate evidence (2026-08-05)
+------------------------------------------------------------------
+
+- Campaign input head and receipt base:
+  `ebe9abc64e1f195fab12a37ad8d141b1f5d1561d`.
+- EVMYulLean remains pinned exactly at
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`; Lean remains 4.31.0 and the
+  Mathlib pin is unchanged.
+- The bounded typed AST contains `mstore-address`, `calldataload-address`,
+  `sload-address`, and `calldatacopy-source-target` roles and reuses the
+  abstract P-ADDRESS-1 address-renaming theorem. It makes no EVM execution
+  refinement claim and introduces no runtime/precompile interface.
+- Identity, identity-plus-rename, address-stomp build, and zero-byte vectors
+  compile; a distinct 20-byte target stomp is rejected by the abstract
+  address-renaming relation.
+- Full `lake build`: exit 0 (1187 jobs).
+- `python3 scripts/audit_metadata.py check` and `make audit-check`: exit 0,
+  reporting exactly 11 canonical guarantees plus five subordinate rows.
+- The new row remains subordinate to `P-ADDRESS-1`; its theorem plane is only
+  `yul`, the inherited abstract `tx` status is not promoted, and EVM remains
+  open.
+
+PR #34 re-pin resolution (2026-08-05)
+---------------------------------------
+
+This commit resolves the textual conflict between PR #34 (campaign infra:
+re-pin Verity to 066f1bf5 post-#2235) and the campaign at 4c8e79b1
+(post-PR #33 merge). Resolution follows the canonical pattern from PR
+#32's ebe9abc6 rebind: drops the strict head_present + EXPECTED_HEAD
+checker and the receipt head: field; retains base:, validation-subject:,
+and validated-tree:. Campaign-side rebind is owed after this merge to bind
+the new head and refresh validated-tree: to the receipt-excluded tree of
+the post-merge campaign commit (following the ebe9abc6 pattern).
+
+Verity f485b2ca re-pin validation (2026-08-06)
+------------------------------------------------
+
+- Campaign input head and receipt base:
+  `9dbe426f95ffe2be3dac7d3ef48e9520e0c6cb74`.
+- Verity is pinned exactly at
+  `f485b2ca7502793ce227ede0076b7d070a0697b7`; EVMYulLean remains pinned at
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`, with Lean 4.31.0 and the
+  Mathlib pin unchanged.
+- Full `lake build`: exit 0 (`Build completed successfully (1300 jobs).`).
+- No Lido-side API compatibility changes were required.

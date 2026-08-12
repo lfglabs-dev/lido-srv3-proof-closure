@@ -40,6 +40,11 @@ BUILD_SHA256="$(sha256sum "$BUILD_LOG" | awk '{print $1}')"
 VERIFIED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 VERIFIED_SOURCE_TREE="$(bash scripts/verified_source_tree.sh)"
 RECORDED_SOURCE_TREE="$(sed -nE 's/^verified_source_tree=([0-9a-f]{40})$/\1/p' "$BUILD_LOG")"
+ [ "$(printf '%s\n' "$RECORDED_SOURCE_TREE" | sed '/^$/d' | wc -l | tr -d ' ')" = "1" ] || \
+  fail "build log '$BUILD_LOG' must contain exactly one verified_source_tree=<40-hex-tree-id> line"
+[ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
+  fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
+
 LEAN_VERSION_OUTPUT="$(lake env lean --version)"
 LEAN_VERSION="$(printf '%s\n' "$LEAN_VERSION_OUTPUT" | sed -nE 's/^Lean \(version ([^,]+),.*$/\1/p')"
 PINNED_TOOLCHAIN="$(tr -d '\r\n' < lean-toolchain)"
@@ -50,19 +55,27 @@ PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprove
   fail "could not parse Lean version from lean-toolchain ('$PINNED_TOOLCHAIN')"
 [ "$LEAN_VERSION" = "$PINNED_LEAN_VERSION" ] || \
   fail "running Lean version '$LEAN_VERSION' does not match lean-toolchain '$PINNED_LEAN_VERSION'"
- [ "$(printf '%s\n' "$RECORDED_SOURCE_TREE" | sed '/^$/d' | wc -l | tr -d ' ')" = "1" ] || \
-  fail "build log '$BUILD_LOG' must contain exactly one verified_source_tree=<40-hex-tree-id> line"
-[ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
-  fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
 grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
   fail "build log '$BUILD_LOG' does not record the running Lean version"
+
+VERITY_COMMIT="$(python3 -c 'import json; d=json.load(open("lake-manifest.json")); print(next(p["rev"] for p in d["packages"] if p["name"] == "verity"))')"
+[ -n "$VERITY_COMMIT" ] || fail "could not read the pinned Verity revision from lake-manifest.json"
+VERITY_DIR=".lake/packages/verity"
+[ -d "$VERITY_DIR" ] || fail "resolved Verity checkout '$VERITY_DIR' not found"
+VERITY_HEAD="$(git -C "$VERITY_DIR" rev-parse HEAD 2>/dev/null)" || \
+  fail "could not read resolved Verity checkout revision from '$VERITY_DIR'"
+[ "$VERITY_HEAD" = "$VERITY_COMMIT" ] || \
+  fail "resolved Verity checkout revision '$VERITY_HEAD' does not match manifest '$VERITY_COMMIT'"
+[ -z "$(git -C "$VERITY_DIR" status --porcelain --untracked-files=all)" ] || \
+  fail "resolved Verity checkout '$VERITY_DIR' is dirty"
 
 cat <<JSON
 {
   "schema": "srv3-verity-lean-proof-report-v2",
+  "target_scope": "legacy-srv3-p1-p15-superseded",
   "toolchain": {
     "lean": "${LEAN_VERSION}",
-    "verity_commit": "538c4a9ce2baa25b56062bdc727eb0191ad9e67f"
+    "verity_commit": "${VERITY_COMMIT}"
   },
   "command": "lake build LidoSRv3",
   "build": {

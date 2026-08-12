@@ -8,7 +8,7 @@ PROOF_LOG := proofs/logs/proof-report.json
 SHELL     := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all bootstrap test prove report clean distclean
+.PHONY: all bootstrap audit-generate audit-check audit_metadata check test prove report clean distclean
 
 all: report
 
@@ -17,15 +17,50 @@ bootstrap:
 	@lake --version
 	@printf '%s\n' 'bootstrap ok: Lean/Lake Verity toolchain is available'
 
+audit-generate:
+	@python3 scripts/audit_metadata.py generate
+
+audit-check:
+	@python3 scripts/audit_metadata.py check
+
+audit_metadata: audit-check
+	@printf '%s\n' 'audit_metadata alias: see audit-check'
+
+check: test
+	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
+
 test:
+	@python3 scripts/audit_metadata.py check
+	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
+	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
-	@lake build LidoSRv3.Audit.Vectors
+	@lake build LidoSRv3.Tests.MinFirstVectors
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
-	@test -s tests/solidity-reference/stakingRouter.getDepositAllocations.test.ts
-	@test -s tests/solidity-reference/stakingRouter.rewards.test.ts
-	@test -s tests/solidity-reference/deposits-reserve.integration.ts
-	@printf '%s\n' 'reference fixtures present; no legacy proof artifacts remain'
+	@lake build LidoSRv3.Tests.PAlloc1EugeneBoundVectors
+	@printf '%s\n' 'executable Eugene operator-bond vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.SszRegression
+	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
+	@lake build LidoSRv3.Tests.DepositVectors
+	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.TopupVectors
+	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.TopupHybridMutants
+	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.ReserveMutants
+	@printf '%s\n' 'executable reserve non-interference and rollback mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.AccountingVectors
+	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.DereferenceMutants
+	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
+	@lake build LidoSRv3.Tests.AddressEquivariance
+	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
+	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
+	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
+	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
+	@test -s fixtures/solidity-reference/deposits-reserve.integration.ts
+	@test -s fixtures/solidity-reference/accounting-oracle-module-balances.integration.ts
+	@printf '%s\n' 'reference fixtures present; all 5 validated'
 
 prove:
 	@mkdir -p proofs/logs
