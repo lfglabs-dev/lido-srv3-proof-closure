@@ -9,7 +9,7 @@
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors` — successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open
 - `P-RESERVE-1`: `lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants` — successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build
 - `P-ETH-1`: `lake build LidoSRv3.Audit.Guarantees.PEth1` — successful bounded child-model proofs only; parent P-ETH-1 remains OPEN
-- `P-ADDRESS-1`: `lake build LidoSRv3.Audit.Guarantees.PAddress1` — admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded
+- `P-ADDRESS-1`: `lake build LidoSRv3.Audit.Guarantees.PAddress1` — address-renaming definitions and logical composition helper compile; no modeled permissionless entrypoint discharges the admission or post-state properties, so MODEL and transaction planes remain open
 - `P-TOPUP-2`: `lake build LidoSRv3.Audit.Guarantees.PTopup2` — successful configurable top-up-limit and transition-derived aggregate conservation build; verifier-binding remains blocked on runtime provenance
 - `P-CONSOLIDATION-1`: `python3 scripts/audit_metadata.py check` — opaque FFI risk remains recorded; no crypto closure
 - `P-SSZ-1`: `lake build LidoSRv3.Audit.Ssz` — successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence

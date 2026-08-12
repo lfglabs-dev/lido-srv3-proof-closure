@@ -77,13 +77,13 @@
     {
       "id": "P-ADDRESS-1",
       "catalogue_wording": "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance",
-      "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "theorem": null,
+      "theorem_planes": [],
+      "statuses": {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-ABSTRACT-TX"],
       "note": "Admission compares success/failure only; successful post-states are compared modulo the caller swap. Singleton-actor functions requiring Lido, TriggerableWithdrawalsGateway, or ConsolidationGateway are excluded and belong to authentication-integrity properties.",
       "next_gate": "Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1", "expected": "admission non-discrimination and successful post-state equivariance modulo a bijective caller swap compile; singleton-actor functions remain excluded"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1", "expected": "address-renaming definitions and logical composition helper compile; no modeled permissionless entrypoint discharges the admission or post-state properties, so MODEL and transaction planes remain open"}
     },
     {
       "id": "P-TOPUP-2",

@@ -5,8 +5,8 @@ namespace LidoSRv3.Audit.Guarantees.PAddress1
 
 open Verity
 
-/-- Abstract-model evidence only; source and EVM correspondence remain open. -/
-def guarantee : Guarantee := ⟨.pAddress1, [.model, .abstractTx]⟩
+/-- The abstract relation is specified, but no modeled entrypoint discharges it yet. -/
+def guarantee : Guarantee := ⟨.pAddress1, []⟩
 
 /-!
 # P-ADDRESS-1: permissionless caller non-discrimination
@@ -124,7 +124,7 @@ def address_nondiscrimination (cfg : Config)
     (fn : Address → Input → Outcome State) : Prop :=
   admission_nondiscriminatory cfg fn ∧ post_state_equivariant cfg rename_state fn
 
-/-- Independent proofs of admission and renamed post-state behavior compose the guarantee. -/
+/-- Logical composition helper only; this is not evidence for any modeled entrypoint. -/
 theorem admission_and_post_state_equivariance
     (cfg : Config) (rename_state : (Address → Address) → State → State)
     (fn : Address → Input → Outcome State)
