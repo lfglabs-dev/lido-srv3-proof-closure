@@ -11,7 +11,7 @@ open LidoSRv3.Audit.Verity.AllocCapacityPhase3
 
 def callKindMutant : FunctionSpec :=
   { consumedSummaryEntry with
-    body := consumedSummaryBody.set 1
+    body := consumedSummaryBody.set 2
       (.letVar "summaryOk"
         (.call (.literal maxGas) (.param "moduleAddress") (.literal 0)
           (.literal 0) (.literal 4) (.literal 0) (.literal summaryReturnBytes))) }
@@ -23,7 +23,7 @@ def selectorMutant : FunctionSpec :=
 
 def returnLayoutMutant : FunctionSpec :=
   { consumedSummaryEntry with
-    body := consumedSummaryBody.set 1
+    body := consumedSummaryBody.set 2
       (.letVar "summaryOk"
         (.staticcall (.literal maxGas) (.param "moduleAddress")
           (.literal 0) (.literal 4) (.literal 0) (.literal 32))) }
@@ -50,6 +50,8 @@ theorem return_layout_mutant_breaks_actual_bridge (moduleAddress : Nat) :
     ¬ SourceCallStorageABI returnLayoutMutant moduleAddress := by
   rintro ⟨_, _, hbody, _⟩
   simp [returnLayoutMutant, consumedSummaryBody] at hbody
+  have hneq : (32 : Nat) ≠ summaryReturnBytes := by native_decide
+  exact hneq hbody
 
 theorem call_mutant_cannot_satisfy_source_bridge (moduleAddress : Nat) :
     ¬ SourceCallStorageABI callKindMutant moduleAddress := by

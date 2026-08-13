@@ -110,6 +110,11 @@
       "axioms": ["propext"]
     },
     {
+      "name": "Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
       "name": "Guarantees.PAlloc1Phase3.mapped_summary_call_transaction",
       "status": "lean_checked",
       "axioms": []

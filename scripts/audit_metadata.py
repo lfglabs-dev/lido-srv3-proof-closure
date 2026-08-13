@@ -45,7 +45,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Checked pinned-source allocation-capacity correspondence is extended by a bounded Verity transaction slice for the mapped staking-module summary call: byte-level selector calldata, a source-shaped pre-call scalar store, typed success/revert status, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
+    "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
@@ -265,7 +265,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
@@ -414,6 +414,8 @@ EXPECTED_MANIFEST_THEOREMS = [
     {"name": "Guarantees.PAlloc1.router_order_preserved", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math", "status": "lean_checked",
+     "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction", "status": "lean_checked",
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc1Phase3.mapped_summary_call_transaction", "status": "lean_checked",
      "axioms": []},

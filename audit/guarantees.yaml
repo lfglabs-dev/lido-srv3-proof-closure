@@ -4,8 +4,8 @@
   "guarantees": [
     {
       "id": "P-ALLOC-1",
-      "catalogue_wording": "Checked pinned-source allocation-capacity correspondence is extended by a bounded Verity transaction slice for the mapped staking-module summary call: byte-level selector calldata, a source-shaped pre-call scalar store, typed success/revert status, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction",
+      "catalogue_wording": "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],

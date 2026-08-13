@@ -24,18 +24,27 @@ open Compiler.CompilationModel.DenoteMemory
 
 /-- `bytes4(keccak256("getStakingModuleSummary()"))`. -/
 def summarySelector : Nat := 0x9abddf09
-def summaryCalldata : List Nat := [0x9a, 0xbd, 0xdf, 0x09]
+/-- The selector is the sole canonical ABI representation.  Both the call
+payload and the staged `mstore` word below are computed from it, so changing
+the selector changes the checked source/program/memory bridge. -/
+def selectorByte (index : Nat) : Nat :=
+  match index with
+  | 0 => (summarySelector / 0x1000000) % 0x100
+  | 1 => (summarySelector / 0x10000) % 0x100
+  | 2 => (summarySelector / 0x100) % 0x100
+  | 3 => summarySelector % 0x100
+  | _ => 0
+
+def summaryCalldata : List Nat := [selectorByte 0, selectorByte 1, selectorByte 2, selectorByte 3]
 def entrySelector : Nat := 0x6a70ca02
 def summaryReturnBytes : Nat := 96
 def depositableWordOffset : Nat := 64
 def maxGas : Nat := Verity.Core.MAX_UINT256
 
-/-- The exact selector word staged by `mstore(0, bytes4 << 224)`. -/
+/-- The exact selector word staged by `mstore(0, bytes4 << 224)`, derived
+from the same selector used by the source expression and calldata. -/
 def summarySelectorWord : Word := fun index =>
-  if index = 0 then ⟨0x9a, by decide⟩ else
-  if index = 1 then ⟨0xbd, by decide⟩ else
-  if index = 2 then ⟨0xdf, by decide⟩ else
-  if index = 3 then ⟨0x09, by decide⟩ else zeroByte
+  if index < 4 then ⟨selectorByte index, by simp [selectorByte]; split <;> omega⟩ else zeroByte
 
 /-- `moduleAddress` is the mapped `SRStorage.getIStakingModule(moduleId)`
 result.  The mapping layout is deliberately outside this bounded slice. -/
@@ -135,7 +144,8 @@ theorem selector_memory_is_byte_precise :
     rw [Memory.readWord]
     rw [Memory.readByte]
     simp [Memory.writeWord, Memory.expand, expandedLength, Memory.empty,
-      summarySelectorWord]
+      summarySelectorWord, selectorByte]
+    native_decide
 
 theorem consumed_summary_source_bridge (moduleAddress : Nat) :
     SourceCallStorageABI consumedSummaryEntry moduleAddress ∧
