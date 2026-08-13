@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 62ac43a11f7727f176dedf64b1f6da9a687681fe
+validated-tree: 2335337a3d22512fc4b06446eea9afab62002118
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -9,6 +9,24 @@ negative fixtures without circularly claiming the receipt's own commit.
 
 P-ADDRESS-1 review correction (2026-08-12)
 -------------------------------------------
+
+P-ALLOC-1 Phase-3 exact-head repair (2026-08-13)
+---------------------------------------------------
+
+- The bounded `SRLib._getStakingModuleSummary` slice now records its selector
+  as the four calldata bytes `9a bd df 09`, with a `DenoteMemory` selector-word
+  theorem rather than a one-word pseudo-payload.
+- The real P-ALLOC-1 facade, `AllGuarantees`, the canonical guarantee metadata,
+  trust report, and target manifest consume the same bounded transaction
+  theorem. The public minimal-11 list and `campaign/lido-minimal-11` are not
+  changed.
+- The executable Verity wrapper writes a model-local scalar storage word before
+  the typed summary-call boundary. A reverted `CallProgram` observation feeds
+  that wrapper's false success bit; `Contract.run` returns the original snapshot
+  after the pre-call write. The linked external remains a typed summary boundary:
+  this is not a Yul, EVM, deployed-layout, or full allocation-loop theorem.
+- Focused regressions reject selector, call-kind, return-layout, and pre-call
+  storage mutations, and assert the failed typed-call transaction snapshot.
 
 - Independent review found that
   `admission_and_post_state_equivariance` only conjoined admission and

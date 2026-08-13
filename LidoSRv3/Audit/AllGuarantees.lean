@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PAlloc1
+import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PTopup1
@@ -15,7 +16,7 @@ import LidoSRv3.Audit.Guarantees.PDeref1
 # Canonical minimal-11 public facade
 
 `all` is deliberately the complete public surface. Its checked layers cover
-the existing MODEL, ALG, and abstract-transaction evidence; empty entries are
+the existing MODEL, ALG, SOURCE, and bounded Verity-transaction evidence; empty entries are
 intentional blockers, not omitted proofs.
 -/
 

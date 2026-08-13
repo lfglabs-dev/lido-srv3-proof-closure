@@ -49,4 +49,5 @@ theorem checked_uint256_execution_refines_math
         MathView.capacities cfg modules depositsToAllocate isTopUp :=
   source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds
 
+
 end LidoSRv3.Audit.Guarantees.PAlloc1
