@@ -185,6 +185,49 @@ def executeMappedSummaryCall (adversary : AdversaryModel) (moduleAddress : Nat) 
       (denote (sourceCallProgram consumedSummaryEntry moduleAddress)
         adversary (callStateOfTransaction state)).1 state
 
+/-- The same source-shaped call boundary, retaining the observed result bytes
+for the post-call guards.  `sourceCallProgram` intentionally records only the
+success bit for its trace theorem; this companion program is what prevents the
+transaction adapter from discarding returndata before checking it. -/
+def sourceSummaryResultProgram (fn : FunctionSpec) (moduleAddress : Nat) :
+    CallProgram (Option ExternalCallResult) :=
+  match fn.body with
+  | [ .mstore (.literal 0) (.shl (.literal 224) (.literal selector))
+    , .setStorage "lastCapacity" (.param "depositable")
+    , .letVar "summaryOk"
+        (.staticcall (.literal gas) (.param "moduleAddress")
+          (.literal 0) (.literal inputBytes) (.literal 0) (.literal outputBytes))
+    , .require (.eq (.localVar "summaryOk") (.literal 1))
+        "StakingModuleSummaryCallFailed"
+    , .require (.le (.literal returnBytes) .returndataSize)
+        "StakingModuleSummaryMalformedReturn"
+    , .letVar "depositableCapacity" (.mload (.literal offset))
+    , .require (.le (.localVar "depositableCapacity") (.param "depositable"))
+        "CapacityExceedsDepositable"
+    , .return (.localVar "depositableCapacity") ] =>
+      if selector = summarySelector ∧ gas = maxGas ∧ inputBytes = 4 ∧
+          outputBytes = summaryReturnBytes ∧ returnBytes = summaryReturnBytes ∧
+          offset = depositableWordOffset then
+        .bind (sourceSummarySite moduleAddress) fun observation =>
+          .pure (some observation.result)
+      else .pure none
+  | _ => .pure none
+
+/-- Execute the exact source-derived call and keep its typed returndata for the
+transaction-level checks. -/
+def executeMappedSummaryResult (adversary : AdversaryModel) (moduleAddress : Nat) :
+    _root_.Verity.Contract (Option ExternalCallResult) :=
+  fun state =>
+    _root_.Verity.ContractResult.success
+      (denote (sourceSummaryResultProgram consumedSummaryEntry moduleAddress)
+        adversary (callStateOfTransaction state)).1 state
+
+/-- Big-endian `mload` of one copied returndata word.  The preceding size
+guard ensures that this consumes copied response bytes rather than stale
+memory. -/
+def returndataWord (data : List Nat) (offset : Nat) : Nat :=
+  ((data.drop offset).take 32).foldl (fun acc byte => acc * 256 + byte) 0
+
 /-- Non-circular executable bridge: running the contract call adapter yields
 the result of the very `CallProgram` whose site fixes the mapped target,
 selector calldata, call kind, and gas. -/
@@ -201,10 +244,16 @@ that causes the following `require` and whole-transaction rollback. -/
 def executeObservedSummary (adversary : AdversaryModel) (moduleAddress : Nat)
     (depositable : _root_.Verity.Uint256) : _root_.Verity.Contract Unit :=
   fun state =>
-    match (executeMappedSummaryCall adversary moduleAddress)
+    match (executeMappedSummaryResult adversary moduleAddress)
       (state.writeSlot lastCapacitySlot.slot depositable) with
-    | .success callSucceeded afterCall =>
-        _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed" afterCall
+    | .success (some (.success data)) afterCall =>
+        if summaryReturnBytes <= data.length then
+          if returndataWord data depositableWordOffset <= depositable.val then
+            _root_.Verity.ContractResult.success () afterCall
+          else _root_.Verity.ContractResult.revert "CapacityExceedsDepositable" afterCall
+        else _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" afterCall
+    | .success _ afterCall =>
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" afterCall
     | .revert reason afterCall => .revert reason afterCall
 
 theorem typed_success_commits_pre_call_store
@@ -231,38 +280,81 @@ theorem typed_external_revert_rolls_back_pre_call_store
       (state.writeSlot lastCapacitySlot.slot depositable) = .revert data) :
     (executeObservedSummary adversary moduleAddress depositable).run state =
       _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state := by
-  /- The failed result is observed in the state produced by `setStorage` and
-  directly selects the following `require` failure; `Contract.run` then
-  restores its transaction-entry snapshot. -/
-  have hfailed :
-      (denote (sourceCallProgram consumedSummaryEntry moduleAddress) adversary
-        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1 = false := by
-    change (adversary.result (sourceSummarySite moduleAddress)
-      (state.writeSlot lastCapacitySlot.slot depositable)).succeeded = false
-    rw [hresult]
-    rfl
   have hcall :
-      (executeMappedSummaryCall adversary moduleAddress)
+      (executeMappedSummaryResult adversary moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) =
-        _root_.Verity.ContractResult.success false
+        _root_.Verity.ContractResult.success (some (.revert data))
           (state.writeSlot lastCapacitySlot.slot depositable) := by
     change _root_.Verity.ContractResult.success
-      (denote (sourceCallProgram consumedSummaryEntry moduleAddress) adversary
-        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1
-      (state.writeSlot lastCapacitySlot.slot depositable) = _
-    rw [hfailed]
-  have hinner :
-      (executeObservedSummary adversary moduleAddress depositable) state =
-        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed"
+      (denote (sourceSummaryResultProgram consumedSummaryEntry moduleAddress) adversary
+        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1 _ = _
+    change _root_.Verity.ContractResult.success
+      (some (adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable))) _ = _
+    rw [hresult]
+  unfold executeObservedSummary _root_.Verity.Contract.run
+  dsimp only
+  rw [hcall]
+
+/-- A zero-success-bit is not the only rejecting path: a successful mapped
+call with insufficient returndata reaches the source-shaped size guard and
+rolls the pre-call store back through the same transaction boundary. -/
+theorem typed_short_returndata_rolls_back_pre_call_store
+    (adversary : AdversaryModel) (moduleAddress : Nat) (data : List Nat)
+    (depositable : _root_.Verity.Uint256) (state : _root_.Verity.ContractState)
+    (hresult : adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable) = .success data)
+    (hshort : ¬ summaryReturnBytes <= data.length) :
+    (executeObservedSummary adversary moduleAddress depositable).run state =
+      _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" state := by
+  have hresponse :
+      (denote (sourceSummaryResultProgram consumedSummaryEntry moduleAddress) adversary
+        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1 =
+        some (.success data) := by
+    change some (adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable)) = _
+    rw [hresult]
+  have hcall :
+      (executeMappedSummaryResult adversary moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) =
+        _root_.Verity.ContractResult.success (some (.success data))
           (state.writeSlot lastCapacitySlot.slot depositable) := by
-    change (match (executeMappedSummaryCall adversary moduleAddress)
-        (state.writeSlot lastCapacitySlot.slot depositable) with
-      | .success callSucceeded afterCall =>
-          _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed" afterCall
-      | .revert reason afterCall => .revert reason afterCall) = _
-    rw [hcall]
-    rfl
-  simp [_root_.Verity.Contract.run, hinner]
+    change _root_.Verity.ContractResult.success _ _ = _
+    rw [hresponse]
+  unfold executeObservedSummary _root_.Verity.Contract.run
+  dsimp only
+  rw [hcall]
+  simp [hshort]
+
+/-- Once the size guard passes, the adapter consumes the copied depositable
+word and applies the source capacity bound before allowing the store to commit. -/
+theorem typed_excess_capacity_rolls_back_pre_call_store
+    (adversary : AdversaryModel) (moduleAddress : Nat) (data : List Nat)
+    (depositable : _root_.Verity.Uint256) (state : _root_.Verity.ContractState)
+    (hresult : adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable) = .success data)
+    (hsize : summaryReturnBytes <= data.length)
+    (hcapacity : ¬ returndataWord data depositableWordOffset <= depositable.val) :
+    (executeObservedSummary adversary moduleAddress depositable).run state =
+      _root_.Verity.ContractResult.revert "CapacityExceedsDepositable" state := by
+  have hresponse :
+      (denote (sourceSummaryResultProgram consumedSummaryEntry moduleAddress) adversary
+        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1 =
+        some (.success data) := by
+    change some (adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable)) = _
+    rw [hresult]
+  have hcall :
+      (executeMappedSummaryResult adversary moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) =
+        _root_.Verity.ContractResult.success (some (.success data))
+          (state.writeSlot lastCapacitySlot.slot depositable) := by
+    change _root_.Verity.ContractResult.success _ _ = _
+    rw [hresponse]
+  unfold executeObservedSummary _root_.Verity.Contract.run
+  dsimp only
+  rw [hcall]
+  simp [hsize, hcapacity]
 
 theorem consumed_summary_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
@@ -284,12 +376,31 @@ theorem consumed_summary_phase3_transaction (moduleAddress : Nat) :
       adversary.result (sourceSummarySite moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) = .revert data →
       (executeObservedSummary adversary moduleAddress depositable).run state =
-        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) := by
-  refine ⟨consumed_summary_function_spec_compiles, ?_, ?_, rfl, ?_⟩
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) ∧
+    (∀ adversary data (depositable : _root_.Verity.Uint256) state,
+      adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) = .success data →
+      ¬ summaryReturnBytes <= data.length →
+      (executeObservedSummary adversary moduleAddress depositable).run state =
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" state) ∧
+    (∀ adversary data (depositable : _root_.Verity.Uint256) state,
+      adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) = .success data →
+      summaryReturnBytes <= data.length →
+      ¬ returndataWord data depositableWordOffset <= depositable.val →
+      (executeObservedSummary adversary moduleAddress depositable).run state =
+        _root_.Verity.ContractResult.revert "CapacityExceedsDepositable" state) := by
+  refine ⟨consumed_summary_function_spec_compiles, ?_, ?_, rfl, ?_, ?_, ?_⟩
   · exact (consumed_summary_source_bridge moduleAddress).1
   · exact (consumed_summary_source_bridge moduleAddress).2.1
   · intro adversary data depositable state hresult
     exact typed_external_revert_rolls_back_pre_call_store adversary moduleAddress data
       depositable state hresult
+  · intro adversary data depositable state hresult hshort
+    exact typed_short_returndata_rolls_back_pre_call_store adversary moduleAddress data
+      depositable state hresult hshort
+  · intro adversary data depositable state hresult hsize hcapacity
+    exact typed_excess_capacity_rolls_back_pre_call_store adversary moduleAddress data
+      depositable state hresult hsize hcapacity
 
 end LidoSRv3.Audit.Verity.AllocCapacityPhase3

@@ -45,7 +45,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
+    "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, returndata-size and capacity-word guards, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
@@ -101,7 +101,7 @@ EXPECTED_ASSUMPTIONS = {
 }
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants",
-     "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"},
+     "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size/capacity guard regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",

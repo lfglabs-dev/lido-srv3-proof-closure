@@ -22,7 +22,20 @@ theorem mapped_summary_call_transaction (moduleAddress : Nat) :
       adversary.result (sourceSummarySite moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) = .revert data →
       (executeObservedSummary adversary moduleAddress depositable).run state =
-        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) :=
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) ∧
+    (∀ adversary data (depositable : _root_.Verity.Uint256) state,
+      adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) = .success data →
+      ¬ summaryReturnBytes <= data.length →
+      (executeObservedSummary adversary moduleAddress depositable).run state =
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" state) ∧
+    (∀ adversary data (depositable : _root_.Verity.Uint256) state,
+      adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) = .success data →
+      summaryReturnBytes <= data.length →
+      ¬ returndataWord data depositableWordOffset <= depositable.val →
+      (executeObservedSummary adversary moduleAddress depositable).run state =
+        _root_.Verity.ContractResult.revert "CapacityExceedsDepositable" state) :=
   consumed_summary_phase3_transaction moduleAddress
 
 end LidoSRv3.Audit.Guarantees.PAlloc1Phase3

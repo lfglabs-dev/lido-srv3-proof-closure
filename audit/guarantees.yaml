@@ -4,13 +4,13 @@
   "guarantees": [
     {
       "id": "P-ALLOC-1",
-      "catalogue_wording": "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
+      "catalogue_wording": "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, returndata-size and capacity-word guards, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
       "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
       "next_gate": "Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants", "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants", "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size/capacity guard regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"}
     },
     {
       "id": "P-ALLOC-2",

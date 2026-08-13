@@ -32,7 +32,25 @@ def mappedSummaryTransaction (moduleAddress : Nat) : Prop :=
         _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable) = .revert data →
     (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.executeObservedSummary
       adversary moduleAddress depositable).run state =
-        Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state)
+        Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) ∧
+  (∀ adversary data (depositable : Verity.Uint256) state,
+    adversary.result (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite moduleAddress)
+      (state.writeSlot
+        _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable) = .success data →
+    ¬ _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.summaryReturnBytes <= data.length →
+    (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.executeObservedSummary
+      adversary moduleAddress depositable).run state =
+        Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" state) ∧
+  (∀ adversary data (depositable : Verity.Uint256) state,
+    adversary.result (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite moduleAddress)
+      (state.writeSlot
+        _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable) = .success data →
+    _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.summaryReturnBytes <= data.length →
+    ¬ _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.returndataWord data
+      _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.depositableWordOffset <= depositable.val →
+    (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.executeObservedSummary
+      adversary moduleAddress depositable).run state =
+        Verity.ContractResult.revert "CapacityExceedsDepositable" state)
 
 /-- The canonical active capacity is bounded by both operands of the pinned
 `Math.min` clamp. -/

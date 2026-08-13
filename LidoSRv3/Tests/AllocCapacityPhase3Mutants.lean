@@ -72,7 +72,21 @@ not merely a source-extractor mismatch. -/
 private def mappedAddressAdversary : AdversaryModel :=
   { stateTransition := fun _ world => world
     result := fun site _ =>
-      if site.target = 17 then .success [] else .revert [0]
+      if site.target = 17 then .success (List.replicate summaryReturnBytes 0) else .revert [0]
+    gasUsed := fun _ _ => 0 }
+
+/-- A successful call with no returndata must fail the same explicit
+`returndataSize` guard represented in the checked source body. -/
+private def shortReturndataAdversary : AdversaryModel :=
+  { stateTransition := fun _ world => world
+    result := fun _ _ => .success []
+    gasUsed := fun _ _ => 0 }
+
+/-- The 96-byte ABI shape alone is insufficient: the copied depositable word
+at offset 64 must also pass the source capacity bound. -/
+private def excessiveCapacityAdversary : AdversaryModel :=
+  { stateTransition := fun _ world => world
+    result := fun _ _ => .success (List.replicate 95 0 ++ [8])
     gasUsed := fun _ _ => 0 }
 
 #guard match (executeObservedSummary mappedAddressAdversary 17 7).run state with
@@ -85,6 +99,19 @@ private def mappedAddressAdversary : AdversaryModel :=
 which restores the pre-call state. -/
 #guard match (executeObservedSummary mappedAddressAdversary 18 7).run state with
   | _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" rollback =>
+      rollback.sender == state.sender && rollback.storage lastCapacitySlot.slot == 0
+  | _ => false
+
+/- Mutation-negative executable regressions for the post-call source guards:
+neither malformed successful returndata nor a capacity word over the bound may
+commit the pre-call store. -/
+#guard match (executeObservedSummary shortReturndataAdversary 17 7).run state with
+  | _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" rollback =>
+      rollback.sender == state.sender && rollback.storage lastCapacitySlot.slot == 0
+  | _ => false
+
+#guard match (executeObservedSummary excessiveCapacityAdversary 17 7).run state with
+  | _root_.Verity.ContractResult.revert "CapacityExceedsDepositable" rollback =>
       rollback.sender == state.sender && rollback.storage lastCapacitySlot.slot == 0
   | _ => false
 
