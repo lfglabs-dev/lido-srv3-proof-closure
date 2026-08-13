@@ -82,9 +82,10 @@ private def shortReturndataAdversary : AdversaryModel :=
     result := fun _ _ => .success []
     gasUsed := fun _ _ => 0 }
 
-/-- The 96-byte ABI shape alone is insufficient: the copied depositable word
-at offset 64 must also pass the source capacity bound. -/
-private def excessiveCapacityAdversary : AdversaryModel :=
+/-- A capacity larger than this transaction's requested depositable count is
+still a valid mapped summary: source adds it to the current allocation and
+later allocation logic determines what to use. -/
+private def highCapacityAdversary : AdversaryModel :=
   { stateTransition := fun _ world => world
     result := fun _ _ => .success (List.replicate 95 0 ++ [8])
     gasUsed := fun _ _ => 0 }
@@ -102,17 +103,16 @@ which restores the pre-call state. -/
       rollback.sender == state.sender && rollback.storage lastCapacitySlot.slot == 0
   | _ => false
 
-/- Mutation-negative executable regressions for the post-call source guards:
-neither malformed successful returndata nor a capacity word over the bound may
-commit the pre-call store. -/
+/- Mutation-negative executable regression for the post-call source guard:
+malformed successful returndata must not commit the pre-call store. -/
 #guard match (executeObservedSummary shortReturndataAdversary 17 7).run state with
   | _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" rollback =>
       rollback.sender == state.sender && rollback.storage lastCapacitySlot.slot == 0
   | _ => false
 
-#guard match (executeObservedSummary excessiveCapacityAdversary 17 7).run state with
-  | _root_.Verity.ContractResult.revert "CapacityExceedsDepositable" rollback =>
-      rollback.sender == state.sender && rollback.storage lastCapacitySlot.slot == 0
+#guard match (executeObservedSummary highCapacityAdversary 17 7).run state with
+  | _root_.Verity.ContractResult.success () after =>
+      after.sender == state.sender && after.storage lastCapacitySlot.slot == 7
   | _ => false
 
 #guard match (executeSummary 7 false).run state with

@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: e8b78054fb56a5bb3a2119c4d10068c51daee199
+validated-tree: 88f3e7e4ea5930cf8a237547e5ec32e32703af51
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -42,6 +42,16 @@ P-ALLOC-1 Phase-3 exact-head repair (2026-08-13)
   regressions cover both rejecting branches and snapshot rollback. The focused
   reproduction command, aggregate guarantees, trust report, metadata mutants,
   and full `lake build LidoSRv3` all exit 0 under Lean 4.31.0.
+- The current exact-head repair removes that invented capacity-versus-request
+  rejection from both the source-shaped body and executable adapter: a complete
+  summary whose capacity exceeds this call's `depositable` value now succeeds,
+  while malformed short returndata still reverts and restores the pre-call
+  snapshot. This remains bounded MODEL → SOURCE → VERITY_TX evidence only;
+  it does not claim allocation-loop, Yul, EVM, deployed-layout, or runtime
+  provenance closure.
+- Canonical and supplemental P-ALLOC-1 guarantee facades consume that corrected
+  theorem shape. Focused Phase-3 and aggregate P-ALLOC-1 builds, plus the full
+  `lake build LidoSRv3`, exit 0 under Lean 4.31.0.
 - The proof-report guard now checks the resolved Verity revision before any
   `lake env` invocation, so Lake cannot repair a stale checkout before the
   negative provenance regression observes and rejects it.

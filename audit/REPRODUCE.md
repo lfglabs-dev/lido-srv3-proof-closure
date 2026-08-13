@@ -2,7 +2,7 @@
 
 # REPRODUCE
 
-- `P-ALLOC-1`: `lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants` — successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size/capacity guard regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open
+- `P-ALLOC-1`: `lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants` — successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size rejection and high-capacity success regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open
 - `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2` — successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open
 - `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Guarantees.PDeposit1` — successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants` — successful pinned-source conservation plus actual Verity Contract.run transaction simulation, snapshot rollback, declared-call program, and negative-mutant build; linked-external/Yul/EVM/runtime/deployment semantics remain open

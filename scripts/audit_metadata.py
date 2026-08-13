@@ -101,7 +101,7 @@ EXPECTED_ASSUMPTIONS = {
 }
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants",
-     "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size/capacity guard regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"},
+     "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size rejection and high-capacity success regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",

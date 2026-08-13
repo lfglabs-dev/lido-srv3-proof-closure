@@ -10,7 +10,7 @@
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
       "next_gate": "Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants", "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size/capacity guard regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants", "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size rejection and high-capacity success regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"}
     },
     {
       "id": "P-ALLOC-2",
