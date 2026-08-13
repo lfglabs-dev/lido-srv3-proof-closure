@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2acb8934153c1cc0f3566e26761f5bcbcb0e9faf
+validated-tree: 2e07e6f28b81e806a024bd5e51a5d8cda7623727
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -36,6 +36,12 @@ P-ALLOC-1 Phase-3 exact-head repair (2026-08-13)
   receipt records bounded MODEL → SOURCE → VERITY_TX evidence only; it does
   not claim allocation-loop, Yul, EVM, deployed-storage-layout, or runtime
   provenance closure.
+- The final exact-head repair retains successful-call returndata, rejects a
+  response shorter than 96 bytes, decodes the copied capacity word at offset
+  64, and rejects a capacity above the pre-call `depositable` value. Executable
+  regressions cover both rejecting branches and snapshot rollback. The focused
+  reproduction command, aggregate guarantees, trust report, metadata mutants,
+  and full `lake build LidoSRv3` all exit 0 under Lean 4.31.0.
 
 - Independent review found that
   `admission_and_post_state_equivariance` only conjoined admission and
