@@ -28,6 +28,7 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction
