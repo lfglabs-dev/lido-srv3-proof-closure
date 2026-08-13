@@ -18,11 +18,11 @@ theorem mapped_summary_call_transaction (moduleAddress : Nat) :
         gasUsed := fun _ _ => 0 } canonicalCallState =
       [sourceSummarySite moduleAddress] ∧
     summaryCalldata = [0x9a, 0xbd, 0xdf, 0x09] ∧
-    (∀ adversary data depositable state rollback reason,
-      adversary.result (sourceSummarySite moduleAddress) canonicalCallState.world = .revert data →
+    (∀ adversary data (depositable : _root_.Verity.Uint256) state,
+      adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) = .revert data →
       (executeObservedSummary adversary moduleAddress depositable).run state =
-        _root_.Verity.ContractResult.revert reason rollback →
-      rollback = state) :=
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) :=
   consumed_summary_phase3_transaction moduleAddress
 
 end LidoSRv3.Audit.Guarantees.PAlloc1Phase3

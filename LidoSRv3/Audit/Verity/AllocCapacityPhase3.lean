@@ -168,6 +168,12 @@ def executeSummary (depositable : _root_.Verity.Uint256) (callSucceeded : Bool) 
   Contracts.externalCallBind [] "getStakingModuleSummary" ([] : List Verity.Uint256)
   _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed"
 
+/-- Embed the live transaction state in the call-program state.  In
+particular, the mapped call observes the state after the router-local
+pre-call write, rather than a fixed default snapshot. -/
+def callStateOfTransaction (state : _root_.Verity.ContractState) : CallState :=
+  { world := state, gasRemaining := maxGas }
+
 /-- Execute the exact mapped summary `CallProgram` observation in the
 `Contract` transaction.  This adapter deliberately retains the complete
 call-site construction -- including `moduleAddress` and `summaryCalldata` --
@@ -177,7 +183,7 @@ def executeMappedSummaryCall (adversary : AdversaryModel) (moduleAddress : Nat) 
   fun state =>
     _root_.Verity.ContractResult.success
       (denote (sourceCallProgram consumedSummaryEntry moduleAddress)
-        adversary canonicalCallState).1 state
+        adversary (callStateOfTransaction state)).1 state
 
 /-- Non-circular executable bridge: running the contract call adapter yields
 the result of the very `CallProgram` whose site fixes the mapped target,
@@ -187,17 +193,19 @@ theorem execute_mapped_summary_call_bridge (adversary : AdversaryModel)
     (executeMappedSummaryCall adversary moduleAddress).run state =
       _root_.Verity.ContractResult.success
         (denote (sourceCallProgram consumedSummaryEntry moduleAddress)
-          adversary canonicalCallState).1 state := rfl
+          adversary (callStateOfTransaction state)).1 state := rfl
 
 /-- The transaction wrapper executes the typed `CallProgram` observation
 inside `Contract.run`; a reverted mapped summary call is therefore the call
 that causes the following `require` and whole-transaction rollback. -/
 def executeObservedSummary (adversary : AdversaryModel) (moduleAddress : Nat)
     (depositable : _root_.Verity.Uint256) : _root_.Verity.Contract Unit :=
-  do
-    _root_.Verity.setStorage lastCapacitySlot depositable
-    let callSucceeded ← executeMappedSummaryCall adversary moduleAddress
-    _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed"
+  fun state =>
+    match (executeMappedSummaryCall adversary moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable) with
+    | .success callSucceeded afterCall =>
+        _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed" afterCall
+    | .revert reason afterCall => .revert reason afterCall
 
 theorem typed_success_commits_pre_call_store
     (depositable : _root_.Verity.Uint256) (state : _root_.Verity.ContractState) :
@@ -218,17 +226,43 @@ theorem typed_revert_rolls_back_pre_call_store
 
 theorem typed_external_revert_rolls_back_pre_call_store
     (adversary : AdversaryModel) (moduleAddress : Nat) (data : List Nat)
-    (_hresult : adversary.result (sourceSummarySite moduleAddress)
-      canonicalCallState.world = .revert data)
-    (depositable : _root_.Verity.Uint256) (state rollback : _root_.Verity.ContractState) (reason : String)
-    (h : (executeObservedSummary adversary moduleAddress depositable).run state =
-      _root_.Verity.ContractResult.revert reason rollback) :
-    rollback = state := by
-  /- `executeObservedSummary` executes the mapped observation before its
-  `require`; `Contract.run` supplies the snapshot equality for that enclosing
-  transaction. -/
-  unfold _root_.Verity.Contract.run at h
-  split at h <;> simp_all [executeObservedSummary]
+    (depositable : _root_.Verity.Uint256) (state : _root_.Verity.ContractState)
+    (hresult : adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable) = .revert data) :
+    (executeObservedSummary adversary moduleAddress depositable).run state =
+      _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state := by
+  /- The failed result is observed in the state produced by `setStorage` and
+  directly selects the following `require` failure; `Contract.run` then
+  restores its transaction-entry snapshot. -/
+  have hfailed :
+      (denote (sourceCallProgram consumedSummaryEntry moduleAddress) adversary
+        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1 = false := by
+    change (adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable)).succeeded = false
+    rw [hresult]
+    rfl
+  have hcall :
+      (executeMappedSummaryCall adversary moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) =
+        _root_.Verity.ContractResult.success false
+          (state.writeSlot lastCapacitySlot.slot depositable) := by
+    change _root_.Verity.ContractResult.success
+      (denote (sourceCallProgram consumedSummaryEntry moduleAddress) adversary
+        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1
+      (state.writeSlot lastCapacitySlot.slot depositable) = _
+    rw [hfailed]
+  have hinner :
+      (executeObservedSummary adversary moduleAddress depositable) state =
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed"
+          (state.writeSlot lastCapacitySlot.slot depositable) := by
+    change (match (executeMappedSummaryCall adversary moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) with
+      | .success callSucceeded afterCall =>
+          _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed" afterCall
+      | .revert reason afterCall => .revert reason afterCall) = _
+    rw [hcall]
+    rfl
+  simp [_root_.Verity.Contract.run, hinner]
 
 theorem consumed_summary_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
@@ -246,16 +280,16 @@ theorem consumed_summary_phase3_transaction (moduleAddress : Nat) :
         gasUsed := fun _ _ => 0 } canonicalCallState =
       [sourceSummarySite moduleAddress] ∧
     summaryCalldata = [0x9a, 0xbd, 0xdf, 0x09] ∧
-    (∀ adversary data (depositable : _root_.Verity.Uint256) state rollback reason,
-      adversary.result (sourceSummarySite moduleAddress) canonicalCallState.world = .revert data →
+    (∀ adversary data (depositable : _root_.Verity.Uint256) state,
+      adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) = .revert data →
       (executeObservedSummary adversary moduleAddress depositable).run state =
-        _root_.Verity.ContractResult.revert reason rollback →
-      rollback = state) := by
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) := by
   refine ⟨consumed_summary_function_spec_compiles, ?_, ?_, rfl, ?_⟩
   · exact (consumed_summary_source_bridge moduleAddress).1
   · exact (consumed_summary_source_bridge moduleAddress).2.1
-  · intro adversary data depositable state rollback reason hresult h
+  · intro adversary data depositable state hresult
     exact typed_external_revert_rolls_back_pre_call_store adversary moduleAddress data
-      hresult depositable state rollback reason h
+      depositable state hresult
 
 end LidoSRv3.Audit.Verity.AllocCapacityPhase3

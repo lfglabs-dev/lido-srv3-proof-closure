@@ -26,12 +26,13 @@ def mappedSummaryTransaction (moduleAddress : Nat) : Prop :=
       _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.canonicalCallState =
         [_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite moduleAddress] ∧
   _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.summaryCalldata = [0x9a, 0xbd, 0xdf, 0x09] ∧
-  (∀ adversary data (depositable : Verity.Uint256) state rollback reason,
+  (∀ adversary data (depositable : Verity.Uint256) state,
     adversary.result (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite moduleAddress)
-      _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.canonicalCallState.world = .revert data →
+      (state.writeSlot
+        _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable) = .revert data →
     (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.executeObservedSummary
       adversary moduleAddress depositable).run state =
-        Verity.ContractResult.revert reason rollback → rollback = state)
+        Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state)
 
 /-- The canonical active capacity is bounded by both operands of the pinned
 `Math.min` clamp. -/
