@@ -66,6 +66,28 @@ theorem pre_call_store_mutant_breaks_actual_bridge (moduleAddress : Nat) :
 private def state : _root_.Verity.ContractState :=
   { _root_.Verity.defaultState with sender := 17 }
 
+/-- This adversary succeeds only at the observed mapped address.  Changing
+that target is a negative regression at the executable contract boundary,
+not merely a source-extractor mismatch. -/
+private def mappedAddressAdversary : AdversaryModel :=
+  { stateTransition := fun _ world => world
+    result := fun site _ =>
+      if site.target = 17 then .success [] else .revert [0]
+    gasUsed := fun _ _ => 0 }
+
+#guard match (executeObservedSummary mappedAddressAdversary 17 7).run state with
+  | _root_.Verity.ContractResult.success () after =>
+      after.storage lastCapacitySlot.slot == 7
+  | _ => false
+
+/- Mutation-negative regression: changing the mapped target makes the exact
+`CallProgram` observation revert inside the same `Contract.run` transaction,
+which restores the pre-call state. -/
+#guard match (executeObservedSummary mappedAddressAdversary 18 7).run state with
+  | _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" rollback =>
+      rollback.sender == state.sender && rollback.storage lastCapacitySlot.slot == 0
+  | _ => false
+
 #guard match (executeSummary 7 false).run state with
   | _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" rollback =>
       rollback.sender == state.sender

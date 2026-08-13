@@ -168,13 +168,36 @@ def executeSummary (depositable : _root_.Verity.Uint256) (callSucceeded : Bool) 
   Contracts.externalCallBind [] "getStakingModuleSummary" ([] : List Verity.Uint256)
   _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed"
 
-/-- The transaction wrapper consumes the success bit produced by the actual
-typed `CallProgram` observation rather than an unrelated Boolean. -/
+/-- Execute the exact mapped summary `CallProgram` observation in the
+`Contract` transaction.  This adapter deliberately retains the complete
+call-site construction -- including `moduleAddress` and `summaryCalldata` --
+rather than passing a precomputed success bit into a separate transaction. -/
+def executeMappedSummaryCall (adversary : AdversaryModel) (moduleAddress : Nat) :
+    _root_.Verity.Contract Bool :=
+  fun state =>
+    _root_.Verity.ContractResult.success
+      (denote (sourceCallProgram consumedSummaryEntry moduleAddress)
+        adversary canonicalCallState).1 state
+
+/-- Non-circular executable bridge: running the contract call adapter yields
+the result of the very `CallProgram` whose site fixes the mapped target,
+selector calldata, call kind, and gas. -/
+theorem execute_mapped_summary_call_bridge (adversary : AdversaryModel)
+    (moduleAddress : Nat) (state : _root_.Verity.ContractState) :
+    (executeMappedSummaryCall adversary moduleAddress).run state =
+      _root_.Verity.ContractResult.success
+        (denote (sourceCallProgram consumedSummaryEntry moduleAddress)
+          adversary canonicalCallState).1 state := rfl
+
+/-- The transaction wrapper executes the typed `CallProgram` observation
+inside `Contract.run`; a reverted mapped summary call is therefore the call
+that causes the following `require` and whole-transaction rollback. -/
 def executeObservedSummary (adversary : AdversaryModel) (moduleAddress : Nat)
     (depositable : _root_.Verity.Uint256) : _root_.Verity.Contract Unit :=
-  executeSummary depositable
-    (denote (sourceCallProgram consumedSummaryEntry moduleAddress)
-      adversary canonicalCallState).1
+  do
+    _root_.Verity.setStorage lastCapacitySlot depositable
+    let callSucceeded ← executeMappedSummaryCall adversary moduleAddress
+    _root_.Verity.require callSucceeded "StakingModuleSummaryCallFailed"
 
 theorem typed_success_commits_pre_call_store
     (depositable : _root_.Verity.Uint256) (state : _root_.Verity.ContractState) :
@@ -195,21 +218,17 @@ theorem typed_revert_rolls_back_pre_call_store
 
 theorem typed_external_revert_rolls_back_pre_call_store
     (adversary : AdversaryModel) (moduleAddress : Nat) (data : List Nat)
-    (hresult : adversary.result (sourceSummarySite moduleAddress)
+    (_hresult : adversary.result (sourceSummarySite moduleAddress)
       canonicalCallState.world = .revert data)
     (depositable : _root_.Verity.Uint256) (state rollback : _root_.Verity.ContractState) (reason : String)
     (h : (executeObservedSummary adversary moduleAddress depositable).run state =
       _root_.Verity.ContractResult.revert reason rollback) :
     rollback = state := by
-  have hfalse :
-      (denote (sourceCallProgram consumedSummaryEntry moduleAddress)
-        adversary canonicalCallState).1 = false := by
-    change (adversary.result (sourceSummarySite moduleAddress)
-      canonicalCallState.world).succeeded = false
-    rw [hresult]
-    rfl
-  apply typed_revert_rolls_back_pre_call_store depositable state rollback reason
-  simpa [executeObservedSummary, hfalse] using h
+  /- `executeObservedSummary` executes the mapped observation before its
+  `require`; `Contract.run` supplies the snapshot equality for that enclosing
+  transaction. -/
+  unfold _root_.Verity.Contract.run at h
+  split at h <;> simp_all [executeObservedSummary]
 
 theorem consumed_summary_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
