@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 5f26eb15136780653a96755f657f9025aaa6b82f
+validated-tree: 2acb8934153c1cc0f3566e26761f5bcbcb0e9faf
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -28,6 +28,14 @@ P-ALLOC-1 Phase-3 exact-head repair (2026-08-13)
   deployed-layout, or full allocation-loop theorem.
 - Focused regressions reject selector, call-kind, return-layout, and pre-call
   storage mutations, and assert the failed typed-call transaction snapshot.
+- The follow-up exact-head repair evaluates the mapped observation against the
+  post-store `ContractState` and derives its `Contract.run` revert directly
+  from the observed mapped-call `.revert` result. Focused Phase-3, canonical
+  P-ALLOC-1, allocation regression, and semantic-mutant targets: exit 0.
+  The canonical theorem's axiom report is printed by `Audit.Trust`. This
+  receipt records bounded MODEL → SOURCE → VERITY_TX evidence only; it does
+  not claim allocation-loop, Yul, EVM, deployed-storage-layout, or runtime
+  provenance closure.
 
 - Independent review found that
   `admission_and_post_state_equivariance` only conjoined admission and
