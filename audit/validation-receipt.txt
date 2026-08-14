@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 40a215fdf4de48f107a50eacd98c78f68971f830
+validated-tree: 195a2cf08f48b6b03d82148a9d3089420ce2c2a4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -640,3 +640,51 @@ P-TOPUP-2 source-artifact to deployed-runtime identity (2026-08-11)
   for that implementation and block. It does not claim Solidity-to-Verity
   semantic correspondence, Verity model refinement, verifier/SSZ correctness,
   or Yul/EVM semantics.
+
+P-TOPUP-1 whole-parent Verity closure (2026-08-11)
+--------------------------------------------------
+
+- Required campaign base was verified before edits as
+  `campaign/lido-minimal-11@b6c94920604074a3d1630106bf8d8b99f40983c3`.
+  A pre-validation fetch found the remote campaign ref unchanged at that SHA.
+- Verity remains pinned to live `main@1fe0218863a4c8d6113e6cdd4de3766a54df81c7`.
+  Upstream PR #2253 remains open at
+  `387cbe87af66ff57284b548e2043ee5d283baff9`; it is a smoke-event declaration
+  fix and supplies no missing parent-transaction primitive, so no speculative
+  dependency re-pin was made.
+- Canonical theorem:
+  `LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure`.
+  It is an explicit public parent proposition over executable
+  `Verity.Contract.run`, beginning at caller authentication and covering the
+  allocation response, allocation/input/module guards, modulo-2^256 unchecked
+  accumulation, successful empty commit, Lido pull, per-nonzero-allocation
+  Beacon deposit calls, amount/balance assertion, success/revert classification,
+  and exact caller-frame snapshot rollback.
+- Arbitrary callee observations explicitly retain success/failure/revert,
+  value, returndata, allocation return shape, and caller-frame preservation.
+  They are not `externalCallBind` summaries; at the pinned Verity head that
+  helper reduces to `pure ()` and is not used as semantic evidence here.
+- Focused builds on node `agent-core`:
+  `lake build LidoSRv3.Audit.Verity.TopupParent
+  LidoSRv3.Audit.Guarantees.PTopup1`, exit 0; and
+  `lake build LidoSRv3.Tests.TopupParentMutants`, exit 0.
+  The mutants cover uint256 wrap/assert, short positive allocation arrays,
+  short zero-sum commit, unauthorized caller, allocation failure, failed Lido
+  pull, failed Beacon push, per-call values/returndata, positive commit, and
+  snapshot rollback.
+- `lake build LidoSRv3.Audit.Trust`, exit 0. The canonical parent theorem
+  reports only `[propext]`; it uses no `Classical.choice`, project axiom,
+  `sorry`, or `admit`.
+- Metadata generation/check, evidence-index fixtures, optimized metadata
+  mutants, and `git diff --check` pass. The first pre-commit `make test` reached
+  and passed those gates, then exited 2 at the intentionally clean-tree-only
+  provenance guard; the post-commit receipt below records the final clean-tree
+  full validation.
+- Final clean-tree validation on node `agent-core`: `make test`, exit 0,
+  including 5 passing Forge tests and the compiler-derived P-TOPUP-2
+  AST/layout gate; then full `lake build`, exit 0, `Build completed
+  successfully (1344 jobs).`
+- Guarantees-v4/source-map-v3 remain the normative boundary. Yul/EVM are not
+  registry closure planes. `A-SOLC-TRUSTED` is linked to P-TOPUP-1; source and
+  Verity pins plus deployment provenance remain separately recorded. Existing
+  SSZ/SHA-256 FFI and assembly/crypto tracking is unchanged.

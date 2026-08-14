@@ -67,7 +67,7 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
-#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.exiting_branch
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.slashed_branch
 #print axioms LidoSRv3.Audit.Guarantees.PTopup2.target_reached_branch

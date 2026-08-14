@@ -89,7 +89,7 @@ def main():
         # These public rows have historically shared short theorem names with
         # nearby evidence.  A bare short name must never resolve by accident.
         for row_id, short_name in (
-            ("P-TOPUP-1", "verity_tx_simulates_source"),
+            ("P-TOPUP-1", "parent_verity_transaction_closure"),
             ("P-ACCOUNT-1", "source_to_verityTx"),
             ("P-SSZ-1", "structural_witness_binding_sound"),
         ):

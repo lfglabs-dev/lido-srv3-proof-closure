@@ -78,8 +78,8 @@
     },
     {
       "id": "P-TOPUP-1",
-      "catalogue_wording": "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
+      "catalogue_wording": "The complete public topUp parent transaction is simulated by executable Verity Contract.run from authentication through allocation, wrapped uint256 accumulation, empty commit, Lido pull, Beacon push, assertion, commit/revert, and snapshot rollback; arbitrary callees expose control, value, returndata, and caller-frame preservation, while solc and deployment provenance remain separately trusted/recorded under A-SOLC-TRUSTED.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure",
       "theorem_planes": [
         "model",
         "source",
@@ -94,14 +94,14 @@
       },
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-TOPUP-NOWRAP",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED"
       ],
-      "note": "Hybrid boundary: the full source guard/array/loop outcome feeds a typed Verity suffix with declared pull/push calls; linked-external effects are summaries and Yul/EVM/runtime/deployment planes remain open. Verity #2242 packed TopUpGateway storage is not the complete guarantee.",
-      "next_gate": "Discharge the declared linked-external call summaries and establish independently verified deployment provenance.",
+      "note": "Whole-parent boundary: authentication is derived from the Verity caller frame; the allocation return and Lido/Beacon call control, value, and returndata are explicit observations; unchecked accumulation is modulo 2^256; Contract.run supplies parent snapshot rollback. Yul/EVM are not registry planes and compilation to recorded deployed bytecode is trusted under A-SOLC-TRUSTED.",
+      "next_gate": "Strengthen independently reproducible deployment-provenance receipts without changing the guarantees-v4/source-map-v3 green boundary.",
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants",
-        "expected": "successful pinned-source conservation plus actual Verity Contract.run transaction simulation, snapshot rollback, declared-call program, and negative-mutant build; linked-external/Yul/EVM/runtime/deployment semantics remain open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupParentMutants",
+        "expected": "successful whole-parent pinned-source to Verity Contract.run simulation with wrapped uint256 accumulation, explicit call observations, snapshot rollback, and high-risk negative mutants; Yul/EVM are outside the registry plane under A-SOLC-TRUSTED"
       }
     },
     {

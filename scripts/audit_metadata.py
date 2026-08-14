@@ -49,7 +49,7 @@ EXPECTED_WORDING = [
     "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
-    "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
+    "The complete public topUp parent transaction is simulated by executable Verity Contract.run from authentication through allocation, wrapped uint256 accumulation, empty commit, Lido pull, Beacon push, assertion, commit/revert, and snapshot rollback; arbitrary callees expose control, value, returndata, and caller-frame preservation, while solc and deployment provenance remain separately trusted/recorded under A-SOLC-TRUSTED.",
     "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
     "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
@@ -82,7 +82,7 @@ EXPECTED_ASSUMPTIONS = {
         {"id": "A-SOURCE-SHAPED", "accepted": True,
          "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans."},
         {"id": "A-TOPUP-NOWRAP", "accepted": True,
-         "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans."},
+         "risk": "Legacy subordinate Nat top-up lemmas read line 732 under a no-wrap premise; the canonical P-TOPUP-1 parent theorem does not consume this assumption and executes allocSumUnchecked modulo 2^256."},
         {"id": "A-HANDWRITTEN-MINFIRST", "accepted": True,
          "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence."},
         {"id": "A-VERITY-SCAFFOLD", "accepted": True,
@@ -114,8 +114,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
      "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants",
-     "expected": "successful pinned-source conservation plus actual Verity Contract.run transaction simulation, snapshot rollback, declared-call program, and negative-mutant build; linked-external/Yul/EVM/runtime/deployment semantics remain open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupParentMutants",
+     "expected": "successful whole-parent pinned-source to Verity Contract.run simulation with wrapped uint256 accumulation, explicit call observations, snapshot rollback, and high-risk negative mutants; Yul/EVM are outside the registry plane under A-SOLC-TRUSTED"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
      "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, typed-storage Contract.run commit for accepted accounting prefixes, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; external calls and later guards/Yul/EVM/runtime/crypto/E2E remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
@@ -150,7 +150,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
-    ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
+    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     [],
@@ -174,7 +174,7 @@ EXPECTED_NEXT_GATES = [
     "Refine proportional allocation amounts and checked-Uint256 execution "
     "for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Connect the pinned deposit conservation/rollback correspondence to an official Verity transaction.",
-    "Discharge the declared linked-external call summaries and establish independently verified deployment provenance.",
+    "Strengthen independently reproducible deployment-provenance receipts without changing the guarantees-v4/source-map-v3 green boundary.",
     "Extend the checked Verity transaction beyond the accepted accounting prefix (later source guards, external calls) and establish independently verified deployment provenance.",
     "Optionally establish deployed storage/call provenance; semantic closure ends at the proved Verity transaction under the solc trust assumption.",
     "Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity and deployment provenance.",
@@ -255,7 +255,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
-    "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
+    "LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure",
     "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
     "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
     None,
@@ -336,7 +336,8 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
-            "LidoSRv3.Audit.Verity.TopupHybrid",
+            "LidoSRv3.Audit.Source.TopupParentCorrespondence",
+            "LidoSRv3.Audit.Verity.TopupParent",
             "LidoSRv3.Audit.Source.AccountingCorrespondence",
             "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
             "LidoSRv3.Audit.Verity.SszAbstractDigest",
@@ -348,7 +349,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Tests.SszRegression",
             "LidoSRv3.Tests.DepositVectors",
             "LidoSRv3.Tests.TopupVectors",
-            "LidoSRv3.Tests.TopupHybridMutants",
+            "LidoSRv3.Tests.TopupParentMutants",
             "LidoSRv3.Tests.ReserveMutants",
             "LidoSRv3.Tests.AccountingVectors",
             "LidoSRv3.Audit.AddressEquivariance",
@@ -370,7 +371,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
-            "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, "
+            "P-TOPUP-1 whole-parent source-to-Verity transaction closure, "
             "P-TOPUP-2 MODEL-only headroom/budget bounds plus subordinate packed-storage evidence, "
             "P-ADDRESS-1 caller-renaming MODEL-to-SOURCE-to-VERITY_TX simulation, and "
             "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
@@ -453,8 +454,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard",
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
-    {"name": "Guarantees.PTopup1.verity_tx_simulates_source",
-     "status": "lean_checked", "axioms": ["propext", "Classical.choice", "Quot.sound"]},
+    {"name": "Guarantees.PTopup1.parent_verity_transaction_closure",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve",
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
