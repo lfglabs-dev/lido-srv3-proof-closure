@@ -115,11 +115,12 @@ Closure-v2 immutable-boundary and review repair (2026-08-12)
   vector rejects an abstract relation, rather than claiming a modified Yul
   program fails to build.
 
-Certified Verity re-pin receipt (2026-08-12)
-------------------------------------------------
+Superseded historical Verity re-pin receipt (2026-08-12)
+---------------------------------------------------------
 
-- Closure-v2 remains rooted at immutable milestone
-  `25c82e137236131c037a45618e44382547efebe2`; the divergent
+- This historical receipt incorrectly claimed that closure-v2 remained rooted
+  at milestone `25c82e137236131c037a45618e44382547efebe2`. That ancestry claim is
+  invalid and is superseded by the exact merge-base analysis above; the
   `campaign/lido-minimal-11` ref was neither modified nor merged.
 - The resolved and requested Verity revision is exactly
   `bfa13e715d2a11d476e5d90f9264e87676ff7594`; Lake's `rev` and `inputRev`,
