@@ -143,7 +143,7 @@ def spec : CompilationModel :=
 /-! The remaining source participants are explicit Verity contract models even
 though their bodies remain outside the checked prefix.  Their distinct positive
 `contractId`s select the official contract-separated storage worlds introduced
-by `verity@54f1e002`. -/
+by `verity@04729a9`. -/
 def lidoSpec : CompilationModel :=
   { name := "Lido"
     contractId := lidoNamespace
