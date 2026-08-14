@@ -306,6 +306,37 @@ theorem typed_short_returndata_rolls_back_pre_call_store
   rw [hcall]
   simp [hshort]
 
+/-- A successful mapped call with the complete summary tuple commits the
+pre-call store.  The payload is otherwise unconstrained here: in particular,
+this transaction slice does not invent a `capacity <= depositable` guard. -/
+theorem typed_complete_returndata_commits_pre_call_store
+    (adversary : AdversaryModel) (moduleAddress : Nat) (data : List Nat)
+    (depositable : _root_.Verity.Uint256) (state : _root_.Verity.ContractState)
+    (hresult : adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable) = .success data)
+    (hcomplete : summaryReturnBytes <= data.length) :
+    (executeObservedSummary adversary moduleAddress depositable).run state =
+      _root_.Verity.ContractResult.success ()
+        (state.writeSlot lastCapacitySlot.slot depositable) := by
+  have hresponse :
+      (denote (sourceSummaryResultProgram consumedSummaryEntry moduleAddress) adversary
+        (callStateOfTransaction (state.writeSlot lastCapacitySlot.slot depositable))).1 =
+        some (.success data) := by
+    change some (adversary.result (sourceSummarySite moduleAddress)
+      (state.writeSlot lastCapacitySlot.slot depositable)) = _
+    rw [hresult]
+  have hcall :
+      (executeMappedSummaryResult adversary moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) =
+        _root_.Verity.ContractResult.success (some (.success data))
+          (state.writeSlot lastCapacitySlot.slot depositable) := by
+    change _root_.Verity.ContractResult.success _ _ = _
+    rw [hresponse]
+  unfold executeObservedSummary _root_.Verity.Contract.run
+  dsimp only
+  rw [hcall]
+  simp [hcomplete]
+
 theorem consumed_summary_function_spec_compiles :
     (CompilationModel.compile spec [entrySelector]).isOk = true := by
   native_decide
@@ -332,8 +363,15 @@ theorem consumed_summary_phase3_transaction (moduleAddress : Nat) :
         (state.writeSlot lastCapacitySlot.slot depositable) = .success data →
       ¬ summaryReturnBytes <= data.length →
       (executeObservedSummary adversary moduleAddress depositable).run state =
-        _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" state) := by
-  refine ⟨consumed_summary_function_spec_compiles, ?_, ?_, rfl, ?_, ?_⟩
+        _root_.Verity.ContractResult.revert "StakingModuleSummaryMalformedReturn" state) ∧
+    (∀ adversary data (depositable : _root_.Verity.Uint256) state,
+      adversary.result (sourceSummarySite moduleAddress)
+        (state.writeSlot lastCapacitySlot.slot depositable) = .success data →
+      summaryReturnBytes <= data.length →
+      (executeObservedSummary adversary moduleAddress depositable).run state =
+        _root_.Verity.ContractResult.success ()
+          (state.writeSlot lastCapacitySlot.slot depositable)) := by
+  refine ⟨consumed_summary_function_spec_compiles, ?_, ?_, rfl, ?_, ?_, ?_⟩
   · exact (consumed_summary_source_bridge moduleAddress).1
   · exact (consumed_summary_source_bridge moduleAddress).2.1
   · intro adversary data depositable state hresult
@@ -342,5 +380,8 @@ theorem consumed_summary_phase3_transaction (moduleAddress : Nat) :
   · intro adversary data depositable state hresult hshort
     exact typed_short_returndata_rolls_back_pre_call_store adversary moduleAddress data
       depositable state hresult hshort
+  · intro adversary data depositable state hresult hcomplete
+    exact typed_complete_returndata_commits_pre_call_store adversary moduleAddress data
+      depositable state hresult hcomplete
 
 end LidoSRv3.Audit.Verity.AllocCapacityPhase3
