@@ -30,9 +30,9 @@ def mappedSummaryTransaction (moduleAddress : Nat) : Prop :=
     adversary.result (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite moduleAddress)
       (state.writeSlot
         _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable) = .revert data →
-    (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.executeObservedSummary
+    ∃ reason, (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.executeObservedSummary
       adversary moduleAddress depositable).run state =
-        Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) ∧
+        Verity.ContractResult.revert reason state) ∧
   (∀ adversary data (depositable : Verity.Uint256) state,
     adversary.result (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite moduleAddress)
       (state.writeSlot

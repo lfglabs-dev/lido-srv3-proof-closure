@@ -17,8 +17,12 @@ import LidoSRv3.Audit.Guarantees.PReserve1
 /-!
 Machine-readable-in-build trust report for the first audit slice.
 
-Expected output is only Lean foundations (`propext`, `Quot.sound`) where used;
-there are no project-level assumptions or proof escapes.
+Most output uses only Lean foundations (`propext`, `Classical.choice`, and
+`Quot.sound`) where listed.  The canonical P-ALLOC-1 Phase-3 compilation
+theorems additionally disclose the generated
+`consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
+dependency recorded in the target manifest; there are no undisclosed
+project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero

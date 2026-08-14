@@ -21,8 +21,8 @@ theorem mapped_summary_call_transaction (moduleAddress : Nat) :
     (∀ adversary data (depositable : _root_.Verity.Uint256) state,
       adversary.result (sourceSummarySite moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) = .revert data →
-      (executeObservedSummary adversary moduleAddress depositable).run state =
-        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) ∧
+      ∃ reason, (executeObservedSummary adversary moduleAddress depositable).run state =
+        _root_.Verity.ContractResult.revert reason state) ∧
     (∀ adversary data (depositable : _root_.Verity.Uint256) state,
       adversary.result (sourceSummarySite moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) = .success data →

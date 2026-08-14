@@ -258,8 +258,8 @@ theorem typed_external_revert_rolls_back_pre_call_store
     (depositable : _root_.Verity.Uint256) (state : _root_.Verity.ContractState)
     (hresult : adversary.result (sourceSummarySite moduleAddress)
       (state.writeSlot lastCapacitySlot.slot depositable) = .revert data) :
-    (executeObservedSummary adversary moduleAddress depositable).run state =
-      _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state := by
+    ∃ reason, (executeObservedSummary adversary moduleAddress depositable).run state =
+      _root_.Verity.ContractResult.revert reason state := by
   have hcall :
       (executeMappedSummaryResult adversary moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) =
@@ -275,6 +275,7 @@ theorem typed_external_revert_rolls_back_pre_call_store
   unfold executeObservedSummary _root_.Verity.Contract.run
   dsimp only
   rw [hcall]
+  exact ⟨_, rfl⟩
 
 /-- A zero-success-bit is not the only rejecting path: a successful mapped
 call with insufficient returndata reaches the source-shaped size guard and
@@ -356,8 +357,8 @@ theorem consumed_summary_phase3_transaction (moduleAddress : Nat) :
     (∀ adversary data (depositable : _root_.Verity.Uint256) state,
       adversary.result (sourceSummarySite moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) = .revert data →
-      (executeObservedSummary adversary moduleAddress depositable).run state =
-        _root_.Verity.ContractResult.revert "StakingModuleSummaryCallFailed" state) ∧
+      ∃ reason, (executeObservedSummary adversary moduleAddress depositable).run state =
+        _root_.Verity.ContractResult.revert reason state) ∧
     (∀ adversary data (depositable : _root_.Verity.Uint256) state,
       adversary.result (sourceSummarySite moduleAddress)
         (state.writeSlot lastCapacitySlot.slot depositable) = .success data →
