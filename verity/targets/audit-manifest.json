@@ -21,6 +21,11 @@
         "LidoSRv3.Audit.Source.MinFirstCorrespondence",
         "LidoSRv3.Audit.Model.AllocCapacity",
         "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
+        "LidoSRv3.Audit.Verity.AllocCapacityPhase3",
+        "LidoSRv3.Audit.Guarantees.PAlloc1Phase3",
+        "LidoSRv3.Audit.Guarantees.PAlloc1",
+        "LidoSRv3.Audit.AllGuarantees",
+        "LidoSRv3.Audit.Trust",
         "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
         "LidoSRv3.Audit.Source.DepositCorrespondence",
         "LidoSRv3.Audit.Source.TopupCorrespondence",
@@ -32,6 +37,7 @@
         "LidoSRv3.Audit.Source.ReserveCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Tests.AllocCapacityRegression",
+        "LidoSRv3.Tests.AllocCapacityPhase3Mutants",
         "LidoSRv3.Audit.Ssz",
         "LidoSRv3.Tests.SszRegression",
         "LidoSRv3.Tests.DepositVectors",
@@ -47,7 +53,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, and P-ACCOUNT-1 full-success-gated and positive-fee-conditional MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus executable Verity transaction simulation is checked against pinned Solidity, while later guards remain an explicit interface premise; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
+      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity plus bounded summary-call Verity transaction rollback, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, and P-ACCOUNT-1 full-success-gated and positive-fee-conditional MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus executable Verity transaction simulation is checked against pinned Solidity, while later guards remain an explicit interface premise; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs, and its SOURCE-plane correspondence remains OPEN in audit/guarantees.yaml"
     }
   },
   "proof_policy": {
@@ -102,6 +108,16 @@
       "name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math",
       "status": "lean_checked",
       "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
+      "status": "lean_checked",
+      "axioms": ["propext", "Classical.choice", "Quot.sound", "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]
+    },
+    {
+      "name": "Guarantees.PAlloc1Phase3.mapped_summary_call_transaction",
+      "status": "lean_checked",
+      "axioms": ["propext", "Classical.choice", "Quot.sound", "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]
     },
     {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",

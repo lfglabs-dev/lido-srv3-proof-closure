@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 62ac43a11f7727f176dedf64b1f6da9a687681fe
+validated-tree: cc82e26dc93cc7e215adcef408073f0f4271412d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -9,6 +9,52 @@ negative fixtures without circularly claiming the receipt's own commit.
 
 P-ADDRESS-1 review correction (2026-08-12)
 -------------------------------------------
+
+P-ALLOC-1 Phase-3 exact-head repair (2026-08-13)
+---------------------------------------------------
+
+- The bounded `SRLib._getStakingModuleSummary` slice now records its selector
+  as the four calldata bytes `9a bd df 09`, with a `DenoteMemory` selector-word
+  theorem rather than a one-word pseudo-payload.
+- The real P-ALLOC-1 facade, `AllGuarantees`, the canonical guarantee metadata,
+  trust report, and target manifest consume the same bounded transaction
+  theorem. The public minimal-11 list and `campaign/lido-minimal-11` are not
+  changed.
+- The executable Verity wrapper writes a model-local scalar storage word before
+  executing the exact mapped `CallProgram` observation inside `Contract.run`.
+  Its target, selector calldata, call kind, gas, and result are retained by the
+  non-circular adapter bridge; a target-mutation regression makes that observed
+  call revert and restores the pre-call snapshot. This is not a Yul, EVM,
+  deployed-layout, or full allocation-loop theorem.
+- Focused regressions reject selector, call-kind, return-layout, and pre-call
+  storage mutations, and assert the failed typed-call transaction snapshot.
+- The follow-up exact-head repair evaluates the mapped observation against the
+  post-store `ContractState` and derives its `Contract.run` revert directly
+  from the observed mapped-call `.revert` result. Focused Phase-3, canonical
+  P-ALLOC-1, allocation regression, and semantic-mutant targets: exit 0.
+  The canonical theorem's axiom report is printed by `Audit.Trust`. This
+  receipt records bounded MODEL → SOURCE → VERITY_TX evidence only; it does
+  not claim allocation-loop, Yul, EVM, deployed-storage-layout, or runtime
+  provenance closure.
+- The final exact-head repair retains successful-call returndata, rejects a
+  response shorter than 96 bytes, decodes the copied capacity word at offset
+  64, and rejects a capacity above the pre-call `depositable` value. Executable
+  regressions cover both rejecting branches and snapshot rollback. The focused
+  reproduction command, aggregate guarantees, trust report, metadata mutants,
+  and full `lake build LidoSRv3` all exit 0 under Lean 4.31.0.
+- The current exact-head repair removes that invented capacity-versus-request
+  rejection from both the source-shaped body and executable adapter: a complete
+  summary whose capacity exceeds this call's `depositable` value now succeeds,
+  while malformed short returndata still reverts and restores the pre-call
+  snapshot. This remains bounded MODEL → SOURCE → VERITY_TX evidence only;
+  it does not claim allocation-loop, Yul, EVM, deployed-layout, or runtime
+  provenance closure.
+- Canonical and supplemental P-ALLOC-1 guarantee facades consume that corrected
+  theorem shape. Focused Phase-3 and aggregate P-ALLOC-1 builds, plus the full
+  `lake build LidoSRv3`, exit 0 under Lean 4.31.0.
+- The proof-report guard now checks the resolved Verity revision before any
+  `lake env` invocation, so Lake cannot repair a stale checkout before the
+  negative provenance regression observes and rejects it.
 
 - Independent review found that
   `admission_and_post_state_equivariance` only conjoined admission and

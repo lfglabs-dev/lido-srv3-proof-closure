@@ -3,6 +3,7 @@ import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Common.Atomicity
 import LidoSRv3.Audit.Common.Bounded
 import LidoSRv3.Audit.Guarantees.PAlloc1
+import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
 import LidoSRv3.Audit.Guarantees.PAccount1
@@ -16,8 +17,12 @@ import LidoSRv3.Audit.Guarantees.PReserve1
 /-!
 Machine-readable-in-build trust report for the first audit slice.
 
-Expected output is only Lean foundations (`propext`, `Quot.sound`) where used;
-there are no project-level assumptions or proof escapes.
+Most output uses only Lean foundations (`propext`, `Classical.choice`, and
+`Quot.sound`) where listed.  The canonical P-ALLOC-1 Phase-3 compilation
+theorems additionally disclose the generated
+`consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
+dependency recorded in the target manifest; there are no undisclosed
+project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
@@ -27,8 +32,10 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence

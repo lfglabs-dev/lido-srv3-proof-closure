@@ -45,7 +45,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
+    "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, returndata-size rejection, complete-return success, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
@@ -100,8 +100,8 @@ EXPECTED_ASSUMPTIONS = {
     ],
 }
 EXPECTED_REPRODUCTION = [
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression",
-     "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants",
+     "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size rejection and high-capacity success regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -140,7 +140,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-SOURCE-SHAPED"],
+    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
@@ -163,8 +163,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     [],
 ]
 EXPECTED_NEXT_GATES = [
-    "Refine proportional allocation amounts and EVM "
-    "correspondence for SRLib._getModulesAllocationAndCapacity.",
+    "Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.",
     "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
     "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Refine success/revert and rollback against pinned executable EVM semantics.",
@@ -203,7 +202,7 @@ EXPECTED_EXCLUSIONS = {
 }
 PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN",
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -243,7 +242,7 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
-    ["model", "source"],
+    ["model", "source", "tx"],
     ["algorithm", "source"],
     ["model", "source"],
     ["model", "source", "tx"],
@@ -266,7 +265,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
@@ -345,8 +344,13 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.StrategyProofs",
             "LidoSRv3.Audit.Source.MinFirstCorrespondence",
             "LidoSRv3.Audit.Model.AllocCapacity",
-            "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
-            "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
+        "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
+        "LidoSRv3.Audit.Verity.AllocCapacityPhase3",
+        "LidoSRv3.Audit.Guarantees.PAlloc1Phase3",
+        "LidoSRv3.Audit.Guarantees.PAlloc1",
+        "LidoSRv3.Audit.AllGuarantees",
+        "LidoSRv3.Audit.Trust",
+        "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
             "LidoSRv3.Audit.Verity.TopupHybrid",
@@ -356,7 +360,8 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel",
             "LidoSRv3.Audit.Source.ReserveCorrespondence",
             "LidoSRv3.Tests.MinFirstVectors",
-            "LidoSRv3.Tests.AllocCapacityRegression",
+        "LidoSRv3.Tests.AllocCapacityRegression",
+        "LidoSRv3.Tests.AllocCapacityPhase3Mutants",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
             "LidoSRv3.Tests.DepositVectors",
@@ -376,7 +381,7 @@ EXPECTED_MANIFEST_LAYERS = {
         ],
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
-            "P-ALLOC-1 allocation-capacity, P-ALLOC-2 next-target, "
+            "P-ALLOC-1 allocation-capacity plus bounded summary-call Verity transaction rollback, P-ALLOC-2 next-target, "
             "P-DEPOSIT-1 deposit conservation/rollback, "
             "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, and "
             "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
@@ -410,6 +415,12 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math", "status": "lean_checked",
      "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction", "status": "lean_checked",
+     "axioms": ["propext", "Classical.choice", "Quot.sound",
+                "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]},
+    {"name": "Guarantees.PAlloc1Phase3.mapped_summary_call_transaction", "status": "lean_checked",
+     "axioms": ["propext", "Classical.choice", "Quot.sound",
+                "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]},
     {"name": "Guarantees.PAlloc2.selects_least_open_bucket", "status": "lean_checked",
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Guarantees.PAlloc2.source_selects_same_next_target", "status": "lean_checked",
