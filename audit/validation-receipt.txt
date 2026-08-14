@@ -14,6 +14,31 @@ historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
 
+lido-verity-closure-v2 exact-milestone re-pin receipt (2026-08-14)
+-----------------------------------------------------------------
+
+- Campaign base is the immutable minimal-11 milestone
+  `25c82e137236131c037a45618e44382547efebe2`; the re-pin branch is a direct
+  descendant of that commit.  The independently reconciled upstream Verity
+  main ref is `04729a9de9099e065dd09283e4f733a5fd4c2a16`.
+- The declared Verity revision is synchronized in `lakefile.lean`,
+  `lake-manifest.json` (`rev` and `inputRev`), `audit/artifacts.lock.json`,
+  `verity/targets/audit-manifest.json`, `verity/targets/source-map.json`, and
+  `proofs/LOCKFILE.md`.  The checked-out local dependency was verified at the
+  same immutable revision with a clean worktree.
+- Local non-DGX validation only (DGX Spark remained paused): `make prove`
+  completed with exit 0 using Lean 4.31.0.  Its generated report and complete
+  build log are tracked under `proofs/logs/`; the report records the exact
+  Verity revision, source-tree ID, log digest, and successful exit status.
+- `python3 scripts/audit_metadata.py check`,
+  `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`, and
+  `bash scripts/check_no_python_evidence.sh` completed successfully before
+  this receipt was recorded.  The re-pin changes no theorem statement,
+  source mapping, trust gate, or proof status.
+- The changed-Lean forbidden-token scan (`sorry`, `admit`, `axiom`, `unsafe`)
+  found no added occurrence, and `git diff --check` was clean.  This receipt
+  documents validation only; it does not promote any OPEN or unchecked claim.
+
 PR #48 source-shaped deposit prefix scaffold (OPEN) repair receipt (non-receipt tree recorded above):
 - Re-read the exact pinned functions at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
   `StakingRouter.deposit` 942--997, `Lido.withdrawDepositableEther` 869--886,
