@@ -1,11 +1,32 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: cc82e26dc93cc7e215adcef408073f0f4271412d
+validated-tree: 16bebbb3b4c4ec5686e20ad305a0829685ad204e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Verity PR #2333 re-pin receipt (2026-08-14)
+------------------------------------------
+
+- The immutable `campaign/lido-minimal-11` milestone remains untouched. This
+  focused successor moves only the Verity dependency from
+  `bfa13e715d2a11d476e5d90f9264e87676ff7594` to verified upstream main
+  checkpoint `04729a9de9099e065dd09283e4f733a5fd4c2a16`, the merge commit of
+  Verity PR #2333.
+- Lake's requested revision, resolved `lake-manifest.json` `rev` and
+  `inputRev`, clean `.lake/packages/verity` checkout, artifact lock, source
+  map, audit manifest, metadata gate, proof lock, and regenerated proof report
+  all agree on `04729a9de9099e065dd09283e4f733a5fd4c2a16`.
+- `lake build LidoSRv3`: exit 0, `Build completed successfully (1339 jobs)`
+  under Lean 4.31.0. The regenerated proof report records verified source tree
+  `27227f979623dc4f3c13bbc2ca67c7fdeafbdefb` and build-log SHA-256
+  `7242c8f3c66354c377333d1066af5f725a7fab18d9ca0b170e55a6e4600d435f`.
+- The focused aggregate/trust/negative-mutant build completed successfully
+  (1260 jobs). `python3 scripts/audit_metadata.py check`, provenance guards,
+  and Python-evidence guards passed. No guarantee status, theorem claim,
+  assumption, or trust boundary was widened.
 
 P-ADDRESS-1 review correction (2026-08-12)
 -------------------------------------------
