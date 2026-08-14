@@ -91,12 +91,17 @@ Closure-v2 immutable-boundary and review repair (2026-08-12)
 --------------------------------------------------------------
 
 - This successor is a normal child of PR #65's reviewed head
-  `85dfb291cede752d4b17e8a35796aa8dfa19222f`. Its closure-v2 content remains
-  on the ancestry path beginning at immutable milestone
-  `25c82e137236131c037a45618e44382547efebe2`; `git merge-base --is-ancestor`
-  returns success for that milestone and the PR head. The accidentally advanced
-  `campaign/lido-minimal-11` ref `b6c94920604074a3d1630106bf8d8b99f40983c3`
-  is not an ancestor of the PR head and is not an integration target.
+  `85dfb291cede752d4b17e8a35796aa8dfa19222f`. The immutable milestone
+  `25c82e137236131c037a45618e44382547efebe2` remains a historical campaign
+  reference, but it is not an ancestor of this closure-v2 lineage: its exact
+  merge-base with this PR head is `ee2e65cd807e913ea245ae6fd7987a7f1d962800`.
+  Accordingly, this receipt makes no claim that the PR is a successor of that
+  milestone. The advanced `origin/campaign/lido-minimal-11` ref is likewise not
+  an integration target for this focused Verity re-pin.
+- A re-pin that must be descended from `25c82e13` requires a separately
+  reconciled, fully revalidated branch rooted at that milestone (or a normal
+  merge of the campaign lineage with all resulting proof/model changes
+  reviewed). It cannot be certified by this focused receipt alone.
 - P-TOPUP-1's canonical SOURCE-to-VERITY_TX theorem now requires the explicit
   `NoUncheckedWrap inp` premise. That premise is the required boundary between
   the source's unchecked `uint256` accumulation at StakingRouter line 732 and
