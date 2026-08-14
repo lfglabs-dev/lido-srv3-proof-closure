@@ -90,8 +90,9 @@ P-ALLOC-1 Phase-3 exact-head repair (2026-08-13)
 Closure-v2 immutable-boundary and review repair (2026-08-12)
 --------------------------------------------------------------
 
-- This successor is a normal child of PR #65's reviewed head
-  `85dfb291cede752d4b17e8a35796aa8dfa19222f`. The immutable milestone
+- This successor descends from PR #65's squash-merge commit
+  `8667d6da8c51f78086e02b0348f9aba261bb2a51`, not from that PR's reviewed
+  branch head `85dfb291cede752d4b17e8a35796aa8dfa19222f`. The immutable milestone
   `25c82e137236131c037a45618e44382547efebe2` remains a historical campaign
   reference, but it is not an ancestor of this closure-v2 lineage: its exact
   merge-base with this PR head is `ee2e65cd807e913ea245ae6fd7987a7f1d962800`.
