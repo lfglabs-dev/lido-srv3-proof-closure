@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 7b7ab48cc773c64e1e6716e61ec2f1b22ac01a78
+validated-tree: ff27a6681a6e2df9faeb48cc8c255491ef03c684
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -13,6 +13,25 @@ legacy-model regression modules are retained under `LidoSRv3.Legacy`. Their
 historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
+
+Minimal-11 Verity main re-pin receipt (2026-08-14)
+--------------------------------------------------
+
+- Immutable semantic base: `25c82e137236131c037a45618e44382547efebe2`.
+  This branch is a direct descendant of that milestone commit; no campaign or
+  mainline changes were incorporated.
+- Reconciled Verity main pin: `04729a9de9099e065dd09283e4f733a5fd4c2a16`.
+  `lake update` checked out that exact revision, and the Lake manifest,
+  dependency lock, generated audit views, proof lock, and pin-aware validators
+  agree on it.
+- Local, non-DGX validation: `make prove` ran once with Lean 4.31.0 and
+  `lake build LidoSRv3`, exit status 0. Generated evidence is
+  `proofs/logs/prove.txt` and `proofs/logs/proof-report.json` (source tree
+  `c9a2b85568d539594607be8138467c97aebf0a9c`; log SHA-256
+  `3ef99cbe0dfd844c86404fbe0897ace72c2c6f064d0276a23c1842d833410972`).
+- The re-pin changes no theorem statement, guarantee status, source mapping,
+  or trust policy. The only Lean edit updates a stale revision comment. No
+  `sorry`, `admit`, project `axiom`, or `unsafe` escape was introduced.
 
 PR #48 source-shaped deposit prefix scaffold (OPEN) repair receipt (non-receipt tree recorded above):
 - Re-read the exact pinned functions at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:

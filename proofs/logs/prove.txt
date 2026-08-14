@@ -1,0 +1,875 @@
+verified_source_tree=c9a2b85568d539594607be8138467c97aebf0a9c
+lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
+✔ [575/630] Built LidoSRv3.Audit.Common.Units (1.1s)
+✔ [576/630] Built LidoSRv3.Audit.Guarantees.Registry (1.0s)
+✔ [577/633] Built Verity.Core.Address (1.2s)
+✔ [578/633] Built LidoSRv3.Audit.Common.Result (1.2s)
+✔ [579/634] Built Verity.Core.Model.Constants (1.1s)
+✔ [580/642] Built Verity.Core.Model.ProofStatus (1.1s)
+✔ [581/644] Built Verity.Core.Model.Yul.Ast (1.9s)
+✔ [582/645] Built Verity.Core.Model.Identifier (960ms)
+✔ [583/645] Built LidoSRv3.Audit.Common.Bounded (1.0s)
+✔ [584/645] Built Verity.Core.Uint256 (2.4s)
+✔ [585/646] Built LidoSRv3.Audit.Ssz (2.0s)
+✔ [586/646] Built LidoSRv3.Audit.Common.Trace (1.5s)
+✔ [587/646] Built LidoSRv3.Audit.Guarantees.PEth1 (1.6s)
+✔ [588/646] Built Compiler.Keccak.Circuit (2.1s)
+✔ [589/647] Built Compiler.Yul.Ast (1.1s)
+✔ [590/647] Built Compiler.CompilationModel.InternalNaming (1.5s)
+✔ [591/649] Built Verity.Core.FiniteSet (1.7s)
+✔ [592/649] Built Verity.Core.Model.ECM (1.6s)
+✔ [593/650] Built Verity.EVM.Uint256 (1.2s)
+✔ [594/650] Built Compiler.CompilationModel.IssueRefs (1.2s)
+✔ [595/657] Built Verity.Core.Uint16 (1.5s)
+✔ [596/658] Built Verity.Core.Int256 (1.8s)
+✔ [597/695] Built LidoSRv3.Audit.Common.Atomicity (1.4s)
+✔ [598/696] Built Verity.Core.Intrinsics (2.7s)
+✔ [599/696] Built Compiler.ECM (1.4s)
+✔ [600/765] Built Compiler.IR (1.7s)
+✔ [601/765] Built Compiler.Json (1.6s)
+✔ [602/765] Built Compiler.ProofStatus (958ms)
+✔ [990/1192] Built Compiler.CompilationModel.DynamicData (2.2s)
+✔ [1086/1215] Built LidoSRv3.Audit.Guarantees.PTopup2 (1.2s)
+✔ [1088/1250] Built LidoSRv3.Audit.Guarantees.PConsolidation1 (1.3s)
+✔ [1093/1263] Built Verity.Core.NarrowTypes (1.9s)
+✔ [1094/1263] Built Compiler.Sha256.Engine (1.4s)
+✔ [1095/1263] Built Verity.Core.StorageAttr (6.4s)
+✔ [1096/1275] Built EvmYul.FFI.ffi (972ms)
+✔ [1097/1275] Built EvmYul.PerformIO (943ms)
+✔ [1101/1296] Built EvmYul.SpongeHash.Keccak256 (1.2s)
+✔ [1102/1322] Built EvmYul.Data.Stack (1.6s)
+✔ [1103/1322] Built Compiler.Proofs.YulGeneration.LogNames (1.0s)
+✔ [1105/1329] Built LidoSRv3.Audit.Source.DepositDataRootCorrespondence (5.2s)
+✔ [1106/1329] Built Compiler.Constants (1.7s)
+✔ [1107/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanSignedArithSpec (1.7s)
+✔ [1108/1329] Built Verity.Core.Free.IRStepAttr (2.0s)
+✔ [1109/1329] Built Compiler.Hex (2.1s)
+✔ [1110/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBridgePredicates (1.7s)
+✔ [1111/1329] Built Compiler.Proofs.YulGeneration.Calldata (1.4s)
+✔ [1112/1329] Built Compiler.Keccak.CircuitData (6.1s)
+✔ [1113/1329] Built Verity.Macro.Syntax (9.5s)
+✔ [1114/1329] Built LidoSRv3.Audit.Source.SszVerifierProgram (3.0s)
+✔ [1115/1329] Built LidoSRv3.Audit.Guarantees.PSsz1 (2.5s)
+✔ [1116/1329] Built Compiler.Keccak.Sponge (1.5s)
+✔ [1117/1329] Built Compiler.Yul.PrettyPrint (2.0s)
+✔ [1118/1329] Built LidoSRv3.Tests.SszRegression (2.9s)
+✔ [1119/1329] Built Compiler.Selectors (696ms)
+✔ [1120/1329] Built Compiler.Keccak.SpongeProperties (732ms)
+✔ [1121/1329] Built Compiler.Yul.PatchFramework (4.9s)
+ℹ [1122/1329] Built LidoSRv3.Tests.SszVerifierProgram (1.3s)
+info: LidoSRv3/Tests/SszVerifierProgram.lean:102:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.deposit_call_preimages_exact' does not depend on any axioms
+info: LidoSRv3/Tests/SszVerifierProgram.lean:103:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.validator_root_preimages_exact' does not depend on any axioms
+info: LidoSRv3/Tests/SszVerifierProgram.lean:104:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.verifier_pair_preimage_exact' depends on axioms: [propext]
+info: LidoSRv3/Tests/SszVerifierProgram.lean:105:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_memory_fails_closed' depends on axioms: [propext]
+info: LidoSRv3/Tests/SszVerifierProgram.lean:106:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_abi_fails_closed' depends on axioms: [propext]
+info: LidoSRv3/Tests/SszVerifierProgram.lean:107:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_sha_fails_closed' depends on axioms: [propext]
+✔ [1123/1329] Built Verity.Core (5.4s)
+✔ [1124/1329] Built Verity.Core.Model.CodeData (1.3s)
+✔ [1125/1329] Built EvmYul.UInt256 (7.6s)
+✔ [1126/1329] Built Verity.Core.Semantics (2.5s)
+✔ [1127/1329] Built Verity.Macro.KeccakString (3.1s)
+✔ [1128/1329] Built Verity.Macro.KeccakLit (3.2s)
+✔ [1129/1329] Built Verity.Stdlib.Math (3.5s)
+✔ [1130/1329] Built Verity.Specs.Common (3.4s)
+✔ [1131/1329] Built LidoSRv3.Legacy.Model (4.3s)
+✔ [1132/1329] Built EvmYul.EVM.GasConstants (3.8s)
+✔ [1133/1329] Built Compiler.Proofs.IRGeneration.IRStorageWord (4.0s)
+✔ [1134/1329] Built EvmYul.Wheels (6.1s)
+✔ [1135/1329] Built LidoSRv3.Audit.Arithmetic (4.2s)
+✔ [1136/1329] Built LidoSRv3.Audit.Model.AllocCapacity (6.4s)
+✔ [1137/1329] Built Compiler.Proofs.IRGeneration.IRRuntimeTypes (5.7s)
+✔ [1138/1329] Built Verity.Core.Free.TypedIR (8.8s)
+⚠ [1139/1329] Built Conform.Wheels (6.1s)
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+✔ [1140/1329] Built EvmYul.Yul.Wheels (5.9s)
+✔ [1141/1329] Built EvmYul.State.TrieRoot (6.3s)
+✔ [1142/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanNativeSignedArithLemmas (12s)
+✔ [1143/1329] Built Verity.Proofs.Stdlib.Automation (11s)
+⚠ [1144/1329] Built LidoSRv3.Legacy.SpecProofs (10s)
+warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+✔ [1145/1329] Built EvmYul.Maps.ByteMap (5.4s)
+✔ [1146/1329] Built EvmYul.State.BlockHeader (7.0s)
+✔ [1147/1329] Built LidoSRv3.Audit.Source.AllocCapacityCorrespondence (3.4s)
+✔ [1148/1329] Built LidoSRv3.Audit.Regression.AllocCapacityLegacy (3.7s)
+✔ [1149/1329] Built LidoSRv3.Audit.Source.AccountingCorrespondence (6.3s)
+✔ [1150/1329] Built LidoSRv3.Audit.Trace (4.4s)
+✔ [1151/1329] Built EvmYul.BN_ADD (3.7s)
+✔ [1152/1329] Built EvmYul.EllipticCurves (4.2s)
+✔ [1153/1329] Built LidoSRv3.Audit.MinFirstAllocation (7.4s)
+✔ [1154/1329] Built EvmYul.BN_MUL (4.7s)
+✔ [1155/1329] Built EvmYul.SNARKV (4.2s)
+✔ [1156/1329] Built EvmYul.BLAKE2_F (4.4s)
+✔ [1157/1329] Built EvmYul.RIP160 (3.9s)
+✔ [1158/1329] Built EvmYul.PointEval (4.2s)
+✔ [1159/1329] Built EvmYul.SHA256 (4.1s)
+✔ [1160/1329] Built LidoSRv3.Audit.Guarantees.PAlloc1 (3.2s)
+✔ [1161/1329] Built EvmYul.Maps.StorageMap (3.0s)
+✔ [1162/1329] Built Verity.Core.Model.Types (21s)
+✔ [1163/1329] Built LidoSRv3.Audit.Guarantees.PAccount1 (2.9s)
+✔ [1164/1329] Built EvmYul.MachineState (4.1s)
+✔ [1165/1329] Built LidoSRv3.Tests.AllocCapacityRegression (3.5s)
+✔ [1166/1329] Built Verity.Macro.SpecGen (18s)
+✔ [1167/1329] Built Compiler.CompilationModel.Types (770ms)
+✔ [1168/1329] Built Compiler.CompilationModel.SelectorInteropHelpers (1.3s)
+✔ [1169/1329] Built LidoSRv3.Audit.AddressEquivariance (3.2s)
+✔ [1170/1329] Built LidoSRv3.Audit.Source.DepositCorrespondence (4.7s)
+✔ [1171/1329] Built LidoSRv3.Audit.Source.TopupCorrespondence (5.4s)
+✔ [1172/1329] Built LidoSRv3.Tests.AccountingVectors (3.5s)
+✔ [1173/1329] Built Compiler.CompilationModel.YulImporter (1.6s)
+✔ [1174/1329] Built Compiler.CompilationModel.LogicalPurity (1.4s)
+✔ [1175/1329] Built LidoSRv3.Audit.Allocation (4.6s)
+✔ [1176/1329] Built EvmYul.MachineStateOps (4.2s)
+✔ [1177/1329] Built EvmYul.Yul.MachineState (4.3s)
+✔ [1178/1329] Built Compiler.CompilationModel.EcmAxiomCollection (2.0s)
+✔ [1179/1329] Built Compiler.CompilationModel.AdtStorageLayout (1.3s)
+✔ [1180/1329] Built Compiler.CompilationModel.AbiHelpers (1.5s)
+✔ [1181/1329] Built Compiler.CompilationModel.ReservedScratchNames (3.1s)
+✔ [1182/1329] Built Compiler.CompilationModel.AbiTypeLayout (1.7s)
+✔ [1183/1329] Built Verity.Macro.Types (6.8s)
+✔ [1184/1329] Built LidoSRv3.Tests.AddressEquivariance (3.4s)
+✔ [1185/1329] Built LidoSRv3.Audit.Guarantees.PTopup1 (3.5s)
+✔ [1186/1329] Built LidoSRv3.Audit.Guarantees.PAddress1 (4.0s)
+✔ [1187/1329] Built LidoSRv3.Audit.Guarantees.PDeposit1 (3.8s)
+✔ [1188/1329] Built Compiler.CompilationModel.InternalArgs (1000ms)
+✔ [1189/1329] Built EvmYul.Operations (8.6s)
+✔ [1190/1329] Built LidoSRv3.Audit.Strategy (3.6s)
+✔ [1191/1329] Built Compiler.CompilationModel.TrustSurface (4.8s)
+✔ [1192/1329] Built Verity.Core.Model.DynamicAbi (2.0s)
+✔ [1193/1329] Built Compiler.CompilationModel.ParamLoading (2.1s)
+✔ [1194/1329] Built Compiler.Proofs.IRGeneration.ExprCore (10s)
+✔ [1195/1329] Built Verity.Macro.ExternalCalls (4.3s)
+✔ [1196/1329] Built Verity.Macro.Executable (4.0s)
+✔ [1197/1329] Built Verity.Macro.Functions (3.6s)
+✔ [1198/1329] Built Compiler.CodegenCommon (6.8s)
+✔ [1199/1329] Built Compiler.CompilationModel.ValidationHelpers (11s)
+✔ [1200/1329] Built Verity.Macro.Interfaces (5.8s)
+✔ [1201/1329] Built LidoSRv3.Tests.DepositVectors (3.6s)
+✔ [1202/1329] Built Verity.Macro.Internal (4.9s)
+✔ [1203/1329] Built Verity.Macro.Storage (6.4s)
+✔ [1204/1329] Built LidoSRv3.Tests.TopupVectors (5.1s)
+✔ [1205/1329] Built Compiler.CompilationModel.MappingWrites (1.4s)
+✔ [1206/1329] Built Compiler.CompilationModel.LayoutValidation (2.5s)
+✔ [1207/1329] Built Compiler.CompilationModel.ValidationInterop (12s)
+⚠ [1208/1329] Built EvmYul.Pretty (4.0s)
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+✔ [1209/1329] Built LidoSRv3.Audit.Source.MinFirstCorrespondence (3.9s)
+✔ [1210/1329] Built LidoSRv3.Audit.StrategyProofs (3.9s)
+✔ [1211/1329] Built EvmYul.Yul.Ast (4.9s)
+✔ [1212/1329] Built Compiler.CompilationModel.LayoutReport (1.5s)
+✔ [1213/1329] Built EvmYul.EVM.Instr (5.6s)
+✔ [1214/1329] Built Compiler.CompilationModel.LayoutCompatibilityReport (2.1s)
+✔ [1215/1329] Built Verity.Core.Model.Denote (7.4s)
+✔ [1216/1329] Built LidoSRv3.Audit.Guarantees.PAlloc2 (4.2s)
+✔ [1217/1329] Built EvmYul.State.Account (4.2s)
+✔ [1218/1329] Built EvmYul.State.ExecutionEnv (4.3s)
+✔ [1219/1329] Built LidoSRv3.Audit.Verity.AddressYulInterface (5.4s)
+✔ [1220/1329] Built EvmYul.Yul.SizeLemmas (5.9s)
+✔ [1221/1329] Built Verity.Macro.Translate.Parsing (8.1s)
+✔ [1222/1329] Built Verity.Core.Model.DenoteSha256 (3.6s)
+✔ [1223/1329] Built Verity.Core.Model.DenoteExternalCalls (4.4s)
+✔ [1224/1329] Built EvmYul.State.Substate (4.0s)
+✔ [1225/1329] Built LidoSRv3.Tests.MinFirstVectors (4.5s)
+✔ [1226/1329] Built LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound (4.5s)
+✔ [1227/1329] Built EvmYul.State.AccountOps (3.5s)
+✔ [1228/1329] Built EvmYul.Yul.YulNotation (9.2s)
+✔ [1229/1329] Built Compiler.CompilationModel.ScopeValidation (16s)
+✔ [1230/1329] Built LidoSRv3.Tests.AddressYulInterface (4.1s)
+✔ [1231/1329] Built EvmYul.State.SubstateOps (3.2s)
+✔ [1232/1329] Built Verity.Core.Model.CallProgramRollback (3.8s)
+✔ [1233/1329] Built EvmYul.Maps.AccountMap (3.2s)
+✔ [1234/1329] Built LidoSRv3.Tests.PAlloc1EugeneBoundVectors (3.4s)
+✔ [1235/1329] Built EvmYul.State.Transaction (4.0s)
+✔ [1236/1329] Built EvmYul.EVM.Exception (2.6s)
+✔ [1237/1329] Built EvmYul.State.TransactionOps (2.3s)
+✔ [1238/1329] Built EvmYul.State.Withdrawal (2.5s)
+✔ [1239/1329] Built EvmYul.EVM.PrecompiledContracts (3.7s)
+✔ [1240/1329] Built EvmYul.State.Block (3.2s)
+✔ [1241/1329] Built EvmYul.State (2.3s)
+✔ [1242/1329] Built Compiler.CompilationModel.ExpressionCompile (27s)
+✔ [1243/1329] Built Compiler.CompilationModel.EventAbiHelpers (1.2s)
+✔ [1244/1329] Built Compiler.CompilationModel.StorageWrites (1.4s)
+✔ [1245/1329] Built EvmYul.SharedState (2.7s)
+✔ [1246/1329] Built EvmYul.StateOps (3.1s)
+✔ [1247/1329] Built Compiler.CompilationModel.AbiEncoding (1.9s)
+✔ [1248/1329] Built Compiler.CompilationModel.ValidationEvents (2.4s)
+✔ [1249/1329] Built EvmYul.Yul.State (2.6s)
+✔ [1250/1329] Built EvmYul.EVM.State (2.8s)
+✔ [1251/1329] Built EvmYul.SharedStateOps (2.7s)
+✔ [1252/1329] Built Verity.Core.Model.DenoteMemory (20s)
+✔ [1253/1329] Built Compiler.CompilationModel.EventEmission (2.1s)
+✔ [1254/1329] Built Compiler.CompilationModel.UsageAnalysis (47s)
+✔ [1255/1329] Built EvmYul.Yul.Exception (2.3s)
+✔ [1256/1329] Built EvmYul.EVM.StateOps (2.3s)
+✔ [1257/1329] Built EvmYul.Yul.StateOps (3.6s)
+✔ [1258/1329] Built Compiler.CompilationModel.ValidationCalls (2.5s)
+✔ [1259/1329] Built EvmYul.EVM.Gas (4.5s)
+✔ [1260/1329] Built EvmYul.EVM.PrimOps (2.3s)
+✔ [1261/1329] Built EvmYul.Yul.PrimOps (2.2s)
+✔ [1262/1329] Built Compiler.CompilationModel.Validation (2.9s)
+⚠ [1263/1329] Built EvmYul.Semantics (2.8s)
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+✔ [1264/1329] Built Compiler.CompilationModel.Compile (4.2s)
+⚠ [1265/1329] Built EvmYul.EVM.Semantics (4.2s)
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+✔ [1266/1329] Built Compiler.CompilationModel.Dispatch (3.1s)
+✔ [1267/1329] Built Compiler.CompilationModel (405ms)
+✔ [1268/1329] Built Compiler.Modules.Oracle (824ms)
+✔ [1269/1329] Built LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel (795ms)
+✔ [1270/1329] Built Compiler.Modules.Precompiles (1.1s)
+✔ [1271/1329] Built Compiler.Modules.Calls (1.2s)
+✔ [1272/1329] Built Compiler.Modules.ERC20 (1.4s)
+✔ [1273/1329] Built LidoSRv3.Audit.Verity.OfficialSemantics (2.1s)
+✔ [1274/1329] Built LidoSRv3.Audit.Verity.SszAbstractDigest (2.3s)
+⚠ [1275/1329] Built LidoSRv3.Audit.Verity.ConsolidationFee (3.4s)
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:35: Variable name `hdecode` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:377:5: Variable name `hvalue` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:382:70: This simp argument is unused:
+  hsize
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hs̵i̵z̵e̵,̵ ̵h̵decode,
+  ̵  ̵ ̵ ̵hvalue, hkey]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:382:77: This simp argument is unused:
+  hdecode
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hd̵e̵c̵o̵d̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵h̵value, hkey]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:383:4: This simp argument is unused:
+  hvalue
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hv̵a̵l̵u̵e̵,̵ ̵h̵key]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:396:5: Variable name `hrequest` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:407:32: This simp argument is unused:
+  hrequest
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hbound,
+  ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [1276/1329] Built LidoSRv3.Audit.Verity.AllocCapacity (2.3s)
+✔ [1277/1329] Built LidoSRv3.Audit.Verity.Tests.ConsolidationFee (2.2s)
+⚠ [1278/1329] Built LidoSRv3.Audit.Verity.SszTxSimulation (2.8s)
+warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:346:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
+  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
+  exactTxWidths input ∧
+    (digestPreimages input.toInputs).length = 7 ∧
+      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
+        (runVerification input = VerificationOutcome.revertRootMismatch →
+          (transactionObservation input before after attempts trace).committedState = before)
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:347:0: LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback (input : Inputs) (adversary : AdversaryModel)
+  (state : CallState) : (DenoteExternalCalls.denote (sha256Calls input) adversary state).snd.world = state.world
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationModel.Denote.Sha256.denote_success_compose (oracle : StaticCallOracle)
+  (fipsSha256 : ByteArray → ByteArray) (world : Verity.ContractState) (inputOffset inputSize outputOffset : Nat)
+  (digest : Digest) (sha256_correct : sha256_correct oracle fipsSha256)
+  (hcall : oracle (request world.memory inputOffset inputSize outputOffset) = StaticCallResult.success digest) :
+  Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
+    Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+      (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+ℹ [1279/1329] Built LidoSRv3.Audit.Verity.Tests.SszTxSimulation (3.2s)
+info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:35:0: LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected (input : TxInputs)
+  (hmutant : computedRoot input ≠ input.expectedDepositDataRoot) :
+  runVerification input = VerificationOutcome.revertRootMismatch
+info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:36:0: LidoSRv3.Audit.Verity.SszTxSimulation.verification_failure_rolls_back {State : Type} (input : TxInputs)
+  (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
+  (hfail : runVerification input = VerificationOutcome.revertRootMismatch) :
+  (transactionObservation input before after attempts trace).committedState = before ∧
+    (transactionObservation input before after attempts trace).committedTrace.ethMoves = [] ∧
+      (transactionObservation input before after attempts trace).committedTrace.logs = []
+info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:37:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
+  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
+  exactTxWidths input ∧
+    (digestPreimages input.toInputs).length = 7 ∧
+      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
+        (runVerification input = VerificationOutcome.revertRootMismatch →
+          (transactionObservation input before after attempts trace).committedState = before)
+✔ [1280/1329] Built EvmYul.Yul.Interpreter (18s)
+✔ [1281/1329] Built EvmYul (2.5s)
+✔ [1282/1329] Built Compiler.Proofs.KeccakBound (2.3s)
+✔ [1283/1329] Built Compiler.Proofs.MappingSlot (2.6s)
+✔ [1284/1329] Built Compiler.TypedIRCompiler (24s)
+✔ [1285/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanNativeLowering (10s)
+✔ [1286/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanPureBuiltinLemmas (8.1s)
+✔ [1287/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBuiltinSemantics (3.0s)
+✔ [1288/1329] Built Compiler.TypedIRCompilerCorrectness (19s)
+✔ [1289/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBridgeLemmas (5.1s)
+✔ [1290/1329] Built Compiler.Proofs.IRGeneration.SupportedFragment (2.6s)
+✔ [1291/1329] Built Verity.Macro.Translate.Expr (52s)
+✔ [1292/1329] Built Compiler.Proofs.IRGeneration.IRInterpreter (24s)
+✔ [1293/1329] Built Verity.Macro.Translate (74s)
+✔ [1294/1329] Built Verity.Macro.Bridge (4.5s)
+✔ [1295/1329] Built Verity.Macro.Elaborate (5.1s)
+✔ [1296/1329] Built Verity.Macro (1.8s)
+⚠ [1297/1329] Built LidoSRv3.Audit.Source.ReserveCorrespondence (10s)
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:299:53: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵observeVerity, specTx,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵spendDepositableEther, getBufferedEtherAllocation, decode,
+            min, minWord, requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵Verity.bind, Bind.bind, Pure.pure, Contract.run,
+            hzero, hdeposits, depositsReserve, hremaining]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:300:34: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity, specTx,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther, spendDepositableEther, getBufferedEtherAllocation, decode,
+            min, minWord, requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, hremaining]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:302:28: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵observeVerity, specTx,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵spendDepositableEther, getBufferedEtherAllocation, decode,
+            min, minWord, requireSomeUint, getStorage, setStorage,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵Verity.bind, Bind.bind, Pure.pure, Contract.run,
+            hzero, hdeposits, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:316:57: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot, Verity.require, Verity.bind,
+                Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲withdrawalsReserve, hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:317:38: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:319:46: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, ContractState.writeSlot, Verity.require,
+                Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:320:14: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, ContractState.writeSlot, Verity.require,
+                Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:330:30: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ ̵ContractState.readSlot, ContractState.writeSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+                    hwithdrawals, depositsReserve, withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:331:18: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved, hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:333:32: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+                    ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵withdrawalsReserve, hremaining,
+                    hunreserved, hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:333:49: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+                    ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
+                    hunreserved, hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:345:67: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot,
+                          ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲withdrawalsReserve, hremaining, hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:346:48: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:348:70: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                          Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve,
+                          hremaining, hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:349:24: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                          Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:359:71: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot, Verity.require,
+                              Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:360:52: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
+                              ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require, Verity.bind, Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:362:74: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
+                              ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved, hdepositable,
+                              henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:363:28: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
+                              ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved, hdepositable,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:375:61: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run,
+                                  hzero, hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve,
+                                  hremaining, hunreserved, hdepositable, henough, hpost, hbuffered,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:376:56: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require,
+                                  Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:378:78: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved, hdepositable, henough,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:379:32: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved, hdepositable, henough,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:400:78: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, ReserveContract.buffered,
+                                  ReserveContract.storedDepositsReserve,
+                                  ReserveContract.unfinalizedStETH,
+                                  ReserveContract.depositedPostReport,
+                                  ReserveContract.depositedNextReportAdjusted,
+                                  modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲minWord, requireSomeUint, getStorage, setStorage,
+                                  ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough, hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:401:32: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, ReserveContract.buffered,
+                                  ReserveContract.storedDepositsReserve,
+                                  ReserveContract.unfinalizedStETH,
+                                  ReserveContract.depositedPostReport,
+                                  ReserveContract.depositedNextReportAdjusted,
+                                  modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲minWord, requireSomeUint, getStorage, setStorage,
+                                  ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved,
+                                  hdepositable, henough, hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:408:63: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:409:44: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require,
+                    Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved, hdepositable,
+                    henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:411:66: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                    Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:412:20: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                    Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [1298/1329] Built LidoSRv3.Audit.Guarantees.PReserve1 (1.6s)
+✔ [1299/1329] Built LidoSRv3.Tests.ReserveMutants (1.9s)
+ℹ [1300/1329] Built LidoSRv3.Audit.Trust (2.4s)
+info: LidoSRv3/Audit/Trust.lean:23:0: 'LidoSRv3.Audit.Quantity.checkedDiv_zero' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:24:0: 'LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:25:0: 'LidoSRv3.Audit.revert_restores_state_value_and_logs' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:26:0: 'LidoSRv3.Audit.revert_may_retain_attempts' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:27:0: 'LidoSRv3.Audit.valid_result_preserves_router_order' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:28:0: 'LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:29:0: 'LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:30:0: 'LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:31:0: 'LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:32:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:33:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:34:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:35:0: 'LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:36:0: 'LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:37:0: 'LidoSRv3.Audit.MinFirstAllocation.Model.success_conservation' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:38:0: 'LidoSRv3.Audit.MinFirstAllocation.Model.success_capacity' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:39:0: 'LidoSRv3.Audit.MinFirstAllocation.Model.failure_rolls_back' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:40:0: 'LidoSRv3.Audit.MinFirstAllocation.Source.success_conservation' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:41:0: 'LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:42:0: 'LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:43:0: 'LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:44:0: 'LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:45:0: 'LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:46:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:47:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:48:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:49:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:50:0: 'LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:51:0: 'LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:52:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:53:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_router_balance_unchanged' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:54:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_reverting_branch_moves_no_ether' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:55:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:56:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:57:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:58:0: 'LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:59:0: 'LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:60:0: 'LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:61:0: 'LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:62:0: 'LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root' depends on axioms: [propext,
+ Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:64:0: 'LidoSRv3.Audit.MinFirst.candidate_mem' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:65:0: 'LidoSRv3.Audit.MinFirst.candidate_open' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:66:0: 'LidoSRv3.Audit.MinFirst.candidate_none_no_open' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:67:0: 'LidoSRv3.Audit.MinFirst.candidate_minimal' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:68:0: 'LidoSRv3.Audit.MinFirst.candidate_router_tie' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:69:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_moduleId' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:70:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_active' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:71:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_monotone' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:72:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_eq_of_ne' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:73:0: 'LidoSRv3.Audit.MinFirst.step_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:74:0: 'LidoSRv3.Audit.MinFirst.step_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:75:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:76:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:77:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:78:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:79:0: 'LidoSRv3.Audit.MinFirst.run_spent_le' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:80:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_le_requested' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:81:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:82:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:83:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
+✔ [1301/1329] Built LidoSRv3.Audit.AllGuarantees (2.5s)
+✔ [1302/1329] Built Compiler.Proofs.IRGeneration.SupportedSpec (110s)
+✔ [1303/1329] Built Compiler.Proofs.IRGeneration.SourceSemantics (42s)
+✔ [1304/1329] Built Compiler.Proofs.IRGeneration.ParamLoading (10s)
+✔ [1305/1329] Built Compiler.Proofs.IRGeneration.DenoteAgreement (20s)
+✔ [1306/1329] Built Compiler.Proofs.IRGeneration.DenoteFunctionAgreement (2.9s)
+✔ [1307/1329] Built Compiler.Proofs.IRGeneration.DenoteEquivalence (2.8s)
+✔ [1308/1329] Built Compiler.Proofs.IRGeneration.FunctionBody.Base (20s)
+✔ [1309/1329] Built Compiler.Proofs.IRGeneration.FunctionBody.Stmt (13s)
+✔ [1310/1329] Built Compiler.Proofs.IRGeneration.FunctionBody (2.1s)
+✔ [1311/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.ResultRelation (3.1s)
+✔ [1312/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.InterfaceAssembly (3.1s)
+✔ [1313/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Scope (10s)
+✔ [1314/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.ExprStmt (3.1s)
+✔ [1315/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Storage (28s)
+✔ [1316/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Loops (6.8s)
+✔ [1317/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.EventBridge (14s)
+✔ [1318/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Helpers (7.1s)
+✔ [1319/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Main (2.0s)
+✔ [1320/1329] Built Compiler.Proofs.Storage.SolidityStorage (4.5s)
+✔ [1321/1329] Built Compiler.Proofs.LoopSimulation (2.4s)
+✔ [1322/1329] Built Verity.Proofs.LoopSimulation (2.4s)
+✔ [1323/1329] Built Verity.Core.Model.AllocationExtraction (3.6s)
+✔ [1324/1329] Built LidoSRv3.Audit.Verity.DepositRollback (2.6s)
+✔ [1325/1329] Built LidoSRv3.Audit.Verity.TopupRollback (2.7s)
+ℹ [1326/1329] Built LidoSRv3.Audit.Verity.Tests.TopupRollback (2.7s)
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:41:0: LidoSRv3.Audit.Verity.TopupRollback.topup_program_declared : spec.functions = [topUpEntry]
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:42:0: LidoSRv3.Audit.Verity.TopupRollback.topup_success_post_state_equiv (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+  {keys pulled pushed balanceAfter : ℕ} (hRun : run cfg inp = Outcome.committedTopUp keys pulled pushed balanceAfter) :
+  pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:43:0: LidoSRv3.Audit.Verity.TopupRollback.topup_rollback_restores_state {State : Type} (cfg : SourceTopupConfig)
+  (inp : SourceTopupInput) (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
+  (hRevert : (topupProgram cfg inp before).sourceOutcome.reverts = true) :
+  (transactionObservation (topupProgram cfg inp before) after attempts trace).committedState = before ∧
+    (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] ∧
+      (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.logs = []
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:44:0: LidoSRv3.Audit.Verity.TopupRollback.topup_allocation_extracted_from_pinned_source :
+  Verity.Core.Model.AllocationExtraction.extractAllocation spec topUpEntry =
+    Verity.Core.Model.AllocationExtraction.extractAllocationFromSource spec pinnedSolidityTopUp
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:45:0: LidoSRv3.Audit.Verity.TopupRollback.topup_amount_extraction_correct (inp : SourceTopupInput)
+  (hNoWrap : NoUncheckedWrap inp) : allocSumUnchecked inp.allocations = totalAllocated inp
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:46:0: LidoSRv3.Audit.Verity.TopupRollback.topup_call_world_rollback {State : Type} (program : TopupProgram State)
+  (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+  (state : Compiler.CompilationModel.DenoteExternalCalls.CallState)
+  (h :
+    ∀ entry ∈ Compiler.CompilationModel.DenoteExternalCalls.ObservedCalls program.calls adversary state,
+      Compiler.CompilationModel.DenoteExternalCalls.RollsBack adversary entry) :
+  (Compiler.CompilationModel.DenoteExternalCalls.denote program.calls adversary state).2.world = state.world
+✔ [1327/1329] Built LidoSRv3.Audit.Verity.Tests.DepositRollback (3.1s)
+✔ [1328/1329] Built LidoSRv3 (2.3s)
+Build completed successfully (1329 jobs).
