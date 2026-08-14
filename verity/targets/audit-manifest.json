@@ -112,12 +112,12 @@
     {
       "name": "Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": ["propext", "Classical.choice", "Quot.sound", "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]
     },
     {
       "name": "Guarantees.PAlloc1Phase3.mapped_summary_call_transaction",
       "status": "lean_checked",
-      "axioms": []
+      "axioms": ["propext", "Classical.choice", "Quot.sound", "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]
     },
     {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
