@@ -16,6 +16,7 @@ import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Tests.DepositTxMutants
+import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
@@ -43,6 +44,12 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_pinned_expression_shape
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_totality
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_conservation

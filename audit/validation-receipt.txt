@@ -1,15 +1,25 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-<<<<<<< HEAD
-validated-tree: 965d2a3452b3223eb198c82e3bcdc033ef712bba
-=======
-validated-tree: da3d9a73b684b3b5479fcae14cbd533a2865ec98
->>>>>>> origin/main
+validated-tree: f485891b5f417ab246c0a3f45fc38aa606e68232
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
+--------------------------------------------------------------
+
+- Pinned-source correspondence covers the candidate scan, allocation-size
+  upper bound, proportional amount, bucket mutation, and outer-loop amount
+  updates. The canonical transaction theorems require the transaction row to
+  be the row returned by `Source.candidate?`.
+- The typed `Contract.run` slice proves checked arithmetic, strict progress,
+  capacity non-breach, accumulator/remaining-demand updates, and exact
+  snapshot rollback. Candidate-array memory semantics, Yul, EVM, runtime
+  bytecode, and deployment provenance remain open.
+- `A-ALLOC2-TX-BOUNDARY` records that candidate scanning, candidate count, and
+  allocation-size upper bound are supplied as source-plane words.
 
 P-TOPUP-2 bounded source/transaction closure (2026-08-15)
 ---------------------------------------------------------

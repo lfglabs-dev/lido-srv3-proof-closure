@@ -43,7 +43,10 @@
       "id": "P-ALLOC-2",
       "status": "MAPPED",
       "spans": [
-        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/MinFirstAllocationStrategy.sol", "function": "allocateToBestCandidate candidate search", "start_line": 76, "end_line": 86, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"}
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/MinFirstAllocationStrategy.sol", "function": "allocate outer loop", "start_line": 30, "end_line": 44, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/MinFirstAllocationStrategy.sol", "function": "allocateToBestCandidate candidate search", "start_line": 76, "end_line": 86, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/MinFirstAllocationStrategy.sol", "function": "allocateToBestCandidate allocation-size upper bound", "start_line": 93, "end_line": 100, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L93-L100"},
+        {"repository": "lidofinance/core", "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b", "path": "contracts/common/lib/MinFirstAllocationStrategy.sol", "function": "allocateToBestCandidate proportional amount and bucket mutation", "start_line": 102, "end_line": 106, "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"}
       ]
     },
     {
