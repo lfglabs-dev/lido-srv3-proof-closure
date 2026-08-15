@@ -16,6 +16,7 @@ import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Tests.DepositTxMutants
+import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -82,6 +83,9 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected
 #print axioms
   LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
