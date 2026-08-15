@@ -4,8 +4,8 @@
 
 - `P-ALLOC-1`: Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.
 - `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
-- `P-DEPOSIT-1`: Refine declared linked-external calls and the summarized balance world through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.
-- `P-TOPUP-1`: Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.
+- `P-DEPOSIT-1`: Repair Verity externalCallBind with observable call traces/effects, bind the actual Contract.run program to those observations, and add a mutant that changes the executed program and is mechanically rejected.
+- `P-TOPUP-1`: Repair Verity externalCallBind with observable call traces/effects, then rebuild the TX plane so call-sequence/value mutants alter execution and are mechanically rejected.
 - `P-ACCOUNT-1`: Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.
 - `P-RESERVE-1`: Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.
 - `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.
