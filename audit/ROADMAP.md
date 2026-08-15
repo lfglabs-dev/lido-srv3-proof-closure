@@ -10,6 +10,6 @@
 - `P-RESERVE-1`: Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.
 - `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.
 - `P-ADDRESS-1`: Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.
-- `P-TOPUP-2`: Obtain independent canonical runtime, codehash, fork, and address provenance.
+- `P-TOPUP-2`: Obtain independent canonical runtime, codehash, fork, and address provenance, then refine the conditional source/Verity boundary through Yul and EVM semantics.
 - `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
 - `P-SSZ-1`: Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.

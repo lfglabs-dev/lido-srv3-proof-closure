@@ -30,7 +30,7 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | 6 | `P-RESERVE-1` | `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` (independent MODEL → pinned source-shaped semantics → Verity transaction refinement) |
 | 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
 | 8 | `P-ADDRESS-1` | OPEN; the address-renaming relation is specified, but no modeled entrypoint proves it |
-| 9 | `P-TOPUP-2` | metadata-only; no Lean theorem claimed |
+| 9 | `P-TOPUP-2` | `LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap` (MODEL aggregate-cap conservation → pinned source-shaped transition → adversary-quantified Verity external-call plane, conditional on an explicit runtime-provenance witness; EVM verifier binding stays BLOCKED) |
 | 10 | `P-CONSOLIDATION-1` | metadata-only; no Lean theorem claimed |
 | 11 | `P-SSZ-1` | `LidoSRv3.Audit.Ssz.structural_witness_binding_sound` (model); source plane OPEN for mapped helper/wrapper scope; carries the subordinate `P-SSZ-1.deposit-data-root` child claim noted below |
 

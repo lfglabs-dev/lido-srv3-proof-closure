@@ -155,11 +155,13 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
   exact Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
 
-/-- Corrected budget/headroom model is checked at MODEL. -/
-def guarantee : Guarantee := ⟨.pTopup2, [.model]⟩
+/-- The model theorem is extended by source and bounded-Verity transaction
+correspondence in `Source.Topup2Correspondence` and `Verity.Topup2Tx`. -/
+def guarantee : Guarantee := ⟨.pTopup2, [.model, .source, .verityTx]⟩
 
 /- TODO(P-TOPUP-2 verifier binding): establish from runtime provenance that the
 deployed verifier address and codehash bind an accepted SSZ proof to the intended
-validator. Source, transaction, and EVM closure remain BLOCKED until then. -/
+validator. EVM closure remains BLOCKED until then; source and transaction
+statements take the provenance witness explicitly as an input. -/
 
 end LidoSRv3.Audit.Guarantees.PTopup2
