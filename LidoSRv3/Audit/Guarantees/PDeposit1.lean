@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.DepositCorrespondence
+import LidoSRv3.Audit.Verity.DepositTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PDeposit1
@@ -7,7 +8,40 @@ namespace LidoSRv3.Audit.Guarantees.PDeposit1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityDeposit
 
-def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source]⟩
+def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
+
+/-- Public P-DEPOSIT-1 transaction-plane closure for one bounded deposit unit.
+The result is an actual `Verity.Contract.run` observation at the summarized-call
+boundary: Lido loses exactly `amount`, the modeled beacon sink gains exactly
+`amount`, and router ETH plus the withdrawal reserve are unchanged. -/
+theorem tx_one_unit_exact_transfer
+    {cfg : SourceDepositConfig} {inp : SourceDepositInput}
+    {snapshot : _root_.Verity.ContractState}
+    {balances : LidoSRv3.Audit.Verity.DepositTx.Balances} {amount : Nat}
+    (hRun : run cfg inp = .committedDeposits 1 amount amount inp.routerBalanceBefore)
+    (hFunds : amount ≤ balances.lidoDepositable) :
+    let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances amount
+      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp).run snapshot)
+    tx.status = .committed ∧
+      tx.balancesAfter.lidoDepositable + amount = balances.lidoDepositable ∧
+      tx.balancesAfter.beaconSink = balances.beaconSink + amount ∧
+      tx.balancesAfter.routerEth = balances.routerEth ∧
+      tx.balancesAfter.withdrawalReserve = balances.withdrawalReserve :=
+  LidoSRv3.Audit.Verity.DepositTx.one_unit_exact_transfer hRun hFunds
+
+/-- Public transaction-plane rollback theorem: any source revert restores the
+exact Verity snapshot and exposes no committed modeled balance effects. -/
+theorem tx_revert_restores_snapshot_and_effects
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (snapshot : _root_.Verity.ContractState)
+    (balances : LidoSRv3.Audit.Verity.DepositTx.Balances)
+    (h : (run cfg inp).reverts = true) :
+    let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances
+      (depositsValue cfg inp)
+      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp).run snapshot)
+    tx.status = .reverted ∧ tx.after = snapshot ∧ tx.balancesAfter = balances :=
+  LidoSRv3.Audit.Verity.DepositTx.source_revert_restores_committed_effects
+    cfg inp snapshot balances h
 
 /-- Abstract transaction rollback, not an executable EVM trace. -/
 theorem revert_restores_state_value_and_logs {State : Type} :
