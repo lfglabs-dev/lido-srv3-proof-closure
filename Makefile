@@ -41,6 +41,8 @@ test:
 	@printf '%s\n' 'executable Eugene operator-bond vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.SszRegression
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
+	@lake build LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+	@printf '%s\n' 'typed SSZ transaction-simulation acceptance/mutant/rollback vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositVectors
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositTxMutants
@@ -51,6 +53,8 @@ test:
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupHybridMutants
 	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.Topup2TxMutants
+	@printf '%s\n' 'bounded Verity P-TOPUP-2 aggregate-cap transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveMutants
 	@printf '%s\n' 'executable reserve non-interference and rollback mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors

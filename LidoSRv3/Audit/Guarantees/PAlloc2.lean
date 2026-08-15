@@ -122,6 +122,7 @@ theorem tx_step_matches_source
     (allocationSize : MinFirstAllocation.Source.Word)
     (best : MinFirstAllocation.Source.Row)
     (total : MinFirstAllocation.Source.Word) (base : Verity.ContractState)
+    (hSelected : MinFirstAllocation.Source.candidate? rs = some best)
     (hOpen : MinFirstAllocation.Source.hasFreeSpace best = true)
     (hLen : rs.length < Verity.Core.Uint256.modulus)
     (hTotal : total.val + allocationSize.val ≤ Verity.Core.MAX_UINT256) :
@@ -131,7 +132,8 @@ theorem tx_step_matches_source
           (MinFirstAllocation.upperBound rs best)).run
         (Verity.MinFirstAmountTx.stateFor best total allocationSize base)) =
       Verity.MinFirstAmountTx.sourceView rs allocationSize best total :=
-  Verity.MinFirstAmountTx.tx_observes_source rs allocationSize best total base hOpen hLen hTotal
+  Verity.MinFirstAmountTx.tx_observes_source rs allocationSize best total base
+    hSelected hOpen hLen hTotal
 
 /-- Transaction-plane safety of one min-first step: it commits, allocates at
 least one unit, never writes past the candidate's capacity, and decrements the
@@ -141,6 +143,7 @@ theorem tx_step_is_safe
     (allocationSize : MinFirstAllocation.Source.Word)
     (best : MinFirstAllocation.Source.Row)
     (total : MinFirstAllocation.Source.Word) (base : Verity.ContractState)
+    (hSelected : MinFirstAllocation.Source.candidate? rs = some best)
     (hOpen : MinFirstAllocation.Source.hasFreeSpace best = true)
     (hLen : rs.length < Verity.Core.Uint256.modulus)
     (hSize : allocationSize.val ≠ 0)
@@ -157,7 +160,8 @@ theorem tx_step_is_safe
       tx.bucket.val ≤ best.capacity.val ∧
       tx.total.val = total.val + tx.allocated.val ∧
       tx.remaining.val + tx.allocated.val = allocationSize.val :=
-  Verity.MinFirstAmountTx.tx_step_is_safe rs allocationSize best total base hOpen hLen hSize hTotal
+  Verity.MinFirstAmountTx.tx_step_is_safe rs allocationSize best total base
+    hSelected hOpen hLen hSize hTotal
 
 /-- Every revert of the amounts transaction rolls storage back to the exact
 pre-call snapshot. -/

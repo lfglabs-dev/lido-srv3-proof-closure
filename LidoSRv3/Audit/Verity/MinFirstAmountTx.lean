@@ -128,12 +128,14 @@ lines 93--100), commits and produces exactly the word and the three storage
 mutations that `Source.checkedAmount`, source line 106 and the outer loop's
 lines 41 and 37 predict.
 
-The two premises are the honest word-size side conditions: `hLen` bounds the
+The candidate premise binds this row to the result of the pinned candidate
+scan. The remaining premises are honest word-size side conditions: `hLen` bounds the
 candidate array by the word size (so `bestCandidatesCount` is representable),
 and `hTotal` says the accumulator plus the remaining demand fits in one word. -/
 theorem tx_observes_source
     (rs : List Source.Row) (allocationSize : Source.Word) (best : Source.Row)
     (total : Source.Word) (base : ContractState)
+    (_hSelected : Source.candidate? rs = some best)
     (hOpen : Source.hasFreeSpace best = true)
     (hLen : rs.length < Core.Uint256.modulus)
     (hTotal : total.val + allocationSize.val ≤ Core.MAX_UINT256) :
@@ -175,6 +177,7 @@ underflows the outer loop's remaining demand. -/
 theorem tx_step_is_safe
     (rs : List Source.Row) (allocationSize : Source.Word) (best : Source.Row)
     (total : Source.Word) (base : ContractState)
+    (hSelected : Source.candidate? rs = some best)
     (hOpen : Source.hasFreeSpace best = true)
     (hLen : rs.length < Core.Uint256.modulus)
     (hSize : allocationSize.val ≠ 0)
@@ -189,7 +192,7 @@ theorem tx_step_is_safe
       tx.bucket.val ≤ best.capacity.val ∧
       tx.total.val = total.val + tx.allocated.val ∧
       tx.remaining.val + tx.allocated.val = allocationSize.val := by
-  have hobs := tx_observes_source rs allocationSize best total base hOpen hLen hTotal
+  have hobs := tx_observes_source rs allocationSize best total base hSelected hOpen hLen hTotal
   have hAmount : Source.checkedAmount rs allocationSize best =
       some (Source.minWord (sourceShare rs allocationSize best)
         (Source.minWord (upperBound rs best) best.capacity - best.allocation)) :=

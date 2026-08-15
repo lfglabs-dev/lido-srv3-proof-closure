@@ -12,9 +12,12 @@ import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Verity.Topup2Tx
+import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Tests.DepositTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
+import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -23,13 +26,8 @@ Most output uses only Lean foundations (`propext`, `Classical.choice`, and
 `Quot.sound`) where listed.  The canonical P-ALLOC-1 Phase-3 compilation
 theorems additionally disclose the generated
 `consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
-dependency recorded in the target manifest.  The mutant-rejection theorems of
-`LidoSRv3.Tests.DepositTxMutants` and `LidoSRv3.Tests.MinFirstAmountTxMutants`
-are decided by `native_decide` and therefore each disclose their own generated
-`Lean.ofReduceBool` / `_native.native_decide` axiom; they are negative tests
-that discriminate the pinned behaviour from mutants, and no positive guarantee
-theorem depends on them.  There are no undisclosed project-level assumptions or
-proof escapes.
+dependency recorded in the target manifest; there are no undisclosed
+project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
@@ -52,9 +50,6 @@ proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_revert_restores_snapshot
-#print axioms LidoSRv3.Audit.Verity.MinFirstAmountTx.tx_underflow_reverts_to_snapshot
-#print axioms LidoSRv3.Tests.MinFirstAmountTxMutants.dropHeadroomMin_is_detected
-#print axioms LidoSRv3.Tests.MinFirstAmountTxMutants.floorShare_is_detected_in_tx
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_conservation
@@ -82,10 +77,22 @@ proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source
+#print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_restores_world
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_committed_world_is_commit_fold
+#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_has_failed_call
+#print axioms LidoSRv3.Tests.Topup2TxMutants.over_cap_aggregate_rejected
+#print axioms LidoSRv3.Tests.Topup2TxMutants.double_send_rejected
+#print axioms LidoSRv3.Tests.Topup2TxMutants.reverting_adversary_cannot_leak_state
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected
 #print axioms
   LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root
 #print axioms LidoSRv3.Audit.MinFirst.candidate_mem
