@@ -87,13 +87,13 @@
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "Per-validator top-up headroom and aggregate budget conservation are proved at MODEL, SOURCE, and bounded Verity transaction planes, conditional on independently supplied runtime provenance; EVM verifier-binding remains BLOCKED.",
+      "catalogue_wording": "Aggregate top-up budget conservation is proved at MODEL, SOURCE, and bounded Verity transaction planes, conditional on independently supplied runtime provenance. The TX theorem constrains the sum of dynamically observed call values; it does not establish callee address, call kind, calldata, per-validator call granularity, or failed-call provenance. EVM verifier-binding remains BLOCKED.",
       "theorem": "LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap",
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-RUNTIME-PROVENANCE"],
-      "note": "SOURCE and TX theorems require explicit gateway/verifier address, codehash, and fork provenance inputs. They do not establish that witness or any deployed runtime semantics.",
-      "next_gate": "Obtain independent canonical runtime, codehash, fork, and address provenance, then refine the conditional source/Verity boundary through Yul and EVM semantics.",
+      "note": "SOURCE and TX theorems require explicit gateway/verifier address, codehash, and fork provenance inputs. The adversary-quantified call trace and aggregate value bound are non-vacuous: omission/zero-value and doubled-value mutants are mechanically rejected across the exactness/cap pair. Scope is aggregate only: target, kind, calldata, one-call-per-validator shape, and the claimed membership of tx_revert_has_failed_call in ObservedCalls are not established.",
+      "next_gate": "Strengthen tx_revert_has_failed_call so its witness is constrained to ObservedCalls of the same run; separately bind target, call kind, calldata, and per-validator call granularity before claiming those properties. Then obtain independent runtime provenance and refine through Yul/EVM.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Tests.Topup2TxMutants", "expected": "successful configurable source correspondence and adversary-quantified external-call plane with aggregate cap conservation and rollback; EVM verifier binding remains blocked on runtime provenance"}
     },
     {
