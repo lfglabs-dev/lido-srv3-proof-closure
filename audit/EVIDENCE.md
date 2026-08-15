@@ -8,15 +8,15 @@ Campaign commit: `4649ba55052fa29132b016dc443ac738134c332f`
 
 ## P-ALLOC-1
 
-Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.
+The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded official Verity Contract.run allocation receipt: on fixed single-row router states the executed transaction's returned amount and committed router-ordered allocation column equal the independently checked source amount and its additive conservation, and three orthogonal mutant programs (overwrite instead of add, dropped effective-capacity clamp, disabled-row participation) change an observed post-state. This slice executes storage operations only and performs no external calls, so it does not rest on Verity's vacuous externalCallBind; storage slots are model-local, and generality beyond the fixed receipt states, proportional-amount refinement, deployed proxy layout, Yul, EVM, and gas remain open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
-- Theorem planes: `model`, `source`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:27`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
-- Assumptions: `A-SOURCE-SHAPED`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression`
-- Expected scope: successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L69)
+- Theorem planes: `model`, `source`, `tx`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:69`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L69)
+- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.MinFirstVectors`
+- Expected scope: successful checked-source to independent Audit-model correspondence conjoined with the bounded Contract.run allocation receipt and its three mutant-sensitivity receipts; generality beyond the fixed receipt states and Yul/EVM/deployed-layout refinement remain open
 
 ### Subordinate evidence (does not prove the parent)
 

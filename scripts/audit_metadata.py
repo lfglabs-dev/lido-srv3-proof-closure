@@ -46,7 +46,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.",
+    "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded official Verity Contract.run allocation receipt: on fixed single-row router states the executed transaction's returned amount and committed router-ordered allocation column equal the independently checked source amount and its additive conservation, and three orthogonal mutant programs (overwrite instead of add, dropped effective-capacity clamp, disabled-row participation) change an observed post-state. This slice executes storage operations only and performs no external calls, so it does not rest on Verity's vacuous externalCallBind; storage slots are model-local, and generality beyond the fixed receipt states, proportional-amount refinement, deployed proxy layout, Yul, EVM, and gas remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "The complete public topUp parent transaction is simulated by executable Verity Contract.run from authentication through allocation, wrapped uint256 accumulation, empty commit, Lido pull, Beacon push, assertion, commit/revert, and snapshot rollback; arbitrary callees expose control, value, returndata, and caller-frame preservation, while solc and deployment provenance remain separately trusted/recorded under A-SOLC-TRUSTED.",
@@ -108,8 +108,8 @@ EXPECTED_ASSUMPTIONS = {
     ],
 }
 EXPECTED_REPRODUCTION = [
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression",
-     "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.MinFirstVectors",
+     "expected": "successful checked-source to independent Audit-model correspondence conjoined with the bounded Contract.run allocation receipt and its three mutant-sensitivity receipts; generality beyond the fixed receipt states and Yul/EVM/deployed-layout refinement remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -147,7 +147,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-SOURCE-SHAPED"],
+    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED"],
@@ -169,8 +169,9 @@ EXPECTED_ASSUMPTION_LINKS = [
     [],
 ]
 EXPECTED_NEXT_GATES = [
-    "Refine proportional allocation amounts for "
-    "SRLib._getModulesAllocationAndCapacity.",
+    "Generalize the bounded single-row allocation receipt to arbitrary "
+    "router-ordered states and proportional amounts, and bind the model-local "
+    "storage slots to the deployed proxy layout and generated Yul/EVM semantics.",
     "Refine proportional allocation amounts and checked-Uint256 execution "
     "for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Connect the pinned deposit conservation/rollback correspondence to an official Verity transaction.",
@@ -208,7 +209,7 @@ EXPECTED_EXCLUSIONS = {
 }
 PLANES = {"model", "algorithm", "source", "tx", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
@@ -230,7 +231,7 @@ EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
-    ["model", "source"],
+    ["model", "source", "tx"],
     ["algorithm", "source"],
     ["model", "source"],
     ["model", "source", "tx"],
@@ -252,7 +253,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure",
@@ -408,6 +409,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
      "status": "lean_checked", "axioms": ["propext"]},
+    {"name": "Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction",
+     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "SolidityMinFirst.run_conservation_mutant_sensitive",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_capacity_mutant_sensitive",
