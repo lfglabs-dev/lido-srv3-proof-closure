@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2b190780946481e434126a367ad34e62bec97575
+validated-tree: aab1c78b5884fcd3cebe5dea91bd4f35f6fcbe43
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -14,7 +14,7 @@ historical dossiers now live under `archive/legacy-p1-p15/`, which is retained
 because their source references and limitations are not all represented in the
 minimal-11 registry, and which no gate validates.
 
-Minimal-11 Verity main re-pin receipt (2026-08-14)
+Minimal-11 Verity main re-pin receipt (2026-08-14; evidence refreshed 2026-08-15)
 --------------------------------------------------
 
 - Immutable semantic base: `25c82e137236131c037a45618e44382547efebe2`.
@@ -27,8 +27,8 @@ Minimal-11 Verity main re-pin receipt (2026-08-14)
 - Local, non-DGX validation: `make prove` ran once with Lean 4.31.0 and
   `lake build LidoSRv3`, exit status 0. Generated evidence is
   `proofs/logs/prove.txt` and `proofs/logs/proof-report.json` (source tree
-  `c9a2b85568d539594607be8138467c97aebf0a9c`; log SHA-256
-  `3ef99cbe0dfd844c86404fbe0897ace72c2c6f064d0276a23c1842d833410972`).
+  `7596d7e067c31aa40f09cba33eb05478dc7e2d6d`; log SHA-256
+  `ffb0fdb48d29481374bf34636aaa9e0670335c6f7d8b5c0e8f10bf45b402baf6`).
 - The re-pin changes no theorem statement, guarantee status, source mapping,
   or trust policy. The only Lean edit updates a stale revision comment. No
   `sorry`, `admit`, project `axiom`, or `unsafe` escape was introduced.
