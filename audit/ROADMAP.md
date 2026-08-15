@@ -2,12 +2,12 @@
 
 # ROADMAP
 
-- `P-ALLOC-1`: Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.
+- `P-ALLOC-1`: Replace the native_decide compilation dependency with an auditable theorem path, bind moduleAddress to pinned source/runtime provenance, and refine the bounded summary-call and model-local storage slice through the allocation loop and generated Yul/EVM semantics.
 - `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
 - `P-DEPOSIT-1`: Repair Verity externalCallBind with observable call traces/effects, bind the actual Contract.run program to those observations, and add a mutant that changes the executed program and is mechanically rejected.
 - `P-TOPUP-1`: Repair Verity externalCallBind with observable call traces/effects, then rebuild the TX plane so call-sequence/value mutants alter execution and are mechanically rejected.
-- `P-ACCOUNT-1`: Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.
-- `P-RESERVE-1`: Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.
+- `P-ACCOUNT-1`: Define a distinct stateful transaction execution, connect accepted/source steps to its reads and writes, and reject validity-guard and overflow mutants outside decorative premises before restoring TX status.
+- `P-RESERVE-1`: Bind guard order and revert reasons if they are claimed, and independently justify transaction-frame rollback before refining the proved transaction through generated Yul/EVM/runtime and deployed storage/call semantics.
 - `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity, deployment provenance, and executable EVM semantics.
 - `P-ADDRESS-1`: Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.
 - `P-TOPUP-2`: Strengthen tx_revert_has_failed_call so its witness is constrained to ObservedCalls of the same run; separately bind target, call kind, calldata, and per-validator call granularity before claiming those properties. Then obtain independent runtime provenance and refine through Yul/EVM.
