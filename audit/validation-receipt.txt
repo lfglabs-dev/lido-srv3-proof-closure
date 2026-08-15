@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: PLACEHOLDER
+validated-tree: 84902545be7f331f430dac953cfdeaa9d6337394
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -679,7 +679,7 @@ P-ADDRESS-1 official-denotation admission subordinate evidence (2026-08-16)
   entrypoint writes no storage. No correspondence to pinned Lido SRv3 Solidity
   is claimed, so the SOURCE plane is `NOT_APPLICABLE` for this row and the
   parent transaction plane stays OPEN.
-- Full `lake build`: exit 0 (`Build completed successfully (1345 jobs).`).
+- Full `lake build`: exit 0 (`Build completed successfully (1348 jobs).`).
 - `lake build LidoSRv3.Audit.Trust`: exit 0. All six new theorems report
   `depends on axioms: [propext, Quot.sound]`; no `sorry`, `admit`,
   `native_decide`, or project-level axiom is introduced.
