@@ -14,13 +14,13 @@
     },
     {
       "id": "P-ALLOC-2",
-      "catalogue_wording": "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
-      "theorem_planes": ["algorithm", "source"],
-      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-HANDWRITTEN-MINFIRST"],
-      "next_gate": "Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"}
+      "catalogue_wording": "Pinned-source correspondence proves the next-target selection rule and the proportional allocation amount of MinFirstAllocationStrategy lines 102-106, discharging the min-then-subtract expression shape rather than assuming it; an actual Verity Contract.run transaction executes the checked min/ceilDiv arithmetic, the bucket mutation, and the calling allocate loop's accumulator and remaining-demand updates, proving strict progress, capacity non-breach, and exact snapshot rollback on revert. The candidate scan and best-candidate count enter the transaction as source-plane words, and Yul, EVM, and buckets/capacities memory-array layout equivalence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source",
+      "theorem_planes": ["algorithm", "source", "tx"],
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-HANDWRITTEN-MINFIRST", "A-ALLOC2-TX-BOUNDARY", "A-VERITY-SCAFFOLD"],
+      "next_gate": "Lift the source-plane candidate scan, best-candidate count, and allocationSizeUpperBound into the transaction against the buckets/capacities memory-array layout, then refine the proved amount transaction through generated Yul and EVM/runtime-bytecode semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstAmountTx LidoSRv3.Tests.MinFirstAmountTxMutants", "expected": "successful pinned-source next-target selection and proportional-amount correspondence plus actual Verity Contract.run transaction simulation, progress/capacity/rollback proofs, and rejection of capacity-breach, non-termination, and floor-division mutants; Yul, EVM, and memory-array layout equivalence remain open"}
     },
     {
       "id": "P-DEPOSIT-1",

@@ -1,11 +1,53 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ef09a9e9fceadc7a0f3439c4ac26b209f018fcff
+validated-tree: 9ba0d7c1a10c5bd7982037fb840d7e05bc11a72d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ALLOC-2 amounts transaction-plane closure (2026-08-15)
+--------------------------------------------------------
+
+- P-ALLOC-2 previously claimed next-target selection only. This successor adds
+  the proportional allocation amount of pinned
+  `contracts/common/lib/MinFirstAllocationStrategy.sol` lines 102--106 on the
+  SOURCE plane and closes the transaction plane, moving `tx`
+  `NOT_APPLICABLE` -> `LEAN_CHECKED` and `yul` `NOT_APPLICABLE` -> `OPEN`.
+- Line anchors were re-derived from the pinned file at
+  `af095e48bbc1c3841c2c9936219c8461af01056b`: candidate search 76--86,
+  `allocationSizeUpperBound` scan 93--100, `allocated = Math256.min(...)`
+  102--105, `buckets[bestCandidateIndex] += allocated;` 106, and the calling
+  `allocate` loop 30--44 whose lines 37 and 41 supply the remaining-demand and
+  accumulator updates. Earlier drafts of these modules cited lines 104--118 and
+  attributed `allocatedActual += allocated` / `allocationSize -= allocated` to
+  `allocateToBestCandidate`; those citations were wrong and are corrected here.
+  The four spans above replace the single 76--86 span in `audit/source-map.yaml`.
+- `LidoSRv3.Audit.Source.MinFirstAmountCorrespondence` discharges rather than
+  assumes the shape difference between the pinned single subtraction after the
+  inner `Math256.min` and the audit's distributed form, and proves totality,
+  strict positivity, the `allocationSize` bound, and the capacity headroom bound.
+- `LidoSRv3.Audit.Verity.MinFirstAmountTx` runs the four statements under
+  `Verity.Contract.run` with Solidity-0.8 panic arithmetic.
+  `tx_observes_source` proves the transaction observation equals the
+  independently computed source-plane view; `tx_step_is_safe` proves commit,
+  strict progress, capacity non-breach, and exact remaining-demand decrement;
+  `tx_revert_restores_snapshot` proves every revert restores the pre-call state.
+- Trust report: all P-ALLOC-2 guarantee theorems, including the three tx-plane
+  ones, depend only on `propext` and `Quot.sound`. The new
+  `LidoSRv3.Tests.MinFirstAmountTxMutants` negative tests use `native_decide`
+  and disclose their generated axioms; no positive guarantee theorem depends on
+  them. `LidoSRv3/Audit/Trust.lean` now states this explicitly.
+- New assumption `A-ALLOC2-TX-BOUNDARY` records the honest boundary: the
+  candidate scan, `bestCandidatesCount`, and `allocationSizeUpperBound` enter
+  the transaction as source-plane words rather than being read from the
+  `buckets`/`capacities` memory arrays, and the accumulator no-overflow bound
+  originates in the calling `allocate` loop outside the pinned
+  `allocateToBestCandidate` span.
+- Generated Yul, runtime bytecode, and the memory-array layout remain open and
+  are recorded as the next gate. No other guarantee status, theorem claim,
+  assumption, or trust boundary was widened.
 
 Verity PR #2333 re-pin receipt (2026-08-14)
 ------------------------------------------

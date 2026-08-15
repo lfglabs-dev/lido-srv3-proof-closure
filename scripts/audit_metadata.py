@@ -46,7 +46,7 @@ EXPECTED_AUTHORITY = (
 )
 EXPECTED_WORDING = [
     "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, returndata-size rejection, complete-return success, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
-    "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
+    "Pinned-source correspondence proves the next-target selection rule and the proportional allocation amount of MinFirstAllocationStrategy lines 102-106, discharging the min-then-subtract expression shape rather than assuming it; an actual Verity Contract.run transaction executes the checked min/ceilDiv arithmetic, the bucket mutation, and the calling allocate loop's accumulator and remaining-demand updates, proving strict progress, capacity non-breach, and exact snapshot rollback on revert. The candidate scan and best-candidate count enter the transaction as source-plane words, and Yul, EVM, and buckets/capacities memory-array layout equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation; a bounded actual Verity Contract.run suffix derives its committed summarized-call balance world from the successful result and proves exact one-unit Lido-to-beacon transfer, reserve/router non-interference, and snapshot rollback. Linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
     "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
     "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
@@ -85,6 +85,8 @@ EXPECTED_ASSUMPTIONS = {
          "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans."},
         {"id": "A-HANDWRITTEN-MINFIRST", "accepted": True,
          "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence."},
+        {"id": "A-ALLOC2-TX-BOUNDARY", "accepted": True,
+         "risk": "The P-ALLOC-2 amount transaction executes the checked arithmetic and bucket mutation of MinFirstAllocationStrategy.sol lines 102-106 against a two-slot best-candidate row; the candidate scan, bestCandidatesCount, and allocationSizeUpperBound of lines 76-100 are supplied as source-plane words instead of being read from the buckets/capacities memory arrays, and the accumulator no-overflow bound originates in the calling allocate loop at lines 30-44, outside the pinned allocateToBestCandidate span."},
         {"id": "A-VERITY-SCAFFOLD", "accepted": True,
          "risk": "The Verity 4.31 scaffold is non-certified."},
         {"id": "A-DEV-NOT-CERT", "accepted": True,
@@ -102,8 +104,8 @@ EXPECTED_ASSUMPTIONS = {
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants",
      "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size rejection and high-capacity success regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
-     "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstAmountTx LidoSRv3.Tests.MinFirstAmountTxMutants",
+     "expected": "successful pinned-source next-target selection and proportional-amount correspondence plus actual Verity Contract.run transaction simulation, progress/capacity/rollback proofs, and rejection of capacity-breach, non-termination, and floor-division mutants; Yul, EVM, and memory-array layout equivalence remain open"},
     {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Tests.DepositTxMutants",
      "expected": "successful pinned-source conservation plus bounded actual Verity Contract.run transaction simulation, result-derived summarized balance effects, exact snapshot rollback, Uint256-bound premise, and executable double-send mutant rejection; linked-external/Yul/EVM/runtime/deployment semantics remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants",
@@ -141,7 +143,7 @@ EXPECTED_REPRODUCTION = [
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-    ["A-HANDWRITTEN-MINFIRST"],
+    ["A-HANDWRITTEN-MINFIRST", "A-ALLOC2-TX-BOUNDARY", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
@@ -164,8 +166,10 @@ EXPECTED_ASSUMPTION_LINKS = [
 ]
 EXPECTED_NEXT_GATES = [
     "Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.",
-    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
-    "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
+    "Lift the source-plane candidate scan, best-candidate count, and "
+    "allocationSizeUpperBound into the transaction against the buckets/capacities "
+    "memory-array layout, then refine the proved amount transaction through "
+    "generated Yul and EVM/runtime-bytecode semantics.",
     "Refine declared linked-external calls and the summarized balance world through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.",
     "Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.",
     "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
@@ -204,8 +208,8 @@ PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
@@ -243,7 +247,7 @@ EXPECTED_STATUSES = [
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
-    ["algorithm", "source"],
+    ["algorithm", "source", "tx"],
     ["model", "source", "tx"],
     ["model", "source", "tx"],
     ["model", "source", "tx"],
@@ -266,7 +270,7 @@ EXPECTED_THEOREM_PLANES = [
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
-    "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
+    "LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source",
     "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer",
     "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
     "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
@@ -568,7 +572,10 @@ VERIFIED_SOURCE_ANCHORS = {
         ("package.json", "@openzeppelin/contracts-v5.2 dependency pin", 143, 143),
     },
     "P-ALLOC-2": {
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocate outer loop", 30, 44),
         ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate candidate search", 76, 86),
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate allocation-size upper bound", 93, 100),
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate proportional amount and bucket mutation", 102, 106),
     },
     "P-DEPOSIT-1": {
         ("contracts/0.8.25/sr/StakingRouter.sol", "deposit", 942, 997),

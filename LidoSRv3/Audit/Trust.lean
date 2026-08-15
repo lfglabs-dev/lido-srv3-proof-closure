@@ -14,6 +14,7 @@ import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Tests.DepositTxMutants
+import LidoSRv3.Tests.MinFirstAmountTxMutants
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -22,8 +23,13 @@ Most output uses only Lean foundations (`propext`, `Classical.choice`, and
 `Quot.sound`) where listed.  The canonical P-ALLOC-1 Phase-3 compilation
 theorems additionally disclose the generated
 `consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
-dependency recorded in the target manifest; there are no undisclosed
-project-level assumptions or proof escapes.
+dependency recorded in the target manifest.  The mutant-rejection theorems of
+`LidoSRv3.Tests.DepositTxMutants` and `LidoSRv3.Tests.MinFirstAmountTxMutants`
+are decided by `native_decide` and therefore each disclose their own generated
+`Lean.ofReduceBool` / `_native.native_decide` axiom; they are negative tests
+that discriminate the pinned behaviour from mutants, and no positive guarantee
+theorem depends on them.  There are no undisclosed project-level assumptions or
+proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
@@ -40,6 +46,15 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_pinned_expression_shape
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_totality
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.MinFirstAmountTx.tx_underflow_reverts_to_snapshot
+#print axioms LidoSRv3.Tests.MinFirstAmountTxMutants.dropHeadroomMin_is_detected
+#print axioms LidoSRv3.Tests.MinFirstAmountTxMutants.floorShare_is_detected_in_tx
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_conservation
