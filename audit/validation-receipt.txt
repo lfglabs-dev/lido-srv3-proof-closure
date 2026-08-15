@@ -1,11 +1,51 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f485891b5f417ab246c0a3f45fc38aa606e68232
+validated-tree: fcc847878a855640dfc09553a87f190636e5e3c6
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-CONSOLIDATION-1 exact-head blocker record (2026-08-16)
+--------------------------------------------------------
+
+- Not a plane closure. P-CONSOLIDATION-1 keeps `theorem: null`,
+  `theorem_planes: []` and its OPEN transaction plane; `audit/guarantees.yaml`
+  and `scripts/audit_metadata.py` are untouched by this change.
+- `audit/P-CONSOLIDATION-1-VERITY-GAPS.md` was pinned at Verity
+  `f485b2ca7502793ce227ede0076b7d070a0697b7` and had not been refreshed across
+  two intervening re-pins. Re-assessed at the current pin
+  `04729a9de9099e065dd09283e4f733a5fd4c2a16`: item 4 (transaction-frame
+  rollback) is CLOSED and items 1 and 5 are PARTIALLY CLOSED, so the previous
+  revision overstated the blocker set. Items 2, 3 and 6 remain OPEN.
+- The load-bearing item 2 (`FunctionSpec` has no connection to `CallProgram`)
+  is now machine-checked instead of asserted, in
+  `LidoSRv3/Audit/Verity/ConsolidationCallFragment.lean`:
+  `raw_call_entrypoint_always_reverts` and
+  `external_call_bind_entrypoint_always_reverts` show that a consolidation
+  entrypoint — `Expr.call` and `Stmt.externalCallBind` formulations
+  respectively — reports failure under the official denotation for every
+  oracle, transaction and world, including the calldata-decode failure branch.
+- `guards_only_succeeds` is the control: the identically shaped entrypoint with
+  the external call deleted succeeds, so the revert is attributable to the call
+  and not to the guards or to parameter binding.
+- `success_hypotheses_are_vacuous` exhibits the degenerate derivation for an
+  arbitrary predicate `P`, recording that any consolidation transaction claim
+  phrased as an implication out of `success = true` is contentless at this head
+  and must not be accepted as transaction-plane evidence.
+- All four theorems are disclosed in `LidoSRv3/Audit/Trust.lean` and report
+  `[propext, Quot.sound]`. No `native_decide`, no project axioms, no `sorry`.
+- Gates on this tree: `lake build` completes in 1348 jobs;
+  `python3 scripts/audit_metadata.py check` reports 11 canonical guarantees +
+  11 subordinate evidence rows; `bash scripts/check_provenance_guards.sh`
+  passes.
+- Pre-existing failures carried in from the base commit and not repaired here:
+  `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` fails at its
+  P-TOPUP-1 `statuses.tx = "BLOCKED"` negative fixture, which became a no-op
+  when that plane was retracted to BLOCKED; and
+  `bash scripts/check_no_python_evidence.sh` aborts because `rg` is absent from
+  this environment. Both reproduce unchanged at base `34b0fd0f`.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------
