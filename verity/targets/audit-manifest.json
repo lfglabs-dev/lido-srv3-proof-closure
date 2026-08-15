@@ -23,6 +23,7 @@
         "LidoSRv3.Audit.Source.AllocCapacityCorrespondence",
         "LidoSRv3.Audit.Regression.AllocCapacityLegacy",
         "LidoSRv3.Audit.Source.DepositCorrespondence",
+        "LidoSRv3.Audit.Verity.DepositLedgerTx",
         "LidoSRv3.Audit.Source.TopupCorrespondence",
         "LidoSRv3.Audit.Source.TopupParentCorrespondence",
         "LidoSRv3.Audit.Verity.TopupParent",
@@ -184,6 +185,21 @@
     },
     {
       "name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Verity.DepositLedgerTx.verity_revert_rolls_back",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Verity.DepositLedgerTx.forEach_wrapper_unrolls_once",
+      "status": "lean_checked",
+      "axioms": ["propext"]
+    },
+    {
+      "name": "Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback",
       "status": "lean_checked",
       "axioms": ["propext"]
     },
