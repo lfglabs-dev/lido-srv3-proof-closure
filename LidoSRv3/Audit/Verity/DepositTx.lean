@@ -100,15 +100,21 @@ def sourceObservation (cfg : SourceDepositConfig) (inp : SourceDepositInput)
   | _ => ⟨.reverted, snapshot, snapshot, balances, balances⟩
 
 theorem run_simulates_source (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (snapshot : ContractState) (balances : Balances) :
+    (snapshot : ContractState) (balances : Balances)
+    (hBound : depositsValue cfg inp ≤ Core.MAX_UINT256) :
     observe snapshot balances
       ((executeOutcome cfg inp balances).run snapshot) =
-        sourceObservation cfg inp snapshot balances := by
+        sourceObservation cfg inp snapshot balances ∧
+      (Core.Uint256.ofNat (depositsValue cfg inp)).val = depositsValue cfg inp := by
+  have hAmountLt : depositsValue cfg inp < Core.Uint256.modulus := by
+    rw [← Core.Uint256.max_uint256_succ_eq_modulus]
+    omega
   cases hrun : run cfg inp <;>
     simp [executeOutcome, executeCalls, sourceObservation, observe, DepositTxContract.execute,
       _root_.Contracts.externalCallBind, _root_.Verity.require,
       DepositTxContract.executeNoDeposits, _root_.Verity.Contract.run, _root_.Verity.bind,
-      _root_.Verity.pure, Bind.bind, Pure.pure, hrun]
+      _root_.Verity.pure, Bind.bind, Pure.pure, hrun, Core.Uint256.ofNat,
+      Nat.mod_eq_of_lt hAmountLt]
 
 theorem one_unit_exact_transfer
     {cfg : SourceDepositConfig} {inp : SourceDepositInput}
@@ -145,11 +151,12 @@ theorem failure_restores_snapshot
 theorem source_revert_restores_committed_effects
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (snapshot : ContractState) (balances : Balances)
+    (hBound : depositsValue cfg inp ≤ Core.MAX_UINT256)
     (h : (run cfg inp).reverts = true) :
     let tx := observe snapshot balances
       ((executeOutcome cfg inp balances).run snapshot)
     tx.status = .reverted ∧ tx.after = snapshot ∧ tx.balancesAfter = balances := by
-  rw [run_simulates_source]
+  rw [(run_simulates_source cfg inp snapshot balances hBound).1]
   cases hrun : run cfg inp <;> simp [sourceObservation, Outcome.reverts, hrun] at h ⊢
 
 end LidoSRv3.Audit.Verity.DepositTx

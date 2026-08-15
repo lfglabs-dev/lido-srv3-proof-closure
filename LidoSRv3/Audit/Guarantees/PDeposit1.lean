@@ -37,12 +37,13 @@ theorem tx_revert_restores_snapshot_and_effects
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (snapshot : _root_.Verity.ContractState)
     (balances : LidoSRv3.Audit.Verity.DepositTx.Balances)
+    (hBound : depositsValue cfg inp ≤ _root_.Verity.Core.MAX_UINT256)
     (h : (run cfg inp).reverts = true) :
     let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances
       ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp balances).run snapshot)
     tx.status = .reverted ∧ tx.after = snapshot ∧ tx.balancesAfter = balances :=
   LidoSRv3.Audit.Verity.DepositTx.source_revert_restores_committed_effects
-    cfg inp snapshot balances h
+    cfg inp snapshot balances hBound h
 
 /-- Abstract transaction rollback, not an executable EVM trace. -/
 theorem revert_restores_state_value_and_logs {State : Type} :
