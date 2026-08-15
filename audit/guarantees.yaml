@@ -9,7 +9,8 @@
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-      "next_gate": "Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.",
+      "note": "The bounded TX slice is mutation-sensitive: result, returndata-size guard, pre-call write, write-before-call order, call multiplicity, and selector changes are mechanically rejected. Scope remains partial: moduleAddress provenance is unconstrained, rollback equality is inherited from the generic runner, and the public theorem depends on native_decide for FunctionSpec compilation.",
+      "next_gate": "Replace the native_decide compilation dependency with an auditable theorem path, bind moduleAddress to pinned source/runtime provenance, and refine the bounded summary-call and model-local storage slice through the allocation loop and generated Yul/EVM semantics.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants", "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size rejection and high-capacity success regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"}
     },
     {
@@ -24,35 +25,36 @@
     },
     {
       "id": "P-DEPOSIT-1",
-      "catalogue_wording": "Pinned-source correspondence proves branch-wise stake conservation; a bounded actual Verity Contract.run suffix derives its committed summarized-call balance world from the successful result and proves exact one-unit Lido-to-beacon transfer, reserve/router non-interference, and snapshot rollback. Linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer",
-      "theorem_planes": ["model", "source", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "catalogue_wording": "Pinned-source correspondence proves branch-wise stake conservation. The previously claimed Verity TX suffix is retracted: externalCallBind discards every call and argument (pure ()), so omitted/doubled/reordered calls are definitionally indistinguishable and rollback is vacuous. TX remains BLOCKED pending observable external-call semantics and a non-vacuous execution bridge.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-      "note": "Bounded hybrid boundary: the source outcome feeds a typed Verity suffix with declared module, Lido-pull, and beacon-push calls; the successful Contract.run result carries the summarized balance world. The public exact-transfer theorem requires the transferred Nat amount to fit Uint256. Linked-external/Yul/EVM/runtime/deployment semantics remain open.",
-      "next_gate": "Refine declared linked-external calls and the summarized balance world through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Tests.DepositTxMutants", "expected": "successful pinned-source conservation plus bounded actual Verity Contract.run transaction simulation, result-derived summarized balance effects, exact snapshot rollback, Uint256-bound premise, and executable double-send mutant rejection; linked-external/Yul/EVM/runtime/deployment semantics remain open"}
+      "note": "TX claim retracted by mechanical probe: DepositTx.execute is only a require cascade because Verity externalCallBind is pure (); the shipped double-send test rejected a handwritten balance record rather than the program. Model/source proofs survive; linked-external/Yul/EVM/runtime/deployment remain open.",
+      "next_gate": "Repair Verity externalCallBind with observable call traces/effects, bind the actual Contract.run program to those observations, and add a mutant that changes the executed program and is mechanically rejected.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1", "expected": "successful model/source conservation proofs only; TX intentionally remains BLOCKED until observable external-call semantics exist"}
     },
     {
       "id": "P-TOPUP-1",
-      "catalogue_wording": "Pinned-source correspondence proves branch-wise top-up value conservation; an actual Verity Contract.run transaction suffix simulates source commit/revert and snapshot rollback with the two declared value-bearing calls, while linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
-      "theorem_planes": ["model", "source", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "catalogue_wording": "Pinned-source correspondence proves branch-wise top-up value conservation. The previously claimed Verity TX suffix is retracted: externalCallBind discards every call and argument (pure ()), so omitted pull, doubled beacon push, and attacker-sweep mutants are definitionally equal to the audited program. TX remains BLOCKED pending observable external-call semantics.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
-      "note": "Hybrid boundary: the full source guard/array/loop outcome feeds a typed Verity suffix with declared pull/push calls; linked-external effects are summaries and Yul/EVM/runtime/deployment planes remain open. Verity #2242 packed TopUpGateway storage is not the complete guarantee.",
-      "next_gate": "Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupHybridMutants", "expected": "successful pinned-source conservation plus actual Verity Contract.run transaction simulation, snapshot rollback, declared-call program, and negative-mutant build; linked-external/Yul/EVM/runtime/deployment semantics remain open"}
+      "note": "TX claim retracted by mechanical probe: the evil mutant (pull omitted, beacon push doubled, attacker sweep added) is rfl-equal to the genuine program and satisfies the former public TX theorem. Model/source proofs survive; linked-external/Yul/EVM/runtime/deployment remain open.",
+      "next_gate": "Repair Verity externalCallBind with observable call traces/effects, then rebuild the TX plane so call-sequence/value mutants alter execution and are mechanically rejected.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1", "expected": "successful model/source conservation proofs only; TX intentionally remains BLOCKED until observable external-call semantics exist"}
     },
     {
       "id": "P-ACCOUNT-1",
-      "catalogue_wording": "Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx",
-      "theorem_planes": ["model", "source", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "catalogue_wording": "Under an explicit independently established full-success premise, pinned-source correspondence proves the accepted report ordering and checked-word accumulation. The former TX claim is retracted: verityTxTrace is definitionally the source trace, the success premises do not create distinct transaction semantics, and no transaction state is written. TX remains BLOCKED.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward",
+      "theorem_planes": ["model", "source"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-      "next_gate": "Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors", "expected": "successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; later guards/Yul/EVM/runtime/crypto/E2E remain open"}
+      "note": "Mechanical probe: tx_steps_ARE_source_steps is rfl with zero axioms; fullReportSucceeds/hSuccess are decorative for the trace equality, while hAccept carries the checked-word result but masks invalid/overflow guards. Mutants deleting validity guards or overflowing accumulation survive under the accepted-domain premise.",
+      "next_gate": "Define a distinct stateful transaction execution, connect accepted/source steps to its reads and writes, and reject validity-guard and overflow mutants outside decorative premises before restoring TX status.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors", "expected": "successful MODEL/SOURCE ordering and checked-word accumulation evidence only; TX intentionally remains BLOCKED until a distinct stateful execution is proved"}
     },
     {
       "id": "P-RESERVE-1",
@@ -61,7 +63,8 @@
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-      "next_gate": "Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.",
+      "note": "The executable plan genuinely mutates four storage slots and rejects guard-removal, write-removal, and double-debit mutants. Scope limits: guard order/revert reasons are observationally erased, guard reordering survives, and exact rollback equality follows from the generic Contract.run snapshot construction.",
+      "next_gate": "Bind guard order and revert reasons if they are claimed, and independently justify transaction-frame rollback before refining the proved transaction through generated Yul/EVM/runtime and deployed storage/call semantics.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants", "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"}
     },
     {
@@ -87,13 +90,13 @@
     },
     {
       "id": "P-TOPUP-2",
-      "catalogue_wording": "Per-validator top-up headroom and aggregate budget conservation are proved at MODEL, SOURCE, and bounded Verity transaction planes, conditional on independently supplied runtime provenance; EVM verifier-binding remains BLOCKED.",
+      "catalogue_wording": "Aggregate top-up budget conservation is proved at MODEL, SOURCE, and bounded Verity transaction planes, conditional on independently supplied runtime provenance. The TX theorem constrains the sum of dynamically observed call values; it does not establish callee address, call kind, calldata, per-validator call granularity, or failed-call provenance. EVM verifier-binding remains BLOCKED.",
       "theorem": "LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap",
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-RUNTIME-PROVENANCE"],
-      "note": "SOURCE and TX theorems require explicit gateway/verifier address, codehash, and fork provenance inputs. They do not establish that witness or any deployed runtime semantics.",
-      "next_gate": "Obtain independent canonical runtime, codehash, fork, and address provenance, then refine the conditional source/Verity boundary through Yul and EVM semantics.",
+      "note": "SOURCE and TX theorems require explicit gateway/verifier address, codehash, and fork provenance inputs. The adversary-quantified call trace and aggregate value bound are non-vacuous: omission/zero-value and doubled-value mutants are mechanically rejected across the exactness/cap pair. Scope is aggregate only: target, kind, calldata, one-call-per-validator shape, and the claimed membership of tx_revert_has_failed_call in ObservedCalls are not established.",
+      "next_gate": "Strengthen tx_revert_has_failed_call so its witness is constrained to ObservedCalls of the same run; separately bind target, call kind, calldata, and per-validator call granularity before claiming those properties. Then obtain independent runtime provenance and refine through Yul/EVM.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Tests.Topup2TxMutants", "expected": "successful configurable source correspondence and adversary-quantified external-call plane with aggregate cap conservation and rollback; EVM verifier binding remains blocked on runtime provenance"}
     },
     {
@@ -216,15 +219,15 @@
     {
       "id": "P-SSZ-1.tx-execution-simulation",
       "parent_id": "P-SSZ-1",
-      "catalogue_wording": "Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
+      "catalogue_wording": "Concrete MODEL evidence stages the exact DepositData calldata layout and pure-Lean seven-preimage digest composition. The former TX claim is retracted: the registry theorem does not consume sha256Calls, denote/ObservedCalls, or sha256_call_world_rollback, so removing or mutating the external-call program leaves it provable. TX remains BLOCKED; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
       "source_plane_scope": "SSZ transaction execution simulation only",
-      "theorem": "LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct",
-      "theorem_planes": ["model", "tx"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+      "theorem": "LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length",
+      "theorem_planes": ["model"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
       "no_new_forbidden_lean_tokens": true,
-      "next_gate": "Refine generated Yul/EVM semantics and independently verified production runtime provenance without closing the SHA-256 assumption.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs"}
+      "next_gate": "Make the registry-facing theorem consume the actual sha256Calls denotation and observed call trace, prove exact seven-site payload/order correspondence, and add an executed-program mutant rejected by that theorem before restoring TX status.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful MODEL-only typed layout and seven-preimage digest build; TX intentionally remains BLOCKED until the registry theorem binds the external-call program and observations"}
     },
     {
       "id": "P-ETH-1a",
