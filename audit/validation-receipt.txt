@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: b9387d64ad2a06922fe64ab6abae2de353ed6a1a
+validated-tree: ac8adac9c25c07944455cea9646fd93f6c6ca3ae
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
