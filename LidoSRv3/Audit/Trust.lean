@@ -13,6 +13,7 @@ import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Guarantees.PReserve1
+import LidoSRv3.Tests.DepositTxMutants
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -53,6 +54,10 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.tx_revert_restores_snapshot_and_effects
+#print axioms LidoSRv3.Audit.Verity.DepositTx.run_simulates_source
+#print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back

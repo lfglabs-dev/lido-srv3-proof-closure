@@ -4,7 +4,7 @@
 
 - `P-ALLOC-1`: Refine the bounded summary-call and model-local storage slice through the allocation loop, generated Yul/EVM semantics, deployed storage layout, and runtime provenance.
 - `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
-- `P-DEPOSIT-1`: Refine success/revert and rollback against pinned executable EVM semantics.
+- `P-DEPOSIT-1`: Refine declared linked-external calls and the summarized balance world through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.
 - `P-TOPUP-1`: Refine the declared linked-external calls and generated program through Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.
 - `P-ACCOUNT-1`: Refine the checked Verity transaction model against executable Yul/EVM semantics and independently verified deployment provenance.
 - `P-RESERVE-1`: Optionally refine the proved Verity transaction through generated Yul, EVM/runtime-bytecode, and deployed storage/call semantics.
