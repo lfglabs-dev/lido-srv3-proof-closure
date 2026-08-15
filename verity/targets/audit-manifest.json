@@ -135,11 +135,6 @@
       "axioms": ["propext", "Quot.sound"]
     },
     {
-      "name": "Guarantees.PAccount1.source_to_verityTx",
-      "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
-    },
-    {
       "name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
       "status": "lean_checked",
       "axioms": ["propext"]
@@ -188,11 +183,6 @@
       "name": "Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard",
       "status": "lean_checked",
       "axioms": ["propext", "Quot.sound"]
-    },
-    {
-      "name": "Guarantees.PTopup1.verity_tx_simulates_source",
-      "status": "lean_checked",
-      "axioms": ["propext", "Classical.choice", "Quot.sound"]
     },
     {
       "name": "Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve",

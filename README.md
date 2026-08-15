@@ -24,9 +24,9 @@ fixes both the count and this exact order, so the set cannot drift silently.
 | --- | --- | --- |
 | 1 | `P-ALLOC-1` | `LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded` |
 | 2 | `P-ALLOC-2` | `LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket` |
-| 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer` |
-| 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source` (hybrid MODEL → pinned source-shaped semantics → declared Verity `Contract.run` suffix, under `NoUncheckedWrap`) |
-| 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx` |
+| 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back` (MODEL/SOURCE conservation plus abstract rollback; TX BLOCKED) |
+| 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back` (MODEL/SOURCE conservation plus abstract rollback; TX BLOCKED) |
+| 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward` (MODEL/SOURCE ordering under the stated success premises; TX BLOCKED) |
 | 6 | `P-RESERVE-1` | `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` (independent MODEL → pinned source-shaped semantics → Verity transaction refinement) |
 | 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
 | 8 | `P-ADDRESS-1` | OPEN; the address-renaming relation is specified, but no modeled entrypoint proves it |
@@ -42,16 +42,14 @@ checked `AllGuarantees.all.length = 11` facade.
 
 Each guarantee carries per-plane status across the model, algorithm, source,
 transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2,
-P-DEPOSIT-1, and P-ACCOUNT-1 claim Lean-checked correspondence to their pinned
-Solidity spans. P-TOPUP-1 is narrower: under `NoUncheckedWrap`, its checked
-chain is MODEL → pinned source-shaped semantics → a declared Verity
-`Contract.run` suffix. That suffix observes only the declared Lido-pull and
-beacon-push calls plus snapshot rollback; linked-external effects, generated
-Yul, EVM/runtime bytecode, and deployment provenance remain open. P-ACCOUNT-1
-additionally closes the checked VERITY_TX plane under an explicit independently
-established full-report-success premise, and models `reportRewardsMinted` only
-for positive fee shares. Later report guards, Yul/EVM/runtime/crypto/E2E remain
-unmodeled, open, or not applicable.
+P-DEPOSIT-1 and P-TOPUP-1 claim MODEL/SOURCE conservation over pinned
+source-shaped paths and abstract rollback under `A-ABSTRACT-TX`; P-TOPUP-1 also
+uses `A-TOPUP-NOWRAP`. Their former Verity transaction suffixes are retracted
+because the external-call scaffold erases calls and arguments, so TX is
+BLOCKED. P-ACCOUNT-1 claims only MODEL/SOURCE report ordering under its explicit
+full-success and positive-fee premises. Its definitionally source-identical
+transaction trace is non-evidence, and TX is BLOCKED. These statuses and their
+precise assumptions are authoritative only in `audit/guarantees.yaml`.
 P-ADDRESS-1 currently specifies an abstract address-renaming relation, but its
 composition helper assumes both admission and post-state properties and is not
 evidence for a modeled entrypoint. MODEL, transaction, source, Yul, bytecode,
