@@ -1,11 +1,29 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ac8adac9c25c07944455cea9646fd93f6c6ca3ae
+validated-tree: 991bfa31a01052e4c056e7b53f7f33b3c7d6489f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+PR #80 blocked-transaction public-surface correction (2026-08-16)
+------------------------------------------------------------------
+
+- README and the canonical P-DEPOSIT-1, P-TOPUP-1, and P-ACCOUNT-1 Lean
+  facades now expose only their registry MODEL/SOURCE theorems and abstract
+  rollback where applicable. The former TX wrappers were removed from the
+  public guarantee modules and theorem ledger; their scoped implementation
+  modules remain available as non-canonical historical evidence. TX stays
+  BLOCKED in the registry.
+- `scripts/check_public_claim_surfaces.py` derives the canonical theorem and TX
+  status from the registry, checks the README table and Lean checkedLayers, and
+  rejects the retired public theorem names. Its regression rejects stale
+  README and Lean-facade mutants and fails closed on a missing surface file.
+- Direct public-surface check and regressions: exit 0. Focused build of
+  PDeposit1, PTopup1, PAccount1, AllGuarantees, and Trust: exit 0,
+  `Build completed successfully (1270 jobs)`; log SHA-256
+  `7b733ad41031deb9489f1956da2b2d1f4522b9633b1efb8f84d25db6a82096f3`.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------
