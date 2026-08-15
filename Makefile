@@ -43,6 +43,8 @@ test:
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositVectors
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.DepositTxMutants
+	@printf '%s\n' 'bounded Verity deposit transaction mutant compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupVectors
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupHybridMutants

@@ -24,14 +24,14 @@
     },
     {
       "id": "P-DEPOSIT-1",
-      "catalogue_wording": "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
-      "theorem_planes": ["model", "source"],
-      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
-      "note": "abstract Lean model retained; the Verity subordinate row is a checked source prefix only and leaves the multi-contract transaction path OPEN",
-      "next_gate": "Refine success/revert and rollback against pinned executable EVM semantics.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1", "expected": "successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open"}
+      "catalogue_wording": "Pinned-source correspondence proves branch-wise stake conservation; a bounded actual Verity Contract.run suffix derives its committed summarized-call balance world from the successful result and proves exact one-unit Lido-to-beacon transfer, reserve/router non-interference, and snapshot rollback. Linked-external effects, Yul, EVM, runtime bytecode, and deployment provenance remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "note": "Bounded hybrid boundary: the source outcome feeds a typed Verity suffix with declared module, Lido-pull, and beacon-push calls; the successful Contract.run result carries the summarized balance world. The public exact-transfer theorem requires the transferred Nat amount to fit Uint256. Linked-external/Yul/EVM/runtime/deployment semantics remain open.",
+      "next_gate": "Refine declared linked-external calls and the summarized balance world through generated Yul/EVM/runtime-bytecode semantics and independently verified deployment provenance.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Tests.DepositTxMutants", "expected": "successful pinned-source conservation plus bounded actual Verity Contract.run transaction simulation, result-derived summarized balance effects, exact snapshot rollback, Uint256-bound premise, and executable double-send mutant rejection; linked-external/Yul/EVM/runtime/deployment semantics remain open"}
     },
     {
       "id": "P-TOPUP-1",

@@ -19,15 +19,17 @@ theorem tx_one_unit_exact_transfer
     {snapshot : _root_.Verity.ContractState}
     {balances : LidoSRv3.Audit.Verity.DepositTx.Balances} {amount : Nat}
     (hRun : run cfg inp = .committedDeposits 1 amount amount inp.routerBalanceBefore)
+    (hBound : amount ≤ _root_.Verity.Core.MAX_UINT256)
     (hFunds : amount ≤ balances.lidoDepositable) :
-    let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances amount
-      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp).run snapshot)
+    let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances
+      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp balances).run snapshot)
     tx.status = .committed ∧
+      (_root_.Verity.Core.Uint256.ofNat amount).val = amount ∧
       tx.balancesAfter.lidoDepositable + amount = balances.lidoDepositable ∧
       tx.balancesAfter.beaconSink = balances.beaconSink + amount ∧
       tx.balancesAfter.routerEth = balances.routerEth ∧
       tx.balancesAfter.withdrawalReserve = balances.withdrawalReserve :=
-  LidoSRv3.Audit.Verity.DepositTx.one_unit_exact_transfer hRun hFunds
+  LidoSRv3.Audit.Verity.DepositTx.one_unit_exact_transfer hRun hBound hFunds
 
 /-- Public transaction-plane rollback theorem: any source revert restores the
 exact Verity snapshot and exposes no committed modeled balance effects. -/
@@ -37,8 +39,7 @@ theorem tx_revert_restores_snapshot_and_effects
     (balances : LidoSRv3.Audit.Verity.DepositTx.Balances)
     (h : (run cfg inp).reverts = true) :
     let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances
-      (depositsValue cfg inp)
-      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp).run snapshot)
+      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp balances).run snapshot)
     tx.status = .reverted ∧ tx.after = snapshot ∧ tx.balancesAfter = balances :=
   LidoSRv3.Audit.Verity.DepositTx.source_revert_restores_committed_effects
     cfg inp snapshot balances h

@@ -62,13 +62,13 @@ def committedBalances (before : Balances) (amount : Nat) : Balances :=
     routerEth := before.routerEth
     withdrawalReserve := before.withdrawalReserve }
 
-def observe (snapshot : ContractState) (balances : Balances) (amount : Nat) :
-    ContractResult Unit → TxObservation
-  | .success _ after =>
-      ⟨.committed, snapshot, after, balances, committedBalances balances amount⟩
+def observe (snapshot : ContractState) (balances : Balances) :
+    ContractResult Balances → TxObservation
+  | .success balancesAfter after =>
+      ⟨.committed, snapshot, after, balances, balancesAfter⟩
   | .revert _ rollback => ⟨.reverted, snapshot, rollback, balances, balances⟩
 
-def executeOutcome (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Contract Unit :=
+private def executeCalls (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Contract Unit :=
   let amount := Core.Uint256.ofNat (depositsValue cfg inp)
   match run cfg inp with
   | .committedDeposits _ _ _ _ => DepositTxContract.execute amount true true true
@@ -80,42 +80,59 @@ def executeOutcome (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Cont
       DepositTxContract.execute amount true true false
   | _ => DepositTxContract.execute amount false true true
 
+/-- The bounded summarized-call world returned by the executable transaction.
+Unlike an observer-side projection, this result is produced only after the
+typed call program succeeds; `Contract.run` discards it on every revert. -/
+def executeOutcome (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (balances : Balances) : Contract Balances := do
+  executeCalls cfg inp
+  match run cfg inp with
+  | .committedDeposits _ pulled _ _ => _root_.Verity.pure (committedBalances balances pulled)
+  | .committedNoDeposits => _root_.Verity.pure balances
+  | _ => _root_.Verity.pure balances
+
 def sourceObservation (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (snapshot : ContractState) (balances : Balances) : TxObservation :=
-  if (run cfg inp).reverts then
-    ⟨.reverted, snapshot, snapshot, balances, balances⟩
-  else
-    ⟨.committed, snapshot, snapshot, balances,
-      committedBalances balances (depositsValue cfg inp)⟩
+  match run cfg inp with
+  | .committedDeposits _ pulled _ _ =>
+      ⟨.committed, snapshot, snapshot, balances, committedBalances balances pulled⟩
+  | .committedNoDeposits => ⟨.committed, snapshot, snapshot, balances, balances⟩
+  | _ => ⟨.reverted, snapshot, snapshot, balances, balances⟩
 
 theorem run_simulates_source (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (snapshot : ContractState) (balances : Balances) :
-    observe snapshot balances (depositsValue cfg inp)
-      ((executeOutcome cfg inp).run snapshot) =
+    observe snapshot balances
+      ((executeOutcome cfg inp balances).run snapshot) =
         sourceObservation cfg inp snapshot balances := by
   cases hrun : run cfg inp <;>
-    simp [executeOutcome, sourceObservation, observe, DepositTxContract.execute,
+    simp [executeOutcome, executeCalls, sourceObservation, observe, DepositTxContract.execute,
       _root_.Contracts.externalCallBind, _root_.Verity.require,
       DepositTxContract.executeNoDeposits, _root_.Verity.Contract.run, _root_.Verity.bind,
-      Bind.bind, Pure.pure, Outcome.reverts, hrun]
+      _root_.Verity.pure, Bind.bind, Pure.pure, hrun]
 
 theorem one_unit_exact_transfer
     {cfg : SourceDepositConfig} {inp : SourceDepositInput}
     {snapshot : ContractState} {balances : Balances} {amount : Nat}
     (hRun : run cfg inp = .committedDeposits 1 amount amount inp.routerBalanceBefore)
+    (hBound : amount ≤ Core.MAX_UINT256)
     (hFunds : amount ≤ balances.lidoDepositable) :
-    let tx := observe snapshot balances amount ((executeOutcome cfg inp).run snapshot)
+    let tx := observe snapshot balances ((executeOutcome cfg inp balances).run snapshot)
     tx.status = .committed ∧
+      (Core.Uint256.ofNat amount).val = amount ∧
       tx.balancesAfter.lidoDepositable + amount = balances.lidoDepositable ∧
       tx.balancesAfter.beaconSink = balances.beaconSink + amount ∧
       tx.balancesAfter.routerEth = balances.routerEth ∧
       tx.balancesAfter.withdrawalReserve = balances.withdrawalReserve := by
   have hAmount : depositsValue cfg inp = amount :=
     (committed_deposits_spec hRun).2.2.1.symm
-  simp [executeOutcome, hRun, observe, DepositTxContract.execute,
+  have hAmountLt : amount < Core.Uint256.modulus := by
+    rw [← Core.Uint256.max_uint256_succ_eq_modulus]
+    omega
+  simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
     _root_.Contracts.externalCallBind, _root_.Verity.require,
     _root_.Verity.Contract.run, _root_.Verity.bind,
-    Bind.bind, Pure.pure, committedBalances, Nat.sub_add_cancel hFunds]
+    _root_.Verity.pure, Bind.bind, Pure.pure, committedBalances, Nat.sub_add_cancel hFunds,
+    Core.Uint256.ofNat, Nat.mod_eq_of_lt hAmountLt]
 
 theorem failure_restores_snapshot
     (amount : Uint256) (moduleOk lidoOk beaconOk : Bool)
@@ -129,10 +146,10 @@ theorem source_revert_restores_committed_effects
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (snapshot : ContractState) (balances : Balances)
     (h : (run cfg inp).reverts = true) :
-    let tx := observe snapshot balances (depositsValue cfg inp)
-      ((executeOutcome cfg inp).run snapshot)
+    let tx := observe snapshot balances
+      ((executeOutcome cfg inp balances).run snapshot)
     tx.status = .reverted ∧ tx.after = snapshot ∧ tx.balancesAfter = balances := by
   rw [run_simulates_source]
-  simp [sourceObservation, h]
+  cases hrun : run cfg inp <;> simp [sourceObservation, Outcome.reverts, hrun] at h ⊢
 
 end LidoSRv3.Audit.Verity.DepositTx
