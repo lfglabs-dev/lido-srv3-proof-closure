@@ -688,9 +688,9 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        # P-TOPUP-1 closes source plus the explicitly bounded hybrid Verity
-        # transaction suffix. Neither plane may be silently downgraded, the
-        # theorem must stay the hybrid adequacy theorem, and EVM stays open.
+        # P-TOPUP-1 closes source only; its TX plane is retracted to BLOCKED.
+        # Source may not be silently downgraded, the retracted TX plane may not
+        # be re-asserted or relabelled, and EVM stays open.
         topup_source_downgrade = copy.deepcopy(guarantees)
         topup_source_downgrade["guarantees"][3]["statuses"]["source"] = "OPEN"
         write_json(guarantees_path, topup_source_downgrade)
@@ -702,14 +702,15 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_tx_blocked = copy.deepcopy(guarantees)
-        topup_tx_blocked["guarantees"][3]["statuses"]["tx"] = "BLOCKED"
-        write_json(guarantees_path, topup_tx_blocked)
+        topup_tx_reasserted = copy.deepcopy(guarantees)
+        topup_tx_reasserted["guarantees"][3]["statuses"]["tx"] = "LEAN_CHECKED"
+        write_json(guarantees_path, topup_tx_reasserted)
         run(
             fixture,
             False,
             "generate",
-            "P-TOPUP-1: assurance statuses differ from canonical claims",
+            "P-TOPUP-1: tx status LEAN_CHECKED requires theorem evidence "
+            "for that plane",
         )
         write_json(guarantees_path, guarantees)
 

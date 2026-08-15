@@ -1,15 +1,62 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-<<<<<<< HEAD
-validated-tree: 965d2a3452b3223eb198c82e3bcdc033ef712bba
-=======
-validated-tree: da3d9a73b684b3b5479fcae14cbd533a2865ec98
->>>>>>> origin/main
+validated-tree: b4b24801f98d655d94b61b0b62a19db139c4ec03
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-TOPUP-2 failed-call provenance retraction (2026-08-16)
+--------------------------------------------------------
+
+- `LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_has_failed_call` is retracted. Its
+  conclusion was `∃ obs : CallObservation, obs.result.succeeded = false ∧
+  obs.result.returndata = data`, with `obs` quantified independently of the
+  program, the adversary, the initial `CallState`, and the revert hypothesis.
+  A scratch module restating that conclusion with every hypothesis deleted
+  builds (`⟨{ result := .revert data, gasUsed := 0, state := anyState }, rfl,
+  rfl⟩`), so the theorem carried no information about the executed call
+  program. It is removed rather than restated, together with its
+  `#print axioms` line in `LidoSRv3/Audit/Trust.lean`.
+- The claim cannot be strengthened at Verity pin
+  `04729a9de9099e065dd09283e4f733a5fd4c2a16`: the supporting lemma
+  `CallProgramRollback.forEachCall_revert_step_abort` has the same
+  unconstrained existential, and `ObservedCall` records only `site`/`preWorld`
+  — not the gas and returndata needed to rebuild an observation — so
+  membership of the aborting observation in `ObservedCalls` cannot be stated
+  against this pin. `next_gate` now records that upstream requirement.
+- Exact-head blocker recorded for P-TOPUP-2: this plane contains no
+  `Contract.run` observation at all. `gatewayCallProgram` is an abstract
+  `CallProgram` built directly from the source transition `execute batch cfg`,
+  so it constrains the modelled call schedule rather than an executed
+  contract. The repo's only executed-program binding that avoids
+  `Contracts.Common.externalCallBind` is
+  `LidoSRv3.Audit.Verity.AllocCapacityPhase3.executeObservedSummary`, a
+  `Contract.run` observation over a real `writeSlot` store combined with an
+  adversary-supplied `ExternalCallResult`; it is unchanged by this revision and
+  remains the template for closing the P-TOPUP-2 gap.
+- Retained and still non-vacuous: `tx_aggregate_bounded_by_block_cap` (the
+  registry theorem), `tx_all_success_value_exact`, `tx_revert_restores_world`,
+  `tx_all_rollback_preserves_world`, `tx_committed_world_is_commit_fold`, and
+  `gateway_abort_is_failed_call`, which constrains a *given* observation. The
+  `Topup2TxMutants` over-cap and double-send mutants still genuinely breach the
+  cap, so P-TOPUP-2 `tx` stays LEAN_CHECKED; `yul` stays OPEN and `evm` stays
+  BLOCKED.
+- Two defects inherited from the predecessor tree are repaired here: this
+  receipt carried unresolved `<<<<<<<`/`>>>>>>>` merge-conflict markers around
+  `validated-tree`, and `scripts/test_audit_metadata.py` mutated P-TOPUP-1's
+  `tx` status to `BLOCKED` — already its canonical value after the #73
+  retraction — so that negative control asserted nothing. It now asserts that
+  the retracted P-TOPUP-1 TX plane cannot be re-asserted as `LEAN_CHECKED`
+  without theorem evidence.
+- Focused build `lake build LidoSRv3.Audit.Guarantees.PTopup2
+  LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Tests.Topup2TxMutants
+  LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust`: exit 0,
+  `Build completed successfully (1268 jobs)` under Lean 4.31.0. The Trust
+  report shows only `propext` and `Quot.sound`; no sorry, admit, or undisclosed
+  axioms. `python3 scripts/audit_metadata.py check` and the optimized metadata
+  mutants pass. No guarantee status was widened.
 
 P-TOPUP-2 bounded source/transaction closure (2026-08-15)
 ---------------------------------------------------------

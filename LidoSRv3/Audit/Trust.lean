@@ -75,7 +75,6 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_restores_world
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_committed_world_is_commit_fold
-#print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_has_failed_call
 #print axioms LidoSRv3.Tests.Topup2TxMutants.over_cap_aggregate_rejected
 #print axioms LidoSRv3.Tests.Topup2TxMutants.double_send_rejected
 #print axioms LidoSRv3.Tests.Topup2TxMutants.reverting_adversary_cannot_leak_state
