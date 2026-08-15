@@ -9,7 +9,9 @@ namespace LidoSRv3.Audit.Guarantees.PTopup1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityTopup
 
-def guarantee : Guarantee := ⟨.pTopup1, [.model, .source, .verityTx]⟩
+/-- The active registry exposes MODEL, SOURCE, and abstract rollback evidence.
+The former Verity transaction claim is blocked and deliberately absent. -/
+def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source]⟩
 
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order

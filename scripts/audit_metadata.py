@@ -49,7 +49,7 @@ EXPECTED_WORDING = [
     "Pinned-source correspondence proves the next-target selection rule and the proportional allocation amount of MinFirstAllocationStrategy lines 102-106, discharging the min-then-subtract expression shape rather than assuming it; an actual Verity Contract.run transaction executes the checked min/ceilDiv arithmetic, the bucket mutation, and the calling allocate loop's accumulator and remaining-demand updates, proving strict progress, capacity non-breach, and exact snapshot rollback on revert. The candidate scan and best-candidate count enter the transaction as source-plane words, and Yul, EVM, and buckets/capacities memory-array layout equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation. The previously claimed Verity TX suffix is retracted: externalCallBind discards every call and argument (pure ()), so omitted/doubled/reordered calls are definitionally indistinguishable and rollback is vacuous. TX remains BLOCKED pending observable external-call semantics and a non-vacuous execution bridge.",
     "Pinned-source correspondence proves branch-wise top-up value conservation. The previously claimed Verity TX suffix is retracted: externalCallBind discards every call and argument (pure ()), so omitted pull, doubled beacon push, and attacker-sweep mutants are definitionally equal to the audited program. TX remains BLOCKED pending observable external-call semantics.",
-    "Under an explicit independently established full-success premise, pinned-source correspondence proves the accepted report ordering and checked-word accumulation. The former TX claim is retracted: verityTxTrace is definitionally the source trace, the success premises do not create distinct transaction semantics, and no transaction state is written. TX remains BLOCKED.",
+    "Under an explicit independently established full-success premise, the canonical pinned-source theorem proves accepted report ordering. The former TX claim is retracted: verityTxTrace is definitionally the source trace, the success premises do not create distinct transaction semantics, and no transaction state is written. TX remains BLOCKED.",
     "Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.",
     "The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.",
     "Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.",
@@ -63,7 +63,7 @@ EXPECTED_WORDING = [
     "Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; an address-stomp observation is rejected by that abstract relation (it is not a claim that a changed Yul program fails to build), and no EVM execution refinement is claimed.",
     "Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.",
     "Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.",
-    "Concrete MODEL evidence stages the exact DepositData calldata layout and pure-Lean seven-preimage digest composition. The former TX claim is retracted: the registry theorem does not consume sha256Calls, denote/ObservedCalls, or sha256_call_world_rollback, so removing or mutating the external-call program leaves it provable. TX remains BLOCKED; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
+    "Concrete MODEL evidence proves only that the staged digest-preimage list has length seven. It does not prove exact calldata layout or digest composition. The former TX claim is retracted: the registry theorem does not consume sha256Calls, denote/ObservedCalls, or sha256_call_world_rollback, so removing or mutating the external-call program leaves it provable. TX remains BLOCKED; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
     "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
     "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
 ]
@@ -111,7 +111,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
      "expected": "successful model/source conservation proofs only; TX intentionally remains BLOCKED until observable external-call semantics exist"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
-     "expected": "successful MODEL/SOURCE ordering and checked-word accumulation evidence only; TX intentionally remains BLOCKED until a distinct stateful execution is proved"},
+     "expected": "successful canonical MODEL/SOURCE report-ordering theorem and separate accounting-vector regressions; the registry theorem does not claim checked-word accumulation, and TX remains BLOCKED"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
      "expected": "successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
@@ -135,7 +135,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Tests.AddressYulInterface", "expected": "successful typed-Yul-builtin compilation against the exact EVMYulLean pin and an abstract address-renaming rejection vector; no claim that a changed Yul program fails to build and no EVM theorem"},
     {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationFee", "expected": "successful source-shaped FunctionSpec scaffold build; dynamic ABI, call/event trace, balance rollback, and source/tx adequacy remain OPEN"},
-    {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful MODEL-only typed layout and seven-preimage digest build; TX intentionally remains BLOCKED until the registry theorem binds the external-call program and observations"},
+    {"command": "lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation", "expected": "successful MODEL-only proof that the digest-preimage list has length seven; exact calldata layout and digest composition are not registry-backed, and TX remains BLOCKED"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
      "expected": "successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
@@ -144,8 +144,8 @@ EXPECTED_REPRODUCTION = [
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-HANDWRITTEN-MINFIRST", "A-ALLOC2-TX-BOUNDARY", "A-VERITY-SCAFFOLD"],
-    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-    ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
+    ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
+    ["A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     [],
@@ -386,11 +386,11 @@ EXPECTED_MANIFEST_LAYERS = {
         "trust": (
             "Lean-proved predicates over source-shaped audit data; "
             "P-ALLOC-1 allocation-capacity plus bounded summary-call Verity transaction rollback, P-ALLOC-2 next-target, "
-            "P-DEPOSIT-1 deposit conservation/rollback, "
-            "P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, and "
-            "P-ACCOUNT-1 full-success-gated and positive-fee-conditional "
-            "MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is "
-            "checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus "
+            "P-DEPOSIT-1 deposit conservation plus abstract rollback, "
+            "P-TOPUP-1 top-up conservation plus abstract rollback, and "
+            "P-ACCOUNT-1 full-success-gated, positive-fee-conditional SOURCE ordering are "
+            "checked against pinned Solidity while their Verity transaction planes are BLOCKED; "
+            "P-RESERVE-1 reserve non-interference plus "
             "executable Verity transaction simulation is checked against pinned Solidity, "
             "while later guards remain an "
             "explicit interface premise; "

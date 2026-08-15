@@ -3,7 +3,9 @@ import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PAccount1
 
-def guarantee : Guarantee := ⟨.pAccount1, [.model, .source, .verityTx]⟩
+/-- The active registry exposes only MODEL and SOURCE ordering evidence. The
+definitionally source-identical transaction trace is blocked and omitted. -/
+def guarantee : Guarantee := ⟨.pAccount1, [.model, .source]⟩
 
 /-- MODEL -> SOURCE: an accepted report has one balance snapshot for rewards. -/
 theorem source_report_before_reward

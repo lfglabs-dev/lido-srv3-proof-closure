@@ -713,9 +713,13 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_tx_downgrade = copy.deepcopy(guarantees)
-        topup_tx_downgrade["guarantees"][3]["statuses"]["tx"] = "OPEN"
-        write_json(guarantees_path, topup_tx_downgrade)
+        # BLOCKED is canonical. Use a genuinely invalid classification so this
+        # negative test continues to exercise the canonical-status invariant.
+        topup_tx_wrong_classification = copy.deepcopy(guarantees)
+        topup_tx_wrong_classification["guarantees"][3]["statuses"]["tx"] = (
+            "NOT_APPLICABLE"
+        )
+        write_json(guarantees_path, topup_tx_wrong_classification)
         run(
             fixture,
             False,

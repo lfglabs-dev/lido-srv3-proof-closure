@@ -8,7 +8,9 @@ namespace LidoSRv3.Audit.Guarantees.PDeposit1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityDeposit
 
-def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
+/-- The active registry exposes MODEL, SOURCE, and abstract rollback evidence.
+The former Verity transaction claim is blocked and deliberately absent. -/
+def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source]⟩
 
 /-- Public P-DEPOSIT-1 transaction-plane closure for one bounded deposit unit.
 The result is an actual `Verity.Contract.run` observation at the summarized-call
