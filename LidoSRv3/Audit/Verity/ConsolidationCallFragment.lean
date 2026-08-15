@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.PConsolidation1
+import Compiler.CompilationModel
 import Verity.Core.Model.Denote
 
 /-!
@@ -24,10 +25,13 @@ catch-alls `| _ => none` (`Verity/Core/Model/Denote.lean:1030`) and
 directly (`Denote.lean:55-62`, "raw calls, ABI re-encoding returns, ECM,
 unsafe Yul, `matchAdt`, internal calls").
 
-An EIP-7251 consolidation request is *irreducibly* an external call: the
-96-byte `source ‖ target` payload must reach the consolidation predeploy.  So
-under the official denotation a faithful consolidation entrypoint denotes as
-**unconditional revert**, for every oracle, every transaction and every world.
+An EIP-7251 consolidation request is *irreducibly* an external call.  The
+small raw-call fragment below names a 96-byte input window but deliberately
+does not claim that the two keys have been written there: this denotation has
+no faithful byte-memory bridge for that preparation.  The exact theorem is
+therefore narrower: unsupported `Expr.call` denotes as **unconditional
+revert**, irrespective of payload preparation, for every oracle, transaction
+and world.
 
 The audit consequence is the point of this module.  Any statement of the form
 `(run …).success = true → P` over such an entrypoint is **vacuously true** by
@@ -59,6 +63,15 @@ def requestsSlot : Nat := 0
 def requestsField : Field :=
   { name := "requests", ty := .uint256, «slot» := some requestsSlot }
 
+/-- Compiler declaration for the bind-shaped foreign boundary.  It is marked
+unchecked: compilation is not a denotation or refinement theorem. -/
+def consolidationExternal : ExternalFunction :=
+  { name := "consolidationPredeploy"
+    params := [.uint256, .uint256]
+    returnType := some .uint256
+    proofStatus := .unchecked
+    axiomNames := [] }
+
 /-- The two guards a consolidation entrypoint performs before it calls out:
 both keys must be non-zero.  These constructors *are* inside the fragment, so
 they are not what makes the entrypoint revert. -/
@@ -70,8 +83,9 @@ def params : List Param :=
   [ { name := "sourceKey", ty := .uint256 }
   , { name := "targetKey", ty := .uint256 } ]
 
-/-- The 96-byte payload handed to the predeploy by a raw `Expr.call`, followed
-by the success return.  This is the only part of the body outside the fragment. -/
+/-- A raw `Expr.call` reading the 96-byte memory window `[0, 96)`, followed by
+the success return.  This fragment performs no memory writes and does not claim
+that the window contains `sourceKey ‖ targetKey`. -/
 def rawCallTail : List Stmt :=
   [ .require
       (.eq
@@ -89,7 +103,8 @@ def bindCallTail : List Stmt :=
   , .return (.literal 1) ]
 
 /-- Consolidation-shaped entrypoint using the first-class low-level
-`Expr.call` to hand the 96-byte payload to the predeploy. -/
+`Expr.call`.  Its unsupported-call result is independent of the unwritten
+96-byte input window. -/
 def requestConsolidation : FunctionSpec :=
   { name := "requestConsolidation", params := params, returnType := some .uint256
     body := guards ++ rawCallTail }
@@ -99,6 +114,9 @@ statement instead of the raw opcode expression. -/
 def requestConsolidationBind : FunctionSpec :=
   { requestConsolidation with
     name := "requestConsolidationBind"
+    -- Required compiler disposition for this foreign-call scaffold.  This is
+    -- an explicit unchecked trust annotation, not a reentrancy proof.
+    reentrancyTrusted := true
     body := guards ++ bindCallTail }
 
 /-- Identical shape with the external call deleted.  This is the control: it
@@ -110,9 +128,24 @@ def guardsOnly : FunctionSpec :=
 
 def spec : CompilationModel :=
   { name := "ConsolidationCallFragment", fields := [requestsField]
-    constructor := none, functions := [requestConsolidation, guardsOnly] }
+    constructor := none,
+    functions := [requestConsolidation, requestConsolidationBind, guardsOnly],
+    externals := [consolidationExternal] }
 
 def selector : Nat := 0x9d1c5d81
+def bindSelector : Nat := 0x9d1c5d82
+def guardsOnlySelector : Nat := 0x9d1c5d83
+
+theorem requestConsolidationBind_registered :
+    requestConsolidationBind ∈ spec.functions := by
+  simp [spec]
+
+-- The bind entrypoint taken from the registered function list enters Verity's
+-- official compiler.  The raw-call sibling is deliberately outside the safe
+-- compiler fragment, so this guard compiles only the reviewed registered
+-- element without adding a generated proof dependency.
+#guard (CompilationModel.compile { spec with functions := [spec.functions[1]] }
+  [bindSelector]).isOk
 
 def txOf (sourceKey targetKey : Nat) : DenoteTransaction :=
   { sender := 0xCAFE, functionSelector := selector, args := [sourceKey, targetKey] }
@@ -199,6 +232,14 @@ theorem external_call_bind_entrypoint_always_reverts
     (run oracle requestConsolidationBind tx world).success = false :=
   denote_fails_of_body_reverts oracle _ tx world fun _ =>
     guarded_body_reverts _ _ _ _ (bindCallTail_reverts oracle _)
+
+/-- The registered bind entrypoint has the same reverting behavior; the
+statement fixes the function to the member proved above rather than accepting
+an arbitrary caller-supplied `FunctionSpec`. -/
+theorem registered_external_call_bind_entrypoint_always_reverts
+    (oracle : DenoteOracle) (tx : DenoteTransaction) (world : Verity.ContractState) :
+    (denoteFunction oracle spec spec.functions[1] tx world).success = false := by
+  simpa [run, spec] using external_call_bind_entrypoint_always_reverts oracle tx world
 
 /-! ## The revert is caused by the call, not by the guards
 

@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: fcc847878a855640dfc09553a87f190636e5e3c6
+validated-tree: 3d983a4fc7f544a71e4b0b3ab3472aa2cce0cb9d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -27,6 +27,15 @@ P-CONSOLIDATION-1 exact-head blocker record (2026-08-16)
   entrypoint — `Expr.call` and `Stmt.externalCallBind` formulations
   respectively — reports failure under the official denotation for every
   oracle, transaction and world, including the calldata-decode failure branch.
+- The raw-call theorem is intentionally payload-agnostic: `rawCallTail` reads
+  `[0, 96)` but performs no memory writes, so neither the module nor the gaps
+  record claims that `source ‖ target` reaches the predeploy. The proved cause
+  is the unsupported `Expr.call`, irrespective of payload preparation.
+- `requestConsolidationBind` is now a member of `spec.functions`; its membership,
+  official compilation when selected from that registered list, and reverting
+  behavior through the same registered list element are separately
+  machine-checked. The raw-call sibling remains outside the compiler's safe
+  fragment and is not smuggled through an unsafe wrapper.
 - `guards_only_succeeds` is the control: the identically shaped entrypoint with
   the external call deleted succeeds, so the revert is attributable to the call
   and not to the guards or to parameter binding.

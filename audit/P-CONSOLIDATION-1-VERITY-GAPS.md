@@ -47,15 +47,23 @@ package mentioning both `denoteFunction`/`FunctionSpec` and `CallProgram`.
 `execStmtList` whose `denotation_eq` (`:414`) is `rfl`; it never produces a
 `CallSite` and supplies no connection.
 
-An EIP-7251 consolidation request is irreducibly an external call — the 96-byte
-`source ‖ target` payload must reach the predeploy.  Therefore, under the
-official denotation, a faithful consolidation entrypoint denotes as
-**unconditional revert**.  Machine-checked at this head:
+An EIP-7251 consolidation request is irreducibly an external call.  The raw
+fragment names the call's `[0, 96)` input window but performs no memory writes,
+so it does **not** claim that `source ‖ target` reaches the predeploy.  Its exact
+result is narrower: under the official denotation the unsupported `Expr.call`
+denotes as **unconditional revert irrespective of payload preparation**.
+Machine-checked at this head:
 
 - `ConsolidationCallFragment.raw_call_entrypoint_always_reverts` — for every
   oracle, transaction and world, the `Expr.call` entrypoint reports failure.
 - `ConsolidationCallFragment.external_call_bind_entrypoint_always_reverts` —
-  likewise for the `Stmt.externalCallBind` formulation.
+  likewise for the `Stmt.externalCallBind` formulation; that function is now
+  included in `spec.functions`.
+- `ConsolidationCallFragment.requestConsolidationBind_registered`,
+  the official-compiler `#guard` over that registered list element, and
+  `registered_external_call_bind_entrypoint_always_reverts` — membership,
+  official compilation, and denotation of the registered bind entrypoint,
+  without accepting an arbitrary caller-supplied `FunctionSpec`.
 - `ConsolidationCallFragment.guards_only_succeeds` — the identically shaped
   entrypoint with the call deleted succeeds, so the revert is attributable to
   the call and not to the guards or to calldata decoding.
