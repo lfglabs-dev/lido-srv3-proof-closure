@@ -1,11 +1,42 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
+<<<<<<< HEAD
+validated-tree: 965d2a3452b3223eb198c82e3bcdc033ef712bba
+=======
 validated-tree: da3d9a73b684b3b5479fcae14cbd533a2865ec98
+>>>>>>> origin/main
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-TOPUP-2 bounded source/transaction closure (2026-08-15)
+---------------------------------------------------------
+
+- P-TOPUP-2 closes its SOURCE and TX planes: the registry theorem moves to
+  `LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap`, which
+  binds the gateway's value-bearing top-up schedule to the pinned Verity
+  external-call boundary (`DenoteExternalCalls`/`CallProgramRollback`) and
+  bounds the observed call-value aggregate by the block cap for every
+  `AdversaryModel` and initial call state, conditional on an explicit
+  runtime-provenance witness. Supporting theorems cover exact conservation on
+  full success, revert restoring the initial world, commit as the adversary
+  transition fold, and revert provenance from an observed failed call.
+- The plane deliberately does not use `Contracts.Common.externalCallBind`: at
+  Verity pin `04729a9de9099e065dd09283e4f733a5fd4c2a16` that combinator is
+  `pure ()`, so a conservation statement over it would be vacuous. The module
+  docstring records this.
+- Focused build `lake build LidoSRv3.Audit.Guarantees.PTopup2
+  LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Tests.Topup2TxMutants
+  LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust`: exit 0,
+  `Build completed successfully (1263 jobs)` under Lean 4.31.0. The Trust
+  report shows the new theorems and mutants depend only on `propext` and
+  `Quot.sound`; no sorry, admit, or undisclosed axioms.
+- `python3 scripts/audit_metadata.py check`, the optimized metadata mutants,
+  Python-evidence guard, and provenance guards all passed. EVM verifier
+  binding stays BLOCKED; no trust boundary was widened beyond the declared
+  conditional provenance inputs.
 
 Verity PR #2333 re-pin receipt (2026-08-14)
 ------------------------------------------
