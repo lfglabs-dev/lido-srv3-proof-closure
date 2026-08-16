@@ -140,7 +140,7 @@
       ],
       "source": {
         "source": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
-        "line": 66
+        "line": 69
       },
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -173,6 +173,35 @@
           "reproduction": {
             "command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback",
             "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"
+          }
+        },
+        {
+          "id": "P-DEPOSIT-1.ledger-conservation-tx",
+          "catalogue_wording": "Bounded SOURCE/VERITY_TX evidence for the ETH-ledger conservation and rollback core of the deposit push. Official Verity Contract.run executes the StakingRouter.sol line 976 counter write, the line 983 pull scaled by MAX_EFFECTIVE_BALANCE_WC_TYPE_01, the DEPOSIT_SIZE beacon push, and the line 996 balance assert over storage only, so no vacuous externalCallBind participates. Rollback is universally quantified over the entry state, the arguments, and the rolled-back state; source correspondence is bounded to the committing push, the line 978 empty-batch early return, and the misconfigured-deployment revert, each made discriminating by a disagreeing mutant. Allocation, the module ABI, multi-contract Lido/queue/oracle state, per-validator deposit-data roots, generated Yul, and EVM execution remain OPEN.",
+          "scope": "ETH-ledger conservation/rollback core only; allocation, module ABI, multi-contract state, and per-validator deposit-data roots are excluded",
+          "statuses": {
+            "model": "NOT_APPLICABLE",
+            "algorithm": "NOT_APPLICABLE",
+            "source": "LEAN_CHECKED",
+            "tx": "LEAN_CHECKED",
+            "crypto": "NOT_APPLICABLE"
+          },
+          "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback",
+          "theorem_planes": [
+            "source",
+            "tx"
+          ],
+          "assumptions": [
+            "A-SOURCE-SHAPED",
+            "A-VERITY-SCAFFOLD"
+          ],
+          "source": {
+            "source": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
+            "line": 153
+          },
+          "reproduction": {
+            "command": "lake build LidoSRv3.Audit.Verity.DepositLedgerTx LidoSRv3.Audit.Guarantees.PDeposit1",
+            "expected": "successful storage-only Contract.run deposit-ledger build: universally quantified revert rollback, three bounded source-correspondence receipts, two disagreeing mutants, and the checked forEach-wrapper unrolling probe; the multi-contract deposit transaction, generated Yul, and EVM execution remain OPEN"
           }
         }
       ]
