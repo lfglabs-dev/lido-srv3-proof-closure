@@ -1,11 +1,24 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 43025d1e5a7a346c75b8affd28060d027b75a153
+validated-tree: c91bdea488b534e3fb49c33546dfda076b4b07ba
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+PR #88 final exact-head repair (2026-08-16)
+-------------------------------------------
+
+- The public-claim allowlist parses Lean import commands across physical line
+  breaks, including `public`, `meta`, and `all`; multiline mutants fail closed.
+- `make prove` validates requested, resolved, audit, and checkout Verity
+  provenance before its first Lake invocation can repair dependency state.
+- P-CONSOLIDATION-1 remains OPEN/PARTIAL: upstream transaction rollback is
+  available, but the local handwritten program does not consume it and is not
+  connected to the `FunctionSpec`.
+- Receipt subject: tracked tree excluding this receipt,
+  `c91bdea488b534e3fb49c33546dfda076b4b07ba`.
 
 PR #88 reviewed-head repair (2026-08-16)
 -----------------------------------------
