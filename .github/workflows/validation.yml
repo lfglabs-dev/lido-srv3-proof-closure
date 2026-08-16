@@ -28,9 +28,5 @@ jobs:
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Install Foundry
-        run: |
-          curl -L https://foundry.paradigm.xyz | bash
-          source "$HOME/.bashrc"
-          foundryup
-          echo "$HOME/.foundry/bin" >> "$GITHUB_PATH"
+        uses: foundry-rs/foundry-toolchain@v1
       - run: make test
