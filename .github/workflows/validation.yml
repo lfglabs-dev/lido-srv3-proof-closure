@@ -27,4 +27,9 @@ jobs:
             https://raw.githubusercontent.com/leanprover/elan/v4.1.2/elan-init.sh \
             | sh -s -- -y
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Install Foundry
+        run: |
+          curl -L https://foundry.paradigm.xyz | bash
+          "$HOME/.foundry/bin/foundryup"
+          echo "$HOME/.foundry/bin" >> "$GITHUB_PATH"
       - run: make test
