@@ -70,6 +70,19 @@ with tempfile.TemporaryDirectory() as tmp:
     run(fixture, False, "README: P-DEPOSIT-1")
     readme.write_text(original, encoding="utf-8")
 
+    guarantees = fixture / "audit/guarantees.yaml"
+    original = guarantees.read_text(encoding="utf-8")
+    guarantees.write_text(
+        original.replace(
+            "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+            "LidoSRv3.Audit.Guarantees.PDeposit1.nonexistent_theorem",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    run(fixture, False, "P-DEPOSIT-1: checked abstract theorem differs")
+    guarantees.write_text(original, encoding="utf-8")
+
     account.write_text(
         account_original
         + "\n-- renamed false-claim mutant\ntheorem plausible_new_tx_closure : True := True.intro\n",
@@ -123,10 +136,22 @@ with tempfile.TemporaryDirectory() as tmp:
     )
     run(fixture, False, "imports differ from the structural allowlist")
 
+    account.write_text(
+        "  import LidoSRv3.Audit.Verity.AccountingTx\n" + account_original,
+        encoding="utf-8",
+    )
+    run(fixture, False, "imports differ from the structural allowlist")
+
+    account.write_text(
+        "\timport LidoSRv3.Audit.Verity.AccountingTx\n" + account_original,
+        encoding="utf-8",
+    )
+    run(fixture, False, "imports differ from the structural allowlist")
+
     account.unlink()
     run(fixture, False, "required public claim surface is missing")
 
 print(
     "public claim surface regressions ok: allowed declarations pass; "
-    "ASCII/quoted/Unicode/escaped/whitespace/attribute/import/README/missing-file mutants fail closed"
+    "ASCII/quoted/Unicode/escaped/whitespace/attribute/import/registry/README/missing-file mutants fail closed"
 )

@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 3f7e969ac08bf418dc9ad51ebb916a1de9c35cad
+validated-tree: b01a01ad578d15cfa4608dc1f24f29dfa4845383
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -32,7 +32,7 @@ PR #88 reviewed-head repair (2026-08-16)
   `3c4ef1821dda8d58af6c0d228d484907f7121bc3`.
 - `make all`: exit 0; the 32-page report PDF was built successfully.
 - Receipt subject: tracked tree excluding this receipt,
-  `3f7e969ac08bf418dc9ad51ebb916a1de9c35cad`.
+  `b01a01ad578d15cfa4608dc1f24f29dfa4845383`.
 
 Campaign/main recovery integration (2026-08-16)
 -----------------------------------------------
