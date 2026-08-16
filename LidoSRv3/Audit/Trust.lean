@@ -8,6 +8,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PAddress1
+import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
@@ -16,6 +17,7 @@ import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Tests.DepositTxMutants
+import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
@@ -43,6 +45,12 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_correspondence
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_pinned_expression_shape
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_totality
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Model.success_conservation
@@ -53,6 +61,12 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_claim_success
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_admits
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_empty_balance
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_when_paused
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether

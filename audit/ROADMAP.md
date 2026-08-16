@@ -3,7 +3,7 @@
 # ROADMAP
 
 - `P-ALLOC-1`: Replace the native_decide compilation dependency with an auditable theorem path, bind moduleAddress to pinned source/runtime provenance, and refine the bounded summary-call and model-local storage slice through the allocation loop and generated Yul/EVM semantics.
-- `P-ALLOC-2`: Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.
+- `P-ALLOC-2`: Lift the source-plane candidate scan, best-candidate count, and allocationSizeUpperBound into the transaction against the buckets/capacities memory-array layout, then refine the proved amount transaction through generated Yul and EVM/runtime-bytecode semantics.
 - `P-DEPOSIT-1`: Repair Verity externalCallBind with observable call traces/effects, bind the actual Contract.run program to those observations, and add a mutant that changes the executed program and is mechanically rejected.
 - `P-TOPUP-1`: Repair Verity externalCallBind with observable call traces/effects, then rebuild the TX plane so call-sequence/value mutants alter execution and are mechanically rejected.
 - `P-ACCOUNT-1`: Define a distinct stateful transaction execution, connect accepted/source steps to its reads and writes, and reject validity-guard and overflow mutants outside decorative premises before restoring TX status.

@@ -15,13 +15,13 @@
     },
     {
       "id": "P-ALLOC-2",
-      "catalogue_wording": "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
-      "theorem_planes": ["algorithm", "source"],
-      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE", "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-      "assumptions": ["A-HANDWRITTEN-MINFIRST"],
-      "next_gate": "Refine proportional allocation amounts, checked-Uint256 execution, and EVM correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2", "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"}
+      "catalogue_wording": "Pinned-source correspondence proves the next-target selection rule and the proportional allocation amount of MinFirstAllocationStrategy lines 102-106, discharging the min-then-subtract expression shape rather than assuming it; an actual Verity Contract.run transaction executes the checked min/ceilDiv arithmetic, the bucket mutation, and the calling allocate loop's accumulator and remaining-demand updates, proving strict progress, capacity non-breach, and exact snapshot rollback on revert. The candidate scan and best-candidate count enter the transaction as source-plane words, and Yul, EVM, and buckets/capacities memory-array layout equivalence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source",
+      "theorem_planes": ["algorithm", "source", "tx"],
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-HANDWRITTEN-MINFIRST", "A-ALLOC2-TX-BOUNDARY", "A-VERITY-SCAFFOLD"],
+      "next_gate": "Lift the source-plane candidate scan, best-candidate count, and allocationSizeUpperBound into the transaction against the buckets/capacities memory-array layout, then refine the proved amount transaction through generated Yul and EVM/runtime-bytecode semantics.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstAmountTx LidoSRv3.Tests.MinFirstAmountTxMutants", "expected": "successful pinned-source next-target selection and proportional-amount correspondence plus actual Verity Contract.run transaction simulation, progress/capacity/rollback proofs, and rejection of capacity-breach, non-termination, and floor-division mutants; Yul, EVM, and memory-array layout equivalence remain open"}
     },
     {
       "id": "P-DEPOSIT-1",
@@ -254,6 +254,19 @@
       "note": "Deployment-provenance assumption: Solidity uses nonzero immutable CONSOLIDATION_REQUEST, but proving its deployed value is 0x00...007251 is outside this source theorem.",
       "next_gate": "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
       "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1", "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"}
+    },
+    {
+      "id": "P-ADDRESS-1.denote-admission",
+      "parent_id": "P-ADDRESS-1",
+      "catalogue_wording": "An audit-authored permissionless entrypoint written in the pinned Verity deep EDSL is evaluated by the official denotation Compiler.CompilationModel.Denote.denoteFunction, which installs the transaction sender into ContractState.sender, so the caller is a genuine input of the run rather than an index on an abstract function. For every mapping-slot oracle, every caller pair whose balance entries do not alias the pause slot, and every world, the admission bit under one caller equals the admission bit under the other in the caller-swapped world. Admission only: post-state equivariance, correspondence to pinned Lido Solidity, generated Yul, and EVM execution are not claimed, so the parent transaction plane remains OPEN.",
+      "source_plane_scope": "audit-authored permissionless entrypoint admission only; no pinned Solidity correspondence",
+      "theorem": "LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant",
+      "theorem_planes": ["tx"],
+      "statuses": {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE", "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "note": "Contracts.Common.externalCallBind is pure () at Verity pin 04729a9 (Contracts/Common.lean line 582), so an entrypoint whose admission depended on a declared external call would be definitionally insensitive to that call. This entrypoint contains no external call: admission is decided by a global pause gate and a caller-indexed balance read that the official denotation genuinely evaluates. Non-vacuity is mechanical: claim_admits, claim_rejects_empty_balance, and claim_rejects_when_paused show both gates are load-bearing, and ownerGated_not_admission_equivariant refutes the property for the owner-gated mutant.",
+      "next_gate": "Extend the observation to post-state equivariance and bind the entrypoint to a pinned permissionless Lido SRv3 Solidity span before the parent transaction plane can move off OPEN.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.AddressAdmission", "expected": "successful official-denotation admission reduction, caller-swap equivariance, both-gate non-vacuity witnesses, and owner-gated mutant refutation; post-state equivariance, pinned-source correspondence, Yul, and EVM remain open"}
     },
     {
       "id": "P-DEREF-1",

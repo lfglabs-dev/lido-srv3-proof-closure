@@ -36,6 +36,7 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.tx-execution-simulation",
     "P-ETH-1a",
     "P-ETH-1b",
+    "P-ADDRESS-1.denote-admission",
     "P-DEREF-1",
 ]
 SOURCE_TARGET_IDS = EXPECTED_IDS[:6] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
@@ -46,7 +47,7 @@ EXPECTED_AUTHORITY = (
 )
 EXPECTED_WORDING = [
     "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded Verity transaction slice for the mapped staking-module summary call: selector-derived byte-level calldata, a source-shaped pre-call scalar store, typed success/revert status, returndata-size rejection, complete-return success, and Contract.run snapshot rollback are checked; allocation-loop completion, Yul, EVM, and deployed storage-layout equivalence remain open.",
-    "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
+    "Pinned-source correspondence proves the next-target selection rule and the proportional allocation amount of MinFirstAllocationStrategy lines 102-106, discharging the min-then-subtract expression shape rather than assuming it; an actual Verity Contract.run transaction executes the checked min/ceilDiv arithmetic, the bucket mutation, and the calling allocate loop's accumulator and remaining-demand updates, proving strict progress, capacity non-breach, and exact snapshot rollback on revert. The candidate scan and best-candidate count enter the transaction as source-plane words, and Yul, EVM, and buckets/capacities memory-array layout equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation. The previously claimed Verity TX suffix is retracted: externalCallBind discards every call and argument (pure ()), so omitted/doubled/reordered calls are definitionally indistinguishable and rollback is vacuous. TX remains BLOCKED pending observable external-call semantics and a non-vacuous execution bridge.",
     "Pinned-source correspondence proves branch-wise top-up value conservation. The previously claimed Verity TX suffix is retracted: externalCallBind discards every call and argument (pure ()), so omitted pull, doubled beacon push, and attacker-sweep mutants are definitionally equal to the audited program. TX remains BLOCKED pending observable external-call semantics.",
     "Under an explicit independently established full-success premise, pinned-source correspondence proves the accepted report ordering and checked-word accumulation. The former TX claim is retracted: verityTxTrace is definitionally the source trace, the success premises do not create distinct transaction semantics, and no transaction state is written. TX remains BLOCKED.",
@@ -66,6 +67,7 @@ EXPECTED_WORDING = [
     "Concrete MODEL evidence stages the exact DepositData calldata layout and pure-Lean seven-preimage digest composition. The former TX claim is retracted: the registry theorem does not consume sha256Calls, denote/ObservedCalls, or sha256_call_world_rollback, so removing or mutating the external-call program leaves it provable. TX remains BLOCKED; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
     "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
     "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
+    "An audit-authored permissionless entrypoint written in the pinned Verity deep EDSL is evaluated by the official denotation Compiler.CompilationModel.Denote.denoteFunction, which installs the transaction sender into ContractState.sender, so the caller is a genuine input of the run rather than an index on an abstract function. For every mapping-slot oracle, every caller pair whose balance entries do not alias the pause slot, and every world, the admission bit under one caller equals the admission bit under the other in the caller-swapped world. Admission only: post-state equivariance, correspondence to pinned Lido Solidity, generated Yul, and EVM execution are not claimed, so the parent transaction plane remains OPEN.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -85,6 +87,8 @@ EXPECTED_ASSUMPTIONS = {
          "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans."},
         {"id": "A-HANDWRITTEN-MINFIRST", "accepted": True,
          "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence."},
+        {"id": "A-ALLOC2-TX-BOUNDARY", "accepted": True,
+         "risk": "The P-ALLOC-2 amount transaction executes the checked arithmetic and bucket mutation of MinFirstAllocationStrategy.sol lines 102-106 against a two-slot best-candidate row; the candidate scan, bestCandidatesCount, and allocationSizeUpperBound of lines 76-100 are supplied as source-plane words instead of being read from the buckets/capacities memory arrays, and the accumulator no-overflow bound originates in the calling allocate loop at lines 30-44, outside the pinned allocateToBestCandidate span."},
         {"id": "A-VERITY-SCAFFOLD", "accepted": True,
          "risk": "The Verity 4.31 scaffold is non-certified."},
         {"id": "A-DEV-NOT-CERT", "accepted": True,
@@ -102,8 +106,8 @@ EXPECTED_ASSUMPTIONS = {
 EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants",
      "expected": "successful canonical P-ALLOC-1 consumption, byte-level selector and source-body bridge, returndata-size rejection and high-capacity success regressions, Contract.run rollback after a pre-call store, trust report, and semantic-mutant build; allocation-loop/Yul/EVM/deployed-layout refinement remains open"},
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
-     "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstAmountTx LidoSRv3.Tests.MinFirstAmountTxMutants",
+     "expected": "successful pinned-source next-target selection and proportional-amount correspondence plus actual Verity Contract.run transaction simulation, progress/capacity/rollback proofs, and rejection of capacity-breach, non-termination, and floor-division mutants; Yul, EVM, and memory-array layout equivalence remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
      "expected": "successful model/source conservation proofs only; TX intentionally remains BLOCKED until observable external-call semantics exist"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
@@ -138,10 +142,12 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
      "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
+    {"command": "lake build LidoSRv3.Audit.Verity.AddressAdmission",
+     "expected": "successful official-denotation admission reduction, caller-swap equivariance, both-gate non-vacuity witnesses, and owner-gated mutant refutation; post-state equivariance, pinned-source correspondence, Yul, and EVM remain open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-    ["A-HANDWRITTEN-MINFIRST"],
+    ["A-HANDWRITTEN-MINFIRST", "A-ALLOC2-TX-BOUNDARY", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
@@ -161,11 +167,14 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
     [],
     [],
+    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
 ]
 EXPECTED_NEXT_GATES = [
     "Replace the native_decide compilation dependency with an auditable theorem path, bind moduleAddress to pinned source/runtime provenance, and refine the bounded summary-call and model-local storage slice through the allocation loop and generated Yul/EVM semantics.",
-    "Refine proportional allocation amounts, checked-Uint256 execution, and EVM "
-    "correspondence for MinFirstAllocationStrategy.allocateToBestCandidate.",
+    "Lift the source-plane candidate scan, best-candidate count, and "
+    "allocationSizeUpperBound into the transaction against the buckets/capacities "
+    "memory-array layout, then refine the proved amount transaction through "
+    "generated Yul and EVM/runtime-bytecode semantics.",
     "Repair Verity externalCallBind with observable call traces/effects, bind the actual Contract.run program to those observations, and add a mutant that changes the executed program and is mechanically rejected.",
     "Repair Verity externalCallBind with observable call traces/effects, then rebuild the TX plane so call-sequence/value mutants alter execution and are mechanically rejected.",
     "Define a distinct stateful transaction execution, connect accepted/source steps to its reads and writes, and reject validity-guard and overflow mutants outside decorative premises before restoring TX status.",
@@ -185,6 +194,7 @@ EXPECTED_NEXT_GATES = [
     "Make the registry-facing theorem consume the actual sha256Calls denotation and observed call trace, prove exact seven-site payload/order correspondence, and add an executed-program mutant rejected by that theorem before restoring TX status.",
     "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
     "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
+    "Extend the observation to post-state equivariance and bind the entrypoint to a pinned permissionless Lido SRv3 Solidity span before the parent transaction plane can move off OPEN.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -204,8 +214,8 @@ PLANES = {"model", "algorithm", "source", "tx", "yul", "evm", "crypto"}
 EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
      "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
-    {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE",
-     "yul": "NOT_APPLICABLE", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED",
+     "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED",
@@ -240,10 +250,12 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE",
+     "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
-    ["algorithm", "source"],
+    ["algorithm", "source", "tx"],
     ["model", "source"],
     ["model", "source"],
     ["model", "source"],
@@ -263,10 +275,11 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
     ["model"],
     ["model"],
+    ["tx"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
-    "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
+    "LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward",
@@ -286,6 +299,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length",
     "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
     "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
+    "LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -568,7 +582,10 @@ VERIFIED_SOURCE_ANCHORS = {
         ("package.json", "@openzeppelin/contracts-v5.2 dependency pin", 143, 143),
     },
     "P-ALLOC-2": {
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocate outer loop", 30, 44),
         ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate candidate search", 76, 86),
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate allocation-size upper bound", 93, 100),
+        ("contracts/common/lib/MinFirstAllocationStrategy.sol", "allocateToBestCandidate proportional amount and bucket mutation", 102, 106),
     },
     "P-DEPOSIT-1": {
         ("contracts/0.8.25/sr/StakingRouter.sol", "deposit", 942, 997),
@@ -1004,6 +1021,15 @@ def validate():
                     "P-SSZ-1.tx-execution-simulation: scope differs")
             require(row.get("no_new_forbidden_lean_tokens") is True,
                     "P-SSZ-1.tx-execution-simulation: forbidden-token assertion is missing")
+        elif row["id"] == "P-ADDRESS-1.denote-admission":
+            require(row.get("parent_id") == "P-ADDRESS-1",
+                    "P-ADDRESS-1.denote-admission must remain subordinate to P-ADDRESS-1")
+            require(row.get("source_plane_scope") ==
+                    "audit-authored permissionless entrypoint admission only; no pinned Solidity correspondence",
+                    "P-ADDRESS-1.denote-admission: scope differs")
+            require(row["statuses"]["tx"] != "LEAN_CHECKED",
+                    "P-ADDRESS-1.denote-admission: the audit-authored entrypoint may not claim a "
+                    "pinned-source transaction closure")
         else:
             require("parent_id" not in row,
                     f"{row['id']}: only declared subordinate evidence may have a parent")
@@ -1036,7 +1062,8 @@ def validate():
             mapping = source_targets["P-ALLOC-1"]
         elif row["id"] == "P-CONSOLIDATION-1.abstract-flow-model":
             mapping = source_targets["P-CONSOLIDATION-1"]
-        elif row["id"] == "P-ADDRESS-1.yul-interface-harness":
+        elif row["id"] in {"P-ADDRESS-1.yul-interface-harness",
+                            "P-ADDRESS-1.denote-admission"}:
             mapping = source_targets["P-ADDRESS-1"]
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             mapping = source_targets["P-DEPOSIT-1"]
