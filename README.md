@@ -37,6 +37,10 @@ fixes both the count and this exact order, so the set cannot drift silently.
 `P-SSZ-1.deposit-data-root` is a subordinate child claim of row 11, not a
 twelfth public guarantee: it narrows part of P-SSZ-1's scope and is carried by
 `LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`.
+`P-SSZ-1.gindex-concat` is likewise subordinate: it closes SOURCE only for the
+pure mapped `GIndex.concat` helper and explicitly leaves the parent SOURCE open
+and TX blocked. It does not cover `SSZ.verifyProof`, wrappers, SHA-256,
+Yul/EVM, or deployment provenance.
 The public claim surface stays at the eleven numbered IDs above, matching the
 checked `AllGuarantees.all.length = 11` facade.
 

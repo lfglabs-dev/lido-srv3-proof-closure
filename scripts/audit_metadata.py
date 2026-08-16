@@ -27,6 +27,7 @@ EXPECTED_IDS = [
 ]
 SUBORDINATE_IDS = [
     "P-SSZ-1.deposit-data-root",
+    "P-SSZ-1.gindex-concat",
     "P-SSZ-1.abstract-digest",
     "P-CONSOLIDATION-1.abstract-flow-model",
     "P-ALLOC-1.eugene-bound",
@@ -58,6 +59,7 @@ EXPECTED_WORDING = [
     "Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.",
     "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
     "Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.",
+    "Narrow pinned-source correspondence for GIndex.concat only: the decoded 248-bit indices follow the exact fls-zero sentinel, depth guard, left-shift/XOR/OR ordering, pack bound, and rhs power propagation at lidofinance/core af095e48 lines 72-89. P-SSZ-1 canonical SOURCE remains OPEN and TX remains BLOCKED; SSZ.verifyProof, wrappers, SHA-256, Yul/EVM, and deployment provenance are not claimed.",
     "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
     "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
@@ -128,6 +130,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"},
     {"command": "lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression",
      "expected": "successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Source.GIndexConcatCorrespondence LidoSRv3.Tests.GIndexConcatMutants",
+     "expected": "successful exact GIndex.concat source transcription, accepted/rejected boundary vectors, and wrong-shift, wrong-depth, wrong-order, and wrapping-overflow mutant rejection; no parent SOURCE/TX closure"},
     {"command": "lake build LidoSRv3.Audit.Verity.SszAbstractDigest",
      "expected": "successful typed-program compilation and exact seven-call pure-Lean digest composition; no Verity execution simulation or SHA-256 functional proof"},
     {"command": "lake build LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel",
@@ -158,6 +162,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-SHA256-FFI"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
+    [],
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
@@ -185,6 +190,7 @@ EXPECTED_NEXT_GATES = [
     "Replace or independently validate the opaque native SHA-256 FFI trust boundary.",
     "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
     "Refine the excluded GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence; SHA-256/precompile semantics and canonical production runtime provenance remain required before any Yul/EVM/crypto/E2E composition.",
+    "Keep this child subordinate while independently refining SSZ.verifyProof and all three mapped wrapper call sites; canonical P-SSZ-1 SOURCE and TX remain OPEN/BLOCKED.",
     "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
     "Refine the typed 96-byte single-call program against generated Yul/EVM semantics and independently verified production runtime provenance.",
     "Refine the composed checked SRLib/MinFirst operator-bound evidence against executable EVM semantics.",
@@ -236,6 +242,8 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
+    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "BLOCKED",
+     "yul": "OPEN", "evm": "BLOCKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
@@ -266,6 +274,7 @@ EXPECTED_THEOREM_PLANES = [
     [],
     ["model"],
     ["model"],
+    ["source"],
     ["model", "tx"],
     ["model", "tx"],
     ["model", "algorithm"],
@@ -290,6 +299,7 @@ EXPECTED_THEOREMS = [
     None,
     "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
     "LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
+    "LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec",
     "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
     "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
     "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
@@ -370,6 +380,7 @@ EXPECTED_MANIFEST_LAYERS = {
             "LidoSRv3.Audit.Verity.TopupHybrid",
             "LidoSRv3.Audit.Source.AccountingCorrespondence",
             "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
+            "LidoSRv3.Audit.Source.GIndexConcatCorrespondence",
             "LidoSRv3.Audit.Verity.SszAbstractDigest",
             "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel",
             "LidoSRv3.Audit.Source.ReserveCorrespondence",
@@ -378,6 +389,7 @@ EXPECTED_MANIFEST_LAYERS = {
         "LidoSRv3.Tests.AllocCapacityPhase3Mutants",
             "LidoSRv3.Audit.Ssz",
             "LidoSRv3.Tests.SszRegression",
+            "LidoSRv3.Tests.GIndexConcatMutants",
             "LidoSRv3.Tests.DepositVectors",
             "LidoSRv3.Tests.TopupVectors",
             "LidoSRv3.Tests.TopupHybridMutants",
@@ -405,8 +417,9 @@ EXPECTED_MANIFEST_LAYERS = {
             "while later guards remain an "
             "explicit interface premise; "
             "P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural "
-            "evidence over source-shaped inputs, and its SOURCE-plane "
-            "correspondence remains OPEN in audit/guarantees.yaml"
+            "evidence over source-shaped inputs; narrow GIndex.concat SOURCE child "
+            "evidence does not close canonical P-SSZ-1 SOURCE, and TX remains BLOCKED "
+            "in audit/guarantees.yaml"
         ),
     },
 }
@@ -475,6 +488,8 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext", "Quot.sound"]},
     {"name": "Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
      "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
+    {"name": "Source.GIndexConcatCorrespondence.source_concat_matches_spec",
+     "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_mem", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_open", "status": "lean_checked", "axioms": ["propext"]},
     {"name": "MinFirst.candidate_none_no_open", "status": "lean_checked",
@@ -931,6 +946,11 @@ def validate():
                     "P-SSZ-1.deposit-data-root must remain subordinate to P-SSZ-1")
             require(row.get("source_plane_scope") == "deposit-data-root only",
                     "P-SSZ-1.deposit-data-root: source plane scope must remain deposit-data-root only")
+        elif row["id"] == "P-SSZ-1.gindex-concat":
+            require(row.get("parent_id") == "P-SSZ-1",
+                    "P-SSZ-1.gindex-concat must remain subordinate to P-SSZ-1")
+            require(row.get("source_plane_scope") == "GIndex.concat pure helper only",
+                    "P-SSZ-1.gindex-concat: source scope must remain helper-only")
         elif row["id"] == "P-SSZ-1.abstract-digest":
             require(row.get("parent_id") == "P-SSZ-1",
                     "P-SSZ-1.abstract-digest must remain subordinate to P-SSZ-1")
@@ -1055,7 +1075,7 @@ def validate():
         require(row["statuses"] == expected_statuses,
                 f"{row['id']}: assurance statuses differ from canonical claims")
         source_status = row["statuses"]["source"]
-        if row["id"] in {"P-SSZ-1.deposit-data-root", "P-SSZ-1.abstract-digest",
+        if row["id"] in {"P-SSZ-1.deposit-data-root", "P-SSZ-1.gindex-concat", "P-SSZ-1.abstract-digest",
                           "P-SSZ-1.tx-execution-simulation"}:
             mapping = source_targets["P-SSZ-1"]
         elif row["id"] == "P-ALLOC-1.eugene-bound":
