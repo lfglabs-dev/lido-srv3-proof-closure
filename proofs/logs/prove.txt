@@ -1,6 +1,6 @@
 verified_source_tree=2ac3928650b608846785bb89246304729a5d80bf
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
-⚠ [689/750] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+⚠ [689/735] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:299:53: This simp argument is unused:
   setStorage
 
@@ -398,7 +398,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [691/750] Replayed LidoSRv3.Audit.Trust
+ℹ [691/735] Replayed LidoSRv3.Audit.Trust
 info: LidoSRv3/Audit/Trust.lean:23:0: 'LidoSRv3.Audit.Quantity.checkedDiv_zero' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:24:0: 'LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:25:0: 'LidoSRv3.Audit.revert_restores_state_value_and_logs' depends on axioms: [propext]
@@ -462,7 +462,7 @@ info: LidoSRv3/Audit/Trust.lean:80:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_le
 info: LidoSRv3/Audit/Trust.lean:81:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
 info: LidoSRv3/Audit/Trust.lean:82:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:83:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
-⚠ [703/750] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+⚠ [703/735] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
 warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -482,75 +482,18 @@ info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationMode
   Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
     Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
       (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-⚠ [1194/1275] Replayed Conform.Wheels
-warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1195/1275] Replayed EvmYul.Pretty
-warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1242/1275] Replayed EvmYul.Semantics
-warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
-
-import Mathlib.Init
-⚠ [1243/1275] Replayed EvmYul.EVM.Semantics
-warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
-
-import Mathlib.Init
-ℹ [1303/1329] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:41:0: LidoSRv3.Audit.Verity.TopupRollback.topup_program_declared : spec.functions = [topUpEntry]
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:42:0: LidoSRv3.Audit.Verity.TopupRollback.topup_success_post_state_equiv (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-  {keys pulled pushed balanceAfter : ℕ} (hRun : run cfg inp = Outcome.committedTopUp keys pulled pushed balanceAfter) :
-  pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:43:0: LidoSRv3.Audit.Verity.TopupRollback.topup_rollback_restores_state {State : Type} (cfg : SourceTopupConfig)
-  (inp : SourceTopupInput) (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
-  (hRevert : (topupProgram cfg inp before).sourceOutcome.reverts = true) :
-  (transactionObservation (topupProgram cfg inp before) after attempts trace).committedState = before ∧
-    (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] ∧
-      (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.logs = []
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:44:0: LidoSRv3.Audit.Verity.TopupRollback.topup_allocation_extracted_from_pinned_source :
-  Verity.Core.Model.AllocationExtraction.extractAllocation spec topUpEntry =
-    Verity.Core.Model.AllocationExtraction.extractAllocationFromSource spec pinnedSolidityTopUp
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:45:0: LidoSRv3.Audit.Verity.TopupRollback.topup_amount_extraction_correct (inp : SourceTopupInput)
-  (hNoWrap : NoUncheckedWrap inp) : allocSumUnchecked inp.allocations = totalAllocated inp
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:46:0: LidoSRv3.Audit.Verity.TopupRollback.topup_call_world_rollback {State : Type} (program : TopupProgram State)
-  (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
-  (state : Compiler.CompilationModel.DenoteExternalCalls.CallState)
-  (h :
-    ∀ entry ∈ Compiler.CompilationModel.DenoteExternalCalls.ObservedCalls program.calls adversary state,
-      Compiler.CompilationModel.DenoteExternalCalls.RollsBack adversary entry) :
-  (Compiler.CompilationModel.DenoteExternalCalls.denote program.calls adversary state).2.world = state.world
-⚠ [1307/1329] Replayed LidoSRv3.Legacy.SpecProofs
+⚠ [1137/1329] Replayed LidoSRv3.Legacy.SpecProofs
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-ℹ [1320/1329] Replayed LidoSRv3.Tests.SszVerifierProgram
+ℹ [1148/1329] Replayed LidoSRv3.Tests.SszVerifierProgram
 info: LidoSRv3/Tests/SszVerifierProgram.lean:102:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.deposit_call_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:103:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.validator_root_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:104:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.verifier_pair_preimage_exact' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:105:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_memory_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:106:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_abi_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:107:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_sha_fails_closed' depends on axioms: [propext]
-ℹ [1323/1329] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+ℹ [1151/1329] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:35:0: LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected (input : TxInputs)
   (hmutant : computedRoot input ≠ input.expectedDepositDataRoot) :
   runVerification input = VerificationOutcome.revertRootMismatch
@@ -567,7 +510,7 @@ info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:37:0: LidoSRv3.Audit.Veri
       (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
         (runVerification input = VerificationOutcome.revertRootMismatch →
           (transactionObservation input before after attempts trace).committedState = before)
-⚠ [1326/1329] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1152/1329] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -621,4 +564,224 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [1155/1329] Built Mathlib.Algebra.Order.Group.Multiset (8.9s)
+✔ [1156/1329] Built Mathlib.Algebra.Order.Ring.Rat (9.8s)
+✔ [1157/1329] Built Mathlib.Algebra.Group.Nat.Even (11s)
+✔ [1158/1329] Built Mathlib.Algebra.Order.Sub.Basic (12s)
+✔ [1159/1329] Built Mathlib.Data.Vector.Basic (13s)
+✔ [1160/1329] Built Mathlib.Data.Nat.Cast.Basic (13s)
+✔ [1161/1329] Built Mathlib.Algebra.Group.Int.Even (4.2s)
+✔ [1162/1329] Built Mathlib.Data.Nat.ModEq (10s)
+✔ [1163/1329] Built Mathlib.Data.Multiset.Sum (14s)
+✔ [1164/1329] Built Mathlib.Algebra.BigOperators.Group.Multiset.Basic (14s)
+✔ [1165/1329] Built Mathlib.Tactic.CancelDenoms.Core (25s)
+✔ [1166/1329] Built Mathlib.Data.Nat.Cast.Order.Basic (14s)
+✔ [1167/1329] Built Mathlib.Data.ZMod.Defs (12s)
+✔ [1168/1329] Built Mathlib.Data.Multiset.Bind (12s)
+✔ [1169/1329] Built Mathlib.Algebra.Ring.Parity (22s)
+✔ [1170/1329] Built Mathlib.Data.Finset.Sum (13s)
+✔ [1171/1329] Built Mathlib.Algebra.Order.Nonneg.Basic (20s)
+✔ [1172/1329] Built Mathlib.Algebra.Order.Ring.Nat (10s)
+✔ [1173/1329] Built Mathlib.Algebra.Order.Ring.Canonical (16s)
+✔ [1174/1329] Built Mathlib.Algebra.Order.Ring.Basic (22s)
+✔ [1175/1329] Built Mathlib.Data.Finset.Union (23s)
+✔ [1176/1329] Built Mathlib.Tactic.NormNum.Basic (48s)
+✔ [1177/1329] Built Mathlib.Data.Int.Cast.Lemmas (24s)
+✔ [1178/1329] Built Mathlib.Algebra.Ring.Int.Parity (25s)
+✔ [1179/1329] Built Mathlib.Data.Nat.Bitwise (25s)
+✔ [1180/1329] Built Mathlib.Data.PNat.Basic (16s)
+✔ [1181/1329] Built Mathlib.Data.Nat.Cast.Order.Ring (17s)
+✔ [1182/1329] Built Mathlib.Algebra.Order.Field.Canonical (16s)
+✔ [1183/1329] Built Mathlib.Algebra.Order.Nonneg.Ring (24s)
+✔ [1184/1329] Built Mathlib.Data.NNRat.Defs (26s)
+✔ [1185/1329] Built Mathlib.Data.Int.CharZero (15s)
+✔ [1186/1329] Built Mathlib.Algebra.Order.Ring.Int (14s)
+✔ [1187/1329] Built Mathlib.Data.Finset.Option (26s)
+✔ [1188/1329] Built Mathlib.Data.BitVec (27s)
+✔ [1189/1329] Built Mathlib.Data.Rat.Lemmas (28s)
+✔ [1190/1329] Built Mathlib.Tactic.FieldSimp.Lemmas (27s)
+✔ [1191/1329] Built Mathlib.Tactic.Linarith.Lemmas (23s)
+✔ [1192/1329] Built Mathlib.Tactic.NormNum.Abs (24s)
+✔ [1193/1329] Built Mathlib.Tactic.NormNum.Pow (35s)
+✔ [1194/1329] Built Mathlib.Algebra.Order.Invertible (23s)
+✔ [1195/1329] Built Mathlib.Algebra.Field.Rat (21s)
+✔ [1196/1329] Built Mathlib.Data.Finset.Lattice.Fold (77s)
+✔ [1197/1329] Built Mathlib.Algebra.Order.Ring.Cast (25s)
+✔ [1198/1329] Built Mathlib.Algebra.Order.Nonneg.Field (37s)
+✔ [1199/1329] Built Mathlib.Tactic.Abel (55s)
+✔ [1200/1329] Built Mathlib.Algebra.Order.Ring.Abs (30s)
+✔ [1201/1329] Built Mathlib.Tactic.Linarith.Datatypes (22s)
+✔ [1202/1329] Built Mathlib.Order.CompleteLattice.Finset (26s)
+✔ [1203/1329] Built Mathlib.Tactic.Linarith.Parsing (8.1s)
+✔ [1204/1329] Built Mathlib.Data.Rat.Cast.Defs (24s)
+✔ [1205/1329] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm (11s)
+✔ [1206/1329] Built Mathlib.Algebra.Order.Field.Rat (18s)
+✔ [1207/1329] Built Mathlib.Data.Rat.Cast.CharZero (15s)
+✔ [1208/1329] Built Mathlib.Data.Finset.Sigma (23s)
+✔ [1209/1329] Built Mathlib.Algebra.Order.Floor.Defs (28s)
+✔ [1210/1329] Built Mathlib.Tactic.Linarith.Preprocessing (27s)
+✔ [1211/1329] Built Mathlib.Tactic.Linarith.Verification (21s)
+✔ [1212/1329] Built Mathlib.Tactic.Positivity.Core (33s)
+✔ [1213/1329] Built Mathlib.Tactic.NormNum.Inv (15s)
+✔ [1214/1329] Built Mathlib.Algebra.Order.Floor.Semiring (17s)
+✔ [1215/1329] Built Mathlib.Tactic.NormNum.Eq (10s)
+✔ [1216/1329] Built Mathlib.Data.Finmap (31s)
+✔ [1217/1329] Built Mathlib.Tactic.FieldSimp.Discharger (37s)
+✔ [1218/1329] Built Mathlib.Data.Rat.Cast.Order (38s)
+✔ [1219/1329] Built Mathlib.Algebra.Order.Field.Basic (51s)
+✔ [1220/1329] Built Mathlib.Tactic.NormNum.Ineq (41s)
+✔ [1221/1329] Built Mathlib.Tactic.NormNum.DivMod (10s)
+✔ [1222/1329] Built Mathlib.Tactic.Positivity.Basic (72s)
+✔ [1223/1329] Built Mathlib.Tactic.Ring.Common (73s)
+✔ [1224/1329] Built Mathlib.Data.Rat.Cast.Lemmas (9.6s)
+✔ [1225/1329] Built Mathlib.Tactic.NormNum.OfScientific (10s)
+✔ [1226/1329] Built Mathlib.Tactic.FieldSimp (62s)
+✔ [1227/1329] Built Mathlib.Tactic.NormNum (8.2s)
+✔ [1228/1329] Built Mathlib.Tactic.Ring.Basic (18s)
+✔ [1229/1329] Built Mathlib.Tactic.Ring.PNat (7.5s)
+✔ [1230/1329] Built Mathlib.Tactic.Ring.RingNF (9.2s)
+✔ [1231/1329] Built Mathlib.Tactic.Field (10s)
+✔ [1232/1329] Built Mathlib.Tactic.Ring (2.8s)
+✔ [1233/1329] Built Mathlib.Tactic.Linarith.Frontend (13s)
+✔ [1234/1329] Built Mathlib.Tactic.Linarith (2.1s)
+✔ [1235/1329] Built Mathlib.Algebra.Order.Floor.Ring (16s)
+✔ [1236/1329] Built EvmYul.UInt256 (7.3s)
+✔ [1237/1329] Built Compiler.Proofs.IRGeneration.IRStorageWord (11s)
+✔ [1238/1329] Built EvmYul.EVM.GasConstants (11s)
+✔ [1239/1329] Built EvmYul.Wheels (15s)
+✔ [1240/1329] Built Compiler.Proofs.IRGeneration.IRRuntimeTypes (14s)
+✔ [1241/1329] Built EvmYul.State.TrieRoot (16s)
+✔ [1242/1329] Built EvmYul.Yul.Wheels (16s)
+✔ [1243/1329] Built EvmYul.Maps.ByteMap (16s)
+✔ [1244/1329] Built EvmYul.State.BlockHeader (20s)
+⚠ [1245/1329] Built Conform.Wheels (20s)
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+✔ [1246/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanNativeSignedArithLemmas (37s)
+✔ [1247/1329] Built EvmYul.MachineState (20s)
+✔ [1248/1329] Built EvmYul.PointEval (17s)
+✔ [1249/1329] Built EvmYul.Maps.StorageMap (24s)
+✔ [1250/1329] Built EvmYul.SHA256 (21s)
+✔ [1251/1329] Built EvmYul.BN_ADD (25s)
+✔ [1252/1329] Built EvmYul.BN_MUL (25s)
+✔ [1253/1329] Built EvmYul.SNARKV (25s)
+✔ [1254/1329] Built EvmYul.EllipticCurves (26s)
+✔ [1255/1329] Built EvmYul.RIP160 (26s)
+✔ [1256/1329] Built EvmYul.BLAKE2_F (26s)
+✔ [1257/1329] Built EvmYul.Yul.MachineState (14s)
+✔ [1258/1329] Built EvmYul.MachineStateOps (16s)
+✔ [1259/1329] Built EvmYul.Operations (21s)
+⚠ [1260/1329] Built EvmYul.Pretty (8.8s)
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+✔ [1261/1329] Built EvmYul.Yul.Ast (10s)
+✔ [1264/1329] Built EvmYul.EVM.Instr (10s)
+✔ [1265/1329] Built EvmYul.State.Account (13s)
+✔ [1266/1329] Built EvmYul.Yul.SizeLemmas (13s)
+✔ [1267/1329] Built EvmYul.State.ExecutionEnv (14s)
+✔ [1268/1329] Built EvmYul.Yul.YulNotation (17s)
+✔ [1269/1329] Built EvmYul.State.AccountOps (7.1s)
+✔ [1270/1329] Built EvmYul.State.Substate (7.3s)
+✔ [1271/1329] Built EvmYul.State.SubstateOps (4.8s)
+✔ [1272/1329] Built EvmYul.State.Transaction (5.7s)
+✔ [1273/1329] Built EvmYul.Maps.AccountMap (6.8s)
+✔ [1274/1329] Built EvmYul.EVM.Exception (3.5s)
+✔ [1275/1329] Built EvmYul.State.TransactionOps (5.9s)
+✔ [1276/1329] Built EvmYul.State.Withdrawal (6.2s)
+✔ [1277/1329] Built EvmYul.EVM.PrecompiledContracts (7.5s)
+✔ [1278/1329] Built EvmYul.State.Block (5.4s)
+✔ [1279/1329] Built EvmYul.State (2.8s)
+✔ [1280/1329] Built EvmYul.SharedState (5.9s)
+✔ [1281/1329] Built EvmYul.StateOps (7.1s)
+✔ [1282/1329] Built EvmYul.Yul.State (7.6s)
+✔ [1283/1329] Built EvmYul.EVM.State (8.8s)
+✔ [1284/1329] Built EvmYul.SharedStateOps (8.7s)
+✔ [1285/1329] Built EvmYul.Yul.Exception (9.5s)
+✔ [1286/1329] Built EvmYul.EVM.StateOps (8.6s)
+✔ [1287/1329] Built EvmYul.Yul.StateOps (13s)
+✔ [1288/1329] Built EvmYul.EVM.PrimOps (5.6s)
+✔ [1289/1329] Built EvmYul.EVM.Gas (14s)
+✔ [1290/1329] Built EvmYul.Yul.PrimOps (4.4s)
+⚠ [1291/1329] Built EvmYul.Semantics (3.6s)
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1292/1329] Built EvmYul.EVM.Semantics (8.5s)
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+✔ [1293/1329] Built EvmYul.Yul.Interpreter (25s)
+✔ [1294/1329] Built EvmYul (2.3s)
+✔ [1295/1329] Built Compiler.Proofs.KeccakBound (3.4s)
+✔ [1296/1329] Built Compiler.Proofs.MappingSlot (3.6s)
+✔ [1297/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanNativeLowering (15s)
+✔ [1298/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanPureBuiltinLemmas (12s)
+✔ [1299/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBuiltinSemantics (4.8s)
+✔ [1300/1329] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBridgeLemmas (11s)
+✔ [1301/1329] Built Compiler.Proofs.IRGeneration.IRInterpreter (52s)
+✔ [1302/1329] Built Compiler.Proofs.IRGeneration.SupportedSpec (195s)
+✔ [1303/1329] Built Compiler.Proofs.IRGeneration.SourceSemantics (64s)
+✔ [1304/1329] Built Compiler.Proofs.IRGeneration.ParamLoading (17s)
+✔ [1305/1329] Built Compiler.Proofs.IRGeneration.DenoteAgreement (57s)
+✔ [1306/1329] Built Compiler.Proofs.IRGeneration.DenoteFunctionAgreement (7.1s)
+✔ [1307/1329] Built Compiler.Proofs.IRGeneration.DenoteEquivalence (4.0s)
+✔ [1308/1329] Built Compiler.Proofs.IRGeneration.FunctionBody.Base (51s)
+✔ [1309/1329] Built Compiler.Proofs.IRGeneration.FunctionBody.Stmt (23s)
+✔ [1310/1329] Built Compiler.Proofs.IRGeneration.FunctionBody (2.7s)
+✔ [1311/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.ResultRelation (4.5s)
+✔ [1312/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.InterfaceAssembly (4.3s)
+✔ [1313/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Scope (17s)
+✔ [1314/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.ExprStmt (3.6s)
+✔ [1315/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Storage (46s)
+✔ [1316/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Loops (14s)
+✔ [1317/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.EventBridge (22s)
+✔ [1318/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Helpers (9.9s)
+✔ [1319/1329] Built Compiler.Proofs.IRGeneration.GenericInduction.Main (3.9s)
+✔ [1320/1329] Built Compiler.Proofs.Storage.SolidityStorage (4.9s)
+✔ [1321/1329] Built Compiler.Proofs.LoopSimulation (2.8s)
+✔ [1322/1329] Built Verity.Proofs.LoopSimulation (2.3s)
+✔ [1323/1329] Built Verity.Core.Model.AllocationExtraction (3.7s)
+ℹ [1325/1329] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:41:0: LidoSRv3.Audit.Verity.TopupRollback.topup_program_declared : spec.functions = [topUpEntry]
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:42:0: LidoSRv3.Audit.Verity.TopupRollback.topup_success_post_state_equiv (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+  {keys pulled pushed balanceAfter : ℕ} (hRun : run cfg inp = Outcome.committedTopUp keys pulled pushed balanceAfter) :
+  pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:43:0: LidoSRv3.Audit.Verity.TopupRollback.topup_rollback_restores_state {State : Type} (cfg : SourceTopupConfig)
+  (inp : SourceTopupInput) (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
+  (hRevert : (topupProgram cfg inp before).sourceOutcome.reverts = true) :
+  (transactionObservation (topupProgram cfg inp before) after attempts trace).committedState = before ∧
+    (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] ∧
+      (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.logs = []
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:44:0: LidoSRv3.Audit.Verity.TopupRollback.topup_allocation_extracted_from_pinned_source :
+  Verity.Core.Model.AllocationExtraction.extractAllocation spec topUpEntry =
+    Verity.Core.Model.AllocationExtraction.extractAllocationFromSource spec pinnedSolidityTopUp
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:45:0: LidoSRv3.Audit.Verity.TopupRollback.topup_amount_extraction_correct (inp : SourceTopupInput)
+  (hNoWrap : NoUncheckedWrap inp) : allocSumUnchecked inp.allocations = totalAllocated inp
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:46:0: LidoSRv3.Audit.Verity.TopupRollback.topup_call_world_rollback {State : Type} (program : TopupProgram State)
+  (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+  (state : Compiler.CompilationModel.DenoteExternalCalls.CallState)
+  (h :
+    ∀ entry ∈ Compiler.CompilationModel.DenoteExternalCalls.ObservedCalls program.calls adversary state,
+      Compiler.CompilationModel.DenoteExternalCalls.RollsBack adversary entry) :
+  (Compiler.CompilationModel.DenoteExternalCalls.denote program.calls adversary state).2.world = state.world
 Build completed successfully (1329 jobs).
