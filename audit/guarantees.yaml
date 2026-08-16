@@ -758,21 +758,22 @@
       "source_plane_scope": "protocol-controlled stVault rebalance/redemption interface only",
       "assumptions": [],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
-        "expected": "successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1RefundTx LidoSRv3.Tests.PEth1RefundTxMutants",
+        "expected": "successful bounded protocol rebalance/redemption return-confinement proof plus gateway/vault Contract.run refund and withdraw observations; parent ETH-flow guarantee remains open"
       },
-      "summary": "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
+      "summary": "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue. A source-shaped Contract.run ledger observes ConsolidationGateway fee send and refund plus WithdrawalVault.withdrawWithdrawals, including snapshot rollback after a failed refund. Raw owner-controlled StakingVault.withdraw is excluded. Parent composition remains open.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Verity.PEth1RefundTx.gateway_refund_success_moves_value"
       },
       "fidelity": {
         "covered": [
-          "protocol-controlled stVault rebalance/redemption interface only"
+          "protocol-controlled stVault rebalance/redemption interface only",
+          "gateway fee send, refund, and vault withdraw Contract.run ledger"
         ],
         "missing": [
           "parent guarantee composition"
@@ -790,21 +791,22 @@
       "source_plane_scope": "configured immutable consolidation-request fee target only",
       "assumptions": [],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
-        "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1RequestTx LidoSRv3.Tests.PEth1RequestTxMutants",
+        "expected": "successful configurable consolidation-request fee-target proof plus bus-forward and request-contract Contract.run observations; canonical deployed address and parent ETH-flow guarantee remain open"
       },
-      "summary": "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
+      "summary": "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest. A source-shaped Contract.run ledger observes ConsolidationBus value-forward and WithdrawalVault EIP-7002/EIP-7251 fee sends, including snapshot rollback after a later request failure. Equating the immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation. Parent composition remains open.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Verity.PEth1RequestTx.bus_forward_success"
       },
       "fidelity": {
         "covered": [
-          "configured immutable consolidation-request fee target only"
+          "configured immutable consolidation-request fee target only",
+          "bus forward and request-contract fee Contract.run ledger"
         ],
         "missing": [
           "parent guarantee composition"

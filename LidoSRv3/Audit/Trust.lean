@@ -12,6 +12,10 @@ import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.ConsolidationCallFragment
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
+import LidoSRv3.Audit.Verity.PEth1RefundTx
+import LidoSRv3.Audit.Verity.PEth1RequestTx
+import LidoSRv3.Tests.PEth1RefundTxMutants
+import LidoSRv3.Tests.PEth1RequestTxMutants
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
@@ -87,6 +91,17 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined
+#print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.gateway_refund_success_moves_value
+#print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.gateway_refund_failure_keeps_prefix_out
+#print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.withdraw_success_moves_to_lido
+#print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.refund_failure_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.bus_forward_success
+#print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.withdrawal_fee_success
+#print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.consolidation_second_failure_discards_prefix
+#print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.bus_failure_restores_snapshot
+#print axioms LidoSRv3.Tests.PEth1RefundTxMutants.double_refund_rejected
+#print axioms LidoSRv3.Tests.PEth1RefundTxMutants.leak_on_refund_failure_rejected
+#print axioms LidoSRv3.Tests.PEth1RequestTxMutants.keep_first_consolidation_fee_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_reverting_branch_moves_no_ether
