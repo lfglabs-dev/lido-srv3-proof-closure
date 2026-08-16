@@ -147,10 +147,12 @@ theorem verity_tx_simulates_source
       _root_.Contracts.externalCallBind, _root_.Verity.Contract.run,
       _root_.Verity.bind, Bind.bind, declaredTopupCalls,
       _root_.Contracts.ExternalArg.toWords,
+      _root_.Contracts.externalCallStubSuccess,
       Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
   case revertAssertBalanceUnchanged =>
     by_cases heq : Core.Uint256.ofNat (totalAllocated inp) =
-        Core.Uint256.ofNat (pushedValue inp) <;> simp [heq]
+        Core.Uint256.ofNat (pushedValue inp) <;>
+      simp [heq]
   case committedTopUp =>
     subst_vars
     simp
@@ -192,7 +194,8 @@ theorem executeTopup_journals_declared_calls (pulled pushed : Uint256)
   subst h
   simp [TopupTxContract.executeTopup, _root_.Contracts.externalCallBind,
     _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
-    Bind.bind, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords]
+    Bind.bind, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords,
+    _root_.Contracts.externalCallStubSuccess]
 
 /-- Mutant: the Lido pull is omitted but the beacon push still happens, so the
 router pushes ether it never pulled. -/
@@ -217,13 +220,10 @@ theorem no_pull_rejected (pulled pushed : Uint256) (h : pulled = pushed)
     ((mutantNoPull pushed).run s).snd.calls ≠
       ((TopupTxContract.executeTopup false pulled pushed true).run s).snd.calls := by
   rw [executeTopup_journals_declared_calls pulled pushed h]
-  simp only [mutantNoPull, _root_.Contracts.externalCallBind,
+  simp [mutantNoPull, _root_.Contracts.externalCallBind,
     _root_.Verity.Contract.run, ContractResult.snd, declaredTopupCalls,
-    _root_.Contracts.ExternalArg.toWords]
-  intro hcalls
-  have hlen := congrArg List.length hcalls
-  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
-  omega
+    _root_.Contracts.ExternalArg.toWords,
+    _root_.Contracts.externalCallStubSuccess]
 
 /-- Doubling the beacon push is observable in every pre-state. -/
 theorem double_push_rejected (pulled pushed : Uint256) (h : pulled = pushed)
@@ -231,13 +231,10 @@ theorem double_push_rejected (pulled pushed : Uint256) (h : pulled = pushed)
     ((mutantDoublePush pulled pushed).run s).snd.calls ≠
       ((TopupTxContract.executeTopup false pulled pushed true).run s).snd.calls := by
   rw [executeTopup_journals_declared_calls pulled pushed h]
-  simp only [mutantDoublePush, _root_.Contracts.externalCallBind,
+  simp [mutantDoublePush, _root_.Contracts.externalCallBind,
     _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
-    ContractResult.snd, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords]
-  intro hcalls
-  have hlen := congrArg List.length hcalls
-  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
-  omega
+    ContractResult.snd, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords,
+    _root_.Contracts.externalCallStubSuccess]
 
 /-- An appended attacker sweep is observable in every pre-state. -/
 theorem attacker_sweep_rejected (pulled pushed : Uint256) (h : pulled = pushed)
@@ -245,13 +242,10 @@ theorem attacker_sweep_rejected (pulled pushed : Uint256) (h : pulled = pushed)
     ((mutantAttackerSweep pulled pushed).run s).snd.calls ≠
       ((TopupTxContract.executeTopup false pulled pushed true).run s).snd.calls := by
   rw [executeTopup_journals_declared_calls pulled pushed h]
-  simp only [mutantAttackerSweep, _root_.Contracts.externalCallBind,
+  simp [mutantAttackerSweep, _root_.Contracts.externalCallBind,
     _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
-    ContractResult.snd, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords]
-  intro hcalls
-  have hlen := congrArg List.length hcalls
-  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
-  omega
+    ContractResult.snd, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords,
+    _root_.Contracts.externalCallStubSuccess]
 
 /-- A revert during the beacon suffix rolls the whole journal back: neither the
 pull nor the push survives, matching EVM top-level revert observability. -/
@@ -260,6 +254,7 @@ theorem push_revert_rolls_back_journal (pulled pushed : Uint256)
     ((TopupTxContract.executePushRevert pulled pushed).run s).snd.calls = s.calls := by
   simp [TopupTxContract.executePushRevert, _root_.Contracts.externalCallBind,
     _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
-    Bind.bind, ContractResult.snd]
+    Bind.bind, ContractResult.snd,
+    _root_.Contracts.externalCallStubSuccess]
 
 end LidoSRv3.Audit.Verity.TopupHybrid

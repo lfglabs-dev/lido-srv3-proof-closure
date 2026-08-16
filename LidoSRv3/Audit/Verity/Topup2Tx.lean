@@ -16,7 +16,7 @@ call states.
 This module still binds through `DenoteExternalCalls` / `CallProgramRollback`,
 not `Contracts.Common.externalCallBind`. At the previous certified pin
 `04729a9` that combinator was `pure ()` (vacuous). This branch pins Verity
-PR #2334 `984759773677e51194732f59a86bb682b308b98d`, where `externalCallBind`
+PR #2334 `5f27213d2b7bd1e679c3de7c8813022520cedbf2`, where `externalCallBind`
 journals `ContractState.calls`. Restating these theorems on that combinator
 is the next slice, not this pin.  Here, by contrast:
 

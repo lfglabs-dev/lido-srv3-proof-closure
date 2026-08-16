@@ -128,7 +128,8 @@ theorem run_simulates_source (cfg : SourceDepositConfig) (inp : SourceDepositInp
       _root_.Contracts.externalCallBind, _root_.Verity.require, declaredDepositCalls,
       DepositTxContract.executeNoDeposits, _root_.Verity.Contract.run, _root_.Verity.bind,
       _root_.Verity.pure, Bind.bind, hrun, Core.Uint256.ofNat,
-      _root_.Contracts.ExternalArg.toWords, Nat.mod_eq_of_lt hAmountLt]
+      _root_.Contracts.ExternalArg.toWords, _root_.Contracts.externalCallStubSuccess,
+      Nat.mod_eq_of_lt hAmountLt]
 
 theorem one_unit_exact_transfer
     {cfg : SourceDepositConfig} {inp : SourceDepositInput}
@@ -152,7 +153,8 @@ theorem one_unit_exact_transfer
     _root_.Contracts.externalCallBind, _root_.Verity.require,
     _root_.Verity.Contract.run, _root_.Verity.bind,
     _root_.Verity.pure, Bind.bind, committedBalances, Nat.sub_add_cancel hFunds,
-    Core.Uint256.ofNat, Nat.mod_eq_of_lt hAmountLt]
+    Core.Uint256.ofNat, _root_.Contracts.externalCallStubSuccess,
+    Nat.mod_eq_of_lt hAmountLt]
 
 theorem failure_restores_snapshot
     (amount : Uint256) (moduleOk lidoOk beaconOk : Bool)
@@ -193,7 +195,8 @@ theorem execute_journals_declared_calls (amount : Uint256) (s : ContractState) :
   simp [DepositTxContract.execute, _root_.Contracts.externalCallBind,
     _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
     Bind.bind, declaredDepositCalls,
-    _root_.Contracts.ExternalArg.toWords]
+    _root_.Contracts.ExternalArg.toWords,
+    _root_.Contracts.externalCallStubSuccess]
 
 /-- Mutant: the Lido pull at `StakingRouter.sol` line 744 is omitted. -/
 private def mutantOmittedPull (amount : Uint256) : Contract Unit := do
@@ -219,26 +222,20 @@ theorem omitted_pull_rejected (amount : Uint256) (s : ContractState) :
     ((mutantOmittedPull amount).run s).snd.calls ≠
       ((DepositTxContract.execute amount true true true).run s).snd.calls := by
   rw [execute_journals_declared_calls]
-  simp only [mutantOmittedPull, _root_.Contracts.externalCallBind,
+  simp [mutantOmittedPull, _root_.Contracts.externalCallBind,
     _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
-    ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords]
-  intro h
-  have hlen := congrArg List.length h
-  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
-  omega
+    ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords,
+    _root_.Contracts.externalCallStubSuccess]
 
 /-- Double-sending the beacon push is observable in every pre-state. -/
 theorem doubled_push_rejected (amount : Uint256) (s : ContractState) :
     ((mutantDoubledPush amount).run s).snd.calls ≠
       ((DepositTxContract.execute amount true true true).run s).snd.calls := by
   rw [execute_journals_declared_calls]
-  simp only [mutantDoubledPush, _root_.Contracts.externalCallBind,
+  simp [mutantDoubledPush, _root_.Contracts.externalCallBind,
     _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
-    ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords]
-  intro h
-  have hlen := congrArg List.length h
-  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
-  omega
+    ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords,
+    _root_.Contracts.externalCallStubSuccess]
 
 /-- Pushing to the beacon before pulling from Lido is observable in every
 pre-state: the journal records call order. -/
@@ -246,13 +243,12 @@ theorem swapped_order_rejected (amount : Uint256) (s : ContractState) :
     ((mutantSwappedOrder amount).run s).snd.calls ≠
       ((DepositTxContract.execute amount true true true).run s).snd.calls := by
   rw [execute_journals_declared_calls]
-  simp only [mutantSwappedOrder, _root_.Contracts.externalCallBind,
+  simp [mutantSwappedOrder, _root_.Contracts.externalCallBind,
     _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
     ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords,
-    List.append_assoc, List.cons_append, List.nil_append]
+    _root_.Contracts.externalCallStubSuccess]
   intro h
-  have hpair := List.append_cancel_left h
-  simp [_root_.Contracts.linkedCallEntry] at hpair
+  simp [_root_.Contracts.linkedCallEntry] at h
 
 /-- A guard failure rolls the whole journal back: no call survives a revert,
 matching EVM top-level revert observability. -/
@@ -260,6 +256,6 @@ theorem revert_rolls_back_journal (amount : Uint256) (s : ContractState) :
     ((DepositTxContract.execute amount true true false).run s).snd.calls = s.calls := by
   simp [DepositTxContract.execute, _root_.Contracts.externalCallBind,
     _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
-    Bind.bind, ContractResult.snd]
+    Bind.bind, ContractResult.snd, _root_.Contracts.externalCallStubSuccess]
 
 end LidoSRv3.Audit.Verity.DepositTx
