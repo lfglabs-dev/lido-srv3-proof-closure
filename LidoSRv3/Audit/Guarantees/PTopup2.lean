@@ -159,9 +159,10 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
 correspondence in `Source.Topup2Correspondence` and `Verity.Topup2Tx`. -/
 def guarantee : Guarantee := ⟨.pTopup2, [.model, .source, .verityTx]⟩
 
-/- TODO(P-TOPUP-2 verifier binding): establish from runtime provenance that the
-deployed verifier address and codehash bind an accepted SSZ proof to the intended
-validator. EVM closure remains BLOCKED until then; source and transaction
-statements take the provenance witness explicitly as an input. -/
+/- Out of scope for P-TOPUP-2: identifying the deployed verifier address and
+codehash. The active assurance contract asks for a faithful Verity model of the
+guarantee-relevant call behavior, not a general deployment-provenance chain.
+For SSZ only, audit metadata separately tracks whether the imported Yul fragment
+matches the deployed fragment. -/
 
 end LidoSRv3.Audit.Guarantees.PTopup2

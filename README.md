@@ -20,55 +20,65 @@ These eleven IDs are the entire public claim surface. The facade in
 `LidoSRv3/Audit/AllGuarantees.lean` carries a machine-checked regression that
 fixes both the count and this exact order, so the set cannot drift silently.
 
-| # | ID | Named theorem or evidence |
-| --- | --- | --- |
-| 1 | `P-ALLOC-1` | `LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded` |
-| 2 | `P-ALLOC-2` | `LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket` |
-| 3 | `P-DEPOSIT-1` | `LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer` |
-| 4 | `P-TOPUP-1` | `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source` (hybrid MODEL → pinned source-shaped semantics → declared Verity `Contract.run` suffix, under `NoUncheckedWrap`) |
-| 5 | `P-ACCOUNT-1` | `LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx` |
-| 6 | `P-RESERVE-1` | `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` (independent MODEL → pinned source-shaped semantics → Verity transaction refinement) |
-| 7 | `P-ETH-1` | metadata-only; no Lean theorem claimed |
-| 8 | `P-ADDRESS-1` | OPEN; the address-renaming relation is specified, but no modeled entrypoint proves it |
-| 9 | `P-TOPUP-2` | `LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap` (MODEL aggregate-cap conservation → pinned source-shaped transition → adversary-quantified Verity external-call plane, conditional on an explicit runtime-provenance witness; EVM verifier binding stays BLOCKED) |
-| 10 | `P-CONSOLIDATION-1` | metadata-only; no Lean theorem claimed |
-| 11 | `P-SSZ-1` | `LidoSRv3.Audit.Ssz.structural_witness_binding_sound` (model); source plane OPEN for mapped helper/wrapper scope; carries the subordinate `P-SSZ-1.deposit-data-root` child claim noted below |
+| # | ID | Abstract Lean | Faithful Verity |
+| --- | --- | --- | --- |
+| 1 | `P-ALLOC-1` | CHECKED | PARTIAL |
+| 2 | `P-ALLOC-2` | CHECKED | PARTIAL — needs proof-backed mutable memory arrays |
+| 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL — linked calls not yet faithfully executed |
+| 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | PARTIAL |
+| 5 | `P-ACCOUNT-1` | CHECKED | PARTIAL — no distinct stateful execution yet |
+| 6 | `P-RESERVE-1` | CHECKED | CHECKED |
+| 7 | `P-ETH-1` | OPEN | OPEN |
+| 8 | `P-ADDRESS-1` | OPEN | PARTIAL subordinate evidence |
+| 9 | `P-TOPUP-2` | CHECKED | PARTIAL — aggregate `CallProgram` evidence only |
+| 10 | `P-CONSOLIDATION-1` | OPEN | PARTIAL subordinate evidence |
+| 11 | `P-SSZ-1` | CHECKED structural model | PARTIAL |
 
 `P-SSZ-1.deposit-data-root` is a subordinate child claim of row 11, not a
 twelfth public guarantee: it narrows part of P-SSZ-1's scope and is carried by
 `LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`.
-`P-SSZ-1.gindex-concat` is likewise subordinate: it closes SOURCE only for the
-pure mapped `GIndex.concat` helper and explicitly leaves the parent SOURCE open
-and TX blocked. It does not cover `SSZ.verifyProof`, wrappers, SHA-256,
-Yul/EVM, or deployment provenance.
+`P-SSZ-1.gindex-concat` is likewise subordinate evidence for the pure mapped
+`GIndex.concat` helper. It does not close the parent, `SSZ.verifyProof`, its
+wrappers, or SHA-256 correctness.
 The public claim surface stays at the eleven numbered IDs above, matching the
 checked `AllGuarantees.all.length = 11` facade.
 
-Each guarantee carries per-plane status across the model, algorithm, source,
-transaction, Yul, EVM, and cryptographic planes. P-ALLOC-1, P-ALLOC-2,
-P-DEPOSIT-1, and P-ACCOUNT-1 claim Lean-checked correspondence to their pinned
-Solidity spans. P-TOPUP-1 is narrower: under `NoUncheckedWrap`, its checked
-chain is MODEL → pinned source-shaped semantics → a declared Verity
-`Contract.run` suffix. That suffix observes only the declared Lido-pull and
-beacon-push calls plus snapshot rollback; linked-external effects, generated
-Yul, EVM/runtime bytecode, and deployment provenance remain open. P-ACCOUNT-1
-additionally closes the checked VERITY_TX plane under an explicit independently
-established full-report-success premise, and models `reportRewardsMinted` only
-for positive fee shares. Later report guards, Yul/EVM/runtime/crypto/E2E remain
-unmodeled, open, or not applicable.
-P-ADDRESS-1 currently specifies an abstract address-renaming relation, but its
-composition helper assumes both admission and post-state properties and is not
-evidence for a modeled entrypoint. MODEL, transaction, source, Yul, bytecode,
-and EVM execution correspondence therefore remain open.
-`P-SSZ-1.deposit-data-root` does not: its registry row declares
-`theorem_planes: ["model"]` and `statuses.source: OPEN`, so it claims only a
-structural-witness MODEL-plane correspondence under the existing pinned-source
-assumptions, and its SOURCE-plane correspondence to the pinned Solidity remains
-open.
-No guarantee currently claims correspondence to deployed bytecode, and several
-are explicitly blocked on runtime provenance. Read the exact
-per-guarantee wording, status, assumptions, and next gate from
-`audit/guarantees.yaml` rather than from any prose summary, including this one.
+## Assurance contract
+
+The project has exactly two general proof objectives per public guarantee:
+
+1. a clear abstract Lean property with a checked theorem; and
+2. a behaviorally faithful Verity model with a checked refinement theorem.
+
+Faithfulness means the guarantee-relevant inputs, guards, state reads/writes,
+indices, arithmetic, external-call target/kind/value/calldata/order/multiplicity,
+success/revert behavior, and rollback are represented whenever they are
+observable for that guarantee. It does **not** require modeling unrelated
+contract behavior.
+
+When the Verity proof cannot be completed, the registry must classify the
+primary gap as exactly one of:
+
+- `VERITY_FEATURE_REQUIRED`, with the missing upstream feature and a minimal
+  consumer test;
+- `PROPERTY_FALSE`, with a reproducible counterexample;
+- `ASSUMPTION_REQUIRED`, linked to a justified risk record; or
+- `IMPLEMENTATION_PENDING`, when the required Verity feature already exists.
+
+General Yul refinement, EVM semantics, runtime-bytecode identity, and deployment
+provenance are outside this project's assurance objective. They are not hidden
+open lanes and do not block a guarantee. `A-SOLC-TRUSTED` records the explicit
+compiler boundary when an artifact is produced.
+
+SSZ has one narrow exception: because its implementation imports a substantial
+Yul fragment, the registry carries a targeted, currently open check that this
+imported fragment is the fragment used by the deployed contract. This identity
+check does not reopen a general source-to-EVM chain. SHA-256 functional
+correctness remains separately explicit under `A-SHA256-FFI`.
+
+Read the exact per-guarantee status, fidelity coverage/missing dimensions,
+classification, assumptions, and next gate from `audit/guarantees.yaml` rather
+than from prose summaries, including this one.
 Generated views of the same data live in `audit/STATUS.md`, `audit/ROADMAP.md`,
 and `audit/REPRODUCE.md`; regenerate them with `make audit-generate`.
 
