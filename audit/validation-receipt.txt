@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6960b6e4324e792fb3f78048ffd5f5dd1b311e5e
+validated-tree: 23ea3736ed20f58d5e1b90817e02e3d2ab07fd7e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -25,7 +25,7 @@ Campaign/main recovery integration (2026-08-16)
   local loop/transaction definitions and prefix/rollback laws its bounded child
   actually consumes.
 - `make prove` completed successfully under Lean 4.31.0: 1362 jobs. The proof
-  report binds verified source tree `f20ce4255abe527303a93f4a158d4790d611e1a6`.
+  report binds verified source tree `5b049c5c85040b21ac0133af6c164fc207fa6d0c`.
 - `main` is the sole active integration branch. The campaign branch is archival
   after synchronization to the integrated head and is not a second target for
   new pull requests.
