@@ -10,6 +10,8 @@ build/
 # Local browser and research artifacts
 /.playwright-mcp/
 /tmp/
+/solidity/cache/
+/solidity/out/
 
 # Generated diagram exports
 /diagram/exports/

@@ -1,0 +1,40 @@
+{
+  "name": "Storage",
+  "members": [
+    {
+      "name": "maxValidatorsPerTopUp",
+      "type": "uint64",
+      "src": "1498:28:1"
+    },
+    {
+      "name": "lastTopUpTimestamp",
+      "type": "uint32",
+      "src": "1542:25:1"
+    },
+    {
+      "name": "lastTopUpBlock",
+      "type": "uint32",
+      "src": "1583:21:1"
+    },
+    {
+      "name": "minBlockDistance",
+      "type": "uint16",
+      "src": "1620:23:1"
+    },
+    {
+      "name": "maxRootAge",
+      "type": "uint16",
+      "src": "1659:17:1"
+    },
+    {
+      "name": "targetBalanceGwei",
+      "type": "uint64",
+      "src": "1692:24:1"
+    },
+    {
+      "name": "minTopUpGwei",
+      "type": "uint64",
+      "src": "1732:19:1"
+    }
+  ]
+}
