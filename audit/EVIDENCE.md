@@ -4,308 +4,133 @@
 
 **Catalogue target ≠ theorem scope.** A compiling file is not evidence that every natural-language claim associated with it is proved. Lean theorem statements are the authority; subordinate evidence remains subordinate.
 
-Campaign commit: `4649ba55052fa29132b016dc443ac738134c332f`
+Campaign commit: `assurance-v4`
 
 ## P-ALLOC-1
 
-Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts, composition with the bounded transaction receipt, and EVM equivalence remain open.
+The abstract capacity bound is checked. Bounded pinned-source and Contract.run summary-call evidence exists, but the faithful Verity objective remains PARTIAL until the full allocation loop and moduleAddress binding are represented.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
-- Theorem planes: `model`, `source`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:27`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
-- Assumptions: `A-SOURCE-SHAPED`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression`
-- Expected scope: successful checked-source to independent Audit-model correspondence and negative-mutant build; parent TX composition and proportional amount correspondence remain open
-
-### Subordinate evidence (does not prove the parent)
-
-#### P-ALLOC-1.eugene-bound
-
-Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.
-
-- Scope: operator bond bound only
-- Plane statuses: model=LEAN_CHECKED; algorithm=LEAN_CHECKED; source=OPEN; tx=NOT_APPLICABLE; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond`](../LidoSRv3/Audit/Guarantees/PAlloc1EugeneBound.lean#L56)
-- Theorem planes: `model`, `algorithm`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1EugeneBound.lean:56`](../LidoSRv3/Audit/Guarantees/PAlloc1EugeneBound.lean#L56)
-- Assumptions: `A-SOURCE-SHAPED`, `A-HANDWRITTEN-MINFIRST`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors`
-- Expected scope: successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open
-
-#### P-ALLOC-1.bounded-allocation-tx
-
-A fixed one-row official Verity Contract.run receipt is mechanically non-vacuous: allocation succeeds with [70], while overwrite [60], missing-capacity-clamp, and disabled-row mutants diverge. It is subordinate TX evidence only; no cfg, modules, capacity row, or demand from the P-ALLOC-1 parent scope feeds this execution.
-
-- Scope: fixed one-row demand/state receipt only; deliberately not composed with parent scope
-- Plane statuses: model=NOT_APPLICABLE; algorithm=NOT_APPLICABLE; source=OPEN; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L56)
-- Theorem planes: `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:56`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L56)
-- Assumptions: `A-VERITY-SCAFFOLD`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.MinFirstVectors`
-- Expected scope: successful fixed-state Contract.run receipt with [70] success and divergent overwrite [60], capacity, and disabled-row mutants; no parent composition claim
-
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L57)
+- Theorem planes: `model`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:57`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L57)
+- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+- Reproduce: `lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants`
+- Expected scope: canonical abstract theorem, bounded source/Verity slice, rollback and structural mutants build; full-loop fidelity remains partial
 
 ## P-ALLOC-2
 
-Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.
+The abstract MinFirst selection property is checked. Selection/amount source correspondence and a bounded amount-mutation Contract.run slice are checked, but the faithful Verity objective remains PARTIAL because scan/count/upper-bound do not execute over the real buckets/capacities memory arrays.
 
-- Plane statuses: model=NOT_APPLICABLE; algorithm=LEAN_CHECKED; source=LEAN_CHECKED; tx=NOT_APPLICABLE; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target`](../LidoSRv3/Audit/Guarantees/PAlloc2.lean#L31)
-- Theorem planes: `algorithm`, `source`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc2.lean:31`](../LidoSRv3/Audit/Guarantees/PAlloc2.lean#L31)
-- Assumptions: `A-HANDWRITTEN-MINFIRST`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc2`
-- Expected scope: successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket`](../LidoSRv3/Audit/Guarantees/PAlloc2.lean#L16)
+- Theorem planes: `model`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc2.lean:16`](../LidoSRv3/Audit/Guarantees/PAlloc2.lean#L16)
+- Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-ALLOC2-TX-BOUNDARY`, `A-VERITY-SCAFFOLD`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstAmountTx LidoSRv3.Tests.MinFirstAmountTxMutants`
+- Expected scope: abstract MinFirst theorem, source correspondence, bounded amount transaction and mutants build; memory-array scan fidelity remains partial
 
 ## P-DEPOSIT-1
 
-Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.
+Abstract one-unit transfer conservation is checked. Recovered DepositLedgerTx evidence executes the conservation/rollback core over model-local storage and rejects dropped-assert/debit mutants, but the faithful Verity parent remains PARTIAL because authorization, allocation, dynamic deposit data, roots, and the real multi-contract value-call graph are not composed.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L69)
-- Theorem planes: `model`, `source`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:69`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L69)
-- Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PDeposit1`
-- Expected scope: successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
-
-### Subordinate evidence (does not prove the parent)
-
-#### P-DEPOSIT-1.verity-tx-rollback.tx
-
-Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.
-
-- Scope: source-shaped deposit prefix scaffold (OPEN); allocation and multi-contract suffix explicitly OPEN
-- Plane statuses: model=LEAN_CHECKED; algorithm=OPEN; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix`](../LidoSRv3/Audit/Verity/DepositRollback.lean#L194)
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L68)
 - Theorem planes: `model`
-- Lean source: [`LidoSRv3/Audit/Verity/DepositRollback.lean:194`](../LidoSRv3/Audit/Verity/DepositRollback.lean#L194)
-- Assumptions: `A-VERITY-SCAFFOLD`, `A-RUNTIME-PROVENANCE`
-- Reproduce: `lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback`
-- Expected scope: successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN
-
-#### P-DEPOSIT-1.ledger-conservation-tx
-
-Bounded SOURCE/VERITY_TX evidence for the ETH-ledger conservation and rollback core of the deposit push. Official Verity Contract.run executes the StakingRouter.sol line 976 counter write, the line 983 pull scaled by MAX_EFFECTIVE_BALANCE_WC_TYPE_01, the DEPOSIT_SIZE beacon push, and the line 996 balance assert over storage only, so no vacuous externalCallBind participates. Rollback is universally quantified over the entry state, the arguments, and the rolled-back state; source correspondence is bounded to the committing push, the line 978 empty-batch early return, and the misconfigured-deployment revert, each made discriminating by a disagreeing mutant. Allocation, the module ABI, multi-contract Lido/queue/oracle state, per-validator deposit-data roots, generated Yul, and EVM execution remain OPEN.
-
-- Scope: ETH-ledger conservation/rollback core only; allocation, module ABI, multi-contract state, and per-validator deposit-data roots are excluded
-- Plane statuses: model=NOT_APPLICABLE; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L153)
-- Theorem planes: `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:153`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L153)
+- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:68`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L68)
 - Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
-- Reproduce: `lake build LidoSRv3.Audit.Verity.DepositLedgerTx LidoSRv3.Audit.Guarantees.PDeposit1`
-- Expected scope: successful storage-only Contract.run deposit-ledger build: universally quantified revert rollback, three bounded source-correspondence receipts, two disagreeing mutants, and the checked forEach-wrapper unrolling probe; the multi-contract deposit transaction, generated Yul, and EVM execution remain OPEN
-
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositLedgerTx`
+- Expected scope: abstract/source conservation and the recovered storage-ledger Contract.run receipts build; full multi-contract call fidelity remains partial
 
 ## P-TOPUP-1
 
-Parent TX is NOT closed. The current Verity wrapper largely compares sourceExecute to itself; it does not compose allocation WC02 → executed calls → module delta. Keep MODEL/SOURCE; treat the wrapper as a subordinate scaffold, not end-to-end top-up conservation.
+Abstract/source top-up conservation is checked under A-TOPUP-NOWRAP. The recovered TopupParent wrapper checks parent success/revert classification and caller-frame rollback, but it delegates operational behavior to sourceExecute; faithful Verity remains PARTIAL until allocation, Lido pull, and beacon push execute through independent Verity semantics.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L195)
-- Theorem planes: `model`, `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup1.lean:195`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L195)
-- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-SOLC-TRUSTED`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Tests.TopupParentMutants`
-- Expected scope: successful whole-parent pinned-source to Verity Contract.run simulation with wrapped uint256 accumulation, explicit call observations, snapshot rollback, and high-risk negative mutants; Yul/EVM are outside the registry plane under A-SOLC-TRUSTED
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L105)
+- Theorem planes: `model`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup1.lean:105`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L105)
+- Assumptions: `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupParent LidoSRv3.Tests.TopupParentMutants`
+- Expected scope: abstract/source conservation and recovered parent classification/rollback receipts build; the wrapper still delegates behavior to sourceExecute, so faithful Verity execution remains partial
 
 ## P-ACCOUNT-1
 
-Parent TX is NOT closed. Useful arithmetic exists, but the TX compares nearly identical traces and only covers a small write prefix. Full-report success is assumed, not proved.
+Abstract accepted-report ordering and checked accumulation are checked. Faithful Verity execution remains PARTIAL until a distinct stateful path executes validity and overflow guards rather than inheriting decorative premises.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L26)
-- Theorem planes: `model`, `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PAccount1.lean:26`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L26)
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L11)
+- Theorem planes: `model`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PAccount1.lean:11`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L11)
 - Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors`
-- Expected scope: successful full-source-execution-gated MODEL-to-SOURCE-to-VERITY_TX correspondence, typed-storage Contract.run commit for accepted accounting prefixes, positive-fee conditional minting, zero-fee and later-revert regressions, and checked-Uint256 refinement build; external calls and later guards/Yul/EVM/runtime/crypto/E2E remain open
+- Expected scope: abstract/source ordering and checked-word evidence builds; distinct stateful Verity execution remains partial
 
 ## P-RESERVE-1
 
-A real Verity Contract.run preserves a withdrawal-reserve partition under safeAdd/safeSub, guards, multi-slot writes, separate spec, and rollback. This is a neighboring property, NOT the requested relational one: 'at constant report/queue/buffer, changing only the deposits reserve leaves prefinalized/finalized ranges and locked ETH unchanged.'
+The abstract reserve non-interference property and its stateful Verity Contract.run refinement are checked, including checked arithmetic, rollback, and guard/write/debit mutants.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec`](../LidoSRv3/Audit/Guarantees/PReserve1.lean#L30)
-- Theorem planes: `model`, `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PReserve1.lean:30`](../LidoSRv3/Audit/Guarantees/PReserve1.lean#L30)
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve`](../LidoSRv3/Audit/Guarantees/PReserve1.lean#L13)
+- Theorem planes: `model`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PReserve1.lean:13`](../LidoSRv3/Audit/Guarantees/PReserve1.lean#L13)
 - Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants`
-- Expected scope: successful pinned-source reserve non-interference, actual Verity-execution simulation, rollback, checked-Uint256, and source-mutant regression build
+- Expected scope: checked abstract reserve property, faithful stateful Verity refinement, rollback and mutants build
 
 ## P-ETH-1
 
-The complete ETH-flow guarantee remains open across ConsolidationBus, ConsolidationGateway, WithdrawalVault, the EIP-7002 and EIP-7251 request contracts, Lido, and arbitrary refund recipients; the checked child models cover only bounded interfaces.
+The complete cross-contract ETH-flow parent remains OPEN. Checked child models are bounded evidence only and do not compose the parent abstract or faithful Verity guarantees.
 
 - Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
 - **Parent theorem: NO PARENT THEOREM**
 - Proof link: none (a file is not proof of this parent claim)
 - Assumptions: none
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PEth1`
-- Expected scope: successful bounded child-model proofs only; parent P-ETH-1 remains OPEN
-
-### Subordinate evidence (does not prove the parent)
-
-#### P-ETH-1a
-
-The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.
-
-- Scope: protocol-controlled stVault rebalance/redemption interface only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L41)
-- Theorem planes: `model`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PEth1.lean:41`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L41)
-- Assumptions: none
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PEth1`
-- Expected scope: successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open
-
-#### P-ETH-1b
-
-The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.
-
-- Scope: configured immutable consolidation-request fee target only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L79)
-- Theorem planes: `model`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PEth1.lean:79`](../LidoSRv3/Audit/Guarantees/PEth1.lean#L79)
-- Assumptions: none
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PEth1`
-- Expected scope: successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open
-
+- Expected scope: bounded child-model proofs build; the abstract and faithful Verity parent remain open
 
 ## P-ADDRESS-1
 
-Parent TX is NOT closed. Current evidence is mostly caller-renaming equivariance and a precomputed source post-state injected into the contract; it does not prove effective transfer, request, finalization, or redemption.
+The permissionless address-admission and post-state-equivariance parent remains OPEN. Recovered evidence covers official-denotation admission and one pinned owner-transfer handoff witness with source correspondence and a wrong-caller mutant; universal post-state equivariance and request/claim/redemption paths remain open.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx`](../LidoSRv3/Audit/Guarantees/PAddress1.lean#L142)
-- Theorem planes: `model`, `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PAddress1.lean:142`](../LidoSRv3/Audit/Guarantees/PAddress1.lean#L142)
-- Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Tests.AddressSourceMutants`
-- Expected scope: successful MODEL-to-pinned-SOURCE-to-official-VERITY_TX caller-renaming simulation, rollback classification, and caller/address mutant counterexamples; Yul/EVM/runtime remain open
+- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
+- **Parent theorem: NO PARENT THEOREM**
+- Proof link: none (a file is not proof of this parent claim)
+- Assumptions: `A-ABSTRACT-TX`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Source.AddressTransferCorrespondence LidoSRv3.Audit.Verity.AddressTransferTx`
+- Expected scope: admission plus bounded owner-transfer source/official-denotation witnesses build; universal post-state equivariance and remaining entrypoints stay open
 
 ## P-TOPUP-2
 
-The mathematical headroom and aggregate-budget bounds are checked at MODEL only. Packed ERC-7201 layout/RMW and exact pinned-artifact-to-mainnet-runtime identity are subordinate evidence; checked-overflow rollback and the actual topUp batch transition are not connected to an official Verity transaction, so parent SOURCE/TX closure remains open.
+The abstract aggregate top-up cap is checked over Nat. SOURCE and Verity promotion are retracted because effectiveBalanceGwei + pendingBalanceGwei is total in the model but checked uint256 addition reverts on overflow; CallProgram and packed-storage artifacts remain non-promoting regression scaffolds.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L165)
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L144)
 - Theorem planes: `model`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup2.lean:165`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L165)
-- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-EIP4788-ANCHOR`, `A-SHA256-FFI`, `A-TOPUP-EXTERNAL-SUMMARIES`, `A-DEPLOYMENT-PROVENANCE-OPTIONAL`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2Mutants`
-- Expected scope: successful MODEL bounds plus subordinate packed layout/RMW and material Contract.run evidence; parent SOURCE/TX and verifier/Yul/EVM semantics remain open
+- Lean source: [`LidoSRv3/Audit/Guarantees/PTopup2.lean:144`](../LidoSRv3/Audit/Guarantees/PTopup2.lean#L144)
+- Assumptions: none
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2TxMutants LidoSRv3.Tests.Topup2Mutants`
+- Expected scope: abstract aggregate cap and overflow-boundary, CallProgram, and packed-storage regressions build; SOURCE/Verity promotion remains retracted
 
 ## P-CONSOLIDATION-1
 
-Consolidation requests must be eligible, correctly bound, value-conserving and atomic. Fee-refinement and abstract-flow sub-rows are merged; batch eligibility, replay protection, and composition theorem remain open.
+The parent eligibility, binding, value-conservation, and atomicity guarantee remains OPEN. Payload and fee-scaffold children plus the recovered executable call-fragment blocker are partial evidence; faithful composition requires an observable FunctionSpec call/event/memory bridge.
 
-- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=NOT_APPLICABLE; tx=OPEN; crypto=STRETCH_OPAQUE_FFI
+- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
 - **Parent theorem: NO PARENT THEOREM**
 - Proof link: none (a file is not proof of this parent claim)
 - Assumptions: `A-SHA256-FFI`
-- Reproduce: `python3 scripts/audit_metadata.py check`
-- Expected scope: opaque FFI risk remains recorded; no crypto closure
-
-### Subordinate evidence (does not prove the parent)
-
-#### P-CONSOLIDATION-1.abstract-flow-model
-
-Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.
-
-- Scope: abstract 96-byte consolidation flow only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement`](../LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean#L120)
-- Theorem planes: `model`, `tx`
-- Lean source: [`LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean:120`](../LidoSRv3/Audit/Verity/ConsolidationAbstractFlowModel.lean#L120)
-- Assumptions: `A-VERITY-SCAFFOLD`, `A-RUNTIME-PROVENANCE`
-- Reproduce: `lake build LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel`
-- Expected scope: successful typed-program compilation and exact source-then-target 96-byte single-CALL layout; no amount, SHA-256, loop, rollback, Yul, or EVM claim
-
-#### P-CONSOLIDATION-1.fee-refinement.tx
-
-Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.
-
-- Scope: WithdrawalVault consolidation request model only; gateway grouping, quota, proof validation, and refund are excluded
-- Plane statuses: model=OPEN; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=NOT_APPLICABLE
-- **Theorem: NO PARENT THEOREM**
-- Proof link: none (a file is not proof of this parent claim)
-- Assumptions: `A-VERITY-SCAFFOLD`, `A-RUNTIME-PROVENANCE`
-- Reproduce: `lake build LidoSRv3.Audit.Verity.ConsolidationFee`
-- Expected scope: successful source-shaped FunctionSpec scaffold build; dynamic ABI, call/event trace, balance rollback, and source/tx adequacy remain OPEN
-
+- Reproduce: `lake build LidoSRv3.Audit.Verity.ConsolidationCallFragment && python3 scripts/audit_metadata.py check`
+- Expected scope: the executable blocker probe and metadata build; parent abstract and faithful Verity guarantees remain open/partial
 
 ## P-SSZ-1
 
-The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.
+The structural SSZ witness-binding model is checked and helper/digest children provide partial evidence. Faithful Verity execution of verifyProof and wrappers remains PARTIAL; SHA-256 correctness is assumed, and the targeted imported-to-deployed SSZ Yul binding is OPEN.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=BLOCKED; crypto=STRETCH_OPAQUE_FFI
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PARTIAL; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Ssz.structural_witness_binding_sound`](../LidoSRv3/Audit/Ssz.lean#L164)
 - Theorem planes: `model`
 - Lean source: [`LidoSRv3/Audit/Ssz.lean:164`](../LidoSRv3/Audit/Ssz.lean#L164)
-- Assumptions: `A-RUNTIME-PROVENANCE`, `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
-- Reproduce: `lake build LidoSRv3.Audit.Ssz`
-- Expected scope: successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence
-
-### Subordinate evidence (does not prove the parent)
-
-#### P-SSZ-1.deposit-data-root
-
-Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.
-
-- Scope: deposit-data-root only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=BLOCKED; crypto=STRETCH_OPAQUE_FFI
-- Theorem: [`LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`](../LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean#L431)
-- Theorem planes: `model`
-- Lean source: [`LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean:431`](../LidoSRv3/Audit/Source/DepositDataRootCorrespondence.lean#L431)
-- Assumptions: `A-RUNTIME-PROVENANCE`, `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
-- Reproduce: `lake build LidoSRv3.Audit.Source.DepositDataRootCorrespondence LidoSRv3.Tests.SszRegression`
-- Expected scope: successful raw-signature deposit-data-root control-flow and structural-binding regressions only; SHA-256/precompile remains STRETCH_OPAQUE_FFI and source/EVM/crypto/E2E correspondence remains open
-
-#### P-SSZ-1.abstract-digest
-
-Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.
-
-- Scope: abstract SHA-256 digest only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=OPEN; crypto=STRETCH_OPAQUE_FFI
-- Theorem: [`LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement`](../LidoSRv3/Audit/Verity/SszAbstractDigest.lean#L161)
-- Theorem planes: `model`, `tx`
-- Lean source: [`LidoSRv3/Audit/Verity/SszAbstractDigest.lean:161`](../LidoSRv3/Audit/Verity/SszAbstractDigest.lean#L161)
-- Assumptions: `A-RUNTIME-PROVENANCE`, `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
-- Reproduce: `lake build LidoSRv3.Audit.Verity.SszAbstractDigest`
-- Expected scope: successful typed-program compilation and exact seven-call pure-Lean digest composition; no Verity execution simulation or SHA-256 functional proof
-
-#### P-SSZ-1.tx-execution-simulation
-
-Concrete Verity transaction-plane evidence stages the exact DepositData calldata layout, performs the seven address-2 SHA-256 calls, checks the expected root, and restores the transaction snapshot on failure; SHA-256 functional correctness remains assumed under A-SHA256-FFI.
-
-- Scope: SSZ transaction execution simulation only
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=OPEN; tx=PENDING; crypto=STRETCH_OPAQUE_FFI
-- Theorem: [`LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct`](../LidoSRv3/Audit/Verity/SszTxSimulation.lean#L332)
-- Theorem planes: `model`, `tx`
-- Lean source: [`LidoSRv3/Audit/Verity/SszTxSimulation.lean:332`](../LidoSRv3/Audit/Verity/SszTxSimulation.lean#L332)
-- Assumptions: `A-VERITY-SCAFFOLD`, `A-SHA256-FFI`, `A-RUNTIME-PROVENANCE`
-- Reproduce: `lake build LidoSRv3.Audit.Verity.SszTxSimulation LidoSRv3.Audit.Verity.Tests.SszTxSimulation`
-- Expected scope: successful typed DepositData execution simulation, exact seven-call SHA-256 composition, root-mutant rejection, and snapshot rollback proofs
-
-
-## Standalone supplemental evidence
-
-These scoped rows are not public parent guarantees and are not subordinate to one of the eleven public guarantees.
-
-### P-DEREF-1
-
-Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.
-
-- Scope: registry address binding only; migration old-layout contents are explicit inputs
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source`](../LidoSRv3/Audit/Source/DereferenceCorrespondence.lean#L195)
-- Theorem planes: `model`, `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Source/DereferenceCorrespondence.lean:195`](../LidoSRv3/Audit/Source/DereferenceCorrespondence.lean#L195)
-- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-YUL-INTERFACE`, `A-RUNTIME-PROVENANCE`
-- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants`
-- Expected scope: reachable nonzero derivation, source-to-executable-Verity mapping refinement, and guard/address-writer mutants compile; Yul/EVM provenance remains OPEN
+- Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`
+- Reproduce: `lake build LidoSRv3.Audit.Ssz LidoSRv3.Audit.Source.GIndexConcatCorrespondence LidoSRv3.Tests.GIndexConcatMutants`
+- Expected scope: structural abstract model and subordinate helper mutants build; faithful wrappers, SHA-256 boundary, and targeted deployed-Yul binding remain explicit

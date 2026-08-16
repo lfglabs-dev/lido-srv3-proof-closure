@@ -35,7 +35,7 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-ALLOC-2` — **VERITY_FEATURE_REQUIRED**: Add proof-backed mutable uint256 memory-array denotation and consume it in P-ALLOC-2.
 - `P-ETH-1` — **IMPLEMENTATION_PENDING**: Define the abstract parent then compose relevant protocol-controlled Verity value paths.
 - `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
-- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: Compose the recovered packed-storage model and bounded call evidence in one observable Verity run with complete call shape and same-run failure provenance.
+- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: First model checked uint256 addition and overflow rollback; only then compose storage and calls in one observable Verity run with complete call shape and same-run failure provenance.
 - `P-CONSOLIDATION-1` — **VERITY_FEATURE_REQUIRED**: Close the observable FunctionSpec call/event/memory bridge, then consume it.
 
 ## Deferred P3-labelled registry rows

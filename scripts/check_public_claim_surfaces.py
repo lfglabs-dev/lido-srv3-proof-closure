@@ -14,7 +14,7 @@ from typing import NoReturn
 
 CLAIMS = {
     "P-DEPOSIT-1": {
-        "abstract_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer",
+        "abstract_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
         "module": "PDeposit1",
         "layers": ".model, .abstractTx, .source",
         "imports": (
@@ -164,11 +164,11 @@ def declaration_name(source: str, start: int) -> str:
 def lean_surface(source: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], ...]]:
     """Return imports and normalized named public declarations."""
     without_comments = strip_lean_comments(source)
-    imports = tuple(re.findall(r"^import\s+([^\s]+)\s*$", without_comments, re.MULTILINE))
+    imports = tuple(re.findall(r"^[ \t]*import\s+([^\s]+)\s*$", without_comments, re.MULTILINE))
     modifiers = r"(?:(?:public|protected|noncomputable|unsafe)\s+)*"
     attributes = r"(?:@\[[^\n]*\]\s*)*"
     kinds = r"def|theorem|lemma|abbrev|opaque|axiom|instance|structure|class|inductive"
-    heads = re.compile(rf"^{attributes}{modifiers}({kinds})\s+", re.MULTILINE)
+    heads = re.compile(rf"^[ \t]*{attributes}{modifiers}({kinds})\s+", re.MULTILINE)
     declarations = tuple(
         (match.group(1), declaration_name(without_comments, match.end()))
         for match in heads.finditer(without_comments)

@@ -28,7 +28,10 @@ structure TopupConfig where
   moduleAllocationLimitGwei : Nat
   maxRootAge : Nat
 
-/-- Faithful Gwei reading of pinned `_evaluateTopUpLimit`. -/
+/-- Mathematical Gwei model of `_evaluateTopUpLimit` on inputs whose addition
+does not overflow a Solidity `uint256`.  This definition deliberately uses
+`Nat`; it is not source correspondence for unchecked inputs because Solidity's
+checked addition reverts where `Nat` addition remains total. -/
 def evaluated_topup_limit (v : Validator) (cfg : TopupConfig) : Nat :=
   if v.exiting || v.slashed then 0
   else
@@ -155,9 +158,11 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
   exact Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
 
-/-- The model theorem is extended by source and bounded-Verity transaction
-correspondence in `Source.Topup2Correspondence` and `Verity.Topup2Tx`. -/
-def guarantee : Guarantee := ⟨.pTopup2, [.model, .source, .verityTx]⟩
+/-- P-TOPUP-2 is promoted only at the mathematical model layer.  The historical
+source-shaped and call-program artifacts remain useful regression scaffolds,
+but cannot promote SOURCE or Verity until checked-word bounds and the source's
+overflow-revert behavior are represented explicitly. -/
+def guarantee : Guarantee := ⟨.pTopup2, [.model]⟩
 
 /- Out of scope for P-TOPUP-2: identifying the deployed verifier address and
 codehash. The active assurance contract asks for a faithful Verity model of the

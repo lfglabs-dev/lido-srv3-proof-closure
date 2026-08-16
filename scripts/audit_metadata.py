@@ -12,6 +12,8 @@ import json
 import re
 from pathlib import Path
 
+from evidence_index import assurance_v4_evidence, render_json, render_markdown
+
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 CANONICAL_IDS = [
@@ -49,7 +51,7 @@ EXPECTED_OBJECTIVE = "Prove an abstract Lean model and a behaviorally faithful V
 EXPECTED_CANONICAL_CLAIMS = {
     "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket", "PARTIAL", None, "VERITY_FEATURE_REQUIRED", ("A-HANDWRITTEN-MINFIRST", "A-ALLOC2-TX-BOUNDARY", "A-VERITY-SCAFFOLD")),
-    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
@@ -68,7 +70,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-RESERVE-1": "e8f34af2bb8d1eb061da1882ff2460535489056a8e9eca41e7b8c750a614ff27",
     "P-ETH-1": "9f79007c732bddca4e2ca56d988c63aa0059b35c6e48def28985dad3e3cbcd64",
     "P-ADDRESS-1": "882421e998af3fe6be8af7154999801509a085ccf4e1842c310ad6ddf68122e3",
-    "P-TOPUP-2": "25b069ef3cbe2cb60c4feb63f39948c0604196269c8cfdba312e38c9fc8464f0",
+    "P-TOPUP-2": "2c8cb1b166f1bcae465079fad7c0b301d5faf08639d3afc53a327aeaa2ddfca3",
     "P-CONSOLIDATION-1": "9e27decc67733f1e9b4974f97b51ae35829a9c0ed0bb5c318c9152ab0f6211ca",
     "P-SSZ-1": "f56732a1c2b0a8941b2d2b8d2fe05a0bf0e70a7a21b36d4851a2c311f45ffc05",
 }
@@ -304,7 +306,14 @@ def rendered(rows):
         lines.append(f"| `{r['id']}` | {r['abstract']['status']} | {r['verity']['status']} | {missing} | {r['classification']['kind']} | {assumptions} |")
     status = header + "\n".join(lines) + "\n"
     reproduce = header + "# REPRODUCE\n\n" + "\n".join(f"- `{r['id']}`: `{r['reproduction']['command']}` — {r['reproduction']['expected']}" for r in canonical) + "\n"
-    return {"ROADMAP.md": roadmap, "STATUS.md": status, "REPRODUCE.md": reproduce}
+    evidence = assurance_v4_evidence(canonical, ROOT)
+    return {
+        "ROADMAP.md": roadmap,
+        "STATUS.md": status,
+        "REPRODUCE.md": reproduce,
+        "EVIDENCE.md": render_markdown(evidence),
+        "evidence.json": render_json(evidence),
+    }
 
 
 def main():
@@ -319,7 +328,7 @@ def main():
     if args.command == "generate":
         for name, content in views.items():
             (AUDIT / name).write_text(content, encoding="utf-8")
-        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md")
+        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md audit/EVIDENCE.md audit/evidence.json")
     else:
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content, f"{name} is stale; run scripts/audit_metadata.py generate")

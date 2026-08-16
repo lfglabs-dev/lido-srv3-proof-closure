@@ -92,7 +92,7 @@
       "summary": "Abstract one-unit transfer conservation is checked. Recovered DepositLedgerTx evidence executes the conservation/rollback core over model-local storage and rejects dropped-assert/debit mutants, but the faithful Verity parent remains PARTIAL because authorization, allocation, dynamic deposit data, roots, and the real multi-contract value-call graph are not composed.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer"
+        "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
       },
       "verity": {
         "status": "PARTIAL",
@@ -294,9 +294,9 @@
       "assumptions": [],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2TxMutants LidoSRv3.Tests.Topup2Mutants",
-        "expected": "abstract aggregate cap, bounded CallProgram evidence, and recovered packed-storage mutants build; complete call-shape execution remains partial"
+        "expected": "abstract aggregate cap and overflow-boundary, CallProgram, and packed-storage regressions build; SOURCE/Verity promotion remains retracted"
       },
-      "summary": "The abstract aggregate top-up cap is checked; adversary-quantified CallProgram evidence and recovered packed-storage/layout mutants are non-vacuous. Faithful Verity remains PARTIAL because a single execution does not yet bind target, call kind, calldata, per-validator granularity, and failure provenance to the same run.",
+      "summary": "The abstract aggregate top-up cap is checked over Nat. SOURCE and Verity promotion are retracted because effectiveBalanceGwei + pendingBalanceGwei is total in the model but checked uint256 addition reverts on overflow; CallProgram and packed-storage artifacts remain non-promoting regression scaffolds.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
@@ -307,11 +307,12 @@
       },
       "fidelity": {
         "covered": [
-          "abstract/source aggregate cap",
-          "adversarial CallProgram bound/rollback",
-          "recovered packed-storage and source-layout correspondence mutants"
+          "abstract Nat aggregate cap",
+          "non-promoting adversarial CallProgram bound/rollback regressions",
+          "non-promoting packed-storage and source-layout mutants"
         ],
         "missing": [
+          "checked uint256 bounds and overflow-revert correspondence",
           "single Contract.run composition of storage and calls",
           "target/kind/calldata/per-validator granularity",
           "same-run failed-call witness membership"
@@ -321,7 +322,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Compose the recovered packed-storage model and bounded call evidence in one observable Verity run with complete call shape and same-run failure provenance.",
+      "next_gate": "First model checked uint256 addition and overflow rollback; only then compose storage and calls in one observable Verity run with complete call shape and same-run failure provenance.",
       "roadmap_priority": "P2"
     },
     {

@@ -33,6 +33,8 @@ def main():
         (fixture / "audit").mkdir()
         (fixture / "verity/targets").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
+        shutil.copy2(ROOT / "scripts/evidence_index.py", fixture / "scripts/evidence_index.py")
+        shutil.copytree(ROOT / "LidoSRv3", fixture / "LidoSRv3")
         for name in ("guarantees.yaml", "assumptions.yaml", "artifacts.lock.json", "source-map.yaml"):
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")

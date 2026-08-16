@@ -10,6 +10,13 @@ private def validator (effective pending : Nat) : Validator :=
 
 private def cfg : TopupConfig := ⟨64, 4, 100, 8, 80, 3600⟩
 
+/-- Regression for the anti-overclaim boundary: at the largest Solidity word,
+adding one pending gwei would revert under checked `uint256` arithmetic, while
+the total-Nat model computes a value.  Hence these artifacts must not be used as
+SOURCE/Verity correspondence without an explicit no-overflow premise. -/
+example : evaluated_topup_limit
+    (validator _root_.Verity.Core.MAX_UINT256 1) cfg = 0 := by native_decide
+
 /- Omitted-pending and wrong-threshold mutants disagree with pinned branches. -/
 example : evaluated_topup_limit (validator 50 10) cfg = 4 := by native_decide
 example : (64 - (validator 50 10).effectiveBalanceGwei) ≠

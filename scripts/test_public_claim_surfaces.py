@@ -79,6 +79,22 @@ with tempfile.TemporaryDirectory() as tmp:
 
     account.write_text(
         account_original
+        + "\n-- leading-whitespace declaration mutant\n"
+        + "  theorem leading_space_tx_closure : True := True.intro\n",
+        encoding="utf-8",
+    )
+    run(fixture, False, "public declarations differ from the structural allowlist")
+
+    account.write_text(
+        account_original
+        + "\n-- tab/attribute/modifier formatting mutant\n"
+        + "\t@[simp] protected theorem formatted_tx_closure : True := True.intro\n",
+        encoding="utf-8",
+    )
+    run(fixture, False, "public declarations differ from the structural allowlist")
+
+    account.write_text(
+        account_original
         + "\n-- quoted ASCII identifier mutant\n"
         + "theorem «plausible_new_tx_closure» : True := True.intro\n",
         encoding="utf-8",
@@ -112,5 +128,5 @@ with tempfile.TemporaryDirectory() as tmp:
 
 print(
     "public claim surface regressions ok: allowed declarations pass; "
-    "ASCII/quoted/Unicode/escaped/import/README/missing-file mutants fail closed"
+    "ASCII/quoted/Unicode/escaped/whitespace/attribute/import/README/missing-file mutants fail closed"
 )
