@@ -8,7 +8,10 @@
   },
   "layers": {
     "legacy": {
-      "modules": ["LidoSRv3.Legacy.Model", "LidoSRv3.Legacy.SpecProofs"],
+      "modules": [
+        "LidoSRv3.Legacy.Model",
+        "LidoSRv3.Legacy.SpecProofs"
+      ],
       "trust": "pure-model regression evidence"
     },
     "audit": {
@@ -31,10 +34,10 @@
         "LidoSRv3.Audit.Source.TopupCorrespondence",
         "LidoSRv3.Audit.Verity.TopupHybrid",
         "LidoSRv3.Audit.Source.AccountingCorrespondence",
-      "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
-      "LidoSRv3.Audit.Source.GIndexConcatCorrespondence",
-      "LidoSRv3.Audit.Verity.SszAbstractDigest",
-      "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel",
+        "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
+        "LidoSRv3.Audit.Source.GIndexConcatCorrespondence",
+        "LidoSRv3.Audit.Verity.SszAbstractDigest",
+        "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel",
         "LidoSRv3.Audit.Source.ReserveCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
         "LidoSRv3.Tests.AllocCapacityRegression",
@@ -55,7 +58,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved predicates over source-shaped audit data; P-ALLOC-1 allocation-capacity plus bounded summary-call Verity transaction rollback, P-ALLOC-2 next-target, P-DEPOSIT-1 deposit conservation/rollback, P-TOPUP-1 top-up conservation plus hybrid Verity transaction rollback, and P-ACCOUNT-1 full-success-gated and positive-fee-conditional MODEL-to-SOURCE-to-VERITY_TX checked-Uint256 refinement is checked against pinned Solidity, and P-RESERVE-1 reserve non-interference plus executable Verity transaction simulation is checked against pinned Solidity, while later guards remain an explicit interface premise; P-SSZ-1 deposit-data-root control-flow is MODEL-plane structural evidence over source-shaped inputs; narrow GIndex.concat SOURCE child evidence does not close canonical P-SSZ-1 SOURCE, and TX remains BLOCKED in audit/guarantees.yaml"
+      "trust": "Lean-proved abstract properties plus explicitly classified faithful-Verity evidence. P-RESERVE-1 is CHECKED at both objectives; all other canonical Verity states remain PARTIAL or OPEN as recorded in audit/guarantees.yaml. General Yul/EVM/deployment refinement is outside scope. SSZ alone retains a targeted imported-to-deployed Yul binding, currently OPEN; SHA-256 correctness remains under A-SHA256-FFI."
     }
   },
   "proof_policy": {
@@ -69,17 +72,24 @@
     {
       "name": "Quantity.checkedDiv_zero",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Quantity.saturatingSub_zero_of_le",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "revert_restores_state_value_and_logs",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "revert_may_retain_attempts",
@@ -89,167 +99,256 @@
     {
       "name": "valid_result_preserves_router_order",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PAlloc1.active_capacity_bounded",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PAlloc1.source_capacities_match_canonical",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PAlloc1.router_order_preserved",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
       "status": "lean_checked",
-      "axioms": ["propext", "Classical.choice", "Quot.sound", "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
+      ]
     },
     {
       "name": "Guarantees.PAlloc1Phase3.mapped_summary_call_transaction",
       "status": "lean_checked",
-      "axioms": ["propext", "Classical.choice", "Quot.sound", "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"]
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
+      ]
     },
     {
       "name": "Guarantees.PAlloc2.selects_least_open_bucket",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PAlloc2.source_selects_same_next_target",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PAccount1.source_report_before_reward",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PAccount1.source_to_verityTx",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PDeposit1.source_router_balance_unchanged",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PDeposit1.source_reverting_branch_moves_no_ether",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PDeposit1.source_nonconserving_deployment_reverts",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PTopup1.source_router_balance_unchanged",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PTopup1.source_reverting_branch_moves_no_ether",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PTopup1.source_balance_guards_discharged",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PTopup1.source_unchecked_accumulation_faithful",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PTopup1.verity_tx_simulates_source",
       "status": "lean_checked",
-      "axioms": ["propext", "Classical.choice", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Guarantees.PSsz1.structural_witness_binding_sound",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Source.GIndexConcatCorrespondence.source_concat_matches_spec",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.candidate_mem",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.candidate_open",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.candidate_none_no_open",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.candidate_minimal",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "MinFirst.candidate_router_tie",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "MinFirst.incrementSelected_moduleId",
@@ -264,52 +363,78 @@
     {
       "name": "MinFirst.incrementSelected_monotone",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "MinFirst.incrementSelected_eq_of_ne",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.step_preserves_length",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.step_preserves_module_order",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "MinFirst.loop_preserves_length",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.loop_preserves_module_order",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "MinFirst.allocate_preserves_length",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "MinFirst.allocate_preserves_module_order",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "MinFirst.run_spent_le",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "MinFirst.totalAllocated_le_requested",
       "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
     },
     {
       "name": "Common.BoundedAmount.checkedAdd_sound",
@@ -319,12 +444,16 @@
     {
       "name": "Common.revert_rolls_back_state_and_committed_effects",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     },
     {
       "name": "Common.success_exposes_exact_committed_effects",
       "status": "lean_checked",
-      "axioms": ["propext"]
+      "axioms": [
+        "propext"
+      ]
     }
   ]
 }

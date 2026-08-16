@@ -30,9 +30,10 @@ statement over it would be vacuous.  Here, by contrast:
 * every transaction revert originates from an actually observed failed or
   reverting call carrying the same returndata (`tx_revert_has_failed_call`).
 
-The runtime-provenance witness stays an explicit input inherited from the
-SOURCE theorem; generated Yul, EVM/runtime bytecode, and deployment provenance
-remain open/BLOCKED exactly as recorded in `audit/guarantees.yaml`.
+The runtime-provenance witness remains an input of this historical bounded
+theorem, but it is not a general closure gate. The active registry classifies
+this evidence as PARTIAL until a real Contract.run entrypoint binds target,
+kind, calldata, per-validator granularity, and same-run failure membership.
 -/
 
 namespace LidoSRv3.Audit.Verity.Topup2Tx

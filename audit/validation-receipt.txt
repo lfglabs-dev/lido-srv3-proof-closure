@@ -1,11 +1,31 @@
-Closure-v2 validation receipt
-base: c418551251404063793322beaf3b559967a69563
+Assurance-contract v4 validation receipt
+base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 771783a046bf86db6c7dee53b213226edbe8e4a1
+validated-tree: 47d21981c54e474697f352c354f14e609387b45a
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Abstract Lean + faithful Verity contract (2026-08-16)
+-----------------------------------------------------
+
+- The former model/algorithm/source/TX/Yul/EVM/crypto status matrix is
+  superseded. Each canonical guarantee now records an abstract Lean objective,
+  a behaviorally faithful Verity objective, explicit covered/missing fidelity,
+  assumptions, and exactly one primary gap classification.
+- General Yul, EVM, bytecode-identity, and deployment-provenance work is outside
+  the assurance objective and cannot be reintroduced into non-SSZ next gates.
+  `A-SOLC-TRUSTED` is an explicit compiler boundary, not a proof lane.
+- P-SSZ-1 alone retains a targeted OPEN binding between its imported Yul
+  fragment and the fragment used by deployment. SHA-256 correctness remains a
+  separate explicit `A-SHA256-FFI` boundary.
+- The v4 optimized mutants reject nominal closure, canonical status/theorem or
+  assumption drift, malformed feature/counterexample/assumption classes,
+  non-SSZ deployment bindings, widened SSZ binding, stale pins/source spans,
+  proof-policy escapes, and stale generated views.
+- Historical sections below document earlier work but do not define the active
+  assurance contract or reopen the retired seven-plane roadmap.
 
 P-SSZ-1 GIndex.concat review reconciliation (2026-08-16)
 ---------------------------------------------------------
