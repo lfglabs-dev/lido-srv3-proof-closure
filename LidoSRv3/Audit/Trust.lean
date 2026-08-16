@@ -76,6 +76,9 @@ project-level assumptions or proof escapes.
   LidoSRv3.Audit.Verity.ConsolidationCallFragment.registered_external_call_bind_entrypoint_always_reverts
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.guards_only_succeeds
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.success_hypotheses_are_vacuous
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
+#print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
