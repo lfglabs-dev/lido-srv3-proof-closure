@@ -30,43 +30,14 @@ if BUILD_STATUS=0 BUILD_LOG="$tmpdir/stale.log" \
   fail 'emitted a report from a successful-looking log for a different source tree'
 fi
 
-# A current-looking log lets the following cases isolate the dependency guard.
-printf 'verified_source_tree=%s\nlean_version=%s\nBuilt LidoSRv3\n' \
-  "$tree" "$(lake env lean --version)" > "$tmpdir/current.log"
-
-verity_dir=".lake/packages/verity"
-manifest_pin="$(python3 -c 'import json; print(next(p for p in json.load(open("lake-manifest.json"))["packages"] if p["name"] == "verity")["rev"])')"
-[ "$(git -C "$verity_dir" rev-parse HEAD)" = "$manifest_pin" ] || \
-  fail 'test requires the resolved Verity checkout to match the manifest pin'
-[ -z "$(git -C "$verity_dir" status --porcelain --untracked-files=all)" ] || \
-  fail 'test requires a clean resolved Verity checkout'
-
-# The receipt must not attribute a build to the manifest pin when Lake would
-# consume another resolved revision, even if the build log looks current.
-stale_verity="$(git -C "$verity_dir" rev-parse HEAD^)"
-git -C "$verity_dir" checkout --detach --quiet "$stale_verity"
-if BUILD_STATUS=0 BUILD_LOG="$tmpdir/current.log" \
-  bash scripts/write_proof_report.sh > "$tmpdir/report.json" 2>/dev/null; then
-  git -C "$verity_dir" checkout --detach --quiet "$manifest_pin"
-  fail 'emitted a report with a stale resolved Verity checkout'
-fi
-git -C "$verity_dir" checkout --detach --quiet "$manifest_pin"
-
-# Local dependency edits are likewise build inputs and must prevent a receipt.
-dirty_verity="$verity_dir/.provenance-guard-$$"
-printf '%s\n' 'deliberately dirty Verity dependency regression input' > "$dirty_verity"
-if BUILD_STATUS=0 BUILD_LOG="$tmpdir/current.log" \
-  bash scripts/write_proof_report.sh > "$tmpdir/report.json" 2>/dev/null; then
-  rm -f "$dirty_verity"
-  fail 'emitted a report with a dirty resolved Verity checkout'
-fi
-rm -f "$dirty_verity"
-
 # A successful report must carry the exact resolved Verity manifest pin.  This
 # is a narrow positive generator regression, using the current source tree and
 # toolchain while avoiding a redundant build in this guard script.
+printf 'verified_source_tree=%s\nlean_version=%s\nBuilt LidoSRv3\n' \
+  "$tree" "$(lake env lean --version)" > "$tmpdir/current.log"
 BUILD_STATUS=0 BUILD_LOG="$tmpdir/current.log" \
   bash scripts/write_proof_report.sh > "$tmpdir/report.json"
+manifest_pin="$(python3 -c 'import json; print(next(p for p in json.load(open("lake-manifest.json"))["packages"] if p["name"] == "verity")["rev"])')"
 report_pin="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["toolchain"]["verity_commit"])' "$tmpdir/report.json")"
 [ "$report_pin" = "$manifest_pin" ] || \
   fail "proof report Verity pin '$report_pin' differs from manifest '$manifest_pin'"

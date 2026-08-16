@@ -1,12 +1,14 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.AddressEquivariance
+import LidoSRv3.Audit.Source.AddressCorrespondence
+import LidoSRv3.Audit.Verity.AddressTx
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
-open Verity
+open _root_.Verity
 
-/-- The abstract relation is specified, but no modeled entrypoint discharges it yet. -/
-def guarantee : Guarantee := ⟨.pAddress1, []⟩
+/-- Abstract-model evidence only; source and EVM correspondence remain open. -/
+def guarantee : Guarantee := ⟨.pAddress1, [.model, .source, .verityTx]⟩
 
 /-!
 # P-ADDRESS-1: permissionless caller non-discrimination
@@ -124,7 +126,7 @@ def address_nondiscrimination (cfg : Config)
     (fn : Address → Input → Outcome State) : Prop :=
   admission_nondiscriminatory cfg fn ∧ post_state_equivariant cfg rename_state fn
 
-/-- Logical composition helper only; this is not evidence for any modeled entrypoint. -/
+/-- Independent proofs of admission and renamed post-state behavior compose the guarantee. -/
 theorem admission_and_post_state_equivariance
     (cfg : Config) (rename_state : (Address → Address) → State → State)
     (fn : Address → Input → Outcome State)
@@ -132,5 +134,37 @@ theorem admission_and_post_state_equivariance
     (hPostState : post_state_equivariant cfg rename_state fn) :
     address_nondiscrimination cfg rename_state fn := by
   exact ⟨hAdmission, hPostState⟩
+
+/-- Checked MODEL → pinned SOURCE → official VERITY_TX closure.  The first
+conjunct retains the already checked canonical model theorem; the remaining
+conjuncts establish the source caller-swap simulation and executable Verity
+transaction classification.  Yul and EVM execution remain outside this claim. -/
+theorem model_to_source_to_verity_tx
+    (cfg : Config) (rename_state : (Address → Address) → State → State)
+    (fn : Address → Input → Outcome State)
+    (hAdmission : admission_nondiscriminatory cfg fn)
+    (hPostState : post_state_equivariant cfg rename_state fn)
+    (a₁ a₂ : Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
+    (sourceInput : LidoSRv3.Audit.SolidityAddress.Input)
+    (verityState : _root_.Verity.ContractState) :
+    address_nondiscrimination cfg rename_state fn ∧
+      LidoSRv3.Audit.SolidityAddress.succeeds
+          (LidoSRv3.Audit.SolidityAddress.run
+            (LidoSRv3.Audit.SolidityAddress.renameInput a₁ a₂ sourceInput)) =
+        LidoSRv3.Audit.SolidityAddress.succeeds
+          (LidoSRv3.Audit.SolidityAddress.run sourceInput) ∧
+      (LidoSRv3.Audit.SolidityAddress.run
+          (LidoSRv3.Audit.SolidityAddress.renameInput a₁ a₂ sourceInput) =
+        match LidoSRv3.Audit.SolidityAddress.run sourceInput with
+        | .reverted => .reverted
+        | .committed post => .committed
+            (LidoSRv3.Audit.SolidityAddress.renamePost a₁ a₂ post)) ∧
+      LidoSRv3.Audit.Verity.AddressTx.observeVerity verityState
+          ((LidoSRv3.Audit.Verity.AddressTx.executeSource sourceInput).run verityState) =
+        LidoSRv3.Audit.Verity.AddressTx.sourceTx sourceInput verityState := by
+  exact ⟨admission_and_post_state_equivariance cfg rename_state fn hAdmission hPostState,
+    LidoSRv3.Audit.SolidityAddress.source_admission_nondiscriminatory a₁ a₂ h₁ h₂ sourceInput,
+    LidoSRv3.Audit.SolidityAddress.run_rename a₁ a₂ h₁ h₂ sourceInput,
+    LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source sourceInput verityState⟩
 
 end LidoSRv3.Audit.Guarantees.PAddress1

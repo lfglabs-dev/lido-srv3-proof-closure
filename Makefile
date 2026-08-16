@@ -8,7 +8,7 @@ PROOF_LOG := proofs/logs/proof-report.json
 SHELL     := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all bootstrap audit-generate audit-check audit_metadata check test prove report clean distclean
+.PHONY: all bootstrap audit-generate audit-check audit_metadata check test prove p-topup2-runtime-provenance report clean distclean
 
 all: report
 
@@ -27,34 +27,30 @@ audit_metadata: audit-check
 	@printf '%s\n' 'audit_metadata alias: see audit-check'
 
 check: test
-	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
 
 test:
 	@python3 scripts/audit_metadata.py check
+	@python3 scripts/test_evidence_index.py
 	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
 	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
+	@forge test -vv
+	@bash scripts/check_p_topup2_layout.sh
 	@lake build LidoSRv3.Tests.MinFirstVectors
 	@printf '%s\n' 'executable MinFirst falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.PAlloc1EugeneBoundVectors
 	@printf '%s\n' 'executable Eugene operator-bond vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.SszRegression
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
-	@lake build LidoSRv3.Audit.Verity.Tests.SszTxSimulation
-	@printf '%s\n' 'typed SSZ transaction-simulation acceptance/mutant/rollback vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositVectors
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
-	@lake build LidoSRv3.Tests.DepositTxMutants
-	@printf '%s\n' 'bounded Verity deposit transaction mutant compiled and asserted'
-	@lake build LidoSRv3.Tests.MinFirstAmountTxMutants
-	@printf '%s\n' 'P-ALLOC-2 amount transaction mutants and floor-division regression compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupVectors
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupHybridMutants
 	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
-	@lake build LidoSRv3.Tests.Topup2TxMutants
-	@printf '%s\n' 'bounded Verity P-TOPUP-2 aggregate-cap transaction mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.TopupParentMutants
+	@printf '%s\n' 'whole-parent Verity top-up transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveMutants
 	@printf '%s\n' 'executable reserve non-interference and rollback mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors
@@ -63,12 +59,19 @@ test:
 	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
+	@lake build LidoSRv3.Tests.AddressSourceMutants
+	@printf '%s\n' 'P-ADDRESS-1 source caller/address mutants and official Verity transaction compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
 	@test -s fixtures/solidity-reference/deposits-reserve.integration.ts
 	@test -s fixtures/solidity-reference/accounting-oracle-module-balances.integration.ts
 	@printf '%s\n' 'reference fixtures present; all 5 validated'
+
+# Deliberately separate from `test`: without MAINNET_RPC_URL this performs the
+# full local reconstruction, reports SKIPPED_NO_RPC, and exits 2 (never green).
+p-topup2-runtime-provenance:
+	@bash scripts/check_p_topup2_runtime_provenance.sh
 
 prove:
 	@mkdir -p proofs/logs

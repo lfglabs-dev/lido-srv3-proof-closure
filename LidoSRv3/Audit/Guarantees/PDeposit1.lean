@@ -1,6 +1,6 @@
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.DepositCorrespondence
-import LidoSRv3.Audit.Verity.DepositTx
+import LidoSRv3.Audit.Verity.DepositLedgerTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PDeposit1
@@ -8,42 +8,9 @@ namespace LidoSRv3.Audit.Guarantees.PDeposit1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityDeposit
 
-def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
-
-/-- Public P-DEPOSIT-1 transaction-plane closure for one bounded deposit unit.
-The result is an actual `Verity.Contract.run` observation at the summarized-call
-boundary: Lido loses exactly `amount`, the modeled beacon sink gains exactly
-`amount`, and router ETH plus the withdrawal reserve are unchanged. -/
-theorem tx_one_unit_exact_transfer
-    {cfg : SourceDepositConfig} {inp : SourceDepositInput}
-    {snapshot : _root_.Verity.ContractState}
-    {balances : LidoSRv3.Audit.Verity.DepositTx.Balances} {amount : Nat}
-    (hRun : run cfg inp = .committedDeposits 1 amount amount inp.routerBalanceBefore)
-    (hBound : amount ≤ _root_.Verity.Core.MAX_UINT256)
-    (hFunds : amount ≤ balances.lidoDepositable) :
-    let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances
-      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp balances).run snapshot)
-    tx.status = .committed ∧
-      (_root_.Verity.Core.Uint256.ofNat amount).val = amount ∧
-      tx.balancesAfter.lidoDepositable + amount = balances.lidoDepositable ∧
-      tx.balancesAfter.beaconSink = balances.beaconSink + amount ∧
-      tx.balancesAfter.routerEth = balances.routerEth ∧
-      tx.balancesAfter.withdrawalReserve = balances.withdrawalReserve :=
-  LidoSRv3.Audit.Verity.DepositTx.one_unit_exact_transfer hRun hBound hFunds
-
-/-- Public transaction-plane rollback theorem: any source revert restores the
-exact Verity snapshot and exposes no committed modeled balance effects. -/
-theorem tx_revert_restores_snapshot_and_effects
-    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (snapshot : _root_.Verity.ContractState)
-    (balances : LidoSRv3.Audit.Verity.DepositTx.Balances)
-    (hBound : depositsValue cfg inp ≤ _root_.Verity.Core.MAX_UINT256)
-    (h : (run cfg inp).reverts = true) :
-    let tx := LidoSRv3.Audit.Verity.DepositTx.observe snapshot balances
-      ((LidoSRv3.Audit.Verity.DepositTx.executeOutcome cfg inp balances).run snapshot)
-    tx.status = .reverted ∧ tx.after = snapshot ∧ tx.balancesAfter = balances :=
-  LidoSRv3.Audit.Verity.DepositTx.source_revert_restores_committed_effects
-    cfg inp snapshot balances hBound h
+/-- The bounded ETH-ledger `Contract.run` theorem below is subordinate evidence;
+the canonical multi-contract deposit transaction remains open. -/
+def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source]⟩
 
 /-- Abstract transaction rollback, not an executable EVM trace. -/
 theorem revert_restores_state_value_and_logs {State : Type} :
@@ -151,5 +118,62 @@ theorem source_nonconserving_deployment_reverts
       ∀ keys pulled pushed balanceAfter,
         run cfg inp ≠ .committedDeposits keys pulled pushed balanceAfter :=
   ⟨not_conserving_nonempty_reverts hCfg hKeys, not_conserving_reverts hCfg⟩
+
+/--
+Executed-transaction evidence for the ETH-ledger conservation/rollback core of
+the deposit push, stated against official `Verity.Contract.run`.
+
+This is deliberately *not* the canonical P-DEPOSIT-1 claim, which spans the
+whole multi-contract path.  The audited program is a four-slot ledger --
+router balance, Lido depositable, beacon deposited, deposits counter -- carrying
+exactly the operations the guarantee's conservation and rollback halves talk
+about: the `StakingRouter.sol` line 976 counter write, the line 983 pull scaled
+by `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`, the beacon push at `DEPOSIT_SIZE`, and
+the line 996 balance `assert`.  Everything else stays OPEN and is enumerated in
+`LidoSRv3.Audit.Verity.DepositRollback.openComponents`.
+
+What this theorem adds over `source_deposit_conserves_and_rolls_back`:
+
+* the first conjunct is the rollback half discharged by *execution* rather than
+  by `A-ABSTRACT-TX`.  It is universally quantified over the entry state, the
+  three arguments, the revert reason, and the rolled-back state, and it is read
+  through `Contract.run`, whose `.revert` case is derived, not definitional;
+* the next three conjuncts pin the executed transaction to the independent
+  pinned-source interpreter on the committing push, the line 978 empty-batch
+  early return, and the misconfigured-deployment revert;
+* the last two conjuncts are mutants: dropping the line 996 assert, and pushing
+  without debiting Lido.  Both are observed to *disagree* with the source, so
+  the receipts above are enforced rather than accidental.
+
+The audited functions are marked `no_external_calls` and touch storage only, so
+no part of this rests on the vacuous `Contracts.externalCallBind := pure ()`.
+Deleting any of the transaction evidence breaks this theorem instead of leaving
+it provable.  No Yul, EVM, gas, deployed-layout, or multi-contract claim is made.
+-/
+theorem deposit_ledger_conservation_and_executed_rollback
+    (state : Verity.ContractState)
+    (keys maxEBType1 depositSize : LidoSRv3.Audit.Verity.DepositLedgerTx.Word)
+    (reason : String) (rollback : Verity.ContractState)
+    (h : (LidoSRv3.Audit.Verity.DepositLedgerTx.DepositLedgerContract.pushDeposits
+            keys maxEBType1 depositSize).run state = .revert reason rollback) :
+    LidoSRv3.Audit.Verity.DepositLedgerTx.decode rollback =
+        LidoSRv3.Audit.Verity.DepositLedgerTx.decode state ∧
+      LidoSRv3.Audit.Verity.DepositLedgerTx.verityCommittingPushObservation =
+        LidoSRv3.Audit.Verity.DepositLedgerTx.sourceCommittingPushObservation ∧
+      LidoSRv3.Audit.Verity.DepositLedgerTx.verityEmptyBatchObservation =
+        LidoSRv3.Audit.Verity.DepositLedgerTx.sourceEmptyBatchObservation ∧
+      LidoSRv3.Audit.Verity.DepositLedgerTx.verityNonConservingObservation =
+        LidoSRv3.Audit.Verity.DepositLedgerTx.sourceNonConservingObservation ∧
+      LidoSRv3.Audit.Verity.DepositLedgerTx.droppedAssertObservation ≠
+        LidoSRv3.Audit.Verity.DepositLedgerTx.sourceNonConservingObservation ∧
+      LidoSRv3.Audit.Verity.DepositLedgerTx.skippedLidoDebitObservation ≠
+        LidoSRv3.Audit.Verity.DepositLedgerTx.sourceCommittingPushObservation :=
+  ⟨LidoSRv3.Audit.Verity.DepositLedgerTx.verity_revert_moves_no_ether
+      state keys maxEBType1 depositSize reason rollback h,
+   LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_committing_push,
+   LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_empty_batch,
+   LidoSRv3.Audit.Verity.DepositLedgerTx.verity_tx_matches_source_nonconserving_deployment,
+   LidoSRv3.Audit.Verity.DepositLedgerTx.dropped_assert_commits_nonconserving_deployment,
+   LidoSRv3.Audit.Verity.DepositLedgerTx.skipped_lido_debit_breaks_conservation⟩
 
 end LidoSRv3.Audit.Guarantees.PDeposit1

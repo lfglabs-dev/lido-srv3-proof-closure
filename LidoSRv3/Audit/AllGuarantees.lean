@@ -7,7 +7,6 @@ import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Guarantees.PTopup2
-import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PDeref1
@@ -16,7 +15,7 @@ import LidoSRv3.Audit.Guarantees.PDeref1
 # Canonical minimal-11 public facade
 
 `all` is deliberately the complete public surface. Its checked layers cover
-the existing MODEL, ALG, SOURCE, and bounded Verity-transaction evidence; empty entries are
+the existing MODEL, ALG, and abstract-transaction evidence; empty entries are
 intentional blockers, not omitted proofs.
 -/
 
@@ -44,6 +43,10 @@ example : all.map (fun guarantee => guarantee.id.text) =
     ["P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1", "P-ACCOUNT-1",
      "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1", "P-TOPUP-2",
      "P-CONSOLIDATION-1", "P-SSZ-1"] := by decide
+
+/-- Subordinate deposit-ledger execution must not populate the parent facade. -/
+example : PDeposit1.guarantee.checkedLayers =
+    [.model, .abstractTx, .source] := by decide
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
 def supplemental : List Guarantee := [PDeref1.guarantee]

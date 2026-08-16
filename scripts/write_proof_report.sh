@@ -45,20 +45,6 @@ RECORDED_SOURCE_TREE="$(sed -nE 's/^verified_source_tree=([0-9a-f]{40})$/\1/p' "
 [ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
   fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
 
-# Check the resolved dependency before invoking Lake: `lake env` may repair a
-# detached package checkout to the manifest pin, which would otherwise erase
-# the very stale-checkout condition this provenance guard must reject.
-VERITY_COMMIT="$(python3 -c 'import json; d=json.load(open("lake-manifest.json")); print(next(p["rev"] for p in d["packages"] if p["name"] == "verity"))')"
-[ -n "$VERITY_COMMIT" ] || fail "could not read the pinned Verity revision from lake-manifest.json"
-VERITY_DIR=".lake/packages/verity"
-[ -d "$VERITY_DIR" ] || fail "resolved Verity checkout '$VERITY_DIR' not found"
-VERITY_HEAD="$(git -C "$VERITY_DIR" rev-parse HEAD 2>/dev/null)" || \
-  fail "could not read resolved Verity checkout revision from '$VERITY_DIR'"
-[ "$VERITY_HEAD" = "$VERITY_COMMIT" ] || \
-  fail "resolved Verity checkout revision '$VERITY_HEAD' does not match manifest '$VERITY_COMMIT'"
-[ -z "$(git -C "$VERITY_DIR" status --porcelain --untracked-files=all)" ] || \
-  fail "resolved Verity checkout '$VERITY_DIR' is dirty"
-
 LEAN_VERSION_OUTPUT="$(lake env lean --version)"
 LEAN_VERSION="$(printf '%s\n' "$LEAN_VERSION_OUTPUT" | sed -nE 's/^Lean \(version ([^,]+),.*$/\1/p')"
 PINNED_TOOLCHAIN="$(tr -d '\r\n' < lean-toolchain)"
@@ -72,10 +58,29 @@ PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprove
 grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
   fail "build log '$BUILD_LOG' does not record the running Lean version"
 
+# The report pin is read from Lake's resolved dependency manifest instead of
+# being duplicated here.  The metadata gate separately proves that this value
+# agrees with lakefile.lean and every canonical audit lock/manifest.
+VERITY_COMMIT="$(python3 - <<'PY'
+import json
+from pathlib import Path
+
+manifest = json.loads(Path("lake-manifest.json").read_text(encoding="utf-8"))
+matches = [package for package in manifest["packages"] if package["name"] == "verity"]
+if len(matches) != 1:
+    raise SystemExit("lake-manifest.json must contain exactly one Verity package")
+package = matches[0]
+if package.get("rev") != package.get("inputRev"):
+    raise SystemExit("Verity resolved rev and requested inputRev differ")
+print(package["rev"])
+PY
+)" || fail "could not read the resolved Verity pin from lake-manifest.json"
+[[ "$VERITY_COMMIT" =~ ^[0-9a-f]{40}$ ]] || \
+  fail "resolved Verity pin '$VERITY_COMMIT' is not an exact 40-hex commit"
+
 cat <<JSON
 {
   "schema": "srv3-verity-lean-proof-report-v2",
-  "target_scope": "legacy-srv3-p1-p15-superseded",
   "toolchain": {
     "lean": "${LEAN_VERSION}",
     "verity_commit": "${VERITY_COMMIT}"

@@ -115,14 +115,11 @@ def executeSource (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Contract 
   | .committedNoTopUp => TopupTxContract.executeNoTopup false 0 0
   | _ => TopupTxContract.executeNoTopup true 0 0
 
-/-- Adequacy of the hybrid boundary under the explicit source-line-732
-no-wrap premise.  That premise makes the source interpreter's `Nat`
-accumulation faithful to Solidity's unchecked `uint256` accumulation; source
-conservation then discharges the typed program's equality guard, and every
-source revert is normalized by `Contract.run` to the exact pre-call snapshot. -/
+/-- Adequacy of the hybrid boundary: source conservation discharges the typed
+program's equality guard, and every source revert is normalized by
+`Contract.run` to the exact pre-call snapshot. -/
 theorem verity_tx_simulates_source
-    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-    (hNoWrap : NoUncheckedWrap inp) (state : ContractState) :
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput) (state : ContractState) :
     observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state := by
   have hconserves := run_conserves cfg inp
   cases hrun : run cfg inp <;>
