@@ -688,9 +688,9 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        # P-TOPUP-1 closes source only; its TX plane is retracted to BLOCKED.
-        # Source may not be silently downgraded, the retracted TX plane may not
-        # be re-asserted or relabelled, and EVM stays open.
+        # P-TOPUP-1 keeps source correspondence while TX is blocked after the
+        # vacuous external-call bridge was retracted. Neither status may be
+        # silently upgraded or downgraded, and EVM stays open.
         topup_source_downgrade = copy.deepcopy(guarantees)
         topup_source_downgrade["guarantees"][3]["statuses"]["source"] = "OPEN"
         write_json(guarantees_path, topup_source_downgrade)
@@ -702,15 +702,14 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_tx_reasserted = copy.deepcopy(guarantees)
-        topup_tx_reasserted["guarantees"][3]["statuses"]["tx"] = "LEAN_CHECKED"
-        write_json(guarantees_path, topup_tx_reasserted)
+        topup_tx_upgraded = copy.deepcopy(guarantees)
+        topup_tx_upgraded["guarantees"][3]["statuses"]["tx"] = "LEAN_CHECKED"
+        write_json(guarantees_path, topup_tx_upgraded)
         run(
             fixture,
             False,
             "generate",
-            "P-TOPUP-1: tx status LEAN_CHECKED requires theorem evidence "
-            "for that plane",
+            "P-TOPUP-1: tx status LEAN_CHECKED requires theorem evidence for that plane",
         )
         write_json(guarantees_path, guarantees)
 

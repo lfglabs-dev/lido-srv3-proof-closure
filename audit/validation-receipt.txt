@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 07313b7335cce5ac0fb0e25e61b6354d26404a11
+validated-tree: d4f50de33e47852a249a9c5b4e7da8698721ac65
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -43,20 +43,14 @@ P-TOPUP-2 failed-call provenance retraction (2026-08-16)
   `Topup2TxMutants` over-cap and double-send mutants still genuinely breach the
   cap, so P-TOPUP-2 `tx` stays LEAN_CHECKED; `yul` stays OPEN and `evm` stays
   BLOCKED.
-- Two defects inherited from the predecessor tree are repaired here: this
-  receipt carried unresolved `<<<<<<<`/`>>>>>>>` merge-conflict markers around
-  `validated-tree`, and `scripts/test_audit_metadata.py` mutated P-TOPUP-1's
-  `tx` status to `BLOCKED` — already its canonical value after the #73
-  retraction — so that negative control asserted nothing. It now asserts that
-  the retracted P-TOPUP-1 TX plane cannot be re-asserted as `LEAN_CHECKED`
-  without theorem evidence.
 - Focused build `lake build LidoSRv3.Audit.Guarantees.PTopup2
   LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Tests.Topup2TxMutants
   LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust`: exit 0,
-  `Build completed successfully (1268 jobs)` under Lean 4.31.0. The Trust
-  report shows only `propext` and `Quot.sound`; no sorry, admit, or undisclosed
-  axioms. `python3 scripts/audit_metadata.py check` and the optimized metadata
-  mutants pass. No guarantee status was widened.
+  `Build completed successfully (1272 jobs)` under Lean 4.31.0. The Trust
+  entries for the retained P-TOPUP-2 theorems and mutants show only `propext`
+  and `Quot.sound`, and the retracted theorem no longer appears.
+  `python3 scripts/audit_metadata.py check` and the optimized metadata mutants
+  pass. No guarantee status was widened.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------
