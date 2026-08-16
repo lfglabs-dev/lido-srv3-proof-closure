@@ -786,9 +786,11 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_tx_downgrade = copy.deepcopy(guarantees)
-        topup_tx_downgrade["guarantees"][3]["statuses"]["tx"] = "OPEN"
-        write_json(guarantees_path, topup_tx_downgrade)
+        # TX is intentionally OPEN.  The negative fixture must reject an
+        # overclaim, rather than reapplying the canonical value.
+        topup_tx_overclaim = copy.deepcopy(guarantees)
+        topup_tx_overclaim["guarantees"][3]["statuses"]["tx"] = "LEAN_CHECKED"
+        write_json(guarantees_path, topup_tx_overclaim)
         run(
             fixture,
             False,
