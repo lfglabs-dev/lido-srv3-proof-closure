@@ -1,11 +1,34 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 47d21981c54e474697f352c354f14e609387b45a
+validated-tree: 1889dff008503c8ac4c063a294822b1529c309e0
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Campaign/main recovery integration (2026-08-16)
+-----------------------------------------------
+
+- The integration lineage contains `campaign/lido-minimal-11` head
+  `3f0d1c291a6b3e43e4255663d6a01f8b1016e65f` and the exact heads of corrective
+  PRs #76, #79, #80, #84, and #86 as ancestors. No campaign commit is orphaned.
+- Conflicting public claims retain the later soundness corrections from `main`;
+  historical campaign claims are not promoted merely by merging their lineage.
+- Campaign-only address, deposit-ledger, top-up parent/packed-storage,
+  evidence-index, provenance, and mutant artifacts are active in the tree and
+  are classified as subordinate evidence where they do not close a faithful
+  Verity parent.
+- Verity is pinned consistently to the campaign toolchain commit
+  `1fe0218863a4c8d6113e6cdd4de3766a54df81c7`. The removed unsound
+  result-aware abort-witness lemma is not restored; P-TOPUP-2 carries only the
+  local loop/transaction definitions and prefix/rollback laws its bounded child
+  actually consumes.
+- `make prove` completed successfully under Lean 4.31.0: 1362 jobs. The proof
+  report binds verified source tree `f20ce4255abe527303a93f4a158d4790d611e1a6`.
+- `main` is the sole active integration branch. The campaign branch is archival
+  after synchronization to the integrated head and is not a second target for
+  new pull requests.
 
 Abstract Lean + faithful Verity contract (2026-08-16)
 -----------------------------------------------------
