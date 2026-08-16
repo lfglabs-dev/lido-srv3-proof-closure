@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 119b213c06ee1af20f98af87b675803691cb13e2
+validated-tree: 2997ed265ae95bafdca2020083eb5941af85e2b9
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -10,11 +10,16 @@ negative fixtures without circularly claiming the receipt's own commit.
 P-ADDRESS-1 bounded transfer MODEL/SOURCE/TX slice (2026-08-16)
 ----------------------------------------------------------------
 
+- Review correction: the concrete permutation now swaps only 1/2 and therefore
+  fixes recipient 3 and approval 9 in both SOURCE-shaped and Denote receipts.
+  Mutants that stomp 3->4 or 9->8 are explicitly rejected. The registry-facing
+  theorem has an explicit type and compiles (no inferred-theorem parser issue).
 - The parent `P-ADDRESS-1` row remains OPEN. New subordinate row
   `P-ADDRESS-1.transfer-owner-handoff` is limited to the owner-operated branch
   of `WithdrawalQueueERC721.transferFrom/_transfer` at pinned core SHA
   `af095e48bbc1c3841c2c9936219c8461af01056b`, lines 218--253.
-- MODEL and SOURCE are distinct definitions joined by `source_refines_model`.
+- MODEL and SOURCE are distinct audit-authored definitions joined by an `rfl`
+  equality; this is a review boundary, not Solidity extraction/refinement.
   The registry-facing theorem consumes that correspondence, two renamed SOURCE
   post-states, two distinct successful Denote post-states, and a wrong-caller
   rollback control.
@@ -22,8 +27,10 @@ P-ADDRESS-1 bounded transfer MODEL/SOURCE/TX slice (2026-08-16)
   owner mapping read, approval deletion, and owner handoff are evaluated by the
   official denotation. The program contains no external-call primitive and does
   not rely on `externalCallBind`.
-- Scope left open: approved-operator branches, enumerable owner sets, Transfer
-  event, the other mapped request/claim/redemption entrypoints, Yul, and EVM.
+- Included guards/writes: nonzero recipient, recipient != from, stored owner ==
+  from, caller == from, approval deletion, owner replacement. Scope left open:
+  approved-operator branches, enumerable owner sets, Transfer event, safe-transfer
+  receiver callback, other request/claim/redemption entrypoints, Yul, and EVM.
 - Focused build and Trust build passed; metadata check reports 11 canonical
   guarantees plus 13 subordinate evidence rows. Metadata mutants, provenance,
   receipt binding, and diff hygiene passed.
