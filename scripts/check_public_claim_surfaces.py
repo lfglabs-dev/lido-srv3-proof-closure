@@ -7,6 +7,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 
@@ -74,20 +75,99 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def strip_lean_comments(source: str) -> str:
+    """Remove nested Lean comments while preserving strings and line positions."""
+    result: list[str] = []
+    index = 0
+    block_depth = 0
+    in_string = False
+    while index < len(source):
+        pair = source[index : index + 2]
+        char = source[index]
+        if block_depth:
+            if pair == "/-":
+                block_depth += 1
+                result.extend("  ")
+                index += 2
+            elif pair == "-/":
+                block_depth -= 1
+                result.extend("  ")
+                index += 2
+            else:
+                result.append("\n" if char == "\n" else " ")
+                index += 1
+        elif in_string:
+            result.append(char)
+            index += 1
+            if char == "\\" and index < len(source):
+                result.append(source[index])
+                index += 1
+            elif char == '"':
+                in_string = False
+        elif pair == "/-":
+            block_depth = 1
+            result.extend("  ")
+            index += 2
+        elif pair == "--":
+            while index < len(source) and source[index] != "\n":
+                result.append(" ")
+                index += 1
+        else:
+            result.append(char)
+            index += 1
+            if char == '"':
+                in_string = True
+    if block_depth:
+        fail("unterminated Lean block comment")
+    if in_string:
+        fail("unterminated Lean string literal")
+    return "".join(result)
+
+
+def normalize_quoted_identifier(token: str) -> str:
+    """Normalize quoting without conflating distinct Lean names.
+
+    Lean treats backslash spellings inside guillemets as identifier content (for
+    example, ``«foo\\u0061»`` is not the name ``fooa``), so preserve them.
+    """
+    return unicodedata.normalize("NFC", token[1:-1])
+
+
+def declaration_name(source: str, start: int) -> str:
+    """Read one bare Unicode or guillemet-quoted Lean declaration name."""
+    if start >= len(source):
+        fail("public declaration is missing its name")
+    if source[start] == "«":
+        index = start + 1
+        while index < len(source):
+            if source[index] == "\\":
+                index += 2
+            elif source[index] == "»":
+                return normalize_quoted_identifier(source[start : index + 1])
+            else:
+                index += 1
+        fail("unterminated quoted Lean identifier")
+
+    index = start
+    while index < len(source) and not source[index].isspace() and source[index] not in ":([{":
+        index += 1
+    token = source[start:index]
+    if not token or not token.replace("'", "").isidentifier():
+        fail(f"cannot parse public declaration name near {source[start:start + 32]!r}")
+    return unicodedata.normalize("NFC", token)
+
+
 def lean_surface(source: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], ...]]:
-    """Return imports and named public declarations after removing Lean comments."""
-    without_blocks = re.sub(r"/-.*?-/", "", source, flags=re.DOTALL)
-    without_comments = re.sub(r"--[^\n]*", "", without_blocks)
+    """Return imports and normalized named public declarations."""
+    without_comments = strip_lean_comments(source)
     imports = tuple(re.findall(r"^import\s+([^\s]+)\s*$", without_comments, re.MULTILINE))
     modifiers = r"(?:(?:public|protected|noncomputable|unsafe)\s+)*"
     attributes = r"(?:@\[[^\n]*\]\s*)*"
     kinds = r"def|theorem|lemma|abbrev|opaque|axiom|instance|structure|class|inductive"
+    heads = re.compile(rf"^{attributes}{modifiers}({kinds})\s+", re.MULTILINE)
     declarations = tuple(
-        re.findall(
-            rf"^{attributes}{modifiers}({kinds})\s+([A-Za-z_][A-Za-z0-9_']*)\b",
-            without_comments,
-            re.MULTILINE,
-        )
+        (match.group(1), declaration_name(without_comments, match.end()))
+        for match in heads.finditer(without_comments)
     )
     return imports, declarations
 

@@ -41,7 +41,21 @@ with tempfile.TemporaryDirectory() as tmp:
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, destination)
 
+    # Positive control: every existing allowed import and declaration is accepted.
     run(fixture, True)
+
+    account = fixture / "LidoSRv3/Audit/Guarantees/PAccount1.lean"
+    account_original = account.read_text(encoding="utf-8")
+    account.write_text(
+        account_original.replace(
+            "theorem source_report_before_reward",
+            "theorem «source_report_before_reward»",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    account.write_text(account_original, encoding="utf-8")
 
     readme = fixture / "README.md"
     original = readme.read_text(encoding="utf-8")
@@ -56,11 +70,33 @@ with tempfile.TemporaryDirectory() as tmp:
     run(fixture, False, "README: P-DEPOSIT-1")
     readme.write_text(original, encoding="utf-8")
 
-    account = fixture / "LidoSRv3/Audit/Guarantees/PAccount1.lean"
-    account_original = account.read_text(encoding="utf-8")
     account.write_text(
         account_original
         + "\n-- renamed false-claim mutant\ntheorem plausible_new_tx_closure : True := True.intro\n",
+        encoding="utf-8",
+    )
+    run(fixture, False, "public declarations differ from the structural allowlist")
+
+    account.write_text(
+        account_original
+        + "\n-- quoted ASCII identifier mutant\n"
+        + "theorem «plausible_new_tx_closure» : True := True.intro\n",
+        encoding="utf-8",
+    )
+    run(fixture, False, "public declarations differ from the structural allowlist")
+
+    account.write_text(
+        account_original
+        + "\n-- bare Unicode identifier mutant\n"
+        + "theorem plausible_new_tx_closurε : True := True.intro\n",
+        encoding="utf-8",
+    )
+    run(fixture, False, "public declarations differ from the structural allowlist")
+
+    account.write_text(
+        account_original
+        + "\n-- escaped quoted identifier mutant\n"
+        + "theorem «plausible_new_tx_\\u0063losure» : True := True.intro\n",
         encoding="utf-8",
     )
     run(fixture, False, "public declarations differ from the structural allowlist")
@@ -74,4 +110,7 @@ with tempfile.TemporaryDirectory() as tmp:
     account.unlink()
     run(fixture, False, "required public claim surface is missing")
 
-print("public claim surface regressions ok: renamed claim/import/README/missing-file mutants fail closed")
+print(
+    "public claim surface regressions ok: allowed declarations pass; "
+    "ASCII/quoted/Unicode/escaped/import/README/missing-file mutants fail closed"
+)

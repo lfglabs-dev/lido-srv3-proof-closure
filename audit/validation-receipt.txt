@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: c8b4ca870fc4fc34f14e07344216f3251c8b800c
+validated-tree: d3ebc41fea438cb4425f2d882c0bb3273ed47b09
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -19,7 +19,12 @@ PR #80 blocked-transaction public-surface correction (2026-08-16)
 - `scripts/check_public_claim_surfaces.py` derives the canonical theorem and TX
   status from the registry, checks the README table and Lean checkedLayers, and
   enforces exact structural allowlists for imports and public declarations in
-  each blocked guarantee module. Its regressions reject a renamed false claim,
+  each blocked guarantee module. Its fail-closed lexer recognizes nested Lean
+  comments plus quoted and bare Unicode identifiers, normalizes guillemet
+  quoting and Unicode without conflating distinct backslash spellings, and
+  rejects malformed declaration heads. Positive controls accept the existing
+  declarations (including equivalent guillemet quoting); negative mutants
+  reject ASCII, quoted-ASCII, bare-Unicode, and escaped-quoted renamed claims,
   an unauthorized import, stale README data, and a missing surface file.
 - PR #76 is not yet in `main`. Its P-TOPUP-2 failed-call-provenance retraction
   remains a required follow-up; this merge deliberately neither restores nor
@@ -27,10 +32,10 @@ PR #80 blocked-transaction public-surface correction (2026-08-16)
   merge mechanical: retain #76's removal of `tx_revert_has_failed_call`, this
   section, and the then-current validated tree.
 - Full `make test` registry/mutant/provenance matrix: exit 0; log SHA-256
-  `9d5dcb5b2dd0031fb659208507d569393d3b34cad5eb02cb42ab3124e111fd93`.
+  `561fbf341471a8e0d3ddcd9bcc6a16e96201178605cc36e65b2e78897bb7094c`.
   Focused build of PDeposit1, PTopup1, PAccount1, AllGuarantees, and Trust:
   exit 0, `Build completed successfully (1271 jobs)`; log SHA-256
-  `1641a394e187493425965ae5a22e1f8ea392ee415f548d7e0d69d24ad7cdf1fd`.
+  `c5eefed5f6d1f21a4fa46b07b45e1186d5d87a555a80e96373c27919170539f9`.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------
