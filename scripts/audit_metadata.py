@@ -32,6 +32,7 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.abstract-digest",
     "P-CONSOLIDATION-1.abstract-flow-model",
     "P-ALLOC-1.eugene-bound",
+    "P-ALLOC-1.bounded-allocation-tx",
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-DEPOSIT-1.ledger-conservation-tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
@@ -47,7 +48,7 @@ EXPECTED_AUTHORITY = (
     "close a semantic guarantee."
 )
 EXPECTED_WORDING = [
-    "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded official Verity Contract.run allocation receipt: on fixed single-row router states the executed transaction's returned amount and committed router-ordered allocation column equal the independently checked source amount and its additive conservation, and three orthogonal mutant programs (overwrite instead of add, dropped effective-capacity clamp, disabled-row participation) change an observed post-state. This slice executes storage operations only and performs no external calls, so it does not rest on Verity's vacuous externalCallBind; storage slots are model-local, and generality beyond the fixed receipt states, proportional-amount refinement, deployed proxy layout, Yul, EVM, and gas remain open.",
+    "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts, composition with the bounded transaction receipt, and EVM equivalence remain open.",
     "Pinned-source correspondence proves only the next-target selection rule; proportional allocation amounts and EVM equivalence remain open.",
     "Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.",
     "The complete public topUp parent transaction is simulated by executable Verity Contract.run from authentication through allocation, wrapped uint256 accumulation, empty commit, Lido pull, Beacon push, assertion, commit/revert, and snapshot rollback; arbitrary callees expose control, value, returndata, and caller-frame preservation, while solc and deployment provenance remain separately trusted/recorded under A-SOLC-TRUSTED.",
@@ -62,6 +63,7 @@ EXPECTED_WORDING = [
     "Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.",
     "Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.",
     "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
+    "A fixed one-row official Verity Contract.run receipt is mechanically non-vacuous: allocation succeeds with [70], while overwrite [60], missing-capacity-clamp, and disabled-row mutants diverge. It is subordinate TX evidence only; no cfg, modules, capacity row, or demand from the P-ALLOC-1 parent scope feeds this execution.",
     "Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.",
     "Bounded SOURCE/VERITY_TX evidence for the ETH-ledger conservation and rollback core of the deposit push. Official Verity Contract.run executes the StakingRouter.sol line 976 counter write, the line 983 pull scaled by MAX_EFFECTIVE_BALANCE_WC_TYPE_01, the DEPOSIT_SIZE beacon push, and the line 996 balance assert over storage only, so no vacuous externalCallBind participates. Rollback is universally quantified over the entry state, the arguments, and the rolled-back state; source correspondence is bounded to the committing push, the line 978 empty-batch early return, and the misconfigured-deployment revert, each made discriminating by a disagreeing mutant. Allocation, the module ABI, multi-contract Lido/queue/oracle state, per-validator deposit-data roots, generated Yul, and EVM execution remain OPEN.",
     "Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.",
@@ -110,8 +112,8 @@ EXPECTED_ASSUMPTIONS = {
     ],
 }
 EXPECTED_REPRODUCTION = [
-    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.MinFirstVectors",
-     "expected": "successful checked-source to independent Audit-model correspondence conjoined with the bounded Contract.run allocation receipt and its three mutant-sensitivity receipts; generality beyond the fixed receipt states and Yul/EVM/deployed-layout refinement remain open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression",
+     "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; parent TX composition and proportional amount correspondence remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2",
      "expected": "successful pinned-source next-target selection correspondence build; proportional amount correspondence remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -140,6 +142,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful typed-program compilation and exact source-then-target 96-byte single-CALL layout; no amount, SHA-256, loop, rollback, Yul, or EVM claim"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
      "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.MinFirstVectors",
+     "expected": "successful fixed-state Contract.run receipt with [70] success and divergent overwrite [60], capacity, and disabled-row mutants; no parent composition claim"},
     {"command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback", "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"},
     {"command": "lake build LidoSRv3.Audit.Verity.DepositLedgerTx LidoSRv3.Audit.Guarantees.PDeposit1",
      "expected": "successful storage-only Contract.run deposit-ledger build: universally quantified revert rollback, three bounded source-correspondence receipts, two disagreeing mutants, and the checked forEach-wrapper unrolling probe; the multi-contract deposit transaction, generated Yul, and EVM execution remain OPEN"},
@@ -151,7 +155,7 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
-    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+    ["A-SOURCE-SHAPED"],
     ["A-HANDWRITTEN-MINFIRST"],
     ["A-ABSTRACT-TX", "A-SOURCE-SHAPED"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-SOLC-TRUSTED"],
@@ -166,6 +170,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST"],
+    ["A-VERITY-SCAFFOLD"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-VERITY-SCAFFOLD", "A-RUNTIME-PROVENANCE"],
@@ -174,9 +179,9 @@ EXPECTED_ASSUMPTION_LINKS = [
     [],
 ]
 EXPECTED_NEXT_GATES = [
-    "Generalize the bounded single-row allocation receipt to arbitrary "
-    "router-ordered states and proportional amounts, and bind the model-local "
-    "storage slots to the deployed proxy layout and generated Yul/EVM semantics.",
+    "Compose rows, capacity, and demand produced by the parent source scope into "
+    "Contract.run before promoting the TX plane; then generalize proportional "
+    "amounts and bind deployed layout/Yul/EVM semantics.",
     "Refine proportional allocation amounts and checked-Uint256 execution "
     "for MinFirstAllocationStrategy.allocateToBestCandidate.",
     "Compose allocation, the module ABI, Lido/withdrawal-queue/oracle state, and per-validator deposit-data roots into one executed Verity transaction, so the whole-path rollback half no longer rests on A-ABSTRACT-TX.",
@@ -192,6 +197,7 @@ EXPECTED_NEXT_GATES = [
     "Promote the abstract digest layer only after Verity execution simulation connects the typed statement program to precompile denotation; SHA-256 functional correctness and production runtime provenance remain assumptions.",
     "Refine the typed 96-byte single-call program against independently verified production runtime provenance.",
     "Compose the checked SRLib/MinFirst operator-bound evidence with the parent allocation source correspondence.",
+    "Construct ContractState and demand from checked parent rows and prove that the resulting Contract.run observation refines those same rows before any parent promotion.",
     "Add multi-contract composition for allocation, dynamic module-returned memory, Lido/queue/oracle state, per-validator root/calldata construction, and propagating rollback before making any conservation or transaction claim.",
     "Replace the three bounded branch receipts with a universally quantified Contract.run correspondence to SolidityDeposit.run, and extend the audited program past the ETH ledger toward the multi-contract path.",
     "Close the FunctionSpec-to-CallProgram/DenoteMemory/event-trace gaps listed in audit/P-CONSOLIDATION-1-VERITY-GAPS.md, then add transaction-frame rollback and source refinement.",
@@ -215,7 +221,7 @@ EXPECTED_EXCLUSIONS = {
 }
 PLANES = {"model", "algorithm", "source", "tx", "crypto"}
 EXPECTED_STATUSES = [
-    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "LEAN_CHECKED", "source": "LEAN_CHECKED", "tx": "NOT_APPLICABLE", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
@@ -230,6 +236,7 @@ EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "STRETCH_OPAQUE_FFI"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "LEAN_CHECKED", "source": "OPEN", "tx": "NOT_APPLICABLE", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "OPEN", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "crypto": "NOT_APPLICABLE"},
     {"model": "OPEN", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
@@ -238,7 +245,7 @@ EXPECTED_STATUSES = [
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
-    ["model", "source", "tx"],
+    ["model", "source"],
     ["algorithm", "source"],
     ["model", "source"],
     ["model", "source", "tx"],
@@ -253,6 +260,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model", "tx"],
     ["model", "tx"],
     ["model", "algorithm"],
+    ["tx"],
     ["model"],
     ["source", "tx"],
     [],
@@ -261,7 +269,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
 ]
 EXPECTED_THEOREMS = [
-    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
     "LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target",
     "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
     "LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure",
@@ -276,6 +284,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement",
     "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement",
     "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond",
+    "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
     "LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix",
     "LidoSRv3.Audit.Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback",
     None,
@@ -419,8 +428,6 @@ EXPECTED_MANIFEST_THEOREMS = [
      "axioms": ["propext"]},
     {"name": "Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
      "status": "lean_checked", "axioms": ["propext"]},
-    {"name": "Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction",
-     "status": "lean_checked", "axioms": ["propext", "Quot.sound"]},
     {"name": "SolidityMinFirst.run_conservation_mutant_sensitive",
      "status": "lean_checked", "axioms": ["propext"]},
     {"name": "SolidityMinFirst.run_capacity_mutant_sensitive",
@@ -981,6 +988,15 @@ def validate():
                     "P-ALLOC-1.eugene-bound must remain subordinate to P-ALLOC-1")
             require(row.get("source_plane_scope") == "operator bond bound only",
                     "P-ALLOC-1.eugene-bound: source plane scope must remain operator bond bound only")
+        elif row["id"] == "P-ALLOC-1.bounded-allocation-tx":
+            require(row.get("parent_id") == "P-ALLOC-1",
+                    "P-ALLOC-1.bounded-allocation-tx must remain subordinate to P-ALLOC-1")
+            require(row.get("source_plane_scope") ==
+                    "fixed one-row demand/state receipt only; deliberately not composed with parent scope",
+                    "P-ALLOC-1.bounded-allocation-tx: non-composition scope differs")
+            require(row.get("note") ==
+                    "Non-composition is intentional and guarded by metadata mutants: this row may not promote the parent TX plane or claim that parent inputs feed Contract.run.",
+                    "P-ALLOC-1.bounded-allocation-tx: non-composition note differs")
         elif row["id"] == "P-CONSOLIDATION-1.abstract-flow-model":
             require(row.get("parent_id") == "P-CONSOLIDATION-1",
                     "P-CONSOLIDATION-1.abstract-flow-model must remain subordinate to P-CONSOLIDATION-1")
@@ -1069,7 +1085,7 @@ def validate():
         if row["id"] in {"P-SSZ-1.deposit-data-root", "P-SSZ-1.abstract-digest",
                           "P-SSZ-1.tx-execution-simulation"}:
             mapping = source_targets["P-SSZ-1"]
-        elif row["id"] == "P-ALLOC-1.eugene-bound":
+        elif row["id"] in {"P-ALLOC-1.eugene-bound", "P-ALLOC-1.bounded-allocation-tx"}:
             mapping = source_targets["P-ALLOC-1"]
         elif row["id"] == "P-CONSOLIDATION-1.abstract-flow-model":
             mapping = source_targets["P-CONSOLIDATION-1"]

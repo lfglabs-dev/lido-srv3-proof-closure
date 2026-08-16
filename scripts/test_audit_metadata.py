@@ -553,6 +553,57 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
+        # The fixed Contract.run receipt must never be used to promote the
+        # universally scoped P-ALLOC-1 parent: none of its parent inputs feed
+        # the receipt state or demand.
+        promoted_alloc_tx = copy.deepcopy(guarantees)
+        alloc_parent = next(
+            row for row in promoted_alloc_tx["guarantees"]
+            if row["id"] == "P-ALLOC-1"
+        )
+        alloc_parent["statuses"]["tx"] = "LEAN_CHECKED"
+        alloc_parent["theorem_planes"].append("tx")
+        write_json(guarantees_path, promoted_alloc_tx)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1: theorem planes differ from canonical evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
+        detached_alloc_tx = copy.deepcopy(guarantees)
+        alloc_tx = next(
+            row for row in detached_alloc_tx["guarantees"]
+            if row["id"] == "P-ALLOC-1.bounded-allocation-tx"
+        )
+        del alloc_tx["parent_id"]
+        write_json(guarantees_path, detached_alloc_tx)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.bounded-allocation-tx must remain subordinate to P-ALLOC-1",
+        )
+        write_json(guarantees_path, guarantees)
+
+        composed_alloc_tx_claim = copy.deepcopy(guarantees)
+        alloc_tx = next(
+            row for row in composed_alloc_tx_claim["guarantees"]
+            if row["id"] == "P-ALLOC-1.bounded-allocation-tx"
+        )
+        alloc_tx["source_plane_scope"] = (
+            "parent cfg/modules/capacity/demand feed Contract.run"
+        )
+        write_json(guarantees_path, composed_alloc_tx_claim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.bounded-allocation-tx: non-composition scope differs",
+        )
+        write_json(guarantees_path, guarantees)
+
         stale_alloc2_gate = copy.deepcopy(guarantees)
         stale_alloc2_gate["guarantees"][1]["next_gate"] = (
             "Connect checked quantities to independently verified pinned source spans."

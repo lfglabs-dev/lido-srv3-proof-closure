@@ -9,7 +9,7 @@ open Verity
 open Verity.Stdlib.Math
 open LidoSRv3.Audit.AllocCapacity
 
-def guarantee : Guarantee := ⟨.pAlloc1, [.model, .source, .verityTx]⟩
+def guarantee : Guarantee := ⟨.pAlloc1, [.model, .source]⟩
 
 /-- The canonical active capacity is bounded by both operands of the pinned
 `Math.min` clamp. -/
@@ -59,30 +59,5 @@ theorem verity_tx_refines_source_capacity_and_conservation :
         SolidityMinFirst.conservationReceiptState) =
       SolidityMinFirst.sourceCapacityObservation :=
   SolidityMinFirst.verity_tx_refines_source_capacity_and_conservation
-
-/-- Canonical P-ALLOC-1 evidence.  It retains the allocation-capacity
-MODEL→SOURCE correspondence and additionally consumes the bounded official
-`Verity.Contract.run` allocation receipt together with the three mutant
-receipts that make that receipt discriminating.  Deleting or weakening the
-transaction evidence therefore breaks this theorem rather than leaving it
-provable.  No Yul, EVM, gas, or deployed-layout claim is made. -/
-theorem source_capacities_and_bounded_allocation_transaction
-    (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256)
-    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
-    (∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
-      rows.map (fun row => (row.capacity : Nat)) =
-        MathView.capacities cfg modules depositsToAllocate isTopUp) ∧
-    SolidityMinFirst.observeAllocationTx
-      ((SolidityMinFirst.AllocationContract.allocate 60).run
-        SolidityMinFirst.conservationReceiptState) =
-      SolidityMinFirst.sourceCapacityObservation ∧
-    SolidityMinFirst.conservationReceipt = true ∧
-    SolidityMinFirst.capacityReceipt = true ∧
-    SolidityMinFirst.disabledExclusionReceipt = true :=
-  ⟨source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds,
-   verity_tx_refines_source_capacity_and_conservation,
-   SolidityMinFirst.run_conservation_mutant_sensitive,
-   SolidityMinFirst.run_capacity_mutant_sensitive,
-   SolidityMinFirst.run_disabled_exclusion_mutant_sensitive⟩
 
 end LidoSRv3.Audit.Guarantees.PAlloc1

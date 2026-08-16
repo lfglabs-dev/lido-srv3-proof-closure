@@ -4,29 +4,27 @@
   "guarantees": [
     {
       "id": "P-ALLOC-1",
-      "catalogue_wording": "The canonical theorem conjoins checked pinned-source allocation-capacity correspondence with a bounded official Verity Contract.run allocation receipt: on fixed single-row router states the executed transaction's returned amount and committed router-ordered allocation column equal the independently checked source amount and its additive conservation, and three orthogonal mutant programs (overwrite instead of add, dropped effective-capacity clamp, disabled-row participation) change an observed post-state. This slice executes storage operations only and performs no external calls, so it does not rest on Verity's vacuous externalCallBind; storage slots are model-local, and generality beyond the fixed receipt states, proportional-amount refinement, deployed proxy layout, Yul, EVM, and gas remain open.",
-      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction",
+      "catalogue_wording": "Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts, composition with the bounded transaction receipt, and EVM equivalence remain open.",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical",
       "theorem_planes": [
         "model",
-        "source",
-        "tx"
+        "source"
       ],
       "statuses": {
         "model": "LEAN_CHECKED",
         "algorithm": "NOT_APPLICABLE",
         "source": "LEAN_CHECKED",
-        "tx": "LEAN_CHECKED",
+        "tx": "OPEN",
         "crypto": "NOT_APPLICABLE"
       },
       "assumptions": [
-        "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-SOURCE-SHAPED"
       ],
-      "note": "The TX plane is bounded, not universally quantified: it fixes concrete receipt states and deposit demands rather than quantifying over router states. It is nevertheless non-vacuous by mechanical probe - the audited program commits allocations [70] where the mutant commits [60] on the same state, and the observation is a committing success rather than a `none = none` equality. Because the slice makes no external calls, the externalCallBind vacuity that blocked P-DEPOSIT-1 and P-TOPUP-1 does not apply here.",
-      "next_gate": "Generalize the bounded single-row allocation receipt to arbitrary router-ordered states and proportional amounts, and bind the model-local storage slots to the deployed proxy layout and generated Yul/EVM semantics.",
+      "note": "The bounded Contract.run receipt is registered only as subordinate evidence: its fixed demand/state are not fed by this parent's cfg/modules/depositsToAllocate/isTopUp scope.",
+      "next_gate": "Compose rows, capacity, and demand produced by the parent source scope into Contract.run before promoting the TX plane; then generalize proportional amounts and bind deployed layout/Yul/EVM semantics.",
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.MinFirstVectors",
-        "expected": "successful checked-source to independent Audit-model correspondence conjoined with the bounded Contract.run allocation receipt and its three mutant-sensitivity receipts; generality beyond the fixed receipt states and Yul/EVM/deployed-layout refinement remain open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression",
+        "expected": "successful checked-source to independent Audit-model correspondence and negative-mutant build; parent TX composition and proportional amount correspondence remain open"
       }
     },
     {
@@ -426,6 +424,32 @@
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors",
         "expected": "successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open"
+      }
+    },
+    {
+      "id": "P-ALLOC-1.bounded-allocation-tx",
+      "parent_id": "P-ALLOC-1",
+      "catalogue_wording": "A fixed one-row official Verity Contract.run receipt is mechanically non-vacuous: allocation succeeds with [70], while overwrite [60], missing-capacity-clamp, and disabled-row mutants diverge. It is subordinate TX evidence only; no cfg, modules, capacity row, or demand from the P-ALLOC-1 parent scope feeds this execution.",
+      "source_plane_scope": "fixed one-row demand/state receipt only; deliberately not composed with parent scope",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation",
+      "theorem_planes": [
+        "tx"
+      ],
+      "statuses": {
+        "model": "NOT_APPLICABLE",
+        "algorithm": "NOT_APPLICABLE",
+        "source": "OPEN",
+        "tx": "LEAN_CHECKED",
+        "crypto": "NOT_APPLICABLE"
+      },
+      "assumptions": [
+        "A-VERITY-SCAFFOLD"
+      ],
+      "note": "Non-composition is intentional and guarded by metadata mutants: this row may not promote the parent TX plane or claim that parent inputs feed Contract.run.",
+      "next_gate": "Construct ContractState and demand from checked parent rows and prove that the resulting Contract.run observation refines those same rows before any parent promotion.",
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.MinFirstVectors",
+        "expected": "successful fixed-state Contract.run receipt with [70] success and divergent overwrite [60], capacity, and disabled-row mutants; no parent composition claim"
       }
     },
     {
