@@ -58,12 +58,32 @@ PINNED_LEAN_VERSION="$(printf '%s\n' "$PINNED_TOOLCHAIN" | sed -nE 's|^leanprove
 grep -Fqx "lean_version=$LEAN_VERSION_OUTPUT" "$BUILD_LOG" || \
   fail "build log '$BUILD_LOG' does not record the running Lean version"
 
+# The report pin is read from Lake's resolved dependency manifest instead of
+# being duplicated here.  The metadata gate separately proves that this value
+# agrees with lakefile.lean and every canonical audit lock/manifest.
+VERITY_COMMIT="$(python3 - <<'PY'
+import json
+from pathlib import Path
+
+manifest = json.loads(Path("lake-manifest.json").read_text(encoding="utf-8"))
+matches = [package for package in manifest["packages"] if package["name"] == "verity"]
+if len(matches) != 1:
+    raise SystemExit("lake-manifest.json must contain exactly one Verity package")
+package = matches[0]
+if package.get("rev") != package.get("inputRev"):
+    raise SystemExit("Verity resolved rev and requested inputRev differ")
+print(package["rev"])
+PY
+)" || fail "could not read the resolved Verity pin from lake-manifest.json"
+[[ "$VERITY_COMMIT" =~ ^[0-9a-f]{40}$ ]] || \
+  fail "resolved Verity pin '$VERITY_COMMIT' is not an exact 40-hex commit"
+
 cat <<JSON
 {
   "schema": "srv3-verity-lean-proof-report-v2",
   "toolchain": {
     "lean": "${LEAN_VERSION}",
-    "verity_commit": "04729a9de9099e065dd09283e4f733a5fd4c2a16"
+    "verity_commit": "${VERITY_COMMIT}"
   },
   "command": "lake build LidoSRv3",
   "build": {

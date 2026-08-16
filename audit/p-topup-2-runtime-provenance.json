@@ -1,0 +1,58 @@
+{
+  "schema": "p-topup-2-runtime-provenance-v1",
+  "claim_scope": "Pinned Solidity source artifact to deployed TopUpGateway implementation runtime identity at Ethereum mainnet block 25730798",
+  "exclusions": [
+    "Solidity-to-Verity semantic correspondence",
+    "Verity model refinement",
+    "generated Yul or EVM semantic equivalence",
+    "EIP-4788, SSZ, or SHA-256 correctness"
+  ],
+  "source_identity": {
+    "repository": "https://github.com/lidofinance/core.git",
+    "pinned_commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
+    "release": {"tag": "v4.0.0", "commit": "17005714f151e5502c559932319a3f2f74ac2436"},
+    "files": [
+      {"path": "contracts/common/lib/SSZ.sol", "git_blob": "0008c18c4a2ee99e6fbaed59c21cdf0dda41424b", "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"},
+      {"path": "contracts/common/lib/GIndex.sol", "git_blob": "6458a8c42cddb3108383ccefef5e95f0f87c9c10"},
+      {"path": "contracts/common/lib/BLS.sol", "git_blob": "5bb59d367c8ccc80f33841422edcb6381a20ba91"},
+      {"path": "contracts/0.8.25/CLValidatorVerifier.sol", "git_blob": "879b145d3535eeaa1e7180fddc01fb5a25e0f2ab"},
+      {"path": "contracts/0.8.25/TopUpGateway.sol", "git_blob": "243790702ea0c3dc211fc69abeb0a9552b3faf2a"}
+    ],
+    "release_file_diff": "NONE"
+  },
+  "build": {
+    "system": "repository Hardhat configuration",
+    "solidity_source_files": 478,
+    "compiler": "0.8.25+commit.b61c2a91",
+    "optimizer": {"enabled": true, "runs": 200},
+    "via_ir": true,
+    "evm_version": "cancun",
+    "constructor_args": {
+      "lido_locator": "0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb",
+      "g_index_first_validator_prev": "0x0000000000000000000000000000000000000000000000000096000000000028",
+      "g_index_first_validator_curr": "0x0000000000000000000000000000000000000000000000000096000000000028",
+      "pivot_slot": 0,
+      "slots_per_epoch": 32
+    }
+  },
+  "artifact_identity": {
+    "runtime": {"length_bytes": 9868, "keccak256": "0x2b9cce4868b60e874f60387f61ebbaceaf20f074dc78bec5564c8477319aa6e4"},
+    "local_deployment_matches_mainnet_byte_for_byte": true
+  },
+  "deployment": {
+    "chain_id": 1,
+    "reference_block": 25730798,
+    "proxy": "0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374",
+    "eip1967_implementation_slot": "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
+    "implementation": "0xb08dBc68C521cD7A4318dc4C807a42bEB20f1106",
+    "rpc_gate": {"required_for_live_reproduction": true, "credential_input": "MAINNET_RPC_URL", "absent_status": "SKIPPED_NO_RPC", "absent_exit_code": 2}
+  },
+  "independent_explorer_observation": {
+    "provider": "Etherscan",
+    "verification": "Source Code Verified - Exact Match",
+    "compiler": "v0.8.25+commit.b61c2a91",
+    "optimizer_runs": 200,
+    "evm_version": "cancun",
+    "informational_not_used_by_gate": true
+  }
+}

@@ -11,6 +11,8 @@ import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Guarantees.PTopup2
+import LidoSRv3.Audit.Verity.TopupPackedStorage
 import LidoSRv3.Audit.Guarantees.PReserve1
 
 /-!
@@ -29,6 +31,7 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
@@ -40,13 +43,25 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_conservation
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
+#print axioms LidoSRv3.Audit.SolidityMinFirst.run_conservation_mutant_sensitive
+#print axioms LidoSRv3.Audit.SolidityMinFirst.run_capacity_mutant_sensitive
+#print axioms LidoSRv3.Audit.SolidityMinFirst.run_disabled_exclusion_mutant_sensitive
+#print axioms LidoSRv3.Audit.SolidityMinFirst.run_abstract_source_bridge_mutant_sensitive
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_contract_run_commits_accepted
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.admission_and_post_state_equivariance
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx
+#print axioms LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant
+#print axioms LidoSRv3.Audit.SolidityAddress.renameInput_preserves_indexed_facts
+#print axioms LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.verity_revert_rolls_back
+#print axioms LidoSRv3.Audit.Verity.DepositLedgerTx.forEach_wrapper_unrolls_once
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
@@ -55,6 +70,20 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.exiting_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.slashed_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.target_reached_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.accepted_gap_branch
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_individual
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_module_limit
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.generated_layout_exact
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.target_setter_reader_run
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.target_setter_preserves_nonzero_neighbors
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.minimum_setter_reader_run
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.source_headroom_materially_runs
+#print axioms LidoSRv3.Audit.Verity.TopupPackedStorage.record_budget_rejects_over_budget
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve

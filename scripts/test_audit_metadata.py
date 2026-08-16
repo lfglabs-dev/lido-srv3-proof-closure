@@ -40,7 +40,7 @@ def write_json(path, value):
 def main():
     with tempfile.TemporaryDirectory(prefix="audit-metadata-") as directory:
         fixture = Path(directory)
-        for name in ("audit", "scripts", "content", "proofs"):
+        for name in ("audit", "scripts", "LidoSRv3"):
             shutil.copytree(ROOT / name, fixture / name)
         for name in ("lakefile.lean", "lake-manifest.json", "lean-toolchain"):
             shutil.copy2(ROOT / name, fixture / name)
@@ -56,12 +56,14 @@ def main():
         # A source archive has no .git directory, remote, or branch refs.
         run(fixture, True)
 
-        reproducibility_path = fixture / "content/05-reproducibility.tex"
-        reproducibility = reproducibility_path.read_text(encoding="utf-8")
-        reproducibility_path.write_text(
-            reproducibility.replace(
-                "04729a9de9099e065dd09283e4f733a5fd4c2a16",
-                "d2d4a18a4d7021adcd90d4b03e619affe506dd54",
+        # The bounded ledger theorem is subordinate and must never populate the
+        # canonical P-DEPOSIT-1 checked layer.
+        pdeposit_path = fixture / "LidoSRv3/Audit/Guarantees/PDeposit1.lean"
+        pdeposit_source = pdeposit_path.read_text(encoding="utf-8")
+        pdeposit_path.write_text(
+            pdeposit_source.replace(
+                "[.model, .abstractTx, .source]",
+                "[.model, .abstractTx, .source, .verityTx]",
                 1,
             ),
             encoding="utf-8",
@@ -69,28 +71,12 @@ def main():
         run(
             fixture,
             False,
-            "check",
-            "reproducibility report must name the canonical Verity pin exactly twice",
-        )
-        reproducibility_path.write_text(reproducibility, encoding="utf-8")
-
-        proof_lockfile_path = fixture / "proofs/LOCKFILE.md"
-        proof_lockfile = proof_lockfile_path.read_text(encoding="utf-8")
-        proof_lockfile_path.write_text(
-            proof_lockfile.replace(
-                "04729a9de9099e065dd09283e4f733a5fd4c2a16",
-                "d2d4a18a4d7021adcd90d4b03e619affe506dd54",
-                1,
+            expected_error=(
+                "P-DEPOSIT-1: canonical checked layers must exclude subordinate "
+                "Verity TX evidence"
             ),
-            encoding="utf-8",
         )
-        run(
-            fixture,
-            False,
-            "check",
-            "proofs/LOCKFILE.md Verity pin differs from the canonical dependency pin",
-        )
-        proof_lockfile_path.write_text(proof_lockfile, encoding="utf-8")
+        pdeposit_path.write_text(pdeposit_source, encoding="utf-8")
 
         lock_leaves = [
             ("campaign_base", field) for field in ("repository", "ref", "commit")
@@ -589,6 +575,57 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
+        # The fixed Contract.run receipt must never be used to promote the
+        # universally scoped P-ALLOC-1 parent: none of its parent inputs feed
+        # the receipt state or demand.
+        promoted_alloc_tx = copy.deepcopy(guarantees)
+        alloc_parent = next(
+            row for row in promoted_alloc_tx["guarantees"]
+            if row["id"] == "P-ALLOC-1"
+        )
+        alloc_parent["statuses"]["tx"] = "LEAN_CHECKED"
+        alloc_parent["theorem_planes"].append("tx")
+        write_json(guarantees_path, promoted_alloc_tx)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1: theorem planes differ from canonical evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
+        detached_alloc_tx = copy.deepcopy(guarantees)
+        alloc_tx = next(
+            row for row in detached_alloc_tx["guarantees"]
+            if row["id"] == "P-ALLOC-1.bounded-allocation-tx"
+        )
+        del alloc_tx["parent_id"]
+        write_json(guarantees_path, detached_alloc_tx)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.bounded-allocation-tx must remain subordinate to P-ALLOC-1",
+        )
+        write_json(guarantees_path, guarantees)
+
+        composed_alloc_tx_claim = copy.deepcopy(guarantees)
+        alloc_tx = next(
+            row for row in composed_alloc_tx_claim["guarantees"]
+            if row["id"] == "P-ALLOC-1.bounded-allocation-tx"
+        )
+        alloc_tx["source_plane_scope"] = (
+            "parent cfg/modules/capacity/demand feed Contract.run"
+        )
+        write_json(guarantees_path, composed_alloc_tx_claim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.bounded-allocation-tx: non-composition scope differs",
+        )
+        write_json(guarantees_path, guarantees)
+
         stale_alloc2_gate = copy.deepcopy(guarantees)
         stale_alloc2_gate["guarantees"][1]["next_gate"] = (
             "Connect checked quantities to independently verified pinned source spans."
@@ -616,6 +653,32 @@ def main():
             )
         write_json(guarantees_path, guarantees)
 
+        pderef_wording = copy.deepcopy(guarantees)
+        pderef_wording["guarantees"][-1]["catalogue_wording"] = (
+            "Production dereference behavior is fully certified."
+        )
+        write_json(guarantees_path, pderef_wording)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEREF-1: catalogue wording differs from canonical bounded claim",
+        )
+        write_json(guarantees_path, guarantees)
+
+        pderef_scope = copy.deepcopy(guarantees)
+        pderef_scope["guarantees"][-1]["source_plane_scope"] = (
+            "deployed runtime and exact Solidity storage layout"
+        )
+        write_json(guarantees_path, pderef_scope)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-DEREF-1: source plane scope differs from canonical boundary",
+        )
+        write_json(guarantees_path, guarantees)
+
         for status in ("AUDIT-CERT", "TYPO"):
             invalid_status = copy.deepcopy(guarantees)
             invalid_status["guarantees"][5]["statuses"]["source"] = status
@@ -637,13 +700,13 @@ def main():
         write_json(guarantees_path, guarantees)
 
         wrong_plane = copy.deepcopy(guarantees)
-        wrong_plane["guarantees"][0]["statuses"]["evm"] = "LEAN_CHECKED"
+        wrong_plane["guarantees"][0]["statuses"]["crypto"] = "LEAN_CHECKED"
         write_json(guarantees_path, wrong_plane)
         run(
             fixture,
             False,
             "generate",
-            "evm status LEAN_CHECKED requires theorem evidence for that plane",
+            "crypto status LEAN_CHECKED requires theorem evidence for that plane",
         )
         write_json(guarantees_path, guarantees)
 
@@ -661,24 +724,24 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        deposit_evm_overclaim = copy.deepcopy(guarantees)
-        deposit_evm_overclaim["guarantees"][2]["statuses"]["evm"] = "LEAN_CHECKED"
-        write_json(guarantees_path, deposit_evm_overclaim)
+        deposit_crypto_overclaim = copy.deepcopy(guarantees)
+        deposit_crypto_overclaim["guarantees"][2]["statuses"]["crypto"] = "LEAN_CHECKED"
+        write_json(guarantees_path, deposit_crypto_overclaim)
         run(
             fixture,
             False,
             "generate",
-            "P-DEPOSIT-1: evm status LEAN_CHECKED requires theorem evidence "
+            "P-DEPOSIT-1: crypto status LEAN_CHECKED requires theorem evidence "
             "for that plane",
         )
         write_json(guarantees_path, guarantees)
 
-        deposit_evm_plane_overclaim = copy.deepcopy(guarantees)
-        deposit_evm_plane_overclaim["guarantees"][2]["statuses"]["evm"] = "LEAN_CHECKED"
-        deposit_evm_plane_overclaim["guarantees"][2]["theorem_planes"] = [
-            "model", "tx", "source", "evm",
+        deposit_crypto_plane_overclaim = copy.deepcopy(guarantees)
+        deposit_crypto_plane_overclaim["guarantees"][2]["statuses"]["crypto"] = "LEAN_CHECKED"
+        deposit_crypto_plane_overclaim["guarantees"][2]["theorem_planes"] = [
+            "model", "tx", "source", "crypto",
         ]
-        write_json(guarantees_path, deposit_evm_plane_overclaim)
+        write_json(guarantees_path, deposit_crypto_plane_overclaim)
         run(
             fixture,
             False,
@@ -698,11 +761,9 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        # P-TOPUP-1 closed its source plane in this campaign.  The
-        # source claim must not be silently downgraded back to the pre-campaign
-        # model-only row, the theorem must stay the top-up correspondence rather
-        # than the allocation-ordering model fact it replaced, and the evm plane
-        # tx and evm planes it deliberately did not close must stay open.
+        # P-TOPUP-1 closes the complete public parent source/Verity transaction.
+        # Neither plane may be silently downgraded, the theorem must stay the
+        # parent proposition, and Yul/EVM remain outside the registry planes.
         topup_source_downgrade = copy.deepcopy(guarantees)
         topup_source_downgrade["guarantees"][3]["statuses"]["source"] = "OPEN"
         write_json(guarantees_path, topup_source_downgrade)
@@ -725,23 +786,23 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
-        topup_tx_overclaim = copy.deepcopy(guarantees)
-        topup_tx_overclaim["guarantees"][3]["statuses"]["tx"] = "LEAN_CHECKED"
-        write_json(guarantees_path, topup_tx_overclaim)
+        topup_tx_downgrade = copy.deepcopy(guarantees)
+        topup_tx_downgrade["guarantees"][3]["statuses"]["tx"] = "OPEN"
+        write_json(guarantees_path, topup_tx_downgrade)
         run(
             fixture,
             False,
             "generate",
-            "P-TOPUP-1: tx status LEAN_CHECKED requires theorem evidence for that plane",
+            "P-TOPUP-1: assurance statuses differ from canonical claims",
         )
         write_json(guarantees_path, guarantees)
 
-        topup_evm_plane_overclaim = copy.deepcopy(guarantees)
-        topup_evm_plane_overclaim["guarantees"][3]["statuses"]["evm"] = "LEAN_CHECKED"
-        topup_evm_plane_overclaim["guarantees"][3]["theorem_planes"] = [
-            "model", "tx", "source", "evm",
+        topup_crypto_plane_overclaim = copy.deepcopy(guarantees)
+        topup_crypto_plane_overclaim["guarantees"][3]["statuses"]["crypto"] = "LEAN_CHECKED"
+        topup_crypto_plane_overclaim["guarantees"][3]["theorem_planes"] = [
+            "model", "tx", "source", "crypto",
         ]
-        write_json(guarantees_path, topup_evm_plane_overclaim)
+        write_json(guarantees_path, topup_crypto_plane_overclaim)
         run(
             fixture,
             False,
@@ -817,12 +878,12 @@ def main():
             )
         write_json(guarantees_path, guarantees)
 
-        topup_dropped_nowrap = copy.deepcopy(guarantees)
-        topup_dropped_nowrap["guarantees"][3]["assumptions"] = [
-            row for row in topup_dropped_nowrap["guarantees"][3]["assumptions"]
-            if row != "A-TOPUP-NOWRAP"
+        topup_dropped_solc = copy.deepcopy(guarantees)
+        topup_dropped_solc["guarantees"][3]["assumptions"] = [
+            row for row in topup_dropped_solc["guarantees"][3]["assumptions"]
+            if row != "A-SOLC-TRUSTED"
         ]
-        write_json(guarantees_path, topup_dropped_nowrap)
+        write_json(guarantees_path, topup_dropped_solc)
         run(
             fixture,
             False,
@@ -1149,8 +1210,8 @@ def main():
         )
         write_json(source_map_path, source_map)
 
-        reproduce_path = fixture / "audit/REPRODUCE.md"
-        reproduce_path.write_text("stale\n", encoding="utf-8")
+        evidence_path = fixture / "audit/EVIDENCE.md"
+        evidence_path.write_text("stale\n", encoding="utf-8")
         run(fixture, False)
 
     print(
@@ -1162,9 +1223,10 @@ def main():
         "source-map policy, reproduction evidence, "
         "strict source-span evidence, status vocabulary/plane/closure, "
         "P-DEPOSIT-1 source-plane downgrade/overclaim and span unmapping, "
+        "P-DEPOSIT-1 subordinate-TX parent-facade promotion, "
         "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
         "and span unmapping, P-TOPUP-1 transitive-helper span, "
-        "pinned-constant declaration span and no-wrap assumption drops, "
+        "pinned-constant declaration span and solc-boundary assumption drops, "
         "P-ACCOUNT-1 source/tx downgrade, transitive-helper and "
         "MAX_VALUE_GWEI declaration span drops, "
         "P-SSZ-1 deposit-data-root span drops, "

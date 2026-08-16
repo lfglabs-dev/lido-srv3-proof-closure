@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.TopupCorrespondence
+import LidoSRv3.Audit.Verity.TopupParent
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PTopup1
@@ -8,7 +9,7 @@ namespace LidoSRv3.Audit.Guarantees.PTopup1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityTopup
 
-def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source]⟩
+def guarantee : Guarantee := ⟨.pTopup1, [.model, .source, .verityTx]⟩
 
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order
@@ -185,5 +186,18 @@ is a real falsifier and is not papered over.
 theorem source_pinned_config_discharges_pubkey_guard (inp : SourceTopupInput) :
     run pinnedConfig inp ≠ .revertInvalidPublicKeyLength :=
   run_ne_revertInvalidPublicKeyLength pinnedConfig_pubkey_lengths_agree
+
+/-- Whole-parent P-TOPUP-1 closure.  This
+public proposition begins with authentication, obtains the allocation array
+through the observable module-call interface, executes wrapped accumulation,
+and represents Lido/Beacon success, failure, value and returndata before the
+single transaction commit/revert boundary. -/
+theorem parent_verity_transaction_closure
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (gateway : _root_.Verity.Address)
+    (iface : LidoSRv3.Audit.SolidityTopupParent.CalleeInterface)
+    (state : _root_.Verity.ContractState) :
+    LidoSRv3.Audit.Verity.TopupParent.ParentProposition cfg inp gateway iface state :=
+  LidoSRv3.Audit.Verity.TopupParent.parent_transaction_closure cfg inp gateway iface state
 
 end LidoSRv3.Audit.Guarantees.PTopup1
