@@ -35,17 +35,30 @@ def sourceTransfer (caller fromAddr to : Nat) (s : State) : Option State :=
   else if caller != fromAddr then none
   else some { owner := to, approved := 0 }
 
-/-- MODEL → SOURCE correspondence for the bounded pinned-source branch. -/
+/-- Equality of two audit-authored definitions for the bounded pinned-source-
+shaped branch. This `rfl` is not Solidity extraction or compiler refinement. -/
 theorem source_refines_model (caller fromAddr to : Nat) (s : State) :
     sourceTransfer caller fromAddr to s = modelTransfer caller fromAddr to s := rfl
 
-/-- Concrete address-renaming witness: swapping all actor positions commutes
-with the successful source handoff and produces the renamed post-state. -/
+/-- The concrete caller swap used by the bounded witness. -/
+def swap12 (address : Nat) : Nat :=
+  if address = 1 then 2 else if address = 2 then 1 else address
+
+def renameState12 (s : State) : State :=
+  { owner := swap12 s.owner, approved := swap12 s.approved }
+
+/-- Concrete address-renaming witness. Recipient 3 and approval 9 are fixed by
+the 1/2 swap; only caller, `from`, and the pre-state owner change. -/
 theorem source_post_state_equivariant_witness :
     sourceTransfer 1 1 3 { owner := 1, approved := 9 } =
       some { owner := 3, approved := 0 } ∧
-    sourceTransfer 2 2 4 { owner := 2, approved := 8 } =
-      some { owner := 4, approved := 0 } := by decide
+    sourceTransfer 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }) =
+      (sourceTransfer 1 1 3 { owner := 1, approved := 9 }).map renameState12 := by decide
+
+/-- Mutant controls: changing fixed recipient 3 to 4, or fixed approval 9 to 8,
+cannot be presented as the result of the 1/2 address permutation. -/
+theorem recipient_stomp_not_swap : swap12 3 != 4 := by decide
+theorem approval_stomp_not_swap : swap12 9 != 8 := by decide
 
 /-- Privileged-owner mutant: replacing the caller-relative check by a fixed
 actor rejects the renamed caller, so the witness is discrimination-sensitive. -/
@@ -55,6 +68,6 @@ def fixedCallerMutant (caller fromAddr to : Nat) (s : State) : Option State :=
 theorem fixed_caller_mutant_rejected :
     fixedCallerMutant 1 1 3 { owner := 1, approved := 9 } =
       some { owner := 3, approved := 0 } ∧
-    fixedCallerMutant 2 2 4 { owner := 2, approved := 8 } = none := by decide
+    fixedCallerMutant 2 2 3 { owner := 2, approved := 9 } = none := by decide
 
 end LidoSRv3.Audit.Source.AddressTransferCorrespondence

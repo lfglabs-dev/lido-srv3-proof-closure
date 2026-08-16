@@ -271,15 +271,15 @@
     {
       "id": "P-ADDRESS-1.transfer-owner-handoff",
       "parent_id": "P-ADDRESS-1",
-      "catalogue_wording": "A bounded owner-operated WithdrawalQueueERC721 transfer slice separates MODEL, pinned SOURCE, and official Verity Denote execution: caller-relative authorization, approval deletion, and request-owner handoff compose in one registry theorem, two renamed successful post-state receipts commit distinct owners, and a wrong-caller control reverts with the pre-state. Enumerable owner sets, the Transfer event, approved-operator branches, the other mapped permissionless entrypoints, Yul, and EVM remain open, so the parent stays OPEN.",
+      "catalogue_wording": "A bounded owner-operated WithdrawalQueueERC721 transfer slice separates an audit-authored MODEL, an audit-authored SOURCE-shaped transcription of the pinned guards/writes, and official Verity Denote execution. The registry theorem checks a concrete 1/2 caller swap while keeping recipient 3 and approval 9 fixed, and rejects recipient/approval stomp mutants. Enumerable owner sets, the Transfer event, approved-operator branches, the other mapped permissionless entrypoints, Yul, and EVM remain open, so the parent stays OPEN.",
       "source_plane_scope": "WithdrawalQueueERC721.transferFrom owner-operated approval-delete and owner-handoff slice only",
       "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx",
       "theorem_planes": ["model", "source", "tx"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
       "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
-      "note": "The TX receipts use Compiler.CompilationModel.Denote.denoteFunction directly and contain no external-call primitive, so externalCallBind vacuity is irrelevant. The registry theorem consumes the distinct MODEL→SOURCE theorem, both renamed SOURCE post-states, both committed Denote post-states, and the wrong-caller rollback control.",
+      "note": "The SOURCE definition is audit-authored and its rfl correspondence to the separately named MODEL only covers nonzero recipient, recipient!=from, stored owner==from, caller==from, approval deletion, and owner replacement. It does not prove extraction from Solidity. The TX receipts use Compiler.CompilationModel.Denote.denoteFunction directly and contain no external-call primitive. The registry theorem consumes the concrete swap-linked SOURCE/TX receipts, wrong-caller rollback, and controls proving that 3->4 and 9->8 are not produced by the 1/2 swap.",
       "next_gate": "Generalize the bounded transfer receipt beyond fixed witnesses, add the two approved-operator branches, owner-indexed enumerable-set updates and Transfer event, then cover request/claim/redemption entrypoints before moving the parent.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTransferTx LidoSRv3.Audit.Trust", "expected": "successful bounded MODEL/SOURCE/TX composition with committed renamed post-states and wrong-caller rollback; parent P-ADDRESS-1 remains OPEN"}
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTransferTx LidoSRv3.Audit.Trust", "expected": "successful bounded audit-authored MODEL/SOURCE-shaped/TX witness for the exact 1/2 swap, fixed-address stomp mutants, and wrong-caller rollback; parent P-ADDRESS-1 remains OPEN"}
     },
     {
       "id": "P-DEREF-1",

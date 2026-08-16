@@ -138,7 +138,22 @@ theorem admission_and_post_state_equivariance
 for the owner-operated WithdrawalQueue ERC-721 ownership handoff. The umbrella
 guarantee remains open for the other mapped entrypoints and omitted set/event
 effects. -/
-theorem bounded_transfer_model_source_tx :=
+theorem bounded_transfer_model_source_tx :
+    (∀ caller fromAddr to s,
+      LidoSRv3.Audit.Source.AddressTransferCorrespondence.sourceTransfer caller fromAddr to s =
+      LidoSRv3.Audit.Source.AddressTransferCorrespondence.modelTransfer caller fromAddr to s) ∧
+    LidoSRv3.Audit.Source.AddressTransferCorrespondence.sourceTransfer 1 1 3
+      { owner := 1, approved := 9 } = some { owner := 3, approved := 0 } ∧
+    LidoSRv3.Audit.Source.AddressTransferCorrespondence.sourceTransfer 2 2 3
+      { owner := 2, approved := 9 } = some { owner := 3, approved := 0 } ∧
+    LidoSRv3.Audit.Verity.AddressTransferTx.observe
+      (LidoSRv3.Audit.Verity.AddressTransferTx.run 1 1 3 1 9) = (true, 3, 0) ∧
+    LidoSRv3.Audit.Verity.AddressTransferTx.observe
+      (LidoSRv3.Audit.Verity.AddressTransferTx.run 2 2 3 2 9) = (true, 3, 0) ∧
+    LidoSRv3.Audit.Source.AddressTransferCorrespondence.swap12 3 ≠ 4 ∧
+    LidoSRv3.Audit.Source.AddressTransferCorrespondence.swap12 9 ≠ 8 ∧
+    LidoSRv3.Audit.Verity.AddressTransferTx.observe
+      (LidoSRv3.Audit.Verity.AddressTransferTx.run 9 1 3 1 9) = (false, 1, 9) :=
   LidoSRv3.Audit.Verity.AddressTransferTx.model_source_tx_address_equivariance_slice
 
 end LidoSRv3.Audit.Guarantees.PAddress1

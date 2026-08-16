@@ -69,7 +69,7 @@ EXPECTED_WORDING = [
     "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
     "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
     "An audit-authored permissionless entrypoint written in the pinned Verity deep EDSL is evaluated by the official denotation Compiler.CompilationModel.Denote.denoteFunction, which installs the transaction sender into ContractState.sender, so the caller is a genuine input of the run rather than an index on an abstract function. For every mapping-slot oracle, every caller pair whose balance entries do not alias the pause slot, and every world, the admission bit under one caller equals the admission bit under the other in the caller-swapped world. Admission only: post-state equivariance, correspondence to pinned Lido Solidity, generated Yul, and EVM execution are not claimed, so the parent transaction plane remains OPEN.",
-    "A bounded owner-operated WithdrawalQueueERC721 transfer slice separates MODEL, pinned SOURCE, and official Verity Denote execution: caller-relative authorization, approval deletion, and request-owner handoff compose in one registry theorem, two renamed successful post-state receipts commit distinct owners, and a wrong-caller control reverts with the pre-state. Enumerable owner sets, the Transfer event, approved-operator branches, the other mapped permissionless entrypoints, Yul, and EVM remain open, so the parent stays OPEN.",
+    "A bounded owner-operated WithdrawalQueueERC721 transfer slice separates an audit-authored MODEL, an audit-authored SOURCE-shaped transcription of the pinned guards/writes, and official Verity Denote execution. The registry theorem checks a concrete 1/2 caller swap while keeping recipient 3 and approval 9 fixed, and rejects recipient/approval stomp mutants. Enumerable owner sets, the Transfer event, approved-operator branches, the other mapped permissionless entrypoints, Yul, and EVM remain open, so the parent stays OPEN.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -147,7 +147,7 @@ EXPECTED_REPRODUCTION = [
     {"command": "lake build LidoSRv3.Audit.Verity.AddressAdmission",
      "expected": "successful official-denotation admission reduction, caller-swap equivariance, both-gate non-vacuity witnesses, and owner-gated mutant refutation; post-state equivariance, pinned-source correspondence, Yul, and EVM remain open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTransferTx LidoSRv3.Audit.Trust",
-     "expected": "successful bounded MODEL/SOURCE/TX composition with committed renamed post-states and wrong-caller rollback; parent P-ADDRESS-1 remains OPEN"},
+     "expected": "successful bounded audit-authored MODEL/SOURCE-shaped/TX witness for the exact 1/2 swap, fixed-address stomp mutants, and wrong-caller rollback; parent P-ADDRESS-1 remains OPEN"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],

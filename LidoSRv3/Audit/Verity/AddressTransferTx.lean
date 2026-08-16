@@ -74,7 +74,9 @@ theorem run_commits_owner_handoff :
 
 /-- The renamed run commits the correspondingly renamed post-state. -/
 theorem run_post_state_equivariant_witness :
-    observe (run 2 2 4 2 8) = (true, 4, 0) := by decide
+    observe (run 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }).owner
+      (renameState12 { owner := 1, approved := 9 }).approved) =
+      (true, swap12 3, swap12 0) := by decide
 
 /-- Caller discrimination is load-bearing: the same eligible state and
 arguments revert when the transaction sender is not the owner. -/
@@ -93,12 +95,18 @@ control breaks this theorem. -/
 theorem model_source_tx_address_equivariance_slice :
     (∀ caller fromAddr to s, sourceTransfer caller fromAddr to s = modelTransfer caller fromAddr to s) ∧
     sourceTransfer 1 1 3 { owner := 1, approved := 9 } = some { owner := 3, approved := 0 } ∧
-    sourceTransfer 2 2 4 { owner := 2, approved := 8 } = some { owner := 4, approved := 0 } ∧
+    sourceTransfer 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }) =
+      (sourceTransfer 1 1 3 { owner := 1, approved := 9 }).map renameState12 ∧
     observe (run 1 1 3 1 9) = (true, 3, 0) ∧
-    observe (run 2 2 4 2 8) = (true, 4, 0) ∧
+    observe (run 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }).owner
+      (renameState12 { owner := 1, approved := 9 }).approved) =
+      (true, swap12 3, swap12 0) ∧
+    swap12 3 != 4 ∧
+    swap12 9 != 8 ∧
     observe (run 9 1 3 1 9) = (false, 1, 9) := by
   exact ⟨source_refines_model, source_post_state_equivariant_witness.1,
     source_post_state_equivariant_witness.2, run_commits_owner_handoff,
-    run_post_state_equivariant_witness, wrong_caller_reverts⟩
+    run_post_state_equivariant_witness, recipient_stomp_not_swap,
+    approval_stomp_not_swap, wrong_caller_reverts⟩
 
 end LidoSRv3.Audit.Verity.AddressTransferTx
