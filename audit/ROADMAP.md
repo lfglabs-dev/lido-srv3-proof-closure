@@ -2,7 +2,7 @@
 
 # ROADMAP
 
-- `P-ALLOC-1`: Generalize the bounded single-row allocation receipt to arbitrary router-ordered states and proportional amounts, and bind the model-local storage slots to the deployed proxy layout and generated Yul/EVM semantics.
+- `P-ALLOC-1`: Compose rows, capacity, and demand produced by the parent source scope into Contract.run before promoting the TX plane; then generalize proportional amounts and bind deployed layout/Yul/EVM semantics.
 - `P-ALLOC-2`: Refine proportional allocation amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate.
 - `P-DEPOSIT-1`: Connect the pinned deposit conservation/rollback correspondence to an official Verity transaction.
 - `P-TOPUP-1`: Strengthen independently reproducible deployment-provenance receipts without changing the guarantees-v4/source-map-v3 green boundary.

@@ -113,11 +113,6 @@
       "axioms": ["propext"]
     },
     {
-      "name": "Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction",
-      "status": "lean_checked",
-      "axioms": ["propext", "Quot.sound"]
-    },
-    {
       "name": "SolidityMinFirst.run_conservation_mutant_sensitive",
       "status": "lean_checked",
       "axioms": ["propext"]

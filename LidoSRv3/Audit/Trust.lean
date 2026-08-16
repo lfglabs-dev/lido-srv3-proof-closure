@@ -32,7 +32,6 @@ there are no project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation
-#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_bounded_allocation_transaction
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
