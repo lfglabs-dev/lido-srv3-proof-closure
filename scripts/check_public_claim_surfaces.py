@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed when canonical public summaries contradict retracted TX claims."""
+"""Fail closed when public surfaces revive retracted faithful-Verity claims."""
 
 from __future__ import annotations
 
@@ -9,10 +9,12 @@ import re
 import sys
 import unicodedata
 from pathlib import Path
+from typing import NoReturn
 
 
 CLAIMS = {
     "P-DEPOSIT-1": {
+        "abstract_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer",
         "module": "PDeposit1",
         "layers": ".model, .abstractTx, .source",
         "imports": (
@@ -30,6 +32,7 @@ CLAIMS = {
         ),
     },
     "P-TOPUP-1": {
+        "abstract_theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
         "module": "PTopup1",
         "layers": ".model, .abstractTx, .source",
         "imports": (
@@ -51,6 +54,7 @@ CLAIMS = {
         ),
     },
     "P-ACCOUNT-1": {
+        "abstract_theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward",
         "module": "PAccount1",
         "layers": ".model, .source",
         "imports": (
@@ -65,7 +69,7 @@ CLAIMS = {
 }
 
 
-def fail(message: str) -> None:
+def fail(message: str) -> NoReturn:
     raise ValueError(message)
 
 
@@ -183,21 +187,24 @@ def check(root: Path) -> None:
 
     for claim_id, expected in CLAIMS.items():
         row = rows.get(claim_id)
-        if row is None:
+        if not isinstance(row, dict):
             fail(f"canonical registry is missing {claim_id}")
-        if row.get("statuses", {}).get("tx") != "BLOCKED":
-            fail(f"{claim_id}: this guard requires canonical TX status BLOCKED")
-        theorem = row.get("theorem")
-        if not isinstance(theorem, str) or not theorem:
-            fail(f"{claim_id}: canonical theorem is missing")
+        abstract = row.get("abstract")
+        verity = row.get("verity")
+        if not isinstance(abstract, dict) or not isinstance(verity, dict):
+            fail(f"{claim_id}: assurance objectives are malformed")
+        theorem = expected["abstract_theorem"]
+        if abstract.get("status") != "CHECKED" or abstract.get("theorem") != theorem:
+            fail(f"{claim_id}: checked abstract theorem differs from the canonical view")
+        if verity.get("status") != "PARTIAL" or verity.get("theorem") is not None:
+            fail(f"{claim_id}: faithful Verity must remain PARTIAL without a canonical theorem")
 
         table_pattern = re.compile(
-            rf"^\|\s*\d+\s*\|\s*`{re.escape(claim_id)}`\s*\|[^\n]*"
-            rf"`{re.escape(theorem)}`[^\n]*TX BLOCKED[^\n]*\|$",
+            rf"^\|\s*\d+\s*\|\s*`{re.escape(claim_id)}`\s*\|[^\n]*\|\s*PARTIAL[^\n]*\|$",
             re.MULTILINE,
         )
         if not table_pattern.search(readme):
-            fail(f"README: {claim_id} must name its canonical theorem and TX BLOCKED")
+            fail(f"README: {claim_id} must keep faithful Verity PARTIAL")
 
         module = expected["module"]
         lean_path = root / f"LidoSRv3/Audit/Guarantees/{module}.lean"
@@ -216,10 +223,8 @@ def check(root: Path) -> None:
         if declarations != expected["declarations"]:
             fail(f"{lean_path}: public declarations differ from the structural allowlist")
 
-    if "Their former Verity transaction suffixes are retracted" not in readme:
-        fail("README: missing explicit deposit/top-up TX retraction")
-    if "transaction trace is non-evidence, and TX is BLOCKED" not in readme:
-        fail("README: missing explicit accounting TX non-evidence statement")
+    if "a behaviorally faithful Verity model with a checked refinement theorem" not in readme:
+        fail("README: missing the faithful-Verity assurance objective")
 
 
 def main() -> int:
@@ -231,7 +236,7 @@ def main() -> int:
     except (OSError, ValueError) as exc:
         print(f"public claim surface check failed: {exc}", file=sys.stderr)
         return 1
-    print("public claim surfaces match canonical BLOCKED transaction statuses")
+    print("public claim surfaces preserve retracted faithful-Verity claims as PARTIAL")
     return 0
 
 

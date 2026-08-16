@@ -920,6 +920,21 @@
       ]
     },
     {
+      "id": "P-ADDRESS-1.transfer-owner-handoff",
+      "status": "MAPPED",
+      "spans": [
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.9/WithdrawalQueueERC721.sol",
+          "function": "transferFrom and owner-operated _transfer handoff",
+          "start_line": 218,
+          "end_line": 253,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueueERC721.sol#L218-L253"
+        }
+      ]
+    },
+    {
       "id": "P-DEREF-1",
       "status": "MAPPED",
       "spans": [

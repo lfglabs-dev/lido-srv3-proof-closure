@@ -61,8 +61,8 @@ with tempfile.TemporaryDirectory() as tmp:
     original = readme.read_text(encoding="utf-8")
     readme.write_text(
         original.replace(
-            "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
-            "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer",
+            "| 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL — linked calls not yet faithfully executed |",
+            "| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED |",
             1,
         ),
         encoding="utf-8",

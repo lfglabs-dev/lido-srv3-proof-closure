@@ -86,10 +86,10 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
-        "expected": "abstract and source conservation proofs build; faithful observable-call Verity execution remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositLedgerTx",
+        "expected": "abstract/source conservation and the recovered storage-ledger Contract.run receipts build; full multi-contract call fidelity remains partial"
       },
-      "summary": "Abstract one-unit transfer conservation is checked. Pinned-source conservation evidence survives, but faithful Verity execution remains PARTIAL because the former external-call suffix erased call identity, values, multiplicity, and effects.",
+      "summary": "Abstract one-unit transfer conservation is checked. Recovered DepositLedgerTx evidence executes the conservation/rollback core over model-local storage and rejects dropped-assert/debit mutants, but the faithful Verity parent remains PARTIAL because authorization, allocation, dynamic deposit data, roots, and the real multi-contract value-call graph are not composed.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer"
@@ -101,17 +101,19 @@
       "fidelity": {
         "covered": [
           "abstract conservation/rollback",
-          "pinned-source correspondence"
+          "pinned-source correspondence",
+          "storage-only DepositLedgerTx conservation/rollback core"
         ],
         "missing": [
-          "observable linked-call execution"
+          "full authorization/allocation/deposit-data path",
+          "real Lido/router/beacon external-call composition"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Rebuild the Verity model with observable calls and executed-program mutants.",
+      "next_gate": "Compose the recovered ledger core with authorization, allocation, dynamic deposit data, roots, and observable Lido/router/beacon calls.",
       "roadmap_priority": "P1"
     },
     {
@@ -122,10 +124,10 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1",
-        "expected": "abstract/source conservation under no-wrap builds; faithful observable-call Verity execution remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupParent LidoSRv3.Tests.TopupParentMutants",
+        "expected": "abstract/source conservation and recovered parent classification/rollback receipts build; the wrapper still delegates behavior to sourceExecute, so faithful Verity execution remains partial"
       },
-      "summary": "Abstract/source top-up conservation is checked under A-TOPUP-NOWRAP. Faithful Verity execution remains PARTIAL until the Lido pull and beacon push are observably executed with their order, values, multiplicity, and rollback.",
+      "summary": "Abstract/source top-up conservation is checked under A-TOPUP-NOWRAP. The recovered TopupParent wrapper checks parent success/revert classification and caller-frame rollback, but it delegates operational behavior to sourceExecute; faithful Verity remains PARTIAL until allocation, Lido pull, and beacon push execute through independent Verity semantics.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back"
@@ -137,17 +139,19 @@
       "fidelity": {
         "covered": [
           "abstract conservation/rollback",
-          "source correspondence under no-wrap"
+          "source correspondence under no-wrap",
+          "recovered parent classification and caller-frame rollback receipts"
         ],
         "missing": [
-          "observable Lido pull/beacon push execution"
+          "independent Verity execution of allocation and linked calls",
+          "observable Lido pull/beacon push order/value/multiplicity"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Rebuild with observable calls while preserving A-TOPUP-NOWRAP.",
+      "next_gate": "Replace the sourceExecute-backed parent wrapper with independent observable allocation/Lido/beacon execution while preserving A-TOPUP-NOWRAP.",
       "roadmap_priority": "P1"
     },
     {
@@ -255,10 +259,10 @@
         "A-ABSTRACT-TX"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1",
-        "expected": "address-renaming definitions build; parent abstract proof and complete faithful Verity entrypoints remain open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Source.AddressTransferCorrespondence LidoSRv3.Audit.Verity.AddressTransferTx",
+        "expected": "admission plus bounded owner-transfer source/official-denotation witnesses build; universal post-state equivariance and remaining entrypoints stay open"
       },
-      "summary": "The permissionless address-admission and post-state-equivariance parent remains OPEN. Bounded Verity admission evidence is subordinate and does not yet cover source-corresponding transfer, request, claim, and redemption paths.",
+      "summary": "The permissionless address-admission and post-state-equivariance parent remains OPEN. Recovered evidence covers official-denotation admission and one pinned owner-transfer handoff witness with source correspondence and a wrong-caller mutant; universal post-state equivariance and request/claim/redemption paths remain open.",
       "abstract": {
         "status": "OPEN",
         "theorem": null
@@ -269,29 +273,30 @@
       },
       "fidelity": {
         "covered": [
-          "bounded admission and owner-transfer children"
+          "bounded official-denotation admission child",
+          "pinned owner-transfer source/transaction witness and wrong-caller mutant"
         ],
         "missing": [
           "abstract parent theorem",
-          "post-state equivariance",
-          "remaining entrypoints/source correspondence"
+          "universal post-state equivariance",
+          "request/claim/redemption entrypoints and source correspondence"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Finish the abstract parent and faithful permissionless entrypoints.",
+      "next_gate": "Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.",
       "roadmap_priority": "P2"
     },
     {
       "id": "P-TOPUP-2",
       "assumptions": [],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Tests.Topup2TxMutants",
-        "expected": "abstract aggregate cap and adversarial CallProgram mutants build; faithful Contract.run call-shape execution remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2TxMutants LidoSRv3.Tests.Topup2Mutants",
+        "expected": "abstract aggregate cap, bounded CallProgram evidence, and recovered packed-storage mutants build; complete call-shape execution remains partial"
       },
-      "summary": "The abstract aggregate top-up cap is checked and the adversary-quantified CallProgram evidence is non-vacuous. Faithful Verity execution remains PARTIAL because target, call kind, calldata, per-validator granularity, same-run failure membership, and a real Contract.run entrypoint are not established.",
+      "summary": "The abstract aggregate top-up cap is checked; adversary-quantified CallProgram evidence and recovered packed-storage/layout mutants are non-vacuous. Faithful Verity remains PARTIAL because a single execution does not yet bind target, call kind, calldata, per-validator granularity, and failure provenance to the same run.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
@@ -303,19 +308,20 @@
       "fidelity": {
         "covered": [
           "abstract/source aggregate cap",
-          "adversarial CallProgram bound/rollback"
+          "adversarial CallProgram bound/rollback",
+          "recovered packed-storage and source-layout correspondence mutants"
         ],
         "missing": [
-          "actual verity_contract Contract.run",
-          "target/kind/calldata/granularity",
-          "failed-call witness membership"
+          "single Contract.run composition of storage and calls",
+          "target/kind/calldata/per-validator granularity",
+          "same-run failed-call witness membership"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Replace the CallProgram-only boundary with faithful observable Verity execution.",
+      "next_gate": "Compose the recovered packed-storage model and bounded call evidence in one observable Verity run with complete call shape and same-run failure provenance.",
       "roadmap_priority": "P2"
     },
     {
@@ -324,10 +330,10 @@
         "A-SHA256-FFI"
       ],
       "reproduction": {
-        "command": "python3 scripts/audit_metadata.py check",
-        "expected": "metadata classifies the missing observable FunctionSpec bridge; parent abstract and faithful Verity guarantees remain open/partial"
+        "command": "lake build LidoSRv3.Audit.Verity.ConsolidationCallFragment && python3 scripts/audit_metadata.py check",
+        "expected": "the executable blocker probe and metadata build; parent abstract and faithful Verity guarantees remain open/partial"
       },
-      "summary": "The parent eligibility, binding, value-conservation, and atomicity guarantee remains OPEN. Payload and fee-scaffold children are partial evidence; faithful composition requires an observable FunctionSpec call/event/memory bridge.",
+      "summary": "The parent eligibility, binding, value-conservation, and atomicity guarantee remains OPEN. Payload and fee-scaffold children plus the recovered executable call-fragment blocker are partial evidence; faithful composition requires an observable FunctionSpec call/event/memory bridge.",
       "abstract": {
         "status": "OPEN",
         "theorem": null
@@ -339,7 +345,8 @@
       "fidelity": {
         "covered": [
           "96-byte payload child",
-          "bounded fee scaffold"
+          "bounded fee scaffold",
+          "executable proof that the current registered externalCallBind fragment always reverts"
         ],
         "missing": [
           "parent eligibility/value/atomicity",
