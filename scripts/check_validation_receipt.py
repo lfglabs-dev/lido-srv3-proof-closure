@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check that the canonical validation receipt names its non-self-referential tree."""
+"""Check that the canonical validation receipt names its non-self-referential HEAD tree."""
 
 import os
 import re
@@ -39,7 +39,10 @@ def main():
     with tempfile.TemporaryDirectory() as tmp:
         env = os.environ.copy()
         env["GIT_INDEX_FILE"] = str(Path(tmp) / "index")
-        git("read-tree", "HEAD", env=env)
+        # Deliberately start from committed HEAD, not the caller's index.  The
+        # receipt is an assertion about the published commit, and a staged
+        # change must not make a pre-commit tree look validated.
+        git("read-tree", "HEAD^{tree}", env=env)
         git("rm", "--cached", "--quiet", "--force", "--", str(RECEIPT), env=env)
         actual = git("write-tree", env=env)
     if fields.get("validated-tree") != actual:
@@ -47,7 +50,7 @@ def main():
             f"validation receipt tree is stale: recorded {fields.get('validated-tree')}, "
             f"actual {actual}"
         )
-    print(f"validation receipt ok: final tracked content tree excluding receipt {actual}")
+    print(f"validation receipt ok: committed HEAD tree excluding receipt {actual}")
 
 
 if __name__ == "__main__":

@@ -29,6 +29,7 @@ audit_metadata: audit-check
 test:
 	@python3 scripts/audit_metadata.py check
 	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
+	@python3 scripts/test_validation_receipt.py
 	@python3 scripts/check_validation_receipt.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/check_provenance_guards.sh
