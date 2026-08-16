@@ -36,6 +36,7 @@ SUBORDINATE_IDS = [
     "P-SSZ-1.tx-execution-simulation",
     "P-ETH-1a",
     "P-ETH-1b",
+    "P-ADDRESS-1.denote-admission",
     "P-DEREF-1",
 ]
 SOURCE_TARGET_IDS = EXPECTED_IDS[:6] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
@@ -66,6 +67,7 @@ EXPECTED_WORDING = [
     "Concrete MODEL evidence proves only that the staged digest-preimage list has length seven. It does not prove exact calldata layout or digest composition. The former TX claim is retracted: the registry theorem does not consume sha256Calls, denote/ObservedCalls, or sha256_call_world_rollback, so removing or mutating the external-call program leaves it provable. TX remains BLOCKED; SHA-256 functional correctness remains assumed under A-SHA256-FFI.",
     "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
     "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
+    "An audit-authored permissionless entrypoint written in the pinned Verity deep EDSL is evaluated by the official denotation Compiler.CompilationModel.Denote.denoteFunction, which installs the transaction sender into ContractState.sender, so the caller is a genuine input of the run rather than an index on an abstract function. For every mapping-slot oracle, every caller pair whose balance entries do not alias the pause slot, and every world, the admission bit under one caller equals the admission bit under the other in the caller-swapped world. Admission only: post-state equivariance, correspondence to pinned Lido Solidity, generated Yul, and EVM execution are not claimed, so the parent transaction plane remains OPEN.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -140,6 +142,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful bounded protocol rebalance/redemption return-confinement proof; parent ETH-flow guarantee remains open"},
     {"command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
      "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
+    {"command": "lake build LidoSRv3.Audit.Verity.AddressAdmission",
+     "expected": "successful official-denotation admission reduction, caller-swap equivariance, both-gate non-vacuity witnesses, and owner-gated mutant refutation; post-state equivariance, pinned-source correspondence, Yul, and EVM remain open"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
@@ -163,6 +167,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
     [],
     [],
+    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
 ]
 EXPECTED_NEXT_GATES = [
     "Replace the native_decide compilation dependency with an auditable theorem path, bind moduleAddress to pinned source/runtime provenance, and refine the bounded summary-call and model-local storage slice through the allocation loop and generated Yul/EVM semantics.",
@@ -189,6 +194,7 @@ EXPECTED_NEXT_GATES = [
     "Make the registry-facing theorem consume the actual sha256Calls denotation and observed call trace, prove exact seven-site payload/order correspondence, and add an executed-program mutant rejected by that theorem before restoring TX status.",
     "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
     "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
+    "Extend the observation to post-state equivariance and bind the entrypoint to a pinned permissionless Lido SRv3 Solidity span before the parent transaction plane can move off OPEN.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -244,6 +250,8 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "OPEN",
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE",
+     "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
@@ -267,6 +275,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
     ["model"],
     ["model"],
+    ["tx"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
@@ -290,6 +299,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length",
     "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
     "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
+    "LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -1007,6 +1017,15 @@ def validate():
                     "P-SSZ-1.tx-execution-simulation: scope differs")
             require(row.get("no_new_forbidden_lean_tokens") is True,
                     "P-SSZ-1.tx-execution-simulation: forbidden-token assertion is missing")
+        elif row["id"] == "P-ADDRESS-1.denote-admission":
+            require(row.get("parent_id") == "P-ADDRESS-1",
+                    "P-ADDRESS-1.denote-admission must remain subordinate to P-ADDRESS-1")
+            require(row.get("source_plane_scope") ==
+                    "audit-authored permissionless entrypoint admission only; no pinned Solidity correspondence",
+                    "P-ADDRESS-1.denote-admission: scope differs")
+            require(row["statuses"]["tx"] != "LEAN_CHECKED",
+                    "P-ADDRESS-1.denote-admission: the audit-authored entrypoint may not claim a "
+                    "pinned-source transaction closure")
         else:
             require("parent_id" not in row,
                     f"{row['id']}: only declared subordinate evidence may have a parent")
@@ -1039,7 +1058,8 @@ def validate():
             mapping = source_targets["P-ALLOC-1"]
         elif row["id"] == "P-CONSOLIDATION-1.abstract-flow-model":
             mapping = source_targets["P-CONSOLIDATION-1"]
-        elif row["id"] == "P-ADDRESS-1.yul-interface-harness":
+        elif row["id"] in {"P-ADDRESS-1.yul-interface-harness",
+                            "P-ADDRESS-1.denote-admission"}:
             mapping = source_targets["P-ADDRESS-1"]
         elif row["id"] == "P-DEPOSIT-1.verity-tx-rollback.tx":
             mapping = source_targets["P-DEPOSIT-1"]

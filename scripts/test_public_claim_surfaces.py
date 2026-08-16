@@ -57,14 +57,21 @@ with tempfile.TemporaryDirectory() as tmp:
     readme.write_text(original, encoding="utf-8")
 
     account = fixture / "LidoSRv3/Audit/Guarantees/PAccount1.lean"
+    account_original = account.read_text(encoding="utf-8")
     account.write_text(
-        account.read_text(encoding="utf-8")
-        + "\n-- stale facade mutant\ntheorem source_to_verityTx : True := True.intro\n",
+        account_original
+        + "\n-- renamed false-claim mutant\ntheorem plausible_new_tx_closure : True := True.intro\n",
         encoding="utf-8",
     )
-    run(fixture, False, "stale public TX facade survives for P-ACCOUNT-1")
+    run(fixture, False, "public declarations differ from the structural allowlist")
+
+    account.write_text(
+        "import LidoSRv3.Audit.Verity.AccountingTx\n" + account_original,
+        encoding="utf-8",
+    )
+    run(fixture, False, "imports differ from the structural allowlist")
 
     account.unlink()
     run(fixture, False, "required public claim surface is missing")
 
-print("public claim surface regressions ok: README and Lean facade mutants fail closed")
+print("public claim surface regressions ok: renamed claim/import/README/missing-file mutants fail closed")

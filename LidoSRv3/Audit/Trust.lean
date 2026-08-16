@@ -8,6 +8,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PAddress1
+import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
@@ -59,6 +60,12 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_claim_success
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_admits
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_empty_balance
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_when_paused
+#print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether

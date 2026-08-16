@@ -14,17 +14,52 @@ CLAIMS = {
     "P-DEPOSIT-1": {
         "module": "PDeposit1",
         "layers": ".model, .abstractTx, .source",
-        "forbidden": ("tx_one_unit_exact_transfer", "tx_revert_restores_snapshot_and_effects"),
+        "imports": (
+            "LidoSRv3.Audit.Trace",
+            "LidoSRv3.Audit.Source.DepositCorrespondence",
+            "LidoSRv3.Audit.Guarantees.Registry",
+        ),
+        "declarations": (
+            ("def", "guarantee"),
+            ("theorem", "revert_restores_state_value_and_logs"),
+            ("theorem", "source_deposit_conserves_and_rolls_back"),
+            ("theorem", "source_router_balance_unchanged"),
+            ("theorem", "source_reverting_branch_moves_no_ether"),
+            ("theorem", "source_nonconserving_deployment_reverts"),
+        ),
     },
     "P-TOPUP-1": {
         "module": "PTopup1",
         "layers": ".model, .abstractTx, .source",
-        "forbidden": ("verity_tx_simulates_source",),
+        "imports": (
+            "LidoSRv3.Audit.Allocation",
+            "LidoSRv3.Audit.Trace",
+            "LidoSRv3.Audit.Source.TopupCorrespondence",
+            "LidoSRv3.Audit.Guarantees.Registry",
+        ),
+        "declarations": (
+            ("def", "guarantee"),
+            ("theorem", "valid_result_preserves_router_order"),
+            ("theorem", "revert_restores_state_value_and_logs"),
+            ("theorem", "source_topup_conserves_and_rolls_back"),
+            ("theorem", "source_router_balance_unchanged"),
+            ("theorem", "source_reverting_branch_moves_no_ether"),
+            ("theorem", "source_balance_guards_discharged"),
+            ("theorem", "source_unchecked_accumulation_faithful"),
+            ("theorem", "source_pinned_config_discharges_pubkey_guard"),
+        ),
     },
     "P-ACCOUNT-1": {
         "module": "PAccount1",
         "layers": ".model, .source",
-        "forbidden": ("source_to_verityTx",),
+        "imports": (
+            "LidoSRv3.Audit.Source.AccountingCorrespondence",
+            "LidoSRv3.Audit.Guarantees.Registry",
+        ),
+        "declarations": (
+            ("def", "guarantee"),
+            ("theorem", "source_report_before_reward"),
+        ),
     },
 }
 
@@ -37,6 +72,24 @@ def read(path: Path) -> str:
     if not path.is_file():
         fail(f"required public claim surface is missing: {path}")
     return path.read_text(encoding="utf-8")
+
+
+def lean_surface(source: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], ...]]:
+    """Return imports and named public declarations after removing Lean comments."""
+    without_blocks = re.sub(r"/-.*?-/", "", source, flags=re.DOTALL)
+    without_comments = re.sub(r"--[^\n]*", "", without_blocks)
+    imports = tuple(re.findall(r"^import\s+([^\s]+)\s*$", without_comments, re.MULTILINE))
+    modifiers = r"(?:(?:public|protected|noncomputable|unsafe)\s+)*"
+    attributes = r"(?:@\[[^\n]*\]\s*)*"
+    kinds = r"def|theorem|lemma|abbrev|opaque|axiom|instance|structure|class|inductive"
+    declarations = tuple(
+        re.findall(
+            rf"^{attributes}{modifiers}({kinds})\s+([A-Za-z_][A-Za-z0-9_']*)\b",
+            without_comments,
+            re.MULTILINE,
+        )
+    )
+    return imports, declarations
 
 
 def check(root: Path) -> None:
@@ -77,10 +130,11 @@ def check(root: Path) -> None:
             fail(f"{lean_path}: checkedLayers differ from the blocked canonical view")
         if "transaction claim is blocked" not in lean:
             fail(f"{lean_path}: missing explicit blocked-transaction description")
-
-        for stale_name in expected["forbidden"]:
-            if stale_name in readme or stale_name in lean or stale_name in facade:
-                fail(f"stale public TX facade survives for {claim_id}: {stale_name}")
+        imports, declarations = lean_surface(lean)
+        if imports != expected["imports"]:
+            fail(f"{lean_path}: imports differ from the structural allowlist")
+        if declarations != expected["declarations"]:
+            fail(f"{lean_path}: public declarations differ from the structural allowlist")
 
     if "Their former Verity transaction suffixes are retracted" not in readme:
         fail("README: missing explicit deposit/top-up TX retraction")
