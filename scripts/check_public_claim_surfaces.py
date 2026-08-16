@@ -168,7 +168,7 @@ def lean_surface(source: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], .
     modifiers = r"(?:(?:public|protected|noncomputable|unsafe)\s+)*"
     attributes = r"(?:@\[[^\n]*\]\s*)*"
     kinds = r"def|theorem|lemma|abbrev|opaque|axiom|instance|structure|class|inductive"
-    heads = re.compile(rf"^{attributes}{modifiers}({kinds})\s+", re.MULTILINE)
+    heads = re.compile(rf"^[ \t]*{attributes}{modifiers}({kinds})\s+", re.MULTILINE)
     declarations = tuple(
         (match.group(1), declaration_name(without_comments, match.end()))
         for match in heads.finditer(without_comments)

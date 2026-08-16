@@ -155,9 +155,11 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
   exact Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
 
-/-- The model theorem is extended by source and bounded-Verity transaction
-correspondence in `Source.Topup2Correspondence` and `Verity.Topup2Tx`. -/
-def guarantee : Guarantee := ⟨.pTopup2, [.model, .source, .verityTx]⟩
+/-- Only the mathematical model is promoted here.  The recovered source-shaped
+and bounded transaction artifacts use unbounded `Nat` arithmetic and therefore
+do not yet model Solidity's checked `uint256` addition boundary.  They remain
+subordinate evidence until operand bounds and overflow rollback are composed. -/
+def guarantee : Guarantee := ⟨.pTopup2, [.model]⟩
 
 /- Out of scope for P-TOPUP-2: identifying the deployed verifier address and
 codehash. The active assurance contract asks for a faithful Verity model of the
