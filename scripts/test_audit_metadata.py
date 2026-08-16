@@ -40,7 +40,7 @@ def write_json(path, value):
 def main():
     with tempfile.TemporaryDirectory(prefix="audit-metadata-") as directory:
         fixture = Path(directory)
-        for name in ("audit", "scripts"):
+        for name in ("audit", "scripts", "content", "proofs"):
             shutil.copytree(ROOT / name, fixture / name)
         for name in ("lakefile.lean", "lake-manifest.json", "lean-toolchain"):
             shutil.copy2(ROOT / name, fixture / name)
@@ -55,6 +55,42 @@ def main():
         baseline_lock = copy.deepcopy(lock)
         # A source archive has no .git directory, remote, or branch refs.
         run(fixture, True)
+
+        reproducibility_path = fixture / "content/05-reproducibility.tex"
+        reproducibility = reproducibility_path.read_text(encoding="utf-8")
+        reproducibility_path.write_text(
+            reproducibility.replace(
+                "04729a9de9099e065dd09283e4f733a5fd4c2a16",
+                "d2d4a18a4d7021adcd90d4b03e619affe506dd54",
+                1,
+            ),
+            encoding="utf-8",
+        )
+        run(
+            fixture,
+            False,
+            "check",
+            "reproducibility report must name the canonical Verity pin exactly twice",
+        )
+        reproducibility_path.write_text(reproducibility, encoding="utf-8")
+
+        proof_lockfile_path = fixture / "proofs/LOCKFILE.md"
+        proof_lockfile = proof_lockfile_path.read_text(encoding="utf-8")
+        proof_lockfile_path.write_text(
+            proof_lockfile.replace(
+                "04729a9de9099e065dd09283e4f733a5fd4c2a16",
+                "d2d4a18a4d7021adcd90d4b03e619affe506dd54",
+                1,
+            ),
+            encoding="utf-8",
+        )
+        run(
+            fixture,
+            False,
+            "check",
+            "proofs/LOCKFILE.md Verity pin differs from the canonical dependency pin",
+        )
+        proof_lockfile_path.write_text(proof_lockfile, encoding="utf-8")
 
         lock_leaves = [
             ("campaign_base", field) for field in ("repository", "ref", "commit")

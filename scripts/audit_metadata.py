@@ -740,6 +740,10 @@ def validate_lock(lock, source_map):
     )
     toolchain = (ROOT / "lean-toolchain").read_text(encoding="utf-8").strip()
     lakefile = (ROOT / "lakefile.lean").read_text(encoding="utf-8")
+    proof_lockfile = (ROOT / "proofs/LOCKFILE.md").read_text(encoding="utf-8")
+    reproducibility_report = (ROOT / "content/05-reproducibility.tex").read_text(
+        encoding="utf-8"
+    )
     lido_source_repository, lido_commit = source_map["pinned_source"].split("@", 1)
     require(lido_source_repository == "lidofinance/core",
             "source-map pinned_source must use the canonical lidofinance/core repository")
@@ -819,6 +823,19 @@ def validate_lock(lock, source_map):
     require(
         f'"{CANONICAL_VERITY_REPOSITORY}"@"{CANONICAL_VERITY_COMMIT}"' in lakefile,
         "lakefile.lean Verity pin differs from the canonical dependency pin",
+    )
+    require(
+        f"| Verity | `{CANONICAL_VERITY_COMMIT}` |" in proof_lockfile,
+        "proofs/LOCKFILE.md Verity pin differs from the canonical dependency pin",
+    )
+    require(
+        reproducibility_report.count(CANONICAL_VERITY_COMMIT) == 2,
+        "reproducibility report must name the canonical Verity pin exactly twice",
+    )
+    require(
+        f"\\path{{{CANONICAL_VERITY_COMMIT}}}; proof command" in reproducibility_report
+        and f"Verity commit\n  \\path{{{CANONICAL_VERITY_COMMIT}}}." in reproducibility_report,
+        "reproducibility report Verity pins differ from proofs/LOCKFILE.md",
     )
 
     require(lock.get("campaign_base") == CAMPAIGN_BASE,
