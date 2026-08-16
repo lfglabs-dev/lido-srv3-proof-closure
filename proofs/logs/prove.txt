@@ -1,6 +1,6 @@
-verified_source_tree=f20ce4255abe527303a93f4a158d4790d611e1a6
+verified_source_tree=3c4ef1821dda8d58af6c0d228d484907f7121bc3
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
-⚠ [1166/1216] Replayed Conform.Wheels
+⚠ [1167/1362] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -13,7 +13,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1167/1216] Replayed EvmYul.Pretty
+⚠ [1168/1362] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -26,15 +26,15 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1214/1317] Replayed EvmYul.Semantics
+⚠ [1215/1362] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1215/1317] Replayed EvmYul.EVM.Semantics
+⚠ [1216/1362] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1260/1317] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+⚠ [1261/1362] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:299:53: This simp argument is unused:
   setStorage
 
@@ -432,7 +432,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1268/1317] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+⚠ [1269/1362] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
 warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -452,7 +452,7 @@ info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationMode
   Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
     Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
       (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-ℹ [1269/1317] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+ℹ [1270/1362] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:35:0: LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected (input : TxInputs)
   (hmutant : computedRoot input ≠ input.expectedDepositDataRoot) :
   runVerification input = VerificationOutcome.revertRootMismatch
@@ -469,7 +469,7 @@ info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:37:0: LidoSRv3.Audit.Veri
       (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
         (runVerification input = VerificationOutcome.revertRootMismatch →
           (transactionObservation input before after attempts trace).committedState = before)
-ℹ [1270/1317] Replayed LidoSRv3.Audit.Trust
+ℹ [1271/1362] Replayed LidoSRv3.Audit.Trust
 info: LidoSRv3/Audit/Trust.lean:36:0: 'LidoSRv3.Audit.Quantity.checkedDiv_zero' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:37:0: 'LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:38:0: 'LidoSRv3.Audit.revert_restores_state_value_and_logs' depends on axioms: [propext]
@@ -580,7 +580,7 @@ info: LidoSRv3/Audit/Trust.lean:132:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_l
 info: LidoSRv3/Audit/Trust.lean:133:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
 info: LidoSRv3/Audit/Trust.lean:134:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:135:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
-ℹ [1275/1317] Replayed LidoSRv3.Tests.GIndexConcatMutants
+ℹ [1276/1362] Replayed LidoSRv3.Tests.GIndexConcatMutants
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:59:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:60:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:61:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
@@ -703,7 +703,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1360/1362] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+⚠ [1359/1362] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
 warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
