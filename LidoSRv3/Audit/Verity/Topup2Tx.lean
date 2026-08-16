@@ -13,11 +13,12 @@ the P-TOPUP-1 `TopupRollback` refinement: each call site carries its wei
 transition, and the theorems below quantify over all adversaries and initial
 call states.
 
-This module deliberately does **not** use `Contracts.Common.externalCallBind`:
-at Verity pin `04729a9` that combinator is `pure ()`, so declared external
-calls bound through it have no semantics — a `Contract.run` suffix built on it
-observes no call, no value movement, and no callee effect, and a conservation
-statement over it would be vacuous.  Here, by contrast:
+This module still binds through `DenoteExternalCalls` / `CallProgramRollback`,
+not `Contracts.Common.externalCallBind`. At the previous certified pin
+`04729a9` that combinator was `pure ()` (vacuous). This branch pins Verity
+PR #2334 `984759773677e51194732f59a86bb682b308b98d`, where `externalCallBind`
+journals `ContractState.calls`. Restating these theorems on that combinator
+is the next slice, not this pin.  Here, by contrast:
 
 * the observed call trace (`CallsIn`) is a genuine prefix of the planned
   value-bearing sites, and its aggregate wei value is bounded by the block cap

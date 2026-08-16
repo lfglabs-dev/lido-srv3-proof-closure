@@ -1,11 +1,32 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f485891b5f417ab246c0a3f45fc38aa606e68232
+validated-tree: c5c3330c624cd0b2244e4162a5d76a76176fc4fb
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Verity PR #2334 pre-merge pin (2026-08-16)
+------------------------------------------
+
+- Dependency-only re-pin from certified main checkpoint
+  `04729a9de9099e065dd09283e4f733a5fd4c2a16` to the current head of open
+  Verity PR #2334 (`feat/external-call-observability`
+  `984759773677e51194732f59a86bb682b308b98d`). That SHA is fetchable from
+  `lfglabs-dev/verity` and is **not** merged to Verity main. Lido does not
+  wait for the merge.
+- `#2334` journals linked external calls on the executable plane
+  (`Contracts.Common.externalCallBind` appends `ContractState.calls` instead
+  of `pure ()`). This is the Verity feature the blocked TX rows need.
+- Lake requested revision, `lake-manifest.json` `rev`/`inputRev`, artifact
+  lock, source map, audit manifest, metadata constants, and proof lockfile
+  all agree on `984759773677e51194732f59a86bb682b308b98d`. Inherited Lake
+  packages are unchanged versus `04729a9`.
+- This receipt does **not** recertify `lake build LidoSRv3` or rewrite any
+  TX status. `proofs/logs/proof-report.json` remains the last 04729a9 build
+  until a follow-up rebuild on this pin. No guarantee status, theorem claim,
+  assumption, or trust boundary was widened. PR #69 is not merged.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------
