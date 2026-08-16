@@ -167,13 +167,13 @@ def lean_surface(source: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], .
     # Lean.Parser.Module.Syntax defines an import as, in order, optional
     # `public`, optional `meta`, `import`, optional `all`, and one module name.
     # Tokens may be separated by any whitespace, including line breaks
-    # (`public import all\n  Module`). Keep this grammar-shaped model in sync
-    # as a unit: looking only for a single-line `import` token silently misses
-    # valid modifier combinations and split commands.
+    # (`public import all\n  Module`) or packed on one line
+    # (`import Allowed import Unauthorized`). Keep this grammar-shaped model
+    # in sync as a unit: a start-of-line matcher silently misses a second
+    # import command on the same physical line.
     import_head = re.compile(
-        r"^[ \t]*(?:public\s+)?(?:meta\s+)?import\s+"
+        r"(?<![\w.])(?:public\s+)?(?:meta\s+)?import\s+"
         r"(?:all\s+)?(\S+)",
-        re.MULTILINE,
     )
     imports = tuple(match.group(1) for match in import_head.finditer(without_comments))
     modifiers = r"(?:(?:public|protected|noncomputable|unsafe)\s+)*"
