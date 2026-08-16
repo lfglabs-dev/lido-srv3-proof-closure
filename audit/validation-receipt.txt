@@ -1,11 +1,22 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 49500b1eece0f42e3c52894b5f5a5a60abaa13a8
+validated-tree: 771783a046bf86db6c7dee53b213226edbe8e4a1
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-SSZ-1 GIndex.concat review reconciliation (2026-08-16)
+---------------------------------------------------------
+
+- The canonical P-SSZ-1 wording, reproduction expectation, next gate, and
+  generated roadmap now acknowledge the subordinate checked SOURCE evidence
+  for `GIndex.concat`. `SSZ.verifyProof` and all three wrappers remain open.
+- This reconciliation does not promote the child or close the parent:
+  canonical P-SSZ-1 SOURCE remains OPEN and TX remains BLOCKED.
+- Optimized metadata mutants and the focused GIndex/aggregate/trust build
+  passed; no Lean file, protected provenance, or trust assumption changed.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------

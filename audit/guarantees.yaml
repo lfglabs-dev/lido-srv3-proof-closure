@@ -111,13 +111,13 @@
     },
     {
       "id": "P-SSZ-1",
-      "catalogue_wording": "The mapped SSZ helper and wrapper scope remains open: GIndex.concat, SSZ.verifyProof, and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
+      "catalogue_wording": "The mapped SSZ helper and wrapper scope remains open: subordinate pinned-source evidence covers only GIndex.concat, while SSZ.verifyProof and the three wrapper call sites have only a MODEL-layer structural witness binding; SHA-256/precompile semantics are STRETCH_OPAQUE_FFI, while EVM and production provenance remain open.",
       "theorem": "LidoSRv3.Audit.Ssz.structural_witness_binding_sound",
       "theorem_planes": ["model"],
       "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "OPEN", "tx": "BLOCKED", "yul": "OPEN", "evm": "BLOCKED", "crypto": "STRETCH_OPAQUE_FFI"},
       "assumptions": ["A-RUNTIME-PROVENANCE", "A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT"],
-      "next_gate": "Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
-      "reproduction": {"command": "lake build LidoSRv3.Audit.Ssz", "expected": "successful MODEL-layer structural witness binding only; no SSZ helper or wrapper source correspondence"}
+      "next_gate": "Keep the GIndex.concat child subordinate and refine SSZ.verifyProof and all three mapped wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Ssz LidoSRv3.Audit.Source.GIndexConcatCorrespondence LidoSRv3.Tests.GIndexConcatMutants", "expected": "successful MODEL-layer structural witness binding plus subordinate GIndex.concat SOURCE correspondence and mutant rejection; SSZ.verifyProof and wrapper source correspondence remain open, and canonical P-SSZ-1 SOURCE/TX remain OPEN/BLOCKED"}
     },
     {
       "id": "P-SSZ-1.deposit-data-root",
