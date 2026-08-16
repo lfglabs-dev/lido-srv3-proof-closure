@@ -156,6 +156,8 @@ with tempfile.TemporaryDirectory() as tmp:
         "public meta import LidoSRv3.Audit.Verity.AccountingTx",
         "import all LidoSRv3.Audit.Verity.AccountingTx",
         "public meta import all LidoSRv3.Audit.Verity.AccountingTx",
+        "public import all\n  LidoSRv3.Audit.Verity.AccountingTx",
+        "public\n  meta\n  import\n  all\n  LidoSRv3.Audit.Verity.AccountingTx",
     ):
         account.write_text(import_command + "\n" + account_original, encoding="utf-8")
         run(fixture, False, "imports differ from the structural allowlist")
@@ -165,5 +167,5 @@ with tempfile.TemporaryDirectory() as tmp:
 
 print(
     "public claim surface regressions ok: allowed declarations pass; "
-    "ASCII/quoted/Unicode/escaped/whitespace/attribute/import-modifier/registry/README/missing-file mutants fail closed"
+    "ASCII/quoted/Unicode/escaped/whitespace/attribute/import-modifier/multiline-import/registry/README/missing-file mutants fail closed"
 )

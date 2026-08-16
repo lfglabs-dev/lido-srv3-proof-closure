@@ -169,8 +169,8 @@ def lean_surface(source: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], .
     # Keep this grammar-shaped model in sync as a unit: looking only for a
     # literal `import` token silently misses valid modifier combinations.
     import_head = re.compile(
-        r"^[ \t]*(?:public[ \t]+)?(?:meta[ \t]+)?import[ \t]+"
-        r"(?:all[ \t]+)?([^\s]+)[ \t]*$",
+        r"^[ \t]*(?:public\s+)?(?:meta\s+)?import\s+"
+        r"(?:all\s+)?([^\W\d]\w*(?:\.[^\W\d]\w*)*)[ \t]*$",
         re.MULTILINE,
     )
     imports = tuple(match.group(1) for match in import_head.finditer(without_comments))

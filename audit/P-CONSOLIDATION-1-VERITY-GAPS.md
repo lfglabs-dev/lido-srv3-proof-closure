@@ -87,7 +87,7 @@ which the `DenoteMemory` header itself flags as unfaithful (`:20-22`).
 `Stmt.calldatacopy` and `Stmt.returndataCopy` have no arms, and dynamic
 `bytes[]` loading is explicitly outside the fragment (`Denote.lean:52-56`).
 
-## Item 4 — transaction-frame rollback: CLOSED
+## Item 4 — transaction-frame rollback: PARTIALLY CLOSED upstream; LOCAL COMPOSITION OPEN
 
 `denoteTransaction` (`Verity/Core/Model/CallProgramRollback.lean:74`) is the
 transaction-frame operator: on `.revert` it restores `world`, discarding
@@ -96,6 +96,12 @@ committed mutable calls.  The strong law
 the discarded intermediate world to `commitWorlds … (CallsIn …)`, so it is not
 satisfiable by a trivial wrapper.  Separately, `denoteFunction` reverts to
 `worldWithTx` (`Denote.lean:1496`), restoring storage *and* events.
+
+The local consolidation evidence does not consume that operator. Its separate
+handwritten `CallProgram` still proves only all-observed-calls rollback, and no
+theorem connects that program to the `FunctionSpec`. Thus the upstream
+primitive is available, but parent atomicity and transaction-frame composition
+remain open here; this item must not be read as a P-CONSOLIDATION-1 closure.
 
 Caveat: `denoteTransaction` is built on `denote`, not `denoteJournaled`, so a
 top-level revert also erases `ContractState.calls`.
