@@ -69,6 +69,33 @@ Verity PR #2333 re-pin receipt (2026-08-14)
   and Python-evidence guards passed. No guarantee status, theorem claim,
   assumption, or trust boundary was widened.
 
+Live remote reconciliation for the #2333 pin (2026-08-16)
+----------------------------------------------------------
+
+- Repository identity was checked against GitHub as
+  `lfglabs-dev/lido-srv3-proof-closure`; its default branch is `main` at
+  `6f44a024dcdd90e2285700cd9ccaf69aa75155ee`. The immutable campaign ref
+  `milestone/lido-minimal-11-25c82e13` remains at
+  `b6e0bde35006c45be9fc99aec5c2e9e615f2b1e6`; the named historical milestone
+  commit is `25c82e137236131c037a45618e44382547efebe2`.
+- Upstream `lfglabs-dev/verity` `main` was observed at
+  `5f27213d2b7bd1e679c3de7c8813022520cedbf2`. Verity PR #2333 is merged:
+  its PR head is `d8dd14e46212cac9200b10dafd5dc968fc799b30` and its merge
+  commit is the immutable proof dependency
+  `04729a9de9099e065dd09283e4f733a5fd4c2a16`.
+- This repository already consumes that exact merge commit in the Lake request
+  and resolved manifest, artifact lock, source map, target audit manifest,
+  proof lock, and metadata authority. It deliberately does not float to the
+  newer Verity `main` head: that would be an unreviewed source/proof change and
+  would invalidate the exact-pin provenance gate.
+- The current closure-v2 lineage is not descended from the historical
+  `25c82e13` milestone (its documented exact merge-base is
+  `ee2e65cd807e913ea245ae6fd7987a7f1d962800`). The baseline is preserved,
+  not rewritten; claiming direct ancestry or weakening the gate to conceal
+  that incompatibility is forbidden. The merged PR #67 is the original focused
+  re-pin artifact, and this entry provides a current full-SHA reconciliation
+  for review.
+
 P-ADDRESS-1 review correction (2026-08-12)
 -------------------------------------------
 
