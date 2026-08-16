@@ -1,7 +1,7 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: PENDING_VALIDATION
+validated-tree: c8b4ca870fc4fc34f14e07344216f3251c8b800c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -26,10 +26,11 @@ PR #80 blocked-transaction public-surface correction (2026-08-16)
   claims that vacuous provenance. The Trust/receipt layout keeps the eventual
   merge mechanical: retain #76's removal of `tx_revert_has_failed_call`, this
   section, and the then-current validated tree.
-- Direct public-surface check and regressions: exit 0. Focused build of
-  PDeposit1, PTopup1, PAccount1, AllGuarantees, and Trust: exit 0,
-  `Build completed successfully (1270 jobs)`; log SHA-256
-  `7b733ad41031deb9489f1956da2b2d1f4522b9633b1efb8f84d25db6a82096f3`.
+- Full `make test` registry/mutant/provenance matrix: exit 0; log SHA-256
+  `9d5dcb5b2dd0031fb659208507d569393d3b34cad5eb02cb42ab3124e111fd93`.
+  Focused build of PDeposit1, PTopup1, PAccount1, AllGuarantees, and Trust:
+  exit 0, `Build completed successfully (1271 jobs)`; log SHA-256
+  `1641a394e187493425965ae5a22e1f8ea392ee415f548d7e0d69d24ad7cdf1fd`.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------
