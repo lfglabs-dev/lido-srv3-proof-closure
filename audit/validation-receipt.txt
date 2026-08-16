@@ -1,119 +1,320 @@
-Minimal-11 cleanup validation receipt
-base: c418551251404063793322beaf3b559967a69563
+Assurance-contract v4 validation receipt
+base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: c18be8ac97f648d54728db887a5199aa7a9cfa5d
+validated-tree: bf5c42794506210c3242970f3d65cad6878f1a5d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
-Yul/EVM assurance-plane retirement receipt (2026-08-11)
--------------------------------------------------------
+PR #88 final exact-head repair (2026-08-16)
+-------------------------------------------
 
-- The `yul` and `evm` assurance planes are removed from the guarantee
-  registry schema (`lido-srv3-minimal-11-guarantees-v4`,
-  `lido-srv3-minimal-11-source-map-v3`).
-- Rationale: the deployed contracts are compiled from pinned Solidity by
-  solc, not from the Verity models, so no Yul/EVM refinement of solc output
-  was ever going to close those planes. The boundary is now the explicit
-  accepted assumption `A-SOLC-TRUSTED`: assurance closes at
-  model/source/transaction fidelity to pinned source plus recorded
-  deployment provenance.
-- Deployment provenance obligations are unchanged (`A-RUNTIME-PROVENANCE`,
-  `A-DEPLOYMENT-PROVENANCE-OPTIONAL`, P-TOPUP-2 pinned-block runtime lock).
-- Assembly-bearing source (SSZ Merkle-proof verification) remains tracked
-  under the `crypto` plane and `A-SHA256-FFI`/`A-YUL-INTERFACE`.
-- The subordinate registry row `P-ADDRESS-1.yul-interface-harness` is
-  retired with its plane; the Lean harness modules
-  (`LidoSRv3.Audit.Verity.AddressYulInterface`,
-  `LidoSRv3.Tests.AddressYulInterface`) remain built and inventoried in
-  `audit/artifacts.lock.json`.
+- The public-claim allowlist parses Lean import commands across physical line
+  breaks, including `public`, `meta`, and `all`; multiline mutants fail closed.
+- `make prove` validates requested, resolved, audit, and checkout Verity
+  provenance before its first Lake invocation can repair dependency state.
+- P-CONSOLIDATION-1 remains OPEN/PARTIAL: upstream transaction rollback is
+  available, but the local handwritten program does not consume it and is not
+  connected to the `FunctionSpec`.
+- Receipt subject: tracked tree excluding this receipt,
+  `bf5c42794506210c3242970f3d65cad6878f1a5d`.
 
-Verity external-call DSL re-pin receipt (2026-08-11)
-----------------------------------------------------
+PR #88 reviewed-head repair (2026-08-16)
+-----------------------------------------
 
-- Re-pin base: `campaign/lido-minimal-11@c32f4dd89752c7b8ae8a1003b96d433d7a7ee32f`.
-- Previous Verity pin: `c41757164e9e8230536d7af29d81a2961b30e482`.
-- New Verity pin: `1fe0218863a4c8d6113e6cdd4de3766a54df81c7`.
-- The exact Verity delta is the single merged commit `1fe02188`,
-  `feat(macro): support external calls in contract bodies (#2245) (#2252)`.
-  It extends macro syntax and translation for external calls in contract
-  bodies and adds focused Solidity/Lean smoke coverage; no additional commits
-  were present on live Verity `main` when the pin was selected.
-- `lake update verity` resolved both manifest `rev` and `inputRev` to the new
-  exact 40-hex commit. Existing proof-report generation remains manifest-driven;
-  PR #59's concurrent provenance-derivation work is not duplicated here.
+- The successor exact-head review repairs fail closed on every Lean import
+  modifier form admitted by the pinned parser (`public`, `meta`, and `all`,
+  including their combinations, leading horizontal whitespace, and line
+  breaks between command tokens such as `public import all` then the module
+  name on the next line).
+- `make prove` now runs `scripts/check_verity_provenance.py` before any
+  `lake env` or `lake build`, so a stale or dirty Verity checkout is rejected
+  before Lake can repair it. Proof-report emission re-validates the same
+  request/manifest/audit/checkout agreement after the build.
+- Family-level mutants cover import modifiers, split-line import commands,
+  request/package uniqueness, exact 40-hex requests, `rev`/`inputRev`
+  divergence, audit-pin divergence, stale/dirty checkout identity, and the
+  Makefile prove-order guard. The targeted gates and `make test` pass.
 
-P-ALLOC-1 closure-v2 bounded Verity transaction receipt (2026-08-11)
----------------------------------------------------------------------
+- Reproduced from reviewed head `cdc51bd9742ab1f21e4b9c1ad445e8a251397735`:
+  total-Nat effective-plus-pending addition did not model Solidity checked-word
+  reverts; leading-whitespace Lean declarations bypassed the public-surface
+  allowlist; and the active evidence views and evidence-index regression were
+  outside assurance-v4 generation and `make test`.
+- P-TOPUP-2 now advertises MODEL only. SOURCE/Verity promotion is explicitly
+  retracted until checked uint256 bounds and overflow rollback are modeled. A
+  max-word-plus-one regression fixes that anti-overclaim boundary.
+- The public-surface scanner recognizes leading spaces/tabs before imports,
+  attributes, modifiers, and declaration heads; whitespace and formatted
+  declaration mutants are rejected.
+- The stale seven-plane evidence views and their generator/tests are honestly
+  archived under `archive/campaign-evidence-index/`; assurance-v4 no longer
+  presents them as active generated views.
+- The follow-up exact-head review findings are also repaired: P-DEPOSIT-1 now
+  links its existing checked theorem, and leading whitespace is accepted when
+  collecting both Lean declarations and imports, with regressions for each.
+- `make prove`: exit 0; Lean 4.31.0 full `LidoSRv3` build completed successfully
+  (1362 jobs), with verified source tree
+  `3c4ef1821dda8d58af6c0d228d484907f7121bc3`.
+- `make all`: exit 0; the 32-page report PDF was built successfully.
+- Receipt subject: tracked tree excluding this receipt,
+  `b01a01ad578d15cfa4608dc1f24f29dfa4845383`.
 
-- Base: `campaign/lido-closure-v2@4b96af1094c691afee9f7013e4623a2b128a6421`.
-- Verity: `c41757164e9e8230536d7af29d81a2961b30e482`; the executable
-  `AllocationContract.allocate` crosses the actual `Verity.Contract.run`
-  boundary and is observed through the returned checked amount plus the full
-  router-ordered allocation column.
-- `PAlloc1.verity_tx_refines_source_capacity_and_conservation` equates that
-  observation with the merged `MinFirstAllocation.Source.checkedAmount`
-  capacity specification.  The positive vector observes `70 = 10 + 60`.
-- Executed overwrite, effective-capacity-clamp, and disabled-row mutants are
-  distinguished by their actual post-states. Checked `safeSub`/`safeAdd`
-  operations guard demand, capacity, bucket, and total arithmetic.
-- The scope is the official bounded index-zero executable receipt documented in
-  the Lean source. General multi-row executable-wrapper semantics, proportional
-  allocation, Yul, EVM, runtime bytecode, and deployment provenance remain open.
-- `P-ALLOC-1.eugene-bound` remains unchanged and subordinate.
+Campaign/main recovery integration (2026-08-16)
+-----------------------------------------------
 
-P-ADDRESS-1 exact-head review correction (2026-08-11)
-------------------------------------------------------
+- The integration lineage contains `campaign/lido-minimal-11` head
+  `3f0d1c291a6b3e43e4255663d6a01f8b1016e65f` and the exact heads of corrective
+  PRs #76, #79, #80, #84, and #86 as ancestors. No campaign commit is orphaned.
+- Conflicting public claims retain the later soundness corrections from `main`;
+  historical campaign claims are not promoted merely by merging their lineage.
+- Campaign-only address, deposit-ledger, top-up parent/packed-storage,
+  evidence-index, provenance, and mutant artifacts are active in the tree and
+  are classified as subordinate evidence where they do not close a faithful
+  Verity parent.
+- Verity is pinned consistently to the campaign toolchain commit
+  `1fe0218863a4c8d6113e6cdd4de3766a54df81c7`. The removed unsound
+  result-aware abort-witness lemma is not restored; P-TOPUP-2 carries only the
+  local loop/transaction definitions and prefix/rollback laws its bounded child
+  actually consumes.
+- `make prove` completed successfully under Lean 4.31.0: 1362 jobs. The proof
+  report binds verified source tree `f20ce4255abe527303a93f4a158d4790d611e1a6`.
+- `main` is the sole active integration branch. The campaign branch is archival
+  after synchronization to the integrated head and is not a second target for
+  new pull requests.
 
-- Starting PR head: `7576fcc58629343a52ee8335a3707d629882330b`; live base:
-  `campaign/lido-minimal-11@a40a1044298d6977980d4f97858c5b66ad8a6804`.
-- Re-read the pinned `_transfer`, withdrawal request, `_claim`, and `unwrap`
-  paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
-- Added the missing `_from == request.owner` and `msg.sender == request.owner`
-  guards and transported request ownership together with caller, sender, and
-  recipient under address renaming.
-- The closure theorem now includes the complete successful source post-state
-  equivariance equation. The official Verity transaction materially executes
-  owner, recipient, debit-key, and credit-key address writes through
-  `verity_contract`, with commit/revert behavior observed through `Contract.run`.
-- Privileged-caller and address-stomp counterexamples both witness successful,
-  eligible executions and are therefore non-vacuous.
-- Focused closure/mutant builds and the complete Trust build passed. The new
-  registered theorems use only `propext` and `Quot.sound` (or only `propext`).
+Abstract Lean + faithful Verity contract (2026-08-16)
+-----------------------------------------------------
 
-P-ADDRESS-1 closure-v2 SOURCE/VERITY_TX receipt (2026-08-11)
------------------------------------------------------------
+- The former model/algorithm/source/TX/Yul/EVM/crypto status matrix is
+  superseded. Each canonical guarantee now records an abstract Lean objective,
+  a behaviorally faithful Verity objective, explicit covered/missing fidelity,
+  assumptions, and exactly one primary gap classification.
+- General Yul, EVM, bytecode-identity, and deployment-provenance work is outside
+  the assurance objective and cannot be reintroduced into non-SSZ next gates.
+  `A-SOLC-TRUSTED` is an explicit compiler boundary, not a proof lane.
+- P-SSZ-1 alone retains a targeted OPEN binding between its imported Yul
+  fragment and the fragment used by deployment. SHA-256 correctness remains a
+  separate explicit `A-SHA256-FFI` boundary.
+- The v4 optimized mutants reject nominal closure, canonical status/theorem or
+  assumption drift, malformed feature/counterexample/assumption classes,
+  non-SSZ deployment bindings, widened SSZ binding, stale pins/source spans,
+  proof-policy escapes, and stale generated views.
+- Historical sections below document earlier work but do not define the active
+  assurance contract or reopen the retired seven-plane roadmap.
 
-- Exact live base verified before work:
-  `campaign/lido-closure-v2@4b96af1094c691afee9f7013e4623a2b128a6421`.
-- Canonical catalogue wording is byte-for-byte unchanged. The existing
-  `LEAN_CHECKED` abstract model and the subordinate typed-Yul harness are
-  retained; the only harness edit renames the Lean pattern variable `slot` to
-  `storageSlot`, with identical EVMYulLean AST output.
-- Pinned source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
-  The source map now includes the transitive caller/address guards and writes
-  in `_transfer`, `_requestWithdrawal`, `_claim`, and the claim hint checks.
-- `LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx` composes
-  the canonical model theorem, the single-item pinned-source caller-swap
-  simulation, and an official `verity_contract`/`Contract.run` transaction
-  simulation. Batch iteration, generated Yul/EVM, runtime bytecode, external
-  contract denotation, and deployment provenance remain open.
-- Caller-allowlist and successful-address-stomp mutants have checked explicit
-  counterexamples in `LidoSRv3.Tests.AddressSourceMutants`.
-- Verity remains exactly `c41757164e9e8230536d7af29d81a2961b30e482`;
-  EVMYulLean remains transitively pinned exactly at
-  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9` and is used only by the retained
-  subordinate harness.
-- Focused P-ADDRESS-1/source/Verity/mutant build: exit 0 (93 jobs).
-- Trust build: exit 0 (1253 jobs); new theorems report only `propext` and
-  `Quot.sound`, with no project axiom.
-- Full `lake build`: exit 0 (1339 jobs).
-- `python3 scripts/audit_metadata.py check`, `make audit-check`, optimized
-  metadata mutants, `check_no_python_evidence.sh`, `git diff --check`, exact
-  pin check, and canonical-wording equality check: exit 0.
-- Net-new and new-file forbidden scans found no `sorry`, `admit`,
-  `native_decide`, `axiom`, `unsafeYul`, or `runVerity` proof escape.
+P-SSZ-1 GIndex.concat review reconciliation (2026-08-16)
+---------------------------------------------------------
+
+- The canonical P-SSZ-1 wording, reproduction expectation, next gate, and
+  generated roadmap now acknowledge the subordinate checked SOURCE evidence
+  for `GIndex.concat`. `SSZ.verifyProof` and all three wrappers remain open.
+- This reconciliation does not promote the child or close the parent:
+  canonical P-SSZ-1 SOURCE remains OPEN and TX remains BLOCKED.
+- Optimized metadata mutants and the focused GIndex/aggregate/trust build
+  passed; no Lean file, protected provenance, or trust assumption changed.
+
+P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
+--------------------------------------------------------------
+
+- Pinned-source correspondence covers the candidate scan, allocation-size
+  upper bound, proportional amount, bucket mutation, and outer-loop amount
+  updates. The canonical transaction theorems require the transaction row to
+  be the row returned by `Source.candidate?`.
+- The typed `Contract.run` slice proves checked arithmetic, strict progress,
+  capacity non-breach, accumulator/remaining-demand updates, and exact
+  snapshot rollback. Candidate-array memory semantics, Yul, EVM, runtime
+  bytecode, and deployment provenance remain open.
+- `A-ALLOC2-TX-BOUNDARY` records that candidate scanning, candidate count, and
+  allocation-size upper bound are supplied as source-plane words.
+
+P-TOPUP-2 bounded source/transaction closure (2026-08-15)
+---------------------------------------------------------
+
+- P-TOPUP-2 closes its SOURCE and TX planes: the registry theorem moves to
+  `LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap`, which
+  binds the gateway's value-bearing top-up schedule to the pinned Verity
+  external-call boundary (`DenoteExternalCalls`/`CallProgramRollback`) and
+  bounds the observed call-value aggregate by the block cap for every
+  `AdversaryModel` and initial call state, conditional on an explicit
+  runtime-provenance witness. Supporting theorems cover exact conservation on
+  full success, revert restoring the initial world, commit as the adversary
+  transition fold, and revert provenance from an observed failed call.
+- The plane deliberately does not use `Contracts.Common.externalCallBind`: at
+  Verity pin `04729a9de9099e065dd09283e4f733a5fd4c2a16` that combinator is
+  `pure ()`, so a conservation statement over it would be vacuous. The module
+  docstring records this.
+- Focused build `lake build LidoSRv3.Audit.Guarantees.PTopup2
+  LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Tests.Topup2TxMutants
+  LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust`: exit 0,
+  `Build completed successfully (1263 jobs)` under Lean 4.31.0. The Trust
+  report shows the new theorems and mutants depend only on `propext` and
+  `Quot.sound`; no sorry, admit, or undisclosed axioms.
+- `python3 scripts/audit_metadata.py check`, the optimized metadata mutants,
+  Python-evidence guard, and provenance guards all passed. EVM verifier
+  binding stays BLOCKED; no trust boundary was widened beyond the declared
+  conditional provenance inputs.
+
+Verity PR #2333 re-pin receipt (2026-08-14)
+------------------------------------------
+
+- The immutable `campaign/lido-minimal-11` milestone remains untouched. This
+  focused successor moves only the Verity dependency from
+  `bfa13e715d2a11d476e5d90f9264e87676ff7594` to verified upstream main
+  checkpoint `04729a9de9099e065dd09283e4f733a5fd4c2a16`, the merge commit of
+  Verity PR #2333.
+- Lake's requested revision, resolved `lake-manifest.json` `rev` and
+  `inputRev`, clean `.lake/packages/verity` checkout, artifact lock, source
+  map, audit manifest, metadata gate, proof lock, and regenerated proof report
+  all agree on `04729a9de9099e065dd09283e4f733a5fd4c2a16`.
+- `lake build LidoSRv3`: exit 0, `Build completed successfully (1339 jobs)`
+  under Lean 4.31.0. The regenerated proof report records verified source tree
+  `27227f979623dc4f3c13bbc2ca67c7fdeafbdefb` and build-log SHA-256
+  `7242c8f3c66354c377333d1066af5f725a7fab18d9ca0b170e55a6e4600d435f`.
+- The focused aggregate/trust/negative-mutant build completed successfully
+  (1260 jobs). `python3 scripts/audit_metadata.py check`, provenance guards,
+  and Python-evidence guards passed. No guarantee status, theorem claim,
+  assumption, or trust boundary was widened.
+
+Live remote reconciliation for the #2333 pin (2026-08-16)
+----------------------------------------------------------
+
+- Repository identity was checked against GitHub as
+  `lfglabs-dev/lido-srv3-proof-closure`; its default branch is `main` at
+  `6f44a024dcdd90e2285700cd9ccaf69aa75155ee`. The immutable campaign ref
+  `milestone/lido-minimal-11-25c82e13` remains at
+  `b6e0bde35006c45be9fc99aec5c2e9e615f2b1e6`; the named historical milestone
+  commit is `25c82e137236131c037a45618e44382547efebe2`.
+- Upstream `lfglabs-dev/verity` `main` was observed at
+  `5f27213d2b7bd1e679c3de7c8813022520cedbf2`. Verity PR #2333 is merged:
+  its PR head is `d8dd14e46212cac9200b10dafd5dc968fc799b30` and its merge
+  commit is the immutable proof dependency
+  `04729a9de9099e065dd09283e4f733a5fd4c2a16`.
+- This repository already consumes that exact merge commit in the Lake request
+  and resolved manifest, artifact lock, source map, target audit manifest,
+  proof lock, and metadata authority. It deliberately does not float to the
+  newer Verity `main` head: that would be an unreviewed source/proof change and
+  would invalidate the exact-pin provenance gate.
+- The current closure-v2 lineage is not descended from the historical
+  `25c82e13` milestone (its documented exact merge-base is
+  `ee2e65cd807e913ea245ae6fd7987a7f1d962800`). The baseline is preserved,
+  not rewritten; claiming direct ancestry or weakening the gate to conceal
+  that incompatibility is forbidden. The merged PR #67 is the original focused
+  re-pin artifact, and this entry provides a current full-SHA reconciliation
+  for review.
+
+P-ADDRESS-1 review correction (2026-08-12)
+-------------------------------------------
+
+P-ALLOC-1 Phase-3 exact-head repair (2026-08-13)
+---------------------------------------------------
+
+- The bounded `SRLib._getStakingModuleSummary` slice now records its selector
+  as the four calldata bytes `9a bd df 09`, with a `DenoteMemory` selector-word
+  theorem rather than a one-word pseudo-payload.
+- The real P-ALLOC-1 facade, `AllGuarantees`, the canonical guarantee metadata,
+  trust report, and target manifest consume the same bounded transaction
+  theorem. The public minimal-11 list and `campaign/lido-minimal-11` are not
+  changed.
+- The executable Verity wrapper writes a model-local scalar storage word before
+  executing the exact mapped `CallProgram` observation inside `Contract.run`.
+  Its target, selector calldata, call kind, gas, and result are retained by the
+  non-circular adapter bridge; a target-mutation regression makes that observed
+  call revert and restores the pre-call snapshot. This is not a Yul, EVM,
+  deployed-layout, or full allocation-loop theorem.
+- Focused regressions reject selector, call-kind, return-layout, and pre-call
+  storage mutations, and assert the failed typed-call transaction snapshot.
+- The follow-up exact-head repair evaluates the mapped observation against the
+  post-store `ContractState` and derives its `Contract.run` revert directly
+  from the observed mapped-call `.revert` result. Focused Phase-3, canonical
+  P-ALLOC-1, allocation regression, and semantic-mutant targets: exit 0.
+  The canonical theorem's axiom report is printed by `Audit.Trust`. This
+  receipt records bounded MODEL → SOURCE → VERITY_TX evidence only; it does
+  not claim allocation-loop, Yul, EVM, deployed-storage-layout, or runtime
+  provenance closure.
+- The final exact-head repair retains successful-call returndata, rejects a
+  response shorter than 96 bytes, decodes the copied capacity word at offset
+  64, and rejects a capacity above the pre-call `depositable` value. Executable
+  regressions cover both rejecting branches and snapshot rollback. The focused
+  reproduction command, aggregate guarantees, trust report, metadata mutants,
+  and full `lake build LidoSRv3` all exit 0 under Lean 4.31.0.
+- The current exact-head repair removes that invented capacity-versus-request
+  rejection from both the source-shaped body and executable adapter: a complete
+  summary whose capacity exceeds this call's `depositable` value now succeeds,
+  while malformed short returndata still reverts and restores the pre-call
+  snapshot. This remains bounded MODEL → SOURCE → VERITY_TX evidence only;
+  it does not claim allocation-loop, Yul, EVM, deployed-layout, or runtime
+  provenance closure.
+- Canonical and supplemental P-ALLOC-1 guarantee facades consume that corrected
+  theorem shape. Focused Phase-3 and aggregate P-ALLOC-1 builds, plus the full
+  `lake build LidoSRv3`, exit 0 under Lean 4.31.0.
+- The proof-report guard now checks the resolved Verity revision before any
+  `lake env` invocation, so Lake cannot repair a stale checkout before the
+  negative provenance regression observes and rejects it.
+
+- Independent review found that
+  `admission_and_post_state_equivariance` only conjoined admission and
+  post-state properties supplied as hypotheses; it did not prove either
+  property for a modeled permissionless entrypoint.
+- P-ADDRESS-1 is therefore no longer recorded as MODEL- or transaction-checked.
+  Its registry checked-layer list is empty, its metadata theorem evidence is
+  removed, and the address-renaming relation remains a specification helper.
+- Restoring MODEL closure requires instantiating eligible permissionless
+  entrypoints and proving both properties without assuming them.
+
+Closure-v2 immutable-boundary and review repair (2026-08-12)
+--------------------------------------------------------------
+
+- This successor descends from PR #65's squash-merge commit
+  `8667d6da8c51f78086e02b0348f9aba261bb2a51`, not from that PR's reviewed
+  branch head `85dfb291cede752d4b17e8a35796aa8dfa19222f`. The immutable milestone
+  `25c82e137236131c037a45618e44382547efebe2` remains a historical campaign
+  reference, but it is not an ancestor of this closure-v2 lineage: its exact
+  merge-base with this PR head is `ee2e65cd807e913ea245ae6fd7987a7f1d962800`.
+  Accordingly, this receipt makes no claim that the PR is a successor of that
+  milestone. The advanced `origin/campaign/lido-minimal-11` ref is likewise not
+  an integration target for this focused Verity re-pin.
+- A re-pin that must be descended from `25c82e13` requires a separately
+  reconciled, fully revalidated branch rooted at that milestone (or a normal
+  merge of the campaign lineage with all resulting proof/model changes
+  reviewed). It cannot be certified by this focused receipt alone.
+- P-TOPUP-1's canonical SOURCE-to-VERITY_TX theorem now requires the explicit
+  `NoUncheckedWrap inp` premise. That premise is the required boundary between
+  the source's unchecked `uint256` accumulation at StakingRouter line 732 and
+  the model's natural-number accumulation; the theorem no longer admits a
+  wrapping input while claiming faithful source simulation.
+- `proofs/logs/proof-report.json` is labeled as a superseded SRV3-P1--P15
+  compatibility report. The current eleven guarantees remain governed solely
+  by `audit/guarantees.yaml` and the named Lean evidence there.
+- The P-ADDRESS-1 Yul harness receipt now truthfully says that its address-stomp
+  vector rejects an abstract relation, rather than claiming a modified Yul
+  program fails to build.
+
+Superseded historical Verity re-pin receipt (2026-08-12)
+---------------------------------------------------------
+
+- This historical receipt incorrectly claimed that closure-v2 remained rooted
+  at milestone `25c82e137236131c037a45618e44382547efebe2`. That ancestry claim is
+  invalid and is superseded by the exact merge-base analysis above; the
+  `campaign/lido-minimal-11` ref was neither modified nor merged.
+- The resolved and requested Verity revision is exactly
+  `bfa13e715d2a11d476e5d90f9264e87676ff7594`; Lake's `rev` and `inputRev`,
+  `lakefile.lean`, artifact lock, source map, audit manifest, and proof report
+  agree on that SHA.
+- `lake update verity`: exit 0; exact upstream commit fetched and resolved.
+- `lake build LidoSRv3`: exit 0; `Build completed successfully (1336 jobs)`.
+- `make prove`: exit 0; proof report records source tree
+  `4e407c79f5e7f33d881b9f43243ac404567b9ca0`, log SHA-256
+  `2709c4747b857a92eda191b9ef69f168880925458caf6bf664e21293da17fa2c`,
+  and the certified Verity revision.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical guarantees
+  and 11 subordinate rows). The #51-derived `make check` target is restored;
+  its long metadata-mutant subprocess is separately exercised by the same
+  test suite.
+- Scope remains MODEL → SOURCE → VERITY_TX. The updated P-ALLOC-2 note records
+  that the certified Verity pin contains `LoopSimulation`, but no new
+  source-to-official-loop, Yul, EVM, runtime, or deployment closure is claimed.
 
 P-TOPUP-1 closure-v2 hybrid receipt (2026-08-11)
 -------------------------------------------------
@@ -578,113 +779,82 @@ Verity f485b2ca re-pin validation (2026-08-06)
 - Full `lake build`: exit 0 (`Build completed successfully (1300 jobs).`).
 - No Lido-side API compatibility changes were required.
 
-P-TOPUP-2 packed-storage evidence and parent-scope correction (2026-08-11)
----------------------------------------------------------------------
+P-ADDRESS-1 official-denotation admission subordinate evidence (2026-08-16)
+---------------------------------------------------------------------------
 
-- Exact branch point: `campaign/lido-minimal-11@c32f4dd89752c7b8ae8a1003b96d433d7a7ee32f`;
-  validated feature head: `b3316dee7a018c95d23928865bcefc0e9699664a`.
-- Pinned Lido source: `af095e48bbc1c3841c2c9936219c8461af01056b`.
-  The namespaced gateway base and member layout are derived on every gate run
-  from a fresh solc 0.8.25 AST and pinned source literal because standard
-  `storageLayout` omits ERC-7201 namespaced structs;
-  `scripts/check_p_topup2_layout.sh` does not trust committed AST data or a
-  committed `matches` boolean.
-- Complete-source remote Lean focused + full build on Babylon: job
-  `58d52671-368c-4c92-883c-9cff14f96e59`, source bundle
-  `6ba6468e591a406d05b7f8258bdb8ca4b4eb7a44d0c1438d7a5bcb1cbfb9946d`,
-  command `lake build LidoSRv3 LidoSRv3.Tests.Topup2Mutants`, exit 0,
-  `Build completed successfully (1348 jobs).`
-- Complete-source Nippur full-build trial job
-  `18449e89-1e7c-4ebc-ab3c-a26d39b529f3` exercised the full graph but failed
-  at the superseded `8786176` proof head; it is retained as a negative receipt,
-  not represented as successful final-head evidence.
-- `forge test -vv`: 5 passed, 0 failed, including 256 runs each for evaluator
-  differential, target-field RMW, and minimum-field RMW, with arbitrary
-  nonzero neighbor sentinels plus a deterministic checked-addition overflow
-  revert. Pinned `forge build TopUpGateway.sol --force` under solc
-  0.8.25/optimizer 200/viaIR/Cancun exits 0.
-- Metadata check, optimized metadata mutants, provenance guards, no-Python
-  evidence gate, `git diff --check`, and the layout comparison all exit 0.
-- Independent review found that the Nat evaluator does not model checked
-  uint256-addition rollback and that `recordBudget` consumes unrelated
-  caller-supplied values rather than the pinned batch transition. Accordingly
-  P-TOPUP-2 is MODEL-only: SOURCE and TX remain OPEN, and packed storage plus
-  runtime identity are subordinate evidence. Batch/order/role/resume/root-age,
-  EIP-4788 anchor behavior, SHA-256, verifier/SSZ binding, linked external-call
-  summaries, compiler lowering beyond the declared Verity fragment,
-  solc Yul-to-bytecode, EVM/runtime, and optional deployment provenance remain
-  explicit assumptions or OPEN planes. No P-SSZ-1 or runtime closure is claimed.
+- Campaign input head and receipt base: `34b0fd0f` (post-#73). Verity remains
+  pinned exactly at `04729a9de9099e065dd09283e4f733a5fd4c2a16`, EVMYulLean at
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`, Lean 4.31.0, Mathlib unchanged.
+- This is NOT a P-ADDRESS-1 transaction close. The parent row keeps
+  `theorem: null`, `theorem_planes: []`, and every plane it had at `34b0fd0f`.
+  The new subordinate row `P-ADDRESS-1.denote-admission` claims `tx:
+  ABSTRACT_LEAN_CHECKED` for an audit-authored entrypoint only.
+- `LidoSRv3/Audit/Verity/AddressAdmission.lean` evaluates a permissionless
+  `claim()` entrypoint through the official denotation
+  `Compiler.CompilationModel.Denote.denoteFunction`, the same semantic path
+  already pinned by `LidoSRv3.Audit.Verity.OfficialSemantics`. `denoteFunction`
+  installs `DenoteTransaction.sender` into `ContractState.sender` via
+  `withTransactionContext`, and `Expr.caller` reads that field, so the caller is
+  a genuine input of the run rather than an index on an abstract function.
+- Exact-head blocker recorded rather than papered over:
+  `Contracts.Common.externalCallBind` is `pure ()` at Verity pin `04729a9`
+  (`Contracts/Common.lean:582`). The entrypoint therefore contains no external
+  call at all; its admission is decided by a global pause gate and a
+  caller-indexed balance read that the denotation genuinely evaluates. No
+  vacuous bind is claimed as transaction evidence.
+- `run_claim_success` reduces the denotation to exactly those two storage reads.
+  `admission_address_equivariant` is universally quantified over the mapping-slot
+  oracle, both callers, and the world, under an explicit `PauseDisjoint`
+  non-aliasing side condition.
+- Non-vacuity is mechanical: `claim_admits`, `claim_rejects_empty_balance`, and
+  `claim_rejects_when_paused` show the entrypoint is not constant and that both
+  gates are load-bearing; `ownerGated_not_admission_equivariant` refutes the
+  same property for the owner-gated mutant, so the statement has teeth.
+- Post-state equivariance (`PAddress1.post_state_equivariant`) is untouched: the
+  entrypoint writes no storage. No correspondence to pinned Lido SRv3 Solidity
+  is claimed, so the SOURCE plane is `NOT_APPLICABLE` for this row and the
+  parent transaction plane stays OPEN.
+- Full `lake build`: exit 0 (`Build completed successfully (1348 jobs).`).
+- `lake build LidoSRv3.Audit.Trust`: exit 0. All six new theorems report
+  `depends on axioms: [propext, Quot.sound]`; no `sorry`, `admit`,
+  `native_decide`, or project-level axiom is introduced.
+- `python3 scripts/audit_metadata.py check`: exit 0, reporting exactly 11
+  canonical guarantees plus twelve subordinate rows.
+- Pre-existing at `34b0fd0f`, not introduced here and not repaired here:
+  `scripts/test_audit_metadata.py` fails because its P-TOPUP-1 `tx: BLOCKED`
+  negative fixture is now a no-op after the #73 retraction, and
+  `scripts/check_no_python_evidence.sh` requires `rg` on PATH.
+- This branch was authored against `34b0fd0f` (post #73) as the mission's exact
+  head, then rebased onto `main` once #74 landed P-ALLOC-2. Only the
+  `validated-tree:` line conflicted; it is re-derived for the rebased tree. The
+  parent `P-ADDRESS-1` row is byte-identical to its `34b0fd0f` form.
 
-P-TOPUP-2 source-artifact to deployed-runtime identity (2026-08-11)
--------------------------------------------------------------------
+P-SSZ-1 GIndex.concat SOURCE child (2026-08-16)
+------------------------------------------------
 
-- Machine receipt: `audit/p-topup-2-runtime-provenance.json`; deterministic
-  gate: `scripts/check_p_topup2_runtime_provenance.sh`.
-- The audited pin and release `v4.0.0` resolve to identical Git blobs for
-  SSZ.sol, GIndex.sol, BLS.sol, CLValidatorVerifier.sol, and TopUpGateway.sol.
-  SSZ.sol blob `0008c18c4a2ee99e6fbaed59c21cdf0dda41424b` has SHA-256
-  `91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b`.
-- Repository Hardhat compile covers 478 unique Solidity sources using solc
-  0.8.25, optimizer 200, viaIR, Cancun. Local deployment with the recorded
-  mainnet constructor arguments produces 9,868 runtime bytes with keccak256
-  `0x2b9cce4868b60e874f60387f61ebbaceaf20f074dc78bec5564c8477319aa6e4`.
-- The supplied independent mainnet observation at chainId 1/block 25,730,798
-  binds proxy `0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374`, its EIP-1967 implementation
-  slot, implementation `0xb08dBc68C521cD7A4318dc4C807a42bEB20f1106`, and byte-identical runtime.
-- Local gate execution: `LOCAL PASS`; with no credential-bearing RPC configured,
-  the live portion reports `SKIPPED_NO_RPC` and exits 2. Public archive trials
-  were not recorded as green because they did not serve both historical slot
-  and historical code. A reviewer supplies `MAINNET_RPC_URL` to reproduce the
-  complete live gate; credentials are neither embedded nor written.
-- This closes only pinned Solidity source-artifact to deployed-runtime identity
-  for that implementation and block. It does not claim Solidity-to-Verity
-  semantic correspondence, Verity model refinement, verifier/SSZ correctness,
-  or Yul/EVM semantics.
-
-P-TOPUP-1 whole-parent Verity closure (2026-08-11)
---------------------------------------------------
-
-- Required campaign base was verified before edits as
-  `campaign/lido-minimal-11@b6c94920604074a3d1630106bf8d8b99f40983c3`.
-  A pre-validation fetch found the remote campaign ref unchanged at that SHA.
-- Verity remains pinned to live `main@1fe0218863a4c8d6113e6cdd4de3766a54df81c7`.
-  Upstream PR #2253 remains open at
-  `387cbe87af66ff57284b548e2043ee5d283baff9`; it is a smoke-event declaration
-  fix and supplies no missing parent-transaction primitive, so no speculative
-  dependency re-pin was made.
-- Canonical theorem:
-  `LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure`.
-  It is an explicit public parent proposition over executable
-  `Verity.Contract.run`, beginning at caller authentication and covering the
-  allocation response, allocation/input/module guards, modulo-2^256 unchecked
-  accumulation, successful empty commit, Lido pull, per-nonzero-allocation
-  Beacon deposit calls, amount/balance assertion, success/revert classification,
-  and exact caller-frame snapshot rollback.
-- Arbitrary callee observations explicitly retain success/failure/revert,
-  value, returndata, allocation return shape, and caller-frame preservation.
-  They are not `externalCallBind` summaries; at the pinned Verity head that
-  helper reduces to `pure ()` and is not used as semantic evidence here.
-- Focused builds on node `agent-core`:
-  `lake build LidoSRv3.Audit.Verity.TopupParent
-  LidoSRv3.Audit.Guarantees.PTopup1`, exit 0; and
-  `lake build LidoSRv3.Tests.TopupParentMutants`, exit 0.
-  The mutants cover uint256 wrap/assert, short positive allocation arrays,
-  short zero-sum commit, unauthorized caller, allocation failure, failed Lido
-  pull, failed Beacon push, per-call values/returndata, positive commit, and
-  snapshot rollback.
-- `lake build LidoSRv3.Audit.Trust`, exit 0. The canonical parent theorem
-  reports only `[propext]`; it uses no `Classical.choice`, project axiom,
-  `sorry`, or `admit`.
-- Metadata generation/check, evidence-index fixtures, optimized metadata
-  mutants, and `git diff --check` pass. The first pre-commit `make test` reached
-  and passed those gates, then exited 2 at the intentionally clean-tree-only
-  provenance guard; the post-commit receipt below records the final clean-tree
-  full validation.
-- Final clean-tree validation on node `agent-core`: `make test`, exit 0,
-  including 5 passing Forge tests and the compiler-derived P-TOPUP-2
-  AST/layout gate; then full `lake build`, exit 0, `Build completed
-  successfully (1344 jobs).`
-- Guarantees-v4/source-map-v3 remain the normative boundary. Yul/EVM are not
-  registry closure planes. `A-SOLC-TRUSTED` is linked to P-TOPUP-1; source and
-  Verity pins plus deployment provenance remain separately recorded. Existing
-  SSZ/SHA-256 FFI and assembly/crypto tracking is unchanged.
+- Authored from exact live `main`
+  `2c5d3ece640f933f2c2fb5a6dd4a4a383d34b505`, after confirming the open PR
+  set contained no SSZ/GIndex writer. PR #69 was not touched.
+- `P-SSZ-1.gindex-concat` is subordinate evidence for only the pinned
+  `contracts/common/lib/GIndex.sol` `concat` span at Lido core
+  `af095e48bbc1c3841c2c9936219c8461af01056b`. It checks the zero `fls`
+  sentinel, `> 248` depth guard, left shift, right-pivot XOR, ordered OR, pack
+  bound, and `pow(rhs)` propagation.
+- Canonical `P-SSZ-1` remains `source: OPEN` and `tx: BLOCKED`. The child makes
+  no `SSZ.verifyProof`, wrapper, SHA-256/precompile, Yul/EVM, runtime, codehash,
+  fork, address, or deployment-provenance claim. No `CallProgram` or official
+  Verity-execution claim is introduced.
+- Focused Lean build, `LidoSRv3.Audit.AllGuarantees`, and
+  `LidoSRv3.Audit.Trust`: exit 0. The aggregate cold-cache build completed
+  successfully (1281 jobs); the three new theorems report only `[propext]`.
+- Accepted root/root and exact-depth-248 boundaries, first-overflow and zero
+  rejections, and wrong-shift, wrong-depth, wrong-order, and wrapping-overflow
+  mutants compile and are mechanically distinguished.
+- `python3 scripts/audit_metadata.py check`: exit 0, reporting 11 canonical
+  guarantees plus 13 subordinate rows. Optimized metadata mutants reject
+  omission, promotion, and wrong-parent edits to the new child.
+- `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/check_provenance_guards.sh`, `git diff --check`, and the
+  changed-Lean net-new `sorry`/`admit`/`axiom`/`native_decide` audit: exit 0.
+- Receipt subject: tracked tree excluding this receipt,
+  `49500b1eece0f42e3c52894b5f5a5a60abaa13a8`.

@@ -4,27 +4,22 @@
   "policy": "Source spans remain unmapped unless independently verified from pinned source; names or legacy anchors are insufficient.",
   "scope": {
     "public_guarantee_count": 11,
-    "transaction_atomicity": "INTERNAL_ONLY",
-    "assurance_layers": [
-      "MODEL",
-      "ALG",
-      "TX",
-      "REL",
-      "TRACE",
-      "SRC",
-      "CRYPTO",
-      "E2E"
+    "assurance_contract": [
+      "ABSTRACT_LEAN",
+      "FAITHFUL_VERITY"
     ],
+    "general_yul_evm_deployment": "OUT_OF_SCOPE",
+    "ssz_deployed_yul_binding": "TARGETED_ONLY",
     "metadata_is_proof_progress": false
   },
   "accepted_risks": {
     "baseline": "DEV-431-READY_NOT_AUDIT-CERT",
-    "two_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
+    "multi_node_certification": "UNAVAILABLE_OR_PARTIAL_NON_BLOCKING",
     "sha256_ffi": "OPAQUE",
-    "production_runtime_codehash_fork_address_provenance": "INCOMPLETE"
+    "solc": "TRUSTED_WHEN_ARTIFACTS_ARE_PRODUCED"
   },
   "ssz_claim": {
-    "level": "STRUCTURAL_ONLY",
+    "level": "STRUCTURAL_AND_TARGETED_BINDING_PENDING",
     "includes": [
       "structures",
       "generalized_indices",
@@ -35,10 +30,11 @@
     "excludes": [
       "FULL_SSZ",
       "SHA256_CRYPTOGRAPHIC_CORRECTNESS",
-      "DEPLOYED_PRECOMPILE_EQUIVALENCE",
-      "RUNTIME_CODEHASH_FORK_ADDRESS_PROVENANCE",
-      "EIP_7251_PROVENANCE"
-    ]
+      "GENERAL_YUL_REFINEMENT",
+      "GENERAL_EVM_REFINEMENT",
+      "GENERAL_DEPLOYMENT_PROVENANCE"
+    ],
+    "deployed_yul_binding": "OPEN_FOR_IMPORTED_SSZ_FRAGMENT_ONLY"
   },
   "targets": [
     {
@@ -172,10 +168,37 @@
           "repository": "lidofinance/core",
           "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
           "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+          "function": "allocate outer loop",
+          "start_line": 30,
+          "end_line": 44,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
           "function": "allocateToBestCandidate candidate search",
           "start_line": 76,
           "end_line": 86,
           "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+          "function": "allocateToBestCandidate allocation-size upper bound",
+          "start_line": 93,
+          "end_line": 100,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L93-L100"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+          "function": "allocateToBestCandidate proportional amount and bucket mutation",
+          "start_line": 102,
+          "end_line": 106,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"
         }
       ]
     },
@@ -591,15 +614,6 @@
         {
           "repository": "lidofinance/core",
           "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-          "path": "contracts/0.8.9/WithdrawalQueueERC721.sol",
-          "function": "_transfer",
-          "start_line": 230,
-          "end_line": 254,
-          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueueERC721.sol#L230-L254"
-        },
-        {
-          "repository": "lidofinance/core",
-          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
           "path": "contracts/0.8.9/WithdrawalQueue.sol",
           "function": "requestWithdrawals",
           "start_line": 125,
@@ -610,37 +624,10 @@
           "repository": "lidofinance/core",
           "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
           "path": "contracts/0.8.9/WithdrawalQueue.sol",
-          "function": "_requestWithdrawal and amount guards",
-          "start_line": 373,
-          "end_line": 402,
-          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueue.sol#L373-L402"
-        },
-        {
-          "repository": "lidofinance/core",
-          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-          "path": "contracts/0.8.9/WithdrawalQueue.sol",
           "function": "claimWithdrawalsTo",
           "start_line": 244,
           "end_line": 264,
           "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueue.sol#L244-L264"
-        },
-        {
-          "repository": "lidofinance/core",
-          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-          "path": "contracts/0.8.9/WithdrawalQueueBase.sol",
-          "function": "_claim",
-          "start_line": 460,
-          "end_line": 480,
-          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueueBase.sol#L460-L480"
-        },
-        {
-          "repository": "lidofinance/core",
-          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-          "path": "contracts/0.8.9/WithdrawalQueueBase.sol",
-          "function": "_calculateClaimableEther hint guards",
-          "start_line": 482,
-          "end_line": 504,
-          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueueBase.sol#L482-L504"
         },
         {
           "repository": "lidofinance/core",
@@ -929,6 +916,21 @@
           "start_line": 120,
           "end_line": 135,
           "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
+        }
+      ]
+    },
+    {
+      "id": "P-ADDRESS-1.transfer-owner-handoff",
+      "status": "MAPPED",
+      "spans": [
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.9/WithdrawalQueueERC721.sol",
+          "function": "transferFrom and owner-operated _transfer handoff",
+          "start_line": 218,
+          "end_line": 253,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueueERC721.sol#L218-L253"
         }
       ]
     },

@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Audit.Verity.TopupParent
 
 namespace LidoSRv3.Tests.TopupParentMutants
 
@@ -92,7 +92,6 @@ the exact caller snapshot. -/
   .committedTopUp 2
 #guard (sourceExecute cfg base gateway authorized.sender (iface [1, 1])).calls.length = 4
 
-#check LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure
 #check parent_transaction_closure
 #check revert_restores_caller_frame
 

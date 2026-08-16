@@ -28,9 +28,10 @@ structure TopupConfig where
   moduleAllocationLimitGwei : Nat
   maxRootAge : Nat
 
-/-- Mathematical Gwei reading of pinned `_evaluateTopUpLimit` after the
-checked `uint256` addition has succeeded. It is not source correspondence for
-inputs where `effectiveBalanceGwei + pendingBalanceGwei` overflows uint256. -/
+/-- Mathematical Gwei model of `_evaluateTopUpLimit` on inputs whose addition
+does not overflow a Solidity `uint256`.  This definition deliberately uses
+`Nat`; it is not source correspondence for unchecked inputs because Solidity's
+checked addition reverts where `Nat` addition remains total. -/
 def evaluated_topup_limit (v : Validator) (cfg : TopupConfig) : Nat :=
   if v.exiting || v.slashed then 0
   else
@@ -39,28 +40,6 @@ def evaluated_topup_limit (v : Validator) (cfg : TopupConfig) : Nat :=
     else
       let gap := cfg.targetBalanceGwei - currentTotal
       if gap < cfg.minTopUpGwei then 0 else gap
-
-theorem exiting_branch (v : Validator) (cfg : TopupConfig) (h : v.exiting = true) :
-    evaluated_topup_limit v cfg = 0 := by simp [evaluated_topup_limit, h]
-
-theorem slashed_branch (v : Validator) (cfg : TopupConfig) (h : v.slashed = true) :
-    evaluated_topup_limit v cfg = 0 := by simp [evaluated_topup_limit, h]
-
-theorem target_reached_branch (v : Validator) (cfg : TopupConfig)
-    (hexit : v.exiting = false) (hslash : v.slashed = false)
-    (h : cfg.targetBalanceGwei ≤ v.effectiveBalanceGwei + v.pendingBalanceGwei) :
-    evaluated_topup_limit v cfg = 0 := by
-  simp [evaluated_topup_limit, hexit, hslash, Nat.not_lt.mpr h]
-
-theorem accepted_gap_branch (v : Validator) (cfg : TopupConfig)
-    (hexit : v.exiting = false) (hslash : v.slashed = false)
-    (hbelow : v.effectiveBalanceGwei + v.pendingBalanceGwei < cfg.targetBalanceGwei)
-    (hmin : cfg.minTopUpGwei ≤ cfg.targetBalanceGwei -
-      (v.effectiveBalanceGwei + v.pendingBalanceGwei)) :
-    evaluated_topup_limit v cfg = cfg.targetBalanceGwei -
-      (v.effectiveBalanceGwei + v.pendingBalanceGwei) := by
-  simp [evaluated_topup_limit, hexit, hslash, Nat.not_le.mpr hbelow,
-    Nat.not_lt.mpr hmin]
 
 /-- Strict ordering is the source's duplicate-validator exclusion rule. -/
 def strictlyIncreasing : List Nat → Prop
@@ -179,13 +158,16 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
   exact Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
 
-/-- The budget/headroom mathematics is checked at MODEL. The pinned source and
-an official Verity transaction remain open until checked-addition rollback and
-the actual batch transition are connected end to end. -/
+/-- P-TOPUP-2 is promoted only at the mathematical model layer.  The historical
+source-shaped and call-program artifacts remain useful regression scaffolds,
+but cannot promote SOURCE or Verity until checked-word bounds and the source's
+overflow-revert behavior are represented explicitly. -/
 def guarantee : Guarantee := ⟨.pTopup2, [.model]⟩
 
-/- Verifier binding remains separate: EIP-4788 anchor behavior at BEACON_ROOTS,
-SSZ/GIndex correspondence, SHA-256 correctness, linked external summaries, Yul,
-EVM/runtime bytecode, and optional deployed-code provenance are all OPEN. -/
+/- Out of scope for P-TOPUP-2: identifying the deployed verifier address and
+codehash. The active assurance contract asks for a faithful Verity model of the
+guarantee-relevant call behavior, not a general deployment-provenance chain.
+For SSZ only, audit metadata separately tracks whether the imported Yul fragment
+matches the deployed fragment. -/
 
 end LidoSRv3.Audit.Guarantees.PTopup2

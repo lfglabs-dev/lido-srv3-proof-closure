@@ -1,32 +1,49 @@
 {
   "schema": "lido-srv3-artifacts-lock-v1",
-  "campaign_base": {"repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git", "ref": "campaign/lido-minimal-11", "commit": "c32f4dd89752c7b8ae8a1003b96d433d7a7ee32f"},
+  "campaign_base": {
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "ref": "campaign/lido-minimal-11",
+    "commit": "4d7d152551fffed0d43e9b5c73bed6eef4532f05"
+  },
   "pins": {
-    "lido_core": {"repository": "https://github.com/lidofinance/core.git", "commit": "af095e48bbc1c3841c2c9936219c8461af01056b"},
-    "verity": {"repository": "https://github.com/lfglabs-dev/verity.git", "commit": "1fe0218863a4c8d6113e6cdd4de3766a54df81c7"},
-    "evmyullean": {"repository": "https://github.com/lfglabs-dev/EVMYulLean.git", "commit": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"},
-    "lean": {"toolchain": "leanprover/lean4:v4.31.0"},
-    "mathlib": {"repository": "https://github.com/leanprover-community/mathlib4.git", "commit": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"}
+    "lido_core": {
+      "repository": "https://github.com/lidofinance/core.git",
+      "commit": "af095e48bbc1c3841c2c9936219c8461af01056b"
+    },
+    "verity": {
+      "repository": "https://github.com/lfglabs-dev/verity.git",
+      "commit": "1fe0218863a4c8d6113e6cdd4de3766a54df81c7"
+    },
+    "evmyullean": {
+      "repository": "https://github.com/lfglabs-dev/EVMYulLean.git",
+      "commit": "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"
+    },
+    "lean": {
+      "toolchain": "leanprover/lean4:v4.31.0"
+    },
+    "mathlib": {
+      "repository": "https://github.com/leanprover-community/mathlib4.git",
+      "commit": "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"
+    }
   },
-  "modules": ["LidoSRv3.Audit.Verity.AddressYulInterface", "LidoSRv3.Tests.AddressYulInterface", "LidoSRv3.Audit.Verity.TopupPackedStorage", "LidoSRv3.Tests.Topup2Mutants"],
+  "modules": [
+    "LidoSRv3.Audit.Verity.AddressYulInterface",
+    "LidoSRv3.Tests.AddressYulInterface",
+    "LidoSRv3.Audit.Source.AddressCorrespondence",
+    "LidoSRv3.Audit.Source.TopupParentCorrespondence",
+    "LidoSRv3.Audit.Verity.AddressTx",
+    "LidoSRv3.Audit.Verity.DepositLedgerTx",
+    "LidoSRv3.Audit.Verity.TopupPackedStorage",
+    "LidoSRv3.Audit.Verity.TopupParent",
+    "LidoSRv3.Tests.AddressSourceMutants",
+    "LidoSRv3.Tests.Topup2Mutants",
+    "LidoSRv3.Tests.TopupParentMutants"
+  ],
   "unavailable": {
-    "canonical_eip7251_runtime": {"status": "MISSING", "blocked": true, "value": null},
-    "canonical_eip7251_codehash": {"status": "MISSING", "blocked": true, "value": null},
-    "canonical_eip7251_fork": {"status": "MISSING", "blocked": true, "value": null},
-    "canonical_eip7251_address": {"status": "MISSING", "blocked": true, "value": null},
-    "eip4788_anchor_runtime": {"status": "MISSING", "blocked": true, "value": null},
-    "eip4788_anchor_codehash": {"status": "MISSING", "blocked": true, "value": null},
-    "sha256_ffi_implementation_identity": {"status": "MISSING", "blocked": true, "value": null}
-  },
-  "runtime_provenance": {
-    "P-TOPUP-2": {
-      "status": "PINNED_BLOCK_CHECKED",
-      "receipt": "audit/p-topup-2-runtime-provenance.json",
-      "gate": "scripts/check_p_topup2_runtime_provenance.sh",
-      "chain_id": 1,
-      "reference_block": 25730798,
-      "implementation": "0xb08dBc68C521cD7A4318dc4C807a42bEB20f1106",
-      "runtime_keccak256": "0x2b9cce4868b60e874f60387f61ebbaceaf20f074dc78bec5564c8477319aa6e4"
+    "sha256_ffi_implementation_identity": {
+      "status": "MISSING",
+      "blocked": true,
+      "value": null
     }
   }
 }

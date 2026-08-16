@@ -70,25 +70,6 @@ example : reorderedTraceMutant ⟨[1, 2], [10, 20], 30⟩ ≠
 pinned successful report, including its checked total. -/
 example : verityTxAccept valid = some ⟨[1, 2], [10, 20], 30⟩ := by native_decide
 
-/-- The hybrid entrypoint reaches the generated typed-storage commit only
-after executing the accounting-prefix validation and checked accumulation. -/
-example :
-    match (AccountingContract.submitReportBalances valid).run Verity.defaultState with
-    | .success accepted after =>
-        accepted == ⟨[1, 2], [10, 20], 30⟩ &&
-        after.storage AccountingContract.lastTotalBalanceGwei.slot == 30 &&
-        after.storage AccountingContract.lastModuleCount.slot == 2
-    | .revert _ _ => false := by rfl
-
-/-- An order mutant reverts before the typed-storage commit. -/
-example :
-    match (AccountingContract.submitReportBalances
-      ⟨[1, 2], [2, 1], [10, 20]⟩).run Verity.defaultState with
-    | .revert _ rollback =>
-        rollback.storage AccountingContract.lastTotalBalanceGwei.slot == 0 &&
-        rollback.storage AccountingContract.lastModuleCount.slot == 0
-    | .success _ _ => false := by rfl
-
 example : verityTxTrace fullReportSucceeds valid 1 trivial =
     sourceTrace fullReportSucceeds valid 1 trivial := by native_decide
 

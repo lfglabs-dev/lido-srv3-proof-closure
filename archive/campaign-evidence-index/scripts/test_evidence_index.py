@@ -5,7 +5,10 @@ import copy
 import tempfile
 from pathlib import Path
 
-from evidence_index import EvidenceError, evidence_data, render_markdown, validate_and_resolve
+from evidence_index import (
+    EvidenceError, assurance_v4_evidence, evidence_data, render_markdown,
+    validate_and_resolve,
+)
 
 
 STATUSES_OPEN = {
@@ -101,6 +104,18 @@ def main():
         duplicate.write_text((source / "PChecked.lean").read_text(encoding="utf-8"), encoding="utf-8")
         expect_error(rows, root, "declared theorem is ambiguous")
         duplicate.unlink()
+
+        assurance_rows = [{
+            "id": "P-CHECKED", "summary": "Checked model only.",
+            "abstract": {"status": "CHECKED", "theorem": "LidoSRv3.Audit.Guarantees.PChecked.checked_parent"},
+            "verity": {"status": "PARTIAL", "theorem": None},
+            "assumptions": [],
+            "reproduction": {"command": "lake build Fixture", "expected": "model only"},
+        }]
+        current = assurance_v4_evidence(assurance_rows, root)
+        assert current["parents"][0]["source"]["line"] == 2
+        assert current["parents"][0]["statuses"]["source"] == "OPEN"
+        assert current["parents"][0]["statuses"]["tx"] == "PARTIAL"
 
         promoted = copy.deepcopy(rows)
         promoted[0]["theorem"] = promoted[3]["theorem"]

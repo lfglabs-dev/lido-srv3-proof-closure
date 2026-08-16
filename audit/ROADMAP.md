@@ -2,14 +2,46 @@
 
 # ROADMAP
 
-- `P-ALLOC-1`: Compose rows, capacity, and demand produced by the parent source scope into Contract.run before promoting the TX plane; then generalize proportional amounts and bind deployed layout/Yul/EVM semantics.
-- `P-ALLOC-2`: Refine proportional allocation amounts and checked-Uint256 execution for MinFirstAllocationStrategy.allocateToBestCandidate.
-- `P-DEPOSIT-1`: Compose allocation, the module ABI, Lido/withdrawal-queue/oracle state, and per-validator deposit-data roots into one executed Verity transaction, so the whole-path rollback half no longer rests on A-ABSTRACT-TX.
-- `P-TOPUP-1`: Strengthen independently reproducible deployment-provenance receipts without changing the guarantees-v4/source-map-v3 green boundary.
-- `P-ACCOUNT-1`: Extend the checked Verity transaction beyond the accepted accounting prefix (later source guards, external calls) and establish independently verified deployment provenance.
-- `P-RESERVE-1`: Optionally establish deployed storage/call provenance; semantic closure ends at the proved Verity transaction under the solc trust assumption.
-- `P-ETH-1`: Compose all inventoried ETH-bearing call sites and refine the complete flow against pinned Solidity and deployment provenance.
-- `P-ADDRESS-1`: Establish independently verified deployment provenance; semantic closure ends at the checked official Verity transaction under the solc trust assumption.
-- `P-TOPUP-2`: Model checked uint256 addition and rollback, then connect the pinned topUp batch transition and post-state to an official Verity Contract.run transaction before claiming SOURCE/TX closure.
-- `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
-- `P-SSZ-1`: Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.
+## P0 — publish the final consolidation
+
+- Reconcile from `main`, retain the assurance-v4 contract and useful campaign/corrective heads, and require `make test`, `make prove`, the full build, exact-head independent review, and no hollow parent promotion.
+- Classify and close superseded PRs only after the integrated head is contained in `main`; then synchronize and archive the former campaign branch.
+
+## P1 — first complete property: `P-RESERVE-RELATIONAL`
+
+At constant report, queue, and buffer inputs, two states that differ only in `depositsReserve` must produce identical prefinalized/finalized ranges and identical locked ETH. The existing checked `P-RESERVE-1` spending invariant is a useful child, not this requested relational closure.
+
+Acceptance: independent specification; separate source-shaped interpreter; a Verity program that actually computes the observables; a composition theorem; a rejected reserve→range mutant; report/queue/buffer consumption mutants; rollback after an intermediate write; and parent status only after composition.
+
+## P2 — allocation/value conservation
+
+Order the multi-PR program as P-ALLOC-1/2 → deposit/top-up allocation → WC01/WC02 eligibility → Lido debit → Beacon credit → module delta → rollback. Do not start parallel Deposit/Topup/Accounting parent-closure lanes before P-RESERVE-RELATIONAL is green.
+
+## P3 — resume remaining parents after anti-vacuity patterns are established
+
+Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ only against the composition patterns established by P1/P2.
+
+## Current guarantee registry
+
+## Deferred P1-labelled registry rows
+
+- `P-DEPOSIT-1` — **IMPLEMENTATION_PENDING**: Compose the recovered ledger core with authorization, allocation, dynamic deposit data, roots, and observable Lido/router/beacon calls.
+- `P-TOPUP-1` — **IMPLEMENTATION_PENDING**: Replace the sourceExecute-backed parent wrapper with independent observable allocation/Lido/beacon execution while preserving A-TOPUP-NOWRAP.
+- `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: Implement a stateful Verity report path with guard/overflow mutants.
+
+## Deferred P2-labelled registry rows
+
+- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: Complete the allocation loop and bind moduleAddress to the modeled source input; lower-level artifact refinement is outside scope.
+- `P-ALLOC-2` — **VERITY_FEATURE_REQUIRED**: Add proof-backed mutable uint256 memory-array denotation and consume it in P-ALLOC-2.
+- `P-ETH-1` — **IMPLEMENTATION_PENDING**: Define the abstract parent then compose relevant protocol-controlled Verity value paths.
+- `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
+- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: First model checked uint256 addition and overflow rollback; only then compose storage and calls in one observable Verity run with complete call shape and same-run failure provenance.
+- `P-CONSOLIDATION-1` — **VERITY_FEATURE_REQUIRED**: Close the observable FunctionSpec call/event/memory bridge, then consume it.
+
+## Deferred P3-labelled registry rows
+
+- `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Prove SSZ parent/wrappers in Verity and bind only the imported SSZ Yul fragment to deployment.
+
+## Checked baseline to preserve
+
+- `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.

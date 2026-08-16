@@ -7,7 +7,7 @@ from pathlib import Path
 
 PLANES = ("model", "algorithm", "source", "tx", "crypto")
 THEOREM_BACKED_STATUSES = {"ABSTRACT_LEAN_CHECKED", "LEAN_CHECKED", "REGRESSION"}
-CAMPAIGN_COMMIT = "4649ba55052fa29132b016dc443ac738134c332f"
+CAMPAIGN_COMMIT = "assurance-v4"
 DECLARATION = re.compile(
     r"^\s*(?:private\s+|protected\s+)?(?:theorem|lemma)\s+([A-Za-z_][A-Za-z0-9_']*)\b"
 )
@@ -125,6 +125,55 @@ def validate_and_resolve(rows, root):
             if row["theorem"] in child_theorems:
                 raise EvidenceError(f"{row['id']}: broad parent text is paired with a child-only theorem")
     return resolved
+
+
+def assurance_v4_evidence(rows, root):
+    """Build a current theorem index from the active assurance-v4 registry."""
+    declarations = discover_theorems(root)
+    parents = []
+    for row in rows:
+        theorem = row["abstract"]["theorem"]
+        source = None
+        if theorem is not None:
+            matches = declarations.get(theorem, [])
+            if not matches:
+                raise EvidenceError(f"{row['id']}: declared theorem not found: {theorem}")
+            if len(matches) != 1:
+                locations = ", ".join(f"{m['source']}:{m['line']}" for m in matches)
+                raise EvidenceError(
+                    f"{row['id']}: declared theorem is ambiguous: {theorem} ({locations})"
+                )
+            source = matches[0]
+        model_status = (
+            "LEAN_CHECKED" if row["abstract"]["status"] == "CHECKED"
+            else row["abstract"]["status"]
+        )
+        tx_status = (
+            "LEAN_CHECKED" if row["verity"]["status"] == "CHECKED"
+            else row["verity"]["status"]
+        )
+        parents.append({
+            "id": row["id"],
+            "catalogue_wording": row["summary"],
+            "scope": None,
+            "statuses": {
+                "model": model_status, "algorithm": "NOT_APPLICABLE",
+                "source": "OPEN", "tx": tx_status, "crypto": "NOT_APPLICABLE",
+            },
+            "theorem": theorem,
+            "theorem_planes": ["model"] if theorem else [],
+            "assumptions": row["assumptions"],
+            "source": source,
+            "reproduction": row["reproduction"],
+            "children": [],
+        })
+    return {
+        "schema": "lido-srv3-assurance-v4-evidence-v2",
+        "campaign_commit": CAMPAIGN_COMMIT,
+        "authority": "Catalogue target is not theorem scope; Lean theorem statements are authority.",
+        "parents": parents,
+        "supplemental": [],
+    }
 
 
 def evidence_data(rows, resolved):

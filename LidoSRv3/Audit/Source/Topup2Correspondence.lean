@@ -1,9 +1,10 @@
 import LidoSRv3.Audit.Guarantees.PTopup2
 
-/-! Pinned-source correspondence for `TopUpGateway.topUp` and
-`_evaluateTopUpLimit` at `lidofinance/core@af095e48`.  The deployed verifier is
-not identified here: the explicit provenance witness is the boundary that keeps
-runtime/EVM closure blocked. -/
+/-! Source-shaped scaffold for `TopUpGateway.topUp` and `_evaluateTopUpLimit` at
+`lidofinance/core@af095e48`.  This is not promoted SOURCE correspondence:
+`evaluated_topup_limit` uses total `Nat` addition, while the pinned Solidity
+checked `uint256` addition can revert on overflow.  A future correspondence
+must add explicit word bounds and match that revert behavior. -/
 
 namespace LidoSRv3.Audit.Source.Topup2
 
@@ -35,9 +36,9 @@ def execute (batch : TopupBatch) (cfg : TopupConfig) : List Nat :=
 theorem execute_matches_pinned_transition (batch : TopupBatch) (cfg : TopupConfig) :
     execute batch cfg = transition batch cfg := rfl
 
-/-- Conditional SOURCE correspondence: once address/codehash/fork provenance is
-supplied externally, the source-shaped gateway execution conserves the block
-cap.  The proof does not manufacture that provenance. -/
+/-- Conditional bound for the source-shaped scaffold.  This theorem does not
+establish Solidity correspondence for overflowing effective-plus-pending
+balances and therefore does not promote the SOURCE layer. -/
 theorem source_aggregate_bounded_by_block_cap
     (provenance : RuntimeProvenance) (_hProvenance : provenance.Valid)
     (batch : TopupBatch) (cfg : TopupConfig) (hBatch : well_formed_batch batch cfg) :

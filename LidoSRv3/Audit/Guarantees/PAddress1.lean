@@ -1,14 +1,17 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.AddressEquivariance
-import LidoSRv3.Audit.Source.AddressCorrespondence
-import LidoSRv3.Audit.Verity.AddressTx
+import LidoSRv3.Audit.Verity.AddressTransferTx
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
-open _root_.Verity
+open Verity
+open LidoSRv3.Audit.Source.AddressTransferCorrespondence
+open LidoSRv3.Audit.Verity.AddressTransferTx
 
-/-- Abstract-model evidence only; source and EVM correspondence remain open. -/
-def guarantee : Guarantee := ⟨.pAddress1, [.model, .source, .verityTx]⟩
+abbrev Address := Nat
+
+/-- The abstract relation is specified, but no modeled entrypoint discharges it yet. -/
+def guarantee : Guarantee := ⟨.pAddress1, []⟩
 
 /-!
 # P-ADDRESS-1: permissionless caller non-discrimination
@@ -126,7 +129,7 @@ def address_nondiscrimination (cfg : Config)
     (fn : Address → Input → Outcome State) : Prop :=
   admission_nondiscriminatory cfg fn ∧ post_state_equivariant cfg rename_state fn
 
-/-- Independent proofs of admission and renamed post-state behavior compose the guarantee. -/
+/-- Logical composition helper only; this is not evidence for any modeled entrypoint. -/
 theorem admission_and_post_state_equivariance
     (cfg : Config) (rename_state : (Address → Address) → State → State)
     (fn : Address → Input → Outcome State)
@@ -135,36 +138,22 @@ theorem admission_and_post_state_equivariance
     address_nondiscrimination cfg rename_state fn := by
   exact ⟨hAdmission, hPostState⟩
 
-/-- Checked MODEL → pinned SOURCE → official VERITY_TX closure.  The first
-conjunct retains the already checked canonical model theorem; the remaining
-conjuncts establish the source caller-swap simulation and executable Verity
-transaction classification.  Yul and EVM execution remain outside this claim. -/
-theorem model_to_source_to_verity_tx
-    (cfg : Config) (rename_state : (Address → Address) → State → State)
-    (fn : Address → Input → Outcome State)
-    (hAdmission : admission_nondiscriminatory cfg fn)
-    (hPostState : post_state_equivariant cfg rename_state fn)
-    (a₁ a₂ : Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
-    (sourceInput : LidoSRv3.Audit.SolidityAddress.Input)
-    (verityState : _root_.Verity.ContractState) :
-    address_nondiscrimination cfg rename_state fn ∧
-      LidoSRv3.Audit.SolidityAddress.succeeds
-          (LidoSRv3.Audit.SolidityAddress.run
-            (LidoSRv3.Audit.SolidityAddress.renameInput a₁ a₂ sourceInput)) =
-        LidoSRv3.Audit.SolidityAddress.succeeds
-          (LidoSRv3.Audit.SolidityAddress.run sourceInput) ∧
-      (LidoSRv3.Audit.SolidityAddress.run
-          (LidoSRv3.Audit.SolidityAddress.renameInput a₁ a₂ sourceInput) =
-        match LidoSRv3.Audit.SolidityAddress.run sourceInput with
-        | .reverted => .reverted
-        | .committed post => .committed
-            (LidoSRv3.Audit.SolidityAddress.renamePost a₁ a₂ post)) ∧
-      LidoSRv3.Audit.Verity.AddressTx.observeVerity verityState
-          ((LidoSRv3.Audit.Verity.AddressTx.executeSource sourceInput).run verityState) =
-        LidoSRv3.Audit.Verity.AddressTx.sourceTx sourceInput verityState := by
-  exact ⟨admission_and_post_state_equivariance cfg rename_state fn hAdmission hPostState,
-    LidoSRv3.Audit.SolidityAddress.source_admission_nondiscriminatory a₁ a₂ h₁ h₂ sourceInput,
-    LidoSRv3.Audit.SolidityAddress.run_rename a₁ a₂ h₁ h₂ sourceInput,
-    LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source sourceInput verityState⟩
+/-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
+for the owner-operated WithdrawalQueue ERC-721 ownership handoff. The umbrella
+guarantee remains open for the other mapped entrypoints and omitted set/event
+effects. -/
+theorem bounded_transfer_model_source_tx :
+    (∀ caller fromAddr to s, sourceTransfer caller fromAddr to s =
+      modelTransfer caller fromAddr to s) ∧
+    sourceTransfer 1 1 3 { owner := 1, approved := 9 } = some { owner := 3, approved := 0 } ∧
+    sourceTransfer 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }) =
+      (sourceTransfer 1 1 3 { owner := 1, approved := 9 }).map renameState12 ∧
+    observe (run 1 1 3 1 9) = (true, 3, 0) ∧
+    observe (run 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }).owner
+      (renameState12 { owner := 1, approved := 9 }).approved) =
+      (true, swap12 3, swap12 0) ∧
+    swap12 3 != 4 ∧ swap12 9 != 8 ∧
+    observe (run 9 1 3 1 9) = (false, 1, 9) :=
+  model_source_tx_address_equivariance_slice
 
 end LidoSRv3.Audit.Guarantees.PAddress1

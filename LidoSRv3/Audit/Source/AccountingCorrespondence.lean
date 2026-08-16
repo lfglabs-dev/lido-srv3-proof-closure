@@ -1,7 +1,4 @@
 import LidoSRv3.Audit.Arithmetic
-import Verity.Core
-import Verity.EVM.Uint256
-import Verity.Macro
 
 /-!
 Pinned source correspondence for the report-before-reward path at
@@ -105,36 +102,6 @@ def verityTxAccept (i : ReportInput) : Option AcceptedReport := do
   if idsAndBalancesValid i then pure () else none
   let total ← checkedTotal256 i.balancesGwei
   pure ⟨i.reportedModuleIds, i.balancesGwei, total.val⟩
-
-/- Concrete Verity storage projection. These model-local slots record only the
-accounting-relevant result of the router write; they are not a claim about the
-deployed proxy's keccak-derived layout. The external Accounting call and the
-rest of the report deliberately remain outside this entrypoint. -/
-verity_contract AccountingContract where
-  storage
-    lastTotalBalanceGwei : Uint256 := slot 0
-    lastModuleCount : Uint256 := slot 1
-
-  function commitAcceptedReport (total : Uint256, moduleCount : Uint256) : Unit := do
-    setStorage lastTotalBalanceGwei total
-    setStorage lastModuleCount moduleCount
-
-namespace AccountingContract
-
-/-- Source-shaped host entrypoint for the accounting-relevant prefix. Array
-length/order, MAX_VALUE_GWEI, and checked uint64 accumulation execute in
-`verityTxAccept`; only an accepted prefix reaches the generated typed-storage
-entrypoint. This hybrid boundary does not execute the later external calls or
-establish that the full report succeeds. -/
-def submitReportBalances (i : ReportInput) : Contract AcceptedReport :=
-  match verityTxAccept i with
-  | none => fun state => .revert "ACCOUNTING_PREFIX_REJECTED" state
-  | some accepted => do
-      commitAcceptedReport (Verity.Core.Uint256.ofNat accepted.totalBalanceGwei)
-        (Verity.Core.Uint256.ofNat accepted.moduleIds.length)
-      Verity.pure accepted
-
-end AccountingContract
 
 /-- Trace projection gated by independently established successful execution
 of the *full* pinned report.  `accept` deliberately proves only the earlier
@@ -247,25 +214,5 @@ theorem source_to_verityTx
     · simp [verityTxAccept, hValid, hWord, Nat.mod_eq_of_lt hTotalLt]
     · simp [verityTxTrace, sourceTrace, verityTxAccept, accept, hValid,
         hWord, hTotal, verityTxSuccessfulSteps, successfulSteps]
-
-/-- Actual `.run` bridge for the hybrid entrypoint. Every report accepted by
-the independent source model executes successfully, returns the same accepted
-report, and commits its checked total and module count through typed storage. -/
-theorem accounting_run_commits_accepted (state : ContractState)
-    (i : ReportInput) (accepted : AcceptedReport)
-    (hAccept : accept i = some accepted) :
-    ∃ after,
-      (AccountingContract.submitReportBalances i).run state =
-        .success accepted after ∧
-      after.storage AccountingContract.lastTotalBalanceGwei.slot =
-        Verity.Core.Uint256.ofNat accepted.totalBalanceGwei ∧
-      after.storage AccountingContract.lastModuleCount.slot =
-        Verity.Core.Uint256.ofNat accepted.moduleIds.length := by
-  have hRefines := source_to_verityTx (fun _ _ => True) i 0 trivial accepted hAccept
-  have hTx : verityTxAccept i = some accepted := hRefines.2.1
-  simp [AccountingContract.submitReportBalances, hTx,
-    AccountingContract.commitAcceptedReport, setStorage,
-    ContractState.writeSlot, Verity.bind, Bind.bind, Verity.pure, Contract.run,
-    AccountingContract.lastTotalBalanceGwei, AccountingContract.lastModuleCount]
 
 end LidoSRv3.Audit.SolidityAccounting
