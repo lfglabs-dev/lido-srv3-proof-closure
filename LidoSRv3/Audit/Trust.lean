@@ -9,6 +9,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Verity.AddressAdmission
+import LidoSRv3.Audit.Verity.ConsolidationCallFragment
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
@@ -68,6 +69,14 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_empty_balance
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_when_paused
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant
+#print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.raw_call_entrypoint_always_reverts
+#print axioms
+  LidoSRv3.Audit.Verity.ConsolidationCallFragment.external_call_bind_entrypoint_always_reverts
+#print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.requestConsolidationBind_registered
+#print axioms
+  LidoSRv3.Audit.Verity.ConsolidationCallFragment.registered_external_call_bind_entrypoint_always_reverts
+#print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.guards_only_succeeds
+#print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.success_hypotheses_are_vacuous
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
