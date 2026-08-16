@@ -37,10 +37,11 @@ SUBORDINATE_IDS = [
     "P-ETH-1a",
     "P-ETH-1b",
     "P-ADDRESS-1.denote-admission",
+    "P-ADDRESS-1.transfer-owner-handoff",
     "P-DEREF-1",
 ]
 SOURCE_TARGET_IDS = EXPECTED_IDS[:6] + ["P-ETH-1a", "P-ETH-1b"] + EXPECTED_IDS[7:]
-SOURCE_TARGET_IDS = SOURCE_TARGET_IDS + ["P-DEREF-1"]
+SOURCE_TARGET_IDS = SOURCE_TARGET_IDS + ["P-ADDRESS-1.transfer-owner-handoff", "P-DEREF-1"]
 EXPECTED_AUTHORITY = (
     "Lean theorem statements and proofs are authoritative; this metadata does not "
     "close a semantic guarantee."
@@ -68,6 +69,7 @@ EXPECTED_WORDING = [
     "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue; raw owner-controlled StakingVault.withdraw is excluded, and source and executable correspondence remain open.",
     "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest; equating that immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation.",
     "An audit-authored permissionless entrypoint written in the pinned Verity deep EDSL is evaluated by the official denotation Compiler.CompilationModel.Denote.denoteFunction, which installs the transaction sender into ContractState.sender, so the caller is a genuine input of the run rather than an index on an abstract function. For every mapping-slot oracle, every caller pair whose balance entries do not alias the pause slot, and every world, the admission bit under one caller equals the admission bit under the other in the caller-swapped world. Admission only: post-state equivariance, correspondence to pinned Lido Solidity, generated Yul, and EVM execution are not claimed, so the parent transaction plane remains OPEN.",
+    "A bounded owner-operated WithdrawalQueueERC721 transfer slice separates MODEL, pinned SOURCE, and official Verity Denote execution: caller-relative authorization, approval deletion, and request-owner handoff compose in one registry theorem, two renamed successful post-state receipts commit distinct owners, and a wrong-caller control reverts with the pre-state. Enumerable owner sets, the Transfer event, approved-operator branches, the other mapped permissionless entrypoints, Yul, and EVM remain open, so the parent stays OPEN.",
 ]
 EXPECTED_ASSUMPTIONS = {
     "schema": "lido-srv3-assumptions-v1",
@@ -144,6 +146,8 @@ EXPECTED_REPRODUCTION = [
      "expected": "successful configurable consolidation-request fee-target proof; canonical deployed address and parent ETH-flow guarantee remain open"},
     {"command": "lake build LidoSRv3.Audit.Verity.AddressAdmission",
      "expected": "successful official-denotation admission reduction, caller-swap equivariance, both-gate non-vacuity witnesses, and owner-gated mutant refutation; post-state equivariance, pinned-source correspondence, Yul, and EVM remain open"},
+    {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTransferTx LidoSRv3.Audit.Trust",
+     "expected": "successful bounded MODEL/SOURCE/TX composition with committed renamed post-states and wrong-caller rollback; parent P-ADDRESS-1 remains OPEN"},
 ]
 EXPECTED_ASSUMPTION_LINKS = [
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
@@ -167,6 +171,7 @@ EXPECTED_ASSUMPTION_LINKS = [
     ["A-VERITY-SCAFFOLD", "A-SHA256-FFI", "A-RUNTIME-PROVENANCE"],
     [],
     [],
+    ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
     ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
 ]
 EXPECTED_NEXT_GATES = [
@@ -195,6 +200,7 @@ EXPECTED_NEXT_GATES = [
     "Refine only the protocol-controlled rebalance/redemption return interface against pinned Solidity and executable EVM semantics.",
     "Refine the configured immutable target against pinned Solidity, then establish the canonical EIP-7251 address through independent deployment provenance and executable EVM semantics.",
     "Extend the observation to post-state equivariance and bind the entrypoint to a pinned permissionless Lido SRv3 Solidity span before the parent transaction plane can move off OPEN.",
+    "Generalize the bounded transfer receipt beyond fixed witnesses, add the two approved-operator branches, owner-indexed enumerable-set updates and Transfer event, then cover request/claim/redemption entrypoints before moving the parent.",
 ]
 EXPECTED_EXCLUSIONS = {
     "schema": "lido-srv3-exclusions-v1",
@@ -252,6 +258,8 @@ EXPECTED_STATUSES = [
      "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
     {"model": "NOT_APPLICABLE", "algorithm": "NOT_APPLICABLE", "source": "NOT_APPLICABLE",
      "tx": "ABSTRACT_LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+    {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED",
+     "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
 ]
 EXPECTED_THEOREM_PLANES = [
     ["model", "source", "tx"],
@@ -276,6 +284,7 @@ EXPECTED_THEOREM_PLANES = [
     ["model"],
     ["model"],
     ["tx"],
+    ["model", "source", "tx"],
 ]
 EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction",
@@ -300,6 +309,7 @@ EXPECTED_THEOREMS = [
     "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined",
     "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined",
     "LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant",
+    "LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx",
 ]
 STATUS_VALUES = {
     "ABSTRACT_LEAN_CHECKED",
@@ -644,6 +654,10 @@ VERIFIED_SOURCE_ANCHORS = {
         ("contracts/0.8.9/WithdrawalQueue.sol", "requestWithdrawals", 125, 142),
         ("contracts/0.8.9/WithdrawalQueue.sol", "claimWithdrawalsTo", 244, 264),
         ("contracts/0.6.12/WstETH.sol", "unwrap", 69, 80),
+    },
+    "P-ADDRESS-1.transfer-owner-handoff": {
+        ("contracts/0.8.9/WithdrawalQueueERC721.sol",
+         "transferFrom and owner-operated _transfer handoff", 218, 253),
     },
     "P-TOPUP-2": {
         ("contracts/0.8.25/TopUpGateway.sol", "topUp", 160, 237),
@@ -1030,6 +1044,12 @@ def validate():
             require(row["statuses"]["tx"] != "LEAN_CHECKED",
                     "P-ADDRESS-1.denote-admission: the audit-authored entrypoint may not claim a "
                     "pinned-source transaction closure")
+        elif row["id"] == "P-ADDRESS-1.transfer-owner-handoff":
+            require(row.get("parent_id") == "P-ADDRESS-1",
+                    "P-ADDRESS-1.transfer-owner-handoff must remain subordinate to P-ADDRESS-1")
+            require(row.get("source_plane_scope") ==
+                    "WithdrawalQueueERC721.transferFrom owner-operated approval-delete and owner-handoff slice only",
+                    "P-ADDRESS-1.transfer-owner-handoff: scope differs")
         else:
             require("parent_id" not in row,
                     f"{row['id']}: only declared subordinate evidence may have a parent")

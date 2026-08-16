@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.AddressEquivariance
+import LidoSRv3.Audit.Verity.AddressTransferTx
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
@@ -132,5 +133,12 @@ theorem admission_and_post_state_equivariance
     (hPostState : post_state_equivariant cfg rename_state fn) :
     address_nondiscrimination cfg rename_state fn := by
   exact ⟨hAdmission, hPostState⟩
+
+/-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
+for the owner-operated WithdrawalQueue ERC-721 ownership handoff. The umbrella
+guarantee remains open for the other mapped entrypoints and omitted set/event
+effects. -/
+theorem bounded_transfer_model_source_tx :=
+  LidoSRv3.Audit.Verity.AddressTransferTx.model_source_tx_address_equivariance_slice
 
 end LidoSRv3.Audit.Guarantees.PAddress1

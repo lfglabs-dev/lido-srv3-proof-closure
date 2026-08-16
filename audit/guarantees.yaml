@@ -269,6 +269,19 @@
       "reproduction": {"command": "lake build LidoSRv3.Audit.Verity.AddressAdmission", "expected": "successful official-denotation admission reduction, caller-swap equivariance, both-gate non-vacuity witnesses, and owner-gated mutant refutation; post-state equivariance, pinned-source correspondence, Yul, and EVM remain open"}
     },
     {
+      "id": "P-ADDRESS-1.transfer-owner-handoff",
+      "parent_id": "P-ADDRESS-1",
+      "catalogue_wording": "A bounded owner-operated WithdrawalQueueERC721 transfer slice separates MODEL, pinned SOURCE, and official Verity Denote execution: caller-relative authorization, approval deletion, and request-owner handoff compose in one registry theorem, two renamed successful post-state receipts commit distinct owners, and a wrong-caller control reverts with the pre-state. Enumerable owner sets, the Transfer event, approved-operator branches, the other mapped permissionless entrypoints, Yul, and EVM remain open, so the parent stays OPEN.",
+      "source_plane_scope": "WithdrawalQueueERC721.transferFrom owner-operated approval-delete and owner-handoff slice only",
+      "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx",
+      "theorem_planes": ["model", "source", "tx"],
+      "statuses": {"model": "LEAN_CHECKED", "algorithm": "NOT_APPLICABLE", "source": "LEAN_CHECKED", "tx": "LEAN_CHECKED", "yul": "OPEN", "evm": "OPEN", "crypto": "NOT_APPLICABLE"},
+      "assumptions": ["A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD"],
+      "note": "The TX receipts use Compiler.CompilationModel.Denote.denoteFunction directly and contain no external-call primitive, so externalCallBind vacuity is irrelevant. The registry theorem consumes the distinct MODEL→SOURCE theorem, both renamed SOURCE post-states, both committed Denote post-states, and the wrong-caller rollback control.",
+      "next_gate": "Generalize the bounded transfer receipt beyond fixed witnesses, add the two approved-operator branches, owner-indexed enumerable-set updates and Transfer event, then cover request/claim/redemption entrypoints before moving the parent.",
+      "reproduction": {"command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTransferTx LidoSRv3.Audit.Trust", "expected": "successful bounded MODEL/SOURCE/TX composition with committed renamed post-states and wrong-caller rollback; parent P-ADDRESS-1 remains OPEN"}
+    },
+    {
       "id": "P-DEREF-1",
       "catalogue_wording": "Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.",
       "source_plane_scope": "registry address binding only; migration old-layout contents are explicit inputs",

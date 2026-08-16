@@ -1,11 +1,32 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 84902545be7f331f430dac953cfdeaa9d6337394
+validated-tree: 119b213c06ee1af20f98af87b675803691cb13e2
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ADDRESS-1 bounded transfer MODEL/SOURCE/TX slice (2026-08-16)
+----------------------------------------------------------------
+
+- The parent `P-ADDRESS-1` row remains OPEN. New subordinate row
+  `P-ADDRESS-1.transfer-owner-handoff` is limited to the owner-operated branch
+  of `WithdrawalQueueERC721.transferFrom/_transfer` at pinned core SHA
+  `af095e48bbc1c3841c2c9936219c8461af01056b`, lines 218--253.
+- MODEL and SOURCE are distinct definitions joined by `source_refines_model`.
+  The registry-facing theorem consumes that correspondence, two renamed SOURCE
+  post-states, two distinct successful Denote post-states, and a wrong-caller
+  rollback control.
+- TX uses `Compiler.CompilationModel.Denote.denoteFunction`: transaction sender,
+  owner mapping read, approval deletion, and owner handoff are evaluated by the
+  official denotation. The program contains no external-call primitive and does
+  not rely on `externalCallBind`.
+- Scope left open: approved-operator branches, enumerable owner sets, Transfer
+  event, the other mapped request/claim/redemption entrypoints, Yul, and EVM.
+- Focused build and Trust build passed; metadata check reports 11 canonical
+  guarantees plus 13 subordinate evidence rows. Metadata mutants, provenance,
+  receipt binding, and diff hygiene passed.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------

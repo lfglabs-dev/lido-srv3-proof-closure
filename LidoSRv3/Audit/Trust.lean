@@ -67,6 +67,9 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_empty_balance
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_rejects_when_paused
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
+#print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
+#print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
