@@ -1,17 +1,14 @@
-# P-ALLOC-2 official loop-semantics blocker
+# P-ALLOC-2 official loop-semantics provenance
 
 The repository pins `lfglabs-dev/verity` at
-`d2d4a18a4d7021adcd90d4b03e619affe506dd54`. That revision does not contain
-`Verity.Proofs.LoopSimulation`.
+`04729a9de9099e065dd09283e4f733a5fd4c2a16`. That revision exports
+`Verity.Proofs.LoopSimulation`; the prior note claiming its absence applied
+only to the historical `d2d4a18a4d7021adcd90d4b03e619affe506dd54` pin.
 
-The proposed official loop framework is Verity PR
-[#2231](https://github.com/lfglabs-dev/verity/pull/2231), head
-`2a380049fb7033c6b7bd2154b7f4becf62bf7e5e` (`proof/phase1k/loop-simulation`).
-It was still **OPEN and unmerged** when this slice was built, so it is not an
-independently verified dependency available at the repository pin.
-
-Accordingly this component stops at independent MODEL/SOURCE representations,
-checked-`Uint256` mutation obligations, and candidate correspondence. It does
-not add `runVerity`, an interpreter, `unsafeYul`, or a substitute axiom. A
-SOURCE-to-official-semantics bridge remains blocked until the loop framework is
-merged, reviewed, and deliberately repinned by the repository.
+This provenance correction does not enlarge P-ALLOC-2's assurance claim. Its
+current MODEL/SOURCE status and remaining proportional-amount correspondence
+scope are recorded in `audit/guarantees.yaml`, `audit/source-map.yaml`, and
+`audit/STATUS.md`. Any future SOURCE-to-official-semantics bridge must use the
+pinned public loop API and remain subject to the existing proof and trust
+surface checks; this document introduces no interpreter, `unsafeYul`, axiom,
+or substitute proof surface.

@@ -4,8 +4,8 @@ import Verity.Core.Model.Denote
 /-!
 # Official Verity semantics smoke test
 
-This file pins the concrete semantic path available in Verity revision
-`d2d4a18a4d7021adcd90d4b03e619affe506dd54`:
+This file uses the concrete semantic path available in the repository's pinned
+Verity revision `04729a9de9099e065dd09283e4f733a5fd4c2a16`:
 
 * `Compiler.CompilationModel` is the official deep EDSL/IR compiler;
 * `Compiler.CompilationModel.Denote` is the canonical denotation exported by
