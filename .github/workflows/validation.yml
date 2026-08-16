@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The receipt is deliberately bound to the submitted commit, not
+          # GitHub's synthetic pull-request merge result.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install validation dependencies
         run: sudo apt-get update && sudo apt-get install --yes ripgrep
       - name: Install Lean toolchain manager
