@@ -85,13 +85,28 @@ structure TxView where
   before : ContractState
   after : ContractState
 
-/-- Independent transaction reading of the pinned source outcome. -/
+/-- The exact `ContractState.calls` journal the committing top-up program is
+expected to append, in call order: the Lido pull at `StakingRouter.sol` line
+744, then the beacon push at line 750. Since Verity #2334 each
+`externalCallBind` appends a name-keyed entry carrying the exact argument
+words, so an omitted pull, a doubled push, or an altered value is observable
+here rather than definitionally erased. -/
+def declaredTopupCalls (pulled pushed : Uint256) : List ExternalCall :=
+  [ linkedCallEntry "withdrawDepositableEther" [pulled]
+  , linkedCallEntry "makeBeaconChainTopUp" [pushed] ]
+
+/-- Independent transaction reading of the pinned source outcome, including
+the call journal the committing branch is required to produce. -/
 def sourceTx (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (before : ContractState) : TxView :=
-  if (run cfg inp).reverts then
-    ⟨.reverted, before, before⟩
-  else
-    ⟨.committed, before, before⟩
+  match run cfg inp with
+  | .committedTopUp _ pulled pushed _ =>
+      ⟨.committed, before,
+        { before with
+            calls := before.calls ++
+              declaredTopupCalls (Core.Uint256.ofNat pulled) (Core.Uint256.ofNat pushed) }⟩
+  | .committedNoTopUp => ⟨.committed, before, before⟩
+  | _ => ⟨.reverted, before, before⟩
 
 def observeVerity (before : ContractState) (result : ContractResult Unit) : TxView :=
   match result with
@@ -130,8 +145,9 @@ theorem verity_tx_simulates_source
       TopupTxContract.executeNoTopup, TopupTxContract.executePullRevert,
       TopupTxContract.executePushRevert, _root_.Verity.require,
       _root_.Contracts.externalCallBind, _root_.Verity.Contract.run,
-      _root_.Verity.bind, _root_.Verity.pure, Bind.bind, Pure.pure,
-      Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
+      _root_.Verity.bind, Bind.bind, declaredTopupCalls,
+      _root_.Contracts.ExternalArg.toWords,
+      Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
   case revertAssertBalanceUnchanged =>
     by_cases heq : Core.Uint256.ofNat (totalAllocated inp) =
         Core.Uint256.ofNat (pushedValue inp) <;> simp [heq]
@@ -153,5 +169,97 @@ theorem source_value_observation_adequate
     (cfg : SourceTopupConfig) (inp : SourceTopupInput) :
     (run cfg inp).pulled = (run cfg inp).pushed :=
   run_conserves cfg inp
+
+/-! ### Executable-plane call-journal evidence
+
+Before Verity #2334 `Contracts.externalCallBind` was `pure ()`, so the evil
+mutant recorded in the P-TOPUP-1 retraction (pull omitted, beacon push
+doubled, attacker sweep appended) was `rfl`-equal to the audited program.
+Since #2334 each call site appends a name-keyed entry carrying its exact
+argument words, so the separations below reject a change to the executed
+program itself.
+
+Scope: executable-plane (`Contract.run`) facts about call name, argument
+words, multiplicity and order only. Callee address, call kind, ABI byte
+layout, gas, and deployed-runtime semantics remain open. -/
+
+/-- The committing top-up program journals exactly the two declared
+value-bearing calls, pull before push. -/
+theorem executeTopup_journals_declared_calls (pulled pushed : Uint256)
+    (h : pulled = pushed) (s : ContractState) :
+    (TopupTxContract.executeTopup false pulled pushed true).run s =
+      .success () { s with calls := s.calls ++ declaredTopupCalls pulled pushed } := by
+  subst h
+  simp [TopupTxContract.executeTopup, _root_.Contracts.externalCallBind,
+    _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
+    Bind.bind, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords]
+
+/-- Mutant: the Lido pull is omitted but the beacon push still happens, so the
+router pushes ether it never pulled. -/
+private def mutantNoPull (pushed : Uint256) : Contract Unit :=
+  externalCallBind ([] : List String) "makeBeaconChainTopUp" [pushed]
+
+/-- Mutant: the beacon push is doubled. -/
+private def mutantDoublePush (pulled pushed : Uint256) : Contract Unit := do
+  externalCallBind ([] : List String) "withdrawDepositableEther" [pulled]
+  externalCallBind ([] : List String) "makeBeaconChainTopUp" [pushed]
+  externalCallBind ([] : List String) "makeBeaconChainTopUp" [pushed]
+
+/-- Mutant: an attacker-controlled sweep is appended after the audited pair. -/
+private def mutantAttackerSweep (pulled pushed : Uint256) : Contract Unit := do
+  externalCallBind ([] : List String) "withdrawDepositableEther" [pulled]
+  externalCallBind ([] : List String) "makeBeaconChainTopUp" [pushed]
+  externalCallBind ([] : List String) "sweepToAttacker" [pushed]
+
+/-- Omitting the Lido pull is observable in every pre-state. -/
+theorem no_pull_rejected (pulled pushed : Uint256) (h : pulled = pushed)
+    (s : ContractState) :
+    ((mutantNoPull pushed).run s).snd.calls ≠
+      ((TopupTxContract.executeTopup false pulled pushed true).run s).snd.calls := by
+  rw [executeTopup_journals_declared_calls pulled pushed h]
+  simp only [mutantNoPull, _root_.Contracts.externalCallBind,
+    _root_.Verity.Contract.run, ContractResult.snd, declaredTopupCalls,
+    _root_.Contracts.ExternalArg.toWords]
+  intro hcalls
+  have hlen := congrArg List.length hcalls
+  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
+  omega
+
+/-- Doubling the beacon push is observable in every pre-state. -/
+theorem double_push_rejected (pulled pushed : Uint256) (h : pulled = pushed)
+    (s : ContractState) :
+    ((mutantDoublePush pulled pushed).run s).snd.calls ≠
+      ((TopupTxContract.executeTopup false pulled pushed true).run s).snd.calls := by
+  rw [executeTopup_journals_declared_calls pulled pushed h]
+  simp only [mutantDoublePush, _root_.Contracts.externalCallBind,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    ContractResult.snd, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords]
+  intro hcalls
+  have hlen := congrArg List.length hcalls
+  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
+  omega
+
+/-- An appended attacker sweep is observable in every pre-state. -/
+theorem attacker_sweep_rejected (pulled pushed : Uint256) (h : pulled = pushed)
+    (s : ContractState) :
+    ((mutantAttackerSweep pulled pushed).run s).snd.calls ≠
+      ((TopupTxContract.executeTopup false pulled pushed true).run s).snd.calls := by
+  rw [executeTopup_journals_declared_calls pulled pushed h]
+  simp only [mutantAttackerSweep, _root_.Contracts.externalCallBind,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    ContractResult.snd, declaredTopupCalls, _root_.Contracts.ExternalArg.toWords]
+  intro hcalls
+  have hlen := congrArg List.length hcalls
+  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
+  omega
+
+/-- A revert during the beacon suffix rolls the whole journal back: neither the
+pull nor the push survives, matching EVM top-level revert observability. -/
+theorem push_revert_rolls_back_journal (pulled pushed : Uint256)
+    (s : ContractState) :
+    ((TopupTxContract.executePushRevert pulled pushed).run s).snd.calls = s.calls := by
+  simp [TopupTxContract.executePushRevert, _root_.Contracts.externalCallBind,
+    _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
+    Bind.bind, ContractResult.snd]
 
 end LidoSRv3.Audit.Verity.TopupHybrid

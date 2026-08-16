@@ -91,11 +91,25 @@ def executeOutcome (cfg : SourceDepositConfig) (inp : SourceDepositInput)
   | .committedNoDeposits => _root_.Verity.pure balances
   | _ => _root_.Verity.pure balances
 
+/-- The exact `ContractState.calls` journal the committing deposit program is
+expected to append, in call order: module data fetch, Lido pull, beacon push.
+Since Verity #2334 each `externalCallBind` appends a name-keyed entry carrying
+the exact argument words, so this list is an observable prediction rather than
+a comment. -/
+def declaredDepositCalls (amount : Uint256) : List ExternalCall :=
+  [ linkedCallEntry "obtainDepositData" [amount]
+  , linkedCallEntry "withdrawDepositableEther" [amount]
+  , linkedCallEntry "depositToBeacon" [amount] ]
+
 def sourceObservation (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (snapshot : ContractState) (balances : Balances) : TxObservation :=
   match run cfg inp with
   | .committedDeposits _ pulled _ _ =>
-      ⟨.committed, snapshot, snapshot, balances, committedBalances balances pulled⟩
+      ⟨.committed, snapshot,
+        { snapshot with
+            calls := snapshot.calls ++
+              declaredDepositCalls (Core.Uint256.ofNat (depositsValue cfg inp)) },
+        balances, committedBalances balances pulled⟩
   | .committedNoDeposits => ⟨.committed, snapshot, snapshot, balances, balances⟩
   | _ => ⟨.reverted, snapshot, snapshot, balances, balances⟩
 
@@ -111,10 +125,10 @@ theorem run_simulates_source (cfg : SourceDepositConfig) (inp : SourceDepositInp
     omega
   cases hrun : run cfg inp <;>
     simp [executeOutcome, executeCalls, sourceObservation, observe, DepositTxContract.execute,
-      _root_.Contracts.externalCallBind, _root_.Verity.require,
+      _root_.Contracts.externalCallBind, _root_.Verity.require, declaredDepositCalls,
       DepositTxContract.executeNoDeposits, _root_.Verity.Contract.run, _root_.Verity.bind,
-      _root_.Verity.pure, Bind.bind, Pure.pure, hrun, Core.Uint256.ofNat,
-      Nat.mod_eq_of_lt hAmountLt]
+      _root_.Verity.pure, Bind.bind, hrun, Core.Uint256.ofNat,
+      _root_.Contracts.ExternalArg.toWords, Nat.mod_eq_of_lt hAmountLt]
 
 theorem one_unit_exact_transfer
     {cfg : SourceDepositConfig} {inp : SourceDepositInput}
@@ -137,7 +151,7 @@ theorem one_unit_exact_transfer
   simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
     _root_.Contracts.externalCallBind, _root_.Verity.require,
     _root_.Verity.Contract.run, _root_.Verity.bind,
-    _root_.Verity.pure, Bind.bind, Pure.pure, committedBalances, Nat.sub_add_cancel hFunds,
+    _root_.Verity.pure, Bind.bind, committedBalances, Nat.sub_add_cancel hFunds,
     Core.Uint256.ofNat, Nat.mod_eq_of_lt hAmountLt]
 
 theorem failure_restores_snapshot
@@ -158,5 +172,94 @@ theorem source_revert_restores_committed_effects
     tx.status = .reverted ∧ tx.after = snapshot ∧ tx.balancesAfter = balances := by
   rw [(run_simulates_source cfg inp snapshot balances hBound).1]
   cases hrun : run cfg inp <;> simp [sourceObservation, Outcome.reverts, hrun] at h ⊢
+
+/-! ### Executable-plane call-journal evidence
+
+Before Verity #2334 `Contracts.externalCallBind` was `pure ()`, so the audited
+program and every call-sequence mutant were *definitionally equal* and the
+separations below were unstatable. Since #2334 each call site appends a
+name-keyed entry carrying its exact argument words, so the theorems here reject
+a change to the executed program itself, not to a handwritten record.
+
+Scope: these are executable-plane (`Contract.run`) facts about call name,
+argument words, multiplicity and order. They do not establish callee address,
+call kind, ABI byte layout, gas, or any deployed-runtime semantics. -/
+
+/-- The committing deposit program journals exactly the three declared calls,
+in pinned-source order, each carrying the deposit amount as its calldata. -/
+theorem execute_journals_declared_calls (amount : Uint256) (s : ContractState) :
+    (DepositTxContract.execute amount true true true).run s =
+      .success () { s with calls := s.calls ++ declaredDepositCalls amount } := by
+  simp [DepositTxContract.execute, _root_.Contracts.externalCallBind,
+    _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
+    Bind.bind, declaredDepositCalls,
+    _root_.Contracts.ExternalArg.toWords]
+
+/-- Mutant: the Lido pull at `StakingRouter.sol` line 744 is omitted. -/
+private def mutantOmittedPull (amount : Uint256) : Contract Unit := do
+  externalCallBind ([] : List String) "obtainDepositData" [amount]
+  externalCallBind ([] : List String) "depositToBeacon" [amount]
+
+/-- Mutant: the beacon push is executed twice (double-send). -/
+private def mutantDoubledPush (amount : Uint256) : Contract Unit := do
+  externalCallBind ([] : List String) "obtainDepositData" [amount]
+  externalCallBind ([] : List String) "withdrawDepositableEther" [amount]
+  externalCallBind ([] : List String) "depositToBeacon" [amount]
+  externalCallBind ([] : List String) "depositToBeacon" [amount]
+
+/-- Mutant: the pull and the push are swapped, so the router pushes to the
+beacon before it has pulled the ether. -/
+private def mutantSwappedOrder (amount : Uint256) : Contract Unit := do
+  externalCallBind ([] : List String) "obtainDepositData" [amount]
+  externalCallBind ([] : List String) "depositToBeacon" [amount]
+  externalCallBind ([] : List String) "withdrawDepositableEther" [amount]
+
+/-- Omitting the Lido pull is observable in every pre-state. -/
+theorem omitted_pull_rejected (amount : Uint256) (s : ContractState) :
+    ((mutantOmittedPull amount).run s).snd.calls ≠
+      ((DepositTxContract.execute amount true true true).run s).snd.calls := by
+  rw [execute_journals_declared_calls]
+  simp only [mutantOmittedPull, _root_.Contracts.externalCallBind,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords]
+  intro h
+  have hlen := congrArg List.length h
+  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
+  omega
+
+/-- Double-sending the beacon push is observable in every pre-state. -/
+theorem doubled_push_rejected (amount : Uint256) (s : ContractState) :
+    ((mutantDoubledPush amount).run s).snd.calls ≠
+      ((DepositTxContract.execute amount true true true).run s).snd.calls := by
+  rw [execute_journals_declared_calls]
+  simp only [mutantDoubledPush, _root_.Contracts.externalCallBind,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords]
+  intro h
+  have hlen := congrArg List.length h
+  simp only [List.length_append, List.length_cons, List.length_nil] at hlen
+  omega
+
+/-- Pushing to the beacon before pulling from Lido is observable in every
+pre-state: the journal records call order. -/
+theorem swapped_order_rejected (amount : Uint256) (s : ContractState) :
+    ((mutantSwappedOrder amount).run s).snd.calls ≠
+      ((DepositTxContract.execute amount true true true).run s).snd.calls := by
+  rw [execute_journals_declared_calls]
+  simp only [mutantSwappedOrder, _root_.Contracts.externalCallBind,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    ContractResult.snd, declaredDepositCalls, _root_.Contracts.ExternalArg.toWords,
+    List.append_assoc, List.cons_append, List.nil_append]
+  intro h
+  have hpair := List.append_cancel_left h
+  simp [_root_.Contracts.linkedCallEntry] at hpair
+
+/-- A guard failure rolls the whole journal back: no call survives a revert,
+matching EVM top-level revert observability. -/
+theorem revert_rolls_back_journal (amount : Uint256) (s : ContractState) :
+    ((DepositTxContract.execute amount true true false).run s).snd.calls = s.calls := by
+  simp [DepositTxContract.execute, _root_.Contracts.externalCallBind,
+    _root_.Verity.require, _root_.Verity.Contract.run, _root_.Verity.bind,
+    Bind.bind, ContractResult.snd]
 
 end LidoSRv3.Audit.Verity.DepositTx
