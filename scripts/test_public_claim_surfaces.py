@@ -156,6 +156,10 @@ with tempfile.TemporaryDirectory() as tmp:
         "public meta import LidoSRv3.Audit.Verity.AccountingTx",
         "import all LidoSRv3.Audit.Verity.AccountingTx",
         "public meta import all LidoSRv3.Audit.Verity.AccountingTx",
+        "public import all\n  LidoSRv3.Audit.Verity.AccountingTx",
+        "public\n  import LidoSRv3.Audit.Verity.AccountingTx",
+        "import\n  all\n  LidoSRv3.Audit.Verity.AccountingTx",
+        "public import all\n\tLidoSRv3.Audit.Verity.AccountingTx",
     ):
         account.write_text(import_command + "\n" + account_original, encoding="utf-8")
         run(fixture, False, "imports differ from the structural allowlist")
