@@ -12,8 +12,6 @@ import json
 import re
 from pathlib import Path
 
-from evidence_index import assurance_v4_evidence, render_json, render_markdown
-
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 CANONICAL_IDS = [
@@ -306,14 +304,7 @@ def rendered(rows):
         lines.append(f"| `{r['id']}` | {r['abstract']['status']} | {r['verity']['status']} | {missing} | {r['classification']['kind']} | {assumptions} |")
     status = header + "\n".join(lines) + "\n"
     reproduce = header + "# REPRODUCE\n\n" + "\n".join(f"- `{r['id']}`: `{r['reproduction']['command']}` — {r['reproduction']['expected']}" for r in canonical) + "\n"
-    evidence = assurance_v4_evidence(canonical, ROOT)
-    return {
-        "ROADMAP.md": roadmap,
-        "STATUS.md": status,
-        "REPRODUCE.md": reproduce,
-        "EVIDENCE.md": render_markdown(evidence),
-        "evidence.json": render_json(evidence),
-    }
+    return {"ROADMAP.md": roadmap, "STATUS.md": status, "REPRODUCE.md": reproduce}
 
 
 def main():
@@ -328,7 +319,7 @@ def main():
     if args.command == "generate":
         for name, content in views.items():
             (AUDIT / name).write_text(content, encoding="utf-8")
-        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md audit/EVIDENCE.md audit/evidence.json")
+        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md")
     else:
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content, f"{name} is stale; run scripts/audit_metadata.py generate")
