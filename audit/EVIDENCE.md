@@ -64,9 +64,9 @@ Pinned-source correspondence proves only the next-target selection rule; proport
 Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.
 
 - Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L70)
+- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L69)
 - Theorem planes: `model`, `source`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:70`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L70)
+- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:69`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L69)
 - Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PDeposit1`
 - Expected scope: successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
@@ -92,9 +92,9 @@ Bounded SOURCE/VERITY_TX evidence for the ETH-ledger conservation and rollback c
 
 - Scope: ETH-ledger conservation/rollback core only; allocation, module ABI, multi-contract state, and per-validator deposit-data roots are excluded
 - Plane statuses: model=NOT_APPLICABLE; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L154)
+- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L153)
 - Theorem planes: `source`, `tx`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:154`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L154)
+- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:153`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L153)
 - Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
 - Reproduce: `lake build LidoSRv3.Audit.Verity.DepositLedgerTx LidoSRv3.Audit.Guarantees.PDeposit1`
 - Expected scope: successful storage-only Contract.run deposit-ledger build: universally quantified revert rollback, three bounded source-correspondence receipts, two disagreeing mutants, and the checked forEach-wrapper unrolling probe; the multi-contract deposit transaction, generated Yul, and EVM execution remain OPEN

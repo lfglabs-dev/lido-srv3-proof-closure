@@ -140,7 +140,7 @@
       ],
       "source": {
         "source": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
-        "line": 70
+        "line": 69
       },
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1",
@@ -197,7 +197,7 @@
           ],
           "source": {
             "source": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
-            "line": 154
+            "line": 153
           },
           "reproduction": {
             "command": "lake build LidoSRv3.Audit.Verity.DepositLedgerTx LidoSRv3.Audit.Guarantees.PDeposit1",

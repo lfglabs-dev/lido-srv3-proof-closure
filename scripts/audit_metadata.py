@@ -890,6 +890,14 @@ def validate_lock(lock, source_map):
 
 
 def validate():
+    pdeposit_facade = (
+        ROOT / "LidoSRv3/Audit/Guarantees/PDeposit1.lean"
+    ).read_text(encoding="utf-8")
+    require(
+        "def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source]⟩"
+        in pdeposit_facade,
+        "P-DEPOSIT-1: canonical checked layers must exclude subordinate Verity TX evidence",
+    )
     registry = load("guarantees.yaml")
     assumptions = load("assumptions.yaml")
     exclusions = load("exclusions.yaml")

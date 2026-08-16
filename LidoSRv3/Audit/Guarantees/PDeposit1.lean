@@ -8,10 +8,9 @@ namespace LidoSRv3.Audit.Guarantees.PDeposit1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityDeposit
 
-/-- `.verityTx` records the ETH-ledger conservation/rollback core only; the
-multi-contract deposit transaction of the canonical wording stays on
-`.abstractTx`. -/
-def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
+/-- The bounded ETH-ledger `Contract.run` theorem below is subordinate evidence;
+the canonical multi-contract deposit transaction remains open. -/
+def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source]⟩
 
 /-- Abstract transaction rollback, not an executable EVM trace. -/
 theorem revert_restores_state_value_and_logs {State : Type} :

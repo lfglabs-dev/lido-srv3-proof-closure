@@ -44,6 +44,10 @@ example : all.map (fun guarantee => guarantee.id.text) =
      "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1", "P-TOPUP-2",
      "P-CONSOLIDATION-1", "P-SSZ-1"] := by decide
 
+/-- Subordinate deposit-ledger execution must not populate the parent facade. -/
+example : PDeposit1.guarantee.checkedLayers =
+    [.model, .abstractTx, .source] := by decide
+
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
 def supplemental : List Guarantee := [PDeref1.guarantee]
 
