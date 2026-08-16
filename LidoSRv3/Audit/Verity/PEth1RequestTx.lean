@@ -46,7 +46,6 @@ def busForward (msgValue : Uint256) (gatewayOk : Bool) : Contract Unit := do
   setStorage gatewaySlot gAfter
 
 def sendWithdrawalFee (fee msgValue : Uint256) (callOk : Bool) : Contract Unit := do
-  require (fee != 0) "ZeroArgument(pubkeys)"
   require (msgValue == fee) "IncorrectFee"
   require callOk "RequestAdditionFailed"
   let v ← getStorage vaultSlot
@@ -58,7 +57,6 @@ def sendWithdrawalFee (fee msgValue : Uint256) (callOk : Bool) : Contract Unit :
 
 /-- Two EIP-7251 fee sends. The first write precedes the second call check. -/
 def sendTwoConsolidationFees (fee : Uint256) (secondOk : Bool) : Contract Unit := do
-  require (fee != 0) "ZeroArgument(sourcePubkeys)"
   let required ← addPanic fee fee
   let v ← getStorage vaultSlot
   require (decide (required ≤ v)) "NotEnoughEther"
@@ -124,14 +122,12 @@ def sourceBus (msgValue : Nat) (gatewayOk : Bool) : SourceOutcome :=
   else .committed msgValue
 
 def sourceWithdrawalFee (fee msgValue : Nat) (callOk : Bool) : SourceOutcome :=
-  if fee = 0 then .reverted "ZeroArgument(pubkeys)"
-  else if msgValue ≠ fee then .reverted "IncorrectFee"
+  if msgValue ≠ fee then .reverted "IncorrectFee"
   else if !callOk then .reverted "RequestAdditionFailed"
   else .committed fee
 
 def sourceTwoConsolidationFees (fee : Nat) (secondOk : Bool) : SourceOutcome :=
-  if fee = 0 then .reverted "ZeroArgument(sourcePubkeys)"
-  else if !secondOk then .reverted "RequestAdditionFailed"
+  if !secondOk then .reverted "RequestAdditionFailed"
   else .committed (fee + fee)
 
 def sourceBusView (before : Ledger) (msgValue : Nat) (gatewayOk : Bool) : TxView :=
@@ -214,6 +210,11 @@ theorem withdrawal_fee_success :
     ⟨.reverted, ⟨3, 1, 20, 2, 4⟩⟩)
 
 #guard decide
+  (observe ((sendWithdrawalFee (word 0) (word 0) true).run
+      (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
+    ⟨.committed, ⟨3, 1, 20, 2, 4⟩⟩)
+
+#guard decide
   (observe ((sendTwoConsolidationFees (word 5) true).run
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
     ⟨.committed, ⟨3, 1, 10, 2, 14⟩⟩)
@@ -227,6 +228,11 @@ theorem consolidation_second_failure_discards_prefix :
   (observe ((sendTwoConsolidationFees (word 5) false).run
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
     ⟨.reverted, ⟨3, 1, 20, 2, 4⟩⟩)
+
+#guard decide
+  (observe ((sendTwoConsolidationFees (word 0) true).run
+      (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
+    ⟨.committed, ⟨3, 1, 20, 2, 4⟩⟩)
 
 #guard decide
   (sourceBusView ⟨3, 1, 20, 0, 0⟩ 5 true =
