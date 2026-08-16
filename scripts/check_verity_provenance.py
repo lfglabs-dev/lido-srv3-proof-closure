@@ -85,6 +85,12 @@ def check(root: Path) -> str:
     if audit_revision != requested_revision:
         fail("audit-manifest Verity revision differs from the lakefile request")
 
+    legacy_source_map = load_json(root / "verity/targets/source-map.json")
+    source_revisions = legacy_source_map.get("source_revisions")
+    source_map_revision = source_revisions.get("verity_commit") if isinstance(source_revisions, dict) else None
+    if source_map_revision != requested_revision:
+        fail("source-map Verity revision differs from the lakefile request")
+
     checkout = root / ".lake/packages/verity"
     if not checkout.is_dir():
         fail(f"resolved Verity checkout {checkout} not found")
