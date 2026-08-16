@@ -1,11 +1,22 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 7fa7807e1b810ff3d5485b49ebdf33f8469f38b9
+validated-tree: 9655e7becd128ac985e9c87026b226d6e7d0671a
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Canonical source-map pin repair (2026-08-16)
+--------------------------------------------
+
+- `verity/targets/source-map.json` now records the canonical Verity pin
+  `1fe0218863a4c8d6113e6cdd4de3766a54df81c7`, matching the lakefile,
+  manifest, artifact lock, audit manifest, proof report, and checkout.
+- `scripts/check_verity_provenance.py` now rejects source-map pin drift, with a
+  dedicated negative mutant in `scripts/test_verity_provenance.py`.
+- Receipt subject: tracked tree excluding this receipt,
+  `9655e7becd128ac985e9c87026b226d6e7d0671a`.
 
 PR #88 final exact-head repair (2026-08-16)
 -------------------------------------------

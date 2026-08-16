@@ -18,6 +18,7 @@ FILES = (
     "lake-manifest.json",
     "audit/artifacts.lock.json",
     "verity/targets/audit-manifest.json",
+    "verity/targets/source-map.json",
 )
 PIN = "1fe0218863a4c8d6113e6cdd4de3766a54df81c7"
 OTHER = "0" * 40
@@ -89,8 +90,18 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     audit["source_revisions"]["verity"] = OTHER
     write(audit_path, audit)
     run(fixture, False, "audit-manifest Verity revision")
+    shutil.copy2(ROOT / "verity/targets/audit-manifest.json", audit_path)
+
+    source_map_path = fixture / "verity/targets/source-map.json"
+    source_map = load(source_map_path)
+    source_revisions = source_map.get("source_revisions")
+    if not isinstance(source_revisions, dict):
+        raise SystemExit("fixture source_revisions must be an object")
+    source_revisions["verity_commit"] = OTHER
+    write(source_map_path, source_map)
+    run(fixture, False, "source-map Verity revision")
 
 print(
     "Verity provenance mutants rejected: exact lakefile request, request uniqueness, "
-    "manifest rev/inputRev/uniqueness, canonical artifact/audit pins, and checkout identity agree"
+    "manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, and checkout identity agree"
 )
