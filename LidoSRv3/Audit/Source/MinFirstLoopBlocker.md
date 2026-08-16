@@ -2,7 +2,7 @@
 
 The former `d2d4a18a4d7021adcd90d4b03e619affe506dd54` pin did not contain
 `Verity.Proofs.LoopSimulation`. The certified current pin,
-`04729a9de9099e065dd09283e4f733a5fd4c2a16`, does contain that upstream
+`1fe0218863a4c8d6113e6cdd4de3766a54df81c7`, does contain that upstream
 module. This audit slice has not yet integrated or reviewed a source-to-official
 loop simulation bridge, so the availability of the module is not itself treated
 as a closure result.

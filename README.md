@@ -13,6 +13,11 @@ them but does not itself prove anything.
 - Lean facade: `LidoSRv3/Audit/AllGuarantees.lean`
 - Source mapping: `audit/source-map.yaml`
 - Assumptions and exclusions: `audit/assumptions.yaml`, `audit/exclusions.yaml`
+- Campaign recovery and branch policy: `audit/CAMPAIGN-RECOVERY.md`
+
+`main` is the only active integration branch. The former
+`campaign/lido-minimal-11` line is preserved as merged history and an archival
+reference; new branches and pull requests must target `main`.
 
 ## The eleven guarantees
 

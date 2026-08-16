@@ -12,7 +12,7 @@
     },
     "verity": {
       "repository": "https://github.com/lfglabs-dev/verity.git",
-      "commit": "04729a9de9099e065dd09283e4f733a5fd4c2a16"
+      "commit": "1fe0218863a4c8d6113e6cdd4de3766a54df81c7"
     },
     "evmyullean": {
       "repository": "https://github.com/lfglabs-dev/EVMYulLean.git",
@@ -28,7 +28,16 @@
   },
   "modules": [
     "LidoSRv3.Audit.Verity.AddressYulInterface",
-    "LidoSRv3.Tests.AddressYulInterface"
+    "LidoSRv3.Tests.AddressYulInterface",
+    "LidoSRv3.Audit.Source.AddressCorrespondence",
+    "LidoSRv3.Audit.Source.TopupParentCorrespondence",
+    "LidoSRv3.Audit.Verity.AddressTx",
+    "LidoSRv3.Audit.Verity.DepositLedgerTx",
+    "LidoSRv3.Audit.Verity.TopupPackedStorage",
+    "LidoSRv3.Audit.Verity.TopupParent",
+    "LidoSRv3.Tests.AddressSourceMutants",
+    "LidoSRv3.Tests.Topup2Mutants",
+    "LidoSRv3.Tests.TopupParentMutants"
   ],
   "unavailable": {
     "sha256_ffi_implementation_identity": {
