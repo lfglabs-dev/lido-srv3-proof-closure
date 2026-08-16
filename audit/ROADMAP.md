@@ -12,4 +12,4 @@
 - `P-ADDRESS-1`: Prove source correspondence for the mapped permissionless transfer, request, claim, and redemption entrypoints, preserving caller-indexed balances, allowances, ownership, request state, pause state, and external-call behavior under renaming.
 - `P-TOPUP-2`: Strengthen tx_revert_has_failed_call so its witness is constrained to ObservedCalls of the same run; separately bind target, call kind, calldata, and per-validator call granularity before claiming those properties. Then obtain independent runtime provenance and refine through Yul/EVM.
 - `P-CONSOLIDATION-1`: Replace or independently validate the opaque native SHA-256 FFI trust boundary.
-- `P-SSZ-1`: Refine the mapped GIndex.concat, SSZ.verifyProof, and wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.
+- `P-SSZ-1`: Keep the GIndex.concat child subordinate and refine SSZ.verifyProof and all three mapped wrapper call sites to pinned-source correspondence before closing the umbrella SSZ source plane.

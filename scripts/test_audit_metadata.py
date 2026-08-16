@@ -523,6 +523,50 @@ def main():
         )
         write_json(guarantees_path, guarantees)
 
+        missing_gindex_concat = copy.deepcopy(guarantees)
+        missing_gindex_concat["guarantees"] = [
+            row for row in missing_gindex_concat["guarantees"]
+            if row["id"] != "P-SSZ-1.gindex-concat"
+        ]
+        write_json(guarantees_path, missing_gindex_concat)
+        run(
+            fixture,
+            False,
+            "generate",
+            "guarantees must contain the exact ordered canonical IDs plus subordinate evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
+        promoted_gindex_concat = copy.deepcopy(guarantees)
+        gindex_concat = next(
+            row for row in promoted_gindex_concat["guarantees"]
+            if row["id"] == "P-SSZ-1.gindex-concat"
+        )
+        del gindex_concat["parent_id"]
+        write_json(guarantees_path, promoted_gindex_concat)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-SSZ-1.gindex-concat must remain subordinate to P-SSZ-1",
+        )
+        write_json(guarantees_path, guarantees)
+
+        wrong_gindex_concat_parent = copy.deepcopy(guarantees)
+        gindex_concat = next(
+            row for row in wrong_gindex_concat_parent["guarantees"]
+            if row["id"] == "P-SSZ-1.gindex-concat"
+        )
+        gindex_concat["parent_id"] = "P-ALLOC-1"
+        write_json(guarantees_path, wrong_gindex_concat_parent)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-SSZ-1.gindex-concat must remain subordinate to P-SSZ-1",
+        )
+        write_json(guarantees_path, guarantees)
+
         promoted_eugene = copy.deepcopy(guarantees)
         eugene = next(
             row for row in promoted_eugene["guarantees"]
@@ -1156,6 +1200,7 @@ def main():
         "P-ACCOUNT-1 source/tx downgrade, transitive-helper and "
         "MAX_VALUE_GWEI declaration span drops, "
         "P-SSZ-1 deposit-data-root span drops, "
+        "P-SSZ-1 GIndex.concat subordinate-row omission/promotion/wrong-parent, "
         "P-ALLOC-1 Eugene subordinate-row omission/promotion/wrong-parent, "
         "stale view"
     )

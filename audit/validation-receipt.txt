@@ -1,11 +1,22 @@
 Closure-v2 validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 84902545be7f331f430dac953cfdeaa9d6337394
+validated-tree: 771783a046bf86db6c7dee53b213226edbe8e4a1
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-SSZ-1 GIndex.concat review reconciliation (2026-08-16)
+---------------------------------------------------------
+
+- The canonical P-SSZ-1 wording, reproduction expectation, next gate, and
+  generated roadmap now acknowledge the subordinate checked SOURCE evidence
+  for `GIndex.concat`. `SSZ.verifyProof` and all three wrappers remain open.
+- This reconciliation does not promote the child or close the parent:
+  canonical P-SSZ-1 SOURCE remains OPEN and TX remains BLOCKED.
+- Optimized metadata mutants and the focused GIndex/aggregate/trust build
+  passed; no Lean file, protected provenance, or trust assumption changed.
 
 P-ALLOC-2 proportional amount/transaction closure (2026-08-15)
 --------------------------------------------------------------
@@ -720,3 +731,33 @@ P-ADDRESS-1 official-denotation admission subordinate evidence (2026-08-16)
   head, then rebased onto `main` once #74 landed P-ALLOC-2. Only the
   `validated-tree:` line conflicted; it is re-derived for the rebased tree. The
   parent `P-ADDRESS-1` row is byte-identical to its `34b0fd0f` form.
+
+P-SSZ-1 GIndex.concat SOURCE child (2026-08-16)
+------------------------------------------------
+
+- Authored from exact live `main`
+  `2c5d3ece640f933f2c2fb5a6dd4a4a383d34b505`, after confirming the open PR
+  set contained no SSZ/GIndex writer. PR #69 was not touched.
+- `P-SSZ-1.gindex-concat` is subordinate evidence for only the pinned
+  `contracts/common/lib/GIndex.sol` `concat` span at Lido core
+  `af095e48bbc1c3841c2c9936219c8461af01056b`. It checks the zero `fls`
+  sentinel, `> 248` depth guard, left shift, right-pivot XOR, ordered OR, pack
+  bound, and `pow(rhs)` propagation.
+- Canonical `P-SSZ-1` remains `source: OPEN` and `tx: BLOCKED`. The child makes
+  no `SSZ.verifyProof`, wrapper, SHA-256/precompile, Yul/EVM, runtime, codehash,
+  fork, address, or deployment-provenance claim. No `CallProgram` or official
+  Verity-execution claim is introduced.
+- Focused Lean build, `LidoSRv3.Audit.AllGuarantees`, and
+  `LidoSRv3.Audit.Trust`: exit 0. The aggregate cold-cache build completed
+  successfully (1281 jobs); the three new theorems report only `[propext]`.
+- Accepted root/root and exact-depth-248 boundaries, first-overflow and zero
+  rejections, and wrong-shift, wrong-depth, wrong-order, and wrapping-overflow
+  mutants compile and are mechanically distinguished.
+- `python3 scripts/audit_metadata.py check`: exit 0, reporting 11 canonical
+  guarantees plus 13 subordinate rows. Optimized metadata mutants reject
+  omission, promotion, and wrong-parent edits to the new child.
+- `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/check_provenance_guards.sh`, `git diff --check`, and the
+  changed-Lean net-new `sorry`/`admit`/`axiom`/`native_decide` audit: exit 0.
+- Receipt subject: tracked tree excluding this receipt,
+  `49500b1eece0f42e3c52894b5f5a5a60abaa13a8`.

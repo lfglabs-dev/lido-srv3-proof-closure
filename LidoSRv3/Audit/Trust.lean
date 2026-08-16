@@ -12,6 +12,7 @@ import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Guarantees.PSsz1
+import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
@@ -97,6 +98,9 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
+#print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec
+#print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits
+#print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback
 #print axioms LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected
