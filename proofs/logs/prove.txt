@@ -623,17 +623,17 @@ info: LidoSRv3/Tests/TopupHybridMutants.lean:45:0: LidoSRv3.Audit.Verity.TopupHy
 info: LidoSRv3/Tests/TopupHybridMutants.lean:46:0: LidoSRv3.Audit.Verity.TopupHybrid.source_value_observation_adequate (cfg : Audit.SolidityTopup.SourceTopupConfig)
   (inp : Audit.SolidityTopup.SourceTopupInput) :
   (Audit.SolidityTopup.run cfg inp).pulled = (Audit.SolidityTopup.run cfg inp).pushed
-⚠ [1330/1362] Replayed LidoSRv3.Legacy.SpecProofs
+⚠ [1329/1362] Replayed LidoSRv3.Legacy.SpecProofs
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-ℹ [1333/1362] Replayed LidoSRv3.Tests.TopupParentMutants
+ℹ [1332/1362] Replayed LidoSRv3.Tests.TopupParentMutants
 info: LidoSRv3/Tests/TopupParentMutants.lean:95:0: LidoSRv3.Audit.Verity.TopupParent.parent_transaction_closure (cfg : SourceTopupConfig) (base : SourceTopupInput)
   (gateway : Address) (iface : CalleeInterface) (state : ContractState) : ParentProposition cfg base gateway iface state
 info: LidoSRv3/Tests/TopupParentMutants.lean:96:0: LidoSRv3.Audit.Verity.TopupParent.revert_restores_caller_frame (cfg : SourceTopupConfig) (base : SourceTopupInput)
   (gateway : Address) (iface : CalleeInterface) (state rollback : ContractState) (reason : String)
   (h : (execute cfg base gateway iface).run state = ContractResult.revert reason rollback) : rollback = state
-ℹ [1344/1362] Replayed LidoSRv3.Tests.AddressSourceMutants
+ℹ [1343/1362] Replayed LidoSRv3.Tests.AddressSourceMutants
 info: LidoSRv3/Tests/AddressSourceMutants.lean:32:0: LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source (inp : Input) (state : ContractState) :
   Audit.Verity.AddressTx.observeVerity state ((Audit.Verity.AddressTx.executeSource inp).run state) =
     Audit.Verity.AddressTx.sourceTx inp state
@@ -642,14 +642,14 @@ info: LidoSRv3/Tests/AddressSourceMutants.lean:33:0: LidoSRv3.Audit.SolidityAddr
 info: LidoSRv3/Tests/AddressSourceMutants.lean:34:0: LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant (a₁ a₂ : Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
   (inp : Input) (post : PostState) (h : run inp = Outcome.committed post) :
   run (renameInput a₁ a₂ inp) = Outcome.committed (renamePost a₁ a₂ post)
-ℹ [1353/1362] Replayed LidoSRv3.Tests.SszVerifierProgram
+ℹ [1352/1362] Replayed LidoSRv3.Tests.SszVerifierProgram
 info: LidoSRv3/Tests/SszVerifierProgram.lean:102:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.deposit_call_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:103:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.validator_root_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:104:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.verifier_pair_preimage_exact' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:105:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_memory_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:106:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_abi_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:107:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_sha_fails_closed' depends on axioms: [propext]
-⚠ [1358/1362] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1357/1362] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
