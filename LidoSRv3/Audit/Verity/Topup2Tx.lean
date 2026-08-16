@@ -26,9 +26,32 @@ statement over it would be vacuous.  Here, by contrast:
 * a transaction-level revert restores the exact initial world
   (`tx_revert_restores_world`), and a fully successful run commits exactly the
   fold of the adversary's per-site transitions
-  (`tx_committed_world_is_commit_fold`);
-* every transaction revert originates from an actually observed failed or
-  reverting call carrying the same returndata (`tx_revert_has_failed_call`).
+  (`tx_committed_world_is_commit_fold`).
+
+**Retracted claim (failed-call provenance).**  This module previously carried
+`tx_revert_has_failed_call`, asserting that "every transaction revert
+originates from an actually observed failed or reverting call carrying the same
+returndata".  Its conclusion was `∃ obs : CallObservation, ...`, with `obs`
+unconstrained by the program, the adversary, the initial state, or the revert
+hypothesis, so it was discharged by fabricating an observation and carried no
+information about the executed call program.  It is removed rather than
+restated.  The residual honest content is `gateway_abort_is_failed_call`, which
+constrains a *given* observation.
+
+Restoring the claim requires upstream work: at pin `04729a9` the supporting
+lemma `forEachCall_revert_step_abort` has the same unconstrained existential,
+and `ObservedCall` records only `site`/`preWorld` — not the gas and returndata
+needed to rebuild the observation — so membership of the aborting observation
+in `ObservedCalls` cannot even be stated against this pin.
+
+**Scope of the plane.**  Avoiding `externalCallBind` also means this plane is
+not a `Contract.run` observation: `gatewayCallProgram` is an abstract
+`CallProgram` built directly from the source transition `execute batch cfg`, so
+it constrains the modelled call schedule rather than an executed contract.  The
+executed-program binding that P-ALLOC-1 obtains via
+`Verity.AllocCapacityPhase3.executeObservedSummary` — a `Contract.run`
+observation over a real `writeSlot` store that never routes through
+`externalCallBind` — has no counterpart here.
 
 The runtime-provenance witness remains an input of this historical bounded
 theorem, but it is not a general closure gate. The active registry classifies
@@ -183,6 +206,9 @@ theorem tx_committed_world_is_commit_fold (batch : TopupBatch) (cfg : TopupConfi
         (CallsIn (gatewayCallProgram batch cfg) adversary state) :=
   denoteCallProgram_all_succeed_commits_world _ adversary state h
 
+/-- The gateway policy aborts only on an observation that actually failed, with
+that observation's returndata.  This constrains a given `obs`; it does not
+assert that such an `obs` belongs to any particular run's `ObservedCalls`. -/
 theorem gateway_abort_is_failed_call (obs : CallObservation) (data : List Nat)
     (h : gatewayPolicy obs = .abort data) :
     obs.result.succeeded = false ∧ obs.result.returndata = data := by
@@ -191,18 +217,5 @@ theorem gateway_abort_is_failed_call (obs : CallObservation) (data : List Nat)
   | false =>
       simp [gatewayPolicy, hsucc] at h
       exact ⟨rfl, h⟩
-
-/-- Every transaction revert originates from an actually observed failed or
-reverting call, and the transaction reports that call's returndata. -/
-theorem tx_revert_has_failed_call (batch : TopupBatch) (cfg : TopupConfig)
-    (adversary : AdversaryModel) (state : CallState) (data : List Nat)
-    (h : (denote (gatewayCallProgram batch cfg) adversary state).1 = .revert data) :
-    ∃ obs : CallObservation,
-      obs.result.succeeded = false ∧ obs.result.returndata = data := by
-  have h' : (denote (forEachCall gatewayPolicy ()
-      (plannedSites 0 (execute batch cfg))) adversary state).1 = .revert data := h
-  obtain ⟨obs, hobs⟩ := forEachCall_revert_step_abort gatewayPolicy ()
-    (plannedSites 0 (execute batch cfg)) adversary state data h'
-  exact ⟨obs, gateway_abort_is_failed_call obs data hobs⟩
 
 end LidoSRv3.Audit.Verity.Topup2Tx
