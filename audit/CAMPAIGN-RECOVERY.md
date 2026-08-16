@@ -19,7 +19,9 @@ The following campaign-only active artifacts are present in the resulting tree:
 - `LidoSRv3/Audit/Verity/TopupPackedStorage.lean`
 - `LidoSRv3/Audit/Verity/TopupParent.lean`
 - their address/top-up mutant suites;
-- the theorem-scoped evidence index and tests;
+- the historical theorem-scoped evidence index and tests, archived under
+  `archive/campaign-evidence-index/` because their seven-plane schema is not an
+  active assurance-v4 view and their line links must not be presented as current;
 - the P-TOPUP-2 pinned-layout/runtime receipts and differential Foundry harness.
 
 The Verity dependency is advanced to the campaign pin
