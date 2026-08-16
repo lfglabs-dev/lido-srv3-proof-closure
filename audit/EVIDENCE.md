@@ -102,9 +102,9 @@ Bounded SOURCE/VERITY_TX evidence for the ETH-ledger conservation and rollback c
 
 ## P-TOPUP-1
 
-The complete public topUp parent transaction is simulated by executable Verity Contract.run from authentication through allocation, wrapped uint256 accumulation, empty commit, Lido pull, Beacon push, assertion, commit/revert, and snapshot rollback; arbitrary callees expose control, value, returndata, and caller-frame preservation, while solc and deployment provenance remain separately trusted/recorded under A-SOLC-TRUSTED.
+Parent TX is NOT closed. The current Verity wrapper largely compares sourceExecute to itself; it does not compose allocation WC02 → executed calls → module delta. Keep MODEL/SOURCE; treat the wrapper as a subordinate scaffold, not end-to-end top-up conservation.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PTopup1.parent_verity_transaction_closure`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L195)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PTopup1.lean:195`](../LidoSRv3/Audit/Guarantees/PTopup1.lean#L195)
@@ -114,9 +114,9 @@ The complete public topUp parent transaction is simulated by executable Verity C
 
 ## P-ACCOUNT-1
 
-Under an explicit independently established full-success premise, pinned-source correspondence proves that AccountingOracle writes the validated module-balance snapshot before Accounting reads rewards and conditionally reports minted shares exactly when fee shares are positive; the SOURCE-to-VERITY_TX refinement includes checked Uint256 and uint64 accumulation, while later source guards, Yul, EVM, runtime, crypto, and E2E are not modeled or remain open.
+Parent TX is NOT closed. Useful arithmetic exists, but the TX compares nearly identical traces and only covers a small write prefix. Full-report success is assumed, not proved.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L26)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAccount1.lean:26`](../LidoSRv3/Audit/Guarantees/PAccount1.lean#L26)
@@ -126,7 +126,7 @@ Under an explicit independently established full-success premise, pinned-source 
 
 ## P-RESERVE-1
 
-Pinned source-shaped reserve spending is simulated by executable Verity Contract.run semantics into the abstract transaction/spec, proving withdrawal-reserve non-interference and rollback across checked-Uint256 failures; Yul, EVM, runtime-bytecode, crypto, and E2E layers remain open or not applicable.
+A real Verity Contract.run preserves a withdrawal-reserve partition under safeAdd/safeSub, guards, multi-slot writes, separate spec, and rollback. This is a neighboring property, NOT the requested relational one: 'at constant report/queue/buffer, changing only the deposits reserve leaves prefinalized/finalized ranges and locked ETH unchanged.'
 
 - Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec`](../LidoSRv3/Audit/Guarantees/PReserve1.lean#L30)
@@ -178,9 +178,9 @@ The bounded abstract consolidation-fee model confines its fee-bearing call to cf
 
 ## P-ADDRESS-1
 
-Permissionless transfer, request, claim, and redemption entrypoints must admit arbitrary eligible users without caller-address discrimination and produce successful post-states equivariant under caller renaming; singleton-actor functions are excluded and covered by authentication-integrity properties.
+Parent TX is NOT closed. Current evidence is mostly caller-renaming equivariance and a precomputed source post-state injected into the contract; it does not prove effective transfer, request, finalization, or redemption.
 
-- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
+- Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAddress1.model_to_source_to_verity_tx`](../LidoSRv3/Audit/Guarantees/PAddress1.lean#L142)
 - Theorem planes: `model`, `source`, `tx`
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAddress1.lean:142`](../LidoSRv3/Audit/Guarantees/PAddress1.lean#L142)
