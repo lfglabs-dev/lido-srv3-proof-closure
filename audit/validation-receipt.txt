@@ -1,7 +1,7 @@
 Minimal-11 cleanup validation receipt
 base: c418551251404063793322beaf3b559967a69563
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 8026d347b523ef4ffeb26cd70c3e1cb6b84473d8
+validated-tree: fc9632f82e311ecddedf449fff427a82a800cfe5
 
 Receipt semantics: `validated-tree` is the Git tree produced from committed HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -26,6 +26,9 @@ lido-verity-closure-v2 exact-milestone re-pin receipt (2026-08-14)
   `verity/targets/audit-manifest.json`, `verity/targets/source-map.json`, and
   `proofs/LOCKFILE.md`.  The checked-out local dependency was verified at the
   same immutable revision with a clean worktree.
+- `content/05-reproducibility.tex` names that exact Verity revision in both
+  reviewer-facing provenance fields. `scripts/audit_metadata.py check` rejects
+  a stale report pin or a `proofs/LOCKFILE.md` pin that diverges from it.
 - Local non-DGX validation only (DGX Spark remained paused): `make prove`
   completed with exit 0 using Lean 4.31.0.  Its generated report and complete
   build log are tracked under `proofs/logs/`; the report records the exact
