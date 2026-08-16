@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: b01a01ad578d15cfa4608dc1f24f29dfa4845383
+validated-tree: 43025d1e5a7a346c75b8affd28060d027b75a153
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -9,6 +9,16 @@ negative fixtures without circularly claiming the receipt's own commit.
 
 PR #88 reviewed-head repair (2026-08-16)
 -----------------------------------------
+
+- The successor exact-head review repairs fail closed on every Lean import
+  modifier form admitted by the pinned parser (`public`, `meta`, and `all`,
+  including their combinations and leading horizontal whitespace).
+- Proof-report emission now validates one exact Verity request against both
+  manifest revision fields, both canonical audit pins, and a clean checkout at
+  that revision before Lake can re-resolve any dependency state.
+- Family-level mutants cover import modifiers, request/package uniqueness,
+  exact 40-hex requests, `rev`/`inputRev` divergence, audit-pin divergence,
+  and stale/dirty checkout identity. The targeted gates and `make test` pass.
 
 - Reproduced from reviewed head `cdc51bd9742ab1f21e4b9c1ad445e8a251397735`:
   total-Nat effective-plus-pending addition did not model Solidity checked-word

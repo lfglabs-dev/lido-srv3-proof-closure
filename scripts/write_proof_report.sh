@@ -45,19 +45,11 @@ RECORDED_SOURCE_TREE="$(sed -nE 's/^verified_source_tree=([0-9a-f]{40})$/\1/p' "
 [ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
   fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
 
-# Check the resolved dependency before invoking Lake: `lake env` may repair a
-# detached package checkout to the manifest pin, which would otherwise erase
-# the very stale-checkout condition this provenance guard must reject.
-VERITY_COMMIT="$(python3 -c 'import json; d=json.load(open("lake-manifest.json")); print(next(p["rev"] for p in d["packages"] if p["name"] == "verity"))')"
-[ -n "$VERITY_COMMIT" ] || fail "could not read the pinned Verity revision from lake-manifest.json"
-VERITY_DIR=".lake/packages/verity"
-[ -d "$VERITY_DIR" ] || fail "resolved Verity checkout '$VERITY_DIR' not found"
-VERITY_HEAD="$(git -C "$VERITY_DIR" rev-parse HEAD 2>/dev/null)" || \
-  fail "could not read resolved Verity checkout revision from '$VERITY_DIR'"
-[ "$VERITY_HEAD" = "$VERITY_COMMIT" ] || \
-  fail "resolved Verity checkout revision '$VERITY_HEAD' does not match manifest '$VERITY_COMMIT'"
-[ -z "$(git -C "$VERITY_DIR" status --porcelain --untracked-files=all)" ] || \
-  fail "resolved Verity checkout '$VERITY_DIR' is dirty"
+# Validate every request/resolution/audit/checkout identity before invoking
+# Lake: `lake env` may otherwise repair the manifest or detached checkout and
+# erase the stale input that this provenance guard must reject.
+VERITY_COMMIT="$(python3 scripts/check_verity_provenance.py)" || \
+  fail "Verity request, manifest, canonical audit pins, and checkout do not agree"
 
 LEAN_VERSION_OUTPUT="$(lake env lean --version)"
 LEAN_VERSION="$(printf '%s\n' "$LEAN_VERSION_OUTPUT" | sed -nE 's/^Lean \(version ([^,]+),.*$/\1/p')"

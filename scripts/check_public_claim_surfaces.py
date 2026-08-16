@@ -164,7 +164,16 @@ def declaration_name(source: str, start: int) -> str:
 def lean_surface(source: str) -> tuple[tuple[str, ...], tuple[tuple[str, str], ...]]:
     """Return imports and normalized named public declarations."""
     without_comments = strip_lean_comments(source)
-    imports = tuple(re.findall(r"^[ \t]*import\s+([^\s]+)\s*$", without_comments, re.MULTILINE))
+    # Lean.Parser.Module.Syntax defines an import as, in order, optional
+    # `public`, optional `meta`, `import`, optional `all`, and one module name.
+    # Keep this grammar-shaped model in sync as a unit: looking only for a
+    # literal `import` token silently misses valid modifier combinations.
+    import_head = re.compile(
+        r"^[ \t]*(?:public[ \t]+)?(?:meta[ \t]+)?import[ \t]+"
+        r"(?:all[ \t]+)?([^\s]+)[ \t]*$",
+        re.MULTILINE,
+    )
+    imports = tuple(match.group(1) for match in import_head.finditer(without_comments))
     modifiers = r"(?:(?:public|protected|noncomputable|unsafe)\s+)*"
     attributes = r"(?:@\[[^\n]*\]\s*)*"
     kinds = r"def|theorem|lemma|abbrev|opaque|axiom|instance|structure|class|inductive"
