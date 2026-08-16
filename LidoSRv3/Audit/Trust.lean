@@ -62,7 +62,6 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
-#print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_to_verityTx
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_claim_success
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_admits
@@ -81,8 +80,6 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
-#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.tx_one_unit_exact_transfer
-#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.tx_revert_restores_snapshot_and_effects
 #print axioms LidoSRv3.Audit.Verity.DepositTx.run_simulates_source
 #print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined
@@ -93,7 +90,6 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
-#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
