@@ -3,14 +3,14 @@
   "target_scope": "legacy-srv3-p1-p15-superseded",
   "toolchain": {
     "lean": "4.31.0",
-    "verity_commit": "04729a9de9099e065dd09283e4f733a5fd4c2a16"
+    "verity_commit": "984759773677e51194732f59a86bb682b308b98d"
   },
   "command": "lake build LidoSRv3",
   "build": {
     "log": "proofs/logs/prove.txt",
-    "log_sha256": "60a098379e8e1916fb9885aa424112324a43d43480b857c6a47022e0dd5fb0e0",
-    "verified_at": "2026-08-15T21:58:33Z",
-    "verified_source_tree": "8b4458960e765cf67a408bd3e0e7632a795d73e0",
+    "log_sha256": "cdab53353edf4c9880f3f65297618e42049539beb6a72418d4e860eb51f76164",
+    "verified_at": "2026-08-16T08:04:42Z",
+    "verified_source_tree": "0ad914c1b53357b3c07fa90668e384056092c875",
     "exit_status": 0
   },
   "targets": [
