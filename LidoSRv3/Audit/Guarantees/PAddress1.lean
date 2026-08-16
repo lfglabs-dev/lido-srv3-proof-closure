@@ -5,6 +5,10 @@ import LidoSRv3.Audit.Verity.AddressTransferTx
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
 open Verity
+open LidoSRv3.Audit.Source.AddressTransferCorrespondence
+open LidoSRv3.Audit.Verity.AddressTransferTx
+
+abbrev Address := Nat
 
 /-- The abstract relation is specified, but no modeled entrypoint discharges it yet. -/
 def guarantee : Guarantee := ⟨.pAddress1, []⟩
@@ -139,21 +143,17 @@ for the owner-operated WithdrawalQueue ERC-721 ownership handoff. The umbrella
 guarantee remains open for the other mapped entrypoints and omitted set/event
 effects. -/
 theorem bounded_transfer_model_source_tx :
-    (∀ caller fromAddr to s,
-      LidoSRv3.Audit.Source.AddressTransferCorrespondence.sourceTransfer caller fromAddr to s =
-      LidoSRv3.Audit.Source.AddressTransferCorrespondence.modelTransfer caller fromAddr to s) ∧
-    LidoSRv3.Audit.Source.AddressTransferCorrespondence.sourceTransfer 1 1 3
-      { owner := 1, approved := 9 } = some { owner := 3, approved := 0 } ∧
-    LidoSRv3.Audit.Source.AddressTransferCorrespondence.sourceTransfer 2 2 3
-      { owner := 2, approved := 9 } = some { owner := 3, approved := 0 } ∧
-    LidoSRv3.Audit.Verity.AddressTransferTx.observe
-      (LidoSRv3.Audit.Verity.AddressTransferTx.run 1 1 3 1 9) = (true, 3, 0) ∧
-    LidoSRv3.Audit.Verity.AddressTransferTx.observe
-      (LidoSRv3.Audit.Verity.AddressTransferTx.run 2 2 3 2 9) = (true, 3, 0) ∧
-    LidoSRv3.Audit.Source.AddressTransferCorrespondence.swap12 3 ≠ 4 ∧
-    LidoSRv3.Audit.Source.AddressTransferCorrespondence.swap12 9 ≠ 8 ∧
-    LidoSRv3.Audit.Verity.AddressTransferTx.observe
-      (LidoSRv3.Audit.Verity.AddressTransferTx.run 9 1 3 1 9) = (false, 1, 9) :=
-  LidoSRv3.Audit.Verity.AddressTransferTx.model_source_tx_address_equivariance_slice
+    (∀ caller fromAddr to s, sourceTransfer caller fromAddr to s =
+      modelTransfer caller fromAddr to s) ∧
+    sourceTransfer 1 1 3 { owner := 1, approved := 9 } = some { owner := 3, approved := 0 } ∧
+    sourceTransfer 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }) =
+      (sourceTransfer 1 1 3 { owner := 1, approved := 9 }).map renameState12 ∧
+    observe (run 1 1 3 1 9) = (true, 3, 0) ∧
+    observe (run 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }).owner
+      (renameState12 { owner := 1, approved := 9 }).approved) =
+      (true, swap12 3, swap12 0) ∧
+    swap12 3 != 4 ∧ swap12 9 != 8 ∧
+    observe (run 9 1 3 1 9) = (false, 1, 9) :=
+  model_source_tx_address_equivariance_slice
 
 end LidoSRv3.Audit.Guarantees.PAddress1

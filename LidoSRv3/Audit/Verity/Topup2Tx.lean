@@ -90,6 +90,67 @@ def valueSum (sites : List CallSite) : Nat := (sites.map (·.value)).sum
     valueSum (site :: rest) = site.value + valueSum rest := by
   simp [valueSum]
 
+/-! The campaign pin removed the old result-aware loop helpers together with
+its unsound unconstrained abort-witness lemma.  Keep only the definitions and
+laws needed by this bounded child, locally and without restoring that lemma. -/
+
+inductive TransactionResult (α : Type) where
+  | commit (value : α)
+  | revert (returndata : List Nat)
+  deriving DecidableEq, Repr
+
+structure TransactionObservation (α : Type) where
+  result : TransactionResult α
+  state : CallState
+
+def denoteTransaction (prog : CallProgram (TransactionResult α))
+    (adversary : AdversaryModel) (state : CallState) : TransactionObservation α :=
+  let (result, postState) := denote prog adversary state
+  match result with
+  | .commit value => { result := .commit value, state := postState }
+  | .revert data =>
+      { result := .revert data
+        state := { postState with world := state.world, returndata := data } }
+
+theorem denoteTransaction_revert_world (prog : CallProgram (TransactionResult α))
+    (adversary : AdversaryModel) (state : CallState) (data : List Nat)
+    (h : (denote prog adversary state).1 = .revert data) :
+    (denoteTransaction prog adversary state).state.world = state.world := by
+  simp [denoteTransaction, h]
+
+inductive LoopStep (α : Type) where
+  | next
+  | stop (value : α)
+  | abort (returndata : List Nat)
+
+def forEachCall (step : CallObservation → LoopStep α) (exhausted : α) :
+    List CallSite → CallProgram (TransactionResult α)
+  | [] => .pure (.commit exhausted)
+  | site :: rest =>
+      .bind site fun obs =>
+        match step obs with
+        | .next => forEachCall step exhausted rest
+        | .stop value => .pure (.commit value)
+        | .abort data => .pure (.revert data)
+
+theorem forEachCall_callsIn_take (step : CallObservation → LoopStep α)
+    (exhausted : α) (sites : List CallSite) (adversary : AdversaryModel)
+    (state : CallState) :
+    ∃ n, CallsIn (forEachCall step exhausted sites) adversary state = sites.take n := by
+  induction sites generalizing state with
+  | nil => exact ⟨0, rfl⟩
+  | cons site rest ih =>
+      cases hstep : step (denoteCall adversary site state) with
+      | next =>
+          obtain ⟨n, hn⟩ := ih (denoteCall adversary site state).state
+          exact ⟨n + 1, by
+            simp [CallsIn, ObservedCalls, forEachCall, hstep] at hn ⊢
+            exact hn⟩
+      | stop value =>
+          exact ⟨1, by simp [CallsIn, ObservedCalls, forEachCall, hstep]⟩
+      | abort data =>
+          exact ⟨1, by simp [CallsIn, ObservedCalls, forEachCall, hstep]⟩
+
 @[simp] theorem denoteCall_result (adversary : AdversaryModel) (site : CallSite)
     (state : CallState) :
     (denoteCall adversary site state).result = adversary.result site state.world := rfl
