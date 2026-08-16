@@ -62,6 +62,33 @@ if BUILD_STATUS=0 BUILD_LOG="$tmpdir/current.log" \
 fi
 rm -f "$dirty_verity"
 
+# `make prove` must invoke the provenance checker before any Lake command.
+# Otherwise `lake env` can repair a stale checkout and the post-build check
+# never observes the mutation the guard exists to reject.
+python3 - <<'PY'
+from pathlib import Path
+
+text = Path("Makefile").read_text(encoding="utf-8")
+lines = text.splitlines()
+start = next(i for i, line in enumerate(lines) if line.startswith("prove:"))
+body = []
+for line in lines[start + 1 :]:
+    if line and not line[0].isspace():
+        break
+    body.append(line)
+recipe = "\n".join(body)
+guard = "scripts/check_verity_provenance.py"
+lake_at = min(
+    (recipe.find(token) for token in ("lake env", "lake build", "$(LATEXMK)") if token in recipe),
+    default=-1,
+)
+guard_at = recipe.find(guard)
+if guard_at < 0:
+    raise SystemExit("check_provenance_guards: make prove never calls check_verity_provenance.py")
+if lake_at >= 0 and guard_at > lake_at:
+    raise SystemExit("check_provenance_guards: make prove invokes Lake before the Verity provenance guard")
+PY
+
 # A successful report must carry the exact resolved Verity manifest pin.  This
 # is a narrow positive generator regression, using the current source tree and
 # toolchain while avoiding a redundant build in this guard script.

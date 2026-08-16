@@ -45,9 +45,10 @@ RECORDED_SOURCE_TREE="$(sed -nE 's/^verified_source_tree=([0-9a-f]{40})$/\1/p' "
 [ "$RECORDED_SOURCE_TREE" = "$VERIFIED_SOURCE_TREE" ] || \
   fail "build log '$BUILD_LOG' source tree '$RECORDED_SOURCE_TREE' does not match current verified source tree '$VERIFIED_SOURCE_TREE'"
 
-# Validate every request/resolution/audit/checkout identity before invoking
-# Lake: `lake env` may otherwise repair the manifest or detached checkout and
-# erase the stale input that this provenance guard must reject.
+# Re-validate after the build as defense in depth. `make prove` already runs
+# this same checker before any `lake env`/`lake build`, so a stale or dirty
+# checkout is rejected before Lake can repair it. This post-build check
+# still refuses a report if Lake rewrote the pin during the build.
 VERITY_COMMIT="$(python3 scripts/check_verity_provenance.py)" || \
   fail "Verity request, manifest, canonical audit pins, and checkout do not agree"
 

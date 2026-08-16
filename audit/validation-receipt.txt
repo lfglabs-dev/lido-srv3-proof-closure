@@ -25,13 +25,17 @@ PR #88 reviewed-head repair (2026-08-16)
 
 - The successor exact-head review repairs fail closed on every Lean import
   modifier form admitted by the pinned parser (`public`, `meta`, and `all`,
-  including their combinations and leading horizontal whitespace).
-- Proof-report emission now validates one exact Verity request against both
-  manifest revision fields, both canonical audit pins, and a clean checkout at
-  that revision before Lake can re-resolve any dependency state.
-- Family-level mutants cover import modifiers, request/package uniqueness,
-  exact 40-hex requests, `rev`/`inputRev` divergence, audit-pin divergence,
-  and stale/dirty checkout identity. The targeted gates and `make test` pass.
+  including their combinations, leading horizontal whitespace, and line
+  breaks between command tokens such as `public import all` then the module
+  name on the next line).
+- `make prove` now runs `scripts/check_verity_provenance.py` before any
+  `lake env` or `lake build`, so a stale or dirty Verity checkout is rejected
+  before Lake can repair it. Proof-report emission re-validates the same
+  request/manifest/audit/checkout agreement after the build.
+- Family-level mutants cover import modifiers, split-line import commands,
+  request/package uniqueness, exact 40-hex requests, `rev`/`inputRev`
+  divergence, audit-pin divergence, stale/dirty checkout identity, and the
+  Makefile prove-order guard. The targeted gates and `make test` pass.
 
 - Reproduced from reviewed head `cdc51bd9742ab1f21e4b9c1ad445e8a251397735`:
   total-Nat effective-plus-pending addition did not model Solidity checked-word
