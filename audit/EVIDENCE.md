@@ -8,7 +8,7 @@ Campaign commit: `4649ba55052fa29132b016dc443ac738134c332f`
 
 ## P-ALLOC-1
 
-Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts and EVM equivalence remain open.
+Checked pinned-source execution refines the independent allocation-capacity Audit model under explicit Uint256 bounds; proportional allocation amounts, composition with the bounded transaction receipt, and EVM equivalence remain open.
 
 - Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
 - Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
@@ -16,7 +16,7 @@ Checked pinned-source execution refines the independent allocation-capacity Audi
 - Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:27`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L27)
 - Assumptions: `A-SOURCE-SHAPED`
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression`
-- Expected scope: successful checked-source to independent Audit-model correspondence and negative-mutant build; proportional amount correspondence remains open
+- Expected scope: successful checked-source to independent Audit-model correspondence and negative-mutant build; parent TX composition and proportional amount correspondence remain open
 
 ### Subordinate evidence (does not prove the parent)
 
@@ -32,6 +32,19 @@ Canonical checked SRLib rows composed with the MinFirst mutation prove that one 
 - Assumptions: `A-SOURCE-SHAPED`, `A-HANDWRITTEN-MINFIRST`
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound LidoSRv3.Tests.PAlloc1EugeneBoundVectors`
 - Expected scope: successful checked Eugene operator-bond bound and cap-sensitive vectors over canonical SRLib and MinFirst models; EVM equivalence remains open
+
+#### P-ALLOC-1.bounded-allocation-tx
+
+A fixed one-row official Verity Contract.run receipt is mechanically non-vacuous: allocation succeeds with [70], while overwrite [60], missing-capacity-clamp, and disabled-row mutants diverge. It is subordinate TX evidence only; no cfg, modules, capacity row, or demand from the P-ALLOC-1 parent scope feeds this execution.
+
+- Scope: fixed one-row demand/state receipt only; deliberately not composed with parent scope
+- Plane statuses: model=NOT_APPLICABLE; algorithm=NOT_APPLICABLE; source=OPEN; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_refines_source_capacity_and_conservation`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L56)
+- Theorem planes: `tx`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PAlloc1.lean:56`](../LidoSRv3/Audit/Guarantees/PAlloc1.lean#L56)
+- Assumptions: `A-VERITY-SCAFFOLD`
+- Reproduce: `lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Trust LidoSRv3.Tests.MinFirstVectors`
+- Expected scope: successful fixed-state Contract.run receipt with [70] success and divergent overwrite [60], capacity, and disabled-row mutants; no parent composition claim
 
 
 ## P-ALLOC-2
@@ -51,9 +64,9 @@ Pinned-source correspondence proves only the next-target selection rule; proport
 Pinned-source correspondence proves branch-wise stake conservation and whole-transaction rollback for the deposit push; TxObservation remains an abstract transaction model, not an EVM execution trace.
 
 - Plane statuses: model=LEAN_CHECKED; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=OPEN; crypto=NOT_APPLICABLE
-- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L66)
+- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L69)
 - Theorem planes: `model`, `source`
-- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:66`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L66)
+- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:69`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L69)
 - Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`
 - Reproduce: `lake build LidoSRv3.Audit.Guarantees.PDeposit1`
 - Expected scope: successful pinned-source deposit conservation/rollback correspondence build; EVM-level revert semantics remain open
@@ -72,6 +85,19 @@ Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles l
 - Assumptions: `A-VERITY-SCAFFOLD`, `A-RUNTIME-PROVENANCE`
 - Reproduce: `lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback`
 - Expected scope: successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN
+
+#### P-DEPOSIT-1.ledger-conservation-tx
+
+Bounded SOURCE/VERITY_TX evidence for the ETH-ledger conservation and rollback core of the deposit push. Official Verity Contract.run executes the StakingRouter.sol line 976 counter write, the line 983 pull scaled by MAX_EFFECTIVE_BALANCE_WC_TYPE_01, the DEPOSIT_SIZE beacon push, and the line 996 balance assert over storage only, so no vacuous externalCallBind participates. Rollback is universally quantified over the entry state, the arguments, and the rolled-back state; source correspondence is bounded to the committing push, the line 978 empty-batch early return, and the misconfigured-deployment revert, each made discriminating by a disagreeing mutant. Allocation, the module ABI, multi-contract Lido/queue/oracle state, per-validator deposit-data roots, generated Yul, and EVM execution remain OPEN.
+
+- Scope: ETH-ledger conservation/rollback core only; allocation, module ABI, multi-contract state, and per-validator deposit-data roots are excluded
+- Plane statuses: model=NOT_APPLICABLE; algorithm=NOT_APPLICABLE; source=LEAN_CHECKED; tx=LEAN_CHECKED; crypto=NOT_APPLICABLE
+- Theorem: [`LidoSRv3.Audit.Guarantees.PDeposit1.deposit_ledger_conservation_and_executed_rollback`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L153)
+- Theorem planes: `source`, `tx`
+- Lean source: [`LidoSRv3/Audit/Guarantees/PDeposit1.lean:153`](../LidoSRv3/Audit/Guarantees/PDeposit1.lean#L153)
+- Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+- Reproduce: `lake build LidoSRv3.Audit.Verity.DepositLedgerTx LidoSRv3.Audit.Guarantees.PDeposit1`
+- Expected scope: successful storage-only Contract.run deposit-ledger build: universally quantified revert rollback, three bounded source-correspondence receipts, two disagreeing mutants, and the checked forEach-wrapper unrolling probe; the multi-contract deposit transaction, generated Yul, and EVM execution remain OPEN
 
 
 ## P-TOPUP-1

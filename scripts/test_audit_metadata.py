@@ -56,6 +56,28 @@ def main():
         # A source archive has no .git directory, remote, or branch refs.
         run(fixture, True)
 
+        # The bounded ledger theorem is subordinate and must never populate the
+        # canonical P-DEPOSIT-1 checked layer.
+        pdeposit_path = fixture / "LidoSRv3/Audit/Guarantees/PDeposit1.lean"
+        pdeposit_source = pdeposit_path.read_text(encoding="utf-8")
+        pdeposit_path.write_text(
+            pdeposit_source.replace(
+                "[.model, .abstractTx, .source]",
+                "[.model, .abstractTx, .source, .verityTx]",
+                1,
+            ),
+            encoding="utf-8",
+        )
+        run(
+            fixture,
+            False,
+            expected_error=(
+                "P-DEPOSIT-1: canonical checked layers must exclude subordinate "
+                "Verity TX evidence"
+            ),
+        )
+        pdeposit_path.write_text(pdeposit_source, encoding="utf-8")
+
         lock_leaves = [
             ("campaign_base", field) for field in ("repository", "ref", "commit")
         ]
@@ -550,6 +572,57 @@ def main():
             False,
             "generate",
             "P-ALLOC-1.eugene-bound must remain subordinate to P-ALLOC-1",
+        )
+        write_json(guarantees_path, guarantees)
+
+        # The fixed Contract.run receipt must never be used to promote the
+        # universally scoped P-ALLOC-1 parent: none of its parent inputs feed
+        # the receipt state or demand.
+        promoted_alloc_tx = copy.deepcopy(guarantees)
+        alloc_parent = next(
+            row for row in promoted_alloc_tx["guarantees"]
+            if row["id"] == "P-ALLOC-1"
+        )
+        alloc_parent["statuses"]["tx"] = "LEAN_CHECKED"
+        alloc_parent["theorem_planes"].append("tx")
+        write_json(guarantees_path, promoted_alloc_tx)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1: theorem planes differ from canonical evidence",
+        )
+        write_json(guarantees_path, guarantees)
+
+        detached_alloc_tx = copy.deepcopy(guarantees)
+        alloc_tx = next(
+            row for row in detached_alloc_tx["guarantees"]
+            if row["id"] == "P-ALLOC-1.bounded-allocation-tx"
+        )
+        del alloc_tx["parent_id"]
+        write_json(guarantees_path, detached_alloc_tx)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.bounded-allocation-tx must remain subordinate to P-ALLOC-1",
+        )
+        write_json(guarantees_path, guarantees)
+
+        composed_alloc_tx_claim = copy.deepcopy(guarantees)
+        alloc_tx = next(
+            row for row in composed_alloc_tx_claim["guarantees"]
+            if row["id"] == "P-ALLOC-1.bounded-allocation-tx"
+        )
+        alloc_tx["source_plane_scope"] = (
+            "parent cfg/modules/capacity/demand feed Contract.run"
+        )
+        write_json(guarantees_path, composed_alloc_tx_claim)
+        run(
+            fixture,
+            False,
+            "generate",
+            "P-ALLOC-1.bounded-allocation-tx: non-composition scope differs",
         )
         write_json(guarantees_path, guarantees)
 
@@ -1150,6 +1223,7 @@ def main():
         "source-map policy, reproduction evidence, "
         "strict source-span evidence, status vocabulary/plane/closure, "
         "P-DEPOSIT-1 source-plane downgrade/overclaim and span unmapping, "
+        "P-DEPOSIT-1 subordinate-TX parent-facade promotion, "
         "P-TOPUP-1 source/tx-plane downgrade/overclaim, stale theorem "
         "and span unmapping, P-TOPUP-1 transitive-helper span, "
         "pinned-constant declaration span and solc-boundary assumption drops, "
