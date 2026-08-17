@@ -3,96 +3,49 @@
 
 \begin{notebox}
 \noteboxtitle{Question answered by this report}
-If PR \#1811 changes how Lido accounts for deposit allocation, deposits,
-top-ups, reserves, module balances, and rewards, can the selected accounting
-rules be stated precisely enough that a machine can check them in a reproducible
-focused model? This report package gives an executable local answer for the
-signed P0 economic scope of the pilot --- the six P0 candidate
-economic-conservation properties (SRV3-P1--P6) listed first below, decomposed
-internally into finer executable target groups such as top-up and
-allocation-capacity --- over the focused economic model, under the named
-assumptions in \cref{sec:trust-boundary}. The additional operational and
-module-configuration target groups are carried as follow-on / internal lanes,
-not as current acceptance commitments.
+Can the PR \#1811 accounting rules for deposits, top-ups, reserves, module
+balances, and rewards be stated so a machine can check them in a focused
+model? Yes, for the six signed P0 properties (SRV3-P1--P6) below, under the
+assumptions in \cref{sec:trust-boundary}. Top-up and allocation-capacity
+(SRV3-P8, P9) support those six. SRV3-P7 and P10--P15 are follow-on lanes,
+not acceptance rows.
 \end{notebox}
 
-\noindent In this repository, ``executable'' has a specific meaning: the model
-target is listed, all premises not discharged inside the model are registered by
-assumption ID, and \texttt{make test} plus \texttt{make prove} recheck the target
-set from a clean checkout.
+\noindent ``Executable'' here means: the target is listed, undischarged premises
+have assumption IDs, and \texttt{make test} plus \texttt{make prove} rebuild
+from a clean checkout.
 
-\subsection*{The story in one page}
-
-The core safety question is simple enough to ask without Solidity or Lean:
-\emph{when ETH and validator balances move through SRv3 accounting, can any
-value be spent from the wrong place, counted twice, rewarded from stale data, or
-sent through a disabled path?} The report answers that question by turning each
-informal concern into a small conservation law.
-
-\smallskip
-\noindent A useful mental model is three ledgers that must agree:
+The model tracks three stores:
 
 \begin{enumerate}
-  \item The \textbf{buffer ledger} says which ETH is depositable and which ETH is
-  reserved for withdrawals.
-  \item The \textbf{router ledger} says how much ETH is pulled for deposits and
-  how validator balances are summed across staking modules.
-  \item The \textbf{reward ledger} says which accepted balances may be used to
-  compute rewards, fees, and recipients.
+  \item Buffer: depositable ETH versus ETH reserved for withdrawals.
+  \item Router: ETH pulled for deposits and validator balances across modules.
+  \item Reward: which accepted balances may set rewards, fees, and recipients.
 \end{enumerate}
 
-\noindent An ``accepted report'' means oracle-provided module-balance data that
-has passed the modeled SRv3 validation checks and is therefore allowed to update
-accounting state. The proof lane checks that PR \#1811 preserves the three
-ledgers through those modeled transitions. It is not trying to prove every
-operational fact about deployment, cryptography, governance, gas, or the
-consensus layer.
+\noindent An accepted report is oracle module-balance data that passed the
+modeled SRv3 checks and may update accounting. The lane checks those modeled
+transitions. It does not prove deployment, cryptography, governance, gas, or
+consensus.
 
 \begin{notebox}
-\noteboxtitle{Why this is more than testing}
-A test asks, ``does this example work?'' A Verity/Lean proof target asks,
-``does this rule follow from the modeled transition for all values covered by
-the theorem statement?'' That is why the report spends so much effort naming the
-model and assumptions: they define exactly what the local command checks.
+\noteboxtitle{Proof versus test}
+A test checks one example. A Lean theorem checks every value in its statement.
+The model and assumptions say exactly what the local command checks.
 \end{notebox}
 
-\smallskip
-\noindent The executable claim this report package supports is:
-
 \begin{quote}
-For the focused SRv3 economic state machine, the Verity/Lean model preserves
-deposit and top-up conservation, reserve separation, module-balance conservation,
-allocation-capacity bounds, report-before-reward consistency, reward/fee bounds,
-and flow-specific status gating under the named assumptions.
+On the focused SRv3 economic state machine, the Verity/Lean model preserves
+deposit and top-up conservation, reserve separation, module-balance
+conservation, allocation-capacity bounds, report-before-reward consistency,
+reward/fee bounds, and status gating, under the named assumptions.
 \end{quote}
 
-\noindent That signed claim is the six P0 candidate economic-conservation
-properties (SRV3-P1--P6) in the first matrix below. The model decomposes the
-deposit and allocation surface internally into finer executable target groups
---- notably top-up (SRV3-P8) and allocation-capacity (SRV3-P9), shown in the
-second matrix --- which support the P0 properties but are not additional signed
-acceptance rows. This is not a claim that every deployed-system behavior is
-proved. The exact boundary is part of the result: cryptographic witnesses,
-consensus truthfulness, governance configuration, and deployment refinement are
-named in \cref{sec:trust-boundary}. The operational and module-configuration
-target groups (SRV3-P7, P10--P15) in the third matrix are executable follow-on /
-internal lanes; they are not part of the signed P0 acceptance claim.
+\noindent That is SRV3-P1--P6. Cryptographic witnesses, consensus, governance,
+and deployment sit in \cref{sec:trust-boundary}.
 
-\subsection*{How to read the proof}
-
-Read each row below as a three-step trace. First, the
-Verity/Lean model names the transition being studied. Second, the property
-states what must not go wrong in the focused model. Third, Lake checks the
-theorem file against the explicit assumptions.
-
-\smallskip
-\noindent The six P0 candidate properties answer six plain questions: what ETH
-is spendable, what deposits consume, what balances add up to, what report
-rewards use, how fees are bounded, and which module states block economic flow.
-A second matrix lists the internal economic decomposition (top-up and
-allocation-capacity) that refines the deposit and allocation surface, and a
-third matrix lists the operational and module-configuration lanes that are
-carried as executable follow-on work rather than signed acceptance rows.
+Each matrix row names a transition, states the property, and is checked by
+Lake against the listed assumptions.
 
 \subsection*{Proof matrix --- six P0 candidate economic properties}
 
@@ -251,7 +204,6 @@ they are follow-on / internal work shown for completeness.
 
 \subsection*{Review posture}
 
-This report package is written for two readers at once. A protocol reviewer can follow
-the ledgers and the trust boundary without reading code. A formal-methods
-reviewer can check whether the target IDs, assumptions, and rebuild gates support
-the advertised local executable claim.
+A protocol reviewer can follow the stores and the trust boundary without
+code. A formal-methods reviewer can check target IDs, assumptions, and rebuild
+gates against the local claim.

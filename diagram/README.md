@@ -1,35 +1,23 @@
 # Lido SRv3 architecture diagram
 
-Interactive component map of the Lido protocol at `lidofinance/core@af095e48`
-(SRv3, PR #1811): contracts with source files and mainnet addresses, off-chain
-actors, and seven toggleable protocol flows with the actual function calls as
-edge labels.
+`index.html` maps contracts, mainnet addresses, off-chain actors, and seven
+protocol flows at `lidofinance/core@af095e48`. Edge labels are function calls.
 
-## Usage
+Open `index.html` in a browser. No build.
 
-Open `index.html` in a browser (no build step, no dependencies, works offline).
+- Flow pills F1–F7 highlight paths. Several pills may be on at once.
+- Hover a node for address and role.
+- Export PNG or SVG of the current view.
 
-- Toggle flow pills (F1 to F7) to highlight a flow's path; combine several to compare.
-- Hover a node for the full address and role.
-- **export PNG / export SVG** downloads the current view, including whichever
-  flows are toggled, as a standalone image (`lido-map-f3.png`,
-  `lido-map-f2-f3.svg`, ...).
+Typeface is Plus Jakarta Sans; accent `#2dd4bf`. The webfont loads from Google
+Fonts and falls back offline.
 
-Styling follows the lfglabs.dev design system (Plus Jakarta Sans, teal accent
-`#2dd4bf`, `#f5f7fa` cards on white). The webfont loads from Google Fonts and
-falls back to the system stack offline.
+Exports are not versioned. `archive/legacy-p1-p15/verity-targets/srv3-flow-map.md`
+points here.
 
-## Exports
-
-PNG and SVG views are generated on demand with the export buttons and are not
-versioned. `archive/legacy-p1-p15/verity-targets/srv3-flow-map.md` links to the canonical interactive
-diagram instead of depending on generated renderings.
-
-## Provenance
-
-Edges were checked against the pinned source in `tmp/core-af095e48.../contracts`
-(for example `DepositSecurityModule.sol:485`, `StakingRouter.sol:983`,
+Edges were checked against pinned source under `tmp/core-af095e48.../contracts`
+(examples: `DepositSecurityModule.sol:485`, `StakingRouter.sol:983`,
 `TopUpGateway.sol:232`, `AccountingOracle.sol:618`, `Accounting.sol:409`,
 `ConsolidationGateway.sol:220`). Mainnet addresses follow
-docs.lido.fi/deployed-contracts (July 2026); SRv3 contracts are marked
-"not deployed".
+docs.lido.fi/deployed-contracts (July 2026). SRv3 contracts are marked
+“not deployed”.

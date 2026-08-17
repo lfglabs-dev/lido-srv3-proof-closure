@@ -1,15 +1,14 @@
 # Lido SRv3 Proof Closure
 
-Lean evidence for eleven public Staking Router v3 guarantees, checked against
-pinned `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+This repo checks eleven Staking Router v3 guarantees in Lean against
+`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
-Lean theorem statements are authoritative. `audit/guarantees.yaml` classifies
-them; it does not prove them.
+Lean theorems decide what is proved. `audit/guarantees.yaml` only classifies
+them.
 
-Each public guarantee has two objectives: a clear abstract Lean property with a
-checked theorem, and a behaviorally faithful Verity model with a checked refinement theorem.
-When the Verity side cannot close, the registry records exactly one gap class.
-General Yul, EVM, runtime bytecode, and deployment provenance are out of scope.
+Each guarantee needs a checked abstract Lean theorem and a behaviorally faithful Verity model with a checked refinement theorem.
+If Verity cannot close, the registry names one gap. Yul, EVM, runtime bytecode,
+and deployment provenance are out of scope.
 
 | # | ID | Abstract Lean | Faithful Verity |
 | --- | --- | --- | --- |
@@ -25,12 +24,12 @@ General Yul, EVM, runtime bytecode, and deployment provenance are out of scope.
 | 10 | `P-CONSOLIDATION-1` | OPEN | PARTIAL |
 | 11 | `P-SSZ-1` | CHECKED | PARTIAL |
 
-Exact wording, assumptions, source spans, and next gates: `audit/guarantees.yaml`.
+Wording, assumptions, source spans, next gates: `audit/guarantees.yaml`.
 Generated views: `audit/STATUS.md`, `audit/ROADMAP.md`, `audit/REPRODUCE.md`.
 
 ## Reproduce
 
-Requires [elan](https://github.com/leanprover/elan) (Lean 4.31.0).
+Needs [elan](https://github.com/leanprover/elan) and Lean 4.31.0.
 
 ```bash
 make audit-check   # registry, pins, source map, generated views
@@ -44,14 +43,14 @@ One guarantee:
 lake build LidoSRv3.Audit.Guarantees.PReserve1
 ```
 
-Optional PDF report: `make report` → `dist/lido-srv3-formal-methods-report.pdf`.
+PDF: `make report` writes `dist/lido-srv3-formal-methods-report.pdf`.
 
 ## Layout
 
-- `LidoSRv3/Audit/` — models, source correspondence, Verity transactions, facade
-- `LidoSRv3/Tests/` — mutants; not imported by the public facade
+- `LidoSRv3/Audit/` — models, source maps, Verity transactions, facade
+- `LidoSRv3/Tests/` — mutants; not imported by the facade
 - `audit/` — registry, source map, assumptions, pins, generated views
-- `verity/targets/` — pin manifest consumed by the Lean project
-- `scripts/` — fail-closed metadata and provenance checks
-- `fixtures/solidity-reference/` — pinned Lido tests kept as source-facing fixtures
-- `archive/` — superseded campaign and P1–P15 material; not current evidence
+- `verity/targets/` — pin manifest
+- `scripts/` — fail-closed checks
+- `fixtures/solidity-reference/` — pinned Lido tests, not executed here
+- `archive/` — old campaign and P1–P15 files; not current evidence

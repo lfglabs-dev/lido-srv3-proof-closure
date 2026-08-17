@@ -1,9 +1,9 @@
 # Proof evidence
 
-- `LOCKFILE.md` — Lido / Verity / Lean pins
-- `audit-foundation.md` — early allocation-source anchors
-- `logs/` — written by `make prove`
+`audit/guarantees.yaml` lists the eleven public guarantees.
+`LidoSRv3/Audit/AllGuarantees.lean` is the Lean facade.
 
-The eleven public guarantees are in `audit/guarantees.yaml`. The Lean facade is
-`LidoSRv3/Audit/AllGuarantees.lean`. Superseded P1–P15 dossiers live in
-`archive/legacy-p1-p15/`.
+- `LOCKFILE.md` — Lido, Verity, Lean pins
+- `audit-foundation.md` — early allocation source anchors
+- `logs/` — output of `make prove`
+- `archive/legacy-p1-p15/` — superseded P1–P15 dossiers

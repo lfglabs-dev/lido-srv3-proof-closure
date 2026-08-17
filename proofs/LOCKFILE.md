@@ -1,7 +1,7 @@
-# Proof Lockfile
+# Proof lockfile
 
-Pins used by this repository. The lock is also recorded in
-`audit/artifacts.lock.json`, `lake-manifest.json`, and `lean-toolchain`.
+These pins also appear in `audit/artifacts.lock.json`, `lake-manifest.json`,
+and `lean-toolchain`.
 
 | Component | Reference |
 | --- | --- |
@@ -9,5 +9,5 @@ Pins used by this repository. The lock is also recorded in
 | Verity | `1fe0218863a4c8d6113e6cdd4de3766a54df81c7` |
 | Lean | `v4.31.0` |
 
-`LidoSRv3.Legacy` is retained as older model context. Current claims live under
-`LidoSRv3.Audit`.
+Current claims live in `LidoSRv3.Audit`. `LidoSRv3.Legacy` is older model
+context only.

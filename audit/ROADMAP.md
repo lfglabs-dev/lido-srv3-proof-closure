@@ -9,17 +9,17 @@
 
 ## P1 — first complete property: `P-RESERVE-RELATIONAL`
 
-At constant report, queue, and buffer inputs, two states that differ only in `depositsReserve` must produce identical prefinalized/finalized ranges and identical locked ETH. The existing checked `P-RESERVE-1` spending invariant is a useful child, not this requested relational closure.
+Fix report, queue, and buffer. Two states that differ only in `depositsReserve` must yield the same prefinalized/finalized ranges and the same locked ETH. Checked `P-RESERVE-1` spending is a child, not this fact.
 
-Acceptance: independent specification; separate source-shaped interpreter; a Verity program that actually computes the observables; a composition theorem; a rejected reserve→range mutant; report/queue/buffer consumption mutants; rollback after an intermediate write; and parent status only after composition.
+Need: a spec, a source interpreter, a Verity program that computes the observables, a composition theorem, a rejected reserve→range mutant, report/queue/buffer mutants, and rollback after a mid-write. Promote the parent only after composition.
 
-## P2 — allocation/value conservation
+## P2 — allocation and value conservation
 
-Order the multi-PR program as P-ALLOC-1/2 → deposit/top-up allocation → WC01/WC02 eligibility → Lido debit → Beacon credit → module delta → rollback. Do not start parallel Deposit/Topup/Accounting parent-closure lanes before P-RESERVE-RELATIONAL is green.
+Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido debit, Beacon credit, module delta, rollback. Do not start other parent-closure lanes before P-RESERVE-RELATIONAL is green.
 
-## P3 — resume remaining parents after anti-vacuity patterns are established
+## P3 — remaining parents
 
-Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ only against the composition patterns established by P1/P2.
+Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ only with the composition patterns from P1/P2.
 
 ## Current guarantee registry
 
