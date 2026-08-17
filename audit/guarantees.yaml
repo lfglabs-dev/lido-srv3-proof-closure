@@ -9,35 +9,34 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants",
-        "expected": "canonical abstract theorem, bounded source/Verity slice, rollback and structural mutants build; full-loop fidelity remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
+        "expected": "abstract capacity bound and faithful moduleAddress-binding allocation transaction composition build with off-by-one, wrong-binding, stale-snapshot, rollback, and two-batch mutants"
       },
-      "summary": "The abstract capacity bound is checked. Bounded pinned-source and Contract.run summary-call evidence exists, but the faithful Verity objective remains PARTIAL until the full allocation loop and moduleAddress binding are represented.",
+      "summary": "The abstract capacity bound and a composed faithful Verity transaction are checked. The transaction binds each router-ordered moduleId to its stored moduleAddress, executes the two allocation/capacity loops, persists observables through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation"
       },
       "fidelity": {
         "covered": [
           "capacity model",
           "pinned-source capacity correspondence",
-          "bounded Contract.run summary-call slice"
-        ],
-        "missing": [
           "full allocation loop",
-          "moduleAddress binding"
-        ]
+          "moduleAddress binding",
+          "Contract.run writeMapUint/writeSlot observables",
+          "rollback after intermediate writes and two-batch mutant coverage"
+        ],
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Complete the allocation loop and bind moduleAddress to the modeled source input; lower-level artifact refinement is outside scope.",
-      "roadmap_priority": "P2"
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-ALLOC-2",
