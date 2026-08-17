@@ -51,11 +51,8 @@ def oracle : DenoteOracle :=
     keccakMemorySlice := fun _ _ _ => 0 }
 
 def worldFor (owner approval : Nat) : Verity.ContractState :=
-  { Verity.defaultState with
-    storage := fun slot =>
-      if slot = oracle.mappingSlot ownersSlot 7 then owner
-      else if slot = oracle.mappingSlot approvalsSlot 7 then approval
-      else 0 }
+  (Verity.defaultState.writeSlot (oracle.mappingSlot ownersSlot 7) owner
+    ).writeSlot (oracle.mappingSlot approvalsSlot 7) approval
 
 def tx (caller fromAddr to : Nat) : DenoteTransaction :=
   { sender := caller, functionSelector := 0x23b872dd, args := [fromAddr, to, 7] }

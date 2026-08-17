@@ -44,7 +44,8 @@ theorem gateway_calls_are_planned_sites (batch : TopupBatch) (cfg : TopupConfig)
   exact callsIn_forEach_all_success _ state
 
 /-- Mutant gateway that performs the allocation schedule twice. -/
-def doubleSendProgram (amounts : List Nat) : CallProgram (TransactionResult Unit) :=
+def doubleSendProgram (amounts : List Nat) :
+    CallProgram (LidoSRv3.Audit.Verity.Topup2Tx.TransactionResult Unit) :=
   forEachCall gatewayPolicy () (plannedSites 0 (amounts ++ amounts))
 
 /-- The double-send mutant genuinely breaches a 1-gwei block cap with a 1-gwei
@@ -57,7 +58,8 @@ theorem double_send_rejected (state : CallState) :
 
 /-- Mutant gateway that forwards raw requested amounts, skipping the pinned
 budget-consuming transition. -/
-def uncappedProgram (requestedGwei : List Nat) : CallProgram (TransactionResult Unit) :=
+def uncappedProgram (requestedGwei : List Nat) :
+    CallProgram (LidoSRv3.Audit.Verity.Topup2Tx.TransactionResult Unit) :=
   forEachCall gatewayPolicy () (plannedSites 0 requestedGwei)
 
 /-- Forwarding a raw 2-gwei request against a 1-gwei cap violates the bound the

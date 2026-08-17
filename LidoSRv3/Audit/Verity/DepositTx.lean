@@ -62,6 +62,14 @@ def committedBalances (before : Balances) (amount : Nat) : Balances :=
     routerEth := before.routerEth
     withdrawalReserve := before.withdrawalReserve }
 
+def withCalls (s : ContractState) (entries : List ExternalCall) : ContractState :=
+  { s with calls := s.calls ++ entries }
+
+def depositCallJournal (amount : Uint256) : List ExternalCall :=
+  [linkedCallEntry "obtainDepositData" (ExternalArg.toWords amount),
+    linkedCallEntry "withdrawDepositableEther" (ExternalArg.toWords amount),
+    linkedCallEntry "depositToBeacon" (ExternalArg.toWords amount)]
+
 def observe (snapshot : ContractState) (balances : Balances) :
     ContractResult Balances → TxObservation
   | .success balancesAfter after =>
@@ -95,7 +103,9 @@ def sourceObservation (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (snapshot : ContractState) (balances : Balances) : TxObservation :=
   match run cfg inp with
   | .committedDeposits _ pulled _ _ =>
-      ⟨.committed, snapshot, snapshot, balances, committedBalances balances pulled⟩
+      ⟨.committed, snapshot,
+        withCalls snapshot (depositCallJournal (Core.Uint256.ofNat (depositsValue cfg inp))),
+        balances, committedBalances balances pulled⟩
   | .committedNoDeposits => ⟨.committed, snapshot, snapshot, balances, balances⟩
   | _ => ⟨.reverted, snapshot, snapshot, balances, balances⟩
 
@@ -110,8 +120,10 @@ theorem run_simulates_source (cfg : SourceDepositConfig) (inp : SourceDepositInp
     rw [← Core.Uint256.max_uint256_succ_eq_modulus]
     omega
   cases hrun : run cfg inp <;>
-    simp [executeOutcome, executeCalls, sourceObservation, observe, DepositTxContract.execute,
-      _root_.Contracts.externalCallBind, _root_.Verity.require,
+    simp [executeOutcome, executeCalls, sourceObservation, observe, withCalls,
+      depositCallJournal, DepositTxContract.execute,
+      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+      _root_.Contracts.linkedCallEntry, _root_.Verity.require,
       DepositTxContract.executeNoDeposits, _root_.Verity.Contract.run, _root_.Verity.bind,
       _root_.Verity.pure, Bind.bind, Pure.pure, hrun, Core.Uint256.ofNat,
       Nat.mod_eq_of_lt hAmountLt]
@@ -135,7 +147,8 @@ theorem one_unit_exact_transfer
     rw [← Core.Uint256.max_uint256_succ_eq_modulus]
     omega
   simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
-    _root_.Contracts.externalCallBind, _root_.Verity.require,
+    _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+    _root_.Verity.require,
     _root_.Verity.Contract.run, _root_.Verity.bind,
     _root_.Verity.pure, Bind.bind, Pure.pure, committedBalances, Nat.sub_add_cancel hFunds,
     Core.Uint256.ofNat, Nat.mod_eq_of_lt hAmountLt]

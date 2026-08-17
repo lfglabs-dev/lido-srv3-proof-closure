@@ -170,10 +170,8 @@ def observeDeref (id : Uint256) : Contract Address := fun state =>
   else
     let address := wordToAddress (state.storageMapUint moduleStatesSlot id)
     if address = 0 then .revert "StakingModuleUnregistered" state
-    else .success address { state with
-      storageMapUint := fun slot key =>
-        if slot = observedAddressesSlot ∧ key = id then addressToWord address
-        else state.storageMapUint slot key }
+    else .success address
+      (state.writeMapUint observedAddressesSlot id (addressToWord address))
 
 /-- Model-local storage relation.  It deliberately does not claim Solidity's
 keccak mapping encoding, ROUTER_STORAGE_POSITION, or emitted SLOAD semantics. -/
@@ -201,9 +199,8 @@ theorem verity_observe_refines_source (s : RegistryState) (hs : Reachable s)
       after.storageMapUint observedAddressesSlot (id : Uint256) = (s.moduleAddress id : Uint256) := by
   rcases hrep with ⟨hpos, haddr⟩
   have hnonzero := reachable_registered_nonzero s hs id hmember
-  refine ⟨{ state with storageMapUint := fun slot key =>
-      if slot = observedAddressesSlot ∧ key = (id : Uint256) then (s.moduleAddress id : Uint256)
-      else state.storageMapUint slot key }, ?_, ?_, ?_⟩
+  refine ⟨state.writeMapUint observedAddressesSlot (id : Uint256)
+      (addressToWord (Verity.Core.Address.ofNat (s.moduleAddress id))), ?_, ?_, ?_⟩
   · change s.registered id = true at hmember
     have hbound := reachable_registered_address_bound s hs id hmember
     have hposition := hpos.mpr hmember
@@ -216,8 +213,14 @@ theorem verity_observe_refines_source (s : RegistryState) (hs : Reachable s)
       intro heq
       have := congrArg Verity.Core.Address.val heq
       exact hnonzero (by simpa [Verity.Core.Address.ofNat, hmod] using this)
-    simp [haddress, hmod]
+    simp [haddress]
   · exact (source_deref_exact_reachable s hs id hmember).1
-  · simp
+  · have hbound := reachable_registered_address_bound s hs id hmember
+    change s.moduleAddress id < Verity.Core.ADDRESS_MODULUS at hbound
+    have hmod : s.moduleAddress id % Verity.Core.Address.modulus = s.moduleAddress id :=
+      Nat.mod_eq_of_lt (by simpa [Verity.Core.Address.modulus] using hbound)
+    simp [ContractState.writeMapUint, ContractState.storageMapUint, addressToWord,
+      Verity.Core.Address.ofNat]
+    exact congrArg Core.Uint256.ofNat hmod
 
 end LidoSRv3.Audit.SolidityDereference

@@ -85,13 +85,24 @@ structure TxView where
   before : ContractState
   after : ContractState
 
+def withCalls (s : ContractState) (entries : List ExternalCall) : ContractState :=
+  { s with calls := s.calls ++ entries }
+
+def topupCallJournal (pulled pushed : Nat) : List ExternalCall :=
+  [linkedCallEntry "withdrawDepositableEther"
+      (ExternalArg.toWords (Core.Uint256.ofNat pulled)),
+    linkedCallEntry "makeBeaconChainTopUp"
+      (ExternalArg.toWords (Core.Uint256.ofNat pushed))]
+
 /-- Independent transaction reading of the pinned source outcome. -/
 def sourceTx (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (before : ContractState) : TxView :=
-  if (run cfg inp).reverts then
-    ⟨.reverted, before, before⟩
-  else
-    ⟨.committed, before, before⟩
+  match run cfg inp with
+  | .committedTopUp _ pulled pushed _ =>
+      ⟨.committed, before, withCalls before (topupCallJournal pulled pushed)⟩
+  | o =>
+      if o.reverts then ⟨.reverted, before, before⟩
+      else ⟨.committed, before, before⟩
 
 def observeVerity (before : ContractState) (result : ContractResult Unit) : TxView :=
   match result with
@@ -126,10 +137,12 @@ theorem verity_tx_simulates_source
     observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state := by
   have hconserves := run_conserves cfg inp
   cases hrun : run cfg inp <;>
-    simp [executeSource, sourceTx, observeVerity, TopupTxContract.executeTopup,
+    simp [executeSource, sourceTx, observeVerity, withCalls, topupCallJournal,
+      TopupTxContract.executeTopup,
       TopupTxContract.executeNoTopup, TopupTxContract.executePullRevert,
       TopupTxContract.executePushRevert, _root_.Verity.require,
-      _root_.Contracts.externalCallBind, _root_.Verity.Contract.run,
+      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+      _root_.Contracts.linkedCallEntry, _root_.Verity.Contract.run,
       _root_.Verity.bind, _root_.Verity.pure, Bind.bind, Pure.pure,
       Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
   case revertAssertBalanceUnchanged =>
