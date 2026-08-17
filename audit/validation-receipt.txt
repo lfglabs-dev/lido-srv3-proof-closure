@@ -1,11 +1,26 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d675f6c03de0b90b436cd61fd164867bf6880cd4
+validated-tree: f22e817899ef6a8c026a74f6ba1d67ea90c52d32
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ALLOC-2 faithful Verity transaction closure (2026-08-17)
+-----------------------------------------------------------
+
+- Source commit `10dc833` composes the checked abstract MinFirst theorem with
+  an executable `Contract.run` transaction over denoted mutable `uint256[]`
+  memory arrays and `writeMapUint` / `writeSlot` outcome observables.
+- The transaction matches the pinned-source scan, equal-minimum count,
+  next-level bound, ceil-division amount, repeated allocation, conservation,
+  and rollback behavior. Mutants cover amount, bound, floor division,
+  intermediate-write rollback, and two-batch chaining.
+- Verity is pinned to merged upstream PR #2363 at
+  `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `f22e817899ef6a8c026a74f6ba1d67ea90c52d32`.
 
 Verity #2360 pin bump (2026-08-17)
 ----------------------------------
