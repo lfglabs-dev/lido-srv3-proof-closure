@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.DepositCorrespondence
+import LidoSRv3.Audit.Verity.DepositParentTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PDeposit1
@@ -7,9 +8,9 @@ namespace LidoSRv3.Audit.Guarantees.PDeposit1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityDeposit
 
-/-- The active registry exposes MODEL, SOURCE, and abstract rollback evidence.
-The former Verity transaction claim is blocked and deliberately absent. -/
-def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source]⟩
+/-- The registry exposes the abstract/source proof and the composed bounded
+executable Verity transaction evidence. -/
+def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
 
 /-- Abstract transaction rollback, not an executable EVM trace. -/
 theorem revert_restores_state_value_and_logs {State : Type} :
@@ -117,5 +118,25 @@ theorem source_nonconserving_deployment_reverts
       ∀ keys pulled pushed balanceAfter,
         run cfg inp ≠ .committedDeposits keys pulled pushed balanceAfter :=
   ⟨not_conserving_nonempty_reverts hCfg hKeys, not_conserving_reverts hCfg⟩
+
+/-- Parent closure composes the general pinned-source conservation/rollback
+theorem with the faithful bounded two-batch `Contract.run` correspondence. -/
+theorem verity_tx_composes_deposit_conservation_and_rollback {State : Type}
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :
+    ((run cfg inp).pulled = (run cfg inp).pushed ∧
+      ((run cfg inp).reverts = true →
+        (observation before after attempts trace (run cfg inp)).committedState = before ∧
+          (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
+          (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧
+      LidoSRv3.Audit.Verity.DepositParentTx.observe
+          LidoSRv3.Audit.Verity.DepositParentTx.canonicalState
+          ((LidoSRv3.Audit.Verity.DepositParentTx.execute
+            LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs).run
+              LidoSRv3.Audit.Verity.DepositParentTx.canonicalState) =
+        LidoSRv3.Audit.Verity.DepositParentTx.sourceSuccessView
+          LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs :=
+  ⟨source_deposit_conserves_and_rolls_back cfg inp before after attempts trace,
+    LidoSRv3.Audit.Verity.DepositParentTx.verity_tx_matches_pinned_source_two_batch⟩
 
 end LidoSRv3.Audit.Guarantees.PDeposit1

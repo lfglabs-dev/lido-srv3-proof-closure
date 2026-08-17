@@ -49,7 +49,7 @@ EXPECTED_OBJECTIVE = "Prove an abstract Lean model and a behaviorally faithful V
 EXPECTED_CANONICAL_CLAIMS = {
     "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket", "PARTIAL", None, "VERITY_FEATURE_REQUIRED", ("A-HANDWRITTEN-MINFIRST", "A-ALLOC2-TX-BOUNDARY", "A-VERITY-SCAFFOLD")),
-    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
@@ -62,7 +62,7 @@ EXPECTED_CANONICAL_CLAIMS = {
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "a32a7ae4d53c0b3a73265b950e17289771f04bd3a93d002ab09ec3bd1919b7e8",
     "P-ALLOC-2": "5e96cfb60cb0a1b918dd08e44e6c82d541e2d00223d8f825632d2740396007bd",
-    "P-DEPOSIT-1": "bd1f9e0347f60d3ea75089dc4d6abbbbe3515ff865bf83419f5286fad32c0968",
+    "P-DEPOSIT-1": "5643a89e9a0cfdc9d615a16f275e90dec43eda9887facfafe7422e37c4f09552",
     "P-TOPUP-1": "e76b6a30ef38a283b05b9a6fbb31b12dc4376682ab824ae26440b512d622667f",
     "P-ACCOUNT-1": "e9fea968dc683b7e784f63be8513e173c5732eac6b5aa0baefa101689b37233b",
     "P-RESERVE-1": "e8f34af2bb8d1eb061da1882ff2460535489056a8e9eca41e7b8c750a614ff27",
@@ -73,8 +73,8 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-SSZ-1": "f56732a1c2b0a8941b2d2b8d2fe05a0bf0e70a7a21b36d4851a2c311f45ffc05",
 }
 EXPECTED_PRIORITIES = {
-    "P-RESERVE-1": "DONE",
-    "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "P1",
+    "P-RESERVE-1": "DONE", "P-DEPOSIT-1": "DONE",
+    "P-TOPUP-1": "P1", "P-ACCOUNT-1": "P1",
     "P-ALLOC-1": "P2", "P-ALLOC-2": "P2", "P-ETH-1": "P2",
     "P-ADDRESS-1": "P2", "P-TOPUP-2": "P2", "P-CONSOLIDATION-1": "P2",
     "P-SSZ-1": "P3",

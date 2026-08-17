@@ -207,31 +207,44 @@ def check(root: Path) -> None:
         theorem = expected["abstract_theorem"]
         if abstract.get("status") != "CHECKED" or abstract.get("theorem") != theorem:
             fail(f"{claim_id}: checked abstract theorem differs from the canonical view")
-        if verity.get("status") != "PARTIAL" or verity.get("theorem") is not None:
+        deposit_checked = claim_id == "P-DEPOSIT-1"
+        if deposit_checked:
+            expected_verity = "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback"
+            if verity.get("status") != "CHECKED" or verity.get("theorem") != expected_verity:
+                fail(f"{claim_id}: checked Verity theorem differs from the canonical view")
+        elif verity.get("status") != "PARTIAL" or verity.get("theorem") is not None:
             fail(f"{claim_id}: faithful Verity must remain PARTIAL without a canonical theorem")
 
+        table_status = "CHECKED" if deposit_checked else "PARTIAL"
         table_pattern = re.compile(
-            rf"^\|\s*\d+\s*\|\s*`{re.escape(claim_id)}`\s*\|[^\n]*\|\s*PARTIAL[^\n]*\|$",
+            rf"^\|\s*\d+\s*\|\s*`{re.escape(claim_id)}`\s*\|[^\n]*\|\s*{table_status}[^\n]*\|$",
             re.MULTILINE,
         )
         if not table_pattern.search(readme):
-            fail(f"README: {claim_id} must keep faithful Verity PARTIAL")
+            fail(f"README: {claim_id} must expose faithful Verity {table_status}")
 
         module = expected["module"]
         lean_path = root / f"LidoSRv3/Audit/Guarantees/{module}.lean"
         lean = read(lean_path)
+        layers = expected["layers"] + (", .verityTx" if deposit_checked else "")
         definition = re.compile(
             rf"def guarantee\s*:\s*Guarantee\s*:=\s*"
-            rf"⟨\.{module[0].lower() + module[1:]},\s*\[{re.escape(expected['layers'])}\]\u27e9"
+            rf"⟨\.{module[0].lower() + module[1:]},\s*\[{re.escape(layers)}\]\u27e9"
         )
         if not definition.search(lean):
             fail(f"{lean_path}: checkedLayers differ from the blocked canonical view")
-        if "transaction claim is blocked" not in lean:
+        if not deposit_checked and "transaction claim is blocked" not in lean:
             fail(f"{lean_path}: missing explicit blocked-transaction description")
         imports, declarations = lean_surface(lean)
-        if imports != expected["imports"]:
+        expected_imports = expected["imports"]
+        if deposit_checked:
+            expected_imports = expected_imports[:2] + ("LidoSRv3.Audit.Verity.DepositParentTx",) + expected_imports[2:]
+        if imports != expected_imports:
             fail(f"{lean_path}: imports differ from the structural allowlist")
-        if declarations != expected["declarations"]:
+        expected_declarations = expected["declarations"]
+        if deposit_checked:
+            expected_declarations += (("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),)
+        if declarations != expected_declarations:
             fail(f"{lean_path}: public declarations differ from the structural allowlist")
 
     if "a behaviorally faithful Verity model with a checked refinement theorem" not in readme:
@@ -247,7 +260,7 @@ def main() -> int:
     except (OSError, ValueError) as exc:
         print(f"public claim surface check failed: {exc}", file=sys.stderr)
         return 1
-    print("public claim surfaces preserve retracted faithful-Verity claims as PARTIAL")
+    print("public claim surfaces match canonical abstract/Verity assurance claims")
     return 0
 
 
