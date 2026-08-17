@@ -1,11 +1,26 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6b4619bc5b7d324823d6badaebc689c26703099b
+validated-tree: cc693aa72e13c9ce6bc39d522e957042a7e19580
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-SSZ-1 structural map outcome readback (2026-08-17)
+-----------------------------------------------------
+
+- Source commit `d21693dd1319d032ce60c345b33c2c6ac21434af` extends the
+  committed outcome with explicit readback of both written path-map entries,
+  both written branch-map entries, their exact lengths, and the witness-bind
+  result. The fixed two-entry windows are complete for every successful named
+  operation witness (depth one or two) and clear unused entries.
+- `verity_tx_simulates_ssz_encoding` now equates those storage-derived outcome
+  observables with the abstract witness path and branch encodings. Mutants that
+  corrupt the path map, drop the branch map, or drop the bind result each fail
+  that same correspondence.
+- Receipt subject: tracked tree excluding this receipt,
+  `cc693aa72e13c9ce6bc39d522e957042a7e19580`.
 
 P-ALLOC-1 faithful Verity transaction closure (2026-08-17)
 -----------------------------------------------------------
