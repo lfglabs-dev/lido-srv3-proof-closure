@@ -61,6 +61,8 @@ test:
 	@printf '%s\n' 'bounded Verity P-TOPUP-2 aggregate-cap transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveMutants
 	@printf '%s\n' 'executable reserve non-interference and rollback mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.ReserveRelationalMutants
+	@printf '%s\n' 'P-RESERVE-RELATIONAL abstract/source correspondence, dependency mutants, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.PEth1RefundTxMutants
 	@printf '%s\n' 'P-ETH-1a gateway/vault refund Contract.run mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.PEth1RequestTxMutants
