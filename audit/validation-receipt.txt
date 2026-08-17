@@ -1,11 +1,21 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 70ca7601f66d75fffca7a421219c60b6d604d937
+validated-tree: d675f6c03de0b90b436cd61fd164867bf6880cd4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Verity #2360 pin bump (2026-08-17)
+----------------------------------
+
+- Lakefile, manifest, artifact lock, audit manifest, source-map, and provenance
+  fixtures now pin Verity `c8cbae3375580d01856efd36f3164fc4ecd05b9c`.
+- Existing ledgers compile against the storage-lens flip via `writeSlot` /
+  `writeMapUint`. Parent `P-ETH-1` stays OPEN; children stay CHECKED.
+- Receipt subject: tracked tree excluding this receipt,
+  `d675f6c03de0b90b436cd61fd164867bf6880cd4`.
 
 P-RESERVE-RELATIONAL first closure slice (2026-08-17)
 ------------------------------------------------------
