@@ -17,6 +17,8 @@ import LidoSRv3.Audit.Verity.PEth1RequestTx
 import LidoSRv3.Tests.PEth1RefundTxMutants
 import LidoSRv3.Tests.PEth1RequestTxMutants
 import LidoSRv3.Audit.Guarantees.PSsz1
+import LidoSRv3.Audit.Verity.SszEncodingTx
+import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Verity.Topup2Tx
@@ -125,7 +127,11 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.source_reserve_does_not_change_finalization
-#print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow

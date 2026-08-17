@@ -14,4 +14,4 @@
 | `P-ADDRESS-1` | OPEN | PARTIAL | abstract parent theorem; universal post-state equivariance; request/claim/redemption entrypoints and source correspondence | IMPLEMENTATION_PENDING | `A-ABSTRACT-TX` |
 | `P-TOPUP-2` | CHECKED | PARTIAL | checked uint256 bounds and overflow-revert correspondence; single Contract.run composition of storage and calls; target/kind/calldata/per-validator granularity; same-run failed-call witness membership | IMPLEMENTATION_PENDING | — |
 | `P-CONSOLIDATION-1` | OPEN | PARTIAL | parent eligibility/value/atomicity; faithful external call/batch/replay | VERITY_FEATURE_REQUIRED | `A-SHA256-FFI` |
-| `P-SSZ-1` | CHECKED | PARTIAL | parent verifyProof/wrappers; faithful SHA-256 observation execution; imported↔deployed Yul binding | IMPLEMENTATION_PENDING | `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED` |
+| `P-SSZ-1` | CHECKED | CHECKED | — | NONE | `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED` |

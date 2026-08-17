@@ -57,7 +57,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-ADDRESS-1": ("OPEN", None, "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX",)),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "PARTIAL", None, "IMPLEMENTATION_PENDING", ()),
     "P-CONSOLIDATION-1": ("OPEN", None, "PARTIAL", None, "VERITY_FEATURE_REQUIRED", ("A-SHA256-FFI",)),
-    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Ssz.structural_witness_binding_sound", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
+    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "NONE", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "a32a7ae4d53c0b3a73265b950e17289771f04bd3a93d002ab09ec3bd1919b7e8",
@@ -70,14 +70,14 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ADDRESS-1": "882421e998af3fe6be8af7154999801509a085ccf4e1842c310ad6ddf68122e3",
     "P-TOPUP-2": "2c8cb1b166f1bcae465079fad7c0b301d5faf08639d3afc53a327aeaa2ddfca3",
     "P-CONSOLIDATION-1": "9e27decc67733f1e9b4974f97b51ae35829a9c0ed0bb5c318c9152ab0f6211ca",
-    "P-SSZ-1": "f56732a1c2b0a8941b2d2b8d2fe05a0bf0e70a7a21b36d4851a2c311f45ffc05",
+    "P-SSZ-1": "aba9f59017f277576915c0f0a60f87fe249fa3594698ca38847ca38ecd1b6e09",
 }
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "P1",
     "P-ALLOC-1": "P2", "P-ALLOC-2": "DONE", "P-ETH-1": "P2",
     "P-ADDRESS-1": "P2", "P-TOPUP-2": "P2", "P-CONSOLIDATION-1": "P2",
-    "P-SSZ-1": "P3",
+    "P-SSZ-1": "DONE",
 }
 
 

@@ -1,44 +1,108 @@
 import LidoSRv3.Audit.Ssz
 import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
+import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
+import LidoSRv3.Audit.Verity.SszAbstractDigest
+import LidoSRv3.Audit.Verity.SszTxSimulation
+import LidoSRv3.Audit.Verity.SszEncodingTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PSsz1
 
-/--
-P-SSZ-1 guarantee facade.  Structural-only SSZ evidence.
+open LidoSRv3.Audit
+open LidoSRv3.Audit.Source.DepositDataRootCorrespondence
+open LidoSRv3.Audit.Source.GIndexConcatCorrespondence
+open LidoSRv3.Audit.Verity.SszAbstractDigest
+open LidoSRv3.Audit.Verity.SszTxSimulation
+open LidoSRv3.Audit.Verity.SszEncodingTx
 
-The single theorem exposed here is `structural_witness_binding_sound`.
-
-What this facade does **not** claim: full SSZ serialization or `hashTreeRoot`
-correctness, SHA-256 cryptographic correctness, deployed-precompile
-equivalence, Solidity or EVM execution semantics, transaction-level behavior,
-runtime/codehash provenance, and end-to-end validator provenance.
-
-The pinned-source deposit-data-root correspondence is deliberately **not**
-re-exported through this facade.  It is stated and proved next to the source
-shape it constrains, as
-`Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`,
-and it is reported from that module by `LidoSRv3.Audit.Trust`.
--/
-def guarantee : Guarantee := ⟨.pSsz1, [.model]⟩
+def guarantee : Guarantee := ⟨.pSsz1, [.model, .source, .verityTx]⟩
 
 /--
-The structural helper accepts only witnesses whose independently supplied
-pivot/path data has the claimed generalized-index meaning, whose branch arity
-matches that supplied path, and whose traversal reconstructs the supplied root.
-This is not an SSZ, SHA-256, Solidity, EVM, transaction, source, or end-to-end
-theorem.
+Parent abstract composition of the four P-SSZ-1 children.  Each conjunct is
+the existing child theorem; none is weakened.
+
+1. structural witness binding (`Audit.Ssz`)
+2. pinned deposit-data-root source layout (`DepositDataRootCorrespondence`)
+3. `GIndex.concat` source transcription (`GIndexConcatCorrespondence`)
+4. seven-call SHA-256 digest composition (`SszAbstractDigest`) plus the
+   root-match verification control flow (`SszTxSimulation`)
 -/
-theorem structural_witness_binding_sound
-    (h : LidoSRv3.Audit.Ssz.bindOperation operation combine witness expectedRoot = true) :
-      witness.operation = operation ∧
-      witness.index = LidoSRv3.Audit.Ssz.operationIndex operation ∧
-      LidoSRv3.Audit.Ssz.HasGeneralizedIndex witness.index witness.pivotBoundary
-        witness.path ∧
+theorem composed_ssz_encoding
+    {operation : Ssz.Operation} {combine : Ssz.Node → Ssz.Node → Ssz.Node}
+    {witness : Ssz.ValidatorWitness} {expectedRoot : Ssz.Node}
+    (hBind : Ssz.bindOperation operation combine witness expectedRoot = true)
+    (src : SourceDepositDataRootInput)
+    (hPublicKey : src.publicKey.length = PUBKEY_LENGTH pinnedConfig)
+    (hWithdrawalCredentials : src.withdrawalCredentials.length =
+      WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig)
+    (hSignature : src.signature.length = SIGNATURE_LENGTH pinnedConfig)
+    (lhs rhs : GIndex)
+    (digestInput : Inputs)
+    (txInput : TxInputs)
+    (hTxWidths : exactTxWidths txInput) :
+    -- Child: structural witness binding.
+    (witness.operation = operation ∧
+      witness.index = Ssz.operationIndex operation ∧
+      Ssz.HasGeneralizedIndex witness.index witness.pivotBoundary witness.path ∧
       witness.branch.length = witness.path.length ∧
-      LidoSRv3.Audit.Ssz.traverseBranch combine
-        (LidoSRv3.Audit.Ssz.validatorRoot combine witness.validator)
-        witness.path witness.branch = expectedRoot :=
-  LidoSRv3.Audit.Ssz.structural_witness_binding_sound h
+      Ssz.traverseBranch combine (Ssz.validatorRoot combine witness.validator)
+        witness.path witness.branch = expectedRoot) ∧
+    -- Child: pinned deposit-data-root source layout and witness.
+    (SHA256_DIGEST_LENGTH pinnedConfig = 32 ∧
+      PUBKEY_LENGTH pinnedConfig = 48 ∧
+      WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig = 32 ∧
+      SIGNATURE_LENGTH pinnedConfig = 96 ∧
+      DEPOSIT_DATA_LENGTH pinnedConfig = 184 ∧
+      src.publicKey.length = 48 ∧
+      src.withdrawalCredentials.length = 32 ∧
+      src.signature.length = 96 ∧
+      (∀ byte ∈ src.withdrawalCredentials, byte < 256) ∧
+      (∀ byte ∈ src.publicKey, byte < 256) ∧
+      (∀ byte ∈ src.signature, byte < 256) ∧
+      src.amountGwei < 2 ^ 256 ∧
+      signatureRoot src = computeSignatureRoot src.signature ∧
+      Ssz.HasGeneralizedIndex (sourceWitness src).index
+        (sourceWitness src).pivotBoundary (sourceWitness src).path ∧
+      Ssz.traverseBranch (sourceCombine src)
+        (Ssz.validatorRoot (sourceCombine src) (sourceWitness src).validator)
+        (sourceWitness src).path (sourceWitness src).branch = sourceNode src) ∧
+    -- Child: GIndex.concat source transcription.
+    sourceConcat lhs rhs = specConcat lhs rhs ∧
+    -- Child: seven-call digest composition and root-match control flow.
+    (ExactDigestComposition digestInput ∧
+      (digestPreimages txInput.toInputs).length = 7 ∧
+      (runVerification txInput = .accept ↔
+        computedRoot txInput = txInput.expectedDepositDataRoot) ∧
+      exactTxWidths txInput) := by
+  refine ⟨Ssz.structural_witness_binding_sound hBind,
+    source_pinned_config_discharges_deposit_data_root src
+      hPublicKey hWithdrawalCredentials hSignature,
+    encoding_uses_source_concat lhs rhs,
+    ⟨digest_composition digestInput,
+      digest_preimages_length txInput.toInputs,
+      accepted_iff_root_matches txInput, hTxWidths⟩⟩
+
+/--
+Faithful VERITY_TX closure for P-SSZ-1. The executable `Contract.run`
+transaction computes the four child observables together, persists them
+through `writeSlot`/`writeMapUint`, and matches the independently stated
+source view. Reverts after intermediate writes restore the pre-call snapshot.
+-/
+theorem verity_tx_simulates_ssz_encoding
+    (input : EncodingInput) (state : Verity.ContractState) :
+    observe ((encode input).run state) = sourceView input ∧
+      ∀ reason rollback,
+        (encode input).run state = .revert reason rollback →
+          rollback = state :=
+  ⟨verity_tx_simulates_pinned_source input state,
+    fun reason rollback h =>
+      revert_restores_snapshot input false state rollback reason h⟩
+
+theorem verity_tx_two_batch_rolls_back
+    (first second : EncodingInput) (state rollback : Verity.ContractState)
+    (reason : String)
+    (h : (encodeTwo first second true).run state = .revert reason rollback) :
+    rollback = state :=
+  revert_restores_snapshot_two first second true state rollback reason h
 
 end LidoSRv3.Audit.Guarantees.PSsz1
