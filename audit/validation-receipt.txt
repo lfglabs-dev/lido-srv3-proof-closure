@@ -1,11 +1,29 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: fa39d96c54f8dd2315e23543e877cad62d329cce
+validated-tree: 70ca7601f66d75fffca7a421219c60b6d604d937
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-RESERVE-RELATIONAL first closure slice (2026-08-17)
+------------------------------------------------------
+
+- Source commit `f81354d5f9cedbbb07393e709ed74997c97b5fe3` adds an independent
+  abstract reserve-invariance specification and theorem, plus a separate
+  source-shaped interpreter and correspondence proof.
+- Mutants cover reserve-to-range dependence and ignored report, queue, and
+  buffer inputs; the two-batch regression checks relational chaining.
+- `P-RESERVE-RELATIONAL` remains PARTIAL pending executable Verity
+  computation, composition, and intermediate-write rollback. `P-RESERVE-1`
+  remains the child/baseline.
+- Receipt subject: tracked tree excluding this receipt,
+  `4026ac4e4d46f8370f0a1e428be99400459dec5b`.
+- Review repair: `sourceRun` equality across reserve-only states is false
+  (the post-state still carries `depositsReserve`); the mutant now compares
+  `outcomeObservables`. `REPRODUCE.md` is generated again; the slice is
+  reproduced by `make test` via `LidoSRv3.Tests.ReserveRelationalMutants`.
 
 Handoff cleanup (2026-08-17)
 ----------------------------
