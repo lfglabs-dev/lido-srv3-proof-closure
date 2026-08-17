@@ -1,11 +1,33 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 59965c84ce794046581c39b688bcd5b6c2ce7a61
+validated-tree: cb3461e83f6babffc624c73cf578532711da9c0b
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-SSZ-1 structural-witness composition on the Verity plane (2026-08-17)
+-----------------------------------------------------------------------
+
+- Exact-head review of PR #100: `composed_ssz_encoding` conjoins four children
+  but `SszEncodingTx` only observed deposit-data-root, concat, digest XOR, and
+  verified. `verity_tx_simulates_ssz_encoding` lifted
+  `verity_tx_simulates_pinned_source` and never executed the structural
+  witness conjunct.
+- `EncodingInput` now carries the same `ValidatorWitness`, named `operation`,
+  `combine`, index, path, branch, and expected witness root the abstract uses.
+  `Contract.run` writes those pieces through `writeSlot` / `writeMapUint`
+  together with the other three children and rolls the snapshot back after
+  intermediate writes.
+- Parent `verity_tx_simulates_ssz_encoding` composes all four children in one
+  statement: executable correspondence, committed ⇒ `bindOperation` and the
+  abstract structural conjunct, source concat, seven-call digest, and
+  rollback. Mutants drop the structural-witness branch as well as concat,
+  digest, and verified.
+- Verity remains pinned at `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `cb3461e83f6babffc624c73cf578532711da9c0b`.
 
 P-SSZ-1 composed abstract and Verity encoding transaction (2026-08-17)
 ----------------------------------------------------------------------

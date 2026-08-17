@@ -131,6 +131,7 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source
+#print axioms LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits

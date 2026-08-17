@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Ssz
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Verity.SszAbstractDigest
 import LidoSRv3.Audit.Verity.SszTxSimulation
@@ -9,10 +10,12 @@ import Verity.Core
 One `Contract.run` transaction computes the four P-SSZ-1 child observables
 together and persists them through `writeSlot` / `writeMapUint`:
 
-1. deposit-data-root — last digest of the pinned seven-call SHA-256 chain
-2. GIndex.concat — exact source `shift`/`xor`/`or`/`pow(rhs)` result
-3. abstract digest — XOR fingerprint of the seven engine digests
-4. verification — accept iff the computed root equals the expected root
+1. structural witness binding — `ValidatorWitness`, named `operation`,
+   generalized index, path, and branch, accepted iff `bindOperation`
+2. deposit-data-root — last digest of the pinned seven-call SHA-256 chain
+3. GIndex.concat — exact source `shift`/`xor`/`or`/`pow(rhs)` result
+4. abstract digest — XOR fingerprint of the seven engine digests, plus
+   verification — accept iff the computed root equals the expected root
 
 A second encoding batch may be chained: its left generalized index is the
 first batch's committed concat. Any failure after intermediate writes is
@@ -25,6 +28,7 @@ SHA-256 functional correctness remains `A-SHA256-FFI`.
 namespace LidoSRv3.Audit.Verity.SszEncodingTx
 
 open _root_.Verity
+open LidoSRv3.Audit
 open LidoSRv3.Audit.Verity.SszAbstractDigest
 open LidoSRv3.Audit.Verity.SszTxSimulation
 open LidoSRv3.Audit.Source.GIndexConcatCorrespondence
@@ -35,13 +39,27 @@ def depositRootSlot (base : Nat) : Nat := base
 def concatSlot (base : Nat) : Nat := base + 1
 def digestXorSlot (base : Nat) : Nat := base + 2
 def verifiedSlot (base : Nat) : Nat := base + 3
-def digestMapSlot (base : Nat) : Nat := 10 + base
+def operationSlot (base : Nat) : Nat := base + 4
+def indexSlot (base : Nat) : Nat := base + 5
+def pivotSlot (base : Nat) : Nat := base + 6
+def traversedRootSlot (base : Nat) : Nat := base + 7
+def boundSlot (base : Nat) : Nat := base + 8
+def digestMapSlot (base : Nat) : Nat := 1000 + base
+def pathMapSlot (base : Nat) : Nat := 2000 + base
+def branchMapSlot (base : Nat) : Nat := 3000 + base
+def batchStride : Nat := 16
 
+/-- Inputs carry the four children the parent abstract composes, including the
+structural witness pieces used by `composed_ssz_encoding`. -/
 structure EncodingInput where
   deposit : Inputs
   lhs : GIndex
   rhs : GIndex
   expectedRoot : Bytes
+  operation : Ssz.Operation
+  combine : Ssz.Node → Ssz.Node → Ssz.Node
+  witness : Ssz.ValidatorWitness
+  expectedWitnessRoot : Ssz.Node
 
 def widthsOk (input : EncodingInput) : Bool :=
   input.deposit.publicKey.size == 48 &&
@@ -49,6 +67,11 @@ def widthsOk (input : EncodingInput) : Bool :=
       input.deposit.signature.size == 96 &&
         input.deposit.amountLittleEndian.size == 8 &&
           input.expectedRoot.size == 32
+
+/-- Child 1, exactly the abstract `bindOperation` hypothesis. -/
+def structuralOk (input : EncodingInput) : Bool :=
+  Ssz.bindOperation input.operation input.combine input.witness
+    input.expectedWitnessRoot
 
 def foldBytesBE (bytes : List UInt8) : Nat :=
   bytes.foldl (fun acc b => acc * 256 + b.toNat) 0
@@ -69,28 +92,89 @@ def xorWords : List Word → Word
 def computedRootBytes (deposit : Inputs) : Bytes :=
   (digestChain deposit).getLast?.getD (zeros digestBytes)
 
-def writeDigests (base : Nat) : ContractState → Nat → List Word → ContractState
+/-- Persist the named operation through the same generalized-index slot the
+abstract uses (`Ssz.operationIndex`). -/
+def operationWord (op : Ssz.Operation) : Word :=
+  Verity.Core.Uint256.ofNat (Ssz.operationIndex op).value
+
+def indexWord (index : Ssz.GeneralizedIndex) : Word :=
+  Verity.Core.Uint256.ofNat index.value
+
+def nodeWord (n : Ssz.Node) : Word :=
+  Verity.Core.Uint256.ofNat n
+
+def siblingWord : Ssz.SiblingSide → Word
+  | .right => 0
+  | .left => 1
+
+def traversedRoot (input : EncodingInput) : Ssz.Node :=
+  Ssz.traverseBranch input.combine
+    (Ssz.validatorRoot input.combine input.witness.validator)
+    input.witness.path input.witness.branch
+
+def writeWords (mapSlot : Nat) : ContractState → Nat → List Word → ContractState
   | state, _, [] => state
   | state, index, word :: rest =>
-      writeDigests base
-        (state.writeMapUint (digestMapSlot base) (Verity.Core.Uint256.ofNat index) word)
+      writeWords mapSlot
+        (state.writeMapUint mapSlot (Verity.Core.Uint256.ofNat index) word)
         (index + 1) rest
+
+def writeDigests (base : Nat) (state : ContractState) (index : Nat)
+    (words : List Word) : ContractState :=
+  writeWords (digestMapSlot base) state index words
+
+def writePath (base : Nat) (state : ContractState) (index : Nat)
+    (words : List Word) : ContractState :=
+  writeWords (pathMapSlot base) state index words
+
+def writeBranch (base : Nat) (state : ContractState) (index : Nat)
+    (words : List Word) : ContractState :=
+  writeWords (branchMapSlot base) state index words
+
+/-- Intermediate child writes (including structural path/branch maps). -/
+def persistChildren (base : Nat) (state : ContractState)
+    (digestWords pathWords branchWords : List Word)
+    (root concat fingerprint opW idxW pivotW travW : Word) : ContractState :=
+  let s := writeDigests base state 0 digestWords
+  let s := writePath base s 0 pathWords
+  let s := writeBranch base s 0 branchWords
+  ((((((s.writeSlot (concatSlot base) concat).writeSlot
+    (depositRootSlot base) root).writeSlot
+    (digestXorSlot base) fingerprint).writeSlot
+    (operationSlot base) opW).writeSlot
+    (indexSlot base) idxW).writeSlot
+    (pivotSlot base) pivotW).writeSlot
+    (traversedRootSlot base) travW
+
+/-- Final commit bits for verification and structural bind. -/
+def persistCommit (base : Nat) (state : ContractState) : ContractState :=
+  (state.writeSlot (verifiedSlot base) 1).writeSlot (boundSlot base) 1
+
+theorem readSlot_writeWords (mapSlot : Nat) (state : ContractState)
+    (index slot : Nat) (words : List Word) :
+    (writeWords mapSlot state index words).readSlot slot = state.readSlot slot := by
+  induction words generalizing state index with
+  | nil => simp [writeWords]
+  | cons word rest ih =>
+      simp [writeWords]
+      rw [ih]
+      simp [ContractState.readSlot, ContractState.storage_writeMapUint]
 
 theorem readSlot_writeDigests (base : Nat) (state : ContractState)
     (index slot : Nat) (words : List Word) :
-    (writeDigests base state index words).readSlot slot = state.readSlot slot := by
-  induction words generalizing state index with
-  | nil => simp [writeDigests]
-  | cons word rest ih =>
-      simp [writeDigests]
-      rw [ih]
-      simp [ContractState.readSlot, ContractState.storage_writeMapUint]
+    (writeDigests base state index words).readSlot slot = state.readSlot slot :=
+  readSlot_writeWords _ _ _ _ _
 
 structure Observables where
   depositDataRoot : Word
   concat : Word
   digestXor : Word
   verified : Word
+  operation : Word
+  index : Word
+  pivotBoundary : Word
+  traversedRoot : Word
+  bound : Word
   deriving DecidableEq, Repr
 
 inductive Status where
@@ -103,17 +187,22 @@ structure View where
   observables : Observables
   deriving DecidableEq, Repr
 
-def zeroObs : Observables := ⟨0, 0, 0, 0⟩
+def zeroObs : Observables := ⟨0, 0, 0, 0, 0, 0, 0, 0, 0⟩
 
 def readObs (state : ContractState) (base : Nat) : Observables :=
   ⟨state.readSlot (depositRootSlot base),
     state.readSlot (concatSlot base),
     state.readSlot (digestXorSlot base),
-    state.readSlot (verifiedSlot base)⟩
+    state.readSlot (verifiedSlot base),
+    state.readSlot (operationSlot base),
+    state.readSlot (indexSlot base),
+    state.readSlot (pivotSlot base),
+    state.readSlot (traversedRootSlot base),
+    state.readSlot (boundSlot base)⟩
 
-/-- Persist the four observables after the child computations. The injected
-failure hook and the root-mismatch branch both revert *after* those writes so
-`Contract.run` can restore the snapshot. -/
+/-- Persist every child after the child computations. The injected failure
+hook, a failed `bindOperation`, and the root-mismatch branch all revert
+*after* those writes so `Contract.run` can restore the snapshot. -/
 def encodeAt (base : Nat) (input : EncodingInput)
     (failAfterWrites : Bool := false) : Contract Observables := fun snapshot =>
   if widthsOk input = false then .revert "WIDTH_MISMATCH" snapshot
@@ -127,18 +216,26 @@ def encodeAt (base : Nat) (input : EncodingInput)
         let root := bytesToWord rootBytes
         let concat := packConcat index pow
         let fingerprint := xorWords (chain.map bytesToWord)
-        let dirty := writeDigests base snapshot 0 (chain.map bytesToWord)
-        let dirty := dirty.writeSlot (concatSlot base) concat
-        let dirty := dirty.writeSlot (depositRootSlot base) root
-        let dirty := dirty.writeSlot (digestXorSlot base) fingerprint
-        if rootBytes = input.expectedRoot then
-          if failAfterWrites then
-            .revert "INJECTED_AFTER_WRITES" dirty
+        let opW := operationWord input.operation
+        let idxW := indexWord input.witness.index
+        let pivotW := nodeWord input.witness.pivotBoundary
+        let travW := nodeWord (traversedRoot input)
+        let dirty := persistChildren base snapshot
+          (chain.map bytesToWord)
+          (input.witness.path.map siblingWord)
+          (input.witness.branch.map nodeWord)
+          root concat fingerprint opW idxW pivotW travW
+        if structuralOk input = true then
+          if rootBytes = input.expectedRoot then
+            if failAfterWrites then
+              .revert "INJECTED_AFTER_WRITES" dirty
+            else
+              .success ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1⟩
+                (persistCommit base dirty)
           else
-            let dirty := dirty.writeSlot (verifiedSlot base) 1
-            .success ⟨root, concat, fingerprint, 1⟩ dirty
+            .revert "DepositDataRootMismatch" dirty
         else
-          .revert "DepositDataRootMismatch" dirty
+          .revert "WITNESS_BIND" dirty
 
 def encode (input : EncodingInput) (failAfterWrites : Bool := false) :
     Contract Observables :=
@@ -158,7 +255,7 @@ def encodeTwo (first second : EncodingInput) (failAfterWrites : Bool := false) :
             if hPow : pow < 256 then
               let chained : EncodingInput :=
                 { second with lhs := ⟨index, pow, hIndex, hPow⟩ }
-              match encodeAt 4 chained failAfterWrites state with
+              match encodeAt batchStride chained failAfterWrites state with
               | .revert reason state => .revert reason state
               | .success secondObs state => .success (firstObs, secondObs) state
             else .revert "CHAIN_POW" snapshot
@@ -172,21 +269,28 @@ def observe : ContractResult Observables → View
 
 def observeTwo : ContractResult (Observables × Observables) → View × View
   | .success _ state =>
-      (⟨.committed, readObs state 0⟩, ⟨.committed, readObs state 4⟩)
+      (⟨.committed, readObs state 0⟩, ⟨.committed, readObs state batchStride⟩)
   | .revert _ _ => (⟨.reverted, zeroObs⟩, ⟨.reverted, zeroObs⟩)
+
+def committedObs (input : EncodingInput) (index pow : Nat) : Observables :=
+  let chain := digestChain input.deposit
+  ⟨bytesToWord (computedRootBytes input.deposit), packConcat index pow,
+    xorWords (chain.map bytesToWord), 1,
+    operationWord input.operation,
+    indexWord input.witness.index,
+    nodeWord input.witness.pivotBoundary,
+    nodeWord (traversedRoot input), 1⟩
 
 def sourceObs (input : EncodingInput) : Option Observables :=
   if widthsOk input = false then none
+  else if structuralOk input = false then none
   else
     match sourceConcat input.lhs input.rhs with
-    | .depthOverflow | .packOverflow => none
     | .value index pow =>
-        let chain := digestChain input.deposit
-        let rootBytes := computedRootBytes input.deposit
-        if rootBytes = input.expectedRoot then
-          some ⟨bytesToWord rootBytes, packConcat index pow,
-            xorWords (chain.map bytesToWord), 1⟩
+        if computedRootBytes input.deposit = input.expectedRoot then
+          some (committedObs input index pow)
         else none
+    | .depthOverflow | .packOverflow => none
 
 def sourceView (input : EncodingInput) : View :=
   match sourceObs input with
@@ -212,20 +316,22 @@ def sourceViewTwo (first second : EncodingInput) : View × View :=
   | _, _ => (⟨.reverted, zeroObs⟩, ⟨.reverted, zeroObs⟩)
 
 private theorem readObs_success_slots (base : Nat) (state : ContractState)
-    (words : List Word) (root concat fingerprint : Word) :
+    (digestWords pathWords branchWords : List Word)
+    (root concat fingerprint opW idxW pivotW travW : Word) :
     readObs
-      (((((writeDigests base state 0 words).writeSlot (concatSlot base) concat).writeSlot
-          (depositRootSlot base) root).writeSlot
-          (digestXorSlot base) fingerprint).writeSlot
-          (verifiedSlot base) 1)
+      (persistCommit base
+        (persistChildren base state digestWords pathWords branchWords
+          root concat fingerprint opW idxW pivotW travW))
       base =
-      ⟨root, concat, fingerprint, 1⟩ := by
-  simp [readObs, depositRootSlot, concatSlot, digestXorSlot, verifiedSlot,
+      ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1⟩ := by
+  simp [readObs, persistCommit, persistChildren, writeBranch, writePath,
+    writeDigests, depositRootSlot, concatSlot, digestXorSlot, verifiedSlot,
+    operationSlot, indexSlot, pivotSlot, traversedRootSlot, boundSlot,
     ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other]
 
 /-- Composed faithful-plane theorem: the executable encoding transaction's
 outcome observables are exactly the independently stated source-view of the
-four children. -/
+four children, including structural witness binding. -/
 theorem verity_tx_simulates_pinned_source
     (input : EncodingInput) (state : ContractState) :
     observe ((encode input).run state) = sourceView input := by
@@ -237,13 +343,19 @@ theorem verity_tx_simulates_pinned_source
     unfold encode sourceView observe Contract.run encodeAt
     simp [hW, sourceObs]
     cases hC : sourceConcat input.lhs input.rhs with
-    | depthOverflow => rfl
-    | packOverflow => rfl
+    | depthOverflow =>
+        cases structuralOk input <;> simp
+    | packOverflow =>
+        cases structuralOk input <;> simp
     | value index pow =>
-        simp [hC]
-        by_cases hRoot : computedRootBytes input.deposit = input.expectedRoot
-        · simp [hRoot, readObs_success_slots]
-        · simp [hRoot]
+        by_cases hBind : structuralOk input = false
+        · simp [hBind]
+        · have hBind' : structuralOk input = true := by
+            cases h : structuralOk input <;> simp_all
+          simp [hBind']
+          by_cases hRoot : computedRootBytes input.deposit = input.expectedRoot
+          · simp [hRoot, committedObs, traversedRoot, readObs_success_slots]
+          · simp [hRoot]
 
 /-- Any failure, including injected failure after intermediate writes, returns
 the exact pre-transaction snapshot. -/
@@ -263,12 +375,12 @@ theorem revert_restores_snapshot_two
   unfold Contract.run at h
   split at h <;> simp_all
 
-/-- Child 2 is not downgraded: every encoding uses the exact source concat. -/
+/-- Child 3 is not downgraded: every encoding uses the exact source concat. -/
 theorem encoding_uses_source_concat (lhs rhs : GIndex) :
     sourceConcat lhs rhs = specConcat lhs rhs :=
   source_concat_matches_spec lhs rhs
 
-/-- Child 3 is not downgraded: the persisted digest chain is the seven-call
+/-- Child 4 is not downgraded: the persisted digest chain is the seven-call
 reference-engine composition. -/
 theorem encoding_uses_exact_digest (deposit : Inputs) :
     ExactDigestComposition deposit ∧ (digestChain deposit).length = 7 :=
@@ -277,14 +389,15 @@ theorem encoding_uses_exact_digest (deposit : Inputs) :
 /-- Child 4 is not downgraded: acceptance is exactly the root-match check. -/
 theorem encoding_accepts_iff_root_matches (input : EncodingInput)
     (hW : widthsOk input = true)
+    (hBind : structuralOk input = true)
     (hC : ∃ index pow, sourceConcat input.lhs input.rhs = .value index pow) :
     (sourceObs input).isSome = true ↔
       computedRootBytes input.deposit = input.expectedRoot := by
   rcases hC with ⟨index, pow, hC⟩
   unfold sourceObs
-  simp [hW, hC]
+  simp [hW, hBind, hC]
 
-/-- Child 1 layout is preserved: a successful encoding requires the pinned
+/-- Child 2 layout is preserved: a successful encoding requires the pinned
 deposit-data widths. -/
 theorem encoding_requires_pinned_widths (input : EncodingInput)
     (h : (sourceObs input).isSome = true) :
@@ -295,5 +408,90 @@ theorem encoding_requires_pinned_widths (input : EncodingInput)
   · cases hW : widthsOk input
     · simp [hW] at *
     · rfl
+
+/-- Child 1 is preserved: a successful encoding requires `bindOperation`. -/
+theorem encoding_requires_structural_bind (input : EncodingInput)
+    (h : (sourceObs input).isSome = true) :
+    structuralOk input = true := by
+  unfold sourceObs at h
+  split at h
+  · simp at h
+  · split at h
+    · simp at h
+    · cases hB : structuralOk input
+      · simp [hB] at *
+      · rfl
+
+theorem sourceObs_committed_fields {input : EncodingInput} {obs : Observables}
+    (h : sourceObs input = some obs) :
+    obs.bound = 1 ∧ obs.verified = 1 ∧
+      obs.operation = operationWord input.operation ∧
+      obs.index = indexWord input.witness.index ∧
+      obs.pivotBoundary = nodeWord input.witness.pivotBoundary ∧
+      obs.traversedRoot = nodeWord (traversedRoot input) := by
+  unfold sourceObs at h
+  split at h
+  · cases h
+  · split at h
+    · cases h
+    · split at h
+      · split at h
+        · injection h with hEq
+          subst hEq
+          simp [committedObs]
+        · cases h
+      · cases h
+      · cases h
+
+/-- The abstract structural-witness conjunct, copied from
+`composed_ssz_encoding` / `Ssz.structural_witness_binding_sound`. -/
+def structuralWitnessConjunct (input : EncodingInput) : Prop :=
+  input.witness.operation = input.operation ∧
+    input.witness.index = Ssz.operationIndex input.operation ∧
+    Ssz.HasGeneralizedIndex input.witness.index input.witness.pivotBoundary
+      input.witness.path ∧
+    input.witness.branch.length = input.witness.path.length ∧
+    Ssz.traverseBranch input.combine
+      (Ssz.validatorRoot input.combine input.witness.validator)
+      input.witness.path input.witness.branch = input.expectedWitnessRoot
+
+theorem structuralOk_implies_conjunct (input : EncodingInput)
+    (h : structuralOk input = true) :
+    structuralWitnessConjunct input :=
+  Ssz.structural_witness_binding_sound h
+
+/-- Child 1 is executed, not merely hypothesized: a committed `Contract.run`
+implies `bindOperation` and therefore the parent structural conjunct, and the
+persisted observables are the witness pieces that conjunct talks about. -/
+theorem encoding_commits_structural_witness
+    (input : EncodingInput) (state : ContractState)
+    (h : (observe ((encode input).run state)).status = .committed) :
+    structuralOk input = true ∧
+      structuralWitnessConjunct input ∧
+      (observe ((encode input).run state)).observables.bound = 1 ∧
+      (observe ((encode input).run state)).observables.operation =
+        operationWord input.operation ∧
+      (observe ((encode input).run state)).observables.index =
+        indexWord input.witness.index ∧
+      (observe ((encode input).run state)).observables.pivotBoundary =
+        nodeWord input.witness.pivotBoundary ∧
+      (observe ((encode input).run state)).observables.traversedRoot =
+        nodeWord (traversedRoot input) := by
+  have hSim := verity_tx_simulates_pinned_source input state
+  have hStatus : (sourceView input).status = .committed := by
+    rwa [hSim] at h
+  unfold sourceView at hStatus
+  cases hObs : sourceObs input with
+  | none => simp [hObs] at hStatus
+  | some obs =>
+      have hBind := encoding_requires_structural_bind input (by simp [hObs])
+      have hFields := sourceObs_committed_fields hObs
+      have hConj := structuralOk_implies_conjunct input hBind
+      refine ⟨hBind, hConj, ?_, ?_, ?_, ?_, ?_⟩
+      · rw [hSim]; simp [sourceView, hObs, hFields]
+      · rw [hSim]; simp [sourceView, hObs, hFields]
+      · rw [hSim]; simp [sourceView, hObs, hFields]
+      · rw [hSim]; simp [sourceView, hObs, hFields]
+      · rw [hSim]; simp [sourceView, hObs, hFields]
 
 end LidoSRv3.Audit.Verity.SszEncodingTx

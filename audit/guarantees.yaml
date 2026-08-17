@@ -367,9 +367,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants",
-        "expected": "composed abstract children and faithful SSZ-encoding Contract.run transaction build with rollback and single-child/encoding/hash/two-batch mutants"
+        "expected": "composed abstract children and faithful SSZ-encoding Contract.run transaction that persists structural-witness binding together with deposit-data-root, concat, and digest/root-match, with rollback and single-child/encoding/hash/two-batch mutants"
       },
-      "summary": "The abstract SSZ parent composes structural witness binding, pinned deposit-data-root layout, GIndex.concat, and the seven-call digest/root-check children. A faithful Contract.run encoding transaction computes those four observables together through writeSlot/writeMapUint, rolls back intermediate writes on failure, and rejects single-child drop, encoding-mismatch, hash-collision, and two-batch chaining mutants. SHA-256 functional correctness remains A-SHA256-FFI; the targeted imported-to-deployed SSZ Yul binding stays OPEN.",
+      "summary": "The abstract SSZ parent composes structural witness binding, pinned deposit-data-root layout, GIndex.concat, and the seven-call digest/root-check children. A faithful Contract.run encoding transaction carries the same ValidatorWitness/operation/index/path/branch pieces the abstract uses, persists those conjuncts together with deposit-data-root, concat, and digest/root-match through writeSlot/writeMapUint, and the parent Verity theorem composes all four children rather than lifting the pinned-source lemma alone. Intermediate writes roll back on failure. Mutants drop each child including the structural-witness branch, plus encoding-mismatch, hash-collision, and two-batch chaining. SHA-256 functional correctness remains A-SHA256-FFI; the targeted imported-to-deployed SSZ Yul binding stays OPEN.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding"
@@ -384,9 +384,10 @@
           "pinned deposit-data-root source layout",
           "GIndex.concat source transcription",
           "seven-call digest composition and root check",
-          "composed Contract.run encoding of the four SSZ observables",
+          "composed Contract.run encoding of the four SSZ observables including structural witness binding",
           "rollback after intermediate writes",
-          "single-child drop, encoding-mismatch, hash-collision, and two-batch mutants"
+          "single-child drop of structural witness, concat, digest, and verified bits",
+          "encoding-mismatch, hash-collision, and two-batch mutants"
         ],
         "missing": []
       },

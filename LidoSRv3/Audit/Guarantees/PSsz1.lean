@@ -83,18 +83,43 @@ theorem composed_ssz_encoding
       accepted_iff_root_matches txInput, hTxWidths⟩⟩
 
 /--
-Faithful VERITY_TX closure for P-SSZ-1. The executable `Contract.run`
-transaction computes the four child observables together, persists them
-through `writeSlot`/`writeMapUint`, and matches the independently stated
-source view. Reverts after intermediate writes restore the pre-call snapshot.
+Faithful VERITY_TX closure for P-SSZ-1. One `Contract.run` transaction
+computes the four children simultaneously — structural witness binding,
+pinned deposit-data-root, `GIndex.concat`, and the seven-call
+digest/root-match — persists every child through `writeSlot`/`writeMapUint`,
+and matches the independently stated source view.
+
+This is not a lift of `verity_tx_simulates_pinned_source` alone: a commit
+implies the same structural-witness conjunct the parent abstract proves from
+`bindOperation`, and the concat and digest children are composed in the
+same statement. Reverts after intermediate writes restore the pre-call
+snapshot.
 -/
 theorem verity_tx_simulates_ssz_encoding
     (input : EncodingInput) (state : Verity.ContractState) :
     observe ((encode input).run state) = sourceView input ∧
+      ((observe ((encode input).run state)).status = .committed →
+        structuralOk input = true ∧
+          structuralWitnessConjunct input ∧
+          (observe ((encode input).run state)).observables.bound = 1 ∧
+          (observe ((encode input).run state)).observables.operation =
+            operationWord input.operation ∧
+          (observe ((encode input).run state)).observables.index =
+            indexWord input.witness.index ∧
+          (observe ((encode input).run state)).observables.pivotBoundary =
+            nodeWord input.witness.pivotBoundary ∧
+          (observe ((encode input).run state)).observables.traversedRoot =
+            nodeWord (traversedRoot input)) ∧
+      sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs ∧
+      (ExactDigestComposition input.deposit ∧
+        (digestChain input.deposit).length = 7) ∧
       ∀ reason rollback,
         (encode input).run state = .revert reason rollback →
           rollback = state :=
   ⟨verity_tx_simulates_pinned_source input state,
+    encoding_commits_structural_witness input state,
+    encoding_uses_source_concat input.lhs input.rhs,
+    encoding_uses_exact_digest input.deposit,
     fun reason rollback h =>
       revert_restores_snapshot input false state rollback reason h⟩
 
