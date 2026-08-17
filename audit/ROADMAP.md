@@ -31,7 +31,6 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Deferred P2-labelled registry rows
 
-- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: Complete the allocation loop and bind moduleAddress to the modeled source input; lower-level artifact refinement is outside scope.
 - `P-ETH-1` — **IMPLEMENTATION_PENDING**: Define the abstract parent then compose relevant protocol-controlled Verity value paths.
 - `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
 - `P-CONSOLIDATION-1` — **VERITY_FEATURE_REQUIRED**: Close the observable FunctionSpec call/event/memory bridge, then consume it.
@@ -42,6 +41,7 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Checked baseline to preserve
 
+- `P-ALLOC-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-ALLOC-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
