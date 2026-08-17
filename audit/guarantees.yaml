@@ -256,38 +256,35 @@
     {
       "id": "P-ADDRESS-1",
       "assumptions": [
-        "A-ABSTRACT-TX"
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Source.AddressTransferCorrespondence LidoSRv3.Audit.Verity.AddressTransferTx",
-        "expected": "admission plus bounded owner-transfer source/official-denotation witnesses build; universal post-state equivariance and remaining entrypoints stay open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
+        "expected": "universal abstract/source equivariance, four executable Contract.run entrypoints, pinned-source entrypoint correspondence, rollback, and address-specific mutants build"
       },
-      "summary": "The permissionless address-admission and post-state-equivariance parent remains OPEN. Recovered evidence covers official-denotation admission and one pinned owner-transfer handoff witness with source correspondence and a wrong-caller mutant; universal post-state equivariance and request/claim/redemption paths remain open.",
+      "summary": "Universal permissionless address-writer equivariance is checked across transfer, request, claim, and redemption. The composed Verity theorem binds the pinned source-shaped tags to independently executable storage-writing Contract.run programs, snapshot rollback after intermediate writes, and fail-closed address mutants.",
       "abstract": {
-        "status": "OPEN",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance"
       },
       "fidelity": {
         "covered": [
-          "bounded official-denotation admission child",
-          "pinned owner-transfer source/transaction witness and wrong-caller mutant"
+          "universal abstract and pinned-source post-state equivariance",
+          "four storage-writing Contract.run entrypoints and source tag correspondence",
+          "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
         ],
-        "missing": [
-          "abstract parent theorem",
-          "universal post-state equivariance",
-          "request/claim/redemption entrypoints and source correspondence"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.",
-      "roadmap_priority": "P2"
+      "next_gate": "Preserve this checked abstract-to-Verity address-writer guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-TOPUP-2",

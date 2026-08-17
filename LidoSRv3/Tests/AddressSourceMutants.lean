@@ -29,7 +29,39 @@ theorem address_stomp_mutant_counterexample :
       run (renameInput 1 2 inp) ≠ .committed stomp := by
   decide
 
-#check LidoSRv3.Audit.Verity.AddressTx.verity_tx_simulates_source
+/-- Wrong-recipient mutant: the renamed successful outcome cannot retain the
+old caller as payout recipient.  Only outcome observables are compared. -/
+theorem wrong_recipient_mutant_rejected :
+    let inp := eligibleUnwrap (1 : Address)
+    let renamed := renameInput (1 : Address) (2 : Address) inp
+    let wrong : PostState := ⟨2, 1, 2, 2⟩
+    run renamed ≠ .committed wrong := by decide
+
+/-- Address-writer abuse: replacing the caller-relative owner with a fixed
+singleton is detected by universal post-state equivariance. -/
+theorem fixed_owner_writer_mutant_rejected :
+    let inp := eligibleUnwrap (1 : Address)
+    let fixed : PostState := ⟨1, 1, 1, 1⟩
+    run (renameInput (1 : Address) (2 : Address) inp) ≠ .committed fixed := by
+  decide
+
+/-- Admission-boundary mutant: changing `amount != 0` to unconditional
+admission accepts the zero-amount redemption rejected by the pinned source. -/
+theorem zero_amount_admission_mutant_rejected :
+    let inp := { eligibleUnwrap (1 : Address) with amount := 0 }
+    run inp = .reverted ∧
+      (if true then .committed (successfulPost inp) else .reverted) ≠ run inp := by
+  decide
+
+/-- The executable boundary independently rejects the same zero-amount case. -/
+theorem verity_zero_amount_rejected :
+    let caller := (1 : Address)
+    let state := { Verity.defaultState with sender := caller }
+    (LidoSRv3.Audit.Verity.AddressTx.AddressTxContract.redeem 0 true).run state =
+      .revert "ZeroAmount" state := by
+  rfl
+
+#check LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance
 #check source_admission_nondiscriminatory
 #check source_success_post_state_equivariant
 

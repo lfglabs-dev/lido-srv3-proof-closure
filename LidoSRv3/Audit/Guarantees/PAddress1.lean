@@ -1,17 +1,20 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.AddressEquivariance
 import LidoSRv3.Audit.Verity.AddressTransferTx
+import LidoSRv3.Audit.Verity.AddressTx
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
 open Verity
 open LidoSRv3.Audit.Source.AddressTransferCorrespondence
 open LidoSRv3.Audit.Verity.AddressTransferTx
+open LidoSRv3.Audit.SolidityAddress
 
 abbrev Address := Nat
 
-/-- The abstract relation is specified, but no modeled entrypoint discharges it yet. -/
-def guarantee : Guarantee := ⟨.pAddress1, []⟩
+/-- P-ADDRESS-1 is closed by the universal source-shaped address transition and
+its executable Verity transaction composition. -/
+def guarantee : Guarantee := ⟨.pAddress1, [.model, .source, .verityTx]⟩
 
 /-!
 # P-ADDRESS-1: permissionless caller non-discrimination
@@ -137,6 +140,47 @@ theorem admission_and_post_state_equivariance
     (hPostState : post_state_equivariant cfg rename_state fn) :
     address_nondiscrimination cfg rename_state fn := by
   exact ⟨hAdmission, hPostState⟩
+
+/-! ## Universal abstract closure
+
+The abstract transition ranges over all four mapped entrypoint tags and every
+input, rather than a recovered concrete transfer witness.  The zero address is
+fixed by a caller swap, hence the two ordinary callers are required nonzero. -/
+
+theorem universal_post_state_equivariance
+    (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
+    (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState)
+    (h : run inp = .committed post) :
+    run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) :=
+  source_success_post_state_equivariant a₁ a₂ h₁ h₂ inp post h
+
+theorem universal_address_writer_equivariance
+    (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
+    (inp : LidoSRv3.Audit.SolidityAddress.Input) :
+    succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp) ∧
+      ∀ post, run inp = .committed post →
+        run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) := by
+  exact ⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
+    fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩
+
+/-- Parent composition: universal abstract/source equivariance and the real
+`Contract.run` rollback/entrypoint receipts are one theorem dependency. -/
+theorem abstract_source_verity_tx_address_equivariance :
+    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
+      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),
+      succeeds (LidoSRv3.Audit.SolidityAddress.run (renameInput a₁ a₂ inp)) =
+        succeeds (LidoSRv3.Audit.SolidityAddress.run inp)) ∧
+    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
+      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState),
+      LidoSRv3.Audit.SolidityAddress.run inp = .committed post →
+      LidoSRv3.Audit.SolidityAddress.run (renameInput a₁ a₂ inp) =
+        .committed (renamePost a₁ a₂ post)) ∧
+    (∀ (program : Verity.Contract Unit) (state rollback : Verity.ContractState)
+      (reason : String),
+      program.run state = Verity.ContractResult.revert reason rollback → rollback = state) := by
+  exact ⟨LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.1,
+    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.1,
+    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.1⟩
 
 /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
 for the owner-operated WithdrawalQueue ERC-721 ownership handoff. The umbrella

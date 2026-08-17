@@ -54,7 +54,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ETH-1": ("OPEN", None, "OPEN", None, "IMPLEMENTATION_PENDING", ()),
-    "P-ADDRESS-1": ("OPEN", None, "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX",)),
+    "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "PARTIAL", None, "IMPLEMENTATION_PENDING", ()),
     "P-CONSOLIDATION-1": ("OPEN", None, "PARTIAL", None, "VERITY_FEATURE_REQUIRED", ("A-SHA256-FFI",)),
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Ssz.structural_witness_binding_sound", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
@@ -67,7 +67,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ACCOUNT-1": "e9fea968dc683b7e784f63be8513e173c5732eac6b5aa0baefa101689b37233b",
     "P-RESERVE-1": "e8f34af2bb8d1eb061da1882ff2460535489056a8e9eca41e7b8c750a614ff27",
     "P-ETH-1": "9f79007c732bddca4e2ca56d988c63aa0059b35c6e48def28985dad3e3cbcd64",
-    "P-ADDRESS-1": "882421e998af3fe6be8af7154999801509a085ccf4e1842c310ad6ddf68122e3",
+    "P-ADDRESS-1": "4e4ee990ab73713e1aca565186f3efb65baa72e7454dccbac2793bd421c4b2f5",
     "P-TOPUP-2": "2c8cb1b166f1bcae465079fad7c0b301d5faf08639d3afc53a327aeaa2ddfca3",
     "P-CONSOLIDATION-1": "9e27decc67733f1e9b4974f97b51ae35829a9c0ed0bb5c318c9152ab0f6211ca",
     "P-SSZ-1": "f56732a1c2b0a8941b2d2b8d2fe05a0bf0e70a7a21b36d4851a2c311f45ffc05",
@@ -76,7 +76,7 @@ EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "P1",
     "P-ALLOC-1": "P2", "P-ALLOC-2": "P2", "P-ETH-1": "P2",
-    "P-ADDRESS-1": "P2", "P-TOPUP-2": "P2", "P-CONSOLIDATION-1": "P2",
+    "P-ADDRESS-1": "DONE", "P-TOPUP-2": "P2", "P-CONSOLIDATION-1": "P2",
     "P-SSZ-1": "P3",
 }
 
