@@ -15,7 +15,8 @@ private def highReserve : State := ⟨90, 7⟩
 example : sourceRun inputs lowReserve = .committed ⟨5, 87⟩
     ⟨some (10, 14), some (10, 14), 87⟩ := by decide
 
-example : sourceRun inputs lowReserve = sourceRun inputs highReserve := by decide
+example : outcomeObservables (sourceRun inputs lowReserve) =
+    outcomeObservables (sourceRun inputs highReserve) := by decide
 
 /-- Forbidden reserve-to-range dependency. -/
 private def reserveToRangeMutant (i : Inputs) (s : State) : Outcome :=

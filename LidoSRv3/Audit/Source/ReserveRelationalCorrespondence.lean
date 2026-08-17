@@ -84,10 +84,10 @@ theorem source_run_correspondence (inputs : Inputs) (before : State) :
             abstractPrefinalize, lockFor, requestedRange]
       | cons head tail =>
           simp [sourceRun, spec, sourcePrefinalize_correspondence]
-          cases hpre : abstractPrefinalize
+          cases abstractPrefinalize
               { batchEnds := head :: tail, useDiscount := discount }
               { lastFinalizedRequestId := lastFinalized, batches := batches, paused := false } <;>
-            simp [hpre]
+            simp
 
 theorem source_reserve_relational (inputs : Inputs) (left right : State)
     (h : differOnlyInReserve left right) :

@@ -99,10 +99,10 @@ theorem reserve_relational (inputs : Inputs) (left right : State)
   simp only [spec]
   split <;> try rfl
   cases hl : abstractPrefinalize inputs.report inputs.queue with
-  | none => simp [hl, outcomeObservables]
+  | none => simp [outcomeObservables]
   | some pair =>
       rcases pair with ⟨amount, range⟩
       by_cases hb : amount ≤ inputs.buffer <;>
-        simp [hl, hb, outcomeObservables]
+        simp [hb, outcomeObservables]
 
 end LidoSRv3.Audit.ReserveRelational
