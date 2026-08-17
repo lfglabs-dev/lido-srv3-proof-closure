@@ -1,11 +1,27 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f22e817899ef6a8c026a74f6ba1d67ea90c52d32
+validated-tree: 59965c84ce794046581c39b688bcd5b6c2ce7a61
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-SSZ-1 composed abstract and Verity encoding transaction (2026-08-17)
+----------------------------------------------------------------------
+
+- Source commit `15f6a5d` composes the four P-SSZ-1 children into
+  `Guarantees.PSsz1.composed_ssz_encoding` and a faithful `Contract.run`
+  encoding transaction `verity_tx_simulates_ssz_encoding`.
+- The transaction computes deposit-data-root, `GIndex.concat`, the seven-call
+  digest fingerprint, and the root-match bit together, persists them through
+  `writeSlot` / `writeMapUint`, and rolls back intermediate writes on failure.
+- Mutants cover single-child drop, encoding mismatch, hash collision, and
+  two-batch chaining. SHA-256 functional correctness remains `A-SHA256-FFI`;
+  the targeted imported-to-deployed SSZ Yul binding stays OPEN.
+- Verity remains pinned at `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `59965c84ce794046581c39b688bcd5b6c2ce7a61`.
 
 P-ALLOC-2 faithful Verity transaction closure (2026-08-17)
 -----------------------------------------------------------
