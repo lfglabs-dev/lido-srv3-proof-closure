@@ -175,17 +175,24 @@ theorem abstract_source_verity_tx_address_equivariance :
       LidoSRv3.Audit.SolidityAddress.run inp = .committed post →
       LidoSRv3.Audit.SolidityAddress.run (renameInput a₁ a₂ inp) =
         .committed (renamePost a₁ a₂ post)) ∧
+    (∀ (inp : LidoSRv3.Audit.SolidityAddress.Input), inp.amount < 2 ^ 256 →
+      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →
+      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →
+      LidoSRv3.Audit.Verity.AddressTx.observeAddress inp
+          ((LidoSRv3.Audit.Verity.AddressTx.executePinnedSource inp).run
+            (LidoSRv3.Audit.Verity.AddressTx.stateFor inp)) =
+        LidoSRv3.Audit.Verity.AddressTx.sourceAddressView inp) ∧
     (∀ (program : Verity.Contract Unit) (state rollback : Verity.ContractState)
       (reason : String),
       program.run state = Verity.ContractResult.revert reason rollback → rollback = state) := by
   exact ⟨LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.1,
-    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.1⟩
+    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.1,
+    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1⟩
 
 /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
-for the owner-operated WithdrawalQueue ERC-721 ownership handoff. The umbrella
-guarantee remains open for the other mapped entrypoints and omitted set/event
-effects. -/
+for the owner-operated WithdrawalQueue ERC-721 ownership handoff. This retained
+regression theorem is subordinate to the universal parent composition above. -/
 theorem bounded_transfer_model_source_tx :
     (∀ caller fromAddr to s, sourceTransfer caller fromAddr to s =
       modelTransfer caller fromAddr to s) ∧

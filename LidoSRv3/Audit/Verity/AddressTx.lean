@@ -98,6 +98,15 @@ structure OutcomeView where
   claimed : Uint256
   deriving DecidableEq, Repr
 
+/-- Address-only outcome boundary used for SOURCE correspondence.  It omits
+the numeric balances and the claimed bit, so the theorem does not compare a
+full state containing unrelated or representation-specific fields. -/
+structure AddressOutcomeView where
+  status : TxStatus
+  ownerWrite : Option Uint256
+  recipientWrite : Option Uint256
+  deriving DecidableEq, Repr
+
 def observe (requestId : Uint256) (caller : Address) (_before : ContractState) :
     ContractResult Unit → OutcomeView
   | .success _ after => ⟨.committed, after.readMapUint 3 requestId,
@@ -105,6 +114,69 @@ def observe (requestId : Uint256) (caller : Address) (_before : ContractState) :
   | .revert _ rollback => ⟨.reverted, rollback.readMapUint 3 requestId,
       rollback.readMapUint 5 requestId, rollback.readMap 1 caller,
       rollback.readMapUint 4 requestId⟩
+
+def observeAddress (inp : Input) : ContractResult Unit → AddressOutcomeView
+  | .success _ after =>
+      let requestId : Uint256 := .ofNat inp.requestId
+      match inp.entryPoint with
+      | .transferFrom | .requestWithdrawals =>
+          ⟨.committed, some (after.readMapUint 3 requestId),
+            some (after.readMapUint 5 requestId)⟩
+      | .claimWithdrawalsTo =>
+          ⟨.committed, none, some (after.readMapUint 5 requestId)⟩
+      | .unwrap =>
+          ⟨.committed, none, some (after.readMapUint 5 (.ofNat inp.amount))⟩
+  | .revert _ _ => ⟨.reverted, none, none⟩
+
+def sourceAddressView (inp : Input) : AddressOutcomeView :=
+  match run inp with
+  | .reverted => ⟨.reverted, none, none⟩
+  | .committed post =>
+      match inp.entryPoint with
+      | .transferFrom | .requestWithdrawals =>
+          ⟨.committed, some (addressToWord post.owner),
+            some (addressToWord post.recipient)⟩
+      | .claimWithdrawalsTo | .unwrap =>
+          ⟨.committed, none, some (addressToWord post.recipient)⟩
+
+/-- Storage realization of the source-shaped facts.  The side conditions on
+`pinned_source_observable_correspondence` exclude impossible abstract fact
+combinations such as an insufficient balance for a zero amount. -/
+def stateFor (inp : Input) : ContractState :=
+  let amount : Uint256 := .ofNat inp.amount
+  let requestId : Uint256 := .ofNat inp.requestId
+  let balance := if inp.callerBalanceSufficient then amount else 0
+  let allowance := if inp.callerAllowanceSufficient then amount else 0
+  let claimed := if inp.requestClaimed then 1 else 0
+  let paused := if inp.paused then 1 else 0
+  { defaultState with sender := inp.caller }
+    |>.writeSlot 0 paused
+    |>.writeMap 1 inp.caller balance
+    |>.writeMap2 2 inp.caller inp.recipient allowance
+    |>.writeMapUint 3 requestId (addressToWord inp.requestOwner)
+    |>.writeMapUint 4 requestId claimed
+    |>.writeMapUint 5 requestId (addressToWord inp.requestOwner)
+
+@[simp] theorem addressToWord_eq_iff (a b : Address) :
+    addressToWord a = addressToWord b ↔ a = b := by
+  constructor
+  · intro h
+    apply Verity.Core.Address.toNat_injective
+    have hv := congrArg Verity.Core.Uint256.val h
+    have hmodulus : Verity.Core.Address.modulus < Verity.Core.Uint256.modulus := by
+      change 2 ^ 160 < 2 ^ 256
+      exact Nat.pow_lt_pow_right (by decide) (by decide)
+    have ha : a.toNat < Verity.Core.Uint256.modulus := Nat.lt_trans a.isLt hmodulus
+    have hb : b.toNat < Verity.Core.Uint256.modulus := Nat.lt_trans b.isLt hmodulus
+    change a.toNat % Verity.Core.Uint256.modulus =
+      b.toNat % Verity.Core.Uint256.modulus at hv
+    simpa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] using hv
+  · rintro rfl
+    rfl
+
+@[simp] theorem addressWordRaw_eq_iff (a b : Address) :
+    Verity.Core.Uint256.ofNat a.toNat = Verity.Core.Uint256.ofNat b.toNat ↔ a = b := by
+  simpa only [addressToWord] using addressToWord_eq_iff a b
 
 /-- Source-to-Verity entrypoint map for the pinned
 `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b` projection.
@@ -136,6 +208,178 @@ theorem pinned_source_entrypoint_correspondence (inp : Input) :
           inp.recipient inp.requestExists inp.requestFinalized inp.hintValid
           inp.externalCallSucceeds
       | .unwrap => AddressTxContract.redeem (.ofNat inp.amount) inp.externalCallSucceeds := rfl
+
+set_option maxHeartbeats 2000000 in
+private theorem transfer_observable_correspondence (inp : Input)
+    (hEntry : inp.entryPoint = .transferFrom) :
+    observeAddress inp ((executePinnedSource inp).run (stateFor inp)) =
+      sourceAddressView inp := by
+  have hone : (1 : Uint256) ≠ 0 := by decide
+  simp_all (config := { maxSteps := 1000000 })
+    [executePinnedSource, stateFor, observeAddress, sourceAddressView, run, admitted,
+    successfulPost, AddressTxContract.transferFrom, _root_.Verity.require,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+    _root_.Verity.setMappingUint, AddressTxContract.paused,
+    AddressTxContract.balances, AddressTxContract.allowances,
+    AddressTxContract.owners, AddressTxContract.claimed,
+    AddressTxContract.recipients, ContractState.readSlot,
+    ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+    ContractState.readMap2, ContractState.writeMap2,
+    ContractState.readMapUint, ContractState.writeMapUint,
+    ContractState.storage, ContractState.storageMap,
+    ContractState.storageMap2, ContractState.storageMapUint]
+  by_cases hz : inp.recipient = 0 <;> try simp_all (config := { maxSteps := 1000000 })
+  by_cases hself : inp.recipient = inp.senderFrom <;> try simp_all (config := { maxSteps := 1000000 })
+  cases hExists : inp.requestExists <;> try simp_all (config := { maxSteps := 1000000 })
+  cases hClaimed : inp.requestClaimed <;> try simp_all (config := { maxSteps := 1000000 })
+    [hone, _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  by_cases howner : inp.senderFrom = inp.requestOwner <;>
+    try simp_all (config := { maxSteps := 1000000 })
+      [show inp.requestOwner = inp.senderFrom ↔ inp.senderFrom = inp.requestOwner from eq_comm,
+        _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  by_cases hcaller : inp.caller = inp.requestOwner <;> try simp_all (config := { maxSteps := 1000000 })
+  cases hApprovedAll : inp.callerIsApprovedForAll <;> try simp_all (config := { maxSteps := 1000000 })
+  cases hApprovedToken : inp.callerIsTokenApproved <;> simp_all (config := { maxSteps := 1000000 })
+
+set_option maxHeartbeats 2000000 in
+private theorem request_observable_correspondence (inp : Input)
+    (hEntry : inp.entryPoint = .requestWithdrawals)
+    (hAmount : inp.amount < 2 ^ 256)
+    (hBalance : !inp.callerBalanceSufficient = true → inp.amount ≠ 0)
+    (hAllowance : !inp.callerAllowanceSufficient = true → inp.amount ≠ 0) :
+    observeAddress inp ((executePinnedSource inp).run (stateFor inp)) =
+      sourceAddressView inp := by
+  have hmod : inp.amount % Verity.Core.Uint256.modulus = inp.amount := by
+    exact Nat.mod_eq_of_lt (by simpa [Verity.Core.Uint256.modulus,
+      Verity.Core.UINT256_MODULUS] using hAmount)
+  have hone : (1 : Uint256) ≠ 0 := by decide
+  simp_all (config := { maxSteps := 1000000 })
+    [executePinnedSource, stateFor, observeAddress, sourceAddressView, run, admitted,
+    successfulPost, AddressTxContract.requestWithdrawal, _root_.Verity.require,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    _root_.Verity.msgSender, _root_.Verity.getStorage, _root_.Verity.getMapping,
+    _root_.Verity.getMapping2, _root_.Verity.setMapping,
+    _root_.Verity.setMappingUint, AddressTxContract.paused,
+    AddressTxContract.balances, AddressTxContract.allowances,
+    AddressTxContract.owners, AddressTxContract.claimed,
+    AddressTxContract.recipients, ContractState.readSlot, ContractState.writeSlot,
+    ContractState.readMap, ContractState.writeMap,
+    ContractState.readMap2, ContractState.writeMap2,
+    ContractState.readMapUint, ContractState.writeMapUint,
+    ContractState.storage, ContractState.storageMap,
+    ContractState.storageMap2, ContractState.storageMapUint,
+    Verity.Core.Uint256.ofNat, hmod]
+  cases hPaused : inp.paused <;> try simp_all (config := { maxSteps := 1000000 })
+    [hone, _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hRange : inp.amountInRange <;> try simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hBalanceFact : inp.callerBalanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hAllowanceFact : inp.callerAllowanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hExternal : inp.externalCallSucceeds <;> try simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+      _root_.Verity.setMapping, ContractState.writeMap]
+  by_cases hz : inp.recipient = 0 <;> simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      _root_.Verity.Contract.run, observeAddress,
+      ContractState.writeMapUint, ContractState.readMapUint,
+      ContractState.storageMapUint, ContractState.storage]
+
+set_option maxHeartbeats 2000000 in
+private theorem claim_observable_correspondence (inp : Input)
+    (hEntry : inp.entryPoint = .claimWithdrawalsTo) :
+    observeAddress inp ((executePinnedSource inp).run (stateFor inp)) =
+      sourceAddressView inp := by
+  have hone : (1 : Uint256) ≠ 0 := by decide
+  simp_all (config := { maxSteps := 1000000 })
+    [executePinnedSource, stateFor, observeAddress, sourceAddressView, run, admitted,
+    successfulPost, AddressTxContract.claimWithdrawal, _root_.Verity.require,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    _root_.Verity.msgSender, _root_.Verity.getMappingUint,
+    _root_.Verity.setMappingUint, AddressTxContract.paused,
+    AddressTxContract.balances, AddressTxContract.allowances,
+    AddressTxContract.owners, AddressTxContract.claimed,
+    AddressTxContract.recipients, ContractState.readSlot,
+    ContractState.writeSlot, ContractState.readMap, ContractState.writeMap,
+    ContractState.readMap2, ContractState.writeMap2,
+    ContractState.readMapUint, ContractState.writeMapUint,
+    ContractState.storage, ContractState.storageMap,
+    ContractState.storageMap2, ContractState.storageMapUint]
+  by_cases hz : inp.recipient = 0 <;> try simp_all (config := { maxSteps := 1000000 })
+  cases hExists : inp.requestExists <;> try simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hClaimed : inp.requestClaimed <;> try simp_all (config := { maxSteps := 1000000 })
+    [hone, _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hFinalized : inp.requestFinalized <;> try simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hHint : inp.hintValid <;> try simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  by_cases howner : inp.caller = inp.requestOwner <;>
+    try simp_all (config := { maxSteps := 1000000 })
+      [show inp.requestOwner = inp.caller ↔ inp.caller = inp.requestOwner from eq_comm,
+        _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind]
+  cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, ContractState.readMapUint,
+      ContractState.storageMapUint]
+
+set_option maxHeartbeats 2000000 in
+private theorem unwrap_observable_correspondence (inp : Input)
+    (hEntry : inp.entryPoint = .unwrap)
+    (hAmount : inp.amount < 2 ^ 256)
+    (hBalance : !inp.callerBalanceSufficient = true → inp.amount ≠ 0) :
+    observeAddress inp ((executePinnedSource inp).run (stateFor inp)) =
+      sourceAddressView inp := by
+  have hmod : inp.amount % Verity.Core.Uint256.modulus = inp.amount := by
+    exact Nat.mod_eq_of_lt (by simpa [Verity.Core.Uint256.modulus,
+      Verity.Core.UINT256_MODULUS] using hAmount)
+  have hzero : (Verity.Core.Uint256.ofNat inp.amount = 0) ↔ inp.amount = 0 := by
+    constructor
+    · intro h
+      have hv := congrArg Verity.Core.Uint256.val h
+      simpa [Verity.Core.Uint256.val_ofNat, hmod] using hv
+    · intro h
+      simpa [h]
+  simp_all (config := { maxSteps := 1000000 })
+    [executePinnedSource, stateFor, observeAddress, sourceAddressView, run, admitted,
+    successfulPost, AddressTxContract.redeem, _root_.Verity.require,
+    _root_.Verity.Contract.run, _root_.Verity.bind, Bind.bind,
+    _root_.Verity.msgSender, _root_.Verity.getMapping,
+    _root_.Verity.setMapping, _root_.Verity.setMappingUint,
+    AddressTxContract.paused, AddressTxContract.balances,
+    AddressTxContract.allowances, AddressTxContract.owners,
+    AddressTxContract.claimed, AddressTxContract.recipients,
+    ContractState.readSlot, ContractState.writeSlot,
+    ContractState.readMap, ContractState.writeMap,
+    ContractState.readMap2, ContractState.writeMap2,
+    ContractState.readMapUint, ContractState.writeMapUint,
+    ContractState.storage, ContractState.storageMap,
+    ContractState.storageMap2, ContractState.storageMapUint,
+    Verity.Core.Uint256.ofNat, hzero]
+  by_cases hz : inp.amount = 0 <;> try simp_all (config := { maxSteps := 1000000 })
+  cases hBalanceFact : inp.callerBalanceSufficient <;> try simp_all (config := { maxSteps := 1000000 })
+  cases hExternal : inp.externalCallSucceeds <;> simp_all (config := { maxSteps := 1000000 })
+    [_root_.Verity.bind, Bind.bind, _root_.Verity.setMappingUint,
+      ContractState.writeMapUint, ContractState.readMapUint,
+      ContractState.storageMapUint]
+
+/-- Behavioral SOURCE → executable-Verity correspondence on only the address
+writes of the selected entrypoint.  `amount < 2^256` is the Solidity `uint256`
+domain, while the two implications characterize realizable negative
+balance/allowance facts. -/
+theorem pinned_source_observable_correspondence (inp : Input)
+    (hAmount : inp.amount < 2 ^ 256)
+    (hBalance : !inp.callerBalanceSufficient = true → inp.amount ≠ 0)
+    (hAllowance : !inp.callerAllowanceSufficient = true → inp.amount ≠ 0) :
+    observeAddress inp ((executePinnedSource inp).run (stateFor inp)) =
+      sourceAddressView inp := by
+  cases hEntry : inp.entryPoint
+  · exact transfer_observable_correspondence inp hEntry
+  · exact request_observable_correspondence inp hEntry hAmount hBalance hAllowance
+  · exact claim_observable_correspondence inp hEntry
+  · exact unwrap_observable_correspondence inp hEntry hAmount hBalance
 
 /-- `Contract.run` restores its snapshot after every failed guard, including
 failures reached after the balance/claimed intermediate writes. -/
@@ -178,6 +422,11 @@ theorem composed_verity_tx_address_equivariance :
           inp.recipient inp.requestExists inp.requestFinalized inp.hintValid
           inp.externalCallSucceeds
       | .unwrap => AddressTxContract.redeem (.ofNat inp.amount) inp.externalCallSucceeds) ∧
+    (∀ inp, inp.amount < 2 ^ 256 →
+      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →
+      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →
+      observeAddress inp ((executePinnedSource inp).run (stateFor inp)) =
+        sourceAddressView inp) ∧
     (∀ (program : Contract Unit) (state rollback : ContractState) (reason : String),
       program.run state = ContractResult.revert reason rollback → rollback = state) ∧
     (∀ state rollback reason,
@@ -188,7 +437,7 @@ theorem composed_verity_tx_address_equivariance :
         .revert reason rollback → rollback = state) := by
   exact ⟨source_admission_nondiscriminatory,
     source_success_post_state_equivariant, pinned_source_entrypoint_correspondence,
-    every_revert_restores_snapshot,
+    pinned_source_observable_correspondence, every_revert_restores_snapshot,
     request_external_failure_rolls_back, claim_external_failure_rolls_back⟩
 
 end LidoSRv3.Audit.Verity.AddressTx

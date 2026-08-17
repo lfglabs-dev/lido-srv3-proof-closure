@@ -261,9 +261,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
-        "expected": "universal abstract/source equivariance, four executable Contract.run entrypoints, pinned-source entrypoint correspondence, rollback, and address-specific mutants build"
+        "expected": "universal abstract/source equivariance, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
       },
-      "summary": "Universal permissionless address-writer equivariance is checked across transfer, request, claim, and redemption. The composed Verity theorem binds the pinned source-shaped tags to independently executable storage-writing Contract.run programs, snapshot rollback after intermediate writes, and fail-closed address mutants.",
+      "summary": "Universal permissionless address-writer equivariance is checked across transfer, request, claim, and redemption. The composed Verity theorem proves behavioral pinned-source correspondence on each entrypoint's address-write observables for independently executable storage-writing Contract.run programs, snapshot rollback after intermediate writes, and fail-closed address mutants.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
@@ -275,7 +275,7 @@
       "fidelity": {
         "covered": [
           "universal abstract and pinned-source post-state equivariance",
-          "four storage-writing Contract.run entrypoints and source tag correspondence",
+          "four storage-writing Contract.run entrypoints and behavioral source correspondence on entrypoint-specific address-write observables",
           "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
         ],
         "missing": []
