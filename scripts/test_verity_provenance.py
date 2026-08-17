@@ -20,7 +20,7 @@ FILES = (
     "verity/targets/audit-manifest.json",
     "verity/targets/source-map.json",
 )
-PIN = "1fe0218863a4c8d6113e6cdd4de3766a54df81c7"
+PIN = "c8cbae3375580d01856efd36f3164fc4ecd05b9c"
 OTHER = "0" * 40
 
 

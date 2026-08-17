@@ -400,7 +400,7 @@ theorem verity_execution_simulates_spec (state : ContractState) (amount : Word) 
                                 Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
                                 withdrawalsReserve, hremaining, hunreserved,
                                 hdepositable, henough, hpost, hbuffered, hnext]
-                              rfl
+                              simp [ContractState.storage, HSub.hSub]
                 · simp [ReserveContract.withdrawWithGuards,
                     ReserveContract.withdraw, observeVerity, specTx,
                     modelWithdrawDepositableEther, spendDepositableEther,

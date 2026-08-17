@@ -3,9 +3,8 @@
 Parent `P-ETH-1` stays `OPEN` with `theorem: null`. Child rows stay
 `parent_id: P-ETH-1`.
 
-Pins: proof head `7d7cdee29947037875d23d58b44e94c3b24ce938`, Lido
-`af095e48bbc1c3841c2c9936219c8461af01056b`, Verity
-`1fe0218863a4c8d6113e6cdd4de3766a54df81c7`.
+Pins: Lido `af095e48bbc1c3841c2c9936219c8461af01056b`, Verity
+`c8cbae3375580d01856efd36f3164fc4ecd05b9c` (PR #2360).
 
 ## Children
 
@@ -26,24 +25,43 @@ restores the snapshot on revert, so a failed refund or second request drops
 the prefix. Mutants that double-refund, pay the wrong party, or keep a prefix
 disagree.
 
-## Why the parent cannot close
+## What PR #2360 added
+
+The three old "composition does not exist" blockers are now official APIs.
+They are not a parent closure.
+
+1. `DenoteFunctionCalls` denotes `Expr.call` and `Stmt.externalCallBind` with
+   target, value, ETH debit, returndata, and an `AdversaryModel`. Base
+   `evalExpr` / `execStmt` stay `none` / `.revert`, so
+   `ConsolidationCallFragment.success_hypotheses_are_vacuous` remains valid.
+   The widened path is `denoteFunctionWithCalls`, not default `Contract.run`.
+2. `externalCallBindTo` journals a real target and value and debits
+   `selfBalance` on success. Callee state is not updated here. The older
+   `externalCallBind` still journals without value or target.
+3. `MultiContract.callValue` debits the caller, credits the callee, installs
+   sender / this / msg.value, and journals the hop. `routeEth` sequences
+   Bus → Gateway → Vault → (Lido | request).
+
+## Why the parent still cannot close
 
 `TX: LEAN_CHECKED` needs one executed program that is the source call graph:
-Bus calls Gateway with `msg.value`; Gateway pays the Vault and refunds; Vault
-pays Lido or a request contract.
+Bus calls Gateway with `msg.value`; Gateway pays `requestsCount * fee` to the
+Vault and refunds the rest; Vault pays Lido or a request contract.
 
-This Verity pin cannot do that.
+This pin still cannot do that.
 
-1. Official `FunctionSpec` denotation has no external call. `Expr.call` and
-   `Stmt.externalCallBind` become `none` or `.revert`.
-   `ConsolidationCallFragment` checks this for every oracle, transaction, and
-   world. `success_hypotheses_are_vacuous` shows `success = true → P` proves
-   nothing.
-2. `Contracts.Common.externalCallBind` is `pure ()`. No call, no value, no
-   callee effect.
-3. No official multi-contract world threads `msg.value` from Bus to Gateway to
-   Vault to `(Lido | WITHDRAWAL_REQUEST | CONSOLIDATION_REQUEST)` under one
-   `denoteTransaction` bound to the child ledgers.
+1. `routeEth` forwards one `value` on every hop. It does not split fee versus
+   refund, name a refund recipient, or distinguish `WITHDRAWAL_REQUEST` from
+   `CONSOLIDATION_REQUEST`.
+2. Hops are model-plane `callValue` steps. They are not compiled Lido
+   `FunctionSpec`s under `denoteFunctionWithCalls` or `denoteTransaction`.
+3. `externalCallBindTo` updates only the caller journal and `selfBalance`.
+   Callee effects live in `MultiContract`, not in the same `Contract.run`.
+4. Base `FunctionSpec` denotation still reverts on `Expr.call` /
+   `Stmt.externalCallBind`. Default `Contract.run` still sees empty success
+   hypotheses.
 
-One local store that sequences the six transfers is still one store, not the
-source call graph. It is child evidence, not parent coverage.
+A local `routeEth` that splits fee and refund is the next honest slice. It is
+still a MultiContract model, not source-compiled TX closure.
+
+Therefore parent `statuses.tx` stays `OPEN` and no parent theorem is declared.

@@ -97,14 +97,11 @@ def decode (s : ContractState) : Ledger :=
     consolidationRequest := (s.readSlot 4).val }
 
 def stateFor (l : Ledger) (base : ContractState) : ContractState :=
-  { base with
-    storage := fun sl =>
-      if sl = 0 then Core.Uint256.ofNat l.bus
-      else if sl = 1 then Core.Uint256.ofNat l.gateway
-      else if sl = 2 then Core.Uint256.ofNat l.vault
-      else if sl = 3 then Core.Uint256.ofNat l.withdrawalRequest
-      else if sl = 4 then Core.Uint256.ofNat l.consolidationRequest
-      else base.storage sl }
+  ((((base.writeSlot 0 (Core.Uint256.ofNat l.bus)
+         ).writeSlot 1 (Core.Uint256.ofNat l.gateway)
+         ).writeSlot 2 (Core.Uint256.ofNat l.vault)
+         ).writeSlot 3 (Core.Uint256.ofNat l.withdrawalRequest)
+         ).writeSlot 4 (Core.Uint256.ofNat l.consolidationRequest)
 
 def observe (result : ContractResult Unit) : TxView :=
   match result with

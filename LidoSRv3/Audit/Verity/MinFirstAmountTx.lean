@@ -84,13 +84,10 @@ candidate's row in slots 0/1, the accumulator in slot 2, the outer loop's
 remaining `allocationSize` in slot 3. -/
 def stateFor (best : Source.Row) (total remaining : Source.Word)
     (base : ContractState) : ContractState :=
-  { base with
-    «storage» := fun sl =>
-      if sl = 0 then best.allocation
-      else if sl = 1 then best.capacity
-      else if sl = 2 then total
-      else if sl = 3 then remaining
-      else base.storage sl }
+  (((base.writeSlot 0 best.allocation
+        ).writeSlot 1 best.capacity
+        ).writeSlot 2 total
+        ).writeSlot 3 remaining
 
 inductive TxStatus where
   | committed
@@ -165,7 +162,8 @@ theorem tx_observes_source
     MinFirstAllocationTx.bucket, MinFirstAllocationTx.capacity,
     MinFirstAllocationTx.allocatedActual, MinFirstAllocationTx.remaining,
     _root_.Verity.Contract.run, _root_.Verity.getStorage, _root_.Verity.setStorage,
-    ContractState.readSlot, ContractState.writeSlot,
+    ContractState.readSlot,
+    ContractState.storage_writeSlot_same, ContractState.storage_writeSlot_other,
     _root_.Verity.bind, _root_.Verity.pure, Bind.bind, Pure.pure,
     _root_.Verity.Stdlib.Math.subPanic, _root_.Verity.Stdlib.Math.addPanic,
     _root_.Verity.Stdlib.Math.requireSomeUint,
@@ -229,6 +227,7 @@ theorem tx_underflow_reverts_to_snapshot
     MinFirstAllocationTx.bucket, MinFirstAllocationTx.capacity,
     _root_.Verity.Contract.run, _root_.Verity.getStorage,
     ContractState.readSlot,
+    ContractState.storage_writeSlot_same, ContractState.storage_writeSlot_other,
     _root_.Verity.bind, Bind.bind, Pure.pure,
     _root_.Verity.Stdlib.Math.subPanic, _root_.Verity.Stdlib.Math.requireSomeUint,
     _root_.Verity.require, contracts_min_eq_minWord, safeSub, h]

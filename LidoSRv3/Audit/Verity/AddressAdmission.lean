@@ -148,11 +148,8 @@ the P-ADDRESS-1 renaming `rename_input` restricted to the address-indexed storag
 this entrypoint actually reads. -/
 def swapBalances (oracle : DenoteOracle) (a₁ a₂ : Nat)
     (world : Verity.ContractState) : Verity.ContractState :=
-  { world with
-    storage := fun s =>
-      if s = balanceSlotOf oracle a₁ then world.storage (balanceSlotOf oracle a₂)
-      else if s = balanceSlotOf oracle a₂ then world.storage (balanceSlotOf oracle a₁)
-      else world.storage s }
+  (world.writeSlot (balanceSlotOf oracle a₁) (world.storage (balanceSlotOf oracle a₂))
+    ).writeSlot (balanceSlotOf oracle a₂) (world.storage (balanceSlotOf oracle a₁))
 
 /-- Storage-disjointness side condition: the mapping-slot oracle does not alias a
 caller's balance entry onto the scalar `paused` slot.  A colliding oracle would
@@ -183,11 +180,12 @@ theorem run_claim_success (oracle : DenoteOracle) (a : Nat) (w : Verity.Contract
     show bindExternalParams claimSelector [] [] = some [] from rfl,
     paused_lookup, balances_lookup,
     execStmtList, execStmt, evalExpr, readFieldWord, pausedField, balancesField,
-    withTransactionContext, Verity.ContractState.readSlot, successResult, revertedResult,
+    withTransactionContext, Verity.ContractState.readSlot, Verity.ContractState.storage,
+    successResult, revertedResult,
     balanceSlotOf, callerKey, boolWord]
-  by_cases hp : (w.storage (wordNormalize pausedSlot)).val = 0 <;>
-    by_cases hb : 0 < (w.storage (wordNormalize
-      (oracle.mappingSlot balancesSlot (Verity.wordToAddress (a : Verity.Core.Uint256)).val))).val <;>
+  by_cases hp : (w.storageWords (.slot (wordNormalize pausedSlot))).val = 0 <;>
+    by_cases hb : 0 < (w.storageWords (.slot (wordNormalize
+      (oracle.mappingSlot balancesSlot (Verity.wordToAddress (a : Verity.Core.Uint256)).val)))).val <;>
     simp [hp, hb, -Verity.wordToAddress, show wordNormalize 0 = 0 from rfl]
 
 /-! ## Admission equivariance -/
@@ -198,17 +196,14 @@ private theorem swap_reads_paused (oracle : DenoteOracle) (a₁ a₂ : Nat)
     (swapBalances oracle a₁ a₂ world).storage (wordNormalize pausedSlot) =
       world.storage (wordNormalize pausedSlot) := by
   simp only [swapBalances]
-  rw [if_neg (fun h => h₁ h.symm), if_neg (fun h => h₂ h.symm)]
+  rw [Verity.ContractState.storage_writeSlot_other _ (fun h => h₂ h.symm),
+    Verity.ContractState.storage_writeSlot_other _ (fun h => h₁ h.symm)]
 
 private theorem swap_reads_balance (oracle : DenoteOracle) (a₁ a₂ : Nat)
     (world : Verity.ContractState) :
     (swapBalances oracle a₁ a₂ world).storage (balanceSlotOf oracle a₂) =
       world.storage (balanceSlotOf oracle a₁) := by
-  simp only [swapBalances]
-  by_cases h : balanceSlotOf oracle a₂ = balanceSlotOf oracle a₁
-  · rw [if_pos h, h]
-  · rw [if_neg h]
-    simp
+  simp [swapBalances, Verity.ContractState.storage_writeSlot_same]
 
 /-- **P-ADDRESS-1 admission non-discrimination over the official denotation.**
 
@@ -246,13 +241,11 @@ def witnessOracle : DenoteOracle :=
 Slot `101` is `balances[1]`, slot `102` is `balances[2]`, slot `5` is `owner`,
 and slot `4` (`paused`) is `0`. -/
 def witnessWorld : Verity.ContractState :=
-  { Verity.defaultState with
-    storage := fun s => if s = 101 then 7 else if s = 5 then 1 else 0 }
+  (Verity.defaultState.writeSlot 101 7).writeSlot 5 1
 
 /-- The paused variant of `witnessWorld`; only the pause gate differs. -/
 def pausedWorld : Verity.ContractState :=
-  { witnessWorld with
-    storage := fun s => if s = 4 then 1 else witnessWorld.storage s }
+  witnessWorld.writeSlot 4 1
 
 theorem witness_balance_slot_one : balanceSlotOf witnessOracle 1 = 101 := by decide
 
@@ -301,13 +294,14 @@ theorem run_ownerGated_success (oracle : DenoteOracle) (a : Nat) (w : Verity.Con
     show bindExternalParams claimSelector [] [] = some [] from rfl,
     paused_lookup, balances_lookup, owner_lookup,
     execStmtList, execStmt, evalExpr, readFieldWord, pausedField, balancesField, ownerField,
-    withTransactionContext, Verity.ContractState.readSlot, successResult, revertedResult,
+    withTransactionContext, Verity.ContractState.readSlot, Verity.ContractState.storage,
+    successResult, revertedResult,
     balanceSlotOf, callerKey, boolWord]
-  by_cases hp : (w.storage (wordNormalize pausedSlot)).val = 0
-  · by_cases ho : (w.storage (wordNormalize ownerSlot)).val =
+  by_cases hp : (w.storageWords (.slot (wordNormalize pausedSlot))).val = 0
+  · by_cases ho : (w.storageWords (.slot (wordNormalize ownerSlot))).val =
         (Verity.wordToAddress (a : Verity.Core.Uint256)).val
-    · by_cases hb : 0 < (w.storage (wordNormalize
-        (oracle.mappingSlot balancesSlot (Verity.wordToAddress (a : Verity.Core.Uint256)).val))).val <;>
+    · by_cases hb : 0 < (w.storageWords (.slot (wordNormalize
+        (oracle.mappingSlot balancesSlot (Verity.wordToAddress (a : Verity.Core.Uint256)).val)))).val <;>
         simp [hp, ho, hb, -Verity.wordToAddress, show wordNormalize 0 = 0 from rfl]
     · simp [hp, ho, Ne.symm ho, -Verity.wordToAddress, show wordNormalize 0 = 0 from rfl]
   · simp [hp, -Verity.wordToAddress, show wordNormalize 0 = 0 from rfl]
