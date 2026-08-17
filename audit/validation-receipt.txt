@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 4026ac4e4d46f8370f0a1e428be99400459dec5b
+validated-tree: 70ca7601f66d75fffca7a421219c60b6d604d937
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -24,6 +24,20 @@ P-RESERVE-RELATIONAL first closure slice (2026-08-17)
   (the post-state still carries `depositsReserve`); the mutant now compares
   `outcomeObservables`. `REPRODUCE.md` is generated again; the slice is
   reproduced by `make test` via `LidoSRv3.Tests.ReserveRelationalMutants`.
+
+Handoff cleanup (2026-08-17)
+----------------------------
+
+- README is the Lido-facing entry point: eleven-guarantee table, how to
+  reproduce, and a short layout. Campaign-recovery prose is archived.
+- Removed committed `__pycache__`, a stale Verity-migration receipt, the empty
+  `lean/` stub, and a first-compile scratch note. ROADMAP P0 no longer
+  describes internal branch reconciliation.
+- Active markdown, ROADMAP copy, disclaimer, and executive-summary lead now
+  state the claim first and drop preamble.
+- README no longer says the eleven guarantees are checked, keeps
+  `A-TOPUP-NOWRAP` on P-TOPUP-1, and labels `proof-report.json` as
+  legacy P1–P15 only.
 
 Canonical source-map pin repair (2026-08-16)
 --------------------------------------------

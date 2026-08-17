@@ -1,17 +1,11 @@
-# Archived: legacy P1-P15 work
+# Archived: legacy P1–P15 work
 
-> **This directory is historical and is not the current audit surface.** It
-> describes the superseded SRV3-P1 through SRV3-P15 registry. The current
-> surface is exactly 11 guarantees: see `audit/guarantees.yaml` (canonical
-> registry) and `LidoSRv3/Audit/AllGuarantees.lean` (Lean facade) at the
-> repository root. Nothing in this directory is validated by `make audit-check`
-> or `make test`; it is retained for provenance only.
->
-> Contents: `proofs/` (the P1-P15 dossiers), `verity-targets/` (legacy proof
-> targets, flow map, Solidity correspondence, and the Certora/PR #1811 mapping),
-> and `oracle-trust-surface-audit.md` (an oracle trust-surface review written
-> against a different commit, citing an assumption that is absent from the
-> current registry).
+This directory is historical. Current guarantees are the eleven IDs in
+`audit/guarantees.yaml` and `LidoSRv3/Audit/AllGuarantees.lean`.
+`make audit-check` and `make test` do not validate this tree.
+
+Contents: `proofs/` (P1–P15 dossiers), `verity-targets/`, and
+`oracle-trust-surface-audit.md` (written against another commit).
 
 ## Verity targets (historical)
 

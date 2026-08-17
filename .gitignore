@@ -6,6 +6,9 @@ build/
 *.log
 *.out
 *.toc
+__pycache__/
+*.pyc
+.DS_Store
 
 # Local browser and research artifacts
 /.playwright-mcp/

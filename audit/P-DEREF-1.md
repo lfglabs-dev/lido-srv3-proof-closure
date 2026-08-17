@@ -1,24 +1,19 @@
 # P-DEREF-1 bounded receipt
 
+Supplemental child evidence. Not a twelfth public guarantee.
+
 Writer: `LidoSRv3/Audit/Guarantees/PDeref1.lean`.
+Pin: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
-Pinned source: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+The model proves a registered module address is nonzero and 160-bit after
+reachable `initialize`, one valid `_migrateStorage`, and `_addModule`. A
+guarded Verity mapping transaction then returns that address and writes it to
+the observation map.
 
-This is supplemental evidence, not a twelfth minimal-11 guarantee. The checked
-model derives a registered address's nonzero and 160-bit bounds from reachable
-`initialize`, valid one-time `_migrateStorage`, and `_addModule` states. It
-then proves that a concrete executable Verity mapping transaction guarded by a
-module-position mapping returns that source-model address and writes the same
-address to its observation map.
+Writers: `SRLib._migrateStorage` 51–155, `_addModule` 183–232, and later
+status/accounting/parameter/share writers that do not change
+`config.moduleAddress`. Mutants: `LidoSRv3/Tests/DereferenceMutants.lean`.
 
-The writer inventory includes the migration address copy in
-`SRLib._migrateStorage` (51-155), `_addModule` (183-232), and the normal
-post-migration status/accounting/parameter/share writers, which do not modify
-`config.moduleAddress`. Guard-removal and address-replacement mutants remain
-concrete regressions in `LidoSRv3/Tests/DereferenceMutants.lean`.
-
-OPEN: the old-layout migration contents are an explicit input boundary; no
-claim is made about `ROUTER_STORAGE_POSITION`'s computed hash, Solidity's
-keccak mapping location, struct packing, compiler-generated Yul, emitted
-`SLOAD` execution, proxy/runtime bytecode, or deployed provenance. The Yul
-file is deliberately syntax-only and contains no exact-location theorem.
+OPEN: old-layout migration bytes are an input. No claim on
+`ROUTER_STORAGE_POSITION` hash, Solidity keccak map slots, packing, Yul,
+`SLOAD`, proxy bytecode, or deployment. The Yul file is syntax only.

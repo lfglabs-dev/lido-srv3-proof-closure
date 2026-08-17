@@ -1,28 +1,21 @@
 \section*{Confidentiality and result status}
 \addcontentsline{toc}{section}{Confidentiality and result status}
 
-This document is a \textbf{private executable evidence package} for the selected
-SRv3 accounting proof-closure lane. It connects the report claims to local model
-files, reference tests, proof target files, and reproducibility commands for
-PR \#1811 at the commit named on the cover.
+This is a private evidence package for the SRv3 accounting lane on PR \#1811
+at the commit on the cover.
 
-\smallskip
-\noindent The report is intentionally narrow. It covers the economic state
-machine modeled for deposits, reserves, module balances, accepted reports,
-rewards, fees, and status gates. It does not claim full deployed-system
-equivalence, oracle truthfulness, cryptographic correctness, governance
-correctness, or exact proxy/storage refinement beyond the named assumptions.
+It covers the modeled economic state machine: deposits, reserves, module
+balances, accepted reports, rewards, fees, and status gates. It does not claim
+full deployed-system equality, oracle truth, cryptographic correctness,
+governance correctness, or proxy/storage refinement beyond the named
+assumptions.
 
-\smallskip
-\noindent Every selected target row is backed by a source-code cross-reference,
-trust-boundary entry, Verity/Lean theorem, and rebuild command. These artifacts
-are checked over the focused economic model; they are not full deployed-system
-refinement proofs.
+Each selected row has a source cross-reference, a trust-boundary entry, a
+Verity/Lean theorem, and a rebuild command. Those check the focused model.
 
 \begin{notebox}
 \noteboxtitle{Distribution}
-Private review channel for Lido protocol contributors and selected technical
-reviewers. Public release, forum excerpts, or website publication should keep
-the same bounded-check language unless stronger theorem-checker artifacts are
-added and independently rebuilt.
+Private review for Lido protocol contributors and named reviewers. Public
+excerpts must keep this bounded-check language unless stronger artifacts are
+added and rebuilt independently.
 \end{notebox}
