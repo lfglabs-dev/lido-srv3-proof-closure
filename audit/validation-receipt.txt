@@ -1,11 +1,27 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f22e817899ef6a8c026a74f6ba1d67ea90c52d32
+validated-tree: fd55f56d8e1f61ae49319a8628ae95e9971ead05
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-CONSOLIDATION-1 faithful Verity transaction closure (2026-08-17)
+------------------------------------------------------------------
+
+- Source commit `fbcc947` composes the checked abstract eligibility,
+  value-conservation, and atomicity theorem with an executable
+  `Contract.run` transaction over denoted memory-backed public-key arrays,
+  journaled CALL / ConsolidationRequestAdded observables, and
+  `writeMapUint` / `writeSlot` persistence.
+- The transaction matches the pinned-source vault entrypoint at
+  `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. Mutants cover
+  call drop, event drop, memory drop, mismatched arity, double-emit,
+  intermediate-write rollback, and two-batch chaining.
+- Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `fd55f56d8e1f61ae49319a8628ae95e9971ead05`.
 
 P-ALLOC-2 faithful Verity transaction closure (2026-08-17)
 -----------------------------------------------------------
