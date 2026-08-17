@@ -65,6 +65,17 @@ def executeHop (w : MultiWorld) (caller callee : Address) (value id : Nat)
   let fn := receiver (s!"hop-{id}") caller ok
   callFunction env (receiverSpec fn) fn id w caller callee (site callee value id)
 
+def compiledHop (caller callee : Address) (value id : Nat) (ok : Bool) :
+    CompiledCall :=
+  let fn := receiver (s!"hop-{id}") caller ok
+  { env := env
+    spec := receiverSpec fn
+    fn := fn
+    selector := id
+    caller := caller
+    callee := callee
+    site := site callee value id }
+
 inductive FailedHop where
   | invalidFee
   | busToGateway
@@ -93,15 +104,17 @@ def run (before : MultiWorld) (msgValue fee : Nat)
     (busOk vaultOk refundOk requestOk : Bool) : TxResult :=
   if fee > msgValue then .reverted .invalidFee before
   else
-    advance before .busToGateway
-      (executeHop before busAddr gatewayAddr msgValue 1 busOk) fun w1 =>
-    advance before .gatewayToVault
-      (executeHop w1 gatewayAddr vaultAddr fee 2 vaultOk) fun w2 =>
-    advance before .gatewayToRefund
-      (executeHop w2 gatewayAddr refundAddr (msgValue - fee) 3 refundOk) fun w3 =>
-    advance before .vaultToRequest
-      (executeHop w3 vaultAddr requestAddr fee 4 requestOk) fun w4 =>
-    .committed w4
+    let execution := denoteTransaction before
+      [compiledHop busAddr gatewayAddr msgValue 1 busOk,
+       compiledHop gatewayAddr vaultAddr fee 2 vaultOk,
+       compiledHop gatewayAddr refundAddr (msgValue - fee) 3 refundOk,
+       compiledHop vaultAddr requestAddr fee 4 requestOk]
+    match execution.control with
+    | .success => .committed execution.world
+    | .invalidCall 0 | .callFailed 0 _ => .reverted .busToGateway execution.world
+    | .invalidCall 1 | .callFailed 1 _ => .reverted .gatewayToVault execution.world
+    | .invalidCall 2 | .callFailed 2 _ => .reverted .gatewayToRefund execution.world
+    | .invalidCall _ | .callFailed _ _ => .reverted .vaultToRequest execution.world
 
 def initial (msgValue : Nat) : MultiWorld :=
   { accounts :=

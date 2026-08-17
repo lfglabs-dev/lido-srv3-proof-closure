@@ -4,7 +4,8 @@ Parent `P-ETH-1` stays `OPEN` with `theorem: null`. Child rows stay
 `parent_id: P-ETH-1`.
 
 Pins: Lido `af095e48bbc1c3841c2c9936219c8461af01056b`, Verity
-`2d9d2d1e88a7a8eb78f8a13c8407b18e3a2b91bf` (provisional PR #2362 head).
+`a97cfafefececbdea8212f37b99d3c7c480c8061` (provisional PR #2365 head,
+stacked on PR #2362).
 
 ## Execution-backed composition slice
 
@@ -14,12 +15,14 @@ and Vault → request. It splits `10` into a fee of `3` and refund of `7`, and
 restores the transaction-entry world when the final request hop fails. The
 four required mutants are rejected in `PEth1CompositionTxMutants`.
 
-This is stronger than the old journal-only `routeEth`, but it remains bounded
-evidence: the outer nested-call scheduler and fee split are handwritten Lean,
-not denoted from the bodies of the pinned Lido caller functions. Parent
-`P-ETH-1` therefore remains OPEN pending a Verity `denoteTransaction` (or
-equivalent nested frame scheduler) that drives child frames from executed
-caller `FunctionSpec` external-call statements.
+This is stronger than the old journal-only `routeEth`: provisional Verity PR
+#2365 supplies `denoteTransaction`, and the slice now executes its four
+compiled receiver `FunctionSpec`s through that atomic interpreter. It remains
+bounded evidence because the transaction program (including the fee split)
+is assembled as a `List CompiledCall`; it is not emitted by executing the
+external-call statements in the pinned Bus, Gateway, and Vault caller bodies.
+Parent `P-ETH-1` therefore remains OPEN pending recursive dispatch from an
+executed caller `FunctionSpec` into the shared `MultiWorld` transaction.
 
 ## Children
 
