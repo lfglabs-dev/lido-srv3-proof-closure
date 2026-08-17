@@ -1,7 +1,8 @@
 # Lido SRv3 Proof Closure
 
-This repo checks eleven Staking Router v3 guarantees in Lean against
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+This repo holds Lean evidence for eleven Staking Router v3 guarantees on
+pinned `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+The table below is the status. Not every row is closed.
 
 Lean theorems decide what is proved. `audit/guarantees.yaml` only classifies
 them.
@@ -15,7 +16,7 @@ and deployment provenance are out of scope.
 | 1 | `P-ALLOC-1` | CHECKED | PARTIAL |
 | 2 | `P-ALLOC-2` | CHECKED | PARTIAL |
 | 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL — linked calls not yet faithfully executed |
-| 4 | `P-TOPUP-1` | CHECKED | PARTIAL |
+| 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | PARTIAL |
 | 5 | `P-ACCOUNT-1` | CHECKED | PARTIAL — no distinct stateful execution yet |
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |
 | 7 | `P-ETH-1` | OPEN | OPEN — child TX ledgers only |
@@ -36,6 +37,10 @@ make audit-check   # registry, pins, source map, generated views
 make test          # mutants, receipt, provenance guards, Lean regressions
 make prove         # full LidoSRv3 build; writes proofs/logs/proof-report.json
 ```
+
+`proofs/logs/proof-report.json` is a build receipt for the superseded
+SRV3-P1–P15 lane (`target_scope: legacy-srv3-p1-p15-superseded`). It is not
+evidence for the eleven guarantees above. Use `audit/guarantees.yaml` for those.
 
 One guarantee:
 

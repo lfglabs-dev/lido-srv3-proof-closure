@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 3d4b028b8b4e28181f638a77ea9423497b3e75c3
+validated-tree: fa39d96c54f8dd2315e23543e877cad62d329cce
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -17,6 +17,9 @@ Handoff cleanup (2026-08-17)
   describes internal branch reconciliation.
 - Active markdown, ROADMAP copy, disclaimer, and executive-summary lead now
   state the claim first and drop preamble.
+- README no longer says the eleven guarantees are checked, keeps
+  `A-TOPUP-NOWRAP` on P-TOPUP-1, and labels `proof-report.json` as
+  legacy P1–P15 only.
 
 Canonical source-map pin repair (2026-08-16)
 --------------------------------------------
