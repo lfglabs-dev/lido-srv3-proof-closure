@@ -2,10 +2,10 @@
 
 # ROADMAP
 
-## P0 — publish the final consolidation
+## P0 — keep published claims honest
 
-- Reconcile from `main`, retain the assurance-v4 contract and useful campaign/corrective heads, and require `make test`, `make prove`, the full build, exact-head independent review, and no hollow parent promotion.
-- Classify and close superseded PRs only after the integrated head is contained in `main`; then synchronize and archive the former campaign branch.
+- Do not promote a parent guarantee without a composed theorem on the claimed plane.
+- `make test` and `make prove` remain the local gates; metadata never closes evidence.
 
 ## P1 — first complete property: `P-RESERVE-RELATIONAL`
 

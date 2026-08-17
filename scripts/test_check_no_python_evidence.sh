@@ -17,7 +17,7 @@ if PATH="$tmpdir/empty-path" /bin/bash "$checker" \
     >"$tmpdir/no-rg.out" 2>"$tmpdir/no-rg.err"; then
   fail "missing rg was accepted"
 fi
-if ! /bin/grep -q "requires 'rg'" "$tmpdir/no-rg.err"; then
+if ! grep -q "requires 'rg'" "$tmpdir/no-rg.err"; then
   fail "missing rg did not produce the required diagnostic"
 fi
 
@@ -32,7 +32,7 @@ if (cd "$fixture" && /bin/bash scripts/check_no_python_evidence.sh) \
     >"$tmpdir/stale.out" 2>"$tmpdir/stale.err"; then
   fail "stale reference was accepted"
 fi
-if ! /bin/grep -q 'content/stale-reference.tex' "$tmpdir/stale.err"; then
+if ! grep -q 'content/stale-reference.tex' "$tmpdir/stale.err"; then
   fail "stale reference failure did not identify the fixture"
 fi
 

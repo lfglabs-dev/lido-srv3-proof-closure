@@ -1,11 +1,20 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 9655e7becd128ac985e9c87026b226d6e7d0671a
+validated-tree: 06a8a230a1213dd9217e0d0ae9b75fc2388b2e1d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Handoff cleanup (2026-08-17)
+----------------------------
+
+- README is the Lido-facing entry point: eleven-guarantee table, how to
+  reproduce, and a short layout. Campaign-recovery prose is archived.
+- Removed committed `__pycache__`, a stale Verity-migration receipt, the empty
+  `lean/` stub, and a first-compile scratch note. ROADMAP P0 no longer
+  describes internal branch reconciliation.
 
 Canonical source-map pin repair (2026-08-16)
 --------------------------------------------
