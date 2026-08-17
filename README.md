@@ -22,7 +22,7 @@ and deployment provenance are out of scope.
 | 7 | `P-ETH-1` | OPEN | OPEN — child TX ledgers only |
 | 8 | `P-ADDRESS-1` | OPEN | PARTIAL |
 | 9 | `P-TOPUP-2` | CHECKED | PARTIAL |
-| 10 | `P-CONSOLIDATION-1` | OPEN | PARTIAL |
+| 10 | `P-CONSOLIDATION-1` | CHECKED | CHECKED |
 | 11 | `P-SSZ-1` | CHECKED | PARTIAL |
 
 Wording, assumptions, source spans, next gates: `audit/guarantees.yaml`.
