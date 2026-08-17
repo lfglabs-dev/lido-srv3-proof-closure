@@ -47,7 +47,7 @@ PINNED = {
 EXPECTED_AUTHORITY = "Lean theorem statements and proofs are authoritative; metadata classifies but never closes evidence."
 EXPECTED_OBJECTIVE = "Prove an abstract Lean model and a behaviorally faithful Verity model for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
 EXPECTED_CANONICAL_CLAIMS = {
-    "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "NONE", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD")),
     "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
@@ -60,7 +60,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "NONE", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "a32a7ae4d53c0b3a73265b950e17289771f04bd3a93d002ab09ec3bd1919b7e8",
+    "P-ALLOC-1": "7213a88f97f5d96fc8ad3e075bebbf3e2fb3501ed694b177e82e8a29d280f916",
     "P-ALLOC-2": "425bb708216a67f8040e0ecd7279d969e343a8bc2f335a95cbc91086bfe96894",
     "P-DEPOSIT-1": "bd1f9e0347f60d3ea75089dc4d6abbbbe3515ff865bf83419f5286fad32c0968",
     "P-TOPUP-1": "e76b6a30ef38a283b05b9a6fbb31b12dc4376682ab824ae26440b512d622667f",
@@ -75,7 +75,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "P1",
-    "P-ALLOC-1": "P2", "P-ALLOC-2": "DONE", "P-ETH-1": "P2",
+    "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "P2",
     "P-ADDRESS-1": "P2", "P-TOPUP-2": "P2", "P-CONSOLIDATION-1": "P2",
     "P-SSZ-1": "DONE",
 }

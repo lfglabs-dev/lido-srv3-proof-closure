@@ -28,6 +28,8 @@ import LidoSRv3.Audit.Guarantees.PReserveRelational
 import LidoSRv3.Tests.DepositTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
+import LidoSRv3.Audit.Verity.AllocationTx
+import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
@@ -49,6 +51,9 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction
