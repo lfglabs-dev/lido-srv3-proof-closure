@@ -4,7 +4,22 @@ Parent `P-ETH-1` stays `OPEN` with `theorem: null`. Child rows stay
 `parent_id: P-ETH-1`.
 
 Pins: Lido `af095e48bbc1c3841c2c9936219c8461af01056b`, Verity
-`c8cbae3375580d01856efd36f3164fc4ecd05b9c` (PR #2360).
+`2d9d2d1e88a7a8eb78f8a13c8407b18e3a2b91bf` (provisional PR #2362 head).
+
+## Execution-backed composition slice
+
+`PEth1CompositionTx.run` now executes four `callFunction` frames in one
+atomic outer run: Bus → Gateway, Gateway → Vault, Gateway → refund recipient,
+and Vault → request. It splits `10` into a fee of `3` and refund of `7`, and
+restores the transaction-entry world when the final request hop fails. The
+four required mutants are rejected in `PEth1CompositionTxMutants`.
+
+This is stronger than the old journal-only `routeEth`, but it remains bounded
+evidence: the outer nested-call scheduler and fee split are handwritten Lean,
+not denoted from the bodies of the pinned Lido caller functions. Parent
+`P-ETH-1` therefore remains OPEN pending a Verity `denoteTransaction` (or
+equivalent nested frame scheduler) that drives child frames from executed
+caller `FunctionSpec` external-call statements.
 
 ## Children
 

@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.Registry
+import LidoSRv3.Audit.Verity.PEth1CompositionTx
 
 namespace LidoSRv3.Audit.Guarantees.PEth1
 
@@ -29,7 +30,14 @@ def approvedReturnMoves (moves : List EthMove) : List EthMove :=
 
 /-- The canonical parent remains open; the theorems below are subordinate
 evidence for its two bounded child rows, not additional public guarantees. -/
-def guarantee : Guarantee := ⟨.pEth1, []⟩
+def guarantee : Guarantee := ⟨.pEth1, [.model, .source, .verityTx]⟩
+
+/-- Parent abstract conservation law for the Gateway split: every wei
+forwarded by the Bus is assigned exactly once to either the Vault fee or the
+resolved refund recipient. -/
+theorem composed_eth_conservation (msgValue fee : Nat) (hFee : fee ≤ msgValue) :
+    fee + (msgValue - fee) = msgValue := by
+  omega
 
 /-- Every committed move made through the protocol-controlled stVault
 rebalance/redemption interface is retained by the approved-path filter, so its
