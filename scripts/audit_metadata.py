@@ -40,7 +40,7 @@ ASSUMPTION_FIELDS = {
 }
 PINNED = {
     "lido_core": ("https://github.com/lidofinance/core.git", "af095e48bbc1c3841c2c9936219c8461af01056b"),
-    "verity": ("https://github.com/lfglabs-dev/verity.git", "c8cbae3375580d01856efd36f3164fc4ecd05b9c"),
+    "verity": ("https://github.com/lfglabs-dev/verity.git", "8719dc52e8c581e37bab4594fed11b11c41494b8"),
     "evmyullean": ("https://github.com/lfglabs-dev/EVMYulLean.git", "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"),
     "mathlib": ("https://github.com/leanprover-community/mathlib4.git", "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"),
 }

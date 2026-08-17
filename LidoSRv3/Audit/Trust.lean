@@ -25,6 +25,7 @@ import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Audit.Guarantees.PReserveRelational
 import LidoSRv3.Tests.DepositTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
+import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
@@ -50,6 +51,8 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution
+#print axioms LidoSRv3.Audit.Verity.MinFirstDistributionTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_correspondence
