@@ -1,11 +1,25 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 9655e7becd128ac985e9c87026b226d6e7d0671a
+validated-tree: 4612f088805d79430786e1649f4b1db9d616b4f4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-RESERVE-RELATIONAL first closure slice (2026-08-17)
+------------------------------------------------------
+
+- Source commit `f81354d5f9cedbbb07393e709ed74997c97b5fe3` adds an independent
+  abstract reserve-invariance specification and theorem, plus a separate
+  source-shaped interpreter and correspondence proof.
+- Mutants cover reserve-to-range dependence and ignored report, queue, and
+  buffer inputs; the two-batch regression checks relational chaining.
+- `P-RESERVE-RELATIONAL` remains PARTIAL pending executable Verity
+  computation, composition, and intermediate-write rollback. `P-RESERVE-1`
+  remains the child/baseline.
+- Receipt subject: tracked tree excluding this receipt,
+  `4612f088805d79430786e1649f4b1db9d616b4f4`.
 
 Canonical source-map pin repair (2026-08-16)
 --------------------------------------------
