@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 3440ac0af3630733cfd4766ed0f4157513e80333
+validated-tree: f3fa3c4a574d613cc23930c5a7bc629e5255fe11
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -22,7 +22,7 @@ P-ADDRESS-1 abstract and Verity transaction closure (2026-08-17)
 - Generated shared views also retain the accepted P-ALLOC-1/P-ALLOC-2 closures
   from current `origin/main`; no allocation theorem source is duplicated here.
 - Receipt subject: tracked tree excluding this receipt,
-  `3440ac0af3630733cfd4766ed0f4157513e80333`.
+  `f3fa3c4a574d613cc23930c5a7bc629e5255fe11`.
 
 P-ALLOC-1 faithful Verity transaction closure (2026-08-17)
 -----------------------------------------------------------
