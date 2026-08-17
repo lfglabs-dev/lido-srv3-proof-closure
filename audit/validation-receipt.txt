@@ -1,11 +1,23 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d675f6c03de0b90b436cd61fd164867bf6880cd4
+validated-tree: 2b12370be5b839bfb8917084b5b4cce7602ead66
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 composed Verity transaction closure (2026-08-17)
+-------------------------------------------------------------
+
+- Source commit `80a603e` composes the checked abstract conservation/rollback
+  theorem with a bounded two-batch executable `Contract.run` transaction.
+- Authorization, allocation, dynamic data/root writes, and address/value-keyed
+  Lido, module, and beacon calls execute in one rollback-sensitive program.
+- Exact-snapshot rollback and second-root alias/second-batch omission mutants
+  are kernel checked; canonical P-DEPOSIT-1 is CHECKED on both planes.
+- Receipt subject: tracked tree excluding this receipt,
+  `2b12370be5b839bfb8917084b5b4cce7602ead66`.
 
 Verity #2360 pin bump (2026-08-17)
 ----------------------------------
