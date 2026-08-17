@@ -109,7 +109,15 @@ theorem verity_tx_simulates_ssz_encoding
           (observe ((encode input).run state)).observables.pivotBoundary =
             nodeWord input.witness.pivotBoundary ∧
           (observe ((encode input).run state)).observables.traversedRoot =
-            nodeWord (traversedRoot input)) ∧
+            nodeWord (traversedRoot input) ∧
+          (observe ((encode input).run state)).observables.pathLength =
+            input.witness.path.length ∧
+          (observe ((encode input).run state)).observables.branchLength =
+            input.witness.branch.length ∧
+          (observe ((encode input).run state)).observables.path =
+            twoWords (input.witness.path.map siblingWord) ∧
+          (observe ((encode input).run state)).observables.branch =
+            twoWords (input.witness.branch.map nodeWord)) ∧
       sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs ∧
       (ExactDigestComposition input.deposit ∧
         (digestChain input.deposit).length = 7) ∧

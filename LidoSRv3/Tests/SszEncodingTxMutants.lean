@@ -80,6 +80,14 @@ example : (runView matching).observables.operation =
 example : (runView matching).observables.index =
     indexWord boundWitness.index := by native_decide
 
+example : (runView matching).observables.pathLength = boundWitness.path.length ∧
+    (runView matching).observables.path =
+      twoWords (boundWitness.path.map siblingWord) := by native_decide
+
+example : (runView matching).observables.branchLength = boundWitness.branch.length ∧
+    (runView matching).observables.branch =
+      twoWords (boundWitness.branch.map nodeWord) := by native_decide
+
 /-- Root mismatch reverts the whole transaction. -/
 example : runView mismatched = ⟨.reverted, zeroObs⟩ := by native_decide
 
@@ -144,6 +152,41 @@ private def dropOperationMutant (input : EncodingInput) : Contract Observables :
 
 example :
     observe ((dropOperationMutant matching).run defaultState) ≠ runView matching := by
+  native_decide
+
+/-- Structural map corruption: changing a written path-side entry is visible
+in the outcome readback and therefore violates the composed correspondence. -/
+private def corruptPathMapMutant (input : EncodingInput) : Contract Observables :=
+  fun snapshot =>
+    match (encode input).run snapshot with
+    | .revert reason state => .revert reason state
+    | .success obs state =>
+        .success obs (state.writeMapUint (pathMapSlot 0) 0 1)
+
+example :
+    observe ((corruptPathMapMutant matching).run defaultState) ≠
+      sourceView matching := by
+  native_decide
+
+/-- Structural map drop: clearing a written branch entry is visible in the
+outcome readback and therefore violates the composed correspondence. -/
+private def dropBranchMapMutant (input : EncodingInput) : Contract Observables :=
+  fun snapshot =>
+    match (encode input).run snapshot with
+    | .revert reason state => .revert reason state
+    | .success obs state =>
+        .success obs (state.writeMapUint (branchMapSlot 0) 0 0)
+
+example :
+    observe ((dropBranchMapMutant matching).run defaultState) ≠
+      sourceView matching := by
+  native_decide
+
+/-- Witness-bind drop: clearing the executed bind result is likewise rejected
+by the same outcome correspondence used by the composed theorem. -/
+example :
+    observe ((dropBoundMutant matching).run defaultState) ≠
+      sourceView matching := by
   native_decide
 
 /-- Encoding-mismatch: swapped concat operands change the packed observable. -/

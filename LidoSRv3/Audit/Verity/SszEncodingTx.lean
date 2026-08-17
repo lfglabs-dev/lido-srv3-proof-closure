@@ -44,6 +44,8 @@ def indexSlot (base : Nat) : Nat := base + 5
 def pivotSlot (base : Nat) : Nat := base + 6
 def traversedRootSlot (base : Nat) : Nat := base + 7
 def boundSlot (base : Nat) : Nat := base + 8
+def pathLengthSlot (base : Nat) : Nat := base + 9
+def branchLengthSlot (base : Nat) : Nat := base + 10
 def digestMapSlot (base : Nat) : Nat := 1000 + base
 def pathMapSlot (base : Nat) : Nat := 2000 + base
 def branchMapSlot (base : Nat) : Nat := 3000 + base
@@ -131,20 +133,28 @@ def writeBranch (base : Nat) (state : ContractState) (index : Nat)
     (words : List Word) : ContractState :=
   writeWords (branchMapSlot base) state index words
 
+/-- Successful named-operation witnesses have depth at most two. Persisting a
+fixed two-entry readback window also clears unused entries and prevents an
+arbitrary pre-state map value from entering the outcome observable. -/
+def twoWords (words : List Word) : List Word :=
+  [words.getD 0 0, words.getD 1 0]
+
 /-- Intermediate child writes (including structural path/branch maps). -/
 def persistChildren (base : Nat) (state : ContractState)
     (digestWords pathWords branchWords : List Word)
     (root concat fingerprint opW idxW pivotW travW : Word) : ContractState :=
   let s := writeDigests base state 0 digestWords
-  let s := writePath base s 0 pathWords
-  let s := writeBranch base s 0 branchWords
-  ((((((s.writeSlot (concatSlot base) concat).writeSlot
-    (depositRootSlot base) root).writeSlot
-    (digestXorSlot base) fingerprint).writeSlot
-    (operationSlot base) opW).writeSlot
-    (indexSlot base) idxW).writeSlot
-    (pivotSlot base) pivotW).writeSlot
-    (traversedRootSlot base) travW
+  let s := writePath base s 0 (twoWords pathWords)
+  let s := writeBranch base s 0 (twoWords branchWords)
+  let s := s.writeSlot (concatSlot base) concat
+  let s := s.writeSlot (depositRootSlot base) root
+  let s := s.writeSlot (digestXorSlot base) fingerprint
+  let s := s.writeSlot (operationSlot base) opW
+  let s := s.writeSlot (indexSlot base) idxW
+  let s := s.writeSlot (pivotSlot base) pivotW
+  let s := s.writeSlot (traversedRootSlot base) travW
+  let s := s.writeSlot (pathLengthSlot base) pathWords.length
+  s.writeSlot (branchLengthSlot base) branchWords.length
 
 /-- Final commit bits for verification and structural bind. -/
 def persistCommit (base : Nat) (state : ContractState) : ContractState :=
@@ -175,6 +185,10 @@ structure Observables where
   pivotBoundary : Word
   traversedRoot : Word
   bound : Word
+  pathLength : Word
+  branchLength : Word
+  path : List Word
+  branch : List Word
   deriving DecidableEq, Repr
 
 inductive Status where
@@ -187,7 +201,13 @@ structure View where
   observables : Observables
   deriving DecidableEq, Repr
 
-def zeroObs : Observables := ⟨0, 0, 0, 0, 0, 0, 0, 0, 0⟩
+def zeroObs : Observables := ⟨0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, [], []⟩
+
+def readWords (mapSlot : Nat) (state : ContractState) : Nat → Nat → List Word
+  | _, 0 => []
+  | index, count + 1 =>
+      state.readMapUint mapSlot (Verity.Core.Uint256.ofNat index) ::
+        readWords mapSlot state (index + 1) count
 
 def readObs (state : ContractState) (base : Nat) : Observables :=
   ⟨state.readSlot (depositRootSlot base),
@@ -198,7 +218,11 @@ def readObs (state : ContractState) (base : Nat) : Observables :=
     state.readSlot (indexSlot base),
     state.readSlot (pivotSlot base),
     state.readSlot (traversedRootSlot base),
-    state.readSlot (boundSlot base)⟩
+    state.readSlot (boundSlot base),
+    state.readSlot (pathLengthSlot base),
+    state.readSlot (branchLengthSlot base),
+    readWords (pathMapSlot base) state 0 2,
+    readWords (branchMapSlot base) state 0 2⟩
 
 /-- Persist every child after the child computations. The injected failure
 hook, a failed `bindOperation`, and the root-mismatch branch all revert
@@ -230,7 +254,10 @@ def encodeAt (base : Nat) (input : EncodingInput)
             if failAfterWrites then
               .revert "INJECTED_AFTER_WRITES" dirty
             else
-              .success ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1⟩
+              .success ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1,
+                input.witness.path.length, input.witness.branch.length,
+                twoWords (input.witness.path.map siblingWord),
+                twoWords (input.witness.branch.map nodeWord)⟩
                 (persistCommit base dirty)
           else
             .revert "DepositDataRootMismatch" dirty
@@ -269,7 +296,8 @@ def observe : ContractResult Observables → View
 
 def observeTwo : ContractResult (Observables × Observables) → View × View
   | .success _ state =>
-      (⟨.committed, readObs state 0⟩, ⟨.committed, readObs state batchStride⟩)
+      (⟨.committed, readObs state 0⟩,
+        ⟨.committed, readObs state batchStride⟩)
   | .revert _ _ => (⟨.reverted, zeroObs⟩, ⟨.reverted, zeroObs⟩)
 
 def committedObs (input : EncodingInput) (index pow : Nat) : Observables :=
@@ -279,7 +307,10 @@ def committedObs (input : EncodingInput) (index pow : Nat) : Observables :=
     operationWord input.operation,
     indexWord input.witness.index,
     nodeWord input.witness.pivotBoundary,
-    nodeWord (traversedRoot input), 1⟩
+    nodeWord (traversedRoot input), 1,
+    input.witness.path.length, input.witness.branch.length,
+    twoWords (input.witness.path.map siblingWord),
+    twoWords (input.witness.branch.map nodeWord)⟩
 
 def sourceObs (input : EncodingInput) : Option Observables :=
   if widthsOk input = false then none
@@ -323,11 +354,22 @@ private theorem readObs_success_slots (base : Nat) (state : ContractState)
         (persistChildren base state digestWords pathWords branchWords
           root concat fingerprint opW idxW pivotW travW))
       base =
-      ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1⟩ := by
+      ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1,
+        pathWords.length, branchWords.length,
+        twoWords pathWords, twoWords branchWords⟩ := by
   simp [readObs, persistCommit, persistChildren, writeBranch, writePath,
-    writeDigests, depositRootSlot, concatSlot, digestXorSlot, verifiedSlot,
+    writeDigests, writeWords, readWords, twoWords,
+    depositRootSlot, concatSlot, digestXorSlot, verifiedSlot,
     operationSlot, indexSlot, pivotSlot, traversedRootSlot, boundSlot,
-    ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other]
+    pathLengthSlot, branchLengthSlot, pathMapSlot, branchMapSlot,
+    ContractState.readSlot, ContractState.storage, ContractState.readMapUint,
+    ContractState.storageMapUint, ContractState.writeMapUint,
+    ContractState.writeSlot]
+  constructor <;> intro h
+  · have hne : (0 : Word) ≠ 1 := by decide
+    exact False.elim (hne h)
+  · have hne : (0 : Word) ≠ 1 := by decide
+    exact False.elim (hne h)
 
 /-- Composed faithful-plane theorem: the executable encoding transaction's
 outcome observables are exactly the independently stated source-view of the
@@ -428,7 +470,11 @@ theorem sourceObs_committed_fields {input : EncodingInput} {obs : Observables}
       obs.operation = operationWord input.operation ∧
       obs.index = indexWord input.witness.index ∧
       obs.pivotBoundary = nodeWord input.witness.pivotBoundary ∧
-      obs.traversedRoot = nodeWord (traversedRoot input) := by
+      obs.traversedRoot = nodeWord (traversedRoot input) ∧
+      obs.pathLength = input.witness.path.length ∧
+      obs.branchLength = input.witness.branch.length ∧
+      obs.path = twoWords (input.witness.path.map siblingWord) ∧
+      obs.branch = twoWords (input.witness.branch.map nodeWord) := by
   unfold sourceObs at h
   split at h
   · cases h
@@ -476,7 +522,15 @@ theorem encoding_commits_structural_witness
       (observe ((encode input).run state)).observables.pivotBoundary =
         nodeWord input.witness.pivotBoundary ∧
       (observe ((encode input).run state)).observables.traversedRoot =
-        nodeWord (traversedRoot input) := by
+        nodeWord (traversedRoot input) ∧
+      (observe ((encode input).run state)).observables.pathLength =
+        input.witness.path.length ∧
+      (observe ((encode input).run state)).observables.branchLength =
+        input.witness.branch.length ∧
+      (observe ((encode input).run state)).observables.path =
+        twoWords (input.witness.path.map siblingWord) ∧
+      (observe ((encode input).run state)).observables.branch =
+        twoWords (input.witness.branch.map nodeWord) := by
   have hSim := verity_tx_simulates_pinned_source input state
   have hStatus : (sourceView input).status = .committed := by
     rwa [hSim] at h
@@ -487,7 +541,11 @@ theorem encoding_commits_structural_witness
       have hBind := encoding_requires_structural_bind input (by simp [hObs])
       have hFields := sourceObs_committed_fields hObs
       have hConj := structuralOk_implies_conjunct input hBind
-      refine ⟨hBind, hConj, ?_, ?_, ?_, ?_, ?_⟩
+      refine ⟨hBind, hConj, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+      · rw [hSim]; simp [sourceView, hObs, hFields]
+      · rw [hSim]; simp [sourceView, hObs, hFields]
+      · rw [hSim]; simp [sourceView, hObs, hFields]
+      · rw [hSim]; simp [sourceView, hObs, hFields]
       · rw [hSim]; simp [sourceView, hObs, hFields]
       · rw [hSim]; simp [sourceView, hObs, hFields]
       · rw [hSim]; simp [sourceView, hObs, hFields]
