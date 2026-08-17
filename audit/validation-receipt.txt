@@ -1,11 +1,25 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d675f6c03de0b90b436cd61fd164867bf6880cd4
+validated-tree: 3143fc354e7f635c8a7641005c5ed1713f81f558
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ADDRESS-1 abstract and Verity transaction closure (2026-08-17)
+-----------------------------------------------------------------
+
+- Source commit `84e2fbf` proves universal address-writer equivariance for all
+  four mapped tags and composes it with independently executable
+  `Contract.run` transfer, request, claim, and redemption programs.
+- The Verity transactions read and write real slot/mapping storage; the
+  pinned-source correspondence selects those programs directly, and snapshot
+  rollback covers failures after intermediate balance and claimed writes.
+- Wrong-recipient, fixed address-writer, and zero-amount admission mutants are
+  rejected using outcome observables. P-ADDRESS-1 is CHECKED on both planes.
+- Receipt subject: tracked tree excluding this receipt,
+  `3143fc354e7f635c8a7641005c5ed1713f81f558`.
 
 Verity #2360 pin bump (2026-08-17)
 ----------------------------------
