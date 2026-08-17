@@ -2,11 +2,31 @@ import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Source.MinFirstCorrespondence
 import LidoSRv3.Audit.MinFirstAllocation
 import LidoSRv3.Audit.Verity.MinFirstAmountTx
+import LidoSRv3.Audit.Verity.MinFirstDistributionTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
 def guarantee : Guarantee := ⟨.pAlloc2, [.algorithm, .source, .verityTx]⟩
+
+/-- Headline composed closure theorem for P-ALLOC-2. The executable
+memory-array transaction scans, counts, bounds, divides, mutates and repeats
+the pinned MinFirst loop, and its committed/reverted observables are exactly
+the pinned-source loop observables. -/
+theorem verity_tx_simulates_min_first_distribution
+    (buckets capacities : List MinFirstAllocation.Source.Word)
+    (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState)
+    (hBuckets : Verity.MinFirstDistributionTx.readArray state "buckets"
+      Verity.MinFirstDistributionTx.bucketsBase buckets.length = some buckets)
+    (hCapacities : Verity.MinFirstDistributionTx.readArray state "capacities"
+      Verity.MinFirstDistributionTx.capacitiesBase capacities.length = some capacities) :
+    Verity.MinFirstDistributionTx.observe buckets
+        ((Verity.MinFirstDistributionTx.allocate buckets.length capacities.length
+          allocationSize).run
+        state) =
+      Verity.MinFirstDistributionTx.sourceView buckets capacities allocationSize :=
+  Verity.MinFirstDistributionTx.verity_tx_simulates_pinned_source
+    buckets capacities allocationSize state hBuckets hCapacities
 
 /--
 The executable MinFirst control rule selects an open bucket with no larger
