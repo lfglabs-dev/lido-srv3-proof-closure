@@ -7,7 +7,7 @@
 | `P-ALLOC-1` | CHECKED | PARTIAL | full allocation loop; moduleAddress binding | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
 | `P-ALLOC-2` | CHECKED | PARTIAL | candidate scan/count/upper bound in Verity; real buckets/capacities memory arrays | VERITY_FEATURE_REQUIRED | `A-HANDWRITTEN-MINFIRST`, `A-ALLOC2-TX-BOUNDARY`, `A-VERITY-SCAFFOLD` |
 | `P-DEPOSIT-1` | CHECKED | PARTIAL | full authorization/allocation/deposit-data path; real Lido/router/beacon external-call composition | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-TOPUP-1` | CHECKED | PARTIAL | independent Verity execution of allocation and linked calls; observable Lido pull/beacon push order/value/multiplicity | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD` |
+| `P-TOPUP-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD` |
 | `P-ACCOUNT-1` | CHECKED | PARTIAL | stateful Verity execution; executable validity/overflow guards | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
 | `P-RESERVE-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
 | `P-ETH-1` | OPEN | OPEN | abstract parent ETH-flow theorem; faithful Verity composition | IMPLEMENTATION_PENDING | — |

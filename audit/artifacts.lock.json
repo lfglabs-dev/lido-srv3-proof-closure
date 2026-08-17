@@ -35,9 +35,11 @@
     "LidoSRv3.Audit.Verity.DepositLedgerTx",
     "LidoSRv3.Audit.Verity.TopupPackedStorage",
     "LidoSRv3.Audit.Verity.TopupParent",
+    "LidoSRv3.Audit.Verity.TopupTx",
     "LidoSRv3.Tests.AddressSourceMutants",
     "LidoSRv3.Tests.Topup2Mutants",
-    "LidoSRv3.Tests.TopupParentMutants"
+    "LidoSRv3.Tests.TopupParentMutants",
+    "LidoSRv3.Tests.TopupTxMutants"
   ],
   "unavailable": {
     "sha256_ffi_implementation_identity": {

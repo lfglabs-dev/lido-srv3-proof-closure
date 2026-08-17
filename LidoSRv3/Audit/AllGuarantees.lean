@@ -47,7 +47,7 @@ example : all.map (fun guarantee => guarantee.id.text) =
 
 /-- Blocked transaction claims must not survive in the Lean-side registry. -/
 example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
-example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
+example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
 example : PAccount1.guarantee.checkedLayers = [.model, .source] := by decide
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/

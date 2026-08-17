@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.TopupCorrespondence
+import LidoSRv3.Audit.Verity.TopupTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PTopup1
@@ -10,7 +11,7 @@ open LidoSRv3.Audit.SolidityTopup
 
 /-- The active registry exposes MODEL, SOURCE, and abstract rollback evidence.
 The former Verity transaction claim is blocked and deliberately absent. -/
-def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source]⟩
+def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source, .verityTx]⟩
 
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order
@@ -187,5 +188,67 @@ is a real falsifier and is not papered over.
 theorem source_pinned_config_discharges_pubkey_guard (inp : SourceTopupInput) :
     run pinnedConfig inp ≠ .revertInvalidPublicKeyLength :=
   run_ne_revertInvalidPublicKeyLength pinnedConfig_pubkey_lengths_agree
+
+/--
+Composed faithful `VERITY_TX` closure for the committing P-TOPUP-1 path.
+
+The premise is the pinned source interpreter's committing classification; the
+executable side independently folds `inp.allocations` through `writeMapUint`
+and `writeSlot`, performs the zero-value Lido call, credits the pull, and emits
+one value-bearing beacon call per nonzero allocation.  The equality compares
+only outcome observables.  The final conjunct states rollback for every
+injected failure point after intermediate writes/calls.
+-/
+theorem verity_tx_simulates_source
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hNoWrap : NoUncheckedWrap inp) (state : Verity.ContractState)
+    (hCommit : (run cfg inp).reverts = false) :
+    let before := Verity.TopupTx.fundedFrame state
+    Verity.TopupTx.observe before
+        ((Verity.TopupTx.execute inp.allocations .none).run before) =
+          Verity.TopupTx.sourceObservables inp.allocations ∧
+      (run cfg inp).pulled =
+        (Verity.TopupTx.sourceObservables inp.allocations).pulled ∧
+      (run cfg inp).pushed =
+        (Verity.TopupTx.sourceObservables inp.allocations).pushed ∧
+      ∀ failure reason rollback,
+        (Verity.TopupTx.execute inp.allocations failure).run before =
+            .revert reason rollback →
+          rollback = before := by
+  dsimp
+  refine ⟨Verity.TopupTx.execute_success_observes_source inp.allocations state hNoWrap,
+    ?_, ?_, ?_⟩
+  · cases hRun : run cfg inp with
+    | committedNoTopUp =>
+        have hZero := committedNoTopUp_implies_zero_total hRun
+        have hz : allocSum inp.allocations = 0 := by
+          simpa [totalAllocated] using hZero
+        simp [Outcome.pulled, Verity.TopupTx.sourceObservables, hz]
+    | committedTopUp keys pulled pushed balanceAfter =>
+        have hSpec := committed_topup_spec hRun
+        have hPositive : 0 < totalAllocated inp := by
+          rw [← hSpec.2.2.2.1]
+          exact hSpec.2.2.2.2.2.2.1
+        have hNonzero : allocSum inp.allocations ≠ 0 := by
+          simpa [totalAllocated] using Nat.ne_of_gt hPositive
+        simpa [hRun, Outcome.pulled, Verity.TopupTx.sourceObservables,
+          totalAllocated, hNonzero] using hSpec.2.2.2.1
+    | _ => simp_all [Outcome.reverts]
+  · cases hRun : run cfg inp with
+    | committedNoTopUp =>
+        have hZero := committedNoTopUp_implies_zero_total hRun
+        simpa [hRun, Outcome.pushed, Verity.TopupTx.sourceObservables,
+          totalAllocated] using hZero.symm
+    | committedTopUp keys pulled pushed balanceAfter =>
+        have hSpec := committed_topup_spec hRun
+        calc
+          pushed = pulled := hSpec.2.2.2.2.2.1.symm
+          _ = allocSum inp.allocations := by
+            simpa [totalAllocated] using hSpec.2.2.2.1
+          _ = (Verity.TopupTx.sourceObservables inp.allocations).pushed := rfl
+    | _ => simp_all [Outcome.reverts]
+  · intro failure reason rollback hRevert
+    exact Verity.TopupTx.revert_restores_snapshot inp.allocations failure
+      _ rollback reason hRevert
 
 end LidoSRv3.Audit.Guarantees.PTopup1
