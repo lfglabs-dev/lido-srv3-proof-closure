@@ -43,41 +43,36 @@
       "id": "P-ALLOC-2",
       "assumptions": [
         "A-HANDWRITTEN-MINFIRST",
-        "A-ALLOC2-TX-BOUNDARY",
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstAmountTx LidoSRv3.Tests.MinFirstAmountTxMutants",
-        "expected": "abstract MinFirst theorem, source correspondence, bounded amount transaction and mutants build; memory-array scan fidelity remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
+        "expected": "abstract MinFirst theorem and faithful memory-array Verity transaction composition build with amount, bound, floor, rollback, and two-batch mutants"
       },
-      "summary": "The abstract MinFirst selection property is checked. Selection/amount source correspondence and a bounded amount-mutation Contract.run slice are checked, but the faithful Verity objective remains PARTIAL because scan/count/upper-bound do not execute over the real buckets/capacities memory arrays.",
+      "summary": "The abstract MinFirst selection property and a composed faithful Verity transaction are checked. The transaction decodes mutable uint256 memory arrays, executes candidate scan/count/upper-bound/ceil-division and repeated allocation, persists observables through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution"
       },
       "fidelity": {
         "covered": [
           "MinFirst model/source correspondence",
-          "checked Contract.run amount mutation",
-          "progress/capacity/rollback mutants"
+          "denoted mutable uint256 buckets/capacities memory arrays",
+          "candidate scan/count/next-level bound and ceil-division fidelity",
+          "repeated Contract.run distribution with writeMapUint/writeSlot observables",
+          "rollback after intermediate writes and two-batch mutant coverage"
         ],
-        "missing": [
-          "candidate scan/count/upper bound in Verity",
-          "real buckets/capacities memory arrays"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "VERITY_FEATURE_REQUIRED",
-        "feature": "proof-backed mutable uint256 memory arrays",
-        "upstream_test": "Minimal Verity consumer executes and rejects a structural mutant.",
-        "consumer": "P-ALLOC-2"
+        "kind": "NONE"
       },
-      "next_gate": "Add proof-backed mutable uint256 memory-array denotation and consume it in P-ALLOC-2.",
-      "roadmap_priority": "P2"
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-DEPOSIT-1",

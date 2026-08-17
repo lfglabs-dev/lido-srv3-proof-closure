@@ -3,7 +3,7 @@
 # REPRODUCE
 
 - `P-ALLOC-1`: `lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Tests.AllocCapacityRegression LidoSRv3.Tests.AllocCapacityPhase3Mutants` — canonical abstract theorem, bounded source/Verity slice, rollback and structural mutants build; full-loop fidelity remains partial
-- `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstAmountTx LidoSRv3.Tests.MinFirstAmountTxMutants` — abstract MinFirst theorem, source correspondence, bounded amount transaction and mutants build; memory-array scan fidelity remains partial
+- `P-ALLOC-2`: `lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants` — abstract MinFirst theorem and faithful memory-array Verity transaction composition build with amount, bound, floor, rollback, and two-batch mutants
 - `P-DEPOSIT-1`: `lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositLedgerTx` — abstract/source conservation and the recovered storage-ledger Contract.run receipts build; full multi-contract call fidelity remains partial
 - `P-TOPUP-1`: `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupParent LidoSRv3.Tests.TopupParentMutants` — abstract/source conservation and recovered parent classification/rollback receipts build; the wrapper still delegates behavior to sourceExecute, so faithful Verity execution remains partial
 - `P-ACCOUNT-1`: `lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors` — abstract/source ordering and checked-word evidence builds; distinct stateful Verity execution remains partial
