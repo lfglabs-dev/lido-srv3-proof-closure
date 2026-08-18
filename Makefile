@@ -65,6 +65,8 @@ test:
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupHybridMutants
 	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.TopupTxMutants
+	@printf '%s\n' 'faithful P-TOPUP-1 executable-transaction mutants (skipped allocation words, dropped/misrouted/short-paid/reordered/duplicated deposits) and intermediate-effect rollback compiled and asserted'
 	@lake build LidoSRv3.Tests.Topup2TxMutants
 	@printf '%s\n' 'bounded Verity P-TOPUP-2 aggregate-cap transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.Topup2DistributionTxMutants

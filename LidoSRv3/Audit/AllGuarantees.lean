@@ -48,7 +48,7 @@ example : all.map (fun guarantee => guarantee.id.text) =
 /-- Retracted transaction claims stay blocked; P-ACCOUNT-1 now includes the
 composed faithful Verity transaction layer. -/
 example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
-example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
+example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
 example : PAccount1.guarantee.checkedLayers = [.model, .source, .verityTx] := by decide
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/

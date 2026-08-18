@@ -118,35 +118,34 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupParent LidoSRv3.Tests.TopupParentMutants",
-        "expected": "abstract/source conservation and recovered parent classification/rollback receipts build; the wrapper still delegates behavior to sourceExecute, so faithful Verity execution remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
+        "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, and executable fail-closed mutants build"
       },
-      "summary": "Abstract/source top-up conservation is checked under A-TOPUP-NOWRAP. The recovered TopupParent wrapper checks parent success/revert classification and caller-frame rollback, but it delegates operational behavior to sourceExecute; faithful Verity remains PARTIAL until allocation, Lido pull, and beacon push execute through independent Verity semantics.",
+      "summary": "P-TOPUP-1 is checked on both planes under A-TOPUP-NOWRAP. The faithful transaction routes the Lido pull and every per-validator beacon deposit through Verity external-call frames, so the call journal is produced by executing the transaction rather than supplied to it, and the observables the correspondence theorem compares carry call destinations, wei values, argument words and ordering alongside the per-validator allocation words. Failures injected after real storage writes and real journalled frames restore the caller snapshot exactly.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source"
       },
       "fidelity": {
         "covered": [
           "abstract conservation/rollback",
-          "source correspondence under no-wrap",
-          "recovered parent classification and caller-frame rollback receipts"
+          "pinned-source correspondence under no-wrap for batches of at most 2^256 validators",
+          "Lido pull and beacon deposits executed through Verity external-call frames that debit contract balance",
+          "observable call destinations, values, argument words and ordering plus per-validator allocation storage words",
+          "rollback to the caller snapshot after allocation writes, after the journalled pull, and after the first journalled deposit",
+          "fail-closed mutation of the executable transaction: skipped per-validator writes, dropped, misrouted, short-paid, reordered and duplicated deposits"
         ],
-        "missing": [
-          "independent Verity execution of allocation and linked calls",
-          "observable Lido pull/beacon push order/value/multiplicity"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Replace the sourceExecute-backed parent wrapper with independent observable allocation/Lido/beacon execution while preserving A-TOPUP-NOWRAP.",
-      "roadmap_priority": "P1"
+      "next_gate": "Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, and its executable mutants.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-ACCOUNT-1",

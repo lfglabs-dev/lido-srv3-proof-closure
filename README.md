@@ -16,7 +16,7 @@ and deployment provenance are out of scope.
 | 1 | `P-ALLOC-1` | CHECKED | CHECKED |
 | 2 | `P-ALLOC-2` | CHECKED | PARTIAL |
 | 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL — linked calls not yet faithfully executed |
-| 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | PARTIAL |
+| 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | CHECKED |
 | 5 | `P-ACCOUNT-1` | CHECKED | CHECKED |
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |
 | 7 | `P-ETH-1` | CHECKED | CHECKED |

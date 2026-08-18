@@ -27,6 +27,7 @@ import LidoSRv3.Audit.Verity.SszEncodingTx
 import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
+import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
@@ -144,6 +145,18 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source
+#print axioms LidoSRv3.Tests.TopupTxMutants.mutant_none_reproduces_execute
+#print axioms LidoSRv3.Tests.TopupTxMutants.honest_run_matches_source
+#print axioms LidoSRv3.Tests.TopupTxMutants.skipped_allocation_write_rejected
+#print axioms LidoSRv3.Tests.TopupTxMutants.dropped_push_rejected
+#print axioms LidoSRv3.Tests.TopupTxMutants.misrouted_push_rejected
+#print axioms LidoSRv3.Tests.TopupTxMutants.corrupted_amount_rejected
+#print axioms LidoSRv3.Tests.TopupTxMutants.swapped_order_rejected
+#print axioms LidoSRv3.Tests.TopupTxMutants.duplicated_push_rejected
+#print axioms LidoSRv3.Tests.TopupTxMutants.allocation_write_failure_rolls_back
+#print axioms LidoSRv3.Tests.TopupTxMutants.lido_pull_failure_rolls_back
+#print axioms LidoSRv3.Tests.TopupTxMutants.first_beacon_failure_rolls_back
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
