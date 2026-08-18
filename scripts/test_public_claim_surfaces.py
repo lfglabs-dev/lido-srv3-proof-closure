@@ -17,7 +17,6 @@ FILES = (
     "LidoSRv3/Audit/AllGuarantees.lean",
     "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
     "LidoSRv3/Audit/Guarantees/PTopup1.lean",
-    "LidoSRv3/Audit/Guarantees/PAccount1.lean",
 )
 
 
@@ -44,18 +43,18 @@ with tempfile.TemporaryDirectory() as tmp:
     # Positive control: every existing allowed import and declaration is accepted.
     run(fixture, True)
 
-    account = fixture / "LidoSRv3/Audit/Guarantees/PAccount1.lean"
-    account_original = account.read_text(encoding="utf-8")
-    account.write_text(
-        account_original.replace(
-            "theorem source_report_before_reward",
-            "theorem «source_report_before_reward»",
+    deposit = fixture / "LidoSRv3/Audit/Guarantees/PDeposit1.lean"
+    deposit_original = deposit.read_text(encoding="utf-8")
+    deposit.write_text(
+        deposit_original.replace(
+            "theorem source_deposit_conserves_and_rolls_back",
+            "theorem «source_deposit_conserves_and_rolls_back»",
             1,
         ),
         encoding="utf-8",
     )
     run(fixture, True)
-    account.write_text(account_original, encoding="utf-8")
+    deposit.write_text(deposit_original, encoding="utf-8")
 
     readme = fixture / "README.md"
     original = readme.read_text(encoding="utf-8")
@@ -83,67 +82,67 @@ with tempfile.TemporaryDirectory() as tmp:
     run(fixture, False, "P-DEPOSIT-1: checked abstract theorem differs")
     guarantees.write_text(original, encoding="utf-8")
 
-    account.write_text(
-        account_original
+    deposit.write_text(
+        deposit_original
         + "\n-- renamed false-claim mutant\ntheorem plausible_new_tx_closure : True := True.intro\n",
         encoding="utf-8",
     )
     run(fixture, False, "public declarations differ from the structural allowlist")
 
-    account.write_text(
-        account_original
+    deposit.write_text(
+        deposit_original
         + "\n-- leading-whitespace declaration mutant\n"
         + "  theorem leading_space_tx_closure : True := True.intro\n",
         encoding="utf-8",
     )
     run(fixture, False, "public declarations differ from the structural allowlist")
 
-    account.write_text(
-        account_original
+    deposit.write_text(
+        deposit_original
         + "\n-- tab/attribute/modifier formatting mutant\n"
         + "\t@[simp] protected theorem formatted_tx_closure : True := True.intro\n",
         encoding="utf-8",
     )
     run(fixture, False, "public declarations differ from the structural allowlist")
 
-    account.write_text(
-        account_original
+    deposit.write_text(
+        deposit_original
         + "\n-- quoted ASCII identifier mutant\n"
         + "theorem «plausible_new_tx_closure» : True := True.intro\n",
         encoding="utf-8",
     )
     run(fixture, False, "public declarations differ from the structural allowlist")
 
-    account.write_text(
-        account_original
+    deposit.write_text(
+        deposit_original
         + "\n-- bare Unicode identifier mutant\n"
         + "theorem plausible_new_tx_closurε : True := True.intro\n",
         encoding="utf-8",
     )
     run(fixture, False, "public declarations differ from the structural allowlist")
 
-    account.write_text(
-        account_original
+    deposit.write_text(
+        deposit_original
         + "\n-- escaped quoted identifier mutant\n"
         + "theorem «plausible_new_tx_\\u0063losure» : True := True.intro\n",
         encoding="utf-8",
     )
     run(fixture, False, "public declarations differ from the structural allowlist")
 
-    account.write_text(
-        "import LidoSRv3.Audit.Verity.AccountingTx\n" + account_original,
+    deposit.write_text(
+        "import LidoSRv3.Audit.Verity.AccountingTx\n" + deposit_original,
         encoding="utf-8",
     )
     run(fixture, False, "imports differ from the structural allowlist")
 
-    account.write_text(
-        "  import LidoSRv3.Audit.Verity.AccountingTx\n" + account_original,
+    deposit.write_text(
+        "  import LidoSRv3.Audit.Verity.AccountingTx\n" + deposit_original,
         encoding="utf-8",
     )
     run(fixture, False, "imports differ from the structural allowlist")
 
-    account.write_text(
-        "\timport LidoSRv3.Audit.Verity.AccountingTx\n" + account_original,
+    deposit.write_text(
+        "\timport LidoSRv3.Audit.Verity.AccountingTx\n" + deposit_original,
         encoding="utf-8",
     )
     run(fixture, False, "imports differ from the structural allowlist")
@@ -161,13 +160,13 @@ with tempfile.TemporaryDirectory() as tmp:
         "public\n  import LidoSRv3.Audit.Verity.AccountingTx",
         "import\n  all\n  LidoSRv3.Audit.Verity.AccountingTx",
         "public import all\n\tLidoSRv3.Audit.Verity.AccountingTx",
-        "import LidoSRv3.Audit.Source.AccountingCorrespondence import LidoSRv3.Audit.Verity.AccountingTx",
-        "import LidoSRv3.Audit.Source.AccountingCorrespondence public import LidoSRv3.Audit.Verity.AccountingTx",
+        "import LidoSRv3.Audit.Source.DepositCorrespondence import LidoSRv3.Audit.Verity.AccountingTx",
+        "import LidoSRv3.Audit.Source.DepositCorrespondence public import LidoSRv3.Audit.Verity.AccountingTx",
     ):
-        account.write_text(import_command + "\n" + account_original, encoding="utf-8")
+        deposit.write_text(import_command + "\n" + deposit_original, encoding="utf-8")
         run(fixture, False, "imports differ from the structural allowlist")
 
-    account.unlink()
+    deposit.unlink()
     run(fixture, False, "required public claim surface is missing")
 
 print(

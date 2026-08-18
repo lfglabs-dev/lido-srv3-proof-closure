@@ -7,9 +7,14 @@ import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
 import LidoSRv3.Audit.Guarantees.PAccount1
+import LidoSRv3.Audit.Verity.HandleOracleReportTx
+import LidoSRv3.Tests.HandleOracleReportTxMutants
 import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.ConsolidationCallFragment
+import LidoSRv3.Audit.Guarantees.PConsolidation1
+import LidoSRv3.Audit.Verity.ConsolidationTx
+import LidoSRv3.Tests.ConsolidationTxMutants
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Guarantees.PEth1
 import LidoSRv3.Audit.Verity.PEth1RefundTx
@@ -25,6 +30,9 @@ import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Audit.Guarantees.PReserveRelational
 import LidoSRv3.Tests.DepositTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
+import LidoSRv3.Tests.MinFirstDistributionTxMutants
+import LidoSRv3.Audit.Verity.AllocationTx
+import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
@@ -46,10 +54,15 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution
+#print axioms LidoSRv3.Audit.Verity.MinFirstDistributionTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_selects_same_next_target
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.full_candidate_correspondence
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_correspondence
@@ -67,6 +80,10 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.verity_tx_simulates_pinned_source
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_claim_success
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_admits
@@ -81,6 +98,14 @@ project-level assumptions or proof escapes.
   LidoSRv3.Audit.Verity.ConsolidationCallFragment.registered_external_call_bind_entrypoint_always_reverts
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.guards_only_succeeds
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.success_hypotheses_are_vacuous
+#print axioms
+  LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity
+#print axioms
+  LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation
+#print axioms
+  LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.txRun_eq_sourceRun
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
 #print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected

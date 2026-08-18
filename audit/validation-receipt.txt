@@ -1,23 +1,91 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2b12370be5b839bfb8917084b5b4cce7602ead66
+validated-tree: 009fd62f214ca3ebe9b3bb74638b47f630603de5
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
-P-DEPOSIT-1 composed Verity transaction closure (2026-08-17)
--------------------------------------------------------------
+P-CONSOLIDATION-1 faithful Verity transaction closure (2026-08-17)
+------------------------------------------------------------------
 
-- Source commit `80a603e` composes the checked abstract conservation/rollback
-  theorem with a bounded two-batch executable `Contract.run` transaction.
-- Authorization, allocation, dynamic data/root writes, and address/value-keyed
-  Lido, module, and beacon calls execute in one rollback-sensitive program.
-- Exact-snapshot rollback and second-root alias/second-batch omission mutants
-  are kernel checked; canonical P-DEPOSIT-1 is CHECKED on both planes.
+- Source commit `fbcc947` composes the checked abstract eligibility,
+  value-conservation, and atomicity theorem with an executable
+  `Contract.run` transaction over denoted memory-backed public-key arrays,
+  journaled CALL / ConsolidationRequestAdded observables, and
+  `writeMapUint` / `writeSlot` persistence.
+- The transaction matches the pinned-source vault entrypoint at
+  `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. Mutants cover
+  call drop, event drop, memory drop, mismatched arity, double-emit,
+  intermediate-write rollback, and two-batch chaining.
+- Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
 - Receipt subject: tracked tree excluding this receipt,
-  `2b12370be5b839bfb8917084b5b4cce7602ead66`.
+  `009fd62f214ca3ebe9b3bb74638b47f630603de5`.
+
+P-ACCOUNT-1 faithful Verity transaction closure (2026-08-17)
+------------------------------------------------------------
+
+- Source commit `c5c4fc1822adb1b1c0c12b1e2d418c8b08a7d7ed` composes the
+  checked abstract report-before-reward theorem with an executable
+  `Contract.run` oracle-report transaction over `writeMapUint` module
+  balances and `writeSlot` total/step-flag observables.
+- The transaction executes registered-order, length, `MAX_VALUE_GWEI`, and
+  checked uint64 overflow guards, matches the pinned-source accept/step
+  view, and rolls back prefix writes on failure. Mutants cover overflow,
+  bypass-guard, dropped-snapshot, intermediate-write rollback, and
+  two-batch chaining.
+- Verity remains pinned to merged upstream
+  `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `37a6c0d5f21ba6070a241e56681c652c365e61e6`.
+
+P-TOPUP-2 faithful Verity transaction closure (2026-08-17)
+----------------------------------------------------------
+
+- Source commit `4dab091` composes the checked abstract aggregate-cap theorem
+  with an executable `Contract.run` transaction over denoted mutable
+  `uint256[]` memory arrays and `writeMapUint` / `writeSlot` outcome
+  observables.
+- The transaction matches the pinned-source checked `_evaluateTopUpLimit`
+  addition, left-to-right share/block budget consumption, remaining-cap
+  update, and rollback behavior. Mutants cover overflow on checked uint256
+  addition, off-by-one allocation, intermediate-write rollback, and two-batch
+  chaining.
+- Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `828be035a57bd5d62257075793c0670232afc340`.
+
+P-ALLOC-1 faithful Verity transaction closure (2026-08-17)
+-----------------------------------------------------------
+
+- Source commit `33ebea2fd0aabd6392a34f7747306ce2663007a1` composes the
+  checked abstract capacity bound with an executable `Contract.run`
+  transaction that binds each router-ordered `moduleId` to its stored
+  `moduleAddress` and persists allocation observables with `writeMapUint`
+  / `writeSlot`.
+- The transaction matches the pinned-source
+  `_getModulesAllocationAndCapacity` loops. Mutants cover
+  wrong-module-binding, off-by-one, stale-snapshot, independent-batch
+  collapse, intermediate-write rollback, and two-batch chaining.
+- Verity remains pinned at `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `5f4f2cf1dcd1401b8051387dbfe3e8f8a178f120`.
+
+P-ALLOC-2 faithful Verity transaction closure (2026-08-17)
+-----------------------------------------------------------
+
+- Source commit `10dc833` composes the checked abstract MinFirst theorem with
+  an executable `Contract.run` transaction over denoted mutable `uint256[]`
+  memory arrays and `writeMapUint` / `writeSlot` outcome observables.
+- The transaction matches the pinned-source scan, equal-minimum count,
+  next-level bound, ceil-division amount, repeated allocation, conservation,
+  and rollback behavior. Mutants cover amount, bound, floor division,
+  intermediate-write rollback, and two-batch chaining.
+- Verity is pinned to merged upstream PR #2363 at
+  `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `f22e817899ef6a8c026a74f6ba1d67ea90c52d32`.
 
 Verity #2360 pin bump (2026-08-17)
 ----------------------------------

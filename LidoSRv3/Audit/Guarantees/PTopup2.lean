@@ -158,11 +158,11 @@ theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
   exact Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
 
-/-- P-TOPUP-2 is promoted only at the mathematical model layer.  The historical
-source-shaped and call-program artifacts remain useful regression scaffolds,
-but cannot promote SOURCE or Verity until checked-word bounds and the source's
-overflow-revert behavior are represented explicitly. -/
-def guarantee : Guarantee := ⟨.pTopup2, [.model]⟩
+/-- P-TOPUP-2 is closed on the abstract Nat cap and on a composed faithful
+`Contract.run` transaction that computes allocation/share observables.
+The composed Verity theorem lives in this namespace via
+`LidoSRv3.Audit.Guarantees.PTopup2Verity`. -/
+def guarantee : Guarantee := ⟨.pTopup2, [.model, .source, .verityTx]⟩
 
 /- Out of scope for P-TOPUP-2: identifying the deployed verifier address and
 codehash. The active assurance contract asks for a faithful Verity model of the
