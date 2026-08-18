@@ -51,6 +51,8 @@ test:
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositTxMutants
 	@printf '%s\n' 'bounded Verity deposit transaction mutant compiled and asserted'
+	@lake build LidoSRv3.Tests.DepositParentTxMutants
+	@printf '%s\n' 'P-DEPOSIT-1 composed transaction mutants (per-module writes, journal, ledger) compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstAmountTxMutants
 	@printf '%s\n' 'P-ALLOC-2 amount transaction mutants and floor-division regression compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstDistributionTxMutants

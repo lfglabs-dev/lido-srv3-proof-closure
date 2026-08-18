@@ -119,24 +119,174 @@ theorem source_nonconserving_deployment_reverts
         run cfg inp ≠ .committedDeposits keys pulled pushed balanceAfter :=
   ⟨not_conserving_nonempty_reverts hCfg hKeys, not_conserving_reverts hCfg⟩
 
-/-- Parent closure composes the general pinned-source conservation/rollback
-theorem with the faithful bounded two-batch `Contract.run` correspondence. -/
+/-! ## Composition with the executable Verity transaction
+
+The abstract/source plane above and the executable plane below are joined by
+`LinksSource`, which pins the transaction's inputs to the pinned-source
+quantities.  Nothing in the composed theorem is a ground term: it quantifies
+over every configuration, call input, transaction input and entry state that
+the link and the transaction's own guards permit.
+-/
+
+open LidoSRv3.Audit.Verity.DepositParentTx
+
+/--
+Bridge from the pinned-source deposit model to the executable transaction's
+inputs.  Each field names the source quantity it pins:
+
+* `depositSize` -- `BeaconChainDepositor.DEPOSIT_SIZE` (`BeaconChainDepositor.sol`
+  line 24), the per-key wei the loop at line 57 sends;
+* `keys` -- the two legs partition `actualDepositsCount` from `StakingRouter.sol`
+  line 967;
+* `firstAmount`/`secondAmount` -- each leg carries exactly `DEPOSIT_SIZE` per key.
+
+The link is data-only: it says nothing about the post-state, so it cannot
+smuggle the conclusion in.
+-/
+structure LinksSource (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : Inputs) : Prop where
+  depositSize : inputs.depositSize.val = cfg.depositSize
+  keys : inputs.first.keys.val + inputs.second.keys.val = actualDepositsCount cfg inp
+  firstAmount : inputs.first.amount.val = inputs.first.keys.val * cfg.depositSize
+  secondAmount : inputs.second.amount.val = inputs.second.keys.val * cfg.depositSize
+
+/-- The wei the two beacon legs move is exactly the loop total at
+`BeaconChainDepositor.sol` lines 53--63. -/
+theorem linked_total_eq_pushedValue (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : Inputs) (hLink : LinksSource cfg inp inputs)
+    (hNoWrap : inputs.first.amount.val + inputs.second.amount.val
+      < _root_.Verity.Core.Uint256.modulus) :
+    (totalAmount inputs).val = pushedValue cfg inp := by
+  rw [total_val inputs hNoWrap, hLink.firstAmount, hLink.secondAmount, ← Nat.add_mul,
+    hLink.keys, pushedValue, loopPushed_eq]
+
+/-- On a conserving deployment the same wei is exactly the pull at
+`StakingRouter.sol` line 983. -/
+theorem linked_total_eq_depositsValue (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : Inputs) (hLink : LinksSource cfg inp inputs)
+    (hNoWrap : inputs.first.amount.val + inputs.second.amount.val
+      < _root_.Verity.Core.Uint256.modulus)
+    (hCons : ConservingConfig cfg) :
+    (totalAmount inputs).val = depositsValue cfg inp := by
+  rw [linked_total_eq_pushedValue cfg inp inputs hLink hNoWrap, pushedValue, loopPushed_eq,
+    depositsValue, hCons]
+
+/--
+Parent closure for P-DEPOSIT-1.  One theorem, four shared variables: the pinned
+source configuration and call input `(cfg, inp)`, the executable transaction
+input `inputs`, and the entry `ContractState` -- joined by `LinksSource` and by
+the transaction's own executable guards `Preconditions`.
+
+*(a)* is the pinned-source conservation and abstract-transaction rollback claim
+for `(cfg, inp)`.
+
+*(b)* is the executable transaction's own boundary: every reverting
+`Contract.run` restores the entry snapshot and leaves the observation idle --
+no ether moved, no call surviving, every probed mapping word at its entry value.
+This holds for arbitrary `inputs` and entry states, including the failure
+injections that revert *after* real storage writes and real journalled frames.
+
+*(c)* is the correspondence: the executable transaction reproduces the pinned
+two-batch source observables -- per-module allocation, dynamic-data and
+deposit-data-root words, the guard counter, the Lido ledger, both conservation
+aggregates, the router's closing retention, and the call journal down to name,
+destination, wei value, argument words and order -- and, whenever the source
+model commits its push, its `pulled` and `pushed` are exactly the executable
+plane's.
+
+Scope, stated rather than hidden: the executable plane is a Verity-EDSL
+transaction (`A-VERITY-SCAFFOLD`), not an EVM execution, and the source plane is
+`A-SOURCE-SHAPED`.  `LinksSource` is a hypothesis about the caller's allocation,
+not a proof that the pinned Solidity produces those two legs.
+-/
 theorem verity_tx_composes_deposit_conservation_and_rollback {State : Type}
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :
+    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
+    (inputs : Inputs) (entry : _root_.Verity.ContractState)
+    (hLink : LinksSource cfg inp inputs)
+    (hPre : Preconditions inputs entry) :
     ((run cfg inp).pulled = (run cfg inp).pushed ∧
-      ((run cfg inp).reverts = true →
-        (observation before after attempts trace (run cfg inp)).committedState = before ∧
-          (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
-          (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧
-      LidoSRv3.Audit.Verity.DepositParentTx.observe
-          LidoSRv3.Audit.Verity.DepositParentTx.canonicalState
-          ((LidoSRv3.Audit.Verity.DepositParentTx.execute
-            LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs).run
-              LidoSRv3.Audit.Verity.DepositParentTx.canonicalState) =
-        LidoSRv3.Audit.Verity.DepositParentTx.sourceSuccessView
-          LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs :=
-  ⟨source_deposit_conserves_and_rolls_back cfg inp before after attempts trace,
-    LidoSRv3.Audit.Verity.DepositParentTx.verity_tx_matches_pinned_source_two_batch⟩
+        ((run cfg inp).reverts = true →
+          (observation before after attempts trace (run cfg inp)).committedState = before ∧
+            (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
+            (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧
+      (∀ reason rollback,
+          (execute inputs).run entry = .revert reason rollback →
+            rollback = entry ∧
+              observe entry (probes inputs) ((execute inputs).run entry)
+                = idleObservables entry (probes inputs)) ∧
+      (observe entry (probes inputs) ((execute inputs).run entry)
+          = sourceObservables inputs entry ∧
+        ∀ keys pulled pushed balanceAfter,
+          run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
+            (sourceObservables inputs entry).pulled = (run cfg inp).pulled ∧
+              (sourceObservables inputs entry).pushed = (run cfg inp).pushed) := by
+  refine ⟨source_deposit_conserves_and_rolls_back cfg inp before after attempts trace,
+    fun reason rollback hRevert =>
+      ⟨revert_after_intermediate_writes_restores_snapshot inputs entry rollback reason hRevert,
+        revert_observes_idle inputs entry rollback reason hRevert⟩,
+    execute_observes_source inputs entry hPre, ?_⟩
+  intro keys pulled pushed balanceAfter hCommit
+  obtain ⟨-, -, hPulled, hPushed, -, -⟩ := committed_deposits_spec hCommit
+  have hCons : ConservingConfig cfg := committed_implies_conserving hCommit
+  have hTotal : (totalAmount inputs).val = depositsValue cfg inp :=
+    linked_total_eq_depositsValue cfg inp inputs hLink hPre.noWrap hCons
+  have hTotal' : (totalAmount inputs).val = pushedValue cfg inp :=
+    linked_total_eq_pushedValue cfg inp inputs hLink hPre.noWrap
+  have hSum : inputs.first.amount.val + inputs.second.amount.val = pushedValue cfg inp := by
+    rw [← total_val inputs hPre.noWrap]; exact hTotal'
+  have hPulledRun : (run cfg inp).pulled = depositsValue cfg inp := by
+    rw [hCommit]; exact hPulled
+  have hPushedRun : (run cfg inp).pushed = pushedValue cfg inp := by
+    rw [hCommit]; exact hPushed
+  exact ⟨hTotal.trans hPulledRun.symm, hSum.trans hPushedRun.symm⟩
+
+/-! ## Non-vacuity
+
+A composed theorem with unsatisfiable hypotheses proves nothing.  The witnesses
+below discharge `LinksSource` and `Preconditions` simultaneously on a pinned
+five-key deployment that the source model actually *commits*, so conjunct (c)'s
+aggregate implication fires rather than being vacuously true. -/
+
+/-- A conserving deployment: `MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = DEPOSIT_SIZE`,
+with the pinned pubkey/signature lengths. -/
+def canonicalSourceConfig : SourceDepositConfig :=
+  { maxEBType1 := 32, depositSize := 32, pubkeyLength := 48,
+    publicKeyLength := 48, signatureLength := 96 }
+
+/-- Five keys, split 2 + 3 by the executable transaction's two module legs. -/
+def canonicalSourceInput : SourceDepositInput :=
+  { moduleActive := true, maxDepositsPerBlock := 8, moduleDepositableEth := 256,
+    publicKeysBatchLength := 240, signaturesBatchLength := 480,
+    routerBalanceBefore := 0, lidoCanDeposit := true, lidoDepositableEther := 1000 }
+
+theorem canonical_links_source :
+    LinksSource canonicalSourceConfig canonicalSourceInput canonicalInputs where
+  depositSize := by decide
+  keys := by decide
+  firstAmount := by decide
+  secondAmount := by decide
+
+/-- Both hypothesis bundles hold at once, the source model commits, and the two
+planes agree on the wei pulled and the wei pushed. -/
+theorem canonical_composition_witness :
+    LinksSource canonicalSourceConfig canonicalSourceInput canonicalInputs ∧
+      Preconditions canonicalInputs canonicalState ∧
+      run canonicalSourceConfig canonicalSourceInput = .committedDeposits 5 160 160 0 ∧
+      observe canonicalState (probes canonicalInputs)
+          ((execute canonicalInputs).run canonicalState)
+        = sourceObservables canonicalInputs canonicalState ∧
+      (sourceObservables canonicalInputs canonicalState).pulled
+          = (run canonicalSourceConfig canonicalSourceInput).pulled ∧
+        (sourceObservables canonicalInputs canonicalState).pushed
+          = (run canonicalSourceConfig canonicalSourceInput).pushed := by
+  have hRun : run canonicalSourceConfig canonicalSourceInput
+      = .committedDeposits 5 160 160 0 := by decide
+  obtain ⟨-, -, hObs, hAgg⟩ :=
+    verity_tx_composes_deposit_conservation_and_rollback (State := Unit)
+      canonicalSourceConfig canonicalSourceInput () () [] ⟨[], [], []⟩
+      canonicalInputs canonicalState canonical_links_source canonical_preconditions
+  exact ⟨canonical_links_source, canonical_preconditions, hRun, hObs,
+    (hAgg 5 160 160 0 hRun).1, (hAgg 5 160 160 0 hRun).2⟩
 
 end LidoSRv3.Audit.Guarantees.PDeposit1

@@ -80,10 +80,10 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx",
-        "expected": "checked abstract/source conservation and composed executable two-batch Verity transaction correspondence, rollback, and chaining mutants build"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants",
+        "expected": "checked abstract/source conservation composed with the executable two-batch Verity transaction over shared quantified variables, its per-module observable correspondence, rollback, and execute-level mutants build"
       },
-      "summary": "Abstract/source deposit conservation and rollback are checked and composed with a bounded two-batch Contract.run transaction covering authorization, allocation, dynamic deposit data, roots, and observable Lido/module/beacon calls and value flow. Intermediate-write rollback and second-batch chaining mutants are checked.",
+      "summary": "Abstract/source deposit conservation and rollback are composed with a bounded two-batch Contract.run transaction in one theorem quantified over the source configuration and call input, the transaction input, and the entry state, linked by LinksSource. The transaction covers authorization, allocation, dynamic deposit data, deposit-data roots, the Lido pull and both beacon value calls; observables expose the per-module allocation, dynamic-data and deposit-data-root words alongside the aggregates and the ordered call journal. Rollback after intermediate writes and execute-level mutants are checked.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
@@ -97,15 +97,17 @@
           "abstract conservation/rollback",
           "pinned-source correspondence",
           "authorization, allocation, dynamic deposit data, and deposit roots",
-          "observable Lido/module/beacon calls and two-batch ETH value flow",
-          "Contract.run rollback after intermediate writes and fail-closed chaining mutants"
+          "per-module allocation, dynamic-data, and deposit-data-root storage words",
+          "observable Lido/module/beacon call names, destinations, wei values, argument words, and order",
+          "composed correspondence over shared quantified source and transaction variables",
+          "Contract.run rollback after intermediate writes and fail-closed execute-level mutants"
         ],
         "missing": []
       },
       "classification": {
         "kind": "NONE"
       },
-      "next_gate": "Preserve the checked abstract-to-Verity deposit guarantee.",
+      "next_gate": "Preserve the composed abstract-to-Verity deposit guarantee and its executable mutants.",
       "roadmap_priority": "DONE"
     },
     {
@@ -380,7 +382,7 @@
         "missing": [
           "parent verifyProof/wrappers",
           "faithful SHA-256 observation execution",
-          "imported↔deployed Yul binding"
+          "imported\u2194deployed Yul binding"
         ]
       },
       "classification": {

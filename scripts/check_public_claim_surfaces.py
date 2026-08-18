@@ -230,7 +230,21 @@ def check(root: Path) -> None:
             fail(f"{lean_path}: imports differ from the structural allowlist")
         expected_declarations = expected["declarations"]
         if deposit_checked:
-            expected_declarations += (("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),)
+            # The composed claim is a single theorem quantified over the source
+            # configuration/input, the transaction input and the entry state, so
+            # its bridge (`LinksSource`), the two arithmetic links it needs, and
+            # the witness proving its hypotheses jointly satisfiable are all part
+            # of the public surface.
+            expected_declarations += (
+                ("structure", "LinksSource"),
+                ("theorem", "linked_total_eq_pushedValue"),
+                ("theorem", "linked_total_eq_depositsValue"),
+                ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
+                ("def", "canonicalSourceConfig"),
+                ("def", "canonicalSourceInput"),
+                ("theorem", "canonical_links_source"),
+                ("theorem", "canonical_composition_witness"),
+            )
         if declarations != expected_declarations:
             fail(f"{lean_path}: public declarations differ from the structural allowlist")
 
