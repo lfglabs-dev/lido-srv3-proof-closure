@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: PENDING_TREE
+validated-tree: 6fb2bb393dcbd1addd9cbc0ad70e22cd95fe27d7
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -107,7 +107,7 @@ P-TOPUP-1 external-call-frame repair of the faithful plane (2026-08-18)
   Verity source, outside this branch's authority; the re-pin to `a063bfc8`
   discharges it, so the note is retired rather than carried.
 - Receipt subject: tracked tree excluding this receipt,
-  `PENDING_TREE`.
+  `6fb2bb393dcbd1addd9cbc0ad70e22cd95fe27d7`.
 
 P-ETH-1 parent composition closure (2026-08-18)
 ------------------------------------------------
