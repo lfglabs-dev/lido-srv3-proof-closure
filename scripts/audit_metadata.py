@@ -56,7 +56,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-ETH-1": ("OPEN", None, "OPEN", None, "IMPLEMENTATION_PENDING", ()),
     "P-ADDRESS-1": ("OPEN", None, "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX",)),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-CONSOLIDATION-1": ("OPEN", None, "PARTIAL", None, "VERITY_FEATURE_REQUIRED", ("A-SHA256-FFI",)),
+    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Ssz.structural_witness_binding_sound", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
@@ -69,14 +69,14 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ETH-1": "9f79007c732bddca4e2ca56d988c63aa0059b35c6e48def28985dad3e3cbcd64",
     "P-ADDRESS-1": "882421e998af3fe6be8af7154999801509a085ccf4e1842c310ad6ddf68122e3",
     "P-TOPUP-2": "f71ef81588d77e28a3226eafd91e4a896fe0f6a04db1bc5d9dd4d0e84cf16c61",
-    "P-CONSOLIDATION-1": "9e27decc67733f1e9b4974f97b51ae35829a9c0ed0bb5c318c9152ab0f6211ca",
+    "P-CONSOLIDATION-1": "c459ec05da73f3d6ac52d13d93bdf263c2eeced71a999f3c34fe8397e496eb1d",
     "P-SSZ-1": "f56732a1c2b0a8941b2d2b8d2fe05a0bf0e70a7a21b36d4851a2c311f45ffc05",
 }
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "DONE",
     "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "P2",
-    "P-ADDRESS-1": "P2", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "P2",
+    "P-ADDRESS-1": "P2", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "P3",
 }
 

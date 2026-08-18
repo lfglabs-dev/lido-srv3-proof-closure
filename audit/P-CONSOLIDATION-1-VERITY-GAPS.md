@@ -1,7 +1,10 @@
 # P-CONSOLIDATION-1 Verity gaps
 
-P-CONSOLIDATION-1 stays `theorem: null` and TX OPEN. Nothing below closes a
-plane.
+Parent P-CONSOLIDATION-1 is CHECKED on both planes via
+`LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation`
+(`Contract.run`, memory-array decode, journaled CALL/event observables,
+`writeMapUint`/`writeSlot`). The notes below remain a historical record of
+the official `denoteFunction` fragment; they are not parent blockers.
 
 Assessed at Verity `04729a9de9099e065dd09283e4f733a5fd4c2a16`. The repo pin is
 now `1fe0218863a4c8d6113e6cdd4de3766a54df81c7`; item 2 is still machine-checked

@@ -57,6 +57,8 @@ test:
 	@printf '%s\n' 'P-ALLOC-2 full memory-array transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.AllocationTxMutants
 	@printf '%s\n' 'P-ALLOC-1 allocation-loop transaction mutants, moduleAddress binding, rollback, and two-batch chain compiled and asserted'
+	@lake build LidoSRv3.Tests.ConsolidationTxMutants
+	@printf '%s\n' 'P-CONSOLIDATION-1 call/event/memory transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupVectors
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupHybridMutants
