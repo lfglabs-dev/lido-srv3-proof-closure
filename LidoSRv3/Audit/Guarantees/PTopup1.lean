@@ -10,7 +10,8 @@ open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityTopup
 
 /-- The active registry exposes MODEL, SOURCE, and abstract rollback evidence.
-The former Verity transaction claim is blocked and deliberately absent. -/
+The Verity transaction layer composes the pinned-source observables with the
+executable external-call frames (post-#2362/#2365). -/
 def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source, .verityTx]⟩
 
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/

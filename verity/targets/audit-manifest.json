@@ -38,6 +38,9 @@
         "LidoSRv3.Audit.Source.DepositDataRootCorrespondence",
         "LidoSRv3.Audit.Source.GIndexConcatCorrespondence",
         "LidoSRv3.Audit.Verity.SszAbstractDigest",
+        "LidoSRv3.Audit.Verity.SszEncodingTx",
+        "LidoSRv3.Audit.Guarantees.PSsz1",
+        "LidoSRv3.Tests.SszEncodingTxMutants",
         "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel",
         "LidoSRv3.Audit.Source.ReserveCorrespondence",
         "LidoSRv3.Tests.MinFirstVectors",
@@ -60,7 +63,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved abstract properties plus explicitly classified faithful-Verity evidence. P-RESERVE-1 and P-TOPUP-1 are CHECKED at both objectives; all other canonical Verity states remain PARTIAL or OPEN as recorded in audit/guarantees.yaml. General Yul/EVM/deployment refinement is outside scope. SSZ alone retains a targeted imported-to-deployed Yul binding, currently OPEN; SHA-256 correctness remains under A-SHA256-FFI."
+      "trust": "Lean-proved abstract properties plus explicitly classified faithful-Verity evidence. P-ALLOC-1, P-ALLOC-2, P-TOPUP-1, P-TOPUP-2, P-ACCOUNT-1, P-RESERVE-1, P-CONSOLIDATION-1, and P-SSZ-1 are CHECKED at both objectives; P-DEPOSIT-1, P-ADDRESS-1, and P-ETH-1 stay PARTIAL or OPEN as recorded in audit/guarantees.yaml. General Yul/EVM/deployment refinement is outside scope. SSZ retains a targeted imported-to-deployed Yul binding, currently OPEN; SHA-256 correctness remains under A-SHA256-FFI."
     }
   },
   "proof_policy": {
@@ -293,7 +296,15 @@
       ]
     },
     {
-      "name": "Guarantees.PSsz1.structural_witness_binding_sound",
+      "name": "Guarantees.PSsz1.composed_ssz_encoding",
+      "status": "lean_checked",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "Guarantees.PSsz1.verity_tx_simulates_ssz_encoding",
       "status": "lean_checked",
       "axioms": [
         "propext",

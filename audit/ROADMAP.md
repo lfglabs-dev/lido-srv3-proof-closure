@@ -31,11 +31,9 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 - `P-ETH-1` — **IMPLEMENTATION_PENDING**: Define the abstract parent then compose relevant protocol-controlled Verity value paths.
 - `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
-- `P-CONSOLIDATION-1` — **VERITY_FEATURE_REQUIRED**: Close the observable FunctionSpec call/event/memory bridge, then consume it.
 
 ## Deferred P3-labelled registry rows
 
-- `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Prove SSZ parent/wrappers in Verity and bind only the imported SSZ Yul fragment to deployment.
 
 ## Checked baseline to preserve
 
@@ -45,3 +43,5 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-ACCOUNT-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-CONSOLIDATION-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-SSZ-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
