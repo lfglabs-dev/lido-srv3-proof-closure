@@ -19,7 +19,7 @@ Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido 
 
 ## P3 — remaining parents
 
-Resume Accounting, Address, Topup2, Deposit, Topup1, Consolidation, and SSZ only with the composition patterns from P1/P2.
+Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ only with the composition patterns from P1/P2.
 
 ## Current guarantee registry
 
@@ -31,11 +31,9 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, Consolidation, and SSZ only
 ## Deferred P2-labelled registry rows
 
 - `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
-- `P-CONSOLIDATION-1` — **VERITY_FEATURE_REQUIRED**: Close the observable FunctionSpec call/event/memory bridge, then consume it.
 
 ## Deferred P3-labelled registry rows
 
-- `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Prove SSZ parent/wrappers in Verity and bind only the imported SSZ Yul fragment to deployment.
 
 ## Checked baseline to preserve
 
@@ -45,3 +43,5 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, Consolidation, and SSZ only
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-ETH-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-CONSOLIDATION-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-SSZ-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.

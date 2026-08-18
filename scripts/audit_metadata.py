@@ -56,8 +56,8 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback", "NONE", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ADDRESS-1": ("OPEN", None, "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX",)),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-CONSOLIDATION-1": ("OPEN", None, "PARTIAL", None, "VERITY_FEATURE_REQUIRED", ("A-SHA256-FFI",)),
-    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Ssz.structural_witness_binding_sound", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
+    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "NONE", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "7213a88f97f5d96fc8ad3e075bebbf3e2fb3501ed694b177e82e8a29d280f916",
@@ -69,15 +69,15 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ETH-1": "eafed670006edc8828d45b03192348f274f2c14cca25d670bce06646b09539ef",
     "P-ADDRESS-1": "882421e998af3fe6be8af7154999801509a085ccf4e1842c310ad6ddf68122e3",
     "P-TOPUP-2": "f71ef81588d77e28a3226eafd91e4a896fe0f6a04db1bc5d9dd4d0e84cf16c61",
-    "P-CONSOLIDATION-1": "9e27decc67733f1e9b4974f97b51ae35829a9c0ed0bb5c318c9152ab0f6211ca",
-    "P-SSZ-1": "f56732a1c2b0a8941b2d2b8d2fe05a0bf0e70a7a21b36d4851a2c311f45ffc05",
+    "P-CONSOLIDATION-1": "c459ec05da73f3d6ac52d13d93bdf263c2eeced71a999f3c34fe8397e496eb1d",
+    "P-SSZ-1": "a429fac6e7be5569d75e24b9f83a627c2383032ba87bf639fe4274e53bed218f",
 }
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "DONE",
     "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "DONE",
-    "P-ADDRESS-1": "P2", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "P2",
-    "P-SSZ-1": "P3",
+    "P-ADDRESS-1": "P2", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
+    "P-SSZ-1": "DONE",
 }
 
 
@@ -136,7 +136,8 @@ def validate_pins(lock, manifest, source_map):
     require(isinstance(targets, list), "source-map targets must be a list")
     target_ids = [x.get("id") for x in targets]
     require(len(target_ids) == len(set(target_ids)), "duplicate source-map target")
-    require(set(CANONICAL_IDS) <= set(target_ids), "canonical source targets are incomplete")
+    required_targets = set(CANONICAL_IDS) - {"P-ETH-1"}
+    require(required_targets <= set(target_ids), "canonical source targets are incomplete")
     require({"P-ETH-1a", "P-ETH-1b"} <= set(target_ids), "P-ETH-1 child source targets are incomplete")
     sha = PINNED["lido_core"][1]
     for target in targets:
@@ -280,7 +281,7 @@ def rendered(rows):
         "## P2 — allocation and value conservation\n\n"
         "Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido debit, Beacon credit, module delta, rollback. Do not start other parent-closure lanes before P-RESERVE-RELATIONAL is green.\n\n"
         "## P3 — remaining parents\n\n"
-        "Resume Accounting, Address, Topup2, Deposit, Topup1, Consolidation, and SSZ only with the composition patterns from P1/P2.\n\n"
+        "Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ only with the composition patterns from P1/P2.\n\n"
         "## Current guarantee registry\n"]
     labels = {
         "P1": "Deferred P1-labelled registry rows",

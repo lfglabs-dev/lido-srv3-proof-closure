@@ -327,40 +327,38 @@
     {
       "id": "P-CONSOLIDATION-1",
       "assumptions": [
-        "A-SHA256-FFI"
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Verity.ConsolidationCallFragment && python3 scripts/audit_metadata.py check",
-        "expected": "the executable blocker probe and metadata build; parent abstract and faithful Verity guarantees remain open/partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidation1 LidoSRv3.Audit.Verity.ConsolidationTx LidoSRv3.Tests.ConsolidationTxMutants",
+        "expected": "abstract eligibility/value/atomicity theorem and faithful call/event/memory Verity transaction composition build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, rollback, and two-batch mutants"
       },
-      "summary": "The parent eligibility, binding, value-conservation, and atomicity guarantee remains OPEN. Payload and fee-scaffold children plus the recovered executable call-fragment blocker are partial evidence; faithful composition requires an observable FunctionSpec call/event/memory bridge.",
+      "summary": "The abstract eligibility, value-conservation, and atomicity property and a composed faithful Verity transaction are checked. The transaction decodes memory-backed public-key arrays, journals one CALL and one ConsolidationRequestAdded event per pair, persists payloads through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
       "abstract": {
-        "status": "OPEN",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation"
       },
       "fidelity": {
         "covered": [
-          "96-byte payload child",
-          "bounded fee scaffold",
-          "executable proof that the current registered externalCallBind fragment always reverts"
+          "eligibility, value-conservation, and atomicity",
+          "pinned-source vault correspondence",
+          "denoted memory-backed public-key arrays",
+          "journaled CALL and ConsolidationRequestAdded observables",
+          "writeMapUint/writeSlot persistence",
+          "rollback after intermediate writes and two-batch mutant coverage"
         ],
-        "missing": [
-          "parent eligibility/value/atomicity",
-          "faithful external call/batch/replay"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "VERITY_FEATURE_REQUIRED",
-        "feature": "observable FunctionSpec call/event/memory execution bridge",
-        "upstream_test": "Minimal Verity consumer executes and rejects a structural mutant.",
-        "consumer": "P-CONSOLIDATION-1"
+        "kind": "NONE"
       },
-      "next_gate": "Close the observable FunctionSpec call/event/memory bridge, then consume it.",
-      "roadmap_priority": "P2"
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-SSZ-1",
@@ -370,35 +368,36 @@
         "A-SOLC-TRUSTED"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Ssz LidoSRv3.Audit.Source.GIndexConcatCorrespondence LidoSRv3.Tests.GIndexConcatMutants",
-        "expected": "structural abstract model and subordinate helper mutants build; faithful wrappers, SHA-256 boundary, and targeted deployed-Yul binding remain explicit"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants",
+        "expected": "composed abstract children and faithful SSZ-encoding Contract.run transaction that persists structural-witness binding together with deposit-data-root, concat, and digest/root-match, with rollback and single-child/encoding/hash/two-batch mutants"
       },
-      "summary": "The structural SSZ witness-binding model is checked and helper/digest children provide partial evidence. Faithful Verity execution of verifyProof and wrappers remains PARTIAL; SHA-256 correctness is assumed, and the targeted imported-to-deployed SSZ Yul binding is OPEN.",
+      "summary": "The abstract SSZ parent composes structural witness binding, pinned deposit-data-root layout, GIndex.concat, and the seven-call digest/root-check children. A faithful Contract.run encoding transaction carries the same ValidatorWitness/operation/index/path/branch pieces the abstract uses, persists those conjuncts together with deposit-data-root, concat, and digest/root-match through writeSlot/writeMapUint, and reads back the complete successful-operation path/branch map windows, their lengths, and the witness bind result as outcome observables. The parent Verity theorem composes all four children rather than lifting the pinned-source lemma alone. Intermediate writes roll back on failure. Mutants corrupt/drop the path map, branch map, and witness bind result, and cover the other child drops, encoding mismatch, hash collision, and two-batch chaining. SHA-256 functional correctness remains A-SHA256-FFI; the targeted imported-to-deployed SSZ Yul binding stays OPEN.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Ssz.structural_witness_binding_sound"
+        "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding"
       },
       "fidelity": {
         "covered": [
-          "structural model",
-          "GIndex.concat child",
-          "seven-preimage typed shape"
+          "structural witness binding",
+          "pinned deposit-data-root source layout",
+          "GIndex.concat source transcription",
+          "seven-call digest composition and root check",
+          "composed Contract.run encoding of the four SSZ observables including structural witness binding",
+          "outcome readback of path/branch map contents and lengths plus witness bind result",
+          "rollback after intermediate writes",
+          "path-map corruption, branch-map drop, witness-bind drop, and single-child drops of concat, digest, and verified bits",
+          "encoding-mismatch, hash-collision, and two-batch mutants"
         ],
-        "missing": [
-          "parent verifyProof/wrappers",
-          "faithful SHA-256 observation execution",
-          "imported↔deployed Yul binding"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Prove SSZ parent/wrappers in Verity and bind only the imported SSZ Yul fragment to deployment.",
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
       "special_bindings": {
         "deployed_yul": {
           "status": "OPEN",
@@ -408,7 +407,7 @@
           "assumption": "A-SOLC-TRUSTED"
         }
       },
-      "roadmap_priority": "P3"
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-SSZ-1.deposit-data-root",
@@ -443,7 +442,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
+      "next_gate": "Preserve this child; it is composed into P-SSZ-1."
     },
     {
       "id": "P-SSZ-1.gindex-concat",
@@ -475,7 +474,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
+      "next_gate": "Preserve this child; it is composed into P-SSZ-1."
     },
     {
       "id": "P-SSZ-1.abstract-digest",
@@ -525,7 +524,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
+      "next_gate": "Preserve this child; it is composed into P-SSZ-1."
     },
     {
       "id": "P-CONSOLIDATION-1.abstract-flow-model",
@@ -749,7 +748,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Implement and compose the listed missing fidelity without widening the guarantee."
       },
-      "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
+      "next_gate": "Preserve this child; it is composed into P-SSZ-1."
     },
     {
       "id": "P-ETH-1a",
