@@ -155,34 +155,33 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
-        "expected": "abstract/source ordering and checked-word evidence builds; distinct stateful Verity execution remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
+        "expected": "abstract/source ordering and faithful Contract.run oracle-report transaction build with overflow, bypass-guard, dropped-snapshot, rollback, and two-batch mutants"
       },
-      "summary": "Abstract accepted-report ordering and checked accumulation are checked. Faithful Verity execution remains PARTIAL until a distinct stateful path executes validity and overflow guards rather than inheriting decorative premises.",
+      "summary": "The abstract accepted-report ordering property and a composed faithful Verity transaction are checked. The transaction executes validity and overflow guards, persists module balances through writeMapUint and totals/step flags through writeSlot, and rolls back intermediate writes on failure.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report"
       },
       "fidelity": {
         "covered": [
           "abstract ordering",
-          "accepted-report source correspondence"
+          "accepted-report source correspondence",
+          "stateful Contract.run report path",
+          "executable validity/overflow guards",
+          "rollback after intermediate writes and two-batch mutant coverage"
         ],
-        "missing": [
-          "stateful Verity execution",
-          "executable validity/overflow guards"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Implement a stateful Verity report path with guard/overflow mutants.",
-      "roadmap_priority": "P1"
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-RESERVE-1",
