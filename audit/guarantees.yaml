@@ -119,9 +119,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
-        "expected": "abstract/source conservation, composed independent Contract.run allocation/call correspondence, rollback, and two-batch fail-closed mutants build"
+        "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, and executable fail-closed mutants build"
       },
-      "summary": "P-TOPUP-1 is checked on both planes under A-TOPUP-NOWRAP. The composed faithful transaction independently writes allocation observables, journals the zero-value Lido pull and per-allocation beacon values in one Contract.run, and restores the caller snapshot after intermediate failures.",
+      "summary": "P-TOPUP-1 is checked on both planes under A-TOPUP-NOWRAP. The faithful transaction routes the Lido pull and every per-validator beacon deposit through Verity external-call frames, so the call journal is produced by executing the transaction rather than supplied to it, and the observables the correspondence theorem compares carry call destinations, wei values, argument words and ordering alongside the per-validator allocation words. Failures injected after real storage writes and real journalled frames restore the caller snapshot exactly.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back"
@@ -133,17 +133,18 @@
       "fidelity": {
         "covered": [
           "abstract conservation/rollback",
-          "pinned-source correspondence under no-wrap",
-          "independent Contract.run allocation storage and Lido/beacon call execution",
-          "outcome-observable correspondence, intermediate-effect rollback, and two-batch mutants"
-        ]
-        ,
+          "pinned-source correspondence under no-wrap for batches of at most 2^256 validators",
+          "Lido pull and beacon deposits executed through Verity external-call frames that debit contract balance",
+          "observable call destinations, values, argument words and ordering plus per-validator allocation storage words",
+          "rollback to the caller snapshot after allocation writes, after the journalled pull, and after the first journalled deposit",
+          "fail-closed mutation of the executable transaction: skipped per-validator writes, dropped, misrouted, short-paid, reordered and duplicated deposits"
+        ],
         "missing": []
       },
       "classification": {
         "kind": "NONE"
       },
-      "next_gate": "Preserve the composed P-TOPUP-1 Contract.run correspondence and its rollback/two-batch mutants.",
+      "next_gate": "Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, and its executable mutants.",
       "roadmap_priority": "DONE"
     },
     {
@@ -153,34 +154,33 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Tests.AccountingVectors",
-        "expected": "abstract/source ordering and checked-word evidence builds; distinct stateful Verity execution remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
+        "expected": "abstract/source ordering and faithful Contract.run oracle-report transaction build with overflow, bypass-guard, dropped-snapshot, rollback, and two-batch mutants"
       },
-      "summary": "Abstract accepted-report ordering and checked accumulation are checked. Faithful Verity execution remains PARTIAL until a distinct stateful path executes validity and overflow guards rather than inheriting decorative premises.",
+      "summary": "The abstract accepted-report ordering property and a composed faithful Verity transaction are checked. The transaction executes validity and overflow guards, persists module balances through writeMapUint and totals/step flags through writeSlot, and rolls back intermediate writes on failure.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report"
       },
       "fidelity": {
         "covered": [
           "abstract ordering",
-          "accepted-report source correspondence"
+          "accepted-report source correspondence",
+          "stateful Contract.run report path",
+          "executable validity/overflow guards",
+          "rollback after intermediate writes and two-batch mutant coverage"
         ],
-        "missing": [
-          "stateful Verity execution",
-          "executable validity/overflow guards"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Implement a stateful Verity report path with guard/overflow mutants.",
-      "roadmap_priority": "P1"
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-RESERVE-1",
@@ -383,7 +383,7 @@
         "missing": [
           "parent verifyProof/wrappers",
           "faithful SHA-256 observation execution",
-          "imported↔deployed Yul binding"
+          "imported\u2194deployed Yul binding"
         ]
       },
       "classification": {

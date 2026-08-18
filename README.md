@@ -17,7 +17,7 @@ and deployment provenance are out of scope.
 | 2 | `P-ALLOC-2` | CHECKED | PARTIAL |
 | 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL — linked calls not yet faithfully executed |
 | 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | CHECKED |
-| 5 | `P-ACCOUNT-1` | CHECKED | PARTIAL — no distinct stateful execution yet |
+| 5 | `P-ACCOUNT-1` | CHECKED | CHECKED |
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |
 | 7 | `P-ETH-1` | OPEN | OPEN — child TX ledgers only |
 | 8 | `P-ADDRESS-1` | OPEN | PARTIAL |

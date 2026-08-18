@@ -26,7 +26,6 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 ## Deferred P1-labelled registry rows
 
 - `P-DEPOSIT-1` — **IMPLEMENTATION_PENDING**: Compose the recovered ledger core with authorization, allocation, dynamic deposit data, roots, and observable Lido/router/beacon calls.
-- `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: Implement a stateful Verity report path with guard/overflow mutants.
 
 ## Deferred P2-labelled registry rows
 
@@ -42,6 +41,7 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 - `P-ALLOC-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-ALLOC-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
-- `P-TOPUP-1` — **NONE**: Preserve the composed P-TOPUP-1 Contract.run correspondence and its rollback/two-batch mutants.
+- `P-TOPUP-1` — **NONE**: Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, and its executable mutants.
+- `P-ACCOUNT-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.

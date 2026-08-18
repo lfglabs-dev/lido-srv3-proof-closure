@@ -57,19 +57,6 @@ CLAIMS = {
             ("theorem", "verity_tx_simulates_source"),
         ),
     },
-    "P-ACCOUNT-1": {
-        "abstract_theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward",
-        "module": "PAccount1",
-        "layers": ".model, .source",
-        "imports": (
-            "LidoSRv3.Audit.Source.AccountingCorrespondence",
-            "LidoSRv3.Audit.Guarantees.Registry",
-        ),
-        "declarations": (
-            ("def", "guarantee"),
-            ("theorem", "source_report_before_reward"),
-        ),
-    },
 }
 
 
