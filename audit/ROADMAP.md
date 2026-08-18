@@ -28,7 +28,6 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Deferred P2-labelled registry rows
 
-- `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
 
 ## Deferred P3-labelled registry rows
 
@@ -42,6 +41,7 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-ACCOUNT-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-ETH-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-ADDRESS-1` — **NONE**: Preserve this checked abstract-to-Verity address-writer guarantee.
 - `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-CONSOLIDATION-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-SSZ-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.

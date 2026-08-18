@@ -101,7 +101,7 @@ def ownerGated : FunctionSpec :=
 def spec : CompilationModel :=
   { name := "AddressAdmission"
     fields := [balancesField, pausedField, ownerField]
-    constructor := none
+    «constructor» := none
     functions := [claim] }
 
 def claimSelector : Nat := 0x4e71d92d
