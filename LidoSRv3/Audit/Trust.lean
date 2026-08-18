@@ -28,6 +28,7 @@ import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.AllocationTx
 import LidoSRv3.Tests.AllocationTxMutants
+import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
@@ -89,6 +90,14 @@ project-level assumptions or proof escapes.
   LidoSRv3.Audit.Verity.ConsolidationCallFragment.registered_external_call_bind_entrypoint_always_reverts
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.guards_only_succeeds
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.success_hypotheses_are_vacuous
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance
+#print axioms LidoSRv3.Audit.Verity.AddressTx.pinned_source_observable_correspondence
+#print axioms LidoSRv3.Audit.Verity.AddressTx.executed_address_writes_follow_renamed_source
+#print axioms LidoSRv3.Audit.Verity.AddressTx.every_revert_restores_snapshot
+#print axioms LidoSRv3.Tests.AddressSourceMutants.verity_wrong_recipient_mutant_rejected
+#print axioms LidoSRv3.Tests.AddressSourceMutants.verity_fixed_owner_writer_mutant_rejected
+#print axioms LidoSRv3.Tests.AddressSourceMutants.verity_zero_amount_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
 #print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected

@@ -128,6 +128,16 @@ def observeAddress (inp : Input) : ContractResult Unit → AddressOutcomeView
           ⟨.committed, none, some (after.readMapUint 5 (.ofNat inp.amount))⟩
   | .revert _ _ => ⟨.reverted, none, none⟩
 
+/-- Address-write view determined by a committed source post-state.  Splitting
+this out of `sourceAddressView` lets the executed observation be compared against
+a *renamed* post-state, not only against the view of the same input. -/
+def postAddressView (ep : EntryPoint) (post : PostState) : AddressOutcomeView :=
+  match ep with
+  | .transferFrom | .requestWithdrawals =>
+      ⟨.committed, some (addressToWord post.owner), some (addressToWord post.recipient)⟩
+  | .claimWithdrawalsTo | .unwrap =>
+      ⟨.committed, none, some (addressToWord post.recipient)⟩
+
 def sourceAddressView (inp : Input) : AddressOutcomeView :=
   match run inp with
   | .reverted => ⟨.reverted, none, none⟩
@@ -381,6 +391,37 @@ theorem pinned_source_observable_correspondence (inp : Input)
   · exact claim_observable_correspondence inp hEntry
   · exact unwrap_observable_correspondence inp hEntry hAmount hBalance
 
+private theorem sourceAddressView_committed (inp : Input) (post : PostState)
+    (h : run inp = .committed post) :
+    sourceAddressView inp = postAddressView inp.entryPoint post := by
+  cases hEntry : inp.entryPoint <;>
+    simp [sourceAddressView, postAddressView, h, hEntry]
+
+/-- **Address equivariance of the executed transaction.**
+
+For a committed source outcome, running the *renamed* input through the real
+`Contract.run` program yields exactly the address writes of the *renamed* source
+post-state.  This transports `source_success_post_state_equivariant` onto
+executable Verity storage writes over shared `a₁ a₂ inp post`, so the abstract
+and executable planes are linked by a theorem rather than placed side by side. -/
+theorem executed_address_writes_follow_renamed_source
+    (a₁ a₂ : Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0) (inp : Input) (post : PostState)
+    (hRun : run inp = .committed post)
+    (hAmount : inp.amount < 2 ^ 256)
+    (hBalance : !inp.callerBalanceSufficient = true → inp.amount ≠ 0)
+    (hAllowance : !inp.callerAllowanceSufficient = true → inp.amount ≠ 0) :
+    observeAddress (renameInput a₁ a₂ inp)
+        ((executePinnedSource (renameInput a₁ a₂ inp)).run
+          (stateFor (renameInput a₁ a₂ inp))) =
+      postAddressView inp.entryPoint (renamePost a₁ a₂ post) := by
+  have hcorr := pinned_source_observable_correspondence (renameInput a₁ a₂ inp)
+    (by simpa [renameInput] using hAmount)
+    (by simpa [renameInput] using hBalance)
+    (by simpa [renameInput] using hAllowance)
+  rw [hcorr, sourceAddressView_committed _ _
+    (source_success_post_state_equivariant a₁ a₂ h₁ h₂ inp post hRun)]
+  simp [renameInput]
+
 /-- `Contract.run` restores its snapshot after every failed guard, including
 failures reached after the balance/claimed intermediate writes. -/
 theorem every_revert_restores_snapshot (program : Contract Unit) (state rollback : ContractState)
@@ -434,10 +475,19 @@ theorem composed_verity_tx_address_equivariance :
         .revert reason rollback → rollback = state) ∧
     (∀ state rollback reason,
       (AddressTxContract.claimWithdrawal 7 (1 : Address) true true true false).run state =
-        .revert reason rollback → rollback = state) := by
+        .revert reason rollback → rollback = state) ∧
+    (∀ a₁ a₂, a₁ ≠ 0 → a₂ ≠ 0 → ∀ inp post, run inp = .committed post →
+      inp.amount < 2 ^ 256 →
+      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →
+      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →
+      observeAddress (renameInput a₁ a₂ inp)
+          ((executePinnedSource (renameInput a₁ a₂ inp)).run
+            (stateFor (renameInput a₁ a₂ inp))) =
+        postAddressView inp.entryPoint (renamePost a₁ a₂ post)) := by
   exact ⟨source_admission_nondiscriminatory,
     source_success_post_state_equivariant, pinned_source_entrypoint_correspondence,
     pinned_source_observable_correspondence, every_revert_restores_snapshot,
-    request_external_failure_rolls_back, claim_external_failure_rolls_back⟩
+    request_external_failure_rolls_back, claim_external_failure_rolls_back,
+    executed_address_writes_follow_renamed_source⟩
 
 end LidoSRv3.Audit.Verity.AddressTx

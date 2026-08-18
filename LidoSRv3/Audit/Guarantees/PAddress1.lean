@@ -184,11 +184,24 @@ theorem abstract_source_verity_tx_address_equivariance :
         LidoSRv3.Audit.Verity.AddressTx.sourceAddressView inp) ∧
     (∀ (program : Verity.Contract Unit) (state rollback : Verity.ContractState)
       (reason : String),
-      program.run state = Verity.ContractResult.revert reason rollback → rollback = state) := by
+      program.run state = Verity.ContractResult.revert reason rollback → rollback = state) ∧
+    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
+      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState),
+      LidoSRv3.Audit.SolidityAddress.run inp = .committed post →
+      inp.amount < 2 ^ 256 →
+      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →
+      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →
+      LidoSRv3.Audit.Verity.AddressTx.observeAddress (renameInput a₁ a₂ inp)
+          ((LidoSRv3.Audit.Verity.AddressTx.executePinnedSource
+              (renameInput a₁ a₂ inp)).run
+            (LidoSRv3.Audit.Verity.AddressTx.stateFor (renameInput a₁ a₂ inp))) =
+        LidoSRv3.Audit.Verity.AddressTx.postAddressView inp.entryPoint
+          (renamePost a₁ a₂ post)) := by
   exact ⟨LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.1,
-    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1⟩
+    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1,
+    LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.2.2.2⟩
 
 /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
 for the owner-operated WithdrawalQueue ERC-721 ownership handoff. This retained
