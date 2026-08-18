@@ -884,13 +884,14 @@
       "id": "P-RESERVE-RELATIONAL",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-CLASSICAL-CHOICE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserveRelationalVerity LidoSRv3.Tests.ReserveRelationalMutants LidoSRv3.Tests.ReserveRelationalTxMutants",
         "expected": "abstract model, pinned-source interpreter, and composed executable finalization transaction build with reserve-to-range, reserve-to-shares, report, queue, buffer, and mid-write rollback mutants"
       },
-      "summary": "Supplemental parent-closure row promoted only after composition: two states differing solely in depositsReserve produce the same prefinalized ranges, prefinalized ETH, shares to burn, finalized range, and locked ETH. The abstract model, an independently defined pinned-source interpreter for Accounting._calculateWithdrawals, WithdrawalQueue.prefinalize, and WithdrawalQueue._finalize, and an executable Verity Contract.run transaction that decodes a denoted uint256[] batch-ends memory array together with mapUint queue economics are tied together by composition theorems rather than shared names. depositsReserve is proved to lie outside the transaction read frame.",
+      "summary": "Supplemental parent-closure row promoted only after composition: two states differing solely in depositsReserve produce the same prefinalized ranges, prefinalized ETH, shares to burn, finalized range, and locked ETH. The abstract model, an independently defined pinned-source interpreter for Accounting._calculateWithdrawals, WithdrawalQueue.prefinalize, and WithdrawalQueue._finalize, and an executable Verity Contract.run transaction that decodes a denoted uint256[] batch-ends memory array together with mapUint queue economics are tied together by composition theorems rather than shared names. depositsReserve is proved to lie outside the transaction read frame. The executable plane implements the Solidity 0.8 checked lockedEtherAmount accumulator, which the unbounded Nat planes cannot express, so the correspondence theorem carries an explicit no-overflow side condition and the complementary regime is closed by a separate theorem proving the transaction reverts on the exact pre-call snapshot; the relational non-interference theorem itself is unconditional.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization"
@@ -905,17 +906,15 @@
           "pinned-source interpreter correspondence stated independently of the abstract names",
           "executable Contract.run over a denoted uint256[] batch-ends memory array and mapUint queue economics",
           "depositsReserve proved outside the transaction read frame",
-          "rollback to the pre-call snapshot after the batch journal and both finalization writes"
+          "rollback to the pre-call snapshot after the batch journal and both finalization writes",
+          "checked uint256 addition on the locked ETH accumulator: the transaction reverts with LOCKED_ETH_OVERFLOW on the exact pre-call snapshot instead of committing a wrapped word, the abstract correspondence is stated under that bound, and the relational non-interference theorem stays unconditional across both regimes"
         ],
-        "missing": [
-          "checked uint256 addition on the locked ETH accumulator; the transaction records the wrapped word where Solidity 0.8 would revert"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Model checked uint256 addition on the locked ETH accumulator so the transaction reverts exactly where the pinned Solidity reverts."
+        "kind": "NONE"
       },
-      "next_gate": "Model checked uint256 addition on the locked ETH accumulator without widening the guarantee."
+      "next_gate": "Replace the source-shaped decoding premise with a machine-checked correspondence to the pinned Solidity spans."
     }
   ],
   "objective": "Prove an abstract Lean model and a behaviorally faithful Verity model for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."

@@ -115,4 +115,35 @@ example :
     (finalize 2 false true).run (worldFor inputs lowReserve) =
       .revert "INJECTED_AFTER_WRITES" (worldFor inputs lowReserve) := by rfl
 
+/-! ## Checked locked-ETH accumulator
+
+`lockedEtherAmount += prefinalized` is a Solidity 0.8 checked addition.  These
+vectors pin that the transaction reverts on overflow instead of committing a
+wrapped word, and that the boundary is inclusive. -/
+
+private def wrapState : State := ⟨5, Verity.Core.MAX_UINT256⟩
+
+/-- An accumulator that would leave one word fails closed. -/
+example : runView inputs wrapState = ⟨.reverted, [], 0, 0, none, word 0⟩ := by rfl
+
+/-- The revert is the checked-arithmetic one and restores the exact snapshot;
+nothing is written. -/
+example :
+    (finalize 2 false false).run (worldFor inputs wrapState) =
+      .revert "LOCKED_ETH_OVERFLOW" (worldFor inputs wrapState) := by rfl
+
+/-- The rejection is a real wrap, not an unreachable guard: an unchecked
+accumulator would have committed 79 on this world. -/
+example : (word (Verity.Core.MAX_UINT256 + 80)).val = 79 := by decide
+
+/-- A wrapping mutant that stores the truncated word instead of reverting is
+observably different from the certified transaction. -/
+example : runView inputs wrapState ≠
+    ⟨.committed, [(10, 11), (12, 14)], 80, 37, some (10, word 14), word 79⟩ := by decide
+
+/-- The bound is inclusive: landing exactly on `MAX_UINT256` still commits. -/
+example : runView inputs ⟨5, Verity.Core.MAX_UINT256 - 80⟩ =
+    ⟨.committed, [(10, 11), (12, 14)], 80, 37, some (10, word 14),
+      word Verity.Core.MAX_UINT256⟩ := by rfl
+
 end LidoSRv3.Tests.ReserveRelationalTxMutants

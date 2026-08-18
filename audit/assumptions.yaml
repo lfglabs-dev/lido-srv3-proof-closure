@@ -135,6 +135,16 @@
       "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
       "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
       "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-CLASSICAL-CHOICE",
+      "accepted": true,
+      "risk": "Proofs may depend on the classical axiom Classical.choice in addition to propext and Quot.sound; the development is therefore not constructive.",
+      "justification": "Classical.choice is a standard Lean 4 / Mathlib foundational axiom, discharged by the kernel rather than by project-level trust. It is accepted as the third allowed axiom alongside propext and Quot.sound so that the axiom gate can distinguish it from genuine proof escapes such as sorryAx, Lean.ofReduceBool, or project-introduced axioms.",
+      "severity": "LOW",
+      "violation_impact": "Only a foundational inconsistency in Lean's classical axioms would invalidate the affected theorems; no project-specific claim rests on it.",
+      "validation": "LidoSRv3.Audit.Trust prints the axiom dependencies of every registered theorem, so any dependency outside {propext, Classical.choice, Quot.sound} is visible in the build log.",
+      "removal_path": "Re-prove the affected theorems constructively; not required, since classical reasoning is in scope for this development."
     }
   ]
 }

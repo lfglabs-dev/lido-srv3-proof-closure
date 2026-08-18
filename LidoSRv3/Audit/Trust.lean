@@ -35,12 +35,28 @@ import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 /-!
 Machine-readable-in-build trust report for the first audit slice.
 
-Most output uses only Lean foundations (`propext`, `Classical.choice`, and
-`Quot.sound`) where listed.  The canonical P-ALLOC-1 Phase-3 compilation
-theorems additionally disclose the generated
-`consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
-dependency recorded in the target manifest; there are no undisclosed
-project-level assumptions or proof escapes.
+## Allowed axioms
+
+Every theorem printed below may depend only on the three Lean foundational
+axioms `propext`, `Classical.choice`, and `Quot.sound`.
+
+`Classical.choice` is an **accepted** dependency, disclosed in
+`audit/assumptions.yaml` as `A-CLASSICAL-CHOICE`: it is a standard Lean 4 /
+Mathlib axiom discharged by the kernel, it makes the development classical
+rather than constructive, and no project-specific claim rests on it.  It is
+named here rather than folded silently into "Lean foundations" so that a
+reviewer reading this report sees the same three-axiom boundary that the
+assurance metadata records.
+
+Anything outside those three is a proof escape and is *not* accepted.  In
+particular `sorryAx`, `Lean.ofReduceBool`, and any project-introduced `axiom`
+must not appear in the output below.  The single disclosed exception is the
+canonical P-ALLOC-1 Phase-3 compilation theorems, which additionally report the
+generated `consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
+dependency recorded in the target manifest.
+
+Subject to that one recorded exception, there are no undisclosed project-level
+assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
@@ -133,6 +149,7 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.source_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_simulates_reserve_relational_spec
+#print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_reverts_on_locked_overflow
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_slot_is_not_read
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot

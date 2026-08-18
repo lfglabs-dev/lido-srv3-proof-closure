@@ -26,9 +26,13 @@ request id, and journals each prefinalized batch's upper endpoint.  Reverts roll
 back to the pre-call snapshot through `Contract.run`, including reverts injected
 after those writes.
 
-Fidelity note: the abstract plane is unbounded `Nat` arithmetic, so this
-transaction records the wrapped `uint256` word rather than reproducing
-Solidity 0.8 checked-arithmetic reverts on `lockedEtherAmount` overflow.
+The abstract plane is unbounded `Nat`, but `lockedEtherAmount += prefinalized`
+is a Solidity 0.8 checked addition, so `finalize` reverts rather than storing a
+wrapped word when the accumulator would exceed `MAX_UINT256`
+(`verity_tx_reverts_on_locked_overflow`).  The correspondence to the unbounded
+planes therefore carries an explicit no-overflow side condition; the relational
+guarantee itself does not, because two worlds differing only in
+`depositsReserve` decode to the same locked ETH and so overflow alike.
 -/
 
 namespace LidoSRv3.Audit.Verity.ReserveRelationalTx
@@ -162,10 +166,13 @@ structure Result where
   lockedEtherAfter : Nat
   deriving DecidableEq, Repr
 
-/-- Executable transaction.  Empty batches, undecodable queue storage, and an
-oversubscribed buffer revert to the pre-call snapshot.  `failAfterWrites` is a
-test hook placed after the batch journal and the two finalization writes; it
-proves rollback even after intermediate effects. -/
+/-- Executable transaction.  Empty batches, undecodable queue storage, an
+oversubscribed buffer, and a locked-ETH accumulator that would exceed
+`MAX_UINT256` all revert to the pre-call snapshot.  The last of those is the
+Solidity 0.8 checked `lockedEtherAmount += prefinalized`: no wrapped word is
+ever stored.  `failAfterWrites` is a test hook placed after the batch journal
+and the two finalization writes; it proves rollback even after intermediate
+effects. -/
 def finalize (count : Nat) (discount : Bool) (failAfterWrites : Bool := false) :
     Contract Result := fun snapshot =>
   if count == 0 then .revert "EmptyBatches" snapshot else
@@ -175,6 +182,8 @@ def finalize (count : Nat) (discount : Bool) (failAfterWrites : Bool := false) :
       match txRun decoded discount with
       | none => .revert "TOO_MUCH_ETH_TO_FINALIZE" snapshot
       | some (ranges, eth, shares, range, locked) =>
+          if Verity.Core.MAX_UINT256 < locked then .revert "LOCKED_ETH_OVERFLOW" snapshot
+          else
           let dirty := writeRanges 0 ranges snapshot
           let dirty :=
             (dirty.writeSlot lockedEtherSlot (Verity.Core.Uint256.ofNat locked)).writeSlot
@@ -227,22 +236,37 @@ def Decodes (state : ContractState) (inputs : Inputs) (before : State) : Prop :=
 
 theorem lockedEtherSlot_ne_lastFinalizedSlot : lockedEtherSlot ≠ lastFinalizedSlot := by decide
 
+/-- The locked ETH accumulator stays inside one word.  This is exactly the
+condition under which the Solidity 0.8 checked `lockedEtherAmount +=
+prefinalized` does not revert, so it is the honest side condition for relating
+the checked executable plane to the unbounded `Nat` planes. -/
+def NoLockedOverflow (inputs : Inputs) (before : State) : Prop :=
+  ∀ after observables, sourceRun inputs before = .committed after observables →
+    observables.lockedEtherAfter ≤ Verity.Core.MAX_UINT256
+
 /-- Composed faithful-plane theorem: the executable storage/memory transaction
 has the same five finalization observables as the independently stated
-pinned-source interpreter, which in turn agrees with the abstract model. -/
+pinned-source interpreter, which in turn agrees with the abstract model.  The
+unbounded planes cannot express the checked accumulator, so the correspondence
+holds exactly where that accumulator does not overflow; the overflow case is
+`verity_tx_reverts_on_locked_overflow`. -/
 theorem verity_tx_simulates_pinned_source
     (inputs : Inputs) (before : State) (state : ContractState)
-    (h : Decodes state inputs before) :
+    (h : Decodes state inputs before) (hNoWrap : NoLockedOverflow inputs before) :
     observe ((finalize inputs.report.batchEnds.length inputs.report.useDiscount).run state) =
       sourceView inputs before := by
   unfold Decodes at h
+  unfold NoLockedOverflow at hNoWrap
   rcases hEnds : inputs.report.batchEnds with _ | ⟨first, rest⟩
   · unfold Contract.run finalize sourceView sourceRun sourcePrefinalize
     simp [hEnds, observe]
   · rw [hEnds] at h
     have hCount : ((first :: rest).length == 0) = false := by simp
+    rw [hEnds] at hNoWrap
     unfold Contract.run finalize sourceView sourceRun sourcePrefinalize
+    unfold sourceRun sourcePrefinalize at hNoWrap
     rw [h, hEnds]
+    rw [hEnds] at hNoWrap
     cases hSel : sourceSelect inputs.report inputs.queue with
     | none => simp [observe]
     | some selected =>
@@ -253,7 +277,12 @@ theorem verity_tx_simulates_pinned_source
             | none => simp at hGet
             | some last =>
                 by_cases hFits : sourceSum inputs.report.useDiscount selected ≤ inputs.buffer
-                · simp [observe, txRun, hGet, hFits, lastFinalizedSlot,
+                · have hBound :
+                      before.lockedEth + sourceSum inputs.report.useDiscount selected ≤
+                        Verity.Core.MAX_UINT256 := by
+                    refine hNoWrap _ _ ?_
+                    simp [hSel, hPaused, hGet, hFits]
+                  simp [observe, txRun, hGet, hFits, Nat.not_lt.mpr hBound, lastFinalizedSlot,
                     lockedEtherSlot, ContractState.readSlot_writeSlot_same,
                     ContractState.readSlot_writeSlot_other]
                 · simp [observe, txRun, hGet, hFits]
@@ -313,13 +342,33 @@ theorem verity_reserve_slot_is_not_read
           | none => simp [hRun, observe]
           | some quint =>
               obtain ⟨ranges, eth, shares, range, locked⟩ := quint
-              cases inject <;>
-                simp [hRun, observe, lastFinalizedSlot, lockedEtherSlot,
-                  ContractState.readSlot_writeSlot_same,
-                  ContractState.readSlot_writeSlot_other]
+              by_cases hOv : Verity.Core.MAX_UINT256 < locked
+              · simp [hRun, hOv, observe]
+              · cases inject <;>
+                  simp [hRun, hOv, observe, lastFinalizedSlot, lockedEtherSlot,
+                    ContractState.readSlot_writeSlot_same,
+                    ContractState.readSlot_writeSlot_other]
+
+/-- Solidity 0.8 checked `lockedEtherAmount += prefinalized`.  Where the
+unbounded planes would commit an accumulator wider than one word, the
+transaction reverts on the exact pre-call snapshot: no wrapped word is ever
+written, and the injected-failure hook cannot change that. -/
+theorem verity_tx_reverts_on_locked_overflow
+    (count : Nat) (discount inject : Bool) (state : ContractState) (decoded : Decoded)
+    (ranges : List (Nat × Nat)) (eth shares : Nat) (range : Nat × Nat) (locked : Nat)
+    (hCount : (count == 0) = false)
+    (hDecode : decode state count = some decoded)
+    (hRun : txRun decoded discount = some (ranges, eth, shares, range, locked))
+    (hWrap : Verity.Core.MAX_UINT256 < locked) :
+    (finalize count discount inject).run state = .revert "LOCKED_ETH_OVERFLOW" state := by
+  unfold Contract.run finalize
+  simp [hCount, hDecode, hRun, hWrap]
 
 /-- Two contract worlds whose decodings differ only in `depositsReserve`
-produce identical finalization observables. -/
+produce identical finalization observables.  Proved directly from the decoding:
+`differOnlyInReserve` pins the locked ETH, so both worlds decode identically and
+the checked accumulator overflows in both or neither.  The relational guarantee
+therefore carries no no-overflow side condition. -/
 theorem verity_reserve_does_not_change_finalization
     (inputs : Inputs) (left right : State) (stateLeft stateRight : ContractState)
     (hLeft : Decodes stateLeft inputs left) (hRight : Decodes stateRight inputs right)
@@ -328,12 +377,28 @@ theorem verity_reserve_does_not_change_finalization
         stateLeft) =
       observe ((finalize inputs.report.batchEnds.length inputs.report.useDiscount).run
         stateRight) := by
-  rw [verity_tx_simulates_pinned_source inputs left stateLeft hLeft,
-    verity_tx_simulates_pinned_source inputs right stateRight hRight]
-  have hObs := source_reserve_relational inputs left right h
-  unfold sourceView
-  cases hL : sourceRun inputs left <;> cases hR : sourceRun inputs right <;>
-    simp [hL, hR, outcomeObservables] at hObs ⊢ <;> simp [hObs]
+  have hDecode : decode stateLeft inputs.report.batchEnds.length =
+      decode stateRight inputs.report.batchEnds.length := by
+    unfold Decodes at hLeft hRight
+    unfold differOnlyInReserve at h
+    rw [hLeft, hRight, h]
+  unfold Contract.run finalize
+  rw [hDecode]
+  cases hCount : inputs.report.batchEnds.length == 0 with
+  | true => simp [observe]
+  | false =>
+      cases hDec : decode stateRight inputs.report.batchEnds.length with
+      | none => simp [observe]
+      | some decoded =>
+          cases hRun : txRun decoded inputs.report.useDiscount with
+          | none => simp [observe]
+          | some quint =>
+              obtain ⟨ranges, eth, shares, range, locked⟩ := quint
+              by_cases hOv : Verity.Core.MAX_UINT256 < locked
+              · simp [hOv, observe]
+              · simp [hOv, observe, lastFinalizedSlot, lockedEtherSlot,
+                  ContractState.readSlot_writeSlot_same,
+                  ContractState.readSlot_writeSlot_other]
 
 /-- Any failure, including the failure injected after the batch journal and the
 finalization writes, returns the exact pre-transaction snapshot. -/
