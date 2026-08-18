@@ -40,7 +40,7 @@ ASSUMPTION_FIELDS = {
 }
 PINNED = {
     "lido_core": ("https://github.com/lidofinance/core.git", "af095e48bbc1c3841c2c9936219c8461af01056b"),
-    "verity": ("https://github.com/lfglabs-dev/verity.git", "8719dc52e8c581e37bab4594fed11b11c41494b8"),
+    "verity": ("https://github.com/lfglabs-dev/verity.git", "a063bfc869735045354ebc3862ca08859da0f56e"),
     "evmyullean": ("https://github.com/lfglabs-dev/EVMYulLean.git", "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"),
     "mathlib": ("https://github.com/leanprover-community/mathlib4.git", "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"),
 }
@@ -53,7 +53,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-ETH-1": ("OPEN", None, "OPEN", None, "IMPLEMENTATION_PENDING", ()),
+    "P-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback", "NONE", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ADDRESS-1": ("OPEN", None, "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX",)),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
@@ -66,7 +66,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-TOPUP-1": "e76b6a30ef38a283b05b9a6fbb31b12dc4376682ab824ae26440b512d622667f",
     "P-ACCOUNT-1": "b4422bd7a9dd34f3f2e18bb0afa2774a8f093db6c37de717e1fd6bdde80ff1d3",
     "P-RESERVE-1": "e8f34af2bb8d1eb061da1882ff2460535489056a8e9eca41e7b8c750a614ff27",
-    "P-ETH-1": "9f79007c732bddca4e2ca56d988c63aa0059b35c6e48def28985dad3e3cbcd64",
+    "P-ETH-1": "eafed670006edc8828d45b03192348f274f2c14cca25d670bce06646b09539ef",
     "P-ADDRESS-1": "882421e998af3fe6be8af7154999801509a085ccf4e1842c310ad6ddf68122e3",
     "P-TOPUP-2": "f71ef81588d77e28a3226eafd91e4a896fe0f6a04db1bc5d9dd4d0e84cf16c61",
     "P-CONSOLIDATION-1": "c459ec05da73f3d6ac52d13d93bdf263c2eeced71a999f3c34fe8397e496eb1d",
@@ -75,7 +75,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "DONE",
-    "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "P2",
+    "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "DONE",
     "P-ADDRESS-1": "P2", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
