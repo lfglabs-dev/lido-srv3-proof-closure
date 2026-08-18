@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: PENDING
+validated-tree: 67dd52d84905004bd0abef26e01acd6eebd06c5c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -19,10 +19,17 @@ P-ADDRESS-1 abstract and Verity transaction closure (2026-08-17)
   failures after intermediate balance and claimed writes.
 - Wrong-recipient, fixed address-writer, and zero-amount admission mutants are
   rejected using outcome observables. P-ADDRESS-1 is CHECKED on both planes.
+- Repair commit `67c5224` restores the attestation build (the `verity_contract`
+  import closure reserves `constructor`, so `AddressAdmission` escapes the field
+  name as `«constructor»`; semantics unchanged), adds
+  `executed_address_writes_follow_renamed_source` so the executed transaction's
+  address writes are proved equal to the *renamed* source post-state rather than
+  only bundled alongside it, and prints axioms for both promoted theorems and the
+  address mutants on the `Trust` surface.
 - Generated shared views also retain the accepted P-ALLOC-1/P-ALLOC-2 closures
   from current `origin/main`; no allocation theorem source is duplicated here.
 - Receipt subject: tracked tree excluding this receipt,
-  `PENDING`.
+  `67dd52d84905004bd0abef26e01acd6eebd06c5c`.
 
 P-CONSOLIDATION-1 faithful Verity transaction closure (2026-08-17)
 ------------------------------------------------------------------
