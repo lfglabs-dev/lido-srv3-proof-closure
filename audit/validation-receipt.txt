@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6db98df3b9bdafe5e64cf3eee2e189d1d24a8b40
+validated-tree: 009fd62f214ca3ebe9b3bb74638b47f630603de5
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -21,7 +21,24 @@ P-CONSOLIDATION-1 faithful Verity transaction closure (2026-08-17)
   intermediate-write rollback, and two-batch chaining.
 - Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
 - Receipt subject: tracked tree excluding this receipt,
-  `6db98df3b9bdafe5e64cf3eee2e189d1d24a8b40`.
+  `009fd62f214ca3ebe9b3bb74638b47f630603de5`.
+
+P-ACCOUNT-1 faithful Verity transaction closure (2026-08-17)
+------------------------------------------------------------
+
+- Source commit `c5c4fc1822adb1b1c0c12b1e2d418c8b08a7d7ed` composes the
+  checked abstract report-before-reward theorem with an executable
+  `Contract.run` oracle-report transaction over `writeMapUint` module
+  balances and `writeSlot` total/step-flag observables.
+- The transaction executes registered-order, length, `MAX_VALUE_GWEI`, and
+  checked uint64 overflow guards, matches the pinned-source accept/step
+  view, and rolls back prefix writes on failure. Mutants cover overflow,
+  bypass-guard, dropped-snapshot, intermediate-write rollback, and
+  two-batch chaining.
+- Verity remains pinned to merged upstream
+  `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `37a6c0d5f21ba6070a241e56681c652c365e61e6`.
 
 P-TOPUP-2 faithful Verity transaction closure (2026-08-17)
 ----------------------------------------------------------

@@ -77,6 +77,8 @@ test:
 	@printf '%s\n' 'P-ETH-1b bus/request Contract.run mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors
 	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.HandleOracleReportTxMutants
+	@printf '%s\n' 'P-ACCOUNT-1 faithful oracle-report transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.DereferenceMutants
 	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
