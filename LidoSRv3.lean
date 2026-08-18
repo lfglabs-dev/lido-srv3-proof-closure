@@ -15,8 +15,11 @@ import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Tests.GIndexConcatMutants
 import LidoSRv3.Audit.Verity.SszAbstractDigest
 import LidoSRv3.Audit.Verity.SszTxSimulation
+import LidoSRv3.Audit.Verity.SszEncodingTx
+import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Verity.TopupRollback
 import LidoSRv3.Audit.Verity.Tests.TopupRollback
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Tests.TopupHybridMutants
+import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel

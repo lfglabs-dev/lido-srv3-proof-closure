@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed when public surfaces revive retracted faithful-Verity claims."""
+"""Fail closed when public surfaces diverge from canonical Verity claims."""
 
 from __future__ import annotations
 
@@ -15,13 +15,21 @@ from typing import NoReturn
 CLAIMS = {
     "P-DEPOSIT-1": {
         "abstract_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+        "verity_status": "CHECKED",
+        "verity_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback",
         "module": "PDeposit1",
-        "layers": ".model, .abstractTx, .source",
+        "layers": ".model, .abstractTx, .source, .verityTx",
         "imports": (
             "LidoSRv3.Audit.Trace",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
+            "LidoSRv3.Audit.Verity.DepositParentTx",
             "LidoSRv3.Audit.Guarantees.Registry",
         ),
+        # The composed claim is a single theorem quantified over the source
+        # configuration/input, the transaction input and the entry state, so its
+        # bridge (`LinksSource`), the two arithmetic links it needs, and the
+        # witness proving its hypotheses jointly satisfiable are all part of the
+        # public surface.
         "declarations": (
             ("def", "guarantee"),
             ("theorem", "revert_restores_state_value_and_logs"),
@@ -29,16 +37,27 @@ CLAIMS = {
             ("theorem", "source_router_balance_unchanged"),
             ("theorem", "source_reverting_branch_moves_no_ether"),
             ("theorem", "source_nonconserving_deployment_reverts"),
+            ("structure", "LinksSource"),
+            ("theorem", "linked_total_eq_pushedValue"),
+            ("theorem", "linked_total_eq_depositsValue"),
+            ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
+            ("def", "canonicalSourceConfig"),
+            ("def", "canonicalSourceInput"),
+            ("theorem", "canonical_links_source"),
+            ("theorem", "canonical_composition_witness"),
         ),
     },
     "P-TOPUP-1": {
         "abstract_theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
+        "verity_status": "CHECKED",
+        "verity_theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
         "module": "PTopup1",
-        "layers": ".model, .abstractTx, .source",
+        "layers": ".model, .abstractTx, .source, .verityTx",
         "imports": (
             "LidoSRv3.Audit.Allocation",
             "LidoSRv3.Audit.Trace",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
+            "LidoSRv3.Audit.Verity.TopupTx",
             "LidoSRv3.Audit.Guarantees.Registry",
         ),
         "declarations": (
@@ -51,6 +70,7 @@ CLAIMS = {
             ("theorem", "source_balance_guards_discharged"),
             ("theorem", "source_unchecked_accumulation_faithful"),
             ("theorem", "source_pinned_config_discharges_pubkey_guard"),
+            ("theorem", "verity_tx_simulates_source"),
         ),
     },
 }
@@ -194,15 +214,19 @@ def check(root: Path) -> None:
         theorem = expected["abstract_theorem"]
         if abstract.get("status") != "CHECKED" or abstract.get("theorem") != theorem:
             fail(f"{claim_id}: checked abstract theorem differs from the canonical view")
-        if verity.get("status") != "PARTIAL" or verity.get("theorem") is not None:
-            fail(f"{claim_id}: faithful Verity must remain PARTIAL without a canonical theorem")
+        expected_verity_status = expected.get("verity_status", "PARTIAL")
+        expected_verity_theorem = expected.get("verity_theorem")
+        if (verity.get("status"), verity.get("theorem")) != (
+            expected_verity_status, expected_verity_theorem
+        ):
+            fail(f"{claim_id}: faithful Verity status/theorem differs from the canonical view")
 
         table_pattern = re.compile(
-            rf"^\|\s*\d+\s*\|\s*`{re.escape(claim_id)}`\s*\|[^\n]*\|\s*PARTIAL[^\n]*\|$",
+            rf"^\|\s*\d+\s*\|\s*`{re.escape(claim_id)}`\s*\|[^\n]*\|\s*{expected_verity_status}[^\n]*\|$",
             re.MULTILINE,
         )
         if not table_pattern.search(readme):
-            fail(f"README: {claim_id} must keep faithful Verity PARTIAL")
+            fail(f"README: {claim_id} faithful Verity status differs")
 
         module = expected["module"]
         lean_path = root / f"LidoSRv3/Audit/Guarantees/{module}.lean"
@@ -213,7 +237,7 @@ def check(root: Path) -> None:
         )
         if not definition.search(lean):
             fail(f"{lean_path}: checkedLayers differ from the blocked canonical view")
-        if "transaction claim is blocked" not in lean:
+        if expected_verity_status == "PARTIAL" and "transaction claim is blocked" not in lean:
             fail(f"{lean_path}: missing explicit blocked-transaction description")
         imports, declarations = lean_surface(lean)
         if imports != expected["imports"]:
@@ -234,7 +258,7 @@ def main() -> int:
     except (OSError, ValueError) as exc:
         print(f"public claim surface check failed: {exc}", file=sys.stderr)
         return 1
-    print("public claim surfaces preserve retracted faithful-Verity claims as PARTIAL")
+    print("public claim surfaces match canonical faithful-Verity claims")
     return 0
 
 

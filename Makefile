@@ -47,10 +47,14 @@ test:
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
 	@lake build LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 	@printf '%s\n' 'typed SSZ transaction-simulation acceptance/mutant/rollback vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.SszEncodingTxMutants
+	@printf '%s\n' 'P-SSZ-1 composed encoding transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositVectors
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositTxMutants
 	@printf '%s\n' 'bounded Verity deposit transaction mutant compiled and asserted'
+	@lake build LidoSRv3.Tests.DepositParentTxMutants
+	@printf '%s\n' 'P-DEPOSIT-1 composed transaction mutants (per-module writes, journal, ledger) compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstAmountTxMutants
 	@printf '%s\n' 'P-ALLOC-2 amount transaction mutants and floor-division regression compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstDistributionTxMutants
@@ -63,6 +67,8 @@ test:
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupHybridMutants
 	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.TopupTxMutants
+	@printf '%s\n' 'faithful P-TOPUP-1 executable-transaction mutants (skipped allocation words, dropped/misrouted/short-paid/reordered/duplicated deposits) and intermediate-effect rollback compiled and asserted'
 	@lake build LidoSRv3.Tests.Topup2TxMutants
 	@printf '%s\n' 'bounded Verity P-TOPUP-2 aggregate-cap transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.Topup2DistributionTxMutants
@@ -75,6 +81,8 @@ test:
 	@printf '%s\n' 'P-ETH-1a gateway/vault refund Contract.run mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.PEth1RequestTxMutants
 	@printf '%s\n' 'P-ETH-1b bus/request Contract.run mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.PEth1CompositionTxMutants
+	@printf '%s\n' 'P-ETH-1 recursively dispatched Bus/Gateway/Vault drop, misroute, corrupt, rollback, and two-batch mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors
 	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.HandleOracleReportTxMutants
