@@ -91,6 +91,8 @@ test:
 	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
+	@lake build LidoSRv3.Tests.AddressSourceMutants
+	@printf '%s\n' 'P-ADDRESS-1 executable address-writer, wrong-recipient, and admission-boundary mutants compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
