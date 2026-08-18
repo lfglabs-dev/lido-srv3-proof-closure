@@ -80,35 +80,35 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositLedgerTx",
-        "expected": "abstract/source conservation and the recovered storage-ledger Contract.run receipts build; full multi-contract call fidelity remains partial"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants",
+        "expected": "checked abstract/source conservation composed with the executable two-batch Verity transaction over shared quantified variables, its per-module observable correspondence, rollback, and execute-level mutants build"
       },
-      "summary": "Abstract one-unit transfer conservation is checked. Recovered DepositLedgerTx evidence executes the conservation/rollback core over model-local storage and rejects dropped-assert/debit mutants, but the faithful Verity parent remains PARTIAL because authorization, allocation, dynamic deposit data, roots, and the real multi-contract value-call graph are not composed.",
+      "summary": "Abstract/source deposit conservation and rollback are composed with a bounded two-batch Contract.run transaction in one theorem quantified over the source configuration and call input, the transaction input, and the entry state, linked by LinksSource. The transaction covers authorization, allocation, dynamic deposit data, deposit-data roots, the Lido pull and both beacon value calls; observables expose the per-module allocation, dynamic-data and deposit-data-root words alongside the aggregates and the ordered call journal. Rollback after intermediate writes and execute-level mutants are checked.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback"
       },
       "fidelity": {
         "covered": [
           "abstract conservation/rollback",
           "pinned-source correspondence",
-          "storage-only DepositLedgerTx conservation/rollback core"
+          "authorization, allocation, dynamic deposit data, and deposit roots",
+          "per-module allocation, dynamic-data, and deposit-data-root storage words",
+          "observable Lido/module/beacon call names, destinations, wei values, argument words, and order",
+          "composed correspondence over shared quantified source and transaction variables",
+          "Contract.run rollback after intermediate writes and fail-closed execute-level mutants"
         ],
-        "missing": [
-          "full authorization/allocation/deposit-data path",
-          "real Lido/router/beacon external-call composition"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Compose the recovered ledger core with authorization, allocation, dynamic deposit data, roots, and observable Lido/router/beacon calls.",
-      "roadmap_priority": "P1"
+      "next_gate": "Preserve the composed abstract-to-Verity deposit guarantee and its executable mutants.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-TOPUP-1",
@@ -647,37 +647,34 @@
     {
       "id": "P-DEPOSIT-1.verity-tx-rollback.tx",
       "parent_id": "P-DEPOSIT-1",
-      "source_plane_scope": "source-shaped deposit prefix scaffold (OPEN); allocation and multi-contract suffix explicitly OPEN",
+      "source_plane_scope": "bounded two-batch deposit transaction with authorization, allocation, dynamic data/root writes, and observable Lido/module/beacon calls",
       "assumptions": [
         "A-VERITY-SCAFFOLD"
       ],
       "no_new_forbidden_lean_tokens": true,
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Verity.DepositRollback LidoSRv3.Audit.Verity.Tests.DepositRollback",
-        "expected": "successful OPEN prefix-scaffold compilation, 32-byte successful-returndata guards, actual FunctionSpec malformed-ABI rejection, independently declared expected-footprint comparison, and call-site-sensitive immutable-target guards; malformed-ABI snapshot rollback and the full source/transaction path remain OPEN"
+        "command": "lake build LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Audit.Guarantees.PDeposit1",
+        "expected": "executable two-batch transaction correspondence, exact snapshot rollback after intermediate writes, and chaining-mutant rejection build"
       },
-      "summary": "Source-shaped deposit prefix scaffold (OPEN): the Verity FunctionSpec compiles locator-derived DSM authentication, module membership/config extraction, withdrawal-credentials conversion, immutable LIDO.getDepositableEther, and 32-byte successful-returndata checks. Allocation and the multi-contract suffix remain OPEN; this is not a full source, transaction, conservation, or rollback proof.",
+      "summary": "Checked bounded Verity transaction slice composes authorization, allocation, dynamic deposit data and roots with address/value-keyed Lido, module, and beacon calls. Contract.run restores the exact snapshot after intermediate writes, and two-batch alias/omission mutants are rejected.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Verity.DepositRollback.allocation_extraction_matches_source_derived_prefix"
+        "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot"
       },
       "fidelity": {
         "covered": [
-          "source-shaped deposit prefix scaffold (OPEN); allocation and multi-contract suffix explicitly OPEN"
+          "bounded two-batch deposit transaction with authorization, allocation, dynamic data/root writes, and observable Lido/module/beacon calls"
         ],
-        "missing": [
-          "parent guarantee composition"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
+      "next_gate": "Preserve this checked bounded transaction and its parent composition."
     },
     {
       "id": "P-CONSOLIDATION-1.fee-refinement.tx",

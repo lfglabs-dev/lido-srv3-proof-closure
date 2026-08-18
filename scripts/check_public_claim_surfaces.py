@@ -15,13 +15,21 @@ from typing import NoReturn
 CLAIMS = {
     "P-DEPOSIT-1": {
         "abstract_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+        "verity_status": "CHECKED",
+        "verity_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback",
         "module": "PDeposit1",
-        "layers": ".model, .abstractTx, .source",
+        "layers": ".model, .abstractTx, .source, .verityTx",
         "imports": (
             "LidoSRv3.Audit.Trace",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
+            "LidoSRv3.Audit.Verity.DepositParentTx",
             "LidoSRv3.Audit.Guarantees.Registry",
         ),
+        # The composed claim is a single theorem quantified over the source
+        # configuration/input, the transaction input and the entry state, so its
+        # bridge (`LinksSource`), the two arithmetic links it needs, and the
+        # witness proving its hypotheses jointly satisfiable are all part of the
+        # public surface.
         "declarations": (
             ("def", "guarantee"),
             ("theorem", "revert_restores_state_value_and_logs"),
@@ -29,6 +37,14 @@ CLAIMS = {
             ("theorem", "source_router_balance_unchanged"),
             ("theorem", "source_reverting_branch_moves_no_ether"),
             ("theorem", "source_nonconserving_deployment_reverts"),
+            ("structure", "LinksSource"),
+            ("theorem", "linked_total_eq_pushedValue"),
+            ("theorem", "linked_total_eq_depositsValue"),
+            ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
+            ("def", "canonicalSourceConfig"),
+            ("def", "canonicalSourceInput"),
+            ("theorem", "canonical_links_source"),
+            ("theorem", "canonical_composition_witness"),
         ),
     },
     "P-TOPUP-1": {

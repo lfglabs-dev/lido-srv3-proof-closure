@@ -33,6 +33,7 @@ import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Audit.Guarantees.PReserveRelational
 import LidoSRv3.Tests.DepositTxMutants
+import LidoSRv3.Tests.DepositParentTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.AllocationTx
@@ -119,6 +120,20 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
 #print axioms LidoSRv3.Audit.Verity.DepositTx.run_simulates_source
 #print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.canonical_composition_witness
+#print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
+#print axioms
+  LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.DepositParentTx.revert_observes_idle
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.mutant_none_reproduces_execute
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.skipped_allocation_write_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.skipped_dynamic_data_write_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.skipped_root_write_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.misrouted_push_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.dropped_push_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.root_failure_observes_idle
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent
