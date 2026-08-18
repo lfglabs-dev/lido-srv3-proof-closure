@@ -13,7 +13,7 @@ and deployment provenance are out of scope.
 
 | # | ID | Abstract Lean | Faithful Verity |
 | --- | --- | --- | --- |
-| 1 | `P-ALLOC-1` | CHECKED | PARTIAL |
+| 1 | `P-ALLOC-1` | CHECKED | CHECKED |
 | 2 | `P-ALLOC-2` | CHECKED | PARTIAL |
 | 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL — linked calls not yet faithfully executed |
 | 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | PARTIAL |
@@ -21,7 +21,7 @@ and deployment provenance are out of scope.
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |
 | 7 | `P-ETH-1` | OPEN | OPEN — child TX ledgers only |
 | 8 | `P-ADDRESS-1` | OPEN | PARTIAL |
-| 9 | `P-TOPUP-2` | CHECKED | PARTIAL |
+| 9 | `P-TOPUP-2` | CHECKED | CHECKED |
 | 10 | `P-CONSOLIDATION-1` | OPEN | PARTIAL |
 | 11 | `P-SSZ-1` | CHECKED | PARTIAL |
 

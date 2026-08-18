@@ -2,6 +2,7 @@ import LidoSRv3.Audit.Model.AllocCapacity
 import LidoSRv3.Audit.Source.AllocCapacityCorrespondence
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Verity.AllocCapacityPhase3
+import LidoSRv3.Audit.Verity.AllocationTx
 
 namespace LidoSRv3.Audit.Guarantees.PAlloc1
 
@@ -105,5 +106,36 @@ theorem source_capacities_and_mapped_summary_transaction
   exact ⟨source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds,
     _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_phase3_transaction moduleAddress⟩
 
+/-- Headline composed closure theorem for P-ALLOC-1. The executable
+transaction binds each router-ordered `moduleId` to its stored
+`moduleAddress`, runs the two allocation/capacity loops, persists
+observables through `writeMapUint` / `writeSlot`, and matches the
+pinned-source `_getModulesAllocationAndCapacity` interpreter. -/
+theorem verity_tx_simulates_allocation
+    (cfg : Config) (modules : List _root_.LidoSRv3.Audit.Verity.AllocationTx.BoundModule)
+    (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)
+    (state : Verity.ContractState)
+    (hBind : _root_.LidoSRv3.Audit.Verity.AllocationTx.sourceBindAll
+      state modules.length = modules) :
+    _root_.LidoSRv3.Audit.Verity.AllocationTx.observe modules
+        ((_root_.LidoSRv3.Audit.Verity.AllocationTx.allocate
+          modules.length cfg depositsToAllocate isTopUp).run state) =
+      _root_.LidoSRv3.Audit.Verity.AllocationTx.sourceView
+        cfg modules depositsToAllocate isTopUp :=
+  _root_.LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_pinned_source
+    cfg modules depositsToAllocate isTopUp state hBind
+
+/-- Every revert of the allocation transaction, including the injected
+failure after intermediate map/slot writes, restores the pre-call snapshot. -/
+theorem verity_tx_revert_restores_snapshot
+    (count : Nat) (cfg : Config) (depositsToAllocate : Verity.Uint256)
+    (isTopUp inject : Bool) (state rollback : Verity.ContractState)
+    (reason : String)
+    (h : (_root_.LidoSRv3.Audit.Verity.AllocationTx.allocate
+        count cfg depositsToAllocate isTopUp inject).run state =
+      Verity.ContractResult.revert reason rollback) :
+    rollback = state :=
+  _root_.LidoSRv3.Audit.Verity.AllocationTx.revert_restores_snapshot
+    count cfg depositsToAllocate isTopUp inject state rollback reason h
 
 end LidoSRv3.Audit.Guarantees.PAlloc1
