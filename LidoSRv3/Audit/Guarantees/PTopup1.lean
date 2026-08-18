@@ -194,17 +194,30 @@ Composed faithful `VERITY_TX` closure for the committing P-TOPUP-1 path.
 
 The premise is the pinned source interpreter's committing classification; the
 executable side independently folds `inp.allocations` through `writeMapUint`
-and `writeSlot`, performs the zero-value Lido call, credits the pull, and emits
-one value-bearing beacon call per nonzero allocation.  The equality compares
-only outcome observables.  The final conjunct states rollback for every
-injected failure point after intermediate writes/calls.
+and `writeSlot`, then runs two *real* Verity external-call frames
+(`externalCallBindTo`) -- the zero-value Lido pull and one value-bearing
+beacon push per nonzero allocation.  The journal is produced by execution, not
+appended: `Verity.TopupTx.execute` never mentions `expectedCalls`.
+
+The first conjunct compares outcome observables, and those observables now
+include the journal's destination addresses, wei values, argument words and
+order, plus the per-allocation mapping words -- so a misrouted call, a
+corrupted amount, a dropped argument or a reordered batch all falsify it.
+The final conjunct states rollback for every injected failure point, each of
+which fires after real storage writes and, past the first, after a real
+journalled and balance-debiting call frame.
+
+`hLen` bounds the batch length by the word modulus; it is what makes the
+per-allocation mapping keys injective, and a `List` longer than `2^256` has no
+EVM counterpart.
 -/
 theorem verity_tx_simulates_source
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (hNoWrap : NoUncheckedWrap inp) (state : Verity.ContractState)
+    (hLen : inp.allocations.length ≤ uint256Modulus)
     (hCommit : (run cfg inp).reverts = false) :
-    let before := Verity.TopupTx.fundedFrame state
-    Verity.TopupTx.observe before
+    let before := Verity.TopupTx.entryFrame state
+    Verity.TopupTx.observe before inp.allocations.length
         ((Verity.TopupTx.execute inp.allocations .none).run before) =
           Verity.TopupTx.sourceObservables inp.allocations ∧
       (run cfg inp).pulled =
@@ -215,8 +228,9 @@ theorem verity_tx_simulates_source
         (Verity.TopupTx.execute inp.allocations failure).run before =
             .revert reason rollback →
           rollback = before := by
+  have hSum : allocSum inp.allocations < uint256Modulus := hNoWrap
   dsimp
-  refine ⟨Verity.TopupTx.execute_success_observes_source inp.allocations state hNoWrap,
+  refine ⟨Verity.TopupTx.execute_observes_source_from_entry inp.allocations state hSum hLen,
     ?_, ?_, ?_⟩
   · cases hRun : run cfg inp with
     | committedNoTopUp =>
