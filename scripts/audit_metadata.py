@@ -51,12 +51,12 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "NONE", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD")),
     "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
-    "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward", "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ETH-1": ("OPEN", None, "OPEN", None, "IMPLEMENTATION_PENDING", ()),
     "P-ADDRESS-1": ("OPEN", None, "PARTIAL", None, "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX",)),
-    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "PARTIAL", None, "IMPLEMENTATION_PENDING", ()),
-    "P-CONSOLIDATION-1": ("OPEN", None, "PARTIAL", None, "VERITY_FEATURE_REQUIRED", ("A-SHA256-FFI",)),
+    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "NONE", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
@@ -64,19 +64,19 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-2": "425bb708216a67f8040e0ecd7279d969e343a8bc2f335a95cbc91086bfe96894",
     "P-DEPOSIT-1": "bd1f9e0347f60d3ea75089dc4d6abbbbe3515ff865bf83419f5286fad32c0968",
     "P-TOPUP-1": "e76b6a30ef38a283b05b9a6fbb31b12dc4376682ab824ae26440b512d622667f",
-    "P-ACCOUNT-1": "e9fea968dc683b7e784f63be8513e173c5732eac6b5aa0baefa101689b37233b",
+    "P-ACCOUNT-1": "b4422bd7a9dd34f3f2e18bb0afa2774a8f093db6c37de717e1fd6bdde80ff1d3",
     "P-RESERVE-1": "e8f34af2bb8d1eb061da1882ff2460535489056a8e9eca41e7b8c750a614ff27",
     "P-ETH-1": "9f79007c732bddca4e2ca56d988c63aa0059b35c6e48def28985dad3e3cbcd64",
     "P-ADDRESS-1": "882421e998af3fe6be8af7154999801509a085ccf4e1842c310ad6ddf68122e3",
-    "P-TOPUP-2": "2c8cb1b166f1bcae465079fad7c0b301d5faf08639d3afc53a327aeaa2ddfca3",
-    "P-CONSOLIDATION-1": "9e27decc67733f1e9b4974f97b51ae35829a9c0ed0bb5c318c9152ab0f6211ca",
+    "P-TOPUP-2": "f71ef81588d77e28a3226eafd91e4a896fe0f6a04db1bc5d9dd4d0e84cf16c61",
+    "P-CONSOLIDATION-1": "c459ec05da73f3d6ac52d13d93bdf263c2eeced71a999f3c34fe8397e496eb1d",
     "P-SSZ-1": "a429fac6e7be5569d75e24b9f83a627c2383032ba87bf639fe4274e53bed218f",
 }
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
-    "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "P1",
+    "P-DEPOSIT-1": "P1", "P-TOPUP-1": "P1", "P-ACCOUNT-1": "DONE",
     "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "P2",
-    "P-ADDRESS-1": "P2", "P-TOPUP-2": "P2", "P-CONSOLIDATION-1": "P2",
+    "P-ADDRESS-1": "P2", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
 

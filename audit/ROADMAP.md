@@ -27,14 +27,11 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 - `P-DEPOSIT-1` — **IMPLEMENTATION_PENDING**: Compose the recovered ledger core with authorization, allocation, dynamic deposit data, roots, and observable Lido/router/beacon calls.
 - `P-TOPUP-1` — **IMPLEMENTATION_PENDING**: Replace the sourceExecute-backed parent wrapper with independent observable allocation/Lido/beacon execution while preserving A-TOPUP-NOWRAP.
-- `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: Implement a stateful Verity report path with guard/overflow mutants.
 
 ## Deferred P2-labelled registry rows
 
 - `P-ETH-1` — **IMPLEMENTATION_PENDING**: Define the abstract parent then compose relevant protocol-controlled Verity value paths.
 - `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
-- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: First model checked uint256 addition and overflow rollback; only then compose storage and calls in one observable Verity run with complete call shape and same-run failure provenance.
-- `P-CONSOLIDATION-1` — **VERITY_FEATURE_REQUIRED**: Close the observable FunctionSpec call/event/memory bridge, then consume it.
 
 ## Deferred P3-labelled registry rows
 
@@ -43,5 +40,8 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 - `P-ALLOC-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-ALLOC-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-ACCOUNT-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-CONSOLIDATION-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-SSZ-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.

@@ -45,10 +45,11 @@ example : all.map (fun guarantee => guarantee.id.text) =
      "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1", "P-TOPUP-2",
      "P-CONSOLIDATION-1", "P-SSZ-1"] := by decide
 
-/-- Blocked transaction claims must not survive in the Lean-side registry. -/
+/-- Retracted transaction claims stay blocked; P-ACCOUNT-1 now includes the
+composed faithful Verity transaction layer. -/
 example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
 example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
-example : PAccount1.guarantee.checkedLayers = [.model, .source] := by decide
+example : PAccount1.guarantee.checkedLayers = [.model, .source, .verityTx] := by decide
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
 def supplemental : List Guarantee := [PDeref1.guarantee]
