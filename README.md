@@ -21,7 +21,7 @@ and deployment provenance are out of scope.
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |
 | 7 | `P-ETH-1` | OPEN | OPEN — child TX ledgers only |
 | 8 | `P-ADDRESS-1` | OPEN | PARTIAL |
-| 9 | `P-TOPUP-2` | CHECKED | PARTIAL |
+| 9 | `P-TOPUP-2` | CHECKED | CHECKED |
 | 10 | `P-CONSOLIDATION-1` | OPEN | PARTIAL |
 | 11 | `P-SSZ-1` | CHECKED | PARTIAL |
 
