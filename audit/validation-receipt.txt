@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 874a3f227fcc9e99e997830524612c4a657386a1
+validated-tree: 97c42df746b98442af4746501badbc6591cb2f75
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -108,6 +108,16 @@ P-RESERVE-RELATIONAL checked locked-ETH accumulator (2026-08-18)
   main only in `P-RESERVE-RELATIONAL` and carries main's `P-DEPOSIT-1` and
   `P-ADDRESS-1.denote-admission` rows untouched. `validated-tree` above is
   rebound to the post-merge tracked tree excluding this receipt.
+- The merge exposed a pre-existing metadata defect on `main`, repaired here in
+  its own commit. #103's integration merge `de538a0` kept the stale
+  `EXPECTED_CANONICAL_DETAIL_SHA256` entry `9f79007c` for `P-ETH-1` (the digest
+  of the superseded `OPEN` row) while taking main's closed `CHECKED` claims
+  tuple, so `python3 scripts/audit_metadata.py check` failed on `main` with
+  "P-ETH-1: canonical assurance detail differs". The `P-ETH-1` row itself is
+  byte-identical at the merge base `1a90395`, at `main` `fff2c27`, and here;
+  its digest is `eafed670`, the value `main` carried at `1a90395` when the
+  check was last green. The pin is restored to `eafed670`. No guarantee row,
+  theorem, claim, classification, or assumption is changed by that repair.
 
 P-DEPOSIT-1 composed parent-transaction repair (2026-08-18)
 -----------------------------------------------------------
