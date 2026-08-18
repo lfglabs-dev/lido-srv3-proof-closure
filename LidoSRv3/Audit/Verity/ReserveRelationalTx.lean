@@ -262,7 +262,6 @@ theorem verity_tx_simulates_pinned_source
     simp [hEnds, observe]
   · rw [hEnds] at h
     have hCount : ((first :: rest).length == 0) = false := by simp
-    rw [hEnds] at hNoWrap
     unfold Contract.run finalize sourceView sourceRun sourcePrefinalize
     unfold sourceRun sourcePrefinalize at hNoWrap
     rw [h, hEnds]
@@ -280,7 +279,15 @@ theorem verity_tx_simulates_pinned_source
                 · have hBound :
                       before.lockedEth + sourceSum inputs.report.useDiscount selected ≤
                         Verity.Core.MAX_UINT256 := by
-                    refine hNoWrap _ _ ?_
+                    refine hNoWrap
+                      { before with
+                        lockedEth :=
+                          before.lockedEth + sourceSum inputs.report.useDiscount selected }
+                      ⟨sourceRanges inputs.queue.lastFinalizedRequestId selected,
+                        sourceSum inputs.report.useDiscount selected,
+                        sourceShareSum selected,
+                        some (inputs.queue.lastFinalizedRequestId + 1, last),
+                        before.lockedEth + sourceSum inputs.report.useDiscount selected⟩ ?_
                     simp [hSel, hPaused, hGet, hFits]
                   simp [observe, txRun, hGet, hFits, Nat.not_lt.mpr hBound, lastFinalizedSlot,
                     lockedEtherSlot, ContractState.readSlot_writeSlot_same,
@@ -391,12 +398,12 @@ theorem verity_reserve_does_not_change_finalization
       | none => simp [observe]
       | some decoded =>
           cases hRun : txRun decoded inputs.report.useDiscount with
-          | none => simp [observe]
+          | none => simp [hRun, observe]
           | some quint =>
               obtain ⟨ranges, eth, shares, range, locked⟩ := quint
               by_cases hOv : Verity.Core.MAX_UINT256 < locked
-              · simp [hOv, observe]
-              · simp [hOv, observe, lastFinalizedSlot, lockedEtherSlot,
+              · simp [hRun, hOv, observe]
+              · simp [hRun, hOv, observe, lastFinalizedSlot, lockedEtherSlot,
                   ContractState.readSlot_writeSlot_same,
                   ContractState.readSlot_writeSlot_other]
 
