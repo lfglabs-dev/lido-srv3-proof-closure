@@ -53,6 +53,8 @@ test:
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositTxMutants
 	@printf '%s\n' 'bounded Verity deposit transaction mutant compiled and asserted'
+	@lake build LidoSRv3.Tests.DepositParentTxMutants
+	@printf '%s\n' 'P-DEPOSIT-1 composed transaction mutants (per-module writes, journal, ledger) compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstAmountTxMutants
 	@printf '%s\n' 'P-ALLOC-2 amount transaction mutants and floor-division regression compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstDistributionTxMutants
@@ -91,6 +93,8 @@ test:
 	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
+	@lake build LidoSRv3.Tests.AddressSourceMutants
+	@printf '%s\n' 'P-ADDRESS-1 executable address-writer, wrong-recipient, and admission-boundary mutants compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts

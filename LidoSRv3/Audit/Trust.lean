@@ -35,10 +35,12 @@ import LidoSRv3.Audit.Guarantees.PReserveRelational
 import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 import LidoSRv3.Tests.ReserveRelationalTxMutants
 import LidoSRv3.Tests.DepositTxMutants
+import LidoSRv3.Tests.DepositParentTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.AllocationTx
 import LidoSRv3.Tests.AllocationTxMutants
+import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 
 /-!
@@ -120,6 +122,14 @@ assumptions or proof escapes.
   LidoSRv3.Audit.Verity.ConsolidationCallFragment.registered_external_call_bind_entrypoint_always_reverts
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.guards_only_succeeds
 #print axioms LidoSRv3.Audit.Verity.ConsolidationCallFragment.success_hypotheses_are_vacuous
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance
+#print axioms LidoSRv3.Audit.Verity.AddressTx.pinned_source_observable_correspondence
+#print axioms LidoSRv3.Audit.Verity.AddressTx.executed_address_writes_follow_renamed_source
+#print axioms LidoSRv3.Audit.Verity.AddressTx.every_revert_restores_snapshot
+#print axioms LidoSRv3.Tests.AddressSourceMutants.verity_wrong_recipient_mutant_rejected
+#print axioms LidoSRv3.Tests.AddressSourceMutants.verity_fixed_owner_writer_mutant_rejected
+#print axioms LidoSRv3.Tests.AddressSourceMutants.verity_zero_amount_rejected
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity
 #print axioms
@@ -137,6 +147,20 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
 #print axioms LidoSRv3.Audit.Verity.DepositTx.run_simulates_source
 #print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.canonical_composition_witness
+#print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
+#print axioms
+  LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.DepositParentTx.revert_observes_idle
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.mutant_none_reproduces_execute
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.skipped_allocation_write_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.skipped_dynamic_data_write_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.skipped_root_write_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.misrouted_push_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.dropped_push_rejected
+#print axioms LidoSRv3.Tests.DepositParentTxMutants.root_failure_observes_idle
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent
