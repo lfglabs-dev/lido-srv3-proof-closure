@@ -7,6 +7,8 @@ import LidoSRv3.Audit.Guarantees.PAlloc1Phase3
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
 import LidoSRv3.Audit.Guarantees.PAccount1
+import LidoSRv3.Audit.Verity.HandleOracleReportTx
+import LidoSRv3.Tests.HandleOracleReportTxMutants
 import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.ConsolidationCallFragment
@@ -76,6 +78,10 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.success_capacity
 #print axioms LidoSRv3.Audit.MinFirstAllocation.Source.revert_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.verity_tx_simulates_pinned_source
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_claim_success
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_admits
