@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 44324824dbfd69a3974b689f37cc7c9d67419ccb
+validated-tree: c5ddf63cbc9042ed9e40acb0186685a219c12b26
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -79,10 +79,30 @@ P-TOPUP-1 external-call-frame repair of the faithful plane (2026-08-18)
   earlier merge resolution. Only the two marker lines were removed; no receipt
   content was removed with them. This branch had already repaired the same
   defect at lines 26 and 42 against `5fcfe44`.
+- `verity/targets/audit-manifest.json` carries a hand-maintained `trust` prose
+  string naming which guarantees are CHECKED at both objectives. No script
+  generates or validates it, and both sides of the merge named a stale set. It
+  is restated here against the merged registry: P-ALLOC-1, P-ALLOC-2,
+  P-TOPUP-1, P-TOPUP-2, P-ACCOUNT-1, P-RESERVE-1, P-CONSOLIDATION-1, and
+  P-SSZ-1 at both objectives; P-DEPOSIT-1, P-ADDRESS-1, and P-ETH-1 not.
+- The `PTopup1.guarantee` docstring still described the Verity transaction
+  claim as "blocked and deliberately absent" while the layer list it documents
+  already carried `.verityTx`. Corrected to describe the composed layer. This
+  is a comment correction; no theorem statement or proof changed.
+- Scope note on the full-tree build. `lake build LidoSRv3` does not reach exit
+  0 at this Verity pin: `Compiler.Proofs.IRGeneration.DenoteAgreement.lean:69`
+  fails with a `rfl` type mismatch on `evalExpr ... Expr.memoryArrayElement`.
+  That module is upstream Verity source under `.lake/packages/verity`,
+  compiled only from pinned dependency sources, so it is independent of this
+  branch and reproduces identically on `main` (`lakefile.lean` and
+  `lean-toolchain` here are byte-identical to `b59c650`). It is recorded, not
+  repaired: this branch has no authority over the pin. Every LidoSRv3 module
+  reached exit 0, including all three P-TOPUP-1 targets and all `make test`
+  mutant modules.
 - Verity remains pinned to merged upstream
   `8719dc52e8c581e37bab4594fed11b11c41494b8`.
 - Receipt subject: tracked tree excluding this receipt,
-  `5473f3b817fe70b61cb4b436f0d8bcaeb9a3b4c7`.
+  `c5ddf63cbc9042ed9e40acb0186685a219c12b26`.
 
 P-SSZ-1 structural map outcome readback (2026-08-17)
 -----------------------------------------------------
