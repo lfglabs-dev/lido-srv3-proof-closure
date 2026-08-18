@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 306dac5ff1393bbc55f56820a72aeda4a055689b
+validated-tree: 874a3f227fcc9e99e997830524612c4a657386a1
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -97,6 +97,17 @@ P-RESERVE-RELATIONAL checked locked-ETH accumulator (2026-08-18)
 - The row moves to `classification.kind` `NONE` with `fidelity.missing` empty.
   `next_gate` is now the remaining source-shaped decoding premise, which is
   unchanged by this slice and still carried as `A-SOURCE-SHAPED`.
+- Integration merge of `origin/main` `fff2c27` (P-DEPOSIT-1 composed
+  parent-transaction repair, #103) by normal merge, never rebase. The only
+  conflict was this receipt, resolved by additive union: both the
+  `P-RESERVE-RELATIONAL` and the `P-DEPOSIT-1` sections are retained and no
+  evidence bullet was dropped. `LidoSRv3/Audit/Trust.lean`,
+  `LidoSRv3/Audit/AllGuarantees.lean`, `scripts/audit_metadata.py`,
+  `audit/guarantees.yaml`, `audit/assumptions.yaml`, `audit/ROADMAP.md` and
+  `Makefile` auto-merged on disjoint regions; the merged registry differs from
+  main only in `P-RESERVE-RELATIONAL` and carries main's `P-DEPOSIT-1` and
+  `P-ADDRESS-1.denote-admission` rows untouched. `validated-tree` above is
+  rebound to the post-merge tracked tree excluding this receipt.
 
 P-DEPOSIT-1 composed parent-transaction repair (2026-08-18)
 -----------------------------------------------------------
