@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: b1f2fcd3a766bc36cd68fb1fb94c9ae91ef3a15a
+validated-tree: 6db98df3b9bdafe5e64cf3eee2e189d1d24a8b40
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -21,7 +21,23 @@ P-CONSOLIDATION-1 faithful Verity transaction closure (2026-08-17)
   intermediate-write rollback, and two-batch chaining.
 - Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
 - Receipt subject: tracked tree excluding this receipt,
-  `b1f2fcd3a766bc36cd68fb1fb94c9ae91ef3a15a`.
+  `6db98df3b9bdafe5e64cf3eee2e189d1d24a8b40`.
+
+P-TOPUP-2 faithful Verity transaction closure (2026-08-17)
+----------------------------------------------------------
+
+- Source commit `4dab091` composes the checked abstract aggregate-cap theorem
+  with an executable `Contract.run` transaction over denoted mutable
+  `uint256[]` memory arrays and `writeMapUint` / `writeSlot` outcome
+  observables.
+- The transaction matches the pinned-source checked `_evaluateTopUpLimit`
+  addition, left-to-right share/block budget consumption, remaining-cap
+  update, and rollback behavior. Mutants cover overflow on checked uint256
+  addition, off-by-one allocation, intermediate-write rollback, and two-batch
+  chaining.
+- Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `828be035a57bd5d62257075793c0670232afc340`.
 
 P-ALLOC-1 faithful Verity transaction closure (2026-08-17)
 -----------------------------------------------------------

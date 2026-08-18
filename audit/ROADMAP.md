@@ -33,7 +33,6 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 - `P-ETH-1` — **IMPLEMENTATION_PENDING**: Define the abstract parent then compose relevant protocol-controlled Verity value paths.
 - `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
-- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: First model checked uint256 addition and overflow rollback; only then compose storage and calls in one observable Verity run with complete call shape and same-run failure provenance.
 
 ## Deferred P3-labelled registry rows
 
@@ -44,4 +43,5 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-ALLOC-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-ALLOC-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-CONSOLIDATION-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
