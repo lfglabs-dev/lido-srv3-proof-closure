@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 4711cccadce6c7fcc5afcfd9ccf115e4bdfbbe98
+validated-tree: fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -958,3 +958,63 @@ P-SSZ-1 GIndex.concat SOURCE child (2026-08-16)
   changed-Lean net-new `sorry`/`admit`/`axiom`/`native_decide` audit: exit 0.
 - Receipt subject: tracked tree excluding this receipt,
   `49500b1eece0f42e3c52894b5f5a5a60abaa13a8`.
+
+P-RESERVE-RELATIONAL executable finalization composition (2026-08-18)
+---------------------------------------------------------------------
+
+- Authored on `prove/p-reserve-relational-2` from `main`
+  `54db83e0` with no rebase, force-push, or merge. Slice 1 supplied the
+  abstract statement only; this slice adds the executable plane and is the
+  first time the parent is registered.
+- `LidoSRv3.Audit.Verity.ReserveRelationalTx.finalize` is an executable
+  `Contract.run` transaction, not a wrapper over the interpreter. It decodes
+  the requested batch ends from a denoted `uint256[]` memory array through
+  `evalExpr (.memoryArrayElement ...)`, reads queue economics from four
+  `mapUint` storage channels behind an existence marker, journals every
+  prefinalized endpoint, and persists locked ETH and the last finalized
+  request id with `writeSlot`. It computes all five observables:
+  `prefinalizedRanges`, `prefinalizedEth`, `sharesToBurn`, `finalizedRange`,
+  and `lockedEtherAfter`.
+- `verity_tx_simulates_reserve_relational_spec` composes the three planes: the
+  transaction's committed/reverted observables equal those of the
+  independently defined pinned-source interpreter, which in turn corresponds
+  to the abstract spec via `source_run_correspondence`. The composition is
+  non-vacuous: `Decodes (worldFor inputs lowReserve) inputs lowReserve` is
+  discharged by `rfl` on a concrete storage-and-memory world.
+- `verity_reserve_slot_is_not_read` proves `depositsReserveSlot` lies outside
+  the transaction's read frame, including under an injected post-write
+  failure, and `verity_reserve_does_not_change_finalization` states the
+  relational guarantee on the executable plane.
+- `verity_revert_restores_snapshot` proves that any failure, including one
+  injected after the batch journal and both finalization writes, returns the
+  exact pre-transaction snapshot.
+- Verity-plane mutants reject a reserve-to-range read, a reserve-to-shares
+  read, and an off-by-one range endpoint; report, queue-pause, unknown batch
+  end, and buffer-shortfall paths fail closed; the discount column and a
+  two-call batch chain are pinned. No `native_decide` is used anywhere in this
+  lane: every vector closes by `rfl` or `decide`.
+- Recorded fidelity gap: the abstract plane is unbounded `Nat`, so the
+  transaction stores the wrapped `uint256` word on the locked ETH accumulator
+  where Solidity 0.8 checked addition would revert. This is the single
+  `fidelity.missing` entry, which holds the row at
+  `IMPLEMENTATION_PENDING`; no fully-checked claim is made.
+- Registration is post-composition only. The canonical minimal-11 facade,
+  its length regression, and its ID-order regression are untouched;
+  `P-RESERVE-RELATIONAL` is a supplemental row in `AllGuarantees.supplemental`
+  and the 14th subordinate metadata row.
+- Focused Lean build, `LidoSRv3.Audit.AllGuarantees`, and
+  `LidoSRv3.Audit.Trust`: exit 0, 1289 jobs. The six registered
+  `PReserveRelational` theorems report only `[propext]`, `[propext,
+  Quot.sound]`, or `[propext, Classical.choice, Quot.sound]`; no `sorryAx` and
+  no `Lean.ofReduceBool` appear in the axiom gate.
+- `make test`, `python3 scripts/audit_metadata.py check` (11 canonical
+  guarantees plus 14 subordinate rows), the optimized metadata mutants,
+  `scripts/check_no_python_evidence.sh`,
+  `scripts/check_public_claim_surfaces.py`,
+  `scripts/check_verity_provenance.py`, `scripts/check_provenance_guards.sh`,
+  and `git diff --check`: exit 0.
+- Verified source tree over `LidoSRv3`, `LidoSRv3.lean`, `lakefile.lean`,
+  `lake-manifest.json`, and `lean-toolchain`:
+  `7ec46bd54a7960490a3c0177c4b17ca393e60542`.
+- Receipt subject: tracked tree excluding this receipt,
+  `fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca`.
