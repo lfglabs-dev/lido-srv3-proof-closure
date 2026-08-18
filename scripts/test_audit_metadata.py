@@ -57,7 +57,7 @@ def main():
         x = copy.deepcopy(guarantees); x["guarantees"][0], x["guarantees"][1] = x["guarantees"][1], x["guarantees"][0]; mutants.append((gpath, x, "IDs/order differ"))
         x = copy.deepcopy(guarantees); x["guarantees"][0]["abstract"]["theorem"] = None; mutants.append((gpath, x, "checked abstract lacks"))
         x = copy.deepcopy(guarantees); x["guarantees"][2]["verity"] = {"status":"CHECKED", "theorem":"LidoSRv3.Fake.nominal_tx"}; mutants.append((gpath, x, "canonical assurance claim differs"))
-        x = copy.deepcopy(guarantees); x["guarantees"][8]["abstract"]["status"] = "OPEN"; x["guarantees"][8]["abstract"]["theorem"] = None; mutants.append((gpath, x, "canonical assurance claim differs"))
+        x = copy.deepcopy(guarantees); x["guarantees"][8]["verity"]["theorem"] = "LidoSRv3.Fake.topup2"; mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][1]["classification"]["consumer"] = "P-ALLOC-1"; mutants.append((gpath, x, "NONE may not hide extra claims"))
         x = copy.deepcopy(guarantees); x["guarantees"][6]["classification"] = {"kind":"PROPERTY_FALSE"}; mutants.append((gpath, x, "lacks counterexample"))
         x = copy.deepcopy(guarantees); x["guarantees"][3]["assumptions"].remove("A-TOPUP-NOWRAP"); mutants.append((gpath, x, "canonical assurance claim differs"))

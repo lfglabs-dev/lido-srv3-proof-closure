@@ -283,39 +283,38 @@
     },
     {
       "id": "P-TOPUP-2",
-      "assumptions": [],
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD"
+      ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Verity.Topup2Tx LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Tests.Topup2TxMutants LidoSRv3.Tests.Topup2Mutants",
-        "expected": "abstract aggregate cap and overflow-boundary, CallProgram, and packed-storage regressions build; SOURCE/Verity promotion remains retracted"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
+        "expected": "abstract aggregate cap and faithful memory-array Verity transaction composition build with overflow, off-by-one, rollback, and two-batch mutants"
       },
-      "summary": "The abstract aggregate top-up cap is checked over Nat. SOURCE and Verity promotion are retracted because effectiveBalanceGwei + pendingBalanceGwei is total in the model but checked uint256 addition reverts on overflow; CallProgram and packed-storage artifacts remain non-promoting regression scaffolds.",
+      "summary": "The abstract aggregate top-up cap and a composed faithful Verity transaction are checked. The transaction decodes uint256 memory arrays, evaluates checked top-up limits, consumes the module-share/block budget, persists allocations through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec"
       },
       "fidelity": {
         "covered": [
           "abstract Nat aggregate cap",
-          "non-promoting adversarial CallProgram bound/rollback regressions",
-          "non-promoting packed-storage and source-layout mutants"
+          "checked uint256 overflow-revert correspondence",
+          "denoted mutable uint256 effective/pending/requested memory arrays",
+          "repeated Contract.run allocation with writeMapUint/writeSlot observables",
+          "rollback after intermediate writes and two-batch mutant coverage"
         ],
-        "missing": [
-          "checked uint256 bounds and overflow-revert correspondence",
-          "single Contract.run composition of storage and calls",
-          "target/kind/calldata/per-validator granularity",
-          "same-run failed-call witness membership"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "First model checked uint256 addition and overflow rollback; only then compose storage and calls in one observable Verity run with complete call shape and same-run failure provenance.",
-      "roadmap_priority": "P2"
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-CONSOLIDATION-1",
