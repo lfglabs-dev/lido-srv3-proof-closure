@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f3fa3c4a574d613cc23930c5a7bc629e5255fe11
+validated-tree: PENDING
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -22,7 +22,56 @@ P-ADDRESS-1 abstract and Verity transaction closure (2026-08-17)
 - Generated shared views also retain the accepted P-ALLOC-1/P-ALLOC-2 closures
   from current `origin/main`; no allocation theorem source is duplicated here.
 - Receipt subject: tracked tree excluding this receipt,
-  `f3fa3c4a574d613cc23930c5a7bc629e5255fe11`.
+  `PENDING`.
+
+P-CONSOLIDATION-1 faithful Verity transaction closure (2026-08-17)
+------------------------------------------------------------------
+
+- Source commit `fbcc947` composes the checked abstract eligibility,
+  value-conservation, and atomicity theorem with an executable
+  `Contract.run` transaction over denoted memory-backed public-key arrays,
+  journaled CALL / ConsolidationRequestAdded observables, and
+  `writeMapUint` / `writeSlot` persistence.
+- The transaction matches the pinned-source vault entrypoint at
+  `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. Mutants cover
+  call drop, event drop, memory drop, mismatched arity, double-emit,
+  intermediate-write rollback, and two-batch chaining.
+- Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `009fd62f214ca3ebe9b3bb74638b47f630603de5`.
+
+P-ACCOUNT-1 faithful Verity transaction closure (2026-08-17)
+------------------------------------------------------------
+
+- Source commit `c5c4fc1822adb1b1c0c12b1e2d418c8b08a7d7ed` composes the
+  checked abstract report-before-reward theorem with an executable
+  `Contract.run` oracle-report transaction over `writeMapUint` module
+  balances and `writeSlot` total/step-flag observables.
+- The transaction executes registered-order, length, `MAX_VALUE_GWEI`, and
+  checked uint64 overflow guards, matches the pinned-source accept/step
+  view, and rolls back prefix writes on failure. Mutants cover overflow,
+  bypass-guard, dropped-snapshot, intermediate-write rollback, and
+  two-batch chaining.
+- Verity remains pinned to merged upstream
+  `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `37a6c0d5f21ba6070a241e56681c652c365e61e6`.
+
+P-TOPUP-2 faithful Verity transaction closure (2026-08-17)
+----------------------------------------------------------
+
+- Source commit `4dab091` composes the checked abstract aggregate-cap theorem
+  with an executable `Contract.run` transaction over denoted mutable
+  `uint256[]` memory arrays and `writeMapUint` / `writeSlot` outcome
+  observables.
+- The transaction matches the pinned-source checked `_evaluateTopUpLimit`
+  addition, left-to-right share/block budget consumption, remaining-cap
+  update, and rollback behavior. Mutants cover overflow on checked uint256
+  addition, off-by-one allocation, intermediate-write rollback, and two-batch
+  chaining.
+- Verity remains pinned to `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- Receipt subject: tracked tree excluding this receipt,
+  `828be035a57bd5d62257075793c0670232afc340`.
 
 P-ALLOC-1 faithful Verity transaction closure (2026-08-17)
 -----------------------------------------------------------

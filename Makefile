@@ -57,12 +57,16 @@ test:
 	@printf '%s\n' 'P-ALLOC-2 full memory-array transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.AllocationTxMutants
 	@printf '%s\n' 'P-ALLOC-1 allocation-loop transaction mutants, moduleAddress binding, rollback, and two-batch chain compiled and asserted'
+	@lake build LidoSRv3.Tests.ConsolidationTxMutants
+	@printf '%s\n' 'P-CONSOLIDATION-1 call/event/memory transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupVectors
 	@printf '%s\n' 'executable top-up conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.TopupHybridMutants
 	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.Topup2TxMutants
 	@printf '%s\n' 'bounded Verity P-TOPUP-2 aggregate-cap transaction mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.Topup2DistributionTxMutants
+	@printf '%s\n' 'P-TOPUP-2 faithful memory-array transaction mutants, overflow, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveMutants
 	@printf '%s\n' 'executable reserve non-interference and rollback mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveRelationalMutants
@@ -73,6 +77,8 @@ test:
 	@printf '%s\n' 'P-ETH-1b bus/request Contract.run mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors
 	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.HandleOracleReportTxMutants
+	@printf '%s\n' 'P-ACCOUNT-1 faithful oracle-report transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.DereferenceMutants
 	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
