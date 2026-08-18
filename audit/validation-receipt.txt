@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: PENDING_TREE_SHA
+validated-tree: 78e69c3ec590add55c38a8589a473d969b5f3263
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -64,7 +64,7 @@ P-ETH-1 parent composition closure (2026-08-18)
   immutable `CONSOLIDATION_REQUEST` value with the canonical EIP-7251 address
   remains the separate `P-ETH-1b` provenance obligation.
 - Receipt subject: tracked tree excluding this receipt,
-  `PENDING_TREE_SHA`.
+  `78e69c3ec590add55c38a8589a473d969b5f3263`.
 
 P-ACCOUNT-1 faithful Verity transaction closure (2026-08-17)
 ------------------------------------------------------------
