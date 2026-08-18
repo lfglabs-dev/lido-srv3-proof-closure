@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 97c42df746b98442af4746501badbc6591cb2f75
+validated-tree: 8fed8c66140d37f249f74eb17a8fcb8739c416cb
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -118,6 +118,20 @@ P-RESERVE-RELATIONAL checked locked-ETH accumulator (2026-08-18)
   its digest is `eafed670`, the value `main` carried at `1a90395` when the
   check was last green. The pin is restored to `eafed670`. No guarantee row,
   theorem, claim, classification, or assumption is changed by that repair.
+- A second pre-existing `main` defect blocked the build gate and is repaired
+  here in its own commit. The pinned Verity revision declares `"slot"` as a
+  syntax token (`Verity/Macro/Syntax.lean:51-57`), which makes `slot` a
+  reserved keyword in every module importing Verity's macro layer;
+  `AddressBuiltin.toYul` bound its `.sloadAddress` payload to that identifier,
+  so `LidoSRv3/Audit/Verity/AddressYulInterface.lean` failed to parse at
+  `40:17` with "unexpected token 'slot'; expected '=>'". The file is
+  byte-identical to `origin/main` `fff2c27` and reproduces there at the same
+  line and column, it is unchanged since #88, and the module sits in the
+  default lake target, so `lake build` could not reach exit 0 on any branch.
+  The repository carries no CI workflow, which is why the regression survived
+  the Verity pin bump. The binder is renamed to `storageSlot`, the name the
+  `AddressBuiltin.sloadAddress` constructor already gives that field. No
+  guarantee row, theorem statement, proof, or claim is changed by that repair.
 
 P-DEPOSIT-1 composed parent-transaction repair (2026-08-18)
 -----------------------------------------------------------
