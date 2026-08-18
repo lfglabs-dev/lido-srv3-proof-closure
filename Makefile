@@ -47,6 +47,8 @@ test:
 	@printf '%s\n' 'executable structural SSZ branch regressions compiled and asserted'
 	@lake build LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 	@printf '%s\n' 'typed SSZ transaction-simulation acceptance/mutant/rollback vectors compiled and asserted'
+	@lake build LidoSRv3.Tests.SszEncodingTxMutants
+	@printf '%s\n' 'P-SSZ-1 composed encoding transaction mutants, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositVectors
 	@printf '%s\n' 'executable deposit conservation/rollback falsifier vectors compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositTxMutants

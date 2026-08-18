@@ -35,7 +35,6 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Deferred P3-labelled registry rows
 
-- `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Prove SSZ parent/wrappers in Verity and bind only the imported SSZ Yul fragment to deployment.
 
 ## Checked baseline to preserve
 
@@ -45,3 +44,4 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-CONSOLIDATION-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-SSZ-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
