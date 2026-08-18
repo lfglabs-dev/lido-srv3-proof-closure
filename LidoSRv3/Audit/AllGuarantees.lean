@@ -46,10 +46,10 @@ example : all.map (fun guarantee => guarantee.id.text) =
      "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1", "P-TOPUP-2",
      "P-CONSOLIDATION-1", "P-SSZ-1"] := by decide
 
-/-- Retracted transaction claims stay blocked; P-DEPOSIT-1 and P-ACCOUNT-1 now
-include the composed faithful Verity transaction layer. -/
+/-- Retracted transaction claims stay blocked; P-DEPOSIT-1, P-TOPUP-1 and
+P-ACCOUNT-1 now include the composed faithful Verity transaction layer. -/
 example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
-example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
+example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
 example : PAccount1.guarantee.checkedLayers = [.model, .source, .verityTx] := by decide
 
 /-- P-DEPOSIT-1's `.verityTx` layer is carried by a theorem that shares its

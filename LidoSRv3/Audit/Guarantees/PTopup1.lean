@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.TopupCorrespondence
+import LidoSRv3.Audit.Verity.TopupTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PTopup1
@@ -9,8 +10,9 @@ open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityTopup
 
 /-- The active registry exposes MODEL, SOURCE, and abstract rollback evidence.
-The former Verity transaction claim is blocked and deliberately absent. -/
-def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source]⟩
+The Verity transaction layer composes the pinned-source observables with the
+executable external-call frames (post-#2362/#2365). -/
+def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source, .verityTx]⟩
 
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order
@@ -187,5 +189,81 @@ is a real falsifier and is not papered over.
 theorem source_pinned_config_discharges_pubkey_guard (inp : SourceTopupInput) :
     run pinnedConfig inp ≠ .revertInvalidPublicKeyLength :=
   run_ne_revertInvalidPublicKeyLength pinnedConfig_pubkey_lengths_agree
+
+/--
+Composed faithful `VERITY_TX` closure for the committing P-TOPUP-1 path.
+
+The premise is the pinned source interpreter's committing classification; the
+executable side independently folds `inp.allocations` through `writeMapUint`
+and `writeSlot`, then runs two *real* Verity external-call frames
+(`externalCallBindTo`) -- the zero-value Lido pull and one value-bearing
+beacon push per nonzero allocation.  The journal is produced by execution, not
+appended: `Verity.TopupTx.execute` never mentions `expectedCalls`.
+
+The first conjunct compares outcome observables, and those observables now
+include the journal's destination addresses, wei values, argument words and
+order, plus the per-allocation mapping words -- so a misrouted call, a
+corrupted amount, a dropped argument or a reordered batch all falsify it.
+The final conjunct states rollback for every injected failure point, each of
+which fires after real storage writes and, past the first, after a real
+journalled and balance-debiting call frame.
+
+`hLen` bounds the batch length by the word modulus; it is what makes the
+per-allocation mapping keys injective, and a `List` longer than `2^256` has no
+EVM counterpart.
+-/
+theorem verity_tx_simulates_source
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hNoWrap : NoUncheckedWrap inp) (state : Verity.ContractState)
+    (hLen : inp.allocations.length ≤ uint256Modulus)
+    (hCommit : (run cfg inp).reverts = false) :
+    let before := Verity.TopupTx.entryFrame state
+    Verity.TopupTx.observe before inp.allocations.length
+        ((Verity.TopupTx.execute inp.allocations .none).run before) =
+          Verity.TopupTx.sourceObservables inp.allocations ∧
+      (run cfg inp).pulled =
+        (Verity.TopupTx.sourceObservables inp.allocations).pulled ∧
+      (run cfg inp).pushed =
+        (Verity.TopupTx.sourceObservables inp.allocations).pushed ∧
+      ∀ failure reason rollback,
+        (Verity.TopupTx.execute inp.allocations failure).run before =
+            .revert reason rollback →
+          rollback = before := by
+  have hSum : allocSum inp.allocations < uint256Modulus := hNoWrap
+  dsimp
+  refine ⟨Verity.TopupTx.execute_observes_source_from_entry inp.allocations state hSum hLen,
+    ?_, ?_, ?_⟩
+  · cases hRun : run cfg inp with
+    | committedNoTopUp =>
+        have hZero := committedNoTopUp_implies_zero_total hRun
+        have hz : allocSum inp.allocations = 0 := by
+          simpa [totalAllocated] using hZero
+        simp [Outcome.pulled, Verity.TopupTx.sourceObservables, hz]
+    | committedTopUp keys pulled pushed balanceAfter =>
+        have hSpec := committed_topup_spec hRun
+        have hPositive : 0 < totalAllocated inp := by
+          rw [← hSpec.2.2.2.1]
+          exact hSpec.2.2.2.2.2.2.1
+        have hNonzero : allocSum inp.allocations ≠ 0 := by
+          simpa [totalAllocated] using Nat.ne_of_gt hPositive
+        simpa [hRun, Outcome.pulled, Verity.TopupTx.sourceObservables,
+          totalAllocated, hNonzero] using hSpec.2.2.2.1
+    | _ => simp_all [Outcome.reverts]
+  · cases hRun : run cfg inp with
+    | committedNoTopUp =>
+        have hZero := committedNoTopUp_implies_zero_total hRun
+        simpa [hRun, Outcome.pushed, Verity.TopupTx.sourceObservables,
+          totalAllocated] using hZero.symm
+    | committedTopUp keys pulled pushed balanceAfter =>
+        have hSpec := committed_topup_spec hRun
+        calc
+          pushed = pulled := hSpec.2.2.2.2.2.1.symm
+          _ = allocSum inp.allocations := by
+            simpa [totalAllocated] using hSpec.2.2.2.1
+          _ = (Verity.TopupTx.sourceObservables inp.allocations).pushed := rfl
+    | _ => simp_all [Outcome.reverts]
+  · intro failure reason rollback hRevert
+    exact Verity.TopupTx.revert_restores_snapshot inp.allocations failure
+      _ rollback reason hRevert
 
 end LidoSRv3.Audit.Guarantees.PTopup1
