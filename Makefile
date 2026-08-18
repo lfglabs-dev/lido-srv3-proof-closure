@@ -63,6 +63,8 @@ test:
 	@printf '%s\n' 'hybrid Verity top-up transaction mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.Topup2TxMutants
 	@printf '%s\n' 'bounded Verity P-TOPUP-2 aggregate-cap transaction mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.Topup2DistributionTxMutants
+	@printf '%s\n' 'P-TOPUP-2 faithful memory-array transaction mutants, overflow, rollback, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveMutants
 	@printf '%s\n' 'executable reserve non-interference and rollback mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveRelationalMutants
