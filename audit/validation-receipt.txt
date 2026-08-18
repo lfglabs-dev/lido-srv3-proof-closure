@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 306dac5ff1393bbc55f56820a72aeda4a055689b
+validated-tree: 800b836fa05a8ad125b5a3d35becaf7ec2cd2864
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -97,6 +97,48 @@ P-RESERVE-RELATIONAL checked locked-ETH accumulator (2026-08-18)
 - The row moves to `classification.kind` `NONE` with `fidelity.missing` empty.
   `next_gate` is now the remaining source-shaped decoding premise, which is
   unchanged by this slice and still carried as `A-SOURCE-SHAPED`.
+=======
+P-DEPOSIT-1 composed parent-transaction repair (2026-08-18)
+-----------------------------------------------------------
+
+- `LidoSRv3/Audit/Verity/DepositParentTx.lean` runs the pinned two-batch
+  `StakingRouter.deposit` path as one `Verity.Contract.run` program:
+  authorization, module-active and allocation guards, the reentrancy counter,
+  per-module `writeMapUint` allocation / dynamic-data / deposit-data-root
+  writes, the Lido pull, and both beacon value legs through
+  `externalCallBindTo` frames carrying concrete targets, wei values and
+  argument words.
+- `execute_observes_source` quantifies over every `Inputs` and every entry
+  `ContractState` satisfying `Preconditions` and is proved by reducing the
+  program, not by `decide` on a ground term. Observables expose the per-module
+  allocation, dynamic-data and deposit-data-root words alongside the
+  conservation aggregates, the guard counter, the Lido ledger, the router's
+  closing retention, and the ordered call journal down to name, destination,
+  wei value and argument words.
+- `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` is a single
+  theorem over shared variables `(cfg, inp, inputs, entry)`. `LinksSource`
+  pins the transaction inputs to the pinned-source deposit quantities, so the
+  abstract conservation/rollback claim, the executable revert boundary, the
+  source-observable correspondence, and the cross-plane `pulled`/`pushed`
+  equality all range over the same data. `canonical_composition_witness`
+  discharges `LinksSource` and `Preconditions` on a deployment where the
+  source model commits, so the composition is not vacuous.
+- `LidoSRv3/Tests/DepositParentTxMutants.lean` mutates `execute` itself,
+  pinned to production by `mutant_none_reproduces_execute`. Mutants cover
+  skipped per-module allocation, dynamic-data and root writes, a skipped
+  counter bump, a skipped Lido debit, and dropped, misrouted, mis-valued,
+  reordered and duplicated beacon pushes, plus intermediate-write rollback.
+- P-DEPOSIT-1 is registered in `LidoSRv3/Audit/AllGuarantees.lean` and its
+  theorems are listed in `LidoSRv3/Audit/Trust.lean`; every one depends only
+  on `propext`, `Classical.choice` and `Quot.sound`.
+- Verity is pinned to `a063bfc869735045354ebc3862ca08859da0f56e`, EVMYulLean to
+  `f7e4ee0dc8f8d5265ce822a937ab5be771f182e9`, and Lido core to
+  `af095e48bbc1c3841c2c9936219c8461af01056b`. This lane was certified against
+  Verity `8719dc52e8c581e37bab4594fed11b11c41494b8` and re-verified after the
+  merge that advanced the pin.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+>>>>>>> origin/main
 
 P-TOPUP-1 external-call-frame repair of the faithful plane (2026-08-18)
 -----------------------------------------------------------------------

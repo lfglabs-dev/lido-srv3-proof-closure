@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PDeposit1
+import LidoSRv3.Audit.Verity.DepositParentTx
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PReserve1
@@ -46,11 +47,24 @@ example : all.map (fun guarantee => guarantee.id.text) =
      "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1", "P-TOPUP-2",
      "P-CONSOLIDATION-1", "P-SSZ-1"] := by decide
 
-/-- Retracted transaction claims stay blocked; P-ACCOUNT-1 now includes the
-composed faithful Verity transaction layer. -/
-example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by decide
+/-- Retracted transaction claims stay blocked; P-DEPOSIT-1, P-TOPUP-1 and
+P-ACCOUNT-1 now include the composed faithful Verity transaction layer. -/
+example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
 example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
 example : PAccount1.guarantee.checkedLayers = [.model, .source, .verityTx] := by decide
+
+/-- P-DEPOSIT-1's `.verityTx` layer is carried by a theorem that shares its
+variables across both planes rather than by a conjunction of two unrelated
+facts: the source configuration/input, the transaction input and the entry
+`ContractState` are quantified once and linked by `LinksSource`.  Naming both
+the composition and its non-vacuity witness here keeps the aggregate surface
+honest if either is ever weakened. -/
+example := @PDeposit1.verity_tx_composes_deposit_conservation_and_rollback
+
+example : LidoSRv3.Audit.Verity.DepositParentTx.Preconditions
+    LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs
+    LidoSRv3.Audit.Verity.DepositParentTx.canonicalState :=
+  PDeposit1.canonical_composition_witness.2.1
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
 def supplemental : List Guarantee := [PDeref1.guarantee, PReserveRelational.guarantee]
