@@ -551,6 +551,66 @@
       ]
     },
     {
+      "id": "P-ETH-1",
+      "status": "MAPPED",
+      "spans": [
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol",
+          "function": "executeConsolidation",
+          "start_line": 383,
+          "end_line": 406,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
+          "function": "addConsolidationRequests",
+          "start_line": 185,
+          "end_line": 223,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
+          "function": "_refundFee",
+          "start_line": 295,
+          "end_line": 307,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L295-L307"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
+          "function": "_callAddConsolidationRequest",
+          "start_line": 113,
+          "end_line": 121,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
+          "function": "_callAddWithdrawalRequest",
+          "start_line": 103,
+          "end_line": 111,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L103-L111"
+        },
+        {
+          "repository": "lidofinance/core",
+          "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+          "path": "contracts/0.8.9/WithdrawalVault.sol",
+          "function": "withdrawWithdrawals",
+          "start_line": 107,
+          "end_line": 121,
+          "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L107-L121"
+        }
+      ]
+    },
+    {
       "id": "P-ETH-1a",
       "status": "MAPPED",
       "spans": [

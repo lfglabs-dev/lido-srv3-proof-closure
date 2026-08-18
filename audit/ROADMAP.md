@@ -19,7 +19,7 @@ Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido 
 
 ## P3 — remaining parents
 
-Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ only with the composition patterns from P1/P2.
+Resume Accounting, Address, Topup2, Deposit, Topup1, Consolidation, and SSZ only with the composition patterns from P1/P2.
 
 ## Current guarantee registry
 
@@ -31,7 +31,6 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Deferred P2-labelled registry rows
 
-- `P-ETH-1` — **IMPLEMENTATION_PENDING**: Define the abstract parent then compose relevant protocol-controlled Verity value paths.
 - `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Generalize the recovered transfer witness to universal post-state equivariance, then add faithful request/claim/redemption entrypoints.
 - `P-CONSOLIDATION-1` — **VERITY_FEATURE_REQUIRED**: Close the observable FunctionSpec call/event/memory bridge, then consume it.
 
@@ -44,4 +43,5 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-ALLOC-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-ALLOC-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-ETH-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
 - `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.

@@ -1,6 +1,14 @@
 import LidoSRv3.Audit.Verity.PEth1CompositionTx
 
-/-! Discriminating mutants for the composed P-ETH-1 MultiContract slice. -/
+/-!
+Discriminating mutants for the composed P-ETH-1 transaction.
+
+Each mutant is the *same* ensemble and the *same* dispatcher under a mutated
+`Wiring` (or, for the rollback mutant, under the projection that drops
+atomicity).  A mutant is killed when its outcome observable differs from the
+reference run, so none of these can be satisfied by weakening the parent
+statement.
+-/
 
 namespace LidoSRv3.Tests.PEth1CompositionTxMutants
 
@@ -9,67 +17,45 @@ open Compiler.CompilationModel.DenoteExternalCalls
 open _root_.Verity.MultiContract
 open LidoSRv3.Audit.Verity.PEth1CompositionTx
 
-def wrongRefundAddr : Address := (7 : Address)
+/-- Reference: a two-request batch at 3 wei per request funded with 10 wei. -/
+def reference : TxOutcome := run honest 10 2 3
 
-def runDoubleRefund : TxResult :=
-  let before := initial 10
-  advance before .busToGateway
-    (executeHop before busAddr gatewayAddr 10 1 true) fun w1 =>
-  advance before .gatewayToVault
-    (executeHop w1 gatewayAddr vaultAddr 3 2 true) fun w2 =>
-  advance before .gatewayToRefund
-    (executeHop w2 gatewayAddr refundAddr 14 3 true) fun w3 =>
-  advance before .vaultToRequest
-    (executeHop w3 vaultAddr requestAddr 3 4 true) fun w4 =>
-  .committed w4
+/-- Reference for the atomicity claim: the same batch against a
+consolidation-request predeploy that rejects. -/
+def referenceRejected : TxOutcome := run { honest with requestAccepts := false } 10 2 3
 
-def runWrongRecipient : TxResult :=
-  let before := initial 10
-  advance before .busToGateway
-    (executeHop before busAddr gatewayAddr 10 1 true) fun w1 =>
-  advance before .gatewayToVault
-    (executeHop w1 gatewayAddr vaultAddr 3 2 true) fun w2 =>
-  advance before .gatewayToRefund
-    (executeHop w2 gatewayAddr wrongRefundAddr 7 3 true) fun w3 =>
-  advance before .vaultToRequest
-    (executeHop w3 vaultAddr requestAddr 3 4 true) fun w4 =>
-  .committed w4
+/-! ## drop — the Gateway never emits the refund leg -/
 
-/-- Bug: returns the world after the first three committed hops when the final
-request call fails, instead of the transaction-entry snapshot. -/
-def runPreservedPrefix : TxResult :=
-  let before := initial 10
-  advance before .busToGateway
-    (executeHop before busAddr gatewayAddr 10 1 true) fun w1 =>
-  advance before .gatewayToVault
-    (executeHop w1 gatewayAddr vaultAddr 3 2 true) fun w2 =>
-  advance before .gatewayToRefund
-    (executeHop w2 gatewayAddr refundAddr 7 3 true) fun w3 =>
-  match executeHop w3 vaultAddr requestAddr 3 4 false with
-  | some _ => .reverted .vaultToRequest w3
-  | none => .reverted .vaultToRequest w3
+def dropRefund : TxOutcome := run { honest with emitRefund := false } 10 2 3
 
-/-- Bug: restores the Bus balance after an otherwise committing run. -/
-def runValueNotDebited : TxResult :=
-  match run (initial 10) 10 3 true true true true with
-  | .reverted hop w => .reverted hop w
-  | .committed w =>
-      .committed (upsert w busAddr (accountAt busAddr 10).state)
+theorem rejects_dropped_refund_leg :
+    observe dropRefund ≠ observe reference := by decide +kernel
 
-theorem rejects_double_refund :
-    observe runDoubleRefund ≠
-      observe (run (initial 10) 10 3 true true true true) := by decide
+/-! ## misroute — the Gateway's vault link points at Lido -/
 
-theorem rejects_wrong_recipient :
-    observe runWrongRecipient ≠
-      observe (run (initial 10) 10 3 true true true true) := by decide
+def misrouteVault : TxOutcome := run { honest with vaultTarget := lidoAddr } 10 2 3
+
+theorem rejects_misrouted_vault_leg :
+    observe misrouteVault ≠ observe reference := by decide +kernel
+
+/-! ## corrupt — the Gateway declares the whole `msg.value` as the refund -/
+
+def corruptRefundAmount : TxOutcome := run { honest with refundWholeValue := true } 10 2 3
+
+theorem rejects_corrupted_refund_amount :
+    observe corruptRefundAmount ≠ observe reference := by decide +kernel
+
+/-! ## rollback — the committed prefix is kept after a failing hop -/
 
 theorem rejects_preserved_prefix_after_failed_hop :
-    observe runPreservedPrefix ≠
-      observe (run (initial 10) 10 3 true true true false) := by decide
+    observeWithoutRollback referenceRejected ≠ observe referenceRejected := by
+  decide +kernel
 
-theorem rejects_value_not_debited :
-    observe runValueNotDebited ≠
-      observe (run (initial 10) 10 3 true true true true) := by decide
+/-! ## two-batch — the Vault issues one request for a two-request batch -/
+
+def singleRequestForBatch : TxOutcome := run { honest with perRequestCalls := false } 10 2 3
+
+theorem rejects_single_request_for_two_request_batch :
+    observe singleRequestForBatch ≠ observe reference := by decide +kernel
 
 end LidoSRv3.Tests.PEth1CompositionTxMutants

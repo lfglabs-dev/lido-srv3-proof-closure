@@ -5,11 +5,14 @@ namespace LidoSRv3.Audit.Guarantees.PEth1
 
 abbrev Address := Nat
 
-/-- Abstract destinations relevant to the two P-ETH-1 sub-properties. -/
+/-- Abstract destinations covering every ETH-bearing leg of the P-ETH-1
+inventory. `other` is the residual lateral destination the parent forbids. -/
 inductive EthDestination
   | lido
   | withdrawalQueue
   | consolidationContract
+  | withdrawalRequestContract
+  | refundRecipient
   | other (addr : Address)
   deriving DecidableEq, Repr
 
@@ -28,9 +31,44 @@ def totalAmount (moves : List EthMove) : Nat :=
 def approvedReturnMoves (moves : List EthMove) : List EthMove :=
   moves.filter fun m => m.destination = .lido ∨ m.destination = .withdrawalQueue
 
-/-- The canonical parent remains open; the theorems below are subordinate
-evidence for its two bounded child rows, not additional public guarantees. -/
 def guarantee : Guarantee := ⟨.pEth1, [.model, .source, .verityTx]⟩
+
+/-! ## Sum laws for `totalAmount`
+
+`totalAmount` is an accumulating `foldl`, so the parent needs the accumulator
+generalised before it can be split across `++` and `List.replicate`. -/
+
+private theorem foldl_amount (moves : List EthMove) (acc : Nat) :
+    moves.foldl (fun a m => a + m.amount) acc = acc + totalAmount moves := by
+  induction moves generalizing acc with
+  | nil => simp [totalAmount]
+  | cons m ms ih =>
+      simp only [List.foldl_cons, totalAmount, Nat.zero_add]
+      rw [ih (acc + m.amount), ih m.amount]
+      omega
+
+theorem totalAmount_nil : totalAmount [] = 0 := rfl
+
+theorem totalAmount_cons (m : EthMove) (ms : List EthMove) :
+    totalAmount (m :: ms) = m.amount + totalAmount ms := by
+  simp only [totalAmount, List.foldl_cons, Nat.zero_add]
+  exact foldl_amount ms m.amount
+
+theorem totalAmount_append (xs ys : List EthMove) :
+    totalAmount (xs ++ ys) = totalAmount xs + totalAmount ys := by
+  induction xs with
+  | nil => simp [totalAmount]
+  | cons x xs ih =>
+      rw [List.cons_append, totalAmount_cons, ih, totalAmount_cons]
+      omega
+
+theorem totalAmount_replicate (n : Nat) (m : EthMove) :
+    totalAmount (List.replicate n m) = n * m.amount := by
+  induction n with
+  | zero => simp [totalAmount]
+  | succ n ih =>
+      rw [List.replicate_succ, totalAmount_cons, ih, Nat.succ_mul]
+      omega
 
 /-- Parent abstract conservation law for the Gateway split: every wei
 forwarded by the Bus is assigned exactly once to either the Vault fee or the
@@ -93,22 +131,180 @@ theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall
   simp [hMem]
 
 /-!
-## ETH-bearing call-site inventory
+## Parent: every ETH-bearing path
 
-This file proves only the two bounded abstract child properties above. The
-parent P-ETH-1 remains open and includes every ETH-bearing path identified by
-the source review:
+The three constructors of `EthPath` are the complete ETH-bearing call-site
+inventory recovered by the source review:
 
-* `ConsolidationBus.executeConsolidation` forwards `msg.value` to
-  `ConsolidationGateway`.
-* `ConsolidationGateway` sends `requestsCount × fee` to `WithdrawalVault` and
-  refunds the remainder to an arbitrary `refundRecipient` (falling back to
-  `msg.sender`).
-* `WithdrawalVault.withdrawWithdrawals` sends ETH to Lido.
-* `WithdrawalVault` sends EIP-7002 fees to the immutable
-  `WITHDRAWAL_REQUEST` request contract.
-* `WithdrawalVault` sends EIP-7251 fees to the immutable
-  `CONSOLIDATION_REQUEST` request contract.
--/
+* `consolidation` — `ConsolidationBus.executeConsolidation` forwards `msg.value`
+  to `ConsolidationGateway`, which pays `requestsCount × feePerRequest` onward
+  through `WithdrawalVault` to the immutable EIP-7251 `CONSOLIDATION_REQUEST`
+  contract and refunds the remainder to the resolved `refundRecipient`
+  (`msg.sender` when unset).
+* `withdrawalRequests` — `WithdrawalVault` pays EIP-7002 fees to the immutable
+  `WITHDRAWAL_REQUEST` contract, one per request.
+* `withdrawalsToLido` — `WithdrawalVault.withdrawWithdrawals` sends ETH to Lido.
+
+The parent states, over every path, that no wei reaches a lateral destination
+and that the trace totals exactly the value the path was entered with. -/
+
+structure ConsolidationTx where
+  msgValue : Nat
+  requestsCount : Nat
+  feePerRequest : Nat
+  deriving DecidableEq, Repr
+
+def consolidationFee (t : ConsolidationTx) : Nat :=
+  t.requestsCount * t.feePerRequest
+
+def consolidationRefund (t : ConsolidationTx) : Nat :=
+  t.msgValue - consolidationFee t
+
+/-- The Gateway skips the refund leg entirely when the remainder is zero. -/
+def refundMoves (t : ConsolidationTx) : List EthMove :=
+  if consolidationRefund t = 0 then []
+  else [{ amount := consolidationRefund t, destination := .refundRecipient }]
+
+inductive EthPath
+  | consolidation (t : ConsolidationTx)
+  | withdrawalRequests (count feePerRequest : Nat)
+  | withdrawalsToLido (amount : Nat)
+  deriving Repr
+
+def pathTrace : EthPath → List EthMove
+  | .consolidation t =>
+      List.replicate t.requestsCount
+          { amount := t.feePerRequest, destination := .consolidationContract }
+        ++ refundMoves t
+  | .withdrawalRequests count feePerRequest =>
+      List.replicate count
+        { amount := feePerRequest, destination := .withdrawalRequestContract }
+  | .withdrawalsToLido amount =>
+      [{ amount := amount, destination := .lido }]
+
+/-- The value the path is entered with: `msg.value` for the consolidation
+transaction, the aggregate fee for the request legs, the withdrawn amount for
+the Lido leg. -/
+def pathValue : EthPath → Nat
+  | .consolidation t => t.msgValue
+  | .withdrawalRequests count feePerRequest => count * feePerRequest
+  | .withdrawalsToLido amount => amount
+
+/-- The Gateway's `InsufficientValue` guard; the other legs are unconditioned. -/
+def pathFunded : EthPath → Prop
+  | .consolidation t => consolidationFee t ≤ t.msgValue
+  | .withdrawalRequests _ _ => True
+  | .withdrawalsToLido _ => True
+
+/-- A destination is parent-approved when it is one of the five protocol
+destinations, i.e. anything other than a lateral `other` address. -/
+def parentApproved : EthDestination → Prop
+  | .other _ => False
+  | _ => True
+
+theorem totalAmount_refundMoves (t : ConsolidationTx) :
+    totalAmount (refundMoves t) = consolidationRefund t := by
+  unfold refundMoves
+  split
+  · next h => simp [totalAmount, h]
+  · simp [totalAmount_cons, totalAmount_nil]
+
+theorem refundMoves_approved (t : ConsolidationTx) :
+    ∀ m ∈ refundMoves t, parentApproved m.destination := by
+  unfold refundMoves
+  split
+  · intro m hm; simp at hm
+  · intro m hm
+    simp only [List.mem_singleton] at hm
+    subst hm
+    trivial
+
+/-- **Parent P-ETH-1.** On every ETH-bearing path of the inventory, provided the
+Gateway fee guard holds, no wei escapes to a lateral destination and the
+committed trace sums to exactly the value entering the path. -/
+theorem eth_flow_parent (p : EthPath) (h : pathFunded p) :
+    (∀ m ∈ pathTrace p, parentApproved m.destination) ∧
+      totalAmount (pathTrace p) = pathValue p := by
+  cases p with
+  | consolidation t =>
+      have hFee : consolidationFee t ≤ t.msgValue := h
+      refine ⟨?_, ?_⟩
+      · intro m hm
+        rcases List.mem_append.mp hm with hm | hm
+        · rw [List.eq_of_mem_replicate hm]; trivial
+        · exact refundMoves_approved t m hm
+      · show totalAmount (List.replicate _ _ ++ refundMoves t) = t.msgValue
+        rw [totalAmount_append, totalAmount_replicate, totalAmount_refundMoves]
+        show consolidationFee t + consolidationRefund t = t.msgValue
+        unfold consolidationRefund
+        omega
+  | withdrawalRequests count feePerRequest =>
+      refine ⟨?_, ?_⟩
+      · intro m hm
+        rw [List.eq_of_mem_replicate hm]; trivial
+      · exact totalAmount_replicate count _
+  | withdrawalsToLido amount =>
+      refine ⟨?_, ?_⟩
+      · intro m hm
+        simp only [pathTrace, List.mem_singleton] at hm
+        subst hm
+        trivial
+      · simp [pathTrace, pathValue, totalAmount_cons, totalAmount_nil]
+
+/-! ## Verity plane
+
+The composed transaction is stated in `LidoSRv3.Audit.Verity.PEth1CompositionTx`
+and re-exported here so the assurance contract can name a stable path. -/
+
+/-- **Verity plane P-ETH-1.** Recursive dispatch of the compiled
+`Bus → Gateway → Vault → (CONSOLIDATION_REQUEST | refund)` ensemble through
+external-call frames over one shared `MultiWorld`: the fee/refund split lands
+on the outcome observables, a rejecting request contract restores the entry
+world, the underfunded batch reverts inside the Gateway, ETH is conserved
+across every run, and the discovered call program replays identically as one
+atomic compiled multicall. -/
+theorem verity_tx_composes_value_flow_and_rollback :
+    (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3) =
+      ⟨.success, 6, ⟨0, 0, 0, 0, 0, 6, 4⟩⟩ ∧
+      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 1 3) =
+      ⟨.success, 5, ⟨0, 0, 0, 0, 0, 3, 7⟩⟩ ∧
+      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 6 2 3) =
+      ⟨.success, 5, ⟨0, 0, 0, 0, 0, 6, 0⟩⟩) ∧
+    _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
+      (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+        { _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest with
+          requestAccepts := false } 10 2 3) =
+      ⟨.calleeReverted _root_.Verity.MultiContract.requestAddr, 4,
+        ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+    _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
+      (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+        _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 4 3) =
+      ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
+        ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+    (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.escrowed
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3) = 10 ∧
+      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.escrowed
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 6 2 3) = 6 ∧
+      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.escrowed
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          { _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest with
+            requestAccepts := false } 10 2 3) = 10) ∧
+    ((_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+        _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3).program.length = 6 ∧
+      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.replay
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3) =
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
+          (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+            _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3)).balances) :=
+  _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.verity_tx_composes_value_flow_and_rollback
 
 end LidoSRv3.Audit.Guarantees.PEth1

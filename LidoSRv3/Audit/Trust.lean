@@ -16,6 +16,7 @@ import LidoSRv3.Audit.Verity.PEth1RefundTx
 import LidoSRv3.Audit.Verity.PEth1RequestTx
 import LidoSRv3.Tests.PEth1RefundTxMutants
 import LidoSRv3.Tests.PEth1RequestTxMutants
+import LidoSRv3.Tests.PEth1CompositionTxMutants
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
@@ -100,6 +101,13 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined
+#print axioms LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent
+#print axioms LidoSRv3.Audit.Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback
+#print axioms LidoSRv3.Tests.PEth1CompositionTxMutants.rejects_dropped_refund_leg
+#print axioms LidoSRv3.Tests.PEth1CompositionTxMutants.rejects_misrouted_vault_leg
+#print axioms LidoSRv3.Tests.PEth1CompositionTxMutants.rejects_corrupted_refund_amount
+#print axioms LidoSRv3.Tests.PEth1CompositionTxMutants.rejects_preserved_prefix_after_failed_hop
+#print axioms LidoSRv3.Tests.PEth1CompositionTxMutants.rejects_single_request_for_two_request_batch
 #print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.gateway_refund_success_moves_value
 #print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.gateway_refund_failure_keeps_prefix_out
 #print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.withdraw_success_moves_to_lido

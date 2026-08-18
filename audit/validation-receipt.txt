@@ -7,6 +7,65 @@ Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
+P-ETH-1 parent composition closure (2026-08-18)
+------------------------------------------------
+
+- Verity is re-pinned from `8719dc52e8c581e37bab4594fed11b11c41494b8` to merged
+  upstream `main` `a063bfc869735045354ebc3862ca08859da0f56e`, which contains
+  PR #2362 (external-call frames) and PR #2365 (atomic compiled multicall). The
+  lakefile request, resolved manifest `rev`/`inputRev`, artifact lock, audit
+  manifest, source map, provenance fixture, and checkout all agree on that SHA.
+- `LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent` closes the abstract plane
+  over `EthPath`, whose three constructors are the complete ETH-bearing
+  call-site inventory. For every path it proves no wei reaches a lateral
+  destination and that the committed trace totals exactly the entering value.
+- `LidoSRv3.Audit.Verity.PEth1CompositionTx.run` dispatches the compiled
+  Bus/Gateway/Vault ensemble recursively over one shared
+  `MultiContract.MultiWorld`. Each hop is a real PR #2362 frame: `callFunction`
+  enters the callee's `FunctionSpec`, the body executes under
+  `denoteFunctionWithCalls`, and the resulting control decides commit or
+  restore. The dispatcher harvests the journal entries the executed body
+  appended and pushes them as the next frames, so the call graph is emitted by
+  the caller bodies rather than assembled by hand.
+- ETH moves exactly once per hop under a declared-amount convention: every
+  `LinkedExternal` carries `value := 0`, the body-computed amount travels as
+  calldata word `0`, the dispatcher lifts it into `CallSite.value`, and every
+  receiver opens with `require(msg.value == amount)`.
+- `verity_tx_composes_value_flow_and_rollback` is stated over `TxView` outcome
+  observables -- control, hop count, and the seven-account balance sheet -- not
+  over full contract states. It covers the fee/refund split for one- and
+  two-request batches and the exact-fee batch, restoration of the entry world
+  when the request predeploy rejects, the in-Gateway revert of an underfunded
+  batch, ETH conservation on success and on revert, and equality between the
+  recursively dispatched run and a PR #2365 `denoteTransaction` replay of the
+  discovered `List CompiledCall`.
+- `LidoSRv3.Tests.PEth1CompositionTxMutants` runs the same ensemble and the same
+  dispatcher under a mutated `Wiring`, so no mutant can be killed by weakening
+  the parent statement. The five mutants are drop (`emitRefund := false`),
+  misroute (`vaultTarget := lidoAddr`), corrupt (`refundWholeValue := true`),
+  rollback (`observeWithoutRollback`), and two-batch
+  (`perRequestCalls := false`). The rollback mutant is falsifiable rather than
+  tautological because `TxOutcome` retains both `entryWorld` and `lastWorld`.
+- `lake env lean LidoSRv3/Audit/Trust.lean`: `eth_flow_parent`,
+  `verity_tx_composes_value_flow_and_rollback`, and all five mutants report
+  `depends on axioms: [propext, Quot.sound]`. The decision procedure is
+  `decide +kernel`, which is kernel reduction and introduces no axiom; no
+  `sorry`, `admit`, `native_decide`, or project-level axiom is introduced.
+- `lake build LidoSRv3.Audit.Trust LidoSRv3.Audit.AllGuarantees`: exit 0,
+  `Build completed successfully (1290 jobs)` under Lean 4.31.0.
+- `P-ETH-1` is promoted to abstract `CHECKED` / Verity `CHECKED` with a real
+  `P-ETH-1` source-map target covering all six inventory spans, so the former
+  `P-ETH-1` exemption in `scripts/audit_metadata.py` is removed rather than
+  tolerated. `P-ETH-1a` and `P-ETH-1b` stay bounded per-leg children.
+- Standing scope is unchanged: the parent is a model-plane composition under
+  `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, and `A-ABSTRACT-TX`. It does not claim
+  the Bus, Gateway, or Vault are the pinned Solidity contracts compiled to
+  bytecode, nor that these are executable EVM trace semantics. Identifying the
+  immutable `CONSOLIDATION_REQUEST` value with the canonical EIP-7251 address
+  remains the separate `P-ETH-1b` provenance obligation.
+- Receipt subject: tracked tree excluding this receipt,
+  `PENDING_TREE_SHA`.
+
 P-TOPUP-2 faithful Verity transaction closure (2026-08-17)
 ----------------------------------------------------------
 

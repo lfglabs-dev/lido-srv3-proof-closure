@@ -10,7 +10,7 @@
 | `P-TOPUP-1` | CHECKED | PARTIAL | independent Verity execution of allocation and linked calls; observable Lido pull/beacon push order/value/multiplicity | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD` |
 | `P-ACCOUNT-1` | CHECKED | PARTIAL | stateful Verity execution; executable validity/overflow guards | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
 | `P-RESERVE-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-ETH-1` | OPEN | OPEN | abstract parent ETH-flow theorem; faithful Verity composition | IMPLEMENTATION_PENDING | — |
+| `P-ETH-1` | CHECKED | CHECKED | — | NONE | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
 | `P-ADDRESS-1` | OPEN | PARTIAL | abstract parent theorem; universal post-state equivariance; request/claim/redemption entrypoints and source correspondence | IMPLEMENTATION_PENDING | `A-ABSTRACT-TX` |
 | `P-TOPUP-2` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
 | `P-CONSOLIDATION-1` | OPEN | PARTIAL | parent eligibility/value/atomicity; faithful external call/batch/replay | VERITY_FEATURE_REQUIRED | `A-SHA256-FFI` |
