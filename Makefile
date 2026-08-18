@@ -79,6 +79,8 @@ test:
 	@printf '%s\n' 'P-ETH-1a gateway/vault refund Contract.run mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.PEth1RequestTxMutants
 	@printf '%s\n' 'P-ETH-1b bus/request Contract.run mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.PEth1CompositionTxMutants
+	@printf '%s\n' 'P-ETH-1 recursively dispatched Bus/Gateway/Vault drop, misroute, corrupt, rollback, and two-batch mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors
 	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.HandleOracleReportTxMutants

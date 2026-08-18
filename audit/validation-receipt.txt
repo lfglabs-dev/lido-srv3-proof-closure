@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: c5ddf63cbc9042ed9e40acb0186685a219c12b26
+validated-tree: PENDING_TREE
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -62,47 +62,111 @@ P-TOPUP-1 external-call-frame repair of the faithful plane (2026-08-18)
 - `make test`, `python3 scripts/audit_metadata.py check`,
   `python3 scripts/check_validation_receipt.py`, and `git diff --check`:
   exit 0.
-- Merged `origin/main` `b59c650` (P-SSZ-1 closure, #100, itself carrying
-  P-CONSOLIDATION-1 closure, #101) by normal merge, never rebase. This
-  supersedes the earlier merge of `5fcfe44` (P-ACCOUNT-1 closure, #99).
-- `audit/guarantees.yaml` was resolved by taking main's file in full and then
-  restoring only the `P-TOPUP-1` entry from this branch. The two sides edit
-  disjoint entries -- this branch touches `P-TOPUP-1` alone, main touches
-  `P-CONSOLIDATION-1` and the `P-SSZ-1` family alone -- so the resolution
-  loses no intent from either side. It also discharges this branch's metadata
-  debt: the stale `P-CONSOLIDATION-1` row this branch still carried from
-  `5fcfe44` (`OPEN` / `PARTIAL` / `VERITY_FEATURE_REQUIRED` / `P2`) is
-  replaced by main's merged state (`CHECKED` / `CHECKED` / `NONE` / `DONE`).
+- Merged `origin/main` twice by normal merge, never rebase: first `b59c650`
+  (P-SSZ-1 closure, #100, itself carrying P-CONSOLIDATION-1 closure, #101),
+  then `0ea45b1` (P-ETH-1 parent composition closure, #94). This supersedes
+  the earlier merge of `5fcfe44` (P-ACCOUNT-1 closure, #99).
+- Verity is re-pinned by that second merge from
+  `8719dc52e8c581e37bab4594fed11b11c41494b8` to
+  `a063bfc869735045354ebc3862ca08859da0f56e`. The P-TOPUP-1 external-call-frame
+  evidence above is therefore re-verified against the new pin rather than
+  carried over: `Contracts.externalCallBindTo` (#2362) and the atomic compiled
+  multicall (#2365) are both contained in it, which is the pin the corrected
+  `PTopup1.guarantee` docstring names.
+- `audit/guarantees.yaml` needed no hand resolution in the second merge; the
+  two sides again edit disjoint entries (this branch `P-TOPUP-1` alone, main
+  `P-ETH-1` alone) and the merged file differs from main only in `P-TOPUP-1`.
+  The first merge did require it, and was resolved by taking main's file in
+  full and restoring only the `P-TOPUP-1` entry. That also discharged this
+  branch's metadata debt: the stale `P-CONSOLIDATION-1` row carried from
+  `5fcfe44` (`OPEN` / `PARTIAL` / `VERITY_FEATURE_REQUIRED` / `P2`) is replaced
+  by main's merged state (`CHECKED` / `CHECKED` / `NONE` / `DONE`).
+- `scripts/audit_metadata.py` conflicted in `EXPECTED_PRIORITIES` and was
+  resolved on the same disjoint-edit principle: main retires `P-ETH-1` to
+  `DONE`, this branch retires `P-TOPUP-1` to `DONE`, and both are kept. The
+  resolved file differs from main only in the three `P-TOPUP-1` fields.
 - Pre-existing defect found on `origin/main` and repaired here, since this
   commit rebinds the file: `audit/validation-receipt.txt` carried unresolved
-  `=======` and `>>>>>>> origin/main` markers at lines 24 and 73, left by an
-  earlier merge resolution. Only the two marker lines were removed; no receipt
-  content was removed with them. This branch had already repaired the same
-  defect at lines 26 and 42 against `5fcfe44`.
+  conflict markers left by earlier merge resolutions. Three (`=======` twice
+  and `>>>>>>> origin/main`) were removed in this merge, and two (at lines 24
+  and 73) in the previous one; this branch had already repaired the same defect
+  at lines 26 and 42 against `5fcfe44`. Only marker lines were removed; no
+  receipt content was removed with them.
 - `verity/targets/audit-manifest.json` carries a hand-maintained `trust` prose
   string naming which guarantees are CHECKED at both objectives. No script
-  generates or validates it, and both sides of the merge named a stale set. It
-  is restated here against the merged registry: P-ALLOC-1, P-ALLOC-2,
-  P-TOPUP-1, P-TOPUP-2, P-ACCOUNT-1, P-RESERVE-1, P-CONSOLIDATION-1, and
-  P-SSZ-1 at both objectives; P-DEPOSIT-1, P-ADDRESS-1, and P-ETH-1 not.
+  generates or validates it, and it goes stale silently. It is restated here
+  against the merged registry.
 - The `PTopup1.guarantee` docstring still described the Verity transaction
   claim as "blocked and deliberately absent" while the layer list it documents
   already carried `.verityTx`. Corrected to describe the composed layer. This
   is a comment correction; no theorem statement or proof changed.
-- Scope note on the full-tree build. `lake build LidoSRv3` does not reach exit
-  0 at this Verity pin: `Compiler.Proofs.IRGeneration.DenoteAgreement.lean:69`
-  fails with a `rfl` type mismatch on `evalExpr ... Expr.memoryArrayElement`.
-  That module is upstream Verity source under `.lake/packages/verity`,
-  compiled only from pinned dependency sources, so it is independent of this
-  branch and reproduces identically on `main` (`lakefile.lean` and
-  `lean-toolchain` here are byte-identical to `b59c650`). It is recorded, not
-  repaired: this branch has no authority over the pin. Every LidoSRv3 module
-  reached exit 0, including all three P-TOPUP-1 targets and all `make test`
-  mutant modules.
-- Verity remains pinned to merged upstream
-  `8719dc52e8c581e37bab4594fed11b11c41494b8`.
+- `lake build LidoSRv3` now reaches exit 0 over the whole tree (1390 jobs, no
+  errors). The previous revision of this section recorded a scope note that it
+  did not, because `Compiler.Proofs.IRGeneration.DenoteAgreement.lean:69` failed
+  with a `rfl` type mismatch at the old pin `8719dc52`. That module is upstream
+  Verity source, outside this branch's authority; the re-pin to `a063bfc8`
+  discharges it, so the note is retired rather than carried.
 - Receipt subject: tracked tree excluding this receipt,
-  `c5ddf63cbc9042ed9e40acb0186685a219c12b26`.
+  `PENDING_TREE`.
+
+P-ETH-1 parent composition closure (2026-08-18)
+------------------------------------------------
+
+- Verity is re-pinned from `8719dc52e8c581e37bab4594fed11b11c41494b8` to merged
+  upstream `main` `a063bfc869735045354ebc3862ca08859da0f56e`, which contains
+  PR #2362 (external-call frames) and PR #2365 (atomic compiled multicall). The
+  lakefile request, resolved manifest `rev`/`inputRev`, artifact lock, audit
+  manifest, source map, provenance fixture, and checkout all agree on that SHA.
+- `LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent` closes the abstract plane
+  over `EthPath`, whose three constructors are the complete ETH-bearing
+  call-site inventory. For every path it proves no wei reaches a lateral
+  destination and that the committed trace totals exactly the entering value.
+- `LidoSRv3.Audit.Verity.PEth1CompositionTx.run` dispatches the compiled
+  Bus/Gateway/Vault ensemble recursively over one shared
+  `MultiContract.MultiWorld`. Each hop is a real PR #2362 frame: `callFunction`
+  enters the callee's `FunctionSpec`, the body executes under
+  `denoteFunctionWithCalls`, and the resulting control decides commit or
+  restore. The dispatcher harvests the journal entries the executed body
+  appended and pushes them as the next frames, so the call graph is emitted by
+  the caller bodies rather than assembled by hand.
+- ETH moves exactly once per hop under a declared-amount convention: every
+  `LinkedExternal` carries `value := 0`, the body-computed amount travels as
+  calldata word `0`, the dispatcher lifts it into `CallSite.value`, and every
+  receiver opens with `require(msg.value == amount)`.
+- `verity_tx_composes_value_flow_and_rollback` is stated over `TxView` outcome
+  observables -- control, hop count, and the seven-account balance sheet -- not
+  over full contract states. It covers the fee/refund split for one- and
+  two-request batches and the exact-fee batch, restoration of the entry world
+  when the request predeploy rejects, the in-Gateway revert of an underfunded
+  batch, ETH conservation on success and on revert, and equality between the
+  recursively dispatched run and a PR #2365 `denoteTransaction` replay of the
+  discovered `List CompiledCall`.
+- `LidoSRv3.Tests.PEth1CompositionTxMutants` runs the same ensemble and the same
+  dispatcher under a mutated `Wiring`, so no mutant can be killed by weakening
+  the parent statement. The five mutants are drop (`emitRefund := false`),
+  misroute (`vaultTarget := lidoAddr`), corrupt (`refundWholeValue := true`),
+  rollback (`observeWithoutRollback`), and two-batch
+  (`perRequestCalls := false`). The rollback mutant is falsifiable rather than
+  tautological because `TxOutcome` retains both `entryWorld` and `lastWorld`.
+- `lake env lean LidoSRv3/Audit/Trust.lean`: `eth_flow_parent`,
+  `verity_tx_composes_value_flow_and_rollback`, and all five mutants report
+  `depends on axioms: [propext, Quot.sound]`. The decision procedure is
+  `decide +kernel`, which is kernel reduction and introduces no axiom; no
+  `sorry`, `admit`, `native_decide`, or project-level axiom is introduced.
+- `lake build LidoSRv3.Audit.Trust LidoSRv3.Audit.AllGuarantees`: exit 0,
+  `Build completed successfully (1290 jobs)` under Lean 4.31.0.
+- `P-ETH-1` is promoted to abstract `CHECKED` / Verity `CHECKED` with a real
+  `P-ETH-1` source-map target covering all six inventory spans, so the former
+  `P-ETH-1` exemption in `scripts/audit_metadata.py` is removed rather than
+  tolerated. `P-ETH-1a` and `P-ETH-1b` stay bounded per-leg children.
+- Standing scope is unchanged: the parent is a model-plane composition under
+  `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, and `A-ABSTRACT-TX`. It does not claim
+  the Bus, Gateway, or Vault are the pinned Solidity contracts compiled to
+  bytecode, nor that these are executable EVM trace semantics. Identifying the
+  immutable `CONSOLIDATION_REQUEST` value with the canonical EIP-7251 address
+  remains the separate `P-ETH-1b` provenance obligation.
+- Receipt subject: tracked tree excluding this receipt,
+  `78e69c3ec590add55c38a8589a473d969b5f3263`.
 
 P-SSZ-1 structural map outcome readback (2026-08-17)
 -----------------------------------------------------
@@ -118,6 +182,7 @@ P-SSZ-1 structural map outcome readback (2026-08-17)
   that same correspondence.
 - Receipt subject: tracked tree excluding this receipt,
   `cc693aa72e13c9ce6bc39d522e957042a7e19580`.
+
 P-CONSOLIDATION-1 faithful Verity transaction closure (2026-08-17)
 ------------------------------------------------------------------
 

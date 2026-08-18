@@ -217,33 +217,40 @@
     },
     {
       "id": "P-ETH-1",
-      "assumptions": [],
+      "assumptions": [
+        "A-ABSTRACT-TX",
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD"
+      ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PEth1",
-        "expected": "bounded child-model proofs build; the abstract and faithful Verity parent remain open"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1CompositionTx LidoSRv3.Tests.PEth1CompositionTxMutants",
+        "expected": "abstract ETH-flow parent over every inventory path and the recursively dispatched Bus/Gateway/Vault composition build with drop, misroute, corrupt, rollback, and two-batch mutants"
       },
-      "summary": "The complete cross-contract ETH-flow parent remains OPEN. Checked child models are bounded evidence only and do not compose the parent abstract or faithful Verity guarantees.",
+      "summary": "The abstract parent confines every ETH-bearing path of the call-site inventory to protocol destinations and totals each trace to the value entering it. The Verity parent dispatches the compiled Bus/Gateway/Vault ensemble recursively through external-call frames over one shared multi-contract world: the fee/refund split, the entry-world restore after a rejecting request contract, the underfunded-batch revert, ETH conservation, and replay of the discovered call program as one atomic compiled multicall are all stated over outcome observables.",
       "abstract": {
-        "status": "OPEN",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent"
       },
       "verity": {
-        "status": "OPEN",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback"
       },
       "fidelity": {
-        "covered": [],
-        "missing": [
-          "abstract parent ETH-flow theorem",
-          "faithful Verity composition"
-        ]
+        "covered": [
+          "abstract parent over the complete ETH-bearing call-site inventory",
+          "recursive Bus/Gateway/Vault dispatch through external-call frames on a shared multi-contract world",
+          "fee/refund split and per-request batch legs on outcome observables",
+          "atomic rollback to the entry world after a failing hop",
+          "ETH conservation across successful and reverting runs",
+          "replay of the dispatched call program as one atomic compiled multicall"
+        ],
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Define the abstract parent then compose relevant protocol-controlled Verity value paths.",
-      "roadmap_priority": "P2"
+      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "roadmap_priority": "DONE"
     },
     {
       "id": "P-ADDRESS-1",
@@ -749,9 +756,9 @@
       "assumptions": [],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1RefundTx LidoSRv3.Tests.PEth1RefundTxMutants",
-        "expected": "successful bounded protocol rebalance/redemption return-confinement proof plus gateway/vault Contract.run refund and withdraw observations; parent ETH-flow guarantee remains open"
+        "expected": "successful bounded protocol rebalance/redemption return-confinement proof plus gateway/vault Contract.run refund and withdraw observations; the parent ETH-flow guarantee composes these legs"
       },
-      "summary": "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue. A source-shaped Contract.run ledger observes ConsolidationGateway fee send and refund plus WithdrawalVault.withdrawWithdrawals, including snapshot rollback after a failed refund. Raw owner-controlled StakingVault.withdraw is excluded. Parent composition remains open.",
+      "summary": "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue. A source-shaped Contract.run ledger observes ConsolidationGateway fee send and refund plus WithdrawalVault.withdrawWithdrawals, including snapshot rollback after a failed refund. Raw owner-controlled StakingVault.withdraw is excluded. These legs are composed by the checked P-ETH-1 parent.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined"
@@ -763,17 +770,15 @@
       "fidelity": {
         "covered": [
           "protocol-controlled stVault rebalance/redemption interface only",
-          "gateway fee send, refund, and vault withdraw Contract.run ledger"
+          "gateway fee send, refund, and vault withdraw Contract.run ledger",
+          "composed into the checked P-ETH-1 parent"
         ],
-        "missing": [
-          "parent guarantee composition"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
+      "next_gate": "Preserve this bounded evidence as it stands under the checked P-ETH-1 parent."
     },
     {
       "id": "P-ETH-1b",
@@ -782,9 +787,9 @@
       "assumptions": [],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1RequestTx LidoSRv3.Tests.PEth1RequestTxMutants",
-        "expected": "successful configurable consolidation-request fee-target proof plus bus-forward and request-contract Contract.run observations; canonical deployed address and parent ETH-flow guarantee remain open"
+        "expected": "successful configurable consolidation-request fee-target proof plus bus-forward and request-contract Contract.run observations; the canonical deployed address remains a separate provenance obligation"
       },
-      "summary": "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest. A source-shaped Contract.run ledger observes ConsolidationBus value-forward and WithdrawalVault EIP-7002/EIP-7251 fee sends, including snapshot rollback after a later request failure. Equating the immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation. Parent composition remains open.",
+      "summary": "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest. A source-shaped Contract.run ledger observes ConsolidationBus value-forward and WithdrawalVault EIP-7002/EIP-7251 fee sends, including snapshot rollback after a later request failure. Equating the immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation. These legs are composed by the checked P-ETH-1 parent.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined"
@@ -796,17 +801,15 @@
       "fidelity": {
         "covered": [
           "configured immutable consolidation-request fee target only",
-          "bus forward and request-contract fee Contract.run ledger"
+          "bus forward and request-contract fee Contract.run ledger",
+          "composed into the checked P-ETH-1 parent"
         ],
-        "missing": [
-          "parent guarantee composition"
-        ]
+        "missing": []
       },
       "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "kind": "NONE"
       },
-      "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
+      "next_gate": "Preserve this bounded evidence as it stands under the checked P-ETH-1 parent."
     },
     {
       "id": "P-ADDRESS-1.denote-admission",
