@@ -23,6 +23,8 @@ import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
 import LidoSRv3.Audit.Guarantees.PReserveRelational
+import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
+import LidoSRv3.Tests.ReserveRelationalTxMutants
 import LidoSRv3.Tests.DepositTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
@@ -130,6 +132,10 @@ project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.source_reserve_does_not_change_finalization
+#print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_simulates_reserve_relational_spec
+#print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_slot_is_not_read
+#print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization
+#print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.structural_witness_binding_sound
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec
 #print axioms LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits

@@ -11,6 +11,7 @@ import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PDeref1
+import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 
 /-!
 # Canonical minimal-11 public facade
@@ -51,6 +52,6 @@ example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source] := by
 example : PAccount1.guarantee.checkedLayers = [.model, .source] := by decide
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
-def supplemental : List Guarantee := [PDeref1.guarantee]
+def supplemental : List Guarantee := [PDeref1.guarantee, PReserveRelational.guarantee]
 
 end LidoSRv3.Audit.Guarantees

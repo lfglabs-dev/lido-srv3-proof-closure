@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Source.ReserveRelationalCorrespondence
 
 namespace LidoSRv3.Audit.Guarantees.PReserveRelational
@@ -16,5 +17,12 @@ theorem source_reserve_does_not_change_finalization
     outcomeObservables (sourceRun inputs left) =
       outcomeObservables (sourceRun inputs right) :=
   source_reserve_relational inputs left right h
+
+/-- P-RESERVE-RELATIONAL is closed on the abstract model, on an independently
+defined pinned-source interpreter, and on a composed faithful `Contract.run`
+transaction that computes the five finalization observables from contract
+storage and memory.  The composed Verity theorems live in this namespace via
+`LidoSRv3.Audit.Guarantees.PReserveRelationalVerity`. -/
+def guarantee : Guarantee := ⟨.pReserveRelational, [.model, .source, .verityTx]⟩
 
 end LidoSRv3.Audit.Guarantees.PReserveRelational

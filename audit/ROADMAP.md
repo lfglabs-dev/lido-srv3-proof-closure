@@ -11,11 +11,11 @@
 
 Fix report, queue, and buffer. Two states that differ only in `depositsReserve` must yield the same prefinalized/finalized ranges and the same locked ETH. Checked `P-RESERVE-1` spending is a child, not this fact.
 
-Need: a spec, a source interpreter, a Verity program that computes the observables, a composition theorem, a rejected reserve→range mutant, report/queue/buffer mutants, and rollback after a mid-write. Promote the parent only after composition.
+Closed: a spec, an independently defined pinned-source interpreter, an executable Verity transaction that computes the five observables from storage and memory, the composition theorem, a rejected reserve→range mutant, report/queue/buffer mutants, and rollback after a mid-write. The parent is registered as a supplemental row now that composition exists.
 
 ## P2 — allocation and value conservation
 
-Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido debit, Beacon credit, module delta, rollback. Do not start other parent-closure lanes before P-RESERVE-RELATIONAL is green.
+Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido debit, Beacon credit, module delta, rollback. The P-RESERVE-RELATIONAL gate on other parent-closure lanes is now satisfied.
 
 ## P3 — remaining parents
 
