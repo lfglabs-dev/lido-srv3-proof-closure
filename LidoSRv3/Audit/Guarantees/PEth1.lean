@@ -253,7 +253,14 @@ theorem eth_flow_parent (approved : ApprovedSet)
         show n * fee + (msgValue - n * fee) = msgValue
         omega
 
-/-! ## Verity plane -/
+/-! ## Verity plane
+
+**Scope.** `verity_tx_composes_value_flow_and_rollback` is a finite
+conjunction over five concrete `(msgValue, batchSize, feePerRequest)` tuples
+— unlike `eth_flow_parent` above, it is not a `∀`-quantified theorem over
+funded batches. `Tests.PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget`
+exhibits a funded, guard-passing tuple outside this witness set whose
+dispatch exhausts the model's fixed fuel budget instead of succeeding. -/
 
 theorem verity_tx_composes_value_flow_and_rollback :
     (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe

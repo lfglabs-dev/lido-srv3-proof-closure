@@ -3,6 +3,45 @@
 Theorems: `PEth1.eth_flow_parent`, `PEth1.verity_tx_composes_value_flow_and_rollback`.
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
+## Wave 2 changes (2026-08-19)
+
+**Scope narrowing, not generalization.** `eth_flow_parent` (abstract plane)
+was already `∀ (msgValue n fee : Nat)` as of Wave 1. `verity_tx_composes_value_flow_and_rollback`
+(Verity plane) remains a finite conjunction over five concrete
+`(msgValue, batchSize, feePerRequest)` tuples. A genuine `∀`-generalization
+of the Verity plane was evaluated and rejected as infeasible without
+`sorry`: it would require new induction infrastructure for the recursive
+`MultiContract.callFunction` dispatch (`PEth1CompositionTx.step`) over an
+arbitrary `batchSize`-driven `forEach`, and even then two model properties
+make an unconditional universal statement *false*, not merely hard to
+prove:
+- `fuelBudget = 32` (issue 9) caps the number of dispatched frames, so any
+  candidate `∀` statement needs a batch-size side condition the current
+  statement has none of;
+- `Expr.mul` wraps mod `2^256` in the compiled bodies (issue 12), so
+  "funded" as the model computes it and "funded" in checked-Solidity
+  arithmetic diverge for large inputs.
+
+Instead this wave (a) documents the finite-witness scope honestly in the
+Lean docstrings, `audit/P-ETH-1-COMPOSITION.md`, and `audit/guarantees.yaml`
+(explicit `fidelity.missing` entry), and (b) adds two named, executable
+kill-line theorems to `PEth1CompositionTxMutants.lean` that refute reading
+the registered Verity parent as `∀`:
+- `underfunded_batch_is_not_a_repartition` — `(10, 4, 3)` reverts instead of
+  repartitioning the total (restates issue 2's counterexample as a named,
+  citable theorem instead of an anonymous `example`).
+- `large_funded_batch_exhausts_fuel_budget` — `(30, 29, 1)` is funded and
+  passes every guard the compiled bodies check, yet needs 33 dispatched
+  frames against `fuelBudget = 32` and so hits `TxControl.exhausted`, a
+  control value none of the five registered witnesses ever produce. This is
+  issue 9 made executable, and a strictly new failure mode: it refutes even
+  the narrower over-generalization "every batch whose own Gateway/Vault
+  guards pass succeeds."
+
+No Lean statement changed; only the docstrings, this report, the
+composition doc, and the metadata gained the explicit scope and the two new
+kill-line theorems.
+
 ## Wave 1 changes (2026-08-19)
 
 **Strengthened `eth_flow_parent`:**
@@ -59,7 +98,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 | # | Close | Note |
 | --- | --- | --- |
 | 1, 7, 8 | A | Tagged inventory / `finalWorld` / 7-account escrow named honestly. |
-| 2 | A | Verity parent is a numeric ensemble. |
+| 2 | A | Verity parent is a numeric ensemble; kill-lines `underfunded_batch_is_not_a_repartition` / `large_funded_batch_exhausts_fuel_budget` refute a `∀` reading (Wave 2). |
 | 3, 5, 10, 15, 17 | scope | Extra ETH sites, hops, ABI in `missing`. |
 | 4, 6, 9, 11, 18, 19, 20 | A | Declared-amount, two planes, fuel, sinks, fee slot, replay. |
 | 12, 14 | C | Post-`mul` wrap-check reverts when `(a*b)/a ≠ b`. |
@@ -111,6 +150,8 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    `PEth1CompositionTx.fuelBudget` is 32 frames. A 40-request batch hits `TxControl.exhausted` and `finalWorld` restores the entry world.
 
    *Scenario.* `run honest 40 40 1` (fee 40, exact). Source vault loops 40 CALLs. Lean stops at 32 hops and reports `exhausted`, which `observe` treats like a revert (entry balances). The registered theorem never mentions this. CHECKED “atomic compiled multicall” is a 32-frame cap.
+
+   *Executable (Wave 2).* `PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget` proves `(run honest 30 29 1).control = .exhausted` — a funded (`29 * 1 ≤ 30`), guard-passing batch that still cannot reach the registered parent's success shape. This is a kill-line against generalizing the registered Verity parent to `∀` funded batches, not just against this report's prose.
 
 10. **`pathTrace` omits the Bus→Gateway and Gateway→Vault hops.**
    The inventory comment lists those CALLs. `pathTrace (.consolidation t)` is only `replicate count {fee, consolidationContract} ++ refundMoves`. Intermediate forwards of `msg.value` / `totalFee` are not `EthMove`s. Conservation is `n*fee + refund = msg.value`, which ignores that the same wei is counted once at the terminal, not at each hop.

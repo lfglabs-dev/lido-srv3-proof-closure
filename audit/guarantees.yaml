@@ -258,9 +258,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1CompositionTx LidoSRv3.Tests.PEth1CompositionTxMutants",
-        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and kill-line mutants (unapproved journal, zero msg.value) build with drop, misroute, corrupt, rollback, and two-batch mutants"
+        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and kill-line mutants (unapproved journal, zero msg.value) build with drop, misroute, corrupt, rollback, and two-batch mutants; Wave 2 scope kill-lines (underfunded_batch_is_not_a_repartition, large_funded_batch_exhausts_fuel_budget) build and refute reading the Verity parent as a universal batch theorem"
       },
-      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses. Kill-line mutants reject unapproved journal entries and zero-value success.",
+      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses, not a universal batch theorem (Wave 2 named kill-lines refute a ∀ reading: an underfunded batch reverts instead of repartitioning, and a funded/guard-passing batch exhausts the fixed fuel budget). Kill-line mutants reject unapproved journal entries and zero-value success.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent"
@@ -275,7 +275,8 @@
           "∀ (msgValue, n, fee) quantification with overflow (n*fee≥2^256) and zero-value reverts",
           "numeric Bus/Gateway/Vault ensemble and Contract.run rollback",
           "five numeral witnesses (not a universal batch theorem)",
-          "kill-line mutants: unapproved journal entry and zero msg.value"
+          "kill-line mutants: unapproved journal entry and zero msg.value",
+          "named scope kill-lines refuting a ∀ reading of the Verity parent: underfunded batch is not a repartition, funded batch exhausts fuel budget"
         ],
         "missing": [
           "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)",
@@ -283,12 +284,13 @@
           "reverting refund or Lido sinks",
           "refinement between abstract parent and the Verity ensemble",
           "getConsolidationRequestFee versus stored fee slot",
-          "composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests)"
+          "composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests)",
+          "∀ (msgValue, batchSize, feePerRequest) quantification on the Verity plane: fuelBudget=32 bounds dispatched frames and Expr.mul wraps mod 2^256 in the compiled bodies, so no batchSize-unconditional universal statement holds"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Wave 1 strengthens the parent with journal classification and revert guards. Do NOT compose into P-CONSOLIDATION-1 until FunctionSpec is ConsolidationGateway.addConsolidationRequests."
+        "work": "Wave 1 strengthens the parent with journal classification and revert guards. Wave 2 narrows the claimed Verity-plane scope honestly (finite witnesses, named kill-lines) instead of generalizing, since fuelBudget and wrapping multiplication make a batchSize-unconditional ∀ statement false, not merely unproved. Do NOT compose into P-CONSOLIDATION-1 until FunctionSpec is ConsolidationGateway.addConsolidationRequests."
       },
       "next_gate": "Compose into P-CONSOLIDATION-1 only after FunctionSpec becomes ConsolidationGateway.addConsolidationRequests.",
       "roadmap_priority": "DONE"
