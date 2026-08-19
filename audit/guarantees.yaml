@@ -376,9 +376,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidation1 LidoSRv3.Audit.Verity.ConsolidationTx LidoSRv3.Tests.ConsolidationTxMutants",
-        "expected": "abstract caller/length/fee and if-tree theorem and vault-loop Verity transaction build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, rollback, and two-batch mutants"
+        "expected": "abstract caller/length/fee and if-tree theorem with gateway-nonzero-value premise, packing-order kill-line, and vault-loop Verity transaction build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, swapped-concat, rollback, and two-batch mutants"
       },
-      "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). fee=0 with msg.value=0 commits. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Not beacon eligibility and not the Bus.",
+      "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). fee=0 with msg.value=0 commits but is no longer user-reachable (gateway-nonzero-value premise). Packing-order kill-line: swapped source||target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Not beacon eligibility and not the Bus. Do not compose with P-ETH-1.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity"
@@ -390,22 +390,24 @@
       "fidelity": {
         "covered": [
           "caller/length/fee eligibility, input-equality value, if-tree atomicity",
+          "gateway-nonzero-value discipline on the vault entry premise",
+          "packing order kill-line: swapped source||target concat fails observe",
           "single sourceRun; observe reads state.calls / state.events",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
           "beacon eligibility, quota, witness, and gateway grouping",
           "96-byte packed pubkey calldata and real request-contract calls",
-          "preservesEthBalance",
+          "preservesEthBalance (requires value-bearing CALL frames, not success stubs)",
           "Bus publisher/executor path",
           "keccak memory-array oracle"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked vault-loop theorems; do not widen to Bus publisher/executor or beacon eligibility."
+        "work": "Keep the checked vault-loop theorems; do not widen to Bus publisher/executor or beacon eligibility. Do not compose with P-ETH-1."
       },
-      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim. Do not compose with P-ETH-1.",
       "roadmap_priority": "DONE"
     },
     {

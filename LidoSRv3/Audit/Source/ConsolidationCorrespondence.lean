@@ -50,6 +50,17 @@ and independently required to be 48 bytes wide. -/
 def payload (request : Request) : List Word :=
   [request.source, request.target]
 
+/-- Swapped target then source payload; used only to prove packing order matters. -/
+def swappedPayload (request : Request) : List Word :=
+  [request.target, request.source]
+
+theorem payload_ne_swapped (request : Request) (h : request.source ≠ request.target) :
+    payload request ≠ swappedPayload request := by
+  unfold payload swappedPayload
+  intro heq
+  injection heq with h1 _
+  exact h h1
+
 structure CallObs where
   target : Word
   value : Word
@@ -103,6 +114,17 @@ def requestEvent (request : Request) : EventObs :=
   { topic := Verity.Core.Uint256.ofNat consolidationRequestAddedTopic
     payload := payload request }
 
+def swappedRequestCall (target fee : Word) (request : Request) : CallObs :=
+  { target := target, value := fee, input := swappedPayload request }
+
+def swappedCommitObservables (target fee msgValue : Word) (requests : List Request) :
+    Observables :=
+  { calls := requests.map (swappedRequestCall target fee)
+    events := requests.map requestEvent
+    payloads := requests.map swappedPayload
+    requestCount := requests.length
+    feePaid := msgValue }
+
 def commitObservables (target fee msgValue : Word) (requests : List Request) :
     Observables :=
   { calls := requests.map (requestCall target fee)
@@ -110,6 +132,22 @@ def commitObservables (target fee msgValue : Word) (requests : List Request) :
     payloads := requests.map payload
     requestCount := requests.length
     feePaid := msgValue }
+
+theorem commitObservables_ne_swapped (target fee msgValue : Word)
+    (requests : List Request)
+    (hne : requests.length = 1)
+    (hdist : ∀ r ∈ requests, r.source ≠ r.target) :
+    commitObservables target fee msgValue requests ≠
+      swappedCommitObservables target fee msgValue requests := by
+  obtain ⟨r, hr⟩ := List.length_eq_one_iff.mp hne
+  subst hr
+  intro heq
+  have hcalls := congrArg Observables.calls heq
+  simp only [commitObservables, swappedCommitObservables, requestCall, swappedRequestCall,
+    List.map_cons, List.map_nil] at hcalls
+  injection hcalls with hcall _
+  injection hcall with _ _ hinput
+  exact payload_ne_swapped r (hdist r List.mem_cons_self) hinput
 
 /-- Independent pinned-source interpreter. It does not call the Verity
 transaction or any shared execution helper besides the constructors above. -/
