@@ -138,4 +138,57 @@ example :
       before) ≠ sourceView cfg modules (w 10) false := by
   native_decide
 
+/-- Kill-line mutant: `capacity := target` instead of `wordMin target available`.
+The mutant executor disagrees with `MathView.capacities`, which uses `min`. -/
+private def secondLoopMutant (cfg' : Config) (isTopUp : Bool) (total : Verity.Core.Uint256) :
+    List Module → List (Verity.Core.Uint256 × Verity.Core.Uint256) → Option (List Row)
+  | [], [] => some []
+  | m :: ms, entry :: entries => do
+      let (allocation, active) := entry
+      if m.isActive then
+        let _available ← availableCapacity? cfg' isTopUp m allocation active
+        let target ← targetValidators? total m
+        let rows ← secondLoopMutant cfg' isTopUp total ms entries
+        pure (({
+          moduleId := m.moduleId
+          currentAllocation := allocation
+          capacity := target
+          targetValidators := target
+          activeCount := active
+        } : Row) :: rows)
+      else
+        let rows ← secondLoopMutant cfg' isTopUp total ms entries
+        pure (({
+          moduleId := m.moduleId
+          currentAllocation := allocation
+          capacity := allocation
+          targetValidators := 0
+          activeCount := active
+        } : Row) :: rows)
+  | _, _ => none
+
+private def executeMutant (cfg' : Config) (modules' : List Module)
+    (deposits : Verity.Core.Uint256) (isTopUp : Bool) : Option (List Row) := do
+  let (entries, total) ← firstLoop cfg' modules' deposits
+  secondLoopMutant cfg' isTopUp total modules' entries
+
+private def killLineModules : List Module :=
+  [ { moduleId := w 1, shareLimit := w 8000, isActive := true, isType2 := false
+      depositableCount := w 1, depositedCount := w 10
+      summaryExitedCount := w 0, accountingExitedCount := w 0
+      totalModuleStake := w 0 }
+  , { moduleId := w 2, shareLimit := w 8000, isActive := true, isType2 := false
+      depositableCount := w 1, depositedCount := w 10
+      summaryExitedCount := w 0, accountingExitedCount := w 0
+      totalModuleStake := w 0 } ]
+
+/-- The kill-line mutant produces capacities that differ from `MathView`.
+This means the new parent `checked_execute_and_active_capacity_bounded`
+would fail for this mutant (execute result ≠ MathView). -/
+example :
+    (executeMutant cfg killLineModules (w 10) false).map (fun rows =>
+      rows.map (fun r => (r.capacity : Nat))) ≠
+    some (MathView.capacities cfg killLineModules (w 10) false) := by
+  native_decide
+
 end LidoSRv3.Tests.AllocationTxMutants
