@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6dc6978d6766e7ab86ef7e20cb4e5ab6463c8333
+validated-tree: 51916cb78a290038dadd15a748dedb819ccaab9b
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1833,3 +1833,82 @@ P-RESERVE-RELATIONAL executable finalization composition (2026-08-18)
   `7ec46bd54a7960490a3c0177c4b17ca393e60542`.
 - Receipt subject: tracked tree excluding this receipt,
   `fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca`.
+
+Wave 4: P-ADDRESS-1 vacuous-parent-hypothesis remediation (2026-08-19)
+----------------------------------------------------------------------
+
+- Defect (wave-4 review finding, coordinator-verified): the registered
+  parent `LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance`
+  carried `_hScope : addressEquivarianceEntryScope inp.entryPoint`,
+  `_hWellFormed : wellFormedAddressInput inp`, and
+  `_hNotSingleton : ¬ singletonActorEntryPoint inp.entryPoint` as
+  underscore-prefixed binders never referenced by the proof body -- three
+  decorative premises. `_hNotSingleton` was additionally content-free:
+  `singletonActorEntryPoint` is defined as `False` for every `EntryPoint`
+  in this model (`not_singleton_actor_entry_point` proves the negation
+  vacuously), so requiring it restricted nothing while reading as a real
+  exclusion. `audit/guarantees.yaml`'s summary and `fidelity.covered`
+  overclaimed a "scoped, well-formed ... explicit singleton-actor
+  exclusion" parent that Lean never had.
+- Fix: ports the un-landed wave-3 branch commit `b07e40b`
+  (`cursor/wave3-paddress1-0830`; PR #131 was closed after only the
+  kill-line half merged, so the hypothesis half never reached `main`).
+  `_hWellFormed` and `_hNotSingleton` are dropped from the parent;
+  `hScope` is kept (no underscore) and genuinely threaded: the proof
+  case-splits on `inp.entryPoint`, closes the out-of-scope
+  `claimWithdrawalsTo` branch from `hScope : False` via `hScope.elim`,
+  and proves the three in-scope branches by the existing source lemmas
+  `source_admission_nondiscriminatory` and
+  `universal_post_state_equivariance`. Load-bearing check performed:
+  deleting the `hScope` binder fails `lake build
+  LidoSRv3.Audit.Guarantees.PAddress1` with "Unknown identifier
+  `hScope`"; with it, the build is green.
+- Kill-line bar kept: `fixed_owner_gate_not_admission_equivariant`
+  (`LidoSRv3/Tests/AddressSourceMutants.lean`) still refutes the parent's
+  first-conjunct admission predicate on a one-conjunct mutant of this
+  file's own `admitted`/`run`/`renameInput`; unchanged by this
+  remediation and still cited as the parent kill-line.
+- `audit/guarantees.yaml`'s `P-ADDRESS-1` row: `summary` now states
+  `addressEquivarianceEntryScope` is a genuine used premise (the proof
+  eliminates the `claimWithdrawalsTo` branch from `hScope`), the
+  "well-formed" and "singleton-actor exclusion" claims are out of
+  `fidelity.covered`, and `fidelity.missing` discloses that
+  singleton-actor exclusion is not modeled (`singletonActorEntryPoint`
+  is `False` for every `EntryPoint` here). `abstract.theorem`,
+  `verity.theorem`, classification, and assumptions are unchanged.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ADDRESS-1"]` is recomputed to
+  `79cdf43b256be799e8171bc9e650d8b8f5da92a3382721ceb03aeef2d1992e6d`,
+  and `audit/STATUS.md` is regenerated with `python3
+  scripts/audit_metadata.py generate` (`ROADMAP.md`/`REPRODUCE.md`
+  unchanged); the diff is confined to the `P-ADDRESS-1` row.
+- `report/P-ADDRESS-1.md`: the Proof section now describes the
+  `hScope` case split instead of admitting that "extra hypotheses are
+  carried on the registered statement for honest fidelity"; the issue is
+  relabeled as the wave-4 review finding; the resolution is split into
+  the landed wave-3 kill-line retarget and this wave-4 hypothesis
+  remediation.
+- Incidental repair, called out for honesty: `scripts/test_audit_metadata.py`
+  had a stale mutant (added a `consumer` key to `guarantees[1]`
+  P-ALLOC-2 expecting the "NONE may not hide extra claims" rejection, but
+  P-ALLOC-2 has been `IMPLEMENTATION_PENDING` since its `fidelity.missing`
+  list grew, so the test failed on pristine `main`). The mutation is
+  retargeted at `guarantees[2]` (P-DEPOSIT-1, classification `NONE`),
+  preserving its fail-closed intent. No guarantee row, metadata dict row,
+  or report for any other guarantee is touched.
+- Gates: `lake build LidoSRv3` (1395 jobs), `lake build
+  LidoSRv3.Tests.AddressEquivariance LidoSRv3.Tests.AddressSourceMutants`,
+  `python3 scripts/audit_metadata.py check`, `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`, `python3
+  scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, and `bash
+  scripts/test_check_no_python_evidence.sh`: exit 0. No
+  `sorry`/`admit`/axioms introduced.
+- Authored in the isolated git worktree `/home/ubuntu/wt/paddress1` on
+  branch `cursor/wave4-paddress1-4b38`; no other worktree or branch is
+  touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
