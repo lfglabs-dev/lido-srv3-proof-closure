@@ -93,6 +93,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_pinned_expression_shape
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_totality
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.proportional_step_correspondence_and_bounded
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_revert_restores_snapshot

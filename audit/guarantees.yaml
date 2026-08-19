@@ -52,12 +52,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
-        "expected": "abstract proportional-step correspondence-and-bound parent, +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, non-least-index kill-line, over-headroom kill-line, rollback, and two-batch mutants"
+        "expected": "abstract explicit-∀ proportional-step correspondence-and-bound parent (∀ over valid model/source rows + allocationSize), +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, non-least-index kill-line, TX-level over-headroom kill-line (mutantSourceView vs runView and over-headroom witness), rollback, and two-batch mutants"
       },
-      "summary": "proportional_step_correspondence_and_bounded: for the pinned-source proportional step (RowsCorrespond between Model/Source), the two independent candidate scans select the same bucket, and a successful checked amount is positive, ≤ remaining demand, and keeps the candidate within capacity (no over-headroom). selects_least_open_bucket (the +1 Nat model) is demoted to a child. Kill-line mutants reject a non-least-index selection and a checkedAmount that skips the capacity-headroom clamp. Verity: if memory arrays decode, observe of allocateToBestCandidate equals sourceView. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
+      "summary": "forall_proportional_step_correspondence_and_bounded: ∀ (model source best allocationSize w) with RowsCorrespond between Model/Source, candidate? source = some best, hasFreeSpace best, source.length < 2^256, allocationSize ≠ 0, checkedAmount source allocationSize best = some w → candidate correspondence (Model.candidate? ↔ Source.candidate?) ∧ 0 < w ∧ w ≤ allocationSize ∧ best.allocation + w ≤ best.capacity (no over-headroom). The original proportional_step_correspondence_and_bounded is retained as a helper; the explicit ∀ is the registered parent so the bound is universal over valid rows + allocationSize, not an existential witness. selects_least_open_bucket (the +1 Nat model) is demoted to a child. Kill-line mutants: (1) firstOpenCandidate? picks first open row not least (e.g., [(5,10),(0,10)]), (2) TX-level checkedAmountNoCapacityCap drops the capacity-headroom clamp and would commit an over-capacity bucket (single row 0/3 with demand 10 → mutant allocate 10 → 0+10=10 > 3) which the parent's final conjunct excludes, witnessed by mutantSourceView vs runView and the over-headroom mutant. Verity: if memory arrays decode, observe of allocate (persisted bucket array plus totals) equals sourceView of the same allocateToBestCandidate loop. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.proportional_step_correspondence_and_bounded"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded"
       },
       "verity": {
         "status": "CHECKED",
@@ -65,8 +65,8 @@
       },
       "fidelity": {
         "covered": [
-          "proportional-step candidate correspondence and positive/bounded/capacity-safe checked amount",
-          "kill-line mutants: non-least-index selection and over-headroom amount rejected",
+          "explicit-∀ proportional-step candidate correspondence and positive/bounded/capacity-safe checked amount (∀ over valid model/source rows + allocationSize)",
+          "kill-line mutants: non-least-index selection and TX-level over-headroom amount (mutantSourceView observes over-capacity bucket) rejected by the explicit ∀ parent",
           "handwritten +1 Strategy selection (demoted child)",
           "single allocateToBestCandidate loop; observe reads writeArray buckets",
           "Contract.run rollback after intermediate writes"
