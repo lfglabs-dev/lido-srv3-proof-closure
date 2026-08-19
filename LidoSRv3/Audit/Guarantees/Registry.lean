@@ -11,7 +11,7 @@ namespace LidoSRv3.Audit.Guarantees
 inductive Id
   | pAlloc1 | pAlloc2 | pDeposit1 | pTopup1 | pAccount1 | pReserve1
   | pEth1 | pAddress1 | pTopup2 | pConsolidation1 | pSsz1
-  | pDeref1
+  | pDeref1 | pReserveRelational
   deriving DecidableEq, Repr
 
 def Id.text : Id → String
@@ -27,6 +27,7 @@ def Id.text : Id → String
   | .pConsolidation1 => "P-CONSOLIDATION-1"
   | .pSsz1 => "P-SSZ-1"
   | .pDeref1 => "P-DEREF-1"
+  | .pReserveRelational => "P-RESERVE-RELATIONAL"
 
 inductive CheckedLayer
   /-- An abstract semantic model with machine-checked properties. -/
