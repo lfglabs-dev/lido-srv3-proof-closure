@@ -122,7 +122,10 @@ theorem source_amount_totality
    MinFirstAllocation.checkedAmount_le_size hOpen hLen hAmount,
    MinFirstAllocation.checkedAmount_le_headroom hOpen hAmount⟩
 
-/-- **Wave 1 registered parent.**  For the pinned-source *proportional* step
+/-- **Helper (wave-1 parent with implicit binders; the registered parent is
+now the explicit-∀ `forall_proportional_step_correspondence_and_bounded`
+below, re-registered by human PR #134 — this theorem is the retained helper
+the parent's proof forwards to).**  For the pinned-source *proportional* step
 (not the +1-per-iteration `MinFirst` model demoted above): given
 `RowsCorrespond` between the handwritten `Model` rows and the word-typed
 `Source` rows, and given that the source scan selected `best` (`hSelected`),
