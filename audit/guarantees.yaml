@@ -93,10 +93,10 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants",
-        "expected": "checked abstract/source conservation composed with the executable two-batch Verity transaction over shared quantified variables, its per-module observable correspondence, rollback, and execute-level mutants build"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants",
+        "expected": "checked commit-branch-explicit abstract conservation and non-conserving-deployment revert composed with the executable two-batch Verity transaction over shared quantified variables; source-plane kill-line LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed shows the line-996-assert mutant of SolidityDeposit.run commits with pulled ≠ pushed, and execute-level mutants build"
       },
-      "summary": "source_deposit_conserves_and_rolls_back: pulled = pushed on the source-shaped run, and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX). The Verity parent composes that fact with a bounded two-batch Contract.run over shared variables linked by LinksSource. Kill-line: DepositParentTxMutants.skipped_lido_debit_breaks_pulled_eq_pushed patches out the Lido debit and shows the mutant's own pulled/pushed Observables disagree, at the identical DepositParentTx granularity the registered parent composes over (not the disconnected DepositLedgerTx model). Not an EVM claim.",
+      "summary": "source_deposit_conserves_and_rolls_back is the registered abstract parent, now with no definitional or vacuous conjunct: (1) on every committed push of the source-shaped run, pulled = pushed and the independently written depositsValue/pushedValue formulas agree -- the line 996 assert is what gates the commit, and Outcome.pulled/pushed are 0 by definition on all other branches, so the equality is stated on the commit branch rather than as a mostly-0=0 whole-path accessor equality; (2) a non-conserving deployment (MAX_EFFECTIVE_BALANCE_WC_TYPE_01 ≠ DEPOSIT_SIZE) reverts on any nonempty batch instead of committing a mismatched push. The definitional abstract TxObservation rollback (observation maps reverts to .reverted by construction) is demoted to the unregistered child revert_restores_state_value_and_logs; load-bearing rollback evidence is the executable snapshot-restore conjunct of verity_tx_composes_deposit_conservation_and_rollback, which composes this parent with a bounded two-batch Contract.run over shared variables linked by LinksSource. Kill-line: Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed drops the line 996 assert branch from SolidityDeposit.run (mutantRun) and the skewed deployment commits with pulled ≠ pushed -- the registered parent's own first conjunct evaluated on the mutant of its own model (DepositParentTxMutants.skipped_lido_debit_breaks_pulled_eq_pushed remains as executable-plane sibling evidence). Not an EVM claim.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
@@ -107,21 +107,27 @@
       },
       "fidelity": {
         "covered": [
-          "abstract conservation/rollback",
+          "abstract commit-branch conservation (pulled = pushed on every committed push) and non-conserving-deployment revert on nonempty batches",
           "pinned-source correspondence",
           "authorization, allocation, dynamic deposit data, and deposit roots",
           "per-module allocation, dynamic-data, and deposit-data-root storage words",
           "observable Lido/module/beacon call names, destinations, wei values, argument words, and order",
           "composed correspondence over shared quantified source and transaction variables",
           "Contract.run rollback after intermediate writes and fail-closed execute-level mutants",
-          "conservation kill-line at the registered DepositParentTx granularity: skipping the Lido debit breaks the mutant's own pulled = pushed equality, not just a whole-record mismatch"
+          "source-plane kill-line at the registered abstract parent's own predicate: dropping the line 996 assert from SolidityDeposit.run (mutantRun) commits the skewed deployment with pulled ≠ pushed, and mutantRun = run wherever the assert passes",
+          "executable-plane conservation sibling evidence: skipping the Lido debit breaks the mutant DepositParentTx's own pulled = pushed Observables equality"
         ],
-        "missing": []
+        "missing": [
+          "LinksSource is a caller-supplied hypothesis about the two allocation legs, not yet composed from the P-ALLOC-1/P-ALLOC-2 parents' live loops",
+          "beacon deposit contract address provenance is a named assumption, not derived",
+          "the executable transaction is an exactly-two-batch unrolling of the source deposit loop, not a proved bound on the loop"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Compose LinksSource from the P-ALLOC-1/P-ALLOC-2 parents once their live loops land, derive the beacon deposit contract address instead of assuming it, and generalize the exactly-two-batch executable unrolling toward a proved loop bound."
       },
-      "next_gate": "Preserve the composed abstract-to-Verity deposit guarantee, its executable mutants, and the DepositParentTx-granularity conservation kill-line.",
+      "next_gate": "Preserve the commit-branch-explicit abstract parent, its source-plane dropped-assert kill-line, and the composed Verity transaction evidence; the open work is the LinksSource/ALLOC composition, beacon-address provenance, and the two-batch unrolling.",
       "roadmap_priority": "DONE"
     },
     {
