@@ -49,7 +49,7 @@ EXPECTED_AUTHORITY = "Lean theorem statements and proofs are authoritative; meta
 EXPECTED_OBJECTIVE = "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
 EXPECTED_CANONICAL_CLAIMS = {
     "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.proportional_step_correspondence_and_bounded", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "IMPLEMENTATION_PENDING", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD")),
+    "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "IMPLEMENTATION_PENDING", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD")),
     "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
@@ -62,7 +62,7 @@ EXPECTED_CANONICAL_CLAIMS = {
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-ALLOC-1": "4adec12785fe1b4da3f232ada566f4e97c16fda9b4dbd0a2daf00396c44d4a74",
-    "P-ALLOC-2": "e896bd711734c36373cdecccb901694efdffdd3879842f88fb2c6bf24cf6f760",
+    "P-ALLOC-2": "1bf43efe51ffd27fa3cf59109dce6af7c308544b7d37297339522f802c2a4988",
     "P-DEPOSIT-1": "5e8b7c86e1ca43bbb0de39bf6a36be064a43791c1c9860286ffa86b553884afa",
     "P-TOPUP-1": "a36e50f6f97b241465c7cde7f83f7c5e5766cbe6092bc2b2a5a8dd29c928ce99",
     "P-ACCOUNT-1": "4d078d6909b4eaba18eb36ca2e7687ae55e55f551c080801caf8dc42de7c3e90",
