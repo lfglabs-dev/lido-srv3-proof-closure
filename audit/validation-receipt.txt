@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6dc6978d6766e7ab86ef7e20cb4e5ab6463c8333
+validated-tree: 301d383a21b3757258503699c9e37f060292ded4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1833,3 +1833,60 @@ P-RESERVE-RELATIONAL executable finalization composition (2026-08-18)
   `7ec46bd54a7960490a3c0177c4b17ca393e60542`.
 - Receipt subject: tracked tree excluding this receipt,
   `fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca`.
+
+Wave 4: P-CONSOLIDATION-1 kill-line scope remediation (2026-08-19)
+------------------------------------------------------------------
+
+- Defect (found in wave-4 review): `gateway_admitted_nonzero_kill_line`
+  (re-exported in Tests as `gateway_admitted_nonzero_kill_line_refutes_parent`)
+  proved `¬ (∀ inputs obs, sourceRun inputs = .committed obs →
+  inputs.fee.val ≠ 0)` via `freeBatchWitness` (caller = gateway, `fee = 0`,
+  `msg.value = 0`). That witness VIOLATES the registered parent's
+  `hGatewayAdmittedNonzero` premise, so the theorem refuted only the
+  hypothesis-free projection of the parent's committed arm; no kill-line
+  refuted the hypothesis-conditioned parent on a mutant of its own model,
+  and the "…_refutes_parent" naming plus YAML/report wording overclaimed
+  the scope.
+- Fix: new model mutant `SolidityConsolidation.sourceRunFeeBlind`
+  (`sourceRun` with the exact-fee guard dropped, nothing else changed) and
+  `fee_blind_commit_kill_line_refutes_parent`, proved in
+  `ConsolidationCorrespondence.lean` and re-exported by the
+  `PConsolidation1` wrapper and `Tests/ConsolidationTxMutants.lean`: the
+  concrete `feeBlindWitness` (caller = gateway, `msg.value = 1`, `fee = 0`,
+  one valid 48-byte pair) SATISFIES the premise, the mutant commits it,
+  every fee-independent conjunct of the parent's committed arm holds of
+  that commit, and `inputs.fee.val = 0` makes the full committed-arm
+  conjunction false. The "…_refutes_parent" name in Tests moved to this
+  theorem; the old re-export is renamed
+  `gateway_admitted_nonzero_premise_necessity`, and every docstring, the
+  YAML row, and the report now label it premise-necessity evidence.
+- `audit/guarantees.yaml`'s `P-CONSOLIDATION-1` row: `summary`,
+  `fidelity.covered`, and `reproduction.expected` re-scoped to cite the
+  model-mutant kill-line as the parent kill-line and to describe
+  premise-necessity separately; `abstract.theorem`, `verity.theorem`,
+  `classification`, and `assumptions` unchanged.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-CONSOLIDATION-1"]` recomputed;
+  `audit/REPRODUCE.md` regenerated (`STATUS.md` and `ROADMAP.md` are
+  unchanged by this row edit).
+- `report/P-CONSOLIDATION-1.md`: Wave 4 section added; the wave-3
+  kill-line narrative is corrected; stale issue 3 refreshed (`observe`
+  reads the `state.calls` / `state.events` journal suffix, not the
+  `Result` payload).
+- Also cherry-picked the coordinator's main-side self-test repair
+  (`8e55c05`: the `test_audit_metadata.py` NONE-classification mutant now
+  picks a NONE row dynamically); the pre-existing mutant was red on the
+  base tree and blocked the optimized-metadata gate. Repaired the shared
+  `.lake/packages/verity` checkout (found clobbered to an empty git repo
+  by concurrent worktree activity) back to the manifest pin
+  `a063bfc869735045354ebc3862ca08859da0f56e`; no package content changed.
+- `lake build LidoSRv3` and `lake build
+  LidoSRv3.Tests.ConsolidationTxMutants`: exit 0. The new theorems use the
+  codebase's existing `native_decide` idiom for ground `Word`
+  computations; no `sorry`/`admit`, no new axioms beyond that idiom.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical
+  guarantees plus 14 subordinate evidence rows); the optimized metadata
+  mutants, public-claim-surface checks, Verity provenance mutants and
+  guards, and the no-python-evidence checks: exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
