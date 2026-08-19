@@ -208,9 +208,13 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupTxMutants.allocation_write_failure_rolls_back
 #print axioms LidoSRv3.Tests.TopupTxMutants.lido_pull_failure_rolls_back
 #print axioms LidoSRv3.Tests.TopupTxMutants.first_beacon_failure_rolls_back
-#print axioms LidoSRv3.Tests.TopupTxMutants.kill_wrap_skip_assert
-#print axioms LidoSRv3.Tests.TopupTxMutants.kill_remove_module_exists
-#print axioms LidoSRv3.Tests.TopupTxMutants.kill_remove_wc_type2
+#print axioms LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_wrapping_input
+#print axioms LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_unregistered_module_input
+#print axioms LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_non_type2_wc_input
+#print axioms LidoSRv3.Tests.TopupTxMutants.dropped_conservation_assert_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.TopupTxMutants.dropped_module_guard_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.TopupTxMutants.dropped_wc_guard_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.TopupTxMutants.unwrapped_accumulator_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
