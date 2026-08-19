@@ -144,10 +144,19 @@ theorem aggregate_bounded_by_individual (b : TopupBatch) (cfg : TopupConfig) :
   apply Nat.le_trans (consumeBudget_sum_le_sum _ _)
   exact candidates_sum_le b.validators b.requestedGwei cfg hreq
 
-/-- Leftover-budget consumption of
+/-- **Registered P-TOPUP-2 parent.** Leftover-budget consumption of
 `min(valueGwei, min(moduleLimit, maxTopUpPerBlock))` is ≤ the per-block
 cap. Validator WC, slash, activation, and `allocations = transition` are
-not used (`A-TOPUP-NOWRAP` still applies to the Nat model). -/
+not used (`A-TOPUP-NOWRAP` still applies to the Nat model).
+
+This is unconditional in `b` and `cfg`: unlike a post-condition that takes
+the sum bound as a hypothesis and hands it back, this theorem's content is
+in the *proof* — induction over `consumeBudget` showing the leftover walk
+never exceeds the budget it was given, composed with `transitionBudget`'s
+`min _ (min _ maxTopUpPerBlockGwei)`. `Tests.Topup2DistributionTxMutants`
+shows the bound is not vacuous: a mutant budget that drops the
+`maxTopUpPerBlockGwei` term from that `min` lets the identical leftover walk
+allocate above the cap (`block_cap_kill_line_refutes_parent`). -/
 theorem aggregate_bounded_by_block_cap (b : TopupBatch) (cfg : TopupConfig) :
     (transition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei :=
   Nat.le_trans (consumeBudget_sum_le _ _)
@@ -191,22 +200,24 @@ example : (transition illFormedCapBatch illFormedCapCfg).sum ≤
   aggregate_bounded_by_block_cap illFormedCapBatch illFormedCapCfg
 
 
-/-- Commit post-condition: unconstrained `alloc` and `limits` from
-`evaluateTopUpLimit` satisfy both per-validator bounds and the aggregate
-block-cap bound.  This is the registered parent; `aggregate_bounded_by_block_cap`
-(the old leftover-walk theorem) is demoted to a child. -/
-theorem router_require_post_condition
-    (validators : List Validator) (cfg : TopupConfig)
-    (alloc : List Nat) (limits : List Nat)
-    (share : Nat)
-    (hLimLen : limits.length = validators.length)
-    (hAllocLen : alloc.length = validators.length)
-    (hLimits : limits = validators.map (fun v => evaluated_topup_limit v cfg))
-    (hEachBound : ∀ i : Fin alloc.length, alloc[i] ≤ limits[i.val]'(by omega))
-    (hSumBound : alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei) :
-    (∀ i : Fin alloc.length, alloc[i] ≤ limits[i.val]'(by omega)) ∧
-    alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei :=
-  ⟨hEachBound, hSumBound⟩
+/- **Retracted (Wave 1 review, P-TOPUP-2 issue).** A prior revision
+registered `router_require_post_condition` as the parent: unconstrained
+`alloc` and `limits`, with `hEachBound : ∀ i, alloc[i] ≤ limits[i]` and
+`hSumBound : alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei` as *hypotheses*,
+concluding exactly `⟨hEachBound, hSumBound⟩`. That conclusion is syntactically
+identical to its hypotheses — the "proof" is `⟨hEachBound, hSumBound⟩` — so
+the theorem holds for any `alloc`/`limits`/`share` whatsoever, including ones
+no execution of `transition`/`consumeBudget` could ever produce. It does not
+depend on `evaluated_topup_limit`, `transition`, or any router execution
+semantics, so no mutant of the actual leftover-budget walk could ever be
+written that this statement would catch: the kill-line mutant that used to
+sit next to it (`Tests.Topup2DistributionTxMutants`) fed concrete numbers
+into the conclusion directly, never through the theorem itself, and so
+"refuted" a general fact about `Nat` inequalities rather than the registered
+parent. It has been removed rather than restated; `aggregate_bounded_by_block_cap`
+above is the registered parent, and its kill-line mutant is stated against
+`transitionBudget`/`consumeBudget`, the functions the parent's proof actually
+uses. -/
 
 /-- P-TOPUP-2 is closed on the abstract Nat cap and on a composed faithful
 `Contract.run` transaction that computes allocation/share observables.
