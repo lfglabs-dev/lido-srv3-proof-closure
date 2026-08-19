@@ -386,9 +386,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidation1 LidoSRv3.Audit.Verity.ConsolidationTx LidoSRv3.Tests.ConsolidationTxMutants",
-        "expected": "abstract caller/length/fee and if-tree theorem with gateway-nonzero-value premise, packing-order kill-line, and vault-loop Verity transaction build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, swapped-concat, rollback, and two-batch mutants"
+        "expected": "abstract caller/length/fee and if-tree theorem whose gateway-admitted-nonzero-value premise is threaded into a nonzero-fee conjunct on every committed run, that premise's own kill-line, the packing-order kill-line, and vault-loop Verity transaction build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, swapped-concat, rollback, and two-batch mutants"
       },
-      "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). fee=0 with msg.value=0 commits but is no longer user-reachable (gateway-nonzero-value premise). Packing-order kill-line: swapped source||target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Not beacon eligibility and not the Bus. Do not compose with P-ETH-1.",
+      "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). The caller-supplied gateway-admitted-nonzero-value premise (caller=gateway -> msg.value != 0) is threaded into the proof and used: on any run satisfying it, the committed branch's own msg.value = count*fee equality forces fee != 0, so the theorem now derives that conjunct instead of leaving the premise unused. gateway_admitted_nonzero_kill_line shows the premise is necessary: drop it and a concrete gateway-authorized, nonempty, 48-byte batch with fee=0 and msg.value=0 still commits sourceRun. Packing-order kill-line: swapped source||target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Not beacon eligibility and not the Bus. Do not compose with P-ETH-1.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity"
@@ -400,7 +400,7 @@
       "fidelity": {
         "covered": [
           "caller/length/fee eligibility, input-equality value, if-tree atomicity",
-          "gateway-nonzero-value discipline on the vault entry premise",
+          "gateway-admitted-nonzero-value premise threaded into the proof: derives a nonzero-fee conjunct on every committed run, load-bearing per gateway_admitted_nonzero_kill_line",
           "packing order kill-line: swapped source||target concat fails observe",
           "single sourceRun; observe reads state.calls / state.events",
           "Contract.run rollback after intermediate writes"
@@ -410,7 +410,8 @@
           "96-byte packed pubkey calldata and real request-contract calls",
           "preservesEthBalance (requires value-bearing CALL frames, not success stubs)",
           "Bus publisher/executor path",
-          "keccak memory-array oracle"
+          "keccak memory-array oracle",
+          "gateway-admitted-nonzero-value premise is caller-supplied, not derived from a modeled ConsolidationGateway"
         ]
       },
       "classification": {

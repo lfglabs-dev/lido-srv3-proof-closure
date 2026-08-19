@@ -179,4 +179,18 @@ example :
       runView { pair 11 21 with sources := [word 21], targets := [word 11] } := by
   native_decide
 
+/-- **Kill-line: `hGatewayAdmittedNonzero` is load-bearing.** The registered
+parent `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`
+derives `inputs.fee.val ≠ 0` for every committed run from this premise. Drop
+the premise (equivalently: stop threading it into the source theorem) and
+the same conjunct is refuted by a concrete gateway-authorized, nonempty,
+48-byte-aligned batch with `fee = 0` and `msg.value = 0`: `sourceRun` still
+commits it (pinned `_requireExactFee(0)` passes; see the `_requireExactFee(0)`
+Verity vector above). If a future edit quietly drops the hypothesis again,
+this theorem stops compiling as a proof of the un-strengthened claim. -/
+theorem gateway_admitted_nonzero_kill_line_refutes_parent :
+    ¬ (∀ (inputs : Inputs) (obs : Observables),
+        sourceRun inputs = .committed obs → inputs.fee.val ≠ 0) :=
+  gateway_admitted_nonzero_kill_line
+
 end LidoSRv3.Tests.ConsolidationTxMutants
