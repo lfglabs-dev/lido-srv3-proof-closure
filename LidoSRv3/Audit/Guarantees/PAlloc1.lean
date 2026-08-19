@@ -53,8 +53,19 @@ def mappedSummaryTransaction (moduleAddress : Nat) : Prop :=
           (state.writeSlot
             _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable))
 
-/-- Child of `MathView`: if `module.isActive`, `MathView.capacity` is defined as
-`min(targetValidators, availableCapacity)`, so it is ≤ both operands. -/
+/-- **MathView-definitional fact, excluded from the registered parent.**
+If `module.isActive`, `MathView.capacity` is *defined* as
+`min(targetValidators, availableCapacity)`, so it is ≤ both operands by
+`Nat.min_le_left`/`Nat.min_le_right`. This holds for any two `Nat`s — it
+restates the definition of `min`, not a property of `execute`'s arithmetic or
+of any router — so Wave 2 removed it from the registered parent
+`checked_execute` below (P-ALLOC-1 audit issue 1: the Wave 1 parent
+`checked_execute_and_active_capacity_bounded` conjoined this tautology with
+the meaningful executable content, so a mutant that only broke this conjunct
+could never be written; the kill-line in `AllocationTxMutants.lean` targets
+`checked_execute`'s actual content instead). Retained here, unregistered, as
+an explicit, separately labeled fact for a reader who wants to cite the
+`min` shape of `MathView.capacity`. -/
 theorem active_capacity_bounded
     (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
     (isTopUp : Bool) (module : Module) (hActive : module.isActive = true) :
@@ -75,25 +86,27 @@ theorem source_capacities_match_canonical
   SolidityAllocCapacity.source_execute_refines_audit_model
     cfg modules depositsToAllocate isTopUp hBounds
 
-/-- **Wave 1 registered parent.**  Under `CheckedBounds`:
-- the source-shaped executor succeeds,
-- its capacity column equals the independent `MathView` model,
-- AND for every active module the executed capacity is bounded by both
-  `targetValidators` (from the row) and `MathView.availableCapacity`. -/
-theorem checked_execute_and_active_capacity_bounded
+/-- **Wave 2 registered parent.**  Under `CheckedBounds`, the source-shaped
+executor succeeds and its capacity column equals the independent `MathView`
+model.  This restates `source_capacities_match_canonical` above under the
+parent's public name: it is exactly the executable content of the retired
+Wave 1 parent `checked_execute_and_active_capacity_bounded`, with the
+`active_capacity_bounded` conjunct dropped. That conjunct is a
+`Nat.min_le_left`/`Nat.min_le_right` tautology on the `MathView.capacity`
+*definition* that holds for any two `Nat`s regardless of whether `execute`
+computed the right target or headroom (P-ALLOC-1 audit issue 1). Folding a
+definitional tautology into the parent meant no mutant could ever be written
+that broke only that conjunct, so the registered parent is narrowed here to
+the one conjunct a kill-line can actually falsify; `active_capacity_bounded`
+remains available above as an explicit, unregistered MathView-definitional
+child. -/
+theorem checked_execute
     (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
-    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp)
-    (module : Module) (hActive : module.isActive = true) :
-    (∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
       rows.map (fun row => (row.capacity : Nat)) =
-        MathView.capacities cfg modules depositsToAllocate isTopUp) ∧
-    MathView.capacity cfg modules depositsToAllocate isTopUp module ≤
-        MathView.targetValidators cfg modules depositsToAllocate module ∧
-      MathView.capacity cfg modules depositsToAllocate isTopUp module ≤
-        MathView.availableCapacity cfg isTopUp module :=
-  ⟨source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds,
-   AllocCapacity.active_capacity_bounded cfg modules depositsToAllocate isTopUp module hActive⟩
-
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
+  source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}
@@ -101,16 +114,6 @@ theorem router_order_preserved {cfg : Config} {modules : List Module}
     (h : SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows) :
     rows.map Row.moduleId = modules.map Module.moduleId :=
   SolidityAllocCapacity.router_order_preserved h
-
-/-- The whole checked executor, not merely its arithmetic primitives, succeeds
-under the named Solidity bounds and returns the mathematical capacities. -/
-theorem checked_uint256_execution_refines_math
-    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
-    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
-    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
-      rows.map (fun row => (row.capacity : Nat)) =
-        MathView.capacities cfg modules depositsToAllocate isTopUp :=
-  source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds
 
 /-- Canonical P-ALLOC-1 evidence retains the allocation-capacity
 MODEL→SOURCE correspondence and adds only the bounded mapped-summary
