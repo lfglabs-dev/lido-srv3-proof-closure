@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.AddressTx
 
 namespace LidoSRv3.Tests.AddressSourceMutants
@@ -33,6 +34,34 @@ private def fixedOwnerWriterProgram : Contract Unit := do
     (addressToWord (2 : Address))
   setMappingUint LidoSRv3.Audit.Verity.AddressTx.AddressTxContract.owners 7
     (addressToWord (9 : Address))
+
+/-- Kill-line: appending `caller = owner` to permissionless admission breaks
+caller-swap equivariance on an otherwise eligible requestWithdrawals input. -/
+theorem owner_gated_admission_mutant_counterexample :
+    let owner : Address := 1
+    let inp :=
+      { eligibleUnwrap 1 with
+        entryPoint := .requestWithdrawals, requestOwner := 2, amount := 1 }
+    permissionlessAdmission inp = true ∧
+    (permissionlessAdmission inp && decide (inp.caller = owner)) = true ∧
+    (permissionlessAdmission (renameInput 1 2 inp) &&
+      decide ((renameInput 1 2 inp).caller = owner)) = false := by
+  decide
+
+/-- The registered parent depends on the owner-gated refutation above: adding
+an owner gate must falsify admission equivariance. -/
+theorem owner_gate_kill_line_refutes_parent :
+    LidoSRv3.Audit.Verity.AddressAdmission.ownerGateKillLine :=
+  LidoSRv3.Audit.Verity.AddressAdmission.ownerGateKillLine_holds
+
+/-- Scoped requestWithdrawals admission omits any owner gate. -/
+theorem request_withdrawals_admission_has_no_owner_gate :
+    let inp :=
+      { eligibleUnwrap 1 with
+        entryPoint := .requestWithdrawals, requestOwner := 99, amount := 1 }
+    admitted inp = permissionlessAdmission inp ∧
+    ¬ (admitted inp && decide (inp.caller = inp.requestOwner)) := by
+  decide
 
 /-- Counterexample: a caller-address allowlist would reject an otherwise eligible peer. -/
 theorem privileged_caller_mutant_counterexample :

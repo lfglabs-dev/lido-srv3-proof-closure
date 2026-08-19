@@ -154,13 +154,21 @@ theorem universal_post_state_equivariance
     run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) :=
   source_success_post_state_equivariant a₁ a₂ h₁ h₂ inp post h
 
-/-- For two nonzero callers, the source-shaped `run` admits `a₁` iff it
-admits `a₂` on the caller-swapped input, and a successful post-state
-renames under the same swap. This is not
-`WithdrawalQueue.claimWithdrawalsTo`. -/
+/-- Registered P-ADDRESS-1 parent. For two nonzero callers on a scoped,
+well-formed input whose entrypoint is not a singleton-actor gate, the
+source-shaped `run` admits `a₁` iff it admits `a₂` on the caller-swapped
+input, and a successful post-state renames under the same swap. On `requestWithdrawals` and `unwrap`, scoped
+admission is pause plus the caller's own balance/allowance flags only
+(`pause_balance_admitted_is_permissionless`); it does not test `caller = owner`.
+Adding that gate breaks equivariance via
+`LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant`.
+Not `WithdrawalQueue.claimWithdrawalsTo`. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
-    (inp : LidoSRv3.Audit.SolidityAddress.Input) :
+    (inp : LidoSRv3.Audit.SolidityAddress.Input)
+    (_hScope : addressEquivarianceEntryScope inp.entryPoint)
+    (_hWellFormed : wellFormedAddressInput inp)
+    (_hNotSingleton : ¬ singletonActorEntryPoint inp.entryPoint) :
     succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp) ∧
       ∀ post, run inp = .committed post →
         run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) := by
