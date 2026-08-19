@@ -27,7 +27,7 @@ The registered guarantee (`checked_execute`) is an execute↔MathView capacity-c
 
 **SOURCE `source_capacities_match_canonical`.** Under `CheckedBounds` (nonzero `maxEBType1`, no underflow on exited-count, no `uint256` overflow on the sums/products), a pair of inductions on `firstLoop` / `secondLoop` show each `safe*` word equals the corresponding `Nat` operation, so the checked interpreter’s capacity column equals `MathView.capacities`. Router order is a structural list-map identity (`secondLoop_router_order`).
 
-**VERITY `verity_tx_simulates_allocation`.** Assume `sourceBindAll state n = modules`. `txBindOne` is a character-for-character copy of `sourceBindOne`; `txBindOne_eq_sourceBindOne` is `rfl`. The transaction re-runs the same two loops, writes capacity/allocation maps, and `observe` reads those maps back. Equality with `sourceView` is therefore the bind identity plus the already-checked SOURCE interpreter. Revert-rollback is `Contract.run` restoring the snapshot, including an injected `failAfterWrites` hook.
+**VERITY `verity_tx_simulates_allocation`.** Assume `sourceBindAll state n = modules`. The transaction rebinds with the same `sourceBindAll` and runs the same two loops: `sourceExecute` calls `AllocCapacity.firstLoop` / `secondLoop` directly (`AllocationTx.lean:87–91`); the former tx-side copies (`txBindOne`, `txFirstLoop`, …) no longer exist — see the historical notes on issues 2 and 12. The transaction writes capacity/allocation arrays (`persistRows`), and `observe` reads those arrays back. Equality with `sourceView` is therefore the bind identity plus the already-checked SOURCE interpreter. Revert-rollback is `Contract.run` restoring the snapshot, including an injected `failAfterWrites` hook.
 
 ## Issues
 
@@ -83,10 +83,9 @@ from `MathView.capacities`. No other theorem statement changed.
 
    *Counterexample to the intended guarantee, not to the Lean statement.* Take `targetValidators = 10^9` (share limit 10000, huge `totalValidators`) and `availableCapacity = 10^9` (a module that advertised `depositableCount = 10^9`). The theorem holds (`min` of those is still `≤` both). On the deployed router the same inputs produce a capacity of `10^9` validators. The “bound” did not constrain anything the share-limit or depositable-count already failed to constrain.
 
-2. **Verity bind is definitional, not a correspondence.**
-   `txBindOne` and `sourceBindOne` are the same function (`AllocationTx.lean:73–86` vs `104–116`; `txBindOne_eq_sourceBindOne` is `rfl`).
+2. **Verity bind is definitional, not a correspondence.** **Historical as stated** (the tx-side copy is gone): when written, `txBindOne` and `sourceBindOne` were the same function (`AllocationTx.lean:73–86` vs `104–116`; `txBindOne_eq_sourceBindOne` was `rfl`). The duplicate has since been removed — `allocate` rebinds through `sourceBindAll` and `sourceExecute` calls the `AllocCapacity` loops directly (`AllocationTx.lean:107–120`, `87–91`) — which makes the same point without a second copy: the bind the theorem quantifies over is the shared `sourceBindAll` assumed by `hBind`, not an independent artifact.
 
-   *Counterexample to “two independent artifacts.”* Edit only a comment in `txBindOne`. The equality still holds by `rfl`. The only way to break `verity_tx_simulates_allocation` via binding is to hand-edit one copy and leave the other. A solc that emitted the wrong key would not be one of those copies.
+   *Counterexample to “two independent artifacts” (historical).* Edit only a comment in `txBindOne`. The equality still held by `rfl`. The only way to break `verity_tx_simulates_allocation` via binding was to hand-edit one copy and leave the other. A solc that emitted the wrong key would not be one of those copies.
 
 3. **No module callback, so a lying / stale summary is in-model.**
    Deployed `SRLib` lines 516–517 call `getIStakingModule()` then `getStakingModuleSummary`; line 529 is a **second** CALL `getIStakingModuleV2().getTotalModuleStake()` for type-2 modules. The Verity tx never performs those CALLs. Scenario: module address `0xM` is stored; the summary map at `0xM` still holds yesterday’s `depositableCount = 100` while the live module now reports `0`. `verity_tx_simulates_allocation` commits capacity 100. The deployed view function would read `0`. The guarantee as a claim about `getDepositAllocations` is false under any desynchronised summary.
@@ -128,13 +127,12 @@ from `MathView.capacities`. No other theorem statement changed.
 
     *Scenario.* Modules 1 and 2 both have address `0xA`. Map at `0xA` holds `depositable = 10`. Lean gives *each* module available 10, total headroom 20. Live `_addModule` reverts `StakingModuleAddressExists` on the second add, so this state does not arise; if a migration produced it, each CALL to `0xA.getStakingModuleSummary` would still return one summary, but the router would count that summary twice in the first loop. The CHECKED bind cannot tell “two modules” from “one module registered twice.”
 
-12. **`txFirstLoop` / `txAllocationEntry?` are a second handwritten copy of `AllocCapacity`.**
-    Bind equality is already `rfl` (issue 2). The loops (`AllocationTx.lean:124–138`) re-implement `txActiveCount?`, `txCeilDiv?`, type-2 `ceil(stake / maxEBType1)` vs active count — the same arithmetic `AllocCapacity.firstLoop` already runs under `sourceExecute`.
+12. **`txFirstLoop` / `txAllocationEntry?` are a second handwritten copy of `AllocCapacity`.** **Historical** (those symbols no longer exist): the tx-side loop copies have been deleted and `sourceExecute` now calls `AllocCapacity.firstLoop` / `secondLoop` directly (`AllocationTx.lean:87–91`), so there is literally one interpreter; the lines this issue cited (`AllocationTx.lean:124–138`) now hold `Status` / `View` / `observe`. As written: bind equality was already `rfl` (issue 2), and the loops re-implemented `txActiveCount?`, `txCeilDiv?`, type-2 `ceil(stake / maxEBType1)` vs active count — the same arithmetic `AllocCapacity.firstLoop` already ran under `sourceExecute`.
 
-    *Counterexample to independence.* Invert `isType2` in both `AllocCapacity.allocationEntry?` and `txAllocationEntry?`. `verity_tx_simulates_allocation` still holds (both sides take the stake-ceil branch for curated modules). Combined with issue 9 (`wcType != 0` already treats 0x01 as type 2), a shared type-dispatch bug is invisible to the CHECKED equality.
+    *Counterexample to independence (historical).* Invert `isType2` in both `AllocCapacity.allocationEntry?` and `txAllocationEntry?`. `verity_tx_simulates_allocation` still held (both sides took the stake-ceil branch for curated modules). Combined with issue 9 (`wcType != 0` already treats 0x01 as type 2), a shared type-dispatch bug was invisible to the CHECKED equality.
 
 13. **`allocate` takes `count` as an argument, not `getModulesCount()`.**
-    Live `_getModulesAllocationAndCapacity` (`SRLib.sol:496`) sets `modulesCount = SRStorage.getModulesCount()` and walks `getModuleIdAt(i)`. Lean `allocate count` (`AllocationTx.lean:275–278`) does `txBindAll snapshot count` = `List.range count`. There is no modules-count slot.
+    Live `_getModulesAllocationAndCapacity` (`SRLib.sol:496`) sets `modulesCount = SRStorage.getModulesCount()` and walks `getModuleIdAt(i)`. Lean `allocate count` (`AllocationTx.lean:107–120`) does `sourceBindAll snapshot count` = `(List.range count).map (sourceBindOne snapshot)` (`AllocationTx.lean:83–84`). There is no modules-count slot.
 
     *Scenario.* Router has 3 modules. Harness calls `allocate 2`. Lean binds indices 0 and 1, computes a `totalValidators` that omits module 2, and clamps the first two capacities against that smaller total. Live view includes all three and a larger share-limit total. `verity_tx_simulates_allocation` holds of the 2-row fiction. The CHECKED tx is “run the loops on the first `count` map rows,” not “the router’s live module list.”
 
@@ -161,7 +159,7 @@ from `MathView.capacities`. No other theorem statement changed.
 18. **The Eugene “amount ≤ capacity headroom” lemma is not this row.**
     `PAlloc1EugeneBound.checked_amount_le_bond` says MinFirst `checkedAmount` is `≤ capacity − allocation`. That is a P-ALLOC-1 × P-ALLOC-2 composition the CHECKED parent does not state. `active_capacity_bounded` is `min` tautology (issue 1); `verity_tx_simulates_allocation` stops before MinFirst (issue 10).
 
-    *Scenario.* Capacities are fine; MinFirst then over-fills a bucket (issue 11 of P-ALLOC-2). P-ALLOC-1 stays CHECKED. The Eugene lemma would have constrained that fill and is not the registered theorem. YAML “anti-concentration / anti-over-allocation bound” is the `min` of two Nats, not `checked_amount_le_bond`.
+    *Scenario.* Capacities are fine; MinFirst then over-fills a bucket (issue 11 of P-ALLOC-2). P-ALLOC-1 stays CHECKED. The Eugene lemma would have constrained that fill and is not the registered theorem. The YAML row once headlined an “anti-concentration / anti-over-allocation bound” (the phrase has since been removed from the row); that headline was the `min` of two Nats, not `checked_amount_le_bond`.
 
 19. **`verity_tx_simulates_allocation` assumes the bind already produced `modules`.**
     The theorem takes `hBind : sourceBindAll state modules.length = modules`. Unset map rows read as `moduleId = 0`, `moduleAddress = 0`, `status = 0` (inactive under the inverted test, issue 8), `depositable = 0`. `allocate 33` on a two-module seed (issue 15) binds 31 phantom id-0 rows.

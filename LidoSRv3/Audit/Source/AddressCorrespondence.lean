@@ -82,9 +82,12 @@ def wellFormedAddressInput (inp : Input) : Prop :=
   (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) ∧
   (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0)
 
-/-- Singleton-actor protocol entrypoints are excluded from address-equivariance.
-The four pinned writers below are not singleton-actor gated; this predicate is
-carried explicitly on the parent theorem rather than left implicit in prose. -/
+/-- Singleton-actor protocol entrypoints would be excluded from
+address-equivariance, but none of the four pinned writers below is
+singleton-actor gated, so this predicate is `False` for every `EntryPoint`
+(`not_singleton_actor_entry_point`). The parent theorem deliberately does not
+carry its negation: requiring the negation of a provably-`False` predicate
+adds no content while reading as a real exclusion. -/
 def singletonActorEntryPoint (_ep : EntryPoint) : Prop :=
   False
 
