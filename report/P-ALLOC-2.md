@@ -1,6 +1,6 @@
 # P-ALLOC-2
 
-Theorems: `PAlloc2.proportional_step_correspondence_and_bounded` (parent), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (selection kill-line).
+Theorems: `PAlloc2.forall_proportional_step_correspondence_and_bounded` (registered parent, explicit ∀; re-registered by human PR #134), `PAlloc2.proportional_step_correspondence_and_bounded` (helper, implicit binders), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (selection kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (headroom kill-line).
 Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.
 
 ## Intent
@@ -20,7 +20,7 @@ The guarantee is meant to say the selected bucket is a least-filled open bucket,
 
 ## Proof
 
-**Abstract `proportional_step_correspondence_and_bounded` (parent).** The registered parent is the pinned-source *proportional* step, not the +1 model. Its first conjunct pins the selection, not merely the two scans to each other: given `RowsCorrespond` and `hSelected : Source.candidate? source = some best`, the Model scan's candidate maps to exactly `some (best.allocation.val, best.capacity.val)` — proved by rewriting `full_candidate_correspondence hRows` with `hSelected`, so the selection hypothesis is load-bearing (wave 4; it was an unused `_hSelected` before). The second conjunct is `source_amount_totality` (a successful checked amount is positive, ≤ the remaining demand, and keeps the candidate within capacity, i.e. never over headroom). Two kill-lines in `MinFirstDistributionTxMutants.lean` refute the parent on its own model: `selection_kill_line_refutes_parent` is the negation of the parent's FULL predicate shape — all six premises (`RowsCorrespond`, `hSelected`, `hOpen`, `hLen`, `hSize`, `hAmount`) retained and the whole conclusion conjunction negated — with a mutant Model-side scan `mutantFirstOpenCandidate?` (first open bucket wins) in place of `Model.candidate?`. The witness discharges every premise on concrete data: on the `RowsCorrespond` pair `[(5, 10), (0, 10)]`, `Source.candidate?` selects the NON-first row `⟨0, 10⟩` (index 1), the row is open, the demand `10` is nonzero, and `Source.checkedAmount` succeeds with `some 5`; yet the mutant scan maps to `some (5, 10)`, falsifying the pinned-selection conjunct. And the aligned `checkedAmountNoCapacityCap` mutant skips the final capacity-headroom clamp and produces an amount that pushes a candidate past its capacity, refuting the headroom conjunct.
+**Abstract `forall_proportional_step_correspondence_and_bounded` (registered parent, explicit ∀).** The registered parent is the explicit-∀ closure of the pinned-source *proportional* step (re-registered by human PR #134), not the +1 model; the wave-4 implicit-binder `proportional_step_correspondence_and_bounded` is retained as the helper the parent's proof forwards to. Its first conjunct pins the selection, not merely the two scans to each other: given `RowsCorrespond` and `hSelected : Source.candidate? source = some best`, the Model scan's candidate maps to exactly `some (best.allocation.val, best.capacity.val)` — proved by rewriting `full_candidate_correspondence hRows` with `hSelected`, so the selection hypothesis is load-bearing (wave 4; it was an unused `_hSelected` before). The second conjunct is `source_amount_totality` (a successful checked amount is positive, ≤ the remaining demand, and keeps the candidate within capacity, i.e. never over headroom). Two named kill-lines in `MinFirstDistributionTxMutants.lean` refute the registered parent on its own model, each stated as the negation of the parent's FULL explicit-∀ predicate shape — explicit binders `(model) (source) (best) (allocationSize w)`, all six premises (`RowsCorrespond`, `hSelected`, `hOpen`, `hLen`, `hSize`, `hAmount`) retained and discharged on concrete non-vacuous witnesses, whole conclusion conjunction negated. `selection_kill_line_refutes_parent` substitutes a mutant Model-side scan `mutantFirstOpenCandidate?` (first open bucket wins) for `Model.candidate?`: on the `RowsCorrespond` pair `[(5, 10), (0, 10)]`, `Source.candidate?` selects the NON-first row `⟨0, 10⟩` (index 1), the row is open, the demand `10` is nonzero, and `Source.checkedAmount` succeeds with `some 5`; yet the mutant scan maps to `some (5, 10)`, falsifying the pinned-selection conjunct. `headroom_clamp_kill_line_refutes_parent` (wave 6) substitutes `checkedAmountNoCapacityCap` — `checkedAmount` with the final capacity-headroom clamp dropped — at the `checkedAmount` premise only (the conclusion speaks only of `w`, so the first conclusion conjunct keeps the honest `Model.candidate?` scan): on model `[⟨0, 3⟩]`, source `[⟨0, 3⟩]`, demand `10`, the mutant returns `some 10`, and the final conjunct `0 + 10 ≤ 3` is false, refuting the headroom conjunct. The TX-level `mutantSourceView` vs `runView` example (PR #134) is retained as TX-observe computational evidence on the same witness.
 
 **Child `selects_least_open_bucket`.** The previous parent is demoted to a child of the +1 model. Induction on the bucket list following the recursive definition of `MinFirst.candidate?` (scan from the right; on `allocation ≤ later.allocation` keep the left open bucket). Side lemmas: the candidate is a member, is open, and a `none` result means no open bucket. The `≤` conclusion is exactly the selection rule.
 
@@ -199,3 +199,73 @@ theorem names are unchanged. `scripts/audit_metadata.py`'s
 (`e896bd71…24cf6f760`), and `audit/REPRODUCE.md` is regenerated
 (`STATUS.md`/`ROADMAP.md` are byte-identical). No `sorry`/`admit`, no new
 axioms (`#print axioms` still reports only `[propext, Quot.sound]`).
+
+## Wave 6 changes (2026-08-19): P-ALLOC-2 kill-line retarget to the explicit-∀ registered parent
+
+**Defect (P-ALLOC-2, wave-6 review).** Human PR #134 re-registered the parent
+as the explicit-∀
+`PAlloc2.forall_proportional_step_correspondence_and_bounded` (explicit
+binders `(model) (source) (best) (allocationSize w)`), demoting the wave-4
+implicit-binder `proportional_step_correspondence_and_bounded` to a helper.
+The kill-line surface had not followed the re-registration. (1)
+`selection_kill_line_refutes_parent` still negated the IMPLICIT-binder shape
+of the helper — `∀ {model} {source} {best} {allocationSize w}` — and its
+docstring (and the kill-line section prose) still named the helper as the
+parent, so the theorem no longer refuted the registered parent's exact
+predicate shape. (2) The headroom conjunct had no named kill-line: PR #134's
+TX-level evidence was an anonymous `example` proved by `native_decide`
+(`mutantSourceView` vs `runView`), which is not an acceptable kill-line
+theorem, yet the YAML `fidelity.covered` overclaimed the over-headroom amount
+as "rejected by the explicit ∀ parent". (3) Prose in the YAML row, this
+report's header/Proof section, and the helper's docstring in
+`PAlloc2.lean` ("Wave 1 registered parent") still named the helper as the
+registered parent.
+
+**Fix: selection kill-line retargeted to the registered parent's spine.**
+`selection_kill_line_refutes_parent` is restated as the negation of the
+registered parent's FULL explicit-∀ shape —
+`¬ (∀ (model) (source) (best) (allocationSize w), RowsCorrespond → hSelected →
+hOpen → hLen → hSize → hAmount → (C1' ∧ C2 ∧ C3 ∧ C4))` with explicit binders
+exactly matching the registered parent and `mutantFirstOpenCandidate?`
+substituted for `Model.candidate?` in C1'. The witness is unchanged
+(`[(5, 10), (0, 10)]`; all six premises discharged by `rfl`/`decide`; the
+mutant maps to `some (5, 10)`, falsifying the pinned-selection conjunct); the
+proof body is unchanged modulo positional (rather than named-implicit)
+application. Docstrings and the section prose now name
+`forall_proportional_step_correspondence_and_bounded` as the registered
+parent.
+
+**Fix: named headroom kill-line added.** New theorem
+`headroom_clamp_kill_line_refutes_parent` in
+`Tests/MinFirstDistributionTxMutants.lean`: the negation of the registered
+parent's FULL explicit-∀ shape with the capacity-cap mutant
+`checkedAmountNoCapacityCap` (now non-private so the named theorem can
+reference it) substituted at the `checkedAmount` premise ONLY — the
+conclusion speaks only of `w`, so the first conclusion conjunct keeps the
+honest `Model.candidate?` scan. Witness: model `[⟨0, 3⟩]`, source
+`[⟨w 0, w 3⟩]`, best `⟨w 0, w 3⟩`, allocationSize `w 10`, `w = w 10`; all six
+premises discharge by `rfl`/`decide` (the mutant amount check returns
+`some (w 10)`), and the final conjunct `0 + 10 ≤ 3` is refuted by `decide`.
+PR #134's anonymous `mutantSourceView` vs `runView` `example` is kept
+verbatim, but its docstring is relabeled honestly as TX-observe computational
+evidence on the same witness; the wave-4 anonymous `checkedAmountNoCapacityCap`
+`example` is likewise relabeled as computational evidence for the named
+kill-line.
+
+**Metadata/report realignment.** `audit/guarantees.yaml`'s `P-ALLOC-2` row:
+`summary` now describes the first conjunct as PINNING the Model scan's
+candidate to the source-selected row `best` (not scan↔scan correspondence),
+names `forall_proportional_step_correspondence_and_bounded` as the registered
+parent with the helper retained, and cites the two named kill-lines;
+`fidelity.covered` cites `selection_kill_line_refutes_parent` and
+`headroom_clamp_kill_line_refutes_parent` instead of claiming the anonymous
+TX example rejects the parent; `reproduction.expected` updated to match.
+`fidelity.missing`, `classification`, `next_gate`, `assumptions`, and both
+registered theorem names are unchanged
+(`EXPECTED_CANONICAL_CLAIMS["P-ALLOC-2"]` untouched).
+`EXPECTED_CANONICAL_DETAIL_SHA256["P-ALLOC-2"]` recomputed to
+`e94b3877…a961b91`; `audit/REPRODUCE.md` regenerated
+(`STATUS.md`/`ROADMAP.md` byte-identical). The helper's docstring in
+`PAlloc2.lean` now states it is a helper and that the explicit-∀ theorem is
+the registered parent. No `sorry`/`admit`/`native_decide` in the new proofs
+(both kill-lines close by `rfl`/`decide` and `absurd`).
