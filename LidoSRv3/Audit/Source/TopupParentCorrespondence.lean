@@ -210,4 +210,29 @@ theorem committed_conserves (execution : ParentExecution)
     cases result <;> simp_all [ParentResult.reverts, ParentResult.pulled,
       ParentResult.pushed]
 
+/--
+Under a uint256 wrap the on-chain accumulator at source line 732 disagrees with
+the exact Nat sum the push loop sends.  Consequently `afterAllocation` reaches
+the `assert(etherBalanceBefore == etherBalanceAfter)` at source line 755 and
+reverts -- the assert is load-bearing precisely on the wrap branch.
+
+The premise is the *negation* of `NoUncheckedWrap` together with the array-
+length agreement that gates the push tail (`BeaconChainDepositor.sol` line 74).
+-/
+theorem wrap_implies_accumulated_ne_pushed {inp : SourceTopupInput}
+    (hWrap : ¬ NoUncheckedWrap inp)
+    (hLen : inp.pubkeyLengths.length = inp.allocations.length) :
+    accumulated inp ≠ pushedValue inp := by
+  have hGe : uint256Modulus ≤ allocSum inp.allocations := Nat.not_lt.mp hWrap
+  have hMod : allocSumUnchecked inp.allocations = allocSum inp.allocations % uint256Modulus :=
+    allocSumUnchecked_eq_mod inp.allocations
+  have hPos : 0 < uint256Modulus := by decide
+  have hLt : allocSum inp.allocations % uint256Modulus < allocSum inp.allocations :=
+    Nat.lt_of_lt_of_le (Nat.mod_lt _ hPos) hGe
+  have hNe : allocSumUnchecked inp.allocations ≠ allocSum inp.allocations := by omega
+  have hPushed : pushedValue inp = totalAllocated inp :=
+    loopPushed_eq_allocSum _ _ hLen
+  simp only [accumulated, totalAllocated] at *
+  omega
+
 end LidoSRv3.Audit.SolidityTopupParent

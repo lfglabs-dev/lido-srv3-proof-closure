@@ -135,7 +135,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
         "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, and executable fail-closed mutants build"
       },
-      "summary": "source_topup_conserves_and_rolls_back: pulled = pushed on the source-shaped run (A-TOPUP-NOWRAP), and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX). Verity: if NoUncheckedWrap, allocations.length ≤ 2^256, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match. Not P-TOPUP-2 amount computation.",
+      "summary": "source_topup_conserves_and_rolls_back: pulled = pushed on the source-shaped run (A-TOPUP-NOWRAP), and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX). source_wrap_implies_assert_revert: if the unchecked sum wraps, accumulated ≠ pushed, so the line 755 assert reverts (discharges A-TOPUP-NOWRAP on the wrap branch). source_module_guard_required / source_wc_type2_guard_required: the moduleExists and wcTypeIsType2 guards are live in the registered interpreter. Verity: if NoUncheckedWrap, allocations.length ≤ 2^256, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match. Not P-TOPUP-2 amount computation.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back"
@@ -151,7 +151,10 @@
           "Lido pull and beacon deposits executed through Verity external-call frames that debit contract balance",
           "observable call destinations, values, argument words and ordering plus per-validator allocation storage words",
           "rollback to the caller snapshot after allocation writes, after the journalled pull, and after the first journalled deposit",
-          "fail-closed mutation of the executable transaction: skipped per-validator writes, dropped, misrouted, short-paid, reordered and duplicated deposits"
+          "fail-closed mutation of the executable transaction: skipped per-validator writes, dropped, misrouted, short-paid, reordered and duplicated deposits",
+          "wrap branch: if unchecked sum overflows 2^256, accumulated ≠ pushed and the line 755 assert reverts (source_wrap_implies_assert_revert)",
+          "promoted guard: moduleExists is live -- unregistered module reverts at source line 689 (source_module_guard_required)",
+          "promoted guard: wcTypeIsType2 is live -- non-type-2 WC reverts at source line 694 (source_wc_type2_guard_required)"
         ],
         "missing": []
       },

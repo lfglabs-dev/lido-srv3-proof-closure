@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Verity.TopupTx
+import LidoSRv3.Audit.Source.TopupParentCorrespondence
 
 /-! # P-TOPUP-1 faithful-plane fail-closed vectors
 
@@ -155,5 +156,51 @@ theorem reverted_batch_observes_nothing (failure : FailurePoint)
     observe frame twoBatch.length ((execute twoBatch failure).run frame)
       = ⟨false, [], 0, 0, 0, [], [], [], []⟩ := by
   cases failure <;> simp at h ⊢ <;> rfl
+
+/-! ## Wave 1 kill-line mutants (parent-level) -/
+
+open LidoSRv3.Audit.SolidityTopupParent in
+/-- Mutant: wrap the unchecked sum AND skip the balance assert.  Under a wrap,
+`accumulated ≠ pushedValue`, so skipping the assert allows a non-conserving
+commit.  The kill line is source line 755 (`assert`). -/
+theorem kill_wrap_skip_assert :
+    let allocs := [uint256Modulus - 1, 2]
+    let inp : SourceTopupInput :=
+      { callerIsTopUpGateway := true, keyIndicesLength := 2, operatorIdsLength := 2,
+        topUpLimits := [uint256Modulus, uint256Modulus],
+        pubkeyLengths := [48, 48], moduleExists := true, moduleActive := true,
+        wcTypeIsType2 := true, maxTopUpPerBlockGwei := uint256Modulus,
+        moduleAllocationEth := uint256Modulus, lidoCanDeposit := true,
+        allocations := allocs, routerBalanceBefore := uint256Modulus,
+        lidoDepositableEther := uint256Modulus }
+    accumulated inp ≠ pushedValue inp := by decide
+
+/-- Mutant: remove `moduleExists` require.  An unregistered module that would
+be rejected at source line 689 now reaches a later branch; the guard is
+exercised. -/
+theorem kill_remove_module_exists :
+    let cfg : SourceTopupConfig := ⟨48, 48, 1, 1, uint256Modulus⟩
+    let inp : SourceTopupInput :=
+      { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
+        topUpLimits := [10], pubkeyLengths := [48], moduleExists := false,
+        moduleActive := true, wcTypeIsType2 := true, maxTopUpPerBlockGwei := 100,
+        moduleAllocationEth := 100, lidoCanDeposit := true,
+        allocations := [5], routerBalanceBefore := 100,
+        lidoDepositableEther := 100 }
+    run cfg inp = .revertStakingModuleUnregistered := by decide
+
+/-- Mutant: remove `wcTypeIsType2` require.  A non-type-2 module that would be
+rejected at source line 694 now reaches a later branch; the guard is
+exercised. -/
+theorem kill_remove_wc_type2 :
+    let cfg : SourceTopupConfig := ⟨48, 48, 1, 1, uint256Modulus⟩
+    let inp : SourceTopupInput :=
+      { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
+        topUpLimits := [10], pubkeyLengths := [48], moduleExists := true,
+        moduleActive := true, wcTypeIsType2 := false, maxTopUpPerBlockGwei := 100,
+        moduleAllocationEth := 100, lidoCanDeposit := true,
+        allocations := [5], routerBalanceBefore := 100,
+        lidoDepositableEther := 100 }
+    run cfg inp = .revertWrongWithdrawalCredentialsType := by decide
 
 end LidoSRv3.Tests.TopupTxMutants
