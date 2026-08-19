@@ -10,12 +10,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
-        "expected": "abstract Math.min clamp and lockstep moduleAddress-binding allocation transaction build with off-by-one, wrong-binding, stale-snapshot, rollback, and two-batch mutants"
+        "expected": "checked execute + MathView match + active min-clamp parent, lockstep moduleAddress-binding allocation transaction, and kill-line/off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
       },
-      "summary": "active_capacity_bounded: if a module is active, MathView.capacity is defined as min(target, available), so it is ≤ both. Not getDepositAllocations. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
+      "summary": "checked_execute_and_active_capacity_bounded: under CheckedBounds the source executor succeeds with capacities equal to MathView, and for active modules capacity ≤ targetValidators ∧ capacity ≤ availableCapacity. A kill-line mutant (capacity := target) fails the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute_and_active_capacity_bounded"
       },
       "verity": {
         "status": "CHECKED",
@@ -23,7 +23,9 @@
       },
       "fidelity": {
         "covered": [
-          "handwritten capacity model and Math.min clamp",
+          "checked execute succeeds and capacity column equals MathView under CheckedBounds",
+          "handwritten capacity model and Math.min clamp for active modules",
+          "kill-line mutant (capacity := target) rejected by the registered parent",
           "single bind/execute interpreter; observe reads writeArray columns",
           "Contract.run rollback after intermediate writes"
         ],
@@ -37,7 +39,7 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked min-clamp and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks."
+        "work": "Keep the checked execute+min-clamp parent and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
