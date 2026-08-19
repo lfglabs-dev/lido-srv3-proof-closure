@@ -7,7 +7,7 @@ Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 Lido SRv3’s `StakingRouter` decides how many new deposits (or top-ups) each staking module may receive. The live function is `SRLib._getModulesAllocationAndCapacity` (`lidofinance/core@af095e48`, lines 493–559), exposed as `StakingRouter.getDepositAllocations`. For every module it (1) reads `moduleId → moduleAddress` and calls the module’s `getStakingModuleSummary`, (2) computes a current allocation (active-validator count, or `ceil(stake / maxEBType1)` for type-2 / compounding modules), (3) sums those into a new network-wide validator total, then (4) sets each *active* module’s capacity to `min(share-limit target, available headroom)`.
 
-The guarantee is meant to say: an active module cannot be given more capacity than its stake-share target *or* its available depositable/top-up headroom. That is the router’s main anti-concentration / anti-over-allocation bound.
+The registered guarantee (`checked_execute`) is an execute↔MathView capacity-column correspondence: under the named checked-arithmetic bounds (`CheckedBounds`), the source-shaped executor succeeds and its capacity column equals the independent `MathView` model’s, row for row. The earlier headline — an active module cannot be given more capacity than its stake-share target *or* its available depositable/top-up headroom, the router’s anti-concentration / anti-over-allocation bound — is now the unregistered child `active_capacity_bounded`, a `Nat.min` tautology on the `MathView.capacity` definition (issue 1), not the registered claim.
 
 ## Modeling
 
@@ -21,7 +21,7 @@ The guarantee is meant to say: an active module cannot be given more capacity th
 
 ## Proof
 
-**Abstract `checked_execute` (registered parent, Wave 2).** Restates `source_capacities_match_canonical` below under the parent's public name: under `CheckedBounds`, the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. No `min`-tautology conjunct. The kill-line in `AllocationTxMutants.lean` (`capacity := target`, skipping `wordMin`) produces a capacity column that disagrees with `MathView.capacities`, so it is checked against the parent's entire statement, not half of it.
+**Abstract `checked_execute` (registered parent, Wave 2).** Restates `source_capacities_match_canonical` below under the parent's public name: under `CheckedBounds`, the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. No `min`-tautology conjunct. The named kill-line `LidoSRv3.Tests.AllocationTxMutants.capacity_target_kill_line_refutes_parent` (`capacity := target`, skipping `wordMin`) is the explicit negation of the parent's predicate shape with the mutant executor substituted: `CheckedBounds` is discharged at the witness, the mutant commits a capacity column `[24, 24]` that disagrees with `MathView.capacities`' `[11, 11]`, so the kill-line is checked against the parent's entire statement, not half of it.
 
 **Unregistered child `active_capacity_bounded`.** Unfold `MathView.capacity`. For an active module that definition *is* `min(targetValidators, availableCapacity)`. The two conjuncts are `Nat.min_le_left` and `Nat.min_le_right`. No induction, no source loop, no share-limit algebra — this is a fact about the `min` operator applied to whatever two `Nat`s `MathView` computed, true regardless of whether those `Nat`s are the router's actual target/headroom. Wave 1 folded this into the registered parent as `checked_execute_and_active_capacity_bounded`; Wave 2 demoted it back out (issue 1) because a definitional tautology in a registered parent cannot be targeted by any kill-line mutant.
 
@@ -56,13 +56,21 @@ is unchanged in substance and is now checked against the parent's entire
 (purely executable) statement instead of half of a conjunction. Issue 1 is
 reclassified `B` below.
 
+**Wave 5 (2026-08-19): kill-line naming.** The parent kill-line was an
+anonymous `example`; it is now the named theorem
+`LidoSRv3.Tests.AllocationTxMutants.capacity_target_kill_line_refutes_parent`,
+strengthened to the explicit negation of the registered parent's predicate
+shape with `executeMutant` substituted: `CheckedBounds` discharged at the
+witness, the mutant commits, and `Option.map` of its capacity column differs
+from `MathView.capacities`. No other theorem statement changed.
+
 | # | Close | Note |
 | --- | --- | --- |
 | 1 | B (Wave 2) | Registered parent is now `checked_execute` (no `min` conjunct); `active_capacity_bounded` is an explicit unregistered child. `P-ALLOC-1.eugene-bound` remains an unrelated sibling. |
 | 2, 12, 16 | A | SOURCE/TX are lockstep copies. |
 | 3, 4 | scope | Live summary CALL/returndata listed in `missing`. |
 | 5, 14, 17 | A | Unbounded-Nat min; `CheckedBounds` is a separate sibling. |
-| 6 | A | `observe` still reads the result triple; persistence is not claimed. |
+| 6 | C | Fixed in PR #105: `observe` reads the persisted `writeArray` columns (`AllocationTx.lean:132–136`); the write-noop mutant `allocateNoWrite` is rejected. |
 | 7 | scope | Packed `ModuleStateConfig` in `missing`. |
 | 8, 9 | C | Active is status `== 0`; type-2 is WC `== 2`; seed writes 0/1 and 2/1. |
 | 10 | A | Named `_getModulesAllocationAndCapacity` only. |
@@ -93,25 +101,22 @@ reclassified `B` below.
 
    *Scenario.* Misconfigured `maxEBType1 = 0` on a type-2 top-up. Live `getDepositAllocations` reverts. `active_capacity_bounded` reports capacity 0 and succeeds. CHECKED does not mean “the router cannot be in the reverting configuration.”
 
-6. **`observe` reads the returned `Result`, not the written maps.**
-   `AllocationTx.observe` on success takes `result.allocations`, `result.capacities`, `result.moduleAddresses` from the value `allocate` constructed *before* looking at `writeRows`. Only `totalValidators` is `state.readSlot totalSlot`.
+6. **`observe` read the returned `Result`, not the written maps.** **Resolved** (observe-from-storage repair, PR #105): `AllocationTx.observe` on success now reads the persisted arrays — `state.readArray allocationSlot`, `state.readArray capacitySlot`, `state.readArray boundAddressSlot` — plus `state.readSlot totalSlot` (`AllocationTx.lean:132–136`), and the write-noop mutant `allocateNoWrite` in `AllocationTxMutants.lean` is rejected precisely because `observe` reads the storage arrays. Historical statement: `observe` took `result.allocations`, `result.capacities`, `result.moduleAddresses` from the value `allocate` constructed *before* looking at the writes; only `totalValidators` was `state.readSlot totalSlot`.
 
-   *Counterexample mutant.* Make `writeRows` a no-op (or write `0` for every capacity). Keep the `Result` triple built from `rows`. `verity_tx_simulates_allocation` still holds. YAML “persists observables through writeMapUint/writeSlot” is not what `observe` checks, except the one total slot.
+   *Counterexample mutant (now rejected).* Make the row persistence a no-op (or write `0` for every capacity) while keeping the `Result` triple built from `rows`. Before the fix, `verity_tx_simulates_allocation` still held; after the fix, the mutant disagrees with `observe`.
 
 7. **Share-limit / status / WC-type live in one packed Solidity slot; Lean uses separate maps.**
    `ModuleStateConfig` (`SRTypes.sol:118–136`) packs `moduleAddress`, `uint16 stakeShareLimit`, `status`, `uint8 withdrawalCredentialsType` in a single slot. `AllocationTx` reads `shareLimitSlot = 32`, `statusSlot = 33`, `wcTypeSlot = 34` as independent words. `stakeShareLimit` is `uint16`; Lean allows any `Uint256`.
 
    *Scenario.* A wide `SSTORE` that updates status also clobbers the packed share limit on chain. Lean `statusSlot` write (if anyone modeled one) would not touch `shareLimitSlot`. Conversely, Lean can have `shareLimit = 10001` (not a `uint16` field); target becomes `10001 * total / 10000`. The CHECKED bind/loop never sees packing.
 
-8. **`status != 0` is the opposite of `StakingModuleStatus.Active`.**
-   Solidity enum (`SRTypes.sol:40–43`): `Active = 0`, `DepositsPaused = 1`, `Stopped = 2`. Capacity clamp runs only when `cache[i].status == Active` (`SRLib.sol:542`). `AllocationTx.sourceBindOne` / `txBindOne` set `isActive := statusSlot != 0` (`AllocationTx.lean:79, 110`). `seedOne` writes `1` for active and `0` for inactive (`:353`), so the Lean harness is self-consistent and inverted vs storage.
+8. **`status != 0` was the opposite of `StakingModuleStatus.Active`.** **Resolved** (bind/seed repair, PR #105): `sourceBindOne` now sets `isActive := statusSlot == 0` (`AllocationTx.lean:75`) and `seedOne` writes `0` for active / `1` for inactive (`:187`), matching the Solidity enum (`SRTypes.sol:40–43`: `Active = 0`, `DepositsPaused = 1`, `Stopped = 2`) and the `cache[i].status == Active` clamp (`SRLib.sol:542`). Historical statement: the bind set `isActive := statusSlot != 0` and `seedOne` wrote `1` for active and `0` for inactive, so the Lean harness was self-consistent and inverted vs storage.
 
-   *Counterexample.* Real slot: module A `status = 0` (Active), `depositable = 100`; module B `status = 1` (DepositsPaused), `depositable = 100`. Live `getDepositAllocations` gives A `min(target, alloc+100)` and B its current allocation (no new deposits). Lean bind reads A as inactive and B as active: A keeps current allocation, B gets the share-limit clamp and new depositable. `verity_tx_simulates_allocation` on a state copied from mainnet storage computes the wrong capacities. The CHECKED bind is not the deployed status test.
+   *Counterexample (pre-fix).* Real slot: module A `status = 0` (Active), `depositable = 100`; module B `status = 1` (DepositsPaused), `depositable = 100`. Live `getDepositAllocations` gives A `min(target, alloc+100)` and B its current allocation (no new deposits). The pre-fix Lean bind read A as inactive and B as active: A kept current allocation, B got the share-limit clamp and new depositable, so `verity_tx_simulates_allocation` on a state copied from mainnet storage computed the wrong capacities.
 
-9. **`wcType != 0` treats type-0x01 modules as type 2.**
-   Stored `withdrawalCredentialsType` is `0x01` or `0x02` (`WithdrawalCredentials.sol:13–14, 47–48`). Lean `isType2 := wcTypeSlot != 0` (`AllocationTx.lean:80, 111`). Type `0x01` is nonzero, so curated / DVT modules would take the type-2 branch: `ceil(stake / maxEBType1)` instead of active-validator count, and the top-up `active * maxEBType2 / maxEBType1` capacity.
+9. **`wcType != 0` treated type-0x01 modules as type 2.** **Resolved** (bind/seed repair, PR #105): `sourceBindOne` now sets `isType2 := wcTypeSlot == 2` (`AllocationTx.lean:76`) and `seedOne` writes `2` for type 2 / `1` otherwise (`:188`), matching the stored `withdrawalCredentialsType` values `0x01` / `0x02` (`WithdrawalCredentials.sol:13–14, 47–48`). Historical statement: the bind set `isType2 := wcTypeSlot != 0`, so type `0x01` (curated / DVT) modules took the type-2 branch — `ceil(stake / maxEBType1)` instead of active-validator count, and the top-up `active * maxEBType2 / maxEBType1` capacity — and `seedOne` hid it by writing `1` only for type 2 and `0` for type 1.
 
-   *Scenario.* Curated module, `wcType = 1`, `deposited = 100`, `stake = 0`. Live allocation is `100` (active count). Lean bind sees `isType2 = true`, `ceil(0 / 32) = 0`. Capacities and share-limit totals are computed from the wrong column. `seedOne` hides this by writing `1` only for type 2 and `0` for type 1.
+   *Scenario (pre-fix).* Curated module, `wcType = 1`, `deposited = 100`, `stake = 0`. Live allocation is `100` (active count). The pre-fix Lean bind saw `isType2 = true`, `ceil(0 / 32) = 0`; capacities and share-limit totals were computed from the wrong column.
 
 10. **`getDepositAllocations` (the user-facing function) is not this guarantee.**
    After capacities, `SRLib._getDepositAllocations` converts to ETH and runs `MinFirstAllocationStrategy.allocate` (lines 404–421). P-ALLOC-1 stops at the capacity column.

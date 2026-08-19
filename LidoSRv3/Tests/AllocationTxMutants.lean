@@ -182,16 +182,27 @@ private def killLineModules : List Module :=
       summaryExitedCount := w 0, accountingExitedCount := w 0
       totalModuleStake := w 0 } ]
 
-/-- The kill-line mutant produces capacities that differ from `MathView`.
-This means the registered parent `PAlloc1.checked_execute` would fail for
-this mutant (execute result ≠ MathView). `PAlloc1.checked_execute` is Wave 2's
-narrowed parent: it no longer conjoins the `active_capacity_bounded` `Nat.min`
-tautology (P-ALLOC-1 audit issue 1), so this kill-line is checked against the
-parent's entire (now purely executable) statement, not half of it. -/
-example :
-    (executeMutant cfg killLineModules (w 10) false).map (fun rows =>
-      rows.map (fun r => (r.capacity : Nat))) ≠
-    some (MathView.capacities cfg killLineModules (w 10) false) := by
-  native_decide
+/-- **Kill-line for the registered P-ALLOC-1 parent.**  The registered parent
+`LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute` claims, under
+`CheckedBounds`, that the executor succeeds and its capacity column equals
+`MathView.capacities`.  This theorem is the explicit negation of that
+predicate shape with the mutant executor `executeMutant` (`capacity :=
+target`, skipping the `wordMin` clamp against available headroom) substituted
+for `SolidityAllocCapacity.execute`: at the `killLineModules` witness
+`CheckedBounds` holds, the mutant *commits* a row list, and its capacity
+column `[24, 24]` -- the raw share-limit targets -- differs from
+`MathView.capacities`' `[11, 11]`, each clamped to the available headroom
+`10 + 1`.  `PAlloc1.checked_execute` is Wave 2's narrowed parent: it no
+longer conjoins the `active_capacity_bounded` `Nat.min` tautology (P-ALLOC-1
+audit issue 1), so this kill-line is checked against the parent's entire
+(now purely executable) statement, not half of it. -/
+theorem capacity_target_kill_line_refutes_parent :
+    CheckedBounds cfg killLineModules (w 10) false ∧
+      (∃ rows, executeMutant cfg killLineModules (w 10) false = some rows) ∧
+        (executeMutant cfg killLineModules (w 10) false).map (fun rows =>
+          rows.map (fun r => (r.capacity : Nat))) ≠
+        some (MathView.capacities cfg killLineModules (w 10) false) := by
+  refine ⟨⟨by decide, by decide, by decide, by decide, by decide⟩, ⟨_, rfl⟩,
+    by decide⟩
 
 end LidoSRv3.Tests.AllocationTxMutants
