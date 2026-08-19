@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Verity.PEth1CompositionTx
+import Mathlib.Tactic.SplitIfs
 
 namespace LidoSRv3.Audit.Guarantees.PEth1
 
@@ -212,35 +213,44 @@ theorem eth_flow_parent (approved : ApprovedSet)
           totalAmount moves = msgValue := by
   intro msgValue n fee
   unfold gatewayExecute
-  split
-  · assumption
-  · next h =>
-    simp at h ⊢
-    omega
-  · next h1 h2 =>
-    simp at h1 h2 ⊢
-    omega
-  · next hNz hNoOvf hFunded =>
-    simp at hNz hNoOvf hFunded
-    refine ⟨?_, ?_⟩
-    · intro m hm
-      simp at hm
-      rcases List.mem_append.mp hm with hm | hm
-      · have := List.eq_of_mem_replicate hm
+  split_ifs with h1 h2 h3
+  · exact h1
+  · exact h2
+  · exact h3
+  · by_cases h4 : msgValue - n * fee = 0
+    · have hRefund :
+          (if msgValue - n * fee = 0 then ([] : List EthMove)
+            else [{ amount := msgValue - n * fee,
+                    destination := classifyJournal approved approved.refundRecipient }]) = [] :=
+        if_pos h4
+      refine ⟨?_, ?_⟩
+      · intro m hm
+        rw [hRefund, List.append_nil] at hm
+        have := List.eq_of_mem_replicate hm
         subst this
         simp [classifyJournal_self_consolidation, parentApproved]
-      · split at hm
-        · exact absurd hm (List.not_mem_nil _)
-        · simp [List.mem_singleton] at hm
+      · rw [hRefund, List.append_nil, totalAmount_replicate]
+        show n * fee = msgValue
+        omega
+    · have hRefund :
+          (if msgValue - n * fee = 0 then ([] : List EthMove)
+            else [{ amount := msgValue - n * fee,
+                    destination := classifyJournal approved approved.refundRecipient }]) =
+            [{ amount := msgValue - n * fee,
+               destination := classifyJournal approved approved.refundRecipient }] :=
+        if_neg h4
+      refine ⟨?_, ?_⟩
+      · intro m hm
+        rw [hRefund] at hm
+        rcases List.mem_append.mp hm with hm | hm
+        · have := List.eq_of_mem_replicate hm
+          subst this
+          simp [classifyJournal_self_consolidation, parentApproved]
+        · simp only [List.mem_singleton] at hm
           subst hm
           simp [classifyJournal_self_refund approved hDistinct, parentApproved]
-    · rw [totalAmount_append, totalAmount_replicate]
-      split
-      · next h =>
-        simp [totalAmount]
-        omega
-      · next h =>
-        simp [totalAmount_cons, totalAmount_nil]
+      · rw [hRefund, totalAmount_append, totalAmount_replicate, totalAmount_cons, totalAmount_nil]
+        show n * fee + (msgValue - n * fee) = msgValue
         omega
 
 /-! ## Verity plane -/
