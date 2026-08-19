@@ -107,6 +107,22 @@ def zipRequests (sources targets sourceLens targetLens : List Word) :
   else
     none
 
+/-- A successful zip produces exactly one `Request` per source (equivalently
+per target/length, since the guard forces all four lists to the same
+length). Used to transport `sources.length ≠ 0` onto `requests.length`. -/
+theorem zipRequests_some_length {sources targets sourceLens targetLens : List Word}
+    {requests : List Request}
+    (h : zipRequests sources targets sourceLens targetLens = some requests) :
+    requests.length = sources.length := by
+  unfold zipRequests at h
+  split at h
+  · next hcond =>
+      obtain ⟨h1, h2, h3⟩ := hcond
+      injection h with h
+      subst h
+      simp [List.length_zip, h1, h2, h3]
+  · cases h
+
 def requestCall (target fee : Word) (request : Request) : CallObs :=
   { target := target, value := fee, input := payload request }
 
@@ -186,11 +202,26 @@ theorem commitObservables_binds (target fee msgValue : Word)
 `msg.value`, and records `source ‖ target` as the memory payload. A revert
 exposes no prefix of those effects.
 
-`fee = 0` is not a revert: pinned `_requireExactFee` (`WithdrawalVaultEIP7685`
-123--127) is only `msg.value == count * fee`, so a gateway-authorized
-nonempty 48-byte batch with `fee = 0` and `msg.value = 0` commits. -/
+`fee = 0` is not a revert of `sourceRun` itself: pinned `_requireExactFee`
+(`WithdrawalVaultEIP7685` 123--127) is only `msg.value == count * fee`, so
+in isolation a gateway-authorized nonempty 48-byte batch with `fee = 0` and
+`msg.value = 0` commits (see `Tests/ConsolidationTxMutants.lean`'s
+`_requireExactFee(0)` vector on the Verity transaction, which still holds).
+Under the caller-supplied `hGatewayAdmittedNonzero` premise -- the gateway
+entrypoint (`ConsolidationGateway.sol:189`) rejects `msg.value = 0` before
+ever reaching this vault call, so any run this theorem is invoked on with
+`caller = gateway` has `msg.value ≠ 0` -- the committed branch's own
+`msg.value = count * fee` equality forces `fee ≠ 0` (a zero fee times a
+nonempty batch is zero `msg.value`, contradicting the premise). That is the
+`inputs.fee.val ≠ 0` conjunct below: it is a property of runs that satisfy
+the hypothesis, not a change to `sourceRun`'s decision tree. The
+`gateway_admitted_nonzero_kill_line` mutant below shows the premise is
+required: dropped, the same conjunct is false of `sourceRun` on a concrete
+free batch. -/
 theorem source_consolidation_preserves_eligibility_value_atomicity
-    (inputs : Inputs) :
+    (inputs : Inputs)
+    (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →
+      inputs.msgValue.val ≠ 0) :
     (∀ obs, sourceRun inputs = .committed obs →
       ∃ requests,
         zipRequests inputs.sources inputs.targets
@@ -200,6 +231,7 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
         requests.all validRequest = true ∧
         requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
         inputs.msgValue.val = requests.length * inputs.fee.val ∧
+        inputs.fee.val ≠ 0 ∧
         obs = commitObservables inputs.requestTarget inputs.fee
           inputs.msgValue requests) ∧
     (∀ reason, sourceRun inputs = .reverted reason →
@@ -217,6 +249,7 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
     split at hobs
     · next hCaller =>
         have hEq : inputs.caller = inputs.gateway := beq_iff_eq.mp hCaller
+        have hMsgNonzero : inputs.msgValue.val ≠ 0 := hGatewayAdmittedNonzero hEq
         split at hobs
         · cases hobs
         · next hNonempty =>
@@ -239,9 +272,14 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
                             have hFee : inputs.msgValue.val =
                                 requests.length * inputs.fee.val :=
                               beq_iff_eq.mp hFeeB
+                            have hLenPos : requests.length ≠ 0 :=
+                              zipRequests_some_length hZip ▸ hPos
+                            have hFeeNonzero : inputs.fee.val ≠ 0 := by
+                              intro hZeroFee
+                              exact hMsgNonzero (by simp [hFee, hZeroFee])
                             injection hobs with hobs
                             exact ⟨requests, hZip, hEq, hPos, hValid,
-                              hBound, hFee, hobs.symm⟩
+                              hBound, hFee, hFeeNonzero, hobs.symm⟩
                         · cases hobs
                     · cases hobs
                 · cases hobs
@@ -250,5 +288,39 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
     rcases hok with ⟨hEq, hPos, requests, hZip, hValid, hBound, hFee⟩
     unfold sourceRun at hrev
     simp [hEq, hPos, hZip, hValid, hBound, hFee, beq_iff_eq] at hrev
+
+/-- **Kill-line for the registered `hGatewayAdmittedNonzero` premise.** Drop
+the premise and the strengthened conjunct it earns -- "every committed run
+has a nonzero fee" -- is false of `sourceRun` unconditionally: a
+gateway-authorized, nonempty, 48-byte-aligned batch with `fee = 0` and
+`msg.value = 0` commits (pinned `_requireExactFee(0)` passes). This is the
+same free-batch witness `report/P-CONSOLIDATION-1.md` issue 18 and
+`Tests/ConsolidationTxMutants.lean`'s `_requireExactFee(0)` vector exercise;
+this theorem ties it directly to the registered parent's own strengthened
+statement so a future regression that quietly drops the hypothesis (making
+it decorative again) is caught here. -/
+private def freeBatchWitness : Inputs :=
+  { caller := Verity.Core.Uint256.ofNat 7
+    gateway := Verity.Core.Uint256.ofNat 7
+    requestTarget := Verity.Core.Uint256.ofNat consolidationRequestAddress
+    fee := Verity.Core.Uint256.ofNat 0
+    msgValue := Verity.Core.Uint256.ofNat 0
+    sources := [Verity.Core.Uint256.ofNat 11]
+    targets := [Verity.Core.Uint256.ofNat 21]
+    sourceLens := [publicKeyBytes]
+    targetLens := [publicKeyBytes] }
+
+theorem gateway_admitted_nonzero_kill_line :
+    ¬ (∀ (inputs : Inputs) (obs : Observables),
+        sourceRun inputs = .committed obs → inputs.fee.val ≠ 0) := by
+  intro h
+  have hcommit : sourceRun freeBatchWitness = .committed
+      (commitObservables freeBatchWitness.requestTarget freeBatchWitness.fee
+        freeBatchWitness.msgValue
+        [{ source := Verity.Core.Uint256.ofNat 11
+           target := Verity.Core.Uint256.ofNat 21
+           sourceLen := publicKeyBytes, targetLen := publicKeyBytes }]) := by
+    native_decide
+  exact h freeBatchWitness _ hcommit (by native_decide)
 
 end LidoSRv3.Audit.SolidityConsolidation

@@ -1,11 +1,92 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 0f6a92a876288b78e0ea2082aff706fff1f5f682
+validated-tree: c2d9017f719174192a444867bbcbcf2fc61ef1ff
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-CONSOLIDATION-1 unused-hypothesis remediation (2026-08-19)
+--------------------------------------------------------------
+
+- Fixes P-CONSOLIDATION-1: the registered parent
+  `source_consolidation_preserves_eligibility_value_atomicity` declared
+  `hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →
+  inputs.msgValue.val ≠ 0` but its proof term forwarded only `inputs` to
+  `SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity`,
+  which did not take that hypothesis at all -- an inert, decorative premise
+  (Lean's unused-variable linter flagged it) that changed nothing about the
+  theorem's applicability or conclusion. The prior claim that this premise
+  made the `fee = 0 ∧ msg.value = 0` free-batch commit "no longer
+  user-reachable" was false: the conclusion was identical with or without
+  the hypothesis, and `Tests/ConsolidationTxMutants.lean` already exercised
+  a free batch committing two zero-value CALLs.
+- Preferred, load-bearing fix applied: `hGatewayAdmittedNonzero` is now
+  threaded into `SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity`
+  and used. On the `.committed` branch, the hypothesis (applied to
+  `hEq : inputs.caller = inputs.gateway`) gives `inputs.msgValue.val ≠ 0`;
+  combined with the branch's own `inputs.msgValue.val = requests.length *
+  inputs.fee.val` and `requests.length ≠ 0` (new helper lemma
+  `zipRequests_some_length` transports `inputs.sources.length ≠ 0` onto
+  `requests.length`), a zero fee is excluded by contradiction. The
+  committed-branch witness tuple gains an explicit `inputs.fee.val ≠ 0`
+  conjunct: the parent statement itself changed, not just its proof.
+- New kill-line `gateway_admitted_nonzero_kill_line` (added to both
+  `SolidityConsolidation` and the `PConsolidation1` wrapper, and re-exposed
+  as `gateway_admitted_nonzero_kill_line_refutes_parent` in
+  `Tests/ConsolidationTxMutants.lean`): proves
+  `¬ (∀ inputs obs, sourceRun inputs = .committed obs → inputs.fee.val ≠ 0)`
+  via a concrete gateway-authorized, nonempty, 48-byte-aligned batch with
+  `fee = 0` and `msg.value = 0` that still commits `sourceRun` (checked by
+  `native_decide`, the codebase's existing idiom for ground `Uint256`/`Word`
+  computations -- e.g. already used throughout
+  `Tests/ConsolidationTxMutants.lean`). This refutes the registered parent's
+  own strengthened conjunct when the premise is dropped, not a sibling
+  theorem, so a future regression that quietly stops threading the premise
+  is caught here.
+- `audit/guarantees.yaml`'s `P-CONSOLIDATION-1` row: `summary`,
+  `fidelity.covered`, and `reproduction.expected` now describe the premise
+  as threaded and load-bearing instead of claiming free-batch
+  unreachability outright; `fidelity.missing` gains an explicit disclosure
+  that the premise itself is caller-supplied, not derived from a modeled
+  `ConsolidationGateway`.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-CONSOLIDATION-1"]` is recomputed to
+  match, and `audit/ROADMAP.md`, `audit/STATUS.md`, and `audit/REPRODUCE.md`
+  are regenerated with `python3 scripts/audit_metadata.py generate`; the
+  diff is confined to the `P-CONSOLIDATION-1` row.
+- `report/P-CONSOLIDATION-1.md`: Theorems line lists the new kill-line;
+  the Proof section explains the threading; issue 18 is rewritten to
+  distinguish `sourceRun`'s own unconditional decision tree (unchanged --
+  the pinned `_requireExactFee(0)` vector in
+  `Tests/ConsolidationTxMutants.lean` still holds, honestly) from the
+  registered parent's conclusion (now conditioned on the premise); a new
+  dated "Wave 3 changes" section records this remediation and marks the
+  Wave 1 note that introduced the unused hypothesis as superseded.
+- No existing theorem statement is weakened, narrowed, or removed.
+  `sourceRun`, `commitObservables`, `verity_tx_simulates_consolidation`,
+  `packing_order_kills_swapped_concat`, and every existing
+  `Tests/ConsolidationTxMutants.lean` vector (including the
+  `_requireExactFee(0)` free-batch example) are unchanged.
+- `lake build LidoSRv3.Audit.Guarantees.PConsolidation1
+  LidoSRv3.Tests.ConsolidationTxMutants`: exit 0. The pre-existing
+  `hGatewayAdmittedNonzero` unused-variable warning is gone; no new
+  warnings. `lake build LidoSRv3.Audit.Trust` (whole-project sanity, not a
+  required gate): exit 0, 1304 jobs; the two new kill-line theorems depend
+  only on `propext` and the standard `native_decide` axiom pair, matching
+  the codebase's existing `native_decide` usage elsewhere.
+- Changed-Lean forbidden-token scan (`git diff main -- '*.lean'`): no
+  `sorry`, `sorryAx`, or `admit`.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical
+  guarantees plus 14 subordinate evidence rows).
+- Authored in an isolated `git worktree` at
+  `/home/ubuntu/agent-worktrees/wave3-pconsolidation1` on branch
+  `cursor/wave3-pconsolidation1-0830` to avoid interference from concurrent
+  agent branch switches in the shared checkout; no other in-flight
+  branch's files are touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
 
 Wave 2 coordinator: sequential merge closure and receipt rebind (2026-08-19)
 -----------------------------------------------------------------------------
