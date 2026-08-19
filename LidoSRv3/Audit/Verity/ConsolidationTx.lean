@@ -72,32 +72,6 @@ def stateFor (sources targets sourceLens targetLens : List Word)
     (base : ContractState) : ContractState :=
   { base with memory := memoryFor sources targets sourceLens targetLens }
 
-/-- Transaction-side implementation. Deliberately separate from `sourceRun`:
-the correspondence theorem, not a shared definition, is the boundary. -/
-def txRun (inputs : Inputs) : SourceOutcome :=
-  if inputs.caller == inputs.gateway then
-    if inputs.sources.length == 0 then
-      .reverted "ZeroArgument(sourcePubkeys)"
-    else
-      match zipRequests inputs.sources inputs.targets
-          inputs.sourceLens inputs.targetLens with
-      | none => .reverted "ArraysLengthMismatch"
-      | some requests =>
-          if requests.all validRequest then
-            if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
-              if inputs.msgValue.val == requests.length * inputs.fee.val then
-                .committed (commitObservables inputs.requestTarget inputs.fee
-                  inputs.msgValue requests)
-              else .reverted "IncorrectFee"
-            else .reverted "Panic(0x11): checked multiplication overflow"
-          else .reverted "InvalidPublicKeyLength"
-  else .reverted "NotConsolidationGateway"
-
-theorem txRun_eq_sourceRun (inputs : Inputs) :
-    txRun inputs = sourceRun inputs := by
-  unfold txRun sourceRun
-  rfl
-
 def toEvent (ev : EventObs) : Event :=
   { name := "ConsolidationRequestAdded"
     args := ev.payload
@@ -111,6 +85,32 @@ def toJournal (c : CallObs) : ExternalCall :=
     calldata := c.input.map (·.val)
     control := .success
     returndata := [] }
+
+def ofEvent (ev : Event) : EventObs :=
+  { topic := ev.indexedArgs.headD 0
+    payload := ev.args }
+
+def ofJournal (c : ExternalCall) : CallObs :=
+  { target := Verity.Core.Uint256.ofNat c.target
+    value := Verity.Core.Uint256.ofNat c.value
+    input := c.calldata.map Verity.Core.Uint256.ofNat }
+
+private theorem ofNat_val (w : Word) : Verity.Core.Uint256.ofNat w.val = w :=
+  Verity.Core.Uint256.ext (Nat.mod_eq_of_lt w.isLt)
+
+private theorem map_ofNat_val (ws : List Word) :
+    ws.map (fun w => Verity.Core.Uint256.ofNat w.val) = ws := by
+  induction ws with
+  | nil => rfl
+  | cons w ws ih => simp [ofNat_val w, ih]
+
+@[simp] theorem ofEvent_toEvent (ev : EventObs) : ofEvent (toEvent ev) = ev := by
+  simp [ofEvent, toEvent]
+
+@[simp] theorem ofJournal_toJournal (c : CallObs) : ofJournal (toJournal c) = c := by
+  cases c
+  simp [ofJournal, toJournal, ofNat_val]
+  exact map_ofNat_val _
 
 def writePayloads : Nat → List (List Word) → ContractState → ContractState
   | _, [], state => state
@@ -154,7 +154,7 @@ def addRequests (inputs : Inputs) (failAfterWrites : Bool := false) :
         { inputs with
           sources := sources, targets := targets,
           sourceLens := sourceLens, targetLens := targetLens }
-      match txRun decoded with
+      match sourceRun decoded with
       | .reverted reason => .revert reason snapshot
       | .committed obs =>
           let start := (snapshot.readSlot countSlot).val
@@ -174,19 +174,23 @@ structure View where
   feePaid : Word
   deriving DecidableEq, Repr
 
-def observe (beforeCount : Nat) : ContractResult Result → View
-  | .success result state =>
-      ⟨.committed, result.calls, result.events, result.payloads,
+/-- Success reads the journal the body appended to `state.calls` / `state.events`,
+not the `Result` payload. Payloads are the calldata of those calls. -/
+def observe (before : ContractState) : ContractResult Result → View
+  | .success _ state =>
+      let calls := (state.calls.drop before.calls.length).map ofJournal
+      let events := (state.events.drop before.events.length).map ofEvent
+      ⟨.committed, calls, events, calls.map CallObs.input,
         state.readSlot countSlot, state.readSlot feePaidSlot⟩
   | .revert _ _ =>
-      ⟨.reverted, [], [], [], Verity.Core.Uint256.ofNat beforeCount, 0⟩
+      ⟨.reverted, [], [], [], before.readSlot countSlot, 0⟩
 
 def sourceView (inputs : Inputs) (beforeCount : Nat) : View :=
   match sourceRun inputs with
   | .reverted _ =>
       ⟨.reverted, [], [], [], Verity.Core.Uint256.ofNat beforeCount, 0⟩
   | .committed obs =>
-      ⟨.committed, obs.calls, obs.events, obs.payloads,
+      ⟨.committed, obs.calls, obs.events, obs.calls.map CallObs.input,
         Verity.Core.Uint256.ofNat (beforeCount + obs.requestCount), obs.feePaid⟩
 
 theorem writePayloads_readSlot (start : Nat) (payloads : List (List Word))
@@ -225,6 +229,67 @@ theorem persist_read_fee (start : Nat) (obs : Observables)
   rw [readSlot_set_log]
   exact ContractState.readSlot_writeSlot_same _ feePaidSlot _
 
+private theorem writeMapUint_calls (s : ContractState) (slot : Nat)
+    (key value : Word) : (s.writeMapUint slot key value).calls = s.calls :=
+  rfl
+
+private theorem writeMapUint_events (s : ContractState) (slot : Nat)
+    (key value : Word) : (s.writeMapUint slot key value).events = s.events :=
+  rfl
+
+theorem writePayloads_calls (start : Nat) (payloads : List (List Word))
+    (state : ContractState) :
+    (writePayloads start payloads state).calls = state.calls := by
+  revert start state
+  induction payloads with
+  | nil => intro start state; rfl
+  | cons _ rest ih =>
+      intro start state
+      simp only [writePayloads, writeMapUint_calls, ih]
+
+theorem writePayloads_events (start : Nat) (payloads : List (List Word))
+    (state : ContractState) :
+    (writePayloads start payloads state).events = state.events := by
+  revert start state
+  induction payloads with
+  | nil => intro start state; rfl
+  | cons _ rest ih =>
+      intro start state
+      simp only [writePayloads, writeMapUint_events, ih]
+
+theorem persist_calls (start : Nat) (obs : Observables) (state : ContractState) :
+    (persist start obs state).calls = state.calls ++ obs.calls.map toJournal := by
+  unfold persist
+  simp [writePayloads_calls]
+
+theorem persist_events (start : Nat) (obs : Observables) (state : ContractState) :
+    (persist start obs state).events = state.events ++ obs.events.map toEvent := by
+  unfold persist
+  simp [writePayloads_events]
+
+private theorem map_ofJournal_toJournal (cs : List CallObs) :
+    cs.map (ofJournal ∘ toJournal) = cs := by
+  induction cs with
+  | nil => rfl
+  | cons c cs ih => simp [ofJournal_toJournal, ih]
+
+private theorem map_ofEvent_toEvent (es : List EventObs) :
+    es.map (ofEvent ∘ toEvent) = es := by
+  induction es with
+  | nil => rfl
+  | cons e es ih => simp [ofEvent_toEvent, ih]
+
+private theorem drop_map_ofJournal (before : List ExternalCall)
+    (calls : List CallObs) :
+    ((before ++ calls.map toJournal).drop before.length).map ofJournal = calls := by
+  rw [List.drop_left]
+  simpa [Function.comp] using map_ofJournal_toJournal calls
+
+private theorem drop_map_ofEvent (before : List Event) (events : List EventObs) :
+    ((before ++ events.map toEvent).drop before.length).map ofEvent = events := by
+  rw [List.drop_left]
+  simpa [Function.comp] using map_ofEvent_toEvent events
+
 /-- Composed faithful-plane theorem: the real memory-array transaction has the
 same outcome observables as the independently stated pinned-source run. -/
 theorem verity_tx_simulates_pinned_source
@@ -237,15 +302,18 @@ theorem verity_tx_simulates_pinned_source
       inputs.sourceLens.length = some inputs.sourceLens)
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens) :
-    observe (state.readSlot countSlot).val ((addRequests inputs).run state) =
+    observe state ((addRequests inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val := by
   unfold Contract.run addRequests sourceView
   simp only [hSources, hTargets, hSourceLens, hTargetLens]
-  rw [txRun_eq_sourceRun]
   cases hRun : sourceRun inputs with
-  | reverted _ => simp [observe]
+  | reverted _ =>
+      simp [observe, ofNat_val]
   | committed obs =>
-      simp [observe, ofObservables, persist_read_count, persist_read_fee]
+      have hCalls := persist_calls (state.readSlot countSlot).val obs state
+      have hEvents := persist_events (state.readSlot countSlot).val obs state
+      simp [observe, persist_read_count, persist_read_fee, hCalls, hEvents,
+        map_ofJournal_toJournal, map_ofEvent_toEvent]
 
 /-- Any failure, including the injected failure after intermediate
 call/event/memory writes, returns the exact pre-transaction snapshot. -/

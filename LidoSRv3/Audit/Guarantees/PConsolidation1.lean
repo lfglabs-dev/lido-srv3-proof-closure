@@ -46,9 +46,11 @@ def consolidation_reverted (post snapshot : ValidatorRegistry) : Prop :=
 
 def guarantee : Guarantee := ⟨.pConsolidation1, [.model, .source, .verityTx]⟩
 
-/-- Abstract parent: a committed vault consolidation is eligible, conserves
-the exact fee product, and binds one CALL plus one event per `source ‖ target`
-pair. A revert exposes none of those effects. -/
+/-- `sourceRun` commits only when caller = gateway, arrays are nonempty and
+aligned, every key is 48 bytes, the product fits `uint256`, and
+`msg.value` equals `count * fee` (`_requireExactFee`). `fee = 0` with
+`msg.value = 0` commits. A revert implies that conjunction is false.
+Not beacon eligibility and not the Bus. -/
 theorem source_consolidation_preserves_eligibility_value_atomicity
     (inputs : Inputs) :
     (∀ obs, sourceRun inputs = .committed obs →
@@ -74,19 +76,9 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
   SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity
     inputs
 
-/--
-Faithful VERITY_TX closure for P-CONSOLIDATION-1. This theorem starts with the
-actual `Verity.Contract.run` result of the source-shaped consolidation
-transaction: it decodes memory-backed key/length arrays, journals one CALL and
-one event per pair, persists payloads with `writeMapUint` and counts with
-`writeSlot`, and proves that the committed/reverted observables are the
-pinned-source consolidation transaction. Every guard failure and the injected
-post-write failure observes Verity's pre-call rollback state.
-
-This is not an EVM theorem: storage-slot numbers are a model-local projection,
-and no Solidity compiler, Yul, runtime bytecode, proxy layout, deployed code,
-or multi-contract EVM semantics is claimed.
--/
+/-- If the four memory arrays decode to the `Inputs` fields, `observe`
+(suffix of `state.calls` / `state.events` plus count/fee slots) equals
+`sourceView` of the same `sourceRun`. Not 96-byte packed calldata. -/
 theorem verity_tx_simulates_consolidation (inputs : Inputs)
     (state : Verity.ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
@@ -97,7 +89,7 @@ theorem verity_tx_simulates_consolidation (inputs : Inputs)
       inputs.sourceLens.length = some inputs.sourceLens)
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens) :
-    observe (state.readSlot countSlot).val ((addRequests inputs).run state) =
+    observe state ((addRequests inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val :=
   verity_tx_simulates_pinned_source inputs state
     hSources hTargets hSourceLens hTargetLens

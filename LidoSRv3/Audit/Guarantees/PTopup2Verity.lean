@@ -3,11 +3,10 @@ import LidoSRv3.Audit.Verity.Topup2DistributionTx
 
 namespace LidoSRv3.Audit.Guarantees.PTopup2
 
-/-- Headline composed closure theorem for P-TOPUP-2. The executable
-memory-array transaction evaluates checked top-up limits, consumes the
-module-share/block budget left to right, persists allocations through
-`writeMapUint` and remaining/used through `writeSlot`, and its
-committed/reverted observables are exactly the pinned-source batch. -/
+/-- If the three memory arrays decode to equal-length `effective` /
+`pending` / `requested`, then `observe` of `allocate` (persisted
+allocation array plus remaining/used slots) equals `sourceView` of the
+same `sourceRun`. Not live wei `topUpLimits` and not SSZ. -/
 theorem verity_tx_simulates_topup2_spec
     (effective pending requested : List LidoSRv3.Audit.Source.Topup2.Word)
     (target minTopUp remainingCap moduleLimit valueGwei :

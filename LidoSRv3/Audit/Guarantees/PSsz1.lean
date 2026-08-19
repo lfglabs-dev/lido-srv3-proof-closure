@@ -17,16 +17,10 @@ open LidoSRv3.Audit.Verity.SszEncodingTx
 
 def guarantee : Guarantee := ⟨.pSsz1, [.model, .source, .verityTx]⟩
 
-/--
-Parent abstract composition of the four P-SSZ-1 children.  Each conjunct is
-the existing child theorem; none is weakened.
-
-1. structural witness binding (`Audit.Ssz`)
-2. pinned deposit-data-root source layout (`DepositDataRootCorrespondence`)
-3. `GIndex.concat` source transcription (`GIndexConcatCorrespondence`)
-4. seven-call SHA-256 digest composition (`SszAbstractDigest`) plus the
-   root-match verification control flow (`SszTxSimulation`)
--/
+/-- Independent `And` of four children, not `SSZ.verifyProof` on one object:
+structural `bindOperation`, deposit-data-root layout widths, `GIndex.concat`
+transcription, and the seven-call digest / root-match control flow.
+SHA-256 functional correctness remains `A-SHA256-FFI`. -/
 theorem composed_ssz_encoding
     {operation : Ssz.Operation} {combine : Ssz.Node → Ssz.Node → Ssz.Node}
     {witness : Ssz.ValidatorWitness} {expectedRoot : Ssz.Node}
@@ -82,19 +76,9 @@ theorem composed_ssz_encoding
       digest_preimages_length txInput.toInputs,
       accepted_iff_root_matches txInput, hTxWidths⟩⟩
 
-/--
-Faithful VERITY_TX closure for P-SSZ-1. One `Contract.run` transaction
-computes the four children simultaneously — structural witness binding,
-pinned deposit-data-root, `GIndex.concat`, and the seven-call
-digest/root-match — persists every child through `writeSlot`/`writeMapUint`,
-and matches the independently stated source view.
-
-This is not a lift of `verity_tx_simulates_pinned_source` alone: a commit
-implies the same structural-witness conjunct the parent abstract proves from
-`bindOperation`, and the concat and digest children are composed in the
-same statement. Reverts after intermediate writes restore the pre-call
-snapshot.
--/
+/-- `observe` of the handwritten `encode` transaction equals `sourceView`.
+A commit also re-exports the structural-witness conjunct. This is not
+`SSZ.verifyProof` and does not prove SHA-256. -/
 theorem verity_tx_simulates_ssz_encoding
     (input : EncodingInput) (state : Verity.ContractState) :
     observe ((encode input).run state) = sourceView input ∧

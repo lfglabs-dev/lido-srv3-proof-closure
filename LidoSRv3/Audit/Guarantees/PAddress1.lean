@@ -154,6 +154,10 @@ theorem universal_post_state_equivariance
     run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) :=
   source_success_post_state_equivariant a₁ a₂ h₁ h₂ inp post h
 
+/-- For two nonzero callers, the source-shaped `run` admits `a₁` iff it
+admits `a₂` on the caller-swapped input, and a successful post-state
+renames under the same swap. This is not
+`WithdrawalQueue.claimWithdrawalsTo`. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
     (inp : LidoSRv3.Audit.SolidityAddress.Input) :
@@ -163,8 +167,12 @@ theorem universal_address_writer_equivariance
   exact ⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
     fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩
 
-/-- Parent composition: universal abstract/source equivariance and the real
-`Contract.run` rollback/entrypoint receipts are one theorem dependency. -/
+/-- Composition of (i) the universal source-shaped swap, (ii) each
+`Contract.run` entrypoint's address-write `observe` matching
+`sourceAddressView` when `amount < 2^256` and the balance/allowance
+flags are coherent, (iii) any `Contract.run` revert restoring the
+snapshot, (iv) the renamed input's TX view matching `postAddressView`
+of the renamed post-state. Not a WQ claim. -/
 theorem abstract_source_verity_tx_address_equivariance :
     (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
       ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),

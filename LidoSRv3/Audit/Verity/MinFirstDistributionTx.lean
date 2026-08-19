@@ -4,13 +4,15 @@ import Verity.Core.Model.Denote
 /-!
 # P-ALLOC-2 faithful memory-array transaction
 
-This transaction models `MinFirstAllocationStrategy.allocate` from
+This transaction models `MinFirstAllocationStrategy.allocate` /
+`allocateToBestCandidate` from
 `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 30--107.
 Unlike the earlier selected-row slice, both input arrays are read through the
 compilation-model denotation of memory-backed `uint256[]` values.  The loop
-recomputes the pinned candidate, equal-minimum count, next-level bound and
-floor-sensitive `ceilDiv` amount on every iteration.  Successful buckets are
-persisted through `writeMapUint`; totals use `writeSlot`.
+is the source `while (allocated < allocationSize)` over
+`allocateToBestCandidate`: scan, count, bound, `ceilDiv`, then
+`buckets[bestCandidateIndex] += allocated`.  Successful buckets persist
+through `writeArray`; totals use `writeSlot`.
 -/
 
 namespace LidoSRv3.Audit.Verity.MinFirstDistributionTx
@@ -55,54 +57,46 @@ def memoryFor (buckets capacities : List Word) : Nat → Word := fun offset =>
 def stateFor (buckets capacities : List Word) (base : ContractState) : ContractState :=
   { base with memory := memoryFor buckets capacities }
 
-/-- One source-shaped iteration. `fuel` is the initial demand value: positivity
-of every successful amount makes it a sufficient structural bound. -/
-def sourceDistribute : Nat → List Source.Row → Word → Word →
+/-- `buckets[bestCandidateIndex] += allocated` (source line 106). -/
+def setAllocation (rows : List Source.Row) (i : Nat) (newAlloc : Word) :
+    List Source.Row :=
+  match rows[i]? with
+  | none => rows
+  | some r => rows.set i { r with allocation := newAlloc }
+
+/-- One `allocateToBestCandidate` step: scan, compute the share, then mutate
+the best index. A zero amount is the Solidity `break`. -/
+def allocateToBestCandidate (rows : List Source.Row) (remaining : Word) :
+    Option (List Source.Row × Word) :=
+  match Source.candidate? rows with
+  | none => some (rows, 0)
+  | some best => do
+      let amount ← Source.checkedAmount rows remaining best
+      if amount = 0 then some (rows, 0) else
+      let updated ← Verity.Stdlib.Math.safeAdd best.allocation amount
+      match rows.idxOf? best with
+      | none => none
+      | some i => some (setAllocation rows i updated, amount)
+
+/-- `while (allocated < allocationSize)` over `allocateToBestCandidate`.
+`fuel` is the initial demand value: positivity of every successful amount
+makes it a sufficient structural bound. -/
+def allocateLoop : Nat → List Source.Row → Word → Word →
     Option (List Source.Row × Word × Word)
   | 0, rows, remaining, total => if remaining = 0 then some (rows, total, remaining) else none
   | fuel + 1, rows, remaining, total =>
       if remaining = 0 then some (rows, total, remaining) else
-      match Source.candidate? rows with
-      | none => some (rows, total, remaining)
-      | some best => do
-          let amount ← Source.checkedAmount rows remaining best
-          if amount = 0 then none else
-          let updated ← Verity.Stdlib.Math.safeAdd best.allocation amount
-          let newTotal ← Verity.Stdlib.Math.safeAdd total amount
-          let newRemaining ← Verity.Stdlib.Math.safeSub remaining amount
-          sourceDistribute fuel (Source.replaceFirst best updated rows) newRemaining newTotal
+      match allocateToBestCandidate rows remaining with
+      | none => none
+      | some (after, amount) =>
+          if amount = 0 then some (rows, total, remaining) else do
+            let newTotal ← Verity.Stdlib.Math.safeAdd total amount
+            let newRemaining ← Verity.Stdlib.Math.safeSub remaining amount
+            allocateLoop fuel after newRemaining newTotal
 
-/-- Transaction-side implementation.  This is deliberately separate from
-`sourceDistribute`: the correspondence theorem below, rather than a shared
-definition, is the boundary tying executable transaction control flow to the
-pinned-source presentation. -/
-def txDistribute : Nat → List Source.Row → Word → Word →
-    Option (List Source.Row × Word × Word)
-  | 0, rows, remaining, total => if remaining = 0 then some (rows, total, remaining) else none
-  | fuel + 1, rows, remaining, total =>
-      if remaining = 0 then some (rows, total, remaining) else
-      match Source.candidate? rows with
-      | none => some (rows, total, remaining)
-      | some best => do
-          let amount ← Source.checkedAmount rows remaining best
-          if amount = 0 then none else
-          let updated ← Verity.Stdlib.Math.safeAdd best.allocation amount
-          let newTotal ← Verity.Stdlib.Math.safeAdd total amount
-          let newRemaining ← Verity.Stdlib.Math.safeSub remaining amount
-          txDistribute fuel (Source.replaceFirst best updated rows) newRemaining newTotal
-
-theorem txDistribute_eq_sourceDistribute
-    (fuel : Nat) (rows : List Source.Row) (remaining total : Word) :
-    txDistribute fuel rows remaining total =
-      sourceDistribute fuel rows remaining total := by
-  induction fuel generalizing rows remaining total with
-  | zero => simp [txDistribute, sourceDistribute]
-  | succ fuel ih => simp [txDistribute, sourceDistribute, ih]
-
-def writeBucketsState : Nat → List Word → ContractState → ContractState
-  | _, [], state => state
-  | index, value :: rest, state =>
-      writeBucketsState (index + 1) rest (state.writeMapUint bucketsSlot index value)
+/-- Persist allocated buckets as a `uint256[]`-shaped storage array. -/
+def persistBuckets (buckets : List Word) (state : ContractState) : ContractState :=
+  state.writeArray bucketsSlot buckets
 
 structure Result where
   buckets : List Word
@@ -120,11 +114,11 @@ def allocate (bucketCount capacityCount : Nat) (allocationSize : Word)
       readArray snapshot "capacities" capacitiesBase capacityCount with
   | some buckets, some capacities =>
       let rows := (buckets.zip capacities).map fun p => Source.Row.mk p.1 p.2
-      match txDistribute allocationSize.val rows allocationSize 0 with
+      match allocateLoop allocationSize.val rows allocationSize 0 with
       | none => .revert "MIN_FIRST_ARITHMETIC" snapshot
       | some (afterRows, total, remaining) =>
           let after := afterRows.map Source.Row.allocation
-          let dirty := writeBucketsState 0 after snapshot
+          let dirty := persistBuckets after snapshot
           let dirty := (dirty.writeSlot allocatedSlot total).writeSlot remainingSlot remaining
           if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
           else .success ⟨after, total, remaining⟩ dirty
@@ -140,15 +134,15 @@ structure View where
   deriving DecidableEq, Repr
 
 def observe (before : List Word) : ContractResult Result → View
-  | .success result state =>
-      ⟨.committed, result.buckets, state.readSlot allocatedSlot,
+  | .success _ state =>
+      ⟨.committed, state.readArray bucketsSlot, state.readSlot allocatedSlot,
         state.readSlot remainingSlot⟩
   | .revert _ _ => ⟨.reverted, before, 0, 0⟩
 
 def sourceView (buckets capacities : List Word) (allocationSize : Word) : View :=
   if buckets.length != capacities.length then ⟨.reverted, buckets, 0, 0⟩ else
   let rows := (buckets.zip capacities).map fun p => Source.Row.mk p.1 p.2
-  match sourceDistribute allocationSize.val rows allocationSize 0 with
+  match allocateLoop allocationSize.val rows allocationSize 0 with
   | none => ⟨.reverted, buckets, 0, 0⟩
   | some (after, total, remaining) =>
       ⟨.committed, after.map Source.Row.allocation, total, remaining⟩
@@ -165,13 +159,14 @@ theorem verity_tx_simulates_pinned_source
   · have hBne : (buckets.length != capacities.length) = false := by simp [hLen]
     unfold Contract.run allocate sourceView
     simp only [hBne, Bool.false_eq_true, ↓reduceIte, hBuckets, hCapacities]
-    rw [txDistribute_eq_sourceDistribute]
-    cases hRun : sourceDistribute allocationSize.val
+    cases hRun : allocateLoop allocationSize.val
         (List.map (fun p => Source.Row.mk p.1 p.2) (buckets.zip capacities))
         allocationSize 0 <;>
-      simp [observe, allocatedSlot, remainingSlot,
+      simp [observe, persistBuckets, allocatedSlot, remainingSlot,
+        ContractState.readArray, ContractState.writeArray,
         ContractState.readSlot_writeSlot_same,
-        ContractState.readSlot_writeSlot_other]
+        ContractState.readSlot_writeSlot_other,
+        ContractState.storageArray_writeSlot]
   · unfold Contract.run allocate sourceView
     simp [hLen, observe]
 

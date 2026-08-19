@@ -164,14 +164,14 @@ def moduleStatesSlot : Nat := 0
 def moduleIdPositionsSlot : Nat := 2
 def observedAddressesSlot : Nat := 6
 
-def observeDeref (id : Uint256) : Contract Address := fun state =>
+/-- `SRLib.getStakingModuleAddress` after `_requireModuleIdExists`. -/
+def getStakingModuleAddress (id : Uint256) : Contract Address := fun state =>
   if state.storageMapUint moduleIdPositionsSlot id = 0 then
     .revert "StakingModuleUnregistered" state
   else
-    let address := wordToAddress (state.storageMapUint moduleStatesSlot id)
-    if address = 0 then .revert "StakingModuleUnregistered" state
-    else .success address
-      (state.writeMapUint observedAddressesSlot id (addressToWord address))
+    .success (wordToAddress (state.storageMapUint moduleStatesSlot id)) state
+
+abbrev observeDeref := getStakingModuleAddress
 
 /-- Model-local storage relation.  It deliberately does not claim Solidity's
 keccak mapping encoding, ROUTER_STORAGE_POSITION, or emitted SLOAD semantics. -/
@@ -193,34 +193,14 @@ theorem address_word_roundtrip (address : Nat) (h : address < addressModulus) :
 theorem verity_observe_refines_source (s : RegistryState) (hs : Reachable s)
     (state : ContractState) (id : ModuleId) (hrep : VerityRepresents s state id)
     (hmember : Dereferenceable s id) :
-    ∃ after,
-      observeDeref (id : Uint256) state = .success (Verity.Core.Address.ofNat (s.moduleAddress id)) after ∧
-      sourceDeref s id = some (s.moduleAddress id) ∧
-      after.storageMapUint observedAddressesSlot (id : Uint256) = (s.moduleAddress id : Uint256) := by
+    observeDeref (id : Uint256) state =
+      .success (Verity.Core.Address.ofNat (s.moduleAddress id)) state ∧
+    sourceDeref s id = some (s.moduleAddress id) := by
   rcases hrep with ⟨hpos, haddr⟩
-  have hnonzero := reachable_registered_nonzero s hs id hmember
-  refine ⟨state.writeMapUint observedAddressesSlot (id : Uint256)
-      (addressToWord (Verity.Core.Address.ofNat (s.moduleAddress id))), ?_, ?_, ?_⟩
-  · change s.registered id = true at hmember
-    have hbound := reachable_registered_address_bound s hs id hmember
-    have hposition := hpos.mpr hmember
-    simp only [observeDeref]
-    rw [if_neg hposition, haddr]
-    change s.moduleAddress id < Verity.Core.ADDRESS_MODULUS at hbound
-    have hmod : s.moduleAddress id % Verity.Core.Address.modulus = s.moduleAddress id := by
-      exact Nat.mod_eq_of_lt (by simpa [Verity.Core.Address.modulus] using hbound)
-    have haddress : Verity.Core.Address.ofNat (s.moduleAddress id) ≠ 0 := by
-      intro heq
-      have := congrArg Verity.Core.Address.val heq
-      exact hnonzero (by simpa [Verity.Core.Address.ofNat, hmod] using this)
-    simp [haddress]
-  · exact (source_deref_exact_reachable s hs id hmember).1
-  · have hbound := reachable_registered_address_bound s hs id hmember
-    change s.moduleAddress id < Verity.Core.ADDRESS_MODULUS at hbound
-    have hmod : s.moduleAddress id % Verity.Core.Address.modulus = s.moduleAddress id :=
-      Nat.mod_eq_of_lt (by simpa [Verity.Core.Address.modulus] using hbound)
-    simp [ContractState.writeMapUint, ContractState.storageMapUint, addressToWord,
-      Verity.Core.Address.ofNat]
-    exact congrArg Core.Uint256.ofNat hmod
+  change s.registered id = true at hmember
+  have hposition := hpos.mpr hmember
+  refine ⟨?_, (source_deref_exact_reachable s hs id hmember).1⟩
+  simp only [observeDeref, getStakingModuleAddress]
+  rw [if_neg hposition, haddr]
 
 end LidoSRv3.Audit.SolidityDereference

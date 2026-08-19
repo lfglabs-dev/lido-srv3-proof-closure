@@ -32,6 +32,10 @@ theorem revert_restores_state_value_and_logs {State : Type} :
   @LidoSRv3.Audit.revert_restores_state_value_and_logs State
 
 /--
+`run cfg inp` conserves `pulled = pushed` (`A-TOPUP-NOWRAP`). If that run
+reverts, the abstract `TxObservation` (`A-ABSTRACT-TX`) restores `before`
+and erases ETH moves and logs.
+
 Pinned-source conservation and rollback correspondence for the SRv3 beacon-chain
 top-up push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
 

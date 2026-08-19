@@ -77,7 +77,9 @@ def ownerField : Field :=
 
 `claim()` gates on a protocol-wide pause flag and on the caller's own balance.
 It tests no privileged role and no singleton actor, so it is in P-ADDRESS-1 scope
-rather than in the authentication-integrity exclusions recorded in the facade. -/
+rather than in the authentication-integrity exclusions recorded in the facade.
+This is an audit-authored permissionless shape, not
+`WithdrawalQueue.claimWithdrawalsTo`. -/
 
 def claim : FunctionSpec :=
   { name := "claim"
@@ -218,6 +220,8 @@ populates from `DenoteTransaction.sender`.  Post-state equivariance is not
 claimed. -/
 theorem admission_address_equivariant (oracle : DenoteOracle) (a₁ a₂ : Nat)
     (world : Verity.ContractState)
+    (_ha₁ : a₁ < Verity.Core.Address.modulus)
+    (_ha₂ : a₂ < Verity.Core.Address.modulus)
     (h₁ : PauseDisjoint oracle a₁) (h₂ : PauseDisjoint oracle a₂) :
     (run oracle claim a₁ world).success =
       (run oracle claim a₂ (swapBalances oracle a₁ a₂ world)).success := by

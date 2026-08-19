@@ -31,12 +31,39 @@ def vaultSlot : StorageSlot Uint256 := ⟨1⟩
 def refundSlot : StorageSlot Uint256 := ⟨2⟩
 def lidoSlot : StorageSlot Uint256 := ⟨3⟩
 
-/-- Gateway path with a positive remainder. The vault fee write precedes the
-refund `require`, matching source order: vault call then `_refundFee`. -/
-def gatewayRefund (msgValue fee : Uint256) (vaultOk refundOk : Bool) : Contract Unit := do
+/-- Live `_refundFee` remaps `address(0)` (including `2^160` after the 160-bit
+mask) to `msg.sender`. -/
+def resolvedRefundRecipient (recipient sender : Uint256) : Uint256 :=
+  if Core.Address.ofNat recipient.val = 0 then sender else recipient
+
+/-- `_checkFee`: revert if `msg.value < fee`; remainder is `msg.value - fee`. -/
+def checkFee (msgValue fee : Uint256) : Contract Uint256 := do
   require (msgValue != 0) "ZeroArgument(msg.value)"
   require (decide (fee ≤ msgValue)) "InsufficientFee"
-  require (fee != msgValue) "ExactFeeHasNoRefund"
+  subPanic msgValue fee
+
+/-- `_refundFee`: a zero remainder is a no-op. Otherwise pay the resolved
+recipient (`address(0)` / `2^160` → `msg.sender`). Defaults keep the
+registered numeric ledger: recipient and sender are the same nonzero word,
+so resolution does not change the destination slot. -/
+def refundFee (msgValue fee recipient sender : Uint256) (refundOk : Bool) :
+    Contract Unit := do
+  let refund ← subPanic msgValue fee
+  if refund != 0 then do
+    require refundOk "FeeRefundFailed"
+    let dest := resolvedRefundRecipient recipient sender
+    require (dest != 0) "ZeroArgument(refundRecipient)"
+    let r ← getStorage refundSlot
+    let g ← getStorage gatewaySlot
+    let rAfter ← addPanic r refund
+    let gAfterRefund ← subPanic g refund
+    setStorage refundSlot rAfter
+    setStorage gatewaySlot gAfterRefund
+
+/-- Gateway path: `_checkFee`, vault send, then `_refundFee`. -/
+def gatewayRefund (msgValue fee : Uint256) (vaultOk refundOk : Bool)
+    (recipient : Uint256 := 1) (sender : Uint256 := 1) : Contract Unit := do
+  let _remainder ← checkFee msgValue fee
   let g ← getStorage gatewaySlot
   let v ← getStorage vaultSlot
   let gReceived ← addPanic g msgValue
@@ -46,13 +73,7 @@ def gatewayRefund (msgValue fee : Uint256) (vaultOk refundOk : Bool) : Contract 
   let gAfterFee ← subPanic gReceived fee
   setStorage vaultSlot vAfter
   setStorage gatewaySlot gAfterFee
-  require refundOk "FeeRefundFailed"
-  let refund ← subPanic msgValue fee
-  let r ← getStorage refundSlot
-  let rAfter ← addPanic r refund
-  let gAfterRefund ← subPanic gAfterFee refund
-  setStorage refundSlot rAfter
-  setStorage gatewaySlot gAfterRefund
+  refundFee msgValue fee recipient sender refundOk
 
 /-- Gateway path where `msg.value = fee`, so source skips `_refundFee`. -/
 def gatewayExactFee (msgValue : Uint256) (vaultOk : Bool) : Contract Unit := do
@@ -153,6 +174,19 @@ def sourceWithdrawView (before : Ledger) (amount : Nat) (callerIsLido : Bool) :
         { before with vault := before.vault - moved, lido := before.lido + moved }⟩
 
 def word (n : Nat) : Uint256 := Core.Uint256.ofNat n
+
+theorem resolvedRefundRecipient_zero (sender : Uint256) :
+    resolvedRefundRecipient 0 sender = sender := by
+  simp [resolvedRefundRecipient]
+
+theorem resolvedRefundRecipient_overflow (sender : Uint256) :
+    resolvedRefundRecipient (Core.Uint256.ofNat (2 ^ 160)) sender = sender := by
+  simp only [resolvedRefundRecipient]
+  have hmask :
+      Core.Address.ofNat (2 ^ 160 % Core.Uint256.modulus) = 0 := by
+    apply Core.Address.ext
+    decide
+  simp [hmask]
 
 theorem refund_failure_restores_snapshot
     (msgValue fee : Uint256) (vaultOk refundOk : Bool)

@@ -40,7 +40,7 @@ private def stateOf (inputs : Inputs) : Verity.ContractState :=
     defaultState
 
 private def runView (inputs : Inputs) : View :=
-  observe 0 ((addRequests inputs).run (stateOf inputs))
+  observe (stateOf inputs) ((addRequests inputs).run (stateOf inputs))
 
 private def expectedCall (source target : Nat) : CallObs :=
   { target := word consolidationRequestAddress
@@ -115,7 +115,7 @@ example :
       { pair 12 22 with }
     first = ⟨.committed, [expectedCall 11 21], [expectedEvent 11 21],
         [[word 11, word 21]], word 1, word 3⟩ ∧
-      observe 1 ((addRequests secondInputs).run secondState) =
+      observe secondState ((addRequests secondInputs).run secondState) =
         ⟨.committed, [expectedCall 12 22], [expectedEvent 12 22],
           [[word 12, word 22]], word 2, word 3⟩ := by native_decide
 
@@ -127,14 +127,15 @@ example :
       | .success _ after =>
           stateFor [word 12] [word 22] [key48] [key48] after
       | .revert _ s => s
-    observe 1 ((addRequests (pair 12 22)).run secondState) ≠
+    observe secondState ((addRequests (pair 12 22)).run secondState) ≠
       ⟨.committed, [expectedCall 12 22], [expectedEvent 12 22],
         [[word 12, word 22]], word 1, word 3⟩ := by native_decide
 
 /-- Failure after call/event/memory writes is observed as a revert. The
 snapshot law `revert_restores_snapshot` then restores the pre-call state. -/
 example :
-    observe 0 ((addRequests (pair 11 21) true).run (stateOf (pair 11 21))) =
+    observe (stateOf (pair 11 21)) ((addRequests (pair 11 21) true).run
+      (stateOf (pair 11 21))) =
       ⟨.reverted, [], [], [], 0, 0⟩ := by native_decide
 
 example (reason : String) (rollback : Verity.ContractState)
@@ -152,6 +153,17 @@ example :
 example :
     runView { pair 11 21 with caller := word 6 } =
       ⟨.reverted, [], [], [], 0, 0⟩ := by native_decide
+
+/-- Pinned `_requireExactFee(0)`: a gateway-authorized nonempty 48-byte
+pair with `fee = 0` and `msg.value = 0` commits, it does not revert
+`ZeroArgument(fee)`. -/
+example :
+    runView { pair 11 21 with fee := word 0, msgValue := word 0 } =
+      ⟨.committed,
+        [{ target := word consolidationRequestAddress, value := word 0
+           input := [word 11, word 21] }],
+        [expectedEvent 11 21], [[word 11, word 21]], word 1, word 0⟩ := by
+  native_decide
 
 /-- The registered FunctionSpec stays on the call/event/memory constructors. -/
 example : function_spec_bridge_constructors =

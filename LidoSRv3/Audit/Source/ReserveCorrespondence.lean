@@ -69,6 +69,9 @@ inductive SourceOutcome where
   | committed (after : ReserveState)
   deriving DecidableEq, Repr
 
+/-- `_spendDepositableEther` (Lido.sol 839--859): consume `amount` from
+`depositsReserve + unreserved`, then shrink `buffered` and
+`storedDepositsReserve`. `withdrawalsReserve` is not written. -/
 def spendDepositableEther (before : ReserveState) (amount : Word) : SourceOutcome :=
   match getBufferedEtherAllocation before with
   | none => .reverted "ALLOCATION_ARITHMETIC"
@@ -82,17 +85,17 @@ def spendDepositableEther (before : ReserveState) (amount : Word) : SourceOutcom
             | some depositedPostReport =>
                 match safeSub allocation.total amount with
                 | none => .reverted "BUFFER_UNDERFLOW"
-                | some buffered =>
+                | some remaining =>
                     match safeAdd before.depositedNextReportAdjusted amount with
                     | none => .reverted "DEPOSITED_NEXT_REPORT_OVERFLOW"
                     | some depositedNextReportAdjusted =>
-                        let storedDepositsReserve :=
+                        let depositsReserve :=
                           if before.storedDepositsReserve > amount then
                             before.storedDepositsReserve - amount
                           else 0
                         .committed { before with
-                          buffered := buffered
-                          storedDepositsReserve := storedDepositsReserve
+                          buffered := remaining
+                          storedDepositsReserve := depositsReserve
                           depositedPostReport := depositedPostReport
                           depositedNextReportAdjusted := depositedNextReportAdjusted }
           else .reverted "NOT_ENOUGH_ETHER"

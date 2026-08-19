@@ -49,11 +49,10 @@ establish Solidity correspondence for overflowing effective-plus-pending
 balances and therefore does not promote the SOURCE layer. -/
 theorem source_aggregate_bounded_by_block_cap
     (provenance : RuntimeProvenance) (_hProvenance : provenance.Valid)
-    (batch : TopupBatch) (cfg : TopupConfig) (hBatch : well_formed_batch batch cfg) :
+    (batch : TopupBatch) (cfg : TopupConfig) (_hBatch : well_formed_batch batch cfg) :
     (execute batch cfg).sum ≤ cfg.maxTopUpPerBlockGwei := by
   rw [execute_matches_pinned_transition]
-  rw [← hBatch.2.2.2.2.2.2.2.2.2]
-  exact aggregate_bounded_by_block_cap batch cfg hBatch
+  exact aggregate_bounded_by_block_cap batch cfg
 
 /-! ## Checked-word source interpreter
 
@@ -63,13 +62,15 @@ Independent of `evaluated_topup_limit` / `transition`.  Overflow of
 def minWord (a b : Word) : Word := if a ≤ b then a else b
 
 /-- Pinned `_evaluateTopUpLimit` (lines 396--415) after activation/exit/slash
-filters.  The addition is checked; overflow is `none`. -/
-def sourceEvaluateLimit (effective pending target minTopUp : Word) : Option Word := do
-  let current ← safeAdd effective pending
-  if target ≤ current then some 0
+filters.  Locals follow the source: `currentTotal`, then `topUpLimit`.
+The addition is checked; overflow is `none`. Slash/exit/activation arrays
+are upstream of this numeric slice. -/
+def evaluateTopUpLimit (effective pending target minTopUp : Word) : Option Word := do
+  let currentTotal ← safeAdd effective pending
+  if target ≤ currentTotal then some 0
   else
-    let gap ← safeSub target current
-    if gap < minTopUp then some 0 else some gap
+    let topUpLimit ← safeSub target currentTotal
+    if topUpLimit < minTopUp then some 0 else some topUpLimit
 
 /-- Left-to-right budget consumption, matching `consumeBudget` on words. -/
 def sourceConsume : Word → List Word → Option (List Word × Word)
@@ -85,7 +86,7 @@ def sourceCandidates : List Word → List Word → List Word → Word → Word �
     Option (List Word)
   | [], [], [], _, _ => some []
   | e :: es, p :: ps, r :: rs, target, minTopUp => do
-      let limit ← sourceEvaluateLimit e p target minTopUp
+      let limit ← evaluateTopUpLimit e p target minTopUp
       let rest ← sourceCandidates es ps rs target minTopUp
       some (minWord r limit :: rest)
   | _, _, _, _, _ => none
@@ -113,11 +114,11 @@ def sourceRun (effective pending requested : List Word)
 
 /-- Overflow of the pinned checked addition is a source revert, not a total
 Nat wrap. -/
-theorem sourceEvaluateLimit_overflow
+theorem evaluateTopUpLimit_overflow
     (effective pending target minTopUp : Word)
     (h : MAX_UINT256 < effective.val + pending.val) :
-    sourceEvaluateLimit effective pending target minTopUp = none := by
-  unfold sourceEvaluateLimit
+    evaluateTopUpLimit effective pending target minTopUp = none := by
+  unfold evaluateTopUpLimit
   simp [safeAdd, Bind.bind, h]
 
 end LidoSRv3.Audit.Source.Topup2

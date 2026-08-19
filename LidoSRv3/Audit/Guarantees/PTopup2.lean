@@ -113,9 +113,9 @@ private theorem candidates_sum_le (validators : List Validator)
           simp only [List.map_cons, List.zipWith_cons_cons, List.sum_cons]
           exact Nat.add_le_add (Nat.min_le_right _ _) (ih requests hlen)
 
-/-- All source guards represented by the abstract batch.  Conservation is
-deliberately absent: it is a consequence of `allocations = transition`. -/
-def well_formed_batch (b : TopupBatch) (cfg : TopupConfig) : Prop :=
+/-- Source guards represented by the abstract batch, without assuming the
+result of the leftover-budget transition. -/
+def well_formed_pre (b : TopupBatch) (cfg : TopupConfig) : Prop :=
   (∀ v ∈ b.validators,
     v.wc = 0x02 ∧ v.activated = true ∧ v.slashed = false ∧ v.exiting = false) ∧
   strictlyIncreasing (b.validators.map (fun v => v.index)) ∧
@@ -125,38 +125,70 @@ def well_formed_batch (b : TopupBatch) (cfg : TopupConfig) : Prop :=
   b.validators.length ≤ cfg.maxValidatorsPerCall ∧
   b.beaconRootTimestamp ≤ b.currentTimestamp ∧
   b.currentTimestamp - b.beaconRootTimestamp ≤ cfg.maxRootAge ∧
-  b.valueWei % GWEI = 0 ∧
-  b.allocations = transition b cfg
+  b.valueWei % GWEI = 0
 
-/-- The aggregate bound by individual evaluated limits follows from the
-transition and aligned arrays, rather than from an assumed aggregate bound. -/
+/-- A well-formed batch is a pre-validated call whose allocations are exactly
+the leftover-budget transition. Conservation is a consequence of that
+equality, not an extra hypothesis of the bound theorems below. -/
+def well_formed_batch (b : TopupBatch) (cfg : TopupConfig) : Prop :=
+  well_formed_pre b cfg ∧ b.allocations = transition b cfg
+
+/-- The leftover-budget transition is bounded by the independent per-validator
+limits. -/
 theorem aggregate_bounded_by_individual (b : TopupBatch) (cfg : TopupConfig) :
-    well_formed_batch b cfg →
-      b.allocations.sum ≤
+    well_formed_pre b cfg →
+      (transition b cfg).sum ≤
         (b.validators.map (fun v => evaluated_topup_limit v cfg)).sum := by
   intro h
-  rcases h with ⟨_, _, _, hreq, halloc, _, _, _, _, htransition⟩
-  rw [htransition]
+  rcases h with ⟨_, _, _, hreq, _, _, _, _, _⟩
   apply Nat.le_trans (consumeBudget_sum_le_sum _ _)
   exact candidates_sum_le b.validators b.requestedGwei cfg hreq
 
-/-- Per-block conservation is derived from the budget-consuming transition. -/
+/-- Leftover-budget consumption of
+`min(valueGwei, min(moduleLimit, maxTopUpPerBlock))` is ≤ the per-block
+cap. Validator WC, slash, activation, and `allocations = transition` are
+not used (`A-TOPUP-NOWRAP` still applies to the Nat model). -/
 theorem aggregate_bounded_by_block_cap (b : TopupBatch) (cfg : TopupConfig) :
-    well_formed_batch b cfg →
-      b.allocations.sum ≤ cfg.maxTopUpPerBlockGwei := by
-  intro h
-  rw [h.2.2.2.2.2.2.2.2.2]
-  exact Nat.le_trans (consumeBudget_sum_le _ _)
+    (transition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei :=
+  Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_right _ _))
 
 /-- The module allocation limit is conserved by the same transition. -/
 theorem aggregate_bounded_by_module_limit (b : TopupBatch) (cfg : TopupConfig) :
-    well_formed_batch b cfg →
-      b.allocations.sum ≤ cfg.moduleAllocationLimitGwei := by
-  intro h
-  rw [h.2.2.2.2.2.2.2.2.2]
+    well_formed_pre b cfg →
+      (transition b cfg).sum ≤ cfg.moduleAllocationLimitGwei := by
+  intro _h
   exact Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_left _ _))
+
+theorem aggregate_bounded_by_block_cap_of_well_formed
+    (b : TopupBatch) (cfg : TopupConfig) :
+    well_formed_batch b cfg →
+      b.allocations.sum ≤ cfg.maxTopUpPerBlockGwei := by
+  intro h
+  rw [h.2]
+  exact aggregate_bounded_by_block_cap b cfg
+
+/-- Counterexample to reading `aggregate_bounded_by_block_cap` as depending
+on `well_formed_pre`. Allocations `[99]` with no validators fail the
+pre-filter (length mismatch) but leftover-budget consumption is still
+`0 ≤ 1`. -/
+private def illFormedCapCfg : TopupConfig :=
+  { targetBalanceGwei := 32, minTopUpGwei := 1
+    maxTopUpPerBlockGwei := 1, maxValidatorsPerCall := 1
+    moduleAllocationLimitGwei := 10 ^ 18, maxRootAge := 0 }
+
+private def illFormedCapBatch : TopupBatch :=
+  { validators := [], requestedGwei := [], allocations := [99]
+    valueWei := 0, beaconRootTimestamp := 0, currentTimestamp := 0 }
+
+example : ¬ well_formed_pre illFormedCapBatch illFormedCapCfg := by
+  intro h
+  cases h.2.2.2.2.1
+
+example : (transition illFormedCapBatch illFormedCapCfg).sum ≤
+    illFormedCapCfg.maxTopUpPerBlockGwei :=
+  aggregate_bounded_by_block_cap illFormedCapBatch illFormedCapCfg
 
 /-- P-TOPUP-2 is closed on the abstract Nat cap and on a composed faithful
 `Contract.run` transaction that computes allocation/share observables.

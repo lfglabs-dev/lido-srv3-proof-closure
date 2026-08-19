@@ -34,7 +34,6 @@ def withdrawalSlot : StorageSlot Uint256 := ⟨3⟩
 def consolidationSlot : StorageSlot Uint256 := ⟨4⟩
 
 def busForward (msgValue : Uint256) (gatewayOk : Bool) : Contract Unit := do
-  require (msgValue != 0) "ZeroArgument(msg.value)"
   let b ← getStorage busSlot
   let g ← getStorage gatewaySlot
   let bReceived ← addPanic b msgValue
@@ -47,16 +46,19 @@ def busForward (msgValue : Uint256) (gatewayOk : Bool) : Contract Unit := do
 
 def sendWithdrawalFee (fee msgValue : Uint256) (callOk : Bool) : Contract Unit := do
   require (msgValue == fee) "IncorrectFee"
-  require callOk "RequestAdditionFailed"
   let v ← getStorage vaultSlot
+  require (decide (fee ≤ v)) "NotEnoughEther"
+  require callOk "RequestAdditionFailed"
   let t ← getStorage withdrawalSlot
   let vAfter ← subPanic v fee
   let tAfter ← addPanic t fee
   setStorage vaultSlot vAfter
   setStorage withdrawalSlot tAfter
 
-/-- Two EIP-7251 fee sends. The first write precedes the second call check. -/
-def sendTwoConsolidationFees (fee : Uint256) (secondOk : Bool) : Contract Unit := do
+/-- Two EIP-7251 fee sends. `firstOk` defaults to true so existing numerals stay. -/
+def sendTwoConsolidationFees (fee : Uint256) (secondOk : Bool)
+    (firstOk : Bool := true) : Contract Unit := do
+  require firstOk "RequestAdditionFailed"
   let required ← addPanic fee fee
   let v ← getStorage vaultSlot
   require (decide (required ≤ v)) "NotEnoughEther"
@@ -114,17 +116,19 @@ inductive SourceOutcome where
   deriving DecidableEq, Repr
 
 def sourceBus (msgValue : Nat) (gatewayOk : Bool) : SourceOutcome :=
-  if msgValue = 0 then .reverted "ZeroArgument(msg.value)"
-  else if !gatewayOk then .reverted "GatewayCallFailed"
+  if !gatewayOk then .reverted "GatewayCallFailed"
   else .committed msgValue
 
-def sourceWithdrawalFee (fee msgValue : Nat) (callOk : Bool) : SourceOutcome :=
+def sourceWithdrawalFee (fee msgValue vault : Nat) (callOk : Bool) : SourceOutcome :=
   if msgValue ≠ fee then .reverted "IncorrectFee"
+  else if fee > vault then .reverted "NotEnoughEther"
   else if !callOk then .reverted "RequestAdditionFailed"
   else .committed fee
 
-def sourceTwoConsolidationFees (fee : Nat) (secondOk : Bool) : SourceOutcome :=
-  if !secondOk then .reverted "RequestAdditionFailed"
+def sourceTwoConsolidationFees (fee : Nat) (secondOk : Bool)
+    (firstOk : Bool := true) : SourceOutcome :=
+  if !firstOk then .reverted "RequestAdditionFailed"
+  else if !secondOk then .reverted "RequestAdditionFailed"
   else .committed (fee + fee)
 
 def sourceBusView (before : Ledger) (msgValue : Nat) (gatewayOk : Bool) : TxView :=
@@ -135,7 +139,7 @@ def sourceBusView (before : Ledger) (msgValue : Nat) (gatewayOk : Bool) : TxView
 
 def sourceWithdrawalView (before : Ledger) (fee msgValue : Nat) (callOk : Bool) :
     TxView :=
-  match sourceWithdrawalFee fee msgValue callOk with
+  match sourceWithdrawalFee fee msgValue before.vault callOk with
   | .reverted _ => ⟨.reverted, before⟩
   | .committed moved =>
       ⟨.committed,

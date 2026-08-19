@@ -131,13 +131,16 @@ def busEnv : CallEnv :=
 /-! ### TriggerableWithdrawalsGateway -/
 
 def gatewayFn (w : Wiring) : FunctionSpec :=
-  { name := "triggerConsolidation"
+  { name := "addConsolidationRequests"
     params := [amountParam, batchParam]
     returnType := none
     isPayable := true
     body :=
       [ declaredValueCheck
       , .letVar "fee" (.mul (.param "batchSize") (.storage "feePerRequest"))
+      , .ite (.eq (.param "batchSize") (.literal 0)) []
+          [ .require (.eq (.div (.localVar "fee") (.param "batchSize"))
+              (.storage "feePerRequest")) "Panic(0x11)" ]
       , .require (.le (.localVar "fee") (.param "amount")) "InsufficientValue"
       , .letVar "refund" (.sub (.param "amount") (.localVar "fee"))
       , .externalCallBind [] "vault" [.localVar "fee", .param "batchSize"] ]
@@ -150,7 +153,7 @@ def gatewayFn (w : Wiring) : FunctionSpec :=
       ++ [ .stop ] }
 
 def gatewaySpec (w : Wiring) : CompilationModel :=
-  { name := "TriggerableWithdrawalsGateway", fields := [feeField]
+  { name := "ConsolidationGateway", fields := [feeField]
     constructor := none, functions := [gatewayFn w] }
 
 def gatewayEnv (w : Wiring) : CallEnv :=
@@ -168,8 +171,11 @@ def vaultFn (w : Wiring) : FunctionSpec :=
     isPayable := true
     body :=
       [ declaredValueCheck
-      , .require (.eq (.param "amount")
-          (.mul (.param "batchSize") (.storage "feePerRequest"))) "FeeMismatch" ]
+      , .letVar "fee" (.mul (.param "batchSize") (.storage "feePerRequest"))
+      , .ite (.eq (.param "batchSize") (.literal 0)) []
+          [ .require (.eq (.div (.localVar "fee") (.param "batchSize"))
+              (.storage "feePerRequest")) "Panic(0x11)" ]
+      , .require (.eq (.param "amount") (.localVar "fee")) "FeeMismatch" ]
       ++ (if w.perRequestCalls then
             [ .forEach "i" (.param "batchSize")
                 [ .externalCallBind [] "request" [.storage "feePerRequest"] ] ]

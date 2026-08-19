@@ -58,8 +58,8 @@ def wrongBindOne (state : ContractState) (index : Nat) : BoundModule :=
   { moduleId := moduleId
     moduleAddress := state.readMapUint moduleAddressSlot moduleId
     shareLimit := state.readMapUint shareLimitSlot moduleId
-    isActive := state.readMapUint statusSlot moduleId != 0
-    isType2 := state.readMapUint wcTypeSlot moduleId != 0
+    isActive := state.readMapUint statusSlot moduleId == 0
+    isType2 := state.readMapUint wcTypeSlot moduleId == 2
     accountingExitedCount := state.readMapUint accountingExitedSlot moduleId
     depositableCount := state.readMapUint summaryDepositableSlot moduleId
     depositedCount := state.readMapUint summaryDepositedSlot moduleId
@@ -119,5 +119,23 @@ example :
     (allocate 2 cfg (w 10) false true).run before =
       .revert "INJECTED_AFTER_WRITES" before := by
   rfl
+
+/-- Write-noop mutant: a success that skips `persistRows` disagrees with
+`observe`, which reads the storage arrays. -/
+private def allocateNoWrite (count : Nat) (cfg : Config) (deposits : Word)
+    (isTopUp : Bool) : Contract Result :=
+  fun snapshot =>
+    let modules := sourceBindAll snapshot count
+    match sourceExecute cfg modules deposits isTopUp with
+    | none => .revert "ALLOC_ARITHMETIC" snapshot
+    | some (rows, total) =>
+        .success ⟨rows.map Row.currentAllocation, rows.map Row.capacity,
+          modules.map BoundModule.moduleAddress, total⟩ snapshot
+
+example :
+    let before := stateFor modules
+    observe modules ((allocateNoWrite modules.length cfg (w 10) false).run
+      before) ≠ sourceView cfg modules (w 10) false := by
+  native_decide
 
 end LidoSRv3.Tests.AllocationTxMutants
