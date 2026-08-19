@@ -403,10 +403,17 @@ def escrowed (o : TxOutcome) : Nat :=
 Every statement below compares outcome observables — control, hop count,
 per-account balances, total ETH — never a whole `MultiWorld`. -/
 
-/-- A committing batch delivers the entire per-request fee to the EIP-7251
-consolidation-request predeploy and the remainder to the caller's refund
-recipient.  No protocol contract on the route retains ETH, and none reaches
-an address outside the approved set (`lido = 0` on the consolidation path). -/
+/-- On these three witnessed batches, the committing run delivers the entire
+per-request fee to the EIP-7251 consolidation-request predeploy and the
+remainder to the caller's refund recipient.  No protocol contract on the
+route retains ETH, and none reaches an address outside the approved set
+(`lido = 0` on the consolidation path).
+
+**Scope.** This is a finite conjunction over three concrete
+`(msgValue, batchSize, feePerRequest)` tuples, not a `∀` statement over
+batches — see `PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget`
+for a funded, guard-passing tuple whose dispatch exhausts `fuelBudget`
+instead of reaching this success shape. -/
 theorem batch_splits_fee_and_refund :
     observe (run honest 10 2 3) =
         ⟨.success, 6, ⟨0, 0, 0, 0, 0, 6, 4⟩⟩ ∧
@@ -453,11 +460,22 @@ theorem dispatch_matches_atomic_multicall :
 A single root call is dispatched into a shared `MultiWorld`; every onward hop
 is derived from the journal the executing callee emitted, so the Bus → Gateway
 → Vault → CONSOLIDATION_REQUEST route and the Gateway's refund leg are produced
-by the compiled bodies rather than by the harness.  The observables pin down
+by the compiled bodies rather than by the harness.  On the five witnessed
+`(msgValue, batchSize, feePerRequest)` tuples below, the observables pin down
 that (i) the fee reaches only the approved request predeploy and the remainder
 only the caller's refund recipient, (ii) ETH is conserved, (iii) a failure
 anywhere on the route restores the transaction-entry balance sheet, and (iv)
-the recursive dispatch agrees with the atomic compiled-multicall semantics. -/
+the recursive dispatch agrees with the atomic compiled-multicall semantics.
+
+**Scope.** This is a finite conjunction over five concrete numeral tuples —
+not a `∀ (msgValue batchSize feePerRequest : Nat)` theorem, unlike the
+abstract-plane `PEth1.eth_flow_parent`. The fuel-bounded recursive dispatch
+(`fuelBudget = 32`) and the wrapping `Expr.mul` in the compiled bodies (report
+issues 9 and 12) mean a batch can be funded and guard-passing yet still not
+reach the success shape above; see
+`PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget` for an
+executable counterexample. Composition into `P-CONSOLIDATION-1` is out of
+scope regardless (`audit/P-ETH-1-COMPOSITION.md`). -/
 theorem verity_tx_composes_value_flow_and_rollback :
     (observe (run honest 10 2 3) = ⟨.success, 6, ⟨0, 0, 0, 0, 0, 6, 4⟩⟩ ∧
       observe (run honest 10 1 3) = ⟨.success, 5, ⟨0, 0, 0, 0, 0, 3, 7⟩⟩ ∧

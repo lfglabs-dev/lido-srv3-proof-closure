@@ -42,6 +42,45 @@ replay of the discovered `List CompiledCall`.
 Both theorems close on `[propext, Quot.sound]`; the decision procedure is
 `decide +kernel`, which is kernel reduction and introduces no axiom.
 
+## Scope: finite witness bundle, not `∀` funded batches
+
+Unlike the abstract-plane `eth_flow_parent` (`∀ (msgValue n fee : Nat)`),
+`verity_tx_composes_value_flow_and_rollback` is a finite conjunction over
+exactly five concrete `(msgValue, batchSize, feePerRequest)` tuples:
+`(10,2,3)`, `(10,1,3)`, `(6,2,3)`, `(10,2,3)` with `requestAccepts := false`,
+and `(10,4,3)`. It does not quantify over `msgValue`, `batchSize`, or
+`feePerRequest`.
+
+A `∀`-generalization was evaluated for this wave and rejected as infeasible
+without `sorry`: the recursive `MultiContract.callFunction` dispatch
+(`PEth1CompositionTx.step`) has no existing induction lemmas over an
+arbitrary `batchSize`-driven `forEach` in this codebase (P-ETH-1 is the only
+guarantee using this cross-contract dispatch pattern; other composed
+guarantees — e.g. `P-CONSOLIDATION-1`, `P-DEPOSIT-1` — simulate a single
+contract's own `.run`, which is a materially simpler target for induction).
+Beyond the proof-engineering gap, two model properties make an unconditional
+`∀` statement *false*, not merely hard to prove:
+
+- **`fuelBudget = 32`** caps the number of dispatched frames (report issue
+  9). A batch needs `3 + batchSize + (1 if refund > 0 else 0)` frames, so
+  any candidate universal statement needs a `batchSize` side condition the
+  current statement has none of.
+- **`Expr.mul` wraps mod `2^256`** in the compiled Gateway/Vault bodies
+  (report issue 12), so "funded" as the dispatcher computes it and "funded"
+  under Solidity 0.8 checked arithmetic diverge for large inputs.
+
+Two named kill-line theorems in `Tests.PEth1CompositionTxMutants` make this
+scope executable rather than only asserted in prose:
+
+| Theorem | Tuple | Shows |
+| --- | --- | --- |
+| `underfunded_batch_is_not_a_repartition` | `(10, 4, 3)` | Reverts instead of repartitioning the total; not a counterexample to a `∀`-success reading confined to guard-passing batches, but to a naive "the total is always split" reading. |
+| `large_funded_batch_exhausts_fuel_budget` | `(30, 29, 1)` | Funded and guard-passing (`29 * 1 ≤ 30`, no overflow), yet needs `3 + 29 + 1 = 33 > 32` frames and hits `TxControl.exhausted` — a control value none of the five registered witnesses produce, and a failure mode `eth_flow_parent`'s `GatewayRevert` cases do not mention either. |
+
+`P-CONSOLIDATION-1` composition remains blocked on the `FunctionSpec` /
+`ConsolidationGateway.addConsolidationRequests` gap noted below regardless of
+this scope; the two facts are independent.
+
 ## Mutants
 
 `Tests.PEth1CompositionTxMutants` runs the same ensemble and the same
@@ -59,6 +98,12 @@ the parent statement.
 The rollback mutant is falsifiable rather than tautological because `TxOutcome`
 retains both `entryWorld` and `lastWorld`; `observe` applies the atomicity rule
 and `observeWithoutRollback` does not.
+
+The two scope kill-lines above (`underfunded_batch_is_not_a_repartition`,
+`large_funded_batch_exhausts_fuel_budget`) are not `Wiring` mutants — they run
+the *honest* wiring on inputs the registered parent does not witness, so they
+cannot be satisfied by weakening a mutant; they bound how far the registered
+parent's finite conjunction may honestly be read.
 
 ## ETH-bearing call-site inventory
 
