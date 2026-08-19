@@ -94,4 +94,57 @@ mutate the separately defined pinned-source execution transition. -/
 example : reserveChangingMutant vector (word 10) ≠
     sourceSpendDepositableEther vector (word 10) := by decide
 
+/-! ## Wave 1 kill-line: stale WithdrawalQueue cache
+
+`before`/`after` are the same vectors as
+`LidoSRv3.Audit.SolidityReserve.staleQueueCacheKillLine_holds`. The spend is a
+completely ordinary, legal `spendDepositableEther` commit — it satisfies the
+*original* `withdrawalPartitionSpendInvariant` (the restated-field version)
+with no trouble at all. The kill-line is that the same commit still shrinks
+the *live* queue-facing reserve from 80 to 50 once the cached
+`unfinalizedStETH = 50` is stale against a live WQ value of 80: exactly the
+raid `report/P-RESERVE-1.md` issue #2 describes, and exactly what
+`PReserve1.source_spend_preserves_withdrawal_reserve`'s `freshQueueCache`
+hypothesis is there to rule out. -/
+private def staleCacheBefore : ReserveState :=
+  { buffered := word 100
+    storedDepositsReserve := word 20
+    unfinalizedStETH := word 50
+    depositedPostReport := word 3
+    depositedNextReportAdjusted := word 2 }
+
+private def staleCacheAfter : ReserveState :=
+  { buffered := word 50
+    storedDepositsReserve := word 0
+    unfinalizedStETH := word 50
+    depositedPostReport := word 53
+    depositedNextReportAdjusted := word 52 }
+
+/-- Kill-line witness: a legal spend that preserves the cached-field
+invariant can still raid the live queue-facing reserve (80 -> 50) once the
+cache is stale. Concrete counterpart to
+`LidoSRv3.Audit.SolidityReserve.staleQueueCacheKillLine_holds`, referenced by
+name from `PReserve1.source_spend_preserves_withdrawal_reserve`'s
+docstring. -/
+theorem stale_queue_cache_mutant_counterexample :
+    spendDepositableEther staleCacheBefore (word 50) = .committed staleCacheAfter ∧
+    withdrawalPartitionSpendInvariant staleCacheBefore staleCacheAfter (word 50) ∧
+    liveEffectiveWithdrawalsReserve staleCacheAfter (word 80) ≠
+      liveEffectiveWithdrawalsReserve staleCacheBefore (word 80) := by
+  refine ⟨by decide, ?_, by decide⟩
+  exact committed_preserves_withdrawal_reserve staleCacheBefore staleCacheAfter (word 50) (by decide)
+
+/-- The strengthened registered parent rejects exactly this case: it cannot
+be invoked here at all, because the only source of a `live` value in this
+mutant is the stale cache itself, and `freshQueueCache staleCacheBefore live`
+forces `live = staleCacheBefore.unfinalizedStETH = 50`, not the live `80`
+that exposes the raid. Fixing `live := word 50` restores the theorem's
+conclusion on this vector. -/
+example :
+    freshQueueCache staleCacheBefore (word 50) ∧
+    modelWithdrawDepositableEther allowed staleCacheBefore (word 50) = .committed staleCacheAfter ∧
+    liveEffectiveWithdrawalsReserve staleCacheAfter (word 50) =
+      liveEffectiveWithdrawalsReserve staleCacheBefore (word 50) :=
+  ⟨rfl, by decide, by decide⟩
+
 end LidoSRv3.Tests.ReserveMutants

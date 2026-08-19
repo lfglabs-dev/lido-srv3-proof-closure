@@ -209,9 +209,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
-        "expected": "checked spend-formula property, stateful Verity refinement, rollback and mutants build"
+        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, and stale-cache kill-line mutants build"
       },
-      "summary": "source_spend_preserves_withdrawal_reserve: any committed spend satisfies withdrawalPartitionSpendInvariant (amount from depositable partitions, buffered is checked sub, unfinalizedStETH unchanged). Nonzero-amount and buffered ≥ storedDepositsReserve are not used. Verity observe of withdrawWithGuards equals specTx. unfinalizedStETH is a cached word, not a WQ call.",
+      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness show that live invariance fails once the cache goes stale. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve"
@@ -224,11 +224,13 @@
         "covered": [
           "spend reproduces the handwritten WR formula",
           "source-shaped spending and checked arithmetic under well-formed storage",
-          "Contract.run rollback after intermediate writes"
+          "Contract.run rollback after intermediate writes",
+          "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed",
+          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; a stale-cache kill-line witnesses the raid when freshness fails"
         ],
         "missing": [
-          "live WithdrawalQueue.unfinalizedStETH call",
-          "canDeposit / bunker / router authorization",
+          "live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)",
+          "canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)",
           "packed uint128 buffered ether and ETH transfer",
           "frame-nonce reset and report-time rebalance",
           "_seedDepositsCount",
@@ -237,9 +239,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked spend-formula theorems; the relational independence fact is the P-RESERVE-1.relational child."
+        "work": "Keep the checked, guard-and-freshness-scoped spend-formula theorems; the relational independence fact is the P-RESERVE-1.relational child. Do not derive freshQueueCache from ReserveState alone; it stays an explicit per-call hypothesis until a live WithdrawalQueue call is modeled."
       },
-      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim. Do not drop the freshQueueCache hypothesis from the parent theorem.",
       "roadmap_priority": "DONE"
     },
     {
