@@ -135,7 +135,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
         "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, and executable fail-closed mutants build"
       },
-      "summary": "source_topup_conserves_and_rolls_back: pulled = pushed on the source-shaped run (A-TOPUP-NOWRAP), and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX). source_wrap_implies_assert_revert: if the unchecked sum wraps, accumulated ≠ pushed, so the line 755 assert reverts (discharges A-TOPUP-NOWRAP on the wrap branch). source_module_guard_required / source_wc_type2_guard_required: the moduleExists and wcTypeIsType2 guards are live in the registered interpreter. Verity: if NoUncheckedWrap, allocations.length ≤ 2^256, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match. Not P-TOPUP-2 amount computation.",
+      "summary": "source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX, A-TOPUP-NOWRAP); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps, SolidityTopupParent.accumulated ≠ pushedValue, so the line 755 assert would fire on that finer-grained reading of the pinned source (discharges A-TOPUP-NOWRAP on the wrap branch); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants.kill_wrap_skip_assert / kill_remove_module_exists / kill_remove_wc_type2 each project one of conjuncts (2)-(4) out of this same registered theorem at a concrete witness, so a regression in any guard or the wrap discharge fails the registered theorem's own build, not only a sibling lemma the registry never cites. Verity: if NoUncheckedWrap, allocations.length ≤ 2^256, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match. Not P-TOPUP-2 amount computation.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back"
@@ -152,9 +152,9 @@
           "observable call destinations, values, argument words and ordering plus per-validator allocation storage words",
           "rollback to the caller snapshot after allocation writes, after the journalled pull, and after the first journalled deposit",
           "fail-closed mutation of the executable transaction: skipped per-validator writes, dropped, misrouted, short-paid, reordered and duplicated deposits",
-          "wrap branch: if unchecked sum overflows 2^256, accumulated ≠ pushed and the line 755 assert reverts (source_wrap_implies_assert_revert)",
-          "promoted guard: moduleExists is live -- unregistered module reverts at source line 689 (source_module_guard_required)",
-          "promoted guard: wcTypeIsType2 is live -- non-type-2 WC reverts at source line 694 (source_wc_type2_guard_required)"
+          "wrap branch folded into the registered parent's third conjunct: if unchecked sum overflows 2^256, SolidityTopupParent.accumulated ≠ pushedValue, so the line 755 assert would fire on that reading (kill_wrap_skip_assert projects this conjunct at a concrete witness)",
+          "moduleExists guard folded into the registered parent's second conjunct -- unregistered module reverts at source line 689 (kill_remove_module_exists projects this conjunct at a concrete witness)",
+          "wcTypeIsType2 guard folded into the registered parent's fourth conjunct -- non-type-2 WC reverts at source line 694 (kill_remove_wc_type2 projects this conjunct at a concrete witness)"
         ],
         "missing": []
       },

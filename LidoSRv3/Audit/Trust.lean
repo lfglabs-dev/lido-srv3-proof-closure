@@ -186,6 +186,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PEth1RefundTxMutants.double_refund_rejected
 #print axioms LidoSRv3.Tests.PEth1RefundTxMutants.leak_on_refund_failure_rejected
 #print axioms LidoSRv3.Tests.PEth1RequestTxMutants.keep_first_consolidation_fee_rejected
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_wrap_implies_assert_revert
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_module_guard_required
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_wc_type2_guard_required
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_reverting_branch_moves_no_ether
@@ -204,6 +207,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupTxMutants.allocation_write_failure_rolls_back
 #print axioms LidoSRv3.Tests.TopupTxMutants.lido_pull_failure_rolls_back
 #print axioms LidoSRv3.Tests.TopupTxMutants.first_beacon_failure_rolls_back
+#print axioms LidoSRv3.Tests.TopupTxMutants.kill_wrap_skip_assert
+#print axioms LidoSRv3.Tests.TopupTxMutants.kill_remove_module_exists
+#print axioms LidoSRv3.Tests.TopupTxMutants.kill_remove_wc_type2
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact

@@ -33,9 +33,85 @@ theorem revert_restores_state_value_and_logs {State : Type} :
   @LidoSRv3.Audit.revert_restores_state_value_and_logs State
 
 /--
+**Wave 1 conjunct: wrap ⇒ assert revert (A-TOPUP-NOWRAP discharge).**
+
+If the unchecked accumulation at source line 732 wraps mod 2²⁵⁶ (i.e.,
+`¬ NoUncheckedWrap inp`) and the arrays are length-matched (so the push tail
+is reachable), then the on-chain wrapped accumulator disagrees with the push
+loop’s total.  In the parent model this means the
+`assert(etherBalanceBefore == etherBalanceAfter)` at source line 755 fires,
+reverting the transaction.
+
+Folded into `source_topup_conserves_and_rolls_back` below as its third
+conjunct, so a regression here breaks the *registered* P-TOPUP-1 claim, not
+only this standalone lemma. -/
+theorem source_wrap_implies_assert_revert
+    {inp : SourceTopupInput}
+    (hWrap : ¬ NoUncheckedWrap inp)
+    (hLen : inp.pubkeyLengths.length = inp.allocations.length) :
+    SolidityTopupParent.accumulated inp ≠ pushedValue inp :=
+  SolidityTopupParent.wrap_implies_accumulated_ne_pushed hWrap hLen
+
+/--
+**Wave 1: `moduleExists` guard is exercised.**
+
+The `_requireModuleIdExists` guard at `SRUtils.sol` lines 45–47 (reached from
+source line 689) is live in the registered interpreter: when the module does
+not exist, `run` reverts with `revertStakingModuleUnregistered` regardless of
+any other input.
+
+Folded into `source_topup_conserves_and_rolls_back` below as its second
+conjunct, so a regression here breaks the *registered* P-TOPUP-1 claim, not
+only this standalone lemma. -/
+theorem source_module_guard_required
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hMod : inp.moduleExists = false)
+    (hAuth : inp.callerIsTopUpGateway = true)
+    (hKeys : inp.keyIndicesLength ≠ 0)
+    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
+    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false) :
+    run cfg inp = .revertStakingModuleUnregistered := by
+  simp only [run, hAuth, hKeys, hPub, hMod, ite_false, ite_true]
+  simp at hLens
+  simp [hLens.1, hLens.2.1, hLens.2.2]
+
+/--
+**Wave 1: `wcTypeIsType2` guard is exercised.**
+
+The `_requireWCType2` guard at `SRUtils.sol` lines 41–43 (reached from source
+line 694) is live: when withdrawal credentials are not type-2, `run` reverts
+with `revertWrongWithdrawalCredentialsType`, provided earlier guards pass.
+
+Folded into `source_topup_conserves_and_rolls_back` below as its fourth
+conjunct, so a regression here breaks the *registered* P-TOPUP-1 claim, not
+only this standalone lemma. -/
+theorem source_wc_type2_guard_required
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hWc : inp.wcTypeIsType2 = false)
+    (hAuth : inp.callerIsTopUpGateway = true)
+    (hKeys : inp.keyIndicesLength ≠ 0)
+    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
+    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false)
+    (hMod : inp.moduleExists = true)
+    (hActive : inp.moduleActive = true) :
+    run cfg inp = .revertWrongWithdrawalCredentialsType := by
+  simp only [run, hAuth, hKeys, hPub, hMod, hActive, hWc, ite_false, ite_true]
+  simp at hLens
+  simp [hLens.1, hLens.2.1, hLens.2.2]
+
+/--
 `run cfg inp` conserves `pulled = pushed` (`A-TOPUP-NOWRAP`). If that run
 reverts, the abstract `TxObservation` (`A-ABSTRACT-TX`) restores `before`
-and erases ETH moves and logs.
+and erases ETH moves and logs.  The registered claim additionally folds in
+the wrap-branch assert-revert and the `moduleExists`/`wcTypeIsType2` guard
+liveness facts as further conjuncts, so a kill-line mutant that defeats any
+one of them falsifies *this* theorem -- the one tracked as P-TOPUP-1's
+CHECKED abstract claim in `audit/guarantees.yaml` -- and not merely a sibling
+lemma that the registry never cites.
 
 Pinned-source conservation and rollback correspondence for the SRv3 beacon-chain
 top-up push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
@@ -98,7 +174,16 @@ Caveats, stated rather than hidden:
   the line 755 `assert` would become load-bearing again. The corresponding
   `Outcome` constructors are deliberately *retained* rather than deleted, and
   `source_balance_guards_discharged` takes the no-wrap fact as an explicit
-  hypothesis (`A-TOPUP-NOWRAP`) rather than a bounded-arithmetic proof.
+  hypothesis (`A-TOPUP-NOWRAP`) rather than a bounded-arithmetic proof. This
+  theorem's third conjunct is the discharge on the *other* branch: under an
+  actual wrap, `accumulated ≠ pushedValue`, so the guard is live rather than
+  silently skipped.
+* The `moduleExists` and `wcTypeIsType2` guards (source lines 689 and 694) are
+  not merely assumed live -- this theorem's second and fourth conjuncts prove
+  each one reverts with its named `Outcome` constructor whenever the earlier
+  guards pass and the named condition fails, so a regression that drops either
+  guard from `run` breaks this registered theorem directly, not only a sibling
+  lemma that the assurance registry never cites.
 * The empty-top-up branch at source line 741 is a *commit*, not a revert:
   `SolidityTopup.committedNoTopUp_is_not_a_rollback` records this, so no reader
   can mistake the rollback theorem for a claim that a zero-amount top-up aborts.
@@ -112,12 +197,37 @@ Caveats, stated rather than hidden:
 theorem source_topup_conserves_and_rolls_back {State : Type}
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :
-    (run cfg inp).pulled = (run cfg inp).pushed ∧
+    ((run cfg inp).pulled = (run cfg inp).pushed ∧
       ((run cfg inp).reverts = true →
         (observation before after attempts trace (run cfg inp)).committedState = before ∧
           (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
-          (observation before after attempts trace (run cfg inp)).committedTrace.logs = []) :=
-  ⟨run_conserves cfg inp, fun h => reverting_outcome_rolls_back before after attempts trace h⟩
+          (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧
+    (inp.moduleExists = false →
+      inp.callerIsTopUpGateway = true →
+      inp.keyIndicesLength ≠ 0 →
+      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →
+      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
+      run cfg inp = .revertStakingModuleUnregistered) ∧
+    (¬ NoUncheckedWrap inp →
+      inp.pubkeyLengths.length = inp.allocations.length →
+      SolidityTopupParent.accumulated inp ≠ pushedValue inp) ∧
+    (inp.wcTypeIsType2 = false →
+      inp.callerIsTopUpGateway = true →
+      inp.keyIndicesLength ≠ 0 →
+      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →
+      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
+      inp.moduleExists = true →
+      inp.moduleActive = true →
+      run cfg inp = .revertWrongWithdrawalCredentialsType) :=
+  ⟨⟨run_conserves cfg inp, fun h => reverting_outcome_rolls_back before after attempts trace h⟩,
+   fun hMod hAuth hKeys hLens hPub => source_module_guard_required cfg inp hMod hAuth hKeys hLens hPub,
+   fun hWrap hLen => source_wrap_implies_assert_revert hWrap hLen,
+   fun hWc hAuth hKeys hLens hPub hMod hActive =>
+     source_wc_type2_guard_required cfg inp hWc hAuth hKeys hLens hPub hMod hActive⟩
 
 /--
 The `assert(etherBalanceBeforeTopUp == etherBalanceAfterTopUp)` at
@@ -270,67 +380,5 @@ theorem verity_tx_simulates_source
   · intro failure reason rollback hRevert
     exact Verity.TopupTx.revert_restores_snapshot inp.allocations failure
       _ rollback reason hRevert
-
-/--
-**Wave 1 conjunct: wrap ⇒ assert revert (A-TOPUP-NOWRAP discharge).**
-
-If the unchecked accumulation at source line 732 wraps mod 2²⁵⁶ (i.e.,
-`¬ NoUncheckedWrap inp`) and the arrays are length-matched (so the push tail
-is reachable), then the on-chain wrapped accumulator disagrees with the push
-loop’s total.  In the parent model this means the
-`assert(etherBalanceBefore == etherBalanceAfter)` at source line 755 fires,
-reverting the transaction.
--/
-theorem source_wrap_implies_assert_revert
-    {inp : SourceTopupInput}
-    (hWrap : ¬ NoUncheckedWrap inp)
-    (hLen : inp.pubkeyLengths.length = inp.allocations.length) :
-    SolidityTopupParent.accumulated inp ≠ pushedValue inp :=
-  SolidityTopupParent.wrap_implies_accumulated_ne_pushed hWrap hLen
-
-/--
-**Wave 1: `moduleExists` guard is exercised.**
-
-The `_requireModuleIdExists` guard at `SRUtils.sol` lines 45–47 (reached from
-source line 689) is live in the registered interpreter: when the module does
-not exist, `run` reverts with `revertStakingModuleUnregistered` regardless of
-any other input.
--/
-theorem source_module_guard_required
-    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-    (hMod : inp.moduleExists = false)
-    (hAuth : inp.callerIsTopUpGateway = true)
-    (hKeys : inp.keyIndicesLength ≠ 0)
-    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
-        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
-        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
-    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false) :
-    run cfg inp = .revertStakingModuleUnregistered := by
-  simp only [run, hAuth, hKeys, hPub, hMod, ite_false, ite_true]
-  simp at hLens
-  simp [hLens.1, hLens.2.1, hLens.2.2]
-
-/--
-**Wave 1: `wcTypeIsType2` guard is exercised.**
-
-The `_requireWCType2` guard at `SRUtils.sol` lines 41–43 (reached from source
-line 694) is live: when withdrawal credentials are not type-2, `run` reverts
-with `revertWrongWithdrawalCredentialsType`, provided earlier guards pass.
--/
-theorem source_wc_type2_guard_required
-    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-    (hWc : inp.wcTypeIsType2 = false)
-    (hAuth : inp.callerIsTopUpGateway = true)
-    (hKeys : inp.keyIndicesLength ≠ 0)
-    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
-        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
-        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
-    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false)
-    (hMod : inp.moduleExists = true)
-    (hActive : inp.moduleActive = true) :
-    run cfg inp = .revertWrongWithdrawalCredentialsType := by
-  simp only [run, hAuth, hKeys, hPub, hMod, hActive, hWc, ite_false, ite_true]
-  simp at hLens
-  simp [hLens.1, hLens.2.1, hLens.2.2]
 
 end LidoSRv3.Audit.Guarantees.PTopup1
