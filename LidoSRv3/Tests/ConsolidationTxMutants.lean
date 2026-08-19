@@ -179,18 +179,61 @@ example :
       runView { pair 11 21 with sources := [word 21], targets := [word 11] } := by
   native_decide
 
-/-- **Kill-line: `hGatewayAdmittedNonzero` is load-bearing.** The registered
-parent `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`
+/-- **Premise-necessity: `hGatewayAdmittedNonzero` is load-bearing.** The
+registered parent
+`PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`
 derives `inputs.fee.val ≠ 0` for every committed run from this premise. Drop
 the premise (equivalently: stop threading it into the source theorem) and
 the same conjunct is refuted by a concrete gateway-authorized, nonempty,
 48-byte-aligned batch with `fee = 0` and `msg.value = 0`: `sourceRun` still
 commits it (pinned `_requireExactFee(0)` passes; see the `_requireExactFee(0)`
 Verity vector above). If a future edit quietly drops the hypothesis again,
-this theorem stops compiling as a proof of the un-strengthened claim. -/
-theorem gateway_admitted_nonzero_kill_line_refutes_parent :
+this theorem stops compiling as a proof of the un-strengthened claim.
+Scope note: the free-batch witness VIOLATES the parent's premise
+(`caller = gateway` but `msg.value = 0`), so this is premise-necessity
+evidence, not a refutation of the hypothesis-conditioned parent; the
+parent-refuting kill-line is `fee_blind_commit_kill_line_refutes_parent`
+below. -/
+theorem gateway_admitted_nonzero_premise_necessity :
     ¬ (∀ (inputs : Inputs) (obs : Observables),
         sourceRun inputs = .committed obs → inputs.fee.val ≠ 0) :=
   gateway_admitted_nonzero_kill_line
+
+/-- **Kill-line refuting the registered parent on a mutant of its own
+model.** `sourceRunFeeBlind` is `sourceRun` with the exact-fee guard
+dropped. The concrete witness satisfies the parent's
+`hGatewayAdmittedNonzero` premise (`caller = gateway`, `msg.value = 1 ≠ 0`),
+the mutant commits the batch, every fee-independent conjunct of the parent's
+committed arm holds of that commit, yet `inputs.fee.val = 0` -- so the
+parent's hypothesis-conditioned committed-arm conjunction is false on the
+mutant model. This is the parent kill-line;
+`gateway_admitted_nonzero_premise_necessity` above is premise-necessity
+evidence only. -/
+theorem fee_blind_commit_kill_line_refutes_parent :
+    ∃ (inputs : Inputs) (obs : Observables),
+      (inputs.caller = inputs.gateway → inputs.msgValue.val ≠ 0) ∧
+      sourceRunFeeBlind inputs = .committed obs ∧
+      (∃ requests,
+          zipRequests inputs.sources inputs.targets
+            inputs.sourceLens inputs.targetLens = some requests ∧
+          inputs.caller = inputs.gateway ∧
+          inputs.sources.length ≠ 0 ∧
+          requests.all validRequest = true ∧
+          requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
+          obs = commitObservables inputs.requestTarget inputs.fee
+            inputs.msgValue requests) ∧
+      inputs.fee.val = 0 ∧
+      ¬ (∃ requests,
+          zipRequests inputs.sources inputs.targets
+            inputs.sourceLens inputs.targetLens = some requests ∧
+          inputs.caller = inputs.gateway ∧
+          inputs.sources.length ≠ 0 ∧
+          requests.all validRequest = true ∧
+          requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
+          inputs.msgValue.val = requests.length * inputs.fee.val ∧
+          inputs.fee.val ≠ 0 ∧
+          obs = commitObservables inputs.requestTarget inputs.fee
+            inputs.msgValue requests) :=
+  LidoSRv3.Audit.SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent
 
 end LidoSRv3.Tests.ConsolidationTxMutants

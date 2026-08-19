@@ -1,6 +1,6 @@
 # P-CONSOLIDATION-1
 
-Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
+Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -24,7 +24,7 @@ SRv3 lets a module/operator ask the beacon chain to merge two validators (EIP-72
 
 This is inversion of a decision tree, not a conservation argument about ETH.
 
-**`hGatewayAdmittedNonzero` is threaded and used (2026-08-19 fix).** The theorem takes `hGatewayAdmittedNonzero : inputs.caller = inputs.gateway → inputs.msgValue.val ≠ 0` and now forwards it to `SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity`, which takes the same hypothesis. On the `.committed` branch, `hEq : inputs.caller = inputs.gateway` plus the hypothesis gives `inputs.msgValue.val ≠ 0`; combined with the branch's own `inputs.msgValue.val = requests.length * inputs.fee.val` and `requests.length ≠ 0` (transported from `inputs.sources.length ≠ 0` via `zipRequests_some_length`), a zero fee would force `msgValue.val = 0`, contradicting the hypothesis. The committed-branch witness tuple therefore gains an explicit `inputs.fee.val ≠ 0` conjunct. `gateway_admitted_nonzero_kill_line` proves the hypothesis is necessary for that conjunct: on a concrete gateway-authorized, nonempty, 48-byte-aligned batch with `fee = 0` and `msg.value = 0`, `sourceRun` still commits, so "every committed run has a nonzero fee" is false of `sourceRun` unconditionally (i.e. without the hypothesis). Previously the wrapper declared this hypothesis but never forwarded it — an inert, decorative premise that Lean's unused-variable linter flagged and that changed nothing about the theorem's applicability or conclusion.
+**`hGatewayAdmittedNonzero` is threaded and used (2026-08-19 fix).** The theorem takes `hGatewayAdmittedNonzero : inputs.caller = inputs.gateway → inputs.msgValue.val ≠ 0` and now forwards it to `SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity`, which takes the same hypothesis. On the `.committed` branch, `hEq : inputs.caller = inputs.gateway` plus the hypothesis gives `inputs.msgValue.val ≠ 0`; combined with the branch's own `inputs.msgValue.val = requests.length * inputs.fee.val` and `requests.length ≠ 0` (transported from `inputs.sources.length ≠ 0` via `zipRequests_some_length`), a zero fee would force `msgValue.val = 0`, contradicting the hypothesis. The committed-branch witness tuple therefore gains an explicit `inputs.fee.val ≠ 0` conjunct. `gateway_admitted_nonzero_kill_line` proves the hypothesis is necessary for that conjunct: on a concrete gateway-authorized, nonempty, 48-byte-aligned batch with `fee = 0` and `msg.value = 0`, `sourceRun` still commits, so "every committed run has a nonzero fee" is false of `sourceRun` unconditionally (i.e. without the hypothesis — that witness itself violates the premise, so this is premise-necessity evidence, not a refutation of the hypothesis-conditioned parent). Wave 4 adds the parent-refuting kill-line proper: `fee_blind_commit_kill_line_refutes_parent` keeps the premise satisfied and falsifies the hypothesis-conditioned committed-arm conjunction on the mutant interpreter `sourceRunFeeBlind` (exact-fee guard dropped) — see the Wave 4 section below. Previously the wrapper declared this hypothesis but never forwarded it — an inert, decorative premise that Lean's unused-variable linter flagged and that changed nothing about the theorem's applicability or conclusion.
 
 **VERITY `verity_tx_simulates_consolidation`.** Given that the four arrays already sit in the state (`readArray = some …`), running `addRequests` and `observe` equals `sourceView`. Same guards, then persist payloads / counts. Rollback includes an injected post-write failure.
 
@@ -43,7 +43,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 | # | Close | Note |
 | --- | --- | --- |
 | 1, 2, 4, 5, 6 | A | Caller/length/fee, input equality, if-tree named honestly. |
-| 3 | A | `observe` still reports the result journal payload. |
+| 3 | A | Refreshed 2026-08-19: `observe` reads the `state.calls` / `state.events` journal suffix, not the `Result` payload; the skip-append mutant is now caught. |
 | 7, 10, 14 | scope | Real CALL / 96-byte payload in `missing`. |
 | 8 | A | Vault `addConsolidationRequests` only. |
 | 9, 15, 20 | scope | Dummy oracle / 128-word / pad in `missing`. |
@@ -58,10 +58,8 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 2. **Value “conservation” is an input equality, not a balance law.**
    `msgValue.val = requests.length * fee.val` is a guard on numbers supplied with the `Inputs` record. No account is debited. Scenario: `msg.value` on the live CALL is correct but the vault’s `call{value: fee}` to the predeploy fails after the first pair; the model’s committed branch never runs a CALL, and the revert branch is a different `Inputs` (or a Verity inject) rather than a failed predeploy. Atomicity of *real* CALLs is the OPEN item in `P-CONSOLIDATION-1-VERITY-GAPS.md` (official denotation always reverts on `Expr.call`). Promoting `Contract.run` journaling to CHECKED does not execute EIP-7251.
 
-3. **`observe` on success reports the `Result` payload, not the journal.**
-   `ConsolidationTx.observe` (`:177–180`) copies `result.calls` / `result.events` / `result.payloads` from the value `addRequests` returned. Count/fee slots are read from state.
-
-   *Counterexample mutant.* Skip `append` to `ContractState.calls` / `.events` but still return a `Result` with the journal lists. `verity_tx_simulates_consolidation` still holds. YAML “journals one CALL and one event per pair” is true of a struct field, not of an observed log.
+3. **`observe` reads the journal appended to `state.calls` / `state.events` (wording refreshed 2026-08-19).**
+   `ConsolidationTx.observe` (`ConsolidationTx.lean:177–184`) drops the pre-call prefix of `state.calls` / `state.events` and maps the freshly appended journal entries; the view's payloads are the calldata of those calls, and count/fee come from `countSlot` / `feePaidSlot`. The `Result` payload is ignored on success. The earlier wording of this issue (“observe reports the `Result` payload, not the journal”, with a counterexample mutant that skips the journal `append` but returns the lists in the `Result`) is **stale**: `persist` appends to `state.calls` / `state.events` (`:123–131`) and `observe` reads that suffix, so the skip-append mutant is now caught (the Tests call-drop/event-drop/memory-drop vectors exercise exactly this). The residual gap is narrower and is issues 7/10: the journaled CALLs are pre-marked `.success` stubs with empty returndata, so the observed log is a journal of intended CALLs, not executed frames.
 
 4. **Atomicity is the other arm of the same `if`.**
    If `sourceRun` committed, it returned `commitObservables`. If it reverted, it did not. There is no prefix-event in the abstract type at all (`SourceOutcome` is `reverted reason | committed obs`). You cannot even *write down* a partial journal in `sourceRun`. The revert conjunct is therefore “the function did not take the success arm.”
@@ -134,7 +132,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 18. **Zero fee and zero `msg.value` is a committed free batch of `sourceRun` itself.**
     `sourceRun` accepts `n ≥ 1`, `fee = 0`, `msgValue = 0` (`0 == n * 0`, mul bound holds). Live vault `_requireExactFee(0)` also passes, then `call{value: 0}`. The *gateway* (`ConsolidationGateway.sol:189`) reverts `ZeroArgument("msg.value")` before its own call proceeds.
 
-    *Scenario.* One pair, `fee = 0`, `msgValue = 0`, `caller = gateway`. `sourceRun` on its own commits `commitObservables` with two journaled 0-value CALLs (`Tests/ConsolidationTxMutants.lean`'s `_requireExactFee(0)` vector exercises exactly this on the Verity transaction, and still holds — that fact is honest and unchanged). The registered parent's `hGatewayAdmittedNonzero` premise (`caller = gateway → msg.value ≠ 0`) is a caller-supplied hypothesis, not a fact `sourceRun` proves on its own: it is the wrapper's job, when invoked on an `Inputs` value for which the premise is supplied, to derive `inputs.fee.val ≠ 0` on the committed branch (2026-08-19 fix, see Proof section above) — that is what excludes this free-batch arm from *the parent's conclusion*, not from `sourceRun`'s decision tree, which is unaffected and still commits it. `gateway_admitted_nonzero_kill_line` pins this distinction with a proof: drop the premise and the same free batch refutes the strengthened claim. The premise itself is still not derived from a modeled `ConsolidationGateway` (`fidelity.missing`); it is accepted based on the pinned source excerpt above.
+    *Scenario.* One pair, `fee = 0`, `msgValue = 0`, `caller = gateway`. `sourceRun` on its own commits `commitObservables` with two journaled 0-value CALLs (`Tests/ConsolidationTxMutants.lean`'s `_requireExactFee(0)` vector exercises exactly this on the Verity transaction, and still holds — that fact is honest and unchanged). The registered parent's `hGatewayAdmittedNonzero` premise (`caller = gateway → msg.value ≠ 0`) is a caller-supplied hypothesis, not a fact `sourceRun` proves on its own: it is the wrapper's job, when invoked on an `Inputs` value for which the premise is supplied, to derive `inputs.fee.val ≠ 0` on the committed branch (2026-08-19 fix, see Proof section above) — that is what excludes this free-batch arm from *the parent's conclusion*, not from `sourceRun`'s decision tree, which is unaffected and still commits it. `gateway_admitted_nonzero_kill_line` pins this distinction with a proof: drop the premise and the same free batch refutes the strengthened claim's hypothesis-free projection (the witness itself violates the premise, so this is premise-necessity evidence; Wave 4's `fee_blind_commit_kill_line_refutes_parent` is the parent-refuting kill-line, on the exact-fee-guard-dropped mutant `sourceRunFeeBlind` with a premise-satisfying witness). The premise itself is still not derived from a modeled `ConsolidationGateway` (`fidelity.missing`); it is accepted based on the pinned source excerpt above.
 
 19. **`persist` can wrap `countSlot` and overwrite payload index 0 on the next batch.**
     `persist` writes `countSlot = Uint256.ofNat (start + requestCount)` (`ConsolidationTx.lean:126–127`). If `start = 2^256 − 1` and `requestCount = 1`, the stored count is `0`. A second `addRequests` reads `start = 0` and `writePayloads` clobbers map index 0.
@@ -216,6 +214,15 @@ re-exposes it as `gateway_admitted_nonzero_kill_line_refutes_parent` so the
 required test-target build (`LidoSRv3.Tests.ConsolidationTxMutants`)
 covers it.
 
+**Scope corrected by Wave 4 below:** the free-batch witness violates the
+premise (`caller = gateway` but `msg.value = 0`), so this theorem refutes
+only the hypothesis-free projection of the committed arm — it is
+premise-necessity evidence, not a refutation of the hypothesis-conditioned
+parent. The Tests re-export is renamed
+`gateway_admitted_nonzero_premise_necessity`, and the
+"…_refutes_parent" name moved to the model-mutant kill-line
+`fee_blind_commit_kill_line_refutes_parent`.
+
 **What did not change.** `sourceRun`'s decision tree, `commitObservables`,
 `Tests/ConsolidationTxMutants.lean`'s pre-existing `_requireExactFee(0)`
 vector (still committing on the raw, hypothesis-free function — this is
@@ -227,4 +234,65 @@ theorem, and `packing_order_kills_swapped_concat` are all unchanged. No
 LidoSRv3.Tests.ConsolidationTxMutants`: exit 0, no new warnings (the
 pre-existing `hGatewayAdmittedNonzero` unused-variable warning is gone).
 `python3 scripts/audit_metadata.py generate && check`: exit 0 (11 canonical
+guarantees + 14 subordinate evidence rows).
+
+## Wave 4 changes (2026-08-19): P-CONSOLIDATION-1 kill-line scope remediation
+
+**Defect (found in wave-4 review).** `gateway_admitted_nonzero_kill_line`
+(re-exported in Tests as `gateway_admitted_nonzero_kill_line_refutes_parent`)
+proved `¬ (∀ inputs obs, sourceRun inputs = .committed obs →
+inputs.fee.val ≠ 0)` via `freeBatchWitness` (caller = gateway, `fee = 0`,
+`msg.value = 0`). That witness VIOLATES the registered parent's
+`hGatewayAdmittedNonzero` premise, so the theorem refutes only the
+hypothesis-free projection of the parent's committed arm: under the premise
+the witness is out of scope, and no kill-line refuted the
+hypothesis-conditioned parent on a mutant of its own model. The
+"…_refutes_parent" naming, and YAML/report wording that called this a
+refutation of "the registered parent's own strengthened statement",
+overclaimed.
+
+**Fix: model-mutant kill-line with the premise satisfied.**
+`SolidityConsolidation.sourceRunFeeBlind` is `sourceRun` with the exact-fee
+guard (`inputs.msgValue.val = requests.length * inputs.fee.val`, pinned
+`_requireExactFee`) dropped and nothing else changed.
+`fee_blind_commit_kill_line_refutes_parent` (proved in
+`ConsolidationCorrespondence.lean`, re-exported by the `PConsolidation1`
+wrapper and by `Tests/ConsolidationTxMutants.lean`, where the
+"…_refutes_parent" name now lives) exhibits `feeBlindWitness` — a
+gateway-authorized batch with one valid 48-byte pair, `fee = 0`,
+`msg.value = 1` — and proves: (i) the witness SATISFIES
+`hGatewayAdmittedNonzero` (`caller = gateway → msg.value ≠ 0`); (ii)
+`sourceRunFeeBlind` commits it; (iii) every fee-independent conjunct of the
+parent's committed arm holds of that commit (zip, caller = gateway,
+nonempty, 48-byte-valid, `uint256` bound, canonical observables); (iv)
+`inputs.fee.val = 0`, so the full committed-arm conjunction — which includes
+`inputs.fee.val ≠ 0` — is false on the mutant commit. The parent's own
+hypothesis-conditioned predicate is thereby refuted on a mutant of its own
+model, which the wave-3 free-batch theorem could not show.
+
+**Relabeling.** `gateway_admitted_nonzero_kill_line` stays, but its
+docstrings, the YAML row, and this report now describe it as
+premise-necessity evidence (the parent's strengthened conjunct would be
+false without `hGatewayAdmittedNonzero`), not as the parent-refuting
+kill-line; the Tests re-export is renamed
+`gateway_admitted_nonzero_premise_necessity`.
+
+**Also refreshed.** Issue 3 was stale: `observe` reads the journal appended
+to `state.calls` / `state.events` (`ConsolidationTx.lean:177–184`), not the
+`Result` payload, so the skip-append mutant it described is already caught
+by the existing call-drop/event-drop vectors.
+
+**What did not change.** The registered parent's statement and proof,
+`sourceRun`, `commitObservables`, `verity_tx_simulates_consolidation`,
+`packing_order_kills_swapped_concat`, the `_requireExactFee(0)` vector, and
+every pre-existing Tests vector are unchanged. `abstract.theorem`,
+`verity.theorem`, `classification`, and `assumptions` in the YAML row are
+untouched; only `summary`, `fidelity.covered`, and `reproduction.expected`
+were re-scoped, and `EXPECTED_CANONICAL_DETAIL_SHA256["P-CONSOLIDATION-1"]`
+was recomputed. No `sorry`/`admit`/new axioms: the new theorems use the
+codebase's existing `native_decide` idiom for ground `Word` computations.
+
+**Build.** `lake build LidoSRv3` and `lake build
+LidoSRv3.Tests.ConsolidationTxMutants`: exit 0. `python3
+scripts/audit_metadata.py generate && check`: exit 0 (11 canonical
 guarantees + 14 subordinate evidence rows).
