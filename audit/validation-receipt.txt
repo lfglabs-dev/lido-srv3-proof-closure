@@ -1,11 +1,143 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 8fed8c66140d37f249f74eb17a8fcb8739c416cb
+validated-tree: def4da9914c38777a6bb847e237a0e1d735692cc
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ACCOUNT-1 independent tx storage-flag order and mint-after-read discipline (2026-08-19)
+-------------------------------------------------------------------------------------------
+
+- Branch `cursor/wave1-account1-main-0830-d8f8` from `origin/main`
+  `8ae5dcc` (#105, "restyle Verity TX observe-from-storage and restate honest
+  claims"). Strengthens the registered `P-ACCOUNT-1` parent so its Verity
+  transaction plane no longer shares a step-list bridge with the abstract
+  source if-tree, and adds an explicit ordering discipline plus a kill-line
+  mutant on the two tick-bearing writes that discipline depends on.
+- `LidoSRv3/Audit/Verity/HandleOracleReportTx.lean`'s `storedSteps` used to
+  call `AccountingCorrespondence.successfulSteps` directly inside
+  `handleOracleReport`'s own `Result`/`View` construction, so the tx plane's
+  observed steps and the abstract source's step list were, structurally, the
+  same function evaluated once. `storedSteps` is now a standalone
+  reconstruction that reads three tick-tagged storage flags
+  (`accountingCalledSlot`, `rewardsReadSlot`, `rewardsMintedSlot`, written as
+  the literals `1`, `2`, `3` at their call sites) directly off the `dirty`
+  `ContractState`, and never calls `successfulSteps`. The correspondence
+  theorem `verity_tx_simulates_pinned_source` is otherwise unchanged in
+  statement; only its supporting `storedSteps` plumbing moved off the shared
+  helper.
+- New predicate `mintAfterRead readTick mintTick := 0 < mintTick.val →
+  readTick.val < mintTick.val` is a second, independent check over the two
+  raw ticks, not a presence check: `ContractState` writes commute, so
+  `storedSteps`'s "is this flag equal to its literal" test cannot see write
+  order by itself. `mintAfterReadDisciplineOf` states the property for an
+  arbitrary tick-writing transaction and `mintAfterReadDiscipline_holds`
+  proves it for the real `handleOracleReport` (ticks `2 < 3`, unconditionally
+  true regardless of the fee premise).
+- `handleOracleReportSwappedMintBeforeRead` is a second executable
+  transaction, defined beside the discipline it violates, that writes the
+  mint tick (`2`) at the call site that used to write the read tick, and the
+  read tick (`3`) at the call site that used to write the mint tick. The
+  kill-line theorem `mintOrderKillLine_holds` proves this mutant does not
+  satisfy `mintAfterReadDisciplineOf`: on an empty positive-fee report the
+  swapped ticks are `mint = 2`, `read = 3`, so `mintAfterRead 3 2` reduces to
+  `0 < 2 → 3 < 2`, which is `False`.
+- `PAccount1.mint_after_read_discipline` and `PAccount1.mint_order_kill_line`
+  re-export both theorems on the registered guarantee facade, alongside the
+  pre-existing `source_report_before_reward`,
+  `verity_tx_simulates_oracle_report`, and
+  `verity_tx_revert_restores_snapshot`. No existing theorem statement was
+  weakened; the two new ones are additive.
+- `LidoSRv3/Tests/HandleOracleReportTxMutants.lean`: `bypassOrderGuard` is
+  updated to the tick semantics (writing `2`/`3` and reading back through
+  `storedSteps` instead of `successfulSteps`); a new `mintUnconditionally`
+  mutant always writes the mint tick regardless of the fee premise and is
+  shown (by `example`/`native_decide` on a zero-fee input) to diverge from
+  `sourceView`, i.e. the fees-conditional the parent depends on is load-bearing
+  and its removal is mechanically caught. The swapped-order mutant example is
+  split into a concrete-tick-value check and a separate manual proof of the
+  `mintAfterRead` violation (`native_decide` alone could not synthesize a
+  `Decidable` instance for the implication `0 < mintTick → readTick <
+  mintTick`); `swapped_mint_read_kill_line_refutes_parent` connects that test
+  witness to `mintOrderKillLine_holds` on the registered parent.
+- Disclosed, not silently narrowed: `storedSteps`'s presence check still
+  cannot see a mutation that reorders the three `writeSlot` call sites while
+  keeping each tick literal pinned to its original slot (writes to distinct
+  slots commute in `ContractState`). `mint_after_read_discipline` /
+  `mint_order_kill_line` catch only the narrower case where the tick *value*
+  travels with the reordered call site. `report/P-ACCOUNT-1.md` issue 5 is
+  updated to state this residual explicitly; it is not claimed closed.
+  `report/P-ACCOUNT-1.md` issue 11 is also corrected to say
+  `rewardsMintedSlot` now writes tick `3`, not the stale `1`.
+- `audit/guarantees.yaml`'s `P-ACCOUNT-1` row is updated: `reproduction.expected`,
+  `summary`, `fidelity.covered`, `classification.work`, and `next_gate` all
+  name the new tick-based storage-flag independence and the mint-after-read
+  discipline/kill-line pair. `classification.kind` remains
+  `IMPLEMENTATION_PENDING`; the row is not promoted to `NONE` because the
+  `fidelity.missing` list (SRStorage membership, caller/role,
+  `submitReportData`, fee computation, packed accounting words, re-read of
+  the router snapshot) is unchanged and nonempty.
+  `scripts/audit_metadata.py`'s `EXPECTED_CANONICAL_DETAIL_SHA256["P-ACCOUNT-1"]`
+  is recomputed to match. `audit/ROADMAP.md`, `audit/STATUS.md`, and
+  `audit/REPRODUCE.md` are regenerated with `make audit-generate`; the diff is
+  confined to the `P-ACCOUNT-1` row.
+- `lake build LidoSRv3.Audit.Guarantees.PAccount1
+  LidoSRv3.Tests.HandleOracleReportTxMutants`: exit 0 (19 jobs, only
+  pre-existing upstream `Verity.Core` `simpa`-linter warnings, no errors, no
+  warnings in the changed files).
+- `lake env lean LidoSRv3/Audit/Trust.lean`: exit 0. The five new/re-exported
+  theorems --
+  `PAccount1.mint_after_read_discipline`,
+  `PAccount1.mint_order_kill_line`,
+  `HandleOracleReportTx.mintAfterReadDiscipline_holds`,
+  `HandleOracleReportTx.mintOrderKillLine_holds`, and
+  `HandleOracleReportTxMutants.swapped_mint_read_kill_line_refutes_parent` --
+  report only `[propext, Quot.sound]` or `[propext, Classical.choice,
+  Quot.sound]`. No `sorryAx`, `Lean.ofReduceBool`, or project-level `axiom`
+  appears anywhere in the trust report.
+- Changed-Lean forbidden-token scan (`git diff origin/main -- '*.lean'`): no
+  `sorry`, `sorryAx`, or `admit`. `native_decide` appears only at call sites
+  matching the file's pre-existing style (already used by
+  `HandleOracleReportTxMutants.lean` before this change); none is a new
+  proof-policy escape category.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical guarantees
+  + 14 subordinate evidence rows).
+- Pre-existing, not introduced here: `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py` fails on unmodified `origin/main` at
+  `8ae5dcc` with `AssertionError: missing 'NONE may not hide extra claims'`
+  because its `guarantees[1]` (`P-ALLOC-2`) mutant assumes that row's
+  `classification.kind` is `NONE`, but it is `IMPLEMENTATION_PENDING`, so the
+  added `consumer` field is instead rejected by the `IMPLEMENTATION_PENDING`
+  field-set check with a different (still-failing) message. Reproduced
+  independently on a clean `origin/main` worktree; this change touches only
+  the `P-ACCOUNT-1` row (index 4) of `audit/guarantees.yaml` and does not
+  alter `P-ALLOC-2` or this test file.
+- `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/test_check_no_python_evidence.sh`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `python3 scripts/test_public_claim_surfaces.py`, and
+  `python3 scripts/test_verity_provenance.py`: exit 0.
+- `bash scripts/check_provenance_guards.sh`: exit 0 once the tree above is
+  committed (the guard's `verified_source_tree.sh` step requires
+  `LidoSRv3`/`lakefile.lean`/`lake-manifest.json`/`lean-toolchain` to be
+  clean against `HEAD`, so it cannot itself be exercised against an
+  uncommitted working tree).
+- Verity remains pinned at `a063bfc869735045354ebc3862ca08859da0f56e`; this
+  slice makes no lakefile, manifest, artifact-lock, or Verity-checkout
+  change.
+- Pre-existing defect found and repaired here: `check_validation_receipt.py`
+  computes `validated-tree` from `HEAD`'s committed tree (excluding the
+  receipt), not the working directory. The prior entry recorded
+  `8fed8c66140d37f249f74eb17a8fcb8739c416cb`, but re-deriving that same check
+  against unmodified `origin/main` `8ae5dcc` (before any edit in this branch)
+  already yields `1c8a9eecaabc7530d92982f25f3cfcbe07f130a4`: PR #105 changed
+  tracked files without rebinding the receipt. This entry binds
+  `validated-tree` to this branch's own commit rather than propagating that
+  staleness.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
 
 P-RESERVE-RELATIONAL checked locked-ETH accumulator (2026-08-18)
 ----------------------------------------------------------------

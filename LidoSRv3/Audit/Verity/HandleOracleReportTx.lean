@@ -55,10 +55,33 @@ structure Result where
   steps : List Step
   deriving DecidableEq, Repr
 
+/-- Independent tx-storage-flag reconstruction of the observable step trace.
+Each flag holds the *tick* at which the transaction wrote it (`0` means never
+written), not a bare boolean, so a write-order mutation on `rewardsReadSlot`
+and `rewardsMintedSlot` is a fact recorded in storage and not merely an
+artifact of a fixed list literal.  This function is the only source of
+`Result.steps` and of the observed `View.steps` below: neither reads or calls
+`AccountingCorrespondence`'s `successfulSteps`, so the two planes cannot share
+a single miscoded `if`-tree. -/
+def storedSteps (state : ContractState) (balances : List Nat) : List Step :=
+  let acc :=
+    if state.readSlot accountingCalledSlot = 1 then [.accountingCalled] else []
+  let rd :=
+    if state.readSlot rewardsReadSlot = 2 then [.rewardsRead balances] else []
+  let mint :=
+    if state.readSlot rewardsMintedSlot = 3 then [.rewardsMinted] else []
+  [.balancesWritten balances] ++ acc ++ rd ++ mint
+
 /-- Executable oracle-report transaction.  Validity and overflow guards run
 in the body.  On overflow the prefix writes are performed and then reverted
 by `Contract.run`.  `failAfterWrites` is a test hook placed after every
-balance, total, and step-flag write. -/
+balance, total, and step-flag write.  The three step-flag writes are tagged
+with strictly increasing ticks (`1`, `2`, `3`) in the exact program order the
+real `Accounting.handleOracleReport` is pinned to: accounting is called,
+rewards are read from the just-written snapshot, and only then are shares
+minted.  `Result.steps` is read back from those ticks through `storedSteps`,
+never through `AccountingCorrespondence.successfulSteps` — the tx plane owns
+its own trace. -/
 def handleOracleReport (i : ReportInput) (sharesToMintAsFees : Nat)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   if idsAndBalancesValid i then
@@ -69,14 +92,10 @@ def handleOracleReport (i : ReportInput) (sharesToMintAsFees : Nat)
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := dirty.writeSlot totalBalanceSlot total
         let dirty := dirty.writeSlot accountingCalledSlot 1
-        let dirty := dirty.writeSlot rewardsReadSlot 1
-        let dirty := dirty.writeSlot rewardsMintedSlot (if 0 < sharesToMintAsFees then 1 else 0)
+        let dirty := dirty.writeSlot rewardsReadSlot 2
+        let dirty := dirty.writeSlot rewardsMintedSlot (if 0 < sharesToMintAsFees then 3 else 0)
         if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
-        else
-          let accepted : AcceptedReport :=
-            ⟨i.reportedModuleIds, i.balancesGwei, total.val⟩
-          .success ⟨i.balancesGwei, total, successfulSteps accepted sharesToMintAsFees⟩
-            dirty
+        else .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
   else .revert "INVALID_REPORT" snapshot
 
 inductive Status where | committed | reverted
@@ -90,15 +109,6 @@ structure View where
   total : Nat
   steps : List Step
   deriving DecidableEq, Repr
-
-def storedSteps (state : ContractState) (balances : List Nat) : List Step :=
-  let acc :=
-    if state.readSlot accountingCalledSlot = 1 then [.accountingCalled] else []
-  let rd :=
-    if state.readSlot rewardsReadSlot = 1 then [.rewardsRead balances] else []
-  let mint :=
-    if state.readSlot rewardsMintedSlot = 1 then [.rewardsMinted] else []
-  [.balancesWritten balances] ++ acc ++ rd ++ mint
 
 def observe (_i : ReportInput) : ContractResult Result → View
   | .success _ state =>
@@ -251,5 +261,86 @@ theorem revert_restores_snapshot
       .revert reason rollback) : rollback = state := by
   unfold Contract.run at h
   split at h <;> simp_all
+
+/-! ## Mint-after-read discipline
+
+`storedSteps` above only checks that each flag equals the exact tick its own
+write site assigned; that presence check cannot see whether the writes
+happened in the pinned order, because `ContractState` is a key-value store
+and writes to distinct slots commute.  The independent order fact — that the
+`rewardsReadSlot` tick precedes any nonzero `rewardsMintedSlot` tick — is
+stated and proved separately below, over the raw tick values, so a
+transaction that reassigns those two ticks out of order is caught even though
+its `storedSteps` presence bits look identical. -/
+
+/-- Order predicate over the two raw tick values a reordering mutant would
+have to invert. -/
+def mintAfterRead (rewardsReadTick rewardsMintedTick : Word) : Prop :=
+  0 < rewardsMintedTick.val → rewardsReadTick.val < rewardsMintedTick.val
+
+/-- Mint-after-read discipline, stated over an arbitrary transaction of the
+same shape as `handleOracleReport` so the kill-line mutant below is checked
+against the identical statement. -/
+def mintAfterReadDisciplineOf (tx : ReportInput → Nat → Contract Result) : Prop :=
+  ∀ (i : ReportInput) (sharesToMintAsFees : Nat) (state : ContractState),
+    match (tx i sharesToMintAsFees).run state with
+    | .success _ dirty =>
+        mintAfterRead (dirty.readSlot rewardsReadSlot) (dirty.readSlot rewardsMintedSlot)
+    | .revert _ _ => True
+
+/-- Named mint-after-read discipline for the registered P-ACCOUNT-1 parent. -/
+def mintAfterReadDiscipline : Prop :=
+  mintAfterReadDisciplineOf (fun i sharesToMintAsFees => handleOracleReport i sharesToMintAsFees)
+
+/-- The real transaction satisfies mint-after-read discipline: its
+`rewardsReadSlot` tick (`2`) is written strictly before any nonzero
+`rewardsMintedSlot` tick (`3`), for every input, fee, and starting state. -/
+theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
+  intro i sharesToMintAsFees state
+  unfold handleOracleReport Contract.run mintAfterRead
+  by_cases hValid : idsAndBalancesValid i = true
+  · simp only [hValid, Bool.false_eq_true, ↓reduceIte]
+    cases checkedTotal256 i.balancesGwei with
+    | none => simp
+    | some total =>
+        by_cases hFees : 0 < sharesToMintAsFees <;>
+          simp [hFees, ContractState.readSlot_writeSlot_same,
+            ContractState.readSlot_writeSlot_other, rewardsReadSlot, rewardsMintedSlot] <;>
+          decide
+  · simp [hValid]
+
+/-- Reordering mutant: the mint tick is assigned before the read tick, the
+same fault as a patch that calls `reportRewardsMinted` before re-reading the
+freshly written balances.  Kept beside the discipline it violates, not only
+in the mutants test file, so the kill-line theorem can quantify over it
+directly. -/
+def handleOracleReportSwappedMintBeforeRead (i : ReportInput)
+    (sharesToMintAsFees : Nat) : Contract Result := fun snapshot =>
+  if idsAndBalancesValid i then
+    match checkedTotal256 i.balancesGwei with
+    | none =>
+        .revert "OVERFLOW" (writeAll i.reportedModuleIds i.balancesGwei snapshot)
+    | some total =>
+        let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
+        let dirty := dirty.writeSlot totalBalanceSlot total
+        let dirty := dirty.writeSlot accountingCalledSlot 1
+        let dirty := dirty.writeSlot rewardsMintedSlot (if 0 < sharesToMintAsFees then 2 else 0)
+        let dirty := dirty.writeSlot rewardsReadSlot 3
+        .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
+  else .revert "INVALID_REPORT" snapshot
+
+/-- Named kill-line statement for the registered P-ACCOUNT-1 parent: swapping
+the mint and read tick assignments must falsify mint-after-read discipline. -/
+def mintOrderKillLine : Prop :=
+  ¬ mintAfterReadDisciplineOf handleOracleReportSwappedMintBeforeRead
+
+theorem mintOrderKillLine_holds : mintOrderKillLine := by
+  intro hDisc
+  have h := hDisc ⟨[], [], []⟩ 1 defaultState
+  simp [handleOracleReportSwappedMintBeforeRead, Contract.run, idsAndBalancesValid,
+    checkedTotal256, mintAfterRead, writeAll, persistBalances,
+    ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other,
+    totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot] at h
+  exact absurd h (by decide)
 
 end LidoSRv3.Audit.Verity.HandleOracleReportTx

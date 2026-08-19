@@ -93,6 +93,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_correspondence
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_pinned_expression_shape
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_totality
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.proportional_step_correspondence_and_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_revert_restores_snapshot
@@ -107,8 +108,13 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report
 #print axioms LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline
+#print axioms LidoSRv3.Audit.Guarantees.PAccount1.mint_order_kill_line
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.verity_tx_simulates_pinned_source
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.mintAfterReadDiscipline_holds
+#print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.mintOrderKillLine_holds
+#print axioms LidoSRv3.Tests.HandleOracleReportTxMutants.swapped_mint_read_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_claim_success
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_admits
