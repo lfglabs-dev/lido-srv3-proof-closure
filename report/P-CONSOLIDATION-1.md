@@ -143,3 +143,28 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     `addRequests` (`ConsolidationTx.lean:147–151`) reads `inputs.sources.length` words from each base. `memoryFor` returns 0 outside the planted range (same layout as issue 15). Live `bytes[]` length is the ABI length; a short array is a shorter array, not zero-padded keys.
 
     *Scenario.* `inputs.sources.length = 2`, planted one source word `0xAA`. `readArray` returns `[0xAA, 0]`. `validRequest` only checks `sourceLen = 48` (issue 5). If lens are `[48, 48]`, Lean commits a second pair with `source = 0`. Live `sourcePubkeys` of length 1 cannot yield a second key. Combined with issue 9 (dummy oracle), the CHECKED decoder invents a zero pubkey.
+
+## Wave 1 changes (2026-08-19)
+
+1. **Gateway-nonzero-value premise.** Added
+   hGatewayAdmittedNonzero to the parent theorem. The fee = 0 with
+   msg.value = 0 arm stays a correct vault fact but is no longer
+   user-reachable (the gateway reverts ZeroArgument before the vault
+   is called).
+
+2. **Packing-order kill-line.** packing_order_kills_swapped_concat proves
+   that a swapped target-then-source concat produces a different
+   commitObservables than the canonical source-then-target when
+   source != target. One pair suffices.
+
+3. **Cheap mutant.** ConsolidationTxMutants now includes a native_decide
+   example that the committed view with swapped inputs differs from the
+   canonical view.
+
+4. **preservesEthBalance named gap.** Documented as preservesEthBalance_gap
+   in the Lean file and in fidelity.missing. Closing it requires
+   value-bearing CALL frames, not the current success stubs with empty
+   returndata.
+
+5. **No P-ETH-1 composition.** Explicitly noted in YAML classification.work
+   and next_gate.
