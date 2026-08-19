@@ -59,7 +59,7 @@ def main():
         x = copy.deepcopy(guarantees); x["guarantees"][2]["verity"] = {"status":"CHECKED", "theorem":"LidoSRv3.Fake.nominal_tx"}; mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][8]["verity"]["theorem"] = "LidoSRv3.Fake.topup2"; mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][7]["verity"]["theorem"] = "LidoSRv3.Fake.address1"; mutants.append((gpath, x, "canonical assurance claim differs"))
-        x = copy.deepcopy(guarantees); x["guarantees"][1]["classification"]["consumer"] = "P-ALLOC-1"; mutants.append((gpath, x, "NONE may not hide extra claims"))
+        x = copy.deepcopy(guarantees); x["guarantees"][2]["classification"]["consumer"] = "P-DEPOSIT-1"; mutants.append((gpath, x, "NONE may not hide extra claims"))
         x = copy.deepcopy(guarantees); x["guarantees"][6]["fidelity"]["missing"] = ["unclosed leg"]; x["guarantees"][6]["classification"] = {"kind":"PROPERTY_FALSE"}; mutants.append((gpath, x, "lacks counterexample"))
         x = copy.deepcopy(guarantees); x["guarantees"][6]["verity"] = {"status":"OPEN", "theorem":None}; x["guarantees"][6]["fidelity"]["missing"] = ["recursive dispatch absent"]; x["guarantees"][6]["classification"] = {"kind":"IMPLEMENTATION_PENDING", "work":"compose the ensemble"}; mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][3]["assumptions"].remove("A-TOPUP-NOWRAP"); mutants.append((gpath, x, "canonical assurance claim differs"))
