@@ -20,7 +20,7 @@ The guarantee is meant to say the selected bucket is a least-filled open bucket,
 
 ## Proof
 
-**Abstract `proportional_step_correspondence_and_bounded` (parent).** The registered parent is the pinned-source *proportional* step, not the +1 model. Its first conjunct pins the selection, not merely the two scans to each other: given `RowsCorrespond` and `hSelected : Source.candidate? source = some best`, the Model scan's candidate maps to exactly `some (best.allocation.val, best.capacity.val)` — proved by rewriting `full_candidate_correspondence hRows` with `hSelected`, so the selection hypothesis is load-bearing (wave 4; it was an unused `_hSelected` before). The second conjunct is `source_amount_totality` (a successful checked amount is positive, ≤ the remaining demand, and keeps the candidate within capacity, i.e. never over headroom). Two kill-lines in `MinFirstDistributionTxMutants.lean` refute the parent on its own model: `selection_kill_line_refutes_parent` exhibits a concrete `RowsCorrespond` pair `[(5, 10), (0, 10)]` on which `Source.candidate?` selects the NON-first row `⟨0, 10⟩` (index 1), while a mutant Model-side scan `mutantFirstOpenCandidate?` (first open bucket wins) maps to `some (5, 10)` — the negation of the parent's first conjunct with the mutant scan in place of `Model.candidate?`; and the aligned `checkedAmountNoCapacityCap` mutant skips the final capacity-headroom clamp and produces an amount that pushes a candidate past its capacity, refuting the headroom conjunct.
+**Abstract `proportional_step_correspondence_and_bounded` (parent).** The registered parent is the pinned-source *proportional* step, not the +1 model. Its first conjunct pins the selection, not merely the two scans to each other: given `RowsCorrespond` and `hSelected : Source.candidate? source = some best`, the Model scan's candidate maps to exactly `some (best.allocation.val, best.capacity.val)` — proved by rewriting `full_candidate_correspondence hRows` with `hSelected`, so the selection hypothesis is load-bearing (wave 4; it was an unused `_hSelected` before). The second conjunct is `source_amount_totality` (a successful checked amount is positive, ≤ the remaining demand, and keeps the candidate within capacity, i.e. never over headroom). Two kill-lines in `MinFirstDistributionTxMutants.lean` refute the parent on its own model: `selection_kill_line_refutes_parent` is the negation of the parent's FULL predicate shape — all six premises (`RowsCorrespond`, `hSelected`, `hOpen`, `hLen`, `hSize`, `hAmount`) retained and the whole conclusion conjunction negated — with a mutant Model-side scan `mutantFirstOpenCandidate?` (first open bucket wins) in place of `Model.candidate?`. The witness discharges every premise on concrete data: on the `RowsCorrespond` pair `[(5, 10), (0, 10)]`, `Source.candidate?` selects the NON-first row `⟨0, 10⟩` (index 1), the row is open, the demand `10` is nonzero, and `Source.checkedAmount` succeeds with `some 5`; yet the mutant scan maps to `some (5, 10)`, falsifying the pinned-selection conjunct. And the aligned `checkedAmountNoCapacityCap` mutant skips the final capacity-headroom clamp and produces an amount that pushes a candidate past its capacity, refuting the headroom conjunct.
 
 **Child `selects_least_open_bucket`.** The previous parent is demoted to a child of the +1 model. Induction on the bucket list following the recursive definition of `MinFirst.candidate?` (scan from the right; on `allocation ≤ later.allocation` keep the left open bucket). Side lemmas: the candidate is a member, is open, and a `none` result means no open bucket. The `≤` conclusion is exactly the selection rule.
 
@@ -176,12 +176,17 @@ file.
 **New kill-line: `selection_kill_line_refutes_parent`.** A mutant Model-side
 candidate scan `mutantFirstOpenCandidate?` (first open bucket wins, mirroring
 the old Source-side `firstOpenCandidate?` it replaces) is refuted on the
-parent's own model: the theorem exhibits a concrete `RowsCorrespond` pair
-`[(5, 10), (0, 10)]` on which `Source.candidate?` selects the NON-first row
-`⟨w 0, w 10⟩` (index 1, the strictly least allocation) — so the parent's
-`hRows`/`hSelected` premises hold — while the mutant scan maps to
-`some (5, 10)`, the negation of the parent's first conjunct with the mutant
-scan in place of `Model.candidate?`. The old Source-side disagreement
+parent's own model. The theorem is the negation of the parent's FULL
+predicate shape — `¬ ∀ {model source best allocationSize w}, RowsCorrespond →
+hSelected → hOpen → hLen → hSize → hAmount → (C1' ∧ C2 ∧ C3 ∧ C4)` with
+`mutantFirstOpenCandidate?` in place of `Model.candidate?` in C1' — not
+merely a projection: the witness instantiates all five binders and discharges
+all six premises on concrete data (the `RowsCorrespond` pair
+`[(5, 10), (0, 10)]`; `Source.candidate?` selects the NON-first row
+`⟨w 0, w 10⟩`, index 1, the strictly least allocation; the row is open;
+`2 < 2^256`; demand `w 10` nonzero; `Source.checkedAmount` succeeds with
+`some (w 5)`), then contradicts the pinned-selection conjunct, which the
+mutant maps to `some (5, 10)`. The old Source-side disagreement
 example is removed (subsumed); the aligned
 `checkedAmountNoCapacityCap` headroom kill-line is unchanged.
 
@@ -191,6 +196,6 @@ threaded-`hSelected` parent and name `selection_kill_line_refutes_parent`;
 `fidelity.missing`, `classification`, `assumptions`, and both registered
 theorem names are unchanged. `scripts/audit_metadata.py`'s
 `EXPECTED_CANONICAL_DETAIL_SHA256["P-ALLOC-2"]` is recomputed to match
-(`e3756e8b…c7ea19c8674bbd`), and `audit/REPRODUCE.md` is regenerated
+(`e896bd71…24cf6f760`), and `audit/REPRODUCE.md` is regenerated
 (`STATUS.md`/`ROADMAP.md` are byte-identical). No `sorry`/`admit`, no new
 axioms (`#print axioms` still reports only `[propext, Quot.sound]`).

@@ -69,28 +69,40 @@ private def mutantFirstOpenCandidate? : List Model.Bucket → Option Model.Bucke
   | b :: bs => if Model.isOpen b then some b else mutantFirstOpenCandidate? bs
 
 /-- Selection kill-line against the registered parent
-`PAlloc2.proportional_step_correspondence_and_bounded`.  On the concrete
-`RowsCorrespond` pair `[(5, 10), (0, 10)]` the real source scan selects the
-NON-first row `⟨w 0, w 10⟩` (index 1, the strictly least allocation), so the
-parent premises `hRows` and `hSelected` both hold here; but the first-open
-mutant model scan maps to `some (5, 10)` — the negation of the parent's first
-conjunct `Option.map (fun b => (b.allocation, b.capacity))
-(Model.candidate? model) = some (best.allocation.val, best.capacity.val)`
-with the mutant scan in place of `Model.candidate?`. -/
+`PAlloc2.proportional_step_correspondence_and_bounded`: the negation of the
+parent's FULL predicate shape — all six premises retained and discharged,
+whole conclusion conjunction negated — with the first-open mutant scan
+`mutantFirstOpenCandidate?` substituted for `Model.candidate?`.  The witness
+keeps every premise true on concrete data: on the `RowsCorrespond` pair
+`[(5, 10), (0, 10)]` the real source scan selects the NON-first row
+`⟨w 0, w 10⟩` (index 1, the strictly least allocation), that row is open,
+`2 < 2^256`, the demand `w 10` is nonzero, and `Source.checkedAmount`
+succeeds with `some (w 5)`; yet the mutant scan maps to `some (5, 10)`, so
+the pinned-selection conjunct — and hence the whole conclusion conjunction —
+is false on the mutant model. -/
 theorem selection_kill_line_refutes_parent :
-    ∃ model : List Model.Bucket, ∃ source : List Source.Row,
-      ∃ best : Source.Row,
-        RowsCorrespond model source ∧
-        Source.candidate? source = some best ∧
-        Option.map (fun b => (b.allocation, b.capacity))
-            (mutantFirstOpenCandidate? model) ≠
-          some (best.allocation.val, best.capacity.val) := by
-  refine ⟨[⟨5, 10⟩, ⟨0, 10⟩], [⟨w 5, w 10⟩, ⟨w 0, w 10⟩], ⟨w 0, w 10⟩,
-    ?_, ?_, ?_⟩
-  · exact List.Forall₂.cons ⟨rfl, rfl⟩
-      (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil)
-  · rfl
-  · decide
+    ¬ (∀ {model : List Model.Bucket} {source : List Source.Row}
+        {best : Source.Row} {allocationSize w : Source.Word},
+        RowsCorrespond model source →
+        Source.candidate? source = some best →
+        Source.hasFreeSpace best = true →
+        source.length < Verity.Core.Uint256.modulus →
+        allocationSize.val ≠ 0 →
+        Source.checkedAmount source allocationSize best = some w →
+        (Option.map (fun b => (b.allocation, b.capacity))
+            (mutantFirstOpenCandidate? model) =
+          some (best.allocation.val, best.capacity.val)) ∧
+        0 < w.val ∧ w.val ≤ allocationSize.val ∧
+          best.allocation.val + w.val ≤ best.capacity.val) := by
+  intro h
+  exact absurd
+    ((h (model := [⟨5, 10⟩, ⟨0, 10⟩])
+      (source := [⟨w 5, w 10⟩, ⟨w 0, w 10⟩]) (best := ⟨w 0, w 10⟩)
+      (allocationSize := w 10) (w := w 5)
+      (List.Forall₂.cons ⟨rfl, rfl⟩
+        (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil))
+      rfl rfl (by decide) (by decide) rfl).1)
+    (by decide)
 
 /-- Kill-line mutant: `checkedAmount` without the final capacity-headroom
 clamp (dropping `capacityHeadroom` from the three-way `min`). Skipping that
