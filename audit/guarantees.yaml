@@ -405,9 +405,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants",
-        "expected": "composed four-child gadget and SSZ-encoding Contract.run transaction with rollback and single-child/encoding/hash/two-batch mutants; SHA-256 remains A-SHA256-FFI and the imported Yul fragment stays OPEN"
+        "expected": "one-object witness/verifyProof composition (structural-bind + deposit-data-root share ComposedSszInput.src) plus the independent GIndex.concat / seven-call digest children, an SSZ-encoding Contract.run transaction whose outcome rereads the persisted digest chain from storage, an inconsistent-witness kill line, and rollback / single-child / encoding / hash / two-batch mutants; SHA-256 remains A-SHA256-FFI and the imported Yul fragment stays OPEN"
       },
-      "summary": "The parent is the independent And of four children: a toy structural bind (uninterpreted combine, indices 2/3/4), a deposit-data-root layout, GIndex.concat transcription, and a seven-call digest definition. It is not SSZ.verifyProof on one object. SHA-256 functional correctness remains A-SHA256-FFI; the imported helper/wrapper Yul fragment binding stays OPEN under A-YUL-INTERFACE and A-SOLC-TRUSTED.",
+      "summary": "The parent composes the structural-bind and deposit-data-root children on one shared object (ComposedSszInput.src): the bind hypothesis and the witness/root conjuncts both name sourceWitness src / sourceNode src, so a witness bound for one deposit can no longer be paired with a different deposit's pinned deposit-data-root (closes the report/P-SSZ-1.md issue #4 counterexample for that pair; inconsistent_witness_kill_line proves the rejection). GIndex.concat and the seven-call digest / root-match child remain separate arguments, not tied to src. The Verity tx outcome now rereads the seven persisted digest words from digestMapSlot storage (Observables.digest) instead of trusting the pre-write local chain list. SHA-256 functional correctness remains A-SHA256-FFI; the imported helper/wrapper Yul fragment binding stays OPEN under A-YUL-INTERFACE and A-SOLC-TRUSTED.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding"
@@ -420,22 +420,25 @@
         "covered": [
           "toy structural witness binding",
           "pinned deposit-data-root source layout",
+          "one-object witness/verifyProof composition of the structural-bind and deposit-data-root children (ComposedSszInput.src)",
+          "inconsistent-witness kill line: a witness bound for one deposit is rejected against a different deposit's root",
           "GIndex.concat source transcription",
           "seven-call digest definition",
-          "composed Contract.run encoding of the four independent children",
+          "digest-chain storage reread (Observables.digest rereads digestMapSlot, not the pre-write chain list)",
+          "composed Contract.run encoding of the one-object structural-bind/deposit-data-root pair and the independent concat/digest children",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
           "SSZ.verifyProof on production gindices",
           "SHA-256 functional correctness",
           "imported-to-deployed helper/wrapper Yul fragment binding",
-          "one-object composition of the four children",
+          "one-object composition across all four children (GIndex.concat and the digest/tx inputs remain independent of the deposit)",
           "8-byte LE amount and ByteArray identity between children"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked four-child gadget; do not implement SSZ.verifyProof or a cryptographic SHA-256 proof."
+        "work": "Keep the checked one-object witness/root composition and the independent concat/digest children; do not implement SSZ.verifyProof or a cryptographic SHA-256 proof."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "special_bindings": {
