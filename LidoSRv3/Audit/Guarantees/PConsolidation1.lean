@@ -50,9 +50,15 @@ def guarantee : Guarantee := ⟨.pConsolidation1, [.model, .source, .verityTx]�
 aligned, every key is 48 bytes, the product fits `uint256`, and
 `msg.value` equals `count * fee` (`_requireExactFee`). `fee = 0` with
 `msg.value = 0` commits. A revert implies that conjunction is false.
-Not beacon eligibility and not the Bus. -/
+Not beacon eligibility and not the Bus.
+
+**Wave 1 premise.** This vault entry is only reached if the gateway
+admitted nonzero `msg.value`. The `fee = 0 ∧ msg.value = 0` arm stays a
+correct vault fact but is no longer user-reachable. -/
 theorem source_consolidation_preserves_eligibility_value_atomicity
-    (inputs : Inputs) :
+    (inputs : Inputs)
+    (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →
+      inputs.msgValue.val ≠ 0) :
     (∀ obs, sourceRun inputs = .committed obs →
       ∃ requests,
         zipRequests inputs.sources inputs.targets
@@ -102,5 +108,22 @@ theorem verity_tx_revert_restores_snapshot
     (h : (addRequests inputs inject).run state = .revert reason rollback) :
     rollback = state :=
   revert_restores_snapshot inputs inject state rollback reason h
+
+/-- **Kill-line: packing order.** If source ≠ target, a swapped
+target then source concat produces a different observation than the
+canonical source then target. One pair suffices. -/
+theorem packing_order_kills_swapped_concat
+    (target fee msgValue : Word) (r : Request) (h : r.source ≠ r.target) :
+    commitObservables target fee msgValue [r] ≠
+      swappedCommitObservables target fee msgValue [r] := by
+  exact commitObservables_ne_swapped target fee msgValue [r] rfl
+    (fun x hx => by simp [List.mem_cons, List.mem_nil_iff] at hx; subst hx; exact h)
+
+/-- **Named gap: preservesEthBalance.** The Solidity modifier
+(WithdrawalVault.sol:201) snapshots address(this).balance and reverts
+if it changed after the loop. Closing the gap requires value-bearing
+CALL frames, not the current success stubs with empty returndata. -/
+abbrev preservesEthBalance_gap : String :=
+  "preservesEthBalance (requires value-bearing CALL frames, not success stubs)"
 
 end LidoSRv3.Audit.Guarantees.PConsolidation1

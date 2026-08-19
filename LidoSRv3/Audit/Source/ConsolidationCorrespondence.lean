@@ -50,6 +50,16 @@ and independently required to be 48 bytes wide. -/
 def payload (request : Request) : List Word :=
   [request.source, request.target]
 
+/-- Swapped target then source payload; used only to prove packing order matters. -/
+def swappedPayload (request : Request) : List Word :=
+  [request.target, request.source]
+
+theorem payload_ne_swapped (request : Request) (h : request.source ≠ request.target) :
+    payload request ≠ swappedPayload request := by
+  simp [payload, swappedPayload]
+  intro heq
+  exact h heq
+
 structure CallObs where
   target : Word
   value : Word
@@ -102,6 +112,31 @@ def requestCall (target fee : Word) (request : Request) : CallObs :=
 def requestEvent (request : Request) : EventObs :=
   { topic := Verity.Core.Uint256.ofNat consolidationRequestAddedTopic
     payload := payload request }
+
+def swappedRequestCall (target fee : Word) (request : Request) : CallObs :=
+  { target := target, value := fee, input := swappedPayload request }
+
+def swappedCommitObservables (target fee msgValue : Word) (requests : List Request) :
+    Observables :=
+  { calls := requests.map (swappedRequestCall target fee)
+    events := requests.map requestEvent
+    payloads := requests.map swappedPayload
+    requestCount := requests.length
+    feePaid := msgValue }
+
+theorem commitObservables_ne_swapped (target fee msgValue : Word)
+    (requests : List Request)
+    (hne : requests.length = 1)
+    (hdist : ∀ r ∈ requests, r.source ≠ r.target) :
+    commitObservables target fee msgValue requests ≠
+      swappedCommitObservables target fee msgValue requests := by
+  simp [commitObservables, swappedCommitObservables, requestCall, swappedRequestCall,
+    payload, swappedPayload]
+  obtain ⟨r, hr⟩ := List.length_eq_one.mp hne
+  subst hr
+  simp [List.map]
+  intro heq
+  exact (hdist r (List.mem_cons_self r []) heq)
 
 def commitObservables (target fee msgValue : Word) (requests : List Request) :
     Observables :=

@@ -43,5 +43,5 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-ETH-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
 - `P-ADDRESS-1` — **NONE**: Preserve this checked abstract-to-Verity address-writer guarantee.
 - `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
-- `P-CONSOLIDATION-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-CONSOLIDATION-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim. Do not compose with P-ETH-1.
 - `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.

@@ -170,4 +170,13 @@ example : function_spec_bridge_constructors =
     function_spec_bridge_constructors :=
   rfl
 
+/-- **Cheap mutant: swapped concat.** Journal calldata = source then target
+(96 bytes). A swapped target then source concat fails observe: the
+committed view with a swapped input list is not equal to the canonical
+committed view. -/
+example :
+    runView (pair 11 21) ≠
+      runView { pair 11 21 with sources := [word 21], targets := [word 11] } := by
+  native_decide
+
 end LidoSRv3.Tests.ConsolidationTxMutants
