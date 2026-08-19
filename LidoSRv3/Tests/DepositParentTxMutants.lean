@@ -184,14 +184,6 @@ theorem duplicated_push_rejected :
     observe frame (probes inputs) ((mutantExecute .duplicateFirstPush inputs).run frame)
       ≠ sourceObservables inputs frame := by decide
 
-/-- Kill-line: removing the `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)`
-at `StakingRouter.sol` line 996 allows a non-conserving deployment to commit
-instead of reverting.  The registered conjunct
-`source_nonconserving_deployment_reverts` would be falsified. -/
-theorem skipped_balance_assert_rejected :
-    observe frame (probes inputs) ((mutantExecute .skipBalanceAssert inputs).run frame)
-      ≠ sourceObservables inputs frame := by decide
-
 /-! ## Rollback after real prefix effects
 
 The guard-driven failure of `badSecondRootInputs` is not a mutation: it is the

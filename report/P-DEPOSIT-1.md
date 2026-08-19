@@ -31,7 +31,7 @@ Lido SRv3's `StakingRouter.deposit` pulls ether from Lido and pushes it to the b
 
 ## Kill-line mutant
 
-The `skipBalanceAssert` mutant removes the model of `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` at `StakingRouter.sol` line 996. The registered conjunct `source_nonconserving_deployment_reverts` would be falsified by this removal, and the executable-plane observable equality rejects the mutant.
+`LidoSRv3.Audit.Verity.DepositLedgerTx.dropped_assert_commits_nonconserving_deployment` removes the model of `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` at `StakingRouter.sol` line 996 on a deployment where `MAX_EFFECTIVE_BALANCE_WC_TYPE_01 ≠ DEPOSIT_SIZE` (so pulled ≠ pushed by construction). Without the assert this mutant commits and strands wei in the router instead of reverting, which the observable equality rejects. The two-batch `DepositParentTxMutants` transaction ties its pulled and pushed totals together by construction (`total := first.amount + second.amount` feeds both legs), so it cannot exhibit a non-conserving deployment; the kill-line is only reachable, and only claimed, at the `DepositLedgerTx` ledger-model granularity above.
 
 ## Blocked follow-ups
 

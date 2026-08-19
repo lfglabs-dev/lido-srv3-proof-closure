@@ -109,8 +109,7 @@
           "per-module allocation, dynamic-data, and deposit-data-root storage words",
           "observable Lido/module/beacon call names, destinations, wei values, argument words, and order",
           "composed correspondence over shared quantified source and transaction variables",
-          "Contract.run rollback after intermediate writes and fail-closed execute-level mutants",
-          "kill-line mutant: removing the line-996 balance assert is rejected by the registered conjunct"
+          "Contract.run rollback after intermediate writes and fail-closed execute-level mutants"
         ],
         "missing": []
       },
