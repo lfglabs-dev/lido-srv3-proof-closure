@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 1c8a9eecaabc7530d92982f25f3cfcbe07f130a4
+validated-tree: def4da9914c38777a6bb847e237a0e1d735692cc
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -127,6 +127,15 @@ P-ACCOUNT-1 independent tx storage-flag order and mint-after-read discipline (20
 - Verity remains pinned at `a063bfc869735045354ebc3862ca08859da0f56e`; this
   slice makes no lakefile, manifest, artifact-lock, or Verity-checkout
   change.
+- Pre-existing defect found and repaired here: `check_validation_receipt.py`
+  computes `validated-tree` from `HEAD`'s committed tree (excluding the
+  receipt), not the working directory. The prior entry recorded
+  `8fed8c66140d37f249f74eb17a8fcb8739c416cb`, but re-deriving that same check
+  against unmodified `origin/main` `8ae5dcc` (before any edit in this branch)
+  already yields `1c8a9eecaabc7530d92982f25f3cfcbe07f130a4`: PR #105 changed
+  tracked files without rebinding the receipt. This entry binds
+  `validated-tree` to this branch's own commit rather than propagating that
+  staleness.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
 
