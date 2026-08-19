@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: e35a43d0fb92dfcb343a08831eab0c88f3b23420
+validated-tree: bac592024e600c891d72548fcc5ca0b07c81fc4e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1833,6 +1833,14 @@ P-RESERVE-RELATIONAL executable finalization composition (2026-08-18)
   `7ec46bd54a7960490a3c0177c4b17ca393e60542`.
 - Receipt subject: tracked tree excluding this receipt,
   `fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca`.
+P-ALLOC-2 explicit ∀ parent rebind (2026-08-19)
+--------------------------------------------
+- Re-registers P-ALLOC-2 abstract parent as explicit ∀ `forall_proportional_step_correspondence_and_bounded` over valid model/source rows + allocationSize (∀ glyph in Lean statement).
+- Retains original `proportional_step_correspondence_and_bounded` as helper; explicit ∀ quantifies the same correspondence + boundedness invariant.
+- Adds TX-level kill-line mutant (mutantSourceView/mutantAllocateToBestCandidate using checkedAmountNoCapacityCap) that would commit over-capacity bucket (single row 0/3 with demand 10 -> mutant 10 -> 0+10>3) and is excluded by the parent's final conjunct; witnessed by `runView=[3]` vs `mutantSourceView=[10]` and the over-headroom example in `LidoSRv3.Tests.MinFirstDistributionTxMutants`.
+- Updates `audit/guarantees.yaml` and `scripts/audit_metadata.py` EXPECTED claims/digest, regenerates REPRODUCE.md, and adds Trust coverage. No new axioms; native_decide only in disclosed mutant tests.
+- `validated-tree` above is rebound to this commit's tracked tree excluding receipt.
+
 
 Wave 4: P-ADDRESS-1 vacuous-parent-hypothesis remediation (2026-08-19)
 ----------------------------------------------------------------------

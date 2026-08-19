@@ -130,4 +130,67 @@ example :
       ¬ (best.allocation.val + (w 10 : Source.Word).val ≤ best.capacity.val) := by
   native_decide
 
+/-! ## Explicit ∀ parent kill-line: TX observe/amount mutant refutes
+`forall_proportional_step_correspondence_and_bounded` -/
+
+/-- TX-level mutant observe: the `MinFirstDistributionTx.allocate` loop
+using `checkedAmountNoCapacityCap` instead of `checkedAmount` for one step.
+This mutates the Verity TX's `execute` (the `allocateToBestCandidate`
+amount) and its `observe` (committed buckets). -/
+private def mutantAllocateToBestCandidate (rows : List Source.Row) (remaining : Source.Word) :
+    Option (List Source.Row × Source.Word) :=
+  match Source.candidate? rows with
+  | none => some (rows, 0)
+  | some best => do
+      let amount ← checkedAmountNoCapacityCap rows remaining best
+      if amount = 0 then some (rows, 0) else
+      let updated ← Verity.Stdlib.Math.safeAdd best.allocation amount
+      match rows.idxOf? best with
+      | none => none
+      | some i => some (rows.set i { best with allocation := updated }, amount)
+
+/-- Full-loop mutant: `while (allocated < allocationSize)` over the
+capacity-unclamped mutant step. -/
+private def mutantAllocateLoop : Nat → List Source.Row → Source.Word → Source.Word →
+    Option (List Source.Row × Source.Word × Source.Word)
+  | 0, rows, remaining, total => if remaining = 0 then some (rows, total, remaining) else none
+  | fuel + 1, rows, remaining, total =>
+      if remaining = 0 then some (rows, total, remaining) else
+      match mutantAllocateToBestCandidate rows remaining with
+      | none => none
+      | some (after, amount) =>
+          if amount = 0 then some (rows, total, remaining) else do
+            let newTotal ← Verity.Stdlib.Math.safeAdd total amount
+            let newRemaining ← Verity.Stdlib.Math.safeSub remaining amount
+            mutantAllocateLoop fuel after newRemaining newTotal
+
+private def mutantSourceView (buckets capacities : List Source.Word) (allocationSize : Source.Word) : View :=
+  if buckets.length != capacities.length then ⟨.reverted, buckets, 0, 0⟩ else
+  let rows := (buckets.zip capacities).map fun p => Source.Row.mk p.1 p.2
+  match mutantAllocateLoop allocationSize.val rows allocationSize 0 with
+  | none => ⟨.reverted, buckets, 0, 0⟩
+  | some (after, total, remaining) =>
+      ⟨.committed, after.map Source.Row.allocation, total, remaining⟩
+
+/-- Witness `buckets=[0], capacities=[3], allocationSize=10`: real TX commits
+`[3]` (capped by headroom), mutant TX commits `[10]` and breaches
+`best.allocation + w ≤ best.capacity`. The explicit `∀` parent
+`PAlloc2.forall_proportional_step_correspondence_and_bounded`
+proves for the real `checkedAmount` that `best.allocation + w ≤
+best.capacity`; the mutant's `checkedAmountNoCapacityCap` yields `w=10`
+with `0+10=10 > 3`, so the mutant's `observe` would persist an
+over-capacity bucket and the parent's final conjunct excludes exactly this
+execution. -/
+example :
+    let buckets := words [0]
+    let capacities := words [3]
+    let allocationSize := w 10
+    runView buckets capacities allocationSize = ⟨.committed, words [3], 3, 7⟩ ∧
+    mutantSourceView buckets capacities allocationSize = ⟨.committed, words [10], 10, 0⟩ ∧
+    (let best : Source.Row := ⟨w 0, w 3⟩
+     checkedAmountNoCapacityCap [best] allocationSize best = some (w 10) ∧
+     ¬ (best.allocation.val + (w 10 : Source.Word).val ≤ best.capacity.val) ∧
+     Source.checkedAmount [best] allocationSize best = some (w 3)) := by
+  native_decide
+
 end LidoSRv3.Tests.MinFirstDistributionTxMutants

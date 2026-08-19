@@ -150,6 +150,31 @@ theorem proportional_step_correspondence_and_bounded
   ⟨by rw [full_candidate_correspondence hRows, hSelected]; rfl,
    source_amount_totality hOpen hLen hSize hAmount⟩
 
+/-- **Explicit ∀ registered parent (P-ALLOC-2).** Universal closure over
+valid model/source rows and `allocationSize`: for every model/source pair
+with `RowsCorrespond`, every selected open best candidate, every non-zero
+remaining demand and every successful checked amount, the candidate
+correspondence holds and the amount is positive, bounded by the remaining
+demand, and capacity-safe. The `∀` is explicit so the bound is not an
+existential witness over one allocationSize. -/
+theorem forall_proportional_step_correspondence_and_bounded :
+    ∀ (model : List MinFirstAllocation.Model.Bucket)
+      (source : List MinFirstAllocation.Source.Row)
+      (best : MinFirstAllocation.Source.Row)
+      (allocationSize w : MinFirstAllocation.Source.Word),
+      MinFirstAllocation.RowsCorrespond model source →
+      MinFirstAllocation.Source.candidate? source = some best →
+      MinFirstAllocation.Source.hasFreeSpace best = true →
+      source.length < Verity.Core.Uint256.modulus →
+      allocationSize.val ≠ 0 →
+      MinFirstAllocation.Source.checkedAmount source allocationSize best = some w →
+      (Option.map (fun b => (b.allocation, b.capacity)) (MinFirstAllocation.Model.candidate? model) =
+        some (best.allocation.val, best.capacity.val)) ∧
+      0 < w.val ∧ w.val ≤ allocationSize.val ∧
+        best.allocation.val + w.val ≤ best.capacity.val :=
+  fun _ _ _ _ _ hRows hSelected hOpen hLen hSize hAmount =>
+    proportional_step_correspondence_and_bounded hRows hSelected hOpen hLen hSize hAmount
+
 /-! ## Verity transaction plane -/
 
 /--
