@@ -136,6 +136,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.AddressSourceMutants.verity_wrong_recipient_mutant_rejected
 #print axioms LidoSRv3.Tests.AddressSourceMutants.verity_fixed_owner_writer_mutant_rejected
 #print axioms LidoSRv3.Tests.AddressSourceMutants.verity_zero_amount_rejected
+#print axioms LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_not_admission_equivariant
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity
 #print axioms

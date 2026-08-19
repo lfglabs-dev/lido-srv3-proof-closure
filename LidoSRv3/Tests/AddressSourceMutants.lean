@@ -48,9 +48,77 @@ theorem owner_gated_admission_mutant_counterexample :
       decide ((renameInput 1 2 inp).caller = owner)) = false := by
   decide
 
-/-- The registered parent depends on the owner-gated refutation above: adding
-an owner gate must falsify admission equivariance. -/
-theorem owner_gate_kill_line_refutes_parent :
+/-! ## Kill-line for the registered parent
+
+`PAddress1.universal_address_writer_equivariance` quantifies over the real
+`SolidityAddress.run` / `admitted` / `renameInput`.  The disconnected toy
+`AddressAdmission.claim` / `ownerGated` `FunctionSpec` never touches these
+definitions, so refuting *it* does not refute the registered parent.  The
+mutant below is a one-conjunct edit of the real `admitted` on the two
+in-scope writers `requestWithdrawals` and `unwrap`, built from the exact
+`Input` / `Outcome` / `renameInput` the parent is stated over, and it
+falsifies exactly the admission conclusion the parent proves. -/
+
+/-- A hard-coded, unrenamed address standing in for a privileged role.  Unlike
+`Input.requestOwner` -- which `renameInput` renames along with `caller`, so a
+`caller = requestOwner` conjunct stays equivariant -- this constant is not an
+address-indexed input field, so a caller-swap never moves it. -/
+def fixedOwner : Address := 1
+
+/-- Mutant of the registered parent's `admitted`: `requestWithdrawals` and
+`unwrap` additionally require the caller to equal the fixed constant
+`fixedOwner`.  Every other entrypoint and every other guard is exactly
+`SolidityAddress.admitted`. -/
+def admittedFixedOwnerGated (inp : Input) : Bool :=
+  match inp.entryPoint with
+  | .requestWithdrawals =>
+      decide (inp.caller = fixedOwner) &&
+        !inp.paused && inp.amountInRange && inp.callerBalanceSufficient &&
+          inp.callerAllowanceSufficient && inp.externalCallSucceeds
+  | .unwrap =>
+      decide (inp.caller = fixedOwner) &&
+        decide (inp.amount ≠ 0) && inp.callerBalanceSufficient && inp.externalCallSucceeds
+  | _ => admitted inp
+
+/-- Mutant of the registered parent's `run`, built on `admittedFixedOwnerGated`
+instead of `admitted`.  `successfulPost` and `renameInput` are exactly the
+parent's real machinery; only the admission gate is mutated. -/
+def runFixedOwnerGated (inp : Input) : Outcome :=
+  if admittedFixedOwnerGated inp then .committed (successfulPost inp) else .reverted
+
+/-- **Kill-line for the registered P-ADDRESS-1 parent
+(`PAddress1.universal_address_writer_equivariance`).** A fixed-owner gate on
+`requestWithdrawals` is a plausible one-conjunct mutation of the real
+`admitted`, connected to the parent's own `Input` / `run` / `renameInput`.
+It falsifies exactly the parent's admission conclusion: caller `1` (the fixed
+owner) is admitted on an otherwise-eligible `requestWithdrawals` input, but
+caller `2` is rejected on the `1 ↔ 2`-swapped input, so
+`succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp)` fails for this
+mutant even though `a₁, a₂ ≠ 0`. This is the fact
+`AddressAdmission.ownerGated_not_admission_equivariant` could not supply,
+since that theorem is stated over a disconnected toy `FunctionSpec` that never
+mentions `SolidityAddress.run`. -/
+theorem fixed_owner_gate_not_admission_equivariant :
+    ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
+        succeeds (runFixedOwnerGated (renameInput a₁ a₂ inp)) =
+          succeeds (runFixedOwnerGated inp) := by
+  intro h
+  have hcex := h 1 2 (by decide) (by decide)
+    { entryPoint := .requestWithdrawals, caller := 1, senderFrom := 1, recipient := 0,
+      requestOwner := 1, amount := 1, requestId := 0, paused := false, requestExists := true,
+      requestClaimed := false, requestFinalized := false, hintValid := false,
+      callerIsApprovedForAll := false, callerIsTokenApproved := false, amountInRange := true,
+      callerBalanceSufficient := true, callerAllowanceSufficient := true,
+      externalCallSucceeds := true }
+  revert hcex
+  decide
+
+/-- Retained for the denote-admission subordinate row only: the disconnected
+toy `AddressAdmission.ownerGated` mutant is not a kill-line for the registered
+`PAddress1` parent (see `fixed_owner_gate_not_admission_equivariant` above for
+that), but it remains valid evidence for
+`P-ADDRESS-1.denote-admission`'s own `admission_address_equivariant` claim. -/
+theorem address_admission_toy_owner_gate_not_equivariant :
     LidoSRv3.Audit.Verity.AddressAdmission.ownerGateKillLine :=
   LidoSRv3.Audit.Verity.AddressAdmission.ownerGateKillLine_holds
 

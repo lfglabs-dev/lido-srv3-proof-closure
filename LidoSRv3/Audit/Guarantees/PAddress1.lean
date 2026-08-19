@@ -161,8 +161,9 @@ input, and a successful post-state renames under the same swap. On `requestWithd
 admission is pause plus the caller's own balance/allowance flags only
 (`pause_balance_admitted_is_permissionless`); it does not test `caller = owner`.
 Adding that gate breaks equivariance via
-`LidoSRv3.Audit.Verity.AddressAdmission.ownerGated_not_admission_equivariant`.
-Not `WithdrawalQueue.claimWithdrawalsTo`. -/
+`LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_not_admission_equivariant`,
+which mutates this file's own `admitted`/`run`/`renameInput` (not an
+unrelated toy entrypoint). Not `WithdrawalQueue.claimWithdrawalsTo`. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
     (inp : LidoSRv3.Audit.SolidityAddress.Input)
