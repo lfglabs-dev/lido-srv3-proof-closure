@@ -39,7 +39,7 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 - `P-DEPOSIT-1` — **NONE**: Preserve the composed abstract-to-Verity deposit guarantee and its executable mutants.
 - `P-TOPUP-1` — **NONE**: Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, and its executable mutants.
 - `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
-- `P-RESERVE-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-RESERVE-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim. Do not drop the freshQueueCache hypothesis from the parent theorem.
 - `P-ETH-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
 - `P-ADDRESS-1` — **NONE**: Preserve this checked abstract-to-Verity address-writer guarantee.
 - `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
