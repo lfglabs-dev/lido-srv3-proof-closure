@@ -1,6 +1,6 @@
 # P-ALLOC-1
 
-Theorems: `PAlloc1.checked_execute_and_active_capacity_bounded` (registered parent), `PAlloc1.active_capacity_bounded` (MathView child), `PAlloc1.verity_tx_simulates_allocation`.
+Theorems: `PAlloc1.checked_execute` (registered parent), `PAlloc1.active_capacity_bounded` (unregistered MathView-definitional child), `PAlloc1.verity_tx_simulates_allocation`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -21,7 +21,9 @@ The guarantee is meant to say: an active module cannot be given more capacity th
 
 ## Proof
 
-**Abstract `active_capacity_bounded`.** Unfold `MathView.capacity`. For an active module that definition *is* `min(targetValidators, availableCapacity)`. The two conjuncts are `Nat.min_le_left` and `Nat.min_le_right`. No induction, no source loop, no share-limit algebra.
+**Abstract `checked_execute` (registered parent, Wave 2).** Restates `source_capacities_match_canonical` below under the parent's public name: under `CheckedBounds`, the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. No `min`-tautology conjunct. The kill-line in `AllocationTxMutants.lean` (`capacity := target`, skipping `wordMin`) produces a capacity column that disagrees with `MathView.capacities`, so it is checked against the parent's entire statement, not half of it.
+
+**Unregistered child `active_capacity_bounded`.** Unfold `MathView.capacity`. For an active module that definition *is* `min(targetValidators, availableCapacity)`. The two conjuncts are `Nat.min_le_left` and `Nat.min_le_right`. No induction, no source loop, no share-limit algebra — this is a fact about the `min` operator applied to whatever two `Nat`s `MathView` computed, true regardless of whether those `Nat`s are the router's actual target/headroom. Wave 1 folded this into the registered parent as `checked_execute_and_active_capacity_bounded`; Wave 2 demoted it back out (issue 1) because a definitional tautology in a registered parent cannot be targeted by any kill-line mutant.
 
 **SOURCE `source_capacities_match_canonical`.** Under `CheckedBounds` (nonzero `maxEBType1`, no underflow on exited-count, no `uint256` overflow on the sums/products), a pair of inductions on `firstLoop` / `secondLoop` show each `safe*` word equals the corresponding `Nat` operation, so the checked interpreter’s capacity column equals `MathView.capacities`. Router order is a structural list-map identity (`secondLoop_router_order`).
 
@@ -39,9 +41,24 @@ on their (now honest) statements. No pinned-core counterexample was found.
 repair that keeps the existing proof. `D` = register an already-proved sibling.
 `scope` = accepted as an explicit fidelity gap; not expanded to full Lido.
 
+**Wave 2 (2026-08-19): registered-parent repair for issue 1.** The 2026-08-18
+`A+D` close kept `active_capacity_bounded`'s `Nat.min` tautology conjoined
+into the registered parent (`checked_execute_and_active_capacity_bounded`)
+and pointed at the unrelated `P-ALLOC-1.eugene-bound` sibling instead of
+touching the parent statement itself, so the tautological conjunct was still
+part of every CHECKED claim about P-ALLOC-1 and still could not be killed by
+any mutant. This wave splits the Wave 1 parent: the registered parent is now
+`checked_execute` (`source_capacities_match_canonical`'s statement, renamed
+to the public parent name), and `active_capacity_bounded` is kept only as an
+explicit, unregistered, separately labeled MathView-definitional fact. The
+existing kill-line mutant in `AllocationTxMutants.lean` (`capacity := target`)
+is unchanged in substance and is now checked against the parent's entire
+(purely executable) statement instead of half of a conjunction. Issue 1 is
+reclassified `B` below.
+
 | # | Close | Note |
 | --- | --- | --- |
-| 1 | A+D | Abstract is `Math.min`. Child `P-ALLOC-1.eugene-bound` is `checked_amount_le_bond`. |
+| 1 | B (Wave 2) | Registered parent is now `checked_execute` (no `min` conjunct); `active_capacity_bounded` is an explicit unregistered child. `P-ALLOC-1.eugene-bound` remains an unrelated sibling. |
 | 2, 12, 16 | A | SOURCE/TX are lockstep copies. |
 | 3, 4 | scope | Live summary CALL/returndata listed in `missing`. |
 | 5, 14, 17 | A | Unbounded-Nat min; `CheckedBounds` is a separate sibling. |

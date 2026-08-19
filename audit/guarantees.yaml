@@ -10,12 +10,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
-        "expected": "checked execute + MathView match + active min-clamp parent, lockstep moduleAddress-binding allocation transaction, and kill-line/off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
+        "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), lockstep moduleAddress-binding allocation transaction, and kill-line/off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
       },
-      "summary": "checked_execute_and_active_capacity_bounded: under CheckedBounds the source executor succeeds with capacities equal to MathView, and for active modules capacity ≤ targetValidators ∧ capacity ≤ availableCapacity. A kill-line mutant (capacity := target) fails the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
+      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. A kill-line mutant (capacity := target, skipping wordMin) fails the parent. active_capacity_bounded (MathView.capacity = min(target, available), so capacity ≤ targetValidators ∧ capacity ≤ availableCapacity) is a Nat.min tautology on the MathView definition, not on execute's arithmetic; it is registered separately as an unregistered child rather than folded into the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute_and_active_capacity_bounded"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute"
       },
       "verity": {
         "status": "CHECKED",
@@ -24,8 +24,8 @@
       "fidelity": {
         "covered": [
           "checked execute succeeds and capacity column equals MathView under CheckedBounds",
-          "handwritten capacity model and Math.min clamp for active modules",
           "kill-line mutant (capacity := target) rejected by the registered parent",
+          "active_capacity_bounded (Math.min clamp) demoted to an explicit, unregistered MathView-definitional child",
           "single bind/execute interpreter; observe reads writeArray columns",
           "Contract.run rollback after intermediate writes"
         ],
@@ -39,7 +39,7 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked execute+min-clamp parent and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks."
+        "work": "Keep the checked execute parent and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks, and do not re-fold the min-clamp tautology back into the parent."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"

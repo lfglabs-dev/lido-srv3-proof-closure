@@ -183,8 +183,11 @@ private def killLineModules : List Module :=
       totalModuleStake := w 0 } ]
 
 /-- The kill-line mutant produces capacities that differ from `MathView`.
-This means the new parent `checked_execute_and_active_capacity_bounded`
-would fail for this mutant (execute result ≠ MathView). -/
+This means the registered parent `PAlloc1.checked_execute` would fail for
+this mutant (execute result ≠ MathView). `PAlloc1.checked_execute` is Wave 2's
+narrowed parent: it no longer conjoins the `active_capacity_bounded` `Nat.min`
+tautology (P-ALLOC-1 audit issue 1), so this kill-line is checked against the
+parent's entire (now purely executable) statement, not half of it. -/
 example :
     (executeMutant cfg killLineModules (w 10) false).map (fun rows =>
       rows.map (fun r => (r.capacity : Nat))) ≠
