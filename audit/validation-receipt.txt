@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6bdae32000ea0ebb1e120cb71c451c4107bfbeeb
+validated-tree: fbd80bbab57ce4e4f696f51253a931255da4414e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -2908,6 +2908,83 @@ P-TOPUP-1 wrap routing and surgical conservation kill-line (2026-08-19)
   new proofs (the characterization theorems use only `by_cases`/`rw`/`split`).
 - Authored in the isolated git worktree `/home/ubuntu/wt/ptopup1` on branch
   `cursor/wave5-ptopup1-4b38`; no other in-flight branch's files are touched
+  by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+P-ALLOC-2 explicit-∀ kill-line retarget and named headroom kill-line (2026-08-19)
+---------------------------------------------------------------------------------
+
+- Fixes the wave-6 review defect: human PR #134 re-registered the P-ALLOC-2
+  parent as the explicit-∀
+  `LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded`
+  (explicit binders `(model) (source) (best) (allocationSize w)`), demoting
+  the wave-4 implicit-binder `proportional_step_correspondence_and_bounded`
+  to a helper, but the kill-line surface had not followed the
+  re-registration: `selection_kill_line_refutes_parent` still negated the
+  helper's IMPLICIT-binder shape and named the helper as parent, and the
+  headroom conjunct had no named kill-line -- PR #134's TX-level evidence
+  was an anonymous `example` proved by `native_decide` that the YAML
+  `fidelity.covered` overclaimed as "rejected by the explicit ∀ parent".
+- Retarget: `selection_kill_line_refutes_parent`
+  (`LidoSRv3/Tests/MinFirstDistributionTxMutants.lean`) is restated as the
+  negation of the registered parent's FULL explicit-∀ predicate shape --
+  explicit binders exactly matching the registered parent's spine, same six
+  premises, whole conclusion conjunction negated, mutant
+  `mutantFirstOpenCandidate?` substituted for `Model.candidate?`, same
+  `[(5, 10), (0, 10)]` witness with all premises discharged by rfl/decide;
+  proof body unchanged modulo positional (not named-implicit) application.
+  Docstrings and the kill-line section prose now name
+  `forall_proportional_step_correspondence_and_bounded` as the registered
+  parent.
+- New named headroom kill-line `headroom_clamp_kill_line_refutes_parent`:
+  the negation of the registered parent's FULL explicit-∀ shape with the
+  capacity-cap mutant `checkedAmountNoCapacityCap` (made non-private so the
+  named theorem can reference it) substituted at the `checkedAmount`
+  premise ONLY (the conclusion speaks only of `w`; the first conclusion
+  conjunct keeps the honest `Model.candidate?` scan). Witness: model
+  `[⟨0, 3⟩]`, source `[⟨w 0, w 3⟩]`, best `⟨w 0, w 3⟩`, allocationSize
+  `w 10`, w `w 10` -- premises discharge by rfl/decide (mutant
+  checkedAmount returns `some (w 10)`: countBest = 1 so share = 10,
+  nextLevel? = none so levelHeadroom = 10, min(10, 10) = 10) and the final
+  conjunct `0 + 10 ≤ 3` is refuted by `decide`. PR #134's anonymous
+  `mutantSourceView` vs `runView` example is kept verbatim with its
+  docstring relabeled honestly as TX-observe computational evidence; the
+  wave-4 anonymous `checkedAmountNoCapacityCap` example is likewise
+  relabeled as computational evidence for the named kill-line.
+- Prose: `LidoSRv3/Audit/Guarantees/PAlloc2.lean` helper docstring corrected
+  (it is now a helper; the explicit-∀ theorem is the registered parent);
+  `report/P-ALLOC-2.md` header/Proof section updated and gains the dated
+  wave-6 section (wave-4 history intact).
+- Metadata: `audit/guarantees.yaml` P-ALLOC-2 row updated (summary now
+  describes the first conjunct as PINNING the Model scan's candidate to the
+  source-selected row `best` and names the explicit-∀ registered parent
+  with the helper retained; fidelity.covered cites the two named kill-line
+  theorems instead of claiming the anonymous TX example rejects the parent;
+  reproduction.expected updated to match);
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ALLOC-2"]` recomputed to
+  `e94b3877833e21030ed534725260a0c94c6994ddd842823c7bffc7086a961b91`;
+  `EXPECTED_CANONICAL_CLAIMS` unchanged (the registration already names
+  forall_...); views regenerated (`audit/REPRODUCE.md` only;
+  STATUS.md/ROADMAP.md byte-identical);
+  `scripts/check_public_claim_surfaces.py` has no P-ALLOC-2 CLAIMS entry,
+  so nothing to update there.
+- Gates: `lake build LidoSRv3` exit 0 (1395 jobs); `lake build
+  LidoSRv3.Tests.MinFirstDistributionTxMutants` exit 0; `python3
+  scripts/audit_metadata.py check` exit 0 (11 canonical guarantees plus 14
+  subordinate evidence rows); `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`, `python3
+  scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, `bash
+  scripts/test_check_no_python_evidence.sh`, and `make test`: exit 0.
+- Changed-Lean forbidden-token scan: no `sorry`/`sorryAx`/`admit`/
+  `native_decide` in the added lines (both kill-lines close by
+  `rfl`/`decide` and `absurd`).
+- Authored in the isolated git worktree `/home/ubuntu/wt/palloc2` on branch
+  `cursor/wave6-palloc2-4b38`; no other in-flight branch's files are touched
   by this diff.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
