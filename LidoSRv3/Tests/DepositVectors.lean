@@ -17,14 +17,14 @@ open LidoSRv3.Audit.SolidityDeposit
    `DEPOSIT_SIZE` (`StakingRouter.sol` line 65 / `BeaconChainDepositor.sol` line
    24), and both pubkey-length constants are 48 (`StakingRouter.sol` line 57,
    `BeaconChainDepositor.sol` line 21).  Units are 1-ether words. -/
-private def cfg : SourceDepositConfig := ⟨32, 32, 48, 48, 96⟩
+def cfg : SourceDepositConfig := ⟨32, 32, 48, 48, 96⟩
 
 /- A hypothetical deployment whose pull scale is twice its push scale. -/
-private def cfgSkewed : SourceDepositConfig := ⟨64, 32, 48, 48, 96⟩
+def cfgSkewed : SourceDepositConfig := ⟨64, 32, 48, 48, 96⟩
 
 /- Three well-formed keys, an ample block cap and ample
    Lido liquidity. -/
-private def inp : SourceDepositInput := ⟨true, 10, 320, 144, 288, 1000, true, 1000⟩
+def inp : SourceDepositInput := ⟨true, 10, 320, 144, 288, 1000, true, 1000⟩
 
 /- Positive vector: three keys are pulled and pushed at 32 each, and the router
    balance at `StakingRouter.sol` line 993 equals the line 980 snapshot. -/
@@ -155,5 +155,52 @@ example :
                   publicKeysBatchLength := 48 * n.val
                   signaturesBatchLength := 96 * n.val }
         ≠ .revertInvalidPublicKeysBatchLength := by decide
+
+/-! ## Kill-line for the registered abstract P-DEPOSIT-1 parent
+
+The registered parent `PDeposit1.source_deposit_conserves_and_rolls_back`
+proves, as its first conjunct, that every committed push of
+`SolidityDeposit.run` moves the same wei in from Lido as out to the beacon
+deposit contract (`pulled = pushed`, with the independently written
+`depositsValue`/`pushedValue` formulas agreeing).  `SolidityDeposit.mutantRun`
+is that same source-shaped model with the line 996 conservation assert dropped.
+The theorems below are the kill-line: on the skewed deployment above, the
+mutant *commits* a push whose pulled and pushed wei disagree -- the very
+predicate the registered parent proves, false of the mutant of its own model. -/
+
+/- Where the line 996 assert passes, the mutant is the honest `run` -- the
+   deployed conserving configuration commits identically under both. -/
+example : mutantRun cfg inp = run cfg inp := by decide
+
+/- And on a guard-driven revert (a paused Lido), the mutant is again the honest
+   `run`: the dropped assert changes nothing upstream of it. -/
+example :
+    mutantRun cfg { inp with lidoCanDeposit := false }
+      = run cfg { inp with lidoCanDeposit := false } := by decide
+
+/-- With the line 996 assert dropped, the skewed deployment commits the
+mismatched push the honest `run` rolls back: 192 wei pulled from Lido against
+96 wei pushed to the beacon deposit contract, stranding 96 wei in the router. -/
+theorem dropped_conservation_assert_commits_skewed :
+    mutantRun cfgSkewed inp = .committedDeposits 3 192 96 1096 := by
+  decide
+
+/-- **Kill-line for the registered P-DEPOSIT-1 parent.**  The parent's first
+conjunct is `pulled = pushed` on every committed push of `SolidityDeposit.run`;
+applied to the mutant of that same model that drops the line 996 assert, the
+same predicate fails on a committing outcome. -/
+theorem dropped_conservation_assert_breaks_pulled_eq_pushed :
+    (mutantRun cfgSkewed inp).pulled ≠ (mutantRun cfgSkewed inp).pushed := by
+  decide
+
+/-- The same refutation in the registered parent's exact first-conjunct shape:
+the universally quantified commit-branch conservation predicate, transported
+onto `mutantRun`, is false. -/
+theorem dropped_conservation_assert_refutes_commit_conservation :
+    ¬ (∀ keys pulled pushed balanceAfter,
+        mutantRun cfgSkewed inp = .committedDeposits keys pulled pushed balanceAfter →
+          pulled = pushed ∧ depositsValue cfgSkewed inp = pushedValue cfgSkewed inp) :=
+  fun h => absurd (h 3 192 96 1096 dropped_conservation_assert_commits_skewed).1
+    (by decide)
 
 end LidoSRv3.Tests.DepositVectors

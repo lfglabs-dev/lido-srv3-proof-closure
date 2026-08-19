@@ -526,6 +526,156 @@ theorem reverting_moves_no_ether {o : Outcome} (h : o.reverts = true) :
     o.pulled = 0 ∧ o.pushed = 0 := by
   cases o <;> simp_all [Outcome.reverts, Outcome.pulled, Outcome.pushed]
 
+/-! ## The line 996 assert is the conservation load-bearer
+
+`mutantRun` is the pinned `run` with exactly one branch removed: the line 996
+`assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` guard
+(`StakingRouter.sol` lines 993--996), modelled in `run` as the
+`depositsValue ≠ pushedValue → .revertAssertBalanceUnchanged` branch.  Every
+other guard keeps its source order.  The two characterization theorems pin the
+mutation down exactly: where the assert passes the mutant *is* the honest
+`run`, and where the honest run hits the assert the mutant instead commits the
+push.  The executable falsifier for the registered P-DEPOSIT-1 parent built on
+this mutant lives in `LidoSRv3.Tests.DepositVectors`
+(`dropped_conservation_assert_breaks_pulled_eq_pushed`). -/
+
+/-- The pinned deposit path with the line 996 conservation assert dropped: a
+deployment whose pull scale differs from `DEPOSIT_SIZE` commits the mismatched
+push instead of reverting. -/
+def mutantRun (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
+  if inp.moduleActive = false then
+    .revertStakingModuleNotActive
+  else if cfg.maxEBType1 = 0 then
+    .revertMaxDepositsDivisionByZero
+  else if maxDepositsCount cfg inp = 0 then
+    .revertZeroDeposits
+  else if cfg.pubkeyLength = 0 then
+    .revertPubkeyModuloByZero
+  else if inp.publicKeysBatchLength % cfg.pubkeyLength ≠ 0 then
+    .revertWrongPubkeyLength
+  else if maxDepositsCount cfg inp < actualDepositsCount cfg inp then
+    .revertModuleReturnExceedTarget
+  else if actualDepositsCount cfg inp = 0 then
+    .committedNoDeposits
+  else if inp.lidoCanDeposit = false then
+    .revertLidoCannotDeposit
+  else if depositsValue cfg inp = 0 then
+    .revertLidoZeroAmount
+  else if inp.lidoDepositableEther < depositsValue cfg inp then
+    .revertLidoNotEnoughEther
+  else if inp.publicKeysBatchLength ≠ cfg.publicKeyLength * actualDepositsCount cfg inp then
+    .revertInvalidPublicKeysBatchLength
+  else if inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp then
+    .revertInvalidSignaturesBatchLength
+  else if inp.routerBalanceBefore + depositsValue cfg inp < pushedValue cfg inp then
+    .revertInsufficientRouterBalance
+  else
+    .committedDeposits (actualDepositsCount cfg inp) (depositsValue cfg inp)
+      (pushedValue cfg inp) (routerBalanceAfter cfg inp)
+
+/-- The mutation is surgical: wherever the line 996 assert passes, the mutant
+coincides with the honest `run`, branch for branch. -/
+theorem mutantRun_eq_run_of_assert_passing {cfg : SourceDepositConfig}
+    {inp : SourceDepositInput} (h : depositsValue cfg inp = pushedValue cfg inp) :
+    mutantRun cfg inp = run cfg inp := by
+  rw [mutantRun, run]
+  by_cases hModule : inp.moduleActive = false
+  · rw [if_pos hModule, if_pos hModule]
+  rw [if_neg hModule, if_neg hModule]
+  by_cases hMaxEB : cfg.maxEBType1 = 0
+  · rw [if_pos hMaxEB, if_pos hMaxEB]
+  rw [if_neg hMaxEB, if_neg hMaxEB]
+  by_cases hMax : maxDepositsCount cfg inp = 0
+  · rw [if_pos hMax, if_pos hMax]
+  rw [if_neg hMax, if_neg hMax]
+  by_cases hPubkeyZero : cfg.pubkeyLength = 0
+  · rw [if_pos hPubkeyZero, if_pos hPubkeyZero]
+  rw [if_neg hPubkeyZero, if_neg hPubkeyZero]
+  by_cases hAligned : inp.publicKeysBatchLength % cfg.pubkeyLength ≠ 0
+  · rw [if_pos hAligned, if_pos hAligned]
+  rw [if_neg hAligned, if_neg hAligned]
+  by_cases hOver : maxDepositsCount cfg inp < actualDepositsCount cfg inp
+  · rw [if_pos hOver, if_pos hOver]
+  rw [if_neg hOver, if_neg hOver]
+  by_cases hKeys : actualDepositsCount cfg inp = 0
+  · rw [if_pos hKeys, if_pos hKeys]
+  rw [if_neg hKeys, if_neg hKeys]
+  by_cases hCanDeposit : inp.lidoCanDeposit = false
+  · rw [if_pos hCanDeposit, if_pos hCanDeposit]
+  rw [if_neg hCanDeposit, if_neg hCanDeposit]
+  by_cases hZeroAmount : depositsValue cfg inp = 0
+  · rw [if_pos hZeroAmount, if_pos hZeroAmount]
+  rw [if_neg hZeroAmount, if_neg hZeroAmount]
+  by_cases hLiquidity : inp.lidoDepositableEther < depositsValue cfg inp
+  · rw [if_pos hLiquidity, if_pos hLiquidity]
+  rw [if_neg hLiquidity, if_neg hLiquidity]
+  by_cases hPublicKeys :
+      inp.publicKeysBatchLength ≠ cfg.publicKeyLength * actualDepositsCount cfg inp
+  · rw [if_pos hPublicKeys, if_pos hPublicKeys]
+  rw [if_neg hPublicKeys, if_neg hPublicKeys]
+  by_cases hSignatures :
+      inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp
+  · rw [if_pos hSignatures, if_pos hSignatures]
+  rw [if_neg hSignatures, if_neg hSignatures]
+  by_cases hFunded : inp.routerBalanceBefore + depositsValue cfg inp < pushedValue cfg inp
+  · rw [if_pos hFunded, if_pos hFunded]
+  rw [if_neg hFunded, if_neg hFunded]
+  rw [if_neg (not_not_intro h)]
+
+/-- And the mutation bites exactly where the honest run hits the line 996
+assert: there, and only there, the mutant commits the push the honest run
+rolls back. -/
+theorem mutantRun_commits_where_assert_fires {cfg : SourceDepositConfig}
+    {inp : SourceDepositInput} (hRun : run cfg inp = .revertAssertBalanceUnchanged) :
+    mutantRun cfg inp = .committedDeposits (actualDepositsCount cfg inp)
+      (depositsValue cfg inp) (pushedValue cfg inp) (routerBalanceAfter cfg inp) := by
+  rw [run] at hRun
+  rw [mutantRun]
+  by_cases hModule : inp.moduleActive = false
+  · rw [if_pos hModule] at hRun; cases hRun
+  rw [if_neg hModule] at hRun; rw [if_neg hModule]
+  by_cases hMaxEB : cfg.maxEBType1 = 0
+  · rw [if_pos hMaxEB] at hRun; cases hRun
+  rw [if_neg hMaxEB] at hRun; rw [if_neg hMaxEB]
+  by_cases hMax : maxDepositsCount cfg inp = 0
+  · rw [if_pos hMax] at hRun; cases hRun
+  rw [if_neg hMax] at hRun; rw [if_neg hMax]
+  by_cases hPubkeyZero : cfg.pubkeyLength = 0
+  · rw [if_pos hPubkeyZero] at hRun; cases hRun
+  rw [if_neg hPubkeyZero] at hRun; rw [if_neg hPubkeyZero]
+  by_cases hAligned : inp.publicKeysBatchLength % cfg.pubkeyLength ≠ 0
+  · rw [if_pos hAligned] at hRun; cases hRun
+  rw [if_neg hAligned] at hRun; rw [if_neg hAligned]
+  by_cases hOver : maxDepositsCount cfg inp < actualDepositsCount cfg inp
+  · rw [if_pos hOver] at hRun; cases hRun
+  rw [if_neg hOver] at hRun; rw [if_neg hOver]
+  by_cases hKeys : actualDepositsCount cfg inp = 0
+  · rw [if_pos hKeys] at hRun; cases hRun
+  rw [if_neg hKeys] at hRun; rw [if_neg hKeys]
+  by_cases hCanDeposit : inp.lidoCanDeposit = false
+  · rw [if_pos hCanDeposit] at hRun; cases hRun
+  rw [if_neg hCanDeposit] at hRun; rw [if_neg hCanDeposit]
+  by_cases hZeroAmount : depositsValue cfg inp = 0
+  · rw [if_pos hZeroAmount] at hRun; cases hRun
+  rw [if_neg hZeroAmount] at hRun; rw [if_neg hZeroAmount]
+  by_cases hLiquidity : inp.lidoDepositableEther < depositsValue cfg inp
+  · rw [if_pos hLiquidity] at hRun; cases hRun
+  rw [if_neg hLiquidity] at hRun; rw [if_neg hLiquidity]
+  by_cases hPublicKeys :
+      inp.publicKeysBatchLength ≠ cfg.publicKeyLength * actualDepositsCount cfg inp
+  · rw [if_pos hPublicKeys] at hRun; cases hRun
+  rw [if_neg hPublicKeys] at hRun; rw [if_neg hPublicKeys]
+  by_cases hSignatures :
+      inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp
+  · rw [if_pos hSignatures] at hRun; cases hRun
+  rw [if_neg hSignatures] at hRun; rw [if_neg hSignatures]
+  by_cases hFunded : inp.routerBalanceBefore + depositsValue cfg inp < pushedValue cfg inp
+  · rw [if_pos hFunded] at hRun; cases hRun
+  rw [if_neg hFunded] at hRun
+  by_cases hAssert : depositsValue cfg inp ≠ pushedValue cfg inp
+  · rw [if_pos hAssert] at hRun; rw [if_neg hFunded]
+  rw [if_neg hAssert] at hRun; cases hRun
+
 /--
 `Lido.withdrawDepositableEther`'s `ZERO_AMOUNT` guard (`Lido.sol` line 873) is
 unreachable from `StakingRouter.deposit`: the empty-batch early return at source
