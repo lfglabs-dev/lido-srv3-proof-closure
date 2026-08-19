@@ -288,9 +288,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
-        "expected": "universal abstract/source equivariance, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
+        "expected": "scoped well-formed universal abstract/source equivariance with explicit singleton-actor exclusion, owner-gate kill-line mutant, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
       },
-      "summary": "universal_address_writer_equivariance: two nonzero callers have the same source-shaped admission bit, and a successful post-state renames under the swap. Verity composition adds Contract.run observe = sourceAddressView (amount < 2^256, coherent balance/allowance flags) and snapshot rollback. Not WithdrawalQueue.claimWithdrawalsTo.",
+      "summary": "universal_address_writer_equivariance: two nonzero callers on a scoped, well-formed input (`amount < 2^256`, coherent balance/allowance flags) with explicit singleton-actor exclusion have the same source-shaped admission bit, and a successful post-state renames under the swap. On requestWithdrawals/unwrap, admission is pause plus caller balance/allowance only (no owner gate); ownerGateKillLine mutant refutes equivariance if that gate is added. Verity composition adds Contract.run observe = sourceAddressView and snapshot rollback. claimWithdrawalsTo deferred. Not WithdrawalQueue.claimWithdrawalsTo.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
@@ -301,16 +301,21 @@
       },
       "fidelity": {
         "covered": [
-          "universal abstract and pinned-source post-state equivariance",
+          "scoped well-formed universal abstract and pinned-source post-state equivariance with explicit singleton-actor exclusion",
+          "pause/balance/allowance permissionless admission on requestWithdrawals and unwrap",
+          "owner-gate kill-line mutant refuting admission equivariance",
           "four storage-writing Contract.run entrypoints and behavioral source correspondence on entrypoint-specific address-write observables",
           "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
         ],
-        "missing": []
+        "missing": [
+          "WithdrawalQueue.claimWithdrawalsTo request-owner admission and post-state equivariance"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked scoped parent and Verity composition; close claimWithdrawalsTo without widening to singleton-actor entrypoints."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity address-writer guarantee.",
+      "next_gate": "Keep the checked scoped parent; close claimWithdrawalsTo fidelity without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {

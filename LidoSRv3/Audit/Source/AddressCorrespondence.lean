@@ -75,6 +75,31 @@ def succeeds : Outcome → Bool
   | .reverted => false
   | .committed _ => true
 
+/-- Well-formedness for the registered P-ADDRESS-1 parent: amount stays below 2^256
+and the caller-indexed balance/allowance flags are coherent with a nonzero amount. -/
+def wellFormedAddressInput (inp : Input) : Prop :=
+  inp.amount < 2 ^ 256 ∧
+  (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) ∧
+  (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0)
+
+/-- Singleton-actor protocol entrypoints are excluded from address-equivariance.
+The four pinned writers below are not singleton-actor gated; this predicate is
+carried explicitly on the parent theorem rather than left implicit in prose. -/
+def singletonActorEntryPoint (_ep : EntryPoint) : Prop :=
+  False
+
+/-- Scoped entrypoints for the Wave 1 parent: permissionless writers whose
+admission is pause plus the caller's own balance/allowance flags. Request-owner
+gates and singleton-actor callers are excluded (`claimWithdrawalsTo` deferred). -/
+def addressEquivarianceEntryScope (ep : EntryPoint) : Prop :=
+  match ep with
+  | .transferFrom | .requestWithdrawals | .unwrap => True
+  | .claimWithdrawalsTo => False
+
+theorem not_singleton_actor_entry_point (ep : EntryPoint) :
+    ¬ singletonActorEntryPoint ep := by
+  intro h; cases h
+
 /-- Conjunction of the exact caller/address guards on the mapped single-item paths. -/
 def admitted (inp : Input) : Bool :=
   match inp.entryPoint with
@@ -92,6 +117,22 @@ def admitted (inp : Input) : Bool :=
         inp.externalCallSucceeds
   | .unwrap =>
       decide (inp.amount ≠ 0) && inp.callerBalanceSufficient && inp.externalCallSucceeds
+
+/-- Permissionless admission on pause/balance/allowance entrypoints only. It
+deliberately omits any fixed `caller = owner` test. -/
+def permissionlessAdmission (inp : Input) : Bool :=
+  match inp.entryPoint with
+  | .requestWithdrawals =>
+      !inp.paused && inp.amountInRange && inp.callerBalanceSufficient &&
+        inp.callerAllowanceSufficient && inp.externalCallSucceeds
+  | .unwrap =>
+      decide (inp.amount ≠ 0) && inp.callerBalanceSufficient && inp.externalCallSucceeds
+  | _ => admitted inp
+
+theorem pause_balance_admitted_is_permissionless (inp : Input)
+    (hScope : inp.entryPoint = .requestWithdrawals ∨ inp.entryPoint = .unwrap) :
+    admitted inp = permissionlessAdmission inp := by
+  rcases hScope with h | h <;> simp [admitted, permissionlessAdmission, h]
 
 def successfulPost (inp : Input) : PostState :=
   match inp.entryPoint with

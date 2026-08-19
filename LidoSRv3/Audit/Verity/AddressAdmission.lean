@@ -1,4 +1,3 @@
-import LidoSRv3.Audit.Guarantees.PAddress1
 import Verity.Core.Model.Denote
 
 /-!
@@ -328,5 +327,15 @@ theorem ownerGated_not_admission_equivariant :
     show admittedOwner witnessOracle 2 (swapBalances witnessOracle 1 2 witnessWorld) = false from by
       decide] at hcex
   exact Bool.noConfusion hcex
+
+/-- Named kill-line statement for the registered P-ADDRESS-1 parent. -/
+def ownerGateKillLine : Prop :=
+  ¬ ∀ (oracle : DenoteOracle) (a₁ a₂ : Nat) (world : Verity.ContractState),
+    PauseDisjoint oracle a₁ → PauseDisjoint oracle a₂ →
+    (run oracle ownerGated a₁ world).success =
+      (run oracle ownerGated a₂ (swapBalances oracle a₁ a₂ world)).success
+
+theorem ownerGateKillLine_holds : ownerGateKillLine :=
+  ownerGated_not_admission_equivariant
 
 end LidoSRv3.Audit.Verity.AddressAdmission
