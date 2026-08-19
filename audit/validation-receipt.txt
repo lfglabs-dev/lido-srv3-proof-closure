@@ -1,11 +1,82 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 73c2b29a88a39be9534f0278e79c8d93be738cd0
+validated-tree: 049bcc531d252c39fef541e35e6bd5fa6ec9d9cd
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-TOPUP-1 wrap routing and surgical conservation kill-line (2026-08-19)
+-----------------------------------------------------------------------
+
+- Fixes the wave-4 defect found by wave-5 review: the conservation kill-line
+  `dropped_conservation_assert_kill_line_refutes_parent` was built on a
+  MULTI-EDIT mutant (assert deletion + pull-field wrap rewrite + wrapped
+  balance-after). At the witness `wrapInput` (`allocations = [2^256-1, 2]`)
+  the honest exact-Nat assert was dead, so the kill's lethality came from the
+  pull-field rewrite, not the advertised assert deletion.
+- Routes the on-chain `unchecked` accumulator semantics (the
+  `StakingRouter.sol` line-732 sum reduced mod 2^256) through the honest
+  `SolidityTopup.run` value-moving tail (`runPush`): the line-744 pull field,
+  the funded router-balance guard, and the line-755 assert all read
+  `SolidityTopup.accumulated`; `routerBalanceAfter` and the `Outcome`
+  accessors updated consistently; the exact-Nat `totalAllocated` reading
+  remains for the earlier guards. New theorem
+  `SolidityTopup.run_reverts_of_wrap`: the honest run reverts on any wrapping
+  batch. Every other guard/branch unchanged; the over-target guard (line
+  737), zero-sum test (line 741), and Lido-side amount guards (Lido.sol
+  842/873) remain on exact readings as a recorded residual fidelity gap.
+- Re-aims the registered parent
+  `LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back`:
+  conjunct (1) is now genuinely assert-backed (under a wrap the commit cannot
+  happen); conjunct (3) is restated as the direct wrap-implies-revert fact
+  about `run` itself, proved by the renamed `source_wrap_implies_revert`
+  (was `source_wrap_implies_assert_revert` against the finer-grained parent
+  reading, which is retired along with `SolidityTopupParent.accumulated` /
+  `routerBalanceAfterWrapped`). Conjuncts (2)/(4) intact.
+- Surgical kill-line: `mutantRunNoAssert` is the routed `run` with ONLY the
+  line-755 assert branch deleted, with P-DEPOSIT-1-style characterization
+  theorems `mutantRunNoAssert_eq_run_of_assert_passing` and
+  `mutantRunNoAssert_commits_where_assert_fires`; the kill-line shows the
+  assert-drop alone lets `wrapInput` commit with `pulled = 1 ≠ 2^256+1 =
+  pushed`. `unwrapped_accumulator_kill_line_refutes_parent` is re-scoped to
+  the assert-drop mutant's dual (`mutantRunUnwrapped`, the wrap-ignoring
+  routed run); `mutantAccumulatedUnwrapped` retired. Module/WC guard mutants
+  and kill-lines unchanged. `guard_discharge_at_wrapping_input` now shows the
+  honest `run` reverting at `wrapInput` via the assert.
+- Verity plane: `verity_tx_simulates_source` unchanged in statement; its
+  pulled/pushed conjuncts bridge `accumulated` and the exact `allocSum` via
+  `allocSumUnchecked_eq_allocSum` under the `NoUncheckedWrap` premise. No
+  commit values changed on the Verity witnesses (they do not wrap).
+- Metadata: `audit/guarantees.yaml` P-TOPUP-1 row updated (summary, fidelity
+  covered/missing -- the "wrap accumulator not routed through run" gap closes,
+  replaced by the residual exact-reading guards gap -- classification.work,
+  reproduction.expected, next_gate);
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-TOPUP-1"]` recomputed to
+  `a356e53cafaa09ccc78301bca4e832b2ab4bb9c172308e9a8236c7d12238322d`;
+  `EXPECTED_CANONICAL_CLAIMS` theorem names unchanged; views regenerated;
+  `scripts/check_public_claim_surfaces.py` CLAIMS["P-TOPUP-1"] updated for the
+  rename; `report/P-TOPUP-1.md` gains the dated wave-5 section.
+- Gates: `lake build LidoSRv3` exit 0 (1395 jobs); `lake build
+  LidoSRv3.Tests.TopupTxMutants LidoSRv3.Tests.TopupParentMutants
+  LidoSRv3.Tests.TopupVectors LidoSRv3.Tests.TopupHybridMutants` exit 0;
+  `python3 scripts/audit_metadata.py check` exit 0 (11 canonical guarantees
+  plus 14 subordinate evidence rows); `python3
+  scripts/test_audit_metadata.py`, `python3
+  scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, `bash
+  scripts/test_check_no_python_evidence.sh`, and `make test`: exit 0.
+- Changed-Lean forbidden-token scan: no `sorry`/`admit`/`native_decide` in the
+  new proofs (the characterization theorems use only `by_cases`/`rw`/`split`).
+- Authored in the isolated git worktree `/home/ubuntu/wt/ptopup1` on branch
+  `cursor/wave5-ptopup1-4b38`; no other in-flight branch's files are touched
+  by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
 
 P-CONSOLIDATION-1 unused-hypothesis remediation (2026-08-19)
 --------------------------------------------------------------
