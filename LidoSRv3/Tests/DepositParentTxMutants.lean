@@ -156,11 +156,13 @@ theorem skipped_lido_debit_rejected :
     observe frame (probes inputs) ((mutantExecute .skipLidoDebit inputs).run frame)
       ≠ sourceObservables inputs frame := by decide
 
-/-! ### Kill-line for the registered P-DEPOSIT-1 parent
+/-! ### Executable-plane sibling evidence (a Verity debit mutant)
 
 `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` names the
 conserved quantity at exactly this `DepositParentTx` granularity: conjunct (a)
-is `(run cfg inp).pulled = (run cfg inp).pushed`, and conjunct (c) transports
+is commit-branch-explicit (`∀ keys pulled pushed balanceAfter, run cfg inp =
+.committedDeposits keys pulled pushed balanceAfter → pulled = pushed ∧
+depositsValue cfg inp = pushedValue cfg inp`), and conjunct (c) transports
 that same equality onto `Observables.pulled` / `Observables.pushed` for the
 honest `execute` (`(sourceObservables inputs entry).pulled = (run cfg inp).pulled`
 and the `.pushed` sibling). `skipped_lido_debit_rejected` above already shows
@@ -168,10 +170,16 @@ the mutant's *entire* observation record disagrees with `sourceObservables`;
 the theorem below isolates the *conserved quantity itself* -- `pulled ≠
 pushed` on the mutant's own `Observables` -- at the identical
 `DepositParentTx.Observables` granularity the registered parent composes
-over. This is the kill-line: it removes the conservation-carrying step (the
-Lido debit inside `mutantPull`) and shows the very equality the registered
-parent asserts for the honest transaction fails for the patched one. It is
-*not* the same claim as
+over. This is **executable-plane sibling evidence**, not the kill-line for
+the registered parent: it removes the conservation-carrying step (the Lido
+debit inside `mutantPull`) from the Verity transaction and shows the equality
+the honest transaction satisfies fails for the patched one. The registered
+abstract parent's predicate lives on `SolidityDeposit.run`, and its kill-line
+is
+`LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_refutes_commit_conservation`:
+the line-996-assert mutant of that source-shaped model commits the skewed
+deployment, refuting the parent's exact universally-quantified first
+conjunct. Nor is this the same claim as
 `LidoSRv3.Audit.Verity.DepositLedgerTx.dropped_assert_commits_nonconserving_deployment`,
 which mutates a different, disconnected single-batch ledger model that
 `PDeposit1.lean` never imports and the `P-DEPOSIT-1` reproduction command

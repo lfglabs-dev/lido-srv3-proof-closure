@@ -663,9 +663,12 @@ Scope note: this refutes the freshness-DROPPED sibling of the registered
 parent `PReserve1.source_spend_preserves_withdrawal_reserve` — it demonstrates
 that the parent's `freshQueueCache` hypothesis cannot be removed, not that the
 parent is false (the parent cannot be instantiated on the stale-cache
-witness). The parent kill-line, a mutation of the spend transition with
-freshness retained, is
-`LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`. -/
+witness). The parent kill-lines, each with freshness retained, are
+`LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`
+(a mutation of the spend transition, killing the partition-invariant and
+live-reserve conjuncts) and
+`LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent`
+(a dropped `canDeposit` guard, killing the `scopedWithdrawGuards` conjunct). -/
 def staleQueueCacheKillLine : Prop :=
   ¬ ∀ (before after : ReserveState) (amount live : Word),
     spendDepositableEther before amount = .committed after →

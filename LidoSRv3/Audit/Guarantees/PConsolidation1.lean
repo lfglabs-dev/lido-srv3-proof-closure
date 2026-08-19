@@ -61,9 +61,14 @@ eligibility and not the Bus.
 is now forwarded to the source theorem and used to derive the
 `inputs.fee.val ≠ 0` conjunct above, so the premise actually excludes the
 free-batch arm from this parent's committed case (it no longer merely sits
-in the signature unused). `gateway_admitted_nonzero_kill_line` below shows
-the premise is necessary: dropped, the same conjunct is false of `sourceRun`
-on a concrete free batch. -/
+in the signature unused). Two kill-lines pin the claim down:
+`gateway_admitted_nonzero_kill_line` below is premise-necessity evidence
+(dropped, the same conjunct is false of `sourceRun` on a concrete free batch
+that violates the premise), and `fee_blind_commit_kill_line_refutes_parent`
+below is the parent-refuting kill-line (on the mutant interpreter
+`sourceRunFeeBlind` with the exact-fee guard dropped, a batch that SATISFIES
+the premise commits while this parent's committed-arm conjunction is false
+of that commit). -/
 theorem source_consolidation_preserves_eligibility_value_atomicity
     (inputs : Inputs)
     (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →
@@ -92,17 +97,60 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
   SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity
     inputs hGatewayAdmittedNonzero
 
-/-- **Kill-line for the registered `hGatewayAdmittedNonzero` premise.** If a
-future edit drops the premise (or stops threading it into the source
-theorem, making it decorative again), the strengthened "every committed run
-has a nonzero fee" claim is false: a gateway-authorized, nonempty,
-48-byte-aligned batch with `fee = 0` and `msg.value = 0` still commits
-`sourceRun` (pinned `_requireExactFee(0)` passes). This refutes the
-registered parent's own strengthened statement, not a sibling. -/
+/-- **Premise-necessity evidence for the registered `hGatewayAdmittedNonzero`
+premise** (not the parent-refuting kill-line). If a future edit drops the
+premise (or stops threading it into the source theorem, making it decorative
+again), the strengthened "every committed run has a nonzero fee" claim is
+false: a gateway-authorized, nonempty, 48-byte-aligned batch with `fee = 0`
+and `msg.value = 0` still commits `sourceRun` (pinned `_requireExactFee(0)`
+passes). Scope note: that free-batch witness violates the parent's premise
+(`caller = gateway` but `msg.value = 0`), so this theorem refutes the
+hypothesis-FREE projection of the parent's committed arm; under the
+hypothesis the witness is out of scope. The parent-refuting kill-line is
+`fee_blind_commit_kill_line_refutes_parent` below. -/
 theorem gateway_admitted_nonzero_kill_line :
     ¬ (∀ (inputs : Inputs) (obs : Observables),
         sourceRun inputs = .committed obs → inputs.fee.val ≠ 0) :=
   SolidityConsolidation.gateway_admitted_nonzero_kill_line
+
+/-- **Kill-line refuting the registered parent on a mutant of its own
+model.** `sourceRunFeeBlind` is `sourceRun` with the exact-fee guard
+(`inputs.msgValue.val = requests.length * inputs.fee.val`, pinned
+`_requireExactFee`) dropped. The witness below SATISFIES the registered
+parent's `hGatewayAdmittedNonzero` premise (`caller = gateway`,
+`msg.value = 1 ≠ 0`), the mutant commits the batch, every fee-independent
+conjunct of the parent's committed arm still holds (zip, caller, nonempty,
+48-byte-valid, `uint256` bound, canonical observables), yet
+`inputs.fee.val = 0` -- so the parent's hypothesis-conditioned committed-arm
+conjunction, evaluated on the mutant model, is false. This is the
+parent-refuting kill-line; `gateway_admitted_nonzero_kill_line` above is
+premise-necessity evidence only. -/
+theorem fee_blind_commit_kill_line_refutes_parent :
+    ∃ (inputs : Inputs) (obs : Observables),
+      (inputs.caller = inputs.gateway → inputs.msgValue.val ≠ 0) ∧
+      sourceRunFeeBlind inputs = .committed obs ∧
+      (∃ requests,
+          zipRequests inputs.sources inputs.targets
+            inputs.sourceLens inputs.targetLens = some requests ∧
+          inputs.caller = inputs.gateway ∧
+          inputs.sources.length ≠ 0 ∧
+          requests.all validRequest = true ∧
+          requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
+          obs = commitObservables inputs.requestTarget inputs.fee
+            inputs.msgValue requests) ∧
+      inputs.fee.val = 0 ∧
+      ¬ (∃ requests,
+          zipRequests inputs.sources inputs.targets
+            inputs.sourceLens inputs.targetLens = some requests ∧
+          inputs.caller = inputs.gateway ∧
+          inputs.sources.length ≠ 0 ∧
+          requests.all validRequest = true ∧
+          requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
+          inputs.msgValue.val = requests.length * inputs.fee.val ∧
+          inputs.fee.val ≠ 0 ∧
+          obs = commitObservables inputs.requestTarget inputs.fee
+            inputs.msgValue requests) :=
+  SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent
 
 /-- If the four memory arrays decode to the `Inputs` fields, `observe`
 (suffix of `state.calls` / `state.events` plus count/fee slots) equals

@@ -9,10 +9,33 @@ external-call frames and PR #2365 atomic compiled multicall).
 
 ## Abstract plane
 
-`Guarantees.PEth1.eth_flow_parent` quantifies over `EthPath`, whose three
-constructors are the complete ETH-bearing call-site inventory below. For every
-path it proves that no wei reaches a lateral `EthDestination.other` and that
-the committed trace totals exactly the value entering the path.
+`Guarantees.PEth1.eth_flow_parent` is a `∀ (msgValue n fee : Nat)` theorem
+over the call-journal gateway model `gatewayExecute`. An execution reverts
+`ZeroArgument` at `msg.value = 0`, `Panic(0x11)` when `n * fee ≥ 2^256`, and
+`InsufficientValue` when `n * fee > msg.value`. On success the model emits
+`n` fee legs of `fee` wei plus at most one refund leg of
+`msg.value − n * fee` wei, each journaled address classified against a
+two-address `ApprovedSet` by `classifyJournal`; the parent proves every
+classified move is `parentApproved` (no lateral `EthDestination.other`) and
+that the moves total exactly `msg.value` (`totalAmount moves = msgValue`).
+VaultHub and `StakingVault.withdraw` are named out of scope on the theorem
+itself.
+
+The parent's success conjunct is load-bearing, not decorative: Wave 4 adds
+two mutants of `gatewayExecute` in `Tests.PEth1CompositionTxMutants` on whose
+success outputs the conjunct is provably false —
+`misrouted_journal_kill_line_refutes_parent` (fee legs journaled to an
+off-`ApprovedSet` address, classified `.other`) and
+`zero_value_success_kill_line_refutes_parent` (a guard-free gateway succeeds
+at `msg.value = 0` paying `2 * 3 = 6` wei of fees, breaking
+`totalAmount = msgValue`). The factored `parentOutcomePredicate` is proved to
+be exactly the parent's conclusion by
+`parentOutcomePredicate_is_eth_flow_parent_conclusion`, so both kill-lines
+refute the predicate the registered parent proves, applied to a mutant of its
+own model. The Wave 1 theorems formerly presented as kill-lines are retained
+under honest names (`confirms_lateral_journal_entry_is_not_parent_approved`,
+`confirms_zero_msg_value_reverts`): one tested a hand-built list the parent
+never quantifies over, the other confirmed the honest model's own guard.
 
 ## Verity plane
 
@@ -104,6 +127,15 @@ The two scope kill-lines above (`underfunded_batch_is_not_a_repartition`,
 the *honest* wiring on inputs the registered parent does not witness, so they
 cannot be satisfied by weakening a mutant; they bound how far the registered
 parent's finite conjunction may honestly be read.
+
+The Wave 4 kill-lines are different again: they target the *abstract* parent
+`eth_flow_parent` and mutate its own model `gatewayExecute` rather than the
+Verity `Wiring`.
+
+| Theorem | Mutant of `gatewayExecute` | Refutes |
+| --- | --- | --- |
+| `misrouted_journal_kill_line_refutes_parent` | `gatewayExecuteMisrouted` — fee legs journaled to `rogueFeeSink = 999` (off `ApprovedSet`) | `(10, 2, 3)` succeeds with fee moves classified `.other 999`, so `∀ m, m ∈ moves → parentApproved m.destination` fails |
+| `zero_value_success_kill_line_refutes_parent` | `gatewayExecuteUnguarded` — `ZeroArgument`/`InsufficientValue` guards dropped | `(0, 2, 3)` succeeds paying `2 * 3 = 6` wei of fees, so `totalAmount moves = 0` fails |
 
 ## ETH-bearing call-site inventory
 

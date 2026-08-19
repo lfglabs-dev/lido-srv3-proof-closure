@@ -10,9 +10,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
-        "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), lockstep moduleAddress-binding allocation transaction, and kill-line/off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
+        "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), lockstep moduleAddress-binding allocation transaction, the named parent kill-line LidoSRv3.Tests.AllocationTxMutants.capacity_target_kill_line_refutes_parent (capacity := target mutant commits [24,24] against MathView [11,11] with CheckedBounds discharged at the witness), and off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
       },
-      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. A kill-line mutant (capacity := target, skipping wordMin) fails the parent. active_capacity_bounded (MathView.capacity = min(target, available), so capacity ≤ targetValidators ∧ capacity ≤ availableCapacity) is a Nat.min tautology on the MathView definition, not on execute's arithmetic; it is registered separately as an unregistered child rather than folded into the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
+      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named kill-line capacity_target_kill_line_refutes_parent is the explicit negation of the parent's predicate shape with the executeMutant executor (capacity := target, skipping wordMin) substituted: CheckedBounds holds at the witness, the mutant commits, and its capacity column differs from MathView.capacities. active_capacity_bounded (MathView.capacity = min(target, available), so capacity ≤ targetValidators ∧ capacity ≤ availableCapacity) is a Nat.min tautology on the MathView definition, not on execute's arithmetic; it is registered separately as an unregistered child rather than folded into the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute"
@@ -24,7 +24,7 @@
       "fidelity": {
         "covered": [
           "checked execute succeeds and capacity column equals MathView under CheckedBounds",
-          "kill-line mutant (capacity := target) rejected by the registered parent",
+          "named parent kill-line capacity_target_kill_line_refutes_parent: the capacity := target mutant commits a capacity column ≠ MathView.capacities with CheckedBounds discharged at the witness",
           "active_capacity_bounded (Math.min clamp) demoted to an explicit, unregistered MathView-definitional child",
           "single bind/execute interpreter; observe reads writeArray columns",
           "Contract.run rollback after intermediate writes"
@@ -34,7 +34,8 @@
           "packed ModuleStateConfig slot",
           "unique moduleAddress on addModule",
           "getDepositAllocations / MinFirst fill (see P-ALLOC-2)",
-          "reachable-router CheckedBounds"
+          "reachable-router CheckedBounds",
+          "modules count is a harness argument: allocate count walks List.range count rather than SRStorage.getModulesCount(), and count is not capped by MAX_STAKING_MODULES_COUNT = 32 (report issues 13/15)"
         ]
       },
       "classification": {
@@ -93,10 +94,10 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants",
-        "expected": "checked abstract/source conservation composed with the executable two-batch Verity transaction over shared quantified variables, its per-module observable correspondence, rollback, and execute-level mutants build"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants",
+        "expected": "checked commit-branch-explicit abstract conservation and non-conserving-deployment revert composed with the executable two-batch Verity transaction over shared quantified variables; source-plane kill-line LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed shows the line-996-assert mutant of SolidityDeposit.run commits with pulled ≠ pushed, and execute-level mutants build"
       },
-      "summary": "source_deposit_conserves_and_rolls_back: pulled = pushed on the source-shaped run, and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX). The Verity parent composes that fact with a bounded two-batch Contract.run over shared variables linked by LinksSource. Kill-line: DepositParentTxMutants.skipped_lido_debit_breaks_pulled_eq_pushed patches out the Lido debit and shows the mutant's own pulled/pushed Observables disagree, at the identical DepositParentTx granularity the registered parent composes over (not the disconnected DepositLedgerTx model). Not an EVM claim.",
+      "summary": "source_deposit_conserves_and_rolls_back is the registered abstract parent, now with no definitional or vacuous conjunct: (1) on every committed push of the source-shaped run, pulled = pushed and the independently written depositsValue/pushedValue formulas agree -- the line 996 assert is what gates the commit, and Outcome.pulled/pushed are 0 by definition on all other branches, so the equality is stated on the commit branch rather than as a mostly-0=0 whole-path accessor equality; (2) a non-conserving deployment (MAX_EFFECTIVE_BALANCE_WC_TYPE_01 ≠ DEPOSIT_SIZE) reverts on any nonempty batch instead of committing a mismatched push. The definitional abstract TxObservation rollback (observation maps reverts to .reverted by construction) is demoted to the unregistered child revert_restores_state_value_and_logs; load-bearing rollback evidence is the executable snapshot-restore conjunct of verity_tx_composes_deposit_conservation_and_rollback, which composes this parent with a bounded two-batch Contract.run over shared variables linked by LinksSource. Kill-line: Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed drops the line 996 assert branch from SolidityDeposit.run (mutantRun) and the skewed deployment commits with pulled ≠ pushed -- the registered parent's own first conjunct evaluated on the mutant of its own model (DepositParentTxMutants.skipped_lido_debit_breaks_pulled_eq_pushed remains as executable-plane sibling evidence). Not an EVM claim.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
@@ -107,21 +108,27 @@
       },
       "fidelity": {
         "covered": [
-          "abstract conservation/rollback",
+          "abstract commit-branch conservation (pulled = pushed on every committed push) and non-conserving-deployment revert on nonempty batches",
           "pinned-source correspondence",
           "authorization, allocation, dynamic deposit data, and deposit roots",
           "per-module allocation, dynamic-data, and deposit-data-root storage words",
           "observable Lido/module/beacon call names, destinations, wei values, argument words, and order",
           "composed correspondence over shared quantified source and transaction variables",
           "Contract.run rollback after intermediate writes and fail-closed execute-level mutants",
-          "conservation kill-line at the registered DepositParentTx granularity: skipping the Lido debit breaks the mutant's own pulled = pushed equality, not just a whole-record mismatch"
+          "source-plane kill-line at the registered abstract parent's own predicate: dropping the line 996 assert from SolidityDeposit.run (mutantRun) commits the skewed deployment with pulled ≠ pushed, and mutantRun = run wherever the assert passes",
+          "executable-plane conservation sibling evidence: skipping the Lido debit breaks the mutant DepositParentTx's own pulled = pushed Observables equality"
         ],
-        "missing": []
+        "missing": [
+          "LinksSource is a caller-supplied hypothesis about the two allocation legs, not yet composed from the P-ALLOC-1/P-ALLOC-2 parents' live loops",
+          "beacon deposit contract address provenance is a named assumption, not derived",
+          "the executable transaction is an exactly-two-batch unrolling of the source deposit loop, not a proved bound on the loop"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Compose LinksSource from the P-ALLOC-1/P-ALLOC-2 parents once their live loops land, derive the beacon deposit contract address instead of assuming it, and generalize the exactly-two-batch executable unrolling toward a proved loop bound."
       },
-      "next_gate": "Preserve the composed abstract-to-Verity deposit guarantee, its executable mutants, and the DepositParentTx-granularity conservation kill-line.",
+      "next_gate": "Preserve the commit-branch-explicit abstract parent, its source-plane dropped-assert kill-line, and the composed Verity transaction evidence; the open work is the LinksSource/ALLOC composition, beacon-address provenance, and the two-batch unrolling.",
       "roadmap_priority": "DONE"
     },
     {
@@ -134,9 +141,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
-        "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, and executable fail-closed mutants build"
+        "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, executable fail-closed mutants, and the abstract-parent kill-lines dropped_conservation_assert_kill_line_refutes_parent, dropped_module_guard_kill_line_refutes_parent, dropped_wc_guard_kill_line_refutes_parent, unwrapped_accumulator_kill_line_refutes_parent (plus the guard_discharge_at_* positive controls) build"
       },
-      "summary": "source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX, A-TOPUP-NOWRAP); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps, SolidityTopupParent.accumulated ≠ pushedValue, so the line 755 assert would fire on that finer-grained reading of the pinned source (discharges A-TOPUP-NOWRAP on the wrap branch); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants.kill_wrap_skip_assert / kill_remove_module_exists / kill_remove_wc_type2 each project one of conjuncts (2)-(4) out of this same registered theorem at a concrete witness, so a regression in any guard or the wrap discharge fails the registered theorem's own build, not only a sibling lemma the registry never cites. Verity: if NoUncheckedWrap, allocations.length ≤ 2^256, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match. Not P-TOPUP-2 amount computation.",
+      "summary": "source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run -- an unconditional exact-Nat conservation fact with no A-TOPUP-NOWRAP hypothesis -- and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps mod 2^256, SolidityTopupParent.accumulated ≠ pushedValue, so the line 755 assert would fire on that finer-grained reading of the pinned source -- A-TOPUP-NOWRAP lives here, in the wrap antecedent, and in the Verity-side NoUncheckedWrap premise, not in conjunct (1); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants carries real kill-lines on mutants of the parent's own model: dropped_conservation_assert_kill_line_refutes_parent (a mutant run with the line-755 assert deleted and the pull read through the wrapping unchecked accumulator commits with pulled ≠ pushed), dropped_module_guard_kill_line_refutes_parent and dropped_wc_guard_kill_line_refutes_parent (mutants without the moduleExists / wcTypeIsType2 require commit at witnesses where the parent demands the named revert), and unwrapped_accumulator_kill_line_refutes_parent (a wrap-ignoring mutant accumulator satisfies accumulated = pushedValue at a wrapping witness where the honest accumulated ≠ pushedValue). The wave-1 projections are renamed guard_discharge_at_* and are honest positive controls, not kill-lines. Verity: if NoUncheckedWrap, allocations.length ≤ 2^256, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match. Not P-TOPUP-2 amount computation.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back"
@@ -153,16 +160,22 @@
           "observable call destinations, values, argument words and ordering plus per-validator allocation storage words",
           "rollback to the caller snapshot after allocation writes, after the journalled pull, and after the first journalled deposit",
           "fail-closed mutation of the executable transaction: skipped per-validator writes, dropped, misrouted, short-paid, reordered and duplicated deposits",
-          "wrap branch folded into the registered parent's third conjunct: if unchecked sum overflows 2^256, SolidityTopupParent.accumulated ≠ pushedValue, so the line 755 assert would fire on that reading (kill_wrap_skip_assert projects this conjunct at a concrete witness)",
-          "moduleExists guard folded into the registered parent's second conjunct -- unregistered module reverts at source line 689 (kill_remove_module_exists projects this conjunct at a concrete witness)",
-          "wcTypeIsType2 guard folded into the registered parent's fourth conjunct -- non-type-2 WC reverts at source line 694 (kill_remove_wc_type2 projects this conjunct at a concrete witness)"
+          "wrap branch folded into the registered parent's third conjunct: if unchecked sum overflows 2^256, SolidityTopupParent.accumulated ≠ pushedValue, so the line 755 assert would fire on that reading (kill-line unwrapped_accumulator_kill_line_refutes_parent refutes the implication on a wrap-ignoring mutant accumulator; guard_discharge_at_wrapping_input is the honest-side positive control)",
+          "moduleExists guard folded into the registered parent's second conjunct -- unregistered module reverts at source line 689 (kill-line dropped_module_guard_kill_line_refutes_parent: the mutant without the require commits at the same witness; guard_discharge_at_unregistered_module_input is the honest-side positive control)",
+          "wcTypeIsType2 guard folded into the registered parent's fourth conjunct -- non-type-2 WC reverts at source line 694 (kill-line dropped_wc_guard_kill_line_refutes_parent: the mutant without the require commits at the same witness; guard_discharge_at_non_type2_wc_input is the honest-side positive control)",
+          "conservation conjunct kill-line: dropped_conservation_assert_kill_line_refutes_parent commits a mutant run (line-755 assert deleted, pull read through the wrapping unchecked accumulator) with pulled ≠ pushed -- the negation of conjunct (1)'s predicate on the mutant"
         ],
-        "missing": []
+        "missing": [
+          "wrap accumulator is not routed through run: conjunct (3) is stated against SolidityTopupParent.accumulated/pushedValue, a separate finer-grained reading of the pinned source; run's own Outcome interpreter reads the sum as an exact Nat and cannot itself exhibit the wrap",
+          "LinksSource derivation from ALLOC deferred until live loops are in place",
+          "beacon-address provenance is a named assumption, not a parent conjunct"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Route the wrap accumulator through run (or register the finer-grained accumulated/pushedValue reading as its own claim), derive LinksSource from ALLOC once live loops exist, and pin beacon-address provenance."
       },
-      "next_gate": "Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, and its executable mutants.",
+      "next_gate": "Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, its executable mutants, and the four abstract-plane kill-lines; close the listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -217,9 +230,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
-        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, the transition-mutant parent kill-line (partition_spend_mutant_kill_line_refutes_parent), and the stale-cache premise-necessity mutants build"
+        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, both parent kill-lines (guard_drop_kill_line_refutes_parent killing the scopedWithdrawGuards conjunct on a canDeposit-dropped mutant, partition_spend_mutant_kill_line_refutes_parent killing the partition-invariant and live-reserve conjuncts on a mutated spend transition), and the stale-cache premise-necessity mutants build"
       },
-      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. Parent kill-line: LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent refutes the parent's own predicate shape (freshQueueCache hypothesis retained) for mutantWithdraw, a mutation of the spend transition that commits under a fresh cache while the live queue-facing reserve drops 50 to 0. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness are hypothesis-necessity evidence only: they show the freshQueueCache premise cannot be dropped, not that the parent is false. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
+      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. Parent kill-lines, each refuting the parent's full predicate shape with the freshQueueCache hypothesis retained: LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent kills the scopedWithdrawGuards conjunct on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped that commits a canDeposit = false call the honest model reverts; LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent kills the partition-invariant and live-reserve conjuncts on mutantWithdraw, a mutation of the spend transition that commits under a fresh cache while the live queue-facing reserve drops 50 to 0. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness are hypothesis-necessity evidence only: they show the freshQueueCache premise cannot be dropped, not that the parent is false. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve"
@@ -233,7 +246,7 @@
           "spend reproduces the handwritten WR formula",
           "source-shaped spending and checked arithmetic under well-formed storage",
           "Contract.run rollback after intermediate writes",
-          "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed",
+          "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed; the guard-liveness conjunct is kill-line-backed by guard_drop_kill_line_refutes_parent, which refutes the parent predicate shape (freshness retained) on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped",
           "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped"
         ],
         "missing": [
@@ -261,9 +274,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1CompositionTx LidoSRv3.Tests.PEth1CompositionTxMutants",
-        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and kill-line mutants (unapproved journal, zero msg.value) build with drop, misroute, corrupt, rollback, and two-batch mutants; Wave 2 scope kill-lines (underfunded_batch_is_not_a_repartition, large_funded_batch_exhausts_fuel_budget) build and refute reading the Verity parent as a universal batch theorem"
+        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and honest-model confirmations (lateral journal classification, zero msg.value revert) build with drop, misroute, corrupt, rollback, and two-batch mutants; Wave 2 scope kill-lines (underfunded_batch_is_not_a_repartition, large_funded_batch_exhausts_fuel_budget) build and refute reading the Verity parent as a universal batch theorem; Wave 4 parent kill-lines (misrouted_journal_kill_line_refutes_parent, zero_value_success_kill_line_refutes_parent) build and refute the abstract parent's own success conjunct on mutants of gatewayExecute"
       },
-      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses, not a universal batch theorem (Wave 2 named kill-lines refute a ∀ reading: an underfunded batch reverts instead of repartitioning, and a funded/guard-passing batch exhausts the fixed fuel budget). Kill-line mutants reject unapproved journal entries and zero-value success.",
+      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses, not a universal batch theorem (Wave 2 named kill-lines refute a ∀ reading: an underfunded batch reverts instead of repartitioning, and a funded/guard-passing batch exhausts the fixed fuel budget). Wave 4 parent kill-lines refute eth_flow_parent's own success conjunct on mutants of gatewayExecute itself: misrouted_journal_kill_line_refutes_parent (fee legs journaled to an off-ApprovedSet address, classified .other) and zero_value_success_kill_line_refutes_parent (guard-free gateway succeeds at msg.value=0 paying 2*3=6 wei of fees, breaking totalAmount=msgValue).",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent"
@@ -278,7 +291,7 @@
           "∀ (msgValue, n, fee) quantification with overflow (n*fee≥2^256) and zero-value reverts",
           "numeric Bus/Gateway/Vault ensemble and Contract.run rollback",
           "five numeral witnesses (not a universal batch theorem)",
-          "kill-line mutants: unapproved journal entry and zero msg.value",
+          "parent kill-lines on gatewayExecute mutants: misrouted fee journal to a lateral .other address, and zero-value fee-paying success breaking conservation",
           "named scope kill-lines refuting a ∀ reading of the Verity parent: underfunded batch is not a repartition, funded batch exhausts fuel budget"
         ],
         "missing": [
@@ -387,9 +400,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidation1 LidoSRv3.Audit.Verity.ConsolidationTx LidoSRv3.Tests.ConsolidationTxMutants",
-        "expected": "abstract caller/length/fee and if-tree theorem whose gateway-admitted-nonzero-value premise is threaded into a nonzero-fee conjunct on every committed run, that premise's own kill-line, the packing-order kill-line, and vault-loop Verity transaction build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, swapped-concat, rollback, and two-batch mutants"
+        "expected": "abstract caller/length/fee and if-tree theorem whose gateway-admitted-nonzero-value premise is threaded into a nonzero-fee conjunct on every committed run, the model-mutant parent kill-line fee_blind_commit_kill_line_refutes_parent (sourceRunFeeBlind drops the exact-fee guard; a premise-satisfying fee=0, msg.value!=0 batch commits and the parent's committed-arm conjunction fails on that commit), premise-necessity evidence gateway_admitted_nonzero_premise_necessity (premise dropped, a fee=0/msg.value=0 batch still commits sourceRun), the packing-order kill-line, and vault-loop Verity transaction build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, swapped-concat, rollback, and two-batch mutants"
       },
-      "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). The caller-supplied gateway-admitted-nonzero-value premise (caller=gateway -> msg.value != 0) is threaded into the proof and used: on any run satisfying it, the committed branch's own msg.value = count*fee equality forces fee != 0, so the theorem now derives that conjunct instead of leaving the premise unused. gateway_admitted_nonzero_kill_line shows the premise is necessary: drop it and a concrete gateway-authorized, nonempty, 48-byte batch with fee=0 and msg.value=0 still commits sourceRun. Packing-order kill-line: swapped source||target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Not beacon eligibility and not the Bus. Do not compose with P-ETH-1.",
+      "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). The caller-supplied gateway-admitted-nonzero-value premise (caller=gateway -> msg.value != 0) is threaded into the proof and used: on any run satisfying it, the committed branch's own msg.value = count*fee equality forces fee != 0, so the theorem now derives that conjunct instead of leaving the premise unused. Parent-refuting kill-line: fee_blind_commit_kill_line_refutes_parent evaluates the parent's hypothesis-conditioned committed-arm conjunction on the model mutant sourceRunFeeBlind (sourceRun with the exact-fee guard dropped) and falsifies it on a concrete committed batch that SATISFIES the premise (caller=gateway, msg.value=1, fee=0, one valid 48-byte pair): every fee-independent conjunct holds of that commit while fee != 0 fails. Premise-necessity evidence, separately: gateway_admitted_nonzero_kill_line shows that with the premise dropped a free batch (fee=0, msg.value=0) still commits sourceRun; that witness violates the premise, so it refutes only the hypothesis-free projection, not the hypothesis-conditioned parent. Packing-order kill-line: swapped source||target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Not beacon eligibility and not the Bus. Do not compose with P-ETH-1.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity"
@@ -401,7 +414,8 @@
       "fidelity": {
         "covered": [
           "caller/length/fee eligibility, input-equality value, if-tree atomicity",
-          "gateway-admitted-nonzero-value premise threaded into the proof: derives a nonzero-fee conjunct on every committed run, load-bearing per gateway_admitted_nonzero_kill_line",
+          "gateway-admitted-nonzero-value premise threaded into the proof: derives a nonzero-fee conjunct on every committed run; parent-refuting kill-line fee_blind_commit_kill_line_refutes_parent falsifies that hypothesis-conditioned committed-arm conjunction on the model mutant sourceRunFeeBlind (exact-fee guard dropped) via a premise-satisfying fee=0, msg.value!=0 commit",
+          "premise-necessity evidence gateway_admitted_nonzero_kill_line: with the premise dropped a fee=0/msg.value=0 batch still commits sourceRun; that witness violates the premise, so it is not a refutation of the hypothesis-conditioned parent",
           "packing order kill-line: swapped source||target concat fails observe",
           "single sourceRun; observe reads state.calls / state.events",
           "Contract.run rollback after intermediate writes"
@@ -432,9 +446,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants LidoSRv3.Tests.SszRegression",
-        "expected": "one-object composition of all four SSZ-encoding children (structural-bind, deposit-data-root, GIndex.concat operand, seven-call digest/root-match bytes) on a single ComposedSszInput.src, an SSZ-encoding Contract.run transaction whose outcome rereads the persisted digest chain from storage, inconsistent-witness and inconsistent-operation-index kill lines, a non-vacuity witness that the tightened hypotheses are satisfiable, and rollback / single-child / encoding / hash / two-batch mutants build; SHA-256 remains A-SHA256-FFI and the imported Yul fragment stays OPEN"
+        "expected": "composed_ssz_encoding proves the named non-definitional predicate composedEncodingOk (hBind structural-bind soundness on the shared src witness/root, source-combine traversal to sourceNode src, sourceConcat = specConcat on the src-derived GIndex.concat operand, seven-preimage count, runVerification accept-iff, exactTxWidths of the src-derived tx input) on a single ComposedSszInput.src; swapped_combine_kill_line_refutes_parent refutes the mutant-substituted parent (the sourceCombineSwapped model mutant inside the conclusion predicate, which hBind never mentions) at the concrete hypothesis-satisfying witness swappedCombineKillInput; crossed_witness_kill_line_refutes_parent is a conclusion-non-triviality witness (the predicate discriminates the claimed operation, with hBind failing at the crossed point); inconsistent-witness and inconsistent-operation-index bindOperation-level negative results; a non-vacuity witness that the one-object hypotheses are satisfiable; an SSZ-encoding Contract.run transaction whose outcome rereads the persisted digest chain from storage; and rollback / single-child / encoding / hash / two-batch mutants build; SHA-256 remains A-SHA256-FFI and the imported Yul fragment stays OPEN"
       },
-      "summary": "The parent composes all four P-SSZ-1 children on one shared object (ComposedSszInput.src): the structural-bind hypothesis and the deposit-data-root witness/root conjuncts both name sourceWitness src / sourceNode src, GIndex.concat's validator-side operand (ComposedSszInput.rhs) is derived from sourceWitness src's index, and the seven-call digest / root-match child's byte input (ComposedSszInput.digestInput / txInput) is derived from src via srcInputs (the same pubkey/WC/signature bytes and the same 8-byte little-endian amount the source's own toLittleEndian64 produces). A witness bound for one deposit, a generalized index minted for another operation, or digest bytes for a different deposit can no longer be paired with src's pinned deposit-data-root (closes report/P-SSZ-1.md issue #4's four-child counterexample and issues #20/#21's List Nat/ByteArray identity and amount-encoding gaps). inconsistent_witness_kill_line and the new inconsistent_operation_index_kill_line prove the two rejection shapes; sourceWitness_binds_sourceNode (exercised by Tests/SszRegression.composedExample) shows the tightened hypotheses stay jointly satisfiable, not vacuous. Only the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the chain-level fork version / claimed root remain independently supplied, non-deposit values. The Verity tx outcome still rereads the seven persisted digest words from digestMapSlot storage (Observables.digest) instead of trusting the pre-write local chain list. SHA-256 functional correctness remains A-SHA256-FFI; the imported helper/wrapper Yul fragment binding stays OPEN under A-YUL-INTERFACE and A-SOLC-TRUSTED.",
+      "summary": "The parent composes the four P-SSZ-1 children on one shared object (ComposedSszInput.src) and concludes with the named predicate composedEncodingOk, whose registered conjuncts are all non-definitional: the structural-bind soundness transported out of the hBind hypothesis (the derived sourceWitness src is bound to the claimed operation and reconstructs sourceNode src under the claimed combine), the same derived witness's traversal to sourceNode src under the source's own sourceCombine, sourceConcat = specConcat on the src-derived GIndex.concat operand (an equality between two independently written artifacts), the seven-preimage count, the runVerification accept-iff, and the exact pinned widths of the src-derived transaction input. The ComposedSszInput.rhs/digestInput/txInput derived-field definitions remain as the type-level one-object coupling, but the rfl accessor equalities they satisfy (rhs.index = sourceWitness src's index value, digestInput = srcInputs src, txInput.toInputs = srcInputs src), the self-referential ExactDigestComposition (digestChain is defined as that seven-call list), the signatureRoot = computeSignatureRoot definitional unfolding, the pinned-config constant equalities, the src field bound projections, and the hypothesis-restating length lines are no longer registered as claim conjuncts. swapped_combine_kill_line_refutes_parent is THE parent kill-line: it substitutes the model mutant sourceCombineSwapped (children swapped at every pairing) for sourceCombine — the one model function inside the conclusion predicate that the hBind hypothesis never mentions — and refutes the mutant-substituted parent (stated as the negation of the parent's own quantifier/premise/hBind shape) at the concrete swappedCombineKillInput witness, where every premise and hBind still hold (hBind discharged by the same sourceWitness_binds_sourceNode used for the honest artifact); the swapped-combine traversal conjunct reduces definitionally to a Nat.pair tree equality that would force sourceAnchor = 0, contradicting the concrete nonzero public-key fold. crossed_witness_kill_line_refutes_parent is kept as a conclusion-non-triviality witness only: composedEncodingOk discriminates the claimed operation (its first structural conjunct fails at the crossed .clProofVerifier), but hBind also fails there, so the parent implication is vacuous at that point and the theorem does not refute the parent. inconsistent_witness_kill_line and inconsistent_operation_index_kill_line remain as bindOperation-level negative results (a crossed two-source pair that cannot inhabit ComposedSszInput, and a constant slot inequality), not as parent-conclusion refutations. sourceWitness_binds_sourceNode (exercised by Tests/SszRegression.composedExample) shows the one-object hypotheses stay jointly satisfiable, not vacuous. Only the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the chain-level fork version / claimed root remain independently supplied, non-deposit values. The Verity tx outcome still rereads the seven persisted digest words from digestMapSlot storage (Observables.digest) instead of trusting the pre-write local chain list; the Verity EncodingInput plane keeps deposit/rhs/witness/expectedWitnessRoot independent and does not inherit the abstract one-object coupling. SHA-256 functional correctness remains A-SHA256-FFI; the imported helper/wrapper Yul fragment binding stays OPEN under A-YUL-INTERFACE and A-SOLC-TRUSTED.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding"
@@ -447,22 +461,24 @@
         "covered": [
           "toy structural witness binding",
           "pinned deposit-data-root source layout",
-          "one-object composition of all four SSZ-encoding children (structural-bind, deposit-data-root, GIndex.concat operand, seven-call digest/root-match bytes) on the single ComposedSszInput.src",
-          "inconsistent-witness kill line: a witness bound for one deposit is rejected against a different deposit's root",
-          "inconsistent-operation-index kill line: an index minted for a different named operation cannot equal the derived GIndex.concat operand",
-          "GIndex.concat source transcription, now on the same generalized index the structural-bind child binds (ComposedSszInput.rhs derived from sourceWitness input.src)",
-          "seven-call digest definition, now on the same pinned bytes the deposit-data-root child discharges (ComposedSszInput.digestInput / txInput derived from srcInputs input.src)",
-          "cross-type List Nat / ByteArray byte identity and 8-byte LE amount encoding between the deposit-data-root and digest/tx children (srcInputs applies the source's own toLittleEndian64)",
+          "one-object composition of the four SSZ-encoding children on the single ComposedSszInput.src at the type level: ComposedSszInput.rhs/digestInput/txInput are derived from input.src, so a witness bound for one deposit, an index minted for another operation, or digest bytes for a different deposit cannot be paired with src's pinned deposit-data-root (report/P-SSZ-1.md issue #4's four-child counterexample and issues #20/#21's byte-identity/amount-encoding gaps)",
+          "non-definitional parent conclusion predicate composedEncodingOk: hBind-transported structural binding soundness, source-combine traversal to sourceNode src, sourceConcat = specConcat on the derived operand, seven-preimage count, runVerification accept-iff, exactTxWidths of the derived tx input",
+          "parent kill-line: swapped_combine_kill_line_refutes_parent refutes the mutant-substituted parent (composedEncodingOkWithCombine with the model mutant sourceCombineSwapped in place of the honest sourceCombine — the one model function inside the predicate that hBind never mentions) at the concrete swappedCombineKillInput witness where every premise and hBind hold; the swapped-combine traversal reduces to a Nat.pair tree equality forcing sourceAnchor = 0, contradicting the nonzero public-key fold",
+          "conclusion-non-triviality witness: crossed_witness_kill_line_refutes_parent shows composedEncodingOk is not constantly true (its first structural conjunct fails at the crossed .clProofVerifier operation); hBind fails there, so this does not refute the parent",
+          "bindOperation-level negative results: inconsistent_witness_kill_line (a crossed two-source pair fails binding) and inconsistent_operation_index_kill_line (distinct named-operation slots)",
+          "GIndex.concat source transcription (sourceConcat = specConcat)",
+          "cross-type List Nat / ByteArray byte identity and 8-byte LE amount encoding between the deposit-data-root and digest/tx children, delivered by the srcInputs derivation (the source's own toLittleEndian64) at the type level",
           "digest-chain storage reread (Observables.digest rereads digestMapSlot, not the pre-write chain list)",
-          "non-vacuity witness that composed_ssz_encoding's tightened one-object hypotheses are jointly satisfiable (sourceWitness_binds_sourceNode, Tests/SszRegression.composedExample)",
-          "composed Contract.run encoding of the one-object structural-bind/deposit-data-root pair and the independent concat/digest children",
+          "non-vacuity witness that composed_ssz_encoding's one-object hypotheses are jointly satisfiable (sourceWitness_binds_sourceNode, Tests/SszRegression.composedExample)",
+          "composed Contract.run encoding of the structural-bind/deposit-data-root/concat/digest children on the independent EncodingInput fields",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
           "SSZ.verifyProof on production gindices",
           "SHA-256 functional correctness",
           "imported-to-deployed helper/wrapper Yul fragment binding",
-          "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values"
+          "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
+          "the Verity EncodingInput plane keeps deposit, rhs, witness, and expectedWitnessRoot independent (e.g. Tests/SszEncodingTxMutants.matching pairs a witness at index 2 with rhs := gindex 3 11): the one-object coupling holds at the abstract ComposedSszInput type level only and is not inherited by the executable transaction"
         ]
       },
       "classification": {

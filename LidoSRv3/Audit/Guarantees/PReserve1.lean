@@ -34,14 +34,22 @@ axes `report/P-RESERVE-1.md` calls out (issues #1, #2, #5):
   refute this parent, which cannot be instantiated on that stale-cache
   vector).
 
-The parent kill-line is
-`LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`:
-the negation of this theorem's predicate shape — `freshQueueCache` hypothesis
-retained — applied to `mutantWithdraw`, a mutation of the spend transition
-(`withdrawalPartitionMutant` commits the spend, then overwrites `buffered`
-with the post-spend `storedDepositsReserve`). On the witness vector the
-mutated call commits under a fresh cache while the live queue-facing reserve
-drops 50 → 0.
+The parent kill-lines, one per conjunct group, each the negation of this
+theorem's full predicate shape — all five binders, `freshQueueCache`
+hypothesis retained, same three-conjunct conclusion — applied to a mutant of
+`modelWithdrawDepositableEther`:
+
+* `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` kills
+  conjunct (1) (`scopedWithdrawGuards` guard liveness): the mutant
+  `mutantWithdrawNoCanDeposit` deletes only the `canDeposit` check, so on the
+  witness (`canDeposit = false`, `authorizedRouter = true`, nonzero amount,
+  fresh cache) the mutated call commits while the first conjunct is false.
+* `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`
+  kills conjuncts (2)-(3): the mutant `mutantWithdraw` keeps every guard and
+  mutates the spend transition (`withdrawalPartitionMutant` commits the
+  spend, then overwrites `buffered` with the post-spend
+  `storedDepositsReserve`). On the witness vector the mutated call commits
+  under a fresh cache while the live queue-facing reserve drops 50 → 0.
 
 The original `withdrawalPartitionSpendInvariant` conjunct is retained so
 existing consumers of this theorem name keep their evidence. -/

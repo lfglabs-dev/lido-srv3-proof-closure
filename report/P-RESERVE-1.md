@@ -1,6 +1,6 @@
 # P-RESERVE-1
 
-Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-line: `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`. Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
+Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-lines: `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` (kills the `scopedWithdrawGuards` conjunct on a `canDeposit`-dropped mutant) and `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent` (kills the partition-invariant and live-reserve conjuncts on a mutated spend transition). Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -206,3 +206,64 @@ LidoSRv3.Tests.ReserveMutants LidoSRv3.Tests.ReserveRelationalMutants
 LidoSRv3.Tests.ReserveRelationalTxMutants`: exit 0. `python3
 scripts/audit_metadata.py generate && check`: exit 0 (11 canonical guarantees
 + 14 subordinate rows; detail sha for P-RESERVE-1 recomputed).
+
+## Wave 5 changes (2026-08-19): guard-liveness kill-line for conjunct (1)
+
+**Defect (found in wave-5 review).** The registered parent's first conjunct,
+`scopedWithdrawGuards inputs`, is proved by branch inversion on the model's
+own guard chain (a committed call necessarily passed `canDeposit ∧
+authorizedRouter`), and the Wave 4 kill-line cannot exercise it:
+`mutantWithdraw` preserves the guard chain, so on the Wave 4 witness the
+guards hold (`allowed = ⟨true, true⟩`) and conjunct (1) is true trivially. A
+conjunct that no connected mutant falsifies is dilution (criterion 1
+residual): the parent's three-conjunct conjunction was only falsified at
+conjuncts (2)-(3).
+
+**Fix: P-TOPUP-1-style guard-drop kill-line, not demotion.** The conjunct is
+real falsifiable content about the model's gating, so it is kept and backed
+by its own kill-line in `LidoSRv3/Tests/ReserveMutants.lean`:
+
+- `mutantWithdrawNoCanDeposit` — a guard-for-guard copy of
+  `modelWithdrawDepositableEther` with ONLY the `canDeposit` check deleted;
+  `authorizedRouter`, the nonzero-amount check, and the honest
+  `spendDepositableEther` transition are unchanged. Pinned by examples: the
+  honest model reverts `CAN_NOT_DEPOSIT` on the witness inputs while the
+  mutant commits the honest spend, and with `canDeposit = true` the mutant is
+  indistinguishable from the honest model.
+- `guard_drop_mutant_witness` — concrete witness: `noCanDeposit = ⟨false,
+  true⟩`, nonzero amount, the standard `vector`, `live = 50` so
+  `freshQueueCache` holds by `rfl`; the mutant COMMITS, and
+  `scopedWithdrawGuards noCanDeposit` is FALSE (`canDeposit = false`).
+- `guard_drop_kill_line_refutes_parent` — proves the negation of the
+  registered parent's FULL predicate shape (all five binders,
+  `freshQueueCache before live` retained, the same three-conjunct conclusion)
+  with `mutantWithdrawNoCanDeposit` substituted for
+  `modelWithdrawDepositableEther`. Instantiated by the witness above, the
+  parent's conjunction fails at its first conjunct on a premise-satisfying
+  witness.
+
+**Division of labor (now explicit in every docstring).**
+`guard_drop_kill_line_refutes_parent` kills conjunct (1)
+(`scopedWithdrawGuards` guard liveness);
+`partition_spend_mutant_kill_line_refutes_parent` kills conjuncts (2)-(3)
+(`withdrawalPartitionSpendInvariant` and live-reserve invariance, freshness
+retained); `staleQueueCacheKillLine_holds` and
+`stale_queue_cache_mutant_counterexample` remain premise-necessity evidence
+for `freshQueueCache` (they refute the freshness-dropped sibling claim, not
+the parent).
+
+**What did not change.** No registered theorem statement is touched:
+`source_spend_preserves_withdrawal_reserve`,
+`verity_tx_simulates_reserve_spec`, `verity_tx_preserves_withdrawal_reserve`,
+`staleQueueCacheKillLine`, and `staleQueueCacheKillLine_holds` are identical;
+the Wave 4 kill-line theorem and witness are unchanged (docstring roles
+clarified). `abstract.theorem`, `verity.theorem`, classification, and
+assumptions in `audit/guarantees.yaml` are unchanged; `summary`,
+`fidelity.covered`, and `reproduction.expected` now cite both kill-lines and
+their division of labor. No `sorry`/`admit`/`native_decide`: the new vectors
+close by `rfl`, `decide`, or an explicit term (`Bool.false_ne_true`).
+
+**Build.** `lake build LidoSRv3` and `lake build
+LidoSRv3.Tests.ReserveMutants`: exit 0. `python3 scripts/audit_metadata.py
+generate && check`: exit 0 (11 canonical guarantees + 14 subordinate rows;
+detail sha for P-RESERVE-1 recomputed).
