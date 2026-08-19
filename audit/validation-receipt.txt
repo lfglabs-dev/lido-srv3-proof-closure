@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 52fce548fb416bedf224417960198eacdfee94d1
+validated-tree: 8092b7b778ee18f0a3bbfffd2a8b05769a17c6d2
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -2393,3 +2393,211 @@ Wave 4: P-ALLOC-2 decorative-hypothesis / sibling kill-line remediation (2026-08
   `scripts/test_check_no_python_evidence.sh`: exit 0.
 - Receipt subject: tracked tree excluding this receipt,
   `7b33ea43de6e72f2aceeb9e572533bbdd2c5d5f8`.
+
+Wave 4: P-SSZ-1 definitional-conjunct strip and parent-conclusion kill-line (2026-08-19)
+-----------------------------------------------------------------------------------------
+
+- Fixes P-SSZ-1: the registered parent `composed_ssz_encoding`
+  (`LidoSRv3/Audit/Guarantees/PSsz1.lean`) registered conclusion conjuncts
+  that were definitional facts or restated hypotheses, and its two
+  kill-lines did not refute the parent's conclusion. The definitional
+  conjuncts: `input.rhs.index = (sourceWitness input.src).index.value`,
+  `input.digestInput = srcInputs input.src`, and `input.txInput.toInputs =
+  srcInputs input.src` are `rfl` accessor equalities of `ComposedSszInput`'s
+  own derived fields; `ExactDigestComposition input.digestInput` is `rfl`
+  because `digestChain` is defined as that seven-call list; `signatureRoot
+  input.src = computeSignatureRoot input.src.signature` is a definitional
+  unfolding (`signatureRoot` is defined as that call); the pinned-config
+  constant equalities and the `src` field bound projections are constant or
+  accessor facts; and the three length lines restated
+  `hPublicKey`/`hWithdrawalCredentials`/`hSignature` via `simpa`. The old
+  kill-lines refuted only the parent's hypothesis:
+  `inconsistent_witness_kill_line` negates `bindOperation ... = true` on a
+  crossed two-source pair that cannot even inhabit `ComposedSszInput`, and
+  `inconsistent_operation_index_kill_line` is a bare `Nat` constant
+  inequality.
+- Fix applied: the parent's conclusion is now the named predicate
+  `composedEncodingOk operation combine input`, whose every registered
+  conjunct is non-definitional: the `hBind`-transported structural witness
+  binding soundness; the same derived witness's traversal to `sourceNode
+  input.src` under `sourceCombine input.src` (an equality between the
+  generic `Ssz.traverseBranch` fold and the independently written pairing
+  encoding); `sourceConcat input.lhs input.rhs = specConcat input.lhs
+  input.rhs` (two independently written artifacts); the seven-preimage
+  count; the `runVerification` accept-iff; and `exactTxWidths
+  input.txInput`. The `ComposedSszInput` `rhs`/`digestInput`/`txInput`
+  derived-field definitions stay as the type-level one-object coupling;
+  their `rfl` equalities are simply no longer registered as claim
+  conjuncts.
+- New kill-line `crossed_witness_kill_line_refutes_parent` proves
+  `¬ composedEncodingOk .clProofVerifier (sourceCombine input.src) input`
+  for every `input : ComposedSszInput`: the mutant keeps the honest
+  one-object artifact and its own combine but claims the composed encoding
+  under the crossed named operation `.clProofVerifier`, and the predicate's
+  first structural conjunct is false because `sourceWitness input.src` is
+  bound to `.clValidatorVerifier` by construction. A crossed witness/root
+  pair inside `ComposedSszInput` is uninhabitable (witness and root are
+  both derived from the single `src` -- the type-level coupling doing its
+  job), so the operation crossing is the residual mutant shape over exactly
+  the operation/combine/input triple the parent quantifies over. The two
+  older kill-lines remain with docstrings corrected to state they are
+  `bindOperation`-level negative results, not parent-conclusion
+  refutations.
+  SUPERSEDED in part on 2026-08-19 by "Wave 4: P-SSZ-1 model-mutant parent
+  kill-line" below: coordinator review found this theorem is only a
+  conclusion-non-triviality witness, not a parent kill-line -- at the
+  crossed operation the parent's `hBind` hypothesis fails, so the parent
+  implication is vacuously true there. The parent kill-line is now
+  `swapped_combine_kill_line_refutes_parent` (a `sourceCombine` model
+  mutant refuted at a witness where `hBind` holds);
+  `crossed_witness_kill_line_refutes_parent` is kept, honestly relabeled.
+- The four subordinate rows' theorems (P-SSZ-1.deposit-data-root,
+  gindex-concat, abstract-digest, tx-execution-simulation), the
+  `special_bindings`, and the assumptions list are unchanged; the
+  registered theorem name `composed_ssz_encoding` is unchanged, so
+  `EXPECTED_CANONICAL_CLAIMS["P-SSZ-1"]` is untouched.
+- `audit/guarantees.yaml`'s `P-SSZ-1` row: `summary`, `fidelity.covered`,
+  and `reproduction.expected` now describe the stripped non-definitional
+  parent and the new kill-line and no longer present `rfl` accessor
+  equalities as covered substance; `fidelity.missing` gains an explicit
+  disclosure that the Verity `EncodingInput` plane keeps
+  `deposit`/`rhs`/`witness`/`expectedWitnessRoot` independent (e.g.
+  `Tests/SszEncodingTxMutants.matching` pairs a witness at index 2 with
+  `rhs := gindex 3 11`) and does not inherit the abstract one-object
+  coupling. `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-SSZ-1"]` is recomputed to
+  `b63c0bd7745155f01500807d473bff98c51d19b33b9eb3069196b76d8df0f861`, and
+  `audit/STATUS.md` and `audit/REPRODUCE.md` are regenerated with `python3
+  scripts/audit_metadata.py generate` (`audit/ROADMAP.md` is unchanged by
+  the regeneration); the diff is confined to the `P-SSZ-1` row.
+  `scripts/check_public_claim_surfaces.py` has no `P-SSZ-1` block (that
+  registry covers only P-DEPOSIT-1 and P-TOPUP-1), so no declarations list
+  needed updating.
+- `report/P-SSZ-1.md`: the Theorems line lists `composedEncodingOk` and the
+  new kill-line; a dated "Wave 4 changes" section records the stripped
+  conjuncts, the new kill-line, and the Verity coupling disclosure; the
+  Modeling/Proof/Restated sections and the issue #4/#20/#21 close notes are
+  updated to match, with the wave-2 `rfl`-as-substance descriptions marked
+  superseded in that respect.
+- `lake build LidoSRv3`: exit 0. `lake build LidoSRv3.Tests.SszRegression
+  LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+  LidoSRv3.Tests.SszEncodingTxMutants`: exit 0. `lake build
+  LidoSRv3.Audit.Trust`: exit 0; `composed_ssz_encoding` and
+  `crossed_witness_kill_line_refutes_parent` each report `depends on
+  axioms: [propext, Quot.sound]`; no `sorry`, `admit`, `native_decide`, or
+  project-level axiom is introduced.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical
+  guarantees plus 14 subordinate evidence rows).
+- `python3 scripts/check_public_claim_surfaces.py` and `python3
+  scripts/test_public_claim_surfaces.py`: exit 0.
+- `python3 scripts/test_verity_provenance.py` and `bash
+  scripts/check_provenance_guards.sh`: exit 0.
+- `bash scripts/check_no_python_evidence.sh` and `bash
+  scripts/test_check_no_python_evidence.sh`: exit 0.
+- Pre-existing, not introduced here and not repaired here (the house
+  convention recorded in the wave-2/wave-3 entries above):
+  `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` fails on
+  unmodified `main` with the same `P-ALLOC-2` / "NONE may not hide extra
+  claims" staleness -- the test's `guarantees[1]` (`P-ALLOC-2`) mutant
+  expects "NONE may not hide extra claims" but the checker first reports
+  "P-ALLOC-2: pending work is incomplete" for that row's current
+  classification. Reproduced on the clean base tree of this branch (same
+  failure without this diff, via `git stash`). This wave does not alter
+  `P-ALLOC-2` or that test file.
+- `make test` was NOT run to completion on this tree: its recipe aborts at
+  the second step, the pre-existing `test_audit_metadata.py` staleness
+  above. Every other component step was run individually and passed: the
+  script gates (`audit_metadata.py check`, `check_validation_receipt.py`,
+  `check_no_python_evidence.sh` and its regression test,
+  `check_public_claim_surfaces.py` and its regression test,
+  `test_verity_provenance.py`, `check_provenance_guards.sh`), all twenty-eight
+  Lean vector/mutant modules in the recipe (including
+  `LidoSRv3.Tests.SszRegression`,
+  `LidoSRv3.Audit.Verity.Tests.SszTxSimulation`, and
+  `LidoSRv3.Tests.SszEncodingTxMutants` for this row), and all five
+  reference-fixture presence checks.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+Wave 4: P-SSZ-1 model-mutant parent kill-line (2026-08-19)
+----------------------------------------------------------
+
+- Follow-up to the entry above. Coordinator review found that
+  `crossed_witness_kill_line_refutes_parent` does not refute the registered
+  parent: at the crossed operation `.clProofVerifier` the parent's `hBind`
+  hypothesis fails (the witness is bound to `.clValidatorVerifier` by
+  construction), so the parent's implication is vacuously true there. The
+  theorem is a conclusion-non-triviality witness (the conclusion predicate
+  discriminates the claimed operation), not a parent kill-line -- the same
+  premise-level shape classified as insufficient for P-RESERVE-1's
+  stale-cache theorem.
+- Fix applied (the house pattern: mutate the MODEL/FUNCTIONS inside the
+  predicate, not the input). The conclusion predicate is now parameterized
+  as `composedEncodingOkWithCombine srcCombine operation combine input`
+  over the source-combine family used in its deposit-data-root traversal
+  conjunct; the registered `composedEncodingOk` is the honest
+  specialization at `sourceCombine` (the proposition is unchanged, so the
+  registered parent's statement is unchanged). `sourceCombineSwapped`
+  (children swapped at every pairing) is the one model function inside the
+  predicate that `hBind` never mentions.
+- New parent kill-line `swapped_combine_kill_line_refutes_parent`: the
+  negation of the mutant-substituted parent stated in the registered
+  parent's own quantifier/premise/`hBind` shape,
+  `¬ (∀ {operation combine} input, premises → hBind →
+  composedEncodingOkWithCombine sourceCombineSwapped operation combine
+  input)`. At the concrete witness `swappedCombineKillInput` (pinned
+  48/32/96-byte widths, same shape as `Tests/SszRegression.composedExample`;
+  defined in the guarantee module since it cannot import the test module)
+  every premise holds by `decide` and `hBind` is discharged by the same
+  `sourceWitness_binds_sourceNode` used for the honest artifact, while the
+  swapped-combine traversal conjunct reduces definitionally
+  (`traverseBranch_sourceCombineSwapped_eq`, an `rfl` closed form over the
+  witness's concrete `[.right]` path and singleton branch) to a `Nat.pair`
+  tree equality that would force `sourceAnchor swappedCombineKillSrc = 0` --
+  impossible by repeated `Nat.pair` injectivity
+  (`swapped_traverse_ne_structuralEncoding`) against the concrete nonzero
+  public-key fold (`digestBytesFold (List.replicate 48 2) ≠ 0`, by
+  `decide`). No `sorry`, `admit`, or `native_decide` in the new proofs.
+- `crossed_witness_kill_line_refutes_parent` is kept with its docstring,
+  YAML, and report wording honestly relabeled as a
+  conclusion-non-triviality witness; `inconsistent_witness_kill_line` and
+  `inconsistent_operation_index_kill_line` remain `bindOperation`-level
+  negatives. The four subordinate rows' theorems, `special_bindings`, the
+  assumptions list, and the registered theorem name are unchanged.
+- `audit/guarantees.yaml`'s `P-SSZ-1` row: `summary`, `fidelity.covered`,
+  and `reproduction.expected` now cite `swapped_combine_kill_line_refutes_parent`
+  as the parent kill-line and the crossed-operation theorem as a
+  conclusion-non-triviality witness.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-SSZ-1"]` is recomputed to
+  `fa573fadd47cb13988aad4425a61262c7c50effb536ff784254fcbcdea56bd2b`; views
+  regenerated (`audit/REPRODUCE.md` changed; `audit/STATUS.md` and
+  `audit/ROADMAP.md` unchanged by the regeneration). `report/P-SSZ-1.md`'s
+  Theorems line, Wave 4 section, Proof/Restated sections, and issue #4
+  close notes updated to match.
+- Cherry-picked `main`'s `8e55c05` (and nothing else) per coordinator
+  instruction: the dynamic NONE-row mutant retarget fixes the pre-existing
+  `test_audit_metadata.py` staleness documented in the entry above, so gate
+  4 and end-to-end `make test` are green on this branch.
+- `lake build LidoSRv3`: exit 0 (1395 jobs). `lake build
+  LidoSRv3.Tests.SszRegression LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+  LidoSRv3.Tests.SszEncodingTxMutants`: exit 0 (515 jobs). `lake build
+  LidoSRv3.Audit.Trust`: exit 0; `composed_ssz_encoding` reports
+  `[propext, Quot.sound]`, `swapped_combine_kill_line_refutes_parent`
+  reports `[propext, Classical.choice, Quot.sound]`,
+  `crossed_witness_kill_line_refutes_parent` reports `[propext,
+  Quot.sound]`; no `sorryAx`, no `Lean.ofReduceBool`.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical
+  guarantees plus 14 subordinate evidence rows). `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`: exit 0 (post-cherry-pick).
+- `python3 scripts/check_public_claim_surfaces.py` and `python3
+  scripts/test_public_claim_surfaces.py`: exit 0.
+- `python3 scripts/test_verity_provenance.py` and `bash
+  scripts/check_provenance_guards.sh`: exit 0.
+- `bash scripts/check_no_python_evidence.sh` and `bash
+  scripts/test_check_no_python_evidence.sh`: exit 0.
+- `make test`: exit 0 end-to-end, including the previously aborting
+  `test_audit_metadata.py` step and all twenty-eight Lean vector/mutant
+  modules.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
