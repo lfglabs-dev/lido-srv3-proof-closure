@@ -12,7 +12,14 @@ open LidoSRv3.Audit.SolidityDeposit
 executable Verity transaction evidence. -/
 def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
 
-/-- Abstract transaction rollback, not an executable EVM trace. -/
+/-- Abstract transaction rollback, not an executable EVM trace.  This fact is
+definitional in the `TxObservation` model -- `committedState`/`committedTrace`
+of `.reverted` are `before`/`⟨[], [], []⟩` by definition, and `observation`
+maps every reverting outcome to `.reverted` -- so it is kept as an
+unregistered child rather than as a conjunct of the registered parent
+`source_deposit_conserves_and_rolls_back`.  The load-bearing rollback evidence
+is on the executable plane (conjunct (b) of
+`verity_tx_composes_deposit_conservation_and_rollback`). -/
 theorem revert_restores_state_value_and_logs {State : Type} :
     ∀ (tx : LidoSRv3.Audit.TxObservation State),
       tx.result = LidoSRv3.Audit.TxResult.reverted →
@@ -21,12 +28,9 @@ theorem revert_restores_state_value_and_logs {State : Type} :
   @LidoSRv3.Audit.revert_restores_state_value_and_logs State
 
 /--
-`run cfg inp` conserves `pulled = pushed`. If that run reverts, the
-abstract `TxObservation` (`A-ABSTRACT-TX`) restores `before` and erases
-ETH moves and logs.
-
-Pinned-source conservation and rollback correspondence for the SRv3 deposit
-push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Commit-branch-explicit conservation, and rollback of the deployments that
+would break it, for the SRv3 deposit push at
+`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997;
 * `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;
@@ -34,51 +38,67 @@ push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
 * `contracts/0.8.25/lib/BeaconChainDepositor.sol`,
   `makeBeaconChainDeposits32ETH`, lines 36--64.
 
-Two claims, one per half of the guarantee wording.
+Two conjuncts, one per half of the guarantee wording; neither is definitional.
 
-*Conservation.* On every branch of the source-shaped path -- each source
-`revert` or arithmetic-panic guard, the failing line 996 `assert`, the empty-batch early return at
-line 978, and the full push -- the wei pulled from Lido at line 983 equals the wei
-pushed to the beacon deposit contract by the loop at `BeaconChainDepositor.sol`
-lines 53--63. This is exactly the invariant the `assert` at line 996 checks, and
-it is proved, not assumed, from the source-shaped code.
+*Conservation.* On the committed-push branch -- the only branch that moves wei
+-- the wei pulled from Lido at line 983 equals the wei pushed to the beacon
+deposit contract by the loop at `BeaconChainDepositor.sol` lines 53--63, and
+the two independently written source formulas agree: line 972's
+`depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and
+the loop's `pushedValue`.  This is exactly the invariant the `assert` at line
+996 checks, and it is proved from the source-shaped guard structure, not
+assumed: `committedDeposits` carries arbitrary `Nat`s, and only the assert
+gate forces the equality.  The claim is deliberately restricted to the
+committed branch because `Outcome.pulled`/`Outcome.pushed` are defined as `0`
+on every other branch, so a whole-path accessor equality would be mostly
+`0 = 0`.  The kill-line
+`LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed`
+shows this conjunct is load-bearing: dropping the line 996 assert branch from
+`run` (`SolidityDeposit.mutantRun`) lets a skewed deployment commit with
+`pulled ≠ pushed`.
 
-*Rollback.* Every guard on that path is a whole-transaction abort -- the pinned
-span contains no `try`/`catch` and no failure-swallowing low-level call, and a
-failing `assert` is a Solidity 0.8 `Panic(0x01)` -- so a reverting outcome maps
-onto the abstract-transaction model's `.reverted` result, and
-`revert_restores_state_value_and_logs` restores the pre-state and erases all
-committed ETH moves and logs. Locator-derived DSM authentication at lines 943
-and 1173--1179 remains an interface fact outside this data-only model, so this
-is not a claim about every possible caller.
+*Rollback.* A deployment whose `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`
+(`StakingRouter.sol` line 65) differs from `DEPOSIT_SIZE`
+(`BeaconChainDepositor.sol` line 24) never commits a mismatched push: on any
+nonempty key batch the whole transaction reverts -- the failing line 996
+`assert` is a Solidity 0.8 `Panic(0x01)`, and the pinned span contains no
+`try`/`catch` and no failure-swallowing low-level call.  This is the
+source-plane rollback content, and it is not definitional either: it needs the
+empty-batch early return at line 978 excluded (`committedNoDeposits`) and the
+assert gate to exclude a mismatched commit (`committed_implies_conserving`).
 
 Caveats, stated rather than hidden:
 
-* Conservation is unconditional here only because the line 996 `assert` is
-  modelled as the revert it is. The pull at line 972 scales by
-  `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`, which is a constructor `immutable`
-  (`StakingRouter.sol` line 65, assigned line 105), while the push is the literal
-  `32 ether` `DEPOSIT_SIZE` (`BeaconChainDepositor.sol` line 24).
-  `SolidityDeposit.pulled_eq_pushed_iff_conserving` shows the two agree *exactly
-  when* the deployment sets them equal, and
-  `SolidityDeposit.committed_implies_conserving` shows a deployment that sets
-  them apart reverts instead of committing. A misconfigured deployment is
-  therefore a real falsifier of the *commit*, not something this proof papers
-  over -- and not a silent stranding of the difference in the router either.
+* The abstract-transaction rollback fact used in earlier revisions --
+  `observation` maps a reverting outcome to `.reverted`, whose
+  `committedState`/`committedTrace` are `before`/`⟨[], [], []⟩` by definition
+  (`A-ABSTRACT-TX`) -- is definitional in this model and is therefore *not* a
+  conjunct of this registered parent.  It remains available as the
+  unregistered child `revert_restores_state_value_and_logs` (and
+  `SolidityDeposit.reverting_outcome_rolls_back`).
+* Conservation on the commit branch holds without a `ConservingConfig`
+  hypothesis only because the line 996 `assert` is modelled as the revert it
+  is; `SolidityDeposit.pulled_eq_pushed_iff_conserving` shows the pull and
+  push scales agree *exactly when* the deployment sets them equal.
 * Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`
   division matches EVM `DIV`, but no overflow reasoning is performed.
-* The rollback half is stated against the abstract transaction model
-  (`A-ABSTRACT-TX`), so the EVM plane stays open.
+* Locator-derived DSM authentication at lines 943 and 1173--1179 remains an
+  interface fact outside this data-only model, so this is not a claim about
+  every possible caller.
 -/
-theorem source_deposit_conserves_and_rolls_back {State : Type}
-    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :
-    (run cfg inp).pulled = (run cfg inp).pushed ∧
-      ((run cfg inp).reverts = true →
-        (observation before after attempts trace (run cfg inp)).committedState = before ∧
-          (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
-          (observation before after attempts trace (run cfg inp)).committedTrace.logs = []) :=
-  ⟨run_conserves cfg inp, fun h => reverting_outcome_rolls_back before after attempts trace h⟩
+theorem source_deposit_conserves_and_rolls_back
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput) :
+    (∀ keys pulled pushed balanceAfter,
+        run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
+          pulled = pushed ∧ depositsValue cfg inp = pushedValue cfg inp) ∧
+      (¬ ConservingConfig cfg → 0 < actualDepositsCount cfg inp →
+        (run cfg inp).reverts = true) := by
+  constructor
+  · intro keys pulled pushed balanceAfter hRun
+    obtain ⟨-, -, hPulled, hPushed, hMoved, -⟩ := committed_deposits_spec hRun
+    exact ⟨hMoved, hPulled.symm.trans (hMoved.trans hPushed)⟩
+  · intro hCfg hKeys
+    exact not_conserving_nonempty_reverts hCfg hKeys
 
 /--
 The `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` at
@@ -181,14 +201,19 @@ source configuration and call input `(cfg, inp)`, the executable transaction
 input `inputs`, and the entry `ContractState` -- joined by `LinksSource` and by
 the transaction's own executable guards `Preconditions`.
 
-*(a)* is the pinned-source conservation and abstract-transaction rollback claim
-for `(cfg, inp)`.
+*(a)* is the registered abstract parent
+`source_deposit_conserves_and_rolls_back` for `(cfg, inp)`: commit-branch
+conservation of the pulled/pushed wei, and rollback (whole-transaction revert)
+of every non-conserving deployment on a nonempty batch.
 
 *(b)* is the executable transaction's own boundary: every reverting
 `Contract.run` restores the entry snapshot and leaves the observation idle --
 no ether moved, no call surviving, every probed mapping word at its entry value.
 This holds for arbitrary `inputs` and entry states, including the failure
 injections that revert *after* real storage writes and real journalled frames.
+This is the load-bearing rollback evidence; the abstract `TxObservation`
+rollback fact is definitional in this model and stays demoted to the
+unregistered child `revert_restores_state_value_and_logs`.
 
 *(c)* is the correspondence: the executable transaction reproduces the pinned
 two-batch source observables -- per-module allocation, dynamic-data and
@@ -203,17 +228,16 @@ transaction (`A-VERITY-SCAFFOLD`), not an EVM execution, and the source plane is
 `A-SOURCE-SHAPED`.  `LinksSource` is a hypothesis about the caller's allocation,
 not a proof that the pinned Solidity produces those two legs.
 -/
-theorem verity_tx_composes_deposit_conservation_and_rollback {State : Type}
+theorem verity_tx_composes_deposit_conservation_and_rollback
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
     (inputs : Inputs) (entry : _root_.Verity.ContractState)
     (hLink : LinksSource cfg inp inputs)
     (hPre : Preconditions inputs entry) :
-    ((run cfg inp).pulled = (run cfg inp).pushed ∧
-        ((run cfg inp).reverts = true →
-          (observation before after attempts trace (run cfg inp)).committedState = before ∧
-            (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
-            (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧
+    ((∀ keys pulled pushed balanceAfter,
+        run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
+          pulled = pushed ∧ depositsValue cfg inp = pushedValue cfg inp) ∧
+        (¬ ConservingConfig cfg → 0 < actualDepositsCount cfg inp →
+          (run cfg inp).reverts = true)) ∧
       (∀ reason rollback,
           (execute inputs).run entry = .revert reason rollback →
             rollback = entry ∧
@@ -225,7 +249,7 @@ theorem verity_tx_composes_deposit_conservation_and_rollback {State : Type}
           run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
             (sourceObservables inputs entry).pulled = (run cfg inp).pulled ∧
               (sourceObservables inputs entry).pushed = (run cfg inp).pushed) := by
-  refine ⟨source_deposit_conserves_and_rolls_back cfg inp before after attempts trace,
+  refine ⟨source_deposit_conserves_and_rolls_back cfg inp,
     fun reason rollback hRevert =>
       ⟨revert_after_intermediate_writes_restores_snapshot inputs entry rollback reason hRevert,
         revert_observes_idle inputs entry rollback reason hRevert⟩,
@@ -287,8 +311,8 @@ theorem canonical_composition_witness :
   have hRun : run canonicalSourceConfig canonicalSourceInput
       = .committedDeposits 5 160 160 0 := by decide
   obtain ⟨-, -, hObs, hAgg⟩ :=
-    verity_tx_composes_deposit_conservation_and_rollback (State := Unit)
-      canonicalSourceConfig canonicalSourceInput () () [] ⟨[], [], []⟩
+    verity_tx_composes_deposit_conservation_and_rollback
+      canonicalSourceConfig canonicalSourceInput
       canonicalInputs canonicalState canonical_links_source canonical_preconditions
   exact ⟨canonical_links_source, canonical_preconditions, hRun, hObs,
     (hAgg 5 160 160 0 hRun).1, (hAgg 5 160 160 0 hRun).2⟩
