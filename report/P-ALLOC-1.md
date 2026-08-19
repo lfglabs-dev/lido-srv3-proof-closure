@@ -1,6 +1,6 @@
 # P-ALLOC-1
 
-Theorems: `PAlloc1.active_capacity_bounded`, `PAlloc1.verity_tx_simulates_allocation`.
+Theorems: `PAlloc1.checked_execute_and_active_capacity_bounded` (registered parent), `PAlloc1.active_capacity_bounded` (MathView child), `PAlloc1.verity_tx_simulates_allocation`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent

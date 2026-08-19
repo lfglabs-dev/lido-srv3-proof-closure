@@ -53,10 +53,8 @@ def mappedSummaryTransaction (moduleAddress : Nat) : Prop :=
           (state.writeSlot
             _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable))
 
-/-- If `module.isActive`, `MathView.capacity` is defined as
-`min(targetValidators, availableCapacity)`, so it is ≤ both operands.
-This is a fact about that `Nat` definition, not about live
-`StakingRouter.getDepositAllocations`. -/
+/-- Child of `MathView`: if `module.isActive`, `MathView.capacity` is defined as
+`min(targetValidators, availableCapacity)`, so it is ≤ both operands. -/
 theorem active_capacity_bounded
     (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
     (isTopUp : Bool) (module : Module) (hActive : module.isActive = true) :
@@ -76,6 +74,26 @@ theorem source_capacities_match_canonical
         MathView.capacities cfg modules depositsToAllocate isTopUp :=
   SolidityAllocCapacity.source_execute_refines_audit_model
     cfg modules depositsToAllocate isTopUp hBounds
+
+/-- **Wave 1 registered parent.**  Under `CheckedBounds`:
+- the source-shaped executor succeeds,
+- its capacity column equals the independent `MathView` model,
+- AND for every active module the executed capacity is bounded by both
+  `targetValidators` (from the row) and `MathView.availableCapacity`. -/
+theorem checked_execute_and_active_capacity_bounded
+    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
+    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp)
+    (module : Module) (hActive : module.isActive = true) :
+    (∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp) ∧
+    MathView.capacity cfg modules depositsToAllocate isTopUp module ≤
+        MathView.targetValidators cfg modules depositsToAllocate module ∧
+      MathView.capacity cfg modules depositsToAllocate isTopUp module ≤
+        MathView.availableCapacity cfg isTopUp module :=
+  ⟨source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds,
+   AllocCapacity.active_capacity_bounded cfg modules depositsToAllocate isTopUp module hActive⟩
+
 
 /-- Successful execution retains router index order. -/
 theorem router_order_preserved {cfg : Config} {modules : List Module}

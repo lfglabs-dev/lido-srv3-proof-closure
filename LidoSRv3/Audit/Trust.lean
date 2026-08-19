@@ -75,6 +75,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.revert_restores_state_value_and_logs
 #print axioms LidoSRv3.Audit.revert_may_retain_attempts
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute_and_active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
