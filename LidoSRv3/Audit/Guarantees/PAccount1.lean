@@ -50,4 +50,25 @@ theorem verity_tx_revert_restores_snapshot
     rollback = state :=
   revert_restores_snapshot i sharesToMintAsFees inject state rollback reason h
 
+/-- Independent tx-storage-flag order discipline: on every committed
+execution of the real `handleOracleReport`, the `rewardsReadSlot` tick is
+written strictly before any nonzero `rewardsMintedSlot` tick. This reads the
+two raw ticks directly and does not go through `storedSteps`'s presence-only
+check, so it is not the same fact as `verity_tx_simulates_oracle_report`; it
+is the order fact that theorem's `View` equality cannot by itself express.
+`Result.steps` (and the `View.steps` it feeds) is built from these same tx
+storage flags and never calls `AccountingCorrespondence.successfulSteps`;
+the two planes share no step-list bridge. -/
+theorem mint_after_read_discipline : mintAfterReadDiscipline :=
+  mintAfterReadDiscipline_holds
+
+/-- Kill-line for the registered parent: a mutant that assigns the mint tick
+before the read tick — the same fault as calling `reportRewardsMinted`
+before re-reading the freshly written balances — violates
+`mint_after_read_discipline`. If a future edit merges the two tick writes
+back into a shared order-insensitive flag, this theorem's witness fails and
+the regression is caught here, not only by informal review. -/
+theorem mint_order_kill_line : mintOrderKillLine :=
+  mintOrderKillLine_holds
+
 end LidoSRv3.Audit.Guarantees.PAccount1

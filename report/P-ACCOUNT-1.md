@@ -1,6 +1,6 @@
 # P-ACCOUNT-1
 
-Theorems: `PAccount1.source_report_before_reward`, `PAccount1.verity_tx_simulates_oracle_report`.
+Theorems: `PAccount1.source_report_before_reward`, `PAccount1.verity_tx_simulates_oracle_report`, `PAccount1.mint_after_read_discipline`, `PAccount1.mint_order_kill_line`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -14,9 +14,10 @@ The guarantee is meant to say: on an accepted report that mints a positive fee, 
 - `A-SOURCE-SHAPED`: `ReportInput` is three lists (registered ids, reported ids, balances). No oracle committee, no hash consensus, no extra-data, no CL state, no vault transfers.
 - `A-VERITY-SCAFFOLD`.
 - `fullReportSucceeds : ReportInput → Nat → Prop` is a *free* hypothesis. The module comments that `accept` only covers the early router guards (length, order, `MAX_VALUE_GWEI`, uint64 accumulation) and cannot prove the rest of the report does not revert. The later Accounting / mint / `reportRewardsMinted` path is assumed, not executed.
-- `handleOracleReport` does not call Accounting. It writes a map of balances, a total slot, and three *boolean flag slots* (`accountingCalledSlot`, `rewardsReadSlot`, `rewardsMintedSlot`) that stand in for those calls.
+- `handleOracleReport` does not call Accounting. It writes a map of balances, a total slot, and three flag slots (`accountingCalledSlot`, `rewardsReadSlot`, `rewardsMintedSlot`) that stand in for those calls.
 - Step list `successfulSteps` is a literal four-constructor list, not a recorded call journal.
 - Storage slots 10–14 are model-local.
+- `accountingCalledSlot`, `rewardsReadSlot`, `rewardsMintedSlot` hold literal *ticks* (`1`, `2`, `3`; `0` for "never written"), one per write call site, in the exact program order accounting is pinned to. This is not a clock: the ticks are hardcoded per-call-site constants, not values threaded through actual execution, so they record which literal a call site wrote, not when a call physically ran.
 
 ## Proof
 
@@ -31,7 +32,9 @@ The theorem assumes `0 < sharesToMintAsFees` and `sourceTrace _ = some trace`, u
 
 **SOURCE→word refinement `checkedTotal256_refines_source`.** Induction on the balance list: if the Nat `checkedTotal64` succeeds under `≤ 2^64-1`, each `safeAdd` succeeds and the word value equals the Nat total. This is the only non-definitional arithmetic in the abstract plane.
 
-**VERITY `verity_tx_simulates_oracle_report`.** `handleOracleReport` re-checks `idsAndBalancesValid`, runs `txCheckedTotal` (a third copy of the same accumulator), writes the map and the flags, and returns `successfulSteps`. `observe` on success builds a `View` from **the input list** `i.balancesGwei`, the stored total, and `storedSteps` (which reads the flags the same function just wrote). `sourceView` is `accept` + `successfulSteps`. Equality is the third accumulator agreeing with `checkedTotal64` plus the shared step constructor. Rollback: `Contract.run` discards the dirty state on `OVERFLOW` and on the `failAfterWrites` hook.
+**VERITY `verity_tx_simulates_oracle_report`.** `handleOracleReport` re-checks `idsAndBalancesValid`, runs `checkedTotal256` (a second copy of the same accumulator over words), writes the map and the tick flags, and returns `storedSteps dirty i.balancesGwei` — read back from its own storage, not from `AccountingCorrespondence.successfulSteps`. `observe` on success builds a `View` from **the input list** `i.balancesGwei`, the stored total, and `storedSteps` (which reads the flags the same function just wrote). `sourceView` is `accept` + `successfulSteps`. Equality is the second accumulator agreeing with `checkedTotal64` plus each side's own step-list constructor happening to be the same four-step list on this input. Rollback: `Contract.run` discards the dirty state on `OVERFLOW` and on the `failAfterWrites` hook.
+
+**Mint-after-read discipline `mint_after_read_discipline` / kill-line `mint_order_kill_line`.** A presence check on the tick flags (as in `storedSteps`) cannot see write order at all: `ContractState` is a key-value store, so writes to `rewardsReadSlot` and `rewardsMintedSlot` commute regardless of which `writeSlot` call runs first in the program text. `mintAfterRead readTick mintTick := 0 < mintTick → readTick < mintTick` is a second, independent check over the two raw ticks (`2` for read, `3` for mint) rather than their mere presence. `mintAfterReadDiscipline_holds` proves it for the real `handleOracleReport` by unfolding to the literal ticks `2 < 3`. `handleOracleReportSwappedMintBeforeRead` is a second executable transaction, defined beside the discipline it violates, that assigns the mint tick (`2`) at the call site textually before the read tick (`3`); `mintOrderKillLine_holds` proves that mutant does *not* satisfy `mintAfterReadDisciplineOf` (witness: an empty report with a positive fee yields ticks `mint = 2`, `read = 3`, so `mintAfterRead 3 2` is `0 < 2 → 3 < 2`, i.e. false).
 
 ## Issues
 
@@ -45,9 +48,18 @@ on their (now honest) statements. No pinned-core counterexample was found.
 repair that keeps the existing proof. `D` = register an already-proved sibling.
 `scope` = accepted as an explicit fidelity gap; not expanded to full Lido.
 
+2026-08-19: independent tx storage-flag ticks replace the shared
+`successfulSteps` call in `handleOracleReport`'s own `Result`/`View`
+construction (no bridge between the source if-tree and the tx plane), and a
+new `mint_after_read_discipline` / `mint_order_kill_line` pair registers a
+narrower order check plus its swapped-tick kill-line mutant on the parent.
+This is a partial mitigation of issue 5, not a closure of it — see the
+disclosed residual there.
+
 | # | Close | Note |
 | --- | --- | --- |
-| 1, 5, 8, 10, 12 | A | Constructor `sourceTrace` / boolean flags named honestly. |
+| 1, 8, 10, 12 | A | Constructor `sourceTrace` / tx storage flags named honestly. |
+| 5 | B (partial) + A (residual) | `mint_after_read_discipline` / `mint_order_kill_line` catch a tick-travels-with-call-site reordering mutant; a reordering that keeps each literal pinned to its own slot remains an open, disclosed gap. |
 | 2 | A | `fullReportSucceeds` remains an unused parameter of the constructor theorem. |
 | 3 | A | `observe` still uses the input balance list; not claimed as a map readback. |
 | 4, 6, 7, 11, 16, 17, 19 | scope | Membership, caller, role, fee computation, packing, `submitReportData` in `missing`. |
@@ -78,10 +90,12 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Scenario.* After `writeAll`, a re-entrant module callback overwrites `moduleBalancesSlot[1]`. `storedSteps` still emits `.rewardsRead [10, 20]` from the input. The “same snapshot” claim is the same `List Nat` appearing twice in a literal.
 
-5. **`storedSteps` reconstructs order from booleans, so a mint-first write is invisible.**
-   `HandleOracleReportTx.lean:103–110` always concatenates `[balancesWritten] ++ acc? ++ rd? ++ mint?` in that *fixed* order. It does not record write chronology.
+5. **`storedSteps` reconstructs presence from tick literals, so a mint-first write is still invisible to it.**
+   `HandleOracleReportTx.lean`'s `storedSteps` always concatenates `[balancesWritten] ++ acc? ++ rd? ++ mint?` in that *fixed* list order, gated on each flag equaling its own expected literal (`1`/`2`/`3`). It does not record write chronology; `ContractState` writes to distinct slots commute, so no state-based check can see which `writeSlot` call physically ran first.
 
-   *Counterexample mutant.* Swap the three `writeSlot`s so `rewardsMintedSlot` is written first. `observe` still reports `[balancesWritten, accountingCalled, rewardsRead, rewardsMinted]`. `verity_tx_simulates_oracle_report` still holds. That is exactly the ordering bug the guarantee is named for.
+   *Counterexample mutant.* Swap the three `writeSlot`s so `rewardsMintedSlot` is written first, while still writing `2` into `rewardsReadSlot` and `3` into `rewardsMintedSlot` (i.e. keep the *values* pinned to their slots, only move the call sites). `observe` still reports `[balancesWritten, accountingCalled, rewardsRead, rewardsMinted]`; `storedSteps` cannot tell. That residual gap is exactly why `mint_after_read_discipline` (see Proof) is a second, independent check over the raw ticks rather than an upgrade to `storedSteps` itself.
+
+   *What the kill-line does and does not cover.* `mintOrderKillLine_holds`/`handleOracleReportSwappedMintBeforeRead` catch the narrower mutation where the tick *value* travels with the (reordered) call site — write site A now assigns tick `2` and write site B now assigns tick `3`, so the two ticks land in the wrong slots. They do **not** catch the counterexample directly above, where the call sites are reordered but each literal is kept pinned to its original slot; that residual case is unchanged by this change and remains an open, disclosed gap. The ticks are hardcoded per-call-site constants, not a value threaded through actual execution, so "order" here means "which literal ended up in which slot," not "which write ran chronologically first."
 
 6. **“Registered” module ids are an input list, not `SRStorage.getModuleIdAt`.**
    `idsAndBalancesValid` checks `reportedModuleIds == registeredModuleIds` (and lengths / `MAX_VALUE_GWEI`). Live `_validateReportValidatorBalancesByStakingModule` (SRLib 854–869) loads `n = getModulesCount()` and `getModuleIdAt(i)` from storage.
@@ -110,7 +124,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 11. **`sharesToMintAsFees` is an argument, not a fee computation.**
     Live `Accounting.handleOracleReport` obtains `sharesToMintAsFees` from `_simulateOracleReport` / `_calculateProtocolFees` on the just-written balances (`Accounting.sol:135–144`, `403–412`). Lean `handleOracleReport i sharesToMintAsFees` takes the number from the caller.
 
-    *Scenario.* Balances `[10, 20]` should mint 0 (no reward delta). Caller passes `sharesToMintAsFees = 7`. Lean writes `rewardsMintedSlot = 1` and the four-step trace. The abstract theorem’s `hFees : 0 < shares` is satisfied by the same argument. The CHECKED “mint only after reading this snapshot” never computes a mint from the snapshot; it mints whatever the harness asked for.
+    *Scenario.* Balances `[10, 20]` should mint 0 (no reward delta). Caller passes `sharesToMintAsFees = 7`. Lean writes `rewardsMintedSlot = 3` (its "written" tick) and the four-step trace. The abstract theorem’s `hFees : 0 < shares` is satisfied by the same argument. The CHECKED “mint only after reading this snapshot” never computes a mint from the snapshot; it mints whatever the harness asked for.
 
 12. **Three copy-paste accumulators plus a copy-paste step list.**
     `checkedTotal64` (Nat), `checkedTotal256` (word `safeAdd`), `txCheckedTotal` (another word `safeAdd`) are the same recursion. `verityTxSuccessfulSteps` (`AccountingCorrespondence.lean:93–97`) is character-identical to `successfulSteps` (`:86–89`).
