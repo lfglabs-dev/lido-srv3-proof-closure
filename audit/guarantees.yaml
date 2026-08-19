@@ -267,9 +267,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1CompositionTx LidoSRv3.Tests.PEth1CompositionTxMutants",
-        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and kill-line mutants (unapproved journal, zero msg.value) build with drop, misroute, corrupt, rollback, and two-batch mutants; Wave 2 scope kill-lines (underfunded_batch_is_not_a_repartition, large_funded_batch_exhausts_fuel_budget) build and refute reading the Verity parent as a universal batch theorem"
+        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and honest-model confirmations (lateral journal classification, zero msg.value revert) build with drop, misroute, corrupt, rollback, and two-batch mutants; Wave 2 scope kill-lines (underfunded_batch_is_not_a_repartition, large_funded_batch_exhausts_fuel_budget) build and refute reading the Verity parent as a universal batch theorem; Wave 4 parent kill-lines (misrouted_journal_kill_line_refutes_parent, zero_value_success_kill_line_refutes_parent) build and refute the abstract parent's own success conjunct on mutants of gatewayExecute"
       },
-      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses, not a universal batch theorem (Wave 2 named kill-lines refute a ∀ reading: an underfunded batch reverts instead of repartitioning, and a funded/guard-passing batch exhausts the fixed fuel budget). Kill-line mutants reject unapproved journal entries and zero-value success.",
+      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses, not a universal batch theorem (Wave 2 named kill-lines refute a ∀ reading: an underfunded batch reverts instead of repartitioning, and a funded/guard-passing batch exhausts the fixed fuel budget). Wave 4 parent kill-lines refute eth_flow_parent's own success conjunct on mutants of gatewayExecute itself: misrouted_journal_kill_line_refutes_parent (fee legs journaled to an off-ApprovedSet address, classified .other) and zero_value_success_kill_line_refutes_parent (guard-free gateway succeeds at msg.value=0 paying 2*3=6 wei of fees, breaking totalAmount=msgValue).",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent"
@@ -284,7 +284,7 @@
           "∀ (msgValue, n, fee) quantification with overflow (n*fee≥2^256) and zero-value reverts",
           "numeric Bus/Gateway/Vault ensemble and Contract.run rollback",
           "five numeral witnesses (not a universal batch theorem)",
-          "kill-line mutants: unapproved journal entry and zero msg.value",
+          "parent kill-lines on gatewayExecute mutants: misrouted fee journal to a lateral .other address, and zero-value fee-paying success breaking conservation",
           "named scope kill-lines refuting a ∀ reading of the Verity parent: underfunded batch is not a repartition, funded batch exhausts fuel budget"
         ],
         "missing": [

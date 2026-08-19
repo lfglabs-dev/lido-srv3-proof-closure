@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: c17daedf81923fcb8dedd56027f66f3db411be1c
+validated-tree: ea8358c42352059c267edf71f5bc7124f9cf3bbf
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -2072,3 +2072,85 @@ Wave 4: P-TOPUP-1 abstract-parent kill-line remediation (2026-08-19)
   touched by this diff.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
+
+Wave 4: P-ETH-1 parent kill-lines on gatewayExecute mutants (2026-08-19)
+------------------------------------------------------------------------
+
+- Fixes P-ETH-1: the registered parent
+  `LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent` had no kill-line that
+  refutes its own predicate on a mutant of its own model. The wave-1
+  "kills" in `Tests/PEth1CompositionTxMutants.lean` were inert:
+  `rejects_unapproved_journal_entry` quantified over a hand-built
+  one-move list the parent never mentions (the parent quantifies over
+  `gatewayExecute`'s output, not over arbitrary lists), and
+  `rejects_zero_msg_value` *confirmed* the honest model's zero guard --
+  the parent's first clause already requires exactly that behaviour, so
+  nothing was refuted. The wave-2 kills bound the Verity plane's
+  finite-witness scope, not `eth_flow_parent`.
+- Fix applied: `Tests/PEth1CompositionTxMutants.lean` factors the
+  parent's per-outcome predicate out as `parentOutcomePredicate` and
+  proves it is exactly the registered parent's conclusion
+  (`parentOutcomePredicate_is_eth_flow_parent_conclusion`: on the honest
+  model the predicate holds for every input, by `eth_flow_parent`
+  itself). Two mutants of `gatewayExecute` then refute that predicate on
+  their own success outputs. `gatewayExecuteMisrouted` keeps every guard
+  and the fee/refund split but journals the per-request fee legs to
+  `rogueFeeSink = 999`, an address outside the `ApprovedSet` that
+  `classifyJournal` maps to `.other 999`;
+  `misrouted_journal_kill_line_refutes_parent` proves the funded run
+  `(10, 2, 3)` succeeds with moves on which the parent's exact success
+  conjunct is false (conservation still holds at `3 + 3 + 4 = 10`; the
+  `parentApproved` conjunct fails). `gatewayExecuteUnguarded` drops the
+  `ZeroArgument`/`InsufficientValue` value guards so the zero-value call
+  `(0, 2, 3)` succeeds paying `2 * 3 = 6` wei of fees;
+  `zero_value_success_kill_line_refutes_parent` proves the success
+  conjunct false at `msgValue = 0` (`totalAmount = 6 ≠ 0`). The wave-1
+  theorems are retained under honest names
+  (`confirms_lateral_journal_entry_is_not_parent_approved`,
+  `confirms_zero_msg_value_reverts`). A pure zero-guard drop alone cannot
+  refute this parent -- its `.zeroArgument` clause is one-directional and
+  an empty success at `msgValue = 0` satisfies the success conjunct -- so
+  the zero-value mutant must (and does) move wei.
+- `audit/P-ETH-1-COMPOSITION.md` and `report/P-ETH-1.md`: the stale
+  `EthPath`/`pathTrace`/`pathFunded` narrative (definitions removed by
+  the wave-1 rewrite) is replaced with the current
+  `gatewayExecute`/`ApprovedSet` parent, its `split_ifs` proof, and the
+  new kill-lines; issues 1, 3, 6, 10, 13, 14, 15 and the resolution
+  table are rewritten against the current model.
+- `audit/guarantees.yaml`'s `P-ETH-1` row: `summary`,
+  `fidelity.covered`, and `reproduction.expected` now cite the wave-4
+  parent kill-lines accurately and describe the wave-1 theorems as
+  honest-model confirmations; `abstract.theorem`, `verity.theorem`,
+  `classification`, `assumptions`, `next_gate`, and the
+  P-ETH-1a/P-ETH-1b subordinate rows are unchanged.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ETH-1"]` is recomputed to
+  `06947d32143858878146737f63a1c505bc4a0a1ce57a53ddc9c1117e8d2e31ff`,
+  and `audit/REPRODUCE.md` is regenerated (the only changed view; the
+  diff is confined to the `P-ETH-1` row).
+- Pre-existing main repair, required by the gates:
+  `scripts/test_audit_metadata.py`'s NONE-classification mutant targeted
+  `guarantees[1]` (P-ALLOC-2), which has been IMPLEMENTATION_PENDING
+  since it gained fidelity gaps, so the mutant tripped "pending work is
+  incomplete" instead of the expected "NONE may not hide extra claims"
+  and the gate failed on a clean tree. The mutant now targets
+  `guarantees[2]` (P-DEPOSIT-1, classification NONE today), preserving
+  its intent. No guarantee's YAML entry, python dict rows, or report
+  files were touched by this repair.
+- `lake build LidoSRv3` and
+  `lake build LidoSRv3.Tests.PEth1RefundTxMutants
+  LidoSRv3.Tests.PEth1RequestTxMutants
+  LidoSRv3.Tests.PEth1CompositionTxMutants`: exit 0. The new theorems
+  report only `[propext]` or `[propext, Quot.sound]`; no `sorryAx` and no
+  `Lean.ofReduceBool`.
+- `python3 scripts/audit_metadata.py check`, `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `python3 scripts/test_public_claim_surfaces.py`,
+  `python3 scripts/test_verity_provenance.py`,
+  `bash scripts/check_provenance_guards.sh`,
+  `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/test_check_no_python_evidence.sh`, and `make test`:
+  exit 0.
+- Receipt subject: tracked tree excluding this receipt,
+  `ded6b60671fe2edc77ea44b3de54e00cf9bf169a`.

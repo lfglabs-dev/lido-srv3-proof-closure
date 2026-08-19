@@ -1,7 +1,48 @@
 # P-ETH-1
 
 Theorems: `PEth1.eth_flow_parent`, `PEth1.verity_tx_composes_value_flow_and_rollback`.
+Kill-lines (Tests): `misrouted_journal_kill_line_refutes_parent`, `zero_value_success_kill_line_refutes_parent` (abstract parent, Wave 4); `underfunded_batch_is_not_a_repartition`, `large_funded_batch_exhausts_fuel_budget` (Verity scope, Wave 2).
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+
+## Wave 4 changes (2026-08-19)
+
+**Parent kill-lines that actually refute the registered parent.** The Wave 1
+"kill-lines" refuted nothing: `rejects_unapproved_journal_entry` quantified
+over a hand-built one-move list that `eth_flow_parent` never mentions (the
+parent quantifies over `gatewayExecute`'s output, not over arbitrary lists),
+and `rejects_zero_msg_value` *confirmed* the honest model's zero guard —
+exactly what the parent's first clause already requires. Both are retained
+under honest names: `confirms_lateral_journal_entry_is_not_parent_approved`
+and `confirms_zero_msg_value_reverts`.
+
+`Tests.PEth1CompositionTxMutants` now factors the parent's per-outcome
+predicate out as `parentOutcomePredicate` and proves it is exactly the
+registered parent's conclusion
+(`parentOutcomePredicate_is_eth_flow_parent_conclusion`: on the honest model
+the predicate holds for every input, by `eth_flow_parent` itself). Two
+mutants of `gatewayExecute` then refute that predicate on their own success
+outputs:
+
+- `gatewayExecuteMisrouted` keeps every guard and the fee/refund split but
+  journals the per-request fee legs to `rogueFeeSink = 999`, an address
+  outside the `ApprovedSet`, so `classifyJournal` maps them to `.other 999`.
+  `misrouted_journal_kill_line_refutes_parent` proves the funded run
+  `(10, 2, 3)` succeeds with moves on which the parent's exact success
+  conjunct is false: conservation still holds (`3 + 3 + 4 = 10`), but
+  `∀ m, m ∈ moves → parentApproved m.destination` does not. This is issue
+  1's scenario made executable.
+- `gatewayExecuteUnguarded` drops the `ZeroArgument`/`InsufficientValue`
+  value guards, so the zero-value call `(0, 2, 3)` *succeeds*, paying
+  `2 * 3 = 6` wei of fees from the gateway's own balance.
+  `zero_value_success_kill_line_refutes_parent` proves the parent's success
+  conjunct at `msgValue = 0` false: every destination is approved, but
+  `totalAmount moves = 6 ≠ 0`. This is the parent-killing form of the old
+  zero-value check.
+
+No registered Lean statement changed; the report and composition doc also
+drop the stale `EthPath`/`pathTrace`/`pathFunded` narrative (those
+definitions were removed by the Wave 1 rewrite) in favour of the current
+`gatewayExecute`/`ApprovedSet` parent.
 
 ## Wave 2 changes (2026-08-19)
 
@@ -53,9 +94,9 @@ kill-line theorems.
 - Success branch: every move is `parentApproved` (no `.other`) and `totalAmount = msgValue`.
 - VaultHub / `StakingVault.withdraw` explicitly named out of scope on the theorem.
 
-**Kill-line mutants:**
-- `rejects_unapproved_journal_entry`: classifying address 999 (not in ApprovedSet) produces `.other 999`; the parent’s `parentApproved` predicate rejects it.
-- `rejects_zero_msg_value`: `gatewayExecute` with `msgValue = 0` returns `.reverted .zeroArgument`, not success.
+**Model confirmations (renamed in Wave 4 — they confirm the model, they are not parent kill-lines):**
+- `confirms_lateral_journal_entry_is_not_parent_approved` (was `rejects_unapproved_journal_entry`): classifying address 999 (not in ApprovedSet) produces `.other 999`; the parent’s `parentApproved` predicate rejects it. This quantifies over a hand-built list the parent never mentions, so it is a classifier sanity check, not a kill-line.
+- `confirms_zero_msg_value_reverts` (was `rejects_zero_msg_value`): `gatewayExecute` with `msgValue = 0` returns `.reverted .zeroArgument`, not success — exactly what the parent's first clause already requires of the honest model.
 
 **Non-composition:** This ensemble is NOT composed into P-CONSOLIDATION-1 until the `FunctionSpec` is actually `ConsolidationGateway.addConsolidationRequests`.
 
@@ -69,17 +110,16 @@ SRv3 moves ETH along a small set of protocol paths: `ConsolidationBus` forwards 
 - `A-SOURCE-SHAPED`: Bus / Gateway / Vault in `PEth1CompositionTx` are audit-authored `FunctionSpec`s (`executeConsolidation`, `triggerConsolidation`, `addConsolidationRequests`) — names and bodies are not the pinned Solidity functions.
 - `A-VERITY-SCAFFOLD`.
 - **Declared-amount convention** (PEth1CompositionTx header): every `LinkedExternal.value` is `0`. The body puts the amount in calldata word 0; the dispatcher copies it into `CallSite.value`; the callee `require`s `msg.value == amount`. Real Solidity pays via `call{value: x}`. The model cannot express a body that both transfers and forwards the same wei (it would double-debit).
-- `EthPath` has three constructors only: `consolidation`, `withdrawalRequests`, `withdrawalsToLido`. Owner-controlled `StakingVault.withdraw`, `Lido.submit`, WithdrawalQueue claims, EL-rewards sweep, and module deposits are not constructors.
-- `pathTrace` never builds `EthDestination.other`. Lateral leakage is unrepresentable.
-- Composition covers Bus→Gateway→Vault→request plus refund. Abstract `withdrawalsToLido` / `withdrawalRequests` are *not* in the composed Verity run (`audit/P-ETH-1-COMPOSITION.md` says so).
+- The abstract parent models one Gateway execution as `gatewayExecute approved msgValue n fee`: a guard chain (`ZeroArgument` at `msgValue = 0`, `Panic(0x11)` overflow at `n * fee ≥ 2^256`, `InsufficientValue` at `n * fee > msgValue`), then success emits `List.replicate n` fee moves of `fee` wei classified to the approved consolidation contract plus one refund move of `msgValue − n * fee` classified to the approved refund recipient (elided when the refund is zero).
+- Destinations are derived from journaled call addresses classified against a two-address `ApprovedSet` (`classifyJournal`); an address outside the set becomes `EthDestination.other`, which `parentApproved` rejects — lateral leakage is *representable* and excluded by the parent, not unrepresentable. The Wave 4 misroute mutant exercises exactly that representability.
+- Owner-controlled `StakingVault.withdraw`, `Lido.submit`, WithdrawalQueue claims, EL-rewards sweep, and module deposits have no `gatewayExecute` leg; VaultHub / `StakingVault.withdraw` are named out of scope on the theorem.
+- Composition covers Bus→Gateway→Vault→request plus refund. The EIP-7002 and withdrawals-to-Lido legs run on neither parent (issue 15; `audit/P-ETH-1-COMPOSITION.md` says so).
 
 ## Proof
 
-**Abstract `eth_flow_parent`.** Case split on `EthPath`.
-- `consolidation`: `pathFunded` is `count * fee ≤ msg.value`. `pathTrace` is `replicate count {fee, consolidationContract} ++ refundMoves`. Membership in `replicate` gives destination `consolidationContract`; `refundMoves` is empty or `{refund, refundRecipient}`. Neither is `.other`, so `parentApproved` holds by constructor. Sum: `count * fee + (msg.value − count * fee) = msg.value` (`omega`), with the zero-refund branch using `totalAmount [] = 0`.
-- `withdrawalRequests` / `withdrawalsToLido`: the trace is a `replicate` or a singleton of an approved destination; the sum is `n * fee` or `amount` by `totalAmount_replicate` (induction on `n`) / `totalAmount_cons`.
+**Abstract `eth_flow_parent`.** `split_ifs` on the three `gatewayExecute` guards; each revert branch discharges its own clause (`msgValue = 0`, `n * fee ≥ 2^256`, `n * fee > msgValue`). On the success branch, membership in `List.replicate` forces a fee move, whose destination is `classifyJournal approved approved.consolidationContract = .consolidationContract`; the optional refund singleton is `.refundRecipient` under the hypothesis that the two approved addresses differ. Neither is `.other`, so `parentApproved` holds. Conservation: `totalAmount (List.replicate n {fee, …}) = n * fee` by `totalAmount_replicate` (induction on `n`), then `n * fee + (msgValue − n * fee) = msgValue` by `omega`; the zero-refund case uses `totalAmount [] = 0` and `n * fee = msgValue`.
 
-No relation to a contract is used. The proof is arithmetic + “the list we built contains only the tags we put in it.”
+No relation to a contract is used. The proof is arithmetic + “the list `gatewayExecute` built contains only the tags it put in it.”
 
 **VERITY `verity_tx_composes_value_flow_and_rollback`.** Not a `∀` statement. It is a finite conjunction of concrete runs of `PEth1CompositionTx.run honest 10 2 3`, `10 1 3`, `6 2 3`, a `requestAccepts := false` run, an underfunded `10 4 3` run, plus `escrowed = msgValue` on three of those and a `replay` equality on the first (`denoteTransaction` of the discovered `List CompiledCall` matches `observe`’s balance sheet — the only non-arithmetic content, still one numeral). Proof is `decide` / kernel reduction (`audit/P-ETH-1-COMPOSITION.md`). Dispatch itself is a fueled DFS that executes each `FunctionSpec` and prepends journaled child frames.
 
@@ -87,7 +127,7 @@ No relation to a contract is used. The proof is arithmetic + “the list we buil
 
 ## Resolution
 
-**Restated Lean/English.** Abstract is the three-constructor `EthPath` + `pathFunded`. Verity is five numeral witnesses, not `∀`. Underfunded `(10,4,3)` is a counterexample to a universal split.
+**Restated Lean/English.** Abstract is the `∀ (msgValue n fee : Nat)` match on `gatewayExecute` outcomes: three revert clauses plus an approved-and-conserving success clause. Verity is five numeral witnesses, not `∀`. Underfunded `(10,4,3)` is a counterexample to a universal split.
 
 Closed in the 2026-08-18 honesty + encoding repair. Lean theorems stay CHECKED
 on their (now honest) statements. No pinned-core counterexample was found.
@@ -97,19 +137,20 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
 | # | Close | Note |
 | --- | --- | --- |
-| 1, 7, 8 | A | Tagged inventory / `finalWorld` / 7-account escrow named honestly. |
+| 1 | C | Wave 1 journal classification makes lateral destinations representable; Wave 4 `misrouted_journal_kill_line_refutes_parent` refutes the parent's success conjunct on a misrouted-journal mutant of `gatewayExecute`. |
+| 7, 8 | A | `finalWorld` / 7-account escrow named honestly. |
 | 2 | A | Verity parent is a numeric ensemble; kill-lines `underfunded_batch_is_not_a_repartition` / `large_funded_batch_exhausts_fuel_budget` refute a `∀` reading (Wave 2). |
 | 3, 5, 10, 15, 17 | scope | Extra ETH sites, hops, ABI in `missing`. |
 | 4, 6, 9, 11, 18, 19, 20 | A | Declared-amount, two planes, fuel, sinks, fee slot, replay. |
 | 12, 14 | C | Post-`mul` wrap-check reverts when `(a*b)/a ≠ b`. |
-| 13 | C | `pathFunded` now requires `0 < msgValue`. |
+| 13 | C | `gatewayExecute` reverts `ZeroArgument` at `msgValue = 0` and the parent's first clause pins it; Wave 4 `zero_value_success_kill_line_refutes_parent` shows the guard is load-bearing. |
 | 16 | A | 160-bit wrap documented. |
 
 
-1. **“No lateral destination” is unfalsifiable on the abstract type.**
-   `parentApproved (.other _) = False` and `parentApproved _ = True`. `pathTrace` only ever inserts `.consolidationContract`, `.refundRecipient`, `.withdrawalRequestContract`, `.lido`. There is no constructor argument that could place wei on `.other`. The first conjunct of `eth_flow_parent` cannot fail for any `EthPath`.
+1. **“No lateral destination” was unfalsifiable on the abstract type — closed in Waves 1 and 4.**
+   The pre-Wave-1 parent built its move lists by hand, so no constructor argument could place wei on `.other` and the first conjunct could not fail. Wave 1 re-derived destinations from journaled call addresses via `classifyJournal` against an `ApprovedSet`, making lateral destinations representable: `parentApproved (.other _) = False`, and any journaled address outside the set classifies to `.other`. Wave 4 then made the conjunct genuinely load-bearing: `Tests.PEth1CompositionTxMutants.misrouted_journal_kill_line_refutes_parent` runs the funded success case `(10, 2, 3)` through `gatewayExecuteMisrouted` — the same guard chain and split as `gatewayExecute`, but with the fee legs journaled to the operator-supplied `rogueFeeSink = 999`, classified `.other 999` — and proves the registered parent's exact success conjunct is false on that mutant's output. The hand-built-list theorem survives only as `confirms_lateral_journal_entry_is_not_parent_approved`, a classifier sanity check.
 
-   *Scenario the guarantee should catch.* A patched `ConsolidationGateway._refundFee` sends the remainder to `tx.origin` or to an operator-supplied address that is not the documented refund recipient. That destination is not an `EthPath` constructor, so the parent is silent. The CHECKED theorem still holds of the hand-built lists.
+   *Scenario the guarantee now catches.* A patched `ConsolidationGateway` fee or refund leg that sends wei to `tx.origin` or to an operator-supplied address off the `ApprovedSet` produces an `.other` move and violates the parent's first success conjunct — proved executable on the mutant, not just asserted in prose.
 
 2. **The Verity parent is a unit-test bundle, not a theorem about all batches.**
    The named theorem mentions only the tuples `(msgValue, batchSize, fee) ∈ {(10,2,3),(10,1,3),(6,2,3),(10,2,3 false),(10,4,3)}`. It does not quantify over `msgValue`, `feePerRequest`, or `batchSize`.
@@ -119,7 +160,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 3. **Inventory is incomplete versus deployed ETH-bearing sites.**
    Pinned SRv3 also moves ETH through `VaultHub.withdraw` / `Dashboard.withdraw` (protocol-controlled, **any** `_recipient`), `StakingVault.withdraw`, `StakingVault.triggerValidatorWithdrawals` (EIP-7002 + excess refund to a caller-chosen address), `TriggerableWithdrawalsGateway`, `WithdrawalQueueBase._sendValue` (payout to the *claimant*), `Lido.submit`, and beacon `deposit{value:}`.
 
-   *Scenario.* Owner with `WITHDRAW_ROLE` calls `Dashboard.withdraw(attacker, 100 ether)`. ETH leaves the stVault to `attacker`. There is no `EthPath` constructor for this. Separately, `TriggerableWithdrawalsGateway.triggerFullWithdrawals` (`:165–190`) — the contract the Lean gateway is *named* after — pays EIP-7002 fees and refunds; it is not a constructor either. The parent comment’s “complete inventory” is a scope cut. CHECKED “every ETH-bearing path” is false of SRv3.
+   *Scenario.* Owner with `WITHDRAW_ROLE` calls `Dashboard.withdraw(attacker, 100 ether)`. ETH leaves the stVault to `attacker`. No `gatewayExecute` leg models this; the theorem names VaultHub / `StakingVault.withdraw` out of scope explicitly. Separately, `TriggerableWithdrawalsGateway.triggerFullWithdrawals` (`:165–190`) — the contract the Lean gateway is *named* after — pays EIP-7002 fees and refunds; it has no `gatewayExecute` leg either. CHECKED covers the modeled gateway execution, not every ETH-bearing path of SRv3.
 
 4. **Declared-amount convention is not the deployed calling convention.**
    Every `LinkedExternal.value` is `0`; the amount rides in calldata word 0; the dispatcher copies it into `CallSite.value`. Source never takes `amount` as calldata word 0.
@@ -132,9 +173,9 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* A witness/quota bug sends an extra fee CALL, or the executor (`msg.sender`) is refunded instead of a supplied `refundRecipient`. The ensemble cannot represent batch-not-found / delay-not-passed / hash mismatch; the CHECKED split still holds of `(10, 2, 3)`.
 
 6. **Abstract and Verity planes are not refined to each other.**
-   No lemma `pathTrace (.consolidation ⟨10,2,3⟩) ↔ observe (run honest 10 2 3)`. Parent Verity never runs the EIP-7002 or `withdrawWithdrawals` legs the abstract parent “covers.”
+   No lemma relates `gatewayExecute`'s move list to `observe (run honest 10 2 3)`. Parent Verity never runs an EIP-7002 or `withdrawWithdrawals` leg, and the abstract parent has no legs for them beyond the `ApprovedSet`'s two addresses.
 
-   *Scenario.* Change `pathTrace`’s Lido tag to `.other 0` and leave the Verity ensemble alone. `eth_flow_parent` fails; `verity_tx_composes_value_flow_and_rollback` still holds. The two CHECKED marks are independent.
+   *Scenario.* Change the fee-leg destination in `gatewayExecute` to `.other 0` and leave the Verity ensemble alone. `eth_flow_parent` fails; `verity_tx_composes_value_flow_and_rollback` still holds. The two CHECKED marks are independent. (The Wave 4 `gatewayExecuteMisrouted` mutant is essentially this change, executed against the abstract parent only.)
 
 7. **Rollback / conservation-on-revert are `finalWorld` by definition.**
    `finalWorld` returns `entryWorld` on any non-`.success` (`PEth1CompositionTx.lean:343–347`). `observe` reads `finalWorld`. So the reject-request balance sheet `⟨10,0,0,0,0,0,0⟩` follows from `initial 10 _` plus the wrapper, even if the dispatcher never undid anything.
@@ -153,8 +194,8 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Executable (Wave 2).* `PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget` proves `(run honest 30 29 1).control = .exhausted` — a funded (`29 * 1 ≤ 30`), guard-passing batch that still cannot reach the registered parent's success shape. This is a kill-line against generalizing the registered Verity parent to `∀` funded batches, not just against this report's prose.
 
-10. **`pathTrace` omits the Bus→Gateway and Gateway→Vault hops.**
-   The inventory comment lists those CALLs. `pathTrace (.consolidation t)` is only `replicate count {fee, consolidationContract} ++ refundMoves`. Intermediate forwards of `msg.value` / `totalFee` are not `EthMove`s. Conservation is `n*fee + refund = msg.value`, which ignores that the same wei is counted once at the terminal, not at each hop.
+10. **The abstract parent omits the Bus→Gateway and Gateway→Vault hops.**
+   The inventory comment lists those CALLs. `gatewayExecute`'s success list is only `List.replicate n` fee moves plus the optional refund move. Intermediate forwards of `msg.value` / `totalFee` are not `EthMove`s. Conservation is `n*fee + refund = msg.value`, which counts the same wei once at the terminal, not at each hop.
 
    *Scenario.* Gateway keeps `msg.value` and also pays the vault from its own pocket. Terminal fees + refund still sum to `msg.value`. `eth_flow_parent` holds. The protocol’s intermediate balance sheet is not in the theorem.
 
@@ -168,20 +209,20 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Counterexample.* `batchSize = 2^128`, `feePerRequest = 2^128`, `msgValue = 1`. Live `totalFee` overflows and the tx reverts. Lean `mul` wraps to `0`. `require(0 ≤ 1)` passes. The run can succeed with fee 0 (no request value, full refund). The CHECKED numerals never hit this; the ensemble is not 0.8 multiplication.
 
-13. **`pathFunded` is `True` for two of three constructors; `run honest 0 0 3` is a phantom success.**
-   `pathFunded (.withdrawalRequests _ _) = True` and `pathFunded (.withdrawalsToLido _) = True`. The prose “provided the Gateway fee guard holds” does not apply to 2/3 of the inventory.
+13. **`run honest 0 0 3` is a phantom success on the Verity plane.**
+   On the abstract plane this is closed: `gatewayExecute` reverts `ZeroArgument` at `msgValue = 0` and the parent's first clause pins the behaviour. Wave 4 shows the clause is load-bearing — `gatewayExecuteUnguarded` drops the value guards, `(0, 2, 3)` succeeds paying 6 wei of fees, and `zero_value_success_kill_line_refutes_parent` refutes the parent's success conjunct on that mutant. The Verity parent still does not mention the zero-value run.
 
-   *Scenario.* `run honest 0 0 3`: fee `0`, vault `FeeMismatch` is `0 == 0`, `forEach 0`, success with no request hops. Source gateway reverts `ZeroArgument("msg.value")` / empty groups. The registered theorem does not mention this run; CHECKED suggests the split law holds in general. Lean `Nat` `requestsCount * fee` also cannot overflow; Solidity 0.8 reverts.
+   *Scenario.* `run honest 0 0 3`: fee `0`, vault `FeeMismatch` is `0 == 0`, `forEach 0`, success with no request hops. Source gateway reverts `ZeroArgument("msg.value")` / empty groups. The registered Verity theorem does not mention this run; CHECKED suggests the split law holds in general. Lean `Nat` `requestsCount * fee` also cannot overflow; Solidity 0.8 reverts.
 
-14. **Abstract `consolidationFee` is unbounded `Nat` multiply; Verity `.mul` wraps; no refinement.**
-    `PEth1.consolidationFee t = t.requestsCount * t.feePerRequest` (`PEth1.lean:157–158`). `composed_eth_conservation` is `fee + (msgValue - fee) = msgValue` under `fee ≤ msgValue` — true of any two Nats. The Verity ensemble multiplies with wrapping `Expr.mul` (issue 12). There is no lemma `pathTrace t = observe (run … t)`.
+14. **Abstract fee arithmetic is unbounded `Nat` multiply; Verity `.mul` wraps; no refinement.**
+    `composed_eth_conservation` is `fee + (msgValue - fee) = msgValue` under `fee ≤ msgValue` — true of any two Nats — and the abstract parent's overflow clause (`n * fee ≥ 2^256` reverts `Panic(0x11)`) is a model-side guard inside `gatewayExecute`, not a lemma about the Verity ensemble. The Verity ensemble multiplies with wrapping `Expr.mul` (issue 12). There is no lemma relating `gatewayExecute`'s move list to `observe (run …)`.
 
-    *Counterexample.* `requestsCount = 2^128`, `feePerRequest = 2^128`. Abstract fee is `2^256`; `pathTrace` wants `2^256` wei of consolidation moves (or the parent does not apply if `msgValue < 2^256`). Verity wrap product is `0` and can succeed with a full refund (issue 12). Both CHECKED theorems hold of their own plane. The parent “split law” is not the child’s multiplication.
+    *Counterexample.* `n = 2^128`, `fee = 2^128`. Abstract parent: `n * fee = 2^256 ≥ 2^256`, so the model reverts overflow for any `msgValue`. Verity wrap product is `0` and can succeed with a full refund (issue 12). Both CHECKED theorems hold of their own plane; the overflow guard is not the child's multiplication.
 
-15. **`withdrawalsToLido` / EIP-7002 constructors never run on the Verity parent.**
-    `eth_flow_parent` cases on all three `EthPath` constructors. `verity_tx_composes_value_flow_and_rollback` only executes the consolidation ensemble (`run honest …`). P-ETH-1a’s `withdrawToLido` and P-ETH-1b’s `sendWithdrawalFee` are different modules, different numerals.
+15. **EIP-7002 / withdrawals-to-Lido legs run on neither parent.**
+    `gatewayExecute` emits only consolidation-fee and refund legs; `EthDestination.withdrawalRequestContract` and `.lido` exist as tags but no `gatewayExecute` branch produces them, and `verity_tx_composes_value_flow_and_rollback` only executes the consolidation ensemble (`run honest …`). P-ETH-1a’s `withdrawToLido` and P-ETH-1b’s `sendWithdrawalFee` are different modules, different numerals.
 
-    *Scenario.* Change `pathTrace (.withdrawalsToLido 5)` to send 5 wei to `.other 0`. `eth_flow_parent` fails on that constructor. The registered Verity parent is unchanged (it never builds that path). CHECKED “every ETH-bearing path” is an abstract `Inductive` plus one consolidation harness.
+    *Scenario.* A mutant sending the fee leg to `.lido` — an approved tag, but the wrong contract — passes the abstract parent's `parentApproved` check: within the `classifyJournal` model an approved tag can only arise from a journaled address that matches the `ApprovedSet`, so tag-vs-contract confusion is a configuration error the parent cannot see. The Wave 4 misroute mutant covers the complementary case (off-set address → `.other` → caught). The registered Verity parent is unchanged by either.
 
 16. **Dispatcher `callee` is `Address.ofNat` of the journaled target — 160-bit wrap.**
     `PEth1CompositionTx.childPending` (`:262–271`) sets `callee := Core.Address.ofNat entry.target` and `value := entry.calldata.headD 0`. Two targets that differ by `2^160` collapse to the same registry key. The honest wiring only uses addresses 1–7, so the numerals hide this.
