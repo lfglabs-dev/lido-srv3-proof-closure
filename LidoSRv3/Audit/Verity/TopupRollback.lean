@@ -187,7 +187,9 @@ theorem topup_rollback_restores_state {State : Type}
     reverting_outcome_rolls_back before after attempts trace hRevert
 
 /-- Transaction-plane refinement to the canonical P-TOPUP-1 post-state and
-rollback theorem. -/
+rollback theorem.  Projects the conservation/rollback conjunct out of the
+registered parent (`source_topup_conserves_and_rolls_back`), which additionally
+folds in the promoted guard and wrap-branch facts not needed here. -/
 theorem topup_tx_refines_abstract {State : Type}
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :
@@ -197,7 +199,7 @@ theorem topup_tx_refines_abstract {State : Type}
         (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] ∧
         (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.logs = []) := by
   simpa [transactionObservation, topupProgram] using
-    source_topup_conserves_and_rolls_back cfg inp before after attempts trace
+    (source_topup_conserves_and_rolls_back cfg inp before after attempts trace).1
 
 /-- Composable external-call denotation restores the exact world when each
 dynamically observed call rolls back. -/

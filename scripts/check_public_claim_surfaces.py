@@ -61,10 +61,18 @@ CLAIMS = {
             "LidoSRv3.Audit.Verity.TopupTx",
             "LidoSRv3.Audit.Guarantees.Registry",
         ),
+        # source_wrap_implies_assert_revert / source_module_guard_required /
+        # source_wc_type2_guard_required precede source_topup_conserves_and_rolls_back
+        # because that theorem's proof term now folds all three in as
+        # conjuncts (Wave 2: kill-lines must refute the registered parent,
+        # not only a sibling lemma), so they must be declared first.
         "declarations": (
             ("def", "guarantee"),
             ("theorem", "valid_result_preserves_router_order"),
             ("theorem", "revert_restores_state_value_and_logs"),
+            ("theorem", "source_wrap_implies_assert_revert"),
+            ("theorem", "source_module_guard_required"),
+            ("theorem", "source_wc_type2_guard_required"),
             ("theorem", "source_topup_conserves_and_rolls_back"),
             ("theorem", "source_router_balance_unchanged"),
             ("theorem", "source_reverting_branch_moves_no_ether"),
@@ -72,9 +80,6 @@ CLAIMS = {
             ("theorem", "source_unchecked_accumulation_faithful"),
             ("theorem", "source_pinned_config_discharges_pubkey_guard"),
             ("theorem", "verity_tx_simulates_source"),
-            ("theorem", "source_wrap_implies_assert_revert"),
-            ("theorem", "source_module_guard_required"),
-            ("theorem", "source_wc_type2_guard_required"),
         ),
     },
 }

@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Verity.TopupTx
 import LidoSRv3.Audit.Source.TopupParentCorrespondence
+import LidoSRv3.Audit.Guarantees.PTopup1
 
 /-! # P-TOPUP-1 faithful-plane fail-closed vectors
 
@@ -157,12 +158,25 @@ theorem reverted_batch_observes_nothing (failure : FailurePoint)
       = ⟨false, [], 0, 0, 0, [], [], [], []⟩ := by
   cases failure <;> simp at h ⊢ <;> rfl
 
-/-! ## Wave 1 kill-line mutants (parent-level) -/
+/-! ## Wave 1 kill-line mutants (parent-level)
+
+Each theorem below derives its conclusion from a direct projection of
+`LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back`, the
+theorem registered as P-TOPUP-1's CHECKED abstract claim in
+`audit/guarantees.yaml`.  That parent's type folds in the wrap-branch and
+promoted-guard facts as conjuncts, so a mutation that defeats any one of them
+(e.g. dropping the `moduleExists` or `wcTypeIsType2` require from `run`, or
+letting the unchecked sum wrap without reviving the line 755 assert) breaks
+the *registered* theorem's build directly, and these kill lines -- which
+project out of it at a concrete witness -- fail to build right along with it.
+They are therefore no longer independent facts about sibling lemmas the
+registry never cites. -/
 
 open LidoSRv3.Audit.SolidityTopupParent in
 /-- Mutant: wrap the unchecked sum AND skip the balance assert.  Under a wrap,
 `accumulated ≠ pushedValue`, so skipping the assert allows a non-conserving
-commit.  The kill line is source line 755 (`assert`). -/
+commit.  The kill line is source line 755 (`assert`); the fact proved here is
+the *third conjunct* of the registered parent, applied at this witness. -/
 theorem kill_wrap_skip_assert :
     let allocs := [uint256Modulus - 1, 2]
     let inp : SourceTopupInput :=
@@ -173,11 +187,16 @@ theorem kill_wrap_skip_assert :
         moduleAllocationEth := uint256Modulus, lidoCanDeposit := true,
         allocations := allocs, routerBalanceBefore := uint256Modulus,
         lidoDepositableEther := uint256Modulus }
-    accumulated inp ≠ pushedValue inp := by decide
+    accumulated inp ≠ pushedValue inp := by
+  intro allocs inp
+  exact (LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+      (State := Unit) pinnedConfig inp () () [] ⟨[], [], []⟩).2.2.1
+    (by unfold NoUncheckedWrap; decide) (by decide)
 
 /-- Mutant: remove `moduleExists` require.  An unregistered module that would
 be rejected at source line 689 now reaches a later branch; the guard is
-exercised. -/
+exercised.  The fact proved here is the *second conjunct* of the registered
+parent, applied at this witness. -/
 theorem kill_remove_module_exists :
     let cfg : SourceTopupConfig := ⟨48, 48, 1, 1, uint256Modulus⟩
     let inp : SourceTopupInput :=
@@ -187,11 +206,16 @@ theorem kill_remove_module_exists :
         moduleAllocationEth := 100, lidoCanDeposit := true,
         allocations := [5], routerBalanceBefore := 100,
         lidoDepositableEther := 100 }
-    run cfg inp = .revertStakingModuleUnregistered := by decide
+    run cfg inp = .revertStakingModuleUnregistered := by
+  intro cfg inp
+  exact (LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+      (State := Unit) cfg inp () () [] ⟨[], [], []⟩).2.1
+    (by decide) (by decide) (by decide) (by decide) (by decide)
 
 /-- Mutant: remove `wcTypeIsType2` require.  A non-type-2 module that would be
 rejected at source line 694 now reaches a later branch; the guard is
-exercised. -/
+exercised.  The fact proved here is the *fourth conjunct* of the registered
+parent, applied at this witness. -/
 theorem kill_remove_wc_type2 :
     let cfg : SourceTopupConfig := ⟨48, 48, 1, 1, uint256Modulus⟩
     let inp : SourceTopupInput :=
@@ -201,6 +225,10 @@ theorem kill_remove_wc_type2 :
         moduleAllocationEth := 100, lidoCanDeposit := true,
         allocations := [5], routerBalanceBefore := 100,
         lidoDepositableEther := 100 }
-    run cfg inp = .revertWrongWithdrawalCredentialsType := by decide
+    run cfg inp = .revertWrongWithdrawalCredentialsType := by
+  intro cfg inp
+  exact (LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+      (State := Unit) cfg inp () () [] ⟨[], [], []⟩).2.2.2
+    (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
 
 end LidoSRv3.Tests.TopupTxMutants
