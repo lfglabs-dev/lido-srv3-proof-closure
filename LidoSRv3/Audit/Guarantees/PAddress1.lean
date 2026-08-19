@@ -154,46 +154,42 @@ theorem universal_post_state_equivariance
     run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) :=
   source_success_post_state_equivariant a₁ a₂ h₁ h₂ inp post h
 
-/-- Registered P-ADDRESS-1 parent. For two nonzero callers on an input whose
-entrypoint is in scope (`addressEquivarianceEntryScope`, i.e. not
-`WithdrawalQueue.claimWithdrawalsTo`), the source-shaped `run` admits `a₁` iff
-it admits `a₂` on the caller-swapped input, and a successful post-state
-renames under the same swap. `hScope` is genuinely load-bearing below: it is
-case-split to rule out `claimWithdrawalsTo`, on which
-`addressEquivarianceEntryScope` is `False`, so this theorem makes no claim
-about that entrypoint even though the same source lemmas would otherwise
-apply there too (`fidelity.missing` keeps that entrypoint's correspondence
-open). On `requestWithdrawals` and `unwrap`, in-scope admission is pause plus
-the caller's own balance/allowance flags only
-(`pause_balance_admitted_is_permissionless`); it does not test
-`caller = owner` or `caller = <fixed constant>`. Adding a fixed-owner gate to
-that admission breaks equivariance via
-`LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_not_admission_equivariant`,
-which mutates this file's own `admitted`/`run`/`renameInput` (not an
-unrelated toy entrypoint).
+/-- Registered P-ADDRESS-1 parent. For two nonzero callers, the source-shaped
+`run` admits `a₁` iff it admits `a₂` on the caller-swapped input, and a
+successful post-state renames under the same swap. The claim is unconditional
+over the four modeled permissionless writers: since wave 5,
+`addressEquivarianceEntryScope` covers `claimWithdrawalsTo` too -- its
+request-owner gate (`caller = requestOwner`) is caller-relative and renames
+with the caller (`requestOwner` is an address-indexed input field renamed by
+`renameInput`) -- so the scope is total over the modeled writers
+(`addressEquivarianceEntryScope_total`). The wave-4 scope premise thereby
+became vacuous: the source lemmas below hold for every `EntryPoint` via
+`run_rename`, so the premise's deletion cannot break the proof, and per the
+wave-4 load-bearing criterion it is no longer carried. On
+`requestWithdrawals` and `unwrap`, admission is pause plus the caller's own
+balance/allowance flags only (`pause_balance_admitted_is_permissionless`); it
+does not test `caller = owner` or `caller = <fixed constant>`. Adding a
+fixed-owner gate to that admission breaks equivariance via
+`LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent`,
+which negates this theorem's exact predicate shape on a mutant of this file's
+own `admitted`/`run`/`renameInput` (not an unrelated toy entrypoint).
 
 `wellFormedAddressInput` and `singletonActorEntryPoint` are deliberately not
 carried as hypotheses here: neither restricts this conclusion (the proof
-below needs only `hScope` and `a₁, a₂ ≠ 0`), and `singletonActorEntryPoint`
-is provably `False` for every `EntryPoint` in this model
+below needs only `a₁, a₂ ≠ 0`), and `singletonActorEntryPoint` is provably
+`False` for every `EntryPoint` in this model
 (`not_singleton_actor_entry_point`), so requiring its negation would add no
 content while reading as a real exclusion. Carrying either as an unused
 binder would hide that they are premise-free rather than making the claim
 more honest. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
-    (inp : LidoSRv3.Audit.SolidityAddress.Input)
-    (hScope : addressEquivarianceEntryScope inp.entryPoint) :
+    (inp : LidoSRv3.Audit.SolidityAddress.Input) :
     succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp) ∧
       ∀ post, run inp = .committed post →
         run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) := by
-  cases hep : inp.entryPoint with
-  | claimWithdrawalsTo =>
-      rw [hep] at hScope
-      exact hScope.elim
-  | transferFrom | requestWithdrawals | unwrap =>
-      exact ⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
-        fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩
+  exact ⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
+    fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩
 
 /-- Composition of (i) the universal source-shaped swap, (ii) each
 `Contract.run` entrypoint's address-write `observe` matching

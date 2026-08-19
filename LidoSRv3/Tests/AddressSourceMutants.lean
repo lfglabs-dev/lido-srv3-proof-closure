@@ -56,8 +56,13 @@ theorem owner_gated_admission_mutant_counterexample :
 definitions, so refuting *it* does not refute the registered parent.  The
 mutant below is a one-conjunct edit of the real `admitted` on the two
 in-scope writers `requestWithdrawals` and `unwrap`, built from the exact
-`Input` / `Outcome` / `renameInput` the parent is stated over, and it
-falsifies exactly the admission conclusion the parent proves. -/
+`Input` / `Outcome` / `renameInput` the parent is stated over.
+`fixed_owner_gate_kill_line_refutes_parent` negates the parent's FULL
+predicate shape on that mutant (the nonzero-caller binders and BOTH
+conclusion conjuncts; the wave-4 `addressEquivarianceEntryScope` premise was
+retired in wave 5 when the scope widened to all four modeled writers);
+`fixed_owner_gate_not_admission_equivariant` is the weaker
+admission-projection sibling, retained as compact supporting evidence. -/
 
 /-- A hard-coded, unrenamed address standing in for a privileged role.  Unlike
 `Input.requestOwner` -- which `renameInput` renames along with `caller`, so a
@@ -86,36 +91,73 @@ parent's real machinery; only the admission gate is mutated. -/
 def runFixedOwnerGated (inp : Input) : Outcome :=
   if admittedFixedOwnerGated inp then .committed (successfulPost inp) else .reverted
 
-/-- **Kill-line for the registered P-ADDRESS-1 parent
-(`PAddress1.universal_address_writer_equivariance`).** A fixed-owner gate on
-`requestWithdrawals` is a plausible one-conjunct mutation of the real
-`admitted`, connected to the parent's own `Input` / `run` / `renameInput`.
-It falsifies exactly the parent's admission conclusion: caller `1` (the fixed
-owner) is admitted on an otherwise-eligible `requestWithdrawals` input, but
-caller `2` is rejected on the `1 ↔ 2`-swapped input, so
-`succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp)` fails for this
-mutant even though `a₁, a₂ ≠ 0`. This is the fact
+/-- Witness for the parent kill-line: an otherwise-eligible `requestWithdrawals`
+input from caller `1`, the mutant's fixed owner.  `requestWithdrawals` is one
+of the four modeled permissionless writers (in `addressEquivarianceEntryScope`
+under both the wave-4 and the widened wave-5 scope). -/
+private def fixedOwnerGateWitness : Input :=
+  { entryPoint := .requestWithdrawals, caller := 1, senderFrom := 1, recipient := 0,
+    requestOwner := 1, amount := 1, requestId := 0, paused := false, requestExists := true,
+    requestClaimed := false, requestFinalized := false, hintValid := false,
+    callerIsApprovedForAll := false, callerIsTokenApproved := false, amountInRange := true,
+    callerBalanceSufficient := true, callerAllowanceSufficient := true,
+    externalCallSucceeds := true }
+
+/-- **Kill-line refuting the registered P-ADDRESS-1 parent
+(`PAddress1.universal_address_writer_equivariance`) on a mutant of its own
+model.**  The negated statement is the parent's exact predicate shape with the
+mutant `runFixedOwnerGated` substituted for `run`: the same nonzero-caller
+binders and BOTH conclusion conjuncts (admission-bit equality and
+committed-post renaming).  (The wave-4 parent carried an
+`addressEquivarianceEntryScope` premise; wave 5 widened the scope to all four
+modeled writers, retiring the premise as vacuous, so the negated shape carries
+no scope implication.)  On the witness `fixedOwnerGateWitness` with callers
+`1` (the fixed owner) and `2`, the mutant admits caller `1` and commits
+`⟨1, 1, 1, 1⟩`, while the `1 ↔ 2`-swapped input is rejected
+(`2 ≠ fixedOwner`) -- so the admission bits differ AND the swapped run cannot
+commit the renamed post `⟨2, 2, 2, 2⟩`.  Both conjunct failures are
+`decide`-checked in `hBoth`; the refutation closes through the post-state
+conjunct.  This is the fact
 `AddressAdmission.ownerGated_not_admission_equivariant` could not supply,
 since that theorem is stated over a disconnected toy `FunctionSpec` that never
 mentions `SolidityAddress.run`. -/
+theorem fixed_owner_gate_kill_line_refutes_parent :
+    ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
+        succeeds (runFixedOwnerGated (renameInput a₁ a₂ inp)) =
+          succeeds (runFixedOwnerGated inp) ∧
+        ∀ post, runFixedOwnerGated inp = .committed post →
+          runFixedOwnerGated (renameInput a₁ a₂ inp) =
+            .committed (renamePost a₁ a₂ post) := by
+  intro h
+  have hcex := h 1 2 (by decide) (by decide) fixedOwnerGateWitness
+  have hBoth :
+      (succeeds (runFixedOwnerGated (renameInput 1 2 fixedOwnerGateWitness)) ≠
+          succeeds (runFixedOwnerGated fixedOwnerGateWitness)) ∧
+        runFixedOwnerGated (renameInput 1 2 fixedOwnerGateWitness) ≠
+          .committed (renamePost 1 2 ⟨1, 1, 1, 1⟩) :=
+    ⟨by decide, by decide⟩
+  exact hBoth.2 (hcex.2 ⟨1, 1, 1, 1⟩ (by decide))
+
+/-- **Sibling evidence: admission projection only.**  Refutes the parent's
+first conclusion conjunct on the same fixed-owner-gated mutant, WITHOUT the
+parent's `addressEquivarianceEntryScope` premise and WITHOUT the post-state
+conjunct -- the shape of the sibling `source_admission_nondiscriminatory`,
+not of the registered parent.  Subsumed by
+`fixed_owner_gate_kill_line_refutes_parent` above, which negates the parent's
+full predicate shape; retained as a compact, fully `decide`-checked statement
+of the admission-bit failure on its own. -/
 theorem fixed_owner_gate_not_admission_equivariant :
     ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
         succeeds (runFixedOwnerGated (renameInput a₁ a₂ inp)) =
           succeeds (runFixedOwnerGated inp) := by
   intro h
-  have hcex := h 1 2 (by decide) (by decide)
-    { entryPoint := .requestWithdrawals, caller := 1, senderFrom := 1, recipient := 0,
-      requestOwner := 1, amount := 1, requestId := 0, paused := false, requestExists := true,
-      requestClaimed := false, requestFinalized := false, hintValid := false,
-      callerIsApprovedForAll := false, callerIsTokenApproved := false, amountInRange := true,
-      callerBalanceSufficient := true, callerAllowanceSufficient := true,
-      externalCallSucceeds := true }
+  have hcex := h 1 2 (by decide) (by decide) fixedOwnerGateWitness
   revert hcex
   decide
 
 /-- Retained for the denote-admission subordinate row only: the disconnected
 toy `AddressAdmission.ownerGated` mutant is not a kill-line for the registered
-`PAddress1` parent (see `fixed_owner_gate_not_admission_equivariant` above for
+`PAddress1` parent (see `fixed_owner_gate_kill_line_refutes_parent` above for
 that), but it remains valid evidence for
 `P-ADDRESS-1.denote-admission`'s own `admission_address_equivariant` claim. -/
 theorem address_admission_toy_owner_gate_not_equivariant :

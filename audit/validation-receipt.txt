@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 87a2d2122c7c78a0780b7e31e6978acf9fac14aa
+validated-tree: e35a43d0fb92dfcb343a08831eab0c88f3b23420
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -2739,5 +2739,96 @@ Wave 5: P-DEPOSIT-1/P-ALLOC-1/P-ACCOUNT-1 documentation cleanup (2026-08-19)
   files/rows plus shared metadata (`audit/guarantees.yaml`,
   `scripts/audit_metadata.py`, regenerated views, this receipt) are
   touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+Wave 5: P-ADDRESS-1 parent-shaped kill-line and total entrypoint scope (2026-08-19)
+-----------------------------------------------------------------------------------
+
+- Defect (wave-5 review finding): the kill-line
+  `fixed_owner_gate_not_admission_equivariant`
+  (`LidoSRv3/Tests/AddressSourceMutants.lean`) had statement shape
+  `¬ ∀ a₁ a₂ ≠0 inp, Adm_mutant` -- it negated only the ADMISSION
+  conjunct of the fixed-owner-gated mutant, WITHOUT the registered
+  parent's `hScope` premise and WITHOUT the post-state equivariance
+  conjunct. That is the shape of the sibling
+  `source_admission_nondiscriminatory`, not of the registered parent
+  `PAddress1.universal_address_writer_equivariance`
+  (`∀ a₁ a₂ ≠0 inp, hScope → (Adm ∧ Post)`), so no kill-line refuted
+  the registered parent's exact predicate shape (compare the merged
+  gold standards `ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`
+  and `SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent`).
+- Fix (kill-line): new theorem `fixed_owner_gate_kill_line_refutes_parent`
+  in `LidoSRv3/Tests/AddressSourceMutants.lean` negates the parent's
+  FULL predicate shape on the mutant `runFixedOwnerGated` -- the same
+  nonzero-caller binders and BOTH conclusion conjuncts (admission-bit
+  equality and committed-post renaming). On the witness
+  `fixedOwnerGateWitness` (an otherwise-eligible `requestWithdrawals`
+  input, callers `1` = the mutant's fixed owner and `2`), the mutant
+  admits caller `1` and commits `⟨1, 1, 1, 1⟩` while the `1 ↔ 2`-swapped
+  input reverts (`2 ≠ fixedOwner`), so the admission bits differ AND
+  the swapped run cannot commit the renamed post `⟨2, 2, 2, 2⟩`; both
+  failures are `decide`-checked in `hBoth` and the refutation closes
+  through the post-state conjunct. The admission-only theorem is
+  retained with an honest docstring as admission-projection sibling
+  evidence, explicitly subsumed by the parent kill-line.
+- Strengthening (landed cleanly, no new assumptions):
+  `addressEquivarianceEntryScope`
+  (`LidoSRv3/Audit/Source/AddressCorrespondence.lean`) now covers
+  `claimWithdrawalsTo` too -- its request-owner gate
+  (`caller = requestOwner`) is caller-relative and renames with the
+  caller (`requestOwner` is an address-indexed input field renamed by
+  `renameInput`), so the same source lemmas (`run_rename` and its
+  corollaries) apply there. New theorem
+  `addressEquivarianceEntryScope_total` proves the scope total over
+  the four modeled permissionless writers. The wave-4 `hScope`
+  premise thereby became vacuous (`True` on every `EntryPoint`), so
+  per the wave-4 load-bearing criterion it is no longer carried by
+  the registered parent: `universal_address_writer_equivariance` is
+  now unconditional over the four writers, proved by the direct pair
+  `source_admission_nondiscriminatory` /
+  `source_success_post_state_equivariant` (deleting the binder cannot
+  break the proof, and an unused binder would read as a real
+  restriction while hiding that the claim is premise-free). The
+  kill-line's negated shape correspondingly carries no scope
+  implication. `fidelity.missing` drops the `claimWithdrawalsTo`
+  exclusion.
+- `audit/guarantees.yaml`'s `P-ADDRESS-1` row: `summary`,
+  `fidelity.covered`/`missing`, `reproduction.expected`,
+  `classification.work`, and `next_gate` now describe the
+  unconditional four-writer parent, cite
+  `fixed_owner_gate_kill_line_refutes_parent` as the parent kill-line,
+  and label `fixed_owner_gate_not_admission_equivariant` as
+  admission-projection sibling evidence. `abstract.theorem`,
+  `verity.theorem`, classification kind, and assumptions are
+  unchanged. `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ADDRESS-1"]` is recomputed to
+  `21f4201ce493ea0740b743687f441a7ed11b785a606fc8efffe9167b72b791c1`,
+  and `audit/STATUS.md`, `audit/REPRODUCE.md`, and `audit/ROADMAP.md`
+  are regenerated with `python3 scripts/audit_metadata.py generate`;
+  the diff is confined to the `P-ADDRESS-1` row.
+- `report/P-ADDRESS-1.md`: dated wave-5 section added (kill-line
+  reshape plus scope-widening rationale); Theorems line, Intent,
+  Modeling, and Proof sections updated; issues 2-3 refreshed.
+  `scripts/check_public_claim_surfaces.py` covers only P-DEPOSIT-1 and
+  P-TOPUP-1, so the `PAddress1.lean` declaration-surface change (the
+  vacuous `hScope` binder dropped from the parent; no theorems
+  renamed, added, or removed there) needs no surface-registry update.
+- Gates: `lake build LidoSRv3` (1395 jobs) and `lake build
+  LidoSRv3.Tests.AddressEquivariance LidoSRv3.Tests.AddressSourceMutants`
+  exit 0 with no new warnings in the touched files; `python3
+  scripts/audit_metadata.py check` (11 canonical guarantees plus 14
+  subordinate evidence rows), `python3 scripts/test_audit_metadata.py`,
+  `python3 scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, `bash
+  scripts/test_check_no_python_evidence.sh`, and `make test`: exit 0.
+  New proofs use only `decide`/`trivial`/explicit terms; no
+  `sorry`/`admit`/`native_decide`.
+- Authored in the isolated git worktree `/home/ubuntu/wt/paddress1` on
+  branch `cursor/wave5-paddress1-4b38`; no other in-flight branch's
+  files are touched by this diff.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.

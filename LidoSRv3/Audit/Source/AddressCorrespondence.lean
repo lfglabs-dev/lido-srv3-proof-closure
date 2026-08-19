@@ -88,17 +88,25 @@ carried explicitly on the parent theorem rather than left implicit in prose. -/
 def singletonActorEntryPoint (_ep : EntryPoint) : Prop :=
   False
 
-/-- Scoped entrypoints for the Wave 1 parent: permissionless writers whose
-admission is pause plus the caller's own balance/allowance flags. Request-owner
-gates and singleton-actor callers are excluded (`claimWithdrawalsTo` deferred). -/
+/-- Scoped entrypoints for the parent: the four permissionless writers pinned
+in this module.  Since wave 5 the scope covers `claimWithdrawalsTo` too: its
+request-owner gate (`caller = requestOwner`) is caller-relative and renames
+with the caller (`requestOwner` is an address-indexed input field renamed by
+`renameInput`), so the same source lemmas (`run_rename` and its corollaries)
+apply there.  The scope is therefore satisfied by every modeled entrypoint. -/
 def addressEquivarianceEntryScope (ep : EntryPoint) : Prop :=
   match ep with
-  | .transferFrom | .requestWithdrawals | .unwrap => True
-  | .claimWithdrawalsTo => False
+  | .transferFrom | .requestWithdrawals | .claimWithdrawalsTo | .unwrap => True
 
 theorem not_singleton_actor_entry_point (ep : EntryPoint) :
     ¬ singletonActorEntryPoint ep := by
   intro h; cases h
+
+/-- The scope is total over the four modeled permissionless writers (wave 5):
+every `EntryPoint`, including `claimWithdrawalsTo`, is in scope. -/
+theorem addressEquivarianceEntryScope_total (ep : EntryPoint) :
+    addressEquivarianceEntryScope ep := by
+  cases ep <;> trivial
 
 /-- Conjunction of the exact caller/address guards on the mapped single-item paths. -/
 def admitted (inp : Input) : Bool :=
