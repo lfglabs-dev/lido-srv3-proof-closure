@@ -56,7 +56,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "NONE", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
+    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.router_require_post_condition", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
     "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE")),
 }
@@ -69,7 +69,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-RESERVE-1": "f0a6f779832dec50329bdf21669f32fbec1b9863fe00a8dcafb9075535ef9d98",
     "P-ETH-1": "4541a6d063d46ac8519158233925cbb1b26369522327430c4cc402a6da2e8dd5",
     "P-ADDRESS-1": "2d4ad425a74bb7ba0e8b00d0d7b1a9ef287ba622b79621f09142c7f2e9b9093a",
-    "P-TOPUP-2": "1e773bd3b904d1b5a61df67de0bc8c684b94f408991b7c95ece55e4ccf421fc7",
+    "P-TOPUP-2": "457a399ac61bc41f7e2f1795f831ecba783fe8aa2aaf455eba2f67d3e1b81b91",
     "P-CONSOLIDATION-1": "1b3a7c71e6cb94da7bee635b90926502564e4abb2a33f3d365ef92a5ef418949",
     "P-SSZ-1": "40dab808db2b6a2d79ae6090507e9efecb0894f2e9a4600de943dd912222fa94",
 }
