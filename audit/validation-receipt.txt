@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 8c564644fa39845e2e58171073b58ea1006cc77d
+validated-tree: ded6b60671fe2edc77ea44b3de54e00cf9bf169a
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1914,4 +1914,4 @@ Wave 4: P-ETH-1 parent kill-lines on gatewayExecute mutants (2026-08-19)
   `bash scripts/test_check_no_python_evidence.sh`, and `make test`:
   exit 0.
 - Receipt subject: tracked tree excluding this receipt,
-  `8c564644fa39845e2e58171073b58ea1006cc77d`.
+  `ded6b60671fe2edc77ea44b3de54e00cf9bf169a`.
