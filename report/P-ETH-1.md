@@ -3,6 +3,23 @@
 Theorems: `PEth1.eth_flow_parent`, `PEth1.verity_tx_composes_value_flow_and_rollback`.
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
+## Wave 1 changes (2026-08-19)
+
+**Strengthened `eth_flow_parent`:**
+- Derives destinations from call-journal addresses classified against an `ApprovedSet` (consolidation contract, refund recipient).
+- Quantifies `∀ (msgValue n fee : Nat)` — universally over all funded triples.
+- `msg.value = 0` reverts with `GatewayRevert.zeroArgument`.
+- `n * fee ≥ 2^256` reverts with `GatewayRevert.overflowPanic`.
+- `n * fee > msgValue` reverts with `GatewayRevert.insufficientValue`.
+- Success branch: every move is `parentApproved` (no `.other`) and `totalAmount = msgValue`.
+- VaultHub / `StakingVault.withdraw` explicitly named out of scope on the theorem.
+
+**Kill-line mutants:**
+- `rejects_unapproved_journal_entry`: classifying address 999 (not in ApprovedSet) produces `.other 999`; the parent’s `parentApproved` predicate rejects it.
+- `rejects_zero_msg_value`: `gatewayExecute` with `msgValue = 0` returns `.reverted .zeroArgument`, not success.
+
+**Non-composition:** This ensemble is NOT composed into P-CONSOLIDATION-1 until the `FunctionSpec` is actually `ConsolidationGateway.addConsolidationRequests`.
+
 ## Intent
 
 SRv3 moves ETH along a small set of protocol paths: `ConsolidationBus` forwards `msg.value` to `ConsolidationGateway`; the gateway pays `requestsCount × fee` into `WithdrawalVault` and refunds the rest; the vault pays the EIP-7251 `CONSOLIDATION_REQUEST` predeploy (and, separately, EIP-7002 `WITHDRAWAL_REQUEST`); `WithdrawalVault.withdrawWithdrawals` sends finalized EL rewards / withdrawals to Lido. The intended guarantee is that those paths never leak wei to a lateral address and that what goes out equals what came in.

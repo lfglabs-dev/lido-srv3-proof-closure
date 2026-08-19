@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Verity.PEth1CompositionTx
+import LidoSRv3.Audit.Guarantees.PEth1
 
 /-!
 Discriminating mutants for the composed P-ETH-1 transaction.
@@ -65,5 +66,26 @@ example :
     observe (run honest 10 4 3) ≠
       ⟨.success, 6, ⟨0, 0, 0, 0, 0, 12, 0⟩⟩ := by
   decide +kernel
+
+/-! ## Wave 1 kill-line mutants — the registered parent must reject these -/
+
+open LidoSRv3.Audit.Guarantees.PEth1
+
+private def testApproved : ApprovedSet :=
+  { consolidationContract := 100
+    refundRecipient := 200 }
+
+/-- Kill-line: a journal entry to an unapproved address makes the parent fail.
+The `classifyJournal` function maps address 999 to `.other 999`, so
+`parentApproved` is `False`. -/
+theorem rejects_unapproved_journal_entry :
+    let moves := [{ amount := 5, destination := classifyJournal testApproved 999 : EthMove }]
+    ¬ (∀ m, m ∈ moves → parentApproved m.destination) := by
+  simp [classifyJournal, testApproved, parentApproved]
+
+/-- Kill-line: `msg.value = 0` produces a `ZeroArgument` revert, not success. -/
+theorem rejects_zero_msg_value :
+    gatewayExecute testApproved 0 2 3 = .reverted .zeroArgument := by
+  rfl
 
 end LidoSRv3.Tests.PEth1CompositionTxMutants
