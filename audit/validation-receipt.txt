@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 4ad1dbed43e04955b8b6b3021b6f2cfef68fc10f
+validated-tree: f9980cb79c076e6d8839a27abc0c35946279ca58
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1912,3 +1912,71 @@ Wave 4: P-ADDRESS-1 vacuous-parent-hypothesis remediation (2026-08-19)
   touched by this diff.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
+
+Wave 4: P-RESERVE-1 parent kill-line remediation (2026-08-19)
+--------------------------------------------------------------
+
+- Defect: the registered parent
+  `PReserve1.source_spend_preserves_withdrawal_reserve` had no kill-line
+  refuting its own predicate. The named `staleQueueCacheKillLine` /
+  `staleQueueCacheKillLine_holds` (with the `Tests/ReserveMutants.lean`
+  witness `stale_queue_cache_mutant_counterexample`) refutes only the
+  unconditional, freshness-DROPPED sibling claim
+  `∀ before after amount live, spendDepositableEther before amount = .committed after → liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live`.
+  On the stale-cache witness the parent cannot be instantiated at all:
+  `freshQueueCache staleCacheBefore live` forces `live = 50`, where the
+  conclusion holds. That is hypothesis-NECESSITY evidence, not parent
+  falsifiability.
+- Fix: new transition-mutant kill-line in `Tests/ReserveMutants.lean`.
+  `mutantWithdraw` wraps the pre-existing `withdrawalPartitionMutant`
+  (commits like `spendDepositableEther`, then overwrites `buffered` with the
+  post-spend `storedDepositsReserve`) in the same
+  `canDeposit`/`authorizedRouter`/nonzero guards as
+  `modelWithdrawDepositableEther`.
+  `partition_spend_mutant_witness` pins the concrete vector: the cache is
+  FRESH (`freshQueueCache vector (word 50)`), the mutated call commits, and
+  the live queue-facing reserve drops 50 -> 0.
+  `partition_spend_mutant_kill_line_refutes_parent` proves the negation of
+  the parent's own predicate shape -- `freshQueueCache` hypothesis retained
+  -- with `mutantWithdraw` in place of `modelWithdrawDepositableEther`.
+  The mutation hits the spend transition, not the freshness premise.
+- Relabeling only, no statement changes: `staleQueueCacheKillLine_holds`
+  and `stale_queue_cache_mutant_counterexample` are kept as Lean theorems
+  but are now described everywhere (parent docstring, `staleQueueCacheKillLine`
+  docstring, `ReserveMutants` section header, YAML row, report) as
+  premise-necessity evidence showing the `freshQueueCache` hypothesis cannot
+  be dropped, not as the parent kill-line.
+- `audit/guarantees.yaml` P-RESERVE-1 row: `summary`, `fidelity.covered`,
+  and `reproduction.expected` cite the transition-mutant kill-line as the
+  parent kill-line and the stale-cache theorems as hypothesis-necessity
+  evidence; `abstract.theorem`, `verity.theorem`, classification, and
+  assumptions are unchanged.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-RESERVE-1"]` recomputed
+  (`632ea3e4f037172ec14c01d040fcb135ba1624631e74c1ecd7cf3e7b561e6d1b`) and
+  views regenerated with `python3 scripts/audit_metadata.py generate`; the
+  view diff is confined to the P-RESERVE-1 row of `audit/REPRODUCE.md`.
+  `report/P-RESERVE-1.md` gains a dated "Wave 4 changes" section and an
+  updated Theorems line.
+- Pre-existing harness repair (also red on pristine main):
+  `scripts/test_audit_metadata.py`'s NONE-classification mutant targeted
+  `guarantees[1]` (P-ALLOC-2, IMPLEMENTATION_PENDING), tripping "pending
+  work is incomplete" instead of the expected "NONE may not hide extra
+  claims"; retargeted to `guarantees[2]` (P-DEPOSIT-1, classification
+  NONE), same intent -- the same fix wave-4 P-ADDRESS-1 shipped as
+  76e5d1c.
+- Gates: `lake build LidoSRv3` (1395 jobs); `lake build
+  LidoSRv3.Tests.ReserveMutants LidoSRv3.Tests.ReserveRelationalMutants
+  LidoSRv3.Tests.ReserveRelationalTxMutants`; `python3
+  scripts/audit_metadata.py check` (11 canonical guarantees plus 14
+  subordinate rows); `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`; `python3
+  scripts/check_public_claim_surfaces.py`; `python3
+  scripts/test_public_claim_surfaces.py`; `python3
+  scripts/test_verity_provenance.py`; `bash
+  scripts/check_provenance_guards.sh`; `bash
+  scripts/check_no_python_evidence.sh`; `bash
+  scripts/test_check_no_python_evidence.sh`: exit 0. No `sorry`/`admit`; the
+  new theorems close by `rfl`/`decide` only (no `native_decide`).
+- Receipt subject: tracked tree excluding this receipt,
+  `259def02d4e099dd3719adff71d504e62cb89869`.

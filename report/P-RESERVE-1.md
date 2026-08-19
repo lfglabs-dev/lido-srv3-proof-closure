@@ -1,6 +1,6 @@
 # P-RESERVE-1
 
-Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`.
+Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-line: `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`. Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -146,6 +146,63 @@ Directly answers issues #1, #2, and #5 above, without widening the claim past a 
 
 2. **`freshQueueCache` names the WQ/CALL gap, and `liveEffectiveWithdrawalsReserve` is the property issue #1/#2 asked for.** `liveEffectiveWithdrawalsReserve state live` recomputes the min-capped queue-facing reserve against an explicit `live` value standing in for a `WithdrawalQueue.unfinalizedStETH()` CALL, instead of the state's cached field. `committed_preserves_live_effective_withdrawals_reserve` proves it is invariant under a legal spend *given* `freshQueueCache before live` (`before.unfinalizedStETH = live`). This is the non-restatement invariant issue #1 said the old theorem never used, made conditional on the cache freshness issue #2 said was implicit.
 
-3. **`staleQueueCacheKillLine` — the kill-line for #2, made concrete.** `staleQueueCacheKillLine_holds` (in `ReserveCorrespondence.lean`) and `ReserveMutants.stale_queue_cache_mutant_counterexample` exhibit `before`/`after` states where `spendDepositableEther` commits, the *original* `withdrawalPartitionSpendInvariant` holds with no trouble, but `liveEffectiveWithdrawalsReserve` drops from 80 to 50 once the cached `unfinalizedStETH = 50` is stale against a live value of 80 — the exact raid issue #2 describes. `freshQueueCache` is exactly the hypothesis that rules this vector out; drop it and the strengthened conclusion is false on this witness.
+3. **`staleQueueCacheKillLine` — premise-necessity evidence for #2, made concrete.** `staleQueueCacheKillLine_holds` (in `ReserveCorrespondence.lean`) and `ReserveMutants.stale_queue_cache_mutant_counterexample` exhibit `before`/`after` states where `spendDepositableEther` commits, the *original* `withdrawalPartitionSpendInvariant` holds with no trouble, but `liveEffectiveWithdrawalsReserve` drops from 80 to 50 once the cached `unfinalizedStETH = 50` is stale against a live value of 80 — the exact raid issue #2 describes. `freshQueueCache` is exactly the hypothesis that rules this vector out; drop it and the strengthened conclusion is false on this witness. (Relabeled in Wave 4: this refutes the freshness-*dropped* sibling claim — hypothesis necessity — not the registered parent, which cannot be instantiated on the stale-cache vector. The parent kill-line is the Wave 4 transition mutant below.)
 
 4. **What is still not claimed.** No live `WithdrawalQueue.unfinalizedStETH()` CALL exists in the model — `freshQueueCache` is an accepted per-call hypothesis, not something derived from `ReserveState` or a Verity `CALL` observation. `canDeposit`/`authorizedRouter` are still not tied to bunker mode, pause state, or `msg.sender`. Issues #3, #4, #6–#17 are unaffected and remain as originally reported.
+
+## Wave 4 changes (2026-08-19): P-RESERVE-1 parent kill-line remediation
+
+**Defect.** The registered parent
+`PReserve1.source_spend_preserves_withdrawal_reserve` had no kill-line that
+refutes *its own* predicate. The named `staleQueueCacheKillLine` /
+`staleQueueCacheKillLine_holds` (plus the `ReserveMutants` witness
+`stale_queue_cache_mutant_counterexample`) refutes only the *unconditional,
+freshness-dropped* sibling claim
+`∀ before after amount live, spendDepositableEther before amount = .committed after → liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live`.
+On the stale-cache witness the parent cannot even be instantiated:
+`freshQueueCache staleCacheBefore live` forces `live = 50`, where the
+conclusion holds — so the witness demonstrates hypothesis *necessity*, not
+parent *falsifiability*.
+
+**Fix: registered a transition-mutant parent kill-line.** The mutation hits
+the spend transition, not the freshness premise:
+`withdrawalPartitionMutant` (pre-existing in `Tests/ReserveMutants.lean`)
+commits exactly like `spendDepositableEther`, then overwrites `buffered` with
+the post-spend `storedDepositsReserve`. The new `mutantWithdraw` wraps it in
+the same `canDeposit` / `authorizedRouter` / nonzero guards as
+`modelWithdrawDepositableEther`, so the kill-line targets the parent's own
+predicate shape:
+
+- `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_witness` — concrete
+  witness: `freshQueueCache vector (word 50)` holds (the cache is FRESH), the
+  mutated call commits, and
+  `liveEffectiveWithdrawalsReserve` drops 50 → 0 across it.
+- `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent` —
+  proves the negation of the parent's statement shape with
+  `mutantWithdraw` in place of `modelWithdrawDepositableEther`, the
+  `freshQueueCache` hypothesis retained, instantiated by the witness above.
+
+**Relabeling.** `staleQueueCacheKillLine_holds` and
+`stale_queue_cache_mutant_counterexample` are kept unchanged as Lean
+theorems, but every reference (the parent's docstring, the
+`staleQueueCacheKillLine` docstring, the `ReserveMutants` section header, the
+YAML row, and this report) now describes them as premise-necessity evidence —
+they show the `freshQueueCache` hypothesis cannot be dropped — not as the
+parent kill-line.
+
+**What did not change.** No registered theorem statement is touched:
+`source_spend_preserves_withdrawal_reserve`,
+`verity_tx_simulates_reserve_spec`, `verity_tx_preserves_withdrawal_reserve`,
+`staleQueueCacheKillLine`, and `staleQueueCacheKillLine_holds` are all
+identical; the only source-file edits are docstrings. `abstract.theorem`,
+`verity.theorem`, classification, and assumptions in `audit/guarantees.yaml`
+are unchanged; `summary`, `fidelity.covered`, and `reproduction.expected` now
+cite the transition-mutant kill-line as the parent kill-line and the
+stale-cache theorems as hypothesis-necessity evidence. No `sorry`/`admit`;
+every new vector closes by `rfl` or `decide` (no `native_decide`).
+
+**Build.** `lake build LidoSRv3` and `lake build
+LidoSRv3.Tests.ReserveMutants LidoSRv3.Tests.ReserveRelationalMutants
+LidoSRv3.Tests.ReserveRelationalTxMutants`: exit 0. `python3
+scripts/audit_metadata.py generate && check`: exit 0 (11 canonical guarantees
++ 14 subordinate rows; detail sha for P-RESERVE-1 recomputed).

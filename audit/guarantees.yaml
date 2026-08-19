@@ -217,9 +217,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
-        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, and stale-cache kill-line mutants build"
+        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, the transition-mutant parent kill-line (partition_spend_mutant_kill_line_refutes_parent), and the stale-cache premise-necessity mutants build"
       },
-      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness show that live invariance fails once the cache goes stale. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
+      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. Parent kill-line: LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent refutes the parent's own predicate shape (freshQueueCache hypothesis retained) for mutantWithdraw, a mutation of the spend transition that commits under a fresh cache while the live queue-facing reserve drops 50 to 0. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness are hypothesis-necessity evidence only: they show the freshQueueCache premise cannot be dropped, not that the parent is false. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve"
@@ -234,7 +234,7 @@
           "source-shaped spending and checked arithmetic under well-formed storage",
           "Contract.run rollback after intermediate writes",
           "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed",
-          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; a stale-cache kill-line witnesses the raid when freshness fails"
+          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped"
         ],
         "missing": [
           "live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)",

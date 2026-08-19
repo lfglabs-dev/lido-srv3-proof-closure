@@ -651,13 +651,21 @@ theorem committed_preserves_live_effective_withdrawals_reserve
     liveEffectiveWithdrawalsReserve_eq_of_eq before live hfresh]
   exact committed_preserves_effective_withdrawals_reserve before after amount h
 
-/-- Named kill-line: without a fresh queue cache, the same "spend only
-depositsReserve + unreserved" transition that
+/-- Named premise-necessity kill-line: without a fresh queue cache, the same
+"spend only depositsReserve + unreserved" transition that
 `committed_preserves_effective_withdrawals_reserve` shows is always safe
 against the *cached* field can still raid the reserve a live
 `WithdrawalQueue.unfinalizedStETH()` call would report. Concretely witnessed
 by `staleQueueCacheKillLine_holds` and by
-`LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`. -/
+`LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
+
+Scope note: this refutes the freshness-DROPPED sibling of the registered
+parent `PReserve1.source_spend_preserves_withdrawal_reserve` — it demonstrates
+that the parent's `freshQueueCache` hypothesis cannot be removed, not that the
+parent is false (the parent cannot be instantiated on the stale-cache
+witness). The parent kill-line, a mutation of the spend transition with
+freshness retained, is
+`LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`. -/
 def staleQueueCacheKillLine : Prop :=
   ¬ ∀ (before after : ReserveState) (amount live : Word),
     spendDepositableEther before amount = .committed after →
