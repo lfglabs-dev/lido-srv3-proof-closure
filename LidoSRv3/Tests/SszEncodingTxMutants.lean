@@ -182,12 +182,41 @@ example :
       sourceView matching := by
   native_decide
 
+/-- Digest-chain map corruption: changing a written digest-chain entry is
+visible in the outcome readback. Unlike the pre-write local `chain` list,
+`Observables.digest` is reread from `digestMapSlot` storage via `readObs`, so
+this corruption is now observable exactly like the path/branch maps above. -/
+private def corruptDigestMapMutant (input : EncodingInput) : Contract Observables :=
+  fun snapshot =>
+    match (encode input).run snapshot with
+    | .revert reason state => .revert reason state
+    | .success obs state =>
+        .success obs (state.writeMapUint (digestMapSlot 0) 0 1)
+
+example :
+    observe ((corruptDigestMapMutant matching).run defaultState) ≠
+      sourceView matching := by
+  native_decide
+
 /-- Witness-bind drop: clearing the executed bind result is likewise rejected
 by the same outcome correspondence used by the composed theorem. -/
 example :
     observe ((dropBoundMutant matching).run defaultState) ≠
       sourceView matching := by
   native_decide
+
+/-- Kill-line: mixing a witness bound for one deposit (`matching`'s
+`boundWitness`) with a *different* deposit's expected root (`secondMatching`'s
+`secondRoot`) is rejected. This is the executable analogue of
+`PSsz1.inconsistent_witness_kill_line`: the composed parent's structural-bind
+hypothesis now names one shared witness/root pair (`ComposedSszInput`), so a
+witness cannot be paired with an unrelated root and still commit. -/
+private def crossedWitness : EncodingInput :=
+  { matching with expectedWitnessRoot := secondRoot }
+
+example : structuralOk crossedWitness = false := by native_decide
+
+example : runView crossedWitness = ⟨.reverted, zeroObs⟩ := by native_decide
 
 /-- Encoding-mismatch: swapped concat operands change the packed observable. -/
 private def swappedConcat (input : EncodingInput) : EncodingInput :=
