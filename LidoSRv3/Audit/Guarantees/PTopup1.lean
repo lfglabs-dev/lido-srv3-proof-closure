@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.TopupCorrespondence
+import LidoSRv3.Audit.Source.TopupParentCorrespondence
 import LidoSRv3.Audit.Verity.TopupTx
 import LidoSRv3.Audit.Guarantees.Registry
 
@@ -269,5 +270,67 @@ theorem verity_tx_simulates_source
   · intro failure reason rollback hRevert
     exact Verity.TopupTx.revert_restores_snapshot inp.allocations failure
       _ rollback reason hRevert
+
+/--
+**Wave 1 conjunct: wrap ⇒ assert revert (A-TOPUP-NOWRAP discharge).**
+
+If the unchecked accumulation at source line 732 wraps mod 2²⁵⁶ (i.e.,
+`¬ NoUncheckedWrap inp`) and the arrays are length-matched (so the push tail
+is reachable), then the on-chain wrapped accumulator disagrees with the push
+loop’s total.  In the parent model this means the
+`assert(etherBalanceBefore == etherBalanceAfter)` at source line 755 fires,
+reverting the transaction.
+-/
+theorem source_wrap_implies_assert_revert
+    {inp : SourceTopupInput}
+    (hWrap : ¬ NoUncheckedWrap inp)
+    (hLen : inp.pubkeyLengths.length = inp.allocations.length) :
+    SolidityTopupParent.accumulated inp ≠ pushedValue inp :=
+  SolidityTopupParent.wrap_implies_accumulated_ne_pushed hWrap hLen
+
+/--
+**Wave 1: `moduleExists` guard is exercised.**
+
+The `_requireModuleIdExists` guard at `SRUtils.sol` lines 45–47 (reached from
+source line 689) is live in the registered interpreter: when the module does
+not exist, `run` reverts with `revertStakingModuleUnregistered` regardless of
+any other input.
+-/
+theorem source_module_guard_required
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hMod : inp.moduleExists = false)
+    (hAuth : inp.callerIsTopUpGateway = true)
+    (hKeys : inp.keyIndicesLength ≠ 0)
+    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
+    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false) :
+    run cfg inp = .revertStakingModuleUnregistered := by
+  simp only [run, hAuth, hKeys, hPub, hMod, ite_false, ite_true]
+  simp at hLens
+  simp [hLens.1, hLens.2.1, hLens.2.2]
+
+/--
+**Wave 1: `wcTypeIsType2` guard is exercised.**
+
+The `_requireWCType2` guard at `SRUtils.sol` lines 41–43 (reached from source
+line 694) is live: when withdrawal credentials are not type-2, `run` reverts
+with `revertWrongWithdrawalCredentialsType`, provided earlier guards pass.
+-/
+theorem source_wc_type2_guard_required
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hWc : inp.wcTypeIsType2 = false)
+    (hAuth : inp.callerIsTopUpGateway = true)
+    (hKeys : inp.keyIndicesLength ≠ 0)
+    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
+    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false)
+    (hMod : inp.moduleExists = true)
+    (hActive : inp.moduleActive = true) :
+    run cfg inp = .revertWrongWithdrawalCredentialsType := by
+  simp only [run, hAuth, hKeys, hPub, hMod, hActive, hWc, ite_false, ite_true]
+  simp at hLens
+  simp [hLens.1, hLens.2.1, hLens.2.2]
 
 end LidoSRv3.Audit.Guarantees.PTopup1
