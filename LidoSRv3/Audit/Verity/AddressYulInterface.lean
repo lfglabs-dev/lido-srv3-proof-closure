@@ -37,9 +37,9 @@ def AddressBuiltin.toYul : AddressBuiltin → YulStmt
   | .calldataloadAddress offset =>
       .Let ["loadedAddress"]
         (some (.Call (.inl EvmYul.Operation.CALLDATALOAD) [lit offset]))
-  | .sloadAddress slot =>
+  | .sloadAddress storageSlot =>
       .Let ["storedAddress"]
-        (some (.Call (.inl EvmYul.Operation.SLOAD) [lit slot]))
+        (some (.Call (.inl EvmYul.Operation.SLOAD) [lit storageSlot]))
   | .calldatacopySourceTarget memoryOffset calldataOffset byteCount =>
       .ExprStmtCall (.Call (.inl EvmYul.Operation.CALLDATACOPY)
         [lit memoryOffset, lit calldataOffset, lit byteCount])

@@ -12,6 +12,7 @@ import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PDeref1
+import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 
 /-!
 # Canonical minimal-11 public facade
@@ -66,6 +67,6 @@ example : LidoSRv3.Audit.Verity.DepositParentTx.Preconditions
   PDeposit1.canonical_composition_witness.2.1
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
-def supplemental : List Guarantee := [PDeref1.guarantee]
+def supplemental : List Guarantee := [PDeref1.guarantee, PReserveRelational.guarantee]
 
 end LidoSRv3.Audit.Guarantees

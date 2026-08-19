@@ -27,6 +27,7 @@ SUBORDINATE_IDS = [
     "P-CONSOLIDATION-1.fee-refinement.tx",
     "P-SSZ-1.tx-execution-simulation", "P-ETH-1a", "P-ETH-1b",
     "P-ADDRESS-1.denote-admission", "P-DEREF-1",
+    "P-RESERVE-RELATIONAL",
 ]
 EXPECTED_IDS = CANONICAL_IDS + SUBORDINATE_IDS
 ASSURANCE_STATUSES = {"OPEN", "PARTIAL", "CHECKED"}
@@ -66,7 +67,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-TOPUP-1": "cbab53d2f06c49623fab5694619493980e5cff671b5adba37210e70599d926c9",
     "P-ACCOUNT-1": "b4422bd7a9dd34f3f2e18bb0afa2774a8f093db6c37de717e1fd6bdde80ff1d3",
     "P-RESERVE-1": "e8f34af2bb8d1eb061da1882ff2460535489056a8e9eca41e7b8c750a614ff27",
-    "P-ETH-1": "9f79007c732bddca4e2ca56d988c63aa0059b35c6e48def28985dad3e3cbcd64",
+    "P-ETH-1": "eafed670006edc8828d45b03192348f274f2c14cca25d670bce06646b09539ef",
     "P-ADDRESS-1": "5954748d0f86f323fca578148755f5552a3485a2d0f3fdbb717ad626be7ccd3f",
     "P-TOPUP-2": "f71ef81588d77e28a3226eafd91e4a896fe0f6a04db1bc5d9dd4d0e84cf16c61",
     "P-CONSOLIDATION-1": "c459ec05da73f3d6ac52d13d93bdf263c2eeced71a999f3c34fe8397e496eb1d",
@@ -277,9 +278,9 @@ def rendered(rows):
         "- `make test` and `make prove` remain the local gates; metadata never closes evidence.\n\n"
         "## P1 — first complete property: `P-RESERVE-RELATIONAL`\n\n"
         "Fix report, queue, and buffer. Two states that differ only in `depositsReserve` must yield the same prefinalized/finalized ranges and the same locked ETH. Checked `P-RESERVE-1` spending is a child, not this fact.\n\n"
-        "Need: a spec, a source interpreter, a Verity program that computes the observables, a composition theorem, a rejected reserve→range mutant, report/queue/buffer mutants, and rollback after a mid-write. Promote the parent only after composition.\n\n"
+        "Closed: a spec, an independently defined pinned-source interpreter, an executable Verity transaction that computes the five observables from storage and memory, the composition theorem, a rejected reserve→range mutant, report/queue/buffer mutants, and rollback after a mid-write. The parent is registered as a supplemental row now that composition exists.\n\n"
         "## P2 — allocation and value conservation\n\n"
-        "Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido debit, Beacon credit, module delta, rollback. Do not start other parent-closure lanes before P-RESERVE-RELATIONAL is green.\n\n"
+        "Order: P-ALLOC-1/2, then deposit/top-up allocation, WC01/WC02 eligibility, Lido debit, Beacon credit, module delta, rollback. The P-RESERVE-RELATIONAL gate on other parent-closure lanes is now satisfied.\n\n"
         "## P3 — remaining parents\n\n"
         "Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ only with the composition patterns from P1/P2.\n\n"
         "## Current guarantee registry\n"]

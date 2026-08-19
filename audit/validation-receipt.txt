@@ -1,11 +1,137 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6b659176a9d756a094de7fe7a76381749ed5f6e6
+validated-tree: 8fed8c66140d37f249f74eb17a8fcb8739c416cb
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-RESERVE-RELATIONAL checked locked-ETH accumulator (2026-08-18)
+----------------------------------------------------------------
+
+- Closes the single `fidelity.missing` entry that held the row at
+  `IMPLEMENTATION_PENDING` in the "P-RESERVE-RELATIONAL executable
+  finalization composition" section below. The fix is in the executable
+  transaction, not in metadata.
+- `LidoSRv3.Audit.Verity.ReserveRelationalTx.finalize` implements the Solidity
+  0.8 checked `lockedEtherAmount += prefinalized`. Where the accumulator would
+  leave one word it now returns `.revert "LOCKED_ETH_OVERFLOW"` on the exact
+  pre-call snapshot; previously it stored the wrapped word and committed. The
+  guard is `if Verity.Core.MAX_UINT256 < locked`, so the boundary is
+  inclusive: landing exactly on `MAX_UINT256` still commits.
+- The complementary regime is proved, not left implicit.
+  `PReserveRelationalVerity.verity_tx_reverts_on_locked_overflow` shows that
+  for every decode and every `txRun` whose accumulator exceeds one word, the
+  transaction reverts on the entry state. Together with the correspondence
+  theorem this covers both regimes; neither is a hole.
+- The correspondence theorem
+  `verity_tx_simulates_reserve_relational_spec` now carries an explicit
+  `NoLockedOverflow inputs before` premise. That side condition is stated over
+  *committed* pinned-source runs only (`sourceRun inputs before = .committed
+  after observables → observables.lockedEtherAfter ≤ MAX_UINT256`), which is
+  exactly the regime in which the checked addition succeeds, so it is neither
+  vacuous nor wider than the arithmetic it stands for. It is discharged in
+  proof from the witnessed committed run rather than assumed as an axiom.
+- The relational claim itself is unconditional.
+  `verity_reserve_does_not_change_finalization` takes no overflow premise: two
+  worlds differing only in `depositsReserve` decode to the same locked ETH and
+  therefore overflow or commit alike, so non-interference holds across both
+  regimes. This is the property the row exists to state, and it was not
+  weakened to obtain the closure.
+- `A-CLASSICAL-CHOICE` is now disclosed in `audit/assumptions.yaml` and named
+  in the `LidoSRv3.Audit.Trust` allowed-axiom doc-comment. It records that
+  `Classical.choice` is accepted alongside `propext` and `Quot.sound` as a
+  kernel-discharged foundational axiom, so the gate keeps distinguishing it
+  from genuine escapes (`sorryAx`, `Lean.ofReduceBool`, project-level
+  `axiom`). It is a disclosure of what the gate already allowed, not a new
+  trust concession.
+- Mutant vectors pin the new behaviour mechanically, over `Contract.run` and
+  not over hand-written lists: an accumulator that would leave one word
+  reverts; the revert is the checked-arithmetic one and restores the exact
+  snapshot; the rejection is a real wrap rather than an unreachable guard
+  (`(word (MAX_UINT256 + 80)).val = 79`); a wrapping mutant that stores the
+  truncated word is observably distinguished; and the inclusive boundary
+  commits. All use `rfl` or `decide`; no `native_decide`.
+- Three proof repairs were needed on top of the authored fix, all in
+  `ReserveRelationalTx.lean` and all in tactic scripts rather than statements.
+  In `verity_reserve_does_not_change_finalization` the three post-guard
+  branches omitted the `hRun` case hypothesis, so the `txRun` match never
+  reduced. In `verity_tx_simulates_pinned_source` an `rw [hEnds] at hNoWrap`
+  fired before the `unfold` that exposes `batchEnds` (a correctly ordered
+  duplicate already followed it), and `refine hNoWrap _ _ ?_` left the
+  observables metavariable undetermined; the committed-run witness is now
+  supplied explicitly. No statement, premise, or conclusion changed.
+- `lake build LidoSRv3.Audit.Verity.ReserveRelationalTx`: exit 0.
+  `lake build LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
+  LidoSRv3.Tests.ReserveRelationalMutants
+  LidoSRv3.Tests.ReserveRelationalTxMutants`: exit 0, 36 jobs. The only
+  warning in the changed files is a pre-existing unused `simp` argument at
+  `ReserveRelationalTx.lean:303`, present unchanged on the branch base
+  `e800c32`.
+- `lake build LidoSRv3.Audit.Trust LidoSRv3.Audit.AllGuarantees`: exit 0, 1302
+  jobs. Across the whole file the `#print axioms` output takes exactly three
+  values, all subsets of the allowed set: `[propext]`, `[propext, Quot.sound]`,
+  and `[propext, Classical.choice, Quot.sound]`. No `sorryAx`, no
+  `Lean.ofReduceBool`, no project-level `axiom`. The five
+  `PReserveRelational` Verity lines are among them, with
+  `verity_tx_reverts_on_locked_overflow` and `verity_revert_restores_snapshot`
+  at `[propext]` alone. `make test`: exit 0.
+- Merged `origin/main` `1a90395` (P-TOPUP-1 closed both-planes guarantee, #96)
+  by normal merge, never rebase. `audit/guarantees.yaml` and
+  `audit/assumptions.yaml` auto-merged on disjoint entries; the merged registry
+  differs from main only in `P-RESERVE-RELATIONAL`, and carries main's
+  `P-TOPUP-1` row at `NONE` with `fidelity.missing` empty untouched.
+- `LidoSRv3/Audit/Trust.lean` conflicted and was NOT resolved by naive union.
+  Main removed `PSsz1.structural_witness_binding_sound` (the theorem now lives
+  as `Ssz.structural_witness_binding_sound` in `LidoSRv3/Audit/Ssz.lean`), so
+  keeping that `#print axioms` line would not have compiled. The resolution
+  takes main's `PSsz1.composed_ssz_encoding` replacement plus this branch's
+  five `PReserveRelational` lines, including the new
+  `verity_tx_reverts_on_locked_overflow`.
+- `python3 scripts/audit_metadata.py check`, `make audit-generate` (no diff),
+  `python3 scripts/check_validation_receipt.py`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/check_provenance_guards.sh`, and `git diff --check`: exit 0.
+- The row moves to `classification.kind` `NONE` with `fidelity.missing` empty.
+  `next_gate` is now the remaining source-shaped decoding premise, which is
+  unchanged by this slice and still carried as `A-SOURCE-SHAPED`.
+- Integration merge of `origin/main` `fff2c27` (P-DEPOSIT-1 composed
+  parent-transaction repair, #103) by normal merge, never rebase. The only
+  conflict was this receipt, resolved by additive union: both the
+  `P-RESERVE-RELATIONAL` and the `P-DEPOSIT-1` sections are retained and no
+  evidence bullet was dropped. `LidoSRv3/Audit/Trust.lean`,
+  `LidoSRv3/Audit/AllGuarantees.lean`, `scripts/audit_metadata.py`,
+  `audit/guarantees.yaml`, `audit/assumptions.yaml`, `audit/ROADMAP.md` and
+  `Makefile` auto-merged on disjoint regions; the merged registry differs from
+  main only in `P-RESERVE-RELATIONAL` and carries main's `P-DEPOSIT-1` and
+  `P-ADDRESS-1.denote-admission` rows untouched. `validated-tree` above is
+  rebound to the post-merge tracked tree excluding this receipt.
+- The merge exposed a pre-existing metadata defect on `main`, repaired here in
+  its own commit. #103's integration merge `de538a0` kept the stale
+  `EXPECTED_CANONICAL_DETAIL_SHA256` entry `9f79007c` for `P-ETH-1` (the digest
+  of the superseded `OPEN` row) while taking main's closed `CHECKED` claims
+  tuple, so `python3 scripts/audit_metadata.py check` failed on `main` with
+  "P-ETH-1: canonical assurance detail differs". The `P-ETH-1` row itself is
+  byte-identical at the merge base `1a90395`, at `main` `fff2c27`, and here;
+  its digest is `eafed670`, the value `main` carried at `1a90395` when the
+  check was last green. The pin is restored to `eafed670`. No guarantee row,
+  theorem, claim, classification, or assumption is changed by that repair.
+- A second pre-existing `main` defect blocked the build gate and is repaired
+  here in its own commit. The pinned Verity revision declares `"slot"` as a
+  syntax token (`Verity/Macro/Syntax.lean:51-57`), which makes `slot` a
+  reserved keyword in every module importing Verity's macro layer;
+  `AddressBuiltin.toYul` bound its `.sloadAddress` payload to that identifier,
+  so `LidoSRv3/Audit/Verity/AddressYulInterface.lean` failed to parse at
+  `40:17` with "unexpected token 'slot'; expected '=>'". The file is
+  byte-identical to `origin/main` `fff2c27` and reproduces there at the same
+  line and column, it is unchanged since #88, and the module sits in the
+  default lake target, so `lake build` could not reach exit 0 on any branch.
+  The repository carries no CI workflow, which is why the regression survived
+  the Verity pin bump. The binder is renamed to `storageSlot`, the name the
+  `AddressBuiltin.sloadAddress` constructor already gives that field. No
+  guarantee row, theorem statement, proof, or claim is changed by that repair.
 
 P-DEPOSIT-1 composed parent-transaction repair (2026-08-18)
 -----------------------------------------------------------
@@ -1246,3 +1372,66 @@ P-SSZ-1 GIndex.concat SOURCE child (2026-08-16)
   changed-Lean net-new `sorry`/`admit`/`axiom`/`native_decide` audit: exit 0.
 - Receipt subject: tracked tree excluding this receipt,
   `49500b1eece0f42e3c52894b5f5a5a60abaa13a8`.
+
+P-RESERVE-RELATIONAL executable finalization composition (2026-08-18)
+---------------------------------------------------------------------
+
+- Authored on `prove/p-reserve-relational-2` from `main`
+  `54db83e0` with no rebase, force-push, or merge. Slice 1 supplied the
+  abstract statement only; this slice adds the executable plane and is the
+  first time the parent is registered.
+- `LidoSRv3.Audit.Verity.ReserveRelationalTx.finalize` is an executable
+  `Contract.run` transaction, not a wrapper over the interpreter. It decodes
+  the requested batch ends from a denoted `uint256[]` memory array through
+  `evalExpr (.memoryArrayElement ...)`, reads queue economics from four
+  `mapUint` storage channels behind an existence marker, journals every
+  prefinalized endpoint, and persists locked ETH and the last finalized
+  request id with `writeSlot`. It computes all five observables:
+  `prefinalizedRanges`, `prefinalizedEth`, `sharesToBurn`, `finalizedRange`,
+  and `lockedEtherAfter`.
+- `verity_tx_simulates_reserve_relational_spec` composes the three planes: the
+  transaction's committed/reverted observables equal those of the
+  independently defined pinned-source interpreter, which in turn corresponds
+  to the abstract spec via `source_run_correspondence`. The composition is
+  non-vacuous: `Decodes (worldFor inputs lowReserve) inputs lowReserve` is
+  discharged by `rfl` on a concrete storage-and-memory world.
+- `verity_reserve_slot_is_not_read` proves `depositsReserveSlot` lies outside
+  the transaction's read frame, including under an injected post-write
+  failure, and `verity_reserve_does_not_change_finalization` states the
+  relational guarantee on the executable plane.
+- `verity_revert_restores_snapshot` proves that any failure, including one
+  injected after the batch journal and both finalization writes, returns the
+  exact pre-transaction snapshot.
+- Verity-plane mutants reject a reserve-to-range read, a reserve-to-shares
+  read, and an off-by-one range endpoint; report, queue-pause, unknown batch
+  end, and buffer-shortfall paths fail closed; the discount column and a
+  two-call batch chain are pinned. No `native_decide` is used anywhere in this
+  lane: every vector closes by `rfl` or `decide`.
+- Recorded fidelity gap: the abstract plane is unbounded `Nat`, so the
+  transaction stores the wrapped `uint256` word on the locked ETH accumulator
+  where Solidity 0.8 checked addition would revert. This is the single
+  `fidelity.missing` entry, which holds the row at
+  `IMPLEMENTATION_PENDING`; no fully-checked claim is made.
+  SUPERSEDED on 2026-08-18 by the checked-accumulator closure recorded in
+  "P-RESERVE-RELATIONAL checked locked-ETH accumulator" above: the gap is
+  closed, `fidelity.missing` is empty, and the row is `NONE`.
+- Registration is post-composition only. The canonical minimal-11 facade,
+  its length regression, and its ID-order regression are untouched;
+  `P-RESERVE-RELATIONAL` is a supplemental row in `AllGuarantees.supplemental`
+  and the 14th subordinate metadata row.
+- Focused Lean build, `LidoSRv3.Audit.AllGuarantees`, and
+  `LidoSRv3.Audit.Trust`: exit 0, 1289 jobs. The six registered
+  `PReserveRelational` theorems report only `[propext]`, `[propext,
+  Quot.sound]`, or `[propext, Classical.choice, Quot.sound]`; no `sorryAx` and
+  no `Lean.ofReduceBool` appear in the axiom gate.
+- `make test`, `python3 scripts/audit_metadata.py check` (11 canonical
+  guarantees plus 14 subordinate rows), the optimized metadata mutants,
+  `scripts/check_no_python_evidence.sh`,
+  `scripts/check_public_claim_surfaces.py`,
+  `scripts/check_verity_provenance.py`, `scripts/check_provenance_guards.sh`,
+  and `git diff --check`: exit 0.
+- Verified source tree over `LidoSRv3`, `LidoSRv3.lean`, `lakefile.lean`,
+  `lake-manifest.json`, and `lean-toolchain`:
+  `7ec46bd54a7960490a3c0177c4b17ca393e60542`.
+- Receipt subject: tracked tree excluding this receipt,
+  `fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca`.
