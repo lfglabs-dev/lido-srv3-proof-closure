@@ -58,8 +58,9 @@ mutant below is a one-conjunct edit of the real `admitted` on the two
 in-scope writers `requestWithdrawals` and `unwrap`, built from the exact
 `Input` / `Outcome` / `renameInput` the parent is stated over.
 `fixed_owner_gate_kill_line_refutes_parent` negates the parent's FULL
-predicate shape on that mutant (nonzero-caller binders, the
-`addressEquivarianceEntryScope` premise, and BOTH conclusion conjuncts);
+predicate shape on that mutant (the nonzero-caller binders and BOTH
+conclusion conjuncts; the wave-4 `addressEquivarianceEntryScope` premise was
+retired in wave 5 when the scope widened to all four modeled writers);
 `fixed_owner_gate_not_admission_equivariant` is the weaker
 admission-projection sibling, retained as compact supporting evidence. -/
 
@@ -91,9 +92,9 @@ def runFixedOwnerGated (inp : Input) : Outcome :=
   if admittedFixedOwnerGated inp then .committed (successfulPost inp) else .reverted
 
 /-- Witness for the parent kill-line: an otherwise-eligible `requestWithdrawals`
-input from caller `1`, the mutant's fixed owner.  `requestWithdrawals` is in
-the parent's scope (`addressEquivarianceEntryScope` holds of it), so the
-premise discharges trivially on this input. -/
+input from caller `1`, the mutant's fixed owner.  `requestWithdrawals` is one
+of the four modeled permissionless writers (in `addressEquivarianceEntryScope`
+under both the wave-4 and the widened wave-5 scope). -/
 private def fixedOwnerGateWitness : Input :=
   { entryPoint := .requestWithdrawals, caller := 1, senderFrom := 1, recipient := 0,
     requestOwner := 1, amount := 1, requestId := 0, paused := false, requestExists := true,
@@ -106,28 +107,29 @@ private def fixedOwnerGateWitness : Input :=
 (`PAddress1.universal_address_writer_equivariance`) on a mutant of its own
 model.**  The negated statement is the parent's exact predicate shape with the
 mutant `runFixedOwnerGated` substituted for `run`: the same nonzero-caller
-binders, the same `addressEquivarianceEntryScope` premise, and BOTH conclusion
-conjuncts (admission-bit equality and committed-post renaming).  On the
-witness `fixedOwnerGateWitness` with callers `1` (the fixed owner) and `2`,
-the scope premise holds (`requestWithdrawals` is in scope), the mutant admits
-caller `1` and commits `⟨1, 1, 1, 1⟩`, while the `1 ↔ 2`-swapped input is
-rejected (`2 ≠ fixedOwner`) -- so the admission bits differ AND the swapped
-run cannot commit the renamed post `⟨2, 2, 2, 2⟩`.  Both conjunct failures
-are `decide`-checked in `hBoth`; the refutation closes through the post-state
+binders and BOTH conclusion conjuncts (admission-bit equality and
+committed-post renaming).  (The wave-4 parent carried an
+`addressEquivarianceEntryScope` premise; wave 5 widened the scope to all four
+modeled writers, retiring the premise as vacuous, so the negated shape carries
+no scope implication.)  On the witness `fixedOwnerGateWitness` with callers
+`1` (the fixed owner) and `2`, the mutant admits caller `1` and commits
+`⟨1, 1, 1, 1⟩`, while the `1 ↔ 2`-swapped input is rejected
+(`2 ≠ fixedOwner`) -- so the admission bits differ AND the swapped run cannot
+commit the renamed post `⟨2, 2, 2, 2⟩`.  Both conjunct failures are
+`decide`-checked in `hBoth`; the refutation closes through the post-state
 conjunct.  This is the fact
 `AddressAdmission.ownerGated_not_admission_equivariant` could not supply,
 since that theorem is stated over a disconnected toy `FunctionSpec` that never
 mentions `SolidityAddress.run`. -/
 theorem fixed_owner_gate_kill_line_refutes_parent :
     ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
-        addressEquivarianceEntryScope inp.entryPoint →
         succeeds (runFixedOwnerGated (renameInput a₁ a₂ inp)) =
           succeeds (runFixedOwnerGated inp) ∧
         ∀ post, runFixedOwnerGated inp = .committed post →
           runFixedOwnerGated (renameInput a₁ a₂ inp) =
             .committed (renamePost a₁ a₂ post) := by
   intro h
-  have hcex := h 1 2 (by decide) (by decide) fixedOwnerGateWitness trivial
+  have hcex := h 1 2 (by decide) (by decide) fixedOwnerGateWitness
   have hBoth :
       (succeeds (runFixedOwnerGated (renameInput 1 2 fixedOwnerGateWitness)) ≠
           succeeds (runFixedOwnerGated fixedOwnerGateWitness)) ∧
