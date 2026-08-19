@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6dc6978d6766e7ab86ef7e20cb4e5ab6463c8333
+validated-tree: 1e70e01270226b0a8fc6e46287ac31226cf6159b
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1833,3 +1833,111 @@ P-RESERVE-RELATIONAL executable finalization composition (2026-08-18)
   `7ec46bd54a7960490a3c0177c4b17ca393e60542`.
 - Receipt subject: tracked tree excluding this receipt,
   `fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca`.
+
+Wave 4: P-DEPOSIT-1 definitional-conjunct strip and source-plane kill-line (2026-08-19)
+----------------------------------------------------------------------------------------
+
+- Fixes P-DEPOSIT-1: the registered parent
+  `source_deposit_conserves_and_rolls_back`
+  (`LidoSRv3/Audit/Guarantees/PDeposit1.lean`) had a definitional rollback
+  conjunct and a mostly-vacuous conservation conjunct, and its cited
+  kill-line refuted a Verity-plane sibling predicate rather than the
+  registered abstract parent's own predicate on a mutant of its own model.
+  The rollback conjunct was definitional: `observation`
+  (`LidoSRv3/Audit/Source/DepositCorrespondence.lean`) maps `o.reverts` to
+  `.reverted` by construction, and `TxObservation.committedState` /
+  `committedTrace` of `.reverted` are `before` / `⟨[], [], []⟩` by
+  definition (`LidoSRv3/Audit/Trace.lean`), with `after`, `attempts`, and
+  `trace` unconstrained free parameters discarded on the revert branch.
+  The conservation conjunct `(run cfg inp).pulled = (run cfg inp).pushed`
+  was mostly `0 = 0`: `Outcome.pulled`/`Outcome.pushed` are defined as `0`
+  on every non-`committedDeposits` branch, so the universal equality had
+  real content only on the assert-gated commit branch. And the cited
+  kill-line `DepositParentTxMutants.skipped_lido_debit_breaks_pulled_eq_pushed`
+  refuted Verity `DepositParentTx.Observables.pulled = pushed` on a mutant
+  Verity execute -- not the registered abstract parent's predicate on a
+  mutant of `SolidityDeposit.run`.
+- Fix applied: the registered parent keeps its name but its conclusion is
+  now two non-definitional conjuncts. (1) Commit-branch-explicit
+  conservation: `∀ keys pulled pushed balanceAfter, run cfg inp =
+  .committedDeposits keys pulled pushed balanceAfter → pulled = pushed ∧
+  depositsValue cfg inp = pushedValue cfg inp` -- the equality between the
+  independently written line-972 pull formula and the BeaconChainDepositor
+  loop push formula, forced only by the line-996 assert gate, stated on
+  the one branch that moves wei. (2) Source-plane rollback: `¬
+  ConservingConfig cfg → 0 < actualDepositsCount cfg inp → (run cfg
+  inp).reverts = true`, which needs the empty-batch early return excluded
+  and the assert gate to exclude a mismatched commit. The definitional
+  abstract `TxObservation` rollback is demoted to the unregistered child
+  `revert_restores_state_value_and_logs` (kept in the module, docstring
+  updated); the load-bearing rollback evidence remains the Verity
+  composition's executable snapshot-restore conjunct (b), which now embeds
+  the new parent as conjunct (a) and no longer quantifies over the
+  discarded `State`/`before`/`after`/`attempts`/`trace` parameters.
+- New source-plane kill-line: `SolidityDeposit.mutantRun` is the pinned
+  `run` with exactly the line-996 conservation assert branch dropped, and
+  two characterization theorems pin the mutation down
+  (`mutantRun_eq_run_of_assert_passing`, `mutantRun_commits_where_assert_fires`).
+  In `LidoSRv3/Tests/DepositVectors.lean`,
+  `dropped_conservation_assert_breaks_pulled_eq_pushed` proves
+  `(mutantRun cfgSkewed inp).pulled ≠ (mutantRun cfgSkewed inp).pushed` by
+  `decide`: the skewed deployment (pull scale 64, push scale 32, three
+  keys) COMMITS `.committedDeposits 3 192 96 1096`
+  (`dropped_conservation_assert_commits_skewed`), so the registered
+  parent's own first-conjunct predicate is false of the mutant of its own
+  model; `dropped_conservation_assert_refutes_commit_conservation` states
+  the same refutation in the parent's exact universally-quantified shape.
+  The Verity-plane `skipped_lido_debit_breaks_pulled_eq_pushed` remains as
+  executable-plane sibling evidence, no longer cited as the kill-line.
+- `audit/guarantees.yaml`'s `P-DEPOSIT-1` row: `summary` names the
+  abstract theorem as the registered parent and cites the new kill-line;
+  `fidelity.missing` gains the real known gaps (`LinksSource` is a
+  caller-supplied hypothesis, not composed from the P-ALLOC-1/P-ALLOC-2
+  parents' live loops; beacon deposit contract address provenance is a
+  named assumption; the executable transaction is an exactly-two-batch
+  unrolling, not a proved loop bound), flipping `classification.kind` from
+  `NONE` to `IMPLEMENTATION_PENDING` with a `work` string;
+  `reproduction.expected` cites the new kill-line theorem and its module,
+  and the command now builds `LidoSRv3.Tests.DepositVectors`.
+  `scripts/audit_metadata.py`'s `EXPECTED_CANONICAL_CLAIMS["P-DEPOSIT-1"]`
+  classification and `EXPECTED_CANONICAL_DETAIL_SHA256["P-DEPOSIT-1"]`
+  (`5e8b7c86e1ca43bbb0de39bf6a36be064a43791c1c9860286ffa86b553884afa`)
+  updated accordingly; `audit/STATUS.md`, `audit/ROADMAP.md`, and
+  `audit/REPRODUCE.md` regenerated with `python3 scripts/audit_metadata.py
+  generate`; the diff is confined to the `P-DEPOSIT-1` row. Assumptions,
+  theorem names, and the declarations allowlist in
+  `scripts/check_public_claim_surfaces.py` are unchanged (no rename, no
+  new public declarations in `PDeposit1.lean`).
+- `report/P-DEPOSIT-1.md`: stops calling the Verity composition "the
+  registered parent"; registers the abstract theorem; documents the
+  demotion of the definitional rollback conjunct; describes the new
+  kill-line; lists the honest blocked follow-ups.
+- Also on this branch: `scripts/test_audit_metadata.py`'s stale
+  NONE-classification mutant (pinned at `guarantees[1]` = P-ALLOC-2, which
+  has been IMPLEMENTATION_PENDING since wave 3, so the mutant tripped
+  "pending work is incomplete" instead of "NONE may not hide extra claims"
+  and the self-test was red on pristine main) is retargeted at the first
+  dynamically chosen NONE row, surviving classification flips -- required
+  here because this branch flips P-DEPOSIT-1 out of NONE (same fix shape
+  as the wave-4 P-ADDRESS-1 lane's 975b1dd).
+- No existing theorem statement is weakened or removed; the only statement
+  changes are the registered parent's own strengthening and the Verity
+  composition's corresponding conjunct-(a) update. No `sorry`, `admit`,
+  `axiom`, or `native_decide` added; the kill-line closes by `decide`.
+- `lake build LidoSRv3`: exit 0 (1395 jobs); `lake build
+  LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositTxMutants
+  LidoSRv3.Tests.DepositParentTxMutants`: exit 0. `python3
+  scripts/audit_metadata.py check`: exit 0 (11 canonical guarantees plus
+  14 subordinate evidence rows). `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`, `python3
+  scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, `bash
+  scripts/test_check_no_python_evidence.sh`, and `make test`: exit 0.
+- Authored in the isolated git worktree `/home/ubuntu/wt/pdeposit1` on
+  branch `cursor/wave4-pdeposit1-4b38`; no other in-flight branch's files
+  are touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
