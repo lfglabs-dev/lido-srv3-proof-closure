@@ -1,11 +1,83 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: def4da9914c38777a6bb847e237a0e1d735692cc
+validated-tree: 54db7d743c3c433bfcd5ddd5fdf1ed73807777b9
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ACCOUNT-1 registered-parent remediation (2026-08-19)
+-------------------------------------------------------
+
+- Repairs a metadata defect left open by the "P-ACCOUNT-1 independent tx
+  storage-flag order and mint-after-read discipline" slice immediately below:
+  that slice added `mint_after_read_discipline` and its kill-line
+  `mint_order_kill_line` as new theorems on the `PAccount1` facade, but left
+  `audit/guarantees.yaml`'s `abstract.theorem` pointed at
+  `source_report_before_reward`. That theorem is true by construction:
+  `sourceTrace` is `accept i >>= pure (successfulSteps accepted shares)`, and
+  `successfulSteps` is a hardcoded four-constructor list literal that never
+  inspects the independently supplied `fullReportSucceeds` premise, so the
+  theorem cannot fail regardless of what the real `handleOracleReport` does.
+  `mint_order_kill_line` never refuted the registered parent; it refuted only
+  the sibling `mint_after_read_discipline`, so the registered claim carried no
+  adversarial witness of its own.
+- No Lean theorem statement or proof is changed by this entry.
+  `mint_after_read_discipline` and `mint_order_kill_line` already existed
+  (added by the slice below) and are unmodified; only their doc comments are
+  reworded to name them as, respectively, the registered parent and its
+  kill-line. `source_report_before_reward`'s doc comment is reworded to name
+  it as a demoted child with no kill-line of its own.
+- `audit/guarantees.yaml`: `abstract.theorem` is now
+  `LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline`.
+  `reproduction.expected`, `summary`, `fidelity.covered`,
+  `classification.work`, and `next_gate` are rewritten to lead with the
+  registered parent and its kill-line, keep `verity_tx_simulates_oracle_report`
+  as the unchanged Verity child, and disclose the residual gap
+  `mint_after_read_discipline` cannot see: a reordering mutant that keeps each
+  tick literal pinned to its own storage slot while only moving the call sites,
+  since `ContractState` writes to distinct slots commute.
+  `fidelity.missing` gains that one explicit entry; nothing else in the
+  fidelity lists changes. `classification.kind` stays `IMPLEMENTATION_PENDING`.
+- `scripts/audit_metadata.py`: `EXPECTED_CANONICAL_CLAIMS["P-ACCOUNT-1"]` now
+  names `mint_after_read_discipline` as the abstract theorem (status, Verity
+  theorem/status, classification, and assumption tuple unchanged); the
+  corresponding `EXPECTED_CANONICAL_DETAIL_SHA256["P-ACCOUNT-1"]` digest is
+  recomputed from the edited row.
+- `report/P-ACCOUNT-1.md`: the `Theorems:` line now lists
+  `mint_after_read_discipline` (registered parent), `mint_order_kill_line`
+  (kill-line, refutes the parent), `verity_tx_simulates_oracle_report` (Verity
+  child), and `source_report_before_reward` (child, source-plane
+  correspondence). The `Proof` section is restructured to present the parent
+  and its kill-line first, ahead of both children. Issue 1 is rewritten to
+  explain that it concerns the demoted child, not the registered parent, and a
+  dated "2026-08-19 (remediation)" bullet records the registration swap and
+  its rationale. The close table's issue #1 and #5 rows are updated to match.
+- `audit/ROADMAP.md`, `audit/STATUS.md`, `audit/REPRODUCE.md`: regenerated via
+  `python3 scripts/audit_metadata.py generate`; the diff is confined to the
+  `P-ACCOUNT-1` row/lines.
+- `lake build LidoSRv3.Audit.Guarantees.PAccount1
+  LidoSRv3.Tests.HandleOracleReportTxMutants`: exit 0 (19 jobs), only
+  pre-existing upstream `Verity.Core` `simpa`-linter warnings, no errors, no
+  warnings in the changed files.
+- `lake build LidoSRv3.Audit.Trust`: exit 0 (1304 jobs).
+  `PAccount1.mint_after_read_discipline` reports `depends on axioms: [propext,
+  Quot.sound]`; `PAccount1.mint_order_kill_line` reports `depends on axioms:
+  [propext, Classical.choice, Quot.sound]`; `PAccount1.source_report_before_reward`
+  and `PAccount1.verity_tx_simulates_oracle_report` are unchanged at
+  `[propext, Quot.sound]`. No `sorryAx`, `Lean.ofReduceBool`, or project-level
+  `axiom` appears anywhere in the trust report.
+- Changed-Lean forbidden-token scan (`git diff --name-only -- '*.lean' | xargs
+  grep -nE "sorry|admit"`): no matches.
+- `python3 scripts/audit_metadata.py generate && python3
+  scripts/audit_metadata.py check`: exit 0 (11 canonical guarantees + 14
+  subordinate evidence rows).
+- `git diff --check`: exit 0.
+- `validated-tree` above is rebound to this commit's tracked tree excluding
+  this receipt, computed per `scripts/check_validation_receipt.py`'s own
+  algorithm (`git read-tree HEAD`, `git rm --cached` this receipt, `git
+  write-tree`).
 
 P-ACCOUNT-1 independent tx storage-flag order and mint-after-read discipline (2026-08-19)
 -------------------------------------------------------------------------------------------
