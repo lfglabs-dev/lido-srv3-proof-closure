@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 73c2b29a88a39be9534f0278e79c8d93be738cd0
+validated-tree: 0048bc4ff90eabcce26ac67fa59107318f28bb45
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -2311,5 +2311,78 @@ Wave 4: P-CONSOLIDATION-1 kill-line scope remediation (2026-08-19)
 - Authored in the isolated git worktree `/home/ubuntu/wt/pdeposit1` on
   branch `cursor/wave4-pdeposit1-4b38`; no other in-flight branch's files
   are touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+Wave 5: P-DEPOSIT-1/P-ALLOC-1/P-ACCOUNT-1 documentation cleanup (2026-08-19)
+----------------------------------------------------------------------------
+
+- Nit 1 (P-DEPOSIT-1): `LidoSRv3/Tests/DepositParentTxMutants.lean`'s
+  docstring for `skipped_lido_debit_breaks_pulled_eq_pushed` still called
+  it the kill-line for the registered parent and described conjunct (a)
+  as the whole-path `pulled = pushed`. After wave 4 (#138) the registered
+  parent's first conjunct is commit-branch-explicit; the docstring now
+  describes the theorem as executable-plane sibling evidence (a Verity
+  debit mutant) and points at the real parent kill-line
+  `LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_refutes_commit_conservation`.
+  No theorem statement changed. The `PDeposit1.guarantee` facade's
+  `.abstractTx` plane entry was checked for pins first: it is pinned by
+  `scripts/check_public_claim_surfaces.py` (the P-DEPOSIT-1 `layers`
+  entry, enforced by regex against the `def guarantee` line) and by the
+  checked-layers example in `LidoSRv3/Audit/AllGuarantees.lean`, so the
+  facade is left unchanged and the situation is documented in
+  `report/P-DEPOSIT-1.md`.
+- Nit 2 (P-ALLOC-1): the parent kill-line in
+  `LidoSRv3/Tests/AllocationTxMutants.lean` was an anonymous `example`; it
+  is now the named theorem `capacity_target_kill_line_refutes_parent`,
+  the explicit negation of the registered parent
+  `PAlloc1.checked_execute`'s predicate shape with `executeMutant`
+  substituted: `CheckedBounds` discharged at the witness, the
+  `capacity := target` mutant commits, and `Option.map` of its capacity
+  column (`[24, 24]`) differs from `MathView.capacities` (`[11, 11]`).
+  Proved by `decide`; no `sorry`/`admit`/`native_decide` introduced (the
+  anonymous example's pre-existing `native_decide` went away with it).
+  `report/P-ALLOC-1.md`: Intent retargeted from the demoted
+  anti-concentration min-bound to the registered execute-vs-MathView
+  capacity-column correspondence under `CheckedBounds`; issue 6 marked
+  resolved (`observe` reads the persisted `writeArray` columns,
+  `AllocationTx.lean:132-136`, PR #105; the `allocateNoWrite` mutant is
+  rejected); issues 8/9 marked resolved (bind `status == 0` /
+  `wcType == 2`, seed `0/1` and `2/1`, PR #105); historical narratives
+  kept with resolution status explicit. `audit/guarantees.yaml`'s
+  P-ALLOC-1 row: `summary`, `fidelity.covered`, and
+  `reproduction.expected` cite the named kill-line; `fidelity.missing`
+  gains the modules-count / `MAX_STAKING_MODULES_COUNT = 32` gap (report
+  issues 13/15, documented unclosed with close `A`).
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ALLOC-1"]` recomputed to
+  `4adec12785fe1b4da3f232ada566f4e97c16fda9b4dbd0a2daf00396c44d4a74`;
+  `audit/REPRODUCE.md` and `audit/STATUS.md` regenerated
+  (`audit/ROADMAP.md` unchanged).
+- Nit 3 (P-ACCOUNT-1): `report/P-ACCOUNT-1.md`'s Intent retargeted from
+  the demoted four-step trace claim to the registered tick-order
+  discipline (`mint_after_read_discipline`: on every committed run
+  `0 < mintTick → readTick < mintTick`); issue 3 corrected (`observe`
+  reads the persisted `writeArray` balances,
+  `HandleOracleReportTx.lean:113-117`, PR #105, not `i.balancesGwei`; the
+  absent dedicated wrong-map-write mutant remains the disclosed
+  residual). No Lean change; the YAML row already matched the fixed
+  code, so it and its detail sha are unchanged.
+- `lake build LidoSRv3` and `lake build
+  LidoSRv3.Tests.AllocationTxMutants LidoSRv3.Tests.DepositParentTxMutants
+  LidoSRv3.Tests.HandleOracleReportTxMutants`: exit 0.
+- `python3 scripts/audit_metadata.py check`, `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `python3 scripts/test_public_claim_surfaces.py`,
+  `python3 scripts/test_verity_provenance.py`,
+  `bash scripts/check_provenance_guards.sh`,
+  `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/test_check_no_python_evidence.sh`, and `make test`:
+  exit 0.
+- Authored in the isolated git worktree `/home/ubuntu/wt/wave5cleanup` on
+  branch `cursor/wave5-doc-cleanup-4b38`; only the three guarantees'
+  files/rows plus shared metadata (`audit/guarantees.yaml`,
+  `scripts/audit_metadata.py`, regenerated views, this receipt) are
+  touched by this diff.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
