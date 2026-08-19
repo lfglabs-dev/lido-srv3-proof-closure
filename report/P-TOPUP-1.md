@@ -8,9 +8,9 @@ four-conjunct claim, not just conservation/rollback:
 
 | Conjunct | Claim |
 |---|---|
-| 1 (conservation/rollback) | `pulled = pushed` on every branch; a reverting outcome restores pre-state (`A-ABSTRACT-TX`, `A-TOPUP-NOWRAP`) |
+| 1 (conservation/rollback) | `pulled = pushed` on every branch — an unconditional exact-`Nat` fact with **no** `A-TOPUP-NOWRAP` hypothesis; a reverting outcome restores pre-state (`A-ABSTRACT-TX`) |
 | 2 (module guard) | `moduleExists = false` ⇒ `run` returns `revertStakingModuleUnregistered` |
-| 3 (wrap discharge) | If the unchecked sum wraps mod 2^256, `SolidityTopupParent.accumulated ≠ pushedValue` — the line 755 assert would fire on that finer-grained reading of the pinned source |
+| 3 (wrap discharge) | If the unchecked sum wraps mod 2^256, `SolidityTopupParent.accumulated ≠ pushedValue` — the line 755 assert would fire on that finer-grained reading of the pinned source. `A-TOPUP-NOWRAP` lives here, in the wrap antecedent, and in the Verity-side `NoUncheckedWrap` premise of `verity_tx_simulates_source` — not in conjunct 1 |
 | 4 (WC-type guard) | `wcTypeIsType2 = false` ⇒ `run` returns `revertWrongWithdrawalCredentialsType` |
 
 Each conjunct is proved by, and stated identically to, a standalone lemma
@@ -46,13 +46,43 @@ same registered theorem at a concrete witness, instead of an independent
 registered theorem's build, and every kill-line that projects from it fails
 right along with it.
 
+## Wave 4: Real Kill-Lines on Mutants of the Parent's Own Model
+
+Wave-4 review found that the wave-2 "kill-lines" were still not kill-lines:
+each merely *projected* the registered parent's own conjuncts at concrete
+inputs, proving the HONEST model satisfies the parent. No mutant artifact was
+defined and nothing was refuted; conjunct 1 (conservation) had no kill-line at
+all; and `A-TOPUP-NOWRAP` was misattributed to conjunct 1, whose exact-`Nat`
+conservation is in fact unconditional.
+
+Wave 4 remediates this in `LidoSRv3/Tests/TopupTxMutants.lean`:
+
+- The three projections are renamed honestly to
+  `guard_discharge_at_wrapping_input`,
+  `guard_discharge_at_unregistered_module_input`, and
+  `guard_discharge_at_non_type2_wc_input`. They remain as positive controls
+  (honest-side witnesses projected from the registered parent); nothing in the
+  audit metadata or this report calls them kill-lines anymore.
+- Four real kill-lines are added, each defined over a MUTANT of the parent's
+  own model (a copy of `SolidityTopup.run` / `SolidityTopupParent.accumulated`
+  with exactly one guard deleted or one reading changed) and proving the
+  negation of the same predicate the corresponding parent conjunct proves for
+  the honest model.
+
 ### Kill-Line Mapping
 
-| Kill line | Registered conjunct | Concrete witness |
-|---|---|---|
-| `kill_wrap_skip_assert` | conjunct 3 (wrap discharge) | `allocations = [2^256 - 1, 2]`; wraps, so `accumulated ≠ pushedValue` |
-| `kill_remove_module_exists` | conjunct 2 (module guard) | `moduleExists = false`, all earlier guards pass ⇒ `run` reverts `revertStakingModuleUnregistered` |
-| `kill_remove_wc_type2` | conjunct 4 (WC-type guard) | `wcTypeIsType2 = false`, all earlier guards pass ⇒ `run` reverts `revertWrongWithdrawalCredentialsType` |
+| Kill line | Mutant of the parent's model | Registered conjunct refuted on the mutant | Concrete witness |
+|---|---|---|---|
+| `dropped_conservation_assert_kill_line_refutes_parent` | `mutantRunNoAssert`: `run` with the line-755 `assert` deleted and the pull read through the wrapping `unchecked` accumulator | conjunct 1: mutant COMMITS with `pulled = 1 ≠ 2^256 + 1 = pushed` | `allocations = [2^256 - 1, 2]` with all limits/balances above the exact sum |
+| `dropped_module_guard_kill_line_refutes_parent` | `mutantRunNoModuleGuard`: `run` without the `_requireModuleIdExists` require | conjunct 2: at an unregistered-module witness with all antecedents true, the mutant COMMITS instead of returning `revertStakingModuleUnregistered` | `moduleExists = false`, single key, allocation `[5]` |
+| `dropped_wc_guard_kill_line_refutes_parent` | `mutantRunNoWcGuard`: `run` without the `_requireWCType2` require | conjunct 4: at a non-type-2 witness with all antecedents true, the mutant COMMITS instead of returning `revertWrongWithdrawalCredentialsType` | `wcTypeIsType2 = false`, single key, allocation `[5]` |
+| `unwrapped_accumulator_kill_line_refutes_parent` | `mutantAccumulatedUnwrapped`: accumulator read as the exact `Nat` sum, ignoring the `unchecked` wrap | conjunct 3: at a wrapping, length-matched witness, `mutantAccumulatedUnwrapped = pushedValue` while honest `SolidityTopupParent.accumulated ≠ pushedValue` | `allocations = [2^256 - 1, 2]` |
+
+The Verity-plane mutants earlier in that file
+(`skipped_allocation_write_rejected`, `dropped_push_rejected`, etc.) refute
+`observe … ≠ sourceObservables` for mutated Verity executes — the sibling
+faithful plane, not the registered abstract parent's conjuncts — and are
+unchanged.
 
 ## Scope Exclusions
 
