@@ -165,9 +165,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
-        "expected": "abstract constructor ordering and handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, and two-batch mutants"
+        "expected": "abstract constructor ordering and handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, two-batch, fees-conditional-removal, and swapped-mint-read-tick kill-line mutants"
       },
-      "summary": "source_report_before_reward: if an independent fullReportSucceeds premise lets sourceTrace return some trace and fees > 0, the trace is [balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]. Verity: observe of handleOracleReport equals sourceView. Not submitReportData; sharesToMintAsFees is an argument.",
+      "summary": "source_report_before_reward: if an independent fullReportSucceeds premise lets sourceTrace return some trace and fees > 0, the trace is [balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]. Verity: observe of handleOracleReport equals sourceView. Not submitReportData; sharesToMintAsFees is an argument. Result.steps/View.steps are read back from independent tx storage-flag ticks (storedSteps), never from the source if-tree's successfulSteps, so the two planes share no step-list bridge; mint_after_read_discipline additionally checks the raw rewardsRead/rewardsMinted ticks are strictly ordered, and mint_order_kill_line shows a mutant that swaps those two tick assignments violates it.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward"
@@ -180,7 +180,8 @@
         "covered": [
           "constructor ordering of an accepted positive-fee report",
           "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
-          "Contract.run rollback after intermediate writes"
+          "Contract.run rollback after intermediate writes",
+          "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge, plus a mint-after-read order discipline and its swapped-tick kill-line mutant"
         ],
         "missing": [
           "SRStorage membership and unique uint24 module ids",
@@ -193,9 +194,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked constructor-order and handleOracleReport-shaped theorems; do not widen to submitReportData."
+        "work": "Keep the checked constructor-order, handleOracleReport-shaped, and mint-after-read discipline theorems; do not widen to submitReportData."
       },
-      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
+      "next_gate": "Keep the checked theorems and the mint-after-read kill-line; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
