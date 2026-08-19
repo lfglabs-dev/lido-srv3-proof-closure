@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: b5aa038f2a6c6dce2b2238197a2b0cb2fa48b66f
+validated-tree: c6fa175503c1071924ebdc1efa6e2c421da66744
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1841,3 +1841,150 @@ P-ALLOC-2 explicit ∀ parent rebind (2026-08-19)
 - Updates `audit/guarantees.yaml` and `scripts/audit_metadata.py` EXPECTED claims/digest, regenerates REPRODUCE.md, and adds Trust coverage. No new axioms; native_decide only in disclosed mutant tests.
 - `validated-tree` above is rebound to this commit's tracked tree excluding receipt.
 
+
+Wave 4: P-ADDRESS-1 vacuous-parent-hypothesis remediation (2026-08-19)
+----------------------------------------------------------------------
+
+- Defect (wave-4 review finding, coordinator-verified): the registered
+  parent `LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance`
+  carried `_hScope : addressEquivarianceEntryScope inp.entryPoint`,
+  `_hWellFormed : wellFormedAddressInput inp`, and
+  `_hNotSingleton : ¬ singletonActorEntryPoint inp.entryPoint` as
+  underscore-prefixed binders never referenced by the proof body -- three
+  decorative premises. `_hNotSingleton` was additionally content-free:
+  `singletonActorEntryPoint` is defined as `False` for every `EntryPoint`
+  in this model (`not_singleton_actor_entry_point` proves the negation
+  vacuously), so requiring it restricted nothing while reading as a real
+  exclusion. `audit/guarantees.yaml`'s summary and `fidelity.covered`
+  overclaimed a "scoped, well-formed ... explicit singleton-actor
+  exclusion" parent that Lean never had.
+- Fix: ports the un-landed wave-3 branch commit `b07e40b`
+  (`cursor/wave3-paddress1-0830`; PR #131 was closed after only the
+  kill-line half merged, so the hypothesis half never reached `main`).
+  `_hWellFormed` and `_hNotSingleton` are dropped from the parent;
+  `hScope` is kept (no underscore) and genuinely threaded: the proof
+  case-splits on `inp.entryPoint`, closes the out-of-scope
+  `claimWithdrawalsTo` branch from `hScope : False` via `hScope.elim`,
+  and proves the three in-scope branches by the existing source lemmas
+  `source_admission_nondiscriminatory` and
+  `universal_post_state_equivariance`. Load-bearing check performed:
+  deleting the `hScope` binder fails `lake build
+  LidoSRv3.Audit.Guarantees.PAddress1` with "Unknown identifier
+  `hScope`"; with it, the build is green.
+- Kill-line bar kept: `fixed_owner_gate_not_admission_equivariant`
+  (`LidoSRv3/Tests/AddressSourceMutants.lean`) still refutes the parent's
+  first-conjunct admission predicate on a one-conjunct mutant of this
+  file's own `admitted`/`run`/`renameInput`; unchanged by this
+  remediation and still cited as the parent kill-line.
+- `audit/guarantees.yaml`'s `P-ADDRESS-1` row: `summary` now states
+  `addressEquivarianceEntryScope` is a genuine used premise (the proof
+  eliminates the `claimWithdrawalsTo` branch from `hScope`), the
+  "well-formed" and "singleton-actor exclusion" claims are out of
+  `fidelity.covered`, and `fidelity.missing` discloses that
+  singleton-actor exclusion is not modeled (`singletonActorEntryPoint`
+  is `False` for every `EntryPoint` here). `abstract.theorem`,
+  `verity.theorem`, classification, and assumptions are unchanged.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ADDRESS-1"]` is recomputed to
+  `79cdf43b256be799e8171bc9e650d8b8f5da92a3382721ceb03aeef2d1992e6d`,
+  and `audit/STATUS.md` is regenerated with `python3
+  scripts/audit_metadata.py generate` (`ROADMAP.md`/`REPRODUCE.md`
+  unchanged); the diff is confined to the `P-ADDRESS-1` row.
+- `report/P-ADDRESS-1.md`: the Proof section now describes the
+  `hScope` case split instead of admitting that "extra hypotheses are
+  carried on the registered statement for honest fidelity"; the issue is
+  relabeled as the wave-4 review finding; the resolution is split into
+  the landed wave-3 kill-line retarget and this wave-4 hypothesis
+  remediation.
+- Incidental repair, called out for honesty: `scripts/test_audit_metadata.py`
+  had a stale mutant (added a `consumer` key to `guarantees[1]`
+  P-ALLOC-2 expecting the "NONE may not hide extra claims" rejection, but
+  P-ALLOC-2 has been `IMPLEMENTATION_PENDING` since its `fidelity.missing`
+  list grew, so the test failed on pristine `main`). The mutation is
+  retargeted at `guarantees[2]` (P-DEPOSIT-1, classification `NONE`),
+  preserving its fail-closed intent. No guarantee row, metadata dict row,
+  or report for any other guarantee is touched.
+- Gates: `lake build LidoSRv3` (1395 jobs), `lake build
+  LidoSRv3.Tests.AddressEquivariance LidoSRv3.Tests.AddressSourceMutants`,
+  `python3 scripts/audit_metadata.py check`, `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`, `python3
+  scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, and `bash
+  scripts/test_check_no_python_evidence.sh`: exit 0. No
+  `sorry`/`admit`/axioms introduced.
+- Authored in the isolated git worktree `/home/ubuntu/wt/paddress1` on
+  branch `cursor/wave4-paddress1-4b38`; no other worktree or branch is
+  touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+Wave 4: P-RESERVE-1 parent kill-line remediation (2026-08-19)
+--------------------------------------------------------------
+
+- Defect: the registered parent
+  `PReserve1.source_spend_preserves_withdrawal_reserve` had no kill-line
+  refuting its own predicate. The named `staleQueueCacheKillLine` /
+  `staleQueueCacheKillLine_holds` (with the `Tests/ReserveMutants.lean`
+  witness `stale_queue_cache_mutant_counterexample`) refutes only the
+  unconditional, freshness-DROPPED sibling claim
+  `∀ before after amount live, spendDepositableEther before amount = .committed after → liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live`.
+  On the stale-cache witness the parent cannot be instantiated at all:
+  `freshQueueCache staleCacheBefore live` forces `live = 50`, where the
+  conclusion holds. That is hypothesis-NECESSITY evidence, not parent
+  falsifiability.
+- Fix: new transition-mutant kill-line in `Tests/ReserveMutants.lean`.
+  `mutantWithdraw` wraps the pre-existing `withdrawalPartitionMutant`
+  (commits like `spendDepositableEther`, then overwrites `buffered` with the
+  post-spend `storedDepositsReserve`) in the same
+  `canDeposit`/`authorizedRouter`/nonzero guards as
+  `modelWithdrawDepositableEther`.
+  `partition_spend_mutant_witness` pins the concrete vector: the cache is
+  FRESH (`freshQueueCache vector (word 50)`), the mutated call commits, and
+  the live queue-facing reserve drops 50 -> 0.
+  `partition_spend_mutant_kill_line_refutes_parent` proves the negation of
+  the parent's own predicate shape -- `freshQueueCache` hypothesis retained
+  -- with `mutantWithdraw` in place of `modelWithdrawDepositableEther`.
+  The mutation hits the spend transition, not the freshness premise.
+- Relabeling only, no statement changes: `staleQueueCacheKillLine_holds`
+  and `stale_queue_cache_mutant_counterexample` are kept as Lean theorems
+  but are now described everywhere (parent docstring, `staleQueueCacheKillLine`
+  docstring, `ReserveMutants` section header, YAML row, report) as
+  premise-necessity evidence showing the `freshQueueCache` hypothesis cannot
+  be dropped, not as the parent kill-line.
+- `audit/guarantees.yaml` P-RESERVE-1 row: `summary`, `fidelity.covered`,
+  and `reproduction.expected` cite the transition-mutant kill-line as the
+  parent kill-line and the stale-cache theorems as hypothesis-necessity
+  evidence; `abstract.theorem`, `verity.theorem`, classification, and
+  assumptions are unchanged.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-RESERVE-1"]` recomputed
+  (`632ea3e4f037172ec14c01d040fcb135ba1624631e74c1ecd7cf3e7b561e6d1b`) and
+  views regenerated with `python3 scripts/audit_metadata.py generate`; the
+  view diff is confined to the P-RESERVE-1 row of `audit/REPRODUCE.md`.
+  `report/P-RESERVE-1.md` gains a dated "Wave 4 changes" section and an
+  updated Theorems line.
+- Pre-existing harness repair (also red on pristine main):
+  `scripts/test_audit_metadata.py`'s NONE-classification mutant targeted
+  `guarantees[1]` (P-ALLOC-2, IMPLEMENTATION_PENDING), tripping "pending
+  work is incomplete" instead of the expected "NONE may not hide extra
+  claims"; retargeted to `guarantees[2]` (P-DEPOSIT-1, classification
+  NONE), same intent -- the same fix wave-4 P-ADDRESS-1 shipped as
+  76e5d1c.
+- Gates: `lake build LidoSRv3` (1395 jobs); `lake build
+  LidoSRv3.Tests.ReserveMutants LidoSRv3.Tests.ReserveRelationalMutants
+  LidoSRv3.Tests.ReserveRelationalTxMutants`; `python3
+  scripts/audit_metadata.py check` (11 canonical guarantees plus 14
+  subordinate rows); `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`; `python3
+  scripts/check_public_claim_surfaces.py`; `python3
+  scripts/test_public_claim_surfaces.py`; `python3
+  scripts/test_verity_provenance.py`; `bash
+  scripts/check_provenance_guards.sh`; `bash
+  scripts/check_no_python_evidence.sh`; `bash
+  scripts/test_check_no_python_evidence.sh`: exit 0. No `sorry`/`admit`; the
+  new theorems close by `rfl`/`decide` only (no `native_decide`).
+- Receipt subject: tracked tree excluding this receipt,
+  `259def02d4e099dd3719adff71d504e62cb89869`.

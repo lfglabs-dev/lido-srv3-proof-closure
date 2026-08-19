@@ -217,9 +217,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
-        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, and stale-cache kill-line mutants build"
+        "expected": "checked spend-formula property with a guard-checking wrapper premise and a fresh-cache live-reserve invariant, stateful Verity refinement, rollback, the transition-mutant parent kill-line (partition_spend_mutant_kill_line_refutes_parent), and the stale-cache premise-necessity mutants build"
       },
-      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness show that live invariance fails once the cache goes stale. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
+      "summary": "source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. Parent kill-line: LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent refutes the parent's own predicate shape (freshQueueCache hypothesis retained) for mutantWithdraw, a mutation of the spend transition that commits under a fresh cache while the live queue-facing reserve drops 50 to 0. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness are hypothesis-necessity evidence only: they show the freshQueueCache premise cannot be dropped, not that the parent is false. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve"
@@ -234,7 +234,7 @@
           "source-shaped spending and checked arithmetic under well-formed storage",
           "Contract.run rollback after intermediate writes",
           "guard-checking wrapper premise: canDeposit/authorizedRouter are proved to hold on any committed call, not merely assumed",
-          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; a stale-cache kill-line witnesses the raid when freshness fails"
+          "effective, min-capped, live queue-facing reserve is invariant under a fresh WQ-style value, not just the restated storedDepositsReserve field; the parent kill-line partition_spend_mutant_kill_line_refutes_parent refutes the parent predicate shape (freshness retained) on a mutated spend transition, and the stale-cache theorems separately witness that the freshQueueCache hypothesis cannot be dropped"
         ],
         "missing": [
           "live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)",
@@ -306,9 +306,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
-        "expected": "scoped well-formed universal abstract/source equivariance with explicit singleton-actor exclusion, owner-gate kill-line mutant, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
+        "expected": "in-scope universal abstract/source admission and post-state equivariance (claimWithdrawalsTo excluded by hypothesis case-split), fixed-owner-gate kill-line mutant of the real admitted/run/renameInput, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
       },
-      "summary": "universal_address_writer_equivariance: two nonzero callers on a scoped, well-formed input (`amount < 2^256`, coherent balance/allowance flags) with explicit singleton-actor exclusion have the same source-shaped admission bit, and a successful post-state renames under the swap. On requestWithdrawals/unwrap, admission is pause plus caller balance/allowance only (no owner gate); fixed_owner_gate_not_admission_equivariant mutates this file's own admitted/run/renameInput and refutes equivariance if that gate is added (the prior AddressAdmission toy kill-line was disconnected from this parent and is retained only for the denote-admission subordinate row). Verity composition adds Contract.run observe = sourceAddressView and snapshot rollback. claimWithdrawalsTo deferred. Not WithdrawalQueue.claimWithdrawalsTo.",
+      "summary": "universal_address_writer_equivariance: two nonzero callers on an input whose entrypoint is in scope have the same source-shaped admission bit, and a successful post-state renames under the swap; addressEquivarianceEntryScope is a genuine used premise, not a decorative binder (the proof case-splits on inp.entryPoint and eliminates the claimWithdrawalsTo branch from hScope). On requestWithdrawals/unwrap, admission is pause plus caller balance/allowance only (no owner gate, no fixed-owner gate); fixed_owner_gate_not_admission_equivariant mutates this file's own admitted/run/renameInput and refutes equivariance if that gate is added (the prior AddressAdmission toy kill-line was disconnected from this parent and is retained only for the denote-admission subordinate row). Verity composition adds Contract.run observe = sourceAddressView and snapshot rollback. claimWithdrawalsTo deferred. Not WithdrawalQueue.claimWithdrawalsTo.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
@@ -319,14 +319,15 @@
       },
       "fidelity": {
         "covered": [
-          "scoped well-formed universal abstract and pinned-source post-state equivariance with explicit singleton-actor exclusion",
+          "in-scope universal abstract and pinned-source admission/post-state equivariance, with claimWithdrawalsTo excluded by a case-split hypothesis rather than an unused premise",
           "pause/balance/allowance permissionless admission on requestWithdrawals and unwrap",
-          "owner-gate kill-line mutant refuting admission equivariance",
+          "fixed-owner-gate kill-line mutant of the real admitted/run/renameInput refuting admission equivariance (connected to the registered parent, not a disconnected toy FunctionSpec)",
           "four storage-writing Contract.run entrypoints and behavioral source correspondence on entrypoint-specific address-write observables",
           "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
         ],
         "missing": [
-          "WithdrawalQueue.claimWithdrawalsTo request-owner admission and post-state equivariance"
+          "WithdrawalQueue.claimWithdrawalsTo request-owner admission and post-state equivariance",
+          "singleton-actor exclusion is not modeled: singletonActorEntryPoint is False for every EntryPoint in this model, so the parent carries no such premise"
         ]
       },
       "classification": {
