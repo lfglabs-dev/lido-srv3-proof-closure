@@ -1,7 +1,75 @@
 # P-SSZ-1
 
-Theorems: `PSsz1.composed_ssz_encoding` (registered parent; concludes the named predicate `PSsz1.composedEncodingOk`), `PSsz1.swapped_combine_kill_line_refutes_parent` (parent kill-line: negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold), `PSsz1.crossed_witness_kill_line_refutes_parent` (conclusion-non-triviality witness: the conclusion predicate discriminates the claimed operation), `PSsz1.verity_tx_simulates_ssz_encoding`.
-Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`.
+Theorems: `PSsz1.composed_ssz_encoding` (registered parent; concludes the named predicate `PSsz1.composedEncodingOk`, stripped in wave 6 to the single mutant-exercised traversal conjunct), `PSsz1.swapped_combine_kill_line_refutes_parent` (parent kill-line: negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness` (conclusion-non-triviality witness on the unregistered full bundle `PSsz1.composedEncodingOkFull`: the bundle discriminates the claimed operation; renamed in wave 6 from `crossed_witness_kill_line_refutes_parent`), `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle, not registered claim content), `PSsz1.verity_tx_simulates_ssz_encoding`.
+Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`.
+
+## Wave 6 changes (2026-08-19)
+
+**The wave-4 strip was incomplete; the registered conclusion is now the
+mutant-exercised core only.** Wave-6 review found that the wave-4 strip
+(PR #140) left five conjuncts registered that are definitional facts or
+restated premises, while this report and the YAML row claimed every
+registered conjunct was "non-definitional" — false. The registered
+predicate `composedEncodingOk` (via `composedEncodingOkWithCombine`) is now
+stripped to the single substantive conjunct: the derived witness's
+traversal to `sourceNode input.src` under the source-combine family
+(`Ssz.traverseBranch (srcCombine input.src) … = sourceNode input.src`),
+the one conjunct the `sourceCombineSwapped` model mutant breaks. The
+registered parent's statement shape — binders, the five width/size
+premises, and `hBind` — is unchanged; its proof projects the registered
+conjunct out of the full bundle, so every premise remains consumed.
+
+**Demotions (still proved, still available, explicitly unregistered).**
+The stripped conjuncts remain as independent lemmas and are re-bundled on
+the same one-object input as the unregistered `composedEncodingOkFull`
+(proved by `composed_ssz_encoding_full`), which consumers may use but which
+is not registered claim content:
+
+1. the structural witness binding — `Ssz.structural_witness_binding_sound`
+   is the Bool→Prop unpacking of the parent's own `hBind` premise (a
+   restated hypothesis);
+2. `sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs` —
+   `rfl` (`source_concat_matches_spec`, re-exported as
+   `encoding_uses_source_concat`);
+3. `(digestPreimages …).length = 7` — a list-literal length
+   (`digest_preimages_length`, by `simp [digestPreimages]`);
+4. the `runVerification` accept-iff — `runVerification` IS the
+   root-match `if`, so the iff is `simp [runVerification]`
+   (`accepted_iff_root_matches`);
+5. `exactTxWidths input.txInput` — assembled from the parent's own width
+   premises (`srcInputs_exactWidths`), the amount width being definitional
+   (`toLittleEndian64`'s fixed `List.range 8`).
+
+**Kill-line repair.** `swapped_combine_kill_line_refutes_parent` is
+unchanged in statement — it already negated the mutant-substituted parent
+in the registered parent's exact quantifier/premise/`hBind` shape — and its
+proof simplifies: after the strip the mutant-substituted conclusion IS the
+traversal conjunct, so the refutation uses it directly (no `obtain`
+projection), still closing via `traverseBranch_sourceCombineSwapped_eq` and
+the nonzero public-key anchor (`swapped_traverse_ne_structuralEncoding`) at
+the hypothesis-satisfying witness `swappedCombineKillInput`.
+
+**Rename.** `crossed_witness_kill_line_refutes_parent` is renamed to
+`composedEncodingOkFull_not_trivial_crossed_witness` and retargeted at the
+unregistered full bundle: after the strip the registered predicate mentions
+neither `operation` nor `combine` (the honest traversal is
+hypothesis-free), so no statement of the form `¬ composedEncodingOk …` is
+provable and the crossed-operation discrimination lives only in the
+bundle's first structural conjunct. The theorem remains honestly labeled as
+NOT a parent kill-line (`hBind` fails at the crossed point, so the parent
+implication is vacuously true there). References in
+`LidoSRv3/Audit/Trust.lean` (`#print axioms`), the YAML row, and this
+report are updated.
+
+**Metadata honesty.** The YAML `summary`, `fidelity.covered`, and
+`reproduction.expected` now describe the stripped registered conclusion and
+name the demoted unregistered children; `A-YUL-INTERFACE` is added to this
+report's Assumptions header (it was already on the YAML row and in
+STATUS.md — issue #23's body, which says "not on this row", is superseded;
+its resolution-table row already records the attachment). The wave-4
+sections below that describe the six-conjunct predicate as the registered
+conclusion, and any claim that its conjuncts are "all non-definitional",
+are superseded in that respect.
 
 ## Wave 4 changes (2026-08-19)
 
@@ -28,7 +96,14 @@ independently written artifacts); the seven-preimage count; the
 derived-field definitions stay — they are the type-level one-object coupling
 — but their `rfl` equalities are no longer registered as claim conjuncts.
 The wave-2 notes below that describe those equalities as proved conclusion
-conjuncts are superseded in that respect.
+conjuncts are superseded in that respect. (Wave 6 amendment: the claim here
+that the six wave-4 conjuncts are "all non-definitional" was false — the
+`hBind` unpacking restates a premise, the concat equality is `rfl`, the
+preimage count is a list-literal length, the accept-iff unfolds
+`runVerification`'s definition, and the widths reassemble the premises.
+Wave 6 strips the registered predicate to the traversal conjunct only and
+demotes the other five to the unregistered `composedEncodingOkFull`; see
+the Wave 6 section above.)
 
 **The parent kill-line is a model mutant with `hBind` satisfied.** The
 wave-2 kill-lines did not refute the registered parent's conclusion:
@@ -58,7 +133,15 @@ public-key fold (`swapped_traverse_ne_structuralEncoding`). A crossed
 witness/root pair *inside* `ComposedSszInput` remains uninhabitable — witness
 and root are both derived from the single `src`, which is the type-level
 coupling doing its job — so the model-function axis is the residual mutant
-shape that keeps the hypothesis satisfied.
+shape that keeps the hypothesis satisfied. (Wave 6 amendment:
+`crossed_witness_kill_line_refutes_parent` is renamed
+`composedEncodingOkFull_not_trivial_crossed_witness` and retargeted at the
+unregistered full bundle `composedEncodingOkFull` — after the wave-6 strip
+the registered predicate no longer mentions the operation, so
+`¬ composedEncodingOk .clProofVerifier …` is no longer provable. The
+kill-line's statement is unchanged; its proof simplifies because the
+mutant-substituted conclusion is now exactly the traversal conjunct. See
+the Wave 6 section above.)
 
 **Verity plane coupling disclosure.** The executable `EncodingInput` plane
 keeps `deposit`, `rhs`, `witness`, and `expectedWitnessRoot` independent
@@ -144,20 +227,25 @@ SRv3 verifies consensus-layer validator records (top-up, consolidation target WC
 - `A-SHA256-FFI`: digest value claims fail if the host SHA-256 differs. Severity HIGH.
 - `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`: imported Yul / precompile / compiler are trusted, not proved. YAML fidelity still lists the seven-call digest as covered.
 - `Operation` is three tags (`clValidatorVerifier`, `clProofVerifier`, `consolidationGateway`) mapped to toy generalized indices 2, 3, 4 — “not a claim that the numbers are production source constants.”
-- `composed_ssz_encoding` takes one `ComposedSszInput` record and concludes the named predicate `composedEncodingOk operation combine input`. The structural-bind hypothesis and the deposit-data-root child both name `sourceWitness input.src` / `sourceNode input.src` directly — they are proved about the **same** `src`, not independently typed arguments. `GIndex.concat`'s validator-side operand (`ComposedSszInput.rhs`) and the seven-call digest / root-match child's byte input (`ComposedSszInput.digestInput`/`.txInput`) are *derived* from `input.src` (via `sourceWitness input.src`'s index and `srcInputs input.src` respectively), so all four children read off the same object; since Wave 4 those derivations are the type-level coupling only, not registered conclusion conjuncts. Only `input.lhs` (the state-root anchor position), `input.rhsPow` (the concat model's separate power byte), and `input.forkVersion`/`input.expectedDepositDataRoot` (chain-level, not deposit content) remain independently supplied.
+- `composed_ssz_encoding` takes one `ComposedSszInput` record and concludes the named predicate `composedEncodingOk operation combine input`. The structural-bind hypothesis and the deposit-data-root child both name `sourceWitness input.src` / `sourceNode input.src` directly — they are proved about the **same** `src`, not independently typed arguments. `GIndex.concat`'s validator-side operand (`ComposedSszInput.rhs`) and the seven-call digest / root-match child's byte input (`ComposedSszInput.digestInput`/`.txInput`) are *derived* from `input.src` (via `sourceWitness input.src`'s index and `srcInputs input.src` respectively), so all four children read off the same object; since Wave 4 those derivations are the type-level coupling only, not registered conclusion conjuncts, and since Wave 6 the registered predicate is stripped to the single mutant-exercised traversal conjunct (the other wave-4 conjuncts demoted to the unregistered `composedEncodingOkFull`). Only `input.lhs` (the state-root anchor position), `input.rhsPow` (the concat model's separate power byte), and `input.forkVersion`/`input.expectedDepositDataRoot` (chain-level, not deposit content) remain independently supplied.
 - Verity `encode` persists those four pieces through `writeSlot` / `writeMapUint`. `structuralOk input` *is* `Ssz.bindOperation` on the same input. The outcome observable's digest field (`Observables.digest`) is now read back from `digestMapSlot` storage via `readObs`, not the pre-write local `chain` list.
 
 ## Proof
 
-**Abstract `composed_ssz_encoding`.** Proves `composedEncodingOk operation combine input` — the named, non-definitional conclusion predicate — by `refine ⟨t1, t2, t3, t4, t5, t6⟩` over one `input : ComposedSszInput` (with `input.rhs`, `input.digestInput`, `input.txInput` themselves defined as functions of `input.src`):
-1. `Ssz.structural_witness_binding_sound hBind` — unfold `bindOperation` / `verifyProof` (`&&` of five bools) and restate them as a Prop, applied to `sourceWitness input.src` / `sourceNode input.src`. No tree induction.
-2. The non-definitional residue of `source_pinned_config_discharges_deposit_data_root input.src`: the same `sourceWitness input.src` traverses to `sourceNode input.src` under `sourceCombine input.src`. (The discharge's pinned-constant equalities, `src` bound projections, `rfl` signature-root unfolding, and hypothesis-restating length lines are *not* registered as conjuncts.)
-3. `encoding_uses_source_concat input.lhs input.rhs` — `sourceConcat = specConcat` by transcription, on the operand `sourceWitness input.src` binds.
-4. `digest_preimages_length input.txInput.toInputs` — the digest preimage count is seven.
-5. `accepted_iff_root_matches input.txInput` — `runVerification` accepts iff the computed root equals the expected root.
-6. `exactTxWidths input.txInput` via `srcInputs_exactWidths` — the derived transaction input has the pinned widths.
+**Abstract `composed_ssz_encoding`.** Since wave 6, proves `composedEncodingOk operation combine input` — the named conclusion predicate stripped to the single mutant-exercised conjunct — by projecting it out of the unregistered full bundle: `(composed_ssz_encoding_full input … hBind).2.1` over one `input : ComposedSszInput` (with `input.rhs`, `input.digestInput`, `input.txInput` themselves defined as functions of `input.src`). The registered conjunct (wave-4 conjunct 2) is the residue of `source_pinned_config_discharges_deposit_data_root input.src`: the same `sourceWitness input.src` traverses to `sourceNode input.src` under `sourceCombine input.src`. (The discharge's pinned-constant equalities, `src` bound projections, `rfl` signature-root unfolding, and hypothesis-restating length lines are *not* registered as conjuncts.) The unregistered bundle `composed_ssz_encoding_full` additionally proves, on the same premises, the demoted wave-4 conjuncts:
 
-**Kill-line.** `swapped_combine_kill_line_refutes_parent` negates the mutant-substituted parent `∀ {operation combine} input, premises → hBind → composedEncodingOkWithCombine sourceCombineSwapped operation combine input`: the conclusion predicate is parameterized over the source-combine family (`composedEncodingOk` is the honest specialization at `sourceCombine`), and `sourceCombine` is the one model function inside the predicate that `hBind` never mentions. At the concrete witness `swappedCombineKillInput` every premise holds (`by decide`) and `hBind` is discharged by the same `sourceWitness_binds_sourceNode` used for the honest artifact, but the swapped-combine traversal conjunct reduces definitionally (`traverseBranch_sourceCombineSwapped_eq`) to a `Nat.pair` tree equality forcing `sourceAnchor swappedCombineKillSrc = 0` — impossible by `Nat.pair` injectivity since the concrete public-key fold is nonzero (`swapped_traverse_ne_structuralEncoding`). Because the mutant parent is refuted at a hypothesis-satisfying witness, this refutes the parent shape itself, not a vacuous point of it. Separately, `crossed_witness_kill_line_refutes_parent input` proves `¬ composedEncodingOk .clProofVerifier (sourceCombine input.src) input` — a conclusion-non-triviality witness (the predicate discriminates the claimed operation), NOT a parent kill-line: at the crossed operation `hBind` fails, so the parent implication is vacuously true there. `inconsistent_witness_kill_line` (binding `sourceWitness srcA` against `sourceNode srcB` for a *different* deposit, `sourceAnchor srcA ≠ sourceAnchor srcB`, fails `bindOperation`: a negation of the parent's *hypothesis* on a pair that cannot inhabit `ComposedSszInput`) and `inconsistent_operation_index_kill_line` (`Ssz.operationIndex .clProofVerifier`'s value never equals `(sourceWitness src).index.value`: a bare constant inequality) remain as `bindOperation`-level negative results for the cross-child mismatches the one-object `ComposedSszInput.src` rules out by construction — `composed_ssz_encoding`'s hypotheses can only be discharged when the structural witness, the pinned deposit-data-root, the concat operand, and the digest bytes all name the same object. `sourceWitness_binds_sourceNode` (used by `Tests/SszRegression.composedExample_satisfies_composed_ssz_encoding`) shows those hypotheses remain jointly satisfiable.
+- Conjunct 1: `Ssz.structural_witness_binding_sound hBind` — unfold `bindOperation` / `verifyProof` (`&&` of five bools) and restate them as a Prop, applied to `sourceWitness input.src` / `sourceNode input.src`. No tree induction. (Wave 6: demoted — this restates the `hBind` premise.)
+- Conjunct 3: `encoding_uses_source_concat input.lhs input.rhs` — `sourceConcat = specConcat` by transcription, on the operand `sourceWitness input.src` binds. (Wave 6: demoted — `rfl`.)
+- Conjunct 4: `digest_preimages_length input.txInput.toInputs` — the digest preimage count is seven. (Wave 6: demoted — list-literal length.)
+- Conjunct 5: `accepted_iff_root_matches input.txInput` — `runVerification` accepts iff the computed root equals the expected root. (Wave 6: demoted — `simp [runVerification]`.)
+- Conjunct 6: `exactTxWidths input.txInput` via `srcInputs_exactWidths` — the derived transaction input has the pinned widths. (Wave 6: demoted — reassembled from the premises.)
+
+(The wave-4 version of this paragraph described all six as the registered,
+"non-definitional" conjuncts proved by `refine ⟨t1, …, t6⟩`; that claim was
+incorrect about conjuncts 1 and 3–6 and is superseded by the Wave 6
+section.)
+
+**Kill-line.** `swapped_combine_kill_line_refutes_parent` negates the mutant-substituted parent `∀ {operation combine} input, premises → hBind → composedEncodingOkWithCombine sourceCombineSwapped operation combine input`: the conclusion predicate is parameterized over the source-combine family (`composedEncodingOk` is the honest specialization at `sourceCombine`), and `sourceCombine` is the one model function inside the predicate that `hBind` never mentions. At the concrete witness `swappedCombineKillInput` every premise holds (`by decide`) and `hBind` is discharged by the same `sourceWitness_binds_sourceNode` used for the honest artifact, but the swapped-combine traversal conjunct reduces definitionally (`traverseBranch_sourceCombineSwapped_eq`) to a `Nat.pair` tree equality forcing `sourceAnchor swappedCombineKillSrc = 0` — impossible by `Nat.pair` injectivity since the concrete public-key fold is nonzero (`swapped_traverse_ne_structuralEncoding`). Because the mutant parent is refuted at a hypothesis-satisfying witness, this refutes the parent shape itself, not a vacuous point of it. (Wave 6: after the strip, the mutant-substituted conclusion is exactly the traversal conjunct, so the proof uses it directly instead of projecting it out of the six-conjunct bundle.) Separately, `composedEncodingOkFull_not_trivial_crossed_witness input` (renamed in wave 6 from `crossed_witness_kill_line_refutes_parent`) proves `¬ composedEncodingOkFull .clProofVerifier (sourceCombine input.src) input` — a conclusion-non-triviality witness (the unregistered full bundle discriminates the claimed operation via its first structural conjunct), NOT a parent kill-line: at the crossed operation `hBind` fails, so the parent implication is vacuously true there. The stripped registered predicate `composedEncodingOk` mentions neither `operation` nor `combine`, so no negation of it is provable and the discrimination is witnessed on the bundle. `inconsistent_witness_kill_line` (binding `sourceWitness srcA` against `sourceNode srcB` for a *different* deposit, `sourceAnchor srcA ≠ sourceAnchor srcB`, fails `bindOperation`: a negation of the parent's *hypothesis* on a pair that cannot inhabit `ComposedSszInput`) and `inconsistent_operation_index_kill_line` (`Ssz.operationIndex .clProofVerifier`'s value never equals `(sourceWitness src).index.value`: a bare constant inequality) remain as `bindOperation`-level negative results for the cross-child mismatches the one-object `ComposedSszInput.src` rules out by construction — `composed_ssz_encoding`'s hypotheses can only be discharged when the structural witness, the pinned deposit-data-root, the concat operand, and the digest bytes all name the same object. `sourceWitness_binds_sourceNode` (used by `Tests/SszRegression.composedExample_satisfies_composed_ssz_encoding`) shows those hypotheses remain jointly satisfiable.
 
 **VERITY `verity_tx_simulates_ssz_encoding`.** `observe (encode input).run = sourceView input`, and if the status is committed then `structuralOk` (i.e. the same `bindOperation`) plus the persisted words equal the input’s operation/index/path/branch. Concat and digest children are included as the same abstract facts, not re-executed as hash. Revert restores snapshot, including two-batch.
 
@@ -167,7 +255,7 @@ SRv3 verifies consensus-layer validator records (top-up, consolidation target WC
 
 ## Resolution
 
-**Restated Lean/English.** Parent composes all four children — structural-bind, deposit-data-root, `GIndex.concat`'s operand, and the seven-call digest / root-match bytes — on one shared `ComposedSszInput.src`, not an independent `And` of four unrelated arguments, and concludes the named non-definitional predicate `composedEncodingOk` (no `rfl` derived-accessor equalities or restated hypotheses as conjuncts). The parent kill-line `swapped_combine_kill_line_refutes_parent` negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold; `crossed_witness_kill_line_refutes_parent` separately witnesses that the conclusion predicate is not constantly true (it discriminates the claimed operation). Only the state-root anchor (`lhs`), the concat power byte (`rhsPow`), and the tx child's chain-level fork version / claimed root remain independent, non-deposit fields. SHA-256 stays `A-SHA256-FFI`.
+**Restated Lean/English.** Parent composes all four children — structural-bind, deposit-data-root, `GIndex.concat`'s operand, and the seven-call digest / root-match bytes — on one shared `ComposedSszInput.src`, not an independent `And` of four unrelated arguments, and concludes the named predicate `composedEncodingOk`, stripped in wave 6 to the single mutant-exercised traversal conjunct (no `rfl` derived-accessor equalities, no restated hypotheses, no definitional facts as registered conjuncts; the demoted wave-4 conjuncts remain proved as the unregistered `composedEncodingOkFull`). The parent kill-line `swapped_combine_kill_line_refutes_parent` negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold; `composedEncodingOkFull_not_trivial_crossed_witness` (renamed from `crossed_witness_kill_line_refutes_parent`) separately witnesses that the unregistered full bundle is not constantly true (it discriminates the claimed operation). Only the state-root anchor (`lhs`), the concat power byte (`rhsPow`), and the tx child's chain-level fork version / claimed root remain independent, non-deposit fields. SHA-256 stays `A-SHA256-FFI`.
 
 Closed in the 2026-08-18 honesty + encoding repair; issue 4's witness/root
 pairing fixed plus a digest storage reread added in the 2026-08-19 one-object
@@ -183,7 +271,15 @@ concrete witness where every premise and `hBind` hold), keeping
 `crossed_witness_kill_line_refutes_parent` as an honestly labeled
 conclusion-non-triviality witness; the
 Verity `EncodingInput` plane's independence of `deposit`/`rhs`/`witness`/
-`expectedWitnessRoot` is now an explicit `fidelity.missing` entry. Lean
+`expectedWitnessRoot` is now an explicit `fidelity.missing` entry. Wave 6
+(2026-08-19) completed the strip: the registered predicate
+`composedEncodingOk` is now only the mutant-exercised traversal conjunct;
+the premise-restating / definitional wave-4 conjuncts are demoted to the
+unregistered `composedEncodingOkFull` (`composed_ssz_encoding_full`); the
+kill-line statement is unchanged with a simplified proof; and
+`crossed_witness_kill_line_refutes_parent` is renamed
+`composedEncodingOkFull_not_trivial_crossed_witness`, retargeted at the
+unregistered bundle. Lean
 theorems stay CHECKED on their (now honest) statements. No pinned-core
 counterexample was found.
 `A` = YAML/`fidelity.missing`/assumption.
@@ -194,7 +290,7 @@ to full Lido.
 | # | Close | Note |
 | --- | --- | --- |
 | 1–3, 5–14, 16, 18, 19, 22–26 | A | SHA-256/witness abstraction, toy indices, invented observables; `A-SHA256-FFI` + `A-YUL-INTERFACE`; Yul binding stays OPEN. |
-| 4 | B | `ComposedSszInput` bundles `src` once; the structural-bind hypothesis, the deposit-data-root child, `GIndex.concat`'s operand (`ComposedSszInput.rhs`), and the digest/tx child's bytes (`ComposedSszInput.digestInput`/`.txInput`, via `srcInputs`) all name or are derived from `sourceWitness input.src` / `sourceNode input.src`, closing the "witness for validator 1, root for validator 2" counterexample across all four children, not just the witness/root pair. `inconsistent_witness_kill_line` and `inconsistent_operation_index_kill_line` prove the two `bindOperation`-level rejection shapes; `Tests/SszEncodingTxMutants.lean`'s `crossedWitness` is the executable analogue of the first. Wave 4: the registered conclusion is now the named non-definitional predicate `composedEncodingOk`; the parent kill-line `swapped_combine_kill_line_refutes_parent` negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold, and `crossed_witness_kill_line_refutes_parent` is a conclusion-non-triviality witness (the predicate discriminates the claimed operation). Only `lhs` (state-root anchor), `rhsPow` (concat power byte), and the tx child's fork version / claimed root remain independent, non-deposit fields (tracked in `fidelity.missing`). `sourceWitness_binds_sourceNode` / `Tests/SszRegression.composedExample` show the tightened parent is non-vacuous. |
+| 4 | B | `ComposedSszInput` bundles `src` once; the structural-bind hypothesis, the deposit-data-root child, `GIndex.concat`'s operand (`ComposedSszInput.rhs`), and the digest/tx child's bytes (`ComposedSszInput.digestInput`/`.txInput`, via `srcInputs`) all name or are derived from `sourceWitness input.src` / `sourceNode input.src`, closing the "witness for validator 1, root for validator 2" counterexample across all four children, not just the witness/root pair. `inconsistent_witness_kill_line` and `inconsistent_operation_index_kill_line` prove the two `bindOperation`-level rejection shapes; `Tests/SszEncodingTxMutants.lean`'s `crossedWitness` is the executable analogue of the first. Wave 4: the registered conclusion is now the named non-definitional predicate `composedEncodingOk`; the parent kill-line `swapped_combine_kill_line_refutes_parent` negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold, and `crossed_witness_kill_line_refutes_parent` is a conclusion-non-triviality witness (the predicate discriminates the claimed operation). Only `lhs` (state-root anchor), `rhsPow` (concat power byte), and the tx child's fork version / claimed root remain independent, non-deposit fields (tracked in `fidelity.missing`). `sourceWitness_binds_sourceNode` / `Tests/SszRegression.composedExample` show the tightened parent is non-vacuous. Wave 6: the registered conclusion is stripped to the single mutant-exercised traversal conjunct; the other wave-4 conjuncts are demoted to the unregistered `composedEncodingOkFull`, and the non-triviality witness is renamed `composedEncodingOkFull_not_trivial_crossed_witness`. |
 | 15, 17 | A | `nodeWord` / `packConcat` wrap documented, not expanded to a new SSZ proof. |
 | 20, 21 | B | `srcInputs` converts `src`'s pinned `List Nat` pubkey/WC/signature to `ByteArray` via `toByteArray` (an exact octet cast, since every byte is `< 256`) and computes the amount bytes via the source's own `toLittleEndian64`. `ComposedSszInput.digestInput` and `ComposedSszInput.txInput.toInputs` are *defined* as `srcInputs input.src`, so the digest/tx child's bytes are identical to, and correctly derived from, the same `src` the deposit-data-root child discharges — closing both the cross-type identity gap (20) and the unconstrained-amount gap (21) for the composed parent. (Wave 4: the defining equalities are `rfl` accessor facts, so they are no longer registered as conclusion conjuncts; the coupling holds at the type level.) |
 | 23 | A | `A-YUL-INTERFACE` attached to the row. |
@@ -328,6 +424,8 @@ still reads the *input* witness, not the persisted words, and the `path` /
     `audit/assumptions.yaml` accepts `A-YUL-INTERFACE` (MEDIUM): handwritten Yul needs an explicit interface, not a fabricated projection. P-SSZ-1 lists `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`. YAML summary last sentence: imported-to-deployed SSZ Yul stays OPEN (issue 16).
 
     *Scenario.* A reader of CHECKED Verity plus empty `fidelity.missing` would think the Yul interface was discharged. The campaign already has a named assumption for that hole and did not attach it to the row. Promoting the parent to CHECKED did not add `A-YUL-INTERFACE`; it left Yul OPEN in prose and CHECKED in the status field.
+
+    *Superseded (Wave 6).* The body's "not on this row" predates the fix the resolution table already records: `A-YUL-INTERFACE` is attached to the YAML row's `assumptions` (and therefore to STATUS.md), and as of wave 6 it is also on this report's Assumptions header — the header omission was the remaining body-vs-table mismatch, now repaired.
 
 24. **`persistCommit` writes invented `verified = 1` / `bound = 1` flags.**
     `SszEncodingTx.lean:160–161`. No pinned function SSTOREs those bits. Live `SSZ.verifyProof` / `BeaconChainDepositor` return a bool or revert; they do not persist a “bound” flag. `readObs` includes both words. `sourceView` sets them to 1 on the success arm (`committedObs`).

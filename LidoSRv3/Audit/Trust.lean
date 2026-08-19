@@ -239,7 +239,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.swapped_combine_kill_line_refutes_parent
-#print axioms LidoSRv3.Audit.Guarantees.PSsz1.crossed_witness_kill_line_refutes_parent
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.composedEncodingOkFull_not_trivial_crossed_witness
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_witness_kill_line
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_operation_index_kill_line
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode
