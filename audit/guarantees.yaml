@@ -10,12 +10,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
-        "expected": "checked execute + MathView match + active min-clamp parent, lockstep moduleAddress-binding allocation transaction, and kill-line/off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
+        "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), lockstep moduleAddress-binding allocation transaction, and kill-line/off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
       },
-      "summary": "checked_execute_and_active_capacity_bounded: under CheckedBounds the source executor succeeds with capacities equal to MathView, and for active modules capacity ≤ targetValidators ∧ capacity ≤ availableCapacity. A kill-line mutant (capacity := target) fails the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
+      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. A kill-line mutant (capacity := target, skipping wordMin) fails the parent. active_capacity_bounded (MathView.capacity = min(target, available), so capacity ≤ targetValidators ∧ capacity ≤ availableCapacity) is a Nat.min tautology on the MathView definition, not on execute's arithmetic; it is registered separately as an unregistered child rather than folded into the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute_and_active_capacity_bounded"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute"
       },
       "verity": {
         "status": "CHECKED",
@@ -24,8 +24,8 @@
       "fidelity": {
         "covered": [
           "checked execute succeeds and capacity column equals MathView under CheckedBounds",
-          "handwritten capacity model and Math.min clamp for active modules",
           "kill-line mutant (capacity := target) rejected by the registered parent",
+          "active_capacity_bounded (Math.min clamp) demoted to an explicit, unregistered MathView-definitional child",
           "single bind/execute interpreter; observe reads writeArray columns",
           "Contract.run rollback after intermediate writes"
         ],
@@ -39,7 +39,7 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked execute+min-clamp parent and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks."
+        "work": "Keep the checked execute parent and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks, and do not re-fold the min-clamp tautology back into the parent."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
@@ -173,12 +173,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
-        "expected": "abstract constructor ordering and handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, two-batch, fees-conditional-removal, and swapped-mint-read-tick kill-line mutants"
+        "expected": "mint-after-read tick-order discipline with its swapped-tick kill-line mutant on the registered parent, plus the handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, two-batch, and fees-conditional-removal mutants"
       },
-      "summary": "source_report_before_reward: if an independent fullReportSucceeds premise lets sourceTrace return some trace and fees > 0, the trace is [balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]. Verity: observe of handleOracleReport equals sourceView. Not submitReportData; sharesToMintAsFees is an argument. Result.steps/View.steps are read back from independent tx storage-flag ticks (storedSteps), never from the source if-tree's successfulSteps, so the two planes share no step-list bridge; mint_after_read_discipline additionally checks the raw rewardsRead/rewardsMinted ticks are strictly ordered, and mint_order_kill_line shows a mutant that swaps those two tick assignments violates it.",
+      "summary": "mint_after_read_discipline (registered parent): on every committed execution of the real handleOracleReport, the rewardsReadSlot tick is written strictly before any nonzero rewardsMintedSlot tick, read directly off the two raw tx-storage ticks rather than through storedSteps's presence-only check. Kill-line mint_order_kill_line directly refutes this same mintAfterReadDisciplineOf predicate applied to a mutant that swaps the mint/read tick assignments, so the registered parent is the theorem the kill-line actually falsifies. Child source_report_before_reward is a source-plane correspondence fact only (successfulSteps is a literal four-constructor list; fullReportSucceeds is never inspected) and carries no kill-line of its own. Verity child verity_tx_simulates_oracle_report: observe of handleOracleReport equals sourceView; Result.steps/View.steps are read back from independent tx storage-flag ticks (storedSteps), never from the source if-tree's successfulSteps, so the two planes share no step-list bridge. Not submitReportData; sharesToMintAsFees is an argument.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline"
       },
       "verity": {
         "status": "CHECKED",
@@ -186,12 +186,14 @@
       },
       "fidelity": {
         "covered": [
-          "constructor ordering of an accepted positive-fee report",
+          "mint-after-read order discipline over the two raw tx-storage ticks, refuted on the registered parent itself by the swapped-tick kill-line mutant",
+          "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge",
           "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
           "Contract.run rollback after intermediate writes",
-          "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge, plus a mint-after-read order discipline and its swapped-tick kill-line mutant"
+          "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree"
         ],
         "missing": [
+          "a reordering mutant that keeps each tick literal pinned to its own storage slot while only moving the call sites is undetected by mint_after_read_discipline (ContractState writes to distinct slots commute)",
           "SRStorage membership and unique uint24 module ids",
           "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
           "submitReportData / _handleConsensusReportData",
@@ -202,9 +204,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked constructor-order, handleOracleReport-shaped, and mint-after-read discipline theorems; do not widen to submitReportData."
+        "work": "Keep the checked mint-after-read discipline theorem and its swapped-tick kill-line as the registered parent; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
       },
-      "next_gate": "Keep the checked theorems and the mint-after-read kill-line; close listed fidelity gaps without widening the claim.",
+      "next_gate": "Keep the checked theorems and the mint-after-read kill-line on the registered parent; close listed fidelity gaps (starting with the slot-pinned reordering residual) without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {

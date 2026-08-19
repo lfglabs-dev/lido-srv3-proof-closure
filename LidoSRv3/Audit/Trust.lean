@@ -75,7 +75,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.revert_restores_state_value_and_logs
 #print axioms LidoSRv3.Audit.revert_may_retain_attempts
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
-#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute_and_active_capacity_bounded
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
@@ -83,7 +83,6 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.AllocationTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.router_order_preserved
-#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_uint256_execution_refines_math
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1Phase3.mapped_summary_call_transaction
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution

@@ -131,7 +131,7 @@
       ]
     },
     {
-      "name": "Guarantees.PAlloc1.checked_uint256_execution_refines_math",
+      "name": "Guarantees.PAlloc1.checked_execute",
       "status": "lean_checked",
       "axioms": [
         "propext"
