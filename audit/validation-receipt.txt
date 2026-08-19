@@ -1,11 +1,54 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 096e83e8cd23caecd7b7b64aba257dc0a7bfc456
+validated-tree: 0f6a92a876288b78e0ea2082aff706fff1f5f682
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Wave 2 coordinator: sequential merge closure and receipt rebind (2026-08-19)
+-----------------------------------------------------------------------------
+
+- Merges seven independently reviewed Wave 2 remediation branches into `main`
+  in dependency order to keep `audit/guarantees.yaml` and
+  `scripts/audit_metadata.py` conflicts isolated to one row at a time:
+  `P-ALLOC-1` (#127, `970696d`), `P-TOPUP-2` (#123, `d70b809`), `P-ACCOUNT-1`
+  (#124, `7c307bf`), `P-TOPUP-1` (#128, `5765f40`, rebased onto `main` to
+  resolve an `EXPECTED_CANONICAL_DETAIL_SHA256` conflict with the
+  already-merged `P-ACCOUNT-1` row), `P-DEPOSIT-1` (#126, `6edcb6f`, rebased
+  to resolve an append-order conflict in this receipt and to rebind this
+  receipt's own `validated-tree` to the rebased commit), `P-ETH-1` (#125,
+  `ea6c291`), and `P-SSZ-1` (#129, `fe1d7d4`).
+- Each branch was independently re-verified before merge: registered parent
+  non-vacuous, kill-line mutant refutes the registered parent (not a
+  sibling), `lake build LidoSRv3.Audit.AllGuarantees LidoSRv3.Audit.Trust`
+  exit 0, `python3 scripts/audit_metadata.py generate && python3
+  scripts/audit_metadata.py check` exit 0,
+  `python3 scripts/check_public_claim_surfaces.py` exit 0 where applicable,
+  zero `sorry`/`sorryAx`/`admit` in changed Lean files, and an honest
+  `audit/guarantees.yaml` summary/scope for each row.
+- This entry does not change any guarantee, theorem, or metadata row itself.
+  It only rebinds `validated-tree` above from the `P-DEPOSIT-1` rebase
+  commit's tree (`096e83e8cd23caecd7b7b64aba257dc0a7bfc456`) to the tree
+  produced by `HEAD` after the two subsequent merges (`P-ETH-1`, `P-SSZ-1`)
+  that landed on top of it, each of which advanced the tracked tree without
+  re-rebinding this append-only receipt in turn. The new value,
+  `0f6a92a876288b78e0ea2082aff706fff1f5f682`, is recomputed with the same
+  `git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt &&
+  git write-tree` procedure `scripts/check_validation_receipt.py` uses, run
+  against post-`P-SSZ-1`-merge `main`.
+- Post-merge `main` re-verification: `lake build LidoSRv3.Audit.AllGuarantees
+  LidoSRv3.Audit.Trust` exit 0; `python3 scripts/audit_metadata.py generate
+  && python3 scripts/audit_metadata.py check` exit 0; `python3
+  scripts/check_public_claim_surfaces.py` exit 0; `python3
+  scripts/check_validation_receipt.py` exit 0 against the rebind in this
+  entry.
+- Authored in an isolated `git worktree` at
+  `/home/ubuntu/agent-worktrees/wave2-coordinator` on branch `main` to avoid
+  interference from concurrent agent branch switches in the shared checkout.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
 
 P-DEPOSIT-1 conservation kill-line realignment to the registered parent granularity (2026-08-19)
 --------------------------------------------------------------------------------------------------
