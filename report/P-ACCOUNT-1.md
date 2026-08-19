@@ -1,6 +1,6 @@
 # P-ACCOUNT-1
 
-Theorems: `PAccount1.source_report_before_reward`, `PAccount1.verity_tx_simulates_oracle_report`, `PAccount1.mint_after_read_discipline`, `PAccount1.mint_order_kill_line`.
+Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -21,20 +21,22 @@ The guarantee is meant to say: on an accepted report that mints a positive fee, 
 
 ## Proof
 
-**Abstract `source_report_before_reward`.** `sourceTrace` is `accept i >>= pure (successfulSteps accepted shares)`. `successfulSteps` is, by definition,
+**Abstract `mint_after_read_discipline` (parent).** A presence check on the tick flags (as in `storedSteps`) cannot see write order at all: `ContractState` is a key-value store, so writes to `rewardsReadSlot` and `rewardsMintedSlot` commute regardless of which `writeSlot` call runs first in the program text. `mintAfterRead readTick mintTick := 0 < mintTick → readTick < mintTick` is a second, independent check over the two raw ticks (`2` for read, `3` for mint) rather than their mere presence. `mintAfterReadDiscipline_holds` proves it for the real `handleOracleReport` by unfolding to the literal ticks `2 < 3`.
+
+**Kill-line `mint_order_kill_line` (refutes the parent).** `handleOracleReportSwappedMintBeforeRead` is a second executable transaction, defined beside the discipline it violates, that assigns the mint tick (`2`) at the call site textually before the read tick (`3`); `mintOrderKillLine_holds` proves that mutant does *not* satisfy `mintAfterReadDisciplineOf` — the identical predicate `mint_after_read_discipline` proves for the real transaction — witness: an empty report with a positive fee yields ticks `mint = 2`, `read = 3`, so `mintAfterRead 3 2` is `0 < 2 → 3 < 2`, i.e. false. This is what makes the registered parent falsifiable rather than true by construction: the kill-line mutates the same shape of transaction the parent quantifies over and the parent's own statement rejects it.
+
+**Child `source_report_before_reward`.** `sourceTrace` is `accept i >>= pure (successfulSteps accepted shares)`. `successfulSteps` is, by definition,
 
 ```
 [balancesWritten bs, accountingCalled, rewardsRead bs]
   ++ (if 0 < shares then [rewardsMinted] else [])
 ```
 
-The theorem assumes `0 < sharesToMintAsFees` and `sourceTrace _ = some trace`, unfolds the `Option.bind`, and closes by `rfl`. `fullReportSucceeds` is never inspected. No induction.
+The theorem assumes `0 < sharesToMintAsFees` and `sourceTrace _ = some trace`, unfolds the `Option.bind`, and closes by `rfl`. `fullReportSucceeds` is never inspected. No induction. This is a source-plane correspondence fact, useful for pinning `successfulSteps`'s shape, but it is tautological on its own statement (see issue 1) and carries no kill-line, which is why it is demoted rather than registered as the headline.
 
 **SOURCE→word refinement `checkedTotal256_refines_source`.** Induction on the balance list: if the Nat `checkedTotal64` succeeds under `≤ 2^64-1`, each `safeAdd` succeeds and the word value equals the Nat total. This is the only non-definitional arithmetic in the abstract plane.
 
-**VERITY `verity_tx_simulates_oracle_report`.** `handleOracleReport` re-checks `idsAndBalancesValid`, runs `checkedTotal256` (a second copy of the same accumulator over words), writes the map and the tick flags, and returns `storedSteps dirty i.balancesGwei` — read back from its own storage, not from `AccountingCorrespondence.successfulSteps`. `observe` on success builds a `View` from **the input list** `i.balancesGwei`, the stored total, and `storedSteps` (which reads the flags the same function just wrote). `sourceView` is `accept` + `successfulSteps`. Equality is the second accumulator agreeing with `checkedTotal64` plus each side's own step-list constructor happening to be the same four-step list on this input. Rollback: `Contract.run` discards the dirty state on `OVERFLOW` and on the `failAfterWrites` hook.
-
-**Mint-after-read discipline `mint_after_read_discipline` / kill-line `mint_order_kill_line`.** A presence check on the tick flags (as in `storedSteps`) cannot see write order at all: `ContractState` is a key-value store, so writes to `rewardsReadSlot` and `rewardsMintedSlot` commute regardless of which `writeSlot` call runs first in the program text. `mintAfterRead readTick mintTick := 0 < mintTick → readTick < mintTick` is a second, independent check over the two raw ticks (`2` for read, `3` for mint) rather than their mere presence. `mintAfterReadDiscipline_holds` proves it for the real `handleOracleReport` by unfolding to the literal ticks `2 < 3`. `handleOracleReportSwappedMintBeforeRead` is a second executable transaction, defined beside the discipline it violates, that assigns the mint tick (`2`) at the call site textually before the read tick (`3`); `mintOrderKillLine_holds` proves that mutant does *not* satisfy `mintAfterReadDisciplineOf` (witness: an empty report with a positive fee yields ticks `mint = 2`, `read = 3`, so `mintAfterRead 3 2` is `0 < 2 → 3 < 2`, i.e. false).
+**VERITY child `verity_tx_simulates_oracle_report`.** `handleOracleReport` re-checks `idsAndBalancesValid`, runs `checkedTotal256` (a second copy of the same accumulator over words), writes the map and the tick flags, and returns `storedSteps dirty i.balancesGwei` — read back from its own storage, not from `AccountingCorrespondence.successfulSteps`. `observe` on success builds a `View` from **the input list** `i.balancesGwei`, the stored total, and `storedSteps` (which reads the flags the same function just wrote). `sourceView` is `accept` + `successfulSteps`. Equality is the second accumulator agreeing with `checkedTotal64` plus each side's own step-list constructor happening to be the same four-step list on this input. Rollback: `Contract.run` discards the dirty state on `OVERFLOW` and on the `failAfterWrites` hook.
 
 ## Issues
 
@@ -51,27 +53,41 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 2026-08-19: independent tx storage-flag ticks replace the shared
 `successfulSteps` call in `handleOracleReport`'s own `Result`/`View`
 construction (no bridge between the source if-tree and the tx plane), and a
-new `mint_after_read_discipline` / `mint_order_kill_line` pair registers a
-narrower order check plus its swapped-tick kill-line mutant on the parent.
-This is a partial mitigation of issue 5, not a closure of it — see the
-disclosed residual there.
+new `mint_after_read_discipline` / `mint_order_kill_line` pair adds a
+narrower order check plus its swapped-tick kill-line mutant. This is a
+partial mitigation of issue 5, not a closure of it — see the disclosed
+residual there.
+
+2026-08-19 (remediation): the metadata registration was tautological —
+`audit/guarantees.yaml`'s `abstract.theorem` pointed at
+`source_report_before_reward` (issue 1: true by construction, no kill-line of
+its own) while the only kill-line that actually exercises a real fault class
+(`mint_order_kill_line`) refutes the *sibling* `mint_after_read_discipline`,
+never the registered parent. `mint_after_read_discipline` is now the
+registered P-ACCOUNT-1 parent (`audit/guarantees.yaml` `abstract.theorem`
+and `EXPECTED_CANONICAL_CLAIMS`/`EXPECTED_CANONICAL_DETAIL_SHA256` in
+`scripts/audit_metadata.py`); `source_report_before_reward` is demoted to a
+child (source-plane correspondence only). `verity_tx_simulates_oracle_report`
+stays the Verity child. No Lean theorem statement or proof changed; this is
+a registration/documentation fix over already-proved theorems (`Guarantees.PAccount1.lean`
+doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`).
 
 | # | Close | Note |
 | --- | --- | --- |
-| 1, 8, 10, 12 | A | Constructor `sourceTrace` / tx storage flags named honestly. |
-| 5 | B (partial) + A (residual) | `mint_after_read_discipline` / `mint_order_kill_line` catch a tick-travels-with-call-site reordering mutant; a reordering that keeps each literal pinned to its own slot remains an open, disclosed gap. |
-| 2 | A | `fullReportSucceeds` remains an unused parameter of the constructor theorem. |
+| 1, 8, 10, 12 | A | Constructor `sourceTrace` / tx storage flags named honestly; issue 1's child is no longer the registered headline. |
+| 5 | B (partial) + A (residual) | `mint_after_read_discipline` (now the registered parent) / `mint_order_kill_line` catch a tick-travels-with-call-site reordering mutant; a reordering that keeps each literal pinned to its own slot remains an open, disclosed gap. |
+| 2 | A | `fullReportSucceeds` remains an unused parameter of the (now child) constructor theorem. |
 | 3 | A | `observe` still uses the input balance list; not claimed as a map readback. |
 | 4, 6, 7, 11, 16, 17, 19 | scope | Membership, caller, role, fee computation, packing, `submitReportData` in `missing`. |
-| 9 | A | Abstract theorem is the positive-fee case. |
+| 9 | A | Child abstract theorem is the positive-fee case. |
 | 13, 15, 18 | A | `ofNat` / empty / non-unique ids documented. |
 | 14 | A | `Contract.run` rollback is the spec. |
 
 
-1. **The ordering theorem is true by construction.**
-   The “trace” is not extracted from Accounting.sol. It is the list `successfulSteps` literally written in `AccountingCorrespondence.lean:86–89`. The theorem says that list equals itself under `0 < fees`. It cannot fail if the real `handleOracleReport` minted before reading balances; that call is not in the model.
+1. **The child `source_report_before_reward` is true by construction.**
+   The “trace” is not extracted from Accounting.sol. It is the list `successfulSteps` literally written in `AccountingCorrespondence.lean:86–89`. The theorem says that list equals itself under `0 < fees`. It cannot fail if the real `handleOracleReport` minted before reading balances; that call is not in the model. This is why `source_report_before_reward` is a demoted child rather than the registered parent: the mint-before-read scenario below is exactly the fault class `mint_after_read_discipline` (the registered parent) and its `mint_order_kill_line` mutant are built to catch, over the tx storage-flag ticks instead of the source if-tree.
 
-   *Scenario that the guarantee is supposed to rule out, and does not.* Accounting is patched to call `reportRewardsMinted` *before* reading the freshly written module balances. `source_report_before_reward` still holds, because `successfulSteps` is unchanged. The CHECKED status does not track the deployed order.
+   *Scenario that this child alone is supposed to rule out, and does not.* Accounting is patched to call `reportRewardsMinted` *before* reading the freshly written module balances. `source_report_before_reward` still holds, because `successfulSteps` is unchanged. The CHECKED status of this child does not track the deployed order; that tracking is the registered parent's job, not this child's.
 
 2. **`fullReportSucceeds` makes the abstract statement conditional on an unproved oracle.**
    The parameter is bound as `_` in `sourceTrace` (`AccountingCorrespondence.lean:111`) and never inspected. Tests instantiate it as `True` (`AccountingVectors.lean`).

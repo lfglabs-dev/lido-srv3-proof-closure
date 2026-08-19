@@ -9,12 +9,16 @@ open LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 def guarantee : Guarantee := ⟨.pAccount1, [.model, .source, .verityTx]⟩
 
-/-- If an independently supplied `fullReportSucceeds` premise lets
+/-- Child: source-plane correspondence only, not the registered P-ACCOUNT-1
+parent. If an independently supplied `fullReportSucceeds` premise lets
 `sourceTrace` return `some trace`, and fee shares are strictly positive,
 then that trace is exactly
 `[balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]`
 for one shared `b`. This is the constructor order of `successfulSteps`,
-not `submitReportData`. -/
+not `submitReportData`. `successfulSteps` is a hardcoded four-constructor
+list and `fullReportSucceeds` is never inspected by the proof, so this fact
+carries no kill-line of its own: see `mint_after_read_discipline` for the
+registered parent that the `mint_order_kill_line` mutant actually refutes. -/
 theorem source_report_before_reward
     (fullReportSucceeds :
       LidoSRv3.Audit.SolidityAccounting.ReportInput → Nat → Prop)
@@ -31,8 +35,8 @@ theorem source_report_before_reward
   LidoSRv3.Audit.SolidityAccounting.source_report_before_reward
     fullReportSucceeds i sharesToMintAsFees hSuccess hFees trace h
 
-/-- `observe` of `handleOracleReport` (balance array + total/flag slots)
-equals the independently stated `sourceView`. Not `submitReportData`;
+/-- Verity child. `observe` of `handleOracleReport` (balance array + total/flag
+slots) equals the independently stated `sourceView`. Not `submitReportData`;
 `sharesToMintAsFees` is an argument, not a computed fee. -/
 theorem verity_tx_simulates_oracle_report
     (i : ReportInput) (sharesToMintAsFees : Nat) (state : Verity.ContractState) :
@@ -50,24 +54,33 @@ theorem verity_tx_revert_restores_snapshot
     rollback = state :=
   revert_restores_snapshot i sharesToMintAsFees inject state rollback reason h
 
-/-- Independent tx-storage-flag order discipline: on every committed
-execution of the real `handleOracleReport`, the `rewardsReadSlot` tick is
-written strictly before any nonzero `rewardsMintedSlot` tick. This reads the
-two raw ticks directly and does not go through `storedSteps`'s presence-only
-check, so it is not the same fact as `verity_tx_simulates_oracle_report`; it
-is the order fact that theorem's `View` equality cannot by itself express.
-`Result.steps` (and the `View.steps` it feeds) is built from these same tx
-storage flags and never calls `AccountingCorrespondence.successfulSteps`;
-the two planes share no step-list bridge. -/
+/-- Registered P-ACCOUNT-1 parent. Independent tx-storage-flag order
+discipline: on every committed execution of the real `handleOracleReport`,
+the `rewardsReadSlot` tick is written strictly before any nonzero
+`rewardsMintedSlot` tick. This reads the two raw ticks directly and does not
+go through `storedSteps`'s presence-only check, so it is not the same fact as
+`verity_tx_simulates_oracle_report`; it is the order fact that theorem's
+`View` equality cannot by itself express. `Result.steps` (and the
+`View.steps` it feeds) is built from these same tx storage flags and never
+calls `AccountingCorrespondence.successfulSteps`; the two planes share no
+step-list bridge. Unlike the demoted `source_report_before_reward` child,
+this parent is directly refuted by the `mint_order_kill_line` mutant below,
+so the registered claim has an adversarial witness rather than being true by
+construction. Residual, disclosed gap: a reordering mutant that keeps each
+tick literal pinned to its own slot while only moving the call sites is
+undetected here, because `ContractState` writes to distinct slots commute
+(see `report/P-ACCOUNT-1.md` issue 5). -/
 theorem mint_after_read_discipline : mintAfterReadDiscipline :=
   mintAfterReadDiscipline_holds
 
-/-- Kill-line for the registered parent: a mutant that assigns the mint tick
-before the read tick — the same fault as calling `reportRewardsMinted`
-before re-reading the freshly written balances — violates
-`mint_after_read_discipline`. If a future edit merges the two tick writes
-back into a shared order-insensitive flag, this theorem's witness fails and
-the regression is caught here, not only by informal review. -/
+/-- Kill-line for the registered parent `mint_after_read_discipline`: a
+mutant that assigns the mint tick before the read tick — the same fault as
+calling `reportRewardsMinted` before re-reading the freshly written
+balances — violates `mintAfterReadDisciplineOf` for that mutant, the same
+predicate the registered parent proves for the real transaction. If a future
+edit merges the two tick writes back into a shared order-insensitive flag,
+this theorem's witness fails and the regression is caught here, not only by
+informal review. -/
 theorem mint_order_kill_line : mintOrderKillLine :=
   mintOrderKillLine_holds
 
