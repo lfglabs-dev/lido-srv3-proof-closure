@@ -224,6 +224,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization
 #print axioms LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_witness_kill_line
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_operation_index_kill_line
+#print axioms LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding
 #print axioms LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back
 #print axioms LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source

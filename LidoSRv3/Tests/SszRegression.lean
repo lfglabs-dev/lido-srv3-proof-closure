@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Ssz
 import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
+import LidoSRv3.Audit.Guarantees.PSsz1
 
 namespace LidoSRv3.Tests.SszRegression
 
@@ -170,5 +171,50 @@ example (left right : Sha256Digest) :
 /-- Regression: the pinned constant width stays a separate computation from the leaf. -/
 example : sourceNodeWidth depositInput = SHA256_DIGEST_LENGTH pinnedConfig :=
   sourceNodeWidth_pinned depositInput
+
+/-! ### P-SSZ-1 one-object composition smoke test
+
+`composedExample` has the pinned 48/32/96-byte widths every other
+`depositInput` above deliberately lacks, so it can actually discharge
+`PSsz1.composed_ssz_encoding`'s hypotheses. This shows the four-child
+one-object coupling (`ComposedSszInput.rhs`/`digestInput`/`txInput` all
+derived from `composedExample.src`) is satisfiable, not vacuously closed. -/
+
+open LidoSRv3.Audit.Guarantees.PSsz1
+open LidoSRv3.Audit.Verity.SszAbstractDigest
+open LidoSRv3.Audit.Source.GIndexConcatCorrespondence
+
+def compositionSrc : SourceDepositDataRootInput := {
+  withdrawalCredentials := List.replicate 32 1, publicKey := List.replicate 48 2,
+  signature := List.replicate 96 3, amountGwei := 32_000_000_000
+  withdrawalCredentialsBounded := by
+    intro byte h
+    simpa using (List.eq_of_mem_replicate h) ▸ (by decide : (1 : Nat) < 256)
+  publicKeyBounded := by
+    intro byte h
+    simpa using (List.eq_of_mem_replicate h) ▸ (by decide : (2 : Nat) < 256)
+  signatureBounded := by
+    intro byte h
+    simpa using (List.eq_of_mem_replicate h) ▸ (by decide : (3 : Nat) < 256)
+  amountGweiBounded := by decide }
+
+def composedExample : ComposedSszInput :=
+  { src := compositionSrc
+    lhs := ⟨2, 7, by decide, by decide⟩
+    rhsPow := 11
+    rhsPowFits := by decide
+    forkVersion := zeros 4
+    expectedDepositDataRoot := zeros digestBytes }
+
+/-- Non-vacuity witness: `composed_ssz_encoding` is genuinely invokable on a
+pinned-width deposit, its own derived witness/root, and the derived
+`rhs`/`digestInput`/`txInput` -- the tightened one-object hypotheses are
+jointly satisfiable, not vacuously closed. The type is inferred from the term
+so it stays in lockstep with `composed_ssz_encoding`'s conclusion. -/
+def composedExample_satisfies_composed_ssz_encoding :=
+  composed_ssz_encoding (operation := .clValidatorVerifier)
+    (combine := sourceCombine composedExample.src) composedExample
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+    (sourceWitness_binds_sourceNode compositionSrc (by decide) (by decide) (by decide))
 
 end LidoSRv3.Tests.SszRegression
