@@ -226,11 +226,12 @@ theorem wrap_implies_accumulated_ne_pushed {inp : SourceTopupInput}
   have hGe : uint256Modulus ≤ allocSum inp.allocations := Nat.not_lt.mp hWrap
   have hMod : allocSumUnchecked inp.allocations = allocSum inp.allocations % uint256Modulus :=
     allocSumUnchecked_eq_mod inp.allocations
+  have hPos : 0 < uint256Modulus := by decide
   have hLt : allocSum inp.allocations % uint256Modulus < allocSum inp.allocations :=
-    Nat.mod_lt_of_pos_of_le (Nat.pos_of_ne_zero (by omega)) hGe
+    Nat.lt_of_lt_of_le (Nat.mod_lt _ hPos) hGe
   have hNe : allocSumUnchecked inp.allocations ≠ allocSum inp.allocations := by omega
   have hPushed : pushedValue inp = totalAllocated inp :=
-    (loopPushed_eq_allocSum _ _ hLen).symm
+    loopPushed_eq_allocSum _ _ hLen
   simp only [accumulated, totalAllocated] at *
   omega
 
