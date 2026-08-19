@@ -139,11 +139,19 @@ arbitrary pre-state map value from entering the outcome observable. -/
 def twoWords (words : List Word) : List Word :=
   [words.getD 0 0, words.getD 1 0]
 
+/-- The pinned digest chain always has exactly seven entries (`seven_calls`).
+Persisting a fixed seven-entry readback window mirrors `twoWords` above and
+lets the outcome observable *reread the persisted digest words from storage*
+rather than trusting the pre-write local `chain` list. -/
+def sevenWords (words : List Word) : List Word :=
+  [words.getD 0 0, words.getD 1 0, words.getD 2 0, words.getD 3 0,
+    words.getD 4 0, words.getD 5 0, words.getD 6 0]
+
 /-- Intermediate child writes (including structural path/branch maps). -/
 def persistChildren (base : Nat) (state : ContractState)
     (digestWords pathWords branchWords : List Word)
     (root concat fingerprint opW idxW pivotW travW : Word) : ContractState :=
-  let s := writeDigests base state 0 digestWords
+  let s := writeDigests base state 0 (sevenWords digestWords)
   let s := writePath base s 0 (twoWords pathWords)
   let s := writeBranch base s 0 (twoWords branchWords)
   let s := s.writeSlot (concatSlot base) concat
@@ -189,6 +197,9 @@ structure Observables where
   branchLength : Word
   path : List Word
   branch : List Word
+  /-- The seven persisted digest-chain words, reread from `digestMapSlot`
+  storage (not the pre-write local `chain` list). -/
+  digest : List Word
   deriving DecidableEq, Repr
 
 inductive Status where
@@ -201,7 +212,7 @@ structure View where
   observables : Observables
   deriving DecidableEq, Repr
 
-def zeroObs : Observables := ⟨0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, [], []⟩
+def zeroObs : Observables := ⟨0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, [], [], []⟩
 
 def readWords (mapSlot : Nat) (state : ContractState) : Nat → Nat → List Word
   | _, 0 => []
@@ -222,7 +233,10 @@ def readObs (state : ContractState) (base : Nat) : Observables :=
     state.readSlot (pathLengthSlot base),
     state.readSlot (branchLengthSlot base),
     readWords (pathMapSlot base) state 0 2,
-    readWords (branchMapSlot base) state 0 2⟩
+    readWords (branchMapSlot base) state 0 2,
+    -- Reread the seven persisted digest words from `digestMapSlot` storage,
+    -- not the pre-write local `chain` list.
+    readWords (digestMapSlot base) state 0 7⟩
 
 /-- Persist every child after the child computations. The injected failure
 hook, a failed `bindOperation`, and the root-mismatch branch all revert
@@ -257,7 +271,8 @@ def encodeAt (base : Nat) (input : EncodingInput)
               .success ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1,
                 input.witness.path.length, input.witness.branch.length,
                 twoWords (input.witness.path.map siblingWord),
-                twoWords (input.witness.branch.map nodeWord)⟩
+                twoWords (input.witness.branch.map nodeWord),
+                sevenWords (chain.map bytesToWord)⟩
                 (persistCommit base dirty)
           else
             .revert "DepositDataRootMismatch" dirty
@@ -310,7 +325,8 @@ def committedObs (input : EncodingInput) (index pow : Nat) : Observables :=
     nodeWord (traversedRoot input), 1,
     input.witness.path.length, input.witness.branch.length,
     twoWords (input.witness.path.map siblingWord),
-    twoWords (input.witness.branch.map nodeWord)⟩
+    twoWords (input.witness.branch.map nodeWord),
+    sevenWords (chain.map bytesToWord)⟩
 
 def sourceObs (input : EncodingInput) : Option Observables :=
   if widthsOk input = false then none
@@ -356,20 +372,15 @@ private theorem readObs_success_slots (base : Nat) (state : ContractState)
       base =
       ⟨root, concat, fingerprint, 1, opW, idxW, pivotW, travW, 1,
         pathWords.length, branchWords.length,
-        twoWords pathWords, twoWords branchWords⟩ := by
-  simp [readObs, persistCommit, persistChildren, writeBranch, writePath,
-    writeDigests, writeWords, readWords, twoWords,
+        twoWords pathWords, twoWords branchWords, sevenWords digestWords⟩ := by
+  simp (config := { decide := true }) [readObs, persistCommit, persistChildren, writeBranch,
+    writePath, writeDigests, writeWords, readWords, twoWords, sevenWords,
     depositRootSlot, concatSlot, digestXorSlot, verifiedSlot,
     operationSlot, indexSlot, pivotSlot, traversedRootSlot, boundSlot,
-    pathLengthSlot, branchLengthSlot, pathMapSlot, branchMapSlot,
+    pathLengthSlot, branchLengthSlot, digestMapSlot, pathMapSlot, branchMapSlot,
     ContractState.readSlot, ContractState.storage, ContractState.readMapUint,
     ContractState.storageMapUint, ContractState.writeMapUint,
     ContractState.writeSlot]
-  constructor <;> intro h
-  · have hne : (0 : Word) ≠ 1 := by decide
-    exact False.elim (hne h)
-  · have hne : (0 : Word) ≠ 1 := by decide
-    exact False.elim (hne h)
 
 /-- Composed faithful-plane theorem: the executable encoding transaction's
 outcome observables are exactly the independently stated source-view of the

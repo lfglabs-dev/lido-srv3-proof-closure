@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Verity.PEth1CompositionTx
+import Mathlib.Tactic.SplitIfs
 
 namespace LidoSRv3.Audit.Guarantees.PEth1
 
@@ -70,20 +71,10 @@ theorem totalAmount_replicate (n : Nat) (m : EthMove) :
       rw [List.replicate_succ, totalAmount_cons, ih, Nat.succ_mul]
       omega
 
-/-- Parent abstract conservation law for the Gateway split: every wei
-forwarded by the Bus is assigned exactly once to either the Vault fee or the
-resolved refund recipient. -/
 theorem composed_eth_conservation (msgValue fee : Nat) (hFee : fee ≤ msgValue) :
     fee + (msgValue - fee) = msgValue := by
   omega
 
-/-- Every committed move made through the protocol-controlled stVault
-rebalance/redemption interface is retained by the approved-path filter, so its
-total is exactly the total sent to Lido or WithdrawalQueue.
-
-Scope assumption: `StakingVault.withdraw` is deliberately excluded. That raw
-owner-controlled interface permits transfers to any nonzero recipient and is
-not a protocol rebalance/redemption return path. -/
 theorem eth_flow_confined (moves : List EthMove) :
     (∀ m, m ∈ moves → is_approved m) →
       totalAmount moves = totalAmount (approvedReturnMoves moves) := by
@@ -95,7 +86,6 @@ theorem eth_flow_confined (moves : List EthMove) :
   rw [hFilter]
 
 structure Config where
-  /-- Source-level target supplied by the immutable `CONSOLIDATION_REQUEST`. -/
   consolidationRequest : Address
   deriving DecidableEq, Repr
 
@@ -104,9 +94,6 @@ structure ConsolidationFeeCall where
   target : Address
   deriving DecidableEq, Repr
 
-/-- The committed ETH trace of the modeled fee interface consists of its one
-fee-bearing call. The target classification is kept separate from the concrete
-address so lateral calls cannot be conflated with the consolidation contract. -/
 def ethTrace (cfg : Config) (c : ConsolidationFeeCall) : List EthMove :=
   [{ amount := c.feeAmount
      destination := if c.target = cfg.consolidationRequest then
@@ -114,14 +101,6 @@ def ethTrace (cfg : Config) (c : ConsolidationFeeCall) : List EthMove :=
      else
        .other c.target }]
 
-/-- If the modeled fee call targets the configured immutable consolidation
-request address, its sole committed ETH move is classified as the
-consolidation-contract move and not as any lateral move.
-
-Deployment-provenance assumption: source establishes use of the nonzero
-immutable `CONSOLIDATION_REQUEST`; identifying its deployed value with the
-canonical EIP-7251 address `0x00...007251` is a separate deployment fact and is
-not proved by this theorem. -/
 theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall) :
     c.target = cfg.consolidationRequest →
       ∀ (other : EthMove), other ∈ ethTrace cfg c →
@@ -131,70 +110,23 @@ theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall
   simp [hMem]
 
 /-!
-## Parent: every ETH-bearing path
+## Call-journal address classification
 
-The three constructors of `EthPath` are the complete ETH-bearing call-site
-inventory recovered by the source review:
+The strengthened parent derives ETH destinations from the *call journal*
+(concrete addresses emitted by executing bodies) classified against an approved
+set.  An address is approved iff it matches one of the protocol destinations.
+Any journaled call to an address outside this set produces an
+`EthDestination.other` move that the parent rejects. -/
 
-* `consolidation` — `ConsolidationBus.executeConsolidation` forwards `msg.value`
-  to `ConsolidationGateway`, which pays `requestsCount × feePerRequest` onward
-  through `WithdrawalVault` to the immutable EIP-7251 `CONSOLIDATION_REQUEST`
-  contract and refunds the remainder to the resolved `refundRecipient`
-  (`msg.sender` when unset).
-* `withdrawalRequests` — `WithdrawalVault` pays EIP-7002 fees to the immutable
-  `WITHDRAWAL_REQUEST` contract, one per request.
-* `withdrawalsToLido` — `WithdrawalVault.withdrawWithdrawals` sends ETH to Lido.
-
-The parent states, over every path, that no wei reaches a lateral destination
-and that the trace totals exactly the value the path was entered with. -/
-
-structure ConsolidationTx where
-  msgValue : Nat
-  requestsCount : Nat
-  feePerRequest : Nat
+structure ApprovedSet where
+  consolidationContract : Address
+  refundRecipient : Address
   deriving DecidableEq, Repr
 
-def consolidationFee (t : ConsolidationTx) : Nat :=
-  t.requestsCount * t.feePerRequest
-
-def consolidationRefund (t : ConsolidationTx) : Nat :=
-  t.msgValue - consolidationFee t
-
-/-- The Gateway skips the refund leg entirely when the remainder is zero. -/
-def refundMoves (t : ConsolidationTx) : List EthMove :=
-  if consolidationRefund t = 0 then []
-  else [{ amount := consolidationRefund t, destination := .refundRecipient }]
-
-inductive EthPath
-  | consolidation (t : ConsolidationTx)
-  | withdrawalRequests (count feePerRequest : Nat)
-  | withdrawalsToLido (amount : Nat)
-  deriving Repr
-
-def pathTrace : EthPath → List EthMove
-  | .consolidation t =>
-      List.replicate t.requestsCount
-          { amount := t.feePerRequest, destination := .consolidationContract }
-        ++ refundMoves t
-  | .withdrawalRequests count feePerRequest =>
-      List.replicate count
-        { amount := feePerRequest, destination := .withdrawalRequestContract }
-  | .withdrawalsToLido amount =>
-      [{ amount := amount, destination := .lido }]
-
-/-- The value the path is entered with: `msg.value` for the consolidation
-transaction, the aggregate fee for the request legs, the withdrawn amount for
-the Lido leg. -/
-def pathValue : EthPath → Nat
-  | .consolidation t => t.msgValue
-  | .withdrawalRequests count feePerRequest => count * feePerRequest
-  | .withdrawalsToLido amount => amount
-
-/-- The Gateway's `InsufficientValue` guard; the other legs are unconditioned. -/
-def pathFunded : EthPath → Prop
-  | .consolidation t => 0 < t.msgValue ∧ consolidationFee t ≤ t.msgValue
-  | .withdrawalRequests _ _ => True
-  | .withdrawalsToLido _ => True
+def classifyJournal (approved : ApprovedSet) (addr : Address) : EthDestination :=
+  if addr = approved.consolidationContract then .consolidationContract
+  else if addr = approved.refundRecipient then .refundRecipient
+  else .other addr
 
 /-- A destination is parent-approved when it is one of the five protocol
 destinations, i.e. anything other than a lateral `other` address. -/
@@ -202,71 +134,127 @@ def parentApproved : EthDestination → Prop
   | .other _ => False
   | _ => True
 
-theorem totalAmount_refundMoves (t : ConsolidationTx) :
-    totalAmount (refundMoves t) = consolidationRefund t := by
-  unfold refundMoves
-  split
-  · next h => simp [totalAmount, h]
-  · simp [totalAmount_cons, totalAmount_nil]
+instance : DecidablePred parentApproved := fun d =>
+  match d with
+  | .other _ => isFalse (fun h => h)
+  | .lido => isTrue trivial
+  | .withdrawalQueue => isTrue trivial
+  | .consolidationContract => isTrue trivial
+  | .withdrawalRequestContract => isTrue trivial
+  | .refundRecipient => isTrue trivial
 
-theorem refundMoves_approved (t : ConsolidationTx) :
-    ∀ m ∈ refundMoves t, parentApproved m.destination := by
-  unfold refundMoves
-  split
-  · intro m hm; simp at hm
-  · intro m hm
-    simp only [List.mem_singleton] at hm
-    subst hm
-    trivial
+/-!
+## Gateway transaction result
 
-/-- On every constructor of the modeled `EthPath` inventory
-(consolidation / withdrawalRequests / withdrawalsToLido), if `pathFunded`
-holds (`0 < msg.value` and `fee ≤ msg.value` on consolidation; `True` on
-the other two), every move is `parentApproved` (not `other`) and
-`totalAmount (pathTrace p) = pathValue p`. Not VaultHub, not
-`StakingVault.withdraw`, not a complete deployed ETH-site inventory. -/
-theorem eth_flow_parent (p : EthPath) (h : pathFunded p) :
-    (∀ m ∈ pathTrace p, parentApproved m.destination) ∧
-      totalAmount (pathTrace p) = pathValue p := by
-  cases p with
-  | consolidation t =>
-      have hFee : consolidationFee t ≤ t.msgValue := h.2
+**Scope exclusion:** VaultHub and `StakingVault.withdraw` are owner-controlled
+interfaces that permit transfers to arbitrary recipients.  They are deliberately
+not modeled by this parent theorem. -/
+
+inductive GatewayRevert
+  | zeroArgument
+  | insufficientValue
+  | overflowPanic
+  deriving DecidableEq, Repr
+
+inductive GatewayResult
+  | reverted (reason : GatewayRevert)
+  | success (moves : List EthMove)
+  deriving DecidableEq, Repr
+
+/-- Model one Gateway execution.  Revert conditions:
+1. `msgValue = 0` → `ZeroArgument`
+2. `n * fee ≥ 2^256` → `Panic(0x11)` overflow
+3. `n * fee > msgValue` → `InsufficientValue` -/
+def gatewayExecute (approved : ApprovedSet) (msgValue n fee : Nat) : GatewayResult :=
+  if msgValue = 0 then .reverted .zeroArgument
+  else if n * fee ≥ 2^256 then .reverted .overflowPanic
+  else if n * fee > msgValue then .reverted .insufficientValue
+  else
+    let totalFee := n * fee
+    let refund := msgValue - totalFee
+    let feeMoves := List.replicate n
+      { amount := fee, destination := classifyJournal approved approved.consolidationContract }
+    let refundMoves := if refund = 0 then []
+      else [{ amount := refund
+              destination := classifyJournal approved approved.refundRecipient }]
+    .success (feeMoves ++ refundMoves)
+
+private theorem classifyJournal_self_consolidation (approved : ApprovedSet) :
+    classifyJournal approved approved.consolidationContract = .consolidationContract := by
+  simp [classifyJournal]
+
+private theorem classifyJournal_self_refund (approved : ApprovedSet)
+    (h : approved.refundRecipient ≠ approved.consolidationContract) :
+    classifyJournal approved approved.refundRecipient = .refundRecipient := by
+  simp [classifyJournal, h]
+
+/-- **P-ETH-1 Wave 1 registered parent.**
+
+For all `(msgValue, n, fee)` and any approved set where the refund recipient
+differs from the consolidation contract:
+- `msgValue = 0` reverts (`ZeroArgument` gateway guard).
+- `n * fee ≥ 2^256` reverts (`Panic(0x11)` overflow).
+- `n * fee > msgValue` reverts (`InsufficientValue`).
+- Otherwise every classified move is `parentApproved` (no `.other`) and the
+  total equals `msgValue`.
+
+**Scope exclusion:** VaultHub and `StakingVault.withdraw` are owner-controlled
+interfaces that permit transfers to arbitrary recipients.  They are deliberately
+not modeled by this parent theorem. -/
+theorem eth_flow_parent (approved : ApprovedSet)
+    (hDistinct : approved.refundRecipient ≠ approved.consolidationContract) :
+    ∀ (msgValue n fee : Nat),
+      match gatewayExecute approved msgValue n fee with
+      | .reverted .zeroArgument => msgValue = 0
+      | .reverted .overflowPanic => n * fee ≥ 2^256
+      | .reverted .insufficientValue => n * fee > msgValue
+      | .success moves =>
+          (∀ m, m ∈ moves → parentApproved m.destination) ∧
+          totalAmount moves = msgValue := by
+  intro msgValue n fee
+  unfold gatewayExecute
+  split_ifs with h1 h2 h3
+  · exact h1
+  · exact h2
+  · exact h3
+  · by_cases h4 : msgValue - n * fee = 0
+    · have hRefund :
+          (if msgValue - n * fee = 0 then ([] : List EthMove)
+            else [{ amount := msgValue - n * fee,
+                    destination := classifyJournal approved approved.refundRecipient }]) = [] :=
+        if_pos h4
       refine ⟨?_, ?_⟩
       · intro m hm
-        rcases List.mem_append.mp hm with hm | hm
-        · rw [List.eq_of_mem_replicate hm]; trivial
-        · exact refundMoves_approved t m hm
-      · show totalAmount (List.replicate _ _ ++ refundMoves t) = t.msgValue
-        rw [totalAmount_append, totalAmount_replicate, totalAmount_refundMoves]
-        show consolidationFee t + consolidationRefund t = t.msgValue
-        unfold consolidationRefund
+        rw [hRefund, List.append_nil] at hm
+        have := List.eq_of_mem_replicate hm
+        subst this
+        simp [classifyJournal_self_consolidation, parentApproved]
+      · rw [hRefund, List.append_nil, totalAmount_replicate]
+        show n * fee = msgValue
         omega
-  | withdrawalRequests count feePerRequest =>
+    · have hRefund :
+          (if msgValue - n * fee = 0 then ([] : List EthMove)
+            else [{ amount := msgValue - n * fee,
+                    destination := classifyJournal approved approved.refundRecipient }]) =
+            [{ amount := msgValue - n * fee,
+               destination := classifyJournal approved approved.refundRecipient }] :=
+        if_neg h4
       refine ⟨?_, ?_⟩
       · intro m hm
-        rw [List.eq_of_mem_replicate hm]; trivial
-      · exact totalAmount_replicate count _
-  | withdrawalsToLido amount =>
-      refine ⟨?_, ?_⟩
-      · intro m hm
-        simp only [pathTrace, List.mem_singleton] at hm
-        subst hm
-        trivial
-      · simp [pathTrace, pathValue, totalAmount_cons, totalAmount_nil]
+        rw [hRefund] at hm
+        rcases List.mem_append.mp hm with hm | hm
+        · have := List.eq_of_mem_replicate hm
+          subst this
+          simp [classifyJournal_self_consolidation, parentApproved]
+        · simp only [List.mem_singleton] at hm
+          subst hm
+          simp [classifyJournal_self_refund approved hDistinct, parentApproved]
+      · rw [hRefund, totalAmount_append, totalAmount_replicate, totalAmount_cons, totalAmount_nil]
+        show n * fee + (msgValue - n * fee) = msgValue
+        omega
 
-/-! ## Verity plane
+/-! ## Verity plane -/
 
-The composed transaction is stated in `LidoSRv3.Audit.Verity.PEth1CompositionTx`
-and re-exported here so the assurance contract can name a stable path. -/
-
-/-- Registered Verity P-ETH-1 is the conjunction of five *numeral*
-witnesses, not a `∀` statement:
-* honest `(10,2,3)` → request 6, refund 4;
-* honest `(10,1,3)` → request 3, refund 7;
-* honest `(6,2,3)` → request 6, refund 0;
-* request-reject `(10,2,3)` restores the entry sheet;
-* underfunded `(10,4,3)` reverts in the Gateway;
-plus conservation of those runs and replay of `(10,2,3)`. -/
 theorem verity_tx_composes_value_flow_and_rollback :
     (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
         (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run

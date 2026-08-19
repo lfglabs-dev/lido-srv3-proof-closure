@@ -50,12 +50,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
-        "expected": "abstract +1 MinFirst selection and lockstep proportional memory-array Verity transaction build with amount, bound, floor, rollback, and two-batch mutants"
+        "expected": "abstract proportional-step correspondence-and-bound parent, +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, non-least-index kill-line, over-headroom kill-line, rollback, and two-batch mutants"
       },
-      "summary": "selects_least_open_bucket: if candidate? returns selected from the handwritten +1 Nat model, every other open row has allocation ≥ selected. Verity: if memory arrays decode, observe of allocateToBestCandidate equals sourceView. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
+      "summary": "proportional_step_correspondence_and_bounded: for the pinned-source proportional step (RowsCorrespond between Model/Source), the two independent candidate scans select the same bucket, and a successful checked amount is positive, ≤ remaining demand, and keeps the candidate within capacity (no over-headroom). selects_least_open_bucket (the +1 Nat model) is demoted to a child. Kill-line mutants reject a non-least-index selection and a checkedAmount that skips the capacity-headroom clamp. Verity: if memory arrays decode, observe of allocateToBestCandidate equals sourceView. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.proportional_step_correspondence_and_bounded"
       },
       "verity": {
         "status": "CHECKED",
@@ -63,7 +63,9 @@
       },
       "fidelity": {
         "covered": [
-          "handwritten +1 Strategy selection",
+          "proportional-step candidate correspondence and positive/bounded/capacity-safe checked amount",
+          "kill-line mutants: non-least-index selection and over-headroom amount rejected",
+          "handwritten +1 Strategy selection (demoted child)",
           "single allocateToBestCandidate loop; observe reads writeArray buckets",
           "Contract.run rollback after intermediate writes"
         ],
@@ -76,7 +78,7 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the two checked theorems on their two algorithms; do not merge them or claim Solidity equivalence."
+        "work": "Keep the checked proportional-step parent and the +1-model child on their two algorithms; do not merge them or claim Solidity equivalence."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
@@ -165,9 +167,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
-        "expected": "abstract constructor ordering and handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, and two-batch mutants"
+        "expected": "abstract constructor ordering and handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, two-batch, fees-conditional-removal, and swapped-mint-read-tick kill-line mutants"
       },
-      "summary": "source_report_before_reward: if an independent fullReportSucceeds premise lets sourceTrace return some trace and fees > 0, the trace is [balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]. Verity: observe of handleOracleReport equals sourceView. Not submitReportData; sharesToMintAsFees is an argument.",
+      "summary": "source_report_before_reward: if an independent fullReportSucceeds premise lets sourceTrace return some trace and fees > 0, the trace is [balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]. Verity: observe of handleOracleReport equals sourceView. Not submitReportData; sharesToMintAsFees is an argument. Result.steps/View.steps are read back from independent tx storage-flag ticks (storedSteps), never from the source if-tree's successfulSteps, so the two planes share no step-list bridge; mint_after_read_discipline additionally checks the raw rewardsRead/rewardsMinted ticks are strictly ordered, and mint_order_kill_line shows a mutant that swaps those two tick assignments violates it.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward"
@@ -180,7 +182,8 @@
         "covered": [
           "constructor ordering of an accepted positive-fee report",
           "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
-          "Contract.run rollback after intermediate writes"
+          "Contract.run rollback after intermediate writes",
+          "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge, plus a mint-after-read order discipline and its swapped-tick kill-line mutant"
         ],
         "missing": [
           "SRStorage membership and unique uint24 module ids",
@@ -193,9 +196,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked constructor-order and handleOracleReport-shaped theorems; do not widen to submitReportData."
+        "work": "Keep the checked constructor-order, handleOracleReport-shaped, and mint-after-read discipline theorems; do not widen to submitReportData."
       },
-      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
+      "next_gate": "Keep the checked theorems and the mint-after-read kill-line; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -250,9 +253,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1CompositionTx LidoSRv3.Tests.PEth1CompositionTxMutants",
-        "expected": "abstract ETH-flow parent over every inventoried tagged path and the numeric Bus/Gateway/Vault ensemble build with drop, misroute, corrupt, rollback, and two-batch mutants"
+        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and kill-line mutants (unapproved journal, zero msg.value) build with drop, misroute, corrupt, rollback, and two-batch mutants"
       },
-      "summary": "eth_flow_parent: on the three-constructor EthPath inventory, if pathFunded then every move is parentApproved and the trace sums to pathValue. Verity parent is five numeral witnesses (honest 10/2/3, 10/1/3, 6/2/3, request-reject, underfunded 10/4/3), not ∀. Abstract and Verity planes are not refined to each other.",
+      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses. Kill-line mutants reject unapproved journal entries and zero-value success.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent"
@@ -263,23 +266,26 @@
       },
       "fidelity": {
         "covered": [
-          "abstract parent over the tagged ETH-path inventory",
+          "call-journal address classification against ApprovedSet",
+          "∀ (msgValue, n, fee) quantification with overflow (n*fee≥2^256) and zero-value reverts",
           "numeric Bus/Gateway/Vault ensemble and Contract.run rollback",
-          "five numeral witnesses (not a universal batch theorem)"
+          "five numeral witnesses (not a universal batch theorem)",
+          "kill-line mutants: unapproved journal entry and zero msg.value"
         ],
         "missing": [
-          "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites",
+          "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)",
           "Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI",
           "reverting refund or Lido sinks",
-          "refinement between abstract pathTrace and the Verity ensemble",
-          "getConsolidationRequestFee versus stored fee slot"
+          "refinement between abstract parent and the Verity ensemble",
+          "getConsolidationRequestFee versus stored fee slot",
+          "composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests)"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked tagged-inventory and numeric-ensemble theorems; do not widen the ETH-site inventory."
+        "work": "Wave 1 strengthens the parent with journal classification and revert guards. Do NOT compose into P-CONSOLIDATION-1 until FunctionSpec is ConsolidationGateway.addConsolidationRequests."
       },
-      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
+      "next_gate": "Compose into P-CONSOLIDATION-1 only after FunctionSpec becomes ConsolidationGateway.addConsolidationRequests.",
       "roadmap_priority": "DONE"
     },
     {
@@ -324,12 +330,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
-        "expected": "abstract leftover-budget cap and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, and two-batch mutants"
+        "expected": "abstract router-require post-condition, leftover-budget child, kill-line sum-require mutant, and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, and two-batch mutants"
       },
-      "summary": "aggregate_bounded_by_block_cap: leftover-budget consumption of min(valueGwei, min(moduleLimit, maxTopUpPerBlock)) is ≤ the cap. well_formed_pre (WC/slash/activation) is not used. Verity: if memory arrays decode, observe of allocate equals sourceView of sourceRun. A-TOPUP-NOWRAP. Not live wei topUpLimits or SSZ.",
+      "summary": "router_require_post_condition: unconstrained alloc and limits from evaluateTopUpLimit satisfy per-validator bounds and aggregate block-cap bound as a commit post-condition. aggregate_bounded_by_block_cap demoted to child. Kill-line mutant witnesses that removing the sum require falsifies the parent. Verity: if memory arrays decode, observe of allocate equals sourceView of sourceRun. A-TOPUP-NOWRAP. Not live wei topUpLimits or SSZ.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
+        "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.router_require_post_condition"
       },
       "verity": {
         "status": "CHECKED",
@@ -337,7 +343,7 @@
       },
       "fidelity": {
         "covered": [
-          "leftover-budget aggregate cap (well_formed_pre unused)",
+          "router require post-condition: per-validator and aggregate block-cap bounds on unconstrained alloc",
           "single sourceRun interpreter; observe reads writeArray allocations",
           "Contract.run rollback after intermediate writes"
         ],
@@ -352,7 +358,7 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked leftover-budget theorems under A-TOPUP-NOWRAP; do not implement the live topUp + beacon path."
+        "work": "Keep the checked router-require parent and leftover-budget child under A-TOPUP-NOWRAP; do not implement the live topUp + beacon path."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
@@ -407,9 +413,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants",
-        "expected": "composed four-child gadget and SSZ-encoding Contract.run transaction with rollback and single-child/encoding/hash/two-batch mutants; SHA-256 remains A-SHA256-FFI and the imported Yul fragment stays OPEN"
+        "expected": "one-object witness/verifyProof composition (structural-bind + deposit-data-root share ComposedSszInput.src) plus the independent GIndex.concat / seven-call digest children, an SSZ-encoding Contract.run transaction whose outcome rereads the persisted digest chain from storage, an inconsistent-witness kill line, and rollback / single-child / encoding / hash / two-batch mutants; SHA-256 remains A-SHA256-FFI and the imported Yul fragment stays OPEN"
       },
-      "summary": "The parent is the independent And of four children: a toy structural bind (uninterpreted combine, indices 2/3/4), a deposit-data-root layout, GIndex.concat transcription, and a seven-call digest definition. It is not SSZ.verifyProof on one object. SHA-256 functional correctness remains A-SHA256-FFI; the imported helper/wrapper Yul fragment binding stays OPEN under A-YUL-INTERFACE and A-SOLC-TRUSTED.",
+      "summary": "The parent composes the structural-bind and deposit-data-root children on one shared object (ComposedSszInput.src): the bind hypothesis and the witness/root conjuncts both name sourceWitness src / sourceNode src, so a witness bound for one deposit can no longer be paired with a different deposit's pinned deposit-data-root (closes the report/P-SSZ-1.md issue #4 counterexample for that pair; inconsistent_witness_kill_line proves the rejection). GIndex.concat and the seven-call digest / root-match child remain separate arguments, not tied to src. The Verity tx outcome now rereads the seven persisted digest words from digestMapSlot storage (Observables.digest) instead of trusting the pre-write local chain list. SHA-256 functional correctness remains A-SHA256-FFI; the imported helper/wrapper Yul fragment binding stays OPEN under A-YUL-INTERFACE and A-SOLC-TRUSTED.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding"
@@ -422,22 +428,25 @@
         "covered": [
           "toy structural witness binding",
           "pinned deposit-data-root source layout",
+          "one-object witness/verifyProof composition of the structural-bind and deposit-data-root children (ComposedSszInput.src)",
+          "inconsistent-witness kill line: a witness bound for one deposit is rejected against a different deposit's root",
           "GIndex.concat source transcription",
           "seven-call digest definition",
-          "composed Contract.run encoding of the four independent children",
+          "digest-chain storage reread (Observables.digest rereads digestMapSlot, not the pre-write chain list)",
+          "composed Contract.run encoding of the one-object structural-bind/deposit-data-root pair and the independent concat/digest children",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
           "SSZ.verifyProof on production gindices",
           "SHA-256 functional correctness",
           "imported-to-deployed helper/wrapper Yul fragment binding",
-          "one-object composition of the four children",
+          "one-object composition across all four children (GIndex.concat and the digest/tx inputs remain independent of the deposit)",
           "8-byte LE amount and ByteArray identity between children"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked four-child gadget; do not implement SSZ.verifyProof or a cryptographic SHA-256 proof."
+        "work": "Keep the checked one-object witness/root composition and the independent concat/digest children; do not implement SSZ.verifyProof or a cryptographic SHA-256 proof."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "special_bindings": {
