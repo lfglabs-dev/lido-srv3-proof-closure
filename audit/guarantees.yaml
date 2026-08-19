@@ -251,9 +251,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1CompositionTx LidoSRv3.Tests.PEth1CompositionTxMutants",
-        "expected": "abstract ETH-flow parent over every inventoried tagged path and the numeric Bus/Gateway/Vault ensemble build with drop, misroute, corrupt, rollback, and two-batch mutants"
+        "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and kill-line mutants (unapproved journal, zero msg.value) build with drop, misroute, corrupt, rollback, and two-batch mutants"
       },
-      "summary": "eth_flow_parent: on the three-constructor EthPath inventory, if pathFunded then every move is parentApproved and the trace sums to pathValue. Verity parent is five numeral witnesses (honest 10/2/3, 10/1/3, 6/2/3, request-reject, underfunded 10/4/3), not ∀. Abstract and Verity planes are not refined to each other.",
+      "summary": "eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent is five numeral witnesses. Kill-line mutants reject unapproved journal entries and zero-value success.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent"
@@ -264,23 +264,26 @@
       },
       "fidelity": {
         "covered": [
-          "abstract parent over the tagged ETH-path inventory",
+          "call-journal address classification against ApprovedSet",
+          "∀ (msgValue, n, fee) quantification with overflow (n*fee≥2^256) and zero-value reverts",
           "numeric Bus/Gateway/Vault ensemble and Contract.run rollback",
-          "five numeral witnesses (not a universal batch theorem)"
+          "five numeral witnesses (not a universal batch theorem)",
+          "kill-line mutants: unapproved journal entry and zero msg.value"
         ],
         "missing": [
-          "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites",
+          "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)",
           "Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI",
           "reverting refund or Lido sinks",
-          "refinement between abstract pathTrace and the Verity ensemble",
-          "getConsolidationRequestFee versus stored fee slot"
+          "refinement between abstract parent and the Verity ensemble",
+          "getConsolidationRequestFee versus stored fee slot",
+          "composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests)"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked tagged-inventory and numeric-ensemble theorems; do not widen the ETH-site inventory."
+        "work": "Wave 1 strengthens the parent with journal classification and revert guards. Do NOT compose into P-CONSOLIDATION-1 until FunctionSpec is ConsolidationGateway.addConsolidationRequests."
       },
-      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
+      "next_gate": "Compose into P-CONSOLIDATION-1 only after FunctionSpec becomes ConsolidationGateway.addConsolidationRequests.",
       "roadmap_priority": "DONE"
     },
     {
