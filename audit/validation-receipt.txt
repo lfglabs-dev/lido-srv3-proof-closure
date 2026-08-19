@@ -1,11 +1,81 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 54db7d743c3c433bfcd5ddd5fdf1ed73807777b9
+validated-tree: 096e83e8cd23caecd7b7b64aba257dc0a7bfc456
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 conservation kill-line realignment to the registered parent granularity (2026-08-19)
+--------------------------------------------------------------------------------------------------
+
+- Fixes a granularity mismatch: `report/P-DEPOSIT-1.md` cited
+  `LidoSRv3.Audit.Verity.DepositLedgerTx.dropped_assert_commits_nonconserving_deployment`
+  as this guarantee's kill-line, but that theorem mutates a standalone,
+  disconnected single-batch ledger model. `PDeposit1.lean` never imports
+  `DepositLedgerTx`, the `P-DEPOSIT-1` registry row and reproduction command
+  never build it, and it carries no `LinksSource` tie into the registered
+  parent `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` at
+  all. That parent names the conserved quantity at the `DepositParentTx`
+  granularity: conjunct (a) is `(run cfg inp).pulled = (run cfg inp).pushed`,
+  and conjunct (c) transports that same equality onto
+  `Observables.pulled`/`Observables.pushed` for the honest `execute`. The
+  cited mutant could not refute it.
+- `LidoSRv3/Tests/DepositParentTxMutants.lean` adds
+  `skipped_lido_debit_breaks_pulled_eq_pushed`, proved by `decide`. It reuses
+  the existing `.skipLidoDebit` mutant case (already present for
+  `skipped_lido_debit_rejected`), which patches `mutantPull` to skip the
+  `setStorage` that debits `lidoDepositableSlot` while still crediting the
+  router and still sending both beacon pushes. The new theorem isolates the
+  conserved quantity itself on the mutant's own `Observables` --
+  `pulled ≠ pushed` (`0 ≠ 160` on the shared two-batch fixture `inputs`) --
+  at the identical `DepositParentTx.Observables` granularity the registered
+  parent composes over, rather than the weaker whole-record
+  `≠ sourceObservables` that `skipped_lido_debit_rejected` already showed.
+  Both theorems are kept; the new one is additive and does not weaken or
+  replace the old one.
+- `report/P-DEPOSIT-1.md`'s "Theorems" line now lists the new kill-line
+  theorem, and its "Kill-line mutant" section is rewritten to state the
+  correct kill-line first, explain exactly which patched step and which
+  equality it breaks, and then explain why `DepositLedgerTx`'s mutant is a
+  different, disconnected model that must not be cited as this guarantee's
+  kill-line (rather than silently dropping that theorem from the tree, which
+  remains legitimate evidence for its own narrower ledger model).
+- `audit/guarantees.yaml`'s `P-DEPOSIT-1` row: `summary` and
+  `fidelity.covered` now name the `DepositParentTx`-granularity kill-line
+  (skipping the Lido debit breaks the mutant's own `pulled = pushed`
+  equality) instead of the disconnected ledger-model claim; `next_gate` is
+  restated to say this alignment is preserved.
+  `scripts/audit_metadata.py`'s `EXPECTED_CANONICAL_DETAIL_SHA256["P-DEPOSIT-1"]`
+  is recomputed to match, and `audit/ROADMAP.md`, `audit/STATUS.md`, and
+  `audit/REPRODUCE.md` are regenerated with `make audit-generate`; the diff is
+  confined to the `P-DEPOSIT-1` row.
+- No existing theorem statement is weakened, narrowed, or removed. The
+  registered parent's conjuncts (a)-(d), the honest `mutant_none_reproduces_execute`
+  pin, and `skipped_lido_debit_rejected` are all unchanged.
+- `lake build LidoSRv3.Audit.Guarantees.PDeposit1
+  LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants`:
+  exit 0, no errors, no warnings in the changed files.
+- Changed-Lean forbidden-token scan (`git diff main -- '*.lean'`): no `sorry`,
+  `sorryAx`, or `admit`. The new theorem uses `decide`, matching the file's
+  pre-existing style for ground `Observables` equalities/inequalities on this
+  fixture.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical guarantees
+  plus 14 subordinate evidence rows).
+- Pre-existing, not introduced here: `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py` fails on unmodified `main` with the same
+  `P-ALLOC-2` / "NONE may not hide extra claims" staleness recorded in the
+  `P-ACCOUNT-1` entry below; this change touches only the `P-DEPOSIT-1` row
+  (a different index) of `audit/guarantees.yaml` and does not alter
+  `P-ALLOC-2` or that test file.
+- Authored in an isolated `git worktree` at
+  `/home/ubuntu/agent-worktrees/wave2-pdeposit1` on branch
+  `cursor/wave2-pdeposit1-0830` to avoid interference from concurrent agent
+  branch switches in the shared checkout; no other in-flight branch's files
+  are touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
 
 P-ACCOUNT-1 registered-parent remediation (2026-08-19)
 -------------------------------------------------------

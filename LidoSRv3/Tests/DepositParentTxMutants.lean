@@ -156,6 +156,31 @@ theorem skipped_lido_debit_rejected :
     observe frame (probes inputs) ((mutantExecute .skipLidoDebit inputs).run frame)
       ≠ sourceObservables inputs frame := by decide
 
+/-! ### Kill-line for the registered P-DEPOSIT-1 parent
+
+`PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` names the
+conserved quantity at exactly this `DepositParentTx` granularity: conjunct (a)
+is `(run cfg inp).pulled = (run cfg inp).pushed`, and conjunct (c) transports
+that same equality onto `Observables.pulled` / `Observables.pushed` for the
+honest `execute` (`(sourceObservables inputs entry).pulled = (run cfg inp).pulled`
+and the `.pushed` sibling). `skipped_lido_debit_rejected` above already shows
+the mutant's *entire* observation record disagrees with `sourceObservables`;
+the theorem below isolates the *conserved quantity itself* -- `pulled ≠
+pushed` on the mutant's own `Observables` -- at the identical
+`DepositParentTx.Observables` granularity the registered parent composes
+over. This is the kill-line: it removes the conservation-carrying step (the
+Lido debit inside `mutantPull`) and shows the very equality the registered
+parent asserts for the honest transaction fails for the patched one. It is
+*not* the same claim as
+`LidoSRv3.Audit.Verity.DepositLedgerTx.dropped_assert_commits_nonconserving_deployment`,
+which mutates a different, disconnected single-batch ledger model that
+`PDeposit1.lean` never imports and the `P-DEPOSIT-1` reproduction command
+never builds. -/
+theorem skipped_lido_debit_breaks_pulled_eq_pushed :
+    (observe frame (probes inputs) ((mutantExecute .skipLidoDebit inputs).run frame)).pulled
+      ≠ (observe frame (probes inputs) ((mutantExecute .skipLidoDebit inputs).run frame)).pushed := by
+  decide
+
 /-- Omitting the second beacon frame leaves the pulled ether stranded on the
 router, and `ASSERT_BALANCE_UNCHANGED` closes the transaction out. -/
 theorem dropped_push_rejected :
