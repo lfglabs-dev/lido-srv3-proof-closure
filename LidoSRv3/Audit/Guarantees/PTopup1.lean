@@ -33,24 +33,30 @@ theorem revert_restores_state_value_and_logs {State : Type} :
   @LidoSRv3.Audit.revert_restores_state_value_and_logs State
 
 /--
-**Wave 1 conjunct: wrap ⇒ assert revert (A-TOPUP-NOWRAP discharge).**
+**Wave 5 conjunct: wrap ⇒ revert (A-TOPUP-NOWRAP discharge), stated about
+`run` itself.**
 
-If the unchecked accumulation at source line 732 wraps mod 2²⁵⁶ (i.e.,
-`¬ NoUncheckedWrap inp`) and the arrays are length-matched (so the push tail
-is reachable), then the on-chain wrapped accumulator disagrees with the push
-loop’s total.  In the parent model this means the
-`assert(etherBalanceBefore == etherBalanceAfter)` at source line 755 fires,
-reverting the transaction.
+Wave 5 routed the on-chain `unchecked` reading of the line 732 accumulation
+through `run`'s value-moving tail: `SolidityTopup.accumulated` (the sum
+reduced mod 2²⁵⁶, as the enclosing `unchecked` block at source line 722
+computes it) is the wei the line 744 pull moves, the balance the router holds
+while the push loop sends the exact per-key amounts, and the reading the line
+755 `assert` observes.  The wrap discharge is therefore no longer a fact about
+a separate finer-grained reading of the pinned source: if the exact sum
+reaches 2²⁵⁶, the wrapped pull is strictly below the exact pushed total, and
+the honest `run` itself aborts the whole transaction -- either at the
+underfunded push (`BeaconChainDepositor.sol` line 106) or, when the router
+can fund the loop, at the line 755 `assert`, which is consequently
+load-bearing exactly on the wrap branch (`SolidityTopup.run_reverts_of_wrap`).
 
 Folded into `source_topup_conserves_and_rolls_back` below as its third
 conjunct, so a regression here breaks the *registered* P-TOPUP-1 claim, not
 only this standalone lemma. -/
-theorem source_wrap_implies_assert_revert
-    {inp : SourceTopupInput}
-    (hWrap : ¬ NoUncheckedWrap inp)
-    (hLen : inp.pubkeyLengths.length = inp.allocations.length) :
-    SolidityTopupParent.accumulated inp ≠ pushedValue inp :=
-  SolidityTopupParent.wrap_implies_accumulated_ne_pushed hWrap hLen
+theorem source_wrap_implies_revert
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hWrap : ¬ NoUncheckedWrap inp) :
+    (run cfg inp).reverts = true :=
+  run_reverts_of_wrap cfg inp hWrap
 
 /--
 **Wave 1: `moduleExists` guard is exercised.**
@@ -104,14 +110,14 @@ theorem source_wc_type2_guard_required
   simp [hLens.1, hLens.2.1, hLens.2.2]
 
 /--
-`run cfg inp` conserves `pulled = pushed` (`A-TOPUP-NOWRAP`). If that run
-reverts, the abstract `TxObservation` (`A-ABSTRACT-TX`) restores `before`
-and erases ETH moves and logs.  The registered claim additionally folds in
-the wrap-branch assert-revert and the `moduleExists`/`wcTypeIsType2` guard
-liveness facts as further conjuncts, so a kill-line mutant that defeats any
-one of them falsifies *this* theorem -- the one tracked as P-TOPUP-1's
-CHECKED abstract claim in `audit/guarantees.yaml` -- and not merely a sibling
-lemma that the registry never cites.
+`run cfg inp` conserves `pulled = pushed`. If that run reverts, the abstract
+`TxObservation` (`A-ABSTRACT-TX`) restores `before` and erases ETH moves and
+logs.  The registered claim additionally folds in the wrap-branch revert
+discharge (`A-TOPUP-NOWRAP` lives in its antecedent) and the
+`moduleExists`/`wcTypeIsType2` guard liveness facts as further conjuncts, so a
+kill-line mutant that defeats any one of them falsifies *this* theorem -- the
+one tracked as P-TOPUP-1's CHECKED abstract claim in `audit/guarantees.yaml`
+-- and not merely a sibling lemma that the registry never cites.
 
 Pinned-source conservation and rollback correspondence for the SRv3 beacon-chain
 top-up push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
@@ -139,15 +145,19 @@ empty-top-up early commit at source line 741, and the full push -- the wei pulle
 from Lido at source line 744 equals the wei pushed to the beacon deposit contract
 by the loop at `BeaconChainDepositor.sol` lines 79--107.
 
-Unlike the 32-ETH deposit path (P-DEPOSIT-1), this holds *unconditionally*, with
-no deployment-configuration side condition. The reason is structural: the pulled
-`amount` accumulated at source line 732 and the pushed sum at
-`BeaconChainDepositor.sol` line 106 are two readings of the *same* `_amounts`
-array, not a count multiplied by two separately-configured constants.
-`SolidityTopup.pulled_eq_pushed` records that, and
-`SolidityTopup.loopPushed_eq_allocSum` records that the `if (amount == 0) continue`
-skip at `BeaconChainDepositor.sol` line 89 loses nothing, because a skipped entry
-contributes zero to the pull as well.
+The pull is the on-chain `unchecked` reading of the line 732 accumulation (the
+sum reduced mod 2^256, `SolidityTopup.accumulated`); the push is the exact
+per-key total (`SolidityTopup.pushedValue`, with the
+`if (amount == 0) continue` skip at `BeaconChainDepositor.sol` line 89 losing
+nothing, per `SolidityTopup.loopPushed_eq_allocSum`).  On the commit branch the
+two agree *because the line 755 `assert` has passed*: reaching the commit means
+the wrapped pull equalled the exact push (`SolidityTopup.committed_topup_spec`),
+and under an actual wrap the commit is unreachable -- the third conjunct shows
+the honest `run` itself reverts (`SolidityTopup.run_reverts_of_wrap`).  So
+conservation here is genuinely assert-backed, not a same-array `Nat` coincidence,
+and it still needs no deployment-configuration side condition: unlike the 32-ETH
+deposit path (P-DEPOSIT-1), the pull and the push are two readings of the *same*
+`_amounts` array, not a count multiplied by two separately-configured constants.
 
 *Rollback.* Every guard on that path is a whole-transaction abort -- the pinned
 span contains no `try`/`catch` and no failure-swallowing low-level call, and a
@@ -167,17 +177,24 @@ source execution rather than silently assuming an authorized caller.
 Caveats, stated rather than hidden:
 
 * Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`
-  division matches EVM `DIV`, but no overflow reasoning is performed. This
-  matters here specifically: source line 722 opens an `unchecked` block, so the
-  `amount += _amounts[i]` at line 732 wraps mod 2^256 on chain rather than
-  reverting. Under such a wrap the pull would be strictly less than the push and
-  the line 755 `assert` would become load-bearing again. The corresponding
-  `Outcome` constructors are deliberately *retained* rather than deleted, and
-  `source_balance_guards_discharged` takes the no-wrap fact as an explicit
-  hypothesis (`A-TOPUP-NOWRAP`) rather than a bounded-arithmetic proof. This
-  theorem's third conjunct is the discharge on the *other* branch: under an
-  actual wrap, `accumulated ≠ pushedValue`, so the guard is live rather than
-  silently skipped.
+  division matches EVM `DIV`, and the one place the pinned path can overflow --
+  the `amount += _amounts[i]` at source line 732, inside the `unchecked` block
+  opened at line 722 -- is modelled faithfully rather than assumed away: the
+  value-moving tail of `run` reads the sum reduced mod 2^256
+  (`SolidityTopup.accumulated`) for the line 744 pull, the funded router
+  balance, and the line 755 `assert`.  Under an actual wrap the wrapped pull is
+  strictly below the exact push, so the transaction aborts -- this theorem's
+  third conjunct is that discharge, stated about `run` itself
+  (`SolidityTopup.run_reverts_of_wrap`).  On the no-wrap branch
+  `source_balance_guards_discharged` shows the two value guards are
+  unreachable, taking the no-wrap fact as an explicit hypothesis
+  (`A-TOPUP-NOWRAP`) rather than a bounded-arithmetic proof, because the bound
+  is not derivable from the pinned P-TOPUP-1 spans.  Three guards outside the
+  value-moving tail -- the over-target comparison at line 737, the zero-sum
+  test at line 741, and the Lido-side amount guards at `Lido.sol` lines
+  842/873 -- still read the exact `Nat` sum where the chain reads the wrapped
+  `amount`; under a wrap that can change *which* revert fires first, but not
+  that a wrapping batch reverts, which is all the registered claim states.
 * The `moduleExists` and `wcTypeIsType2` guards (source lines 689 and 694) are
   not merely assumed live -- this theorem's second and fourth conjuncts prove
   each one reverts with its named `Outcome` constructor whenever the earlier
@@ -211,8 +228,7 @@ theorem source_topup_conserves_and_rolls_back {State : Type}
       inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
       run cfg inp = .revertStakingModuleUnregistered) ∧
     (¬ NoUncheckedWrap inp →
-      inp.pubkeyLengths.length = inp.allocations.length →
-      SolidityTopupParent.accumulated inp ≠ pushedValue inp) ∧
+      (run cfg inp).reverts = true) ∧
     (inp.wcTypeIsType2 = false →
       inp.callerIsTopUpGateway = true →
       inp.keyIndicesLength ≠ 0 →
@@ -225,7 +241,7 @@ theorem source_topup_conserves_and_rolls_back {State : Type}
       run cfg inp = .revertWrongWithdrawalCredentialsType) :=
   ⟨⟨run_conserves cfg inp, fun h => reverting_outcome_rolls_back before after attempts trace h⟩,
    fun hMod hAuth hKeys hLens hPub => source_module_guard_required cfg inp hMod hAuth hKeys hLens hPub,
-   fun hWrap hLen => source_wrap_implies_assert_revert hWrap hLen,
+   fun hWrap => source_wrap_implies_revert cfg inp hWrap,
    fun hWc hAuth hKeys hLens hPub hMod hActive =>
      source_wc_type2_guard_required cfg inp hWc hAuth hKeys hLens hPub hMod hActive⟩
 
@@ -356,13 +372,15 @@ theorem verity_tx_simulates_source
         simp [Outcome.pulled, Verity.TopupTx.sourceObservables, hz]
     | committedTopUp keys pulled pushed balanceAfter =>
         have hSpec := committed_topup_spec hRun
-        have hPositive : 0 < totalAllocated inp := by
-          rw [← hSpec.2.2.2.1]
-          exact hSpec.2.2.2.2.2.2.1
-        have hNonzero : allocSum inp.allocations ≠ 0 := by
-          simpa [totalAllocated] using Nat.ne_of_gt hPositive
+        have hFaithful : accumulated inp = allocSum inp.allocations :=
+          allocSumUnchecked_eq_allocSum hSum
+        have hPulledExact : pulled = allocSum inp.allocations :=
+          hSpec.2.2.2.1.trans hFaithful
+        have hPositive : 0 < allocSum inp.allocations := by
+          rw [← hPulledExact]; exact hSpec.2.2.2.2.2.2.1
+        have hNonzero : allocSum inp.allocations ≠ 0 := Nat.ne_of_gt hPositive
         simpa [hRun, Outcome.pulled, Verity.TopupTx.sourceObservables,
-          totalAllocated, hNonzero] using hSpec.2.2.2.1
+          hNonzero] using hPulledExact
     | _ => simp_all [Outcome.reverts]
   · cases hRun : run cfg inp with
     | committedNoTopUp =>
@@ -373,8 +391,8 @@ theorem verity_tx_simulates_source
         have hSpec := committed_topup_spec hRun
         calc
           pushed = pulled := hSpec.2.2.2.2.2.1.symm
-          _ = allocSum inp.allocations := by
-            simpa [totalAllocated] using hSpec.2.2.2.1
+          _ = accumulated inp := hSpec.2.2.2.1
+          _ = allocSum inp.allocations := allocSumUnchecked_eq_allocSum hSum
           _ = (Verity.TopupTx.sourceObservables inp.allocations).pushed := rfl
     | _ => simp_all [Outcome.reverts]
   · intro failure reason rollback hRevert

@@ -90,23 +90,25 @@ Conservation.  This is where the top-up path differs sharply from the deposit
 path.  The amount pulled from Lido at line 744 is `amount`, accumulated at line
 732 from the very same `allocations` array that line 750 hands to the push loop,
 and the push loop sends `_amount[i]` per key at line 106.  So the pull and the
-push are two readings of one sum, and `pulled_eq_pushed` proves they agree with
-*no* deployment-configuration hypothesis at all -- unlike the deposit path, where
-`ConservingConfig` related two independent constants
-(`MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and `DEPOSIT_SIZE`).  The `assert` at line
-755 is consequently *discharged* rather than load-bearing here:
-`run_ne_revertAssertBalanceUnchanged` shows it can never fire.  That is a
-strictly stronger statement than the deposit path's, and it is stated as such
-rather than being folded into a shared vocabulary.
+push are two readings of one sum, and `pulled_eq_pushed` proves the *exact* `Nat`
+readings agree with *no* deployment-configuration hypothesis at all -- unlike
+the deposit path, where `ConservingConfig` related two independent constants
+(`MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and `DEPOSIT_SIZE`).
 
-Overflow caveat, stated rather than hidden.  The accumulation at line 732 sits
-inside an `unchecked` block (line 722), so on chain `amount` wraps modulo 2^256,
-while the `Nat` reading below is the exact sum.  Under a wrap the pull would be
-*smaller* than the push, and the model's `revertInsufficientRouterBalance` and
-`revertAssertBalanceUnchanged` branches -- both unreachable under the `Nat`
-reading -- become the live guards that abort the transaction.  They are retained
-in `Outcome` precisely so the model does not silently assert that no such branch
-exists.
+The pull is routed through the on-chain `unchecked` semantics.  The
+accumulation at line 732 sits inside an `unchecked` block (line 722), so on
+chain `amount` is the sum *reduced modulo `2^256`*.  The value-moving tail of
+`run` below (`runPush`) therefore reads `accumulated inp` -- the wrapped sum --
+for the wei pulled at line 744, for the balance the router actually holds while
+the push loop sends the exact per-key amounts, and for the line 755
+`assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)`.  The assert
+is consequently *load-bearing* on the wrap branch: under a wrap the wrapped pull
+is smaller than the exact pushed total, the assert fires, and
+`run_reverts_of_wrap` shows no wrapping batch can commit.  Under
+`NoUncheckedWrap` the wrapped and exact readings coincide
+(`totalAllocated_faithful`), the assert can never fire
+(`run_ne_revertAssertBalanceUnchanged`), and conservation on the commit branch
+is genuinely assert-backed rather than a same-array `Nat` fact.
 
 The bound that rules the wrap out is *not* derivable from the pinned P-TOPUP-1
 spans: line 728 caps each allocation by `_topUpLimits[i]`, whose derivation lives
@@ -120,6 +122,17 @@ two guard-discharge theorems take the hypothesis as a linked side condition, and
 it is recorded as `A-TOPUP-NOWRAP` in `audit/assumptions.yaml`.  Nothing here
 claims the `unchecked` block is safe; it says which fact the source-plane claim
 rests on.
+
+Residual exact readings, stated rather than hidden.  Three guards outside the
+value-moving tail still read the exact `Nat` sum where the chain reads the
+wrapped `amount`: the over-target comparison at line 737, the zero-sum test at
+line 741, and the Lido-side amount guards at `Lido.sol` lines 842/873.  This
+matters only under a wrap, and there only for *which* outcome the model
+produces: the over-target and zero-sum guards can change which revert fires
+first (or, for a sum that wraps to exactly zero, commit-vs-revert), and the
+exact-reading liquidity guard is conservative (it fires no later than the chain
+would).  The registered wrap discharge (`run_reverts_of_wrap`) is a statement
+about the model and holds regardless.
 
 Rollback.  The pinned path contains no `try`/`catch` and no failure-swallowing
 low-level call, so every guard listed above aborts the whole transaction.  A
@@ -277,16 +290,18 @@ inductive Outcome
   /-- `revert AmountTooLarge()`, `BeaconChainDepositor.sol` lines 97--99. -/
   | revertAmountTooLarge
   /-- The value transfer at `BeaconChainDepositor.sol` line 106 reverts when the
-  router cannot fund the push loop.  Unreachable under the `Nat` reading of the
-  `unchecked` sum at source line 732, and retained because a real `uint256` wrap
-  there is exactly what would make it live. -/
+  router cannot fund the push loop.  Live exactly on the wrap branch: the router
+  holds the line 742 snapshot plus the *wrapped* pull, while the loop sends the
+  exact per-key amounts.  Under `NoUncheckedWrap` it is unreachable -- see
+  `run_ne_revertInsufficientRouterBalance`. -/
   | revertInsufficientRouterBalance
   /-- `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)`, source
   lines 752--755.  A failing `assert` is a Solidity 0.8 `Panic(0x01)` that aborts
   the whole transaction rather than stranding the difference in the router.
-  Unreachable under the `Nat` reading -- see
-  `run_ne_revertAssertBalanceUnchanged` -- and retained for the same reason as
-  `revertInsufficientRouterBalance`. -/
+  Load-bearing on the wrap branch: a wrapped pull is smaller than the exact
+  pushed total, so the assert fires and `run_reverts_of_wrap` shows no wrapping
+  batch can commit.  Under `NoUncheckedWrap` it can never fire -- see
+  `run_ne_revertAssertBalanceUnchanged`. -/
   | revertAssertBalanceUnchanged
   /-- The zero-sum path: `amount > 0` is false at source line 741, so no pull and
   no push happen and control falls straight through to the event at source line
@@ -323,8 +338,12 @@ def allocSum : List Nat → Nat
   | [] => 0
   | a :: as => a + allocSum as
 
-/-- `amount` at the point source line 737 compares it, and the wei pulled from
-Lido at source line 744. -/
+/-- The exact `Nat` reading of `amount`: the sum the over-target guard at
+source line 737, the zero-sum test at source line 741, and the Lido-side amount
+guards (`Lido.sol` lines 842/873) are modelled against, and the exact total the
+push loop sends.  The value-moving tail reads the wrapped `accumulated`
+instead; the two readings coincide under `NoUncheckedWrap`
+(`totalAllocated_faithful`). -/
 def totalAllocated (inp : SourceTopupInput) : Nat := allocSum inp.allocations
 
 /-- The `uint256` modulus the `unchecked` block at source line 722 reduces by. -/
@@ -351,6 +370,14 @@ theorem allocSumUnchecked_eq_allocSum {as : List Nat}
     (h : allocSum as < uint256Modulus) : allocSumUnchecked as = allocSum as := by
   rw [allocSumUnchecked_eq_mod, Nat.mod_eq_of_lt h]
 
+/-- The on-chain reading of `amount`: the accumulation at source line 732
+reduced modulo `2 ^ 256`, as the enclosing `unchecked` block at source line 722
+computes it.  This is the wei the line 744 pull actually moves, the balance the
+router actually holds while the push loop sends the exact per-key amounts, and
+the reading the line 755 `assert` observes; `runPush` below routes all three
+through it. -/
+def accumulated (inp : SourceTopupInput) : Nat := allocSumUnchecked inp.allocations
+
 /-- The no-wrap side condition on one `topUp` call.
 
 It is *not* provable from the pinned P-TOPUP-1 spans -- the per-index cap at
@@ -361,9 +388,10 @@ def NoUncheckedWrap (inp : SourceTopupInput) : Prop :=
   totalAllocated inp < uint256Modulus
 
 /-- Under `NoUncheckedWrap`, the source's `unchecked` accumulation at line 732
-equals `totalAllocated`, the value every theorem below reasons about. -/
+equals `totalAllocated`, the exact sum the guards outside the value-moving tail
+reason about. -/
 theorem totalAllocated_faithful {inp : SourceTopupInput} (h : NoUncheckedWrap inp) :
-    allocSumUnchecked inp.allocations = totalAllocated inp :=
+    accumulated inp = totalAllocated inp :=
   allocSumUnchecked_eq_allocSum h
 
 /-- The wei the push loop at `BeaconChainDepositor.sol` lines 79--107 sends: one
@@ -381,10 +409,10 @@ def pushedValue (inp : SourceTopupInput) : Nat :=
   loopPushed inp.pubkeyLengths inp.allocations
 
 /-- `etherBalanceAfterDeposits`, the `address(this).balance` read at source line
-752: the line 742 snapshot, plus the pull at line 744, minus what the loop at
-`BeaconChainDepositor.sol` lines 79--107 sent out. -/
+752: the line 742 snapshot, plus the *wrapped* pull at line 744, minus what the
+loop at `BeaconChainDepositor.sol` lines 79--107 sent out. -/
 def routerBalanceAfter (inp : SourceTopupInput) : Nat :=
-  inp.routerBalanceBefore + totalAllocated inp - pushedValue inp
+  inp.routerBalanceBefore + accumulated inp - pushedValue inp
 
 /--
 The router's allocation loop, source lines 722--734, as a first-guard-wins
@@ -435,6 +463,14 @@ then the `makeBeaconChainTopUp` call at source line 750
 Split out from `run` because it is the tail that actually moves wei; every guard
 before it is a pure rejection.
 
+The value-moving readings are the on-chain `unchecked` ones: the line 744 pull
+moves `amount` as the `unchecked` block at line 722 computed it (`accumulated
+inp`, the sum reduced mod `2 ^ 256`), the balance the router holds while the
+push loop runs is the line 742 snapshot plus that wrapped pull, and the line 755
+`assert` compares those readings.  The Lido-side amount guards (`Lido.sol` lines
+842/873) are still modelled against the exact sum -- see the module docstring's
+residual exact-readings paragraph.
+
 The `BeaconChainDepositor.sol` line 73 early return is not a separate branch: the
 line 769 and line 773 guards have already forced `_publicKeys.length = n ≠ 0` by
 the time line 750 is reached, and `committed_pubkeys_nonempty` records that.
@@ -451,12 +487,12 @@ def runPush (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Outcome :=
   else match pushLoop cfg inp.pubkeyLengths inp.allocations with
     | some o => o
     | none =>
-      if inp.routerBalanceBefore + totalAllocated inp < pushedValue inp then
+      if inp.routerBalanceBefore + accumulated inp < pushedValue inp then
         .revertInsufficientRouterBalance
-      else if totalAllocated inp ≠ pushedValue inp then
+      else if accumulated inp ≠ pushedValue inp then
         .revertAssertBalanceUnchanged
       else
-        .committedTopUp inp.pubkeyLengths.length (totalAllocated inp) (pushedValue inp)
+        .committedTopUp inp.pubkeyLengths.length (accumulated inp) (pushedValue inp)
           (routerBalanceAfter inp)
 
 /--
@@ -651,16 +687,16 @@ theorem pulled_eq_pushed {inp : SourceTopupInput}
 /--
 The two readings of the line 755 `assert` agree.  Comparing
 `etherBalanceAfterDeposits` (source line 752) with the line 742 snapshot is the
-same test as comparing the pull with the push, provided the router can cover what
-the loop sends -- on chain it always can, because sending wei the router does not
-hold reverts inside the loop at `BeaconChainDepositor.sol` line 106.  The side
-condition is exactly where truncating `Nat` subtraction stops standing in for a
-balance.
+same test as comparing the (wrapped) pull with the push, provided the router can
+cover what the loop sends -- on chain it always can, because sending wei the
+router does not hold reverts inside the loop at `BeaconChainDepositor.sol` line
+106.  The side condition is exactly where truncating `Nat` subtraction stops
+standing in for a balance.
 -/
 theorem balanceAssert_iff_pulled_eq_pushed (inp : SourceTopupInput)
-    (hCovered : pushedValue inp ≤ inp.routerBalanceBefore + totalAllocated inp) :
+    (hCovered : pushedValue inp ≤ inp.routerBalanceBefore + accumulated inp) :
     routerBalanceAfter inp = inp.routerBalanceBefore
-      ↔ totalAllocated inp = pushedValue inp := by
+      ↔ accumulated inp = pushedValue inp := by
   unfold routerBalanceAfter
   refine ⟨fun h => Nat.add_left_cancel ((Nat.sub_eq_iff_eq_add hCovered).1 h), fun h => ?_⟩
   rw [h, Nat.add_sub_cancel]
@@ -671,11 +707,13 @@ theorem balanceAssert_iff_pulled_eq_pushed (inp : SourceTopupInput)
 Inversion for the value-moving tail at source lines 742--756.
 
 Reached with a positive sum (source line 741), `runPush` can only produce one of
-*five* outcomes.  The two balance guards it syntactically contains --
+*seven* outcomes.  The two balance guards it syntactically contains --
 `revertInsufficientRouterBalance` at `BeaconChainDepositor.sol` line 106 and
-`revertAssertBalanceUnchanged` at source line 755 -- are already discharged here,
-because past the `ArrayLengthMismatch` guard at `BeaconChainDepositor.sol` line 74
-the pull and the push are two readings of the one `allocations` array.
+`revertAssertBalanceUnchanged` at source line 755 -- are live exactly on the
+wrap branch, so their disjuncts carry the firing conditions: past the
+`ArrayLengthMismatch` guard at `BeaconChainDepositor.sol` line 74 the exact push
+is `totalAllocated`, while the pull and the funded balance read the wrapped
+`accumulated`.
 -/
 theorem runPush_inversion (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (hZero : totalAllocated inp ≠ 0) {o : Outcome} (hRun : runPush cfg inp = o) :
@@ -684,7 +722,15 @@ theorem runPush_inversion (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     o = .revertArrayLengthMismatch ∨
     (∃ p, pushLoop cfg inp.pubkeyLengths inp.allocations = some p ∧ o = p) ∨
     (inp.pubkeyLengths.length = inp.allocations.length ∧
-      o = .committedTopUp inp.pubkeyLengths.length (totalAllocated inp) (pushedValue inp)
+      inp.routerBalanceBefore + accumulated inp < pushedValue inp ∧
+      o = .revertInsufficientRouterBalance) ∨
+    (inp.pubkeyLengths.length = inp.allocations.length ∧
+      ¬ (inp.routerBalanceBefore + accumulated inp < pushedValue inp) ∧
+      accumulated inp ≠ pushedValue inp ∧
+      o = .revertAssertBalanceUnchanged) ∨
+    (inp.pubkeyLengths.length = inp.allocations.length ∧
+      accumulated inp = pushedValue inp ∧
+      o = .committedTopUp inp.pubkeyLengths.length (accumulated inp) (pushedValue inp)
         (routerBalanceAfter inp)) := by
   unfold runPush at hRun
   by_cases h1 : inp.lidoCanDeposit = false
@@ -700,12 +746,19 @@ theorem runPush_inversion (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     exact Or.inr (Or.inr (Or.inl hRun.symm))
   rw [if_neg h4] at hRun
   have hLen : inp.pubkeyLengths.length = inp.allocations.length := Decidable.of_not_not h4
-  have hEq : totalAllocated inp = pushedValue inp := pulled_eq_pushed hLen
   split at hRun
   · rename_i p hp
     exact Or.inr (Or.inr (Or.inr (Or.inl ⟨p, hp, hRun.symm⟩)))
-  · rw [if_neg (by omega), if_neg (by omega)] at hRun
-    exact Or.inr (Or.inr (Or.inr (Or.inr ⟨hLen, hRun.symm⟩)))
+  · by_cases hBal : inp.routerBalanceBefore + accumulated inp < pushedValue inp
+    · rw [if_pos hBal] at hRun
+      exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨hLen, hBal, hRun.symm⟩))))
+    rw [if_neg hBal] at hRun
+    by_cases hAssert : accumulated inp ≠ pushedValue inp
+    · rw [if_pos hAssert] at hRun
+      exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨hLen, hBal, hAssert, hRun.symm⟩)))))
+    rw [if_neg hAssert] at hRun
+    exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr
+      ⟨hLen, Decidable.of_not_not hAssert, hRun.symm⟩)))))
 
 /--
 Inversion for the whole pinned path.
@@ -800,16 +853,17 @@ theorem run_inversion {cfg : SourceTopupConfig} {inp : SourceTopupInput} {o : Ou
 
 /--
 What a committed push at source lines 741--756 records.  Reaching it means every
-guard passed, so the pulled and pushed wei agree, the router balance is back at
-its line 742 snapshot, the key count is nonzero, and the module returned exactly
-one allocation per key.
+guard passed -- including the line 755 `assert`, so the wrapped pull and the
+exact pushed wei agree -- the router balance is back at its line 742 snapshot,
+the key count is nonzero, and the module returned exactly one allocation per
+key.
 -/
 theorem committed_topup_spec {cfg : SourceTopupConfig} {inp : SourceTopupInput}
     {keys pulled pushed balanceAfter : Nat}
     (hRun : run cfg inp = .committedTopUp keys pulled pushed balanceAfter) :
     keys = inp.pubkeyLengths.length ∧ 0 < keys ∧
       inp.pubkeyLengths.length = inp.allocations.length ∧
-      pulled = totalAllocated inp ∧ pushed = pushedValue inp ∧
+      pulled = accumulated inp ∧ pushed = pushedValue inp ∧
       pulled = pushed ∧ 0 < pulled ∧ balanceAfter = inp.routerBalanceBefore := by
   rcases run_inversion hRun with
     h | h | h | h | h | h | h | h | h | ⟨p, hp, h⟩ | h | ⟨h, -⟩ | ⟨h, -, hKeys, hKeysLen, -, hZero⟩
@@ -830,19 +884,22 @@ theorem committed_topup_spec {cfg : SourceTopupConfig} {inp : SourceTopupInput}
   case _ => cases h
   case _ =>
     rcases runPush_inversion cfg inp hZero h.symm with
-      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨hLen, h'⟩
+      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, -, h'⟩ | ⟨-, -, -, h'⟩ | ⟨hLen, hAssertPass, h'⟩
     · cases h'
     · cases h'
     · cases h'
     · have := pushLoop_reverts _ _ hp
       rw [← h'] at this
       exact absurd this (by simp [Outcome.reverts])
-    · have hEq : totalAllocated inp = pushedValue inp := pulled_eq_pushed hLen
-      cases h'
-      refine ⟨rfl, ?_, hLen, rfl, rfl, hEq, ?_, ?_⟩
+    · cases h'
+    · cases h'
+    · cases h'
+      have hEq : accumulated inp = totalAllocated inp :=
+        hAssertPass.trans (pulled_eq_pushed hLen).symm
+      refine ⟨rfl, ?_, hLen, rfl, rfl, hAssertPass, ?_, ?_⟩
       · rw [hKeysLen]; exact hKeys
-      · exact Nat.pos_of_ne_zero hZero
-      · unfold routerBalanceAfter; rw [hEq, Nat.add_sub_cancel]
+      · exact Nat.pos_of_ne_zero (fun h0 => hZero (hEq ▸ h0))
+      · unfold routerBalanceAfter; rw [hAssertPass, Nat.add_sub_cancel]
 
 /--
 The `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` at source
@@ -941,7 +998,7 @@ theorem committedNoTopUp_implies_zero_total {cfg : SourceTopupConfig}
   case _ => exact hZero
   case _ =>
     rcases runPush_inversion cfg inp hZero h.symm with
-      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, h'⟩
+      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, -, h'⟩ | ⟨-, -, -, h'⟩ | ⟨-, -, h'⟩
     · cases h'
     · cases h'
     · cases h'
@@ -949,24 +1006,26 @@ theorem committedNoTopUp_implies_zero_total {cfg : SourceTopupConfig}
       rw [← h'] at this
       exact absurd this (by simp [Outcome.reverts])
     · cases h'
+    · cases h'
+    · cases h'
 
 /--
-The `assert` at source line 755 is *discharged*, not load-bearing: it can never
-fire.  This is the sharpest difference from the deposit path, where the
-corresponding assert at `StakingRouter.sol` line 996 is the guard that rejects a
-misconfigured deployment.  Here the pull and the push are two readings of the one
-`allocations` array, so there is no configuration that can separate them.
+Under `NoUncheckedWrap` the `assert` at source line 755 can never fire: the
+wrapped pull and the exact push are the same number
+(`totalAllocated_faithful`), so the commit branch is the only way past it.
+This is the sharpest difference from the deposit path, where the corresponding
+assert at `StakingRouter.sol` line 996 is the guard that rejects a
+misconfigured deployment.  Here the pull and the push are two readings of the
+one `allocations` array, so no configuration can separate them -- unless the
+sum itself wraps, which is exactly what the hypothesis excludes.
 
-The `NoUncheckedWrap` hypothesis is the recorded side condition (`A-TOPUP-NOWRAP`)
-under which this `Nat` statement is a statement about the source: a real `uint256`
-wrap in the `unchecked` accumulation at source line 732 would make this branch
-live again, which is why it is retained in `Outcome`.  The `Nat` proof does not
-consume the hypothesis -- it holds of the exact sum unconditionally -- it is
-`totalAllocated_faithful` that needs it to carry the result across to line 732,
-so the hypothesis is stated here rather than left implicit at the call site.
+The `NoUncheckedWrap` hypothesis is the recorded side condition
+(`A-TOPUP-NOWRAP`) under which the wrapped reading the value-moving tail uses
+equals the exact sum.  On the other branch the assert is load-bearing:
+`run_reverts_of_wrap` shows every wrapping input reverts.
 -/
 theorem run_ne_revertAssertBalanceUnchanged (cfg : SourceTopupConfig)
-    (inp : SourceTopupInput) (_hNoWrap : NoUncheckedWrap inp) :
+    (inp : SourceTopupInput) (hNoWrap : NoUncheckedWrap inp) :
     run cfg inp ≠ .revertAssertBalanceUnchanged := by
   intro hRun
   rcases run_inversion hRun with
@@ -985,22 +1044,25 @@ theorem run_ne_revertAssertBalanceUnchanged (cfg : SourceTopupConfig)
   case _ => cases h
   case _ => cases h
   case _ =>
+    have hFaithful : accumulated inp = totalAllocated inp := totalAllocated_faithful hNoWrap
     rcases runPush_inversion cfg inp hZero h.symm with
-      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, h'⟩
+      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, -, h'⟩ | ⟨hLen, -, hAssert, h'⟩ | ⟨-, -, h'⟩
     · cases h'
     · cases h'
     · cases h'
     · rcases pushLoop_range _ _ hp with h'' | h'' | h'' <;> rw [h''] at h' <;> cases h'
     · cases h'
+    · exact absurd (hFaithful.trans (pulled_eq_pushed hLen)) hAssert
+    · cases h'
 
 /--
-The push loop at `BeaconChainDepositor.sol` line 106 can always be funded: the
-router pulled exactly what it is about to send.  Carries the same recorded
-`NoUncheckedWrap` side condition (`A-TOPUP-NOWRAP`), for the same reason as
-`run_ne_revertAssertBalanceUnchanged`.
+Under `NoUncheckedWrap` the push loop at `BeaconChainDepositor.sol` line 106 can
+always be funded: the router pulled exactly what it is about to send.  Carries
+the same recorded `NoUncheckedWrap` side condition (`A-TOPUP-NOWRAP`), for the
+same reason as `run_ne_revertAssertBalanceUnchanged`.
 -/
 theorem run_ne_revertInsufficientRouterBalance (cfg : SourceTopupConfig)
-    (inp : SourceTopupInput) (_hNoWrap : NoUncheckedWrap inp) :
+    (inp : SourceTopupInput) (hNoWrap : NoUncheckedWrap inp) :
     run cfg inp ≠ .revertInsufficientRouterBalance := by
   intro hRun
   rcases run_inversion hRun with
@@ -1019,12 +1081,18 @@ theorem run_ne_revertInsufficientRouterBalance (cfg : SourceTopupConfig)
   case _ => cases h
   case _ => cases h
   case _ =>
+    have hFaithful : accumulated inp = totalAllocated inp := totalAllocated_faithful hNoWrap
     rcases runPush_inversion cfg inp hZero h.symm with
-      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, h'⟩
+      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨hLen, hBal, h'⟩ | ⟨-, -, -, h'⟩ | ⟨-, -, h'⟩
     · cases h'
     · cases h'
     · cases h'
     · rcases pushLoop_range _ _ hp with h'' | h'' | h'' <;> rw [h''] at h' <;> cases h'
+    · have hEq : accumulated inp = pushedValue inp :=
+        hFaithful.trans (pulled_eq_pushed hLen)
+      rw [hEq] at hBal
+      omega
+    · cases h'
     · cases h'
 
 /--
@@ -1052,11 +1120,13 @@ theorem run_ne_revertLidoZeroAmount (cfg : SourceTopupConfig) (inp : SourceTopup
   case _ => cases h
   case _ =>
     rcases runPush_inversion cfg inp hZero h.symm with
-      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, h'⟩
+      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, -, h'⟩ | ⟨-, -, -, h'⟩ | ⟨-, -, h'⟩
     · cases h'
     · cases h'
     · cases h'
     · rcases pushLoop_range _ _ hp with h'' | h'' | h'' <;> rw [h''] at h' <;> cases h'
+    · cases h'
+    · cases h'
     · cases h'
 
 /-- Consequently the pinned path never reaches the `BeaconChainDepositor.sol`
@@ -1083,12 +1153,50 @@ theorem run_ne_revertInvalidPublicKeyLength {cfg : SourceTopupConfig}
   case _ => cases h
   case _ =>
     rcases runPush_inversion cfg inp hZero h.symm with
-      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, h'⟩
+      h' | h' | h' | ⟨p, hp, h'⟩ | ⟨-, -, h'⟩ | ⟨-, -, -, h'⟩ | ⟨-, -, h'⟩
     · cases h'
     · cases h'
     · cases h'
     · exact pushLoop_ne_invalidPublicKeyLength hLengths _ _ hAll (h' ▸ hp)
     · cases h'
+    · cases h'
+    · cases h'
+
+/--
+The registered wrap discharge, stated about `run` itself.  When the exact sum
+reaches `2 ^ 256` the `unchecked` accumulation at source line 732 wraps, so the
+wrapped pull at source line 744 is strictly below the exact total the push loop
+at `BeaconChainDepositor.sol` lines 79--107 sends.  On the value-moving tail
+that means one of two whole-transaction aborts: either the router cannot fund
+the loop (`revertInsufficientRouterBalance`, `BeaconChainDepositor.sol` line
+106), or the loop completes and the `assert` at source line 755 observes the
+deficit (`revertAssertBalanceUnchanged`).  Either way no wrapping batch commits.
+-/
+theorem run_reverts_of_wrap (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hWrap : ¬ NoUncheckedWrap inp) :
+    (run cfg inp).reverts = true := by
+  have hModulusPos : 0 < uint256Modulus := by decide
+  cases hRun : run cfg inp with
+  | committedNoTopUp =>
+      have hZero := committedNoTopUp_implies_zero_total hRun
+      have hLt : totalAllocated inp < uint256Modulus := by
+        rw [hZero]; exact hModulusPos
+      exact absurd hLt hWrap
+  | committedTopUp keys pulled pushed balanceAfter =>
+      obtain ⟨-, -, hLen, hPull, hPush, hMoved, -, -⟩ := committed_topup_spec hRun
+      have hEq : accumulated inp = pushedValue inp :=
+        hPull.symm.trans (hMoved.trans hPush)
+      have hTotalEq : totalAllocated inp = pushedValue inp := pulled_eq_pushed hLen
+      have hMod : accumulated inp = totalAllocated inp % uint256Modulus :=
+        allocSumUnchecked_eq_mod _
+      have hModEq : totalAllocated inp % uint256Modulus = totalAllocated inp := by
+        rw [← hMod, hEq]; exact hTotalEq.symm
+      have hLt : totalAllocated inp < uint256Modulus := by
+        have hModLt : totalAllocated inp % uint256Modulus < uint256Modulus :=
+          Nat.mod_lt _ hModulusPos
+        rwa [hModEq] at hModLt
+      exact absurd hLt hWrap
+  | _ => rfl
 
 /-! ## Abstract-transaction correspondence -/
 

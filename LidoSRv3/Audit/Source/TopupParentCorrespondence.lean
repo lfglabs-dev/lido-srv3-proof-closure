@@ -131,14 +131,13 @@ def preAllocation (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Option Ou
     some .revertLidoDepositsPaused
   else none
 
-/-- Faithful reading of the `unchecked` accumulator at line 732. -/
-def accumulated (inp : SourceTopupInput) : Nat :=
-  allocSumUnchecked inp.allocations
+/-- The complete path after a successful allocation-module return.
 
-def routerBalanceAfterWrapped (inp : SourceTopupInput) : Nat :=
-  inp.routerBalanceBefore + accumulated inp - pushedValue inp
-
-/-- The complete path after a successful allocation-module return. -/
+The `unchecked` accumulator at source line 732 is read through
+`SolidityTopup.accumulated` (the sum reduced mod `2 ^ 256`), and the router
+balance the line 755 `assert` observes through `SolidityTopup.routerBalanceAfter`
+-- wave 5 routed the same wrapped reading through `SolidityTopup.run`'s
+value-moving tail, so this module no longer keeps a separate copy. -/
 def afterAllocation (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (iface : CalleeInterface) : ParentExecution :=
   let allocationObs := allocationCall iface
