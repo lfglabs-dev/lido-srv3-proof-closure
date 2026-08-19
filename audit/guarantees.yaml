@@ -52,9 +52,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
-        "expected": "abstract proportional-step correspondence-and-bound parent, +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, non-least-index kill-line, over-headroom kill-line, rollback, and two-batch mutants"
+        "expected": "abstract proportional-step parent whose first conjunct pins the Model scan's candidate to the source-selected row (hSelected threaded and load-bearing), +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, first-open selection kill-line (selection_kill_line_refutes_parent), over-headroom kill-line, rollback, and two-batch mutants"
       },
-      "summary": "proportional_step_correspondence_and_bounded: for the pinned-source proportional step (RowsCorrespond between Model/Source), the two independent candidate scans select the same bucket, and a successful checked amount is positive, ≤ remaining demand, and keeps the candidate within capacity (no over-headroom). selects_least_open_bucket (the +1 Nat model) is demoted to a child. Kill-line mutants reject a non-least-index selection and a checkedAmount that skips the capacity-headroom clamp. Verity: if memory arrays decode, observe of allocateToBestCandidate equals sourceView. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
+      "summary": "proportional_step_correspondence_and_bounded: for the pinned-source proportional step (RowsCorrespond between Model/Source, hSelected: Source.candidate? source = some best), the Model scan's candidate maps to exactly the selected row best (the first conjunct pins the selection through hSelected, which is load-bearing), and a successful checked amount is positive, ≤ remaining demand, and keeps the candidate within capacity (no over-headroom). selects_least_open_bucket (the +1 Nat model) is demoted to a child. Kill-lines: selection_kill_line_refutes_parent exhibits a concrete RowsCorrespond pair on which Source.candidate? selects a non-first row and a first-open mutant Model scan violates the pinned-selection conjunct; a checkedAmount mutant that skips the capacity-headroom clamp overflows capacity. Verity: if memory arrays decode, observe of allocateToBestCandidate equals sourceView. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.proportional_step_correspondence_and_bounded"
@@ -65,8 +65,8 @@
       },
       "fidelity": {
         "covered": [
-          "proportional-step candidate correspondence and positive/bounded/capacity-safe checked amount",
-          "kill-line mutants: non-least-index selection and over-headroom amount rejected",
+          "proportional-step candidate selection pinned to the source-selected row (hSelected threaded) and positive/bounded/capacity-safe checked amount",
+          "kill-lines: first-open mutant Model scan refutes the pinned-selection conjunct on a concrete RowsCorrespond pair (selection_kill_line_refutes_parent); over-headroom checkedAmount mutant rejected",
           "handwritten +1 Strategy selection (demoted child)",
           "single allocateToBestCandidate loop; observe reads writeArray buckets",
           "Contract.run rollback after intermediate writes"
