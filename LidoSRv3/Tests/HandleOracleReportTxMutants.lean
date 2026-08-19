@@ -46,11 +46,10 @@ private def bypassOrderGuard (i : ReportInput) (fees : Nat) : Contract Result :=
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := (dirty.writeSlot totalBalanceSlot total
           |>.writeSlot accountingCalledSlot 1
-          |>.writeSlot rewardsReadSlot 1)
+          |>.writeSlot rewardsReadSlot 2)
         let dirty :=
-          if 0 < fees then dirty.writeSlot rewardsMintedSlot 1 else dirty
-        .success ⟨i.balancesGwei, total,
-          successfulSteps ⟨i.reportedModuleIds, i.balancesGwei, total.val⟩ fees⟩
+          if 0 < fees then dirty.writeSlot rewardsMintedSlot 3 else dirty
+        .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩
           dirty
 
 example :
@@ -104,5 +103,55 @@ example :
     sourceView valid 1 =
       observe valid ((handleOracleReport valid 1).run defaultState) := by
   native_decide
+
+/-- Fees-conditional-removal mutant: unconditionally tagging rewards as
+minted (dropping the `0 < sharesToMintAsFees` guard on `rewardsMintedSlot`)
+diverges from the zero-fee pinned source view, which has no `.rewardsMinted`
+step. -/
+private def mintUnconditionally (i : ReportInput) : Contract Result :=
+  fun snapshot =>
+    match checkedTotal256 i.balancesGwei with
+    | none => .revert "OVERFLOW" snapshot
+    | some total =>
+        let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
+        let dirty := (dirty.writeSlot totalBalanceSlot total
+          |>.writeSlot accountingCalledSlot 1
+          |>.writeSlot rewardsReadSlot 2
+          |>.writeSlot rewardsMintedSlot 3)
+        .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
+
+/-- Kill-line: a mutant that always tags `rewardsMintedSlot`, even with zero
+fee shares, is caught at the same outcome boundary the composed theorem
+checks — its observed view is not the zero-fee pinned source view. -/
+example :
+    observe valid ((mintUnconditionally valid).run defaultState) ≠
+      sourceView valid 0 := by
+  native_decide
+
+/-- Reordering mutant: the mint tick (`2`) is assigned strictly before the
+read tick (`3`), the same fault as calling `reportRewardsMinted` before
+re-reading the freshly written balances. Both flags are nonzero — a
+presence-only check cannot tell this apart from the honest transaction — but
+the raw tick values disagree with `mintAfterRead`. -/
+example :
+    let dirty := match (handleOracleReportSwappedMintBeforeRead valid 1) defaultState with
+      | .success _ s => s
+      | .revert _ s => s
+    dirty.readSlot rewardsMintedSlot = 2 ∧ dirty.readSlot rewardsReadSlot = 3 := by
+  native_decide
+
+/-- The concrete ticks above (mint `2`, read `3`) witness a mint-after-read
+violation: `mintAfterRead` is a bare implication, not itself `Decidable`, so
+this is checked by modus ponens rather than `decide` on the whole statement. -/
+example : ¬ mintAfterRead 3 2 := by
+  intro h
+  exact absurd (h (by decide)) (by decide)
+
+/-- The registered parent depends on the swapped-order refutation above:
+reassigning the mint tick before the read tick must falsify mint-after-read
+discipline. -/
+theorem swapped_mint_read_kill_line_refutes_parent :
+    LidoSRv3.Audit.Verity.HandleOracleReportTx.mintOrderKillLine :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.mintOrderKillLine_holds
 
 end LidoSRv3.Tests.HandleOracleReportTxMutants
