@@ -91,13 +91,21 @@ example : effectiveWithdrawalsReserve
 
 `stale_queue_cache_mutant_counterexample` below only shows the parent's
 `freshQueueCache` hypothesis cannot be dropped — the registered parent cannot
-even be instantiated on that witness. The actual parent kill-line is this
-transition mutant: `mutantWithdraw` keeps every guard of
+even be instantiated on that witness. The transition-mutant parent kill-line
+is this section's `mutantWithdraw`: it keeps every guard of
 `modelWithdrawDepositableEther` and commits like `spendDepositableEther`, but
 `withdrawalPartitionMutant` then overwrites `buffered` with the post-spend
 `storedDepositsReserve`. With a FRESH live value (`live = 50`, exactly the
 cached `unfinalizedStETH`), the mutated call commits while the live
-queue-facing reserve drops 50 → 0. -/
+queue-facing reserve drops 50 → 0.
+
+Kill-line division of labor for the registered parent's three conjuncts:
+`partition_spend_mutant_kill_line_refutes_parent` (this section) kills
+conjuncts (2)-(3) — the partition invariant and the live-reserve invariance —
+with freshness retained; `guard_drop_kill_line_refutes_parent` (Wave 5
+section below) kills conjunct (1) — `scopedWithdrawGuards` guard liveness —
+which this section's guard-preserving mutant cannot reach. The stale-cache
+theorems remain premise-necessity evidence for `freshQueueCache`. -/
 
 /-- Concrete witness for the Wave 4 kill-line: freshness holds, the mutated
 spend commits, and the live queue-facing reserve the parent says is preserved
@@ -116,7 +124,14 @@ same hypotheses, INCLUDING `freshQueueCache` — when the spend transition is
 mutated to `mutantWithdraw`. The negated statement is the parent's statement
 with `mutantWithdraw` in place of `modelWithdrawDepositableEther`; the witness
 above (fresh cache, committing mutated spend, live reserve 50 → 0)
-instantiates the existential counterexample. -/
+instantiates the existential counterexample.
+
+Role in the kill-line division of labor: `mutantWithdraw` preserves the guard
+chain, so on its witness the parent's first conjunct `scopedWithdrawGuards
+inputs` still holds (`allowed = ⟨true, true⟩`) — this kill-line refutes the
+parent through conjuncts (2)-(3) (the partition invariant and the
+live-reserve invariance) only. Conjunct (1) is killed by the Wave 5
+guard-drop kill-line `guard_drop_kill_line_refutes_parent` below. -/
 theorem partition_spend_mutant_kill_line_refutes_parent :
     ¬ ∀ (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word),
         freshQueueCache before live →
@@ -129,6 +144,95 @@ theorem partition_spend_mutant_kill_line_refutes_parent :
   have hcex := hforall allowed vector partitionMutantAfter (word 10) (word 50)
     partition_spend_mutant_witness.1 partition_spend_mutant_witness.2.1
   exact absurd hcex.2.2 partition_spend_mutant_witness.2.2
+
+/-! ## Wave 5 guard-drop kill-line: `canDeposit` guard liveness
+
+The Wave 4 kill-line above mutates the spend *transition* while keeping every
+guard, so it can never falsify the parent's first conjunct: on its witness the
+guards hold and `scopedWithdrawGuards inputs` is true. A conjunct no connected
+mutant falsifies is dilution, so this section adds the P-TOPUP-1-style
+guard-liveness kill-line: `mutantWithdrawNoCanDeposit` is a guard-for-guard
+copy of `modelWithdrawDepositableEther` with ONLY the `canDeposit` check
+deleted (`authorizedRouter`, the nonzero-amount check, and the honest
+`spendDepositableEther` transition are unchanged), and
+`guard_drop_kill_line_refutes_parent` refutes the parent's full predicate
+shape — all five binders, `freshQueueCache` retained, the same three-conjunct
+conclusion — on a witness whose `canDeposit = false` makes the first conjunct
+false while the mutant still commits. -/
+
+/-- Guard-drop mutant of `modelWithdrawDepositableEther`: the `canDeposit`
+check is deleted; `authorizedRouter`, the nonzero-amount check, and the honest
+`spendDepositableEther` spend transition are kept guard-for-guard. -/
+private def mutantWithdrawNoCanDeposit (inputs : WithdrawInputs)
+    (before : ReserveState) (amount : Word) : SourceOutcome :=
+  if !inputs.authorizedRouter then .reverted "APP_AUTH_FAILED"
+  else if amount = 0 then .reverted "ZERO_AMOUNT"
+  else spendDepositableEther before amount
+
+/-- Witness inputs for the guard-drop kill-line: the dropped `canDeposit`
+guard is false, the retained `authorizedRouter` guard passes. -/
+private def noCanDeposit : WithdrawInputs := ⟨false, true⟩
+
+/-- Post-state the guard-drop mutant commits to on the standard vector: the
+mutation removes a guard, not the transition, so this is exactly the honest
+`spendDepositableEther vector (word 10)` post-state (see the `example`
+pinning that spend above). -/
+private def guardDropAfter : ReserveState :=
+  { vector with
+    buffered := word 90
+    storedDepositsReserve := word 10
+    depositedPostReport := word 13
+    depositedNextReportAdjusted := word 12 }
+
+/-- The honest model rejects the witness inputs at the deleted guard. -/
+example : modelWithdrawDepositableEther noCanDeposit vector (word 10) =
+    .reverted "CAN_NOT_DEPOSIT" := by decide
+
+/-- The guard-drop mutant instead commits the honest spend. -/
+example : mutantWithdrawNoCanDeposit noCanDeposit vector (word 10) =
+    .committed guardDropAfter := by decide
+
+/-- With `canDeposit = true` the mutant is indistinguishable from the honest
+model: exactly one guard is deleted. -/
+example : mutantWithdrawNoCanDeposit allowed vector (word 10) =
+    modelWithdrawDepositableEther allowed vector (word 10) := by decide
+
+/-- Concrete witness for the Wave 5 kill-line: freshness holds (`live = 50` is
+exactly the cached `unfinalizedStETH`, as in the Wave 4 witness), the mutated
+call COMMITS, and the parent's first conjunct `scopedWithdrawGuards inputs` is
+FALSE because `canDeposit = false`. This is the negation of the registered
+parent's conjunction on one premise-satisfying instance, with the
+`freshQueueCache` premise retained. -/
+theorem guard_drop_mutant_witness :
+    freshQueueCache vector (word 50) ∧
+    mutantWithdrawNoCanDeposit noCanDeposit vector (word 10) = .committed guardDropAfter ∧
+    ¬ scopedWithdrawGuards noCanDeposit :=
+  ⟨rfl, by decide, fun h => Bool.false_ne_true h.1⟩
+
+/-- Wave 5 guard-drop kill-line for P-RESERVE-1: refutes the registered parent
+`PReserve1.source_spend_preserves_withdrawal_reserve`'s own predicate shape —
+same five binders, INCLUDING `freshQueueCache`, same three-conjunct conclusion
+— with `mutantWithdrawNoCanDeposit` in place of
+`modelWithdrawDepositableEther`. The witness above satisfies both premises
+(fresh cache, committing mutated call) while falsifying the FIRST conjunct
+(`scopedWithdrawGuards`: `canDeposit = false`), so the parent's conjunction
+fails at a premise-satisfying witness. Division of labor: this kill-line
+kills conjunct (1) (guard liveness);
+`partition_spend_mutant_kill_line_refutes_parent` kills conjuncts (2)-(3)
+(partition invariant and live-reserve invariance, freshness retained); the
+stale-cache theorems remain premise-necessity evidence for `freshQueueCache`. -/
+theorem guard_drop_kill_line_refutes_parent :
+    ¬ ∀ (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word),
+        freshQueueCache before live →
+        mutantWithdrawNoCanDeposit inputs before amount = .committed after →
+        scopedWithdrawGuards inputs ∧
+          withdrawalPartitionSpendInvariant before after amount ∧
+          liveEffectiveWithdrawalsReserve after live =
+            liveEffectiveWithdrawalsReserve before live := by
+  intro hforall
+  have hcex := hforall noCanDeposit vector guardDropAfter (word 10) (word 50)
+    guard_drop_mutant_witness.1 guard_drop_mutant_witness.2.1
+  exact absurd hcex.1 guard_drop_mutant_witness.2.2
 
 /-- A checked-Uint256 overflow after the source-ordered buffer work is still a
 whole Verity transaction rollback. -/
@@ -172,9 +276,11 @@ raid `report/P-RESERVE-1.md` issue #2 describes, and exactly what
 `PReserve1.source_spend_preserves_withdrawal_reserve`'s `freshQueueCache`
 hypothesis is there to rule out. This is hypothesis-NECESSITY evidence — it
 refutes the freshness-dropped sibling claim, and the registered parent cannot
-be instantiated on this witness at all. The parent kill-line (a mutated spend
-transition with freshness retained) is
-`partition_spend_mutant_kill_line_refutes_parent` above. -/
+be instantiated on this witness at all. The parent kill-lines are
+`partition_spend_mutant_kill_line_refutes_parent` (a mutated spend transition
+with freshness retained, killing conjuncts (2)-(3)) and
+`guard_drop_kill_line_refutes_parent` (a dropped `canDeposit` guard with
+freshness retained, killing conjunct (1)) above. -/
 private def staleCacheBefore : ReserveState :=
   { buffered := word 100
     storedDepositsReserve := word 20
