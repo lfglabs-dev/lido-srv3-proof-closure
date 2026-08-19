@@ -3,6 +3,67 @@
 Theorems: `PSsz1.composed_ssz_encoding`, `PSsz1.verity_tx_simulates_ssz_encoding`.
 Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`.
 
+## Wave 2 changes (2026-08-19)
+
+**Full four-child composition, not two of four.** Issue #4 below documented
+that `composed_ssz_encoding` And-introduced four independently typed
+arguments: a witness/root pair (children 1–2), a `GIndex.concat` pair
+(child 3), and a digest/tx input pair (child 4). Nothing tied the concat
+operand or the digest bytes to the same deposit the witness/root pair named,
+so the parent still typechecked for a witness for validator 1, a `GIndex`
+for an unrelated operation, and digest bytes for validator 3.
+
+This wave closes that gap by deriving the remaining two children from the
+same `src` field, instead of taking them as independent record fields:
+
+- `ComposedSszInput.rhs : GIndex` is now `⟨(sourceWitness input.src).index.value,
+  input.rhsPow, …⟩` — the concat operand's *index* component is exactly the
+  generalized index `sourceWitness input.src` binds (`sourceWitness_index_le_maxUint248`
+  proves it always fits the 248-bit bound). Only `rhsPow` (the concat
+  model's separate `uint8` power metadata, not deposit content) stays an
+  independent field.
+- `srcInputs : SourceDepositDataRootInput → Inputs` converts the pinned
+  `List Nat` pubkey/WC/signature bytes to the `ByteArray` shape the digest
+  child consumes (`toByteArray`, an exact octet cast since every byte is
+  already `< 256`), and computes the amount bytes via the *same*
+  `toLittleEndian64` the deposit-data-root layout already uses
+  (`DepositDataRootCorrespondence.lean:128,144`). `ComposedSszInput.digestInput`
+  and `.txInput` are now `srcInputs input.src` plus the tx child's two
+  chain-level fields (`forkVersion`, `expectedDepositDataRoot`), instead of
+  independently supplied `Inputs`/`TxInputs` records.
+
+This closes issue #4's full four-child counterexample (not just the
+witness/root pair it was previously restricted to) and, as a consequence,
+issues #20 and #21 (the `List Nat`/`ByteArray` type mismatch and the
+unconstrained amount encoding between children), since `digestInput` and
+`txInput.toInputs` are now *proved* equal to `srcInputs input.src` rather
+than left as separate arguments that could describe a different deposit.
+
+**New kill-line.** `inconsistent_operation_index_kill_line` shows the
+`.clProofVerifier` operation slot's index can never equal the
+`.clValidatorVerifier` slot `sourceWitness` always binds, so a `GIndex.concat`
+operand minted for a different named operation could not have come from the
+derivation `ComposedSszInput.rhs` performs. `inconsistent_witness_kill_line`
+(unchanged) remains the witness/root rejection. Both are stated directly
+against the registered parent's shared vocabulary (`sourceWitness`,
+`Ssz.operationIndex`), so a regression that decoupled `rhs` or the
+witness/root pair from `input.src` again would make one of these kill-lines
+fail to typecheck against the parent's own definitions, not just an
+independent `example`.
+
+**Non-vacuity.** `sourceWitness_binds_sourceNode` proves the tightened
+`hBind` hypothesis is genuinely satisfiable — any pinned-width `src` binds
+its own derived witness against its own derived root. `Tests/SszRegression.composedExample`
+instantiates a concrete pinned-width `ComposedSszInput` and
+`composedExample_satisfies_composed_ssz_encoding` discharges every
+hypothesis of `composed_ssz_encoding` against it, so the fully coupled
+parent is invokable, not accidentally emptied by the new equalities.
+
+`lhs` (the state-root anchor position), `rhsPow` (the concat power byte),
+and the tx child's `forkVersion`/`expectedDepositDataRoot` remain
+independent fields: they are chain-level values, not deposit content, so
+there is no `src`-derived value to tie them to.
+
 ## Intent
 
 SRv3 verifies consensus-layer validator records (top-up, consolidation target WC, deposit-data) with SSZ Merkle proofs: a generalized-index path, a branch of sibling hashes, SHA-256 `hash_tree_root`, and a deposit-data root layout (`pubkey ‖ wc ‖ amount ‖ signature`). If this is wrong, the gateway can top up or consolidate against a fabricated validator. The intended guarantee is that a bound witness really is a witness of the claimed validator under the claimed operation, with the pinned deposit-data layout, `GIndex.concat`, and the seven-call digest / root check.
@@ -13,18 +74,18 @@ SRv3 verifies consensus-layer validator records (top-up, consolidation target WC
 - `A-SHA256-FFI`: digest value claims fail if the host SHA-256 differs. Severity HIGH.
 - `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`: imported Yul / precompile / compiler are trusted, not proved. YAML fidelity still lists the seven-call digest as covered.
 - `Operation` is three tags (`clValidatorVerifier`, `clProofVerifier`, `consolidationGateway`) mapped to toy generalized indices 2, 3, 4 — “not a claim that the numbers are production source constants.”
-- `composed_ssz_encoding` takes one `ComposedSszInput` record. The structural-bind hypothesis and the deposit-data-root child now both name `sourceWitness input.src` / `sourceNode input.src` directly — they are proved about the **same** `src`, not independently typed arguments. `GIndex.concat` (`input.lhs`/`input.rhs`) and the seven-call digest / root-match child (`input.digestInput`/`input.txInput`) remain separate fields of the record, not tied to `src`.
+- `composed_ssz_encoding` takes one `ComposedSszInput` record. The structural-bind hypothesis and the deposit-data-root child both name `sourceWitness input.src` / `sourceNode input.src` directly — they are proved about the **same** `src`, not independently typed arguments. `GIndex.concat`'s validator-side operand (`ComposedSszInput.rhs`) and the seven-call digest / root-match child's byte input (`ComposedSszInput.digestInput`/`.txInput`) are now *derived* from `input.src` (via `sourceWitness input.src`'s index and `srcInputs input.src` respectively), so all four children read off the same object. Only `input.lhs` (the state-root anchor position), `input.rhsPow` (the concat model's separate power byte), and `input.forkVersion`/`input.expectedDepositDataRoot` (chain-level, not deposit content) remain independently supplied.
 - Verity `encode` persists those four pieces through `writeSlot` / `writeMapUint`. `structuralOk input` *is* `Ssz.bindOperation` on the same input. The outcome observable's digest field (`Observables.digest`) is now read back from `digestMapSlot` storage via `readObs`, not the pre-write local `chain` list.
 
 ## Proof
 
-**Abstract `composed_ssz_encoding`.** `refine ⟨t1, t2, t3, t4⟩` where each `ti` is an existing child, all four instantiated against fields of one `input : ComposedSszInput`:
+**Abstract `composed_ssz_encoding`.** `refine ⟨t1, t2, t3, t4⟩` where each `ti` is an existing child, all four instantiated against fields of one `input : ComposedSszInput` (with `input.rhs`, `input.digestInput`, `input.txInput` themselves defined as functions of `input.src`):
 1. `Ssz.structural_witness_binding_sound` — unfold `bindOperation` / `verifyProof` (`&&` of five bools) and restate them as a Prop, applied to `sourceWitness input.src` / `sourceNode input.src`. No tree induction.
 2. `source_pinned_config_discharges_deposit_data_root input.src` — the pinned length constants are 32/48/32/96/184, the input lists have those lengths, bytes are `< 256`, amount `< 2^256`, and the same `sourceWitness input.src` traverses to `sourceNode input.src`. Mostly `rfl` / list-length.
-3. `encoding_uses_source_concat input.lhs input.rhs` — `sourceConcat = specConcat` by transcription.
-4. `digest_composition input.digestInput` + `digest_preimages_length = 7` + `accepted_iff_root_matches input.txInput` + the width hypothesis.
+3. `encoding_uses_source_concat input.lhs input.rhs` (plus `rfl` that `input.rhs.index = (sourceWitness input.src).index.value`) — `sourceConcat = specConcat` by transcription, on the operand `sourceWitness input.src` binds.
+4. `digest_composition input.digestInput` + `digest_preimages_length = 7` + `accepted_iff_root_matches input.txInput` + the width hypothesis (plus `rfl` that `input.digestInput = input.txInput.toInputs = srcInputs input.src`) — the seven-call digest and root-match now run on `input.src`'s own pinned bytes.
 
-`inconsistent_witness_kill_line` is the negative counterpart: binding `sourceWitness srcA` (child 1) against `sourceNode srcB` (child 2's root for a *different* deposit, `sourceAnchor srcA ≠ sourceAnchor srcB`) always fails `bindOperation`. That is exactly the cross-child mismatch the one-object `ComposedSszInput.src` now rules out by construction — `composed_ssz_encoding`'s `hBind` can only be discharged when the structural witness and the pinned deposit-data-root name the same object.
+`inconsistent_witness_kill_line` is one negative counterpart: binding `sourceWitness srcA` (child 1) against `sourceNode srcB` (child 2's root for a *different* deposit, `sourceAnchor srcA ≠ sourceAnchor srcB`) always fails `bindOperation`. `inconsistent_operation_index_kill_line` is the other: `Ssz.operationIndex .clProofVerifier`'s index value can never equal `(sourceWitness src).index.value` (always the `.clValidatorVerifier` slot), so a `GIndex.concat` operand minted for a different named operation could not have come from `ComposedSszInput.rhs`'s derivation. Together these are exactly the cross-child mismatches the one-object `ComposedSszInput.src` now rules out by construction — `composed_ssz_encoding`'s hypotheses can only be discharged when the structural witness, the pinned deposit-data-root, the concat operand, and the digest bytes all name the same object. `sourceWitness_binds_sourceNode` (used by `Tests/SszRegression.composedExample_satisfies_composed_ssz_encoding`) shows those tightened hypotheses remain jointly satisfiable.
 
 **VERITY `verity_tx_simulates_ssz_encoding`.** `observe (encode input).run = sourceView input`, and if the status is committed then `structuralOk` (i.e. the same `bindOperation`) plus the persisted words equal the input’s operation/index/path/branch. Concat and digest children are included as the same abstract facts, not re-executed as hash. Revert restores snapshot, including two-batch.
 
@@ -34,21 +95,25 @@ SRv3 verifies consensus-layer validator records (top-up, consolidation target WC
 
 ## Resolution
 
-**Restated Lean/English.** Parent composes the structural-bind and deposit-data-root children on one shared `ComposedSszInput.src`, not an independent `And` of four unrelated arguments; `GIndex.concat` and the digest/root-match child remain their own, still-independent fields. SHA-256 stays `A-SHA256-FFI`.
+**Restated Lean/English.** Parent composes all four children — structural-bind, deposit-data-root, `GIndex.concat`'s operand, and the seven-call digest / root-match bytes — on one shared `ComposedSszInput.src`, not an independent `And` of four unrelated arguments. Only the state-root anchor (`lhs`), the concat power byte (`rhsPow`), and the tx child's chain-level fork version / claimed root remain independent, non-deposit fields. SHA-256 stays `A-SHA256-FFI`.
 
-Closed in the 2026-08-18 honesty + encoding repair, and issue 4's witness/root
+Closed in the 2026-08-18 honesty + encoding repair; issue 4's witness/root
 pairing fixed plus a digest storage reread added in the 2026-08-19 one-object
-composition repair. Lean theorems stay CHECKED on their (now honest)
-statements. No pinned-core counterexample was found. `A` = YAML/`fidelity.missing`/assumption.
+composition repair; and issue 4 fully closed to all four children (plus
+issues 20/21) with two new kill-lines and a non-vacuity witness in the
+Wave 2 (2026-08-19) four-child composition repair. Lean theorems stay CHECKED
+on their (now honest) statements. No pinned-core counterexample was found.
+`A` = YAML/`fidelity.missing`/assumption.
 `B`/`C` = Lean premise or encoding repair that keeps the existing proof. `D` = register
 an already-proved sibling. `scope` = accepted as an explicit fidelity gap; not expanded
 to full Lido.
 
 | # | Close | Note |
 | --- | --- | --- |
-| 1–3, 5–14, 16, 18–26 | A | Independent GIndex.concat / seven-call digest children; `A-SHA256-FFI` + `A-YUL-INTERFACE`; Yul binding stays OPEN. |
-| 4 | B | `ComposedSszInput` bundles `src` once; the structural-bind hypothesis and the deposit-data-root child now both name `sourceWitness input.src` / `sourceNode input.src`, closing the "witness for validator 1, root for validator 2" counterexample for that pair. `inconsistent_witness_kill_line` proves the rejection; `Tests/SszEncodingTxMutants.lean`'s `crossedWitness` is the executable analogue. `GIndex.concat` and the digest/tx child remain independent fields of the record — not expanded to a single-deposit closure across all four children (tracked in `fidelity.missing`). |
+| 1–3, 5–14, 16, 18, 19, 22–26 | A | SHA-256/witness abstraction, toy indices, invented observables; `A-SHA256-FFI` + `A-YUL-INTERFACE`; Yul binding stays OPEN. |
+| 4 | B | `ComposedSszInput` bundles `src` once; the structural-bind hypothesis, the deposit-data-root child, `GIndex.concat`'s operand (`ComposedSszInput.rhs`), and the digest/tx child's bytes (`ComposedSszInput.digestInput`/`.txInput`, via `srcInputs`) all name or are derived from `sourceWitness input.src` / `sourceNode input.src`, closing the "witness for validator 1, root for validator 2" counterexample across all four children, not just the witness/root pair. `inconsistent_witness_kill_line` and the new `inconsistent_operation_index_kill_line` prove the two rejection shapes; `Tests/SszEncodingTxMutants.lean`'s `crossedWitness` is the executable analogue of the first. Only `lhs` (state-root anchor), `rhsPow` (concat power byte), and the tx child's fork version / claimed root remain independent, non-deposit fields (tracked in `fidelity.missing`). `sourceWitness_binds_sourceNode` / `Tests/SszRegression.composedExample` show the tightened parent is non-vacuous. |
 | 15, 17 | A | `nodeWord` / `packConcat` wrap documented, not expanded to a new SSZ proof. |
+| 20, 21 | B | `srcInputs` converts `src`'s pinned `List Nat` pubkey/WC/signature to `ByteArray` via `toByteArray` (an exact octet cast, since every byte is `< 256`) and computes the amount bytes via the source's own `toLittleEndian64`. `ComposedSszInput.digestInput = ComposedSszInput.txInput.toInputs = srcInputs input.src` is now a parent conjunct (`rfl`), so the digest/tx child's bytes are proved identical to, and correctly derived from, the same `src` the deposit-data-root child discharges — closing both the cross-type identity gap (20) and the unconstrained-amount gap (21) for the composed parent. |
 | 23 | A | `A-YUL-INTERFACE` attached to the row. |
 
 Issue 19's outcome-readback gap is narrowed, not closed, by the same repair:
@@ -77,6 +142,8 @@ still reads the *input* witness, not the persisted words, and the `path` /
    `composed_ssz_encoding` can be applied to a witness for operation A, a deposit-data input for validator B, concat of unrelated gindices, and a digest input for deposit C. All four conjuncts hold independently. Nothing says the top-up path’s witness is the same bytes the digest hashed.
 
    *Scenario.* Gateway verifies a well-formed *structural* witness for validator 1 and a deposit-data root for validator 2. The parent theorem still typechecks: different arguments. The CHECKED “composed” claim is And-introduction, not a single-pipeline proof.
+
+   *Closed (Wave 2).* `ComposedSszInput.rhs`/`digestInput`/`txInput` are now *functions* of `input.src`, not independent record fields, so the scenario above no longer typechecks: there is exactly one `input.src` in scope, and the concat operand and digest bytes are computed from it, not separately supplied. `inconsistent_witness_kill_line` / `inconsistent_operation_index_kill_line` prove the two mismatch shapes are rejected, and `Tests/SszRegression.composedExample_satisfies_composed_ssz_encoding` shows the tightened parent is still invokable on a genuine pinned-width deposit. Remaining independent fields (`lhs`, `rhsPow`, `forkVersion`, `expectedDepositDataRoot`) are chain-level values with no deposit-derived counterpart to tie them to, not an unclosed instance of this issue.
 
 5. **Verity commit implies `structuralOk`, which is the same boolean the tx just tested.**
    `encode` writes the witness only when `structuralOk input = true`. The implication “commit → structuralWitnessConjunct” is “we did not take the revert arm of our own `if`.”
@@ -158,10 +225,14 @@ still reads the *input* witness, not the persisted words, and the `path` /
 
     *Scenario.* Child 2 discharges a `List Nat` pubkey `[0, 1, …]` of length 48. The Verity tx hashes a different `ByteArray` of length 48. Both CHECKED conjuncts hold. The parent “composed encoding” is not one deposit. A `List Nat` entry of 300 is excluded by child 2’s bound and is unrepresentable as a `ByteArray` — the hole is identity of the preimage, not an out-of-range byte.
 
+    *Closed (Wave 2).* `srcInputs : SourceDepositDataRootInput → Inputs` (`PSsz1.lean`) converts `src`'s `List Nat` pubkey/WC/signature to `ByteArray` via `toByteArray := ByteArray.mk ∘ List.toArray ∘ List.map UInt8.ofNat`, an exact octet cast because every element is already `< 256` (`toByteArray_size` proves the length is preserved). `ComposedSszInput.digestInput := srcInputs input.src` and `composed_ssz_encoding` proves `input.digestInput = input.txInput.toInputs = srcInputs input.src` as a conjunct (`rfl`), so the parent now identifies the digest child's preimage with child 2's own bytes, not a separately supplied `ByteArray`.
+
 21. **Amount is a `Nat` gwei in child 2 and an 8-byte LE `ByteArray` in the Verity tx.**
     Child 2: `amountGwei : Nat` with `amountGwei < 2^256`, hashed via `_toLittleEndian64` in the source-shaped layout. `SszAbstractDigest.Inputs.amountLittleEndian` is 8 bytes (`widthsOk`). Nothing says those 8 bytes are the little-endian encoding of `src.amountGwei`.
 
     *Counterexample.* Child 2 `amountGwei = 32e9`. Verity `amountLittleEndian` is 8 zero bytes. `composed_ssz_encoding` still holds (separate arguments). `encode` commits a deposit-data root for amount 0. Live `_toLittleEndian64(32e9)` is not 8 zeros. The CHECKED parent does not identify the amount.
+
+    *Closed (Wave 2).* `srcInputs src` sets `amountLittleEndian := toByteArray (toLittleEndian64 src.amountGwei)` — the *same* `toLittleEndian64` function (`DepositDataRootCorrespondence.lean:128`) child 2's own `sourceNode`/`signatureRoot` layout already applies to `src.amountGwei` (`:144`), just cast to `ByteArray`. Since `composed_ssz_encoding` proves `input.digestInput = srcInputs input.src`, the counterexample's "8 zero bytes for amount 32e9" can no longer satisfy that equality: the derived `amountLittleEndian` is provably the little-endian encoding of the same `input.src.amountGwei` child 2 hashes, not an independently chosen witness.
 
 22. **`SszVerifierProgram` is an unused interface for the mapped SSZ spans.**
     `Source/SszVerifierProgram.lean` records observations for `SSZ.hashTreeRoot` 89–175, `verifyProof` 179–248, and `BeaconChainDepositor` 110–153, and “does not import or alias `Audit.Ssz`.” `composed_ssz_encoding` / `verity_tx_simulates_ssz_encoding` do not mention it.
