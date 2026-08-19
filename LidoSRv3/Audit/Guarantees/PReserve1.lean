@@ -8,18 +8,50 @@ open LidoSRv3.Audit.SolidityReserve
 
 def guarantee : Guarantee := ⟨.pReserve1, [.model, .source, .verityTx]⟩
 
-/-- Any committed `_spendDepositableEther` satisfies
-`withdrawalPartitionSpendInvariant`: the amount came from
-`depositsReserve + unreserved`, `buffered` is the checked subtraction,
-`storedDepositsReserve` follows the pinned `> amount ? − : 0` update, and
-`unfinalizedStETH` is unchanged. Lido's nonzero-amount and
-`buffered ≥ storedDepositsReserve` guards are not required for this
-formula — they are source call-site facts, not used here. -/
+/-- Registered Wave 1 parent for P-RESERVE-1. Strengthened along the three
+axes `report/P-RESERVE-1.md` calls out (issues #1, #2, #5):
+
+* the premise is `modelWithdrawDepositableEther`, the full wrapper
+  transition that enforces `canDeposit`/`authorizedRouter`
+  (`scopedWithdrawGuards`) before ever reaching `_spendDepositableEther`, not
+  the bare internal spend helper the original theorem quoted. The conclusion
+  now *proves* `scopedWithdrawGuards inputs`, rather than assuming it: a
+  guard failure reverts, so it can never reach the `.committed` branch this
+  theorem is about;
+* the conclusion adds `liveEffectiveWithdrawalsReserve after live =
+  liveEffectiveWithdrawalsReserve before live`, the *effective*, min-capped,
+  queue-facing reserve computed against an explicit `live` value standing in
+  for a `WithdrawalQueue.unfinalizedStETH()` CALL — not merely the restated
+  `storedDepositsReserve` field that `withdrawalPartitionSpendInvariant`
+  quotes;
+* that added conjunct needs `freshQueueCache before live`, naming the
+  cache-freshness the original theorem left implicit. Drop that hypothesis
+  and the identical spend from `depositsReserve + unreserved` can still raid
+  the live reserve — see `staleQueueCacheKillLine_holds` and
+  `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample` for
+  the concrete kill-line witness.
+
+The original `withdrawalPartitionSpendInvariant` conjunct is retained so
+existing consumers of this theorem name keep their evidence. -/
 theorem source_spend_preserves_withdrawal_reserve
-    (before after : ReserveState) (amount : Word)
-    (h : spendDepositableEther before amount = .committed after) :
-    withdrawalPartitionSpendInvariant before after amount :=
-  committed_preserves_withdrawal_reserve before after amount h
+    (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)
+    (hfresh : freshQueueCache before live)
+    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
+    scopedWithdrawGuards inputs ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live := by
+  unfold modelWithdrawDepositableEther at h
+  split at h
+  · contradiction
+  · rename_i hcan
+    split at h
+    · contradiction
+    · rename_i hauth
+      split at h <;> try contradiction
+      refine ⟨⟨?_, ?_⟩, committed_preserves_withdrawal_reserve before after amount h,
+        committed_preserves_live_effective_withdrawals_reserve before after amount live hfresh h⟩
+      · simpa using hcan
+      · simpa using hauth
 
 /--
 Faithful VERITY_TX closure for P-RESERVE-1. This theorem starts with the actual

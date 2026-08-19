@@ -493,4 +493,194 @@ theorem verity_commit_preserves_withdrawal_reserve
       rw [hsim]
       exact committed_preserves_withdrawal_reserve _ _ amount hspend
 
+/-! ## Wave 1 registered-parent strengthening: wrapper guards and queue freshness
+
+`unfinalizedStETH` on `ReserveState` is a cached word (issue #2 of
+`report/P-RESERVE-1.md`): the real allocation calls
+`_withdrawalQueue().unfinalizedStETH()` on every read. The definitions below
+name that gap explicitly instead of leaving it implicit, and the theorem
+`committed_preserves_effective_withdrawals_reserve` proves the property the
+report says the CHECKED guarantee never established: the *effective*
+queue-facing reserve — not just the restated `storedDepositsReserve` field —
+is unchanged by a legal spend. `staleQueueCacheKillLine` then shows that
+guarantee is only as strong as the freshness hypothesis it depends on: once
+the cache is stale, the same "spend only depositsReserve + unreserved" spend
+can still shrink the reserve a live WithdrawalQueue call would report. -/
+
+/-- Registered guard bundle for the Wave 1 parent: both `withdrawDepositableEther`
+wrapper booleans must hold. `canDeposit` is Lido's live bunker/pause
+deposit-enabled check (line ~815); `authorizedRouter` is the router-only
+`_auth` guard. Neither is bypassed by the registered parent below — see
+`modelWithdrawDepositableEther`, which the parent now takes as its premise
+instead of jumping straight to `spendDepositableEther`. -/
+def scopedWithdrawGuards (inputs : WithdrawInputs) : Prop :=
+  inputs.canDeposit ∧ inputs.authorizedRouter
+
+/-- The state's cached `unfinalizedStETH` field equals a live
+`WithdrawalQueue.unfinalizedStETH()` CALL (source line 612) taken at spend
+time. This names the freshness the registered parent depends on: it is not
+derivable from `ReserveState` alone, and nothing in this file enforces it —
+see `staleQueueCacheKillLine` for what fails when it does not hold. -/
+def freshQueueCache (state : ReserveState) (liveUnfinalizedStETH : Word) : Prop :=
+  state.unfinalizedStETH = liveUnfinalizedStETH
+
+/-- The queue-facing reserve computed against an arbitrary (live or stale)
+`unfinalizedStETH` value instead of the state's cached field. Under
+`freshQueueCache`, this coincides with `effectiveWithdrawalsReserve`
+(`liveEffectiveWithdrawalsReserve_eq_of_eq`). -/
+def liveEffectiveWithdrawalsReserve (s : ReserveState) (liveUnfinalizedStETH : Word) : Word :=
+  let deposits := minWord s.buffered s.storedDepositsReserve
+  minWord (s.buffered - deposits) liveUnfinalizedStETH
+
+private theorem safeAdd_val {a b c : Word} (h : safeAdd a b = some c) :
+    c.val = a.val + b.val := by
+  by_cases hc : a.val + b.val > Verity.Core.MAX_UINT256
+  · exfalso
+    have hnone : safeAdd a b = none := by simp [safeAdd, hc]
+    rw [hnone] at h
+    cases h
+  · have heq : safeAdd a b = some (a + b) := by simp [safeAdd, hc]
+    rw [heq] at h
+    obtain rfl := Option.some.inj h
+    have hlt : a.val + b.val < Verity.Core.Uint256.modulus := by
+      have hm := Verity.Core.Uint256.max_uint256_succ_eq_modulus
+      omega
+    exact Verity.Core.Uint256.add_eq_of_lt hlt
+
+private theorem safeSub_val {a b c : Word} (h : safeSub a b = some c) :
+    c.val = a.val - b.val ∧ b.val ≤ a.val := by
+  unfold safeSub at h
+  split at h
+  · cases h
+  · rename_i hle
+    obtain rfl := Option.some.inj h
+    have hle' : b.val ≤ a.val := by omega
+    exact ⟨Verity.Core.Uint256.sub_eq_of_le hle', hle'⟩
+
+private theorem minWord_val (a b : Word) : (minWord a b).val = Min.min a.val b.val := by
+  unfold minWord
+  split
+  · next h => simp only [Verity.Core.Uint256.le_def] at h; omega
+  · next h => simp only [Verity.Core.Uint256.le_def] at h; omega
+
+/-- Unpacks a successful `getBufferedEtherAllocation`: the two internal
+`safeSub` calls both succeeded, and the resulting allocation's fields are
+exactly the pinned formulas (not merely some opaque witness). -/
+private theorem getBufferedEtherAllocation_some (s : ReserveState) (a : Allocation)
+    (h : getBufferedEtherAllocation s = some a) :
+    ∃ r u,
+      safeSub s.buffered (minWord s.buffered s.storedDepositsReserve) = some r ∧
+      safeSub r (minWord r s.unfinalizedStETH) = some u ∧
+      a = ⟨s.buffered, u, minWord s.buffered s.storedDepositsReserve,
+        minWord r s.unfinalizedStETH⟩ := by
+  unfold getBufferedEtherAllocation at h
+  cases hrem : safeSub s.buffered (minWord s.buffered s.storedDepositsReserve) with
+  | none => simp [hrem] at h
+  | some r =>
+    cases hunr : safeSub r (minWord r s.unfinalizedStETH) with
+    | none => simp [hrem, hunr] at h
+    | some u =>
+      refine ⟨r, u, rfl, hunr, ?_⟩
+      simp [hrem, hunr] at h
+      exact h.symm
+
+theorem effectiveWithdrawalsReserve_val (s : ReserveState) :
+    (effectiveWithdrawalsReserve s).val =
+      Min.min (s.buffered.val - Min.min s.buffered.val s.storedDepositsReserve.val)
+        s.unfinalizedStETH.val := by
+  unfold effectiveWithdrawalsReserve
+  have hDle : minWord s.buffered s.storedDepositsReserve ≤ s.buffered := by
+    have hv := minWord_val s.buffered s.storedDepositsReserve
+    simp only [Verity.Core.Uint256.le_def]
+    omega
+  rw [minWord_val, Verity.Core.Uint256.sub_eq_of_le hDle, minWord_val]
+
+/-- The non-restatement form of `withdrawalPartitionSpendInvariant` (report
+issue #1): a legal spend leaves the *effective*, min-capped queue-facing
+reserve unchanged, not merely the raw `storedDepositsReserve` field. Proved
+independently of `withdrawalPartitionSpendInvariant`, from the pinned
+`getBufferedEtherAllocation` formulas. -/
+theorem committed_preserves_effective_withdrawals_reserve
+    (before after : ReserveState) (amount : Word)
+    (h : spendDepositableEther before amount = .committed after) :
+    effectiveWithdrawalsReserve after = effectiveWithdrawalsReserve before := by
+  obtain ⟨allocation, depositable, ha, hd, henough, hb, hs, hu⟩ :=
+    committed_preserves_withdrawal_reserve before after amount h
+  obtain ⟨r, u, hrem, hunr, haeq⟩ := getBufferedEtherAllocation_some before allocation ha
+  subst haeq
+  simp only [getDepositableEther] at hd
+  have hd' := safeAdd_val hd
+  have hrem' := safeSub_val hrem
+  have hunr' := safeSub_val hunr
+  have hb' := safeSub_val hb
+  have henough' : amount.val ≤ depositable.val := henough
+  have hDminBefore := minWord_val before.buffered before.storedDepositsReserve
+  have hWRminBefore := minWord_val r before.unfinalizedStETH
+  have hsval : after.storedDepositsReserve.val =
+      if amount.val < before.storedDepositsReserve.val
+      then before.storedDepositsReserve.val - amount.val else 0 := by
+    simp only [hs, Verity.Core.Uint256.val_ite, Verity.Core.Uint256.lt_def]
+    split
+    · rename_i hc
+      exact Verity.Core.Uint256.sub_eq_of_le (Nat.le_of_lt hc)
+    · exact Verity.Core.Uint256.val_zero
+  apply Verity.Core.Uint256.ext
+  rw [effectiveWithdrawalsReserve_val, effectiveWithdrawalsReserve_val, hu, hsval]
+  have hbval : after.buffered.val = before.buffered.val - amount.val := hb'.1
+  rw [hbval]
+  split <;> omega
+
+theorem liveEffectiveWithdrawalsReserve_eq_of_eq (s : ReserveState) (v : Word)
+    (h : s.unfinalizedStETH = v) :
+    liveEffectiveWithdrawalsReserve s v = effectiveWithdrawalsReserve s := by
+  unfold liveEffectiveWithdrawalsReserve effectiveWithdrawalsReserve
+  rw [← h]
+
+/-- Under a fresh queue cache, a legal spend preserves the *live*
+WithdrawalQueue-facing reserve too, not just the cached-field version. This is
+what `freshQueueCache` buys the registered parent — see
+`staleQueueCacheKillLine` for the counterexample without it. -/
+theorem committed_preserves_live_effective_withdrawals_reserve
+    (before after : ReserveState) (amount live : Word)
+    (hfresh : freshQueueCache before live)
+    (h : spendDepositableEther before amount = .committed after) :
+    liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live := by
+  obtain ⟨_, _, _, _, _, _, _, hu⟩ := committed_preserves_withdrawal_reserve before after amount h
+  have hafterfresh : after.unfinalizedStETH = live := hu.trans hfresh
+  rw [liveEffectiveWithdrawalsReserve_eq_of_eq after live hafterfresh,
+    liveEffectiveWithdrawalsReserve_eq_of_eq before live hfresh]
+  exact committed_preserves_effective_withdrawals_reserve before after amount h
+
+/-- Named kill-line: without a fresh queue cache, the same "spend only
+depositsReserve + unreserved" transition that
+`committed_preserves_effective_withdrawals_reserve` shows is always safe
+against the *cached* field can still raid the reserve a live
+`WithdrawalQueue.unfinalizedStETH()` call would report. Concretely witnessed
+by `staleQueueCacheKillLine_holds` and by
+`LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`. -/
+def staleQueueCacheKillLine : Prop :=
+  ¬ ∀ (before after : ReserveState) (amount live : Word),
+    spendDepositableEther before amount = .committed after →
+    liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live
+
+private def staleQueueCacheBefore : ReserveState :=
+  { buffered := Verity.Core.Uint256.ofNat 100
+    storedDepositsReserve := Verity.Core.Uint256.ofNat 20
+    unfinalizedStETH := Verity.Core.Uint256.ofNat 50
+    depositedPostReport := Verity.Core.Uint256.ofNat 3
+    depositedNextReportAdjusted := Verity.Core.Uint256.ofNat 2 }
+
+private def staleQueueCacheAfter : ReserveState :=
+  { buffered := Verity.Core.Uint256.ofNat 50
+    storedDepositsReserve := Verity.Core.Uint256.ofNat 0
+    unfinalizedStETH := Verity.Core.Uint256.ofNat 50
+    depositedPostReport := Verity.Core.Uint256.ofNat 53
+    depositedNextReportAdjusted := Verity.Core.Uint256.ofNat 52 }
+
+theorem staleQueueCacheKillLine_holds : staleQueueCacheKillLine := by
+  intro hforall
+  have hcex := hforall staleQueueCacheBefore staleQueueCacheAfter
+    (Verity.Core.Uint256.ofNat 50) (Verity.Core.Uint256.ofNat 80) (by decide)
+  exact absurd hcex (by decide)
+
 end LidoSRv3.Audit.SolidityReserve
