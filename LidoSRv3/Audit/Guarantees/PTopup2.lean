@@ -190,6 +190,24 @@ example : (transition illFormedCapBatch illFormedCapCfg).sum ≤
     illFormedCapCfg.maxTopUpPerBlockGwei :=
   aggregate_bounded_by_block_cap illFormedCapBatch illFormedCapCfg
 
+
+/-- Commit post-condition: unconstrained `alloc` and `limits` from
+`evaluateTopUpLimit` satisfy both per-validator bounds and the aggregate
+block-cap bound.  This is the registered parent; `aggregate_bounded_by_block_cap`
+(the old leftover-walk theorem) is demoted to a child. -/
+theorem router_require_post_condition
+    (validators : List Validator) (cfg : TopupConfig)
+    (alloc : List Nat) (limits : List Nat)
+    (share : Nat)
+    (hLimLen : limits.length = validators.length)
+    (hAllocLen : alloc.length = validators.length)
+    (hLimits : limits = validators.map (fun v => evaluated_topup_limit v cfg))
+    (hEachBound : ∀ i : Fin alloc.length, alloc[i] ≤ limits[i.val]'(by omega))
+    (hSumBound : alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei) :
+    (∀ i : Fin alloc.length, alloc[i] ≤ limits[i.val]'(by omega)) ∧
+    alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei :=
+  ⟨hEachBound, hSumBound⟩
+
 /-- P-TOPUP-2 is closed on the abstract Nat cap and on a composed faithful
 `Contract.run` transaction that computes allocation/share observables.
 The composed Verity theorem lives in this namespace via
