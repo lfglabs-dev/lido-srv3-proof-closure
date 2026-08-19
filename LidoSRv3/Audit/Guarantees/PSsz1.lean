@@ -104,6 +104,71 @@ def ComposedSszInput.txInput (input : ComposedSszInput) : TxInputs :=
     forkVersion := input.forkVersion
     expectedDepositDataRoot := input.expectedDepositDataRoot }
 
+/-- The registered parent's conclusion predicate: the non-definitional
+residue of the four-child one-object composition. Every registered conjunct
+is a substantive fact, never an `rfl` accessor equality of `ComposedSszInput`'s
+own derived fields. The wave-2 conclusion also registered
+`input.rhs.index = (sourceWitness input.src).index.value`,
+`input.digestInput = srcInputs input.src`,
+`input.txInput.toInputs = srcInputs input.src`, the self-referential
+`ExactDigestComposition input.digestInput` (`digestChain` is *defined* as
+that seven-call list), the `signatureRoot input.src =
+computeSignatureRoot input.src.signature` definitional unfolding
+(`signatureRoot` is *defined* as that call), the pinned-config constant
+equalities, the `src` field bound projections, and the hypothesis-restating
+length lines; those are all definitional facts or restated hypotheses, so
+they are omitted here. The derived-field definitions themselves
+(`ComposedSszInput.rhs`/`digestInput`/`txInput`) remain — they are the
+type-level one-object coupling, not claim conjuncts. What remains:
+
+1. the structural witness binding soundness transported out of `hBind`: the
+   derived witness really is bound to the claimed `operation` and
+   reconstructs `sourceNode input.src` under the claimed `combine`;
+2. the same derived witness traverses to `sourceNode input.src` under the
+   source's own `sourceCombine input.src` (the non-definitional residue of
+   the pinned deposit-data-root discharge: an equality between the generic
+   `Ssz.traverseBranch` fold and the independently written pairing encoding);
+3. `sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs` on the
+   derived `GIndex.concat` operand — again an equality between two
+   independently written artifacts (the literal pinned transcription and the
+   independent append specification), not an accessor unfolding;
+4. the seven-preimage count, the `runVerification` accept-iff control flow,
+   and the exact pinned widths of the derived transaction input. -/
+def composedEncodingOk (operation : Ssz.Operation)
+    (combine : Ssz.Node → Ssz.Node → Ssz.Node) (input : ComposedSszInput) : Prop :=
+  -- Child: structural witness binding, on the SAME witness/root that the
+  -- deposit-data-root child below discharges for `input.src` -- one shared
+  -- object, not an independently supplied witness/expectedRoot pair.
+  ((sourceWitness input.src).operation = operation ∧
+    (sourceWitness input.src).index = Ssz.operationIndex operation ∧
+    Ssz.HasGeneralizedIndex (sourceWitness input.src).index
+      (sourceWitness input.src).pivotBoundary (sourceWitness input.src).path ∧
+    (sourceWitness input.src).branch.length = (sourceWitness input.src).path.length ∧
+    Ssz.traverseBranch combine
+      (Ssz.validatorRoot combine (sourceWitness input.src).validator)
+      (sourceWitness input.src).path (sourceWitness input.src).branch =
+      sourceNode input.src) ∧
+    -- Child: the SAME derived witness reconstructs the pinned
+    -- deposit-data-root node under the source's own structural combine.
+    (Ssz.traverseBranch (sourceCombine input.src)
+        (Ssz.validatorRoot (sourceCombine input.src) (sourceWitness input.src).validator)
+        (sourceWitness input.src).path (sourceWitness input.src).branch =
+      sourceNode input.src) ∧
+    -- Child: GIndex.concat source transcription, on the SAME generalized
+    -- index the structural-bind child above binds -- `input.rhs` is
+    -- *derived* from `sourceWitness input.src`, not an independently
+    -- supplied index for an unrelated operation or validator.
+    (sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs) ∧
+    -- Child: seven-call digest preimage count and root-match control flow,
+    -- on the SAME pinned bytes the deposit-data-root child discharges for
+    -- `input.src` -- `input.digestInput` / `input.txInput.toInputs` are
+    -- *derived* from `input.src`, not an independently supplied `Inputs` for
+    -- a different deposit.
+    ((digestPreimages input.txInput.toInputs).length = 7 ∧
+      (runVerification input.txInput = .accept ↔
+        computedRoot input.txInput = input.txInput.expectedDepositDataRoot) ∧
+      exactTxWidths input.txInput)
+
 /-- Composed on one object, not an independent `And` of four unrelated
 arguments. The structural-bind hypothesis names `sourceWitness input.src` and
 `sourceNode input.src` directly, so a witness bound for one deposit can no
@@ -114,8 +179,13 @@ root-match child's `Inputs`/`TxInputs` are now likewise *derived* from
 `input.src` (`ComposedSszInput.rhs`/`digestInput`/`txInput`), so all four
 children read off the same object; only the state-root anchor (`lhs`) and the
 chain-level fork version / claimed root remain independent, non-deposit
-values. Still not `SSZ.verifyProof` on production gindices; SHA-256 functional
-correctness remains `A-SHA256-FFI`. -/
+values. The conclusion is the named predicate `composedEncodingOk`, whose
+conjuncts are all non-definitional (no `rfl` accessor equalities of the
+record's own derived fields, no restated hypotheses), and which the
+kill-line `crossed_witness_kill_line_refutes_parent` below refutes on a
+mutant of this theorem's own quantified artifact. Still not `SSZ.verifyProof`
+on production gindices; SHA-256 functional correctness remains
+`A-SHA256-FFI`. -/
 theorem composed_ssz_encoding
     {operation : Ssz.Operation} {combine : Ssz.Node → Ssz.Node → Ssz.Node}
     (input : ComposedSszInput)
@@ -127,67 +197,40 @@ theorem composed_ssz_encoding
     (hExpectedRoot : input.expectedDepositDataRoot.size = digestBytes)
     (hBind : Ssz.bindOperation operation combine (sourceWitness input.src)
       (sourceNode input.src) = true) :
-    -- Child: structural witness binding, on the SAME witness/root that the
-    -- deposit-data-root child below discharges for `input.src` -- one shared
-    -- object, not an independently supplied witness/expectedRoot pair.
-    ((sourceWitness input.src).operation = operation ∧
-      (sourceWitness input.src).index = Ssz.operationIndex operation ∧
-      Ssz.HasGeneralizedIndex (sourceWitness input.src).index
-        (sourceWitness input.src).pivotBoundary (sourceWitness input.src).path ∧
-      (sourceWitness input.src).branch.length = (sourceWitness input.src).path.length ∧
-      Ssz.traverseBranch combine
-        (Ssz.validatorRoot combine (sourceWitness input.src).validator)
-        (sourceWitness input.src).path (sourceWitness input.src).branch =
-        sourceNode input.src) ∧
-    -- Child: pinned deposit-data-root source layout and witness, for the
-    -- same `input.src`.
-    (SHA256_DIGEST_LENGTH pinnedConfig = 32 ∧
-      PUBKEY_LENGTH pinnedConfig = 48 ∧
-      WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig = 32 ∧
-      SIGNATURE_LENGTH pinnedConfig = 96 ∧
-      DEPOSIT_DATA_LENGTH pinnedConfig = 184 ∧
-      input.src.publicKey.length = 48 ∧
-      input.src.withdrawalCredentials.length = 32 ∧
-      input.src.signature.length = 96 ∧
-      (∀ byte ∈ input.src.withdrawalCredentials, byte < 256) ∧
-      (∀ byte ∈ input.src.publicKey, byte < 256) ∧
-      (∀ byte ∈ input.src.signature, byte < 256) ∧
-      input.src.amountGwei < 2 ^ 256 ∧
-      signatureRoot input.src = computeSignatureRoot input.src.signature ∧
-      Ssz.HasGeneralizedIndex (sourceWitness input.src).index
-        (sourceWitness input.src).pivotBoundary (sourceWitness input.src).path ∧
-      Ssz.traverseBranch (sourceCombine input.src)
-        (Ssz.validatorRoot (sourceCombine input.src) (sourceWitness input.src).validator)
-        (sourceWitness input.src).path (sourceWitness input.src).branch =
-        sourceNode input.src) ∧
-    -- Child: GIndex.concat source transcription, now on the SAME generalized
-    -- index the structural-bind child above binds -- `input.rhs` is
-    -- *derived* from `sourceWitness input.src`, not an independently
-    -- supplied index for an unrelated operation or validator.
-    (input.rhs.index = (sourceWitness input.src).index.value ∧
-      sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs) ∧
-    -- Child: seven-call digest composition and root-match control flow, now
-    -- on the SAME pinned bytes the deposit-data-root child discharges for
-    -- `input.src` -- `input.digestInput` / `input.txInput.toInputs` are
-    -- *derived* from `input.src`, not an independently supplied `Inputs` for
-    -- a different deposit.
-    (input.digestInput = srcInputs input.src ∧
-      input.txInput.toInputs = srcInputs input.src ∧
-      ExactDigestComposition input.digestInput ∧
-      (digestPreimages input.txInput.toInputs).length = 7 ∧
-      (runVerification input.txInput = .accept ↔
-        computedRoot input.txInput = input.txInput.expectedDepositDataRoot) ∧
-      exactTxWidths input.txInput) := by
+    composedEncodingOk operation combine input := by
   have hTxWidths : exactTxWidths input.txInput :=
     ⟨srcInputs_exactWidths input.src hPublicKey hWithdrawalCredentials hSignature,
       hForkVersion, hExpectedRoot⟩
-  refine ⟨Ssz.structural_witness_binding_sound hBind,
+  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, -, hTraverse⟩ :=
     source_pinned_config_discharges_deposit_data_root input.src
-      hPublicKey hWithdrawalCredentials hSignature,
-    ⟨rfl, encoding_uses_source_concat input.lhs input.rhs⟩,
-    ⟨rfl, rfl, digest_composition input.digestInput,
-      digest_preimages_length input.txInput.toInputs,
-      accepted_iff_root_matches input.txInput, hTxWidths⟩⟩
+      hPublicKey hWithdrawalCredentials hSignature
+  unfold composedEncodingOk
+  refine ⟨Ssz.structural_witness_binding_sound hBind, hTraverse,
+    encoding_uses_source_concat input.lhs input.rhs,
+    digest_preimages_length input.txInput.toInputs,
+    accepted_iff_root_matches input.txInput, hTxWidths⟩
+
+/-- Kill-line refuting the registered parent's own conclusion predicate. The
+mutant keeps the honest one-object artifact `input : ComposedSszInput` and
+its own `sourceCombine input.src`, but claims the composed encoding under the
+*crossed* named operation `.clProofVerifier`: `sourceWitness input.src` is
+bound to `.clValidatorVerifier` by construction, so the predicate's first
+structural conjunct is false and `composedEncodingOk` — the very conclusion
+`composed_ssz_encoding` proves — fails on a mutant of the same quantified
+artifact shape the parent ranges over. This is deliberately stronger than the
+two older kill-lines below: `inconsistent_witness_kill_line` refutes only the
+parent's *hypothesis* `hBind` on a crossed two-source pair that cannot even
+inhabit `ComposedSszInput`, and `inconsistent_operation_index_kill_line` is a
+bare `Nat` constant inequality; neither negates the parent's conclusion. -/
+theorem crossed_witness_kill_line_refutes_parent (input : ComposedSszInput) :
+    ¬ composedEncodingOk .clProofVerifier (sourceCombine input.src) input := by
+  intro h
+  unfold composedEncodingOk at h
+  obtain ⟨⟨hOperation, -, -, -, -⟩, -, -, -⟩ := h
+  have hWitness : (sourceWitness input.src).operation =
+      Ssz.Operation.clValidatorVerifier := rfl
+  rw [hWitness] at hOperation
+  contradiction
 
 /-- Kill-line: an inconsistent witness across children is rejected. Binding
 `sourceWitness srcA` (child 1) against `sourceNode srcB` (child 2's root for a
@@ -195,7 +238,10 @@ theorem composed_ssz_encoding
 public-key anchors differ. This is exactly the cross-child mismatch
 `composed_ssz_encoding`'s single shared `input.src` now rules out: the parent
 hypothesis `hBind` can only be discharged when the structural witness and the
-pinned deposit-data-root come from the same object. -/
+pinned deposit-data-root come from the same object. Note this negates the
+parent's *hypothesis* on a crossed two-source pair that cannot inhabit
+`ComposedSszInput`; the kill-line that negates the parent's *conclusion*
+predicate on its own artifact shape is `crossed_witness_kill_line_refutes_parent`. -/
 theorem inconsistent_witness_kill_line
     (srcA srcB : SourceDepositDataRootInput)
     (hMismatch : sourceAnchor srcA ≠ sourceAnchor srcB) :
@@ -258,7 +304,10 @@ the new `GIndex.concat` coupling. `ComposedSszInput.rhs`'s index is pinned to
 `sourceWitness input.src`'s slot (`.clValidatorVerifier`, value 2); the slot
 for any other operation is a different value, so it can never equal
 `(sourceWitness input.src).index.value` and the parent's `rhs`-derivation
-could not have produced it from that other operation's index. -/
+could not have produced it from that other operation's index. This is a bare
+constant inequality about the two slots; the same crossing stated as a
+negation of the parent's own conclusion predicate is
+`crossed_witness_kill_line_refutes_parent`. -/
 theorem inconsistent_operation_index_kill_line (src : SourceDepositDataRootInput) :
     (Ssz.operationIndex .clProofVerifier).value ≠ (sourceWitness src).index.value := by
   show (Ssz.operationIndex .clProofVerifier).value ≠
