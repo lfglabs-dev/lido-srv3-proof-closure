@@ -73,4 +73,28 @@ example :
     (allocate 1 (word 64) (word 1) (word 10) (word 100) (word 100) true).run before =
       .revert "INJECTED_AFTER_WRITES" before := by rfl
 
+
+/-- Kill-line mutant for `router_require_post_condition`: two validators each
+independently within their 20-gwei limits, but sum 20 > maxTopUpPerBlockGwei 10.
+If the sum `require` is removed the parent post-condition is false. -/
+example :
+    let cfg : LidoSRv3.Audit.Guarantees.PTopup2.TopupConfig :=
+      { targetBalanceGwei := 32, minTopUpGwei := 1,
+        maxTopUpPerBlockGwei := 10, maxValidatorsPerCall := 100,
+        moduleAllocationLimitGwei := 100, maxRootAge := 0 }
+    let validators : List LidoSRv3.Audit.Guarantees.PTopup2.Validator :=
+      [{ pubkey := ⟨#[1]⟩, index := 0, wc := 2, activated := true,
+         slashed := false, exiting := false,
+         effectiveBalanceGwei := 12, pendingBalanceGwei := 0 },
+       { pubkey := ⟨#[2]⟩, index := 1, wc := 2, activated := true,
+         slashed := false, exiting := false,
+         effectiveBalanceGwei := 12, pendingBalanceGwei := 0 }]
+    let limits := validators.map (fun v =>
+      LidoSRv3.Audit.Guarantees.PTopup2.evaluated_topup_limit v cfg)
+    let alloc := [10, 10]
+    let share := 100
+    limits = [20, 20] ∧
+    alloc[0]! ≤ limits[0]! ∧ alloc[1]! ≤ limits[1]! ∧
+    ¬ (alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei) := by native_decide
+
 end LidoSRv3.Tests.Topup2DistributionTxMutants

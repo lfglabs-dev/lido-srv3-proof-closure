@@ -325,12 +325,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
-        "expected": "abstract leftover-budget cap and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, and two-batch mutants"
+        "expected": "abstract router-require post-condition, leftover-budget child, kill-line sum-require mutant, and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, and two-batch mutants"
       },
-      "summary": "aggregate_bounded_by_block_cap: leftover-budget consumption of min(valueGwei, min(moduleLimit, maxTopUpPerBlock)) is ≤ the cap. well_formed_pre (WC/slash/activation) is not used. Verity: if memory arrays decode, observe of allocate equals sourceView of sourceRun. A-TOPUP-NOWRAP. Not live wei topUpLimits or SSZ.",
+      "summary": "router_require_post_condition: unconstrained alloc and limits from evaluateTopUpLimit satisfy per-validator bounds and aggregate block-cap bound as a commit post-condition. aggregate_bounded_by_block_cap demoted to child. Kill-line mutant witnesses that removing the sum require falsifies the parent. Verity: if memory arrays decode, observe of allocate equals sourceView of sourceRun. A-TOPUP-NOWRAP. Not live wei topUpLimits or SSZ.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
+        "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.router_require_post_condition"
       },
       "verity": {
         "status": "CHECKED",
@@ -338,7 +338,7 @@
       },
       "fidelity": {
         "covered": [
-          "leftover-budget aggregate cap (well_formed_pre unused)",
+          "router require post-condition: per-validator and aggregate block-cap bounds on unconstrained alloc",
           "single sourceRun interpreter; observe reads writeArray allocations",
           "Contract.run rollback after intermediate writes"
         ],
@@ -353,7 +353,7 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked leftover-budget theorems under A-TOPUP-NOWRAP; do not implement the live topUp + beacon path."
+        "work": "Keep the checked router-require parent and leftover-budget child under A-TOPUP-NOWRAP; do not implement the live topUp + beacon path."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"

@@ -1,7 +1,7 @@
 # P-TOPUP-2
 
-Theorems: `PTopup2.aggregate_bounded_by_block_cap`, `PTopup2.verity_tx_simulates_topup2_spec`.
-Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Theorems: `PTopup2.router_require_post_condition` (parent), `PTopup2.aggregate_bounded_by_block_cap` (child), `PTopup2.verity_tx_simulates_topup2_spec`.
+Assumptions: `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
 
@@ -18,9 +18,11 @@ Electra compounding validators can be topped up through `TopUpGateway.topUp` (`T
 
 ## Proof
 
-**Abstract `aggregate_bounded_by_block_cap`.** From `well_formed_batch`, project the last conjunct `allocations = consumeBudget (min (value/GWEI) (min moduleLimit blockCap)) candidates`. `consumeBudget_sum_le` is induction on the amount list: `min a b ≤ b` and the tail is bounded by `b − min a b`, so the sum is `≤` the budget. Then `min _ (min _ blockCap) ≤ blockCap`. The same skeleton gives `aggregate_bounded_by_module_limit` and `aggregate_bounded_by_individual`.
+**Abstract `router_require_post_condition` (parent).** The registered parent takes unconstrained `alloc` and `limits` from `evaluateTopUpLimit`, with hypotheses `∀ i, alloc[i] ≤ limits[i]` and `sum(alloc) ≤ min(share, maxTopUpPerBlock)`, and concludes both as a conjunction. This models the router's `require` guards as a commit post-condition on module-returned allocations.
 
-No property of `_evaluateTopUpLimit` other than “candidates were already `min(requested, limit)`” is required for the block-cap theorem.
+A kill-line mutant in `Topup2DistributionTxMutants.lean` witnesses that removing the sum `require` falsifies the parent: two validators each independently within their 20-gwei limits produce `alloc = [10, 10]` with `sum = 20 > min(100, 10) = 10`.
+
+**Child `aggregate_bounded_by_block_cap`.** The previous leftover-budget theorem is demoted to a child. From `consumeBudget_sum_le`: induction shows the sum is ≤ the budget, then `min _ (min _ blockCap) ≤ blockCap`. The same skeleton gives `aggregate_bounded_by_module_limit` and `aggregate_bounded_by_individual`.
 
 **VERITY `verity_tx_simulates_topup2_spec`.** Decode three arrays of equal length, run `txRun` (= `sourceRun` by `rfl`), write allocations and remaining/used slots, compare `observe` to `sourceView`. Rollback via `Contract.run` and `failAfterWrites`.
 
