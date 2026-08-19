@@ -25,11 +25,15 @@ the two callers swapped.  Admission compares only success/failure.  A successful
 post-state may contain the caller (for example as publisher or refund recipient),
 so post-states are compared only after applying the same address swap.
 
-Singleton-actor functions are excluded from address-equivariance; they are
-covered by authentication-integrity properties.  In particular this excludes
+Singleton-actor functions are outside address-equivariance in principle; they
+are covered by authentication-integrity properties.  In particular
 `WithdrawalVault.withdrawWithdrawals`, `addWithdrawalRequests`, and
 `addConsolidationRequests`, whose callers must respectively be Lido,
-TriggerableWithdrawalsGateway, and ConsolidationGateway.
+TriggerableWithdrawalsGateway, and ConsolidationGateway, are simply not among
+the modeled entrypoints.  The exclusion is not a premise of the theorems
+below: `singletonActorEntryPoint` is `False` for every modeled `EntryPoint`
+(`not_singleton_actor_entry_point`), so there is no modeled singleton-actor
+entrypoint to exclude and the parent carries no such hypothesis.
 -/
 
 /-- A bijective rename which swaps two callers and fixes every other address. -/

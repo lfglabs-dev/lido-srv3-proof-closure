@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: fbd80bbab57ce4e4f696f51253a931255da4414e
+validated-tree: c482e4bcef650df920f38d5b10f9214307419a39
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -2986,6 +2986,83 @@ P-ALLOC-2 explicit-∀ kill-line retarget and named headroom kill-line (2026-08-
 - Authored in the isolated git worktree `/home/ubuntu/wt/palloc2` on branch
   `cursor/wave6-palloc2-4b38`; no other in-flight branch's files are touched
   by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+
+Wave 6: P-ALLOC-1/P-ADDRESS-1 documentation cleanup (2026-08-19)
+----------------------------------------------------------------
+
+- Nit 1 (P-ALLOC-1 YAML summary oxymoron): the row's `summary` said the
+  demoted `active_capacity_bounded` was "registered separately as an
+  unregistered child". Reworded to "kept as an explicit unregistered child
+  rather than folded into the parent".
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ALLOC-1"]` recomputed to
+  `b0383f71a63a7cb3ad8037e3a6ee0786f2770c3c69091ff467001c34a2058cca`;
+  views regenerated (`audit/ROADMAP.md` / `audit/STATUS.md` /
+  `audit/REPRODUCE.md` content unchanged -- the views do not embed the
+  summary). No other YAML row touched; the P-ADDRESS-1 row and its detail
+  sha are unchanged.
+- Nit 2 (P-ALLOC-1 report drift vs `LidoSRv3/Audit/Verity/AllocationTx.lean`,
+  ~203 lines): issue 18 quoted the YAML headline "anti-concentration /
+  anti-over-allocation bound", a phrase no longer present in the row; the
+  quote is now marked historical. Issues 2 and 12 and the Proof section
+  described the deleted tx-side copies `txBindOne` / `txFirstLoop` /
+  `txAllocationEntry?` / `txBindOne_eq_sourceBindOne` as live; those
+  discussions are marked historical and updated to the current shape
+  (`allocate` rebinds via the shared `sourceBindAll`; `sourceExecute` calls
+  `AllocCapacity.firstLoop` / `secondLoop` directly,
+  `AllocationTx.lean:87-91`). Stale line cites fixed after verification
+  against the file: issue 13's `allocate` cite `275-278` became `107-120`
+  (and the deleted `txBindAll` became `sourceBindAll`, `:83-84`); issue
+  12's loop cite `124-138` is noted as now holding `Status` / `View` /
+  `observe`.
+- Nit 3 (P-ADDRESS-1 docstring):
+  `LidoSRv3/Audit/Source/AddressCorrespondence.lean`'s
+  `singletonActorEntryPoint` docstring claimed the predicate "is carried
+  explicitly on the parent theorem" -- false since wave 4/5. The docstring
+  now records that the parent deliberately omits it: the predicate is
+  provably `False` for every `EntryPoint`
+  (`not_singleton_actor_entry_point`), so requiring its negation adds no
+  content.
+- Nit 4 (P-ADDRESS-1 module header): `LidoSRv3/Audit/Guarantees/PAddress1.lean`'s
+  header narrated singleton-actor exclusion as if modeled; Lean only has
+  `singletonActorEntryPoint := False`. The header now states the three
+  singleton-actor functions are simply not among the modeled entrypoints
+  and that the exclusion is not a premise of the theorems below.
+- Nit 5 (P-ADDRESS-1 report): the wave-4 resolution block in
+  `report/P-ADDRESS-1.md` still spoke of the YAML describing a live
+  `hScope` premise; a one-line pointer now marks the block historical
+  (wave 5 widened the scope to all four modeled writers, making `hScope`
+  vacuous, and retired the premise together with that YAML description).
+- Nit 6 (Trust.lean checklist): the `#print axioms` list printed only the
+  admission-projection sibling
+  `Tests.AddressSourceMutants.fixed_owner_gate_not_admission_equivariant`;
+  it now also prints
+  `Tests.AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent`
+  (the parent-shaped kill-line; existing line kept). Build output:
+  `'LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent'
+  depends on axioms: [propext]` -- inside the allowed `[propext,
+  Classical.choice, Quot.sound]` boundary; no `Lean.ofReduceBool`, no
+  `sorryAx`. `scripts/check_public_claim_surfaces.py` does not cover
+  Trust.lean (its CLAIMS map covers only the P-DEPOSIT-1 / P-TOPUP-1
+  guarantee modules), so no allowlist update was needed.
+- No theorem statement changed; no test mutant changed; no YAML row other
+  than the P-ALLOC-1 summary wording changed.
+- Gates: `lake build LidoSRv3` exit 0 (1395 jobs); `python3
+  scripts/audit_metadata.py check`; `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`; `python3
+  scripts/check_public_claim_surfaces.py`; `python3
+  scripts/test_public_claim_surfaces.py`; `python3
+  scripts/test_verity_provenance.py`; `bash
+  scripts/check_provenance_guards.sh`; `bash
+  scripts/check_no_python_evidence.sh`; `bash
+  scripts/test_check_no_python_evidence.sh`; and `make test`: exit 0.
+- Authored in the isolated git worktree `/home/ubuntu/wt/wave6cleanup` on
+  branch `cursor/wave6-doc-cleanup-4b38`; only the two guarantees'
+  prose/docstring files, the P-ALLOC-1 YAML row, the expected detail sha in
+  `scripts/audit_metadata.py`, the Trust.lean checklist, and this receipt
+  are touched by this diff.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
 
