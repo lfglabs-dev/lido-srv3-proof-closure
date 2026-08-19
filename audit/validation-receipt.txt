@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 73c2b29a88a39be9534f0278e79c8d93be738cd0
+validated-tree: 5c958355281d958da7f5f3f088512bebfe1cdbe4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -2311,5 +2311,72 @@ Wave 4: P-CONSOLIDATION-1 kill-line scope remediation (2026-08-19)
 - Authored in the isolated git worktree `/home/ubuntu/wt/pdeposit1` on
   branch `cursor/wave4-pdeposit1-4b38`; no other in-flight branch's files
   are touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+Wave 5: P-RESERVE-1 guard-liveness kill-line (2026-08-19)
+---------------------------------------------------------
+
+- Defect (found in wave-5 review): the registered parent
+  `PReserve1.source_spend_preserves_withdrawal_reserve` concludes three
+  conjuncts -- (1) `scopedWithdrawGuards inputs`, (2)
+  `withdrawalPartitionSpendInvariant before after amount`, (3)
+  live-reserve invariance -- but conjunct (1) is proved by branch
+  inversion on the model's own guard chain and was exercised by no
+  kill-line: the wave-4 partition-spend mutant preserves the guards, so
+  conjunct (1) holds trivially on its witness (`allowed = ⟨true,true⟩`).
+  A conjunct no connected mutant falsifies is dilution (criterion 1
+  residual).
+- Fix (the P-TOPUP-1 pattern -- a guard-liveness conjunct backed by a
+  guard-drop kill-line -- not demotion; the conjunct is real falsifiable
+  content about the model's gating): new model mutant
+  `mutantWithdrawNoCanDeposit` in `LidoSRv3/Tests/ReserveMutants.lean`, a
+  guard-for-guard copy of `modelWithdrawDepositableEther` with ONLY the
+  `canDeposit` check dropped (`authorizedRouter`, the nonzero-amount
+  check, and the honest `spendDepositableEther` transition unchanged),
+  and `guard_drop_kill_line_refutes_parent`: the negation of the
+  parent's full predicate shape (all five binders, `freshQueueCache
+  before live` retained, same three-conjunct conclusion) with the mutant
+  substituted. Witness `guard_drop_mutant_witness`: inputs
+  `⟨false, true⟩`, nonzero amount, the standard `vector`, `live = 50`
+  (freshness holds by `rfl`); the mutant commits and
+  `scopedWithdrawGuards` is false (`canDeposit = false`), so the parent's
+  conjunction fails at a premise-satisfying witness. Proof shape:
+  `intro`, instantiate, `absurd` off the first conjunct.
+- Kill-line division of labor, now explicit in every docstring (the
+  parent's docstring, both ReserveMutants section headers, and the
+  `staleQueueCacheKillLine` scope note):
+  `guard_drop_kill_line_refutes_parent` kills conjunct (1)
+  (`scopedWithdrawGuards` guard liveness);
+  `partition_spend_mutant_kill_line_refutes_parent` (theorem unchanged)
+  kills conjuncts (2)-(3) with freshness retained;
+  `staleQueueCacheKillLine_holds` and
+  `stale_queue_cache_mutant_counterexample` remain premise-necessity
+  evidence for `freshQueueCache`.
+- `audit/guarantees.yaml`'s `P-RESERVE-1` row: `summary`,
+  `fidelity.covered`, and `reproduction.expected` now cite both
+  kill-lines and their division of labor; `abstract.theorem`,
+  `verity.theorem`, `classification`, and `assumptions` unchanged.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-RESERVE-1"]` recomputed;
+  `audit/REPRODUCE.md` regenerated (`STATUS.md` and `ROADMAP.md` are
+  unchanged by this row edit).
+- `report/P-RESERVE-1.md`: dated wave-5 section added; the header line
+  now cites both parent kill-lines.
+- No registered theorem statement is touched; no `sorry`/`admit`/
+  `native_decide` in the new proofs (`rfl`, `decide`, and the explicit
+  term `Bool.false_ne_true h.1` only).
+- `lake build LidoSRv3` and `lake build LidoSRv3.Tests.ReserveMutants`:
+  exit 0. `python3 scripts/audit_metadata.py check`, `PYTHONOPTIMIZE=1
+  python3 scripts/test_audit_metadata.py`, `python3
+  scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, `bash
+  scripts/test_check_no_python_evidence.sh`, and `make test`: exit 0.
+- Authored in the isolated git worktree `/home/ubuntu/wt/preserve1` on
+  branch `cursor/wave5-preserve1-4b38`; no other in-flight branch's
+  files are touched by this diff.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
