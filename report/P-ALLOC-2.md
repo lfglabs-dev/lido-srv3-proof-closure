@@ -1,6 +1,6 @@
 # P-ALLOC-2
 
-Theorems: `PAlloc2.selects_least_open_bucket`, `PAlloc2.verity_tx_simulates_min_first_distribution`.
+Theorems: `PAlloc2.proportional_step_correspondence_and_bounded` (parent), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`.
 Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.
 
 ## Intent
@@ -20,7 +20,9 @@ The guarantee is meant to say the selected bucket is a least-filled open bucket,
 
 ## Proof
 
-**Abstract `selects_least_open_bucket`.** Induction on the bucket list following the recursive definition of `MinFirst.candidate?` (scan from the right; on `allocation ≤ later.allocation` keep the left open bucket). Side lemmas: the candidate is a member, is open, and a `none` result means no open bucket. The `≤` conclusion is exactly the selection rule.
+**Abstract `proportional_step_correspondence_and_bounded` (parent).** The registered parent is the pinned-source *proportional* step, not the +1 model. It composes two already-checked facts: `full_candidate_correspondence` (given `RowsCorrespond`, the Model and Source candidate scans select the same bucket) and `source_amount_totality` (a successful checked amount is positive, ≤ the remaining demand, and keeps the candidate within capacity, i.e. never over headroom). Two kill-line mutants in `MinFirstDistributionTxMutants.lean` witness both conjuncts: a mutant that picks the first open row instead of the least-allocation row disagrees with `Source.candidate?`, and a mutant `checkedAmount` that skips the final capacity-headroom clamp produces an amount that pushes a candidate past its capacity.
+
+**Child `selects_least_open_bucket`.** The previous parent is demoted to a child of the +1 model. Induction on the bucket list following the recursive definition of `MinFirst.candidate?` (scan from the right; on `allocation ≤ later.allocation` keep the left open bucket). Side lemmas: the candidate is a member, is open, and a `none` result means no open bucket. The `≤` conclusion is exactly the selection rule.
 
 **Amount / SOURCE slice.** `source_amount_correspondence` is a calculation: if checked `uint256` arithmetic succeeds and `source.length < 2^256`, the Nat amount equals the word. `source_pinned_expression_shape` shows the audit’s distributed-`min` form equals the source’s “subtract once after `Math256.min`” form, by case split on the `min` arms, for any open best candidate.
 
