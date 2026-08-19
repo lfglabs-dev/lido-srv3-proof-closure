@@ -1,11 +1,107 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6bdae32000ea0ebb1e120cb71c451c4107bfbeeb
+validated-tree: e7b7a72757aa8e0868e043b137bb21fc993d1c28
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Wave 6: P-SSZ-1 strip to the mutant-exercised traversal conjunct (2026-08-19)
+------------------------------------------------------------------------------
+
+- Defect (wave-6 review, coordinator spot-verified): the wave-4 strip
+  (PR #140) was incomplete. The registered parent
+  `LidoSRv3/Audit/Guarantees/PSsz1.lean`'s `composed_ssz_encoding`
+  concluded `composedEncodingOk` = `composedEncodingOkWithCombine
+  sourceCombine`, whose six conjunct groups still registered definitional
+  facts and restated premises: conjunct 1 was the Bool->Prop unpacking of
+  the parent's own `hBind` premise (`Ssz.structural_witness_binding_sound`);
+  conjunct 3 was `rfl` (`source_concat_matches_spec`); conjunct 4 was a
+  list-literal length (`digest_preimages_length`, `simp
+  [digestPreimages]`); conjunct 5 unfolded `runVerification`'s own
+  definition (`accepted_iff_root_matches`, `simp [runVerification]`);
+  conjunct 6 reassembled the parent's own width premises
+  (`srcInputs_exactWidths`, the amount width definitional from
+  `toLittleEndian64`'s fixed `List.range 8`). Meanwhile the YAML row and
+  `report/P-SSZ-1.md` claimed every registered conjunct was
+  "non-definitional" (scope criterion failure); the report's Assumptions
+  header omitted `A-YUL-INTERFACE` (YAML and STATUS.md included it); issue
+  #23's body said "not on this row" while the resolution table recorded
+  closed-by-attaching; and `crossed_witness_kill_line_refutes_parent` was
+  honestly relabeled in prose as NOT a parent kill-line but its name still
+  said `kill_line_refutes_parent`.
+- Lean fix: `composedEncodingOkWithCombine` (and hence the registered
+  `composedEncodingOk`) is stripped to the single mutant-exercised conjunct
+  -- the derived witness's traversal to `sourceNode input.src` under the
+  source-combine family, the one conjunct the `sourceCombineSwapped` model
+  mutant breaks. The registered parent's statement shape (binders, the five
+  premises, `hBind`) is unchanged; its proof projects the registered
+  conjunct out of the new unregistered bundle, so every premise remains
+  consumed (no linter-flagged inert premises). The demoted conjuncts remain
+  proved as independent children and are re-bundled on the same one-object
+  input as the explicitly UNREGISTERED `composedEncodingOkFull`, proved by
+  `composed_ssz_encoding_full` from the pieces; `composedEncodingOk`'s
+  docstring records what was demoted and why (definitional /
+  premise-restated content is not registered claim content). Consumers
+  unaffected: `verity_tx_simulates_ssz_encoding` and
+  `Verity/SszEncodingTx.lean`'s `structuralOk_implies_conjunct` use the
+  independent children directly;
+  `Tests/SszRegression.composedExample_satisfies_composed_ssz_encoding`
+  infers its type from the parent's conclusion and stays in lockstep.
+- Kill-line repair: `swapped_combine_kill_line_refutes_parent` keeps its
+  exact statement (it already negated the mutant-substituted parent in the
+  registered parent's own quantifier/premise/`hBind` shape); after the
+  strip the mutant-substituted conclusion IS the traversal conjunct, so the
+  proof uses it directly (`unfold` instead of the four-way `obtain`),
+  still closing via `traverseBranch_sourceCombineSwapped_eq` and the
+  nonzero public-key anchor (`swapped_traverse_ne_structuralEncoding`) at
+  the hypothesis-satisfying witness `swappedCombineKillInput`.
+- Rename: `crossed_witness_kill_line_refutes_parent` ->
+  `composedEncodingOkFull_not_trivial_crossed_witness`, honestly retargeted
+  at the unregistered full bundle: after the strip the registered predicate
+  mentions neither `operation` nor `combine` (the honest traversal is
+  hypothesis-free), so no statement of the form `not composedEncodingOk ...`
+  is provable and the crossed-operation discrimination lives only in the
+  bundle's first structural conjunct. The docstring keeps the honest
+  "not a parent kill-line" labeling (`hBind` fails at the crossed point, so
+  the parent implication is vacuous there). References updated:
+  `LidoSRv3/Audit/Trust.lean` `#print axioms`, the YAML row, and the
+  report.
+- Metadata: `audit/guarantees.yaml`'s P-SSZ-1 `summary`,
+  `fidelity.covered`, and `reproduction.expected` rewritten for the
+  stripped registered conclusion with the demoted unregistered children
+  named; `assumptions` unchanged (`A-YUL-INTERFACE` stays);
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-SSZ-1"]` recomputed to
+  `92da63e53e07ec36f225949c6aba62c6a91347e908663109bd24acfc62f50587`;
+  views regenerated (`audit/REPRODUCE.md` only; `STATUS.md`/`ROADMAP.md`
+  byte-identical). `scripts/check_public_claim_surfaces.py` covers only
+  P-DEPOSIT-1/P-TOPUP-1 and needed no surface update; verified still
+  passing. `report/P-SSZ-1.md`: `A-YUL-INTERFACE` added to the Assumptions
+  header; issue #23's body marked superseded (the resolution table already
+  recorded the attachment); the wave-4 "all non-definitional" claims
+  amended; a dated wave-6 section added.
+- Gates: `lake build LidoSRv3` exit 0 (1395 jobs); `lake build
+  LidoSRv3.Tests.SszRegression LidoSRv3.Tests.SszEncodingTxMutants
+  LidoSRv3.Audit.Verity.Tests.SszTxSimulation` exit 0; `#print axioms`
+  reports only `[propext, Quot.sound]` for the parent, the kill-line, and
+  the renamed witness -- no `sorryAx`, no `Lean.ofReduceBool`; no
+  `sorry`/`admit`/`native_decide` added or touched. `python3
+  scripts/audit_metadata.py check` (11 canonical guarantees plus 14
+  subordinate rows), `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`, `python3
+  scripts/check_public_claim_surfaces.py`, `python3
+  scripts/test_public_claim_surfaces.py`, `python3
+  scripts/test_verity_provenance.py`, `bash
+  scripts/check_provenance_guards.sh`, `bash
+  scripts/check_no_python_evidence.sh`, `bash
+  scripts/test_check_no_python_evidence.sh`, and `make test`: exit 0.
+- Authored in the isolated git worktree `/home/ubuntu/wt/pssz1` on branch
+  `cursor/wave6-pssz1-4b38`; no other in-flight branch's files are touched
+  by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
 
 P-CONSOLIDATION-1 unused-hypothesis remediation (2026-08-19)
 --------------------------------------------------------------
