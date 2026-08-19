@@ -93,9 +93,8 @@ example :
       LidoSRv3.Audit.Guarantees.PTopup2.evaluated_topup_limit v cfg)
     let alloc := [10, 10]
     let share := 100
-    -- Each alloc[i] ≤ limits[i] (both 10 ≤ 20), but sum 20 > min(100,10) = 10.
-    -- This witnesses that removing the sum require falsifies the parent.
-    (∀ i : Fin alloc.length, alloc[i] ≤ limits[i.val]'(by omega)) ∧
+    limits = [20, 20] ∧
+    alloc[0]! ≤ limits[0]! ∧ alloc[1]! ≤ limits[1]! ∧
     ¬ (alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei) := by native_decide
 
 end LidoSRv3.Tests.Topup2DistributionTxMutants
