@@ -7,7 +7,7 @@ Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 Once per frame, `AccountingOracle.submitReportData` pushes a per-module validator-balance vector through `StakingRouter.reportValidatorBalancesByStakingModule`, then `Accounting.handleOracleReport` mints fee shares and only afterwards calls `reportRewardsMinted`. Rewards must be computed from the *just-written* balance snapshot, not from a stale or post-mint view. Getting that order wrong would mint fees against the wrong module weights.
 
-The guarantee is meant to say: on an accepted report that mints a positive fee, the observable trace is exactly `balancesWritten → accountingCalled → rewardsRead(same balances) → rewardsMinted`.
+The registered guarantee (`mint_after_read_discipline`) is the tick-order discipline: on every committed run of the real `handleOracleReport`, `0 < mintTick → readTick < mintTick` — the `rewardsReadSlot` tick is written strictly before any nonzero `rewardsMintedSlot` tick, read directly off the two raw tx-storage ticks rather than through `storedSteps`'s presence-only check. The earlier headline — on an accepted report that mints a positive fee, the observable trace is exactly `balancesWritten → accountingCalled → rewardsRead(same balances) → rewardsMinted` — is the demoted child `source_report_before_reward` (issue 1: constructor order of a literal four-step list, no kill-line of its own), not the registered claim.
 
 ## Modeling
 
@@ -77,7 +77,7 @@ doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`)
 | 1, 8, 10, 12 | A | Constructor `sourceTrace` / tx storage flags named honestly; issue 1's child is no longer the registered headline. |
 | 5 | B (partial) + A (residual) | `mint_after_read_discipline` (now the registered parent) / `mint_order_kill_line` catch a tick-travels-with-call-site reordering mutant; a reordering that keeps each literal pinned to its own slot remains an open, disclosed gap. |
 | 2 | A | `fullReportSucceeds` remains an unused parameter of the (now child) constructor theorem. |
-| 3 | A | `observe` still uses the input balance list; not claimed as a map readback. |
+| 3 | C | Fixed in PR #105: `observe` reads the persisted `writeArray` balances (`HandleOracleReportTx.lean:113–117`); a dedicated wrong-map-write mutant is still absent. |
 | 4, 6, 7, 11, 16, 17, 19 | scope | Membership, caller, role, fee computation, packing, `submitReportData` in `missing`. |
 | 9 | A | Child abstract theorem is the positive-fee case. |
 | 13, 15, 18 | A | `ofNat` / empty / non-unique ids documented. |
@@ -94,12 +94,9 @@ doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`)
 
    *Scenario.* A report that passes `accept` (ids match, balances `≤ MAX_VALUE_GWEI`, uint64 sum OK) and then reverts in `collectRewardsAndProcessWithdrawals`. `hSuccess` can still be `True`; `source_report_before_reward` produces the four-step “success” trace. The later revert — and any prefix effects — are outside the theorem.
 
-3. **`observe` does not read the written balance map.**
-   `HandleOracleReportTx.observe` (`:112–116`) puts `i.balancesGwei` into the `View`, not `state.readMapUint moduleBalancesSlot _`.
+3. **`observe` did not read the written balance map.** **Resolved** (observe-from-storage repair, PR #105): `HandleOracleReportTx.observe` (`:113–117`) now builds the `View` from `(state.readArray moduleBalancesSlot).map (·.val)` — the persisted `writeArray` balances — plus the stored total and `storedSteps`, not from `i.balancesGwei`. Historical statement: `observe` put `i.balancesGwei` into the `View`, so a mutant that replaced `writeAll` with a no-op (or wrote `0` for every id) while keeping the flag slots and the checked total still reported `[10, 20]` from the input and `verity_tx_simulates_oracle_report` still held. After the fix such a mutant is caught at the observed balance column.
 
-   *Counterexample mutant that the headline theorem cannot kill.* Replace `writeAll` with a no-op (or write `0` for every id). Keep the flag slots and `txCheckedTotal`. `observe` still reports `[10, 20]` from the input. `verity_tx_simulates_oracle_report` still holds. The YAML “persists module balances through writeMapUint” is not an observed fact.
-
-   The mutants file does *not* contain a wrong-map-write mutant. It has a bypass-order-guard mutant and an injected-after-writes hook — both about control, not about map contents.
+   Residual: the mutants file still does *not* contain a dedicated wrong-map-write mutant. It has a bypass-order-guard mutant and an injected-after-writes hook — both about control, not about map contents — though the two-batch chaining vector does exercise the array readback.
 
 4. **Rewards are not read from the snapshot.**
    `rewardsRead balances` carries the same input list that `balancesWritten` carried. There is no second read of storage after a hypothetical intervening write.
