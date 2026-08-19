@@ -14,6 +14,7 @@ Lido SRv3's `StakingRouter.deposit` pulls ether from Lido and pushes it to the b
 
 - `A-SOURCE-SHAPED`: the Lean `SourceDepositConfig` / `SourceDepositInput` records are handwritten from the pinned Solidity spans, not extracted from an AST. Arithmetic is unbounded `Nat`; no overflow reasoning is performed.
 - `A-ABSTRACT-TX`: the abstract-transaction vocabulary (`TxObservation`) the demoted rollback child is stated against; the EVM plane stays open.
+- Facade plane list (wave-5 note): `PDeposit1.guarantee.checkedLayers` still lists `.abstractTx` even though the only abstract-transaction conjunct was demoted in wave 4 (PR #138) to the unregistered child `revert_restores_state_value_and_logs`. The plane list is pinned by `scripts/check_public_claim_surfaces.py` (the `P-DEPOSIT-1` `layers` entry, enforced by regex against the `def guarantee` line of `PDeposit1.lean`) and by the checked-layers example in `LidoSRv3/Audit/AllGuarantees.lean`, so the facade is left unchanged: `.abstractTx` there records that the module still states the (demoted) abstract-tx child, not that any registered conjunct lives on that plane.
 - `A-VERITY-SCAFFOLD`: `Contract.run` is a non-certified Verity 4.31 interpreter, not compiled bytecode.
 - `LinksSource` bridges the pinned-source model to the executable transaction's inputs. It is data-only and says nothing about the post-state.
 - `Preconditions` are the transaction's own executable guards.
