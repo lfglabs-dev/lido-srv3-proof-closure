@@ -113,7 +113,8 @@ theorem verity_tx_revert_restores_snapshot
 target then source concat produces a different observation than the
 canonical source then target. One pair suffices. -/
 theorem packing_order_kills_swapped_concat
-    (target fee msgValue : Word) (r : Request) (h : r.source ≠ r.target) :
+    (target fee msgValue : SolidityConsolidation.Word) (r : Request)
+    (h : r.source ≠ r.target) :
     commitObservables target fee msgValue [r] ≠
       swappedCommitObservables target fee msgValue [r] := by
   exact commitObservables_ne_swapped target fee msgValue [r] rfl
