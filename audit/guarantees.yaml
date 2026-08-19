@@ -318,9 +318,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
-        "expected": "in-scope universal abstract/source admission and post-state equivariance (claimWithdrawalsTo excluded by hypothesis case-split), fixed-owner-gate kill-line mutant of the real admitted/run/renameInput, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
+        "expected": "universal abstract/source admission and post-state equivariance over all four modeled permissionless writers (claimWithdrawalsTo in scope since wave 5), the parent-shaped fixed-owner-gate kill-line fixed_owner_gate_kill_line_refutes_parent on a mutant of the real admitted/run/renameInput, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
       },
-      "summary": "universal_address_writer_equivariance: two nonzero callers on an input whose entrypoint is in scope have the same source-shaped admission bit, and a successful post-state renames under the swap; addressEquivarianceEntryScope is a genuine used premise, not a decorative binder (the proof case-splits on inp.entryPoint and eliminates the claimWithdrawalsTo branch from hScope). On requestWithdrawals/unwrap, admission is pause plus caller balance/allowance only (no owner gate, no fixed-owner gate); fixed_owner_gate_not_admission_equivariant mutates this file's own admitted/run/renameInput and refutes equivariance if that gate is added (the prior AddressAdmission toy kill-line was disconnected from this parent and is retained only for the denote-admission subordinate row). Verity composition adds Contract.run observe = sourceAddressView and snapshot rollback. claimWithdrawalsTo deferred. Not WithdrawalQueue.claimWithdrawalsTo.",
+      "summary": "universal_address_writer_equivariance: two nonzero callers have the same source-shaped admission bit, and a successful post-state renames under the swap, unconditionally over the four modeled permissionless writers. Since wave 5 the scope covers claimWithdrawalsTo too -- its request-owner gate (caller = requestOwner) is caller-relative and renames with the caller (requestOwner is renamed by renameInput) -- so addressEquivarianceEntryScope is total (addressEquivarianceEntryScope_total) and the wave-4 scope premise, now vacuous, is no longer carried by the registered parent (the source lemmas hold for every EntryPoint via run_rename). On requestWithdrawals/unwrap, admission is pause plus caller balance/allowance only (no owner gate, no fixed-owner gate); fixed_owner_gate_kill_line_refutes_parent negates the parent's exact predicate shape on a mutant of this file's own admitted/run/renameInput, falsifying BOTH the admission-bit and post-state conjuncts on one requestWithdrawals witness (fixed_owner_gate_not_admission_equivariant is the weaker admission-projection sibling; the prior AddressAdmission toy kill-line was disconnected from this parent and is retained only for the denote-admission subordinate row). Verity composition adds Contract.run observe = sourceAddressView and snapshot rollback. claimWithdrawalsTo is covered on the same pinned single-item reading as the other writers, not the batch WithdrawalQueue.claimWithdrawalsTo.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
@@ -331,22 +331,21 @@
       },
       "fidelity": {
         "covered": [
-          "in-scope universal abstract and pinned-source admission/post-state equivariance, with claimWithdrawalsTo excluded by a case-split hypothesis rather than an unused premise",
+          "universal abstract and pinned-source admission/post-state equivariance over all four modeled permissionless writers, unconditional since wave 5 (claimWithdrawalsTo's request-owner gate renames with the caller; the total scope made the wave-4 premise vacuous and it was dropped)",
           "pause/balance/allowance permissionless admission on requestWithdrawals and unwrap",
-          "fixed-owner-gate kill-line mutant of the real admitted/run/renameInput refuting admission equivariance (connected to the registered parent, not a disconnected toy FunctionSpec)",
+          "parent-shaped fixed-owner-gate kill-line fixed_owner_gate_kill_line_refutes_parent negating the registered parent's exact predicate shape on a mutant of the real admitted/run/renameInput (both conclusion conjuncts falsified on one in-scope requestWithdrawals witness); fixed_owner_gate_not_admission_equivariant retained as admission-projection sibling evidence",
           "four storage-writing Contract.run entrypoints and behavioral source correspondence on entrypoint-specific address-write observables",
           "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
         ],
         "missing": [
-          "WithdrawalQueue.claimWithdrawalsTo request-owner admission and post-state equivariance",
           "singleton-actor exclusion is not modeled: singletonActorEntryPoint is False for every EntryPoint in this model, so the parent carries no such premise"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked scoped parent and Verity composition; close claimWithdrawalsTo without widening to singleton-actor entrypoints."
+        "work": "Keep the checked unconditional four-writer parent and Verity composition; do not widen to singleton-actor entrypoints (none are modeled)."
       },
-      "next_gate": "Keep the checked scoped parent; close claimWithdrawalsTo fidelity without widening the claim.",
+      "next_gate": "Keep the checked unconditional parent; close the remaining singleton-actor modeling gap without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
