@@ -18,8 +18,8 @@ import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 # Canonical minimal-11 public facade
 
 `all` is deliberately the complete public surface. Its checked layers cover
-the existing MODEL, ALG, SOURCE, and bounded Verity-transaction evidence; empty entries are
-intentional blockers, not omitted proofs.
+the existing abstract model, Verity Lean library, and Verity Executable
+Contract evidence; empty entries are intentional blockers, not omitted proofs.
 -/
 
 namespace LidoSRv3.Audit.Guarantees

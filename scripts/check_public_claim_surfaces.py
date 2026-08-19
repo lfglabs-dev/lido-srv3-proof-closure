@@ -245,8 +245,8 @@ def check(root: Path) -> None:
         if declarations != expected["declarations"]:
             fail(f"{lean_path}: public declarations differ from the structural allowlist")
 
-    if "a behaviorally faithful Verity model with a checked refinement theorem" not in readme:
-        fail("README: missing the faithful-Verity assurance objective")
+    if "Verity Executable Contract" not in readme:
+        fail("README: missing the Verity Executable Contract assurance objective")
 
 
 def main() -> int:

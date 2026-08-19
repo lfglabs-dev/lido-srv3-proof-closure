@@ -9,10 +9,10 @@ namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
 def guarantee : Guarantee := ⟨.pAlloc2, [.algorithm, .source, .verityTx]⟩
 
-/-- Headline composed closure theorem for P-ALLOC-2. The executable
-memory-array transaction scans, counts, bounds, divides, mutates and repeats
-the pinned MinFirst loop, and its committed/reverted observables are exactly
-the pinned-source loop observables. -/
+/-- If the two memory arrays decode to `buckets`/`capacities`, then
+`observe` of `allocate` (persisted bucket array plus totals) equals
+`sourceView` of the same `allocateToBestCandidate` loop.
+Not the +1 `selects_least_open_bucket` model. -/
 theorem verity_tx_simulates_min_first_distribution
     (buckets capacities : List MinFirstAllocation.Source.Word)
     (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState)
@@ -28,12 +28,12 @@ theorem verity_tx_simulates_min_first_distribution
   Verity.MinFirstDistributionTx.verity_tx_simulates_pinned_source
     buckets capacities allocationSize state hBuckets hCapacities
 
-/--
-The executable MinFirst control rule selects an open bucket with no larger
-allocation than any other open input bucket. This is an ALG theorem for the
-handwritten `Nat` model; Solidity and EVM refinement remain open.
--/
+/-- If `candidate?` returns `selected` from the handwritten +1 `Nat` model,
+then every other *open* row has allocation ≥ `selected.allocation`.
+This is not the proportional `allocateToBestCandidate` transaction and
+not Solidity equivalence (`A-HANDWRITTEN-MINFIRST`). -/
 theorem selects_least_open_bucket
+    {rows : List MinFirst.Bucket} {selected other : MinFirst.Bucket}
     (h : MinFirst.candidate? rows = some selected)
     (hOther : other ∈ rows) (hOpen : other.open = true) :
     selected.allocation ≤ other.allocation := by

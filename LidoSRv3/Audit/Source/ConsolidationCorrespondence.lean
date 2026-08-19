@@ -146,7 +146,11 @@ theorem commitObservables_binds (target fee msgValue : Word)
 
 /-- A committed source run binds one CALL and one event per pair, pays exactly
 `msg.value`, and records `source ‖ target` as the memory payload. A revert
-exposes no prefix of those effects. -/
+exposes no prefix of those effects.
+
+`fee = 0` is not a revert: pinned `_requireExactFee` (`WithdrawalVaultEIP7685`
+123--127) is only `msg.value == count * fee`, so a gateway-authorized
+nonempty 48-byte batch with `fee = 0` and `msg.value = 0` commits. -/
 theorem source_consolidation_preserves_eligibility_value_atomicity
     (inputs : Inputs) :
     (∀ obs, sourceRun inputs = .committed obs →
@@ -198,8 +202,8 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
                                 requests.length * inputs.fee.val :=
                               beq_iff_eq.mp hFeeB
                             injection hobs with hobs
-                            exact ⟨requests, hZip, hEq, hPos, hValid, hBound,
-                              hFee, hobs.symm⟩
+                            exact ⟨requests, hZip, hEq, hPos, hValid,
+                              hBound, hFee, hobs.symm⟩
                         · cases hobs
                     · cases hobs
                 · cases hobs

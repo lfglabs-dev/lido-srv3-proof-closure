@@ -8,8 +8,13 @@ open LidoSRv3.Audit.SolidityReserve
 
 def guarantee : Guarantee := ⟨.pReserve1, [.model, .source, .verityTx]⟩
 
-/-- The source-shaped spend preserves the effective withdrawals-reserve
-partition while consuming only depositable ether. -/
+/-- Any committed `_spendDepositableEther` satisfies
+`withdrawalPartitionSpendInvariant`: the amount came from
+`depositsReserve + unreserved`, `buffered` is the checked subtraction,
+`storedDepositsReserve` follows the pinned `> amount ? − : 0` update, and
+`unfinalizedStETH` is unchanged. Lido's nonzero-amount and
+`buffered ≥ storedDepositsReserve` guards are not required for this
+formula — they are source call-site facts, not used here. -/
 theorem source_spend_preserves_withdrawal_reserve
     (before after : ReserveState) (amount : Word)
     (h : spendDepositableEther before amount = .committed after) :

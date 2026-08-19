@@ -192,7 +192,7 @@ def pathValue : EthPath → Nat
 
 /-- The Gateway's `InsufficientValue` guard; the other legs are unconditioned. -/
 def pathFunded : EthPath → Prop
-  | .consolidation t => consolidationFee t ≤ t.msgValue
+  | .consolidation t => 0 < t.msgValue ∧ consolidationFee t ≤ t.msgValue
   | .withdrawalRequests _ _ => True
   | .withdrawalsToLido _ => True
 
@@ -219,15 +219,18 @@ theorem refundMoves_approved (t : ConsolidationTx) :
     subst hm
     trivial
 
-/-- **Parent P-ETH-1.** On every ETH-bearing path of the inventory, provided the
-Gateway fee guard holds, no wei escapes to a lateral destination and the
-committed trace sums to exactly the value entering the path. -/
+/-- On every constructor of the modeled `EthPath` inventory
+(consolidation / withdrawalRequests / withdrawalsToLido), if `pathFunded`
+holds (`0 < msg.value` and `fee ≤ msg.value` on consolidation; `True` on
+the other two), every move is `parentApproved` (not `other`) and
+`totalAmount (pathTrace p) = pathValue p`. Not VaultHub, not
+`StakingVault.withdraw`, not a complete deployed ETH-site inventory. -/
 theorem eth_flow_parent (p : EthPath) (h : pathFunded p) :
     (∀ m ∈ pathTrace p, parentApproved m.destination) ∧
       totalAmount (pathTrace p) = pathValue p := by
   cases p with
   | consolidation t =>
-      have hFee : consolidationFee t ≤ t.msgValue := h
+      have hFee : consolidationFee t ≤ t.msgValue := h.2
       refine ⟨?_, ?_⟩
       · intro m hm
         rcases List.mem_append.mp hm with hm | hm
@@ -256,13 +259,14 @@ theorem eth_flow_parent (p : EthPath) (h : pathFunded p) :
 The composed transaction is stated in `LidoSRv3.Audit.Verity.PEth1CompositionTx`
 and re-exported here so the assurance contract can name a stable path. -/
 
-/-- **Verity plane P-ETH-1.** Recursive dispatch of the compiled
-`Bus → Gateway → Vault → (CONSOLIDATION_REQUEST | refund)` ensemble through
-external-call frames over one shared `MultiWorld`: the fee/refund split lands
-on the outcome observables, a rejecting request contract restores the entry
-world, the underfunded batch reverts inside the Gateway, ETH is conserved
-across every run, and the discovered call program replays identically as one
-atomic compiled multicall. -/
+/-- Registered Verity P-ETH-1 is the conjunction of five *numeral*
+witnesses, not a `∀` statement:
+* honest `(10,2,3)` → request 6, refund 4;
+* honest `(10,1,3)` → request 3, refund 7;
+* honest `(6,2,3)` → request 6, refund 0;
+* request-reject `(10,2,3)` restores the entry sheet;
+* underfunded `(10,4,3)` reverts in the Gateway;
+plus conservation of those runs and replay of `(10,2,3)`. -/
 theorem verity_tx_composes_value_flow_and_rollback :
     (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
         (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run

@@ -9,7 +9,12 @@ open LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 def guarantee : Guarantee := ⟨.pAccount1, [.model, .source, .verityTx]⟩
 
-/-- MODEL -> SOURCE: an accepted report has one balance snapshot for rewards. -/
+/-- If an independently supplied `fullReportSucceeds` premise lets
+`sourceTrace` return `some trace`, and fee shares are strictly positive,
+then that trace is exactly
+`[balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]`
+for one shared `b`. This is the constructor order of `successfulSteps`,
+not `submitReportData`. -/
 theorem source_report_before_reward
     (fullReportSucceeds :
       LidoSRv3.Audit.SolidityAccounting.ReportInput → Nat → Prop)
@@ -26,19 +31,9 @@ theorem source_report_before_reward
   LidoSRv3.Audit.SolidityAccounting.source_report_before_reward
     fullReportSucceeds i sharesToMintAsFees hSuccess hFees trace h
 
-/--
-Faithful VERITY_TX closure for P-ACCOUNT-1. This theorem starts with the
-actual `Verity.Contract.run` result of the source-shaped oracle-report
-transaction and proves that its committed/reverted observables are the
-pinned-source report. Validity and overflow guards execute in the body;
-every failure, including overflow after prefix `writeMapUint` stores and
-an injected failure after the total/step-flag writes, observes Verity's
-pre-call rollback state.
-
-This is not an EVM theorem: storage-slot numbers are a model-local
-projection, and no Solidity compiler, Yul, runtime bytecode, proxy layout,
-deployed code, or external-call semantics is claimed.
--/
+/-- `observe` of `handleOracleReport` (balance array + total/flag slots)
+equals the independently stated `sourceView`. Not `submitReportData`;
+`sharesToMintAsFees` is an argument, not a computed fee. -/
 theorem verity_tx_simulates_oracle_report
     (i : ReportInput) (sharesToMintAsFees : Nat) (state : Verity.ContractState) :
     observe i ((handleOracleReport i sharesToMintAsFees).run state) =

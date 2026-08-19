@@ -2,16 +2,16 @@
 
 # STATUS
 
-| ID | Abstract Lean | Verity | Fidelity gap | Classification | Assumptions |
+| ID | Abstract Lean | Verity Executable Contract | Fidelity gap | Classification | Assumptions |
 | --- | --- | --- | --- | --- | --- |
-| `P-ALLOC-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-ALLOC-2` | CHECKED | CHECKED | — | NONE | `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD` |
-| `P-DEPOSIT-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-TOPUP-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD` |
-| `P-ACCOUNT-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-RESERVE-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-ETH-1` | CHECKED | CHECKED | — | NONE | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
+| `P-ALLOC-1` | CHECKED | CHECKED | live getStakingModuleSummary and getTotalModuleStake calls and returndata; packed ModuleStateConfig slot; unique moduleAddress on addModule; getDepositAllocations / MinFirst fill (see P-ALLOC-2); reachable-router CheckedBounds | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
+| `P-ALLOC-2` | CHECKED | CHECKED | Solidity allocate does not test active (filtered upstream); +1 Strategy and proportional Source are different algorithms; keccak memory-array oracle; cross-call mutation of the decoded arrays | IMPLEMENTATION_PENDING | `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD` |
+| `P-DEPOSIT-1` | CHECKED | CHECKED | — | NONE | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
+| `P-TOPUP-1` | CHECKED | CHECKED | — | NONE | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD` |
+| `P-ACCOUNT-1` | CHECKED | CHECKED | SRStorage membership and unique uint24 module ids; accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE; submitReportData / _handleConsensusReportData; fee computation (sharesToMintAsFees is an argument); packed uint64 accounting words; re-read of the written router snapshot for rewards | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
+| `P-RESERVE-1` | CHECKED | CHECKED | live WithdrawalQueue.unfinalizedStETH call; canDeposit / bunker / router authorization; packed uint128 buffered ether and ETH transfer; frame-nonce reset and report-time rebalance; _seedDepositsCount; buffer is a declared oracle word, not the contract balance | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
+| `P-ETH-1` | CHECKED | CHECKED | VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites; Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI; reverting refund or Lido sinks; refinement between abstract pathTrace and the Verity ensemble; getConsolidationRequestFee versus stored fee slot | IMPLEMENTATION_PENDING | `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
 | `P-ADDRESS-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-TOPUP-2` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-CONSOLIDATION-1` | CHECKED | CHECKED | — | NONE | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
-| `P-SSZ-1` | CHECKED | CHECKED | — | NONE | `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED` |
+| `P-TOPUP-2` | CHECKED | CHECKED | _verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp; live independent per-key limits then allocateDeposits; Lido withdrawDepositableEther and beacon makeBeaconChainTopUp; gwei versus wei units and 48-byte pubkeys; keccak memory-array oracle; pendingBalanceGwei is trusted operator calldata | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD` |
+| `P-CONSOLIDATION-1` | CHECKED | CHECKED | beacon eligibility, quota, witness, and gateway grouping; 96-byte packed pubkey calldata and real request-contract calls; preservesEthBalance; Bus publisher/executor path; keccak memory-array oracle | IMPLEMENTATION_PENDING | `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD` |
+| `P-SSZ-1` | CHECKED | CHECKED | SSZ.verifyProof on production gindices; SHA-256 functional correctness; imported-to-deployed helper/wrapper Yul fragment binding; one-object composition of the four children; 8-byte LE amount and ByteArray identity between children | IMPLEMENTATION_PENDING | `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE` |

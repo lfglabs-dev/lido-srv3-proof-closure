@@ -7,23 +7,27 @@ The table below is the status. Not every row is closed.
 Lean theorems decide what is proved. `audit/guarantees.yaml` only classifies
 them.
 
-Each guarantee needs a checked abstract Lean theorem and a behaviorally faithful Verity model with a checked refinement theorem.
-If Verity cannot close, the registry names one gap. Yul, EVM, runtime bytecode,
-and deployment provenance are out of scope.
+Each guarantee is proved in three layers, except where a guarantee notes otherwise:
 
-| # | ID | Abstract Lean | Faithful Verity |
+1. **Abstract Lean 4 model** — the high-level algorithm, used to prove the invariant.
+2. **Verity Lean library** — a Lean program of the Solidity control flow that uses the Verity Lean library (`uint256`, overflow, revert). When it succeeds, its results match the abstract model.
+3. **Verity Executable Contract** — the same logic as a Verity contract over a `ContractState` (`Contract.run`). Its observables match the Verity Lean library program, and a revert restores the pre-call state.
+
+We do not claim to have verified the bytecode. `CHECKED` means the named Lean theorem builds; `audit/guarantees.yaml` `fidelity.missing` lists the live Lido surfaces that theorem does not cover. If the Verity Executable Contract cannot close, the registry names one gap. Yul, EVM, runtime bytecode, and deployment provenance are out of scope.
+
+| # | ID | Abstract Lean | Verity Executable Contract |
 | --- | --- | --- | --- |
 | 1 | `P-ALLOC-1` | CHECKED | CHECKED |
-| 2 | `P-ALLOC-2` | CHECKED | PARTIAL |
+| 2 | `P-ALLOC-2` | CHECKED | CHECKED |
 | 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed bounded two-batch executable transaction |
 | 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | CHECKED |
 | 5 | `P-ACCOUNT-1` | CHECKED | CHECKED |
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |
 | 7 | `P-ETH-1` | CHECKED | CHECKED |
-| 8 | `P-ADDRESS-1` | OPEN | PARTIAL |
+| 8 | `P-ADDRESS-1` | CHECKED | CHECKED |
 | 9 | `P-TOPUP-2` | CHECKED | CHECKED |
 | 10 | `P-CONSOLIDATION-1` | CHECKED | CHECKED |
-| 11 | `P-SSZ-1` | CHECKED | PARTIAL |
+| 11 | `P-SSZ-1` | CHECKED | CHECKED |
 
 Wording, assumptions, source spans, next gates: `audit/guarantees.yaml`.
 Generated views: `audit/STATUS.md`, `audit/ROADMAP.md`, `audit/REPRODUCE.md`.

@@ -40,7 +40,7 @@ example : runView overflowInput 1 = ⟨.reverted, [], 0, []⟩ := by native_deci
 report the real transaction rejects. -/
 private def bypassOrderGuard (i : ReportInput) (fees : Nat) : Contract Result :=
   fun snapshot =>
-    match txCheckedTotal i.balancesGwei with
+    match checkedTotal256 i.balancesGwei with
     | none => .revert "OVERFLOW" snapshot
     | some total =>
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
@@ -60,7 +60,7 @@ example :
           [.balancesWritten [10, 20], .accountingCalled,
             .rewardsRead [10, 20], .rewardsMinted]⟩ := by native_decide
 
-/-- Overflow after prefix `writeMapUint` stores is rolled back by
+/-- Overflow after prefix `writeArray` stores is rolled back by
 `Contract.run` to the exact pre-call snapshot. -/
 example :
     (handleOracleReport overflowInput 1).run defaultState =
@@ -70,7 +70,7 @@ example :
 the prefix writes that `run` would discard. -/
 example :
     (match (handleOracleReport overflowInput 1) defaultState with
-     | .revert _ dirty => (dirty.readMapUint moduleBalancesSlot 1).val
+     | .revert _ dirty => (dirty.readArray moduleBalancesSlot).headD 0 |>.val
      | .success _ _ => 0) = maxValueGwei := by native_decide
 
 /-- Failure after every balance, total, and step-flag write is rolled back

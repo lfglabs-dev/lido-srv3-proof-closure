@@ -58,4 +58,12 @@ def singleRequestForBatch : TxOutcome := run { honest with perRequestCalls := fa
 theorem rejects_single_request_for_two_request_batch :
     observe singleRequestForBatch ≠ observe reference := by decide +kernel
 
+/-- Counterexample to reading the registered Verity theorem as `∀` batches.
+An underfunded `(10, 4, 3)` does not deliver `4 * 3` to the request
+predeploy; the Gateway reverts and the entry sheet is restored. -/
+example :
+    observe (run honest 10 4 3) ≠
+      ⟨.success, 6, ⟨0, 0, 0, 0, 0, 12, 0⟩⟩ := by
+  decide +kernel
+
 end LidoSRv3.Tests.PEth1CompositionTxMutants

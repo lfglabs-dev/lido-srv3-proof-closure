@@ -10,9 +10,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
-        "expected": "abstract capacity bound and faithful moduleAddress-binding allocation transaction composition build with off-by-one, wrong-binding, stale-snapshot, rollback, and two-batch mutants"
+        "expected": "abstract Math.min clamp and lockstep moduleAddress-binding allocation transaction build with off-by-one, wrong-binding, stale-snapshot, rollback, and two-batch mutants"
       },
-      "summary": "The abstract capacity bound and a composed faithful Verity transaction are checked. The transaction binds each router-ordered moduleId to its stored moduleAddress, executes the two allocation/capacity loops, persists observables through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
+      "summary": "active_capacity_bounded: if a module is active, MathView.capacity is defined as min(target, available), so it is ≤ both. Not getDepositAllocations. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded"
@@ -23,19 +23,23 @@
       },
       "fidelity": {
         "covered": [
-          "capacity model",
-          "pinned-source capacity correspondence",
-          "full allocation loop",
-          "moduleAddress binding",
-          "Contract.run writeMapUint/writeSlot observables",
-          "rollback after intermediate writes and two-batch mutant coverage"
+          "handwritten capacity model and Math.min clamp",
+          "single bind/execute interpreter; observe reads writeArray columns",
+          "Contract.run rollback after intermediate writes"
         ],
-        "missing": []
+        "missing": [
+          "live getStakingModuleSummary and getTotalModuleStake calls and returndata",
+          "packed ModuleStateConfig slot",
+          "unique moduleAddress on addModule",
+          "getDepositAllocations / MinFirst fill (see P-ALLOC-2)",
+          "reachable-router CheckedBounds"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked min-clamp and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -46,9 +50,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
-        "expected": "abstract MinFirst theorem and faithful memory-array Verity transaction composition build with amount, bound, floor, rollback, and two-batch mutants"
+        "expected": "abstract +1 MinFirst selection and lockstep proportional memory-array Verity transaction build with amount, bound, floor, rollback, and two-batch mutants"
       },
-      "summary": "The abstract MinFirst selection property and a composed faithful Verity transaction are checked. The transaction decodes mutable uint256 memory arrays, executes candidate scan/count/upper-bound/ceil-division and repeated allocation, persists observables through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
+      "summary": "selects_least_open_bucket: if candidate? returns selected from the handwritten +1 Nat model, every other open row has allocation ≥ selected. Verity: if memory arrays decode, observe of allocateToBestCandidate equals sourceView. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.selects_least_open_bucket"
@@ -59,23 +63,28 @@
       },
       "fidelity": {
         "covered": [
-          "MinFirst model/source correspondence",
-          "denoted mutable uint256 buckets/capacities memory arrays",
-          "candidate scan/count/next-level bound and ceil-division fidelity",
-          "repeated Contract.run distribution with writeMapUint/writeSlot observables",
-          "rollback after intermediate writes and two-batch mutant coverage"
+          "handwritten +1 Strategy selection",
+          "single allocateToBestCandidate loop; observe reads writeArray buckets",
+          "Contract.run rollback after intermediate writes"
         ],
-        "missing": []
+        "missing": [
+          "Solidity allocate does not test active (filtered upstream)",
+          "+1 Strategy and proportional Source are different algorithms",
+          "keccak memory-array oracle",
+          "cross-call mutation of the decoded arrays"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the two checked theorems on their two algorithms; do not merge them or claim Solidity equivalence."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
       "id": "P-DEPOSIT-1",
       "assumptions": [
+        "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD"
       ],
@@ -83,7 +92,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants",
         "expected": "checked abstract/source conservation composed with the executable two-batch Verity transaction over shared quantified variables, its per-module observable correspondence, rollback, and execute-level mutants build"
       },
-      "summary": "Abstract/source deposit conservation and rollback are composed with a bounded two-batch Contract.run transaction in one theorem quantified over the source configuration and call input, the transaction input, and the entry state, linked by LinksSource. The transaction covers authorization, allocation, dynamic deposit data, deposit-data roots, the Lido pull and both beacon value calls; observables expose the per-module allocation, dynamic-data and deposit-data-root words alongside the aggregates and the ordered call journal. Rollback after intermediate writes and execute-level mutants are checked.",
+      "summary": "source_deposit_conserves_and_rolls_back: pulled = pushed on the source-shaped run, and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX). The Verity parent composes that fact with a bounded two-batch Contract.run over shared variables linked by LinksSource. Not an EVM claim.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
@@ -113,6 +122,7 @@
     {
       "id": "P-TOPUP-1",
       "assumptions": [
+        "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-TOPUP-NOWRAP",
         "A-VERITY-SCAFFOLD"
@@ -121,7 +131,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
         "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, and executable fail-closed mutants build"
       },
-      "summary": "P-TOPUP-1 is checked on both planes under A-TOPUP-NOWRAP. The faithful transaction routes the Lido pull and every per-validator beacon deposit through Verity external-call frames, so the call journal is produced by executing the transaction rather than supplied to it, and the observables the correspondence theorem compares carry call destinations, wei values, argument words and ordering alongside the per-validator allocation words. Failures injected after real storage writes and real journalled frames restore the caller snapshot exactly.",
+      "summary": "source_topup_conserves_and_rolls_back: pulled = pushed on the source-shaped run (A-TOPUP-NOWRAP), and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX). Verity: if NoUncheckedWrap, allocations.length ≤ 2^256, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match. Not P-TOPUP-2 amount computation.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back"
@@ -155,9 +165,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
-        "expected": "abstract/source ordering and faithful Contract.run oracle-report transaction build with overflow, bypass-guard, dropped-snapshot, rollback, and two-batch mutants"
+        "expected": "abstract constructor ordering and handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, and two-batch mutants"
       },
-      "summary": "The abstract accepted-report ordering property and a composed faithful Verity transaction are checked. The transaction executes validity and overflow guards, persists module balances through writeMapUint and totals/step flags through writeSlot, and rolls back intermediate writes on failure.",
+      "summary": "source_report_before_reward: if an independent fullReportSucceeds premise lets sourceTrace return some trace and fees > 0, the trace is [balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]. Verity: observe of handleOracleReport equals sourceView. Not submitReportData; sharesToMintAsFees is an argument.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.source_report_before_reward"
@@ -168,18 +178,24 @@
       },
       "fidelity": {
         "covered": [
-          "abstract ordering",
-          "accepted-report source correspondence",
-          "stateful Contract.run report path",
-          "executable validity/overflow guards",
-          "rollback after intermediate writes and two-batch mutant coverage"
+          "constructor ordering of an accepted positive-fee report",
+          "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
+          "Contract.run rollback after intermediate writes"
         ],
-        "missing": []
+        "missing": [
+          "SRStorage membership and unique uint24 module ids",
+          "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
+          "submitReportData / _handleConsensusReportData",
+          "fee computation (sharesToMintAsFees is an argument)",
+          "packed uint64 accounting words",
+          "re-read of the written router snapshot for rewards"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked constructor-order and handleOracleReport-shaped theorems; do not widen to submitReportData."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -190,9 +206,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
-        "expected": "checked abstract reserve property, faithful stateful Verity refinement, rollback and mutants build"
+        "expected": "checked spend-formula property, stateful Verity refinement, rollback and mutants build"
       },
-      "summary": "The abstract reserve non-interference property and its stateful Verity Contract.run refinement are checked, including checked arithmetic, rollback, and guard/write/debit mutants.",
+      "summary": "source_spend_preserves_withdrawal_reserve: any committed spend satisfies withdrawalPartitionSpendInvariant (amount from depositable partitions, buffered is checked sub, unfinalizedStETH unchanged). Nonzero-amount and buffered ≥ storedDepositsReserve are not used. Verity observe of withdrawWithGuards equals specTx. unfinalizedStETH is a cached word, not a WQ call.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve"
@@ -203,16 +219,24 @@
       },
       "fidelity": {
         "covered": [
-          "abstract reserve non-interference",
-          "source-shaped spending",
-          "stateful Contract.run and rollback mutants"
+          "spend reproduces the handwritten WR formula",
+          "source-shaped spending and checked arithmetic under well-formed storage",
+          "Contract.run rollback after intermediate writes"
         ],
-        "missing": []
+        "missing": [
+          "live WithdrawalQueue.unfinalizedStETH call",
+          "canDeposit / bunker / router authorization",
+          "packed uint128 buffered ether and ETH transfer",
+          "frame-nonce reset and report-time rebalance",
+          "_seedDepositsCount",
+          "buffer is a declared oracle word, not the contract balance"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked spend-formula theorems; the relational independence fact is the P-RESERVE-1.relational child."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -224,9 +248,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1CompositionTx LidoSRv3.Tests.PEth1CompositionTxMutants",
-        "expected": "abstract ETH-flow parent over every inventory path and the recursively dispatched Bus/Gateway/Vault composition build with drop, misroute, corrupt, rollback, and two-batch mutants"
+        "expected": "abstract ETH-flow parent over every inventoried tagged path and the numeric Bus/Gateway/Vault ensemble build with drop, misroute, corrupt, rollback, and two-batch mutants"
       },
-      "summary": "The abstract parent confines every ETH-bearing path of the call-site inventory to protocol destinations and totals each trace to the value entering it. The Verity parent dispatches the compiled Bus/Gateway/Vault ensemble recursively through external-call frames over one shared multi-contract world: the fee/refund split, the entry-world restore after a rejecting request contract, the underfunded-batch revert, ETH conservation, and replay of the discovered call program as one atomic compiled multicall are all stated over outcome observables.",
+      "summary": "eth_flow_parent: on the three-constructor EthPath inventory, if pathFunded then every move is parentApproved and the trace sums to pathValue. Verity parent is five numeral witnesses (honest 10/2/3, 10/1/3, 6/2/3, request-reject, underfunded 10/4/3), not ∀. Abstract and Verity planes are not refined to each other.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent"
@@ -237,19 +261,23 @@
       },
       "fidelity": {
         "covered": [
-          "abstract parent over the complete ETH-bearing call-site inventory",
-          "recursive Bus/Gateway/Vault dispatch through external-call frames on a shared multi-contract world",
-          "fee/refund split and per-request batch legs on outcome observables",
-          "atomic rollback to the entry world after a failing hop",
-          "ETH conservation across successful and reverting runs",
-          "replay of the dispatched call program as one atomic compiled multicall"
+          "abstract parent over the tagged ETH-path inventory",
+          "numeric Bus/Gateway/Vault ensemble and Contract.run rollback",
+          "five numeral witnesses (not a universal batch theorem)"
         ],
-        "missing": []
+        "missing": [
+          "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites",
+          "Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI",
+          "reverting refund or Lido sinks",
+          "refinement between abstract pathTrace and the Verity ensemble",
+          "getConsolidationRequestFee versus stored fee slot"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked tagged-inventory and numeric-ensemble theorems; do not widen the ETH-site inventory."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -262,7 +290,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
         "expected": "universal abstract/source equivariance, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
       },
-      "summary": "Universal permissionless address-writer equivariance is checked across transfer, request, claim, and redemption. The composed Verity theorem proves behavioral pinned-source correspondence on each entrypoint's address-write observables for independently executable storage-writing Contract.run programs, snapshot rollback after intermediate writes, and fail-closed address mutants.",
+      "summary": "universal_address_writer_equivariance: two nonzero callers have the same source-shaped admission bit, and a successful post-state renames under the swap. Verity composition adds Contract.run observe = sourceAddressView (amount < 2^256, coherent balance/allowance flags) and snapshot rollback. Not WithdrawalQueue.claimWithdrawalsTo.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
@@ -289,13 +317,14 @@
       "id": "P-TOPUP-2",
       "assumptions": [
         "A-SOURCE-SHAPED",
+        "A-TOPUP-NOWRAP",
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
-        "expected": "abstract aggregate cap and faithful memory-array Verity transaction composition build with overflow, off-by-one, rollback, and two-batch mutants"
+        "expected": "abstract leftover-budget cap and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, and two-batch mutants"
       },
-      "summary": "The abstract aggregate top-up cap and a composed faithful Verity transaction are checked. The transaction decodes uint256 memory arrays, evaluates checked top-up limits, consumes the module-share/block budget, persists allocations through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
+      "summary": "aggregate_bounded_by_block_cap: leftover-budget consumption of min(valueGwei, min(moduleLimit, maxTopUpPerBlock)) is ≤ the cap. well_formed_pre (WC/slash/activation) is not used. Verity: if memory arrays decode, observe of allocate equals sourceView of sourceRun. A-TOPUP-NOWRAP. Not live wei topUpLimits or SSZ.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
@@ -306,18 +335,24 @@
       },
       "fidelity": {
         "covered": [
-          "abstract Nat aggregate cap",
-          "checked uint256 overflow-revert correspondence",
-          "denoted mutable uint256 effective/pending/requested memory arrays",
-          "repeated Contract.run allocation with writeMapUint/writeSlot observables",
-          "rollback after intermediate writes and two-batch mutant coverage"
+          "leftover-budget aggregate cap (well_formed_pre unused)",
+          "single sourceRun interpreter; observe reads writeArray allocations",
+          "Contract.run rollback after intermediate writes"
         ],
-        "missing": []
+        "missing": [
+          "_verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp",
+          "live independent per-key limits then allocateDeposits",
+          "Lido withdrawDepositableEther and beacon makeBeaconChainTopUp",
+          "gwei versus wei units and 48-byte pubkeys",
+          "keccak memory-array oracle",
+          "pendingBalanceGwei is trusted operator calldata"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked leftover-budget theorems under A-TOPUP-NOWRAP; do not implement the live topUp + beacon path."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -328,9 +363,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidation1 LidoSRv3.Audit.Verity.ConsolidationTx LidoSRv3.Tests.ConsolidationTxMutants",
-        "expected": "abstract eligibility/value/atomicity theorem and faithful call/event/memory Verity transaction composition build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, rollback, and two-batch mutants"
+        "expected": "abstract caller/length/fee and if-tree theorem and vault-loop Verity transaction build with call-drop, event-drop, memory-drop, mismatched-arity, double-emit, rollback, and two-batch mutants"
       },
-      "summary": "The abstract eligibility, value-conservation, and atomicity property and a composed faithful Verity transaction are checked. The transaction decodes memory-backed public-key arrays, journals one CALL and one ConsolidationRequestAdded event per pair, persists payloads through writeMapUint/writeSlot, and rolls back intermediate writes on failure.",
+      "summary": "source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). fee=0 with msg.value=0 commits. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Not beacon eligibility and not the Bus.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity"
@@ -341,19 +376,23 @@
       },
       "fidelity": {
         "covered": [
-          "eligibility, value-conservation, and atomicity",
-          "pinned-source vault correspondence",
-          "denoted memory-backed public-key arrays",
-          "journaled CALL and ConsolidationRequestAdded observables",
-          "writeMapUint/writeSlot persistence",
-          "rollback after intermediate writes and two-batch mutant coverage"
+          "caller/length/fee eligibility, input-equality value, if-tree atomicity",
+          "single sourceRun; observe reads state.calls / state.events",
+          "Contract.run rollback after intermediate writes"
         ],
-        "missing": []
+        "missing": [
+          "beacon eligibility, quota, witness, and gateway grouping",
+          "96-byte packed pubkey calldata and real request-contract calls",
+          "preservesEthBalance",
+          "Bus publisher/executor path",
+          "keccak memory-array oracle"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked vault-loop theorems; do not widen to Bus publisher/executor or beacon eligibility."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
@@ -361,13 +400,14 @@
       "assumptions": [
         "A-SHA256-FFI",
         "A-MULTI-NODE-TRANSPORT",
-        "A-SOLC-TRUSTED"
+        "A-SOLC-TRUSTED",
+        "A-YUL-INTERFACE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants",
-        "expected": "composed abstract children and faithful SSZ-encoding Contract.run transaction that persists structural-witness binding together with deposit-data-root, concat, and digest/root-match, with rollback and single-child/encoding/hash/two-batch mutants"
+        "expected": "composed four-child gadget and SSZ-encoding Contract.run transaction with rollback and single-child/encoding/hash/two-batch mutants; SHA-256 remains A-SHA256-FFI and the imported Yul fragment stays OPEN"
       },
-      "summary": "The abstract SSZ parent composes structural witness binding, pinned deposit-data-root layout, GIndex.concat, and the seven-call digest/root-check children. A faithful Contract.run encoding transaction carries the same ValidatorWitness/operation/index/path/branch pieces the abstract uses, persists those conjuncts together with deposit-data-root, concat, and digest/root-match through writeSlot/writeMapUint, and reads back the complete successful-operation path/branch map windows, their lengths, and the witness bind result as outcome observables. The parent Verity theorem composes all four children rather than lifting the pinned-source lemma alone. Intermediate writes roll back on failure. Mutants corrupt/drop the path map, branch map, and witness bind result, and cover the other child drops, encoding mismatch, hash collision, and two-batch chaining. SHA-256 functional correctness remains A-SHA256-FFI; the targeted imported-to-deployed SSZ Yul binding stays OPEN.",
+      "summary": "The parent is the independent And of four children: a toy structural bind (uninterpreted combine, indices 2/3/4), a deposit-data-root layout, GIndex.concat transcription, and a seven-call digest definition. It is not SSZ.verifyProof on one object. SHA-256 functional correctness remains A-SHA256-FFI; the imported helper/wrapper Yul fragment binding stays OPEN under A-YUL-INTERFACE and A-SOLC-TRUSTED.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding"
@@ -378,22 +418,26 @@
       },
       "fidelity": {
         "covered": [
-          "structural witness binding",
+          "toy structural witness binding",
           "pinned deposit-data-root source layout",
           "GIndex.concat source transcription",
-          "seven-call digest composition and root check",
-          "composed Contract.run encoding of the four SSZ observables including structural witness binding",
-          "outcome readback of path/branch map contents and lengths plus witness bind result",
-          "rollback after intermediate writes",
-          "path-map corruption, branch-map drop, witness-bind drop, and single-child drops of concat, digest, and verified bits",
-          "encoding-mismatch, hash-collision, and two-batch mutants"
+          "seven-call digest definition",
+          "composed Contract.run encoding of the four independent children",
+          "Contract.run rollback after intermediate writes"
         ],
-        "missing": []
+        "missing": [
+          "SSZ.verifyProof on production gindices",
+          "SHA-256 functional correctness",
+          "imported-to-deployed helper/wrapper Yul fragment binding",
+          "one-object composition of the four children",
+          "8-byte LE amount and ByteArray identity between children"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked four-child gadget; do not implement SSZ.verifyProof or a cryptographic SHA-256 proof."
       },
-      "next_gate": "Preserve this checked abstract-to-Verity guarantee.",
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "special_bindings": {
         "deployed_yul": {
           "status": "OPEN",
@@ -589,7 +633,7 @@
       "summary": "Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.operator_reward_share_le_configured_bond"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond"
       },
       "verity": {
         "status": "PARTIAL",
@@ -752,7 +796,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1RefundTx LidoSRv3.Tests.PEth1RefundTxMutants",
         "expected": "successful bounded protocol rebalance/redemption return-confinement proof plus gateway/vault Contract.run refund and withdraw observations; the parent ETH-flow guarantee composes these legs"
       },
-      "summary": "The bounded abstract model confines ETH returned through the protocol-controlled stVault rebalance/redemption interface to Lido or the WithdrawalQueue. A source-shaped Contract.run ledger observes ConsolidationGateway fee send and refund plus WithdrawalVault.withdrawWithdrawals, including snapshot rollback after a failed refund. Raw owner-controlled StakingVault.withdraw is excluded. These legs are composed by the checked P-ETH-1 parent.",
+      "summary": "Abstract eth_flow_confined is a filter on a tagged move list (Lido or WithdrawalQueue tags). The Verity theorem is the numeric gateway_refund_success_moves_value witness on the positive-remainder path. The body is _checkFee, vault send, then _refundFee; address(0)/2^160 remap to sender. Exact-fee is a separate function. Not VaultHub, not WithdrawalQueue claims, not receiveWithdrawals.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_confined"
@@ -763,16 +807,24 @@
       },
       "fidelity": {
         "covered": [
-          "protocol-controlled stVault rebalance/redemption interface only",
-          "gateway fee send, refund, and vault withdraw Contract.run ledger",
-          "composed into the checked P-ETH-1 parent"
+          "tagged-list filter to Lido or WithdrawalQueue tags",
+          "numeric gateway remainder-refund Contract.run witness",
+          "composed as a child of the checked P-ETH-1 parent"
         ],
-        "missing": []
+        "missing": [
+          "parent guarantee composition",
+          "VaultHub / protocol withdraw",
+          "WithdrawalQueue claim destinations",
+          "preservesEthBalance and pre-fee gateway guards",
+          "requestsCount times fee (ledger takes a total fee)",
+          "receiveWithdrawals / stored buffer update"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked filter and remainder-refund witness; do not widen to VaultHub or WithdrawalQueue claims."
       },
-      "next_gate": "Preserve this bounded evidence as it stands under the checked P-ETH-1 parent."
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim."
     },
     {
       "id": "P-ETH-1b",
@@ -783,7 +835,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PEth1 LidoSRv3.Audit.Verity.PEth1RequestTx LidoSRv3.Tests.PEth1RequestTxMutants",
         "expected": "successful configurable consolidation-request fee-target proof plus bus-forward and request-contract Contract.run observations; the canonical deployed address remains a separate provenance obligation"
       },
-      "summary": "The bounded abstract consolidation-fee model confines its fee-bearing call to cfg.consolidationRequest. A source-shaped Contract.run ledger observes ConsolidationBus value-forward and WithdrawalVault EIP-7002/EIP-7251 fee sends, including snapshot rollback after a later request failure. Equating the immutable configurable address with the canonical EIP-7251 deployment is a separate provenance obligation. These legs are composed by the checked P-ETH-1 parent.",
+      "summary": "Abstract consolidation_fee_path_confined is a tag rename to cfg.consolidationRequest. The registered Verity theorem is bus_forward_success (a value-forward numeral), not a fee-target theorem. Equating the configurable address with the canonical request-contract deployment remains a separate provenance obligation.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEth1.consolidation_fee_path_confined"
@@ -794,30 +846,37 @@
       },
       "fidelity": {
         "covered": [
-          "configured immutable consolidation-request fee target only",
-          "bus forward and request-contract fee Contract.run ledger",
-          "composed into the checked P-ETH-1 parent"
+          "configured immutable consolidation-request fee tag",
+          "numeric bus-forward Contract.run witness",
+          "composed as a child of the checked P-ETH-1 parent"
         ],
-        "missing": []
+        "missing": [
+          "parent guarantee composition",
+          "executeConsolidation pending-batch / delay guards",
+          "EIP-7251 / EIP-7002 payloads",
+          "exact-fee and vault auth on the two-fee body",
+          "link from ethTrace to the ledger",
+          "canonical request-contract address provenance"
+        ]
       },
       "classification": {
-        "kind": "NONE"
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep the checked tag-rename and bus-forward witness; do not widen to executeConsolidation or request-contract payloads."
       },
-      "next_gate": "Preserve this bounded evidence as it stands under the checked P-ETH-1 parent."
+      "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim."
     },
     {
       "id": "P-ADDRESS-1.denote-admission",
       "parent_id": "P-ADDRESS-1",
       "source_plane_scope": "audit-authored permissionless entrypoint admission only; no pinned Solidity correspondence",
       "assumptions": [
-        "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Verity.AddressAdmission",
         "expected": "successful official-denotation admission reduction, caller-swap equivariance, both-gate non-vacuity witnesses, and owner-gated mutant refutation; post-state equivariance, pinned-source correspondence, Yul, and EVM remain open"
       },
-      "summary": "An audit-authored permissionless entrypoint written in the pinned Verity deep EDSL is evaluated by the official denotation Compiler.CompilationModel.Denote.denoteFunction, which installs the transaction sender into ContractState.sender, so the caller is a genuine input of the run rather than an index on an abstract function. For every mapping-slot oracle, every caller pair whose balance entries do not alias the pause slot, and every world, the admission bit under one caller equals the admission bit under the other in the caller-swapped world. Admission only: post-state equivariance, correspondence to pinned Lido Solidity, generated Yul, and EVM execution are not claimed, so the parent transaction plane remains OPEN.",
+      "summary": "Audit-authored claim() admission under official denoteFunction. PauseDisjoint is required: aliased pause/balance slots break the property. This is not WithdrawalQueue.claimWithdrawalsTo, not the facade admission_nondiscriminatory property, and not post-state equivariance. The parent transaction plane remains OPEN.",
       "abstract": {
         "status": "OPEN",
         "theorem": null
@@ -828,15 +887,18 @@
       },
       "fidelity": {
         "covered": [
-          "audit-authored permissionless entrypoint admission only; no pinned Solidity correspondence"
+          "audit-authored permissionless claim() admission only; no pinned Solidity correspondence",
+          "PauseDisjoint side condition"
         ],
         "missing": [
-          "parent guarantee composition"
+          "parent guarantee composition",
+          "pinned WithdrawalQueue claim/request/transfer entrypoints",
+          "post-state equivariance"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "work": "Keep the checked audit-authored admission theorem; do not implement WithdrawalQueue claim as this child."
       },
       "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
     },
@@ -851,10 +913,10 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants",
         "expected": "reachable nonzero derivation, source-to-executable-Verity mapping refinement, and guard/address-writer mutants compile; Yul/EVM provenance remains OPEN"
       },
-      "summary": "Supplemental bounded MODEL/SOURCE/VERITY_TX evidence: reachable initialization, migration, and add-module states derive nonzero registered addresses; an executable Verity mapping transaction returns and records that same modeled address. Solidity storage hashing/layout, generated Yul, EVM execution, and runtime provenance remain OPEN.",
+      "summary": "Supplemental. closure says a reachable deref is the registered nonzero address and is stable under the fictional interleaving. migrateStorage is id, so any WellFormed old state is Reachable.migrated. getStakingModuleAddress (observeDeref) is a view and returns 0 for a zero address. keccak ROUTER_STORAGE_POSITION layout remains OPEN.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source"
+        "theorem": "LidoSRv3.Audit.Guarantees.PDeref1.closure"
       },
       "verity": {
         "status": "CHECKED",
@@ -862,15 +924,20 @@
       },
       "fidelity": {
         "covered": [
-          "registry address binding only; migration old-layout contents are explicit inputs"
+          "registry address binding only; migration old-layout contents are explicit inputs",
+          "reachable nonzero derivation under the fictional interleaving"
         ],
         "missing": [
-          "parent guarantee composition"
+          "parent guarantee composition",
+          "keccak ROUTER_STORAGE_POSITION layout",
+          "last+1 / unique-address addModule",
+          "packed ModuleStateConfig",
+          "re-entrant module callback writes"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Implement and compose the listed missing fidelity without widening the guarantee."
+        "work": "Keep the checked reachable-deref and observe-refinement theorems; do not rebuild Reachable or the storage layout."
       },
       "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
     },
@@ -911,5 +978,5 @@
       "next_gate": "Replace the source-shaped decoding premise with a machine-checked correspondence to the pinned Solidity spans."
     }
   ],
-  "objective": "Prove an abstract Lean model and a behaviorally faithful Verity model for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
+  "objective": "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
 }

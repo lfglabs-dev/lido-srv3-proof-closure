@@ -64,40 +64,9 @@ def memoryFor (effective pending requested : List Word) : Nat → Word := fun of
 def stateFor (effective pending requested : List Word) (base : ContractState) : ContractState :=
   { base with memory := memoryFor effective pending requested }
 
-/-- Transaction-side batch.  Deliberately a second definition: the
-correspondence theorem, not a shared name, ties it to `sourceRun`. -/
-def txRun (effective pending requested : List Word)
-    (target minTopUp remainingCap moduleLimit valueGwei : Word) :
-    Option (List Word × Word × Word) :=
-  if effective.length == 0 then none
-  else
-    match sourceCandidates effective pending requested target minTopUp with
-    | none => none
-    | some candidates =>
-        let budget := minWord valueGwei (minWord moduleLimit remainingCap)
-        match sourceConsume budget candidates with
-        | none => none
-        | some (allocs, leftover) =>
-            match Verity.Stdlib.Math.safeSub budget leftover with
-            | none => none
-            | some used =>
-                match Verity.Stdlib.Math.safeSub remainingCap used with
-                | none => none
-                | some remaining => some (allocs, remaining, used)
-
-theorem txRun_eq_sourceRun
-    (effective pending requested : List Word)
-    (target minTopUp remainingCap moduleLimit valueGwei : Word) :
-    txRun effective pending requested target minTopUp remainingCap moduleLimit valueGwei =
-      sourceRun effective pending requested target minTopUp remainingCap moduleLimit valueGwei := by
-  unfold txRun sourceRun
-  rfl
-
-def writeAllocs : Nat → List Word → ContractState → ContractState
-  | _, [], state => state
-  | index, value :: rest, state =>
-      writeAllocs (index + 1) rest
-        (state.writeMapUint allocSlot (Verity.Core.Uint256.ofNat index) value)
+/-- Persist per-validator allocations as a `uint256[]`-shaped storage array. -/
+def persistAllocs (allocs : List Word) (state : ContractState) : ContractState :=
+  state.writeArray allocSlot allocs
 
 structure Result where
   allocations : List Word
@@ -116,11 +85,11 @@ def allocate (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei :
       readArray snapshot "pending" pendingBase count,
       readArray snapshot "requested" requestedBase count with
   | some effective, some pending, some requested =>
-      match txRun effective pending requested target minTopUp remainingCap
+      match sourceRun effective pending requested target minTopUp remainingCap
           moduleLimit valueGwei with
       | none => .revert "TOPUP_ARITHMETIC" snapshot
       | some (allocs, remaining, used) =>
-          let dirty := writeAllocs 0 allocs snapshot
+          let dirty := persistAllocs allocs snapshot
           let dirty := (dirty.writeSlot remainingSlot remaining).writeSlot allocatedSlot used
           if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
           else .success ⟨allocs, remaining, used⟩ dirty
@@ -139,8 +108,8 @@ structure View where
 fields (PR #91). -/
 def observe (beforeAllocs : List Word) (beforeRemaining : Word) :
     ContractResult Result → View
-  | .success result state =>
-      ⟨.committed, result.allocations, state.readSlot remainingSlot,
+  | .success _ state =>
+      ⟨.committed, state.readArray allocSlot, state.readSlot remainingSlot,
         state.readSlot allocatedSlot⟩
   | .revert _ _ => ⟨.reverted, beforeAllocs, beforeRemaining, 0⟩
 
@@ -180,16 +149,17 @@ theorem verity_tx_simulates_pinned_source
   · have hZ : (requested.length == 0) = false := by simp [hZero]
     unfold Contract.run allocate sourceView
     simp only [hZ, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq]
-    rw [txRun_eq_sourceRun]
     cases hRun : sourceRun effective pending requested target minTopUp
         remainingCap moduleLimit valueGwei with
     | none =>
         simp [observe]
     | some trip =>
         rcases trip with ⟨allocs, remaining, used⟩
-        simp [observe, remainingSlot, allocatedSlot,
+        simp [observe, persistAllocs, remainingSlot, allocatedSlot,
+          ContractState.readArray, ContractState.writeArray,
           ContractState.readSlot_writeSlot_same,
-          ContractState.readSlot_writeSlot_other]
+          ContractState.readSlot_writeSlot_other,
+          ContractState.storageArray_writeSlot]
 
 /-- Any failure, including the injected failure after intermediate writes,
 returns the exact pre-transaction snapshot. -/

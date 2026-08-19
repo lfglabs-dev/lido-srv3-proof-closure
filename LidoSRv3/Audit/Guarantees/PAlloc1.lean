@@ -53,8 +53,10 @@ def mappedSummaryTransaction (moduleAddress : Nat) : Prop :=
           (state.writeSlot
             _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.lastCapacitySlot.slot depositable))
 
-/-- The canonical active capacity is bounded by both operands of the pinned
-`Math.min` clamp. -/
+/-- If `module.isActive`, `MathView.capacity` is defined as
+`min(targetValidators, availableCapacity)`, so it is ≤ both operands.
+This is a fact about that `Nat` definition, not about live
+`StakingRouter.getDepositAllocations`. -/
 theorem active_capacity_bounded
     (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
     (isTopUp : Bool) (module : Module) (hActive : module.isActive = true) :
@@ -106,11 +108,10 @@ theorem source_capacities_and_mapped_summary_transaction
   exact ⟨source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds,
     _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_phase3_transaction moduleAddress⟩
 
-/-- Headline composed closure theorem for P-ALLOC-1. The executable
-transaction binds each router-ordered `moduleId` to its stored
-`moduleAddress`, runs the two allocation/capacity loops, persists
-observables through `writeMapUint` / `writeSlot`, and matches the
-pinned-source `_getModulesAllocationAndCapacity` interpreter. -/
+/-- One handwritten bind+execute: if `sourceBindAll state n` recovers
+`modules`, then `observe` of `allocate n` (which reads the persisted
+allocation/capacity/address arrays) equals `sourceView` of the same
+`AllocCapacity` interpreter. Not a live summary CALL. -/
 theorem verity_tx_simulates_allocation
     (cfg : Config) (modules : List _root_.LidoSRv3.Audit.Verity.AllocationTx.BoundModule)
     (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)

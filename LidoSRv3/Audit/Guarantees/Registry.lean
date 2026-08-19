@@ -33,8 +33,10 @@ inductive CheckedLayer
   /-- An abstract semantic model with machine-checked properties. -/
   | model
   | algorithm
+  /-- Verity Lean library program: Solidity-shaped Lean using Verity words. -/
   | source
   | abstractTx
+  /-- Verity Executable Contract: `Contract.run` over a `ContractState`. -/
   | verityTx
   deriving DecidableEq, Repr
 

@@ -34,14 +34,14 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Checked baseline to preserve
 
-- `P-ALLOC-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
-- `P-ALLOC-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-ALLOC-2` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
 - `P-DEPOSIT-1` — **NONE**: Preserve the composed abstract-to-Verity deposit guarantee and its executable mutants.
 - `P-TOPUP-1` — **NONE**: Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, and its executable mutants.
-- `P-ACCOUNT-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
-- `P-RESERVE-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
-- `P-ETH-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-RESERVE-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-ETH-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
 - `P-ADDRESS-1` — **NONE**: Preserve this checked abstract-to-Verity address-writer guarantee.
-- `P-TOPUP-2` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
-- `P-CONSOLIDATION-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
-- `P-SSZ-1` — **NONE**: Preserve this checked abstract-to-Verity guarantee.
+- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-CONSOLIDATION-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.

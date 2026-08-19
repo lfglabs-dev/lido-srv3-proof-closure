@@ -136,7 +136,6 @@ assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_revert_restores_snapshot
-#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.txRun_eq_sourceRun
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
