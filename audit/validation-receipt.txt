@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6dc6978d6766e7ab86ef7e20cb4e5ab6463c8333
+validated-tree: d4fc0dbae6fd29e0351c0a552b58af3fa490c182
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1833,3 +1833,94 @@ P-RESERVE-RELATIONAL executable finalization composition (2026-08-18)
   `7ec46bd54a7960490a3c0177c4b17ca393e60542`.
 - Receipt subject: tracked tree excluding this receipt,
   `fba20ad95c6fd2fb2919edcfe0af6d9ebbedffca`.
+Wave 4: P-TOPUP-1 abstract-parent kill-line remediation (2026-08-19)
+--------------------------------------------------------------------
+
+- Fixes P-TOPUP-1: the three wave-1/2 "kill-line" theorems in
+  `LidoSRv3/Tests/TopupTxMutants.lean` (`kill_wrap_skip_assert`,
+  `kill_remove_module_exists`, `kill_remove_wc_type2`) merely PROJECTED the
+  registered parent `source_topup_conserves_and_rolls_back`'s own conjuncts
+  at concrete inputs -- they proved the HONEST model satisfies the parent.
+  No mutant artifact was defined and nothing was refuted; conjunct 1
+  (conservation) had no kill-line at all; and `A-TOPUP-NOWRAP` was
+  misattributed to conjunct 1 in `audit/guarantees.yaml` and
+  `report/P-TOPUP-1.md` although the Lean parent's conservation conjunct is
+  an unconditional exact-`Nat` fact (the wrap lives in conjunct 3's
+  antecedent and in the Verity-side `NoUncheckedWrap` premise).
+  `fidelity.missing` was empty although the report itself listed real gaps.
+- Preferred, load-bearing fix applied: four real kill-lines over local
+  mutant interpreters of the parent's own model, each proving the negation
+  of the same predicate the corresponding parent conjunct proves for the
+  honest model, on the mutant at a concrete witness:
+  `dropped_conservation_assert_kill_line_refutes_parent` (mutant
+  `mutantRunNoAssert` deletes the line-755 assert and pulls the wrapping
+  `unchecked` accumulator; the wrapping batch `[2^256 - 1, 2]` COMMITS with
+  `pulled = 1 ≠ 2^256 + 1 = pushed`),
+  `dropped_module_guard_kill_line_refutes_parent` (mutant
+  `mutantRunNoModuleGuard` without the `_requireModuleIdExists` require
+  commits at an unregistered-module witness where the parent demands
+  `revertStakingModuleUnregistered`),
+  `dropped_wc_guard_kill_line_refutes_parent` (mutant `mutantRunNoWcGuard`
+  without the `_requireWCType2` require commits at a non-type-2 witness
+  where the parent demands `revertWrongWithdrawalCredentialsType`), and
+  `unwrapped_accumulator_kill_line_refutes_parent` (mutant
+  `mutantAccumulatedUnwrapped` reads the accumulator as the exact `Nat` sum;
+  at the wrapping witness it equals `pushedValue` while the honest
+  `SolidityTopupParent.accumulated ≠ pushedValue`). All four close by
+  `decide` over the concrete witnesses; no `native_decide` is introduced in
+  this lane.
+- The three projections are renamed honestly to
+  `guard_discharge_at_wrapping_input`,
+  `guard_discharge_at_unregistered_module_input`, and
+  `guard_discharge_at_non_type2_wc_input` and kept as positive controls;
+  nothing in the YAML, report, or Lean tree calls them kill-lines anymore.
+  `LidoSRv3/Audit/Trust.lean`'s `#print axioms` list is updated to the seven
+  new names: the kill-lines report `[propext]` or no axioms, the controls
+  `[propext, Quot.sound]`; no `sorryAx`, no `Lean.ofReduceBool`.
+- `audit/guarantees.yaml`'s `P-TOPUP-1` row: `summary` attributes
+  `A-TOPUP-NOWRAP` to conjunct 3 and the Verity-side premise only;
+  `fidelity.covered` names the real kill-lines and positive controls;
+  `fidelity.missing` lists the real gaps (wrap accumulator not routed
+  through `run`, `LinksSource` derivation from ALLOC deferred,
+  beacon-address provenance a named assumption); `classification.kind`
+  flips `NONE` → `IMPLEMENTATION_PENDING` with a `work` string, as the
+  `validate_classification` NONE rule requires once `missing` is non-empty;
+  `reproduction.expected` cites the new kill-line theorems.
+  `scripts/audit_metadata.py`'s `EXPECTED_CANONICAL_CLAIMS["P-TOPUP-1"]`
+  kind and `EXPECTED_CANONICAL_DETAIL_SHA256["P-TOPUP-1"]`
+  (`a36e50f6f97b241465c7cde7f83f7c5e5766cbe6092bc2b2a5a8dd29c928ce99`) are
+  updated to match, and `audit/ROADMAP.md`, `audit/STATUS.md`, and
+  `audit/REPRODUCE.md` are regenerated with
+  `python3 scripts/audit_metadata.py generate`; the diffs are confined to
+  the `P-TOPUP-1` rows. Theorem names and assumptions are unchanged.
+- `report/P-TOPUP-1.md`: the conjunct table fixes the `A-TOPUP-NOWRAP`
+  attribution, and a new Wave 4 section names the real mutant kill-lines
+  and marks the wave-2 projection "kill-lines" as renamed positive
+  controls.
+- No existing theorem statement is weakened, narrowed, or removed; the
+  guarantee file `LidoSRv3/Audit/Guarantees/PTopup1.lean` is untouched, so
+  `CLAIMS["P-TOPUP-1"]` in `scripts/check_public_claim_surfaces.py` needs
+  no change.
+- Deviation from the wave-4 spec: gate 4
+  (`PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py`) was already
+  red at this branch's base (`7797b7e`) because the self-test pinned a
+  kind-NONE mutant at `guarantees[1]` (P-ALLOC-2, IMPLEMENTATION_PENDING).
+  The wave-4 coordinator's repair `8e55c05` ("retarget NONE-classification
+  mutant at a dynamically chosen NONE row") was cherry-picked from `main`
+  onto this branch; no other main commit was taken.
+- `lake build LidoSRv3` and `lake build LidoSRv3.Tests.TopupVectors
+  LidoSRv3.Tests.TopupHybridMutants LidoSRv3.Tests.TopupTxMutants`: exit 0.
+  `python3 scripts/audit_metadata.py check` (11 canonical guarantees plus
+  14 subordinate rows), the optimized metadata mutants,
+  `scripts/check_public_claim_surfaces.py`,
+  `scripts/test_public_claim_surfaces.py`,
+  `scripts/test_verity_provenance.py`,
+  `scripts/check_provenance_guards.sh`,
+  `scripts/check_no_python_evidence.sh`, and
+  `scripts/test_check_no_python_evidence.sh`: exit 0. Changed-Lean
+  forbidden-token scan: no `sorry`, `sorryAx`, or `admit`.
+- Authored in the isolated `git worktree` at `/home/ubuntu/wt/ptopup1` on
+  branch `cursor/wave4-ptopup1-4b38`; no other in-flight branch's files are
+  touched by this diff.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
