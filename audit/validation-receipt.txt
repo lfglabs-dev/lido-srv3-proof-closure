@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 1abf6ab0339ec4863c88ce9ea94fde5d6b5c35cc
+validated-tree: 8a9bcaf19b6163d56375234a2dbd465861e20ba5
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -1883,6 +1883,14 @@ Wave 4: P-SSZ-1 definitional-conjunct strip and parent-conclusion kill-line (202
   older kill-lines remain with docstrings corrected to state they are
   `bindOperation`-level negative results, not parent-conclusion
   refutations.
+  SUPERSEDED in part on 2026-08-19 by "Wave 4: P-SSZ-1 model-mutant parent
+  kill-line" below: coordinator review found this theorem is only a
+  conclusion-non-triviality witness, not a parent kill-line -- at the
+  crossed operation the parent's `hBind` hypothesis fails, so the parent
+  implication is vacuously true there. The parent kill-line is now
+  `swapped_combine_kill_line_refutes_parent` (a `sourceCombine` model
+  mutant refuted at a witness where `hBind` holds);
+  `crossed_witness_kill_line_refutes_parent` is kept, honestly relabeled.
 - The four subordinate rows' theorems (P-SSZ-1.deposit-data-root,
   gindex-concat, abstract-digest, tx-execution-simulation), the
   `special_bindings`, and the assumptions list are unchanged; the
@@ -1948,5 +1956,88 @@ Wave 4: P-SSZ-1 definitional-conjunct strip and parent-conclusion kill-line (202
   `LidoSRv3.Audit.Verity.Tests.SszTxSimulation`, and
   `LidoSRv3.Tests.SszEncodingTxMutants` for this row), and all five
   reference-fixture presence checks.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree` above.
+
+Wave 4: P-SSZ-1 model-mutant parent kill-line (2026-08-19)
+----------------------------------------------------------
+
+- Follow-up to the entry above. Coordinator review found that
+  `crossed_witness_kill_line_refutes_parent` does not refute the registered
+  parent: at the crossed operation `.clProofVerifier` the parent's `hBind`
+  hypothesis fails (the witness is bound to `.clValidatorVerifier` by
+  construction), so the parent's implication is vacuously true there. The
+  theorem is a conclusion-non-triviality witness (the conclusion predicate
+  discriminates the claimed operation), not a parent kill-line -- the same
+  premise-level shape classified as insufficient for P-RESERVE-1's
+  stale-cache theorem.
+- Fix applied (the house pattern: mutate the MODEL/FUNCTIONS inside the
+  predicate, not the input). The conclusion predicate is now parameterized
+  as `composedEncodingOkWithCombine srcCombine operation combine input`
+  over the source-combine family used in its deposit-data-root traversal
+  conjunct; the registered `composedEncodingOk` is the honest
+  specialization at `sourceCombine` (the proposition is unchanged, so the
+  registered parent's statement is unchanged). `sourceCombineSwapped`
+  (children swapped at every pairing) is the one model function inside the
+  predicate that `hBind` never mentions.
+- New parent kill-line `swapped_combine_kill_line_refutes_parent`: the
+  negation of the mutant-substituted parent stated in the registered
+  parent's own quantifier/premise/`hBind` shape,
+  `¬ (∀ {operation combine} input, premises → hBind →
+  composedEncodingOkWithCombine sourceCombineSwapped operation combine
+  input)`. At the concrete witness `swappedCombineKillInput` (pinned
+  48/32/96-byte widths, same shape as `Tests/SszRegression.composedExample`;
+  defined in the guarantee module since it cannot import the test module)
+  every premise holds by `decide` and `hBind` is discharged by the same
+  `sourceWitness_binds_sourceNode` used for the honest artifact, while the
+  swapped-combine traversal conjunct reduces definitionally
+  (`traverseBranch_sourceCombineSwapped_eq`, an `rfl` closed form over the
+  witness's concrete `[.right]` path and singleton branch) to a `Nat.pair`
+  tree equality that would force `sourceAnchor swappedCombineKillSrc = 0` --
+  impossible by repeated `Nat.pair` injectivity
+  (`swapped_traverse_ne_structuralEncoding`) against the concrete nonzero
+  public-key fold (`digestBytesFold (List.replicate 48 2) ≠ 0`, by
+  `decide`). No `sorry`, `admit`, or `native_decide` in the new proofs.
+- `crossed_witness_kill_line_refutes_parent` is kept with its docstring,
+  YAML, and report wording honestly relabeled as a
+  conclusion-non-triviality witness; `inconsistent_witness_kill_line` and
+  `inconsistent_operation_index_kill_line` remain `bindOperation`-level
+  negatives. The four subordinate rows' theorems, `special_bindings`, the
+  assumptions list, and the registered theorem name are unchanged.
+- `audit/guarantees.yaml`'s `P-SSZ-1` row: `summary`, `fidelity.covered`,
+  and `reproduction.expected` now cite `swapped_combine_kill_line_refutes_parent`
+  as the parent kill-line and the crossed-operation theorem as a
+  conclusion-non-triviality witness.
+  `scripts/audit_metadata.py`'s
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-SSZ-1"]` is recomputed to
+  `fa573fadd47cb13988aad4425a61262c7c50effb536ff784254fcbcdea56bd2b`; views
+  regenerated (`audit/REPRODUCE.md` changed; `audit/STATUS.md` and
+  `audit/ROADMAP.md` unchanged by the regeneration). `report/P-SSZ-1.md`'s
+  Theorems line, Wave 4 section, Proof/Restated sections, and issue #4
+  close notes updated to match.
+- Cherry-picked `main`'s `8e55c05` (and nothing else) per coordinator
+  instruction: the dynamic NONE-row mutant retarget fixes the pre-existing
+  `test_audit_metadata.py` staleness documented in the entry above, so gate
+  4 and end-to-end `make test` are green on this branch.
+- `lake build LidoSRv3`: exit 0 (1395 jobs). `lake build
+  LidoSRv3.Tests.SszRegression LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+  LidoSRv3.Tests.SszEncodingTxMutants`: exit 0 (515 jobs). `lake build
+  LidoSRv3.Audit.Trust`: exit 0; `composed_ssz_encoding` reports
+  `[propext, Quot.sound]`, `swapped_combine_kill_line_refutes_parent`
+  reports `[propext, Classical.choice, Quot.sound]`,
+  `crossed_witness_kill_line_refutes_parent` reports `[propext,
+  Quot.sound]`; no `sorryAx`, no `Lean.ofReduceBool`.
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical
+  guarantees plus 14 subordinate evidence rows). `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`: exit 0 (post-cherry-pick).
+- `python3 scripts/check_public_claim_surfaces.py` and `python3
+  scripts/test_public_claim_surfaces.py`: exit 0.
+- `python3 scripts/test_verity_provenance.py` and `bash
+  scripts/check_provenance_guards.sh`: exit 0.
+- `bash scripts/check_no_python_evidence.sh` and `bash
+  scripts/test_check_no_python_evidence.sh`: exit 0.
+- `make test`: exit 0 end-to-end, including the previously aborting
+  `test_audit_metadata.py` step and all twenty-eight Lean vector/mutant
+  modules.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
