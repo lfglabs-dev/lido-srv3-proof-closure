@@ -125,28 +125,29 @@ theorem source_amount_totality
 /-- **Wave 1 registered parent.**  For the pinned-source *proportional* step
 (not the +1-per-iteration `MinFirst` model demoted above): given
 `RowsCorrespond` between the handwritten `Model` rows and the word-typed
-`Source` rows, the two independently-defined candidate scans select the same
-bucket; and whenever the checked `uint256` amount for the selected candidate
-succeeds, it is positive, does not exceed the remaining demand, and keeps the
-candidate within its capacity (`best.allocation + w ≤ best.capacity`, i.e. the
-allocation never runs over headroom). -/
+`Source` rows, and given that the source scan selected `best` (`hSelected`),
+the independently-defined model scan selects that same bucket — the first
+conjunct pins the model scan's result to the *selected* row, so `hSelected`
+is load-bearing; and whenever the checked `uint256` amount for the selected
+candidate succeeds, it is positive, does not exceed the remaining demand, and
+keeps the candidate within its capacity (`best.allocation + w ≤
+best.capacity`, i.e. the allocation never runs over headroom). -/
 theorem proportional_step_correspondence_and_bounded
     {model : List MinFirstAllocation.Model.Bucket}
     {source : List MinFirstAllocation.Source.Row}
     {best : MinFirstAllocation.Source.Row}
     {allocationSize w : MinFirstAllocation.Source.Word}
     (hRows : MinFirstAllocation.RowsCorrespond model source)
-    (_hSelected : MinFirstAllocation.Source.candidate? source = some best)
+    (hSelected : MinFirstAllocation.Source.candidate? source = some best)
     (hOpen : MinFirstAllocation.Source.hasFreeSpace best = true)
     (hLen : source.length < Verity.Core.Uint256.modulus)
     (hSize : allocationSize.val ≠ 0)
     (hAmount : MinFirstAllocation.Source.checkedAmount source allocationSize best = some w) :
     (Option.map (fun b => (b.allocation, b.capacity)) (MinFirstAllocation.Model.candidate? model) =
-      Option.map (fun r => (r.allocation.val, r.capacity.val))
-        (MinFirstAllocation.Source.candidate? source)) ∧
+      some (best.allocation.val, best.capacity.val)) ∧
     0 < w.val ∧ w.val ≤ allocationSize.val ∧
       best.allocation.val + w.val ≤ best.capacity.val :=
-  ⟨full_candidate_correspondence hRows,
+  ⟨by rw [full_candidate_correspondence hRows, hSelected]; rfl,
    source_amount_totality hOpen hLen hSize hAmount⟩
 
 /-! ## Verity transaction plane -/

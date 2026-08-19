@@ -60,23 +60,37 @@ example :
 /-! ## Wave 1 kill-line mutants for the registered parent
 `PAlloc2.proportional_step_correspondence_and_bounded`. -/
 
-/-- Kill-line mutant: pick the first open row regardless of minimality,
-instead of the least-allocation row with earliest-index tie-break that
-`Source.candidate?` (and the parent's `full_candidate_correspondence`
-conjunct) selects. -/
-private def firstOpenCandidate? : List Source.Row → Option Source.Row
+/-- Kill-line mutant: a MODEL-side candidate scan that picks the first open
+bucket regardless of minimality, instead of the least-allocation bucket with
+earliest-index tie-break that `Model.candidate?` (and the registered parent's
+first conjunct) selects. -/
+private def mutantFirstOpenCandidate? : List Model.Bucket → Option Model.Bucket
   | [] => none
-  | r :: rs => if Source.hasFreeSpace r then some r else firstOpenCandidate? rs
+  | b :: bs => if Model.isOpen b then some b else mutantFirstOpenCandidate? bs
 
-/-- Two open rows `[(5,10), (0,10)]`: the real candidate is the least
-(index 1, allocation 0); the non-least-index mutant picks the first open row
-(index 0, allocation 5) instead. This disagrees with `Source.candidate?`,
-so a scan built on this mutant cannot satisfy the parent's selection
-conjunct. -/
-example :
-    let rows : List Source.Row := [⟨w 5, w 10⟩, ⟨w 0, w 10⟩]
-    firstOpenCandidate? rows ≠ Source.candidate? rows := by
-  native_decide
+/-- Selection kill-line against the registered parent
+`PAlloc2.proportional_step_correspondence_and_bounded`.  On the concrete
+`RowsCorrespond` pair `[(5, 10), (0, 10)]` the real source scan selects the
+NON-first row `⟨w 0, w 10⟩` (index 1, the strictly least allocation), so the
+parent premises `hRows` and `hSelected` both hold here; but the first-open
+mutant model scan maps to `some (5, 10)` — the negation of the parent's first
+conjunct `Option.map (fun b => (b.allocation, b.capacity))
+(Model.candidate? model) = some (best.allocation.val, best.capacity.val)`
+with the mutant scan in place of `Model.candidate?`. -/
+theorem selection_kill_line_refutes_parent :
+    ∃ model : List Model.Bucket, ∃ source : List Source.Row,
+      ∃ best : Source.Row,
+        RowsCorrespond model source ∧
+        Source.candidate? source = some best ∧
+        Option.map (fun b => (b.allocation, b.capacity))
+            (mutantFirstOpenCandidate? model) ≠
+          some (best.allocation.val, best.capacity.val) := by
+  refine ⟨[⟨5, 10⟩, ⟨0, 10⟩], [⟨w 5, w 10⟩, ⟨w 0, w 10⟩], ⟨w 0, w 10⟩,
+    ?_, ?_, ?_⟩
+  · exact List.Forall₂.cons ⟨rfl, rfl⟩
+      (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil)
+  · rfl
+  · decide
 
 /-- Kill-line mutant: `checkedAmount` without the final capacity-headroom
 clamp (dropping `capacityHeadroom` from the three-way `min`). Skipping that
