@@ -308,7 +308,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
         "expected": "in-scope universal abstract/source admission and post-state equivariance (claimWithdrawalsTo excluded by hypothesis case-split), fixed-owner-gate kill-line mutant of the real admitted/run/renameInput, four executable Contract.run entrypoints, behavioral pinned-source address-write correspondence, rollback, and address-specific mutants build"
       },
-      "summary": "universal_address_writer_equivariance: two nonzero callers on an in-scope input (addressEquivarianceEntryScope, i.e. not claimWithdrawalsTo) have the same source-shaped admission bit, and a successful post-state renames under the swap. On requestWithdrawals/unwrap, admission is pause plus caller balance/allowance only (no owner gate, no fixed-owner gate); fixed_owner_gate_not_admission_equivariant mutates this file's own admitted/run/renameInput and refutes equivariance if that gate is added (the prior AddressAdmission toy kill-line was disconnected from this parent and is retained only for the denote-admission subordinate row). Verity composition adds Contract.run observe = sourceAddressView and snapshot rollback. claimWithdrawalsTo deferred. Not WithdrawalQueue.claimWithdrawalsTo.",
+      "summary": "universal_address_writer_equivariance: two nonzero callers on an input whose entrypoint is in scope have the same source-shaped admission bit, and a successful post-state renames under the swap; addressEquivarianceEntryScope is a genuine used premise, not a decorative binder (the proof case-splits on inp.entryPoint and eliminates the claimWithdrawalsTo branch from hScope). On requestWithdrawals/unwrap, admission is pause plus caller balance/allowance only (no owner gate, no fixed-owner gate); fixed_owner_gate_not_admission_equivariant mutates this file's own admitted/run/renameInput and refutes equivariance if that gate is added (the prior AddressAdmission toy kill-line was disconnected from this parent and is retained only for the denote-admission subordinate row). Verity composition adds Contract.run observe = sourceAddressView and snapshot rollback. claimWithdrawalsTo deferred. Not WithdrawalQueue.claimWithdrawalsTo.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
@@ -326,7 +326,8 @@
           "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
         ],
         "missing": [
-          "WithdrawalQueue.claimWithdrawalsTo request-owner admission and post-state equivariance"
+          "WithdrawalQueue.claimWithdrawalsTo request-owner admission and post-state equivariance",
+          "singleton-actor exclusion is not modeled: singletonActorEntryPoint is False for every EntryPoint in this model, so the parent carries no such premise"
         ]
       },
       "classification": {
