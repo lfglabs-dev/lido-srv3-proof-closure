@@ -57,6 +57,7 @@ CLAIMS = {
             "LidoSRv3.Audit.Allocation",
             "LidoSRv3.Audit.Trace",
             "LidoSRv3.Audit.Source.TopupCorrespondence",
+            "LidoSRv3.Audit.Source.TopupParentCorrespondence",
             "LidoSRv3.Audit.Verity.TopupTx",
             "LidoSRv3.Audit.Guarantees.Registry",
         ),
@@ -71,6 +72,9 @@ CLAIMS = {
             ("theorem", "source_unchecked_accumulation_faithful"),
             ("theorem", "source_pinned_config_discharges_pubkey_guard"),
             ("theorem", "verity_tx_simulates_source"),
+            ("theorem", "source_wrap_implies_assert_revert"),
+            ("theorem", "source_module_guard_required"),
+            ("theorem", "source_wc_type2_guard_required"),
         ),
     },
 }
