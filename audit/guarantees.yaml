@@ -340,12 +340,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
-        "expected": "abstract router-require post-condition, leftover-budget child, kill-line sum-require mutant, and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, and two-batch mutants"
+        "expected": "abstract leftover-budget block-cap parent (unconditional; proved by induction over the budget-consuming walk), a mutant-budget kill-line refuting the parent's own statement when the cap term is dropped, and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, and two-batch mutants"
       },
-      "summary": "router_require_post_condition: unconstrained alloc and limits from evaluateTopUpLimit satisfy per-validator bounds and aggregate block-cap bound as a commit post-condition. aggregate_bounded_by_block_cap demoted to child. Kill-line mutant witnesses that removing the sum require falsifies the parent. Verity: if memory arrays decode, observe of allocate equals sourceView of sourceRun. A-TOPUP-NOWRAP. Not live wei topUpLimits or SSZ.",
+      "summary": "aggregate_bounded_by_block_cap: for every batch and config, the left-to-right consumeBudget walk over transitionBudget = min(valueGwei, min(moduleLimit, maxTopUpPerBlock)) sums to at most maxTopUpPerBlockGwei; unconditional in b/cfg, proved by induction over consumeBudget, not by restating a hypothesis. block_cap_kill_line_refutes_parent shows the bound is not vacuous: a mutant budget that drops the maxTopUpPerBlockGwei term from that min lets the identical walk allocate above the cap. The prior registered parent router_require_post_condition took the sum bound as a hypothesis and returned it unchanged (Wave 1 review: pure tautology) and has been removed. Verity: if memory arrays decode, observe of allocate equals sourceView of sourceRun. A-TOPUP-NOWRAP. Not live wei topUpLimits or SSZ.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.router_require_post_condition"
+        "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
       },
       "verity": {
         "status": "CHECKED",
@@ -353,7 +353,7 @@
       },
       "fidelity": {
         "covered": [
-          "router require post-condition: per-validator and aggregate block-cap bounds on unconstrained alloc",
+          "leftover-budget block-cap bound: consumeBudget over transitionBudget sums to at most maxTopUpPerBlockGwei, unconditionally, with a mutant-budget kill-line",
           "single sourceRun interpreter; observe reads writeArray allocations",
           "Contract.run rollback after intermediate writes"
         ],
@@ -368,7 +368,7 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked router-require parent and leftover-budget child under A-TOPUP-NOWRAP; do not implement the live topUp + beacon path."
+        "work": "Keep the checked leftover-budget block-cap parent and its mutant-budget kill-line under A-TOPUP-NOWRAP; do not implement the live topUp + beacon path."
       },
       "next_gate": "Keep the checked theorems; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"

@@ -1,6 +1,6 @@
 # P-TOPUP-2
 
-Theorems: `PTopup2.router_require_post_condition` (parent), `PTopup2.aggregate_bounded_by_block_cap` (child), `PTopup2.verity_tx_simulates_topup2_spec`.
+Theorems: `PTopup2.aggregate_bounded_by_block_cap` (parent), `PTopup2.verity_tx_simulates_topup2_spec`.
 Assumptions: `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -18,17 +18,19 @@ Electra compounding validators can be topped up through `TopUpGateway.topUp` (`T
 
 ## Proof
 
-**Abstract `router_require_post_condition` (parent).** The registered parent takes unconstrained `alloc` and `limits` from `evaluateTopUpLimit`, with hypotheses `∀ i, alloc[i] ≤ limits[i]` and `sum(alloc) ≤ min(share, maxTopUpPerBlock)`, and concludes both as a conjunction. This models the router's `require` guards as a commit post-condition on module-returned allocations.
+**Abstract `aggregate_bounded_by_block_cap` (parent).** Unconditional in `b`/`cfg`: `(transition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei`. From `consumeBudget_sum_le`: induction over the left-to-right leftover-budget walk shows the sum is ≤ the budget it was given, then `transitionBudget`'s `min _ (min _ blockCap) ≤ blockCap` closes it. The same skeleton gives `aggregate_bounded_by_module_limit` and `aggregate_bounded_by_individual`. The theorem's content is in the induction, not in a restated hypothesis, so it is non-vacuous: it constrains the actual output of `consumeBudget`/`candidates`, not an arbitrary `alloc` handed in by the caller.
 
-A kill-line mutant in `Topup2DistributionTxMutants.lean` witnesses that removing the sum `require` falsifies the parent: two validators each independently within their 20-gwei limits produce `alloc = [10, 10]` with `sum = 20 > min(100, 10) = 10`.
+*Kill-line (`block_cap_kill_line_refutes_parent`, `Topup2DistributionTxMutants.lean`).* `mutantTransition` runs the identical `consumeBudget` walk against a mutant budget that drops the `maxTopUpPerBlockGwei` term from `transitionBudget`'s `min` — the Lean analogue of a router that dropped its block-cap `require`. Two validators each independently eligible for 20 gwei (`evaluated_topup_limit = target(32) - effective(12) = 20`), each requesting 10 gwei, both clear the uncapped 100-gwei mutant budget in full: the walk commits `[10, 10]`, summing to 20 against `maxTopUpPerBlockGwei = 10`. `¬ ∀ b cfg, (mutantTransition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei` is proved from this witness, and the file also shows the *real* `aggregate_bounded_by_block_cap` still holds on that same `b`/`cfg` pair — the cap term in `transitionBudget` is exactly what the mutant is missing.
 
-**Child `aggregate_bounded_by_block_cap`.** The previous leftover-budget theorem is demoted to a child. From `consumeBudget_sum_le`: induction shows the sum is ≤ the budget, then `min _ (min _ blockCap) ≤ blockCap`. The same skeleton gives `aggregate_bounded_by_module_limit` and `aggregate_bounded_by_individual`.
+**Retracted `router_require_post_condition` (Wave 1 review).** A prior revision registered a different parent: unconstrained `alloc`/`limits`, hypotheses `hEachBound : ∀ i, alloc[i] ≤ limits[i]` and `hSumBound : alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei`, conclusion `⟨hEachBound, hSumBound⟩`. The conclusion is syntactically identical to the hypotheses — a pure tautology, true for any `alloc`/`limits`/`share` including ones no execution of `transition` could produce — and does not mention `transition`, `consumeBudget`, or `evaluated_topup_limit` at all. Its "kill-line mutant" fed concrete numbers into that same restated conclusion directly, never through the theorem, so it refuted a general `Nat` fact rather than the registered parent. It has been removed rather than restated (see `PTopup2.lean` for the retraction note), and `aggregate_bounded_by_block_cap` is registered again, now with the mutant-budget kill-line above closing the gap that made it vulnerable to being swapped out in the first place.
 
-**VERITY `verity_tx_simulates_topup2_spec`.** Decode three arrays of equal length, run `txRun` (= `sourceRun` by `rfl`), write allocations and remaining/used slots, compare `observe` to `sourceView`. Rollback via `Contract.run` and `failAfterWrites`.
+**VERITY `verity_tx_simulates_topup2_spec`.** Decode three arrays of equal length, run `txRun` (= `sourceRun` by `rfl`), write allocations and remaining/used slots, compare `observe` to `sourceView`. Rollback via `Contract.run` and `failAfterWrites`. Unaffected by the parent swap above: it was never `router_require_post_condition`'s Verity plane.
 
 ## Issues
 
 ## Resolution
+
+**Wave 2 (this fix): retracted a tautological parent.** The Wave 1 revision that registered `router_require_post_condition` conjoined the per-validator and aggregate-sum hypotheses and handed them straight back as the conclusion, so the "parent" held for any `alloc`/`limits` and its kill-line mutant never actually applied the theorem — it checked a `Nat` fact about hand-picked numbers instead. `router_require_post_condition` is removed. `aggregate_bounded_by_block_cap` — unconditional in `b`/`cfg`, proved by induction over `consumeBudget` — is the registered parent again, and its non-vacuity now has an explicit witness: `block_cap_kill_line_refutes_parent` shows a mutant that drops `maxTopUpPerBlockGwei` from `transitionBudget`'s `min` lets the identical leftover-budget walk exceed the cap, using the same two-validator numbers the retracted kill-line used, now driven through the real `consumeBudget`/`candidates` functions.
 
 **Restated Lean/English.** `aggregate_bounded_by_block_cap` no longer takes unused `well_formed_pre`. An ill-formed batch still has `transition.sum ≤ cap`.
 
