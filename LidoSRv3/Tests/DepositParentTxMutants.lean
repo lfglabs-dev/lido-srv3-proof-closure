@@ -1,4 +1,6 @@
 import LidoSRv3.Audit.Guarantees.PDeposit1
+import LidoSRv3.Audit.Model.AllocCapacity
+import LidoSRv3.Audit.MinFirstAllocation
 
 /-! # P-DEPOSIT-1 faithful-plane fail-closed vectors
 
@@ -132,21 +134,57 @@ theorem honest_run_matches_source :
 
 The executable allocation witness remains the canonical, checked two-batch
 one.  The independent source input contains one key, however, so its
-`actualDepositsCount` cannot equal the executable allocation's `2 + 3`. -/
+`actualDepositsCount` cannot equal the executable allocation's `2 + 3`.
+
+The statement includes the actual P-ALLOC-1 and P-ALLOC-2 parent premises —
+`CheckedBounds` for the allocation capacity loop, and `RowsCorrespond` /
+`candidate?` / `hasFreeSpace` / `checkedAmount` for the proportional min-first
+step — and the proof exhibits concrete witnesses satisfying all of them.  The
+ALLOC parents constrain capacity rows and proportional amounts; they do not
+constrain the source deposit model's `publicKeysBatchLength`, so the
+counterexample where allocation premises hold but `LinksSource.keys` fails
+remains valid. -/
 
 private def bridgeCounterexampleSourceInput : SourceDepositInput :=
   { canonicalSourceInput with publicKeysBatchLength := 48 }
 
+open _root_.LidoSRv3.Audit.AllocCapacity in
+open _root_.LidoSRv3.Audit.MinFirstAllocation in
 /-- A universally claimed bridge from the executable ALLOC premises to
-`LinksSource` is false.  This is the load-bearing kill-line for that
-hypothetical derived bridge, not a mutation of the honest composed theorem. -/
+`LinksSource` is false even when the P-ALLOC-1 checked-bounds
+(`CheckedBounds`) and P-ALLOC-2 row-correspondence, candidate-selection,
+free-space, and checked-amount premises all hold.  The proof exhibits
+`CheckedBounds ⟨32, 64⟩ [] 1 false` (P-ALLOC-1) and a single-row
+min-first witness `[⟨0, 10⟩]` with `allocationSize = 5` (P-ALLOC-2)
+alongside the existing `bridgeCounterexampleSourceInput` whose one-key
+`actualDepositsCount = 1` still disagrees with the executable's five keys.
+This is the load-bearing kill-line for that hypothetical derived bridge, not
+a mutation of the honest composed theorem. -/
 theorem alloc_derived_linkssource_kill_line_refutes_bridge :
     ¬ (∀ (cfg : SourceDepositConfig) (inp : SourceDepositInput)
-        (txInputs : Inputs) (entry : ContractState),
-          Preconditions txInputs entry → LinksSource cfg inp txInputs) := by
+        (txInputs : Inputs) (entry : ContractState)
+        (allocCfg : Config) (modules : List Module)
+        (depositsToAllocate : _root_.Verity.Core.Uint256) (isTopUp : Bool)
+        (model : List Model.Bucket) (source : List Source.Row)
+        (best : Source.Row) (allocationSize w : Source.Word),
+          Preconditions txInputs entry →
+          CheckedBounds allocCfg modules depositsToAllocate isTopUp →
+          RowsCorrespond model source →
+          Source.candidate? source = some best →
+          Source.hasFreeSpace best = true →
+          source.length < _root_.Verity.Core.Uint256.modulus →
+          allocationSize.val ≠ 0 →
+          Source.checkedAmount source allocationSize best = some w →
+          LinksSource cfg inp txInputs) := by
   intro derivedBridge
   have hLink := derivedBridge canonicalSourceConfig bridgeCounterexampleSourceInput
-    canonicalInputs canonicalState canonical_preconditions
+    canonicalInputs canonicalState
+    ⟨32, 64⟩ [] 1 false
+    [⟨0, 10⟩] [⟨0, 10⟩] ⟨0, 10⟩ 5 5
+    canonical_preconditions
+    ⟨by decide, by decide, by decide, by decide, by decide⟩
+    (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil)
+    rfl rfl (by decide) (by decide) rfl
   -- The two executable legs carry `2 + 3` keys, while the one-key source input
   -- has `actualDepositsCount = 48 / 48 = 1`; both sides are closed terms.
   exact absurd hLink.keys (by decide)
