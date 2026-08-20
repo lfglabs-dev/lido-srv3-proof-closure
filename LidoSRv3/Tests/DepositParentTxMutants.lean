@@ -139,29 +139,38 @@ one.  The independent source input contains one key, however, so its
 The statement includes the actual P-ALLOC-1 and P-ALLOC-2 parent premises —
 `CheckedBounds` for the allocation capacity loop, and `RowsCorrespond` /
 `candidate?` / `hasFreeSpace` / `checkedAmount` for the proportional min-first
-step — together with two cross-plane composition premises that tie the ALLOC
-pipeline output to the transaction legs:
+step — together with three cross-plane composition premises that tie the ALLOC
+pipeline inputs and outputs to the transaction legs:
 
 1. `depositsToAllocate.val = txInputs.first.keys.val + txInputs.second.keys.val`
    — the total allocation demand equals the transaction's key count;
 2. `source.map (·.capacity.val) = MathView.capacities allocCfg modules
    depositsToAllocate isTopUp` — P-ALLOC-1's capacity output feeds
-   P-ALLOC-2's source rows.
+   P-ALLOC-2's source rows;
+3. `source.map (·.allocation.val) = [txInputs.first.keys.val,
+   txInputs.second.keys.val]` — the per-module ALLOC output allocations
+   equal the per-batch transaction keys.
 
-The proof exhibits a single active module (`shareLimit = 10000`,
-`depositableCount = 100`, `depositedCount = 10`) with `depositsToAllocate = 5`
-matching the executable's `2 + 3` keys, and a one-row min-first witness
-`[⟨0, 15⟩]` whose capacity `15 = MathView.capacities` for that module.  The
-ALLOC parents constrain capacity rows and proportional amounts; they do not
-constrain the source deposit model's `publicKeysBatchLength`, so the
-counterexample where all ALLOC and composition premises hold but
-`LinksSource.keys` fails remains valid. -/
+The proof exhibits two active modules (`moduleId = 7, 9`;
+`shareLimit = 5000`, `depositableCount = 100`, `depositedCount = 10` each)
+with `depositsToAllocate = 5` matching the executable's `2 + 3` keys, and
+post-allocation source rows `[⟨2, 12⟩, ⟨3, 12⟩]` whose allocations `2, 3`
+equal the batch keys and whose capacities `12 = MathView.capacities` for
+the two modules.  The ALLOC parents constrain capacity rows, proportional
+amounts, and per-module allocation outputs; they do not constrain the source
+deposit model's `publicKeysBatchLength`, so the counterexample where all ALLOC
+and composition premises hold but `LinksSource.keys` fails remains valid. -/
 
 private def bridgeCounterexampleSourceInput : SourceDepositInput :=
   { canonicalSourceInput with publicKeysBatchLength := 48 }
 
-private def counterexampleAllocModule : LidoSRv3.Audit.AllocCapacity.Module :=
-  { moduleId := 1, shareLimit := 10000, isActive := true, isType2 := false,
+private def counterexampleAllocModule1 : LidoSRv3.Audit.AllocCapacity.Module :=
+  { moduleId := 7, shareLimit := 5000, isActive := true, isType2 := false,
+    depositableCount := 100, depositedCount := 10,
+    summaryExitedCount := 0, accountingExitedCount := 0, totalModuleStake := 0 }
+
+private def counterexampleAllocModule2 : LidoSRv3.Audit.AllocCapacity.Module :=
+  { moduleId := 9, shareLimit := 5000, isActive := true, isType2 := false,
     depositableCount := 100, depositedCount := 10,
     summaryExitedCount := 0, accountingExitedCount := 0, totalModuleStake := 0 }
 
@@ -172,15 +181,18 @@ open _root_.LidoSRv3.Audit.MinFirstAllocation in
 (`CheckedBounds`) and P-ALLOC-2 row-correspondence, candidate-selection,
 free-space, and checked-amount premises all hold, and even when the ALLOC
 outputs are tied to the transaction inputs by cross-plane composition
-premises: (1) `depositsToAllocate.val = first.keys + second.keys` and
-(2) `source` capacities equal `MathView.capacities`.
+premises: (1) `depositsToAllocate.val = first.keys + second.keys`,
+(2) `source` capacities equal `MathView.capacities`, and
+(3) `source` row allocations equal the per-batch keys.
 
-The proof exhibits `allocCfg = ⟨32, 64⟩` with one active module
-(`shareLimit = 10000, depositableCount = 100, depositedCount = 10`),
-`depositsToAllocate = 5` (matching the executable's `2 + 3` keys), and
-a one-row min-first witness `[⟨0, 15⟩]` whose capacity `15` equals
-`MathView.capacities` for that module.  `bridgeCounterexampleSourceInput`
-with `publicKeysBatchLength = 48` has `actualDepositsCount = 1 ≠ 5`,
+The proof exhibits `allocCfg = ⟨32, 64⟩` with two active modules
+(`moduleId = 7, 9`; `shareLimit = 5000, depositableCount = 100,
+depositedCount = 10` each), `depositsToAllocate = 5` (matching the
+executable's `2 + 3` keys), and post-allocation source rows
+`[⟨2, 12⟩, ⟨3, 12⟩]` whose allocations `2, 3` equal the per-batch keys
+and whose capacities `12` equal `MathView.capacities` for the two
+modules.  `bridgeCounterexampleSourceInput` with
+`publicKeysBatchLength = 48` has `actualDepositsCount = 1 ≠ 5`,
 so `LinksSource.keys` fails.  The gap is exactly the
 `depositsToAllocate ≠ actualDepositsCount` inequality that no ALLOC
 premise bridges. -/
@@ -203,17 +215,20 @@ theorem alloc_derived_linkssource_kill_line_refutes_bridge :
             txInputs.first.keys.val + txInputs.second.keys.val →
           source.map (fun r => r.capacity.val) =
             MathView.capacities allocCfg modules depositsToAllocate isTopUp →
+          source.map (fun r => r.allocation.val) =
+            [txInputs.first.keys.val, txInputs.second.keys.val] →
           LinksSource cfg inp txInputs) := by
   intro derivedBridge
   have hLink := derivedBridge canonicalSourceConfig bridgeCounterexampleSourceInput
     canonicalInputs canonicalState
-    ⟨32, 64⟩ [counterexampleAllocModule] 5 false
-    [⟨0, 15⟩] [⟨0, 15⟩] ⟨0, 15⟩ 5 5
+    ⟨32, 64⟩ [counterexampleAllocModule1, counterexampleAllocModule2] 5 false
+    [⟨2, 12⟩, ⟨3, 12⟩] [⟨2, 12⟩, ⟨3, 12⟩] ⟨2, 12⟩ 5 1
     canonical_preconditions
     ⟨by decide, by decide, by decide, by decide, by decide⟩
-    (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil)
+    (List.Forall₂.cons ⟨rfl, rfl⟩ (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil))
     rfl rfl (by decide) (by decide) rfl
     rfl rfl
+    rfl
   exact absurd hLink.keys (by decide)
 
 /-! ## Per-module bookkeeping mutants
