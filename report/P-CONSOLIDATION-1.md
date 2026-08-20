@@ -1,5 +1,22 @@
 # P-CONSOLIDATION-1
 
+> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+
+## Auditor note
+
+P-CONSOLIDATION-1 ensures that TriggerableWithdrawalsGateway.addConsolidationRequests commits a batch only when the gateway is admitted, the consolidation fee is nonzero, and msg.value equals fee times request count.
+
+Each source pubkey is paired with the target pubkey at the same array index. The contract therefore submits the intended source-to-target zip, not two independent collections.
+
+The batch is atomic. Either every paired request commits, or none does. The kill-line makes the commit fee-blind while still satisfying the surrounding premises.
+
+## Proof issues and recommendations
+
+source_consolidation_preserves_eligibility_value_atomicity proves the source-level property for all inputs under hGatewayAdmittedNonzero. verity_tx_simulates_consolidation matches that source view.
+
+The current Verity model observes array updates in contract state. It does not model a value-bearing external CALL, so preservesEthBalance is a stub. The main improvement is real transaction frames carrying msg.value.
+
+
 Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 

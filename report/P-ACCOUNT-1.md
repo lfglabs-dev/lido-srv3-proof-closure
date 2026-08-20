@@ -1,5 +1,24 @@
 # P-ACCOUNT-1
 
+> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+
+## Auditor note
+
+P-ACCOUNT-1 protects one ordering rule. AccountingOracle first records the report's per-module validator balances in StakingRouter, then calls Accounting.handleOracleReport. Accounting reads the updated router balances to calculate the module fee distribution. Positive fee shares are then minted and distributed, and reportRewardsMinted records them last. Recording them before the fresh read could use stale module weights.
+
+mint_after_read_discipline proves this as an execution-order discipline on the modeled transaction. It does not rely on a hardcoded 2 < 3. sequenceSlot is a transaction-local clock. Each stampStep reads it, increments it, and stores the resulting tick in the executed step's slot.
+
+The kill-line changes only control flow. It moves the mint stamp before the read stamp, without changing any slot binding or numeral. The mint then receives the earlier tick, so the same discipline rejects the reordered transaction.
+
+## Proof issues and recommendations
+
+The parent quantifies over every report input, supplied fee amount, and initial state of the honest modeled handleOracleReport. On every committed execution, a nonzero mint tick is strictly after the read tick. Reverting executions impose no ordering obligation.
+
+verity_tx_simulates_oracle_report proves observe equals sourceView for every input. View equality does not itself establish chronology, so the raw-tick order theorem remains necessary.
+
+sharesToMintAsFees is supplied as an argument. The proof does not calculate fees, and it does not prove AccountingOracle.submitReportData, the authorized caller, or router role checks.
+
+
 Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 

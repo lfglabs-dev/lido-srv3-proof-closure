@@ -1,5 +1,24 @@
 # P-RESERVE-1
 
+> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+
+## Auditor note
+
+P-RESERVE-1 ensures that withdrawDepositableEther cannot spend ether reserved for the withdrawal queue. A committed withdrawal may consume only the depositable partition. The withdrawal reserve remains intact.
+
+The parent combines three requirements: scopedWithdrawGuards, partitioned spending, and the live effective reserve under freshQueueCache.
+
+The partition mutant breaks this guarantee by letting the withdrawal consume reserved ether. Dropping the canDeposit guard admits a withdrawal when deposit spending should be blocked.
+
+This is proved by source_spend_preserves_withdrawal_reserve.
+
+## Proof issues and recommendations
+
+The guarantee is universally quantified on both planes. unfinalizedStETH is currently a hypothesis, not the result of a live withdrawal queue call. canDeposit and bunker mode are free inputs. The proof therefore establishes the reserve property conditional on those values.
+
+The main improvement is to replace the withdrawal queue hypothesis with a live call and prove the resulting state and return-value connection. The transaction correspondence is verity_tx_simulates_reserve_spec.
+
+
 Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-lines: `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` (kills the `scopedWithdrawGuards` conjunct on a `canDeposit`-dropped mutant) and `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent` (kills the partition-invariant and live-reserve conjuncts on a mutated spend transition). Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 

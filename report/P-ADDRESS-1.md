@@ -1,5 +1,22 @@
 # P-ADDRESS-1
 
+> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+
+## Auditor note
+
+I proved that address-keyed writes are independent of address identity. For each of the four modeled WithdrawalQueue and router writers, including claimWithdrawalsTo, consistently renaming any nonzero address a1 to a2 preserves admission and renames the committed post-state in the same way.
+
+This rules out hidden dependence on a specific account. The kill-line adds a fixed owner gate. That literal-address check breaks the symmetry because a1 and a2 can then receive different admission results.
+
+The product guarantee is captured by universal_address_writer_equivariance.
+
+## Proof issues and recommendations
+
+The proof is universally quantified over inputs on both modeled planes. It then uses Verity observe to connect the modeled transaction result to the source view.
+
+singletonActor is always False. Therefore the proof does not establish a live WithdrawalQueue claim by a concrete authorized actor. claimWithdrawalsTo is covered only as one of the modeled address-keyed writers.
+
+
 Theorems: `PAddress1.universal_address_writer_equivariance` (parent), `PAddress1.abstract_source_verity_tx_address_equivariance` (Verity), `AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent` (kill-line).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
