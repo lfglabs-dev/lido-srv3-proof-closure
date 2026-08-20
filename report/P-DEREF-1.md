@@ -1,6 +1,6 @@
 # P-DEREF-1
 
-Theorems: facade `PDeref1.closure`; YAML names `SolidityDereference.verity_observe_refines_source` for both abstract and verity.
+Theorems: `PDeref1.closure` (abstract parent) and `SolidityDereference.verity_observe_refines_source` (verity refinement); YAML cites both explicitly. Wave 3 kill-lines `DereferenceMutants.packed_config_clobber_kill_line_refutes_parent` and `reentrant_callback_overwrite_kill_line_refutes_parent` are negations of `closure`'s full predicate shape on syntactic mutants of `applyInterleaving`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -46,6 +46,34 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 | 2–10, 16–18 | A | Fictional `Reachable` / layout / packing named in `missing`; `Reachable` not rebuilt. |
 | 11, 15 | C | `observeDeref` is a view and returns `0` for a zero address. |
 | 14 | A | `ofNat` wrap documented. |
+
+## Wave 3 (2026-08-20) — make the parent load-bearing
+
+Prior closure was almost content-free: the four writers were `id`, so stability
+was vacuous, and the only counterexamples lived in disconnected mutants
+(`replaceAddress`, `uncheckedDeref`). Wave 3 adds two syntactic mutants of the
+parent's own transition `applyInterleaving` that refute `PDeref1.closure`
+itself with premises retained:
+
+* `mutantApplyInterleavingClobber` — one-line edit: `.setStatus id _` now
+  `{s with moduleAddress := if q = id then 0 else s.moduleAddress q}` (wide
+  `SSTORE` clobber of the packed `ModuleStateConfig` word, issues 4/18).
+  Kill-line `packed_config_clobber_kill_line_refutes_parent` is
+  `¬ ∀ s hs id h steps, sourceDeref (mutantRunInterleavingsClobber s steps) id = some (s.moduleAddress id) ∧ …`
+  at witness `registeredOne` (Reachable via `migrated`, `WellFormed`), id `1`
+  (`Dereferenceable`), steps `[.setStatus 1 0]`. Mutant deref is `some 0 ≠ some 0xBEEF`
+  with `decide`; honest theorem holds because that arm is `id`.
+
+* `mutantApplyInterleavingReentrant` — ` .staticCallback` now writes
+  `0xCAFE` over id 1 (issue 6). Kill-line `reentrant_callback_overwrite_kill_line_refutes_parent`
+  same shape at `[.staticCallback]` → `some 0xCAFE ≠ some 0xBEEF`.
+
+Both are cited in `audit/guarantees.yaml` `reproduction.expected` and
+`fidelity.covered`. Honest `closure` still holds (`lake build` green); the
+mutants show it is falsifiable and that the packing / re-entrancy exclusions
+are load-bearing, not vacuous. Residual gaps (migrateStorage = id fiction,
+keccak `ROUTER_STORAGE_POSITION`, `last+1`/unique-address, `uint24` vs `Nat`,
+`DereferenceYulBridge` syntax-only) stay in `fidelity.missing` honestly.
 
 
 1. **YAML theorem name is not the facade theorem.**
