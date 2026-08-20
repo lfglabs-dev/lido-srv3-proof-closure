@@ -139,27 +139,51 @@ one.  The independent source input contains one key, however, so its
 The statement includes the actual P-ALLOC-1 and P-ALLOC-2 parent premises —
 `CheckedBounds` for the allocation capacity loop, and `RowsCorrespond` /
 `candidate?` / `hasFreeSpace` / `checkedAmount` for the proportional min-first
-step — and the proof exhibits concrete witnesses satisfying all of them.  The
+step — together with two cross-plane composition premises that tie the ALLOC
+pipeline output to the transaction legs:
+
+1. `depositsToAllocate.val = txInputs.first.keys.val + txInputs.second.keys.val`
+   — the total allocation demand equals the transaction's key count;
+2. `source.map (·.capacity.val) = MathView.capacities allocCfg modules
+   depositsToAllocate isTopUp` — P-ALLOC-1's capacity output feeds
+   P-ALLOC-2's source rows.
+
+The proof exhibits a single active module (`shareLimit = 10000`,
+`depositableCount = 100`, `depositedCount = 10`) with `depositsToAllocate = 5`
+matching the executable's `2 + 3` keys, and a one-row min-first witness
+`[⟨0, 15⟩]` whose capacity `15 = MathView.capacities` for that module.  The
 ALLOC parents constrain capacity rows and proportional amounts; they do not
 constrain the source deposit model's `publicKeysBatchLength`, so the
-counterexample where allocation premises hold but `LinksSource.keys` fails
-remains valid. -/
+counterexample where all ALLOC and composition premises hold but
+`LinksSource.keys` fails remains valid. -/
 
 private def bridgeCounterexampleSourceInput : SourceDepositInput :=
   { canonicalSourceInput with publicKeysBatchLength := 48 }
+
+private def counterexampleAllocModule : LidoSRv3.Audit.AllocCapacity.Module :=
+  { moduleId := 1, shareLimit := 10000, isActive := true, isType2 := false,
+    depositableCount := 100, depositedCount := 10,
+    summaryExitedCount := 0, accountingExitedCount := 0, totalModuleStake := 0 }
 
 open _root_.LidoSRv3.Audit.AllocCapacity in
 open _root_.LidoSRv3.Audit.MinFirstAllocation in
 /-- A universally claimed bridge from the executable ALLOC premises to
 `LinksSource` is false even when the P-ALLOC-1 checked-bounds
 (`CheckedBounds`) and P-ALLOC-2 row-correspondence, candidate-selection,
-free-space, and checked-amount premises all hold.  The proof exhibits
-`CheckedBounds ⟨32, 64⟩ [] 1 false` (P-ALLOC-1) and a single-row
-min-first witness `[⟨0, 10⟩]` with `allocationSize = 5` (P-ALLOC-2)
-alongside the existing `bridgeCounterexampleSourceInput` whose one-key
-`actualDepositsCount = 1` still disagrees with the executable's five keys.
-This is the load-bearing kill-line for that hypothetical derived bridge, not
-a mutation of the honest composed theorem. -/
+free-space, and checked-amount premises all hold, and even when the ALLOC
+outputs are tied to the transaction inputs by cross-plane composition
+premises: (1) `depositsToAllocate.val = first.keys + second.keys` and
+(2) `source` capacities equal `MathView.capacities`.
+
+The proof exhibits `allocCfg = ⟨32, 64⟩` with one active module
+(`shareLimit = 10000, depositableCount = 100, depositedCount = 10`),
+`depositsToAllocate = 5` (matching the executable's `2 + 3` keys), and
+a one-row min-first witness `[⟨0, 15⟩]` whose capacity `15` equals
+`MathView.capacities` for that module.  `bridgeCounterexampleSourceInput`
+with `publicKeysBatchLength = 48` has `actualDepositsCount = 1 ≠ 5`,
+so `LinksSource.keys` fails.  The gap is exactly the
+`depositsToAllocate ≠ actualDepositsCount` inequality that no ALLOC
+premise bridges. -/
 theorem alloc_derived_linkssource_kill_line_refutes_bridge :
     ¬ (∀ (cfg : SourceDepositConfig) (inp : SourceDepositInput)
         (txInputs : Inputs) (entry : ContractState)
@@ -175,18 +199,21 @@ theorem alloc_derived_linkssource_kill_line_refutes_bridge :
           source.length < _root_.Verity.Core.Uint256.modulus →
           allocationSize.val ≠ 0 →
           Source.checkedAmount source allocationSize best = some w →
+          depositsToAllocate.val =
+            txInputs.first.keys.val + txInputs.second.keys.val →
+          source.map (fun r => r.capacity.val) =
+            MathView.capacities allocCfg modules depositsToAllocate isTopUp →
           LinksSource cfg inp txInputs) := by
   intro derivedBridge
   have hLink := derivedBridge canonicalSourceConfig bridgeCounterexampleSourceInput
     canonicalInputs canonicalState
-    ⟨32, 64⟩ [] 1 false
-    [⟨0, 10⟩] [⟨0, 10⟩] ⟨0, 10⟩ 5 5
+    ⟨32, 64⟩ [counterexampleAllocModule] 5 false
+    [⟨0, 15⟩] [⟨0, 15⟩] ⟨0, 15⟩ 5 5
     canonical_preconditions
     ⟨by decide, by decide, by decide, by decide, by decide⟩
     (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil)
     rfl rfl (by decide) (by decide) rfl
-  -- The two executable legs carry `2 + 3` keys, while the one-key source input
-  -- has `actualDepositsCount = 48 / 48 = 1`; both sides are closed terms.
+    rfl rfl
   exact absurd hLink.keys (by decide)
 
 /-! ## Per-module bookkeeping mutants
