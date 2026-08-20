@@ -165,7 +165,11 @@ inputs.  Each field names the source quantity it pins:
 * `firstAmount`/`secondAmount` -- each leg carries exactly `DEPOSIT_SIZE` per key.
 
 The link is data-only: it says nothing about the post-state, so it cannot
-smuggle the conclusion in.
+smuggle the conclusion in.  In particular, it is an explicit hypothesis for
+this *exactly-two-batch* executable model, not a consequence of either ALLOC
+parent and not a derived bound for the Solidity allocation loop.  The private
+counterexample after `canonical_composition_witness` keeps the executable
+allocation premises true while falsifying `keys`.
 -/
 structure LinksSource (cfg : SourceDepositConfig) (inp : SourceDepositInput)
     (inputs : Inputs) : Prop where
@@ -226,7 +230,10 @@ plane's.
 Scope, stated rather than hidden: the executable plane is a Verity-EDSL
 transaction (`A-VERITY-SCAFFOLD`), not an EVM execution, and the source plane is
 `A-SOURCE-SHAPED`.  `LinksSource` is a hypothesis about the caller's allocation,
-not a proof that the pinned Solidity produces those two legs.
+not a proof that the pinned Solidity produces those two legs.  The transaction
+executes exactly two batches; it does not encode a universally quantified loop,
+and no ALLOC composition into `LinksSource` is claimed (see the private
+counterexample below).
 -/
 theorem verity_tx_composes_deposit_conservation_and_rollback
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
@@ -316,5 +323,39 @@ theorem canonical_composition_witness :
       canonicalInputs canonicalState canonical_links_source canonical_preconditions
   exact ⟨canonical_links_source, canonical_preconditions, hRun, hObs,
     (hAgg 5 160 160 0 hRun).1, (hAgg 5 160 160 0 hRun).2⟩
+
+/-! ## Private non-derivability witness
+
+This witness deliberately leaves the two executable allocation legs unchanged,
+so all of their checked guards, arithmetic bounds, distinct-module premise, and
+amount-per-key equations still hold.  Only the independent source byte length
+changes: it describes one public key while the two legs still contain five.
+Thus allocation outputs do not constrain `publicKeysBatchLength`, and the ALLOC
+parents cannot manufacture `LinksSource.keys`.
+
+Nor may the two calls to `processBatch` be read as a fake `∀` loop.  Repeating a
+leg would violate `Preconditions.distinctModules`; accumulating arbitrary legs
+would require a new no-wrap proof; and `execute` itself is, intentionally,
+exactly-two-batch. -/
+
+private def counterexampleLinkInputs : Inputs := canonicalInputs
+
+private def counterexampleSourceInput : SourceDepositInput :=
+  { canonicalSourceInput with publicKeysBatchLength := 48 }
+
+private theorem alloc_parents_do_not_imply_linkssource :
+    Preconditions counterexampleLinkInputs canonicalState ∧
+      counterexampleLinkInputs.depositSize.val = canonicalSourceConfig.depositSize ∧
+      counterexampleLinkInputs.first.amount.val =
+        counterexampleLinkInputs.first.keys.val * canonicalSourceConfig.depositSize ∧
+      counterexampleLinkInputs.second.amount.val =
+        counterexampleLinkInputs.second.keys.val * canonicalSourceConfig.depositSize ∧
+      ¬ LinksSource canonicalSourceConfig counterexampleSourceInput
+        counterexampleLinkInputs := by
+  refine ⟨canonical_preconditions, by decide, by decide, by decide, ?_⟩
+  intro hLink
+  have hKeys := hLink.keys
+  norm_num [counterexampleLinkInputs, counterexampleSourceInput,
+    canonicalSourceInput, canonicalSourceConfig, actualDepositsCount] at hKeys
 
 end LidoSRv3.Audit.Guarantees.PDeposit1

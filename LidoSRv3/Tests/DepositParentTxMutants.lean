@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Verity.DepositParentTx
+import LidoSRv3.Audit.Guarantees.PDeposit1
 
 /-! # P-DEPOSIT-1 faithful-plane fail-closed vectors
 
@@ -19,6 +19,8 @@ namespace LidoSRv3.Tests.DepositParentTxMutants
 open Verity
 open Contracts
 open LidoSRv3.Audit.Verity.DepositParentTx
+open LidoSRv3.Audit.SolidityDeposit
+open LidoSRv3.Audit.Guarantees.PDeposit1
 
 private def inputs : Inputs := canonicalInputs
 
@@ -125,6 +127,29 @@ theorem honest_run_matches_source :
     observe frame (probes inputs) ((execute inputs).run frame)
       = sourceObservables inputs frame :=
   execute_observes_source inputs frame canonical_preconditions
+
+/-! ## Kill-line for a hypothetical ALLOC-derived source bridge
+
+The executable allocation witness remains the canonical, checked two-batch
+one.  The independent source input contains one key, however, so its
+`actualDepositsCount` cannot equal the executable allocation's `2 + 3`. -/
+
+private def bridgeCounterexampleSourceInput : SourceDepositInput :=
+  { canonicalSourceInput with publicKeysBatchLength := 48 }
+
+/-- A universally claimed bridge from the executable ALLOC premises to
+`LinksSource` is false.  This is the load-bearing kill-line for that
+hypothetical derived bridge, not a mutation of the honest composed theorem. -/
+theorem alloc_derived_linkssource_kill_line_refutes_bridge :
+    ¬ (∀ (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+        (txInputs : Inputs) (entry : ContractState),
+          Preconditions txInputs entry → LinksSource cfg inp txInputs) := by
+  intro derivedBridge
+  have hLink := derivedBridge canonicalSourceConfig bridgeCounterexampleSourceInput
+    canonicalInputs canonicalState canonical_preconditions
+  have hKeys := hLink.keys
+  norm_num [bridgeCounterexampleSourceInput, canonicalSourceInput,
+    canonicalSourceConfig, actualDepositsCount] at hKeys
 
 /-! ## Per-module bookkeeping mutants
 
