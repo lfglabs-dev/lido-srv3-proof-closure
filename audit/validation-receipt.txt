@@ -1,11 +1,42 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 8c02c3bb4aeee5bf95a9be472294574811c5e3a5
+validated-tree: 733df20b2d36ce964812d17db5db4ba6560a8672
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-TOPUP-2 Verity maxValidatorsPerTopUp binding (2026-08-20)
+-----------------------------------------------------------
+
+- Branch `wave-2-p-topup-2-verity-binding` from main `1878b75` (Wave1 P-ACCOUNT-1).
+  Enforces `count ≤ maxValidatorsPerTopUp (32)` in `Topup2DistributionTx.allocate`
+  as checked revert `MaxValidatorsPerTopUpExceeded` before decoding; updates
+  `verity_tx_simulates_pinned_source` and `verity_tx_simulates_topup2_spec` to
+  require `requested.length ≤ maxValidatorsPerTopUp` (proved via `Nat.not_lt.mpr`);
+  adds mutant `allocateNoMaxCheck` without guard and kill-line
+  `max_validators_guard_kill_line_refutes_no_check` (honest reverts 33-validator
+  batch with effective 32/pending 0/requested 1/target 64/remainingCap 100,
+  mutant commits `[1;33]` with remaining 67/used 33, both `rfl`).
+- `audit/guarantees.yaml` P-TOPUP-2 `fidelity.covered` now names the new
+  observable; `reproduction.expected` and `summary` updated; `fidelity.missing`
+  stays honest (six gaps retained). `scripts/audit_metadata.py`
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-TOPUP-2"]` recomputed to
+  `87601621fccecd8e22a9948943f4712732ac1620d01c60a90d057520ba8e08f3`;
+  `audit/REPRODUCE.md` regenerated (STATUS fidelity gap unchanged as missing list
+  unchanged). `report/P-TOPUP-2.md` adds dated 2026-08-20 Wave2 entry.
+- `lake build LidoSRv3.Audit.Guarantees.PTopup2
+  LidoSRv3.Audit.Verity.Topup2DistributionTx
+  LidoSRv3.Tests.Topup2DistributionTxMutants
+  LidoSRv3.Audit.Guarantees.PTopup2Verity`: exit 0 (33 jobs, only upstream
+  Verity.Core simpa warnings). Existing `block_cap_kill_line_refutes_parent`
+  still proves (mutantTransition without maxTopUpPerBlock still refutes parent
+  via `decide`); no new `sorry`/`admit`/`axiom`; new theorems use `rfl`/`decide`
+  (`propext`/`Quot.sound` only).
+- `python3 scripts/audit_metadata.py check`: exit 0 (11 canonical + 14 subordinate).
+- `validated-tree` above rebound to this commit's tracked tree excluding this
+  receipt.
 
 P-ACCOUNT-1 step-clock ticks close the issue-5 reordering residual (2026-08-20)
 --------------------------------------------------------------------------------
