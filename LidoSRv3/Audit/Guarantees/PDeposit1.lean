@@ -354,8 +354,8 @@ private theorem alloc_parents_do_not_imply_linkssource :
         counterexampleLinkInputs := by
   refine ⟨canonical_preconditions, by decide, by decide, by decide, ?_⟩
   intro hLink
-  have hKeys := hLink.keys
-  norm_num [counterexampleLinkInputs, counterexampleSourceInput,
-    canonicalSourceInput, canonicalSourceConfig, actualDepositsCount] at hKeys
+  -- The two executable legs carry `2 + 3` keys, while the one-key source input
+  -- has `actualDepositsCount = 48 / 48 = 1`; both sides are closed terms.
+  exact absurd hLink.keys (by decide)
 
 end LidoSRv3.Audit.Guarantees.PDeposit1

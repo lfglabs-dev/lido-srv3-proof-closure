@@ -147,9 +147,9 @@ theorem alloc_derived_linkssource_kill_line_refutes_bridge :
   intro derivedBridge
   have hLink := derivedBridge canonicalSourceConfig bridgeCounterexampleSourceInput
     canonicalInputs canonicalState canonical_preconditions
-  have hKeys := hLink.keys
-  norm_num [bridgeCounterexampleSourceInput, canonicalSourceInput,
-    canonicalSourceConfig, actualDepositsCount] at hKeys
+  -- The two executable legs carry `2 + 3` keys, while the one-key source input
+  -- has `actualDepositsCount = 48 / 48 = 1`; both sides are closed terms.
+  exact absurd hLink.keys (by decide)
 
 /-! ## Per-module bookkeeping mutants
 
