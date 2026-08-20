@@ -17,13 +17,13 @@ The registered guarantee (`mint_after_read_discipline`) is the tick-order discip
 - `handleOracleReport` does not call Accounting. It writes a map of balances, a total slot, and three flag slots (`accountingCalledSlot`, `rewardsReadSlot`, `rewardsMintedSlot`) that stand in for those calls.
 - Step list `successfulSteps` is a literal four-constructor list, not a recorded call journal.
 - Storage slots 10–14 are model-local.
-- `accountingCalledSlot`, `rewardsReadSlot`, `rewardsMintedSlot` hold literal *ticks* (`1`, `2`, `3`; `0` for "never written"), one per write call site, in the exact program order accounting is pinned to. This is not a clock: the ticks are hardcoded per-call-site constants, not values threaded through actual execution, so they record which literal a call site wrote, not when a call physically ran.
+- `accountingCalledSlot`, `rewardsReadSlot`, `rewardsMintedSlot` hold *ticks* (`1`, `2`, `3`; `0` for "never written"), one per write call site, in the exact program order accounting is pinned to. These are values threaded through execution, not per-call-site constants: `sequenceSlot` (slot 15) is a transaction-local step clock, reset to `0` at the top of the commit branch, and every step flag is written by `stampStep`, which reads the clock and stores `clock + 1` into both the clock and its own slot. A tick therefore records the position at which that write actually ran, so moving a step write — without touching its slot or editing any numeral — changes the tick it records.
 
 ## Proof
 
-**Abstract `mint_after_read_discipline` (parent).** A presence check on the tick flags (as in `storedSteps`) cannot see write order at all: `ContractState` is a key-value store, so writes to `rewardsReadSlot` and `rewardsMintedSlot` commute regardless of which `writeSlot` call runs first in the program text. `mintAfterRead readTick mintTick := 0 < mintTick → readTick < mintTick` is a second, independent check over the two raw ticks (`2` for read, `3` for mint) rather than their mere presence. `mintAfterReadDiscipline_holds` proves it for the real `handleOracleReport` by unfolding to the literal ticks `2 < 3`.
+**Abstract `mint_after_read_discipline` (parent).** A presence check on the tick flags (as in `storedSteps`) cannot see write order at all: `ContractState` is a key-value store, so writes to `rewardsReadSlot` and `rewardsMintedSlot` commute regardless of which `writeSlot` call runs first in the program text. `mintAfterRead readTick mintTick := 0 < mintTick → readTick < mintTick` is a second, independent check over the two raw ticks (`2` for read, `3` for mint) rather than their mere presence. Because both ticks come from `stampStep`'s read of the reset `sequenceSlot` clock, `2 < 3` here *is* the execution-order fact and not a fact about which numeral a line of program text contains. `mintAfterReadDiscipline_holds` proves it for the real `handleOracleReport` for every input, fee, and starting state.
 
-**Kill-line `mint_order_kill_line` (refutes the parent).** `handleOracleReportSwappedMintBeforeRead` is a second executable transaction, defined beside the discipline it violates, that assigns the mint tick (`2`) at the call site textually before the read tick (`3`); `mintOrderKillLine_holds` proves that mutant does *not* satisfy `mintAfterReadDisciplineOf` — the identical predicate `mint_after_read_discipline` proves for the real transaction — witness: an empty report with a positive fee yields ticks `mint = 2`, `read = 3`, so `mintAfterRead 3 2` is `0 < 2 → 3 < 2`, i.e. false. This is what makes the registered parent falsifiable rather than true by construction: the kill-line mutates the same shape of transaction the parent quantifies over and the parent's own statement rejects it.
+**Kill-line `mint_order_kill_line` (refutes the parent).** `handleOracleReportMintBeforeRead` is a second executable transaction, defined beside the discipline it violates, obtained from the real one by a *pure call-site reordering*: the `stampStep rewardsMintedSlot` call moves above the `stampStep rewardsReadSlot` call and nothing else changes — every slot binding is identical and no literal is edited. `mintOrderKillLine_holds` proves that mutant does *not* satisfy `mintAfterReadDisciplineOf` — the identical predicate `mint_after_read_discipline` proves for the real transaction — witness: an empty report with a positive fee yields ticks `mint = 2`, `read = 3`, so `mintAfterRead 3 2` is `0 < 2 → 3 < 2`, i.e. false. This is what makes the registered parent falsifiable rather than true by construction: the kill-line mutates the same shape of transaction the parent quantifies over, changes only control flow, and the parent's own statement rejects it.
 
 **Child `source_report_before_reward`.** `sourceTrace` is `accept i >>= pure (successfulSteps accepted shares)`. `successfulSteps` is, by definition,
 
@@ -54,9 +54,27 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 `successfulSteps` call in `handleOracleReport`'s own `Result`/`View`
 construction (no bridge between the source if-tree and the tx plane), and a
 new `mint_after_read_discipline` / `mint_order_kill_line` pair adds a
-narrower order check plus its swapped-tick kill-line mutant. This is a
-partial mitigation of issue 5, not a closure of it — see the disclosed
-residual there.
+narrower order check plus its swapped-tick kill-line mutant. This was a
+partial mitigation of issue 5; the residual it disclosed is closed by the
+2026-08-20 entry below.
+
+2026-08-20 (issue 5 residual closed): the registered parent
+`mint_after_read_discipline` had degenerated into the numeral fact `2 < 3`.
+Its two ticks were hardcoded at their write call sites, and `ContractState`
+writes to distinct slots commute, so no reordering of the transaction body
+could change either tick — the only mutant that could refute the parent was
+one that moved the *literals* between slots, which is not a control-flow
+fault. `handleOracleReport` now resets a transaction-local step clock
+(`sequenceSlot`) and writes every step flag through `stampStep`, which reads
+that clock and stores `clock + 1`; the tick values are unchanged (`1`, `2`,
+`3`), so `storedSteps`, `observe`, `sourceView` and
+`verity_tx_simulates_oracle_report` all keep their previous meanings, but a
+tick now records when its write ran. The kill-line mutant is correspondingly
+replaced: `handleOracleReportSwappedMintBeforeRead` (which moved literals) is
+retired in favour of `handleOracleReportMintBeforeRead`, a pure call-site
+reordering. Lean: `HandleOracleReportTx.lean`, `Guarantees/PAccount1.lean`
+doc comments, `Tests/HandleOracleReportTxMutants.lean` (kill-line renamed to
+`reordered_mint_read_kill_line_refutes_parent`), `Audit/Trust.lean`.
 
 2026-08-19 (remediation): the metadata registration was tautological —
 `audit/guarantees.yaml`'s `abstract.theorem` pointed at
@@ -75,7 +93,7 @@ doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`)
 | # | Close | Note |
 | --- | --- | --- |
 | 1, 8, 10, 12 | A | Constructor `sourceTrace` / tx storage flags named honestly; issue 1's child is no longer the registered headline. |
-| 5 | B (partial) + A (residual) | `mint_after_read_discipline` (now the registered parent) / `mint_order_kill_line` catch a tick-travels-with-call-site reordering mutant; a reordering that keeps each literal pinned to its own slot remains an open, disclosed gap. |
+| 5 | B | Closed 2026-08-20. Step flags are stamped from a transaction-local clock (`sequenceSlot`) instead of per-call-site constants, so `mint_after_read_discipline` (the registered parent) is an execution-order claim; `mint_order_kill_line` / `handleOracleReportMintBeforeRead` refute it with a pure call-site reordering that edits no literal and rebinds no slot. The previously disclosed residual is gone. |
 | 2 | A | `fullReportSucceeds` remains an unused parameter of the (now child) constructor theorem. |
 | 3 | C | Fixed in PR #105: `observe` reads the persisted `writeArray` balances (`HandleOracleReportTx.lean:113–117`); a dedicated wrong-map-write mutant is still absent. |
 | 4, 6, 7, 11, 16, 17, 19 | scope | Membership, caller, role, fee computation, packing, `submitReportData` in `missing`. |
@@ -106,9 +124,9 @@ doc comments, this report, `audit/guarantees.yaml`, `scripts/audit_metadata.py`)
 5. **`storedSteps` reconstructs presence from tick literals, so a mint-first write is still invisible to it.**
    `HandleOracleReportTx.lean`'s `storedSteps` always concatenates `[balancesWritten] ++ acc? ++ rd? ++ mint?` in that *fixed* list order, gated on each flag equaling its own expected literal (`1`/`2`/`3`). It does not record write chronology; `ContractState` writes to distinct slots commute, so no state-based check can see which `writeSlot` call physically ran first.
 
-   *Counterexample mutant.* Swap the three `writeSlot`s so `rewardsMintedSlot` is written first, while still writing `2` into `rewardsReadSlot` and `3` into `rewardsMintedSlot` (i.e. keep the *values* pinned to their slots, only move the call sites). `observe` still reports `[balancesWritten, accountingCalled, rewardsRead, rewardsMinted]`; `storedSteps` cannot tell. That residual gap is exactly why `mint_after_read_discipline` (see Proof) is a second, independent check over the raw ticks rather than an upgrade to `storedSteps` itself.
+   *Counterexample mutant.* Reorder the step writes so `rewardsMintedSlot` is written before `rewardsReadSlot`, keeping each write bound to its own slot. `observe` still reports `[balancesWritten, accountingCalled, rewardsRead, rewardsMinted]`; `storedSteps` still sees three nonzero flags and cannot tell. That is exactly why `mint_after_read_discipline` (see Proof) is a second, independent check over the raw ticks rather than an upgrade to `storedSteps` itself.
 
-   *What the kill-line does and does not cover.* `mintOrderKillLine_holds`/`handleOracleReportSwappedMintBeforeRead` catch the narrower mutation where the tick *value* travels with the (reordered) call site — write site A now assigns tick `2` and write site B now assigns tick `3`, so the two ticks land in the wrong slots. They do **not** catch the counterexample directly above, where the call sites are reordered but each literal is kept pinned to its original slot; that residual case is unchanged by this change and remains an open, disclosed gap. The ticks are hardcoded per-call-site constants, not a value threaded through actual execution, so "order" here means "which literal ended up in which slot," not "which write ran chronologically first."
+   *Status: closed (2026-08-20).* This was previously recorded here as an open, disclosed gap, on the grounds that the ticks were hardcoded per-call-site constants, so "order" meant "which literal ended up in which slot" rather than "which write ran chronologically first." That is no longer the case. `sequenceSlot` (slot 15) is a transaction-local step clock reset at the top of the commit branch, and each step flag is written by `stampStep`, which reads that clock and stores `clock + 1`. `handleOracleReportMintBeforeRead` is the counterexample mutant above expressed against this model — a pure call-site reorder with no literal edited and no slot binding changed — and because `stampStep` sources its tick from the clock, the mint step now records `2` and the read step `3`, so `mintOrderKillLine_holds` refutes `mintAfterReadDisciplineOf` for it. `HandleOracleReportTxMutants.lean` pins both tick pairs (honest: read `2`, mint `3`; mutant: mint `2`, read `3`) and separately checks that all three of the mutant's `storedSteps` flags are still nonzero, i.e. that the reordering really is invisible to a presence-only check and is caught only by the tick comparison the registered parent performs.
 
 6. **“Registered” module ids are an input list, not `SRStorage.getModuleIdAt`.**
    `idsAndBalancesValid` checks `reportedModuleIds == registeredModuleIds` (and lengths / `MAX_VALUE_GWEI`). Live `_validateReportValidatorBalancesByStakingModule` (SRLib 854–869) loads `n = getModulesCount()` and `getModuleIdAt(i)` from storage.

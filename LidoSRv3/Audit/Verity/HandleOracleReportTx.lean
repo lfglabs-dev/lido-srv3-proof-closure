@@ -17,7 +17,9 @@ The executable body:
 * writes each module balance through `writeArray`;
 * accumulates the router total with checked `uint256` addition and the
   destination `uint64` bound, persisting it through `writeSlot`;
-* records the report-before-reward step flags through `writeSlot`;
+* records the report-before-reward step flags through `writeSlot`, stamping
+  each with a tick taken from a transaction-local step clock rather than a
+  call-site constant, so the flags record execution order;
 * rolls every intermediate write back through `Contract.run` on failure.
 
 This is not an EVM theorem: slot numbers are a model-local projection of the
@@ -38,6 +40,78 @@ def totalBalanceSlot : Nat := 11
 def accountingCalledSlot : Nat := 12
 def rewardsReadSlot : Nat := 13
 def rewardsMintedSlot : Nat := 14
+
+/-- Transaction-local step clock.  It is reset at the top of the modeled body
+and read back by every subsequent step write, so the tick a step records is
+the position at which that write actually ran. -/
+def sequenceSlot : Nat := 15
+
+/-- The tick the next step write will record: one past the current clock. -/
+def nextTick (state : ContractState) : Word :=
+  state.readSlot sequenceSlot + 1
+
+/-- Advance the step clock and stamp `slot` with the new tick.
+
+The tick is *read out of the state* rather than written as a call-site
+constant, so moving this call earlier or later in the body changes the value
+that lands in `slot`.  That is what makes the mint-after-read discipline below
+a claim about execution order rather than about which numeral a particular
+line of the program text happens to contain. -/
+def stampStep (slot : Nat) (state : ContractState) : ContractState :=
+  let tick := nextTick state
+  (state.writeSlot sequenceSlot tick).writeSlot slot tick
+
+@[simp] theorem readSlot_stampStep_self (slot : Nat) (state : ContractState) :
+    (stampStep slot state).readSlot slot = nextTick state := by
+  simp [stampStep, ContractState.readSlot_writeSlot_same]
+
+@[simp] theorem readSlot_stampStep_clock (slot : Nat) (state : ContractState) :
+    (stampStep slot state).readSlot sequenceSlot = nextTick state := by
+  by_cases h : sequenceSlot = slot
+  · rw [h]; simp [stampStep, ContractState.readSlot_writeSlot_same]
+  · simp [stampStep, ContractState.readSlot_writeSlot_other _ h,
+      ContractState.readSlot_writeSlot_same]
+
+@[simp] theorem readSlot_stampStep_other {slot other : Nat} (state : ContractState)
+    (h1 : other ≠ slot) (h2 : other ≠ sequenceSlot) :
+    (stampStep slot state).readSlot other = state.readSlot other := by
+  simp [stampStep, ContractState.readSlot_writeSlot_other _ h1,
+    ContractState.readSlot_writeSlot_other _ h2]
+
+/-! Slot disequalities, so proofs can keep the slot names folded (the tick
+lemmas below are stated in terms of `sequenceSlot`, not its numeral). -/
+
+theorem rewardsRead_ne_rewardsMinted : rewardsReadSlot ≠ rewardsMintedSlot := by decide
+
+theorem rewardsRead_ne_sequence : rewardsReadSlot ≠ sequenceSlot := by decide
+
+/-! The three ticks a committed body hands out.  `handleOracleReport` and every
+mutant below share the same reset-then-stamp prefix, so these close the clock
+arithmetic once instead of re-deriving it inside each proof. -/
+
+@[simp] theorem nextTick_reset (s : ContractState) :
+    nextTick (s.writeSlot sequenceSlot 0) = 1 := by
+  simp [nextTick, ContractState.readSlot_writeSlot_same]
+
+@[simp] theorem nextTick_stamp_one (a : Nat) (s : ContractState) :
+    nextTick (stampStep a (s.writeSlot sequenceSlot 0)) = 2 := by
+  simp only [nextTick, readSlot_stampStep_clock,
+    ContractState.readSlot_writeSlot_same]
+  decide
+
+@[simp] theorem nextTick_stamp_two (a b : Nat) (s : ContractState) :
+    nextTick (stampStep b (stampStep a (s.writeSlot sequenceSlot 0))) = 3 := by
+  simp only [nextTick, readSlot_stampStep_clock,
+    ContractState.readSlot_writeSlot_same]
+  decide
+
+/-! Numeral normalization for the three tick values.  `Uint256`'s `add_comm` /
+`add_assoc` simp lemmas reassociate the clock increments, so these close the
+resulting `1 + 1` / `1 + 2` comparisons that `storedSteps` performs. -/
+
+@[simp] theorem word_one_add_one : (1 : Word) + 1 = 2 := by decide
+
+@[simp] theorem word_one_add_two : (1 : Word) + 2 = 3 := by decide
 
 /-- Persist reported balances in router order as a `uint256[]` storage array.
 This is the `reportValidatorBalancesByStakingModule` write of the modeled
@@ -75,13 +149,14 @@ def storedSteps (state : ContractState) (balances : List Nat) : List Step :=
 /-- Executable oracle-report transaction.  Validity and overflow guards run
 in the body.  On overflow the prefix writes are performed and then reverted
 by `Contract.run`.  `failAfterWrites` is a test hook placed after every
-balance, total, and step-flag write.  The three step-flag writes are tagged
-with strictly increasing ticks (`1`, `2`, `3`) in the exact program order the
-real `Accounting.handleOracleReport` is pinned to: accounting is called,
-rewards are read from the just-written snapshot, and only then are shares
-minted.  `Result.steps` is read back from those ticks through `storedSteps`,
-never through `AccountingCorrespondence.successfulSteps` — the tx plane owns
-its own trace. -/
+balance, total, and step-flag write.  The step clock is reset and then each
+step-flag write `stampStep`s its own slot, so the ticks (`1`, `2`, `3`) are
+*computed from the order the writes execute in*, not chosen at the call site:
+accounting is called, rewards are read from the just-written snapshot, and
+only then are shares minted.  `Result.steps` is read back from those ticks
+through `storedSteps`, never through
+`AccountingCorrespondence.successfulSteps` — the tx plane owns its own
+trace. -/
 def handleOracleReport (i : ReportInput) (sharesToMintAsFees : Nat)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   if idsAndBalancesValid i then
@@ -91,9 +166,12 @@ def handleOracleReport (i : ReportInput) (sharesToMintAsFees : Nat)
     | some total =>
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := dirty.writeSlot totalBalanceSlot total
-        let dirty := dirty.writeSlot accountingCalledSlot 1
-        let dirty := dirty.writeSlot rewardsReadSlot 2
-        let dirty := dirty.writeSlot rewardsMintedSlot (if 0 < sharesToMintAsFees then 3 else 0)
+        let dirty := dirty.writeSlot sequenceSlot 0
+        let dirty := stampStep accountingCalledSlot dirty
+        let dirty := stampStep rewardsReadSlot dirty
+        let dirty :=
+          if 0 < sharesToMintAsFees then stampStep rewardsMintedSlot dirty
+          else dirty.writeSlot rewardsMintedSlot 0
         if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
         else .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
   else .revert "INVALID_REPORT" snapshot
@@ -236,12 +314,14 @@ theorem verity_tx_simulates_pinned_source
         simp [hTx]
         by_cases hFees : 0 < sharesToMintAsFees
         · simp [hFees, storedSteps, successfulSteps, persistBalances, writeAll,
+            stampStep, nextTick, sequenceSlot,
             totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
             ContractState.readArray, ContractState.writeArray,
             ContractState.readSlot_writeSlot_same,
             ContractState.readSlot_writeSlot_other, ContractState.storageArray_writeSlot,
             Nat.mod_eq_of_lt hnlt, map_ofNat_val i.balancesGwei hxs]
         · simp [hFees, storedSteps, successfulSteps, persistBalances, writeAll,
+            stampStep, nextTick, sequenceSlot,
             totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
             ContractState.readArray, ContractState.writeArray,
             ContractState.readSlot_writeSlot_same,
@@ -270,8 +350,13 @@ happened in the pinned order, because `ContractState` is a key-value store
 and writes to distinct slots commute.  The independent order fact — that the
 `rewardsReadSlot` tick precedes any nonzero `rewardsMintedSlot` tick — is
 stated and proved separately below, over the raw tick values, so a
-transaction that reassigns those two ticks out of order is caught even though
-its `storedSteps` presence bits look identical. -/
+transaction that runs those two steps out of order is caught even though its
+`storedSteps` presence bits look identical.
+
+The ticks are `stampStep`'s reads of the transaction-local clock, not
+per-call-site constants, so this is an ordering claim about execution and not
+about which numeral appears on which line: moving a step write without
+touching its slot or any literal already changes the tick it records. -/
 
 /-- Order predicate over the two raw tick values a reordering mutant would
 have to invert. -/
@@ -292,9 +377,10 @@ def mintAfterReadDisciplineOf (tx : ReportInput → Nat → Contract Result) : P
 def mintAfterReadDiscipline : Prop :=
   mintAfterReadDisciplineOf (fun i sharesToMintAsFees => handleOracleReport i sharesToMintAsFees)
 
-/-- The real transaction satisfies mint-after-read discipline: its
-`rewardsReadSlot` tick (`2`) is written strictly before any nonzero
-`rewardsMintedSlot` tick (`3`), for every input, fee, and starting state. -/
+/-- The real transaction satisfies mint-after-read discipline: the read step
+runs at clock tick `2` and any nonzero mint step at tick `3`, for every
+input, fee, and starting state.  Both ticks come from `stampStep`'s read of
+the reset clock, so this is the order the two writes executed in. -/
 theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
   intro i sharesToMintAsFees state
   unfold handleOracleReport Contract.run mintAfterRead
@@ -305,16 +391,24 @@ theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
     | some total =>
         by_cases hFees : 0 < sharesToMintAsFees <;>
           simp [hFees, ContractState.readSlot_writeSlot_same,
-            ContractState.readSlot_writeSlot_other, rewardsReadSlot, rewardsMintedSlot] <;>
+            ContractState.readSlot_writeSlot_other, rewardsRead_ne_rewardsMinted,
+            rewardsRead_ne_sequence] <;>
           decide
   · simp [hValid]
 
-/-- Reordering mutant: the mint tick is assigned before the read tick, the
-same fault as a patch that calls `reportRewardsMinted` before re-reading the
-freshly written balances.  Kept beside the discipline it violates, not only
-in the mutants test file, so the kill-line theorem can quantify over it
-directly. -/
-def handleOracleReportSwappedMintBeforeRead (i : ReportInput)
+/-- Reordering mutant: the mint step runs before the read step, the same fault
+as a patch that calls `reportRewardsMinted` before re-reading the freshly
+written balances.
+
+This is a *pure call-site reordering*: the two `stampStep` calls are moved,
+and each one still stamps its own slot with whatever tick the clock hands it.
+No literal is edited and no slot binding is changed, so `storedSteps`'
+presence check — and any other check that only asks "did this slot get
+written?" — cannot tell this apart from the honest transaction.  It is caught
+only because `stampStep` reads the tick out of the state instead of writing a
+constant.  Kept beside the discipline it violates, not only in the mutants
+test file, so the kill-line theorem can quantify over it directly. -/
+def handleOracleReportMintBeforeRead (i : ReportInput)
     (sharesToMintAsFees : Nat) : Contract Result := fun snapshot =>
   if idsAndBalancesValid i then
     match checkedTotal256 i.balancesGwei with
@@ -323,24 +417,28 @@ def handleOracleReportSwappedMintBeforeRead (i : ReportInput)
     | some total =>
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := dirty.writeSlot totalBalanceSlot total
-        let dirty := dirty.writeSlot accountingCalledSlot 1
-        let dirty := dirty.writeSlot rewardsMintedSlot (if 0 < sharesToMintAsFees then 2 else 0)
-        let dirty := dirty.writeSlot rewardsReadSlot 3
+        let dirty := dirty.writeSlot sequenceSlot 0
+        let dirty := stampStep accountingCalledSlot dirty
+        let dirty :=
+          if 0 < sharesToMintAsFees then stampStep rewardsMintedSlot dirty
+          else dirty.writeSlot rewardsMintedSlot 0
+        let dirty := stampStep rewardsReadSlot dirty
         .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
   else .revert "INVALID_REPORT" snapshot
 
-/-- Named kill-line statement for the registered P-ACCOUNT-1 parent: swapping
-the mint and read tick assignments must falsify mint-after-read discipline. -/
+/-- Named kill-line statement for the registered P-ACCOUNT-1 parent: running
+the mint step before the read step must falsify mint-after-read discipline. -/
 def mintOrderKillLine : Prop :=
-  ¬ mintAfterReadDisciplineOf handleOracleReportSwappedMintBeforeRead
+  ¬ mintAfterReadDisciplineOf handleOracleReportMintBeforeRead
 
 theorem mintOrderKillLine_holds : mintOrderKillLine := by
   intro hDisc
   have h := hDisc ⟨[], [], []⟩ 1 defaultState
-  simp [handleOracleReportSwappedMintBeforeRead, Contract.run, idsAndBalancesValid,
-    checkedTotal256, mintAfterRead, writeAll, persistBalances,
+  simp [handleOracleReportMintBeforeRead, Contract.run, idsAndBalancesValid,
+    checkedTotal256, mintAfterRead, writeAll, persistBalances, stampStep, nextTick,
     ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other,
-    totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot] at h
+    totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
+    sequenceSlot] at h
   exact absurd h (by decide)
 
 end LidoSRv3.Audit.Verity.HandleOracleReportTx

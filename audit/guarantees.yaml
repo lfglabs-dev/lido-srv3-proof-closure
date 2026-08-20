@@ -186,9 +186,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
-        "expected": "mint-after-read tick-order discipline with its swapped-tick kill-line mutant on the registered parent, plus the handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, two-batch, and fees-conditional-removal mutants"
+        "expected": "mint-after-read tick-order discipline over clock-stamped step ticks, with its pure call-site reordering kill-line mutant on the registered parent, plus the handleOracleReport-shaped Contract.run transaction build with overflow, bypass-guard, dropped-snapshot, rollback, two-batch, and fees-conditional-removal mutants"
       },
-      "summary": "mint_after_read_discipline (registered parent): on every committed execution of the real handleOracleReport, the rewardsReadSlot tick is written strictly before any nonzero rewardsMintedSlot tick, read directly off the two raw tx-storage ticks rather than through storedSteps's presence-only check. Kill-line mint_order_kill_line directly refutes this same mintAfterReadDisciplineOf predicate applied to a mutant that swaps the mint/read tick assignments, so the registered parent is the theorem the kill-line actually falsifies. Child source_report_before_reward is a source-plane correspondence fact only (successfulSteps is a literal four-constructor list; fullReportSucceeds is never inspected) and carries no kill-line of its own. Verity child verity_tx_simulates_oracle_report: observe of handleOracleReport equals sourceView; Result.steps/View.steps are read back from independent tx storage-flag ticks (storedSteps), never from the source if-tree's successfulSteps, so the two planes share no step-list bridge. Not submitReportData; sharesToMintAsFees is an argument.",
+      "summary": "mint_after_read_discipline (registered parent): on every committed execution of the real handleOracleReport, the rewardsReadSlot tick is written strictly before any nonzero rewardsMintedSlot tick, read directly off the two raw tx-storage ticks rather than through storedSteps's presence-only check. The ticks are not call-site constants: sequenceSlot is a transaction-local step clock reset at the top of the commit branch, and every step flag is written by stampStep, which reads that clock and stores clock + 1, so a tick records the position at which its write actually ran. Kill-line mint_order_kill_line directly refutes this same mintAfterReadDisciplineOf predicate applied to handleOracleReportMintBeforeRead, a pure call-site reordering that moves the stampStep rewardsMintedSlot call above the stampStep rewardsReadSlot call while editing no literal and rebinding no slot, so the registered parent is the theorem the kill-line actually falsifies and it is falsified by a control-flow fault rather than by relabelled constants. Child source_report_before_reward is a source-plane correspondence fact only (successfulSteps is a literal four-constructor list; fullReportSucceeds is never inspected) and carries no kill-line of its own. Verity child verity_tx_simulates_oracle_report: observe of handleOracleReport equals sourceView; Result.steps/View.steps are read back from independent tx storage-flag ticks (storedSteps), never from the source if-tree's successfulSteps, so the two planes share no step-list bridge. Not submitReportData; sharesToMintAsFees is an argument.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline"
@@ -199,14 +199,14 @@
       },
       "fidelity": {
         "covered": [
-          "mint-after-read order discipline over the two raw tx-storage ticks, refuted on the registered parent itself by the swapped-tick kill-line mutant",
+          "mint-after-read order discipline over the two raw tx-storage ticks, which are stamped from a transaction-local step clock rather than written as call-site constants, refuted on the registered parent itself by a pure call-site reordering kill-line mutant that edits no literal and rebinds no slot",
+          "presence-blindness of storedSteps is pinned: the reordering mutant's three step flags are all still nonzero, so the reordering is caught only by the tick comparison the registered parent performs",
           "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge",
           "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
           "Contract.run rollback after intermediate writes",
           "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree"
         ],
         "missing": [
-          "a reordering mutant that keeps each tick literal pinned to its own storage slot while only moving the call sites is undetected by mint_after_read_discipline (ContractState writes to distinct slots commute)",
           "SRStorage membership and unique uint24 module ids",
           "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
           "submitReportData / _handleConsensusReportData",
@@ -217,9 +217,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked mint-after-read discipline theorem and its swapped-tick kill-line as the registered parent; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
+        "work": "Keep the checked mint-after-read discipline theorem and its call-site-reordering kill-line as the registered parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
       },
-      "next_gate": "Keep the checked theorems and the mint-after-read kill-line on the registered parent; close listed fidelity gaps (starting with the slot-pinned reordering residual) without widening the claim.",
+      "next_gate": "Keep the checked theorems and the mint-after-read kill-line on the registered parent; close listed fidelity gaps without widening the claim.",
       "roadmap_priority": "DONE"
     },
     {
