@@ -66,21 +66,30 @@ calls `AccountingCorrespondence.successfulSteps`; the two planes share no
 step-list bridge. Unlike the demoted `source_report_before_reward` child,
 this parent is directly refuted by the `mint_order_kill_line` mutant below,
 so the registered claim has an adversarial witness rather than being true by
-construction. Residual, disclosed gap: a reordering mutant that keeps each
-tick literal pinned to its own slot while only moving the call sites is
-undetected here, because `ContractState` writes to distinct slots commute
-(see `report/P-ACCOUNT-1.md` issue 5). -/
+construction. The ticks are not call-site constants: every step write goes
+through `stampStep`, which reads the transaction-local step clock in
+`sequenceSlot` and stores `clock + 1`, so the number a slot ends up holding is
+the position at which that write actually ran. Moving a `stampStep` call
+therefore changes the tick it records, which is what makes this an ordering
+claim rather than a fact about which numeral a line of program text
+contains. -/
 theorem mint_after_read_discipline : mintAfterReadDiscipline :=
   mintAfterReadDiscipline_holds
 
-/-- Kill-line for the registered parent `mint_after_read_discipline`: a
-mutant that assigns the mint tick before the read tick — the same fault as
-calling `reportRewardsMinted` before re-reading the freshly written
-balances — violates `mintAfterReadDisciplineOf` for that mutant, the same
-predicate the registered parent proves for the real transaction. If a future
-edit merges the two tick writes back into a shared order-insensitive flag,
-this theorem's witness fails and the regression is caught here, not only by
-informal review. -/
+/-- Kill-line for the registered parent `mint_after_read_discipline`.
+`handleOracleReportMintBeforeRead` is a pure call-site reordering of the real
+transaction: the `stampStep rewardsMintedSlot` call moves above the
+`stampStep rewardsReadSlot` call, and nothing else changes — every slot
+binding is identical and no literal is edited, the same fault as calling
+`reportRewardsMinted` before re-reading the freshly written balances. Because
+`stampStep` takes its tick from the step clock rather than from the call site,
+the mint step now records `2` and the read step `3`, violating
+`mintAfterReadDisciplineOf` for that mutant — the same predicate the
+registered parent proves for the real transaction. This closes the reordering
+gap `report/P-ACCOUNT-1.md` issue 5 previously disclosed as open. If a future
+edit merges the two tick writes back into a shared order-insensitive flag, or
+reverts them to per-call-site constants, this theorem's witness fails and the
+regression is caught here, not only by informal review. -/
 theorem mint_order_kill_line : mintOrderKillLine :=
   mintOrderKillLine_holds
 

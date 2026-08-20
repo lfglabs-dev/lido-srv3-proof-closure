@@ -114,7 +114,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.mintAfterReadDiscipline_holds
 #print axioms LidoSRv3.Audit.Verity.HandleOracleReportTx.mintOrderKillLine_holds
-#print axioms LidoSRv3.Tests.HandleOracleReportTxMutants.swapped_mint_read_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.HandleOracleReportTxMutants.reordered_mint_read_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.run_claim_success
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant
 #print axioms LidoSRv3.Audit.Verity.AddressAdmission.claim_admits

@@ -128,16 +128,42 @@ example :
       sourceView valid 0 := by
   native_decide
 
-/-- Reordering mutant: the mint tick (`2`) is assigned strictly before the
-read tick (`3`), the same fault as calling `reportRewardsMinted` before
-re-reading the freshly written balances. Both flags are nonzero — a
-presence-only check cannot tell this apart from the honest transaction — but
-the raw tick values disagree with `mintAfterRead`. -/
+/-- The honest transaction stamps the read step at clock tick `2` and the
+mint step at tick `3`. Neither number appears at a write site: both are read
+back out of the step clock, so they record the order the two writes ran in. -/
 example :
-    let dirty := match (handleOracleReportSwappedMintBeforeRead valid 1) defaultState with
+    let dirty := match (handleOracleReport valid 1) defaultState with
+      | .success _ s => s
+      | .revert _ s => s
+    dirty.readSlot rewardsReadSlot = 2 ∧ dirty.readSlot rewardsMintedSlot = 3 := by
+  native_decide
+
+/-- Reordering mutant: the mint step runs strictly before the read step, the
+same fault as calling `reportRewardsMinted` before re-reading the freshly
+written balances.
+
+This is the mutation `report/P-ACCOUNT-1.md` issue 5 previously recorded as an
+open, disclosed gap: only the call sites move, every slot binding is
+unchanged, and no literal is edited. Both flags are still nonzero and
+`storedSteps`' presence check still cannot tell this apart from the honest
+transaction — but because `stampStep` takes its tick from the clock, the mint
+step now records `2` and the read step `3`. -/
+example :
+    let dirty := match (handleOracleReportMintBeforeRead valid 1) defaultState with
       | .success _ s => s
       | .revert _ s => s
     dirty.readSlot rewardsMintedSlot = 2 ∧ dirty.readSlot rewardsReadSlot = 3 := by
+  native_decide
+
+/-- The reordering above is invisible to a presence-only check: the mutant's
+`storedSteps` flags are all still nonzero, exactly as in the honest run. This
+is why the parent reads the raw ticks rather than `storedSteps`. -/
+example :
+    let dirty := match (handleOracleReportMintBeforeRead valid 1) defaultState with
+      | .success _ s => s
+      | .revert _ s => s
+    dirty.readSlot accountingCalledSlot ≠ 0 ∧ dirty.readSlot rewardsReadSlot ≠ 0 ∧
+      dirty.readSlot rewardsMintedSlot ≠ 0 := by
   native_decide
 
 /-- The concrete ticks above (mint `2`, read `3`) witness a mint-after-read
@@ -147,10 +173,9 @@ example : ¬ mintAfterRead 3 2 := by
   intro h
   exact absurd (h (by decide)) (by decide)
 
-/-- The registered parent depends on the swapped-order refutation above:
-reassigning the mint tick before the read tick must falsify mint-after-read
-discipline. -/
-theorem swapped_mint_read_kill_line_refutes_parent :
+/-- The registered parent depends on the reordering refutation above: running
+the mint step before the read step must falsify mint-after-read discipline. -/
+theorem reordered_mint_read_kill_line_refutes_parent :
     LidoSRv3.Audit.Verity.HandleOracleReportTx.mintOrderKillLine :=
   LidoSRv3.Audit.Verity.HandleOracleReportTx.mintOrderKillLine_holds
 

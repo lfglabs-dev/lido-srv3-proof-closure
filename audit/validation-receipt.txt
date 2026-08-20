@@ -7,6 +7,125 @@ Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
+P-ACCOUNT-1 step-clock ticks close the issue-5 reordering residual (2026-08-20)
+--------------------------------------------------------------------------------
+
+- Branch `wave-1-p-account-1-sequenced-ticks` from main
+  `edbcec7530e85a04bb622abc9c6af1623b57afe2` (merge of human PR #134 explicit-
+  forall P-ALLOC-2 with wave-5 P-ADDRESS-1 #143). Supersedes the two
+  `P-ACCOUNT-1` sections below on the specific point of where the step ticks
+  come from and which mutant refutes the registered parent.
+- Defect fixed (load-bearing-parent bar, criterion 1). The registered parent
+  `PAccount1.mint_after_read_discipline` was, in content, the numeral fact
+  `2 < 3`. `accountingCalledSlot`, `rewardsReadSlot`, and `rewardsMintedSlot`
+  were written with the *hardcoded call-site literals* `1`, `2`, `3`, and
+  `ContractState` writes to distinct slots commute, so no reordering of
+  `handleOracleReport`'s body could change either tick. The only mutant that
+  could refute the parent was one that moved the literals between slots --
+  a relabelling, not a control-flow fault. `report/P-ACCOUNT-1.md` issue 5
+  disclosed exactly this as an open residual, and the 2026-08-19 section
+  below records it as "not claimed closed".
+- Fix: `HandleOracleReportTx.lean` gains `sequenceSlot : Nat := 15`, a
+  transaction-local step clock, and two primitives -- `nextTick state :=
+  state.readSlot sequenceSlot + 1` and `stampStep slot state`, which writes
+  `nextTick state` into both `sequenceSlot` and `slot`. `handleOracleReport`'s
+  commit branch resets the clock (`writeSlot sequenceSlot 0`) and then writes
+  every step flag through `stampStep`. The tick *values* are unchanged (`1`,
+  `2`, `3`), so `storedSteps`, `observe`, `sourceView`,
+  `verity_tx_simulates_pinned_source`, `verity_tx_simulates_oracle_report`,
+  and `revert_restores_snapshot` all keep their previous statements and
+  meanings; what changed is that a tick is now read out of the state rather
+  than written as a constant, so it records the position at which its write
+  actually ran.
+- Kill-line replaced (bar criterion 2). `handleOracleReportSwappedMintBeforeRead`
+  (which moved the literals `2` and `3` between slots) is retired in favour of
+  `handleOracleReportMintBeforeRead`, a *pure call-site reordering* of the real
+  transaction: the fee-conditional `stampStep rewardsMintedSlot` block moves
+  above the `stampStep rewardsReadSlot` call, every slot binding is identical,
+  and no numeral is edited. `mintOrderKillLine :=
+  ¬ mintAfterReadDisciplineOf handleOracleReportMintBeforeRead` is proved by
+  `mintOrderKillLine_holds` on an empty positive-fee report: the mint step
+  records `2`, the read step `3`, so `mintAfterRead 3 2` reduces to
+  `0 < 2 → 3 < 2`, which is `False`. The kill-line refutes
+  `mintAfterReadDisciplineOf`, the identical predicate
+  `mintAfterReadDiscipline_holds` proves for the real transaction, so it
+  refutes the registered parent itself rather than a sibling model.
+- `mintAfterReadDiscipline_holds` is reproved against the clock; it remains
+  universally quantified over input, fee, and starting state, and its
+  statement (`mintAfterReadDiscipline`, `mintAfterReadDisciplineOf`,
+  `mintAfterRead`) is byte-identical to the prior version. Supporting lemmas
+  added: `readSlot_stampStep_self`, `readSlot_stampStep_clock`,
+  `readSlot_stampStep_other`, `rewardsRead_ne_rewardsMinted`,
+  `rewardsRead_ne_sequence`, `nextTick_reset`, `nextTick_stamp_one`,
+  `nextTick_stamp_two`, `word_one_add_one`, `word_one_add_two`.
+- `LidoSRv3/Tests/HandleOracleReportTxMutants.lean`: the swapped-literal
+  example is replaced by three examples -- the honest run's ticks (`read = 2`,
+  `mint = 3`), the reordering mutant's ticks (`mint = 2`, `read = 3`), and a
+  presence-blindness check showing all three of the mutant's step flags are
+  still nonzero, i.e. the reordering is genuinely invisible to `storedSteps`
+  and is caught only by the tick comparison the registered parent performs.
+  `swapped_mint_read_kill_line_refutes_parent` is renamed
+  `reordered_mint_read_kill_line_refutes_parent`; `LidoSRv3/Audit/Trust.lean`
+  is updated to print axioms for the new name.
+- Scope synchronized (bar criterion 3). `audit/guarantees.yaml`'s
+  `P-ACCOUNT-1` row: `reproduction.expected`, `summary`, `fidelity.covered`,
+  `classification.work`, and `next_gate` now describe clock-stamped ticks and
+  the call-site-reordering kill-line, and a new `fidelity.covered` entry pins
+  the presence-blindness fact. The `fidelity.missing` line asserting the
+  slot-pinned reordering residual is *removed*, because that residual is now
+  refuted by a theorem on main. `classification.kind` remains
+  `IMPLEMENTATION_PENDING`: the rest of `fidelity.missing` (SRStorage
+  membership, caller/role, `submitReportData`, fee computation, packed
+  accounting words, re-read of the router snapshot) is unchanged and nonempty.
+  `scripts/audit_metadata.py`'s `EXPECTED_CANONICAL_DETAIL_SHA256["P-ACCOUNT-1"]`
+  is recomputed to
+  `a9ea6b20f5b83356e604cbc72babaacfab6cc20711b4a7ef4e4ebef6136c832a`.
+  `audit/ROADMAP.md`, `audit/STATUS.md`, and `audit/REPRODUCE.md` are
+  regenerated with `make audit-generate`; the diff is confined to the
+  `P-ACCOUNT-1` row. `report/P-ACCOUNT-1.md` issue 5 is marked
+  `Status: closed (2026-08-20)`, the resolution table row 5 moves from
+  `B (partial) + A (residual)` to `B`, and a dated resolution paragraph is
+  added.
+- `lake build`: exit 0, "Build completed successfully (1395 jobs)". Only
+  pre-existing upstream `Verity.Core` `simpa`-linter and `DepositLedgerTx`
+  unused-variable warnings; zero warnings and zero errors in the four changed
+  Lean files.
+- `lake build LidoSRv3.Audit.Guarantees.PAccount1
+  LidoSRv3.Audit.Verity.HandleOracleReportTx
+  LidoSRv3.Tests.HandleOracleReportTxMutants` (the row's own
+  `reproduction.command`): exit 0 (19 jobs).
+- Trust report from the full build:
+  `PAccount1.mint_after_read_discipline` depends on axioms
+  `[propext, Quot.sound]`;
+  `PAccount1.mint_order_kill_line`,
+  `HandleOracleReportTx.mintOrderKillLine_holds`, and
+  `HandleOracleReportTxMutants.reordered_mint_read_kill_line_refutes_parent`
+  depend on `[propext, Classical.choice, Quot.sound]`;
+  `HandleOracleReportTx.mintAfterReadDiscipline_holds` and
+  `HandleOracleReportTx.verity_tx_simulates_pinned_source` depend on
+  `[propext, Quot.sound]`; `HandleOracleReportTx.revert_restores_snapshot`
+  and `PAccount1.verity_tx_revert_restores_snapshot` depend on `[propext]`.
+  No `sorryAx`, no `Lean.ofReduceBool`, and no project-level `axiom` appears
+  anywhere in the trust report.
+- Changed-Lean forbidden-token scan (`git diff -- '*.lean'` added lines): no
+  `sorry`, `sorryAx`, `admit`, or `axiom` declaration. Two added
+  `native_decide` call sites, both in
+  `Tests/HandleOracleReportTxMutants.lean`, which already used
+  `native_decide` in the same style before this change; neither is a new
+  proof-policy escape category.
+- `make check`: exit 0 -- `audit_metadata.py check` (11 canonical guarantees +
+  14 subordinate evidence rows), `test_audit_metadata.py`,
+  `check_validation_receipt.py`, `check_no_python_evidence.sh`,
+  `test_check_no_python_evidence.sh`, `check_public_claim_surfaces.py`,
+  `test_public_claim_surfaces.py`, `test_verity_provenance.py`, and
+  `check_provenance_guards.sh` all pass.
+- `python3 scripts/check_verity_provenance.py`:
+  `a063bfc869735045354ebc3862ca08859da0f56e`, unchanged.
+- `validated-tree` above is rebound to this commit's tracked tree excluding
+  this receipt, computed per `scripts/check_validation_receipt.py`'s own
+  algorithm (`git read-tree HEAD`, `git rm --cached` this receipt, `git
+  write-tree`).
+
 P-CONSOLIDATION-1 unused-hypothesis remediation (2026-08-19)
 --------------------------------------------------------------
 
