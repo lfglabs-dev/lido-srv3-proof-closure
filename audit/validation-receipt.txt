@@ -1,11 +1,35 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 733df20b2d36ce964812d17db5db4ba6560a8672
+validated-tree: d1f20801c098833d963010c7910db689221ae28c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Wave 3 post-merge prerequisite receipt rebind (2026-08-20)
+-----------------------------------------------------------
+
+- Prerequisite repair only: rebinds `validated-tree` from
+  `733df20b2d36ce964812d17db5db4ba6560a8672` (wave2 tree, still recorded on
+  `main` `0236f0970764253149045ff5fcd02290474a47e7`) to
+  `d1f20801c098833d963010c7910db689221ae28c`, the tracked tree of `main`
+  `0236f09` excluding this receipt per `scripts/check_validation_receipt.py`
+  (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
+- No guarantee semantics, `audit/guarantees.yaml`, `audit/REPRODUCE.md`,
+  `audit/STATUS.md`, `audit/ROADMAP.md`, report scope, Yul/EVM, or source
+  changes; every remaining canonical parent already meets the load-bearing
+  bar per Wave4 audit mission 6198ecd2 (verified `main` `0236f09`), so this
+  is not a new wave and does not renumber guarantees. Wave3 (`P-DEREF-1`
+  load-bearing, PR #150) advanced the tree (`LidoSRv3/Tests/DereferenceMutants.lean`,
+  `audit/guarantees.yaml`, `report/P-DEREF-1.md`) without rebinding the receipt,
+  which caused `make test` / `check_validation_receipt.py` staleness.
+- Verification (post-rebind, on this branch head): `python3 scripts/check_validation_receipt.py`
+  `validation receipt ok: final tracked content tree excluding receipt d1f20801c098833d963010c7910db689221ae28c`;
+  `make audit-check` and `make test` expected to pass; no Lean changes, so
+  `sorry`/`admit`/`axiom`/`unsafe` scan is vacuous. Recomputed `validated-tree`
+  from live `main` before editing; `main` has not advanced past `0236f09` at
+  rebind time.
 
 P-TOPUP-2 Verity maxValidatorsPerTopUp binding (2026-08-20)
 -----------------------------------------------------------
