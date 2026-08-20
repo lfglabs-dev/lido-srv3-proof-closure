@@ -4,9 +4,9 @@ import LidoSRv3.Audit.Verity.Topup2DistributionTx
 namespace LidoSRv3.Audit.Guarantees.PTopup2
 
 /-- If the three memory arrays decode to equal-length `effective` /
-`pending` / `requested`, then `observe` of `allocate` (persisted
-allocation array plus remaining/used slots) equals `sourceView` of the
-same `sourceRun`. Not live wei `topUpLimits` and not SSZ. -/
+`pending` / `requested` within `maxValidatorsPerTopUp`, then `observe` of
+`allocate` (persisted allocation array plus remaining/used slots) equals
+`sourceView` of the same `sourceRun`. Not live wei `topUpLimits` and not SSZ. -/
 theorem verity_tx_simulates_topup2_spec
     (effective pending requested : List LidoSRv3.Audit.Source.Topup2.Word)
     (target minTopUp remainingCap moduleLimit valueGwei :
@@ -21,7 +21,8 @@ theorem verity_tx_simulates_topup2_spec
     (hReq : LidoSRv3.Audit.Verity.Topup2DistributionTx.readArray state "requested"
       LidoSRv3.Audit.Verity.Topup2DistributionTx.requestedBase requested.length =
         some requested)
-    (hLen : effective.length = pending.length ∧ pending.length = requested.length) :
+    (hLen : effective.length = pending.length ∧ pending.length = requested.length)
+    (hMax : requested.length ≤ LidoSRv3.Audit.Verity.Topup2DistributionTx.maxValidatorsPerTopUp) :
     LidoSRv3.Audit.Verity.Topup2DistributionTx.observe
         (List.replicate requested.length 0) remainingCap
         ((LidoSRv3.Audit.Verity.Topup2DistributionTx.allocate requested.length
@@ -31,6 +32,6 @@ theorem verity_tx_simulates_topup2_spec
         requested target minTopUp remainingCap moduleLimit valueGwei :=
   LidoSRv3.Audit.Verity.Topup2DistributionTx.verity_tx_simulates_pinned_source
     effective pending requested target minTopUp remainingCap moduleLimit
-    valueGwei state hEff hPend hReq hLen
+    valueGwei state hEff hPend hReq hLen hMax
 
 end LidoSRv3.Audit.Guarantees.PTopup2

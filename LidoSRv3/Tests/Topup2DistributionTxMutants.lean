@@ -163,4 +163,79 @@ example : (LidoSRv3.Audit.Guarantees.PTopup2.transition killLineBatch killLineCf
     killLineCfg.maxTopUpPerBlockGwei :=
   aggregate_bounded_by_block_cap killLineBatch killLineCfg
 
+/-! ## Kill-line for `maxValidatorsPerTopUp` Verity guard
+
+`Topup2DistributionTx.allocate` now checks `count ≤ maxValidatorsPerTopUp`
+(32) and reverts `MaxValidatorsPerTopUpExceeded` before decoding.
+`allocateNoMaxCheck` is the identical transaction without that guard — the
+Lean analogue of a gateway that dropped the `MaxValidatorsPerTopUpExceeded`
+require. The honest transaction reverts an over-limit batch that the mutant
+commits, so the guard is load-bearing rather than vacuous. -/
+
+def allocateNoMaxCheck (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
+    (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
+  if count == 0 then .revert "WrongArrayLength" snapshot else
+  match readArray snapshot "effective" effectiveBase count,
+      readArray snapshot "pending" pendingBase count,
+      readArray snapshot "requested" requestedBase count with
+  | some effective, some pending, some requested =>
+      match LidoSRv3.Audit.Source.Topup2.sourceRun effective pending requested target minTopUp
+          remainingCap moduleLimit valueGwei with
+      | none => .revert "TOPUP_ARITHMETIC" snapshot
+      | some (allocs, remaining, used) =>
+          let dirty := persistAllocs allocs snapshot
+          let dirty := (dirty.writeSlot remainingSlot remaining).writeSlot allocatedSlot used
+          if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
+          else .success ⟨allocs, remaining, used⟩ dirty
+  | _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
+
+private def overLimitCount : Nat := 33
+
+private def overLimitEffective : List Word := List.replicate overLimitCount (word 32)
+private def overLimitPending : List Word := List.replicate overLimitCount (word 0)
+private def overLimitRequested : List Word := List.replicate overLimitCount (word 1)
+
+private def overLimitState : ContractState :=
+  stateFor overLimitEffective overLimitPending overLimitRequested defaultState
+
+example : overLimitCount > maxValidatorsPerTopUp := by decide
+
+example : (allocate overLimitCount (word 64) (word 1) (word 100) (word 100) (word 100)).run
+    overLimitState = .revert "MaxValidatorsPerTopUpExceeded" overLimitState := by
+  rfl
+
+example : (allocateNoMaxCheck overLimitCount (word 64) (word 1) (word 100) (word 100) (word 100)).run
+    overLimitState = .success ⟨List.replicate overLimitCount (word 1), word 67, word 33⟩
+      ((persistAllocs (List.replicate overLimitCount (word 1)) overLimitState).writeSlot remainingSlot (word 67) |>.writeSlot allocatedSlot (word 33)) := by
+  rfl
+
+private def runViewNoMax (effective pending requested : List Word)
+    (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
+  let before := stateFor effective pending requested defaultState
+  observe (List.replicate requested.length 0) remainingCap
+    ((allocateNoMaxCheck requested.length target minTopUp remainingCap moduleLimit valueGwei).run
+      before)
+
+example : runView overLimitEffective overLimitPending overLimitRequested
+    (word 64) (word 1) (word 100) (word 100) (word 100) =
+    ⟨.reverted, List.replicate overLimitCount (word 0), word 100, word 0⟩ := by
+  decide
+
+example : runViewNoMax overLimitEffective overLimitPending overLimitRequested
+    (word 64) (word 1) (word 100) (word 100) (word 100) =
+    ⟨.committed, List.replicate overLimitCount (word 1), word 67, word 33⟩ := by
+  decide
+
+theorem max_validators_guard_kill_line_refutes_no_check :
+    ∃ (effective pending requested : List Word)
+      (target minTopUp remainingCap moduleLimit valueGwei : Word)
+      (state : ContractState),
+      (allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run state =
+        .revert "MaxValidatorsPerTopUpExceeded" state ∧
+      (allocateNoMaxCheck requested.length target minTopUp remainingCap moduleLimit valueGwei).run state =
+        .success ⟨List.replicate requested.length (word 1), word 67, word 33⟩
+          ((persistAllocs (List.replicate requested.length (word 1)) state).writeSlot remainingSlot (word 67) |>.writeSlot allocatedSlot (word 33)) := by
+  exact ⟨overLimitEffective, overLimitPending, overLimitRequested,
+    word 64, word 1, word 100, word 100, word 100, overLimitState, rfl, rfl⟩
+
 end LidoSRv3.Tests.Topup2DistributionTxMutants

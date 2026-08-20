@@ -33,6 +33,7 @@ def requestedBase : Nat := 0x3000
 def allocSlot : Nat := 30
 def remainingSlot : Nat := 31
 def allocatedSlot : Nat := 32
+def maxValidatorsPerTopUp : Nat := 32
 
 private def oracle : DenoteOracle where
   mappingSlot := fun _ _ => 0
@@ -81,6 +82,7 @@ effects. -/
 def allocate (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   if count == 0 then .revert "WrongArrayLength" snapshot else
+  if count > maxValidatorsPerTopUp then .revert "MaxValidatorsPerTopUpExceeded" snapshot else
   match readArray snapshot "effective" effectiveBase count,
       readArray snapshot "pending" pendingBase count,
       readArray snapshot "requested" requestedBase count with
@@ -130,7 +132,8 @@ theorem verity_tx_simulates_pinned_source
     (hEff : readArray state "effective" effectiveBase effective.length = some effective)
     (hPend : readArray state "pending" pendingBase pending.length = some pending)
     (hReq : readArray state "requested" requestedBase requested.length = some requested)
-    (hLen : effective.length = pending.length ∧ pending.length = requested.length) :
+    (hLen : effective.length = pending.length ∧ pending.length = requested.length)
+    (hMax : requested.length ≤ maxValidatorsPerTopUp) :
     observe (List.replicate requested.length 0) remainingCap
         ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
           state) =
@@ -142,13 +145,15 @@ theorem verity_tx_simulates_pinned_source
     simpa [hER] using hEff
   have hPend' : readArray state "pending" pendingBase requested.length = some pending := by
     simpa [hPR] using hPend
+  have hNotOver : ¬ maxValidatorsPerTopUp < requested.length :=
+    Nat.not_lt.mpr hMax
   by_cases hZero : requested.length = 0
   · have hEffZ : effective.length = 0 := hER.trans hZero
     unfold Contract.run allocate sourceView
     simp [hZero, hEffZ, observe, sourceRun]
   · have hZ : (requested.length == 0) = false := by simp [hZero]
     unfold Contract.run allocate sourceView
-    simp only [hZ, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq]
+    simp only [hZ, hNotOver, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq]
     cases hRun : sourceRun effective pending requested target minTopUp
         remainingCap moduleLimit valueGwei with
     | none =>
