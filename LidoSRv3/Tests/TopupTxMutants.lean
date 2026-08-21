@@ -664,7 +664,8 @@ theorem unwrapped_accumulator_kill_line_refutes_parent :
       run killCfg wrapInput = .revertAssertBalanceUnchanged ∧
       (mutantRunUnwrapped killCfg wrapInput).reverts = false ∧
       (mutantRunUnwrapped killCfg wrapInput).pulled =
-        (mutantRunUnwrapped killCfg wrapInput).pushed := by
+        (mutantRunUnwrapped killCfg wrapInput).pushed ∧
+      (mutantRunUnwrapped killCfg wrapInput).pulled ≠ 0 := by
   unfold NoUncheckedWrap
   decide
 

@@ -211,9 +211,11 @@ theorem committed_conserves (execution : ParentExecution)
 
 /--
 Under a uint256 wrap the on-chain accumulator at source line 732 disagrees with
-the exact Nat sum the push loop sends.  Consequently `afterAllocation` reaches
-the `assert(etherBalanceBefore == etherBalanceAfter)` at source line 755 and
-reverts -- the assert is load-bearing precisely on the wrap branch.
+the exact Nat sum the push loop sends (`accumulated ≠ pushedValue`).  On a
+*nonzero* wrap the line-755 assert is therefore live.  Wrap-to-zero is
+different: `accumulated = 0` takes the line-741 empty commit and never reaches
+the assert (`wrap_to_zero_commits_no_topup` on the routed `run`).  This lemma
+is only the two-sum disagreement, not wrap-implies-revert.
 
 The premise is the *negation* of `NoUncheckedWrap` together with the array-
 length agreement that gates the push tail (`BeaconChainDepositor.sol` line 74).

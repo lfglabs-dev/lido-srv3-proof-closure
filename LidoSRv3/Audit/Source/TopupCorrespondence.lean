@@ -385,8 +385,11 @@ def NoUncheckedWrap (inp : SourceTopupInput) : Prop :=
   totalAllocated inp < uint256Modulus
 
 /-- Under `NoUncheckedWrap`, the source's `unchecked` accumulation at line 732
-equals `totalAllocated`, the exact sum the guards outside the value-moving tail
-reason about. -/
+equals `totalAllocated`, the exact `Nat` sum.  After Wave 6 the over-target,
+zero-sum, Lido-side, pull, funded-balance, and line-755 guards all read
+`accumulated` (`wrappedTotal`); this lemma is the coincidence of those two
+readings, not a claim that any remaining guard still reasons about the exact
+sum. -/
 theorem totalAllocated_faithful {inp : SourceTopupInput} (h : NoUncheckedWrap inp) :
     accumulated inp = totalAllocated inp :=
   allocSumUnchecked_eq_allocSum h

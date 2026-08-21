@@ -18,9 +18,9 @@ The Verity parent `verity_tx_simulates_source` is a forall under `allocations.le
 
 ## Proof issues and recommendations
 
-The residual exact-reading gap is closed. Both planes now read `wrappedTotal = exactTotal % 2^256` at line 737, line 741, and Lido.sol 842/873. Abstract conjunct 3 is wrap precludes a value-moving commit. Verity no longer assumes `NoUncheckedWrap`; wrap-to-zero is an executed empty success. `hCommit` still excludes a nonzero wrap because the source run reverts there, which is the same fact the abstract parent proves.
+The residual exact-reading gap is closed. Both planes now read `wrappedTotal = exactTotal % 2^256` at line 737, line 741, and Lido.sol 842/873. Abstract conjunct 3 is wrap precludes a value-moving commit. Verity no longer assumes `NoUncheckedWrap`; wrap-to-zero is an executed empty success.
 
-Remaining named gap: beacon-address provenance is an assumption, not a parent conjunct. Do not derive a top-up `LinksSource` from ALLOC.
+Quantifier strength still differs: Verity keeps `hCommit` (`(run cfg inp).reverts = false`), so a nonzero wrap is excluded because the source run reverts rather than because it is an executed Verity observation. `sourceObservables` describes the wrapped success schedule, which `execute` does not produce on a nonzero wrap (the push frame fail-closes). YAML `fidelity.missing` records that gap plus beacon-address provenance. Do not derive a top-up `LinksSource` from ALLOC.
 
 ## Registered Theorem
 
@@ -203,8 +203,9 @@ the wrapping batch.
 Verity `verity_tx_simulates_source` dropped the `NoUncheckedWrap` hypothesis.
 It keeps `hLen`, a per-allocation uint256 bound `hAmt` (strictly weaker than
 sum no-wrap), and `hCommit`. Wrap-to-zero is included as
-`execute_observes_source_wrapped_zero`. A nonzero wrap is excluded only
-because the source run reverts.
+`execute_observes_source_wrapped_zero`. A nonzero wrap is excluded because
+the source run reverts (`hCommit`); that remaining quantifier mismatch is
+listed in YAML `fidelity.missing`.
 
 ## Scope Exclusions
 
