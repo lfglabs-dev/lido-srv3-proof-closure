@@ -1,5 +1,154 @@
 # P-ADDRESS-1.denote-admission
 
+> Auditor note (2026-08-21). I treat
+> `LidoSRv3/Audit/Verity/AddressAdmission.lean` as the authority. I use the
+> registry and the existing report only to check how that theorem is described.
+> This is a subordinate admission probe, not the owner P-ADDRESS-1 guarantee.
+
+## A. Product note
+
+I read this row as a narrow executable semantics check for one audit-authored
+function. The function is named `claim()`, takes no arguments, requires the
+global `paused` word to be zero, requires `balances[msg.sender]` to be nonzero,
+and returns that balance. It does not write storage. No pinned Lido Solidity
+function has been shown to have this body.
+
+The useful part is that the caller is not an unconstrained parameter supplied
+to a mathematical function. `run` evaluates the EDSL body with Verity's
+`denoteFunction`; `withTransactionContext` installs the transaction sender in
+contract state, and `.caller` reads it from there. `run_claim_success` reduces
+that execution to the two storage reads that actually control success.
+
+The checked theorem, `admission_address_equivariant`, ranges over two canonical
+160-bit sender values, an arbitrary mapping-slot oracle, and an arbitrary world.
+It swaps the two caller-indexed balance words, assumes neither word aliases the
+pause slot, and proves that caller 1 succeeds before the swap exactly when
+caller 2 succeeds after it. The concrete witnesses show both success and
+failure, and the owner-gated mutant shows that adding a fixed privileged gate
+can break the relation.
+
+I would describe the product result this way: the official Verity denotation of
+this audit probe is caller-relative on its admission bit, provided its balance
+slots do not alias the pause slot. I would not describe it as evidence about a
+deployed Lido claim path. It proves neither pinned-Solidity correspondence nor
+successful post-state renaming, and it does not compare the returned amount.
+Those omissions are not incidental. The modeled function is a read-only probe,
+so it cannot exercise the address writes that make the owner guarantee
+substantive.
+
+## B. Proof audit
+
+**B1. The theorem executes a real denotation, but the program under that
+denotation is audit-authored.** I confirmed that `run_claim_success` unfolds
+`denoteFunction`, parameter binding, statement execution, expression
+evaluation, transaction context, and storage reads. This is stronger than an
+opaque `fn` assumption and it makes the success bit computational.
+
+The execution does not establish source fidelity. `claim` is constructed in
+`AddressAdmission.lean`, `spec.functions` contains only that constructed body,
+and the registry accurately says "no pinned Solidity correspondence." The name
+`claim()` is therefore potentially misleading. It is not
+`WithdrawalQueue.claimWithdrawalsTo`, and it is not one of the four
+storage-writing entrypoints in the owner P-ADDRESS-1 theorem.
+
+**B2. `PauseDisjoint` is load-bearing.** The proof uses both disjointness
+hypotheses only to show that `swapBalances` leaves the pause read unchanged.
+Dropping either premise makes the statement false for the arbitrary oracle that
+the theorem quantifies over.
+
+The existing report's first alias scenario assigns both `paused = 0` and
+`balances[a1] = 7` to the same aliased word, which is not one world. A valid
+counterexample is simpler. Let `balanceSlotOf a1` equal the pause slot, let
+`balanceSlotOf a2` be a distinct slot `q`, and set the pause word to 7 and word
+`q` to 0. Caller 1 is rejected because the contract is paused. The swap writes
+0 to the pause word and 7 to `q`, after which caller 2 is admitted. Thus the
+side condition is real, even though the report's particular valuation should
+be corrected.
+
+Nothing here proves that Solidity's concrete mapping hash is disjoint from the
+scalar slot. That is acceptable for this row only if `PauseDisjoint` remains
+visible as an assumption rather than being read as a discharged layout fact.
+
+**B3. The 160-bit sender bounds narrow the public statement correctly, but the
+proof does not use them.** The current theorem has `_ha1 : a1 <
+Address.modulus` and `_ha2 : a2 < Address.modulus`. This closes the prior
+surface problem in which raw natural senders differing by `2^160` could be
+described as different Ethereum addresses even though `callerKey` masks both
+to the same address. The arguments are intentionally unused because the
+denotation masks every sender anyway. I read them as domain restrictions for
+the public claim, not as load-bearing proof hypotheses.
+
+The theorem does not require the two callers or their balance slots to be
+distinct. That is mathematically sound for equivariance: equal callers and
+colliding caller slots make the swap degenerate. It does mean the theorem is
+not a storage-separation theorem and should not be cited as one.
+
+**B4. The observation is admission only.** The conclusion compares
+`DenoteResult.success` and nothing else. It does not compare the returned
+balance, revert reason, logs, ETH, or final storage. In particular, a mutant
+that preserved the two `require` statements but returned a caller-dependent
+wrong amount would satisfy this theorem.
+
+This is also why "post-state equivariance is out of scope" is more than a
+registry caveat. `claim` performs no write, so adding a post-state equality for
+this body would not test the owner's address-writer property. A meaningful
+post-state child needs a storage-writing pinned entrypoint and a relation over
+the addresses that entrypoint writes.
+
+**B5. The direct-body runner is not ABI dispatch evidence.** `run` receives a
+`FunctionSpec` and passes that body directly to `denoteFunction`. `txFrom`
+always carries the `claim()` selector and empty arguments. This is why the same
+runner can execute `ownerGated` even though `ownerGated` is absent from
+`spec.functions`. The mutant is valid evidence that the denotation of a changed
+body can distinguish the property, but it does not show that selector dispatch
+would reach that body in a compiled contract.
+
+**B6. The non-vacuity package is useful, with one labeling defect.** The three
+positive and negative witnesses establish that the honest probe is not
+constant: balance and pause each affect success. The owner-gated witness uses
+canonical callers 1 and 2 and genuinely falsifies caller-swap admission for the
+mutated body.
+
+The mutant theorem omits the two address-range premises from the exact
+`admission_address_equivariant` quantifier shape, although its concrete witness
+satisfies them. More importantly, the comment above `ownerGateKillLine` calls
+it a kill-line for the "registered P-ADDRESS-1 parent." It is not. It belongs
+to this subordinate denote-admission row; the owner parent now has its own
+source-model fixed-owner kill-line. The report and registry mostly make that
+separation correctly, but the Lean comment should too.
+
+**B7. The historical report header is stale.** The text preserved below says
+this child assumes `A-SOURCE-SHAPED` and that the parent is OPEN / PARTIAL.
+Current `guarantees.yaml` lists only `A-VERITY-SCAFFOLD` on this subordinate
+row, marks its abstract plane OPEN and its Verity theorem CHECKED, and records
+the owner P-ADDRESS-1 parent separately as CHECKED. I would not carry the old
+header into current status reporting.
+
+**Ranked recommendations.**
+
+1. Keep this theorem subordinate and change the row's `next_gate`. Do not say
+   to compose this audit-authored, admission-only body into the owner guarantee.
+   Composition should require a pinned entrypoint and a successful post-state
+   relation.
+2. If protocol relevance is wanted, replace the probe with one of the owner's
+   pinned permissionless writers and execute both its admission gates and its
+   address writes. Keep this toy only as a denotation regression test.
+3. Correct the impossible pause-alias valuation in the existing report and
+   retain the valid counterexample above. Either derive slot disjointness for a
+   concrete compiled layout or continue to expose `PauseDisjoint` as an
+   assumption.
+4. Rename the Lean kill-line comment to the subordinate row and, for exact
+   shape discipline, include the two 160-bit premises in the mutant
+   quantification.
+5. Use a dispatching transaction theorem if selector-to-body binding is meant
+   to be evidence. The current direct-body theorem should remain described as
+   `denoteFunction` evidence.
+6. Do not add a vacuous post-state theorem for this read-only body. Compare the
+   returned value if the row is kept as admission evidence, and reserve
+   post-state equivariance for a real writer.
+
+## Existing report and issue history
+
 Theorem: `AddressAdmission.admission_address_equivariant`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 Parent `P-ADDRESS-1` is OPEN / PARTIAL and has no file here.
