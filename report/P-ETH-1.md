@@ -24,6 +24,17 @@ Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Wave 5 changes (2026-08-21)
 
+**Model repair disclosed first:** the compiled gateway body `gatewayFn` in
+`PEth1CompositionTx.lean` gains the `ZeroArgument` guard
+(`require 0 < msg.value`) this wave, matching the pinned source gateway's
+`ZeroArgument("msg.value")` revert and the abstract plane's Wave 1 guard
+(report issue 13). The guard only affects `msgValue = 0` runs, which lie
+outside the registered parent's premises, so it neither weakens nor
+strengthens the registered success claim; it is what makes the positivity
+premise load-bearing (the premise-necessity kill-line below reverts at that
+guard), and it removes the pre-Wave-5 phantom zero-value success from the
+model rather than merely excluding it by premise.
+
 **The Verity plane is lifted to matching `∀` strength on the success arm.**
 The registered Verity parent is now
 `LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape`: for all
@@ -299,10 +310,10 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Counterexample.* `batchSize = 2^128`, `feePerRequest = 2^128`, `msgValue = 1`. Live `totalFee` overflows and the tx reverts. Lean `mul` wraps to `0`. `require(0 ≤ 1)` passes. The run can succeed with fee 0 (no request value, full refund). The CHECKED numerals never hit this; the ensemble is not 0.8 multiplication.
 
-13. **`run honest 0 0 3` is a phantom success on the Verity plane.**
-    On the abstract plane this is closed: `gatewayExecute` reverts `ZeroArgument` at `msgValue = 0` and the parent's first clause pins the behaviour. Wave 4 shows the clause is load-bearing — `gatewayExecuteUnguarded` drops the value guards, `(0, 2, 3)` succeeds paying 6 wei of fees, and `zero_value_success_kill_line_refutes_parent` refutes the parent's success conjunct on that mutant. On the Verity plane this is closed in Wave 5: the registered universal parent carries the explicit positivity premise `0 < msgValue` (the Gateway's compiled `ZeroArgument` guard reverts the zero-value call), and `zero_value_kill_line_refutes_dropped_positivity` refutes the positivity-dropped projection on the honest wiring at `(0, 2, 0)`.
+13. **Zero-value runs were a phantom success on the Verity plane — model corrected in Wave 5.**
+    On the abstract plane this was already closed: `gatewayExecute` reverts `ZeroArgument` at `msgValue = 0` and the parent's first clause pins the behaviour. Wave 4 shows the clause is load-bearing — `gatewayExecuteUnguarded` drops the value guards, `(0, 2, 3)` succeeds paying 6 wei of fees, and `zero_value_success_kill_line_refutes_parent` refutes the parent's success conjunct on that mutant. On the Verity plane, Wave 5 fixes the model itself: the compiled gateway body `gatewayFn` now opens with the `ZeroArgument` guard (`require 0 < msg.value`), matching the source gateway's `ZeroArgument("msg.value")` revert, so `run honest 0 0 3` reverts at the gateway (`calleeReverted`, 2 hops) instead of reporting a phantom success. The registered universal parent carries the explicit positivity premise `0 < msgValue`, and `zero_value_kill_line_refutes_dropped_positivity` refutes the positivity-dropped projection on the honest wiring at `(0, 2, 0)` — the premise is load-bearing precisely because the corrected model reverts there.
 
-    *Scenario.* `run honest 0 0 3`: fee `0`, vault `FeeMismatch` is `0 == 0`, `forEach 0`, success with no request hops. Source gateway reverts `ZeroArgument("msg.value")` / empty groups. The pre-Wave-5 registered Verity theorem did not mention this run; the Wave 5 parent excludes it by premise and the premise-necessity kill-line shows the exclusion is load-bearing. Lean `Nat` `requestsCount * fee` also cannot overflow; Solidity 0.8 reverts.
+    *Pre-Wave-5 scenario (now closed).* Before the guard was added, `run honest 0 0 3` gave fee `0`, vault `FeeMismatch` `0 == 0`, `forEach 0`, success with no request hops, while the source gateway reverts `ZeroArgument("msg.value")` / empty groups. The guard addition removes that divergence rather than papering over it with a premise alone. Lean `Nat` `requestsCount * fee` also cannot overflow; Solidity 0.8 reverts.
 
 14. **Abstract fee arithmetic is unbounded `Nat` multiply; Verity `.mul` wraps; no refinement.**
     `composed_eth_conservation` is `fee + (msgValue - fee) = msgValue` under `fee ≤ msgValue` — true of any two Nats — and the abstract parent's overflow clause (`n * fee ≥ 2^256` reverts `Panic(0x11)`) is a model-side guard inside `gatewayExecute`, not a lemma about the Verity ensemble. The Verity ensemble multiplies with wrapping `Expr.mul` (issue 12). There is no lemma relating `gatewayExecute`'s move list to `observe (run …)`.

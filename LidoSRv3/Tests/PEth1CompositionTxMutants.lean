@@ -277,7 +277,7 @@ refute the registered claim's own shape rather than a sibling. -/
 theorem universal_parent_is_predicate_at_honest :
     universalSuccessShapePredicate honest :=
   fun mv n fee hpos hmv hnM hfee hnf hle hfuel =>
-    LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal.run_success_shape
+    LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape
       mv n fee hpos hmv hnM hfee hnf hle hfuel
 
 /-- The witness `(10, 2, 3)` satisfies every premise of the universal parent:

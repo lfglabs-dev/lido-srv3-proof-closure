@@ -84,7 +84,12 @@ Since Wave 5 the Verity plane matches the abstract-plane `eth_flow_parent`
 `verity_tx_universal_success_shape` quantifies over all
 `(msgValue, batchSize, feePerRequest)` satisfying:
 
-- `0 < msgValue` — the Gateway's compiled `ZeroArgument` guard;
+- `0 < msgValue` — the Gateway's compiled `ZeroArgument` guard (added to
+  `gatewayFn` in Wave 5, matching the pinned source's
+  `ZeroArgument("msg.value")` revert and the abstract plane's Wave 1 guard;
+  it only affects `msgValue = 0` runs, which are outside the parent's
+  premises, and it is what the positivity premise-necessity kill-line
+  exercises);
 - `msgValue`, `batchSize`, `feePerRequest`, and the product
   `batchSize * feePerRequest` below `2^256` — word-sized inputs and no wrap;
 - `batchSize * feePerRequest ≤ msgValue` — the `InsufficientValue` guard;
