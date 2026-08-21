@@ -1,26 +1,30 @@
-# P-TOPUP-1 — Beacon-Chain Top-Up Conservation & Rollback
+# P-TOPUP-1
 
-> Operator round (2026-08-21). ChatGPT UI pool was unreachable from this session (`SANDBOXED_API_URL` unset), so these two sections are written from the live Lean parents, `audit/guarantees.yaml`, and the 2026-08-20 wrap memo. They are not GPT-5.6 Pro quotes.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+When the top-up gateway asks the router to raise existing type-2 validators above 32 ETH, `StakingRouter.topUp` (`lidofinance/core@af095e48`, lines 679-759) pulls one lump sum out of Lido and forwards it key by key to the beacon deposit contract. P-TOPUP-1 verifies that the lump and the forwarded total are the same wei, and that anything that fails takes the whole transaction with it.
 
-P-TOPUP-1 is the beacon-chain top-up path on `StakingRouter.topUp` (`lidofinance/core@af095e48`, lines 679-759). A type-2 module asks the router to pull depositable ether from Lido and push per-validator top-ups to the beacon depositor. P-TOPUP-2 owns per-key limits. P-ALLOC-1/2 own how the amounts array is filled.
+The pull and the push are two readings of one array. The router sums `allocations` at line 732, inside the `unchecked` block, pulls that sum at line 744, and the depositor loop sends `_amounts[i]` per key:
 
-The registered abstract parent `source_topup_conserves_and_rolls_back` is four conjuncts on the source-shaped `run`:
-1. `pulled = pushed` on every branch, with abstract-tx rollback of a reverting observation.
-2. An unregistered module reverts `revertStakingModuleUnregistered`.
-3. If the unchecked line-732 accumulator wraps (`¬ NoUncheckedWrap`), `run` itself moves no wei (`pulled = pushed = 0`). Wrap-to-zero is `committedNoTopUp`, not a revert.
-4. Non-type-2 withdrawal credentials revert `revertWrongWithdrawalCredentialsType`.
+- $\mathrm{pulled} = \mathrm{accumulated} = (\sum_i a_i) \bmod 2^{256}$, the on-chain `unchecked` reading
+- $\mathrm{pushed} = \sum_i a_i$, exact (`loopPushed_eq_allocSum`)
+- committing a value-moving top-up requires $\mathrm{pulled} = \mathrm{pushed}$, which is the `assert` at line 755
 
-Over-target (line 737), zero-sum (line 741), Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert all read `wrappedTotal = exactTotal % 2^256`. The wrap witness `wrapInput` (allocations `[2^256-1, 2]`) still reverts `revertAssertBalanceUnchanged` because wrapped pull `1` is not exact push `2^256+1`. Kill-line `dropped_conservation_assert_kill_line_refutes_parent` drops only that assert and commits with `pulled ≠ pushed`. Dual `unwrapped_accumulator_kill_line_refutes_parent` shows the wrap-ignoring mutant committing. `wrap_to_zero_commits_no_topup` is the honest wrap-to-zero empty-commit control.
+Below $2^{256}$ the two readings coincide. At or above $2^{256}$ the wrapped pull is strictly under the exact push, so a nonzero wrap still aborts (`wrapInput` allocations $[2^{256}-1, 2]$ reverts `revertAssertBalanceUnchanged` because wrapped pull $1$ is not exact push $2^{256}+1$). Wrap-to-zero (`[2^{256}-1, 1]$) is `committedNoTopUp` with $\mathrm{pulled} = \mathrm{pushed} = 0$, not a revert.
 
-The Verity parent `verity_tx_simulates_source` is a forall under `allocations.length ≤ 2^256`, each allocation a uint256 word, and `(run cfg inp).reverts = false`. It does not assume `NoUncheckedWrap`. On those premises, `observe` of `execute.run` equals `sourceObservables` (wrapped totals, including wrap-to-zero empty success), pulled/pushed agree, and every injected revert restores the entry snapshot.
+Over-target (line 737), zero-sum (line 741), Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert all read $\mathrm{wrappedTotal}$. `source_topup_conserves_and_rolls_back` also folds in: an unregistered module reverts, and non-type-2 credentials revert. `verity_tx_simulates_source` matches observables on the committing path under $\mathrm{allocations.length} \le 2^{256}$, each allocation a uint256 word, and `run.reverts = false`. It does not assume `NoUncheckedWrap`. We do not prove where the per-key amounts come from (P-TOPUP-2), nor the allocation feeding them (P-ALLOC-1/2).
 
-## Proof issues and recommendations
+## Proof limitations and recommendations
 
-The residual exact-reading gap is closed. Both planes now read `wrappedTotal = exactTotal % 2^256` at line 737, line 741, and Lido.sol 842/873. Abstract conjunct 3 is wrap precludes a value-moving commit. Verity no longer assumes `NoUncheckedWrap`; wrap-to-zero is an executed empty success.
+The residual exact-reading gap is closed. Both planes now read $\mathrm{wrappedTotal} = \mathrm{exactTotal} \bmod 2^{256}$ at line 737, line 741, and Lido.sol 842/873. Abstract conjunct 3 is wrap precludes a value-moving commit. Verity no longer assumes `NoUncheckedWrap`; wrap-to-zero is an executed empty success.
 
-Quantifier strength still differs: Verity keeps `hCommit` (`(run cfg inp).reverts = false`), so a nonzero wrap is excluded because the source run reverts rather than because it is an executed Verity observation. `sourceObservables` describes the wrapped success schedule, which `execute` does not produce on a nonzero wrap (the push frame fail-closes). YAML `fidelity.missing` records that gap plus beacon-address provenance. Do not derive a top-up `LinksSource` from ALLOC.
+Quantifier strength still differs. The abstract parent is an unbounded $\forall$. Verity keeps `hCommit` (`(run cfg inp).reverts = false`), so a nonzero wrap is excluded because the source run reverts rather than because it is an executed Verity observation. `sourceObservables` describes the wrapped success schedule, which `execute` does not produce on a nonzero wrap (the push frame fail-closes). YAML `fidelity.missing` records that gap plus beacon-address provenance.
+
+Kill-lines on module / WC / assert-drop / unwrapped-accumulator are parent-shaped. The conservation kill-line uses a wrap witness far from the pinned `uint64` config. Abstract rollback on `TxObservation` is definitional.
+
+CHECKED does not mean bytecode, extracted Solidity, Lido book-keeping, or that the amounts themselves are correct (a consistent wrong array satisfies every conjunct).
+
+Ranked next work: execute a nonzero wrap on the Verity plane; pin beacon-address provenance; do not derive a top-up `LinksSource` from ALLOC.
 
 ## Registered Theorem
 

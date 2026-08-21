@@ -1,17 +1,26 @@
 # P-SSZ-1
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+SRv3 believes facts about consensus-layer validators only through SSZ Merkle proofs. A caller hands a gateway a witness; the verifier folds the branch and compares it to a trusted root; the deposit path recomputes a deposit-data root from pubkey, withdrawal credentials, amount, and signature.
 
-P-SSZ-1 proves one precise property: the composed SSZ encoding traversal under sourceCombine returns exactly sourceNode. The parent guarantee was stripped to this single conjunct, so it makes no broader Merkle or cryptographic claim.
+P-SSZ-1 registers one conjunct of that picture, on a model where `Node = Nat` and the combiner is `Nat.pair` rather than SHA-256:
 
-On the Verity plane, encode.run is observed to equal sourceView for every modeled input. If execution commits, the modeled structural fields also match the source specification.
+- reconstruction: the witness derived from one deposit $src$ folds back to that deposit's own root,
+  $\mathrm{traverseBranch}\;(\mathrm{sourceCombine}\;src)\;\ldots = \mathrm{sourceNode}\;src$
+- one object at the abstract type: concat operand, digest bytes, and tx input are derived from $src$, so a witness for one deposit cannot be paired with another deposit's root on that plane
 
-## Proof issues and recommendations
+Unregistered but still proved: pinned widths, the seven-call digest shape, `sourceConcat = specConcat`, accept-iff-root-match. `swapped_combine_kill_line_refutes_parent` swaps child order at a concrete valid witness. TX persists those observables, rereads them from storage, and restores the snapshot on failure.
 
-The abstract theorem is intentionally narrow. It does not prove SHA-256 correctness, production generalized indices, or imported-to-deployed Yul. Pin the SHA-256 engine and prove its use end to end, or keep SHA correctness documented as an assumption.
+We do not prove `SSZ.verifyProof` on production gindices, SHA-256 (`A-SHA256-FFI`), or the imported-to-deployed Yul fragment (OPEN).
 
+## Proof limitations and recommendations
+
+After the wave-6 strip the registered conclusion is a single traversal equality. The one-object coupling does not reach `EncodingInput`, which keeps deposit / rhs / witness / expected root independent. SHA-256 is two symbols (`opaque sha256` vs `Sha256Engine.sha256`) that are never identified. Targeted Yul binding has null imported and deployed digests.
+
+CHECKED does not mean a Merkle proof was verified, that generalized indices are the deployed ones, or that bytecode was bound.
+
+Ranked next work: keep the swapped-combine kill-line; carry one-object coupling onto the TX input; split SHA obligations; keep Yul visibly OPEN next to every CHECKED presentation.
 
 Theorems: `PSsz1.composed_ssz_encoding` (registered parent; concludes the named predicate `PSsz1.composedEncodingOk`, stripped in wave 6 to the single mutant-exercised traversal conjunct), `PSsz1.swapped_combine_kill_line_refutes_parent` (parent kill-line: negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness` (conclusion-non-triviality witness on the unregistered full bundle `PSsz1.composedEncodingOkFull`: the bundle discriminates the claimed operation; renamed in wave 6 from `crossed_witness_kill_line_refutes_parent`), `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle, not registered claim content), `PSsz1.verity_tx_simulates_ssz_encoding`.
 Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`.

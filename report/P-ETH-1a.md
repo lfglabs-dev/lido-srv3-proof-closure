@@ -1,5 +1,22 @@
 # P-ETH-1a
 
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+
+Child of P-ETH-1 for protocol-controlled ETH returns on the consolidation path: the gateway sends a total fee to the WithdrawalVault, refunds the remainder, and the vault can send an amount to Lido. This is not VaultHub or `StakingVault.withdraw`, where the owner picks the recipient.
+
+- abstract `eth_flow_confined`: if every move is already tagged Lido or WithdrawalQueue, filtering to those tags removes nothing
+- Verity `gateway_refund_success_moves_value`: one numeral, $\mathrm{msgValue}=5$, $\mathrm{fee}=3$, vault $+3$, refund recipient $+2$
+
+The refund recipient is not one of the abstract approved tags. The ledger takes a single total-fee word, so $\mathrm{requestsCount} \times \mathrm{fee}$ is not here. We do not cover WithdrawalQueue claims or `receiveWithdrawals` buffer update (P-RESERVE-1).
+
+## Proof limitations and recommendations
+
+`eth_flow_confined` is `List.filter_eq_self` under its own hypothesis. The parent's happy path uses `.consolidationContract` and `.refundRecipient`, which `is_approved` rejects, so the child theorem does not apply to traces this repo generates. The Verity theorem is one `decide` numeral. There is no parent-shaped kill-line. Child `assumptions: []` omits the inherited three.
+
+CHECKED does not mean protocol ETH returns land only on Lido or the WithdrawalQueue.
+
+Ranked next work: restate the abstract claim over destinations the models inhabit, or register a producer theorem; add a refund-misroute kill-line; keep VaultHub out.
+
 Theorems: `PEth1.eth_flow_confined` (abstract), `PEth1RefundTx.gateway_refund_success_moves_value` (verity).
 Assumptions: none listed on the child row; the parent carries `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 

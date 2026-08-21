@@ -1,31 +1,31 @@
 # P-ALLOC-2
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+Once P-ALLOC-1 has produced the two lists (current allocation, capacity), `MinFirstAllocationStrategy.allocate` distributes the requested amount: it repeatedly calls `allocateToBestCandidate` until demand is exhausted or no bucket can take more.
 
-I read P-ALLOC-2 as the guarantee for the fill step.
+P-ALLOC-2 verifies one such fill step:
 
-StakingRouter.getDepositAllocations first derives each module's current allocation and ETH capacity through SRLib. MinFirstAllocationStrategy.allocate then distributes the requested deposit amount across those buckets.
+- selection: the chosen bucket $b$ is the first open bucket minimizing $\mathrm{allocation}$. Ties keep the lower index (source replaces the saved candidate only on a strict $>$).
+- amount: $\mathrm{allocated} = \min(\mathrm{share},\ \min(\mathrm{upper},\ \mathrm{capacity}[b]) - \mathrm{allocation}[b])$
+  - $\mathrm{share} = \lceil \mathrm{remaining} / \mathrm{count} \rceil$ when $\mathrm{count} > 1$, else remaining
+  - count = number of open buckets sitting at that minimum
+  - upper = least allocation strictly above the minimum among open buckets, else $2^{256}-1$
+- bounds: $0 < \mathrm{allocated} \le \mathrm{remaining}$ and $\mathrm{allocation}[b] + \mathrm{allocated} \le \mathrm{capacity}[b]$
 
-The strategy repeatedly selects the first bucket among those with the lowest allocation and remaining capacity. When several buckets share that minimum, it gives the selected bucket a proportional slice using ceiling division. It caps that slice at the next higher fill level and at the bucket's remaining capacity. It repeats until demand is exhausted or no bucket can accept more.
+Note the cap at the next fill level: the served bucket rises to the level of the bucket above it and no further. That is what makes the fill proportional rather than greedy.
 
-P-ALLOC-1 concerns the construction of the per-module caps. P-ALLOC-2 assumes bucket and capacity values exist, then checks how the algorithm fills them. It does not restate the cap guarantee.
+We prove the step on the abstract model (`forall_proportional_step_correspondence_and_bounded`), then that the source-shaped Lean program computes the same word when the checked `uint256` arithmetic succeeds, then that the Verity Executable Contract of the whole loop has the same observables if execution succeeds (bucket array, allocated, remaining), otherwise revert and state from before the call. We do not prove the caps fed into it (P-ALLOC-1), and we do not prove Solidity or bytecode equivalence.
 
-The abstract parent is forall_proportional_step_correspondence_and_bounded. It explicitly quantifies over every corresponding model list, source list, selected bucket, remaining demand, and returned amount w. Under its premises it proves that Model.candidate? selects the exact bucket already selected by the source scan, that 0 < w and w is at most demand, and that allocation + w is at most capacity.
+## Proof limitations and recommendations
 
-The transaction parent is verity_tx_simulates_min_first_distribution. Given states whose two arrays decode to the stated lists, observe of allocate.run equals sourceView.
+The abstract parent is a genuine unbounded $\forall$ over finite lists and words, hypothesized on `RowsCorrespond`, source selection, openness, length $< 2^{256}$, nonzero demand, and successful `checkedAmount`. It is one step, not the outer `while`. The Verity theorem is universal over decoded lists, but both arrays are assumed decoded and `sourceView` calls the same `allocateLoop` as the transaction.
 
-Two kill-lines show the conclusions are load-bearing. A first-open mutant on [(5,10), (0,10)] selects (5,10) while the source selects (0,10). A mutant that drops the capacity-headroom clamp on (0,3) with demand 10 allocates 10, so 0 + 10 <= 3 is false.
+`A-HANDWRITTEN-MINFIRST` and `A-VERITY-SCAFFOLD` are load-bearing. The +1 child `selects_least_open_bucket` is a different algorithm. YAML already lists activity filtering (upstream), keccak oracle, and in-place memory mutation. Kill-lines `selection_kill_line_refutes_parent` and `headroom_clamp_kill_line_refutes_parent` are parent-shaped; they do not kill positivity, $w \le r$, or the next-level clamp, and they do not refute the Verity parent.
 
-## Proof issues and recommendations
+CHECKED does not mean a full-loop conservation theorem, Solidity equivalence, or that capacities were built correctly.
 
-The abstract theorem is an explicit forall over finite lists and uint256 amounts, not a handful of vectors. The Verity theorem is also universal over decoded lists and states. It is not a theorem about Solidity, Yul, or deployed bytecode.
-
-A-HANDWRITTEN-MINFIRST remains material. The +1 Nat child and the proportional parent are different algorithms. The Verity theorem starts from already decoded List Word values, with a toy memory base and a keccak oracle that returns 0. Cross-call mutation of the Solidity in-memory buckets array is not proved. allocate does not re-test module activity; that is expected upstream.
-
-Recommended next work: compose from getDepositAllocations into allocate, including status filtering; replace the toy decoder with a real memory denotation; prove the caller observes the same mutated array; keep the +1 model outside the product claim.
-
+Ranked next work: add the amount-correspondence conjunct so `ceilDiv` / next-level are load-bearing; register a loop-level theorem; make `sourceView` independent of `allocateLoop`; keep the +1 model as a child.
 
 Theorems: `PAlloc2.forall_proportional_step_correspondence_and_bounded` (registered parent, explicit ∀; re-registered by human PR #134), `PAlloc2.proportional_step_correspondence_and_bounded` (helper, implicit binders), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (selection kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (headroom kill-line).
 Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.

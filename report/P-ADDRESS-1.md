@@ -1,21 +1,25 @@
 # P-ADDRESS-1
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+Four Lido entrypoints let an ordinary account move an address-keyed position: `WithdrawalQueueERC721.transferFrom`, `WithdrawalQueue.requestWithdrawals`, `WithdrawalQueue.claimWithdrawalsTo`, and `WstETH.unwrap`. P-ADDRESS-1 asks whether admission or the committed post-state depends on *which* account the caller is, as opposed to that account's own data.
 
-I proved that address-keyed writes are independent of address identity. For each of the four modeled WithdrawalQueue and router writers, including claimWithdrawalsTo, consistently renaming any nonzero address a1 to a2 preserves admission and renames the committed post-state in the same way.
+For nonzero $a_1, a_2$, let $\rho$ swap them and fix every other address. `universal_address_writer_equivariance` is:
 
-This rules out hidden dependence on a specific account. The kill-line adds a fixed owner gate. That literal-address check breaks the symmetry because a1 and a2 can then receive different admission results.
+- admission: $\mathrm{succeeds}(\mathrm{run}(\rho \cdot \mathrm{inp})) = \mathrm{succeeds}(\mathrm{run}(\mathrm{inp}))$
+- post-state: $\mathrm{run}(\mathrm{inp}) = \mathrm{committed}(p) \Rightarrow \mathrm{run}(\rho \cdot \mathrm{inp}) = \mathrm{committed}(\rho \cdot p)$
 
-The product guarantee is captured by universal_address_writer_equivariance.
+Both hold for every input and every one of the four tags, with no scope premise. `claimWithdrawalsTo` is in because `caller = requestOwner` is caller-relative: `renameInput` renames both. This is a single-item reading, not the live batch loop.
 
-## Proof issues and recommendations
+The kill-line adds `caller == fixedOwner`, a constant $\rho$ does not move: caller 1 commits, caller 2 is rejected. `singletonActorEntryPoint` is `False` for every modeled tag, so singleton-actor writers are excluded by omission. The child `P-ADDRESS-1.denote-admission` is an audit-authored `claim()` under `denoteFunction`, not this four-writer result.
 
-The proof is universally quantified over inputs on both modeled planes. It then uses Verity observe to connect the modeled transaction result to the source view.
+## Proof limitations and recommendations
 
-singletonActor is always False. Therefore the proof does not establish a live WithdrawalQueue claim by a concrete authorized actor. claimWithdrawalsTo is covered only as one of the modeled address-keyed writers.
+The parent is a genuine unbounded $\forall$ over a handwritten 18-field record. Twelve environment Booleans are swap-invariant by construction. Equivariance therefore certifies that the projection introduced no unrenamed address constant. Faithfulness to `core@af095e48` is `A-SOURCE-SHAPED`. Batches, queue existence, and external calls are free Booleans. YAML `fidelity.missing` lists only the `False` singleton predicate; live gaps (batch, packed state, wrapper-only `transferFrom` span) are under-reported. Permissionless admission is proved for two of the four writers.
 
+CHECKED does not mean pinned Solidity, the full claim batch, singleton-actor exclusion by proof, or Yul/EVM.
+
+Ranked next work: add a write-side parent-shaped kill-line; rewrite `fidelity.missing` for live surfaces; stop calling all four "permissionless"; keep singleton-actor functions out of this parent.
 
 Theorems: `PAddress1.universal_address_writer_equivariance` (parent), `PAddress1.abstract_source_verity_tx_address_equivariance` (Verity), `AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent` (kill-line).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

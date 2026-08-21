@@ -1,8 +1,26 @@
 # P-ADDRESS-1.denote-admission
 
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+
+I read this row as a narrow executable semantics check for one audit-authored function. The function is named `claim()`, takes no arguments, requires the global `paused` word to be zero, requires `balances[msg.sender]` to be nonzero, and returns that balance. It does not write storage. No pinned Lido Solidity function has been shown to have this body.
+
+The useful part is that the caller is not an unconstrained parameter. `run` evaluates the EDSL body with official `denoteFunction`; `withTransactionContext` installs the sender, and `.caller` reads it from there.
+
+`admission_address_equivariant` ranges over two canonical 160-bit senders, an arbitrary mapping-slot oracle, and an arbitrary world. It swaps the two caller-indexed balance words, assumes `PauseDisjoint` (neither word aliases the pause slot), and proves that caller 1 succeeds before the swap exactly when caller 2 succeeds after it. An owner-gated mutant breaks the relation.
+
+I would not describe this as evidence about a deployed Lido claim path. It proves neither pinned-Solidity correspondence nor successful post-state renaming. Those omissions are the point of the child: the parent `P-ADDRESS-1` owns the four writers and the post-state conjunct.
+
+## Proof limitations and recommendations
+
+`PauseDisjoint` is load-bearing. The theorem compares `DenoteResult.success`, not the returned amount. Abstract plane of the parent is OPEN on this child row. YAML is honest: "no pinned Solidity correspondence."
+
+CHECKED means the official denotation of this probe is caller-relative on its admission bit when pause and balance slots do not alias. It does not mean `WithdrawalQueue.claimWithdrawalsTo`.
+
+Ranked next work: keep the child as a denotation probe; do not implement WithdrawalQueue claim as this row; compose into the parent only after a pinned body exists.
+
 Theorem: `AddressAdmission.admission_address_equivariant`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
-Parent `P-ADDRESS-1` is OPEN / PARTIAL and has no file here.
+Parent `P-ADDRESS-1` is CHECKED on the four-writer equivariance row; this child is the denotation probe only.
 
 ## Intent
 

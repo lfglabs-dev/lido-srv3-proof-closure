@@ -1,27 +1,26 @@
 # P-TOPUP-2
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+P-TOPUP-2 is the per-block ceiling on Electra compounding top-ups. The product question is whether one call can top up more gwei than governance allows in a block. The answer the row gives is narrower.
 
-P-TOPUP-2 proves that the total top-up allocated from the leftover budget never exceeds maxTopUpPerBlockGwei:
+`aggregate_bounded_by_block_cap` says that for every batch and config, with no well-formedness hypothesis,
 
-transition.sum <= maxTopUpPerBlockGwei
+$(\mathrm{transition}\, b\, \mathrm{cfg}).\mathrm{sum} \le \mathrm{cfg.maxTopUpPerBlockGwei}$
 
-This bound holds without assuming well_formed. The cap is enforced by the transition itself, not borrowed from a global state invariant.
+where `transition` is `consumeBudget` of `transitionBudget = \min(\mathrm{valueGwei},\ \min(\mathrm{moduleLimit},\ \mathrm{maxTopUpPerBlock}))` over per-key candidates. The proof is induction over that leftover walk. This replaces the historical tautology `router_require_post_condition`, which assumed the bound and returned it. `block_cap_kill_line_refutes_parent` drops the cap term and allocates above it.
 
-On the Verity side, allocate persists the accepted allocation. It reverts when the batch contains more than 32 validators, matching maxValidatorsPerTopUp.
+`verity_tx_simulates_topup2_spec` is lockstep of the same leftover-budget walk on decoded arrays of length $\le 32$. `observe` rereads persisted allocations. A 33-validator mutant without the guard commits. We do not implement the live `topUp` plus beacon path: independent per-key limits, `allocateDeposits`, Lido pull, and beacon deposit stay in `fidelity.missing`. That is P-TOPUP-1's conservation surface, and the two rows do not compose.
 
-The kill-lines test both controls. Removing the block cap permits an aggregate above the per-block limit. Removing the validator-count guard permits a batch of 33 validators.
+## Proof limitations and recommendations
 
-The governing theorem is aggregate_bounded_by_block_cap.
+The forall is genuine and the tautology history is closed. Residual content is still definitional in one sense: any `consumeBudget (min _ (min _ cap))` satisfies the bound. Headroom-blind mutants still pass. Live routing accepts any split under per-key and aggregate `require`s; Lean's greedy walk is one policy among many.
 
-## Proof issues and recommendations
+`A-TOPUP-NOWRAP` is listed, but its text names StakingRouter line 732 (P-TOPUP-1). Abstract `evaluated_topup_limit` is unbounded Nat; the word plane uses `safeAdd` and reverts on overflow. The keccak oracle is inert for these reads; the real gap is harness-supplied arrays. The max-validators kill-line does not refute the registered Verity parent, which assumes `count ≤ 32`. The guard is the literal 32, not the packed governance word.
 
-The abstract theorem quantifies over every batch and configuration. The Verity model is narrower: the validator limit is the constant 32, not a universally quantified configuration value.
+CHECKED does not mean the deployed gateway respects `maxTopUpPerBlock`.
 
-The proof does not cover _verifyValidator, withdrawal credentials type 0x02, or the live allocateDeposits integration.
-
+Ranked next work: register a per-key bound; fold the 32-guard into the Verity parent or stop listing it as a parent kill-line; do not compose with P-TOPUP-1; keep the live path out unless the claim is widened on purpose.
 
 Theorems: `PTopup2.aggregate_bounded_by_block_cap` (parent), `PTopup2.verity_tx_simulates_topup2_spec`.
 Assumptions: `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`.
