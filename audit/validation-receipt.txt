@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 0ad22cba2cddbe5dbab62500c09685617f752933
+validated-tree: 08461a63d8f4b5f60ae2e515e10b09491a9c46b5
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3449,3 +3449,19 @@ P-DEPOSIT-1 YAML honesty after Wave 4 (2026-08-21)
   `4681281de06b67f27beb369acbfe38e8d6a9b5735ee9a6063b83c8534df00c27`.
 - `validated-tree` rebound to this commit's tracked tree excluding this receipt
   `0ad22cba2cddbe5dbab62500c09685617f752933`.
+
+P-TOPUP-1 wrap-plane honesty (2026-08-21)
+----------------------------------------
+
+- Metadata only. `fidelity.missing` now records that `verity_tx_simulates_source`
+  assumes `NoUncheckedWrap` and `reverts = false`, so wrap is not an executed
+  Verity observation, while abstract conjunct 3 talks wrap. Residual
+  over-target/zero-sum/Lido-side guards still read the exact Nat sum; if they
+  switch to `wrappedTotal = exactTotal % 2^256`, the honest claim is wrap
+  precludes a value-moving commit. Dropped the leftover ALLOC→LinksSource work
+  item. No Lean edits.
+- `python3 scripts/audit_metadata.py generate && check` exit 0.
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-TOPUP-1"]` rebound to
+  `027ff53d623c57c30d5c8a2d9ad60b680f53f2ecf87612be4d8abaa06511535a`.
+- `validated-tree` rebound to this commit's tracked tree excluding this receipt
+  `08461a63d8f4b5f60ae2e515e10b09491a9c46b5`.
