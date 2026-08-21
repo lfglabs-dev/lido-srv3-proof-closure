@@ -119,16 +119,16 @@
           "executable-plane conservation sibling evidence: skipping the Lido debit breaks the mutant DepositParentTx's own pulled = pushed Observables equality"
         ],
         "missing": [
-          "LinksSource is a caller-supplied hypothesis about the two allocation legs, not yet composed from the P-ALLOC-1/P-ALLOC-2 parents' live loops",
+          "LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength",
           "beacon deposit contract address provenance is a named assumption, not derived",
           "the executable transaction is an exactly-two-batch unrolling of the source deposit loop, not a proved bound on the loop"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Compose LinksSource from the P-ALLOC-1/P-ALLOC-2 parents once their live loops land, derive the beacon deposit contract address instead of assuming it, and generalize the exactly-two-batch executable unrolling toward a proved loop bound."
+        "work": "Keep LinksSource as a caller hypothesis. Do not claim a future ALLOC composition will discharge it: Wave 4 showed ALLOC parents plus key-count composition still fail LinksSource.firstAmount. Derive the beacon deposit contract address instead of assuming it. Keep the executable plane as exactly two batches, or prove a loop bound without advertising a fake forall."
       },
-      "next_gate": "Preserve the commit-branch-explicit abstract parent, its source-plane dropped-assert kill-line, and the composed Verity transaction evidence; the open work is the LinksSource/ALLOC composition, beacon-address provenance, and the two-batch unrolling.",
+      "next_gate": "Preserve the commit-branch-explicit abstract parent, its source-plane dropped-assert kill-line, the Wave 4 ALLOC-does-not-imply-LinksSource kill-line, and the composed two-batch Verity transaction; remaining gaps are beacon-address provenance and a proved loop bound, not ALLOC composition into LinksSource.",
       "roadmap_priority": "DONE"
     },
     {
