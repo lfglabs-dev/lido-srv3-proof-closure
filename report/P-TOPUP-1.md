@@ -9,20 +9,18 @@ P-TOPUP-1 is the beacon-chain top-up path on `StakingRouter.topUp` (`lidofinance
 The registered abstract parent `source_topup_conserves_and_rolls_back` is four conjuncts on the source-shaped `run`:
 1. `pulled = pushed` on every branch, with abstract-tx rollback of a reverting observation.
 2. An unregistered module reverts `revertStakingModuleUnregistered`.
-3. If the unchecked line-732 accumulator wraps (`¬ NoUncheckedWrap`), `run` itself reverts.
+3. If the unchecked line-732 accumulator wraps (`¬ NoUncheckedWrap`), `run` itself moves no wei (`pulled = pushed = 0`). Wrap-to-zero is `committedNoTopUp`, not a revert.
 4. Non-type-2 withdrawal credentials revert `revertWrongWithdrawalCredentialsType`.
 
-Wave 5 routed the wrap through `run`: the value-moving tail reads `accumulated = exactTotal % 2^256` for the pull and the line-755 assert. The wrap witness `wrapInput` (limits `[2^256-1, 2]`) reverts `revertAssertBalanceUnchanged` because wrapped pull `1` is not exact push `2^256+1`. Kill-line `dropped_conservation_assert_kill_line_refutes_parent` drops only that assert and commits with `pulled ≠ pushed`. Dual `unwrapped_accumulator_kill_line_refutes_parent` shows the wrap-ignoring mutant committing.
+Over-target (line 737), zero-sum (line 741), Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert all read `wrappedTotal = exactTotal % 2^256`. The wrap witness `wrapInput` (allocations `[2^256-1, 2]`) still reverts `revertAssertBalanceUnchanged` because wrapped pull `1` is not exact push `2^256+1`. Kill-line `dropped_conservation_assert_kill_line_refutes_parent` drops only that assert and commits with `pulled ≠ pushed`. Dual `unwrapped_accumulator_kill_line_refutes_parent` shows the wrap-ignoring mutant committing. `wrap_to_zero_commits_no_topup` is the honest wrap-to-zero empty-commit control.
 
-The Verity parent `verity_tx_simulates_source` is also a forall, but only under `NoUncheckedWrap`, `allocations.length ≤ 2^256`, and `(run cfg inp).reverts = false`. On those premises, `observe` of `execute.run` equals `sourceObservables`, pulled/pushed agree, and every injected revert restores the entry snapshot.
+The Verity parent `verity_tx_simulates_source` is a forall under `allocations.length ≤ 2^256`, each allocation a uint256 word, and `(run cfg inp).reverts = false`. It does not assume `NoUncheckedWrap`. On those premises, `observe` of `execute.run` equals `sourceObservables` (wrapped totals, including wrap-to-zero empty success), pulled/pushed agree, and every injected revert restores the entry snapshot.
 
 ## Proof issues and recommendations
 
-The wrap story is not the same on both planes. Abstract conjunct 3 talks about wrap. Verity assumes `NoUncheckedWrap` and a non-reverting `run`, so it never executes the wrap branch. YAML already notes that over-target (line 737), zero-sum (line 741), and Lido-side amount guards still read the exact Nat sum where the chain reads the wrapped amount.
+The residual exact-reading gap is closed. Both planes now read `wrappedTotal = exactTotal % 2^256` at line 737, line 741, and Lido.sol 842/873. Abstract conjunct 3 is wrap precludes a value-moving commit. Verity no longer assumes `NoUncheckedWrap`; wrap-to-zero is an executed empty success.
 
-`run_reverts_of_wrap` currently proves wrap implies revert, including wrap-to-zero: `committedNoTopUp` forces `totalAllocated = 0`, which cannot be a wrap. That is true of this model because the zero-sum test still reads the exact sum. If those residual guards are switched to `wrappedTotal = exactTotal % 2^256`, wrap-to-zero can become a no-top-up commit rather than a revert. Then "wrap implies revert" is false. The honest claim is: wrap precludes a value-moving commit.
-
-Recommended next work, in order: put `wrappedTotal` on the over-target and zero-sum guards; restate conjunct 3 as wrap precludes `committedTopUp`; drop or discharge `NoUncheckedWrap` / `reverts = false` from the Verity parent so the wrap branch is an executed observation, not a hypothesis. Do not keep A-TOPUP-NOWRAP as a hidden Verity-only assumption while the abstract parent talks wrap.
+Quantifier strength still differs: Verity keeps `hCommit` (`(run cfg inp).reverts = false`), so a nonzero wrap is excluded because the source run reverts rather than because it is an executed Verity observation. `sourceObservables` describes the wrapped success schedule, which `execute` does not produce on a nonzero wrap (the push frame fail-closes). YAML `fidelity.missing` records that gap plus beacon-address provenance. Do not derive a top-up `LinksSource` from ALLOC.
 
 ## Registered Theorem
 
@@ -34,11 +32,11 @@ four-conjunct claim, not just conservation/rollback:
 |---|---|
 | 1 (conservation/rollback) | `pulled = pushed` on every branch — genuinely assert-backed since wave 5: `run`'s value-moving tail reads the on-chain `unchecked` accumulator (the line-732 sum reduced mod 2^256) for the line-744 pull, the funded router balance, and the line-755 assert, so reaching the commit means the assert passed with the wrapped pull equal to the exact push; a reverting outcome restores pre-state (`A-ABSTRACT-TX`) |
 | 2 (module guard) | `moduleExists = false` ⇒ `run` returns `revertStakingModuleUnregistered` |
-| 3 (wrap discharge) | If the unchecked sum wraps mod 2^256, `run` itself reverts (`(run cfg inp).reverts = true`) — the wrapped pull is strictly below the exact pushed total, so the push is underfunded or the line-755 assert fires. `A-TOPUP-NOWRAP` lives here, in the wrap antecedent, and in the Verity-side `NoUncheckedWrap` premise of `verity_tx_simulates_source` — not in conjunct 1 |
+| 3 (wrap discharge) | If the unchecked sum wraps mod 2^256, `run` itself moves no wei (`pulled = pushed = 0`). A nonzero wrap still aborts on the value-moving tail; wrap-to-zero is `committedNoTopUp`. `A-TOPUP-NOWRAP` lives here, in the wrap antecedent, and in the discharged-balance-guard theorems — not in conjunct 1, and not as a Verity parent hypothesis |
 | 4 (WC-type guard) | `wcTypeIsType2 = false` ⇒ `run` returns `revertWrongWithdrawalCredentialsType` |
 
 Each conjunct is proved by, and stated identically to, a standalone lemma
-(`source_module_guard_required`, `source_wrap_implies_revert`,
+(`source_module_guard_required`, `source_wrap_precludes_value_moving_commit`,
 `source_wc_type2_guard_required`) kept in the same file for readability; the
 registered theorem's proof term is a direct `⟨_, _, _, _⟩` bundling of those
 four facts. `verity_tx_simulates_source` is the separate CHECKED Verity claim.
@@ -187,6 +185,28 @@ the routed model:
   the honest `run` itself reverting at `wrapInput`, and pins the revert to
   the line-755 assert (`run killCfg wrapInput = .revertAssertBalanceUnchanged`).
 
+## Wave 6: wrappedTotal on both planes
+
+The residual exact-reading guards now read the same wrapped word the chain
+reads. Over-target (line 737), zero-sum (line 741), Lido-side amount guards
+(`Lido.sol` 842/873), the line 744 pull, the funded router balance, and the
+line 755 `assert` all use `accumulated` (`wrappedTotal = exactTotal % 2^256`).
+
+Conjunct 3 is therefore `source_wrap_precludes_value_moving_commit`, not wrap
+implies revert. `wrap_to_zero_commits_no_topup` shows
+`allocations = [2^256-1, 1]` committing `committedNoTopUp` with
+`pulled = pushed = 0`. A nonzero wrap at `wrapInput` still hits the line-755
+assert. The four surgical kill-lines are unchanged in predicate: dropping the
+assert still commits `pulled ≠ pushed`; the wrap-ignoring dual still commits
+the wrapping batch.
+
+Verity `verity_tx_simulates_source` dropped the `NoUncheckedWrap` hypothesis.
+It keeps `hLen`, a per-allocation uint256 bound `hAmt` (strictly weaker than
+sum no-wrap), and `hCommit`. Wrap-to-zero is included as
+`execute_observes_source_wrapped_zero`. A nonzero wrap is excluded because
+the source run reverts (`hCommit`); that remaining quantifier mismatch is
+listed in YAML `fidelity.missing`.
+
 ## Scope Exclusions
 
 - Per-validator amount computation and limit accounting → P-TOPUP-2.
@@ -194,10 +214,3 @@ the routed model:
 - SSZ deposit-data-root → P-SSZ-1.
 - Beacon-address provenance: named assumption, not a parent conjunct.
 - `LinksSource` derivation from ALLOC deferred until live loops are in place.
-- Residual exact-reading guards: the over-target comparison (line 737), the
-  zero-sum test (line 741), and the Lido-side amount guards (`Lido.sol`
-  842/873) still read the exact `Nat` sum where the chain reads the wrapped
-  `amount`. Under a wrap this can change which revert fires first (or, for a
-  sum wrapping to exactly zero, commit-vs-revert), though every wrapping
-  batch still reverts in the model — which is all the registered conjunct 3
-  states.

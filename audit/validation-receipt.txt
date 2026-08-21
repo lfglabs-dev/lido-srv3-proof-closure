@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 08461a63d8f4b5f60ae2e515e10b09491a9c46b5
+validated-tree: 7cceb2b4e166abeacec970f6443f1fceffe7e3fa
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3465,3 +3465,29 @@ P-TOPUP-1 wrap-plane honesty (2026-08-21)
   `027ff53d623c57c30d5c8a2d9ad60b680f53f2ecf87612be4d8abaa06511535a`.
 - `validated-tree` rebound to this commit's tracked tree excluding this receipt
   `08461a63d8f4b5f60ae2e515e10b09491a9c46b5`.
+
+P-TOPUP-1 wrappedTotal both planes (2026-08-21)
+----------------------------------------------
+
+- Lean. Over-target (line 737), zero-sum (line 741), and Lido-side amount
+  guards (`Lido.sol` 842/873) now read `wrappedTotal = exactTotal % 2^256`
+  (`accumulated`), matching the line-744 pull, funded router balance, and
+  line-755 assert. Registered conjunct 3 is wrap precludes a value-moving
+  commit (`source_wrap_precludes_value_moving_commit`): wrap-to-zero is
+  `committedNoTopUp`, nonzero wrap still aborts. Verity parent
+  `verity_tx_simulates_source` drops `NoUncheckedWrap`; keeps `hLen`,
+  per-allocation `hAmt`, and `hCommit`. Positive control
+  `wrap_to_zero_commits_no_topup`. Four surgical kill-lines preserved.
+  No sorry/admit/new axiom; Trust print-axioms are propext / Classical.choice
+  / Quot.sound.
+- `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx
+  LidoSRv3.Tests.TopupTxMutants LidoSRv3.Audit.Trust` exit 0.
+- `python3 scripts/audit_metadata.py generate && check` exit 0.
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-TOPUP-1"]` rebound to
+  `be06b1ea3ac5a77f39faef7479d03df1a0c8d759c0a0fa346c601201da84536c`.
+  `fidelity.missing` keeps the Verity `hCommit` / nonzero-wrap observation gap
+  and beacon-address provenance. Independent review of `e60c444` (BLOCKED)
+  required that residual quantifier mismatch stay explicit.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `validated-tree` rebound to this commit's tracked tree excluding this receipt
+  `7cceb2b4e166abeacec970f6443f1fceffe7e3fa`.
