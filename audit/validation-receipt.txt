@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 7cceb2b4e166abeacec970f6443f1fceffe7e3fa
+validated-tree: 51c7595fa3d559468d7ee85773da54955a092134
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3491,3 +3491,59 @@ P-TOPUP-1 wrappedTotal both planes (2026-08-21)
 - `python3 scripts/check_public_claim_surfaces.py` exit 0.
 - `validated-tree` rebound to this commit's tracked tree excluding this receipt
   `7cceb2b4e166abeacec970f6443f1fceffe7e3fa`.
+
+P-ETH-1 universal Verity parent (2026-08-21)
+--------------------------------------------
+
+- Lean. The registered Verity parent is lifted from five numeral traces to
+  `LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape`: for all
+  `(msgValue, batchSize, feePerRequest)` that are nonzero-valued, word-sized,
+  non-wrapping in the product fee (`batchSize * feePerRequest < 2^256`),
+  funded (`batchSize * feePerRequest ≤ msgValue`), and fuel-fit
+  (`batchSize + 4 ≤ fuelBudget = 32`), the honest wiring commits with the
+  whole product fee at the consolidation-request predeploy, the remainder at
+  the refund recipient, and zero retained by every protocol contract on the
+  route. Proved in the new module
+  `LidoSRv3/Audit/Verity/PEth1CompositionTxUniversal.lean` by frame-by-frame
+  chaining through the recursive dispatcher, with a `requestPhaseWorld`
+  induction over the symbolic batch-size-driven request loop. The premises
+  are exactly the abstract parent's non-revert conditions plus the fuel
+  bound, so abstract and Verity parents now share quantifier strength on the
+  success arm. `verity_tx_composes_value_flow_and_rollback` stays as
+  auxiliary regression evidence.
+- Kill-lines on that same parent: `universalSuccessShapePredicate` factors
+  the registered statement over the `Wiring`
+  (`universal_parent_is_predicate_at_honest`); four wiring mutants refute it
+  at the premise-satisfying witness `(10, 2, 3)`
+  (`dropped_refund_leg_kill_line_refutes_universal_parent`,
+  `misrouted_vault_kill_line_refutes_universal_parent`,
+  `corrupted_refund_kill_line_refutes_universal_parent`,
+  `single_request_kill_line_refutes_universal_parent`); three
+  premise-necessity kill-lines refute the premise-dropped projections on the
+  honest wiring (`zero_value_kill_line_refutes_dropped_positivity`,
+  `underfunded_kill_line_refutes_dropped_funding`,
+  `fuel_exhaustion_kill_line_refutes_dropped_fuel_premise`). Wave 2 scope
+  kill-lines remain as executable premise witnesses.
+- `lake build` (full default target, including
+  `LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal`,
+  `LidoSRv3.Audit.Guarantees.PEth1`,
+  `LidoSRv3.Tests.PEth1CompositionTxMutants`, `LidoSRv3.Audit.Trust`,
+  `LidoSRv3.Audit.AllGuarantees`): exit 0, `Build completed successfully
+  (1396 jobs)` under Lean 4.31.0; only pre-existing upstream dependency
+  warnings. Trust print-axioms for the new parent and all seven kill-lines
+  report `propext` / `Classical.choice` / `Quot.sound` only. No sorry/admit/
+  new axiom; no `native_decide`.
+- `python3 scripts/audit_metadata.py generate && check` exit 0.
+  `EXPECTED_CANONICAL_CLAIMS["P-ETH-1"]` Verity theorem rebound to
+  `verity_tx_universal_success_shape`;
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ETH-1"]` rebound to
+  `0ce9c10729d9c2a4f19a00b0883475cb5c305cd8467b2374394f7218165c9d05`.
+  `fidelity.missing` replaces the quantifier-strength gap with the residual
+  revert-arm characterization gap (no ∀ revert-shape theorem on the Verity
+  plane). `audit/REPRODUCE.md` and `audit/STATUS.md` regenerated.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0 (P-ETH-1 is not a
+  tracked surface there; unchanged).
+- `report/P-ETH-1.md` and `audit/P-ETH-1-COMPOSITION.md` updated for the
+  changed claim (Wave 5 section, auditor note, resolution table).
+- `validated-tree` rebound to this commit's tracked tree excluding this
+  receipt `51c7595fa3d559468d7ee85773da54955a092134`.
