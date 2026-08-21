@@ -13,7 +13,7 @@ P-CONSOLIDATION-ETH-1 verifies this on `gatewayExecute`, whose destinations are 
 - $n \times \mathrm{fee} > \mathrm{msgValue}$ reverts `InsufficientValue`
 - otherwise every journaled move is `parentApproved` and $\mathrm{totalAmount} = \mathrm{msgValue}$
 
-That is `eth_flow_parent`, a real $\forall (\mathrm{msgValue}, n, \mathrm{fee})$. The Verity parent is now `verity_tx_universal_success_shape`, which matches that $\forall$ on the success arm: for every $(\mathrm{msgValue}, \mathrm{batchSize}, \mathrm{feePerRequest})$ that is nonzero, word-sized, non-wrapping in the product fee, funded ($\mathrm{batchSize} \times \mathrm{feePerRequest} \le \mathrm{msgValue}$), and fuel-fit ($\mathrm{batchSize} + 4 \le \mathrm{fuelBudget} = 32$), the honest wiring commits the whole product fee at the consolidation-request predeploy, the remainder at the refund recipient, and zero retained on the route. The proof is frame-by-frame chaining through the recursive dispatcher (`PConsolidationEth1CompositionTxUniversal.run_success_shape`), not numeral witnesses. The earlier finite conjunction `verity_tx_composes_value_flow_and_rollback` is kept as auxiliary regression evidence; its success numerals are instances of the universal parent. VaultHub / `StakingVault.withdraw` are named out of scope. Former P-CONSOLIDATION-ETH-1b fee-leg theorems are parent evidence under `A-CANONICAL-REQUEST-ADDRESS`, not a sibling guarantee. Former P-CONSOLIDATION-ETH-1a (vault→Lido/WQ returns) is retired from this parent. Do not compose into P-CONSOLIDATION-1 until the FunctionSpec is the live `addConsolidationRequests` (groups, fee fetch, refund that can fail).
+The registered abstract theorem is `eth_flow_parent_at_canonical`, a real $\forall (\mathrm{msgValue}, n, \mathrm{fee})$ whose `canonicalApprovedSet` fixes the fee destination to the EIP-7251 `0x7251` literal. Equality of a deployed configured target with that model literal remains `A-CANONICAL-REQUEST-ADDRESS`. The Verity parent is `verity_tx_universal_success_shape`, which matches the outcome quantifier strength on the success arm under its non-revert and fuel premises. Former P-CONSOLIDATION-ETH-1a (vault→Lido/WQ returns) remains retired, and no composition into P-CONSOLIDATION-1 is claimed.
 
 ## Proof limitations and recommendations
 
@@ -23,11 +23,11 @@ Residual gap, recorded in YAML `fidelity.missing`: Verity quantifies over the su
 
 CHECKED does not mean a naked Verity $\forall$, pinned-Solidity correspondence, bytecode, or complete SRv3 ETH-site coverage.
 
-Ranked next work: keep the universal success parent and premise kill-lines; register a Verity revert-shape ∀ or keep that gap explicit; fold fee-leg evidence into parent conjuncts once A-CANONICAL-REQUEST-ADDRESS is discharged; compose with P-CONSOLIDATION-1 only after the ABI bridge.
+Ranked next work: keep the universal success parent and premise kill-lines; register the Verity canonical-address/revert partition only with real proofs; discharge deployed-target provenance from artifacts; compose with P-CONSOLIDATION-1 only after the ABI bridge.
 
-Theorems: `PConsolidationEth1.eth_flow_parent`, `PConsolidationEth1.verity_tx_universal_success_shape` (registered Verity parent); `PConsolidationEth1.verity_tx_composes_value_flow_and_rollback` (auxiliary regression evidence).
+Theorems: `PConsolidationEth1.eth_flow_parent_at_canonical`, `PConsolidationEth1.verity_tx_universal_success_shape` (registered parents); `PConsolidationEth1.eth_flow_parent` (generic helper); `PConsolidationEth1.verity_tx_composes_value_flow_and_rollback` (auxiliary regression evidence).
 Kill-lines (Tests): `misrouted_journal_kill_line_refutes_parent`, `zero_value_success_kill_line_refutes_parent` (abstract parent, Wave 4); `dropped_refund_leg_kill_line_refutes_universal_parent`, `misrouted_vault_kill_line_refutes_universal_parent`, `corrupted_refund_kill_line_refutes_universal_parent`, `single_request_kill_line_refutes_universal_parent` (universal Verity parent, Wave 5 wiring mutants); `zero_value_kill_line_refutes_dropped_positivity`, `underfunded_kill_line_refutes_dropped_funding`, `fuel_exhaustion_kill_line_refutes_dropped_fuel_premise` (Wave 5 premise-necessity); `underfunded_batch_is_not_a_repartition`, `large_funded_batch_exhausts_fuel_budget` (Wave 2 executable premise witnesses).
-Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CANONICAL-REQUEST-ADDRESS`.
 
 ## Wave 5 changes (2026-08-21)
 

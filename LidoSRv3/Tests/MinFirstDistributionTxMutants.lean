@@ -97,6 +97,8 @@ theorem selection_kill_line_refutes_parent :
         (Option.map (fun b => (b.allocation, b.capacity))
             (mutantFirstOpenCandidate? model) =
           some (best.allocation.val, best.capacity.val)) ∧
+        Model.amount model allocationSize.val
+          ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
         0 < w.val ∧ w.val ≤ allocationSize.val ∧
           best.allocation.val + w.val ≤ best.capacity.val) := by
   intro h
@@ -161,13 +163,15 @@ theorem headroom_clamp_kill_line_refutes_parent :
         (Option.map (fun b => (b.allocation, b.capacity))
             (Model.candidate? model) =
           some (best.allocation.val, best.capacity.val)) ∧
+        Model.amount model allocationSize.val
+          ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
         0 < w.val ∧ w.val ≤ allocationSize.val ∧
           best.allocation.val + w.val ≤ best.capacity.val) := by
   intro h
   exact absurd
     ((h [⟨0, 3⟩] [⟨w 0, w 3⟩] ⟨w 0, w 3⟩ (w 10) (w 10)
       (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil)
-      rfl rfl (by decide) (by decide) rfl).2.2.2)
+      rfl rfl (by decide) (by decide) rfl).2.2.2.2)
     (by decide)
 
 /-! ## TX-observe computational evidence for the headroom kill-line: the

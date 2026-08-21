@@ -135,6 +135,15 @@ structure ApprovedSet where
   refundRecipient : Address
   deriving DecidableEq, Repr
 
+/-- Canonical EIP-7251 consolidation-request predeploy.  The model pins this
+literal directly; identifying a deployed gateway immutable/slot with it remains
+the explicit provenance boundary `A-CANONICAL-REQUEST-ADDRESS`. -/
+def canonicalRequestAddress : Address :=
+  0x0000000000000000000000000000000000007251
+
+def canonicalApprovedSet (refundRecipient : Address) : ApprovedSet :=
+  { consolidationContract := canonicalRequestAddress, refundRecipient }
+
 def classifyJournal (approved : ApprovedSet) (addr : Address) : EthDestination :=
   if addr = approved.consolidationContract then .consolidationContract
   else if addr = approved.refundRecipient then .refundRecipient
@@ -264,6 +273,26 @@ theorem eth_flow_parent (approved : ApprovedSet)
       · rw [hRefund, totalAmount_append, totalAmount_replicate, totalAmount_cons, totalAmount_nil]
         show n * fee + (msgValue - n * fee) = msgValue
         omega
+
+/-- **Registry-facing abstract parent at the canonical request predeploy.**
+This folds the fee destination into the parent conclusion instead of leaving
+the canonical target only in sibling evidence.  The literal is model content;
+its equality with the deployed configured target remains
+`A-CANONICAL-REQUEST-ADDRESS`. -/
+theorem eth_flow_parent_at_canonical (refundRecipient : Address)
+    (hDistinct : refundRecipient ≠ canonicalRequestAddress) :
+    (canonicalApprovedSet refundRecipient).consolidationContract =
+        canonicalRequestAddress ∧
+      ∀ (msgValue n fee : Nat),
+        match gatewayExecute (canonicalApprovedSet refundRecipient) msgValue n fee with
+        | .reverted .zeroArgument => msgValue = 0
+        | .reverted .overflowPanic => n * fee ≥ 2^256
+        | .reverted .insufficientValue => n * fee > msgValue
+        | .success moves =>
+            (∀ m, m ∈ moves → parentApproved m.destination) ∧
+            totalAmount moves = msgValue := by
+  refine ⟨rfl, eth_flow_parent (canonicalApprovedSet refundRecipient) ?_⟩
+  simpa [canonicalApprovedSet] using hDistinct
 
 /-! ## Verity plane
 

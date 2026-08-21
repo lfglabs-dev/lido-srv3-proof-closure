@@ -175,6 +175,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.consolidation_fee_path_confined
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_composes_value_flow_and_rollback
 #print axioms LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_dropped_refund_leg

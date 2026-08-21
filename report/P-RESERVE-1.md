@@ -14,6 +14,7 @@ Lido's execution-layer buffer is not one pot. `_getBufferedEtherAllocation` (`Li
 `source_spend_preserves_withdrawal_reserve` proves, on any committed call:
 
 - wrapper guards held: $\mathrm{canDeposit} \wedge \mathrm{authorizedRouter}$ (`scopedWithdrawGuards`), derived rather than assumed
+- the live `ZERO_AMOUNT` guard held: $\mathrm{amount} \ne 0$, derived from the committed wrapper
 - the spend is the pinned one (`withdrawalPartitionSpendInvariant`)
 - the queue-facing reserve is unchanged under `freshQueueCache before live` (the cached word equals a live `unfinalizedStETH()` value)
 
@@ -23,11 +24,11 @@ Lido's execution-layer buffer is not one pot. `_getBufferedEtherAllocation` (`Li
 
 Both registered theorems are genuine unbounded universals, conditional on a committed wrapper and (for the parent) freshness. `freshQueueCache` is `before.unfinalizedStETH = live`: one inhabited `live` per state. Stale-cache theorems are premise necessity, not parent kill-lines. Conjunct (3) follows from conjunct (2) plus freshness; a mutant cannot satisfy (2) and violate (3) under a fresh cache.
 
-Guards are free booleans, not bunker / pause / `msg.sender`. The zero-amount guard is not in `scopedWithdrawGuards`. `guard_drop` and `partition_spend` are parent-shaped. The Verity parent has no kill-line of its own. Buffer is a declared word, not `address(this).balance`.
+Guards are free booleans, not bunker / pause / `msg.sender`. The zero-amount guard is separate from `scopedWithdrawGuards` but is already a registered parent conjunct. `guard_drop` and `partition_spend` are parent-shaped. The Verity parent has no kill-line of its own. Buffer is a declared word, not `address(this).balance`.
 
 CHECKED does not mean the reserve cannot be driven to zero by other writers (`setDepositsReserveTarget` plus a report), or that the queue stays payable.
 
-Ranked next work: keep freshness explicit until a live WQ CALL exists; close or keep explicit the zero-amount guard and setDepositsReserveTarget surface; do not treat P-RESERVE-RELATIONAL as this parent.
+Ranked next work: keep freshness explicit until a live WQ CALL exists; model the setDepositsReserveTarget/report-rebalance surface; do not treat P-RESERVE-RELATIONAL as this parent.
 
 Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-lines: `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` (kills the `scopedWithdrawGuards` conjunct on a `canDeposit`-dropped mutant) and `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent` (kills the partition-invariant and live-reserve conjuncts on a mutated spend transition). Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

@@ -19,13 +19,13 @@ We prove the step on the abstract model (`forall_proportional_step_correspondenc
 
 ## Proof limitations and recommendations
 
-The abstract parent is a genuine unbounded $\forall$ over finite lists and words, hypothesized on `RowsCorrespond`, source selection, openness, length $< 2^{256}$, nonzero demand, and successful `checkedAmount`. It is one step, not the outer `while`. The Verity theorem is universal over decoded lists, but both arrays are assumed decoded and `sourceView` calls the same `allocateLoop` as the transaction.
+The abstract parent is a genuine unbounded $\forall$ over finite lists and words, hypothesized on `RowsCorrespond`, source selection, openness, length $< 2^{256}$, nonzero demand, and successful `checkedAmount`. Its conclusion now includes equality with independent `Model.amount`, so ceilDiv and both clamps are load-bearing. It is one step, not the outer `while`. The Verity theorem is universal over decoded lists; `sourceView` uses a separately stated loop with copied equations and a proved equality bridge, but this is not a model-level full-loop invariant.
 
 `A-HANDWRITTEN-MINFIRST` and `A-VERITY-SCAFFOLD` are load-bearing. The +1 child `selects_least_open_bucket` is a different algorithm. YAML already lists activity filtering (upstream), keccak oracle, and in-place memory mutation. Kill-lines `selection_kill_line_refutes_parent` and `headroom_clamp_kill_line_refutes_parent` are parent-shaped; they do not kill positivity, $w \le r$, or the next-level clamp, and they do not refute the Verity parent.
 
 CHECKED does not mean a full-loop conservation theorem, Solidity equivalence, or that capacities were built correctly.
 
-Ranked next work: add the amount-correspondence conjunct so ceilDiv/next-level are load-bearing; register a loop-level theorem; make sourceView independent of allocateLoop; keep the +1 model as a child.
+Ranked next work: register a genuine model-level full-loop conservation/correspondence theorem; keep the +1 model as a child.
 
 Theorems: `PAlloc2.forall_proportional_step_correspondence_and_bounded` (registered parent, explicit ∀; re-registered by human PR #134), `PAlloc2.proportional_step_correspondence_and_bounded` (helper, implicit binders), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (selection kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (headroom kill-line).
 Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.

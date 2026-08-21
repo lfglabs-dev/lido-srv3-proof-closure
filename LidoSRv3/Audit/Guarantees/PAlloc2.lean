@@ -152,9 +152,12 @@ theorem proportional_step_correspondence_and_bounded
     (hAmount : MinFirstAllocation.Source.checkedAmount source allocationSize best = some w) :
     (Option.map (fun b => (b.allocation, b.capacity)) (MinFirstAllocation.Model.candidate? model) =
       some (best.allocation.val, best.capacity.val)) ∧
+    MinFirstAllocation.Model.amount model allocationSize.val
+      ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
     0 < w.val ∧ w.val ≤ allocationSize.val ∧
       best.allocation.val + w.val ≤ best.capacity.val :=
   ⟨by rw [full_candidate_correspondence hRows, hSelected]; rfl,
+   source_amount_correspondence hRows hLen rfl rfl hAmount,
    source_amount_totality hOpen hLen hSize hAmount⟩
 
 /-- **Explicit ∀ registered parent (P-ALLOC-2).** Universal closure over
@@ -162,7 +165,9 @@ valid model/source rows and `allocationSize`: for every model/source pair
 with `RowsCorrespond`, every selected open best candidate, every non-zero
 remaining demand and every successful checked amount, the candidate
 correspondence holds and the amount is positive, bounded by the remaining
-demand, and capacity-safe. The `∀` is explicit so the bound is not an
+ demand, and capacity-safe. It also identifies the checked source word with
+the independent unbounded `Model.amount`, making the proportional `ceilDiv`
+and both model clamps load-bearing parent content. The `∀` is explicit so the bound is not an
 existential witness over one allocationSize. -/
 theorem forall_proportional_step_correspondence_and_bounded :
     ∀ (model : List MinFirstAllocation.Model.Bucket)
@@ -177,6 +182,8 @@ theorem forall_proportional_step_correspondence_and_bounded :
       MinFirstAllocation.Source.checkedAmount source allocationSize best = some w →
       (Option.map (fun b => (b.allocation, b.capacity)) (MinFirstAllocation.Model.candidate? model) =
         some (best.allocation.val, best.capacity.val)) ∧
+      MinFirstAllocation.Model.amount model allocationSize.val
+        ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
       0 < w.val ∧ w.val ≤ allocationSize.val ∧
         best.allocation.val + w.val ≤ best.capacity.val :=
   fun _ _ _ _ _ hRows hSelected hOpen hLen hSize hAmount =>

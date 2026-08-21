@@ -55,7 +55,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
         "expected": "abstract explicit-\u2200 proportional-step pinned-selection correspondence-and-bound parent (\u2200 over valid model/source rows + allocationSize), +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, two named parent-shaped kill-lines refuting the registered parent (selection_kill_line_refutes_parent on the first-open scan mutant, headroom_clamp_kill_line_refutes_parent on the capacity-cap mutant), TX-observe computational evidence (mutantSourceView vs runView over-headroom witness), rollback, and two-batch mutants"
       },
-      "summary": "forall_proportional_step_correspondence_and_bounded (registered parent, explicit \u2200 over (model source best allocationSize w)): with RowsCorrespond between Model/Source, candidate? source = some best, hasFreeSpace best, source.length < 2^256, allocationSize \u2260 0, checkedAmount source allocationSize best = some w \u2192 the Model scan's candidate is PINNED to the source-selected row best (Model.candidate? model maps to some (best.allocation.val, best.capacity.val)) \u2227 0 < w \u2227 w \u2264 allocationSize \u2227 best.allocation + w \u2264 best.capacity (no over-headroom). The wave-4 implicit-binder proportional_step_correspondence_and_bounded is retained as the helper the registered parent forwards to; the explicit \u2200 is an honest strengthening so the bound is universal over valid rows + allocationSize, not an existential witness. selects_least_open_bucket (the +1 Nat model) is demoted to a child. Named parent-shaped kill-lines refute the registered parent: (1) Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent negates the full explicit-\u2200 shape with the first-open mutant scan mutantFirstOpenCandidate? substituted for Model.candidate? \u2014 witness [(5,10),(0,10)] where the source scan selects the non-first row \u27e80,10\u27e9 but the mutant maps to some (5,10); (2) Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent negates the same shape with checkedAmountNoCapacityCap (capacity-headroom clamp dropped) substituted at the checkedAmount premise only \u2014 witness model [\u27e80,3\u27e9], source [\u27e80,3\u27e9], demand 10: the mutant returns w = 10 and the final conjunct 0 + 10 \u2264 3 is false. The TX-level mutantSourceView vs runView example is retained as TX-observe computational evidence on the same witness. Verity: if memory arrays decode, observe of allocate (persisted bucket array plus totals) equals sourceView of the same allocateToBestCandidate loop. A-HANDWRITTEN-MINFIRST: not Solidity equivalence; the two theorems are different algorithms.",
+      "summary": "forall_proportional_step_correspondence_and_bounded is the registered explicit-\u2200 proportional-step parent. Under RowsCorrespond and a successful checkedAmount, it pins the independent Model candidate to the source-selected row, proves Model.amount equals the checked word w, and proves positivity, remaining-demand boundedness, and capacity safety. The amount equality makes ceilDiv and the model clamps load-bearing conclusion content. The +1 Nat model remains a separate child. The selection and headroom-clamp kill-lines retain the strengthened full conclusion shape. Verity separately proves the memory-array transaction agrees with an independently stated copied source loop; no model-level full-loop theorem is claimed.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded"
@@ -66,7 +66,7 @@
       },
       "fidelity": {
         "covered": [
-          "explicit-\u2200 proportional-step pinned-selection correspondence (Model scan's candidate pinned to the source-selected row best) and positive/bounded/capacity-safe checked amount (\u2200 over valid model/source rows + allocationSize)",
+          "explicit-\u2200 proportional-step pinned-selection correspondence, equality of the checked source word with independent Model.amount, and positive/bounded/capacity-safe checked amount (\u2200 over valid model/source rows + allocationSize)",
           "named parent-shaped kill-lines refuting the registered explicit-\u2200 parent: Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent (first-open mutant scan substituted for Model.candidate?) and Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent (checkedAmountNoCapacityCap substituted at the checkedAmount premise only); TX-level mutantSourceView vs runView retained as TX-observe computational evidence",
           "handwritten +1 Strategy selection (demoted child)",
           "executor allocateLoop plus a separately defined sourceAllocateLoop with copied equations and a proved equality bridge; observe reads writeArray buckets",
@@ -75,7 +75,6 @@
         "missing": [
           "Solidity allocate does not test active (filtered upstream)",
           "+1 Strategy and proportional Source are different algorithms",
-          "the registered step parent does not equate w to the independent Model.amount expression, so ceilDiv and the next-level cap are not load-bearing conclusion content",
           "no registered full allocate-loop conservation/correspondence theorem",
           "keccak memory-array oracle",
           "cross-call mutation of the decoded arrays"
@@ -83,9 +82,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked proportional-step parent and the +1-model child on their two algorithms. Close amount correspondence, loop-level registration, and independent sourceView without merging the algorithms or claiming Solidity equivalence."
+        "work": "Keep the strengthened proportional-step parent and the +1-model child on their two algorithms. Add a genuine model-level full-loop conservation/correspondence theorem without merging the algorithms or claiming Solidity equivalence."
       },
-      "next_gate": "source_amount_correspondence is checked parent evidence and sourceView is independently defined; OPEN: fold amount equality into registered parent conclusion and register a full loop theorem; keep the +1 model as a child.",
+      "next_gate": "Amount equality is folded into the registered parent conclusion. OPEN: register a full allocate-loop conservation/model-correspondence theorem; keep the +1 model as a child.",
       "roadmap_priority": "DONE"
     },
     {
@@ -264,7 +263,6 @@
           "frame-nonce reset and report-time rebalance",
           "_seedDepositsCount",
           "buffer is a declared oracle word, not the contract balance",
-          "the live zero-amount guard is outside scopedWithdrawGuards; the model permits amount = 0",
           "reserve-target writer surface setDepositsReserveTarget and its report-time rebalance interaction"
         ]
       },
@@ -272,7 +270,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked, guard-and-freshness-scoped spend-formula theorems; the relational independence fact is the P-RESERVE-1.relational child. Do not derive freshQueueCache from ReserveState alone; it stays an explicit per-call hypothesis until a live WithdrawalQueue call is modeled."
       },
-      "next_gate": "Keep freshQueueCache explicit until a live WQ CALL exists; close or keep explicit the zero-amount guard gap and setDepositsReserveTarget/report-rebalance surface; do not treat P-RESERVE-RELATIONAL as this parent.",
+      "next_gate": "The registered parent already proves the live ZERO_AMOUNT guard on every commit. OPEN: keep freshQueueCache explicit until a live WQ CALL exists, and model setDepositsReserveTarget/report-rebalance; do not treat P-RESERVE-RELATIONAL as this parent.",
       "roadmap_priority": "DONE"
     },
     {
@@ -290,7 +288,7 @@
       "summary": "Renamed from P-ETH-1: consolidation fee/refund ETH plane only (orthogonal to P-CONSOLIDATION-1 vault request atomicity). eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee\u22652^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent verity_tx_universal_success_shape now matches that quantifier strength on the success arm: for all (msgValue, batchSize, feePerRequest) that are nonzero-valued, word-sized, non-wrapping in the product fee, funded (batchSize*feePerRequest \u2264 msgValue), and fuel-fit (batchSize+4 \u2264 fuelBudget=32), the honest wiring commits with the whole product fee at the consolidation-request predeploy, the remainder at the refund recipient, and zero retained by every protocol contract on the route; proved by frame-by-frame chaining through the recursive dispatcher. The premises are exactly the abstract parent's non-revert conditions plus the model's fuel bound, and each is load-bearing: premise-necessity kill-lines refute the premise-dropped projections on the honest wiring (zero-value (0,2,0), underfunded (10,4,3), fuel (30,29,1) witnesses), and four wiring mutants (dropped refund leg, misrouted vault leg, corrupted refund amount, single request per batch) refute the same universal predicate at the premise-satisfying witness (10,2,3). The five numeral witnesses, rejecting-predeploy rollback, underfunded revert, ETH conservation, and dispatch/multicall replay agreement are retained as auxiliary regression evidence (verity_tx_composes_value_flow_and_rollback). Wave 4 parent kill-lines refute eth_flow_parent's own success conjunct on mutants of gatewayExecute itself: misrouted_journal_kill_line_refutes_parent (fee legs journaled to an off-ApprovedSet address, classified .other) and zero_value_success_kill_line_refutes_parent (guard-free gateway succeeds at msg.value=0 paying 2*3=6 wei of fees, breaking totalAmount=msgValue). Former P-CONSOLIDATION-ETH-1b fee-leg theorems are demoted to parent evidence under A-CANONICAL-REQUEST-ADDRESS rather than a sibling guarantee. Former P-CONSOLIDATION-ETH-1a (vault\u2192Lido/WQ return confinement) is retired from this parent: it matches neither the consolidation fee/refund happy path nor P-RESERVE-1 spend accounting.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent"
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical"
       },
       "verity": {
         "status": "CHECKED",
@@ -305,6 +303,7 @@
           "five numeral witnesses, rejecting-predeploy rollback, underfunded revert, ETH conservation, and dispatch/multicall replay agreement retained as auxiliary regression evidence (the witnesses are consequences of the universal parent)",
           "parent kill-lines on gatewayExecute mutants: misrouted fee journal to a lateral .other address, and zero-value fee-paying success breaking conservation",
           "kill-lines on the universal Verity parent itself: four wiring mutants refute the same universal predicate at the premise-satisfying witness (10, 2, 3), and three premise-necessity kill-lines (positivity, funding, fuel) refute the premise-dropped projections on the honest wiring",
+          "canonical EIP-7251 request literal folded into the registered abstract parent via canonicalApprovedSet; deployed configured-target identity remains A-CANONICAL-REQUEST-ADDRESS",
           "parent fee-leg evidence: consolidation_fee_path_confined (configured consolidation-request tag, not a sibling guarantee)",
           "parent fee-leg Verity witness consolidation_fee_target_success: vault debit / configured consolidation-request credit under A-CANONICAL-REQUEST-ADDRESS",
           "bus-forward Contract.run numeral retained as auxiliary fee-path evidence, not a separate guarantee"
@@ -319,7 +318,7 @@
           "universal Verity-plane characterization of the revert arms: the registered parent quantifies over the funded, guard-passing, non-wrapping, fuel-fit success branch only; premise-necessity kill-lines witness non-success runs outside each premise, but no \u2200 revert-shape theorem is registered on the Verity plane",
           "vault\u2192Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)",
           "canonical consolidation-request address provenance (0x00\u20267251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only",
-          "fee-leg evidence is not yet a registered parent conjunct of eth_flow_parent / verity_tx_universal_success_shape (demoted from sibling row; strengthen into the parent when the canonical address is discharged)",
+          "canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address",
           "renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee"
         ]
       },
@@ -327,7 +326,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the universal success-arm parent and wiring/premise kill-lines. Former P-ETH-1b fee-target theorems stay parent evidence under A-CANONICAL-REQUEST-ADDRESS until registered as parent conjuncts. Do not restore vault\u2192Lido/WQ as a child. Do not compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists."
       },
-      "next_gate": "Named fee-leg parent helpers remain evidence under OPEN A-CANONICAL-REQUEST-ADDRESS. Register Verity revert-shape \u2200 or keep the gap explicit; compose only after the ABI/interpreter bridge.",
+      "next_gate": "The canonical EIP-7251 literal is folded into the abstract parent; deployed target provenance remains OPEN under A-CANONICAL-REQUEST-ADDRESS. OPEN: register the Verity canonical-address/revert partition only with real proofs; compose only after the ABI/interpreter bridge.",
       "roadmap_priority": "DONE"
     },
     {
@@ -371,7 +370,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked four-projection parent, its admission-side and write-side kill-lines, and the Verity composition. Do not call all four writers permissionless or widen to singleton-actor entrypoints."
       },
-      "next_gate": "Close listed live batch/storage/CALL surfaces without adding singleton-actor functions; do not call all four writers permissionless.",
+      "next_gate": "OPEN: the checked parent remains a four-projection model. Live claimWithdrawalsTo batch iteration, packed storage, request reads, and payout CALL are unmodeled; do not add singleton-actor functions or call all four writers permissionless.",
       "roadmap_priority": "DONE"
     },
     {
