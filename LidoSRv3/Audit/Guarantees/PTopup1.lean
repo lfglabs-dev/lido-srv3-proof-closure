@@ -424,11 +424,8 @@ theorem verity_wrap_to_zero_is_empty_commit
     inp.allocations state hZero hLen hAmt, ?_⟩
   simp [Verity.TopupTx.sourceObservables, hZero]
 
-/-- Executed nonzero-wrap witness on the Verity plane. For
-`[2^256 - 1, 2]`, the unchecked pull is one wei and the first value-bearing
-frame attempts `2^256 - 1` wei, so execution is observably non-committing and
-`Contract.run` restores the exact entry snapshot. This closes the concrete
-nonzero-wrap branch without claiming a general forall characterization. -/
+/-- Executed nonzero-wrap witness retained as a concrete regression instance
+of the universal close below. -/
 theorem verity_nonzero_wrap_witness_reverts_and_restores
     (state : Verity.ContractState) :
     let before := Verity.TopupTx.entryFrame state
@@ -445,6 +442,24 @@ theorem verity_nonzero_wrap_witness_reverts_and_restores
   refine ⟨reason, hRun, ?_⟩
   rw [hRun]
   rfl
+
+/-- Universal nonzero-wrap close on the Verity plane.  For every list of
+uint256-word allocations, if the exact sum reaches the modulus while its
+unchecked wrapped total is nonzero, the wrapped pull is strictly smaller than
+the exact push schedule.  A real value-bearing frame therefore reverts,
+`Contract.run` restores the entry snapshot, and the outcome is non-committing. -/
+theorem verity_nonzero_wrap_reverts_and_restores
+    (allocations : List Nat) (state : Verity.ContractState)
+    (hWrap : uint256Modulus ≤ allocSum allocations)
+    (hNz : allocSumUnchecked allocations ≠ 0)
+    (hAmt : ∀ a ∈ allocations, a < uint256Modulus) :
+    let before := Verity.TopupTx.entryFrame state
+    ∃ reason,
+      (Verity.TopupTx.execute allocations .none).run before =
+          Verity.ContractResult.revert reason before ∧
+        (Verity.TopupTx.observe before allocations.length
+          ((Verity.TopupTx.execute allocations .none).run before)).committed = false :=
+  Verity.TopupTx.execute_nonzero_wrap_reverts allocations state hWrap hNz hAmt
 
 /-- Predicate packaged from the existing committing-source Verity parent. -/
 def VerityCommittingSimulation (cfg : SourceTopupConfig) (inp : SourceTopupInput)
@@ -463,7 +478,7 @@ def VerityCommittingSimulation (cfg : SourceTopupConfig) (inp : SourceTopupInput
         rollback = before
 
 /-- Registered Verity parent: the full committing-source correspondence,
-including universal injected-failure rollback, conjoined with the concrete
+including universal injected-failure rollback, conjoined with the universal
 nonzero-wrap revert/non-commit/snapshot-restore close above. -/
 theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
@@ -472,14 +487,18 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)
     (hCommit : (run cfg inp).reverts = false) :
     VerityCommittingSimulation cfg inp state ∧
-      (let before := Verity.TopupTx.entryFrame state
-        ∃ reason,
-          (Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run before =
-              Verity.ContractResult.revert reason before ∧
-            (Verity.TopupTx.observe before 2
-              ((Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run
-                before)).committed = false) :=
+      ∀ allocations : List Nat,
+        uint256Modulus ≤ allocSum allocations →
+        allocSumUnchecked allocations ≠ 0 →
+        (∀ a ∈ allocations, a < uint256Modulus) →
+        (let before := Verity.TopupTx.entryFrame state
+          ∃ reason,
+            (Verity.TopupTx.execute allocations .none).run before =
+                Verity.ContractResult.revert reason before ∧
+              (Verity.TopupTx.observe before allocations.length
+                ((Verity.TopupTx.execute allocations .none).run before)).committed = false) :=
   ⟨verity_tx_simulates_source cfg inp state hLen hAmt hCommit,
-    verity_nonzero_wrap_witness_reverts_and_restores state⟩
+    fun allocations hWrap hNz hWords =>
+      verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hWords⟩
 
 end LidoSRv3.Audit.Guarantees.PTopup1

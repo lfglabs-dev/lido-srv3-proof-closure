@@ -340,6 +340,50 @@ theorem verity_tx_universal_success_shape (msgValue batchSize feePerRequest : Na
   _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal.run_success_shape
     msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hle hfuel
 
+/-- Registry-facing Verity close: the universal funded success shape conjoined
+with executable rollback shapes at all four modeled non-success boundaries
+(zero value, wrapped product, underfunding, and dispatch-fuel exhaustion). -/
+theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest : Nat)
+    (hpos : 0 < msgValue)
+    (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)
+    (hnM : batchSize < _root_.Verity.Core.Uint256.modulus)
+    (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)
+    (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)
+    (hle : batchSize * feePerRequest ≤ msgValue)
+    (hfuel : batchSize + 4 ≤
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget) :
+    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest
+          msgValue batchSize feePerRequest) =
+      ⟨.success, batchSize + 3 + (if msgValue - batchSize * feePerRequest = 0 then 0 else 1),
+        ⟨0, 0, 0, 0, 0, batchSize * feePerRequest, msgValue - batchSize * feePerRequest⟩⟩ ∧
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 0 2 0) =
+        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
+          ⟨0, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest
+            10 2 (2 ^ 255)) =
+        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
+          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 4 3) =
+        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
+          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 30 29 1) =
+        ⟨.exhausted,
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget,
+          ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ := by
+  refine ⟨verity_tx_universal_success_shape msgValue batchSize feePerRequest
+    hpos hmv hnM hfee hnf hle hfuel, ?_⟩
+  exact _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest_revert_partition
+
 theorem verity_tx_composes_value_flow_and_rollback :
     (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
         (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run

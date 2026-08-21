@@ -444,6 +444,24 @@ theorem underfunded_batch_reverts_in_gateway :
       ⟨.calleeReverted gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ := by
   decide +kernel
 
+/-- Executable revert-shape partition for the four distinct non-success
+boundaries of the honest Verity ensemble.  The gateway rejects zero value,
+wrapped fee multiplication and underfunding after two entered frames; a
+guard-passing batch that exceeds dispatcher fuel reports exhaustion after
+32 frames.  Every shape reads balances through `finalWorld`, so each case also
+asserts transaction-entry rollback rather than only a control tag. -/
+theorem honest_revert_partition :
+    observe (run honest 0 2 0) =
+        ⟨.calleeReverted gatewayAddr, 2, ⟨0, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      observe (run honest 10 2 (2 ^ 255)) =
+        ⟨.calleeReverted gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      observe (run honest 10 4 3) =
+        ⟨.calleeReverted gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      observe (run honest 30 29 1) =
+        ⟨.exhausted, fuelBudget, ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ := by
+  refine ⟨by decide +kernel, by decide +kernel, underfunded_batch_reverts_in_gateway,
+    by decide +kernel⟩
+
 /-- ETH is conserved across the ensemble on both the committing and the
 reverting route. -/
 theorem dispatch_conserves_eth :
