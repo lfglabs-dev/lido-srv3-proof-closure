@@ -1,4 +1,12 @@
-# P-ETH-1a
+# P-ETH-1a (retired as P-ETH-1 child)
+
+> Status: **retired**. This row is no longer a subordinate guarantee under P-ETH-1.
+
+Its real subject is vault → Lido / WithdrawalQueue protocol returns. That does not align with the P-ETH-1 consolidation fee/refund happy path, and it is not P-RESERVE-1 buffer/spend accounting. Lean modules (`eth_flow_confined`, `PEth1RefundTx`) remain as **unregistered auxiliary** builds only. A future claim “protocol ETH exits only to Lido/WQ” should be a new guarantee (or folded into a relevant existing one), not restored as an ETH-1 child.
+
+The historical product note and proof audit below are retained for provenance.
+
+---
 
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 

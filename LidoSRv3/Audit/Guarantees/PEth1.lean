@@ -23,7 +23,9 @@ structure EthMove where
   destination : EthDestination
   deriving DecidableEq, Repr
 
-/-- P-ETH-1a approves only the two protocol rebalance/redemption destinations. -/
+/-- Retired former P-ETH-1a filter: Lido / WithdrawalQueue only. Kept as an
+unregistered auxiliary predicate. It is not part of the consolidation
+fee/refund parent and is not a P-RESERVE-1 buffer fact. -/
 def is_approved (m : EthMove) : Prop :=
   m.destination = .lido ∨ m.destination = .withdrawalQueue
 
@@ -76,6 +78,8 @@ theorem composed_eth_conservation (msgValue fee : Nat) (hFee : fee ≤ msgValue)
     fee + (msgValue - fee) = msgValue := by
   omega
 
+/-- Unregistered auxiliary (retired P-ETH-1a). `List.filter_eq_self` under its
+own Lido/WQ tagging hypothesis; not a registered parent conjunct. -/
 theorem eth_flow_confined (moves : List EthMove) :
     (∀ m, m ∈ moves → is_approved m) →
       totalAmount moves = totalAmount (approvedReturnMoves moves) := by
@@ -102,6 +106,9 @@ def ethTrace (cfg : Config) (c : ConsolidationFeeCall) : List EthMove :=
      else
        .other c.target }]
 
+/-- Parent fee-leg evidence (former P-ETH-1b): if the call targets the configured
+consolidation-request address, the trace is tagged `.consolidationContract`.
+Canonical equality with `0x00…7251` remains `A-CANONICAL-REQUEST-ADDRESS`. -/
 theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall) :
     c.target = cfg.consolidationRequest →
       ∀ (other : EthMove), other ∈ ethTrace cfg c →

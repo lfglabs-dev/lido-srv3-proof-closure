@@ -2,10 +2,14 @@ import Verity.Core
 import Verity.Stdlib.Math
 
 /-!
-# P-ETH-1a gateway/vault refund transaction
+# Retired P-ETH-1a gateway/vault refund transaction (unregistered)
 
-Source-shaped `Contract.run` ledger for the inventoried P-ETH-1a ETH paths at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Source-shaped `Contract.run` ledger formerly filed as child `P-ETH-1a`. Kept as
+buildable auxiliary evidence only: vault→Lido/WQ returns are not the
+consolidation fee/refund happy path of `P-ETH-1` and are not P-RESERVE-1 buffer
+accounting. Not a registry row.
+
+Pins: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
 * `ConsolidationGateway.addConsolidationRequests` (lines 185--223) sends
   `requestsCount * fee` to `WithdrawalVault`

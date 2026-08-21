@@ -1,7 +1,8 @@
 import LidoSRv3.Audit.Verity.PEth1RequestTx
 
 /-!
-Discriminating mutants for the P-ETH-1b bus/request `Contract.run` ledger.
+Discriminating mutants for the P-ETH-1 fee-leg (former P-ETH-1b) `Contract.run`
+ledger — parent evidence under `A-CANONICAL-REQUEST-ADDRESS`, not a sibling row.
 -/
 
 namespace LidoSRv3.Tests.PEth1RequestTxMutants

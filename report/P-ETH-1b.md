@@ -1,4 +1,12 @@
-# P-ETH-1b
+# P-ETH-1b (absorbed into P-ETH-1)
+
+> Status: **absorbed**. This is no longer a sibling guarantee under P-ETH-1.
+
+The fee → configured consolidation-request target leg is the same consolidation ETH flow as the parent. Theorems (`consolidation_fee_path_confined`, `consolidation_fee_target_success`) are **parent evidence** under `A-CANONICAL-REQUEST-ADDRESS`. Once the canonical `0x00…7251` obligation is discharged, strengthen them into registered parent conjuncts — do not reopen a sister guarantee.
+
+The historical product note and proof audit below are retained for provenance.
+
+---
 
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 

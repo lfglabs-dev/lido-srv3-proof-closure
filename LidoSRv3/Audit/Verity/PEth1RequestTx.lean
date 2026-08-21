@@ -2,10 +2,12 @@ import Verity.Core
 import Verity.Stdlib.Math
 
 /-!
-# P-ETH-1b ConsolidationBus / request-contract transaction
+# P-ETH-1 fee-leg evidence (former P-ETH-1b)
 
-Source-shaped `Contract.run` ledger for the inventoried P-ETH-1b ETH paths at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Source-shaped `Contract.run` ledger for the inventoried consolidation-fee ETH
+paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. These
+theorems are parent evidence under `A-CANONICAL-REQUEST-ADDRESS`, not a sibling
+guarantee row.
 
 * `ConsolidationBus.executeConsolidation` (lines 383--406) forwards
   `msg.value` to `ConsolidationGateway.addConsolidationRequests`

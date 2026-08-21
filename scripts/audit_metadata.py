@@ -25,7 +25,7 @@ SUBORDINATE_IDS = [
     "P-ALLOC-1.eugene-bound", "P-ADDRESS-1.yul-interface-harness",
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
-    "P-SSZ-1.tx-execution-simulation", "P-ETH-1a", "P-ETH-1b",
+    "P-SSZ-1.tx-execution-simulation",
     "P-ADDRESS-1.denote-admission", "P-DEREF-1",
     "P-RESERVE-RELATIONAL",
 ]
@@ -54,7 +54,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CANONICAL-REQUEST-ADDRESS")),
     "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
@@ -67,7 +67,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-TOPUP-1": "be06b1ea3ac5a77f39faef7479d03df1a0c8d759c0a0fa346c601201da84536c",
     "P-ACCOUNT-1": "b51e29cc1f8cee1c5eb664db50dd1bd3ac9f94c2a81684af226d47fbe0d112d8",
     "P-RESERVE-1": "615776b0b5914eed0c9fcb08ecaabc44e894b57d09d0adecf0bd7ba71e821ea3",
-    "P-ETH-1": "c0dc04784cdc1226d5ad7c2ac7f01afa1dd4ef34842696d4a92b392ef9d4f840",
+    "P-ETH-1": "9bc9ecf5661997a88e4ec2f456887af7456f479319a926637f25fa453850c4dd",
     "P-ADDRESS-1": "9be2ad312bba0ba9e1e62c4579fd79bc7dec39938ce9a37f0d9215c898cdb876",
     "P-TOPUP-2": "a8d28ac8158271518a1dbac8c35b1695f9101b9c11cf274e4152f458cdeac531",
     "P-CONSOLIDATION-1": "660f5c8c20da2863a0383427870bd83ce9eabfd32c4964e8d160649e90ce7692",
@@ -137,9 +137,8 @@ def validate_pins(lock, manifest, source_map):
     require(isinstance(targets, list), "source-map targets must be a list")
     target_ids = [x.get("id") for x in targets]
     require(len(target_ids) == len(set(target_ids)), "duplicate source-map target")
-    required_targets = set(CANONICAL_IDS) - {"P-ETH-1"}
+    required_targets = set(CANONICAL_IDS)
     require(required_targets <= set(target_ids), "canonical source targets are incomplete")
-    require({"P-ETH-1a", "P-ETH-1b"} <= set(target_ids), "P-ETH-1 child source targets are incomplete")
     sha = PINNED["lido_core"][1]
     for target in targets:
         require(target.get("status") in {"MAPPED", "UNMAPPED"}, f"{target.get('id')}: invalid source status")

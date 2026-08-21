@@ -1,7 +1,8 @@
 import LidoSRv3.Audit.Verity.PEth1RefundTx
 
 /-!
-Discriminating mutants for the P-ETH-1a refund/withdraw `Contract.run` ledger.
+Discriminating mutants for the retired P-ETH-1a refund/withdraw `Contract.run` ledger
+(unregistered auxiliary; not a P-ETH-1 child claim).
 
 Each `#guard` executes the shipped `Contract.run` entrypoint and checks that a
 disagreeing mutant ledger is not the observed result.
