@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 08461a63d8f4b5f60ae2e515e10b09491a9c46b5
+validated-tree: 6f12b0449ce0da364e307f8620350e3cfda2d563
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3465,3 +3465,37 @@ P-TOPUP-1 wrap-plane honesty (2026-08-21)
   `027ff53d623c57c30d5c8a2d9ad60b680f53f2ecf87612be4d8abaa06511535a`.
 - `validated-tree` rebound to this commit's tracked tree excluding this receipt
   `08461a63d8f4b5f60ae2e515e10b09491a9c46b5`.
+
+P-TOPUP-2 auditor note round 2 and audit probe (2026-08-21)
+-----------------------------------------------------------
+
+- Report plus one unregistered test module. `report/P-TOPUP-2.md` gains a
+  round-2 auditor note (product note plus proof audit) written against the Lean
+  sources: the block-cap parent's genuine forall against the retracted
+  `router_require_post_condition` tautology, `consumeBudget` as a policy the
+  chain does not implement, `A-TOPUP-NOWRAP` carried with P-TOPUP-1's
+  router-line-732 text, the inert `keccakMemorySlice`/`mappingSlot` oracle
+  (verity `a063bfc` evaluates `.memoryArrayElement` without consulting either),
+  the `maxValidatorsPerTopUp` kill-line that does not bear on the registered
+  parent, the declined live `topUp` plus beacon path, and nine ranked
+  recommendations.
+- `LidoSRv3/Tests/Topup2AuditProbe.lean` records the three machine-checked
+  observations behind that note and is explicitly not evidence: it is not
+  imported by the facade and is not named in `audit/guarantees.yaml`.
+  `no_max_check_mutant_survives_registered_verity_parent` derives the
+  mutant-substituted registered Verity parent from the parent itself, since
+  `allocate` and `allocateNoMaxCheck` agree under `hMax`;
+  `verity_tx_simulates_any_run` reproves the parent's script for an arbitrary
+  run function whose only property is that an empty batch is `none`, and
+  instantiates it at a headroom-blind mutant that tops up a validator already
+  at target; `transition_pointwise_le_limit` shows the unregistered per-key
+  bound is eighteen lines from the existing `consumeBudget` induction.
+- No guarantee semantics, `audit/guarantees.yaml`, `audit/STATUS.md`,
+  `audit/ROADMAP.md`, `audit/REPRODUCE.md`, source-map, or assumption changes.
+  No registered theorem statement changed. `sorry`/`admit`/`axiom`/`unsafe`
+  scan clean on the new module.
+- `lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity
+  LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants
+  LidoSRv3.Tests.Topup2AuditProbe` exit 0 at `leanprover/lean4:v4.31.0`.
+- `validated-tree` rebound to this commit's tracked tree excluding this receipt
+  `6f12b0449ce0da364e307f8620350e3cfda2d563`.
