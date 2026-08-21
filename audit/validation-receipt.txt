@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 51c7595fa3d559468d7ee85773da54955a092134
+validated-tree: b522d143686ac5e068ced1062a6e31060d191cc6
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3495,6 +3495,17 @@ P-TOPUP-1 wrappedTotal both planes (2026-08-21)
 P-ETH-1 universal Verity parent (2026-08-21)
 --------------------------------------------
 
+- Model change disclosed: the compiled gateway body `gatewayFn` in
+  `LidoSRv3/Audit/Verity/PEth1CompositionTx.lean` gains the `ZeroArgument`
+  guard (`require 0 < msg.value`) this wave, matching the pinned source
+  gateway's `ZeroArgument("msg.value")` revert and the abstract plane's
+  Wave 1 guard (report/P-ETH-1.md issue 13). The guard only affects
+  `msgValue = 0` runs, which lie outside the registered parent's premises,
+  so it neither weakens nor strengthens the registered success claim; it is
+  what makes the positivity premise load-bearing (the
+  `zero_value_kill_line_refutes_dropped_positivity` witness `(0, 2, 0)`
+  reverts at that guard), and it removes the pre-Wave-5 phantom zero-value
+  success from the model.
 - Lean. The registered Verity parent is lifted from five numeral traces to
   `LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape`: for all
   `(msgValue, batchSize, feePerRequest)` that are nonzero-valued, word-sized,
@@ -3545,5 +3556,11 @@ P-ETH-1 universal Verity parent (2026-08-21)
   tracked surface there; unchanged).
 - `report/P-ETH-1.md` and `audit/P-ETH-1-COMPOSITION.md` updated for the
   changed claim (Wave 5 section, auditor note, resolution table).
+- Post-review (independent review of `07123a1`, verdict CLEAN with
+  disclosure findings): the `ZeroArgument` guard addition is now disclosed
+  in this entry, the report Wave 5 section, and the composition doc; report
+  issue 13 prose corrected to reflect the corrected model;
+  `universal_parent_is_predicate_at_honest` now references the registered
+  parent name directly. Rebuilt and re-gated at the new head.
 - `validated-tree` rebound to this commit's tracked tree excluding this
-  receipt `51c7595fa3d559468d7ee85773da54955a092134`.
+  receipt `b522d143686ac5e068ced1062a6e31060d191cc6`.
