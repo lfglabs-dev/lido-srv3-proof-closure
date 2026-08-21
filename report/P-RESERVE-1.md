@@ -27,7 +27,7 @@ Guards are free booleans, not bunker / pause / `msg.sender`. The zero-amount gua
 
 CHECKED does not mean the reserve cannot be driven to zero by other writers (`setDepositsReserveTarget` plus a report), or that the queue stays payable.
 
-Ranked next work: YAML now states that the zero-amount guard is out and names the `setDepositsReserveTarget`/report-time rebalance surface; keep freshness explicit until a live WQ CALL exists and do not treat P-RESERVE-RELATIONAL as this parent.
+Ranked next work: keep freshness explicit until a live WQ CALL exists; close or keep explicit the zero-amount guard and setDepositsReserveTarget surface; do not treat P-RESERVE-RELATIONAL as this parent.
 
 Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-lines: `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` (kills the `scopedWithdrawGuards` conjunct on a `canDeposit`-dropped mutant) and `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent` (kills the partition-invariant and live-reserve conjuncts on a mutated spend transition). Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

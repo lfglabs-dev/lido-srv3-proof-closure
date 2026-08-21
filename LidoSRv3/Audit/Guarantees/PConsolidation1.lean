@@ -57,18 +57,20 @@ branch's own `msg.value = count * fee` equality then forces a nonzero fee).
 A revert implies the un-strengthened conjunction is false. Not beacon
 eligibility and not the Bus.
 
-**Wave 1 premise, made load-bearing in Wave 3.** `hGatewayAdmittedNonzero`
-is now forwarded to the source theorem and used to derive the
-`inputs.fee.val ≠ 0` conjunct above, so the premise actually excludes the
-free-batch arm from this parent's committed case (it no longer merely sits
-in the signature unused). Two kill-lines pin the claim down:
-`gateway_admitted_nonzero_kill_line` below is premise-necessity evidence
-(dropped, the same conjunct is false of `sourceRun` on a concrete free batch
-that violates the premise), and `fee_blind_commit_kill_line_refutes_parent`
-below is the parent-refuting kill-line (on the mutant interpreter
-`sourceRunFeeBlind` with the exact-fee guard dropped, a batch that SATISFIES
-the premise commits while this parent's committed-arm conjunction is false
-of that commit). -/
+**Wave 1 premise, made load-bearing in Wave 3; relocation still open.**
+`hGatewayAdmittedNonzero` is forwarded to the source theorem and used to
+derive the `inputs.fee.val ≠ 0` conjunct above, so the premise excludes the
+free-batch arm from this parent's committed case. The premise nevertheless
+names the **outer gateway `msg.value` surface** (and the
+`P-CONSOLIDATION-ETH-1` fee/refund plane), not the vault's forwarded
+`totalFee` call: ranked next work is to drop or relocate it before anyone
+reads it as a vault invariant. Two kill-lines pin the present claim:
+`gateway_admitted_nonzero_kill_line` is premise-necessity evidence (dropped,
+the same conjunct is false of `sourceRun` on a concrete free batch that
+violates the premise), and `fee_blind_commit_kill_line_refutes_parent` is
+the parent-refuting kill-line (on the mutant interpreter `sourceRunFeeBlind`
+with the exact-fee guard dropped, a batch that SATISFIES the premise commits
+while this parent's committed-arm conjunction is false of that commit). -/
 theorem source_consolidation_preserves_eligibility_value_atomicity
     (inputs : Inputs)
     (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →

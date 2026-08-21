@@ -23,7 +23,7 @@ The kill-line now uses the valid nonempty report `⟨[1], [1], [1]⟩`. The bala
 
 CHECKED does not mean the pinned path mints after reading fresh balances, that the caller is authorized, or that the minted amount is the protocol fee.
 
-Ranked next work: valid nonempty witness and balance-write stamp landed; retire or independently discharge `fullReportSucceeds`; do not widen to `submitReportData`.
+Ranked next work: retire or independently discharge fullReportSucceeds; keep mint-after-read parent and nonempty kill-line; do not widen to submitReportData.
 
 Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

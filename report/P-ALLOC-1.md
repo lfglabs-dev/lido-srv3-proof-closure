@@ -24,7 +24,7 @@ The registered parent is `checked_execute`, not the `min` tautology. Under `Chec
 
 CHECKED means those Lean theorems build. It does not mean the live view function, a lying module, or MinFirst fill.
 
-Ranked next work: keep the parent as capacity-column correspondence; do not refold the `min` child; close summary CALL / packed slot / count-from-storage without widening into P-ALLOC-2.
+Ranked next work: keep the parent as capacity-column correspondence; do not refold the min child; close summary CALL / packed slot / count-from-storage without widening into P-ALLOC-2.
 
 Theorems: `PAlloc1.checked_execute` (registered parent), `PAlloc1.active_capacity_bounded` (unregistered MathView-definitional child), `PAlloc1.verity_tx_simulates_allocation`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

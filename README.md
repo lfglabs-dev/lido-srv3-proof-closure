@@ -23,7 +23,7 @@ We do not claim to have verified the bytecode. `CHECKED` means the named Lean th
 | 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | CHECKED |
 | 5 | `P-ACCOUNT-1` | CHECKED | CHECKED |
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |
-| 7 | `P-ETH-1` | CHECKED | CHECKED |
+| 7 | `P-CONSOLIDATION-ETH-1` | CHECKED | CHECKED |
 | 8 | `P-ADDRESS-1` | CHECKED | CHECKED |
 | 9 | `P-TOPUP-2` | CHECKED | CHECKED |
 | 10 | `P-CONSOLIDATION-1` | CHECKED | CHECKED |

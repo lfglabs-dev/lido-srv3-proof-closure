@@ -10,7 +10,7 @@ namespace LidoSRv3.Audit.Guarantees
 
 inductive Id
   | pAlloc1 | pAlloc2 | pDeposit1 | pTopup1 | pAccount1 | pReserve1
-  | pEth1 | pAddress1 | pTopup2 | pConsolidation1 | pSsz1
+  | pConsolidationEth1 | pAddress1 | pTopup2 | pConsolidation1 | pSsz1
   | pDeref1 | pReserveRelational
   deriving DecidableEq, Repr
 
@@ -21,7 +21,7 @@ def Id.text : Id → String
   | .pTopup1 => "P-TOPUP-1"
   | .pAccount1 => "P-ACCOUNT-1"
   | .pReserve1 => "P-RESERVE-1"
-  | .pEth1 => "P-ETH-1"
+  | .pConsolidationEth1 => "P-CONSOLIDATION-ETH-1"
   | .pAddress1 => "P-ADDRESS-1"
   | .pTopup2 => "P-TOPUP-2"
   | .pConsolidation1 => "P-CONSOLIDATION-1"

@@ -24,7 +24,7 @@ Kill-lines on module / WC / assert-drop / unwrapped-accumulator are parent-shape
 
 CHECKED does not mean bytecode, extracted Solidity, Lido book-keeping, or that the amounts themselves are correct (a consistent wrong array satisfies every conjunct).
 
-Ranked next work: execute a nonzero wrap on the Verity plane; pin beacon-address provenance; do not derive a top-up `LinksSource` from ALLOC.
+Ranked next work: execute a nonzero wrap on the Verity plane; pin beacon-address provenance; do not derive a top-up LinksSource from ALLOC.
 
 ## Registered Theorem
 

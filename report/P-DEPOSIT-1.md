@@ -25,7 +25,7 @@ Kill-line `dropped_conservation_assert_breaks_pulled_eq_pushed` is adequate for 
 
 CHECKED does not mean the deployed router conserves ether, that ALLOC feeds this row, or that a reverting deposit moves no wei on chain.
 
-Ranked next work: public hypothesis-free `verity_tx_revert_restores_snapshot` landed. YAML says explicitly that the composed parent's rollback conjunct remains vacuous, the two-batch shape has no pinned counterpart, and `DEPOSIT_CONTRACT`/`32 ether` are unresolved provenance facts. Keep `LinksSource` explicit and derive those facts before claiming them.
+Ranked next work: keep LinksSource explicit; pin DEPOSIT_CONTRACT and 32-ether provenance; reshape TX to one-module/n-frames or keep stating the two-batch shape has no pin counterpart.
 
 Theorems: `PDeposit1.source_deposit_conserves_and_rolls_back` (registered abstract parent), `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` (Verity composition), `DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed` (kill-line).
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

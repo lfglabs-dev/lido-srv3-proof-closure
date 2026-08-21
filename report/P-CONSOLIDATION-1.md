@@ -6,7 +6,7 @@ P-CONSOLIDATION-1 covers the inner half of Lido's EIP-7251 path. `ConsolidationG
 
 A batch commits only if the caller is the stored gateway, the source array is nonempty, source and target zip by index, every key carries a 48-byte length word, $n \times \mathrm{fee}$ fits in `uint256`, and $\mathrm{msg.value} = n \times \mathrm{fee}$. A commit produces one predeploy CALL and one event per pair, payload ordered source then target. Anything that fails a guard produces no CALL and no event.
 
-`source_consolidation_preserves_eligibility_value_atomicity` is that characterization, under the caller-supplied premise `caller = gateway → msg.value ≠ 0`, from which a committed run derives $\mathrm{fee} \ne 0$. That premise remains on the wrong outer-gateway value surface and is scheduled for relocation. `verity_tx_simulates_consolidation` matches `sourceView` when four memory arrays decode. We do not cover beacon eligibility, grouping, quota, or the Bus. Do not compose with P-ETH-1.
+`source_consolidation_preserves_eligibility_value_atomicity` is that characterization, under the caller-supplied premise `caller = gateway → msg.value ≠ 0`, from which a committed run derives $\mathrm{fee} \ne 0$. That premise remains on the wrong outer-gateway value surface and is scheduled for relocation. `verity_tx_simulates_consolidation` matches `sourceView` when four memory arrays decode. We do not cover beacon eligibility, grouping, quota, or the Bus. Do not compose with P-CONSOLIDATION-ETH-1.
 
 ## Proof limitations and recommendations
 
@@ -14,7 +14,7 @@ The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. 
 
 CHECKED does not mean eligibility in the beacon sense, that the vault paid $n \times \mathrm{fee}$, or gateway grouping.
 
-Ranked next work: the `preservesEthBalance` wording fix landed; drop or relocate the gateway-value premise and make observe read payloads; keep the P-ETH-1 fence.
+Ranked next work: drop or relocate the outer-gateway nonzero-value premise; make observe read payload storage; keep the P-CONSOLIDATION-ETH-1 fence until an ABI/interpreter bridge exists.
 
 Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
@@ -113,7 +113,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 11. **`consolidationRequestAddress` is unused.**
    The constant `0x00…7251` is defined and not read by `sourceRun`.
 
-   *Scenario.* Set `inputs.requestTarget = 0xdead`. `source_consolidation_preserves_eligibility_value_atomicity` still holds and `commitObservables` journals CALLs to `0xdead`. Same provenance hole as P-ETH-1b. A more faithful 48+48-byte model exists in `ConsolidationAbstractFlowModel` and is **not** the registered parent.
+   *Scenario.* Set `inputs.requestTarget = 0xdead`. `source_consolidation_preserves_eligibility_value_atomicity` still holds and `commitObservables` journals CALLs to `0xdead`. Same provenance hole as P-CONSOLIDATION-ETH-1b. A more faithful 48+48-byte model exists in `ConsolidationAbstractFlowModel` and is **not** the registered parent.
 
 12. **`persist` invents count / fee / payload maps the vault does not write.**
     `ConsolidationTx.persist` (`:123–131`) SSTOREs `countSlot = start + requestCount`, `feePaidSlot = obs.feePaid`, and `sourceMapSlot` / `targetMapSlot` per index. Live `WithdrawalVault.addConsolidationRequests` (`:199–208`) loops `_callAddConsolidationRequest` and emits; it does not keep a request-count word or a source/target map.
@@ -143,7 +143,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 17. **Mapped `preservesEthBalance` is not in `sourceRun`.**
     Live `WithdrawalVault.addConsolidationRequests` (`:201`) is `preservesEthBalance`: snapshot `address(this).balance` and revert if it changed after the loop. Lean `sourceRun` / `addRequests` never read a self-balance. `commitObservables` journals CALLs marked `.success` without moving wei (issue 2, 13).
 
-    *Scenario.* A predeploy CALL that consumes `fee` but also leaves leftover wei on the vault (or a failed CALL that still transferred). Live modifier reverts the whole `addConsolidationRequests`. Lean `source_consolidation_preserves_eligibility_value_atomicity` commits if the input guards pass. Same hole as P-ETH-1a issue 6, on the vault parent this row actually names.
+    *Scenario.* A predeploy CALL that consumes `fee` but also leaves leftover wei on the vault (or a failed CALL that still transferred). Live modifier reverts the whole `addConsolidationRequests`. Lean `source_consolidation_preserves_eligibility_value_atomicity` commits if the input guards pass. Same hole as P-CONSOLIDATION-ETH-1a issue 6, on the vault parent this row actually names.
 
 18. **Zero fee and zero `msg.value` is a committed free batch of `sourceRun` itself.**
     `sourceRun` accepts `n ≥ 1`, `fee = 0`, `msgValue = 0` (`0 == n * 0`, mul bound holds). Live vault `_requireExactFee(0)` also passes, then `call{value: 0}`. The *gateway* (`ConsolidationGateway.sol:189`) reverts `ZeroArgument("msg.value")` before its own call proceeds.
@@ -188,7 +188,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    value-bearing CALL frames, not the current success stubs with empty
    returndata.
 
-5. **No P-ETH-1 composition.** Explicitly noted in YAML classification.work
+5. **No P-CONSOLIDATION-ETH-1 composition.** Explicitly noted in YAML classification.work
    and next_gate.
 
 ## Wave 3 changes (2026-08-19): P-CONSOLIDATION-1 unused-hypothesis remediation

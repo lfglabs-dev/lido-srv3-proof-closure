@@ -34,14 +34,14 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Checked baseline to preserve
 
-- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
-- `P-ALLOC-2` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
-- `P-DEPOSIT-1` — **IMPLEMENTATION_PENDING**: Preserve the commit-branch-explicit abstract parent, its source-plane dropped-assert kill-line, the Wave 4 ALLOC-does-not-imply-LinksSource kill-line, and the composed two-batch Verity transaction; remaining gaps are beacon-address provenance and a proved loop bound, not ALLOC composition into LinksSource.
-- `P-TOPUP-1` — **IMPLEMENTATION_PENDING**: Preserve the four abstract-plane kill-lines (surgical assert-drop, wrap-ignoring dual, two guard-drops), wrap-precludes-value-moving-commit (including wrap-to-zero empty commit), and the Verity correspondence without a NoUncheckedWrap hypothesis; remaining gaps are the Verity hCommit / nonzero-wrap observation and beacon-address provenance, not ALLOC composition.
-- `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems and the mint-after-read kill-line on the registered parent; close listed fidelity gaps without widening the claim.
-- `P-RESERVE-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim. Do not drop the freshQueueCache hypothesis from the parent theorem.
-- `P-ETH-1` — **IMPLEMENTATION_PENDING**: Fold fee-leg evidence into registered parent conjuncts once A-CANONICAL-REQUEST-ADDRESS is discharged; keep vault→Lido/WQ returns out unless a separate guarantee is opened. Compose into P-CONSOLIDATION-1 only after an ABI/interpreter bridge.
-- `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Close the listed live batch/storage/CALL surfaces without adding singleton-actor functions to this parent.
-- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: Make the Verity source view independent of its executor and model live per-key limit inputs before widening the claim.
-- `P-CONSOLIDATION-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim. Do not compose with P-ETH-1.
-- `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Keep the checked theorems; close listed fidelity gaps without widening the claim.
+- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: Close summary CALL / packed ModuleStateConfig / count-from-storage gaps without widening into P-ALLOC-2; do not refold the min-clamp child into the parent.
+- `P-ALLOC-2` — **IMPLEMENTATION_PENDING**: Add amount-correspondence conjunct so ceilDiv/next-level are load-bearing; register a loop-level theorem; make sourceView independent of allocateLoop; keep the +1 model as a child.
+- `P-DEPOSIT-1` — **IMPLEMENTATION_PENDING**: Keep LinksSource explicit; pin DEPOSIT_CONTRACT and 32-ether immutable provenance; either reshape the TX to one-module/n-frames or keep stating the two-batch shape has no pin counterpart; composed parent rollback conjunct remains vacuous under success Preconditions.
+- `P-TOPUP-1` — **IMPLEMENTATION_PENDING**: Execute a nonzero wrap on the Verity plane (or keep hCommit gap explicit); pin beacon-address provenance; do not derive a top-up LinksSource from ALLOC.
+- `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: Retire or independently discharge fullReportSucceeds on the demoted source child; keep mint-after-read parent and nonempty kill-line; do not widen to submitReportData.
+- `P-RESERVE-1` — **IMPLEMENTATION_PENDING**: Keep freshQueueCache explicit until a live WQ CALL exists; close or keep explicit the zero-amount guard gap and setDepositsReserveTarget/report-rebalance surface; do not treat P-RESERVE-RELATIONAL as this parent.
+- `P-CONSOLIDATION-ETH-1` — **IMPLEMENTATION_PENDING**: Register Verity revert-shape ∀ or keep that gap explicit; fold fee-leg evidence into parent conjuncts once A-CANONICAL-REQUEST-ADDRESS is discharged; compose with P-CONSOLIDATION-1 only after the ABI/interpreter bridge.
+- `P-ADDRESS-1` — **IMPLEMENTATION_PENDING**: Close listed live batch/storage/CALL surfaces without adding singleton-actor functions; do not call all four writers permissionless.
+- `P-TOPUP-2` — **IMPLEMENTATION_PENDING**: Make the Verity source view independent of its executor; model live per-key limit inputs before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.
+- `P-CONSOLIDATION-1` — **IMPLEMENTATION_PENDING**: Drop or relocate the outer-gateway nonzero-value premise; make observe read payload storage; keep preservesEthBalance (forwards exactly msg.value) OPEN until CALLs move wei. Do not compose with P-CONSOLIDATION-ETH-1.
+- `P-SSZ-1` — **IMPLEMENTATION_PENDING**: Carry one-object coupling onto the TX input; keep SHA functional correctness split from Sha256Engine refinement; keep Yul visibly OPEN beside every CHECKED presentation.

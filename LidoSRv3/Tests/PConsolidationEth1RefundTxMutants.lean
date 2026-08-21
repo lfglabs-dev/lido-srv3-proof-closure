@@ -1,17 +1,17 @@
-import LidoSRv3.Audit.Verity.PEth1RefundTx
+import LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx
 
 /-!
-Discriminating mutants for the retired P-ETH-1a refund/withdraw `Contract.run` ledger
-(unregistered auxiliary; not a P-ETH-1 child claim).
+Discriminating mutants for the retired P-CONSOLIDATION-ETH-1a refund/withdraw `Contract.run` ledger
+(unregistered auxiliary; not a P-CONSOLIDATION-ETH-1 child claim).
 
 Each `#guard` executes the shipped `Contract.run` entrypoint and checks that a
 disagreeing mutant ledger is not the observed result.
 -/
 
-namespace LidoSRv3.Tests.PEth1RefundTxMutants
+namespace LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
 
 open _root_.Verity
-open LidoSRv3.Audit.Verity.PEth1RefundTx
+open LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx
 
 private def before : Ledger := ⟨10, 1, 4, 7⟩
 
@@ -69,4 +69,4 @@ theorem leak_on_refund_failure_rejected :
 #check refund_failure_restores_snapshot
 #check withdraw_failure_restores_snapshot
 
-end LidoSRv3.Tests.PEth1RefundTxMutants
+end LidoSRv3.Tests.PConsolidationEth1RefundTxMutants

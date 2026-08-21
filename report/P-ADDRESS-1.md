@@ -19,7 +19,7 @@ The parent is a genuine unbounded $\forall$ over a handwritten 18-field record. 
 
 CHECKED does not mean pinned Solidity, the full claim batch, singleton-actor exclusion by proof, or Yul/EVM.
 
-Ranked next work: the write-side parent-shaped kill-line and live-surface honesty edits landed; keep singleton-actor functions out of this parent.
+Ranked next work: close listed live batch/storage/CALL surfaces without adding singleton-actor functions; do not call all four writers permissionless.
 
 Theorems: `PAddress1.universal_address_writer_equivariance` (parent), `PAddress1.abstract_source_verity_tx_address_equivariance` (Verity), `AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent` (kill-line).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

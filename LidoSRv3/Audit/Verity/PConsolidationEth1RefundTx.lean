@@ -2,11 +2,11 @@ import Verity.Core
 import Verity.Stdlib.Math
 
 /-!
-# Retired P-ETH-1a gateway/vault refund transaction (unregistered)
+# Retired P-CONSOLIDATION-ETH-1a gateway/vault refund transaction (unregistered)
 
-Source-shaped `Contract.run` ledger formerly filed as child `P-ETH-1a`. Kept as
+Source-shaped `Contract.run` ledger formerly filed as child `P-CONSOLIDATION-ETH-1a`. Kept as
 buildable auxiliary evidence only: vault→Lido/WQ returns are not the
-consolidation fee/refund happy path of `P-ETH-1` and are not P-RESERVE-1 buffer
+consolidation fee/refund happy path of `P-CONSOLIDATION-ETH-1` and are not P-RESERVE-1 buffer
 accounting. Not a registry row.
 
 Pins: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
@@ -25,7 +25,7 @@ happen before later `require`s so a failed refund discards the vault fee
 credit.
 -/
 
-namespace LidoSRv3.Audit.Verity.PEth1RefundTx
+namespace LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx
 
 open _root_.Verity
 open _root_.Verity.Stdlib.Math
@@ -314,4 +314,4 @@ theorem withdraw_success_moves_to_lido :
   ((observe ((gatewayRefund (word 5) (word 3) true true).run
       (stateFor ⟨10, 1, 0, 7⟩ defaultState))).ledger.refundDest = 2)
 
-end LidoSRv3.Audit.Verity.PEth1RefundTx
+end LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx

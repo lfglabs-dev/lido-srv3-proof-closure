@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
-    "P-ACCOUNT-1", "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1",
+    "P-ACCOUNT-1", "P-RESERVE-1", "P-CONSOLIDATION-ETH-1", "P-ADDRESS-1",
     "P-TOPUP-2", "P-CONSOLIDATION-1", "P-SSZ-1",
 ]
 SUBORDINATE_IDS = [
@@ -54,29 +54,29 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CANONICAL-REQUEST-ADDRESS")),
+    "P-CONSOLIDATION-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CANONICAL-REQUEST-ADDRESS")),
     "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "b0383f71a63a7cb3ad8037e3a6ee0786f2770c3c69091ff467001c34a2058cca",
-    "P-ALLOC-2": "1ef9d11909fd5fb145310d23dfeefc09a76cc60c1dd9185b237226f4f31417cf",
-    "P-DEPOSIT-1": "abf9160af15243e125a3bda1385e003f457e10cd4502e1c5980aae539ad5b46a",
-    "P-TOPUP-1": "be06b1ea3ac5a77f39faef7479d03df1a0c8d759c0a0fa346c601201da84536c",
-    "P-ACCOUNT-1": "b51e29cc1f8cee1c5eb664db50dd1bd3ac9f94c2a81684af226d47fbe0d112d8",
-    "P-RESERVE-1": "615776b0b5914eed0c9fcb08ecaabc44e894b57d09d0adecf0bd7ba71e821ea3",
-    "P-ETH-1": "9bc9ecf5661997a88e4ec2f456887af7456f479319a926637f25fa453850c4dd",
-    "P-ADDRESS-1": "9be2ad312bba0ba9e1e62c4579fd79bc7dec39938ce9a37f0d9215c898cdb876",
-    "P-TOPUP-2": "a8d28ac8158271518a1dbac8c35b1695f9101b9c11cf274e4152f458cdeac531",
-    "P-CONSOLIDATION-1": "660f5c8c20da2863a0383427870bd83ce9eabfd32c4964e8d160649e90ce7692",
-    "P-SSZ-1": "0722359ea7016ddbf1f11db2c650f733d71a1a1ec44081baf87566e532d81b79",
+    "P-ALLOC-1": "58011316341544713a0a0066211beeb3b898c650c2177f9b025676dc5c831e34",
+    "P-ALLOC-2": "cf6a485a2c03012a41e679d0abcb5730feb8421e0d0e914b40ba1aab4a58137f",
+    "P-DEPOSIT-1": "a0355b95e9dcb8d079efc97ef1290e3ffa9bb280e4b13d67dc2ef10ca41e68f0",
+    "P-TOPUP-1": "bc5a77f6392220f9bbd8696fd5f37090dbe45ade8fab987a88322e7d623d3210",
+    "P-ACCOUNT-1": "aaf290a3f4afabd079efc5e90a65e8437950e2d4ee04f327e5fdf4e23e92c513",
+    "P-RESERVE-1": "0f46b3e87724d02ff8b04895c27cb6226273521edd1fc11bc3103ade6288bdde",
+    "P-CONSOLIDATION-ETH-1": "2694d84e76a6c40c4eebc64eb12d0b6d60a11112f5a1e6815ea0947374ff2224",
+    "P-ADDRESS-1": "7c6b2aef4807fab218c922c879a7799efdad0c701a491101a1ba5a6591094692",
+    "P-TOPUP-2": "f11d0e545ba27bd6cb6bd311c14eea54bf1a5df294f400c2cf10499c35a6e82b",
+    "P-CONSOLIDATION-1": "344b0d6ba48caac8e33d2ba9d4bdedf67ae48efc957af4f0d4ed400615287cce",
+    "P-SSZ-1": "4763960633b8a2458da6d59736e543bd0a515a523f93f6f07cd1325779dcc83c",
 }
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "DONE", "P-TOPUP-1": "DONE", "P-ACCOUNT-1": "DONE",
-    "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "DONE",
+    "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-CONSOLIDATION-ETH-1": "DONE",
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }

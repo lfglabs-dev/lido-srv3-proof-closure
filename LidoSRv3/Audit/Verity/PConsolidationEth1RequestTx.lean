@@ -2,7 +2,7 @@ import Verity.Core
 import Verity.Stdlib.Math
 
 /-!
-# P-ETH-1 fee-leg evidence (former P-ETH-1b)
+# P-CONSOLIDATION-ETH-1 fee-leg evidence (former P-CONSOLIDATION-ETH-1b)
 
 Source-shaped `Contract.run` ledger for the inventoried consolidation-fee ETH
 paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. These
@@ -24,7 +24,7 @@ This is a single-contract storage ledger under official `Contract.run`. It is
 not a multi-contract EVM claim and does not use vacuous `externalCallBind`.
 -/
 
-namespace LidoSRv3.Audit.Verity.PEth1RequestTx
+namespace LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx
 
 open _root_.Verity
 open _root_.Verity.Stdlib.Math
@@ -256,4 +256,4 @@ theorem consolidation_second_failure_discards_prefix :
     observe ((sendTwoConsolidationFees (word 5) true).run
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)))
 
-end LidoSRv3.Audit.Verity.PEth1RequestTx
+end LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx

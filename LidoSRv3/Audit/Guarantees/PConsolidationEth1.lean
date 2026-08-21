@@ -1,13 +1,13 @@
 import LidoSRv3.Audit.Guarantees.Registry
-import LidoSRv3.Audit.Verity.PEth1CompositionTx
-import LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal
 import Mathlib.Tactic.SplitIfs
 
-namespace LidoSRv3.Audit.Guarantees.PEth1
+namespace LidoSRv3.Audit.Guarantees.PConsolidationEth1
 
 abbrev Address := Nat
 
-/-- Abstract destinations covering every ETH-bearing leg of the P-ETH-1
+/-- Abstract destinations covering every ETH-bearing leg of the P-CONSOLIDATION-ETH-1
 inventory. `other` is the residual lateral destination the parent forbids. -/
 inductive EthDestination
   | lido
@@ -23,7 +23,7 @@ structure EthMove where
   destination : EthDestination
   deriving DecidableEq, Repr
 
-/-- Retired former P-ETH-1a filter: Lido / WithdrawalQueue only. Kept as an
+/-- Retired former P-CONSOLIDATION-ETH-1a filter: Lido / WithdrawalQueue only. Kept as an
 unregistered auxiliary predicate. It is not part of the consolidation
 fee/refund parent and is not a P-RESERVE-1 buffer fact. -/
 def is_approved (m : EthMove) : Prop :=
@@ -35,7 +35,7 @@ def totalAmount (moves : List EthMove) : Nat :=
 def approvedReturnMoves (moves : List EthMove) : List EthMove :=
   moves.filter fun m => m.destination = .lido ∨ m.destination = .withdrawalQueue
 
-def guarantee : Guarantee := ⟨.pEth1, [.model, .source, .verityTx]⟩
+def guarantee : Guarantee := ⟨.pConsolidationEth1, [.model, .source, .verityTx]⟩
 
 /-! ## Sum laws for `totalAmount`
 
@@ -78,7 +78,7 @@ theorem composed_eth_conservation (msgValue fee : Nat) (hFee : fee ≤ msgValue)
     fee + (msgValue - fee) = msgValue := by
   omega
 
-/-- Unregistered auxiliary (retired P-ETH-1a). `List.filter_eq_self` under its
+/-- Unregistered auxiliary (retired P-CONSOLIDATION-ETH-1a). `List.filter_eq_self` under its
 own Lido/WQ tagging hypothesis; not a registered parent conjunct. -/
 theorem eth_flow_confined (moves : List EthMove) :
     (∀ m, m ∈ moves → is_approved m) →
@@ -106,7 +106,7 @@ def ethTrace (cfg : Config) (c : ConsolidationFeeCall) : List EthMove :=
      else
        .other c.target }]
 
-/-- Parent fee-leg evidence (former P-ETH-1b): if the call targets the configured
+/-- Parent fee-leg evidence (former P-CONSOLIDATION-ETH-1b): if the call targets the configured
 consolidation-request address, the trace is tagged `.consolidationContract`.
 Canonical equality with `0x00…7251` remains `A-CANONICAL-REQUEST-ADDRESS`. -/
 theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall) :
@@ -196,7 +196,7 @@ private theorem classifyJournal_self_refund (approved : ApprovedSet)
     classifyJournal approved approved.refundRecipient = .refundRecipient := by
   simp [classifyJournal, h]
 
-/-- **P-ETH-1 Wave 1 registered parent.**
+/-- **P-CONSOLIDATION-ETH-1 Wave 1 registered parent.**
 
 For all `(msgValue, n, fee)` and any approved set where the refund recipient
 differs from the consolidation contract:
@@ -273,7 +273,7 @@ remainder at the caller's refund recipient, and zero retained by every
 protocol contract on the route.  The premises are exactly the abstract
 parent's non-revert conditions plus the model's fuel bound; each is shown
 undroppable by a premise-necessity kill-line in
-`Tests.PEth1CompositionTxMutants`, which also refutes the same universal
+`Tests.PConsolidationEth1CompositionTxMutants`, which also refutes the same universal
 predicate on four wiring mutants.
 
 **Auxiliary evidence.** `verity_tx_composes_value_flow_and_rollback` keeps
@@ -281,14 +281,14 @@ the five numeral witnesses (now also consequences of the universal parent),
 the rejecting-predeploy rollback, the underfunded revert, ETH conservation,
 and the dispatch/multicall replay agreement as regression facts. -/
 
-/-- **Registry-facing P-ETH-1 Verity-plane parent (universal).**
+/-- **Registry-facing P-CONSOLIDATION-ETH-1 Verity-plane parent (universal).**
 
 For every funded, guard-passing, non-wrapping batch that fits the dispatch
 fuel budget, the honest wiring commits: the whole product fee lands at the
 consolidation-request predeploy, the remainder lands at the refund recipient,
 and no protocol contract on the route retains ETH.  Proved by frame-by-frame
 chaining through the recursive dispatcher in
-`Verity.PEth1CompositionTxUniversal.run_success_shape`. -/
+`Verity.PConsolidationEth1CompositionTxUniversal.run_success_shape`. -/
 theorem verity_tx_universal_success_shape (msgValue batchSize feePerRequest : Nat)
     (hpos : 0 < msgValue)
     (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)
@@ -297,58 +297,58 @@ theorem verity_tx_universal_success_shape (msgValue batchSize feePerRequest : Na
     (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)
     (hle : batchSize * feePerRequest ≤ msgValue)
     (hfuel : batchSize + 4 ≤
-      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.fuelBudget) :
-    _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget) :
+    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest
           msgValue batchSize feePerRequest) =
       ⟨.success, batchSize + 3 + (if msgValue - batchSize * feePerRequest = 0 then 0 else 1),
         ⟨0, 0, 0, 0, 0, batchSize * feePerRequest, msgValue - batchSize * feePerRequest⟩⟩ :=
-  _root_.LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal.run_success_shape
+  _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal.run_success_shape
     msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hle hfuel
 
 theorem verity_tx_composes_value_flow_and_rollback :
-    (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3) =
+    (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 2 3) =
       ⟨.success, 6, ⟨0, 0, 0, 0, 0, 6, 4⟩⟩ ∧
-      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 1 3) =
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 1 3) =
       ⟨.success, 5, ⟨0, 0, 0, 0, 0, 3, 7⟩⟩ ∧
-      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 6 2 3) =
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 6 2 3) =
       ⟨.success, 5, ⟨0, 0, 0, 0, 0, 6, 0⟩⟩) ∧
-    _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
-      (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-        { _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest with
+    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+      (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+        { _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest with
           requestAccepts := false } 10 2 3) =
       ⟨.calleeReverted _root_.Verity.MultiContract.requestAddr, 4,
         ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
-    _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
-      (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-        _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 4 3) =
+    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+      (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+        _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 4 3) =
       ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
         ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
-    (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.escrowed
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3) = 10 ∧
-      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.escrowed
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 6 2 3) = 6 ∧
-      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.escrowed
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          { _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest with
+    (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.escrowed
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 2 3) = 10 ∧
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.escrowed
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 6 2 3) = 6 ∧
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.escrowed
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          { _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest with
             requestAccepts := false } 10 2 3) = 10) ∧
-    ((_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-        _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3).program.length = 6 ∧
-      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.replay
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3) =
-        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
-          (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
-            _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest 10 2 3)).balances) :=
-  _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.verity_tx_composes_value_flow_and_rollback
+    ((_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+        _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 2 3).program.length = 6 ∧
+      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.replay
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 2 3) =
+        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
+          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
+            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 2 3)).balances) :=
+  _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.verity_tx_composes_value_flow_and_rollback
 
-end LidoSRv3.Audit.Guarantees.PEth1
+end LidoSRv3.Audit.Guarantees.PConsolidationEth1

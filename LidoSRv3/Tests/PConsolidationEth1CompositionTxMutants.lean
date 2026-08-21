@@ -1,9 +1,9 @@
-import LidoSRv3.Audit.Verity.PEth1CompositionTx
-import LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal
-import LidoSRv3.Audit.Guarantees.PEth1
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 
 /-!
-Discriminating mutants for the composed P-ETH-1 transaction.
+Discriminating mutants for the composed P-CONSOLIDATION-ETH-1 transaction.
 
 Each mutant is the *same* ensemble and the *same* dispatcher under a mutated
 `Wiring` (or, for the rollback mutant, under the projection that drops
@@ -16,7 +16,7 @@ statement.
 The two theorems in the "Wave 2 kill-lines" section below were introduced as
 executable counterexamples to over-generalizing the then-finite Verity parent.
 Since the registered Verity parent became the universal
-`LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape`, they now
+`LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape`, they now
 double as premise-necessity witnesses: an underfunded tuple reverts instead of
 repartitioning (the funding premise), and a funded, guard-passing tuple that
 needs more frames than `fuelBudget` exhausts the dispatcher instead of
@@ -33,7 +33,7 @@ honest model's zero guard, which the parent already requires. They are kept
 under honest names (`confirms_*`). The actual kill-lines factor the
 registered parent's per-outcome predicate out as `parentOutcomePredicate`,
 prove it is definitionally the conclusion of
-`LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent`, and then exhibit two
+`LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent`, and then exhibit two
 mutants of `gatewayExecute` itself — a misrouted fee journal and a
 guard-free gateway that pays fees at zero `msg.value` — on whose success
 outputs that exact predicate is false.
@@ -53,12 +53,12 @@ guard), the underfunded witness `(10, 4, 3)` (funding), and the fuel witness
 `(30, 29, 1)` (dispatch fuel).
 -/
 
-namespace LidoSRv3.Tests.PEth1CompositionTxMutants
+namespace LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants
 
 open _root_.Verity
 open Compiler.CompilationModel.DenoteExternalCalls
 open _root_.Verity.MultiContract
-open LidoSRv3.Audit.Verity.PEth1CompositionTx
+open LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 
 /-- Reference: a two-request batch at 3 wei per request funded with 10 wei. -/
 def reference : TxOutcome := run honest 10 2 3
@@ -120,7 +120,7 @@ check is satisfied, yet the batch needs `3 + 29 + 1 = 33` dispatched frames
 `fuelBudget = 32`. The dispatcher reports `TxControl.exhausted`, a control
 value none of the registered parent's five witnesses ever produce and that
 `eth_flow_parent`'s `GatewayRevert` cases do not mention either — this is
-report/P-ETH-1.md issue 9 (`fuelBudget` silently bounds the theorem's
+report/P-CONSOLIDATION-ETH-1.md issue 9 (`fuelBudget` silently bounds the theorem's
 meaning), made executable. This refutes generalizing the registered parent
 to "every funded batch succeeds with the fee/refund split", not just to
 "every batch the Gateway's own guards accept". -/
@@ -138,7 +138,7 @@ that behaviour of `gatewayExecute`. They are kept as regression checks on the
 classifier and the honest guards; the parent kill-lines are the Wave 4
 theorems in the next section. -/
 
-open LidoSRv3.Audit.Guarantees.PEth1
+open LidoSRv3.Audit.Guarantees.PConsolidationEth1
 
 private def testApproved : ApprovedSet :=
   { consolidationContract := 100
@@ -163,7 +163,7 @@ theorem confirms_zero_msg_value_reverts :
 `gatewayExecute` itself -/
 
 /-- The registered parent's per-outcome predicate, factored out of
-`eth_flow_parent` (`Guarantees/PEth1.lean`): a zero-argument revert happens
+`eth_flow_parent` (`Guarantees/PConsolidationEth1.lean`): a zero-argument revert happens
 only at `msgValue = 0`, an overflow revert only when `n * fee ≥ 2^256`, an
 insufficient-value revert only when `n * fee > msgValue`, and on success every
 move is `parentApproved` with `totalAmount moves = msgValue`. -/
@@ -185,8 +185,8 @@ theorem parentOutcomePredicate_is_eth_flow_parent_conclusion (msgValue n fee : N
   exact eth_flow_parent testApproved (by decide) msgValue n fee
 
 /-- An address outside `testApproved`'s ApprovedSet, standing in for an
-operator-supplied fee sink (report/P-ETH-1.md issue 1's scenario). -/
-def rogueFeeSink : LidoSRv3.Audit.Guarantees.PEth1.Address := 999
+operator-supplied fee sink (report/P-CONSOLIDATION-ETH-1.md issue 1's scenario). -/
+def rogueFeeSink : LidoSRv3.Audit.Guarantees.PConsolidationEth1.Address := 999
 
 /-- Mutant of `gatewayExecute`: identical revert guards and fee/refund split,
 but the per-request fee moves are journaled to `rogueFeeSink` instead of the
@@ -271,13 +271,13 @@ def universalSuccessShapePredicate (w : Wiring) : Prop :=
         ⟨0, 0, 0, 0, 0, n * fee, mv - n * fee⟩⟩
 
 /-- The registered parent
-`LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape` is exactly
+`LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape` is exactly
 the factored predicate at the honest wiring, so the wiring mutants below
 refute the registered claim's own shape rather than a sibling. -/
 theorem universal_parent_is_predicate_at_honest :
     universalSuccessShapePredicate honest :=
   fun mv n fee hpos hmv hnM hfee hnf hle hfuel =>
-    LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape
+    LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape
       mv n fee hpos hmv hnM hfee hnf hle hfuel
 
 /-- The witness `(10, 2, 3)` satisfies every premise of the universal parent:
@@ -412,4 +412,4 @@ theorem fuel_exhaustion_kill_line_refutes_dropped_fuel_premise :
   exact (by decide +kernel :
     observe (run honest 30 29 1) ≠ ⟨.success, 33, ⟨0, 0, 0, 0, 0, 29, 1⟩⟩) hpred
 
-end LidoSRv3.Tests.PEth1CompositionTxMutants
+end LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants

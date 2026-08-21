@@ -1,6 +1,6 @@
-# P-ETH-1b (absorbed into P-ETH-1)
+# P-CONSOLIDATION-ETH-1b (absorbed into P-CONSOLIDATION-ETH-1)
 
-> Status: **absorbed**. This is no longer a sibling guarantee under P-ETH-1.
+> Status: **absorbed**. This is no longer a sibling guarantee under P-CONSOLIDATION-ETH-1.
 
 The fee → configured consolidation-request target leg is the same consolidation ETH flow as the parent. Theorems (`consolidation_fee_path_confined`, `consolidation_fee_target_success`) are **parent evidence** under `A-CANONICAL-REQUEST-ADDRESS`. Once the canonical `0x00…7251` obligation is discharged, strengthen them into registered parent conjuncts — do not reopen a sister guarantee.
 
@@ -10,7 +10,7 @@ The historical product note and proof audit below are retained for provenance.
 
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-Child of P-ETH-1 for the fee legs: `ConsolidationBus.executeConsolidation` forwards `msg.value`, and the vault pays per-request fees to the configured EIP-7251 / EIP-7002 immutables.
+Child of P-CONSOLIDATION-ETH-1 for the fee legs: `ConsolidationBus.executeConsolidation` forwards `msg.value`, and the vault pays per-request fees to the configured EIP-7251 / EIP-7002 immutables.
 
 - abstract `consolidation_fee_path_confined`: if the call target equals `cfg.consolidationRequest`, the one move in `ethTrace` is tagged `.consolidationContract`, hence not `.other`
 - Verity `consolidation_fee_target_success`: two successful fee sends debit the vault and credit the configured consolidation-request slot
@@ -25,19 +25,19 @@ CHECKED does not mean fees reach the EIP-7251 predeploy.
 
 Ranked next work: the fee-target witness and canonical-address assumption landed; do not compose into P-CONSOLIDATION-1 from here.
 
-Theorems: `PEth1.consolidation_fee_path_confined` (abstract), `PEth1RequestTx.consolidation_fee_target_success` (verity).
+Theorems: `PConsolidationEth1.consolidation_fee_path_confined` (abstract), `PConsolidationEth1RequestTx.consolidation_fee_target_success` (verity).
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CANONICAL-REQUEST-ADDRESS`.
 
 ## Intent
 
-Child of P-ETH-1 for the *fee* legs: consolidation / withdrawal-request predeploys. In SRv3, `WithdrawalVaultEIP7685._callAddConsolidationRequest` sends `fee` wei to the immutable `CONSOLIDATION_REQUEST` (intended to be the EIP-7251 predeploy `0x00…007251`), and `_callAddWithdrawalRequest` does the same for EIP-7002 `WITHDRAWAL_REQUEST`. `ConsolidationBus.executeConsolidation` is just a value-forwarder into the gateway. The intended guarantee: that fee CALL cannot be retargeted to an arbitrary address.
+Child of P-CONSOLIDATION-ETH-1 for the *fee* legs: consolidation / withdrawal-request predeploys. In SRv3, `WithdrawalVaultEIP7685._callAddConsolidationRequest` sends `fee` wei to the immutable `CONSOLIDATION_REQUEST` (intended to be the EIP-7251 predeploy `0x00…007251`), and `_callAddWithdrawalRequest` does the same for EIP-7002 `WITHDRAWAL_REQUEST`. `ConsolidationBus.executeConsolidation` is just a value-forwarder into the gateway. The intended guarantee: that fee CALL cannot be retargeted to an arbitrary address.
 
 ## Modeling
 
 - Child YAML lists `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, and `A-CANONICAL-REQUEST-ADDRESS`.
 - Abstract `Config.consolidationRequest` is an arbitrary `Nat`. Equality with the canonical EIP-7251 address is **explicitly not proved** and is named `A-CANONICAL-REQUEST-ADDRESS`.
 - `ethTrace` has length 1. Destination is `.consolidationContract` if `c.target = cfg.consolidationRequest`, else `.other c.target`.
-- Verity `PEth1RequestTx` is again a **single-contract slot ledger** (bus, gateway, vault, withdrawalRequest, consolidationRequest). `busForward` is `require gatewayOk` plus slot add/sub. `sendWithdrawalFee` / `sendTwoConsolidationFees` move fee words between slots. Deployed-vs-model simplification: no predeploy code, no 96-byte `source ‖ target` calldata, no `getConsolidationRequestFee` CALL.
+- Verity `PConsolidationEth1RequestTx` is again a **single-contract slot ledger** (bus, gateway, vault, withdrawalRequest, consolidationRequest). `busForward` is `require gatewayOk` plus slot add/sub. `sendWithdrawalFee` / `sendTwoConsolidationFees` move fee words between slots. Deployed-vs-model simplification: no predeploy code, no 96-byte `source ‖ target` calldata, no `getConsolidationRequestFee` CALL.
 - Identifying the immutable with `0x00…007251` is left as “a separate provenance obligation.”
 
 ## Proof
@@ -85,7 +85,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* Replace the request-contract fee send with a send to `lidoSlot`. `bus_forward_success` still holds (it never reads those slots). YAML still claims “bus forward **and request-contract fee** Contract.run ledger.” Those legs are `#guard`s / unregistered theorems.
 
 3. **Zero-fee withdrawal is allowed and CHECKED-adjacent.**
-   `#guard` in `PEth1RequestTx.lean:210–212`: `sendWithdrawalFee 0 0 true` **commits** and leaves the ledger unchanged.
+   `#guard` in `PConsolidationEth1RequestTx.lean:210–212`: `sendWithdrawalFee 0 0 true` **commits** and leaves the ledger unchanged.
 
    *Scenario.* `requestsCount = 0` on the live vault: `_addWithdrawalRequests` reverts on empty `pubkeys` before `_requireExactFee(0)`. The model treats a zero-value “fee send” as success. Not the named theorem, but it is in the same CHECKED module.
 
@@ -115,7 +115,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* Change `cfg.consolidationRequest` to `0xbad` (issue 1) and leave `bus_forward_success` alone. Both CHECKED theorems still hold. Three models, zero glue.
 
 9. **`sendTwoConsolidationFees` has no `msg.value` and no exact-fee guard.**
-   Live `_requireExactFee` (`WithdrawalVaultEIP7685.sol:123–127`) is `msg.value == requestsCount * fee`. The Lean two-fee program (`PEth1RequestTx.lean:59–72`) takes only `fee` and `secondOk`. There is no `msgValue`, no `requestsCount`, and no `require(msgValue == 2 * fee)`.
+   Live `_requireExactFee` (`WithdrawalVaultEIP7685.sol:123–127`) is `msg.value == requestsCount * fee`. The Lean two-fee program (`PConsolidationEth1RequestTx.lean:59–72`) takes only `fee` and `secondOk`. There is no `msgValue`, no `requestsCount`, and no `require(msgValue == 2 * fee)`.
 
    *Scenario.* Vault is called with `msg.value = 0` and two consolidation requests whose per-request fee is 5. Live `_requireExactFee` reverts `IncorrectFee`. Lean `sendTwoConsolidationFees 5 true` still commits the two slot credits if `vaultSlot ≥ 10`. The CHECKED-adjacent two-CALL body is not the vault’s fee accounting.
 
@@ -130,7 +130,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* Two-request batch, `getConsolidationRequestFee() = 0`, `msg.value = 0`. Live gateway often reverts `ZeroArgument("msg.value")` before the vault loop. Lean treats a pair of zero-value “fee sends” as success. The CHECKED module’s fee legs include the empty payment.
 
 12. **`busForward` adds a `msg.value ≠ 0` guard that `executeConsolidation` does not have.**
-    Live `ConsolidationBus.executeConsolidation` (`:383–406`) hashes the pending batch, checks delay, deletes, then `CONSOLIDATION_GATEWAY.addConsolidationRequests{value: msg.value}(groups, msg.sender)`. Zero value reaches the gateway, which reverts `ZeroArgument("msg.value")` (`ConsolidationGateway.sol:189`). Lean `busForward` (`PEth1RequestTx.lean:37`) reverts `ZeroArgument(msg.value)` *before* any slot update and has no batch hash / delay / delete.
+    Live `ConsolidationBus.executeConsolidation` (`:383–406`) hashes the pending batch, checks delay, deletes, then `CONSOLIDATION_GATEWAY.addConsolidationRequests{value: msg.value}(groups, msg.sender)`. Zero value reaches the gateway, which reverts `ZeroArgument("msg.value")` (`ConsolidationGateway.sol:189`). Lean `busForward` (`PConsolidationEth1RequestTx.lean:37`) reverts `ZeroArgument(msg.value)` *before* any slot update and has no batch hash / delay / delete.
 
     *Scenario.* `msg.value = 0`, no pending batch. Live reverts `BatchNotFound`. Lean `bus_forward_success` is the `(5, true)` numeral; `busForward 0 _` reverts for a reason the bus never emits. A zero-value execute of a *valid* pending batch is a live gateway revert after `delete _pendingBatches[batchHash]` — the batch is consumed and the tx reverts, so the delete rolls back. Lean never models that delete. The CHECKED bus numeral is not the pending-batch state machine.
 
@@ -140,7 +140,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* `amount = 0` or a 32-byte “pubkey”. Live still pays the fee and submits a malformed 7002 request (predeploy may keep the fee and reject the request — issue 5). Lean `withdrawal_fee_success` (`fee=5`, vault 20→15) still holds. The CHECKED fee leg is not an EIP-7002 request; it cannot be wrong about the payload because there is none.
 
 14. **`sendWithdrawalFee` is a one-request exact-fee, not `requestsCount * fee`.**
-    Live `_addWithdrawalRequests` (`WithdrawalVaultEIP7685.sol:40–54` area) loops N keys and `_requireExactFee(requestsCount * fee)`. Lean `sendWithdrawalFee` (`PEth1RequestTx.lean:48–56`) is `require(msgValue == fee)` for a *single* fee word. There is no `requestsCount`.
+    Live `_addWithdrawalRequests` (`WithdrawalVaultEIP7685.sol:40–54` area) loops N keys and `_requireExactFee(requestsCount * fee)`. Lean `sendWithdrawalFee` (`PConsolidationEth1RequestTx.lean:48–56`) is `require(msgValue == fee)` for a *single* fee word. There is no `requestsCount`.
 
     *Scenario.* Three withdrawal requests, fee 5, `msg.value = 15`. Live exact-fee passes and performs three CALLs. Lean `sendWithdrawalFee 5 15 true` reverts `IncorrectFee`. `sendWithdrawalFee 5 5 true` moves 5 once. The CHECKED-adjacent `#guard` / `withdrawal_fee_success` numeral is not the vault loop; N=1 is baked in. Contrast `sendTwoConsolidationFees`, which hard-codes N=2 (issue 4).
 
@@ -160,6 +160,6 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* First EIP-7251 CALL fails, second would succeed. Live tx reverts with no fee paid. Lean with `secondOk = true` still commits both slot updates (`vault 20→10`). The only failure the two-fee body can represent after the vault-balance check is the *second* CALL. Prefix-rollback (`consolidation_second_failure_discards_prefix`) is the other boolean, not a first-CALL failure.
 
 18. **`sendWithdrawalFee` requires `callOk` before it even reads the vault slot.**
-    `PEth1RequestTx.lean:48–56`: `require(msgValue == fee)` then `require callOk` then `subPanic vault fee`. Live `_callAddWithdrawalRequest` does the value-CALL (which needs `address(this).balance ≥ fee`) and then checks `success`.
+    `PConsolidationEth1RequestTx.lean:48–56`: `require(msgValue == fee)` then `require callOk` then `subPanic vault fee`. Live `_callAddWithdrawalRequest` does the value-CALL (which needs `address(this).balance ≥ fee`) and then checks `success`.
 
     *Scenario.* `callOk = false`, `vaultSlot = 0`, `fee = 5`, `msgValue = 5`. Lean reverts `RequestAdditionFailed` without looking at the vault. Live `_requireExactFee` passes, then `call{value: 5}` fails for insufficient ETH (or succeeds in transferring and then reverts on `!success`). The CHECKED-adjacent `#guard` / `withdrawal_fee_success` never hits this order. Combined with issue 5 (cannot represent “keep the fee, fail the request”), the Lean failure modes are a different partition than the vault’s CALL.
