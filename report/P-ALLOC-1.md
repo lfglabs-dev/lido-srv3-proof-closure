@@ -1,5 +1,183 @@
 # P-ALLOC-1
 
+> Auditor proof note (2026-08-21). I treat
+> `LidoSRv3/Audit/Guarantees/PAlloc1.lean` and
+> `LidoSRv3/Audit/Verity/AllocationTx.lean` as authoritative. I use
+> `audit/guarantees.yaml` and the existing report to audit claim presentation.
+> I have not rewritten the owner product note below.
+
+## Auditor proof audit
+
+**1. The registered parent has been split from the `min` tautology correctly.**
+`PAlloc1.checked_execute` says exactly this: if `CheckedBounds` holds, the
+checked source-shaped executor returns rows and the rows' capacity column,
+coerced to `Nat`, equals `MathView.capacities`. Its proof is a direct
+application of `source_capacities_match_canonical`.
+
+`active_capacity_bounded` is a different theorem. For an active module,
+`MathView.capacity` is defined to be
+`min targetValidators availableCapacity`, so the two inequalities are
+`Nat.min_le_left` and `Nat.min_le_right`. The Lean comments, registry, and
+current report now label that theorem as an unregistered, MathView-definitional
+child. I agree with this repair. Reintroducing it as a parent conjunct would
+add no executable obligation and would recreate the earlier half-tautological
+claim.
+
+The remaining parent does have falsifiable content. It constrains the output of
+the checked-word `execute`, not just `MathView`. Its limit is provenance:
+`SolidityAllocCapacity.execute` is an API alias of
+`AllocCapacity.execute`, not a separately extracted Solidity interpreter.
+The meaningful comparison is one checked-word loop against separately written
+unbounded `Nat` formulas.
+
+**2. `CheckedBounds` is complete for the modeled arithmetic and unproved for
+reachable router states.** The structure requires a nonzero `maxEBType1`, no
+underflow in each active-count subtraction, no overflow in the accumulated
+validator total, no overflow in each active module's available-capacity
+arithmetic, and no overflow in each active module's share-limit
+multiplication. Those hypotheses line up with the `safeSub`, `safeAdd`,
+`safeMul`, and `safeDiv` failure points used by the modeled loops.
+
+No theorem in the reviewed facade proves `CheckedBounds` from a reachable
+StakingRouter configuration. It also contains no module-count, unique-id,
+unique-address, packed-field-width, or share-limit policy invariant. Thus
+CHECKED means "the modeled executor succeeds and refines `MathView` under this
+caller-supplied arithmetic envelope." It does not mean every live router state
+is inside that envelope.
+
+The abstract and executable registered theorems are not composed through this
+premise. `verity_tx_simulates_allocation` has no `CheckedBounds`; it agrees with
+`sourceView` on both success and arithmetic revert. There is no facade theorem
+that starts from a bound module list recovered from storage, converts it to the
+abstract module list, applies `checked_execute`, and concludes a storage-read
+capacity column.
+
+**3. There is no live summary CALL in the allocation transaction.**
+`sourceBindOne` reads depositable, deposited, exited, and stake words from four
+model-local maps keyed by the already-bound module address. `allocate` then
+runs `sourceExecute` on those planted words. A stale word or a dishonest module
+summary is therefore part of the input state, not an execution that the theorem
+can detect.
+
+`mappedSummaryTransaction` does not close that gap. It is a separate Phase-3
+proposition. On a long successful return it proves that
+`executeObservedSummary` succeeds while the prewritten depositable slot remains
+the prewritten value. It does not decode the return bytes into a `BoundModule`,
+and `verity_tx_simulates_allocation` never consumes it.
+
+The conjunction
+`source_capacities_and_mapped_summary_transaction` is correspondingly
+non-compositional. Its `moduleAddress` is free and is not tied to an element of
+`modules`; no return word from the call side flows into `execute`. I read it as
+two facts reported together, not as SOURCE-to-transaction summary
+correspondence.
+
+**4. The module count is a harness dimension.** The lower-level transaction
+takes `count : Nat` and binds `List.range count`. The facade chooses
+`modules.length`, but the caller still chooses an arbitrary module list and
+supplies
+
+    sourceBindAll state modules.length = modules
+
+as `hBind`. There is no `SRStorage.getModulesCount()` read, no
+`MAX_STAKING_MODULES_COUNT = 32` guard, and no theorem connecting the list
+length to a reachable registry. A state seeded with 33 rows can satisfy the
+premise just as a state seeded with two rows can.
+
+`hBind` is useful because it states exactly which rows the storage harness will
+recover. It is not evidence that those rows are the router's live module set.
+The registry's `fidelity.missing` entry on `count` is accurate and should remain
+prominent.
+
+**5. The Verity theorem is lockstep storage plumbing.** `sourceExecute` calls
+`AllocCapacity.firstLoop` and `AllocCapacity.secondLoop` directly.
+`allocate` calls `sourceBindAll` and then that same `sourceExecute`.
+`sourceView` also calls `sourceExecute`. After rewriting by `hBind`, the proof
+case-splits on one shared interpreter.
+
+That design usefully removes a duplicated handwritten loop, but it also fixes
+the theorem's interpretation. `verity_tx_simulates_allocation` does not compare
+two independent implementations of the capacity arithmetic. A shared defect in
+the loop appears on both sides. The theorem checks binding, commit/revert
+branching, persistence, observation, and rollback around that loop.
+
+**6. Observe-from-storage is a real repaired obligation.** On success,
+`observe` ignores the returned `Result` payload. It reads the allocation,
+capacity, and bound-address arrays from the post-state and reads the total from
+`totalSlot`. `persistRows_read` proves that the three writes are what those
+reads recover, and the write-noop mutant is rejected. I consider the old
+result-echo issue closed.
+
+This remains an idealized storage channel. `writeArray` and `readArray` operate
+on the Verity scaffold's array abstraction at literal local slots 40, 41, and
+42. The theorem does not derive Solidity dynamic-array locations, packed
+router storage, or keccak separation. The positive claim should stay
+"persisted arrays are reread in this scaffold," not "the deployed storage
+layout is observed."
+
+On revert, `observe` constructs a reverted view rather than inspecting the
+rollback state. The separate `revert_restores_snapshot` theorem carries the
+real atomicity obligation and proves that even the injected failure after
+writes returns the original state.
+
+**7. `capacity_target_kill_line_refutes_parent` targets the repaired parent,
+with one presentational overstatement.** The mutant still computes
+`availableCapacity?` so it preserves that failure condition, but writes
+`capacity := target` instead of `wordMin target available`. At the two-module
+witness, `CheckedBounds` holds, the mutant commits raw targets `[24, 24]`, and
+`MathView.capacities` is `[11, 11]`. This is the right mutation and the right
+observable for `checked_execute`; it would not be meaningful against the
+unregistered `Nat.min` child.
+
+The theorem is a concrete witness bundle:
+
+    CheckedBounds /\ mutant commits /\ Option.map capacities != some MathView
+
+That is logically sufficient to refute the mutant-substituted parent because
+the executor is deterministic. It is not literally the "explicit negation of
+the parent's predicate shape" claimed by the YAML and comments. A literal
+parent-shaped statement would negate the universal implication, or at least
+negate the existential row-and-equality conclusion at the witness. This is a
+small statement-discipline issue, not a defect in the counterexample.
+
+The parent observes only the capacity column. `router_order_preserved` is a
+separate child, and the parent does not compare current allocations,
+target-validator diagnostics, active counts, addresses, or the persisted total.
+The current kill-line is therefore strong evidence for the clamp in the
+capacity column, but not for every returned field.
+
+**Ranked recommendations.**
+
+1. Preserve the Wave-2 split. Keep `checked_execute` as the registered parent
+   and keep `active_capacity_bounded` explicitly unregistered. Do not re-fold
+   the definitional `min` inequalities into the claim.
+2. State the conditional perimeter at every CHECKED presentation point, and
+   add a theorem from a modeled reachable-router invariant to `CheckedBounds`
+   before making a live non-revert claim. If that invariant is not modeled,
+   continue to list reachable `CheckedBounds` as missing.
+3. Make summary data flow real before calling the Phase-3 conjunction a
+   transaction correspondence. Decode successful callback returndata into the
+   bound module fields, link the called address to the current module, and feed
+   those fields into the loops. Otherwise keep the live summary CALL explicitly
+   missing.
+4. Read the module count from modeled router storage and enforce the live upper
+   bound, or rename `allocate count` as a bounded harness and keep arbitrary
+   `count` out of protocol-facing prose.
+5. Add one composed theorem that starts with storage binding plus
+   `CheckedBounds` on `modules.map toSourceModule` and ends with the
+   observe-from-storage capacity column equaling `MathView.capacities`. This
+   would connect the two current CHECKED cells without pretending the shared
+   loop is independent.
+6. Restate `capacity_target_kill_line_refutes_parent` as the literal negation of
+   the mutant-substituted parent shape. Add targeted mutants for wrong target
+   arithmetic and wrong available headroom, since the present mutant exercises
+   only omission of the final `wordMin`.
+7. Keep the storage-reread and rollback theorems. Describe the array channel as
+   scaffold storage until concrete layout and aliasing are proved, and keep
+   rollback separate from the reverted observation.
+
+## Owner product note and prior audit history
+
 Theorems: `PAlloc1.checked_execute` (registered parent), `PAlloc1.active_capacity_bounded` (unregistered MathView-definitional child), `PAlloc1.verity_tx_simulates_allocation`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
