@@ -161,7 +161,7 @@ theorem universal_post_state_equivariance
 /-- Registered P-ADDRESS-1 parent. For two nonzero callers, the source-shaped
 `run` admits `a₁` iff it admits `a₂` on the caller-swapped input, and a
 successful post-state renames under the same swap. The claim is unconditional
-over the four modeled permissionless writers: since wave 5,
+over four modeled address-bearing writer projections: since wave 5,
 `addressEquivarianceEntryScope` covers `claimWithdrawalsTo` too -- its
 request-owner gate (`caller = requestOwner`) is caller-relative and renames
 with the caller (`requestOwner` is an address-indexed input field renamed by

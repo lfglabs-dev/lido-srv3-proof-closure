@@ -3,8 +3,9 @@ import LidoSRv3.Audit.AddressEquivariance
 /-!
 # P-ADDRESS-1 pinned-source correspondence
 
-This module is a source-shaped, single-item reading of the four permissionless
-entrypoints mapped at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+This module is a source-shaped, single-item reading of four address-bearing
+entrypoint projections mapped at
+`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 The single-item restriction removes only batch iteration; it retains every
 caller/address-dependent guard and successful address write in the mapped
 paths.  Non-address arithmetic and external-contract return values are explicit
@@ -91,7 +92,7 @@ adds no content while reading as a real exclusion. -/
 def singletonActorEntryPoint (_ep : EntryPoint) : Prop :=
   False
 
-/-- Scoped entrypoints for the parent: the four permissionless writers pinned
+/-- Scoped entrypoints for the parent: the four address-bearing writers pinned
 in this module.  Since wave 5 the scope covers `claimWithdrawalsTo` too: its
 request-owner gate (`caller = requestOwner`) is caller-relative and renames
 with the caller (`requestOwner` is an address-indexed input field renamed by
@@ -105,7 +106,7 @@ theorem not_singleton_actor_entry_point (ep : EntryPoint) :
     ¬ singletonActorEntryPoint ep := by
   intro h; cases h
 
-/-- The scope is total over the four modeled permissionless writers (wave 5):
+/-- The scope is total over the four modeled address-bearing writers (wave 5):
 every `EntryPoint`, including `claimWithdrawalsTo`, is in scope. -/
 theorem addressEquivarianceEntryScope_total (ep : EntryPoint) :
     addressEquivarianceEntryScope ep := by

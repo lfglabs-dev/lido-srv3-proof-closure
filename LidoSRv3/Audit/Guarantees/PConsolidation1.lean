@@ -191,10 +191,11 @@ theorem packing_order_kills_swapped_concat
     (fun x hx => by simp [List.mem_cons, List.mem_nil_iff] at hx; subst hx; exact h)
 
 /-- **Named gap: preservesEthBalance.** The Solidity modifier
-(WithdrawalVault.sol:201) snapshots address(this).balance and reverts
-if it changed after the loop. Closing the gap requires value-bearing
-CALL frames, not the current success stubs with empty returndata. -/
+(WithdrawalVault.sol:201) requires the vault to forward exactly `msg.value`
+across the request CALLs, leaving its own ETH balance unchanged after the
+loop. Closing the gap requires value-bearing CALL frames, not the current
+success stubs with empty returndata. -/
 abbrev preservesEthBalance_gap : String :=
-  "preservesEthBalance (requires value-bearing CALL frames, not success stubs)"
+  "preservesEthBalance: forwards exactly msg.value (requires value-bearing CALL frames)"
 
 end LidoSRv3.Audit.Guarantees.PConsolidation1

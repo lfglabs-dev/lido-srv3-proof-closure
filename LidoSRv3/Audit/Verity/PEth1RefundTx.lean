@@ -148,6 +148,24 @@ def sourceGateway (msgValue fee : Nat) (vaultOk refundOk : Bool) : SourceOutcome
   else if fee < msgValue && !refundOk then .reverted "FeeRefundFailed"
   else .committed fee (msgValue - fee)
 
+/-- Producer theorem for the destinations this executable model actually
+inhabits. Any committed gateway run names both legs explicitly: the vault gets
+the fee and the resolved refund destination gets the remainder. This avoids
+misapplying the abstract Lido/WithdrawalQueue filter to gateway traces whose
+destinations are instead vault/refund. -/
+theorem sourceGateway_committed_splits_to_vault_and_refund
+    (msgValue fee feeToVault refundToDest : Nat) (vaultOk refundOk : Bool)
+    (h : sourceGateway msgValue fee vaultOk refundOk =
+      .committed feeToVault refundToDest) :
+    feeToVault = fee ∧ refundToDest = msgValue - fee := by
+  unfold sourceGateway at h
+  split at h <;> try contradiction
+  split at h <;> try contradiction
+  split at h <;> try contradiction
+  split at h <;> try contradiction
+  injection h
+  simp_all
+
 def sourceWithdraw (amount vault : Nat) (callerIsLido : Bool) : SourceOutcome :=
   if !callerIsLido then .reverted "NotLido"
   else if amount = 0 then .reverted "ZeroAmount"

@@ -37,10 +37,14 @@ def refundToLidoMutant (before : Ledger) (msgValue fee : Nat) : Ledger :=
     vault := before.vault + fee
     lido := before.lido + (msgValue - fee) }
 
-#guard decide
-  (observe ((gatewayRefund (word 5) (word 3) true true).run
-      (stateFor before defaultState)) ≠
-    ⟨.committed, refundToLidoMutant before 5 3⟩)
+/-- Refund-misroute kill-line: crediting the remainder to Lido instead of the
+resolved refund destination is distinguishable at the registered executable
+observation boundary. -/
+theorem refund_misroute_kill_line :
+    observe ((gatewayRefund (word 5) (word 3) true true).run
+        (stateFor before defaultState)) ≠
+      ⟨.committed, refundToLidoMutant before 5 3⟩ := by
+  decide
 
 /-- Leak-on-failure mutant: keeps the vault fee when the refund call fails. -/
 def leakVaultOnRefundFailure (before : Ledger) (fee : Nat) : Ledger :=

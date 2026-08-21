@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Guarantees.Registry
+import Mathlib.Data.List.Forall2
 
 namespace LidoSRv3.Audit.Guarantees.PTopup2
 
@@ -82,6 +83,17 @@ private theorem consumeBudget_sum_le_sum (budget : Nat) (amounts : List Nat) :
       simp only [consumeBudget, List.sum_cons]
       exact Nat.add_le_add (Nat.min_le_left _ _) (ih _)
 
+/-- The leftover walk never gives a key more than its independently evaluated
+candidate. This is pointwise, not merely an aggregate consequence. -/
+theorem consumeBudget_per_key_le (budget : Nat) (amounts : List Nat) :
+    List.Forall₂ (fun allocated candidate => allocated ≤ candidate)
+      (consumeBudget budget amounts) amounts := by
+  induction amounts generalizing budget with
+  | nil => simp [consumeBudget]
+  | cons amount amounts ih =>
+      simp only [consumeBudget]
+      exact .cons (Nat.min_le_left _ _) (ih _)
+
 /-- Candidate amounts are independently capped by the evaluated validator
 limits before the aggregate budget is consumed. -/
 def candidates (b : TopupBatch) (cfg : TopupConfig) : List Nat :=
@@ -95,6 +107,13 @@ def transitionBudget (b : TopupBatch) (cfg : TopupConfig) : Nat :=
 
 def transition (b : TopupBatch) (cfg : TopupConfig) : List Nat :=
   consumeBudget (transitionBudget b cfg) (candidates b cfg)
+
+/-- Public per-key bound for P-TOPUP-2. Each produced allocation is paired
+with, and bounded by, the corresponding requested/evaluated candidate. -/
+theorem per_key_bounded_by_candidate (b : TopupBatch) (cfg : TopupConfig) :
+    List.Forall₂ (fun allocated candidate => allocated ≤ candidate)
+      (transition b cfg) (candidates b cfg) :=
+  consumeBudget_per_key_le _ _
 
 private theorem candidates_sum_le (validators : List Validator)
     (requests : List Nat) (cfg : TopupConfig)
@@ -147,7 +166,8 @@ theorem aggregate_bounded_by_individual (b : TopupBatch) (cfg : TopupConfig) :
 /-- **Registered P-TOPUP-2 parent.** Leftover-budget consumption of
 `min(valueGwei, min(moduleLimit, maxTopUpPerBlock))` is ≤ the per-block
 cap. Validator WC, slash, activation, and `allocations = transition` are
-not used (`A-TOPUP-NOWRAP` still applies to the Nat model).
+not used. `A-TOPUP-NOWRAP` is not attached to this row: its recorded
+StakingRouter line-732 accumulator belongs to P-TOPUP-1.
 
 This is unconditional in `b` and `cfg`: unlike a post-condition that takes
 the sum bound as a hypothesis and hands it back, this theorem's content is

@@ -220,6 +220,16 @@ theorem withdrawal_fee_success :
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
     ⟨.committed, ⟨3, 1, 10, 2, 14⟩⟩)
 
+/-- Registered fee-target witness: two successful EIP-7251 fee sends debit the
+vault by ten and credit the configured consolidation-request target by ten.
+This is a model-local target slot; identifying it with canonical
+`0x00…007251` remains `A-CANONICAL-REQUEST-ADDRESS`. -/
+theorem consolidation_fee_target_success :
+    observe ((sendTwoConsolidationFees (word 5) true).run
+      (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
+      ⟨.committed, ⟨3, 1, 10, 2, 14⟩⟩ := by
+  decide
+
 theorem consolidation_second_failure_discards_prefix :
     observe ((sendTwoConsolidationFees (word 5) false).run
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =

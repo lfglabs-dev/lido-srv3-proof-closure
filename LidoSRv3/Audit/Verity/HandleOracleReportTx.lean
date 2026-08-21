@@ -46,6 +46,11 @@ and read back by every subsequent step write, so the tick a step records is
 the position at which that write actually ran. -/
 def sequenceSlot : Nat := 15
 
+/-- Tick proving that the accepted balance vector was actually persisted.
+Unlike the historical hard-coded `.balancesWritten` prefix in `storedSteps`,
+this slot is absent when the write-side step is skipped. -/
+def balancesWrittenSlot : Nat := 16
+
 /-- The tick the next step write will record: one past the current clock. -/
 def nextTick (state : ContractState) : Word :=
   state.readSlot sequenceSlot + 1
@@ -85,7 +90,7 @@ theorem rewardsRead_ne_rewardsMinted : rewardsReadSlot ≠ rewardsMintedSlot := 
 
 theorem rewardsRead_ne_sequence : rewardsReadSlot ≠ sequenceSlot := by decide
 
-/-! The three ticks a committed body hands out.  `handleOracleReport` and every
+/-! The four ticks a committed body hands out.  `handleOracleReport` and every
 mutant below share the same reset-then-stamp prefix, so these close the clock
 arithmetic once instead of re-deriving it inside each proof. -/
 
@@ -101,6 +106,13 @@ arithmetic once instead of re-deriving it inside each proof. -/
 
 @[simp] theorem nextTick_stamp_two (a b : Nat) (s : ContractState) :
     nextTick (stampStep b (stampStep a (s.writeSlot sequenceSlot 0))) = 3 := by
+  simp only [nextTick, readSlot_stampStep_clock,
+    ContractState.readSlot_writeSlot_same]
+  decide
+
+@[simp] theorem nextTick_stamp_three (a b c : Nat) (s : ContractState) :
+    nextTick
+      (stampStep c (stampStep b (stampStep a (s.writeSlot sequenceSlot 0)))) = 4 := by
   simp only [nextTick, readSlot_stampStep_clock,
     ContractState.readSlot_writeSlot_same]
   decide
@@ -138,13 +150,15 @@ artifact of a fixed list literal.  This function is the only source of
 `AccountingCorrespondence`'s `successfulSteps`, so the two planes cannot share
 a single miscoded `if`-tree. -/
 def storedSteps (state : ContractState) (balances : List Nat) : List Step :=
+  let written :=
+    if state.readSlot balancesWrittenSlot = 1 then [.balancesWritten balances] else []
   let acc :=
-    if state.readSlot accountingCalledSlot = 1 then [.accountingCalled] else []
+    if state.readSlot accountingCalledSlot = 2 then [.accountingCalled] else []
   let rd :=
-    if state.readSlot rewardsReadSlot = 2 then [.rewardsRead balances] else []
+    if state.readSlot rewardsReadSlot = 3 then [.rewardsRead balances] else []
   let mint :=
-    if state.readSlot rewardsMintedSlot = 3 then [.rewardsMinted] else []
-  [.balancesWritten balances] ++ acc ++ rd ++ mint
+    if state.readSlot rewardsMintedSlot = 4 then [.rewardsMinted] else []
+  written ++ acc ++ rd ++ mint
 
 /-- Executable oracle-report transaction.  Validity and overflow guards run
 in the body.  On overflow the prefix writes are performed and then reverted
@@ -167,6 +181,7 @@ def handleOracleReport (i : ReportInput) (sharesToMintAsFees : Nat)
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := dirty.writeSlot totalBalanceSlot total
         let dirty := dirty.writeSlot sequenceSlot 0
+        let dirty := stampStep balancesWrittenSlot dirty
         let dirty := stampStep accountingCalledSlot dirty
         let dirty := stampStep rewardsReadSlot dirty
         let dirty :=
@@ -315,14 +330,16 @@ theorem verity_tx_simulates_pinned_source
         by_cases hFees : 0 < sharesToMintAsFees
         · simp [hFees, storedSteps, successfulSteps, persistBalances, writeAll,
             stampStep, nextTick, sequenceSlot,
-            totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
+            totalBalanceSlot, balancesWrittenSlot, accountingCalledSlot,
+            rewardsReadSlot, rewardsMintedSlot,
             ContractState.readArray, ContractState.writeArray,
             ContractState.readSlot_writeSlot_same,
             ContractState.readSlot_writeSlot_other, ContractState.storageArray_writeSlot,
-            Nat.mod_eq_of_lt hnlt, map_ofNat_val i.balancesGwei hxs]
+            Nat.mod_eq_of_lt hnlt, map_ofNat_val i.balancesGwei hxs] <;> decide
         · simp [hFees, storedSteps, successfulSteps, persistBalances, writeAll,
             stampStep, nextTick, sequenceSlot,
-            totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
+            totalBalanceSlot, balancesWrittenSlot, accountingCalledSlot,
+            rewardsReadSlot, rewardsMintedSlot,
             ContractState.readArray, ContractState.writeArray,
             ContractState.readSlot_writeSlot_same,
             ContractState.readSlot_writeSlot_other, ContractState.storageArray_writeSlot,
@@ -351,7 +368,7 @@ and writes to distinct slots commute.  The independent order fact — that the
 `rewardsReadSlot` tick precedes any nonzero `rewardsMintedSlot` tick — is
 stated and proved separately below, over the raw tick values, so a
 transaction that runs those two steps out of order is caught even though its
-`storedSteps` presence bits look identical.
+step flags remain present.
 
 The ticks are `stampStep`'s reads of the transaction-local clock, not
 per-call-site constants, so this is an ordering claim about execution and not
@@ -377,8 +394,9 @@ def mintAfterReadDisciplineOf (tx : ReportInput → Nat → Contract Result) : P
 def mintAfterReadDiscipline : Prop :=
   mintAfterReadDisciplineOf (fun i sharesToMintAsFees => handleOracleReport i sharesToMintAsFees)
 
-/-- The real transaction satisfies mint-after-read discipline: the read step
-runs at clock tick `2` and any nonzero mint step at tick `3`, for every
+/-- The real transaction satisfies mint-after-read discipline: the balance
+write is stamped at tick `1`, the read step runs at tick `3`, and any nonzero
+mint step at tick `4`, for every
 input, fee, and starting state.  Both ticks come from `stampStep`'s read of
 the reset clock, so this is the order the two writes executed in. -/
 theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
@@ -390,9 +408,11 @@ theorem mintAfterReadDiscipline_holds : mintAfterReadDiscipline := by
     | none => simp
     | some total =>
         by_cases hFees : 0 < sharesToMintAsFees <;>
-          simp [hFees, ContractState.readSlot_writeSlot_same,
-            ContractState.readSlot_writeSlot_other, rewardsRead_ne_rewardsMinted,
-            rewardsRead_ne_sequence] <;>
+          simp [hFees, stampStep, nextTick,
+            ContractState.readSlot_writeSlot_same,
+            ContractState.readSlot_writeSlot_other, balancesWrittenSlot, totalBalanceSlot,
+            accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
+            sequenceSlot] <;>
           decide
   · simp [hValid]
 
@@ -418,6 +438,7 @@ def handleOracleReportMintBeforeRead (i : ReportInput)
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := dirty.writeSlot totalBalanceSlot total
         let dirty := dirty.writeSlot sequenceSlot 0
+        let dirty := stampStep balancesWrittenSlot dirty
         let dirty := stampStep accountingCalledSlot dirty
         let dirty :=
           if 0 < sharesToMintAsFees then stampStep rewardsMintedSlot dirty
@@ -433,12 +454,15 @@ def mintOrderKillLine : Prop :=
 
 theorem mintOrderKillLine_holds : mintOrderKillLine := by
   intro hDisc
-  have h := hDisc ⟨[], [], []⟩ 1 defaultState
-  simp [handleOracleReportMintBeforeRead, Contract.run, idsAndBalancesValid,
-    checkedTotal256, mintAfterRead, writeAll, persistBalances, stampStep, nextTick,
+  let witness : ReportInput := ⟨[1], [1], [1]⟩
+  have hValid : idsAndBalancesValid witness = true := by native_decide
+  have hTotal : checkedTotal256 witness.balancesGwei = some 1 := by native_decide
+  have h := hDisc witness 1 defaultState
+  simp [handleOracleReportMintBeforeRead, Contract.run, witness, hValid, hTotal,
+    mintAfterRead, writeAll, persistBalances, stampStep, nextTick,
     ContractState.readSlot_writeSlot_same, ContractState.readSlot_writeSlot_other,
     totalBalanceSlot, accountingCalledSlot, rewardsReadSlot, rewardsMintedSlot,
-    sequenceSlot] at h
-  exact absurd h (by decide)
+    balancesWrittenSlot, sequenceSlot] at h
+  exact absurd (h (by decide)) (by decide)
 
 end LidoSRv3.Audit.Verity.HandleOracleReportTx

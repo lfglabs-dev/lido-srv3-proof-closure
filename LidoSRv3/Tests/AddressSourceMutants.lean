@@ -93,7 +93,7 @@ def runFixedOwnerGated (inp : Input) : Outcome :=
 
 /-- Witness for the parent kill-line: an otherwise-eligible `requestWithdrawals`
 input from caller `1`, the mutant's fixed owner.  `requestWithdrawals` is one
-of the four modeled permissionless writers (in `addressEquivarianceEntryScope`
+of the four modeled address-bearing writers (in `addressEquivarianceEntryScope`
 under both the wave-4 and the widened wave-5 scope). -/
 private def fixedOwnerGateWitness : Input :=
   { entryPoint := .requestWithdrawals, caller := 1, senderFrom := 1, recipient := 0,
@@ -154,6 +154,44 @@ theorem fixed_owner_gate_not_admission_equivariant :
   have hcex := h 1 2 (by decide) (by decide) fixedOwnerGateWitness
   revert hcex
   decide
+
+/-! ## Write-side parent kill-line
+
+The admission-gate mutant above can falsify both parent conjuncts by rejecting
+the renamed call.  This second mutant leaves `admitted` untouched and changes
+only a committed address write, so it isolates the post-state half of the
+registered parent. -/
+
+/-- Mutant post-state: retain the honest recipient and balance-key writes but
+stomp the owner field with an unrenamed fixed address. -/
+def successfulPostFixedOwnerWriter (inp : Input) : PostState :=
+  { successfulPost inp with owner := fixedOwner }
+
+def runFixedOwnerWriter (inp : Input) : Outcome :=
+  if admitted inp then .committed (successfulPostFixedOwnerWriter inp) else .reverted
+
+/-- **Write-side kill-line refuting the registered parent.** Admission remains
+equivariant because it is the honest `admitted`; on the eligible unwrap witness
+both calls commit.  The renamed call nevertheless writes owner `1`, while
+renaming the original committed post requires owner `2`.  Thus the full parent
+shape is false solely through its committed-post conjunct. -/
+theorem fixed_owner_writer_kill_line_refutes_parent :
+    ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
+        succeeds (runFixedOwnerWriter (renameInput a₁ a₂ inp)) =
+          succeeds (runFixedOwnerWriter inp) ∧
+        ∀ post, runFixedOwnerWriter inp = .committed post →
+          runFixedOwnerWriter (renameInput a₁ a₂ inp) =
+            .committed (renamePost a₁ a₂ post) := by
+  intro h
+  have hcex := h 1 2 (by decide) (by decide) (eligibleUnwrap 1)
+  have hcommit :
+      runFixedOwnerWriter (eligibleUnwrap 1) = .committed ⟨1, 1, 1, 1⟩ := by
+    decide
+  have hne :
+      runFixedOwnerWriter (renameInput 1 2 (eligibleUnwrap 1)) ≠
+        .committed (renamePost 1 2 ⟨1, 1, 1, 1⟩) := by
+    decide
+  exact hne (hcex.2 ⟨1, 1, 1, 1⟩ hcommit)
 
 /-- Retained for the denote-admission subordinate row only: the disconnected
 toy `AddressAdmission.ownerGated` mutant is not a kill-line for the registered
