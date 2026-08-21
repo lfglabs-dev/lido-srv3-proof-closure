@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6f12b0449ce0da364e307f8620350e3cfda2d563
+validated-tree: ce304b2063572c3038444bb36c9b36df5d933527
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3499,3 +3499,76 @@ P-TOPUP-2 auditor note round 2 and audit probe (2026-08-21)
   LidoSRv3.Tests.Topup2AuditProbe` exit 0 at `leanprover/lean4:v4.31.0`.
 - `validated-tree` rebound to this commit's tracked tree excluding this receipt
   `6f12b0449ce0da364e307f8620350e3cfda2d563`.
+
+P-ADDRESS-1.denote-admission and P-ALLOC-1 auditor notes, round 1 and round 2
+plus two audit probes (2026-08-21)
+-----------------------------------------------------------------------------
+
+- Reports plus two unregistered test modules. This entry covers four report
+  commits and two test modules; the receipt was already stale against the two
+  round-1 note commits when the round-2 notes landed, so one rebind covers both
+  rounds.
+- `report/P-ADDRESS-1.denote-admission.md` gains a round-1 note and then a
+  round-2 note (product note plus proof audit). The round-2 note records that
+  the registered `admission_address_equivariant`'s two `a < Address.modulus`
+  binders are inert, which is the same defect wave 4 removed from the parent's
+  `_hWellFormed`/`_hNotSingleton` and wave 5 from `hScope`, so round-1 issue 8's
+  class-`B` close is reclassified as a scope sentence rather than an encoding
+  repair; that senders differing by `2^160` are one account under `callerKey`,
+  which is what the inert binder hides; that round 1's pause-alias
+  counterexample assigned two values to one word and that a consistent witness
+  still refutes the premise-free statement; that only `DenoteResult.success` is
+  compared, so an entrypoint paying out the caller's own identity is CHECKED;
+  that `ownerGateKillLine` omits the registered premise shape and is commented
+  as the parent's kill-line when it belongs to this subordinate row; and that
+  the module's `externalCallBind` scope note cites verity pin `04729a9` while
+  this tree pins `a063bfc`, where that combinator is no longer `pure ()`.
+  Positive findings recorded: `audit/source-map.yaml` has no target for this row,
+  so it advertises no pinned coverage it lacks, and `LidoSRv3/Audit/Trust.lean`
+  prints all six module theorems as `propext`/`Quot.sound` only.
+- `report/P-ALLOC-1.md` gains a round-1 proof audit and then a round-2 proof
+  audit. The owner product note is untouched in both rounds; the round-2 diff is
+  252 insertions and 0 deletions. The round-2 note records that
+  `checked_execute` is transcription agreement between two artifacts, since
+  `SolidityAllocCapacity.execute` is a `def` alias of `AllocCapacity.execute`;
+  that the registered parent compares only the capacity column, so a zeroed
+  allocation column is CHECKED; that the registered Verity theorem holds for an
+  arbitrary interpreter, so the row's one kill-line bears on one of its two
+  CHECKED cells; that `hBind` is satisfiable for every state and count rather
+  than restricting the world; that the `storageArray` persistence channel is
+  structurally unaliasable because it is a different `ContractState` record
+  field from `storageWords`, which is also why packed router storage is
+  unrepresentable; that `verity_tx_revert_restores_snapshot` is proved but not
+  named in `audit/guarantees.yaml` while rollback is claimed under
+  `fidelity.covered`; that `CheckedBounds` is stated in `MathView` vocabulary
+  with one branch its own nonzero field makes dead; and that the three summary
+  spans in `audit/source-map.yaml` are mapped but not modeled.
+- `LidoSRv3/Tests/AddressAdmissionAuditProbe.lean` and
+  `LidoSRv3/Tests/Alloc1AuditProbe.lean` record the machine-checked observations
+  behind the two round-2 notes and are explicitly not evidence: neither is
+  imported by any facade, neither is printed by `LidoSRv3.Audit.Trust`, and
+  neither is named in `audit/guarantees.yaml`.
+  `admission_equivariant_without_address_bounds` reproves the registered
+  conclusion with both address binders deleted and the same three-tactic script;
+  `pause_disjoint_is_load_bearing` refutes the premise-free statement on a
+  single consistent world; `high_bit_callers_share_a_balance_slot` shows the
+  `2^160` pair shares one slot; `owner_gate_kill_line_with_parent_premises`
+  restates the row's kill-line in the registered premise shape;
+  `payCaller_admission_equivariant` plus `payCaller_return_value_discriminates`
+  exhibit a caller-discriminating payout that satisfies the registered claim.
+  `bind_premise_is_total` discharges `hBind` for every state and count;
+  `verity_tx_simulates_any_exec` reproves the registered Verity script for an
+  arbitrary interpreter with no hypothesis on it;
+  `capacity_target_mutant_survives_registered_verity_shape` instantiates that at
+  the parent's own kill-line mutant; and
+  `zero_allocation_column_mutant_survives_registered_parent` derives the
+  mutant-substituted abstract parent from the parent itself.
+- No guarantee semantics, `audit/guarantees.yaml`, `audit/STATUS.md`,
+  `audit/ROADMAP.md`, `audit/REPRODUCE.md`, source-map, or assumption changes.
+  No registered theorem statement changed. `sorry`/`admit` scan clean on both
+  new modules.
+- `lake env lean LidoSRv3/Tests/AddressAdmissionAuditProbe.lean` and
+  `lake env lean LidoSRv3/Tests/Alloc1AuditProbe.lean` exit 0 at
+  `leanprover/lean4:v4.31.0`.
+- `validated-tree` rebound to this commit's tracked tree excluding this receipt
+  `ce304b2063572c3038444bb36c9b36df5d933527`.
