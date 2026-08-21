@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d1f20801c098833d963010c7910db689221ae28c
+validated-tree: b1504743a9ffb5a1b192a1094921df2e80be6c38
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3337,3 +3337,87 @@ Wave 6: P-SSZ-1 strip to the mutant-exercised traversal conjunct (2026-08-19)
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
 
+P-DEPOSIT-1 LinksSource honest counterexample and derived-bridge kill-line (2026-08-20)
+---------------------------------------------------------------------------------------
+
+- Branch `wave-4/p-deposit-1-linkssource` from main `85a7d3ea` (#151). Honest-parent path:
+  allocation outputs do not constrain `publicKeysBatchLength`, so `LinksSource.keys`
+  cannot be derived from P-ALLOC-1 `checked_execute` or P-ALLOC-2
+  `forall_proportional_step_correspondence_and_bounded`; `execute` itself is
+  exactly-two-batch, not a ∀ loop (distinctModules / noWrap would be violated on
+  iteration). No fake ∀ loop claimed.
+- `LidoSRv3/Audit/Guarantees/PDeposit1.lean`: `LinksSource` and
+  `verity_tx_composes_deposit_conservation_and_rollback` docstrings now explicitly
+  state the two-batch bound and that no ALLOC composition is claimed; private
+  section after `canonical_composition_witness` adds `counterexampleLinkInputs`,
+  `counterexampleSourceInput` (keeps allocation premises true, `actualDepositsCount=1`
+  vs `2+3`), and private theorem `alloc_parents_do_not_imply_linkssource` proved
+  by `decide`/`norm_num` (`LinksSource.keys` false). Private qualifier keeps
+  `check_public_claim_surfaces.py` green.
+- `LidoSRv3/Tests/DepositParentTxMutants.lean`: adds import of
+  `PDeposit1`, `bridgeCounterexampleSourceInput` (one-key source), and kill-line
+  theorem `alloc_derived_linkssource_kill_line_refutes_bridge`:
+  `¬ (∀ cfg inp txInputs entry, Preconditions txInputs entry → LinksSource cfg inp txInputs)`
+  proved by applying the hypothetical bridge to canonicalInputs/canonicalState/
+  bridgeCounterexampleSourceInput and `norm_num` on the `keys` equality. This
+  refutes the hypothetical derived bridge at the same granularity as the honest
+  parent, with the executable two-batch premises retained.
+- `audit/guarantees.yaml` and `scripts/audit_metadata.py` unchanged; P-DEPOSIT-1
+  `fidelity.missing` already honestly lists `LinksSource` as caller-supplied and
+  the executable as exactly-two-batch. `python3 scripts/audit_metadata.py check`:
+  exit 0 (11 canonical + 14 subordinate). `python3 scripts/check_public_claim_surfaces.py`:
+  exit 0.
+- `lake build LidoSRv3.Audit.Guarantees.PDeposit1
+  LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants`:
+  exit 0 (private theorems use `decide`/`norm_num`, no `sorry`/`admit`/`axiom`).
+- `validated-tree` above rebound to this commit's tracked tree excluding this
+  receipt, computed per `scripts/check_validation_receipt.py` (`git read-tree HEAD`,
+  `git rm --cached -- audit/validation-receipt.txt`, `git write-tree`) = 71e58999689f89b2c4f2ec6e86e577826988c4dd.
+
+P-DEPOSIT-1 counterexample proof repair: `norm_num` left the key sum symbolic (2026-08-20)
+------------------------------------------------------------------------------------------
+
+- Correction to the preceding entry, which recorded `lake build
+  LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx
+  LidoSRv3.Tests.DepositParentTxMutants: exit 0`. That claim was wrong at commit
+  `194b16fb`: the build failed. Reproduced here with exit 1 and
+  `LidoSRv3/Audit/Guarantees/PDeposit1.lean:354:36: unsolved goals`,
+  `hKeys : canonicalInputs.first.keys.val + canonicalInputs.second.keys.val = 1`,
+  `⊢ False`. The `norm_num` simp set named `counterexampleLinkInputs`,
+  `counterexampleSourceInput`, `canonicalSourceInput`, `canonicalSourceConfig`
+  and `actualDepositsCount`, which reduced the source side to `1`, but never
+  named `canonicalInputs`/`batchA`/`batchB`, so the executable key sum stayed
+  symbolic and no contradiction was reachable.
+- Repair is proof-only; no statement, witness, definition, docstring, guarantee
+  or YAML text changes. Both sides of `LinksSource.keys` are closed terms at the
+  counterexample witness, so kernel evaluation discharges them directly:
+  `LidoSRv3/Audit/Guarantees/PDeposit1.lean` `alloc_parents_do_not_imply_linkssource`
+  and `LidoSRv3/Tests/DepositParentTxMutants.lean`
+  `alloc_derived_linkssource_kill_line_refutes_bridge` now close with
+  `exact absurd hLink.keys (by decide)` (executable legs `2 + 3 = 5`; one-key
+  source `actualDepositsCount = 48 / 48 = 1`). Diff is 6 insertions / 6
+  deletions across exactly these two files.
+- The intended ALLOC↛LinksSource counterexample is preserved unchanged: the
+  executable allocation premises (`Preconditions`, `depositSize`, both
+  `amount = keys * depositSize` legs) still hold at `counterexampleLinkInputs =
+  canonicalInputs`, and only the independent source `publicKeysBatchLength`
+  differs, so the refutation content is identical to what the preceding entry
+  described.
+- No `sorry`/`admit`/`axiom`/`unsafe`/`native_decide` introduced; verified by
+  diff scan. `#print axioms` on both repaired theorems: `[propext]` only.
+- Receipts at this tree: `lake build LidoSRv3.Audit.Guarantees.PDeposit1
+  LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositParentTxMutants`:
+  exit 0. `lake build LidoSRv3.Audit.Trust` (the axiom gate of
+  `A-CLASSICAL-CHOICE`): exit 0, 1304 jobs, 190 `#print axioms` lines. 188 of
+  those report only axioms within `{propext, Classical.choice, Quot.sound}`. The
+  remaining two, `PAlloc1.source_capacities_and_mapped_summary_transaction` and
+  `PAlloc1Phase3.mapped_summary_call_transaction`, additionally report
+  `AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
+  — the single pre-existing exception already disclosed in the `Trust.lean`
+  preamble, untouched by this repair and outside its scope. No `sorryAx` and no
+  `Lean.ofReduceBool` appears anywhere in the report. `lake build LidoSRv3`
+  (default target): exit 0. `make check`: exit 0.
+- `validated-tree` above rebound to this commit's tracked tree excluding this
+  receipt, per `scripts/check_validation_receipt.py` (`git read-tree HEAD`,
+  `git rm --cached -- audit/validation-receipt.txt`, `git write-tree`) =
+  60f378e9a3ec14978e2f7a5d15fabb58bda6305a.

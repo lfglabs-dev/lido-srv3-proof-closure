@@ -1,4 +1,6 @@
-import LidoSRv3.Audit.Verity.DepositParentTx
+import LidoSRv3.Audit.Guarantees.PDeposit1
+import LidoSRv3.Audit.Model.AllocCapacity
+import LidoSRv3.Audit.MinFirstAllocation
 
 /-! # P-DEPOSIT-1 faithful-plane fail-closed vectors
 
@@ -19,6 +21,8 @@ namespace LidoSRv3.Tests.DepositParentTxMutants
 open Verity
 open Contracts
 open LidoSRv3.Audit.Verity.DepositParentTx
+open LidoSRv3.Audit.SolidityDeposit
+open LidoSRv3.Audit.Guarantees.PDeposit1
 
 private def inputs : Inputs := canonicalInputs
 
@@ -125,6 +129,103 @@ theorem honest_run_matches_source :
     observe frame (probes inputs) ((execute inputs).run frame)
       = sourceObservables inputs frame :=
   execute_observes_source inputs frame canonical_preconditions
+
+/-! ## Kill-line for a hypothetical ALLOC-derived source bridge
+
+The statement includes the actual P-ALLOC-1 and P-ALLOC-2 parent premises —
+`CheckedBounds` for the allocation capacity loop, and `RowsCorrespond` /
+`candidate?` / `hasFreeSpace` / `checkedAmount` for the proportional min-first
+step — together with four cross-plane composition premises that tie the ALLOC
+pipeline inputs and outputs to the transaction legs:
+
+1. `depositsToAllocate.val = txInputs.first.keys.val + txInputs.second.keys.val`
+   — the total allocation demand equals the transaction's key count;
+2. `depositsToAllocate.val = actualDepositsCount cfg inp`
+   — the allocation demand equals the source-model deposit count;
+3. `source.map (·.capacity.val) = MathView.capacities allocCfg modules
+   depositsToAllocate isTopUp` — P-ALLOC-1's capacity output feeds
+   P-ALLOC-2's source rows;
+4. `source.map (·.allocation.val) = [txInputs.first.keys.val,
+   txInputs.second.keys.val]` — the per-module ALLOC output allocations
+   equal the per-batch transaction keys.
+
+The proof exhibits two active modules (`moduleId = 7, 9`;
+`shareLimit = 5000`, `depositableCount = 100`, `depositedCount = 10` each)
+with `depositsToAllocate = 5` matching both the executable's `2 + 3` keys and
+`actualDepositsCount canonicalSourceConfig canonicalSourceInput`, and
+post-allocation source rows `[⟨2, 12⟩, ⟨3, 12⟩]` whose allocations and
+capacities satisfy the ALLOC premises.  The counterexample uses skewed
+per-batch amounts `(65, 95)` whose total `160 = 5 * 32` satisfies
+`Preconditions.valueMatches` but whose per-batch split fails
+`LinksSource.firstAmount` (`65 ≠ 2 * 32`).  The gap is that ALLOC constrains
+per-module key counts but not per-batch wei amounts; the per-key amount
+invariant is an execution-level fact (`makeBeaconChainDeposits32ETH` sends
+`DEPOSIT_SIZE` per key), not an ALLOC guarantee. -/
+
+private def skewedAmountInputs : Inputs :=
+  { canonicalInputs with
+    first := { batchA with amount := 65 }
+    second := { batchB with amount := 95 } }
+
+private def counterexampleAllocModule1 : LidoSRv3.Audit.AllocCapacity.Module :=
+  { moduleId := 7, shareLimit := 5000, isActive := true, isType2 := false,
+    depositableCount := 100, depositedCount := 10,
+    summaryExitedCount := 0, accountingExitedCount := 0, totalModuleStake := 0 }
+
+private def counterexampleAllocModule2 : LidoSRv3.Audit.AllocCapacity.Module :=
+  { moduleId := 9, shareLimit := 5000, isActive := true, isType2 := false,
+    depositableCount := 100, depositedCount := 10,
+    summaryExitedCount := 0, accountingExitedCount := 0, totalModuleStake := 0 }
+
+open _root_.LidoSRv3.Audit.AllocCapacity in
+open _root_.LidoSRv3.Audit.MinFirstAllocation in
+/-- A universally claimed bridge from the executable ALLOC premises to
+`LinksSource` is false even when P-ALLOC-1 checked-bounds
+(`CheckedBounds`), P-ALLOC-2 row-correspondence / candidate-selection /
+free-space / checked-amount premises, and four cross-plane composition
+premises all hold — including `depositsToAllocate = actualDepositsCount`.
+
+The proof uses `skewedAmountInputs` whose per-batch amounts `(65, 95)` total
+`160 = 5 * 32` (satisfying `Preconditions.valueMatches`) but fail
+`LinksSource.firstAmount` because `65 ≠ 2 * 32`.  ALLOC constrains
+per-module key counts, not per-batch wei amounts. -/
+theorem alloc_derived_linkssource_kill_line_refutes_bridge :
+    ¬ (∀ (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+        (txInputs : Inputs) (entry : ContractState)
+        (allocCfg : Config) (modules : List Module)
+        (depositsToAllocate : _root_.Verity.Core.Uint256) (isTopUp : Bool)
+        (model : List Model.Bucket) (source : List Source.Row)
+        (best : Source.Row) (allocationSize w : Source.Word),
+          Preconditions txInputs entry →
+          CheckedBounds allocCfg modules depositsToAllocate isTopUp →
+          RowsCorrespond model source →
+          Source.candidate? source = some best →
+          Source.hasFreeSpace best = true →
+          source.length < _root_.Verity.Core.Uint256.modulus →
+          allocationSize.val ≠ 0 →
+          Source.checkedAmount source allocationSize best = some w →
+          depositsToAllocate.val =
+            txInputs.first.keys.val + txInputs.second.keys.val →
+          depositsToAllocate.val = actualDepositsCount cfg inp →
+          source.map (fun r => r.capacity.val) =
+            MathView.capacities allocCfg modules depositsToAllocate isTopUp →
+          source.map (fun r => r.allocation.val) =
+            [txInputs.first.keys.val, txInputs.second.keys.val] →
+          LinksSource cfg inp txInputs) := by
+  intro derivedBridge
+  have hLink := derivedBridge canonicalSourceConfig canonicalSourceInput
+    skewedAmountInputs canonicalState
+    ⟨32, 64⟩ [counterexampleAllocModule1, counterexampleAllocModule2] 5 false
+    [⟨2, 12⟩, ⟨3, 12⟩] [⟨2, 12⟩, ⟨3, 12⟩] ⟨2, 12⟩ 5 1
+    ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide,
+     by decide, by decide, by decide, by decide, by decide, by decide, by decide,
+     by decide, by decide, by decide⟩
+    ⟨by decide, by decide, by decide, by decide, by decide⟩
+    (List.Forall₂.cons ⟨rfl, rfl⟩ (List.Forall₂.cons ⟨rfl, rfl⟩ List.Forall₂.nil))
+    rfl rfl (by decide) (by decide) rfl
+    rfl (by decide)
+    rfl rfl
+  exact absurd hLink.firstAmount (by decide)
 
 /-! ## Per-module bookkeeping mutants
 
