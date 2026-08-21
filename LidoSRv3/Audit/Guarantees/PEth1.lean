@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Verity.PEth1CompositionTx
+import LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal
 import Mathlib.Tactic.SplitIfs
 
 namespace LidoSRv3.Audit.Guarantees.PEth1
@@ -255,12 +256,49 @@ theorem eth_flow_parent (approved : ApprovedSet)
 
 /-! ## Verity plane
 
-**Scope.** `verity_tx_composes_value_flow_and_rollback` is a finite
-conjunction over five concrete `(msgValue, batchSize, feePerRequest)` tuples
-— unlike `eth_flow_parent` above, it is not a `∀`-quantified theorem over
-funded batches. `Tests.PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget`
-exhibits a funded, guard-passing tuple outside this witness set whose
-dispatch exhausts the model's fixed fuel budget instead of succeeding. -/
+**Registered parent.** `verity_tx_universal_success_shape` below is the
+Verity-plane lift of the success arm of `eth_flow_parent` to matching
+`∀`-quantifier strength: for every `(msgValue, batchSize, feePerRequest)`
+that is nonzero-valued, word-sized, non-wrapping in the product fee, funded,
+and within the dispatch fuel budget, the honest-wiring transaction commits
+with the whole product fee at the consolidation-request predeploy, the
+remainder at the caller's refund recipient, and zero retained by every
+protocol contract on the route.  The premises are exactly the abstract
+parent's non-revert conditions plus the model's fuel bound; each is shown
+undroppable by a premise-necessity kill-line in
+`Tests.PEth1CompositionTxMutants`, which also refutes the same universal
+predicate on four wiring mutants.
+
+**Auxiliary evidence.** `verity_tx_composes_value_flow_and_rollback` keeps
+the five numeral witnesses (now also consequences of the universal parent),
+the rejecting-predeploy rollback, the underfunded revert, ETH conservation,
+and the dispatch/multicall replay agreement as regression facts. -/
+
+/-- **Registry-facing P-ETH-1 Verity-plane parent (universal).**
+
+For every funded, guard-passing, non-wrapping batch that fits the dispatch
+fuel budget, the honest wiring commits: the whole product fee lands at the
+consolidation-request predeploy, the remainder lands at the refund recipient,
+and no protocol contract on the route retains ETH.  Proved by frame-by-frame
+chaining through the recursive dispatcher in
+`Verity.PEth1CompositionTxUniversal.run_success_shape`. -/
+theorem verity_tx_universal_success_shape (msgValue batchSize feePerRequest : Nat)
+    (hpos : 0 < msgValue)
+    (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)
+    (hnM : batchSize < _root_.Verity.Core.Uint256.modulus)
+    (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)
+    (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)
+    (hle : batchSize * feePerRequest ≤ msgValue)
+    (hfuel : batchSize + 4 ≤
+      _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.fuelBudget) :
+    _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe
+        (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.run
+          _root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.honest
+          msgValue batchSize feePerRequest) =
+      ⟨.success, batchSize + 3 + (if msgValue - batchSize * feePerRequest = 0 then 0 else 1),
+        ⟨0, 0, 0, 0, 0, batchSize * feePerRequest, msgValue - batchSize * feePerRequest⟩⟩ :=
+  _root_.LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal.run_success_shape
+    msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hle hfuel
 
 theorem verity_tx_composes_value_flow_and_rollback :
     (_root_.LidoSRv3.Audit.Verity.PEth1CompositionTx.observe

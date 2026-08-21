@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Verity.PEth1CompositionTx
+import LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal
 import LidoSRv3.Audit.Guarantees.PEth1
 
 /-!
@@ -12,18 +13,18 @@ statement.
 
 ## Wave 2 scope kill-lines
 
-`LidoSRv3.Audit.Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback`
-is a finite conjunction over five concrete `(msgValue, batchSize,
-feePerRequest)` tuples — not a `∀` theorem over funded batches. The two
-theorems in the "Wave 2 kill-lines" section below are executable
-counterexamples to two different ways a reader could over-generalize that
-registered parent: one funded-but-underfunded-relative-to-batch tuple that
-reverts instead of repartitioning, and one funded, guard-passing tuple that
-exhausts the dispatcher's fixed fuel budget instead of succeeding. Neither
-failure mode is a `Wiring` mutation; both arise from the honest wiring on
-inputs the registered parent does not mention.
+The two theorems in the "Wave 2 kill-lines" section below were introduced as
+executable counterexamples to over-generalizing the then-finite Verity parent.
+Since the registered Verity parent became the universal
+`LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape`, they now
+double as premise-necessity witnesses: an underfunded tuple reverts instead of
+repartitioning (the funding premise), and a funded, guard-passing tuple that
+needs more frames than `fuelBudget` exhausts the dispatcher instead of
+succeeding (the fuel premise).  The "Wave 5" section below restates those
+refutations against the exact universal-parent shape and adds the zero-value
+witness for the positivity premise.
 
-## Wave 4 parent kill-lines
+## Wave 4 parent kill-lines (abstract plane)
 
 The Wave 1 theorems at the bottom of this file were originally registered as
 kill-lines but refuted nothing: one quantified over a hand-built move list the
@@ -36,6 +37,20 @@ prove it is definitionally the conclusion of
 mutants of `gatewayExecute` itself — a misrouted fee journal and a
 guard-free gateway that pays fees at zero `msg.value` — on whose success
 outputs that exact predicate is false.
+
+## Wave 5 parent kill-lines (Verity plane, universal parent)
+
+`universalSuccessShapePredicate` factors the registered universal Verity
+parent's exact statement over the `Wiring`, and
+`universal_parent_is_predicate_at_honest` shows the registered parent is that
+predicate at the honest wiring.  Four wiring mutants (dropped refund leg,
+misrouted vault leg, corrupted refund amount, single request per batch) are
+killed by instantiating that same predicate at the witness `(10, 2, 3)`, which
+satisfies every premise.  Three premise-necessity kill-lines then refute the
+premise-dropped projections of the predicate on the honest wiring: the
+zero-value witness `(0, 2, 0)` (positivity, via the Gateway's `ZeroArgument`
+guard), the underfunded witness `(10, 4, 3)` (funding), and the fuel witness
+`(30, 29, 1)` (dispatch fuel).
 -/
 
 namespace LidoSRv3.Tests.PEth1CompositionTxMutants
@@ -237,5 +252,164 @@ theorem zero_value_success_kill_line_refutes_parent :
            { amount := 3, destination := .consolidationContract }], rfl, ?_⟩
   intro h
   exact absurd h.2 (by decide)
+
+/-! ## Wave 5 kill-lines — the universal Verity parent's own predicate -/
+
+/-- The registered universal Verity parent's predicate, factored over the
+wiring: for every nonzero-valued, word-sized, non-wrapping, funded batch that
+fits the dispatch fuel budget, the run commits with the whole product fee at
+the consolidation-request predeploy, the remainder at the refund recipient,
+and zero retained by every protocol contract on the route. -/
+def universalSuccessShapePredicate (w : Wiring) : Prop :=
+  ∀ (mv n fee : Nat),
+    0 < mv → mv < Core.Uint256.modulus →
+    n < Core.Uint256.modulus → fee < Core.Uint256.modulus →
+    n * fee < Core.Uint256.modulus → n * fee ≤ mv →
+    n + 4 ≤ fuelBudget →
+    observe (run w mv n fee) =
+      ⟨.success, n + 3 + (if mv - n * fee = 0 then 0 else 1),
+        ⟨0, 0, 0, 0, 0, n * fee, mv - n * fee⟩⟩
+
+/-- The registered parent
+`LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape` is exactly
+the factored predicate at the honest wiring, so the wiring mutants below
+refute the registered claim's own shape rather than a sibling. -/
+theorem universal_parent_is_predicate_at_honest :
+    universalSuccessShapePredicate honest :=
+  fun mv n fee hpos hmv hnM hfee hnf hle hfuel =>
+    LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal.run_success_shape
+      mv n fee hpos hmv hnM hfee hnf hle hfuel
+
+/-- The witness `(10, 2, 3)` satisfies every premise of the universal parent:
+it is nonzero-valued, word-sized, non-wrapping (`2 * 3 = 6 < 2^256`), funded
+(`6 ≤ 10`), and fuel-fit (`2 + 4 = 6 ≤ 32`). -/
+theorem witness_10_2_3_satisfies_universal_premises :
+    0 < (10 : Nat) ∧ 10 < Core.Uint256.modulus ∧
+    2 < Core.Uint256.modulus ∧ 3 < Core.Uint256.modulus ∧
+    2 * 3 < Core.Uint256.modulus ∧ 2 * 3 ≤ 10 ∧ 2 + 4 ≤ fuelBudget := by
+  refine ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
+
+/-- **Kill-line.** The dropped-refund wiring satisfies the witness premises at
+`(10, 2, 3)`, yet the predicate's success shape (remainder `4` delivered to
+the refund recipient) is false on it: the mutant never emits the refund leg. -/
+theorem dropped_refund_leg_kill_line_refutes_universal_parent :
+    ¬ universalSuccessShapePredicate { honest with emitRefund := false } := by
+  intro h
+  have hpred := h 10 2 3 (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide)
+  exact rejects_dropped_refund_leg (hpred.trans batch_splits_fee_and_refund.1.symm)
+
+/-- **Kill-line.** The misrouted-vault wiring satisfies the witness premises
+at `(10, 2, 3)`, yet the predicate's success shape is false on it: the
+product fee lands at Lido instead of the consolidation-request predeploy. -/
+theorem misrouted_vault_kill_line_refutes_universal_parent :
+    ¬ universalSuccessShapePredicate { honest with vaultTarget := lidoAddr } := by
+  intro h
+  have hpred := h 10 2 3 (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide)
+  exact rejects_misrouted_vault_leg (hpred.trans batch_splits_fee_and_refund.1.symm)
+
+/-- **Kill-line.** The corrupted-refund wiring satisfies the witness premises
+at `(10, 2, 3)`, yet the predicate's success shape is false on it: the refund
+leg declares the whole `msg.value` instead of the post-fee remainder. -/
+theorem corrupted_refund_kill_line_refutes_universal_parent :
+    ¬ universalSuccessShapePredicate { honest with refundWholeValue := true } := by
+  intro h
+  have hpred := h 10 2 3 (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide)
+  exact rejects_corrupted_refund_amount (hpred.trans batch_splits_fee_and_refund.1.symm)
+
+/-- **Kill-line.** The single-request wiring satisfies the witness premises at
+`(10, 2, 3)`, yet the predicate's success shape is false on it: a two-request
+batch issues one request call, so the predeploy is underpaid and the hop count
+is short. -/
+theorem single_request_kill_line_refutes_universal_parent :
+    ¬ universalSuccessShapePredicate { honest with perRequestCalls := false } := by
+  intro h
+  have hpred := h 10 2 3 (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide) (by decide)
+  exact rejects_single_request_for_two_request_batch
+    (hpred.trans batch_splits_fee_and_refund.1.symm)
+
+/-! ### Premise-necessity kill-lines
+
+Each theorem below refutes the universal predicate with one premise dropped,
+on the honest wiring, at a witness that satisfies all the remaining premises —
+so the dropped premise is load-bearing, not incidental.  These refute
+premise-dropped *projections* of the registered parent, not the parent
+itself. -/
+
+/-- The universal predicate with the positivity premise dropped. -/
+def predicateWithoutPositivity (w : Wiring) : Prop :=
+  ∀ (mv n fee : Nat),
+    mv < Core.Uint256.modulus →
+    n < Core.Uint256.modulus → fee < Core.Uint256.modulus →
+    n * fee < Core.Uint256.modulus → n * fee ≤ mv →
+    n + 4 ≤ fuelBudget →
+    observe (run w mv n fee) =
+      ⟨.success, n + 3 + (if mv - n * fee = 0 then 0 else 1),
+        ⟨0, 0, 0, 0, 0, n * fee, mv - n * fee⟩⟩
+
+/-- **Premise-necessity kill-line (`0 < msgValue`).**  The witness `(0, 2, 0)`
+satisfies every remaining premise (word-sized, `2 * 0 = 0` non-wrapping and
+funded, `2 + 4 ≤ 32`), but the Gateway's `ZeroArgument` guard reverts the
+zero-value call, so the premise-dropped projection is false on the honest
+wiring. -/
+theorem zero_value_kill_line_refutes_dropped_positivity :
+    ¬ predicateWithoutPositivity honest := by
+  intro h
+  have hpred := h 0 2 0 (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide)
+  exact (by decide +kernel :
+    observe (run honest 0 2 0) ≠ ⟨.success, 5, ⟨0, 0, 0, 0, 0, 0, 0⟩⟩) hpred
+
+/-- The universal predicate with the funding premise dropped. -/
+def predicateWithoutFunding (w : Wiring) : Prop :=
+  ∀ (mv n fee : Nat),
+    0 < mv → mv < Core.Uint256.modulus →
+    n < Core.Uint256.modulus → fee < Core.Uint256.modulus →
+    n * fee < Core.Uint256.modulus →
+    n + 4 ≤ fuelBudget →
+    observe (run w mv n fee) =
+      ⟨.success, n + 3 + (if mv - n * fee = 0 then 0 else 1),
+        ⟨0, 0, 0, 0, 0, n * fee, mv - n * fee⟩⟩
+
+/-- **Premise-necessity kill-line (`n * fee ≤ msgValue`).**  The witness
+`(10, 4, 3)` satisfies every remaining premise (nonzero, word-sized,
+`4 * 3 = 12 < 2^256`, `4 + 4 ≤ 32`), but the Gateway's `InsufficientValue`
+guard reverts the underfunded batch, so the premise-dropped projection is
+false on the honest wiring.  This is the exact-shape form of
+`underfunded_batch_is_not_a_repartition`. -/
+theorem underfunded_kill_line_refutes_dropped_funding :
+    ¬ predicateWithoutFunding honest := by
+  intro h
+  have hpred := h 10 4 3 (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide)
+  exact (by decide +kernel :
+    observe (run honest 10 4 3) ≠ ⟨.success, 7, ⟨0, 0, 0, 0, 0, 12, 0⟩⟩) hpred
+
+/-- The universal predicate with the fuel premise dropped. -/
+def predicateWithoutFuel (w : Wiring) : Prop :=
+  ∀ (mv n fee : Nat),
+    0 < mv → mv < Core.Uint256.modulus →
+    n < Core.Uint256.modulus → fee < Core.Uint256.modulus →
+    n * fee < Core.Uint256.modulus → n * fee ≤ mv →
+    observe (run w mv n fee) =
+      ⟨.success, n + 3 + (if mv - n * fee = 0 then 0 else 1),
+        ⟨0, 0, 0, 0, 0, n * fee, mv - n * fee⟩⟩
+
+/-- **Premise-necessity kill-line (`n + 4 ≤ fuelBudget`).**  The witness
+`(30, 29, 1)` satisfies every remaining premise (nonzero, word-sized,
+`29 * 1 = 29 < 2^256`, funded `29 ≤ 30`), but the batch needs `33` dispatched
+frames against `fuelBudget = 32`, so the dispatcher reports `.exhausted` and
+the premise-dropped projection is false on the honest wiring.  This is the
+exact-shape form of `large_funded_batch_exhausts_fuel_budget`. -/
+theorem fuel_exhaustion_kill_line_refutes_dropped_fuel_premise :
+    ¬ predicateWithoutFuel honest := by
+  intro h
+  have hpred := h 30 29 1 (by decide) (by decide) (by decide) (by decide) (by decide)
+    (by decide)
+  exact (by decide +kernel :
+    observe (run honest 30 29 1) ≠ ⟨.success, 33, ⟨0, 0, 0, 0, 0, 29, 1⟩⟩) hpred
 
 end LidoSRv3.Tests.PEth1CompositionTxMutants
