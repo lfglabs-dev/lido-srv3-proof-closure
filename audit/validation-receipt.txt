@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: b1504743a9ffb5a1b192a1094921df2e80be6c38
+validated-tree: 96486ebac541e3386f3520016cc3aa9019ac34bb
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3421,3 +3421,16 @@ P-DEPOSIT-1 counterexample proof repair: `norm_num` left the key sum symbolic (2
   receipt, per `scripts/check_validation_receipt.py` (`git read-tree HEAD`,
   `git rm --cached -- audit/validation-receipt.txt`, `git write-tree`) =
   60f378e9a3ec14978e2f7a5d15fabb58bda6305a.
+
+Auditor notes completion receipt rebind (2026-08-21)
+----------------------------------------------------
+
+- Reports-only. Completes A+B auditor notes for P-ETH-1 and P-TOPUP-1 from live
+  Lean and YAML after ChatGPT UI pool was unreachable (`SANDBOXED_API_URL`
+  unset). Records the merged #153 ALLOC↛LinksSource counterexample on
+  `report/P-DEPOSIT-1.md`. Round-1 GPT-5.6 Pro notes for the other eight
+  canonical IDs are unchanged. P-ALLOC-1 product note is unchanged.
+- No Lean, YAML, or guarantee-statement edits. `python3 scripts/audit_metadata.py
+  check` and `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `validated-tree` rebound to this branch's tracked tree excluding this receipt
+  `96486ebac541e3386f3520016cc3aa9019ac34bb`.

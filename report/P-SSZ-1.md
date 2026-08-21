@@ -1,5 +1,18 @@
 # P-SSZ-1
 
+> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+
+## Auditor note
+
+P-SSZ-1 proves one precise property: the composed SSZ encoding traversal under sourceCombine returns exactly sourceNode. The parent guarantee was stripped to this single conjunct, so it makes no broader Merkle or cryptographic claim.
+
+On the Verity plane, encode.run is observed to equal sourceView for every modeled input. If execution commits, the modeled structural fields also match the source specification.
+
+## Proof issues and recommendations
+
+The abstract theorem is intentionally narrow. It does not prove SHA-256 correctness, production generalized indices, or imported-to-deployed Yul. Pin the SHA-256 engine and prove its use end to end, or keep SHA correctness documented as an assumption.
+
+
 Theorems: `PSsz1.composed_ssz_encoding` (registered parent; concludes the named predicate `PSsz1.composedEncodingOk`, stripped in wave 6 to the single mutant-exercised traversal conjunct), `PSsz1.swapped_combine_kill_line_refutes_parent` (parent kill-line: negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness` (conclusion-non-triviality witness on the unregistered full bundle `PSsz1.composedEncodingOkFull`: the bundle discriminates the claimed operation; renamed in wave 6 from `crossed_witness_kill_line_refutes_parent`), `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle, not registered claim content), `PSsz1.verity_tx_simulates_ssz_encoding`.
 Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`.
 

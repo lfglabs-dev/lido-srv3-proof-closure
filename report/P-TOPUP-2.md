@@ -1,5 +1,28 @@
 # P-TOPUP-2
 
+> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+
+## Auditor note
+
+P-TOPUP-2 proves that the total top-up allocated from the leftover budget never exceeds maxTopUpPerBlockGwei:
+
+transition.sum <= maxTopUpPerBlockGwei
+
+This bound holds without assuming well_formed. The cap is enforced by the transition itself, not borrowed from a global state invariant.
+
+On the Verity side, allocate persists the accepted allocation. It reverts when the batch contains more than 32 validators, matching maxValidatorsPerTopUp.
+
+The kill-lines test both controls. Removing the block cap permits an aggregate above the per-block limit. Removing the validator-count guard permits a batch of 33 validators.
+
+The governing theorem is aggregate_bounded_by_block_cap.
+
+## Proof issues and recommendations
+
+The abstract theorem quantifies over every batch and configuration. The Verity model is narrower: the validator limit is the constant 32, not a universally quantified configuration value.
+
+The proof does not cover _verifyValidator, withdrawal credentials type 0x02, or the live allocateDeposits integration.
+
+
 Theorems: `PTopup2.aggregate_bounded_by_block_cap` (parent), `PTopup2.verity_tx_simulates_topup2_spec`.
 Assumptions: `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`.
 
