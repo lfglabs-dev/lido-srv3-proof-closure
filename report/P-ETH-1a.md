@@ -11,11 +11,11 @@ The refund recipient is not one of the abstract approved tags. The ledger takes 
 
 ## Proof limitations and recommendations
 
-`eth_flow_confined` is `List.filter_eq_self` under its own hypothesis. The parent's happy path uses `.consolidationContract` and `.refundRecipient`, which `is_approved` rejects, so the child theorem does not apply to traces this repo generates. The Verity theorem is one `decide` numeral. There is no parent-shaped kill-line. Child `assumptions: []` omits the inherited three.
+`eth_flow_confined` is `List.filter_eq_self` under its own hypothesis. The parent's happy path uses `.consolidationContract` and `.refundRecipient`, which `is_approved` rejects, so the child theorem does not apply to those traces. The executable model now has the producer theorem `sourceGateway_committed_splits_to_vault_and_refund` and the named `refund_misroute_kill_line`. The child row now names its inherited assumptions explicitly.
 
 CHECKED does not mean protocol ETH returns land only on Lido or the WithdrawalQueue.
 
-Ranked next work: restate the abstract claim over destinations the models inhabit, or register a producer theorem; add a refund-misroute kill-line; keep VaultHub out.
+Ranked next work: the producer theorem, refund-misroute kill-line, and assumptions honesty edits landed in `improve/report-recommendations-batch`; keep VaultHub out.
 
 Theorems: `PEth1.eth_flow_confined` (abstract), `PEth1RefundTx.gateway_refund_success_moves_value` (verity).
 Assumptions: none listed on the child row; the parent carries `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

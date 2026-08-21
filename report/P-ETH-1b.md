@@ -11,11 +11,11 @@ Child of P-ETH-1 for the fee legs: `ConsolidationBus.executeConsolidation` forwa
 
 ## Proof limitations and recommendations
 
-The two planes have no common subject. The abstract theorem is a tag rename. The Verity theorem is a bus forward. Canonical-address provenance is a Markdown obligation, not a named assumption. No parent-shaped kill-line.
+The abstract theorem remains a tag rename. The registered Verity theorem is now the fee-target witness `consolidation_fee_target_success`, while the bus-forward numeral remains auxiliary. Canonical-address provenance is named `A-CANONICAL-REQUEST-ADDRESS`; it is not discharged.
 
 CHECKED does not mean fees reach the EIP-7251 predeploy.
 
-Ranked next work: register a fee-target Verity witness; name the canonical-address assumption; do not compose into P-CONSOLIDATION-1 from here.
+Ranked next work: the fee-target witness and canonical-address assumption landed in `improve/report-recommendations-batch`; do not compose into P-CONSOLIDATION-1 from here.
 
 Theorems: `PEth1.consolidation_fee_path_confined` (abstract), `PEth1RequestTx.bus_forward_success` (verity).
 Assumptions: none on the child row; parent carries `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

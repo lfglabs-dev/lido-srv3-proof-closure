@@ -199,6 +199,21 @@ theorem linked_total_eq_depositsValue (cfg : SourceDepositConfig) (inp : SourceD
   rw [linked_total_eq_pushedValue cfg inp inputs hLink hNoWrap, pushedValue, loopPushed_eq,
     depositsValue, hCons]
 
+/-- Hypothesis-free executable rollback theorem. Unlike the composed parent,
+this statement takes neither `LinksSource` nor success `Preconditions`: every
+actual `execute` revert restores the exact entry snapshot and observes the idle
+boundary. -/
+theorem verity_tx_revert_restores_snapshot
+    (inputs : Inputs) (entry rollback : _root_.Verity.ContractState)
+    (reason : String)
+    (hRevert : (execute inputs).run entry = .revert reason rollback) :
+    rollback = entry ∧
+      observe entry (probes inputs) ((execute inputs).run entry) =
+        idleObservables entry (probes inputs) :=
+  ⟨revert_after_intermediate_writes_restores_snapshot
+      inputs entry rollback reason hRevert,
+    revert_observes_idle inputs entry rollback reason hRevert⟩
+
 /--
 Parent closure for P-DEPOSIT-1.  One theorem, four shared variables: the pinned
 source configuration and call input `(cfg, inp)`, the executable transaction

@@ -127,6 +127,16 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
+      "id": "A-CANONICAL-REQUEST-ADDRESS",
+      "accepted": true,
+      "risk": "The model-local consolidation-request target is not proved equal to the canonical EIP-7251 predeploy at 0x0000000000000000000000000000000000007251.",
+      "justification": "Fee-target proofs establish movement to a configured immutable slot; deployment provenance is a separate obligation.",
+      "severity": "HIGH",
+      "violation_impact": "A correctly accounted fee could still be sent to the wrong deployed address.",
+      "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical predeploy address.",
+      "removal_path": "Prove the configured immutable and deployed target both equal the canonical EIP-7251 address."
+    },
+    {
       "id": "A-SOLC-TRUSTED",
       "accepted": true,
       "risk": "Pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",

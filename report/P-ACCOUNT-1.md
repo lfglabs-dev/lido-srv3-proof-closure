@@ -17,13 +17,13 @@ Because the tick is read from state rather than written as a call-site constant,
 
 ## Proof limitations and recommendations
 
-The parent is an unbounded $\forall$ over every report, fee, and state. Invalid, overflowing, and zero-fee commits discharge vacuously. `fullReportSucceeds` is unused in `sourceTrace` (bound as `_`). `storedSteps` compares exact ticks, so the reordering is also visible at the View boundary; YAML prose that says it is "caught only by the parent" is stale.
+The parent is an unbounded $\forall$ over every report, fee, and state. Invalid, overflowing, and zero-fee commits discharge vacuously. `fullReportSucceeds` remains caller-supplied evidence for the demoted source child. `storedSteps` compares exact ticks, so the reordering is also visible at the View boundary.
 
-The kill-line witness is the empty report `⟨[], [], []⟩`, which the live validator rejects. `.rewardsRead` has no counterpart in the pinned call sequence (the deployed order is write, compute fees, mint, `reportRewardsMinted`). Fee computation and `submitReportData` stay in `fidelity.missing`.
+The kill-line now uses the valid nonempty report `⟨[1], [1], [1]⟩`. The balance write has its own clock stamp, so `storedSteps` no longer invents `.balancesWritten` unconditionally. `.rewardsRead` still has no counterpart in the pinned call sequence (the deployed order is write, compute fees, mint, `reportRewardsMinted`). Fee computation and `submitReportData` stay in `fidelity.missing`.
 
 CHECKED does not mean the pinned path mints after reading fresh balances, that the caller is authorized, or that the minted amount is the protocol fee.
 
-Ranked next work: move the kill-line witness to a valid nonempty report; stamp the balance write; retire or use `fullReportSucceeds`; do not widen to `submitReportData`.
+Ranked next work: valid nonempty witness and balance-write stamp landed in `improve/report-recommendations-batch`; retire or independently discharge `fullReportSucceeds`; do not widen to `submitReportData`.
 
 Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

@@ -15,18 +15,18 @@ The kill-line adds `caller == fixedOwner`, a constant $\rho$ does not move: call
 
 ## Proof limitations and recommendations
 
-The parent is a genuine unbounded $\forall$ over a handwritten 18-field record. Twelve environment Booleans are swap-invariant by construction. Equivariance therefore certifies that the projection introduced no unrenamed address constant. Faithfulness to `core@af095e48` is `A-SOURCE-SHAPED`. Batches, queue existence, and external calls are free Booleans. YAML `fidelity.missing` lists only the `False` singleton predicate; live gaps (batch, packed state, wrapper-only `transferFrom` span) are under-reported. Permissionless admission is proved for two of the four writers.
+The parent is a genuine unbounded $\forall$ over a handwritten 18-field record. Twelve environment Booleans are swap-invariant by construction. Equivariance therefore certifies that the projection introduced no unrenamed address constant. Faithfulness to `core@af095e48` is `A-SOURCE-SHAPED`. Batches, queue existence, and external calls are free Booleans. YAML now lists the live batch, packed-state, wrapper-only `transferFrom`, Boolean-environment, and deployed-correspondence gaps. Permissionless admission is proved for two of the four writers.
 
 CHECKED does not mean pinned Solidity, the full claim batch, singleton-actor exclusion by proof, or Yul/EVM.
 
-Ranked next work: add a write-side parent-shaped kill-line; rewrite `fidelity.missing` for live surfaces; stop calling all four "permissionless"; keep singleton-actor functions out of this parent.
+Ranked next work: the write-side parent-shaped kill-line and live-surface honesty edits landed in `improve/report-recommendations-batch`; keep singleton-actor functions out of this parent.
 
 Theorems: `PAddress1.universal_address_writer_equivariance` (parent), `PAddress1.abstract_source_verity_tx_address_equivariance` (Verity), `AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent` (kill-line).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
 
-Permissionless Lido entrypoints should treat two ordinary nonzero callers symmetrically: swapping callers and their address-indexed inputs should preserve admission and rename successful post-states. Since wave 5 the parent covers all four modeled permissionless writers, including `WithdrawalQueue.claimWithdrawalsTo` (`addressEquivarianceEntryScope` is total). The kill line: admission on `requestWithdrawals` / `unwrap` must depend only on pause plus the caller's own balance/allowance flags, not on `msg.sender == owner` or any other fixed, unrenamed caller.
+Address-bearing Lido entrypoint projections should treat two ordinary nonzero callers symmetrically: swapping callers and their address-indexed inputs should preserve admission and rename successful post-states. Since wave 5 the parent covers four modeled writers, including `WithdrawalQueue.claimWithdrawalsTo` (`addressEquivarianceEntryScope` is total). Permissionless admission is only claimed for `requestWithdrawals` / `unwrap`.
 
 ## Modeling
 

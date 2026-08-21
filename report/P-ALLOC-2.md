@@ -25,7 +25,7 @@ The abstract parent is a genuine unbounded $\forall$ over finite lists and words
 
 CHECKED does not mean a full-loop conservation theorem, Solidity equivalence, or that capacities were built correctly.
 
-Ranked next work: add the amount-correspondence conjunct so `ceilDiv` / next-level are load-bearing; register a loop-level theorem; make `sourceView` independent of `allocateLoop`; keep the +1 model as a child.
+Ranked next work: YAML now states explicitly that amount correspondence, a registered loop theorem, and an independent `sourceView` remain open; add those without folding the +1 model into this parent.
 
 Theorems: `PAlloc2.forall_proportional_step_correspondence_and_bounded` (registered parent, explicit ∀; re-registered by human PR #134), `PAlloc2.proportional_step_correspondence_and_bounded` (helper, implicit binders), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (selection kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (headroom kill-line).
 Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.

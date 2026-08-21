@@ -16,14 +16,14 @@ where `transition` is `consumeBudget` of `transitionBudget = \min(\mathrm{valueG
 
 The forall is genuine and the tautology history is closed. Residual content is still definitional in one sense: any `consumeBudget (min _ (min _ cap))` satisfies the bound. Headroom-blind mutants still pass. Live routing accepts any split under per-key and aggregate `require`s; Lean's greedy walk is one policy among many.
 
-`A-TOPUP-NOWRAP` is listed, but its text names StakingRouter line 732 (P-TOPUP-1). Abstract `evaluated_topup_limit` is unbounded Nat; the word plane uses `safeAdd` and reverts on overflow. The keccak oracle is inert for these reads; the real gap is harness-supplied arrays. The max-validators kill-line does not refute the registered Verity parent, which assumes `count ≤ 32`. The guard is the literal 32, not the packed governance word.
+`A-TOPUP-NOWRAP` has been removed from this row because its recorded StakingRouter line-732 risk belongs to P-TOPUP-1. Abstract `evaluated_topup_limit` is still unbounded Nat; the word plane uses `safeAdd` and reverts on overflow. The keccak oracle is inert for these reads; the real gap is harness-supplied arrays. The max-validators witness does not refute the registered Verity parent, which assumes `count ≤ 32`; YAML now labels it guard necessity. The guard is the literal 32, not the packed governance word.
 
 CHECKED does not mean the deployed gateway respects `maxTopUpPerBlock`.
 
-Ranked next work: register a per-key bound; fold the 32-guard into the Verity parent or stop listing it as a parent kill-line; do not compose with P-TOPUP-1; keep the live path out unless the claim is widened on purpose.
+Ranked next work: `per_key_bounded_by_candidate` and the 32-guard honesty edit landed in `improve/report-recommendations-batch`; do not compose with P-TOPUP-1; keep the live path out unless the claim is widened on purpose.
 
 Theorems: `PTopup2.aggregate_bounded_by_block_cap` (parent), `PTopup2.verity_tx_simulates_topup2_spec`.
-Assumptions: `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`.
+Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
 

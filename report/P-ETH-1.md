@@ -21,7 +21,7 @@ Residual gap, recorded in YAML `fidelity.missing`: Verity quantifies over the su
 
 CHECKED does not mean a naked Verity $\forall$, pinned-Solidity correspondence, bytecode, or complete SRv3 ETH-site coverage.
 
-Ranked next work: keep the universal success parent and the named premise kill-lines; register a Verity revert-shape $\forall$ or keep the residual gap explicit; restate the P-CONSOLIDATION-1 gate as an ABI and interpreter bridge, not a name check.
+Ranked next work: keep the universal success parent and named premise kill-lines; the residual Verity revert-shape gap remains explicit, and YAML now states the P-CONSOLIDATION-1 gate as an ABI/interpreter bridge rather than a name check.
 
 Theorems: `PEth1.eth_flow_parent`, `PEth1.verity_tx_universal_success_shape` (registered Verity parent); `PEth1.verity_tx_composes_value_flow_and_rollback` (auxiliary regression evidence).
 Kill-lines (Tests): `misrouted_journal_kill_line_refutes_parent`, `zero_value_success_kill_line_refutes_parent` (abstract parent, Wave 4); `dropped_refund_leg_kill_line_refutes_universal_parent`, `misrouted_vault_kill_line_refutes_universal_parent`, `corrupted_refund_kill_line_refutes_universal_parent`, `single_request_kill_line_refutes_universal_parent` (universal Verity parent, Wave 5 wiring mutants); `zero_value_kill_line_refutes_dropped_positivity`, `underfunded_kill_line_refutes_dropped_funding`, `fuel_exhaustion_kill_line_refutes_dropped_fuel_premise` (Wave 5 premise-necessity); `underfunded_batch_is_not_a_repartition`, `large_funded_batch_exhausts_fuel_budget` (Wave 2 executable premise witnesses).

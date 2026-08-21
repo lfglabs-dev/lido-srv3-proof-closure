@@ -6,15 +6,15 @@ P-CONSOLIDATION-1 covers the inner half of Lido's EIP-7251 path. `ConsolidationG
 
 A batch commits only if the caller is the stored gateway, the source array is nonempty, source and target zip by index, every key carries a 48-byte length word, $n \times \mathrm{fee}$ fits in `uint256`, and $\mathrm{msg.value} = n \times \mathrm{fee}$. A commit produces one predeploy CALL and one event per pair, payload ordered source then target. Anything that fails a guard produces no CALL and no event.
 
-`source_consolidation_preserves_eligibility_value_atomicity` is that characterization, under the caller-supplied premise `caller = gateway → msg.value ≠ 0`, from which a committed run derives $\mathrm{fee} \ne 0$. `verity_tx_simulates_consolidation` matches `sourceView` when four memory arrays decode. `fee_blind_commit_kill_line_refutes_parent` drops the exact-fee guard on a premise-satisfying `fee = 0`, `msg.value = 1` batch. We do not cover beacon eligibility, grouping, quota, or the Bus. Do not compose with P-ETH-1.
+`source_consolidation_preserves_eligibility_value_atomicity` is that characterization, under the caller-supplied premise `caller = gateway → msg.value ≠ 0`, from which a committed run derives $\mathrm{fee} \ne 0$. That premise remains on the wrong outer-gateway value surface and is scheduled for relocation. `verity_tx_simulates_consolidation` matches `sourceView` when four memory arrays decode. We do not cover beacon eligibility, grouping, quota, or the Bus. Do not compose with P-ETH-1.
 
 ## Proof limitations and recommendations
 
-The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. The cited `ConsolidationGateway.sol:189` guards the gateway's own `msg.value`, not the vault's forwarded `totalFee`. If fee is zero the gateway can still call the vault with `value: 0`. `preservesEthBalance` is a `String` gap: journaled CALLs are pre-marked successful and move no wei. The pinned modifier asserts the vault forwarded exactly `msg.value`. Verity rollback is the `Contract.run` combinator, true of every program. `observe` does not reread payload maps.
+The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. The cited `ConsolidationGateway.sol:189` guards the gateway's own `msg.value`, not the vault's forwarded `totalFee`. If fee is zero the gateway can still call the vault with `value: 0`. `preservesEthBalance` is a `String` gap: journaled CALLs are pre-marked successful and move no wei. Lean and YAML now state the pinned obligation precisely: the vault forwards exactly `msg.value`. Verity rollback is the `Contract.run` combinator, true of every program. `observe` does not reread payload maps.
 
 CHECKED does not mean eligibility in the beacon sense, that the vault paid $n \times \mathrm{fee}$, or gateway grouping.
 
-Ranked next work: drop or relocate the gateway-value premise; make observe read payloads; keep the P-ETH-1 fence; fix the `preservesEthBalance` wording to "forwards exactly msg.value" before anyone proves it.
+Ranked next work: the `preservesEthBalance` wording fix landed in `improve/report-recommendations-batch`; drop or relocate the gateway-value premise and make observe read payloads; keep the P-ETH-1 fence.
 
 Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

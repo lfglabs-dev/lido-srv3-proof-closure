@@ -361,14 +361,13 @@ theorem revert_restores_snapshot
 
 /-! ## Mint-after-read discipline
 
-`storedSteps` above only checks that each flag equals the exact tick its own
-write site assigned; that presence check cannot see whether the writes
-happened in the pinned order, because `ContractState` is a key-value store
-and writes to distinct slots commute.  The independent order fact — that the
+`storedSteps` above checks that each flag equals its exact expected clock tick,
+so a reordering is also visible by omission at the `View` boundary. The
+independent order fact — that the
 `rewardsReadSlot` tick precedes any nonzero `rewardsMintedSlot` tick — is
 stated and proved separately below, over the raw tick values, so a
-transaction that runs those two steps out of order is caught even though its
-step flags remain present.
+transaction that runs those two steps out of order is rejected by the named
+predicate itself rather than only by source-view correspondence.
 
 The ticks are `stampStep`'s reads of the transaction-local clock, not
 per-call-site constants, so this is an ordering claim about execution and not
@@ -422,11 +421,10 @@ written balances.
 
 This is a *pure call-site reordering*: the two `stampStep` calls are moved,
 and each one still stamps its own slot with whatever tick the clock hands it.
-No literal is edited and no slot binding is changed, so `storedSteps`'
-presence check — and any other check that only asks "did this slot get
-written?" — cannot tell this apart from the honest transaction.  It is caught
-only because `stampStep` reads the tick out of the state instead of writing a
-constant.  Kept beside the discipline it violates, not only in the mutants
+No literal is edited and no slot binding is changed. A bare presence check
+cannot tell this apart from the honest transaction, while `storedSteps`' exact
+tick checks and the parent predicate both can because `stampStep` reads the
+tick out of state instead of writing a constant. Kept beside the discipline it violates, not only in the mutants
 test file, so the kill-line theorem can quantify over it directly. -/
 def handleOracleReportMintBeforeRead (i : ReportInput)
     (sharesToMintAsFees : Nat) : Contract Result := fun snapshot =>

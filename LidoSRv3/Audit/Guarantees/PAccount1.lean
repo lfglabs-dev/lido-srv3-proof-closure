@@ -58,9 +58,9 @@ theorem verity_tx_revert_restores_snapshot
 discipline: on every committed execution of the real `handleOracleReport`,
 the `rewardsReadSlot` tick is written strictly before any nonzero
 `rewardsMintedSlot` tick. This reads the two raw ticks directly and does not
-go through `storedSteps`'s presence-only check, so it is not the same fact as
-`verity_tx_simulates_oracle_report`; it is the order fact that theorem's
-`View` equality cannot by itself express. `Result.steps` (and the
+go through `storedSteps`; exact expected ticks make the same reordering visible
+at the `View` boundary, but this theorem states the order predicate directly
+rather than obtaining it through source-view equality. `Result.steps` (and the
 `View.steps` it feeds) is built from these same tx storage flags and never
 calls `AccountingCorrespondence.successfulSteps`; the two planes share no
 step-list bridge. Unlike the demoted `source_report_before_reward` child,

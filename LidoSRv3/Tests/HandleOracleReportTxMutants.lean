@@ -148,9 +148,9 @@ written balances.
 This is the mutation `report/P-ACCOUNT-1.md` issue 5 previously recorded as an
 open, disclosed gap: only the call sites move, every slot binding is
 unchanged, and no literal is edited. Both flags are still nonzero and
-`storedSteps`' presence check still cannot tell this apart from the honest
-transaction — but because `stampStep` takes its tick from the clock, the mint
-step now records `3` and the read step `4`. -/
+therefore defeat a bare presence check. Because `stampStep` takes its tick
+from the clock, the mint step records `3` and the read step `4`;
+`storedSteps`' exact-tick reconstruction and the parent both detect it. -/
 example :
     let dirty := match (handleOracleReportMintBeforeRead valid 1) defaultState with
       | .success _ s => s
@@ -159,8 +159,9 @@ example :
   native_decide
 
 /-- The reordering above is invisible to a presence-only check: the mutant's
-`storedSteps` flags are all still nonzero, exactly as in the honest run. This
-is why the parent reads the raw ticks rather than `storedSteps`. -/
+step flags are all still nonzero. `storedSteps` is no longer such a check: it
+requires exact ticks, while the parent states the raw-tick inequality
+directly. -/
 example :
     let dirty := match (handleOracleReportMintBeforeRead valid 1) defaultState with
       | .success _ s => s
