@@ -1,5 +1,31 @@
 # P-ALLOC-1
 
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+
+When new ethers need to be distributed among the modules (initial deposit or top-up), the router passes each module’s current allocation and capacity through a MinFirst algorithm. MinFirst (MinFirstAllocationStrategy) serves the least filled modules first, as long as $\mathrm{allocation} < \mathrm{capacity}$.
+
+P-ALLOC-1 verifies that this capacity is calculated correctly:
+
+- active module: $\mathrm{capacity} = \min(\mathrm{target}, \mathrm{available})$
+  - $\mathrm{target} = \mathrm{shareLimit} \times \mathrm{total} \,/\, 10\_000$
+  - total = amount to allocate + sum of current allocations (type 2: $\lceil \text{stake ETH} \,/\, \mathrm{maxEBType1} \rceil$)
+  - available = type 2 top-up: $\mathrm{activeCount} \times \mathrm{maxEBType2} \,/\, \mathrm{maxEBType1}$; otherwise current allocation + $\mathrm{depositableCount}$
+- inactive module: $\mathrm{capacity} = \text{current allocation}$ → no free capacity, it receives nothing more
+
+Note that if the module is already above its DAO share, target can be lower than the current allocation: then $\mathrm{capacity} < \mathrm{allocation}$, and it is no longer open.
+
+We prove the invariant on the abstract model, then that the Lean program and the Verity Executable Contract conform to it: same observables if execution succeeds (here the two lists current allocation / capacity), otherwise revert and state from before the call. We do not prove that MinFirst respects these caps (P-ALLOC-2).
+
+## Proof limitations and recommendations
+
+The registered parent is `checked_execute`, not the `min` tautology. Under `CheckedBounds` the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. `active_capacity_bounded` stays an unregistered child: it is `Nat.min_le_left` / `Nat.min_le_right` on a definition that is already a clamp. The kill-line `capacity_target_kill_line_refutes_parent` is parent-shaped: a `capacity := target` mutant commits `[24, 24]` against MathView `[11, 11]` with `CheckedBounds` discharged.
+
+`CheckedBounds` is complete for the modeled `safe*` points and unproved of any reachable router. `verity_tx_simulates_allocation` does not carry it. There is no live `getStakingModuleSummary` / `getTotalModuleStake` CALL; bind reads planted maps keyed by `moduleAddress`. `allocate count` walks `List.range count`, not `getModulesCount()`, and is not capped at 32. `observe` now rereads persisted arrays (PR #105). SOURCE `execute` is an alias of `AllocCapacity.execute`. Packed `ModuleStateConfig` and unique addresses stay in `fidelity.missing`.
+
+CHECKED means those Lean theorems build. It does not mean the live view function, a lying module, or MinFirst fill.
+
+Ranked next work: keep the parent as capacity-column correspondence; do not refold the `min` child; close summary CALL / packed slot / count-from-storage without widening into P-ALLOC-2.
+
 Theorems: `PAlloc1.checked_execute` (registered parent), `PAlloc1.active_capacity_bounded` (unregistered MathView-definitional child), `PAlloc1.verity_tx_simulates_allocation`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 

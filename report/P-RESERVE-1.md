@@ -1,23 +1,33 @@
 # P-RESERVE-1
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+Lido's execution-layer buffer is not one pot. `_getBufferedEtherAllocation` (`Lido.sol` 605-616) splits stored buffered ether before any deposit can be funded:
 
-P-RESERVE-1 ensures that withdrawDepositableEther cannot spend ether reserved for the withdrawal queue. A committed withdrawal may consume only the depositable partition. The withdrawal reserve remains intact.
+- $\mathrm{depositsReserve} = \min(\mathrm{buffered},\ \mathrm{storedDepositsReserve})$
+- $\mathrm{withdrawalsReserve} = \min(\mathrm{buffered} - \mathrm{depositsReserve},\ \mathrm{unfinalizedStETH})$
+- $\mathrm{unreserved} = \mathrm{buffered} - \mathrm{depositsReserve} - \mathrm{withdrawalsReserve}$
+- $\mathrm{depositable} = \mathrm{depositsReserve} + \mathrm{unreserved}$
 
-The parent combines three requirements: scopedWithdrawGuards, partitioned spending, and the live effective reserve under freshQueueCache.
+`withdrawDepositableEther` may fund deposits out of depositable and nothing else. The withdrawals slice must not be raided.
 
-The partition mutant breaks this guarantee by letting the withdrawal consume reserved ether. Dropping the canDeposit guard admits a withdrawal when deposit spending should be blocked.
+`source_spend_preserves_withdrawal_reserve` proves, on any committed call:
 
-This is proved by source_spend_preserves_withdrawal_reserve.
+- wrapper guards held: $\mathrm{canDeposit} \wedge \mathrm{authorizedRouter}$ (`scopedWithdrawGuards`), derived rather than assumed
+- the spend is the pinned one (`withdrawalPartitionSpendInvariant`)
+- the queue-facing reserve is unchanged under `freshQueueCache before live` (the cached word equals a live `unfinalizedStETH()` value)
 
-## Proof issues and recommendations
+`verity_tx_simulates_reserve_spec` equates `Contract.run` observables with the spec and restores the snapshot on revert. The relational fact that finalization does not depend on the deposits reserve is `P-RESERVE-RELATIONAL`, not this row.
 
-The guarantee is universally quantified on both planes. unfinalizedStETH is currently a hypothesis, not the result of a live withdrawal queue call. canDeposit and bunker mode are free inputs. The proof therefore establishes the reserve property conditional on those values.
+## Proof limitations and recommendations
 
-The main improvement is to replace the withdrawal queue hypothesis with a live call and prove the resulting state and return-value connection. The transaction correspondence is verity_tx_simulates_reserve_spec.
+Both registered theorems are genuine unbounded universals, conditional on a committed wrapper and (for the parent) freshness. `freshQueueCache` is `before.unfinalizedStETH = live`: one inhabited `live` per state. Stale-cache theorems are premise necessity, not parent kill-lines. Conjunct (3) follows from conjunct (2) plus freshness; a mutant cannot satisfy (2) and violate (3) under a fresh cache.
 
+Guards are free booleans, not bunker / pause / `msg.sender`. The zero-amount guard is not in `scopedWithdrawGuards`. `guard_drop` and `partition_spend` are parent-shaped. The Verity parent has no kill-line of its own. Buffer is a declared word, not `address(this).balance`.
+
+CHECKED does not mean the reserve cannot be driven to zero by other writers (`setDepositsReserveTarget` plus a report), or that the queue stays payable.
+
+Ranked next work: keep freshness explicit until a live WQ CALL exists; add the zero-amount guard or say it is out; name the reserve-target surface in `fidelity.missing`; do not treat P-RESERVE-RELATIONAL as this parent.
 
 Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-lines: `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` (kills the `scopedWithdrawGuards` conjunct on a `canDeposit`-dropped mutant) and `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent` (kills the partition-invariant and live-reserve conjuncts on a mutated spend transition). Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

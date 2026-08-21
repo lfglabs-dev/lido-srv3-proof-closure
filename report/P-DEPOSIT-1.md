@@ -1,23 +1,31 @@
 # P-DEPOSIT-1
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+When the deposit security module pushes a module's keys on chain, `StakingRouter.deposit` (`StakingRouter.sol` 942 to 997) reads that module's allocation, caps it at the block limit, asks the module for a key batch, pulls the matching ether out of Lido, and forwards it to the beacon deposit contract one `DEPOSIT_SIZE` transfer per key.
 
-P-DEPOSIT-1 covers the ETH flow through StakingRouter.depositBufferedEther and depositToModule. The router pulls ETH, divides the work into key batches, then pushes the corresponding ETH to the beacon deposit contract.
+P-DEPOSIT-1 verifies that this push conserves ether:
 
-source_deposit_conserves_and_rolls_back proves that, for every configuration and input, a committed transition satisfies pulled = pushed and depositsValue = pushedValue. A non-conserving configuration reverts whenever the deposit count is positive. Every reverting transition moves exactly 0 wei.
+- pull: $\mathrm{depositsValue} = \mathrm{actualDepositsCount} \times \mathrm{maxEBType1}$, with $\mathrm{actualDepositsCount} = \mathrm{publicKeysBatch.length} / 48$
+- push: $\mathrm{pushedValue} = n \times \mathrm{DEPOSIT\_SIZE}$
+- committed push: $\mathrm{pulled} = \mathrm{pushed}$, so the two independently written formulas agree
+- non-conserving deployment ($\mathrm{maxEBType1} \ne \mathrm{DEPOSIT\_SIZE}$): on a nonempty batch the whole transaction reverts at the line 996 assert
 
-verity_tx_composes_deposit_conservation_and_rollback transfers these guarantees to the modeled Verity transaction. Its execute path contains exactly two batches. This result depends on LinksSource, which the caller supplies as a hypothesis. It is not derived from P-ALLOC-1 or P-ALLOC-2.
+These are the two conjuncts of `source_deposit_conserves_and_rolls_back`. `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` is a constructor immutable while `DEPOSIT_SIZE` is the literal `32 ether`, so their equality is a deployment fact.
 
-PR #153 (merged 2026-08-21, `9129cda5`) makes this boundary concrete. A private witness keeps the two executable legs at 2+3 keys while the source byte length describes one public key, so ALLOC outputs do not manufacture `LinksSource.keys`. The public kill-line `alloc_derived_linkssource_kill_line_refutes_bridge` assumes P-ALLOC-1 `CheckedBounds`, the P-ALLOC-2 step hypotheses, and four cross-plane composition premises including `depositsToAllocate = actualDepositsCount`. The witness still fails `LinksSource.firstAmount` (per-batch wei 65 against 2 * 32). ALLOC constrains key counts, not per-batch amounts.
+`verity_tx_composes_deposit_conservation_and_rollback` conforms an executable Verity transaction to that source plane under `LinksSource`, a caller hypothesis. The executable path is exactly two batches. We do not cover the allocation feeding line 953 (P-ALLOC-1, P-ALLOC-2), the top-up path (P-TOPUP-1), or per-key deposit data roots (P-SSZ-1).
 
-## Proof issues and recommendations
+## Proof limitations and recommendations
 
-The abstract theorem is properly universal over cfg and inp. The Verity theorem is an explicit two-batch unrolling, not a production loop bound. LinksSource remains an assumption.
+The abstract parent is an unbounded $\forall$ over `cfg` and `inp`. Conservation is a commit-branch implication whose live content is mostly `maxEBType1 = depositSize`. The Verity parent is also quantified, but `LinksSource` and `Preconditions` (all health booleans true) make the registered rollback conjunct vacuous: `execute_run` proves success, so the revert antecedent never holds. Real rollback sits in unregistered lemmas.
 
-Do not treat ALLOC composition as unfinished work that will later discharge LinksSource. #153 shows the ALLOC parents plus key-count composition still do not imply LinksSource, because per-batch wei is an execution-level `DEPOSIT_SIZE` fact. Keep the public claim limited to two caller-linked batches, with LinksSource as a hypothesis, unless a new theorem also carries the per-key amount invariant. The beacon deposit contract address should come from pinned provenance, not an unconstrained modeled endpoint.
+`alloc_derived_linkssource_kill_line_refutes_bridge` shows ALLOC parents plus key-count composition still fail `LinksSource.firstAmount`. Keep `LinksSource` as a hypothesis. The two-batch TX is not an unrolling of a multi-module loop: pinned `deposit` is one module, one pull, $n$ beacon frames. Beacon-address provenance is assumed.
 
+Kill-line `dropped_conservation_assert_breaks_pulled_eq_pushed` is adequate for conjunct 1. Conjunct 2 has no kill-line.
+
+CHECKED does not mean the deployed router conserves ether, that ALLOC feeds this row, or that a reverting deposit moves no wei on chain.
+
+Ranked next work: register hypothesis-free rollback; keep LinksSource explicit; either reshape TX to one module / $n$ frames or say the shape has no pin counterpart; pin `DEPOSIT_CONTRACT` and the `32 ether` immutable.
 
 Theorems: `PDeposit1.source_deposit_conserves_and_rolls_back` (registered abstract parent), `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` (Verity composition), `DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed` (kill-line).
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

@@ -1,5 +1,22 @@
 # P-ETH-1b
 
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+
+Child of P-ETH-1 for the fee legs: `ConsolidationBus.executeConsolidation` forwards `msg.value`, and the vault pays per-request fees to the configured EIP-7251 / EIP-7002 immutables.
+
+- abstract `consolidation_fee_path_confined`: if the call target equals `cfg.consolidationRequest`, the one move in `ethTrace` is tagged `.consolidationContract`, hence not `.other`
+- Verity `bus_forward_success`: one numeral, 5 wei from bus slot to gateway slot
+
+`cfg.consolidationRequest` is an arbitrary Nat. Equality with the canonical `0x00…7251` is not proved. The registered Verity theorem does not read a request-contract slot. We do not cover `executeConsolidation` pending-batch / delay guards or 96-byte payloads (P-CONSOLIDATION-1).
+
+## Proof limitations and recommendations
+
+The two planes have no common subject. The abstract theorem is a tag rename. The Verity theorem is a bus forward. Canonical-address provenance is a Markdown obligation, not a named assumption. No parent-shaped kill-line.
+
+CHECKED does not mean fees reach the EIP-7251 predeploy.
+
+Ranked next work: register a fee-target Verity witness; name the canonical-address assumption; do not compose into P-CONSOLIDATION-1 from here.
+
 Theorems: `PEth1.consolidation_fee_path_confined` (abstract), `PEth1RequestTx.bus_forward_success` (verity).
 Assumptions: none on the child row; parent carries `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 

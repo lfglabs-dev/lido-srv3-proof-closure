@@ -1,5 +1,26 @@
 # P-DEREF-1
 
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
+
+Almost every SRv3 action looks up `moduleStates[id].config.moduleAddress` after `_requireModuleIdExists`. If that slot can be zero, or can change under a callback, the router would CALL `address(0)` or a swapped module.
+
+`closure` says that for every reachable registry state $s$, every dereferenceable id, and every source-permitted interleaving list:
+
+- $\mathrm{sourceDeref}(\mathrm{runInterleavings}(s, \mathit{steps}), \mathit{id}) = \mathrm{some}(s.\mathrm{moduleAddress}\, \mathit{id})$
+- $s.\mathrm{moduleAddress}\, \mathit{id} \neq 0$
+
+Reachable means empty, or `migrateStorage` of a well-formed old layout, or `addModule` of a fresh nonzero address. Four named writers (status, accounting, params/shares, static callback) are identities in the honest model; only adding another module can change state, and it refuses an already-registered id.
+
+Wave 3 kill-lines mutate `setStatus` into a packed-config clobber and `staticCallback` into an overwrite; both negate `closure`'s full shape with premises retained. `verity_observe_refines_source` is a model-local view under stipulated `VerityRepresents`. keccak `ROUTER_STORAGE_POSITION` stays OPEN. This is supplemental, not one of the eleven public guarantees.
+
+## Proof limitations and recommendations
+
+`migrateStorage` is the identity, so `Reachable.migrated` accepts any well-formed old state. The nonzero conjunct on migrated states is the `WellFormed` hypothesis. Packed layout and re-entrant writes are excluded by the model; the kill-lines show those exclusions are load-bearing, not that the honest writers match Solidity. Unique addresses and `last+1` allocation are not enforced.
+
+CHECKED does not mean every deployed reachable state satisfies the invariant, or that the real packed slot was read.
+
+Ranked next work: keep both kill-lines; state the migration fiction explicitly; do not rebuild keccak in this row unless the claim is widened.
+
 Theorems: `PDeref1.closure` (abstract parent) and `SolidityDereference.verity_observe_refines_source` (verity refinement); YAML cites both explicitly. Wave 3 kill-lines `DereferenceMutants.packed_config_clobber_kill_line_refutes_parent` and `reentrant_callback_overwrite_kill_line_refutes_parent` are negations of `closure`'s full predicate shape on syntactic mutants of `applyInterleaving`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 

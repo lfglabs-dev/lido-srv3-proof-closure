@@ -1,23 +1,29 @@
 # P-ACCOUNT-1
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+Once per frame `AccountingOracle.submitReportData` pushes a per-module validator balance vector through `StakingRouter.reportValidatorBalancesByStakingModule`, then `Accounting.handleOracleReport` derives the fee distribution from that fresh router state, mints the fee shares, and records them last through `reportRewardsMinted`. Recording the mint before the fresh read would pay fees against stale module weights.
 
-P-ACCOUNT-1 protects one ordering rule. AccountingOracle first records the report's per-module validator balances in StakingRouter, then calls Accounting.handleOracleReport. Accounting reads the updated router balances to calculate the module fee distribution. Positive fee shares are then minted and distributed, and reportRewardsMinted records them last. Recording them before the fresh read could use stale module weights.
+P-ACCOUNT-1 verifies that ordering as an execution-order discipline:
 
-mint_after_read_discipline proves this as an execution-order discipline on the modeled transaction. It does not rely on a hardcoded 2 < 3. sequenceSlot is a transaction-local clock. Each stampStep reads it, increments it, and stores the resulting tick in the executed step's slot.
+- registered parent `mint_after_read_discipline`: on every committed run, $0 < \mathrm{mintTick} \Rightarrow \mathrm{readTick} < \mathrm{mintTick}$
+- $\mathrm{tick} = \mathrm{sequenceSlot} + 1$, from a transaction-local clock reset at the top of the commit branch
+- zero fee shares write $\mathrm{rewardsMinted} = 0$, matching the pinned skip, and the implication then holds with nothing to order
+- reverting runs carry no ordering obligation
 
-The kill-line changes only control flow. It moves the mint stamp before the read stamp, without changing any slot binding or numeral. The mint then receives the earlier tick, so the same discipline rejects the reordered transaction.
+Because the tick is read from state rather than written as a call-site constant, moving a step write changes the tick it records. That is what makes `mint_order_kill_line` a control-flow fault: the mint stamp moves above the read stamp with no literal edit, mint records $2$ and read $3$, and the same predicate rejects it.
 
-## Proof issues and recommendations
+`verity_tx_simulates_oracle_report` equates observe with an independently stated source view. We do not prove the fee amount: `sharesToMintAsFees` is an argument. Constructor order on the source plane is the demoted child `source_report_before_reward`.
 
-The parent quantifies over every report input, supplied fee amount, and initial state of the honest modeled handleOracleReport. On every committed execution, a nonzero mint tick is strictly after the read tick. Reverting executions impose no ordering obligation.
+## Proof limitations and recommendations
 
-verity_tx_simulates_oracle_report proves observe equals sourceView for every input. View equality does not itself establish chronology, so the raw-tick order theorem remains necessary.
+The parent is an unbounded $\forall$ over every report, fee, and state. Invalid, overflowing, and zero-fee commits discharge vacuously. `fullReportSucceeds` is unused in `sourceTrace` (bound as `_`). `storedSteps` compares exact ticks, so the reordering is also visible at the View boundary; YAML prose that says it is "caught only by the parent" is stale.
 
-sharesToMintAsFees is supplied as an argument. The proof does not calculate fees, and it does not prove AccountingOracle.submitReportData, the authorized caller, or router role checks.
+The kill-line witness is the empty report `⟨[], [], []⟩`, which the live validator rejects. `.rewardsRead` has no counterpart in the pinned call sequence (the deployed order is write, compute fees, mint, `reportRewardsMinted`). Fee computation and `submitReportData` stay in `fidelity.missing`.
 
+CHECKED does not mean the pinned path mints after reading fresh balances, that the caller is authorized, or that the minted amount is the protocol fee.
+
+Ranked next work: move the kill-line witness to a valid nonempty report; stamp the balance write; retire or use `fullReportSucceeds`; do not widen to `submitReportData`.
 
 Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

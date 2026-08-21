@@ -1,21 +1,20 @@
 # P-CONSOLIDATION-1
 
-> GPT-5.6 Pro round 1 (ChatGPT UI, 2026-08-20). Voice of the auditor. No em dashes. P-ETH-1 and P-TOPUP-1 notes are missing from this round (ChatGPT UI auth on those slots). P-ALLOC-1 was already written by the owner and is not restated here.
+> Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-## Auditor note
+P-CONSOLIDATION-1 covers the inner half of Lido's EIP-7251 path. `ConsolidationGateway.addConsolidationRequests` does role, pause, witness, quota, and refund, then calls `withdrawalVault.addConsolidationRequests{value: totalFee}(sourcePubkeys, targetPubkeys)`. The registered guarantee starts at that vault call.
 
-P-CONSOLIDATION-1 ensures that TriggerableWithdrawalsGateway.addConsolidationRequests commits a batch only when the gateway is admitted, the consolidation fee is nonzero, and msg.value equals fee times request count.
+A batch commits only if the caller is the stored gateway, the source array is nonempty, source and target zip by index, every key carries a 48-byte length word, $n \times \mathrm{fee}$ fits in `uint256`, and $\mathrm{msg.value} = n \times \mathrm{fee}$. A commit produces one predeploy CALL and one event per pair, payload ordered source then target. Anything that fails a guard produces no CALL and no event.
 
-Each source pubkey is paired with the target pubkey at the same array index. The contract therefore submits the intended source-to-target zip, not two independent collections.
+`source_consolidation_preserves_eligibility_value_atomicity` is that characterization, under the caller-supplied premise `caller = gateway → msg.value ≠ 0`, from which a committed run derives $\mathrm{fee} \ne 0$. `verity_tx_simulates_consolidation` matches `sourceView` when four memory arrays decode. `fee_blind_commit_kill_line_refutes_parent` drops the exact-fee guard on a premise-satisfying `fee = 0`, `msg.value = 1` batch. We do not cover beacon eligibility, grouping, quota, or the Bus. Do not compose with P-ETH-1.
 
-The batch is atomic. Either every paired request commits, or none does. The kill-line makes the commit fee-blind while still satisfying the surrounding premises.
+## Proof limitations and recommendations
 
-## Proof issues and recommendations
+The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. The cited `ConsolidationGateway.sol:189` guards the gateway's own `msg.value`, not the vault's forwarded `totalFee`. If fee is zero the gateway can still call the vault with `value: 0`. `preservesEthBalance` is a `String` gap: journaled CALLs are pre-marked successful and move no wei. The pinned modifier asserts the vault forwarded exactly `msg.value`. Verity rollback is the `Contract.run` combinator, true of every program. `observe` does not reread payload maps.
 
-source_consolidation_preserves_eligibility_value_atomicity proves the source-level property for all inputs under hGatewayAdmittedNonzero. verity_tx_simulates_consolidation matches that source view.
+CHECKED does not mean eligibility in the beacon sense, that the vault paid $n \times \mathrm{fee}$, or gateway grouping.
 
-The current Verity model observes array updates in contract state. It does not model a value-bearing external CALL, so preservesEthBalance is a stub. The main improvement is real transaction frames carrying msg.value.
-
+Ranked next work: drop or relocate the gateway-value premise; make observe read payloads; keep the P-ETH-1 fence; fix the `preservesEthBalance` wording to "forwards exactly msg.value" before anyone proves it.
 
 Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
