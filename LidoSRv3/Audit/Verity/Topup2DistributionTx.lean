@@ -69,6 +69,81 @@ def stateFor (effective pending requested : List Word) (base : ContractState) : 
 def persistAllocs (allocs : List Word) (state : ContractState) : ContractState :=
   state.writeArray allocSlot allocs
 
+/-! ## Independent source-view interpreter
+
+These equations intentionally copy the pinned source interpreter instead of
+calling `Source.Topup2.sourceRun`, which remains the executor path used by
+`allocate`.  The equality lemmas below are the explicit bridge. -/
+
+def sourceConsumeIndependent : Word → List Word → Option (List Word × Word)
+  | remaining, [] => some ([], remaining)
+  | remaining, cand :: rest => do
+      let allocated := minWord cand remaining
+      let next ← Verity.Stdlib.Math.safeSub remaining allocated
+      let (tail, leftover) ← sourceConsumeIndependent next rest
+      some (allocated :: tail, leftover)
+
+def sourceCandidatesIndependent : List Word → List Word → List Word → Word → Word →
+    Option (List Word)
+  | [], [], [], _, _ => some []
+  | e :: es, p :: ps, r :: rs, target, minTopUp => do
+      let limit ← evaluateTopUpLimit e p target minTopUp
+      let rest ← sourceCandidatesIndependent es ps rs target minTopUp
+      some (minWord r limit :: rest)
+  | _, _, _, _, _ => none
+
+def sourceRunIndependent (effective pending requested : List Word)
+    (target minTopUp remainingCap moduleLimit valueGwei : Word) :
+    Option (List Word × Word × Word) :=
+  if effective.length == 0 then none
+  else
+    match sourceCandidatesIndependent effective pending requested target minTopUp with
+    | none => none
+    | some candidates =>
+        let budget := minWord valueGwei (minWord moduleLimit remainingCap)
+        match sourceConsumeIndependent budget candidates with
+        | none => none
+        | some (allocs, leftover) =>
+            match Verity.Stdlib.Math.safeSub budget leftover with
+            | none => none
+            | some used =>
+                match Verity.Stdlib.Math.safeSub remainingCap used with
+                | none => none
+                | some remaining => some (allocs, remaining, used)
+
+theorem sourceConsumeIndependent_eq_sourceConsume :
+    ∀ remaining candidates,
+      sourceConsumeIndependent remaining candidates = sourceConsume remaining candidates
+  | _, [] => rfl
+  | remaining, cand :: rest => by
+      simp [sourceConsumeIndependent, sourceConsume,
+        sourceConsumeIndependent_eq_sourceConsume]
+
+theorem sourceCandidatesIndependent_eq_sourceCandidates :
+    ∀ effective pending requested target minTopUp,
+      sourceCandidatesIndependent effective pending requested target minTopUp =
+        sourceCandidates effective pending requested target minTopUp
+  | [], [], [], _, _ => rfl
+  | e :: es, p :: ps, r :: rs, target, minTopUp => by
+      simp [sourceCandidatesIndependent, sourceCandidates,
+        sourceCandidatesIndependent_eq_sourceCandidates]
+  | [], [], _ :: _, _, _ => rfl
+  | [], _ :: _, _, _, _ => rfl
+  | _ :: _, [], _, _, _ => rfl
+  | _ :: _, _ :: _, [], _, _ => rfl
+
+theorem sourceRunIndependent_eq_sourceRun
+    (effective pending requested : List Word)
+    (target minTopUp remainingCap moduleLimit valueGwei : Word) :
+    sourceRunIndependent effective pending requested target minTopUp remainingCap
+        moduleLimit valueGwei =
+      sourceRun effective pending requested target minTopUp remainingCap
+        moduleLimit valueGwei := by
+  unfold sourceRunIndependent sourceRun
+  simp only [sourceCandidatesIndependent_eq_sourceCandidates,
+    sourceConsumeIndependent_eq_sourceConsume]
+  rfl
+
 structure Result where
   allocations : List Word
   remaining : Word
@@ -117,7 +192,7 @@ def observe (beforeAllocs : List Word) (beforeRemaining : Word) :
 
 def sourceView (effective pending requested : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
-  match sourceRun effective pending requested target minTopUp remainingCap
+  match sourceRunIndependent effective pending requested target minTopUp remainingCap
       moduleLimit valueGwei with
   | none => ⟨.reverted, List.replicate requested.length 0, remainingCap, 0⟩
   | some (allocs, remaining, used) => ⟨.committed, allocs, remaining, used⟩
@@ -150,10 +225,11 @@ theorem verity_tx_simulates_pinned_source
   by_cases hZero : requested.length = 0
   · have hEffZ : effective.length = 0 := hER.trans hZero
     unfold Contract.run allocate sourceView
-    simp [hZero, hEffZ, observe, sourceRun]
+    simp [hZero, hEffZ, observe, sourceRunIndependent]
   · have hZ : (requested.length == 0) = false := by simp [hZero]
     unfold Contract.run allocate sourceView
     simp only [hZ, hNotOver, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq]
+    rw [sourceRunIndependent_eq_sourceRun]
     cases hRun : sourceRun effective pending requested target minTopUp
         remainingCap moduleLimit valueGwei with
     | none =>

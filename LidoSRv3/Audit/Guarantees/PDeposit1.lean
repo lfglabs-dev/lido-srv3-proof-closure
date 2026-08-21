@@ -12,6 +12,18 @@ open LidoSRv3.Audit.SolidityDeposit
 executable Verity transaction evidence. -/
 def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
 
+/-! Deployment provenance is deliberately not manufactured by the source
+model. `A-DEPOSIT-CONTRACT` pins the immutable `DEPOSIT_CONTRACT` to the
+production beacon deposit contract, while `A-DEPOSIT-32-ETHER` pins both the
+BeaconChainDepositor literal and the router constructor's
+`MAX_EFFECTIVE_BALANCE_WC_TYPE_01` to 32 ether. They remain OPEN assumptions;
+`LinksSource` below remains an independent caller hypothesis. -/
+
+def canonicalDepositContractAddress : Nat :=
+  0x00000000219ab540356cBB839Cbe05303d7705Fa
+
+def thirtyTwoEtherWei : Nat := 32 * 10 ^ 18
+
 /-- Abstract transaction rollback, not an executable EVM trace.  This fact is
 definitional in the `TxObservation` model -- `committedState`/`committedTrace`
 of `.reverted` are `before`/`⟨[], [], []⟩` by definition, and `observation`

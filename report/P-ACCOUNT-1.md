@@ -17,13 +17,13 @@ Because the tick is read from state rather than written as a call-site constant,
 
 ## Proof limitations and recommendations
 
-The parent is an unbounded $\forall$ over every report, fee, and state. Invalid, overflowing, and zero-fee commits discharge vacuously. `fullReportSucceeds` remains caller-supplied evidence for the demoted source child. `storedSteps` compares exact ticks, so the reordering is also visible at the View boundary.
+The parent is an unbounded $\forall$ over every report, fee, and state. Invalid, overflowing, and zero-fee commits discharge vacuously. The demoted source child now uses premise-free `sourceTraceRetired`; the legacy `fullReportSucceeds` API remains only as a compatibility adapter. `storedSteps` compares exact ticks, so the reordering is also visible at the View boundary.
 
 The kill-line now uses the valid nonempty report `⟨[1], [1], [1]⟩`. The balance write has its own clock stamp, so `storedSteps` no longer invents `.balancesWritten` unconditionally. `.rewardsRead` still has no counterpart in the pinned call sequence (the deployed order is write, compute fees, mint, `reportRewardsMinted`). Fee computation and `submitReportData` stay in `fidelity.missing`.
 
 CHECKED does not mean the pinned path mints after reading fresh balances, that the caller is authorized, or that the minted amount is the protocol fee.
 
-Ranked next work: retire or independently discharge fullReportSucceeds; keep mint-after-read parent and nonempty kill-line; do not widen to submitReportData.
+Ranked next work: keep the retired source child premise-free and the mint-after-read parent/kill-line intact; model later full-report failures only if widening to that surface is explicitly authorized.
 
 Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

@@ -9,31 +9,28 @@ open LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 def guarantee : Guarantee := ⟨.pAccount1, [.model, .source, .verityTx]⟩
 
-/-- Child: source-plane correspondence only, not the registered P-ACCOUNT-1
-parent. If an independently supplied `fullReportSucceeds` premise lets
-`sourceTrace` return `some trace`, and fee shares are strictly positive,
-then that trace is exactly
+/-- Child: source-plane constructor order only, not the registered P-ACCOUNT-1
+parent. The retired child has no `fullReportSucceeds` binder: if the locally
+modeled `sourceTraceRetired` accepts and fee shares are strictly positive,
+then its trace is exactly
 `[balancesWritten b, accountingCalled, rewardsRead b, rewardsMinted]`
 for one shared `b`. This is the constructor order of `successfulSteps`,
 not `submitReportData`. `successfulSteps` is a hardcoded four-constructor
-list and `fullReportSucceeds` is never inspected by the proof, so this fact
+list, so this fact
 carries no kill-line of its own: see `mint_after_read_discipline` for the
 registered parent that the `mint_order_kill_line` mutant actually refutes. -/
 theorem source_report_before_reward
-    (fullReportSucceeds :
-      LidoSRv3.Audit.SolidityAccounting.ReportInput → Nat → Prop)
     (i : LidoSRv3.Audit.SolidityAccounting.ReportInput)
     (sharesToMintAsFees : Nat)
-    (hSuccess : fullReportSucceeds i sharesToMintAsFees)
     (hFees : 0 < sharesToMintAsFees)
     (trace : List LidoSRv3.Audit.SolidityAccounting.Step)
-    (h : LidoSRv3.Audit.SolidityAccounting.sourceTrace fullReportSucceeds i
-      sharesToMintAsFees hSuccess = some trace) :
+    (h : LidoSRv3.Audit.SolidityAccounting.sourceTraceRetired i
+      sharesToMintAsFees = some trace) :
     ∃ balances, trace = [
       .balancesWritten balances, .accountingCalled,
       .rewardsRead balances, .rewardsMinted] :=
-  LidoSRv3.Audit.SolidityAccounting.source_report_before_reward
-    fullReportSucceeds i sharesToMintAsFees hSuccess hFees trace h
+  LidoSRv3.Audit.SolidityAccounting.source_report_before_reward_retired
+    i sharesToMintAsFees hFees trace h
 
 /-- Verity child. `observe` of `handleOracleReport` (balance array + total/flag
 slots) equals the independently stated `sourceView`. Not `submitReportData`;

@@ -106,9 +106,13 @@ def ethTrace (cfg : Config) (c : ConsolidationFeeCall) : List EthMove :=
      else
        .other c.target }]
 
-/-- Parent fee-leg evidence (former P-CONSOLIDATION-ETH-1b): if the call targets the configured
-consolidation-request address, the trace is tagged `.consolidationContract`.
-Canonical equality with `0x00…7251` remains `A-CANONICAL-REQUEST-ADDRESS`. -/
+/-- Named parent-conjunct helper (former P-CONSOLIDATION-ETH-1b): if the call
+targets the configured consolidation-request address, the trace is tagged
+`.consolidationContract`. Together with
+`Verity.PConsolidationEth1RequestTx.consolidation_fee_target_success`, this is
+registered parent evidence for the fee leg, not a sibling guarantee.
+Canonical equality with `0x00…7251` remains the OPEN
+`A-CANONICAL-REQUEST-ADDRESS` provenance boundary. -/
 theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall) :
     c.target = cfg.consolidationRequest →
       ∀ (other : EthMove), other ∈ ethTrace cfg c →

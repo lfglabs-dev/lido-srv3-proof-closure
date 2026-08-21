@@ -137,13 +137,14 @@ theorem partition_spend_mutant_kill_line_refutes_parent :
         freshQueueCache before live →
         mutantWithdraw inputs before amount = .committed after →
         scopedWithdrawGuards inputs ∧
+          amount ≠ 0 ∧
           withdrawalPartitionSpendInvariant before after amount ∧
           liveEffectiveWithdrawalsReserve after live =
             liveEffectiveWithdrawalsReserve before live := by
   intro hforall
   have hcex := hforall allowed vector partitionMutantAfter (word 10) (word 50)
     partition_spend_mutant_witness.1 partition_spend_mutant_witness.2.1
-  exact absurd hcex.2.2 partition_spend_mutant_witness.2.2
+  exact absurd hcex.2.2.2 partition_spend_mutant_witness.2.2
 
 /-! ## Wave 5 guard-drop kill-line: `canDeposit` guard liveness
 
@@ -226,6 +227,7 @@ theorem guard_drop_kill_line_refutes_parent :
         freshQueueCache before live →
         mutantWithdrawNoCanDeposit inputs before amount = .committed after →
         scopedWithdrawGuards inputs ∧
+          amount ≠ 0 ∧
           withdrawalPartitionSpendInvariant before after amount ∧
           liveEffectiveWithdrawalsReserve after live =
             liveEffectiveWithdrawalsReserve before live := by

@@ -174,13 +174,27 @@ structure View where
   feePaid : Word
   deriving DecidableEq, Repr
 
+/-- Reread the persisted source/target payload pair for each request index. -/
+def readPayloads (state : ContractState) : Nat → Nat → List (List Word)
+  | _, 0 => []
+  | index, count + 1 =>
+      [state.readMapUint sourceMapSlot (Verity.Core.Uint256.ofNat index),
+       state.readMapUint targetMapSlot (Verity.Core.Uint256.ofNat index)] ::
+        readPayloads state (index + 1) count
+
 /-- Success reads the journal the body appended to `state.calls` / `state.events`,
-not the `Result` payload. Payloads are the calldata of those calls. -/
+not the `Result` payload. Payloads are independently reread from the two
+persisted mapping slots for the new request indices
+`[beforeCount, beforeCount + calls.length)`. Using `calls.length` (not a
+Uint256 slot delta) keeps the reread count on `Nat` and avoids modulus
+round-trips through the count slot. -/
 def observe (before : ContractState) : ContractResult Result → View
   | .success _ state =>
       let calls := (state.calls.drop before.calls.length).map ofJournal
       let events := (state.events.drop before.events.length).map ofEvent
-      ⟨.committed, calls, events, calls.map CallObs.input,
+      let beforeCount := (before.readSlot countSlot).val
+      ⟨.committed, calls, events,
+        readPayloads state beforeCount calls.length,
         state.readSlot countSlot, state.readSlot feePaidSlot⟩
   | .revert _ _ =>
       ⟨.reverted, [], [], [], before.readSlot countSlot, 0⟩
@@ -190,8 +204,176 @@ def sourceView (inputs : Inputs) (beforeCount : Nat) : View :=
   | .reverted _ =>
       ⟨.reverted, [], [], [], Verity.Core.Uint256.ofNat beforeCount, 0⟩
   | .committed obs =>
-      ⟨.committed, obs.calls, obs.events, obs.calls.map CallObs.input,
+      ⟨.committed, obs.calls, obs.events, obs.payloads,
         Verity.Core.Uint256.ofNat (beforeCount + obs.requestCount), obs.feePaid⟩
+
+private theorem readMapUint_writeMapUint_other_slot (s : ContractState)
+    {slot slot' : Nat} (hslot : slot' ≠ slot) (key key' value : Word) :
+    (s.writeMapUint slot key value).readMapUint slot' key' =
+      s.readMapUint slot' key' := by
+  simp [ContractState.readMapUint, ContractState.storageMapUint,
+    ContractState.writeMapUint, hslot]
+
+private theorem readMapUint_writeMapUint_other_key (s : ContractState)
+    (slot : Nat) {key key' : Word} (hkey : key' ≠ key) (value : Word) :
+    (s.writeMapUint slot key value).readMapUint slot key' =
+      s.readMapUint slot key' := by
+  simp [ContractState.readMapUint, ContractState.storageMapUint,
+    ContractState.writeMapUint, hkey]
+
+private theorem writePayloads_preserves_prior (payloads : List (List Word)) :
+    ∀ (start : Nat) (state : ContractState) (key : Nat),
+      key < start →
+      start + payloads.length ≤ Verity.Core.Uint256.modulus →
+      (writePayloads start payloads state).readMapUint sourceMapSlot
+          (Verity.Core.Uint256.ofNat key) =
+        state.readMapUint sourceMapSlot (Verity.Core.Uint256.ofNat key) ∧
+      (writePayloads start payloads state).readMapUint targetMapSlot
+          (Verity.Core.Uint256.ofNat key) =
+        state.readMapUint targetMapSlot (Verity.Core.Uint256.ofNat key) := by
+  intro start state key hKey hBound
+  induction payloads generalizing start state with
+  | nil => exact ⟨rfl, rfl⟩
+  | cons payload rest ih =>
+      rw [writePayloads]
+      have hStart : start < Verity.Core.Uint256.modulus := by
+        simp only [List.length_cons] at hBound
+        omega
+      have hKeyBound : key < Verity.Core.Uint256.modulus := Nat.lt_trans hKey hStart
+      have hWordNe :
+          Verity.Core.Uint256.ofNat key ≠ Verity.Core.Uint256.ofNat start := by
+        intro h
+        have hv := congrArg Verity.Core.Uint256.val h
+        simp [Verity.Core.Uint256.val_ofNat, Nat.mod_eq_of_lt hKeyBound,
+          Nat.mod_eq_of_lt hStart] at hv
+        omega
+      have hTail := ih (start + 1)
+        ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
+          (payload.getD 0 0)).writeMapUint targetMapSlot
+          (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))
+        (by omega) (by simp only [List.length_cons] at hBound ⊢; omega)
+      constructor
+      · rw [hTail.1]
+        rw [readMapUint_writeMapUint_other_slot _ (by decide)]
+        exact readMapUint_writeMapUint_other_key _ _ hWordNe _
+      · rw [hTail.2]
+        rw [readMapUint_writeMapUint_other_key _ _ hWordNe]
+        exact readMapUint_writeMapUint_other_slot _ (by decide) _ _ _
+
+theorem writePayloads_read_written (payloads : List (List Word)) :
+    ∀ (start : Nat) (state : ContractState) (i : Nat),
+      start + payloads.length ≤ Verity.Core.Uint256.modulus →
+      i < payloads.length →
+      (writePayloads start payloads state).readMapUint sourceMapSlot
+          (Verity.Core.Uint256.ofNat (start + i)) = (payloads.getD i []).getD 0 0 ∧
+        (writePayloads start payloads state).readMapUint targetMapSlot
+          (Verity.Core.Uint256.ofNat (start + i)) = (payloads.getD i []).getD 1 0 := by
+  intro start state i hBound hi
+  induction payloads generalizing start state i with
+  | nil => simp at hi
+  | cons payload rest ih =>
+      cases i with
+      | zero =>
+          simp only [Nat.add_zero]
+          rw [writePayloads]
+          have hPrior := writePayloads_preserves_prior rest (start + 1)
+            ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
+              (payload.getD 0 0)).writeMapUint targetMapSlot
+              (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))
+            start (by omega)
+            (by simp only [List.length_cons] at hBound ⊢; omega)
+          constructor
+          · rw [hPrior.1, readMapUint_writeMapUint_other_slot _ (by decide)]
+            exact ContractState.readMapUint_writeMapUint_same _ _ _ _
+          · rw [hPrior.2, ContractState.readMapUint_writeMapUint_same]
+            rfl
+      | succ i =>
+          simp only [writePayloads]
+          have hTailBound : start + 1 + rest.length ≤ Verity.Core.Uint256.modulus := by
+            simp only [List.length_cons] at hBound
+            omega
+          have hTailI : i < rest.length := by
+            simp only [List.length_cons, Nat.succ_lt_succ_iff] at hi
+            exact hi
+          simpa [Nat.add_assoc, List.getD_cons_succ] using
+            ih (start + 1)
+              ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
+                (payload.getD 0 0)).writeMapUint targetMapSlot
+                (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))
+              i hTailBound hTailI
+
+def normalizedPayload (payload : List Word) : List Word :=
+  [payload.getD 0 0, payload.getD 1 0]
+
+theorem writePayloads_readPayloads (start : Nat) (payloads : List (List Word))
+    (state : ContractState)
+    (hBound : start + payloads.length ≤ Verity.Core.Uint256.modulus) :
+    readPayloads (writePayloads start payloads state) start payloads.length =
+      payloads.map normalizedPayload := by
+  induction payloads generalizing start state with
+  | nil => rfl
+  | cons payload rest ih =>
+      have hHead := writePayloads_read_written (payload :: rest) start state 0
+        hBound (by simp)
+      have hTailBound : start + 1 + rest.length ≤ Verity.Core.Uint256.modulus := by
+        simp only [List.length_cons] at hBound
+        omega
+      simp only [writePayloads, List.length_cons, readPayloads, List.map_cons]
+      have hs : (writePayloads (start + 1) rest
+            ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
+              (payload.getD 0 0)).writeMapUint targetMapSlot
+              (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))).readMapUint
+              sourceMapSlot (Verity.Core.Uint256.ofNat start) =
+          payload.getD 0 0 := by
+        simpa [Nat.add_zero, writePayloads] using hHead.1
+      have ht : (writePayloads (start + 1) rest
+            ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
+              (payload.getD 0 0)).writeMapUint targetMapSlot
+              (Verity.Core.Uint256.ofNat start) (payload.getD 1 0))).readMapUint
+              targetMapSlot (Verity.Core.Uint256.ofNat start) =
+          payload.getD 1 0 := by
+        simpa [Nat.add_zero, writePayloads] using hHead.2
+      rw [hs, ht, ih (start + 1)
+        ((state.writeMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start)
+          (payload.getD 0 0)).writeMapUint targetMapSlot
+          (Verity.Core.Uint256.ofNat start) (payload.getD 1 0)) hTailBound]
+      rfl
+
+theorem readPayloads_writeSlot (state : ContractState) (slot : Nat) (value : Word)
+    (start count : Nat) :
+    readPayloads (state.writeSlot slot value) start count =
+      readPayloads state start count := by
+  induction count generalizing start with
+  | zero => rfl
+  | succ count ih =>
+      simp only [readPayloads]
+      simp [ContractState.readMapUint, ih]
+
+@[simp] theorem readPayloads_set_log (state : ContractState)
+    (events : List Event) (calls : List ExternalCall) (start count : Nat) :
+    readPayloads { state with events := events, calls := calls } start count =
+      readPayloads state start count := by
+  induction count generalizing start with
+  | zero => rfl
+  | succ count ih =>
+      simp only [readPayloads]
+      change _ :: _ = _ :: _
+      rw [show ({ state with events := events, calls := calls } : ContractState).readMapUint
+          sourceMapSlot (Verity.Core.Uint256.ofNat start) =
+          state.readMapUint sourceMapSlot (Verity.Core.Uint256.ofNat start) by rfl]
+      rw [show ({ state with events := events, calls := calls } : ContractState).readMapUint
+          targetMapSlot (Verity.Core.Uint256.ofNat start) =
+          state.readMapUint targetMapSlot (Verity.Core.Uint256.ofNat start) by rfl]
+      rw [ih]
+
+theorem persist_read_payloads (start : Nat) (obs : Observables)
+    (state : ContractState) (hCount : obs.requestCount = obs.payloads.length)
+    (hNormalized : obs.payloads.map normalizedPayload = obs.payloads)
+    (hBound : start + obs.payloads.length ≤ Verity.Core.Uint256.modulus) :
+    readPayloads (persist start obs state) start obs.requestCount = obs.payloads := by
+  unfold persist
+  rw [readPayloads_set_log, readPayloads_writeSlot, readPayloads_writeSlot, hCount]
+  rw [writePayloads_readPayloads start obs.payloads state hBound, hNormalized]
 
 theorem writePayloads_readSlot (start : Nat) (payloads : List (List Word))
     (state : ContractState) (slot : Nat) :
@@ -290,10 +472,29 @@ private theorem drop_map_ofEvent (before : List Event) (events : List EventObs) 
   rw [List.drop_left]
   simpa [Function.comp] using map_ofEvent_toEvent events
 
+private theorem sourceRun_committed_payload_shape
+    (inputs : Inputs) (obs : Observables)
+    (hRun : sourceRun inputs = .committed obs) :
+    obs.requestCount = obs.payloads.length ∧
+      obs.calls.length = obs.requestCount ∧
+      obs.payloads.length = inputs.sources.length ∧
+      obs.payloads.map normalizedPayload = obs.payloads := by
+  unfold sourceRun at hRun
+  repeat' first | split at hRun
+  all_goals try contradiction
+  all_goals try { cases hRun }
+  next requests hCaller hNonempty hZip hValid hProduct hFee =>
+    injection hRun with hObs
+    subst obs
+    have hLen := zipRequests_some_length hZip
+    simp [commitObservables, normalizedPayload, payload, hLen]
+
 /-- Composed faithful-plane theorem: the real memory-array transaction has the
 same outcome observables as the independently stated pinned-source run. -/
 theorem verity_tx_simulates_pinned_source
     (inputs : Inputs) (state : ContractState)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
     (hTargets : readArray state "targets" targetsBase inputs.targets.length =
@@ -312,8 +513,22 @@ theorem verity_tx_simulates_pinned_source
   | committed obs =>
       have hCalls := persist_calls (state.readSlot countSlot).val obs state
       have hEvents := persist_events (state.readSlot countSlot).val obs state
+      obtain ⟨hCount, hCallsLen, hPayloadLength, hNormalized⟩ :=
+        sourceRun_committed_payload_shape inputs obs hRun
+      have hBound : (state.readSlot countSlot).val + obs.payloads.length ≤
+          Verity.Core.Uint256.modulus := by
+        rw [hPayloadLength]
+        exact Nat.le_of_lt hCountBound
+      have hPayloads := persist_read_payloads
+        (state.readSlot countSlot).val obs state hCount hNormalized hBound
+      have hCountVal :
+          (Verity.Core.Uint256.ofNat
+            ((state.readSlot countSlot).val + obs.requestCount)).val =
+            (state.readSlot countSlot).val + obs.requestCount := by
+        rw [Verity.Core.Uint256.val_ofNat, Nat.mod_eq_of_lt]
+        · rw [hCount, hPayloadLength]; exact hCountBound
       simp [observe, persist_read_count, persist_read_fee, hCalls, hEvents,
-        map_ofJournal_toJournal, map_ofEvent_toEvent]
+        hPayloads, hCallsLen, map_ofJournal_toJournal, map_ofEvent_toEvent]
 
 /-- Any failure, including the injected failure after intermediate
 call/event/memory writes, returns the exact pre-transaction snapshot. -/

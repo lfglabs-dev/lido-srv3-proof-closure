@@ -20,7 +20,7 @@ After the wave-6 strip the registered conclusion is a single traversal equality.
 
 CHECKED does not mean a Merkle proof was verified, that generalized indices are the deployed ones, or that bytecode was bound.
 
-Ranked next work: carry one-object coupling onto the TX input; keep SHA obligations split; keep Yul visibly OPEN next to every CHECKED presentation.
+Ranked next work: preserve the checked `txInputFromComposed` one-object TX theorem; decide separately whether to restrict the general `EncodingInput` API. Keep SHA obligations split and Yul visibly OPEN.
 
 Theorems: `PSsz1.composed_ssz_encoding` (registered parent; concludes the named predicate `PSsz1.composedEncodingOk`, stripped in wave 6 to the single mutant-exercised traversal conjunct), `PSsz1.swapped_combine_kill_line_refutes_parent` (parent kill-line: negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness` (conclusion-non-triviality witness on the unregistered full bundle `PSsz1.composedEncodingOkFull`: the bundle discriminates the claimed operation; renamed in wave 6 from `crossed_witness_kill_line_refutes_parent`), `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle, not registered claim content), `PSsz1.verity_tx_simulates_ssz_encoding`.
 Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`.

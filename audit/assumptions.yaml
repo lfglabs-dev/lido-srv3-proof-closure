@@ -47,6 +47,46 @@
       "removal_path": "Prove an upstream bound on key count and per-key amounts that implies the sum is below 2^256."
     },
     {
+      "id": "A-TOPUP-BEACON-ADDRESS",
+      "accepted": true,
+      "risk": "The model-local beacon deposit target is not proved equal to the immutable/deployed production beacon deposit contract.",
+      "justification": "Call-target correctness and deployment provenance are separate obligations.",
+      "severity": "HIGH",
+      "violation_impact": "Conserved top-up value could be sent to the wrong address.",
+      "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical beacon deposit contract.",
+      "removal_path": "Prove the deployed immutable equals 0x00000000219ab540356cBB839Cbe05303d7705Fa."
+    },
+    {
+      "id": "A-DEPOSIT-CONTRACT",
+      "accepted": true,
+      "risk": "The deposit transaction's DEPOSIT_CONTRACT immutable is not derived from deployment artifacts.",
+      "justification": "The executable model uses a configured destination; production address identity is a provenance fact.",
+      "severity": "HIGH",
+      "violation_impact": "Correctly accounted deposits could be delivered to a noncanonical contract.",
+      "validation": "Check constructor arguments and deployed immutable extraction.",
+      "removal_path": "Prove DEPOSIT_CONTRACT equals the canonical beacon deposit contract in the deployed artifact."
+    },
+    {
+      "id": "A-DEPOSIT-32-ETHER",
+      "accepted": true,
+      "risk": "The production MAX_EFFECTIVE_BALANCE_WC_TYPE_01 constructor value and BeaconChainDepositor DEPOSIT_SIZE are not jointly proved to equal 32 ether.",
+      "justification": "The source model exposes both scales as configuration fields and proves mismatch reverts rather than inventing deployment equality.",
+      "severity": "HIGH",
+      "violation_impact": "The production deposit path can revert or fail its intended per-validator value convention.",
+      "validation": "Pin the constructor argument and source literal in reproducible deployment artifacts.",
+      "removal_path": "Prove both production values equal 32 * 10^18 wei."
+    },
+    {
+      "id": "A-CONSOLIDATION-GATEWAY-NONZERO",
+      "accepted": true,
+      "risk": "The vault-level consolidation theorem receives the outer gateway's nonzero-msg.value admission fact as a caller premise.",
+      "justification": "The fact belongs to the P-CONSOLIDATION-ETH-1 gateway boundary, not the vault request loop.",
+      "severity": "MEDIUM",
+      "violation_impact": "Without outer admission, a zero-fee zero-value vault batch can commit.",
+      "validation": "Compose the gateway entrypoint guard with the vault ABI/interpreter bridge.",
+      "removal_path": "Discharge the premise through a checked P-CONSOLIDATION-ETH-1 to P-CONSOLIDATION-1 composition theorem."
+    },
+    {
       "id": "A-HANDWRITTEN-MINFIRST",
       "accepted": true,
       "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence.",

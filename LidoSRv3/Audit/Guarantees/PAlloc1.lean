@@ -132,7 +132,11 @@ theorem source_capacities_and_mapped_summary_transaction
 /-- One handwritten bind+execute: if `sourceBindAll state n` recovers
 `modules`, then `observe` of `allocate n` (which reads the persisted
 allocation/capacity/address arrays) equals `sourceView` of the same
-`AllocCapacity` interpreter. Not a live summary CALL. -/
+`AllocCapacity` interpreter. This is not a live summary CALL: returndata is
+not decoded into the rows. The packed `ModuleStateConfig` word is represented
+by separate model-local maps, and `n` is a harness argument rather than a
+count reread from `SRStorage.getModulesCount()`. Those three gaps remain OPEN
+and are intentionally not widened into P-ALLOC-2. -/
 theorem verity_tx_simulates_allocation
     (cfg : Config) (modules : List _root_.LidoSRv3.Audit.Verity.AllocationTx.BoundModule)
     (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)

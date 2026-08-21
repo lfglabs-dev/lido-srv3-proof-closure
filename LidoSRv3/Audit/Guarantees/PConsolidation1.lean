@@ -57,14 +57,14 @@ branch's own `msg.value = count * fee` equality then forces a nonzero fee).
 A revert implies the un-strengthened conjunction is false. Not beacon
 eligibility and not the Bus.
 
-**Wave 1 premise, made load-bearing in Wave 3; relocation still open.**
+**Outer-gateway premise, recorded as `A-CONSOLIDATION-GATEWAY-NONZERO`.**
 `hGatewayAdmittedNonzero` is forwarded to the source theorem and used to
 derive the `inputs.fee.val ≠ 0` conjunct above, so the premise excludes the
 free-batch arm from this parent's committed case. The premise nevertheless
 names the **outer gateway `msg.value` surface** (and the
 `P-CONSOLIDATION-ETH-1` fee/refund plane), not the vault's forwarded
-`totalFee` call: ranked next work is to drop or relocate it before anyone
-reads it as a vault invariant. Two kill-lines pin the present claim:
+`totalFee` call. It is therefore classified at that boundary rather than
+presented as a vault-local fact. Two kill-lines pin the present claim:
 `gateway_admitted_nonzero_kill_line` is premise-necessity evidence (dropped,
 the same conjunct is false of `sourceRun` on a concrete free batch that
 violates the premise), and `fee_blind_commit_kill_line_refutes_parent` is
@@ -159,6 +159,8 @@ theorem fee_blind_commit_kill_line_refutes_parent :
 `sourceView` of the same `sourceRun`. Not 96-byte packed calldata. -/
 theorem verity_tx_simulates_consolidation (inputs : Inputs)
     (state : Verity.ContractState)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
     (hTargets : readArray state "targets" targetsBase inputs.targets.length =
@@ -169,7 +171,7 @@ theorem verity_tx_simulates_consolidation (inputs : Inputs)
       inputs.targetLens.length = some inputs.targetLens) :
     observe state ((addRequests inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val :=
-  verity_tx_simulates_pinned_source inputs state
+  verity_tx_simulates_pinned_source inputs state hCountBound
     hSources hTargets hSourceLens hTargetLens
 
 /-- Every revert of the consolidation transaction, including failure after

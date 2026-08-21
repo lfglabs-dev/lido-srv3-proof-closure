@@ -542,6 +542,28 @@ theorem inconsistent_operation_index_kill_line (src : SourceDepositDataRootInput
     (Ssz.operationIndex .clValidatorVerifier).value
   decide
 
+/-- Derive every deposit/witness/index field of the executable transaction
+from one abstract `ComposedSszInput`. Only chain-level `lhs`, fork version,
+and expected digest remain independent, matching the abstract parent. -/
+def txInputFromComposed (input : ComposedSszInput) : EncodingInput :=
+  { deposit := input.digestInput
+    lhs := input.lhs
+    rhs := input.rhs
+    expectedRoot := input.expectedDepositDataRoot
+    operation := .clValidatorVerifier
+    combine := sourceCombine input.src
+    witness := sourceWitness input.src
+    expectedWitnessRoot := sourceNode input.src }
+
+/-- TX-level one-object coupling: one `ComposedSszInput` derives one
+`EncodingInput`, and the executable `encode` observation matches the
+source-view of that same derived object. -/
+theorem verity_tx_one_object_matches_sourceView
+    (input : ComposedSszInput) (state : Verity.ContractState) :
+    observe ((encode (txInputFromComposed input)).run state) =
+      sourceView (txInputFromComposed input) :=
+  verity_tx_simulates_pinned_source (txInputFromComposed input) state
+
 /-- `observe` of the handwritten `encode` transaction equals `sourceView`.
 A commit also re-exports the structural-witness conjunct. This is not
 `SSZ.verifyProof` and does not prove SHA-256. -/

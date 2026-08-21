@@ -94,6 +94,41 @@ def allocateLoop : Nat → List Source.Row → Word → Word →
             let newRemaining ← Verity.Stdlib.Math.safeSub remaining amount
             allocateLoop fuel after newRemaining newTotal
 
+/-- Independently stated source-side loop.  This deliberately copies the
+pinned equations instead of aliasing `allocateLoop`, so transaction/source
+agreement is a proved equation rather than definitional sharing. -/
+def sourceAllocateLoop : Nat → List Source.Row → Word → Word →
+    Option (List Source.Row × Word × Word)
+  | 0, rows, remaining, total =>
+      if remaining = 0 then some (rows, total, remaining) else none
+  | fuel + 1, rows, remaining, total =>
+      if remaining = 0 then some (rows, total, remaining) else
+      match allocateToBestCandidate rows remaining with
+      | none => none
+      | some (after, amount) =>
+          if amount = 0 then some (rows, total, remaining) else do
+            let newTotal ← Verity.Stdlib.Math.safeAdd total amount
+            let newRemaining ← Verity.Stdlib.Math.safeSub remaining amount
+            sourceAllocateLoop fuel after newRemaining newTotal
+
+theorem sourceAllocateLoop_eq_allocateLoop :
+    ∀ fuel rows remaining total,
+      sourceAllocateLoop fuel rows remaining total =
+        allocateLoop fuel rows remaining total
+  | 0, _, _, _ => rfl
+  | fuel + 1, rows, remaining, total => by
+      simp only [sourceAllocateLoop, allocateLoop]
+      split
+      · rfl
+      · cases hStep : allocateToBestCandidate rows remaining with
+        | none => rfl
+        | some step =>
+            rcases step with ⟨after, amount⟩
+            simp only
+            split
+            · rfl
+            · simp [sourceAllocateLoop_eq_allocateLoop fuel]
+
 /-- Persist allocated buckets as a `uint256[]`-shaped storage array. -/
 def persistBuckets (buckets : List Word) (state : ContractState) : ContractState :=
   state.writeArray bucketsSlot buckets
@@ -142,7 +177,7 @@ def observe (before : List Word) : ContractResult Result → View
 def sourceView (buckets capacities : List Word) (allocationSize : Word) : View :=
   if buckets.length != capacities.length then ⟨.reverted, buckets, 0, 0⟩ else
   let rows := (buckets.zip capacities).map fun p => Source.Row.mk p.1 p.2
-  match allocateLoop allocationSize.val rows allocationSize 0 with
+  match sourceAllocateLoop allocationSize.val rows allocationSize 0 with
   | none => ⟨.reverted, buckets, 0, 0⟩
   | some (after, total, remaining) =>
       ⟨.committed, after.map Source.Row.allocation, total, remaining⟩
@@ -159,6 +194,7 @@ theorem verity_tx_simulates_pinned_source
   · have hBne : (buckets.length != capacities.length) = false := by simp [hLen]
     unfold Contract.run allocate sourceView
     simp only [hBne, Bool.false_eq_true, ↓reduceIte, hBuckets, hCapacities]
+    rw [sourceAllocateLoop_eq_allocateLoop]
     cases hRun : allocateLoop allocationSize.val
         (List.map (fun p => Source.Row.mk p.1 p.2) (buckets.zip capacities))
         allocationSize 0 <;>

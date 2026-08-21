@@ -11,7 +11,8 @@ def guarantee : Guarantee := ⟨.pAlloc2, [.algorithm, .source, .verityTx]⟩
 
 /-- If the two memory arrays decode to `buckets`/`capacities`, then
 `observe` of `allocate` (persisted bucket array plus totals) equals
-`sourceView` of the same `allocateToBestCandidate` loop.
+`sourceView` of the separately defined `sourceAllocateLoop`; the copied loop
+equations are connected to the executor by a proved equality theorem.
 Not the +1 `selects_least_open_bucket` model. -/
 theorem verity_tx_simulates_min_first_distribution
     (buckets capacities : List MinFirstAllocation.Source.Word)
@@ -56,7 +57,10 @@ theorem source_selects_same_next_target
   SolidityMinFirst.selects_same_next_target hRows
 
 /-- Full pinned-source candidate scan correspondence for the independent
-MODEL/SOURCE representations used by the proportional mutation slice. -/
+MODEL/SOURCE representations used by the proportional mutation slice.
+Together with `source_amount_correspondence` below this is registered parent
+evidence; the remaining OPEN step is folding amount equality into the
+registered parent's conclusion and lifting it to a full-loop theorem. -/
 theorem full_candidate_correspondence
     (hRows : MinFirstAllocation.RowsCorrespond model source) :
     Option.map (fun b => (b.allocation, b.capacity))

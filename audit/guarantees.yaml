@@ -42,7 +42,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked execute parent and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks, and do not re-fold the min-clamp tautology back into the parent."
       },
-      "next_gate": "Close summary CALL / packed ModuleStateConfig / count-from-storage gaps without widening into P-ALLOC-2; do not refold the min-clamp child into the parent.",
+      "next_gate": "OPEN: decode the live summary CALL returndata, bind packed ModuleStateConfig, and read/cap count from SRStorage without widening into P-ALLOC-2; do not refold the min-clamp child.",
       "roadmap_priority": "DONE"
     },
     {
@@ -69,7 +69,7 @@
           "explicit-\u2200 proportional-step pinned-selection correspondence (Model scan's candidate pinned to the source-selected row best) and positive/bounded/capacity-safe checked amount (\u2200 over valid model/source rows + allocationSize)",
           "named parent-shaped kill-lines refuting the registered explicit-\u2200 parent: Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent (first-open mutant scan substituted for Model.candidate?) and Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent (checkedAmountNoCapacityCap substituted at the checkedAmount premise only); TX-level mutantSourceView vs runView retained as TX-observe computational evidence",
           "handwritten +1 Strategy selection (demoted child)",
-          "single allocateToBestCandidate loop; observe reads writeArray buckets",
+          "executor allocateLoop plus a separately defined sourceAllocateLoop with copied equations and a proved equality bridge; observe reads writeArray buckets",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
@@ -77,7 +77,6 @@
           "+1 Strategy and proportional Source are different algorithms",
           "the registered step parent does not equate w to the independent Model.amount expression, so ceilDiv and the next-level cap are not load-bearing conclusion content",
           "no registered full allocate-loop conservation/correspondence theorem",
-          "Verity sourceView calls the same allocateLoop implementation as the transaction instead of an independent interpreter",
           "keccak memory-array oracle",
           "cross-call mutation of the decoded arrays"
         ]
@@ -86,7 +85,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked proportional-step parent and the +1-model child on their two algorithms. Close amount correspondence, loop-level registration, and independent sourceView without merging the algorithms or claiming Solidity equivalence."
       },
-      "next_gate": "Add amount-correspondence conjunct so ceilDiv/next-level are load-bearing; register a loop-level theorem; make sourceView independent of allocateLoop; keep the +1 model as a child.",
+      "next_gate": "source_amount_correspondence is checked parent evidence and sourceView is independently defined; OPEN: fold amount equality into registered parent conclusion and register a full loop theorem; keep the +1 model as a child.",
       "roadmap_priority": "DONE"
     },
     {
@@ -94,7 +93,9 @@
       "assumptions": [
         "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-DEPOSIT-CONTRACT",
+        "A-DEPOSIT-32-ETHER"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants",
@@ -133,7 +134,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep LinksSource as a caller hypothesis. Do not claim a future ALLOC composition will discharge it: Wave 4 showed ALLOC parents plus key-count composition still fail LinksSource.firstAmount. Derive the beacon deposit contract address instead of assuming it. Keep the executable plane as exactly two batches, or prove a loop bound without advertising a fake forall."
       },
-      "next_gate": "Keep LinksSource explicit; pin DEPOSIT_CONTRACT and 32-ether immutable provenance; either reshape the TX to one-module/n-frames or keep stating the two-batch shape has no pin counterpart; composed parent rollback conjunct remains vacuous under success Preconditions.",
+      "next_gate": "Keep LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER from deployment artifacts; either reshape TX to one-module/n-frames or retain the explicit two-batch limitation.",
       "roadmap_priority": "DONE"
     },
     {
@@ -142,7 +143,8 @@
         "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-TOPUP-NOWRAP",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-TOPUP-BEACON-ADDRESS"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
@@ -171,15 +173,15 @@
           "conservation conjunct kill-line, surgical since wave 5: dropped_conservation_assert_kill_line_refutes_parent commits a mutant run with ONLY the line-755 assert deleted at the wrapping witness with pulled \u2260 pushed -- the negation of conjunct (1)'s predicate on the mutant; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style"
         ],
         "missing": [
-          "Verity parent verity_tx_simulates_source still assumes (run cfg inp).reverts = false, so a nonzero wrap is not an executed Verity observation: execute fail-closes on the underfunded push while sourceObservables describes the wrapped success schedule. Abstract conjunct 3 talks wrap unconditionally. Wrap-to-zero is included. NoUncheckedWrap is not a Verity parent hypothesis",
-          "beacon-address provenance is a named assumption, not a parent conjunct"
+          "Verity parent verity_tx_simulates_source still assumes (run cfg inp).reverts = false, so a nonzero wrap is not universally characterized on the Verity plane; verity_wrap_to_zero_is_empty_commit executes the wrapped-zero subcase without hCommit",
+          "beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Pin beacon-address provenance. Keep the Verity hCommit / nonzero-wrap gap explicit; do not advertise a naked TX forall on wrap. Do not derive a top-up LinksSource from ALLOC."
       },
-      "next_gate": "Execute a nonzero wrap on the Verity plane (or keep hCommit gap explicit); pin beacon-address provenance; do not derive a top-up LinksSource from ALLOC.",
+      "next_gate": "OPEN: prove the general nonzero-wrap Verity revert shape; wrapped-zero execution is checked. Discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.",
       "roadmap_priority": "DONE"
     },
     {
@@ -192,7 +194,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
         "expected": "mint-after-read discipline over clock-stamped balance-write/read/mint ticks, with its pure call-site reordering kill-line on a valid nonempty report, plus the handleOracleReport-shaped Contract.run transaction and mutants"
       },
-      "summary": "mint_after_read_discipline: on every committed modeled handleOracleReport, rewardsReadSlot is stamped before any nonzero rewardsMintedSlot. balancesWrittenSlot is now stamped after the balance array write, so storedSteps no longer invents an unconditional balancesWritten prefix. Every stamp reads sequenceSlot + 1. mint_order_kill_line refutes the same predicate on a pure call-site-reordering mutant using a valid nonempty report. source_report_before_reward remains a demoted constructor-order child whose fullReportSucceeds evidence is not independently discharged. Not submitReportData; sharesToMintAsFees is an argument.",
+      "summary": "mint_after_read_discipline: on every committed modeled handleOracleReport, rewardsReadSlot is stamped before any nonzero rewardsMintedSlot. mint_order_kill_line refutes the same predicate on a pure call-site-reordering mutant. The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline"
@@ -218,14 +220,14 @@
           "fee computation (sharesToMintAsFees is an argument)",
           "packed uint64 accounting words",
           "re-read of the written router snapshot for rewards",
-          "fullReportSucceeds remains caller-supplied evidence for the demoted sourceTrace child; no later Accounting/mint/reportRewardsMinted execution discharges it"
+          "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked mint-after-read discipline theorem and its call-site-reordering kill-line as the registered parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
       },
-      "next_gate": "Retire or independently discharge fullReportSucceeds on the demoted source child; keep mint-after-read parent and nonempty kill-line; do not widen to submitReportData.",
+      "next_gate": "fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Keep mint-after-read parent; do not widen to submitReportData.",
       "roadmap_priority": "DONE"
     },
     {
@@ -325,7 +327,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the universal success-arm parent and wiring/premise kill-lines. Former P-ETH-1b fee-target theorems stay parent evidence under A-CANONICAL-REQUEST-ADDRESS until registered as parent conjuncts. Do not restore vault\u2192Lido/WQ as a child. Do not compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists."
       },
-      "next_gate": "Register Verity revert-shape \u2200 or keep that gap explicit; fold fee-leg evidence into parent conjuncts once A-CANONICAL-REQUEST-ADDRESS is discharged; compose with P-CONSOLIDATION-1 only after the ABI/interpreter bridge.",
+      "next_gate": "Named fee-leg parent helpers remain evidence under OPEN A-CANONICAL-REQUEST-ADDRESS. Register Verity revert-shape \u2200 or keep the gap explicit; compose only after the ABI/interpreter bridge.",
       "roadmap_priority": "DONE"
     },
     {
@@ -395,7 +397,7 @@
         "covered": [
           "leftover-budget block-cap bound: consumeBudget over transitionBudget sums to at most maxTopUpPerBlockGwei, unconditionally, with a mutant-budget kill-line",
           "per-key bound per_key_bounded_by_candidate: every transition allocation is paired with and no greater than its requested/evaluated candidate",
-          "single sourceRun interpreter; observe reads writeArray allocations (persisted storage array) plus remaining/used slots via readSlot",
+          "executor sourceRun plus separately copied sourceRunIndependent/sourceCandidatesIndependent/sourceConsumeIndependent equations with proved equality bridges; observe reads persisted allocations and budget slots",
           "Contract.run rollback after intermediate writes",
           "maxValidatorsPerTopUp guard enforced as checked revert on count>32; the no-check mutant is guard-necessity evidence outside the registered Verity parent's count <= 32 premise"
         ],
@@ -412,14 +414,15 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked block-cap parent, its pointwise per-key child, and the mutant-budget kill-line. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1."
       },
-      "next_gate": "Make the Verity source view independent of its executor; model live per-key limit inputs before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.",
+      "next_gate": "Independent Verity sourceView is checked. OPEN: model live per-key limit inputs before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.",
       "roadmap_priority": "DONE"
     },
     {
       "id": "P-CONSOLIDATION-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-CONSOLIDATION-GATEWAY-NONZERO"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidation1 LidoSRv3.Audit.Verity.ConsolidationTx LidoSRv3.Tests.ConsolidationTxMutants",
@@ -449,7 +452,7 @@
           "preservesEthBalance forwarding invariant: the vault must forward exactly msg.value across request CALLs; current success stubs move no wei",
           "Bus publisher/executor path",
           "keccak memory-array oracle",
-          "gateway-admitted-nonzero-value premise is caller-supplied and belongs to the outer gateway msg.value surface, not the vault's forwarded totalFee call",
+          "A-CONSOLIDATION-GATEWAY-NONZERO is caller-supplied at the outer P-CONSOLIDATION-ETH-1 gateway msg.value boundary, not a vault-local forwarded-totalFee fact",
           "observe reconstructs payloads from the call journal rather than rereading sourceMapSlot/targetMapSlot payload storage",
           "composition with P-CONSOLIDATION-ETH-1 requires ABI/interpreter bridge (groups, fee fetch, failing refund, value-bearing CALLs); fence remains until then"
         ]
@@ -458,7 +461,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked vault-loop theorems. Relocate or remove hGatewayAdmittedNonzero (outer gateway msg.value surface / P-CONSOLIDATION-ETH-1 boundary, not vault totalFee). Make observe reread sourceMapSlot/targetMapSlot payloads before strengthening. Do not compose with P-CONSOLIDATION-ETH-1 until an ABI/interpreter bridge exists."
       },
-      "next_gate": "Drop or relocate the outer-gateway nonzero-value premise; make observe read payload storage; keep preservesEthBalance (forwards exactly msg.value) OPEN until CALLs move wei. Do not compose with P-CONSOLIDATION-ETH-1.",
+      "next_gate": "Outer-gateway nonzero admission is explicitly relocated to A-CONSOLIDATION-GATEWAY-NONZERO. Discharge it only via the ABI/interpreter bridge; keep preservesEthBalance OPEN until CALLs move wei.",
       "roadmap_priority": "DONE"
     },
     {
@@ -504,14 +507,14 @@
           "refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child",
           "imported-to-deployed helper/wrapper Yul fragment binding",
           "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
-          "the Verity EncodingInput plane keeps deposit, rhs, witness, and expectedWitnessRoot independent (e.g. Tests/SszEncodingTxMutants.matching pairs a witness at index 2 with rhs := gindex 3 11): the one-object coupling holds at the abstract ComposedSszInput type level only and is not inherited by the executable transaction"
+          "the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked one-object four-child witness/root/concat/digest composition; do not implement SSZ.verifyProof or a cryptographic SHA-256 proof."
       },
-      "next_gate": "Carry one-object coupling onto the TX input; keep SHA functional correctness split from Sha256Engine refinement; keep Yul visibly OPEN beside every CHECKED presentation.",
+      "next_gate": "TX one-object derived-input coupling is checked; OPEN: make the general EncodingInput API enforce it if desired. Keep SHA correctness and Yul visibly OPEN.",
       "special_bindings": {
         "deployed_yul": {
           "status": "OPEN",
