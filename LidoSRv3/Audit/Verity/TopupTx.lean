@@ -125,7 +125,7 @@ storage writes and, past the first, after real journalled call frames;
 def execute (allocations : List Nat) (failure : FailurePoint) : Contract Unit := do
   allocationStage allocations
   require (decide (failure ≠ .afterAllocationWrite)) "FAIL_AFTER_ALLOCATION_WRITE"
-  let total := allocSum allocations
+  let total := allocSumUnchecked allocations
   if total = 0 then Verity.pure ()
   else pushStage allocations total failure
 
@@ -167,18 +167,22 @@ def observe (before : ContractState) (allocationCount : Nat) :
         fresh.map (·.name), fresh.map (·.target),
         fresh.map (·.value), fresh.map (·.calldata)⟩
 
-/-- Independent source-shaped observable specification. -/
+/-- Independent source-shaped observable specification.
+
+Totals are the on-chain wrapped reading `allocSumUnchecked` (`wrappedTotal =
+exactTotal % 2^256`).  A wrap-to-zero batch is an empty success: no pull and
+no pushes.  Under `NoUncheckedWrap` this coincides with the exact `Nat` sum. -/
 def sourceObservables (allocations : List Nat) : OutcomeObservables :=
-  let total := allocSum allocations
+  let wrapped := allocSumUnchecked allocations
   let pushes := sourcePushes allocations 0
-  ⟨true, allocations, total, total, total,
-    if total = 0 then [] else
+  ⟨true, allocations, wrapped, wrapped, wrapped,
+    if wrapped = 0 then [] else
       "withdrawDepositableEther" :: pushes.map (fun _ => "makeBeaconChainTopUp"),
-    if total = 0 then [] else
+    if wrapped = 0 then [] else
       lidoAddress.toNat :: pushes.map (fun _ => beaconAddress.toNat),
-    if total = 0 then [] else 0 :: pushes.map (fun p => evmWord p.2),
-    if total = 0 then [] else
-      [evmWord total] :: pushes.map (fun p => [evmWord p.1, evmWord p.2])⟩
+    if wrapped = 0 then [] else 0 :: pushes.map (fun p => evmWord p.2),
+    if wrapped = 0 then [] else
+      [evmWord wrapped] :: pushes.map (fun p => [evmWord p.1, evmWord p.2])⟩
 
 /-! ## The journal execution has to produce
 
@@ -197,8 +201,8 @@ def pullEntry (total : Nat) : ExternalCall :=
   linkedCallEntryTo "withdrawDepositableEther" lidoAddress 0 [(total : Uint256)]
 
 def expectedCalls (allocations : List Nat) : List ExternalCall :=
-  if allocSum allocations = 0 then []
-  else pullEntry (allocSum allocations) :: beaconJournal allocations 0
+  if allocSumUnchecked allocations = 0 then []
+  else pullEntry (allocSumUnchecked allocations) :: beaconJournal allocations 0
 
 /-! ## Word and storage laws
 
@@ -431,7 +435,7 @@ theorem cellsOf_frame (state : ContractState) (balance : Uint256)
       = cellsOf state index count := rfl
 
 theorem execute_run_zero (allocations : List Nat) (state : ContractState)
-    (hZero : allocSum allocations = 0) :
+    (hZero : allocSumUnchecked allocations = 0) :
     (execute allocations .none).run state = ContractResult.success ()
       ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0) := by
   simp [execute, Contract.run, allocationStage, Bind.bind, _root_.Verity.bind,
@@ -478,6 +482,9 @@ theorem execute_run_nonzero (allocations : List Nat) (state : ContractState)
             pulledTotalSlot ((allocSum allocations : Nat) : Uint256) with
         selfBalance := 0
         calls := state.calls ++ expectedCalls allocations } := by
+  have hEq : allocSumUnchecked allocations = allocSum allocations :=
+    allocSumUnchecked_eq_allocSum hNoWrap
+  have hNzW : allocSumUnchecked allocations ≠ 0 := by rw [hEq]; exact hNz
   have hstagedBal :
       ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0).selfBalance = 0 := by
     show (allocationPass allocations 0 0 state).selfBalance = 0
@@ -487,8 +494,9 @@ theorem execute_run_nonzero (allocations : List Nat) (state : ContractState)
     allocationPass_calls _ _ _ _
   simp only [execute, Contract.run, allocationStage, Bind.bind, _root_.Verity.bind,
     _root_.Verity.require, ne_eq, reduceCtorEq, not_false_eq_true, decide_true,
-    if_true, hNz, if_false, pushStage_run allocations _ hstagedBal hNoWrap]
-  rw [hstagedCalls, expectedCalls, if_neg hNz]
+    if_true, hNzW, if_false]
+  rw [hEq, pushStage_run allocations _ hstagedBal hNoWrap]
+  rw [hstagedCalls, expectedCalls, hEq, if_neg hNz]
 
 /-! ## Journal projections
 
@@ -570,19 +578,23 @@ theorem execute_observes_source (allocations : List Nat) (state : ContractState)
       = allocSum allocations := by
     rw [allocationPass_total, Nat.zero_add]
     exact word_val hNoWrap
+  have hEq : allocSumUnchecked allocations = allocSum allocations :=
+    allocSumUnchecked_eq_allocSum hNoWrap
   have hcalls : ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0).calls
       = state.calls := allocationPass_calls _ _ _ _
   by_cases hZero : allocSum allocations = 0
-  · rw [execute_run_zero allocations state hZero]
+  · have hZeroW : allocSumUnchecked allocations = 0 := by rw [hEq]; exact hZero
+    rw [execute_run_zero allocations state hZeroW]
     simp only [observe, sourceObservables, cellsOf_writeSlot, hcells,
-      ContractState.readSlot_writeSlot_other _ hOther, htotal, hcalls, hZero,
+      ContractState.readSlot_writeSlot_other _ hOther, htotal, hcalls, hEq, hZero,
       ContractState.readSlot_writeSlot_same, Verity.Core.Uint256.val_zero,
       List.drop_length, callValueOf, if_true, List.map_nil]
-  · rw [execute_run_nonzero allocations state hBalance hNoWrap hZero]
+  · have hNzW : allocSumUnchecked allocations ≠ 0 := by rw [hEq]; exact hZero
+    rw [execute_run_nonzero allocations state hBalance hNoWrap hZero]
     simp only [observe, sourceObservables, cellsOf_frame, cellsOf_writeSlot, hcells,
       readSlot_frame, ContractState.readSlot_writeSlot_same,
       ContractState.readSlot_writeSlot_other _ hOther,
-      htotal, word_val hNoWrap, List.drop_left, expectedCalls, if_neg hZero,
+      htotal, word_val hNoWrap, List.drop_left, expectedCalls, hEq, if_neg hZero,
       List.map_cons, pullEntry_name, pullEntry_target, pullEntry_value, pullEntry_calldata,
       beaconJournal_names, beaconJournal_targets, beaconJournal_values, beaconJournal_calldata,
       callValueOf, callValueOf_beaconJournal allocations 0 hAmt]
@@ -601,6 +613,41 @@ theorem execute_observes_source_from_entry (allocations : List Nat) (state : Con
       = sourceObservables allocations :=
   execute_observes_source allocations (entryFrame state) rfl hNoWrap hLen
 
+/-- Wrap-to-zero (and the ordinary zero batch) is an empty success: the
+executable transaction writes the allocation cells, stores a wrapped total of
+zero, and skips the pull/push. -/
+theorem execute_observes_source_wrapped_zero (allocations : List Nat)
+    (state : ContractState) (_hBalance : state.selfBalance = 0)
+    (hZero : allocSumUnchecked allocations = 0)
+    (hLen : allocations.length ≤ uint256Modulus)
+    (hAmt : ∀ a ∈ allocations, a < uint256Modulus) :
+    observe state allocations.length ((execute allocations .none).run state)
+      = sourceObservables allocations := by
+  have hOther : allocationTotalSlot ≠ pulledTotalSlot := by decide
+  have hcells : cellsOf (allocationPass allocations 0 0 state) 0 allocations.length = allocations :=
+    cellsOf_allocationPass allocations 0 state hLen hAmt
+  have htotal : ((allocationPass allocations 0 0 state).readSlot allocationTotalSlot).val
+      = allocSumUnchecked allocations := by
+    rw [allocationPass_total, Nat.zero_add, allocSumUnchecked_eq_mod]
+    have hmod : Core.Uint256.modulus = uint256Modulus := by decide
+    simp [hmod, Core.Uint256.val_ofNat]
+  have hcalls : ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0).calls
+      = state.calls := allocationPass_calls _ _ _ _
+  rw [execute_run_zero allocations state hZero]
+  simp only [observe, sourceObservables, cellsOf_writeSlot, hcells,
+    ContractState.readSlot_writeSlot_other _ hOther, htotal, hcalls, hZero,
+    ContractState.readSlot_writeSlot_same, Verity.Core.Uint256.val_zero,
+    List.drop_length, callValueOf, if_true, List.map_nil]
+
+theorem execute_observes_source_wrapped_zero_from_entry (allocations : List Nat)
+    (state : ContractState) (hZero : allocSumUnchecked allocations = 0)
+    (hLen : allocations.length ≤ uint256Modulus)
+    (hAmt : ∀ a ∈ allocations, a < uint256Modulus) :
+    observe (entryFrame state) allocations.length
+        ((execute allocations .none).run (entryFrame state))
+      = sourceObservables allocations :=
+  execute_observes_source_wrapped_zero allocations (entryFrame state) rfl hZero hLen hAmt
+
 /-- The batch spends every wei it pulled: the executable counterpart of the
 final `assert(address(this).balance == 0)`. -/
 theorem execute_ends_with_zero_balance (allocations : List Nat) (state : ContractState)
@@ -610,7 +657,9 @@ theorem execute_ends_with_zero_balance (allocations : List Nat) (state : Contrac
       after.selfBalance = 0 := by
   intro after h
   by_cases hZero : allocSum allocations = 0
-  · rw [execute_run_zero allocations state hZero] at h
+  · have hZeroW : allocSumUnchecked allocations = 0 :=
+      (allocSumUnchecked_eq_allocSum hNoWrap).trans hZero
+    rw [execute_run_zero allocations state hZeroW] at h
     injection h with _ hstate
     rw [← hstate]
     show (allocationPass allocations 0 0 state).selfBalance = 0

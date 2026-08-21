@@ -69,7 +69,7 @@ private def runSchedule (m : Mutation) : List (Nat × Nat) → Contract Unit
 
 private def mutantExecute (m : Mutation) (allocations : List Nat) : Contract Unit := do
   mutantAllocationStage m allocations
-  let total := allocSum allocations
+  let total := allocSumUnchecked allocations
   if total = 0 then Verity.pure ()
   else do
     lidoPull total
@@ -229,19 +229,33 @@ private def wcType1Input : SourceTopupInput :=
     allocations := [5], routerBalanceBefore := 100,
     lidoDepositableEther := 100 }
 
+/-- A batch whose exact sum is exactly `2^256`, so the on-chain accumulator
+wraps to zero.  Line 741 therefore commits `committedNoTopUp`: wrap-implies-revert
+is false, wrap-precludes-value-moving-commit is true. -/
+private def wrapToZeroInput : SourceTopupInput :=
+  { wrapInput with allocations := [uint256Modulus - 1, 1] }
+
 /-- Positive control (NOT a kill-line): the honest wrap branch at `wrapInput`,
-projected from the registered parent's third conjunct.  Wave 5 routed the
-`unchecked` accumulator through `run` itself, so the projection now shows the
-honest `run` REVERTING at the wrapping witness -- and the second conjunct pins
-down that the revert is the line 755 `assert` firing (the wrapped pull `1`
-against the exact push `2^256 + 1`), not any earlier guard. -/
+projected from the registered parent's third conjunct.  Nonzero wrap still
+reverts via the line 755 assert (wrapped pull `1` against exact push
+`2^256 + 1`). -/
 theorem guard_discharge_at_wrapping_input :
-    (run killCfg wrapInput).reverts = true ∧
+    ((run killCfg wrapInput).pulled = 0 ∧ (run killCfg wrapInput).pushed = 0) ∧
       run killCfg wrapInput = .revertAssertBalanceUnchanged :=
   ⟨(LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
       (State := Unit) killCfg wrapInput () () [] ⟨[], [], []⟩).2.2.1
     (by unfold NoUncheckedWrap; decide),
    by decide⟩
+
+/-- Positive control: wrap-to-zero is a no-top-up commit, not a revert. -/
+theorem wrap_to_zero_commits_no_topup :
+    ¬ NoUncheckedWrap wrapToZeroInput ∧
+      run killCfg wrapToZeroInput = .committedNoTopUp ∧
+      (run killCfg wrapToZeroInput).reverts = false ∧
+      (run killCfg wrapToZeroInput).pulled = 0 ∧
+      (run killCfg wrapToZeroInput).pushed = 0 := by
+  unfold NoUncheckedWrap
+  decide
 
 /-- Positive control (NOT a kill-line): the honest `run` rejects the
 unregistered-module witness, projected from the registered parent's second
@@ -273,9 +287,9 @@ deletion is now the ONLY difference.) -/
 private def mutantRunPushNoAssert (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Outcome :=
   if inp.lidoCanDeposit = false then
     .revertLidoCannotDeposit
-  else if totalAllocated inp = 0 then
+  else if accumulated inp = 0 then
     .revertLidoZeroAmount
-  else if inp.lidoDepositableEther < totalAllocated inp then
+  else if inp.lidoDepositableEther < accumulated inp then
     .revertLidoNotEnoughEther
   else if inp.pubkeyLengths.length ≠ inp.allocations.length then
     .revertArrayLengthMismatch
@@ -314,9 +328,9 @@ private def mutantRunNoAssert (cfg : SourceTopupConfig) (inp : SourceTopupInput)
   else match allocationLoop cfg inp.allocations inp.topUpLimits with
     | some o => o
     | none =>
-      if smDepositableEthAmountRounded cfg inp < totalAllocated inp then
+      if smDepositableEthAmountRounded cfg inp < accumulated inp then
         .revertModuleReturnExceedTarget
-      else if totalAllocated inp = 0 then
+      else if accumulated inp = 0 then
         .committedNoTopUp
       else
         mutantRunPushNoAssert cfg inp
@@ -359,20 +373,20 @@ theorem mutantRunNoAssert_eq_run_of_assert_passing {cfg : SourceTopupConfig}
   split
   · rename_i o hp; rw [hp]
   · rename_i hp; rw [hp]
-    by_cases hOver : smDepositableEthAmountRounded cfg inp < totalAllocated inp
+    by_cases hOver : smDepositableEthAmountRounded cfg inp < accumulated inp
     · rw [if_pos hOver, if_pos hOver]
     rw [if_neg hOver, if_neg hOver]
-    by_cases hZero : totalAllocated inp = 0
+    by_cases hZero : accumulated inp = 0
     · rw [if_pos hZero, if_pos hZero]
     rw [if_neg hZero, if_neg hZero]
     rw [mutantRunPushNoAssert, runPush]
     by_cases hCan : inp.lidoCanDeposit = false
     · rw [if_pos hCan, if_pos hCan]
     rw [if_neg hCan, if_neg hCan]
-    by_cases hZeroTail : totalAllocated inp = 0
+    by_cases hZeroTail : accumulated inp = 0
     · rw [if_pos hZeroTail, if_pos hZeroTail]
     rw [if_neg hZeroTail, if_neg hZeroTail]
-    by_cases hLiq : inp.lidoDepositableEther < totalAllocated inp
+    by_cases hLiq : inp.lidoDepositableEther < accumulated inp
     · rw [if_pos hLiq, if_pos hLiq]
     rw [if_neg hLiq, if_neg hLiq]
     by_cases hLen : inp.pubkeyLengths.length ≠ inp.allocations.length
@@ -429,20 +443,20 @@ theorem mutantRunNoAssert_commits_where_assert_fires {cfg : SourceTopupConfig}
     rcases allocationLoop_range _ _ hp with h' | h' | h' <;> rw [h'] at hRun <;> cases hRun
   · rename_i hp
     rw [hp]
-    by_cases hOver : smDepositableEthAmountRounded cfg inp < totalAllocated inp
+    by_cases hOver : smDepositableEthAmountRounded cfg inp < accumulated inp
     · rw [if_pos hOver] at hRun; cases hRun
     rw [if_neg hOver] at hRun; rw [if_neg hOver]
-    by_cases hZero : totalAllocated inp = 0
+    by_cases hZero : accumulated inp = 0
     · rw [if_pos hZero] at hRun; cases hRun
     rw [if_neg hZero] at hRun; rw [if_neg hZero]
     rw [runPush] at hRun; rw [mutantRunPushNoAssert]
     by_cases hCan : inp.lidoCanDeposit = false
     · rw [if_pos hCan] at hRun; cases hRun
     rw [if_neg hCan] at hRun; rw [if_neg hCan]
-    by_cases hZeroTail : totalAllocated inp = 0
+    by_cases hZeroTail : accumulated inp = 0
     · rw [if_pos hZeroTail] at hRun; cases hRun
     rw [if_neg hZeroTail] at hRun; rw [if_neg hZeroTail]
-    by_cases hLiq : inp.lidoDepositableEther < totalAllocated inp
+    by_cases hLiq : inp.lidoDepositableEther < accumulated inp
     · rw [if_pos hLiq] at hRun; cases hRun
     rw [if_neg hLiq] at hRun; rw [if_neg hLiq]
     by_cases hLen : inp.pubkeyLengths.length ≠ inp.allocations.length
@@ -483,9 +497,9 @@ private def mutantRunNoModuleGuard (cfg : SourceTopupConfig) (inp : SourceTopupI
   else match allocationLoop cfg inp.allocations inp.topUpLimits with
     | some o => o
     | none =>
-      if smDepositableEthAmountRounded cfg inp < totalAllocated inp then
+      if smDepositableEthAmountRounded cfg inp < accumulated inp then
         .revertModuleReturnExceedTarget
-      else if totalAllocated inp = 0 then
+      else if accumulated inp = 0 then
         .committedNoTopUp
       else
         runPush cfg inp
@@ -516,9 +530,9 @@ private def mutantRunNoWcGuard (cfg : SourceTopupConfig) (inp : SourceTopupInput
   else match allocationLoop cfg inp.allocations inp.topUpLimits with
     | some o => o
     | none =>
-      if smDepositableEthAmountRounded cfg inp < totalAllocated inp then
+      if smDepositableEthAmountRounded cfg inp < accumulated inp then
         .revertModuleReturnExceedTarget
-      else if totalAllocated inp = 0 then
+      else if accumulated inp = 0 then
         .committedNoTopUp
       else
         runPush cfg inp

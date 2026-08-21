@@ -189,7 +189,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PEth1RefundTxMutants.double_refund_rejected
 #print axioms LidoSRv3.Tests.PEth1RefundTxMutants.leak_on_refund_failure_rejected
 #print axioms LidoSRv3.Tests.PEth1RequestTxMutants.keep_first_consolidation_fee_rejected
-#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_wrap_implies_revert
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_wrap_precludes_value_moving_commit
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_module_guard_required
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_wc_type2_guard_required
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
@@ -211,6 +211,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupTxMutants.lido_pull_failure_rolls_back
 #print axioms LidoSRv3.Tests.TopupTxMutants.first_beacon_failure_rolls_back
 #print axioms LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_wrapping_input
+#print axioms LidoSRv3.Tests.TopupTxMutants.wrap_to_zero_commits_no_topup
 #print axioms LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_unregistered_module_input
 #print axioms LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_non_type2_wc_input
 #print axioms LidoSRv3.Tests.TopupTxMutants.mutantRunNoAssert_eq_run_of_assert_passing

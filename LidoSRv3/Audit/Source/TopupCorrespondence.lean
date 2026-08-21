@@ -97,14 +97,15 @@ the deposit path, where `ConservingConfig` related two independent constants
 
 The pull is routed through the on-chain `unchecked` semantics.  The
 accumulation at line 732 sits inside an `unchecked` block (line 722), so on
-chain `amount` is the sum *reduced modulo `2^256`*.  The value-moving tail of
-`run` below (`runPush`) therefore reads `accumulated inp` -- the wrapped sum --
-for the wei pulled at line 744, for the balance the router actually holds while
-the push loop sends the exact per-key amounts, and for the line 755
-`assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)`.  The assert
-is consequently *load-bearing* on the wrap branch: under a wrap the wrapped pull
-is smaller than the exact pushed total, the assert fires, and
-`run_reverts_of_wrap` shows no wrapping batch can commit.  Under
+chain `amount` is the sum *reduced modulo `2^256`* (`wrappedTotal =
+exactTotal % 2^256`, `accumulated`).  The over-target comparison at line 737,
+the zero-sum test at line 741, the Lido-side amount guards at `Lido.sol` lines
+842/873, the line 744 pull, the funded router balance, and the line 755
+`assert` all read that wrapped word.  Under a wrap that is not to zero the
+wrapped pull is smaller than the exact pushed total, so the push is
+underfunded or the assert fires.  A sum that wraps to exactly zero takes the
+line 741 empty commit (`committedNoTopUp`) instead of reverting: wrap
+precludes a *value-moving* commit, not every commit.  Under
 `NoUncheckedWrap` the wrapped and exact readings coincide
 (`totalAllocated_faithful`), the assert can never fire
 (`run_ne_revertAssertBalanceUnchanged`), and conservation on the commit branch
@@ -123,16 +124,10 @@ it is recorded as `A-TOPUP-NOWRAP` in `audit/assumptions.yaml`.  Nothing here
 claims the `unchecked` block is safe; it says which fact the source-plane claim
 rests on.
 
-Residual exact readings, stated rather than hidden.  Three guards outside the
-value-moving tail still read the exact `Nat` sum where the chain reads the
-wrapped `amount`: the over-target comparison at line 737, the zero-sum test at
-line 741, and the Lido-side amount guards at `Lido.sol` lines 842/873.  This
-matters only under a wrap, and there only for *which* outcome the model
-produces: the over-target and zero-sum guards can change which revert fires
-first (or, for a sum that wraps to exactly zero, commit-vs-revert), and the
-exact-reading liquidity guard is conservative (it fires no later than the chain
-would).  The registered wrap discharge (`run_reverts_of_wrap`) is a statement
-about the model and holds regardless.
+The three residual guards now read the same wrapped word the chain reads.
+Wrap-to-zero is therefore a no-top-up commit rather than a revert, which is
+why the registered wrap fact is `run_wrap_precludes_value_moving_commit`
+rather than wrap-implies-revert.
 
 Rollback.  The pinned path contains no `try`/`catch` and no failure-swallowing
 low-level call, so every guard listed above aborts the whole transaction.  A
@@ -298,10 +293,11 @@ inductive Outcome
   /-- `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)`, source
   lines 752--755.  A failing `assert` is a Solidity 0.8 `Panic(0x01)` that aborts
   the whole transaction rather than stranding the difference in the router.
-  Load-bearing on the wrap branch: a wrapped pull is smaller than the exact
-  pushed total, so the assert fires and `run_reverts_of_wrap` shows no wrapping
-  batch can commit.  Under `NoUncheckedWrap` it can never fire -- see
-  `run_ne_revertAssertBalanceUnchanged`. -/
+  Load-bearing on a nonzero wrap: a wrapped pull is smaller than the exact
+  pushed total, so the assert fires.  Wrap-to-zero never reaches it (line 741
+  commits `committedNoTopUp`).  `run_wrap_precludes_value_moving_commit` is
+  the honest wrap fact.  Under `NoUncheckedWrap` the assert can never fire --
+  see `run_ne_revertAssertBalanceUnchanged`. -/
   | revertAssertBalanceUnchanged
   /-- The zero-sum path: `amount > 0` is false at source line 741, so no pull and
   no push happen and control falls straight through to the event at source line
@@ -338,12 +334,11 @@ def allocSum : List Nat → Nat
   | [] => 0
   | a :: as => a + allocSum as
 
-/-- The exact `Nat` reading of `amount`: the sum the over-target guard at
-source line 737, the zero-sum test at source line 741, and the Lido-side amount
-guards (`Lido.sol` lines 842/873) are modelled against, and the exact total the
-push loop sends.  The value-moving tail reads the wrapped `accumulated`
-instead; the two readings coincide under `NoUncheckedWrap`
-(`totalAllocated_faithful`). -/
+/-- The exact `Nat` reading of `amount`: the unbounded sum the push loop
+sends.  Over-target (line 737), zero-sum (line 741), Lido-side amount guards
+(`Lido.sol` 842/873), the line 744 pull, and the line 755 assert all read
+the wrapped `accumulated` (`wrappedTotal = exactTotal % 2^256`).  The two
+readings coincide under `NoUncheckedWrap` (`totalAllocated_faithful`). -/
 def totalAllocated (inp : SourceTopupInput) : Nat := allocSum inp.allocations
 
 /-- The `uint256` modulus the `unchecked` block at source line 722 reduces by. -/
@@ -372,11 +367,13 @@ theorem allocSumUnchecked_eq_allocSum {as : List Nat}
 
 /-- The on-chain reading of `amount`: the accumulation at source line 732
 reduced modulo `2 ^ 256`, as the enclosing `unchecked` block at source line 722
-computes it.  This is the wei the line 744 pull actually moves, the balance the
-router actually holds while the push loop sends the exact per-key amounts, and
-the reading the line 755 `assert` observes; `runPush` below routes all three
-through it. -/
+computes it (`wrappedTotal = exactTotal % 2^256`).  Over-target, zero-sum,
+Lido-side amount guards, the line 744 pull, the funded router balance, and
+the line 755 `assert` all read this word. -/
 def accumulated (inp : SourceTopupInput) : Nat := allocSumUnchecked inp.allocations
+
+/-- Alias used in the wrap-plane statement: `wrappedTotal = exactTotal % 2^256`. -/
+def wrappedTotal (inp : SourceTopupInput) : Nat := accumulated inp
 
 /-- The no-wrap side condition on one `topUp` call.
 
@@ -463,13 +460,10 @@ then the `makeBeaconChainTopUp` call at source line 750
 Split out from `run` because it is the tail that actually moves wei; every guard
 before it is a pure rejection.
 
-The value-moving readings are the on-chain `unchecked` ones: the line 744 pull
-moves `amount` as the `unchecked` block at line 722 computed it (`accumulated
-inp`, the sum reduced mod `2 ^ 256`), the balance the router holds while the
-push loop runs is the line 742 snapshot plus that wrapped pull, and the line 755
-`assert` compares those readings.  The Lido-side amount guards (`Lido.sol` lines
-842/873) are still modelled against the exact sum -- see the module docstring's
-residual exact-readings paragraph.
+The value-moving readings are the on-chain `unchecked` ones: the Lido-side
+amount guards (`Lido.sol` lines 842/873), the line 744 pull, the funded
+router balance, and the line 755 `assert` all read `accumulated inp`
+(`wrappedTotal = exactTotal % 2^256`).
 
 The `BeaconChainDepositor.sol` line 73 early return is not a separate branch: the
 line 769 and line 773 guards have already forced `_publicKeys.length = n ≠ 0` by
@@ -478,9 +472,9 @@ the time line 750 is reached, and `committed_pubkeys_nonempty` records that.
 def runPush (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Outcome :=
   if inp.lidoCanDeposit = false then
     .revertLidoCannotDeposit
-  else if totalAllocated inp = 0 then
+  else if accumulated inp = 0 then
     .revertLidoZeroAmount
-  else if inp.lidoDepositableEther < totalAllocated inp then
+  else if inp.lidoDepositableEther < accumulated inp then
     .revertLidoNotEnoughEther
   else if inp.pubkeyLengths.length ≠ inp.allocations.length then
     .revertArrayLengthMismatch
@@ -527,9 +521,9 @@ def run (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Outcome :=
   else match allocationLoop cfg inp.allocations inp.topUpLimits with
     | some o => o
     | none =>
-      if smDepositableEthAmountRounded cfg inp < totalAllocated inp then
+      if smDepositableEthAmountRounded cfg inp < accumulated inp then
         .revertModuleReturnExceedTarget
-      else if totalAllocated inp = 0 then
+      else if accumulated inp = 0 then
         .committedNoTopUp
       else
         runPush cfg inp
@@ -706,17 +700,18 @@ theorem balanceAssert_iff_pulled_eq_pushed (inp : SourceTopupInput)
 /--
 Inversion for the value-moving tail at source lines 742--756.
 
-Reached with a positive sum (source line 741), `runPush` can only produce one of
-*seven* outcomes.  The two balance guards it syntactically contains --
+Reached with a positive *wrapped* sum (source line 741 reads
+`accumulated`), `runPush` can only produce one of *seven* outcomes.  The two
+balance guards it syntactically contains --
 `revertInsufficientRouterBalance` at `BeaconChainDepositor.sol` line 106 and
 `revertAssertBalanceUnchanged` at source line 755 -- are live exactly on the
-wrap branch, so their disjuncts carry the firing conditions: past the
+nonzero wrap branch, so their disjuncts carry the firing conditions: past the
 `ArrayLengthMismatch` guard at `BeaconChainDepositor.sol` line 74 the exact push
-is `totalAllocated`, while the pull and the funded balance read the wrapped
-`accumulated`.
+is `totalAllocated`, while the pull, Lido-side amount guards, and the funded
+balance read the wrapped `accumulated`.
 -/
 theorem runPush_inversion (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-    (hZero : totalAllocated inp ≠ 0) {o : Outcome} (hRun : runPush cfg inp = o) :
+    (hZero : accumulated inp ≠ 0) {o : Outcome} (hRun : runPush cfg inp = o) :
     o = .revertLidoCannotDeposit ∨
     o = .revertLidoNotEnoughEther ∨
     o = .revertArrayLengthMismatch ∨
@@ -737,7 +732,7 @@ theorem runPush_inversion (cfg : SourceTopupConfig) (inp : SourceTopupInput)
   · rw [if_pos h1] at hRun
     exact Or.inl hRun.symm
   rw [if_neg h1, if_neg hZero] at hRun
-  by_cases h3 : inp.lidoDepositableEther < totalAllocated inp
+  by_cases h3 : inp.lidoDepositableEther < accumulated inp
   · rw [if_pos h3] at hRun
     exact Or.inr (Or.inl hRun.symm)
   rw [if_neg h3] at hRun
@@ -782,13 +777,13 @@ theorem run_inversion {cfg : SourceTopupConfig} {inp : SourceTopupInput} {o : Ou
     o = .revertLidoDepositsPaused ∨
     (∃ p, allocationLoop cfg inp.allocations inp.topUpLimits = some p ∧ o = p) ∨
     o = .revertModuleReturnExceedTarget ∨
-    (o = .committedNoTopUp ∧ totalAllocated inp = 0) ∨
+    (o = .committedNoTopUp ∧ accumulated inp = 0) ∨
     (o = runPush cfg inp ∧
       inp.callerIsTopUpGateway = true ∧
       0 < inp.keyIndicesLength ∧
       inp.pubkeyLengths.length = inp.keyIndicesLength ∧
       (∀ l ∈ inp.pubkeyLengths, l = cfg.pubkeyLength) ∧
-      totalAllocated inp ≠ 0) := by
+      accumulated inp ≠ 0) := by
   unfold run at hRun
   by_cases h1 : inp.callerIsTopUpGateway = false
   · rw [if_pos h1] at hRun
@@ -841,11 +836,11 @@ theorem run_inversion {cfg : SourceTopupConfig} {inp : SourceTopupInput} {o : Ou
   split at hRun
   · rename_i p hp
     exact Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inl ⟨p, hp, hRun.symm⟩
-  by_cases h10 : smDepositableEthAmountRounded cfg inp < totalAllocated inp
+  by_cases h10 : smDepositableEthAmountRounded cfg inp < accumulated inp
   · rw [if_pos h10] at hRun
     exact Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inl hRun.symm
   rw [if_neg h10] at hRun
-  by_cases h11 : totalAllocated inp = 0
+  by_cases h11 : accumulated inp = 0
   · rw [if_pos h11] at hRun
     exact Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inl ⟨hRun.symm, h11⟩
   rw [if_neg h11] at hRun
@@ -894,11 +889,9 @@ theorem committed_topup_spec {cfg : SourceTopupConfig} {inp : SourceTopupInput}
     · cases h'
     · cases h'
     · cases h'
-      have hEq : accumulated inp = totalAllocated inp :=
-        hAssertPass.trans (pulled_eq_pushed hLen).symm
       refine ⟨rfl, ?_, hLen, rfl, rfl, hAssertPass, ?_, ?_⟩
       · rw [hKeysLen]; exact hKeys
-      · exact Nat.pos_of_ne_zero (fun h0 => hZero (hEq ▸ h0))
+      · exact Nat.pos_of_ne_zero hZero
       · unfold routerBalanceAfter; rw [hAssertPass, Nat.add_sub_cancel]
 
 /--
@@ -972,13 +965,14 @@ theorem committing_implies_authorized {cfg : SourceTopupConfig} {inp : SourceTop
   · simpa using hAuth
 
 /--
-The zero-sum commit at source line 741 is reachable only when the module returned
-nothing to deposit -- it is the one non-reverting escape that never reaches the
-line 755 `assert`.
+The zero-sum commit at source line 741 is reachable only when the wrapped
+accumulator is zero -- either the module returned nothing to deposit, or the
+unchecked sum wrapped to exactly zero.  It is the one non-reverting escape
+that never reaches the line 755 `assert`.
 -/
 theorem committedNoTopUp_implies_zero_total {cfg : SourceTopupConfig}
     {inp : SourceTopupInput} (hRun : run cfg inp = .committedNoTopUp) :
-    totalAllocated inp = 0 := by
+    accumulated inp = 0 := by
   rcases run_inversion hRun with
     h | h | h | h | h | h | h | h | h | ⟨p, hp, h⟩ | h | ⟨-, hZero⟩ | ⟨h, -, -, -, -, hZero⟩
   case _ => cases h
@@ -1021,8 +1015,10 @@ sum itself wraps, which is exactly what the hypothesis excludes.
 
 The `NoUncheckedWrap` hypothesis is the recorded side condition
 (`A-TOPUP-NOWRAP`) under which the wrapped reading the value-moving tail uses
-equals the exact sum.  On the other branch the assert is load-bearing:
-`run_reverts_of_wrap` shows every wrapping input reverts.
+equals the exact sum.  On a nonzero wrap the assert is load-bearing:
+`run_wrap_nonzero_reverts` shows every wrapping input with `accumulated ≠ 0`
+reverts, and `run_wrap_precludes_value_moving_commit` shows wrap never
+produces a value-moving commit.
 -/
 theorem run_ne_revertAssertBalanceUnchanged (cfg : SourceTopupConfig)
     (inp : SourceTopupInput) (hNoWrap : NoUncheckedWrap inp) :
@@ -1163,25 +1159,21 @@ theorem run_ne_revertInvalidPublicKeyLength {cfg : SourceTopupConfig}
     · cases h'
 
 /--
-The registered wrap discharge, stated about `run` itself.  When the exact sum
-reaches `2 ^ 256` the `unchecked` accumulation at source line 732 wraps, so the
-wrapped pull at source line 744 is strictly below the exact total the push loop
-at `BeaconChainDepositor.sol` lines 79--107 sends.  On the value-moving tail
-that means one of two whole-transaction aborts: either the router cannot fund
-the loop (`revertInsufficientRouterBalance`, `BeaconChainDepositor.sol` line
-106), or the loop completes and the `assert` at source line 755 observes the
-deficit (`revertAssertBalanceUnchanged`).  Either way no wrapping batch commits.
+A wrapping batch never moves wei.  When the exact sum reaches `2 ^ 256` the
+`unchecked` accumulation at source line 732 wraps.  If the wrapped word is
+zero, line 741 takes `committedNoTopUp`.  If it is nonzero, the wrapped pull
+is strictly below the exact push and the value-moving tail aborts -- either
+the router cannot fund the loop (`revertInsufficientRouterBalance`) or the
+line 755 `assert` fires (`revertAssertBalanceUnchanged`).  Either way
+`pulled = pushed = 0`.
 -/
-theorem run_reverts_of_wrap (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+theorem run_wrap_precludes_value_moving_commit
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (hWrap : ¬ NoUncheckedWrap inp) :
-    (run cfg inp).reverts = true := by
+    (run cfg inp).pulled = 0 ∧ (run cfg inp).pushed = 0 := by
   have hModulusPos : 0 < uint256Modulus := by decide
   cases hRun : run cfg inp with
-  | committedNoTopUp =>
-      have hZero := committedNoTopUp_implies_zero_total hRun
-      have hLt : totalAllocated inp < uint256Modulus := by
-        rw [hZero]; exact hModulusPos
-      exact absurd hLt hWrap
+  | committedNoTopUp => exact ⟨rfl, rfl⟩
   | committedTopUp keys pulled pushed balanceAfter =>
       obtain ⟨-, -, hLen, hPull, hPush, hMoved, -, -⟩ := committed_topup_spec hRun
       have hEq : accumulated inp = pushedValue inp :=
@@ -1196,7 +1188,35 @@ theorem run_reverts_of_wrap (cfg : SourceTopupConfig) (inp : SourceTopupInput)
           Nat.mod_lt _ hModulusPos
         rwa [hModEq] at hModLt
       exact absurd hLt hWrap
+  | _ => exact ⟨rfl, rfl⟩
+
+/-- Nonzero wrap still reverts: the empty-commit exception is only wrap-to-zero. -/
+theorem run_wrap_nonzero_reverts (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hWrap : ¬ NoUncheckedWrap inp) (hNz : accumulated inp ≠ 0) :
+    (run cfg inp).reverts = true := by
+  have ⟨hp, _⟩ := run_wrap_precludes_value_moving_commit cfg inp hWrap
+  cases hRun : run cfg inp with
+  | committedNoTopUp =>
+      exact absurd (committedNoTopUp_implies_zero_total hRun) hNz
+  | committedTopUp keys pulled pushed balanceAfter =>
+      rw [hRun] at hp
+      simp [Outcome.pulled] at hp
+      obtain ⟨-, -, -, hPull, -, -, hPos, -⟩ := committed_topup_spec hRun
+      exact absurd hp (Nat.ne_of_gt (hPull ▸ hPos))
   | _ => rfl
+
+/-- A committed source run is either no-wrap or a wrap-to-zero empty commit. -/
+theorem committed_implies_nowrap_or_wrapped_zero
+    {cfg : SourceTopupConfig} {inp : SourceTopupInput}
+    (hCommit : (run cfg inp).reverts = false) :
+    NoUncheckedWrap inp ∨ accumulated inp = 0 := by
+  by_cases hNoWrap : NoUncheckedWrap inp
+  · exact Or.inl hNoWrap
+  · by_cases hZero : accumulated inp = 0
+    · exact Or.inr hZero
+    · exact absurd hCommit (by
+        simp only [Bool.not_eq_false]
+        exact run_wrap_nonzero_reverts cfg inp hNoWrap hZero)
 
 /-! ## Abstract-transaction correspondence -/
 

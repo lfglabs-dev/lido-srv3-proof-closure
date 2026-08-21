@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 08461a63d8f4b5f60ae2e515e10b09491a9c46b5
+validated-tree: a31d711ac7b34bd25b33b4fa7388c9acd0cbafe2
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3465,3 +3465,27 @@ P-TOPUP-1 wrap-plane honesty (2026-08-21)
   `027ff53d623c57c30d5c8a2d9ad60b680f53f2ecf87612be4d8abaa06511535a`.
 - `validated-tree` rebound to this commit's tracked tree excluding this receipt
   `08461a63d8f4b5f60ae2e515e10b09491a9c46b5`.
+
+P-TOPUP-1 wrappedTotal both planes (2026-08-21)
+----------------------------------------------
+
+- Lean. Over-target (line 737), zero-sum (line 741), and Lido-side amount
+  guards (`Lido.sol` 842/873) now read `wrappedTotal = exactTotal % 2^256`
+  (`accumulated`), matching the line-744 pull, funded router balance, and
+  line-755 assert. Registered conjunct 3 is wrap precludes a value-moving
+  commit (`source_wrap_precludes_value_moving_commit`): wrap-to-zero is
+  `committedNoTopUp`, nonzero wrap still aborts. Verity parent
+  `verity_tx_simulates_source` drops `NoUncheckedWrap`; keeps `hLen`,
+  per-allocation `hAmt`, and `hCommit`. Positive control
+  `wrap_to_zero_commits_no_topup`. Four surgical kill-lines preserved.
+  No sorry/admit/new axiom; Trust print-axioms are propext / Classical.choice
+  / Quot.sound.
+- `lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx
+  LidoSRv3.Tests.TopupTxMutants LidoSRv3.Audit.Trust` exit 0.
+- `python3 scripts/audit_metadata.py generate && check` exit 0.
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-TOPUP-1"]` rebound to
+  `140885e93f9520e951b79d65740dfe805659d5af4614ae9b504f26ebce577154`.
+  `fidelity.missing` retains only beacon-address provenance.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `validated-tree` rebound to this commit's tracked tree excluding this receipt
+  `a31d711ac7b34bd25b33b4fa7388c9acd0cbafe2`.
