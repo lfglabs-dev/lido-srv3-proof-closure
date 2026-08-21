@@ -2,6 +2,7 @@ import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.AddressEquivariance
 import LidoSRv3.Audit.Verity.AddressTransferTx
 import LidoSRv3.Audit.Verity.AddressTx
+import LidoSRv3.Audit.Verity.AddressClaimBatchTx
 
 namespace LidoSRv3.Audit.Guarantees.PAddress1
 
@@ -239,12 +240,35 @@ theorem abstract_source_verity_tx_address_equivariance :
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.2.2.2.2⟩
 
+/-- Bounded live `claimWithdrawalsTo` transaction evidence, kept separate from
+the universal four-projection parent above. The two-item executable receipt
+reads current/previous packed request words and checkpoint words, marks both
+packed claimed bytes, decrements locked ETH, and derives two ordered
+value-bearing payout CALL journal entries. Every failed batch run restores its
+entry snapshot. This is not compiler extraction or keccak-level correspondence. -/
+theorem bounded_live_claim_batch_storage_call_surface :
+    LidoSRv3.Audit.Verity.AddressClaimBatchTx.observe [1, 2]
+        ((LidoSRv3.Audit.Verity.AddressClaimBatchTx.executeClaimWithdrawalsTo
+          [1, 2] [1, 1] (2 : Verity.Address)).run
+            LidoSRv3.Audit.Verity.AddressClaimBatchTx.twoClaimState) =
+      ⟨.committed, [true, true], 0,
+        [LidoSRv3.Audit.Verity.AddressClaimBatchTx.payoutEntry (2 : Verity.Address) 30,
+          LidoSRv3.Audit.Verity.AddressClaimBatchTx.payoutEntry
+            (2 : Verity.Address) 40]⟩ ∧
+    (∀ (requestIds hints : List Nat) (recipient : Verity.Address)
+      (state rollback : Verity.ContractState) (reason : String),
+      (LidoSRv3.Audit.Verity.AddressClaimBatchTx.executeClaimWithdrawalsTo
+        requestIds hints recipient).run state = .revert reason rollback →
+      rollback = state) := by
+  exact ⟨LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe,
+    LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot⟩
+
 /-- Bounded horizontal slice only: MODEL→SOURCE→official-Denote composition
 for the owner-operated WithdrawalQueue ERC-721 ownership handoff. This retained
 regression theorem is subordinate to the universal parent composition above. -/
 theorem bounded_transfer_model_source_tx :
-    (∀ caller fromAddr to s, sourceTransfer caller fromAddr to s =
-      modelTransfer caller fromAddr to s) ∧
+    (∀ caller fromAddr toAddr s, sourceTransfer caller fromAddr toAddr s =
+      modelTransfer caller fromAddr toAddr s) ∧
     sourceTransfer 1 1 3 { owner := 1, approved := 9 } = some { owner := 3, approved := 0 } ∧
     sourceTransfer 2 2 (swap12 3) (renameState12 { owner := 1, approved := 9 }) =
       (sourceTransfer 1 1 3 { owner := 1, approved := 9 }).map renameState12 ∧

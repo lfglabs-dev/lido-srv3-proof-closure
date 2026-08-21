@@ -338,10 +338,10 @@
         "A-VERITY-SCAFFOLD"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Tests.AddressSourceMutants",
-        "expected": "universal admission/post-state equivariance over four modeled address-bearing writers, separate admission-side and write-side parent-shaped kill-lines, four Contract.run entrypoints, source-shaped address-write correspondence, rollback, and mutants"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Audit.Verity.AddressClaimBatchTx LidoSRv3.Tests.AddressSourceMutants",
+        "expected": "universal admission/post-state equivariance over four modeled address-bearing writers; bounded two-item live claim batch receipt with packed request/checkpoint reads, locked-ETH writes, ordered payout CALLs and rollback; admission/write/payout mutants"
       },
-      "summary": "universal_address_writer_equivariance covers four modeled address-bearing entrypoint projections. Only requestWithdrawals and unwrap have the proved pause/balance/allowance permissionless-admission lemma; transferFrom and claimWithdrawalsTo retain caller-relative owner/approval gates. fixed_owner_gate_kill_line_refutes_parent mutates admission. fixed_owner_writer_kill_line_refutes_parent keeps honest admission and mutates only a committed owner write, isolating the post-state conjunct. claimWithdrawalsTo is single-item, not the live batch loop.",
+      "summary": "universal_address_writer_equivariance covers four modeled address-bearing entrypoint projections. Only requestWithdrawals and unwrap have the proved pause/balance/allowance permissionless-admission lemma; transferFrom and claimWithdrawalsTo retain caller-relative owner/approval gates. The separate AddressClaimBatchTx executes arbitrary-length parallel request/hint iteration and has a bounded two-item observe receipt for packed request/checkpoint reads, claimed-bit writes, locked-ETH decrements, and ordered value-bearing payout CALLs. It is incremental transaction evidence, not a widening of the universal parent.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance"
@@ -357,12 +357,16 @@
           "parent-shaped fixed-owner-gate kill-line fixed_owner_gate_kill_line_refutes_parent negating the registered parent's exact predicate shape on a mutant of the real admitted/run/renameInput (both conclusion conjuncts falsified on one in-scope requestWithdrawals witness); fixed_owner_gate_not_admission_equivariant retained as admission-projection sibling evidence",
           "write-only parent-shaped kill-line fixed_owner_writer_kill_line_refutes_parent: honest admission commits both swapped unwrap inputs, but an unrenamed fixed-owner write falsifies committed-post renaming",
           "four storage-writing Contract.run entrypoints and behavioral source correspondence on entrypoint-specific address-write observables",
+          "separate live-shaped claimWithdrawalsTo Contract.run loop over parallel request/hint lists, exact pinned unstructured-storage constants, packed owner/claimed request-word decoding, current/previous request and checkpoint reads, locked-ETH updates, ordered value-bearing empty-calldata payout CALL journal, and universal failed-run snapshot rollback",
+          "bounded two-request batch observe theorem and fixed-payout-recipient journal kill-line",
           "snapshot rollback and wrong-recipient, address-writer, and admission-boundary mutants"
         ],
         "missing": [
           "singleton-actor exclusion is by omission: singletonActorEntryPoint is False for every modeled tag, so the parent carries no live exclusion proof",
-          "live WithdrawalQueue.claimWithdrawalsTo batch iteration, request reads, and payout CALL",
-          "packed WithdrawalQueue ERC-721 and WstETH/ERC-20 storage, approvals, balances, and allowances",
+          "unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item",
+          "keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words",
+          "EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics",
+          "packed WithdrawalQueue ERC-721 transfer and WstETH/ERC-20 storage, approvals, balances, and allowances outside the bounded claim request words",
           "transferFrom is a wrapper-level single-item projection rather than a proved implementation-body correspondence",
           "external-call success and most environment checks are caller-supplied Booleans",
           "pinned implementation-body extraction and machine-level storage/execution correspondence"
@@ -372,7 +376,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked four-projection parent, its admission-side and write-side kill-lines, and the Verity composition. Do not call all four writers permissionless or widen to singleton-actor entrypoints."
       },
-      "next_gate": "OPEN: the checked parent remains a four-projection model. Live claimWithdrawalsTo batch iteration, packed storage, request reads, and payout CALL are unmodeled; do not add singleton-actor functions or call all four writers permissionless.",
+      "next_gate": "OPEN: the checked parent remains a four-projection model. The separate claim batch now iterates arbitrary request/hint lists and materially reads packed request/checkpoint channels, updates locked ETH, and journals payout CALLs, with a checked two-item observe receipt. Still open: unbounded source/equivariance correspondence for that live batch, keccak physical mapping derivation, EnumerableSet/events/adversarial callee semantics, and unrelated packed ERC-721/WstETH storage. Do not add singleton-actor functions or call all four writers permissionless.",
       "roadmap_priority": "DONE"
     },
     {

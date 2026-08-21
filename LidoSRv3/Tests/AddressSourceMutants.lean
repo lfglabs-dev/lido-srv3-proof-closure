@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.AddressTx
+import LidoSRv3.Audit.Verity.AddressClaimBatchTx
 
 namespace LidoSRv3.Tests.AddressSourceMutants
 
@@ -276,6 +277,35 @@ theorem verity_zero_amount_rejected :
     (LidoSRv3.Audit.Verity.AddressTx.AddressTxContract.redeem 0 true).run state =
       .revert "ZeroAmount" state := by
   rfl
+
+/-! ## Live claim-batch payout kill-line -/
+
+open LidoSRv3.Audit.Verity.AddressClaimBatchTx in
+def claimLoopFixedPayout : List Nat → List Nat → Address → Contract Unit
+  | [], [], _ => Verity.pure ()
+  | requestId :: requestIds, hint :: hints, recipient => do
+      claimOne requestId hint (9 : Address)
+      claimLoopFixedPayout requestIds hints recipient
+  | _, _, _ => fun state => .revert "ArraysLengthMismatch" state
+
+open LidoSRv3.Audit.Verity.AddressClaimBatchTx in
+def executeFixedPayoutRecipient (requestIds hints : List Nat) (recipient : Address) :
+    Contract Unit := do
+  require (recipient != zeroAddress) "ZeroRecipient"
+  require (requestIds.length == hints.length) "ArraysLengthMismatch"
+  claimLoopFixedPayout requestIds hints recipient
+
+open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+
+/-- Kill-line for the new live-batch observable: keeping all request reads,
+packed writes, values, and loop order but routing `_sendValue` to a fixed
+unrenamed address is detected by the execution-derived CALL journal. -/
+theorem fixed_payout_recipient_mutant_kill_line :
+    observe [1, 2]
+        ((executeFixedPayoutRecipient [1, 2] [1, 1] (2 : Address)).run twoClaimState) ≠
+      ⟨.committed, [true, true], 0,
+        [payoutEntry (2 : Address) 30, payoutEntry (2 : Address) 40]⟩ := by
+  native_decide
 
 #check LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance
 #check source_admission_nondiscriminatory
