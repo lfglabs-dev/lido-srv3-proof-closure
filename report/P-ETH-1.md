@@ -1,5 +1,23 @@
 # P-ETH-1
 
+> Operator round (2026-08-21). ChatGPT UI pool was unreachable from this session (`SANDBOXED_API_URL` unset), so these two sections are written from the live Lean parents and `audit/guarantees.yaml`. They are not GPT-5.6 Pro quotes.
+
+## Auditor note
+
+P-ETH-1 is the ETH-flow guarantee around Lido's consolidation request path. A caller sends `msg.value` into a gateway. The gateway owes `n * fee` to the EIP-7251 consolidation contract and must refund the rest to the caller. VaultHub / StakingVault withdraw sites are named out of scope.
+
+The abstract parent `eth_flow_parent` is an explicit forall over every `(msgValue, n, fee)`. Zero value reverts `ZeroArgument`. An overflow `n * fee >= 2^256` reverts panic. An underfunded call `n * fee > msgValue` reverts `InsufficientValue`. Otherwise every journaled move is `parentApproved` and `totalAmount = msgValue`. The fee/refund split is the Nat identity `fee + (msgValue - fee) = msgValue` under `fee <= msgValue`.
+
+The Verity parent `verity_tx_composes_value_flow_and_rollback` is not that forall. It is a finite conjunction of five concrete tuples on the Bus/Gateway/Vault ensemble: honest `(10,2,3)`, `(10,1,3)`, `(6,2,3)`, a request-reject `(10,2,3)`, and a gateway-reject `(10,4,3)`, plus escrow and replay equalities on those numerals. `Contract.run` rollback is the snapshot restore of that ensemble, not a compiled multicall of `addConsolidationRequests`.
+
+Two Wave 4 kill-lines refute the abstract parent's own success conjunct on mutants of `gatewayExecute`: a misrouted fee journal to an off-set address, and a guard-free zero-value success that pays `2 * 3 = 6` wei. Two Wave 2 scope kill-lines refute reading the Verity parent as a universal batch theorem: an underfunded batch is not a repartition, and a funded guard-passing batch exhausts the fixed fuel budget.
+
+## Proof issues and recommendations
+
+The two planes do not share quantifier strength. Abstract is `forall msgValue n fee`. Verity is five traces. YAML `fidelity.missing` already records that a batchSize-unconditional Verity forall is false, not merely unproved: `fuelBudget = 32` bounds dispatched frames, and `Expr.mul` wraps mod `2^256`.
+
+Do not advertise a naked Verity forall. A true lift would have to assume funded balance, enough fuel, and no wrap of `n * fee`, and would still not be the live `executeConsolidation` ABI (groups, not `(amount, batchSize)`). If that lift is not landed, keep the finite claim and the named scope kill-lines. Do not compose into P-CONSOLIDATION-1 until `FunctionSpec` is `ConsolidationGateway.addConsolidationRequests`.
+
 Theorems: `PEth1.eth_flow_parent`, `PEth1.verity_tx_composes_value_flow_and_rollback`.
 Kill-lines (Tests): `misrouted_journal_kill_line_refutes_parent`, `zero_value_success_kill_line_refutes_parent` (abstract parent, Wave 4); `underfunded_batch_is_not_a_repartition`, `large_funded_batch_exhausts_fuel_budget` (Verity scope, Wave 2).
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

@@ -10,13 +10,13 @@ source_deposit_conserves_and_rolls_back proves that, for every configuration and
 
 verity_tx_composes_deposit_conservation_and_rollback transfers these guarantees to the modeled Verity transaction. Its execute path contains exactly two batches. This result depends on LinksSource, which the caller supplies as a hypothesis. It is not derived from P-ALLOC-1 or P-ALLOC-2.
 
-Draft PR #153 makes this boundary concrete with the counterexample between a source containing 1 key and supplied execution legs containing 2 and 3 keys.
+PR #153 (merged 2026-08-21, `9129cda5`) makes this boundary concrete. A private witness keeps the two executable legs at 2+3 keys while the source byte length describes one public key, so ALLOC outputs do not manufacture `LinksSource.keys`. The public kill-line `alloc_derived_linkssource_kill_line_refutes_bridge` assumes P-ALLOC-1 `CheckedBounds`, the P-ALLOC-2 step hypotheses, and four cross-plane composition premises including `depositsToAllocate = actualDepositsCount`. The witness still fails `LinksSource.firstAmount` (per-batch wei 65 against 2 * 32). ALLOC constrains key counts, not per-batch amounts.
 
 ## Proof issues and recommendations
 
 The abstract theorem is properly universal over cfg and inp. The Verity theorem is an explicit two-batch unrolling, not a production loop bound. LinksSource remains an assumption.
 
-The clean improvement is either to compose LinksSource from the P-ALLOC guarantees and the router's batch construction, or to keep the public claim explicitly limited to two caller-linked batches. The beacon deposit contract address should come from pinned provenance, not an unconstrained modeled endpoint.
+Do not treat ALLOC composition as unfinished work that will later discharge LinksSource. #153 shows the ALLOC parents plus key-count composition still do not imply LinksSource, because per-batch wei is an execution-level `DEPOSIT_SIZE` fact. Keep the public claim limited to two caller-linked batches, with LinksSource as a hypothesis, unless a new theorem also carries the per-key amount invariant. The beacon deposit contract address should come from pinned provenance, not an unconstrained modeled endpoint.
 
 
 Theorems: `PDeposit1.source_deposit_conserves_and_rolls_back` (registered abstract parent), `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` (Verity composition), `DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed` (kill-line).

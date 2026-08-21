@@ -1,5 +1,29 @@
 # P-TOPUP-1 — Beacon-Chain Top-Up Conservation & Rollback
 
+> Operator round (2026-08-21). ChatGPT UI pool was unreachable from this session (`SANDBOXED_API_URL` unset), so these two sections are written from the live Lean parents, `audit/guarantees.yaml`, and the 2026-08-20 wrap memo. They are not GPT-5.6 Pro quotes.
+
+## Auditor note
+
+P-TOPUP-1 is the beacon-chain top-up path on `StakingRouter.topUp` (`lidofinance/core@af095e48`, lines 679-759). A type-2 module asks the router to pull depositable ether from Lido and push per-validator top-ups to the beacon depositor. P-TOPUP-2 owns per-key limits. P-ALLOC-1/2 own how the amounts array is filled.
+
+The registered abstract parent `source_topup_conserves_and_rolls_back` is four conjuncts on the source-shaped `run`:
+1. `pulled = pushed` on every branch, with abstract-tx rollback of a reverting observation.
+2. An unregistered module reverts `revertStakingModuleUnregistered`.
+3. If the unchecked line-732 accumulator wraps (`¬ NoUncheckedWrap`), `run` itself reverts.
+4. Non-type-2 withdrawal credentials revert `revertWrongWithdrawalCredentialsType`.
+
+Wave 5 routed the wrap through `run`: the value-moving tail reads `accumulated = exactTotal % 2^256` for the pull and the line-755 assert. The wrap witness `wrapInput` (limits `[2^256-1, 2]`) reverts `revertAssertBalanceUnchanged` because wrapped pull `1` is not exact push `2^256+1`. Kill-line `dropped_conservation_assert_kill_line_refutes_parent` drops only that assert and commits with `pulled ≠ pushed`. Dual `unwrapped_accumulator_kill_line_refutes_parent` shows the wrap-ignoring mutant committing.
+
+The Verity parent `verity_tx_simulates_source` is also a forall, but only under `NoUncheckedWrap`, `allocations.length ≤ 2^256`, and `(run cfg inp).reverts = false`. On those premises, `observe` of `execute.run` equals `sourceObservables`, pulled/pushed agree, and every injected revert restores the entry snapshot.
+
+## Proof issues and recommendations
+
+The wrap story is not the same on both planes. Abstract conjunct 3 talks about wrap. Verity assumes `NoUncheckedWrap` and a non-reverting `run`, so it never executes the wrap branch. YAML already notes that over-target (line 737), zero-sum (line 741), and Lido-side amount guards still read the exact Nat sum where the chain reads the wrapped amount.
+
+`run_reverts_of_wrap` currently proves wrap implies revert, including wrap-to-zero: `committedNoTopUp` forces `totalAllocated = 0`, which cannot be a wrap. That is true of this model because the zero-sum test still reads the exact sum. If those residual guards are switched to `wrappedTotal = exactTotal % 2^256`, wrap-to-zero can become a no-top-up commit rather than a revert. Then "wrap implies revert" is false. The honest claim is: wrap precludes a value-moving commit.
+
+Recommended next work, in order: put `wrappedTotal` on the over-target and zero-sum guards; restate conjunct 3 as wrap precludes `committedTopUp`; drop or discharge `NoUncheckedWrap` / `reverts = false` from the Verity parent so the wrap branch is an executed observation, not a hypothesis. Do not keep A-TOPUP-NOWRAP as a hidden Verity-only assumption while the abstract parent talks wrap.
+
 ## Registered Theorem
 
 `source_topup_conserves_and_rolls_back` is the single theorem registered as
