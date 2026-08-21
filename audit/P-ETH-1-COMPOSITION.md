@@ -53,52 +53,76 @@ calldata word `0`, the dispatcher lifts it into `CallSite.value`, and every
 receiver opens with `require(msg.value == amount)`. Without this the body debit
 and the frame debit would both fire.
 
-`Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback` states the parent
-over `TxView` outcome observables — control, hop count, and the seven-account
-balance sheet — not over full contract states. It covers the fee/refund split
-for one- and two-request batches and the exact-fee batch, restoration of the
-entry world when the request predeploy rejects, the in-Gateway revert of an
-underfunded batch, ETH conservation on success and on revert, and equality
-between the recursively dispatched run and a PR #2365 `denoteTransaction`
-replay of the discovered `List CompiledCall`.
+`Guarantees.PEth1.verity_tx_universal_success_shape` (registered parent since
+Wave 5) states the parent over `TxView` outcome observables — control, hop
+count, and the seven-account balance sheet — not over full contract states.
+It is a `∀ (msgValue batchSize feePerRequest : Nat)` theorem: under the
+positivity, word-size, no-wrap, funding, and fuel premises below, the honest
+wiring commits with the whole product fee at the consolidation-request
+predeploy, the remainder at the refund recipient, and zero retained by every
+protocol contract on the route. The proof chains per-hop frame lemmas through
+the recursive dispatcher and closes the symbolic `batchSize`-driven request
+loop by induction over `requestPhaseWorld`
+(`Verity.PEth1CompositionTxUniversal.run_success_shape`).
 
-Both theorems close on `[propext, Quot.sound]`; the decision procedure is
-`decide +kernel`, which is kernel reduction and introduces no axiom.
+`Guarantees.PEth1.verity_tx_composes_value_flow_and_rollback` is retained as
+auxiliary regression evidence: the fee/refund split for one- and two-request
+batches and the exact-fee batch (now instances of the universal parent),
+restoration of the entry world when the request predeploy rejects, the
+in-Gateway revert of an underfunded batch, ETH conservation on success and on
+revert, and equality between the recursively dispatched run and a PR #2365
+`denoteTransaction` replay of the discovered `List CompiledCall`.
 
-## Scope: finite witness bundle, not `∀` funded batches
+The universal parent closes on `[propext, Classical.choice, Quot.sound]`; the
+auxiliary numeral bundle closes on `[propext, Quot.sound]` with `decide
++kernel`, which is kernel reduction and introduces no axiom.
 
-Unlike the abstract-plane `eth_flow_parent` (`∀ (msgValue n fee : Nat)`),
-`verity_tx_composes_value_flow_and_rollback` is a finite conjunction over
-exactly five concrete `(msgValue, batchSize, feePerRequest)` tuples:
-`(10,2,3)`, `(10,1,3)`, `(6,2,3)`, `(10,2,3)` with `requestAccepts := false`,
-and `(10,4,3)`. It does not quantify over `msgValue`, `batchSize`, or
-`feePerRequest`.
+## Scope: universal over the success arm, under explicit premises
 
-A `∀`-generalization was evaluated for this wave and rejected as infeasible
-without `sorry`: the recursive `MultiContract.callFunction` dispatch
-(`PEth1CompositionTx.step`) has no existing induction lemmas over an
-arbitrary `batchSize`-driven `forEach` in this codebase (P-ETH-1 is the only
-guarantee using this cross-contract dispatch pattern; other composed
-guarantees — e.g. `P-CONSOLIDATION-1`, `P-DEPOSIT-1` — simulate a single
-contract's own `.run`, which is a materially simpler target for induction).
-Beyond the proof-engineering gap, two model properties make an unconditional
-`∀` statement *false*, not merely hard to prove:
+Since Wave 5 the Verity plane matches the abstract-plane `eth_flow_parent`
+(`∀ (msgValue n fee : Nat)`) in quantifier strength on the success arm.
+`verity_tx_universal_success_shape` quantifies over all
+`(msgValue, batchSize, feePerRequest)` satisfying:
+
+- `0 < msgValue` — the Gateway's compiled `ZeroArgument` guard (added to
+  `gatewayFn` in Wave 5, matching the pinned source's
+  `ZeroArgument("msg.value")` revert and the abstract plane's Wave 1 guard;
+  it only affects `msgValue = 0` runs, which are outside the parent's
+  premises, and it is what the positivity premise-necessity kill-line
+  exercises);
+- `msgValue`, `batchSize`, `feePerRequest`, and the product
+  `batchSize * feePerRequest` below `2^256` — word-sized inputs and no wrap;
+- `batchSize * feePerRequest ≤ msgValue` — the `InsufficientValue` guard;
+- `batchSize + 4 ≤ fuelBudget` — the dispatch fuel bound.
+
+The premises are exactly the abstract parent's non-revert conditions plus the
+fuel bound. Two model properties make an unconditional `∀` statement *false*,
+not merely hard to prove, which is why they appear as premises:
 
 - **`fuelBudget = 32`** caps the number of dispatched frames (report issue
-  9). A batch needs `3 + batchSize + (1 if refund > 0 else 0)` frames, so
-  any candidate universal statement needs a `batchSize` side condition the
-  current statement has none of.
+  9). A batch needs `3 + batchSize + (1 if refund > 0 else 0)` frames, so the
+  fuel premise is the honest form of that cap.
 - **`Expr.mul` wraps mod `2^256`** in the compiled Gateway/Vault bodies
   (report issue 12), so "funded" as the dispatcher computes it and "funded"
-  under Solidity 0.8 checked arithmetic diverge for large inputs.
+  under Solidity 0.8 checked arithmetic diverge for large inputs unless the
+  no-wrap premise rules the divergence out.
 
-Two named kill-line theorems in `Tests.PEth1CompositionTxMutants` make this
-scope executable rather than only asserted in prose:
+Every premise is load-bearing: Wave 5 premise-necessity kill-lines in
+`Tests.PEth1CompositionTxMutants` refute each premise-dropped projection of
+the registered predicate on the honest wiring, and the two Wave 2 scope
+kill-lines remain as the executable funding/fuel witnesses:
 
 | Theorem | Tuple | Shows |
 | --- | --- | --- |
-| `underfunded_batch_is_not_a_repartition` | `(10, 4, 3)` | Reverts instead of repartitioning the total; not a counterexample to a `∀`-success reading confined to guard-passing batches, but to a naive "the total is always split" reading. |
-| `large_funded_batch_exhausts_fuel_budget` | `(30, 29, 1)` | Funded and guard-passing (`29 * 1 ≤ 30`, no overflow), yet needs `3 + 29 + 1 = 33 > 32` frames and hits `TxControl.exhausted` — a control value none of the five registered witnesses produce, and a failure mode `eth_flow_parent`'s `GatewayRevert` cases do not mention either. |
+| `zero_value_kill_line_refutes_dropped_positivity` | `(0, 2, 0)` | With `0 < msgValue` dropped, the `ZeroArgument` guard reverts a run the projection requires to succeed. |
+| `underfunded_kill_line_refutes_dropped_funding` | `(10, 4, 3)` | With `n * fee ≤ msgValue` dropped, the `InsufficientValue` guard reverts a run the projection requires to succeed. Exact-shape form of `underfunded_batch_is_not_a_repartition`. |
+| `fuel_exhaustion_kill_line_refutes_dropped_fuel_premise` | `(30, 29, 1)` | With `batchSize + 4 ≤ fuelBudget` dropped, a funded guard-passing batch needs `33 > 32` frames and hits `TxControl.exhausted`. Exact-shape form of `large_funded_batch_exhausts_fuel_budget`. |
+
+The residual gap is the revert arms: the registered parent quantifies over
+the success branch only, and no `∀` revert-shape theorem is registered on the
+Verity plane (the premise-necessity kill-lines are negative witnesses, not a
+positive revert characterization). This is recorded in
+`audit/guarantees.yaml` `fidelity.missing`.
 
 `P-CONSOLIDATION-1` composition remains blocked on the `FunctionSpec` /
 `ConsolidationGateway.addConsolidationRequests` gap noted below regardless of
@@ -124,9 +148,21 @@ and `observeWithoutRollback` does not.
 
 The two scope kill-lines above (`underfunded_batch_is_not_a_repartition`,
 `large_funded_batch_exhausts_fuel_budget`) are not `Wiring` mutants — they run
-the *honest* wiring on inputs the registered parent does not witness, so they
-cannot be satisfied by weakening a mutant; they bound how far the registered
-parent's finite conjunction may honestly be read.
+the *honest* wiring on inputs outside the registered parent's premises, so
+they cannot be satisfied by weakening a mutant; since Wave 5 they double as
+the executable funding and fuel premise witnesses.
+
+The Wave 5 wiring kill-lines refute the registered universal predicate itself
+(`universalSuccessShapePredicate`, proved equal to the registered parent at
+the honest wiring by `universal_parent_is_predicate_at_honest`) at the
+premise-satisfying witness `(10, 2, 3)`:
+
+| Theorem | Wiring change | Refutes |
+| --- | --- | --- |
+| `dropped_refund_leg_kill_line_refutes_universal_parent` | `emitRefund := false` | the universal success shape (no refund leg) |
+| `misrouted_vault_kill_line_refutes_universal_parent` | `vaultTarget := lidoAddr` | the universal success shape (fee lands at Lido) |
+| `corrupted_refund_kill_line_refutes_universal_parent` | `refundWholeValue := true` | the universal success shape (refund is the whole `msg.value`) |
+| `single_request_kill_line_refutes_universal_parent` | `perRequestCalls := false` | the universal success shape (one request for a two-request batch) |
 
 The Wave 4 kill-lines are different again: they target the *abstract* parent
 `eth_flow_parent` and mutate its own model `gatewayExecute` rather than the
