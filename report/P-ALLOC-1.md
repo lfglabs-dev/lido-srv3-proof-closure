@@ -176,6 +176,258 @@ capacity column, but not for every returned field.
    scaffold storage until concrete layout and aliasing are proved, and keep
    rollback separate from the reverted observation.
 
+## Second pass, same day: machine-checked proof audit
+
+> Second reviewer (2026-08-21). Proof audit only. The owner product note below
+> is untouched, and so is the note above. Written against
+> `LidoSRv3/Audit/Guarantees/PAlloc1.lean`,
+> `LidoSRv3/Audit/Verity/AllocationTx.lean`,
+> `LidoSRv3/Audit/Model/AllocCapacity.lean`,
+> `LidoSRv3/Audit/Source/AllocCapacityCorrespondence.lean`,
+> `LidoSRv3/Tests/AllocationTxMutants.lean` and `audit/guarantees.yaml`. First
+> person, no em dashes. Lean is the authority. The three modules named in the
+> row's reproduction command build clean at `leanprover/lean4:v4.31.0`. The
+> pinned Lido Solidity is not in this tree, so every `SRLib` line number below is
+> carried from the existing report and not re-verified.
+>
+> I arrived after the first-pass audit above and my job here is to put numbers on
+> its prose where I can. Everything marked "checked" was confirmed by building a
+> throwaway probe, `LidoSRv3/Tests/Alloc1AuditProbe.lean`, at the same pin. It is
+> committed alongside this note and is explicitly not evidence: no facade imports
+> it, `Trust.lean` does not print it, and `audit/guarantees.yaml` does not name
+> it.
+
+**C1. I agree the Wave 2 split was the right repair, and the registered parent
+does have teeth.** `PAlloc1.checked_execute` forwards to
+`source_capacities_match_canonical`, which forwards to
+`SolidityAllocCapacity.source_execute_refines_audit_model`, which forwards to
+`AllocCapacity.execute_refines_math`. Four public names, one theorem, and since
+`SolidityAllocCapacity.execute` is `def execute := AllocCapacity.execute` there
+are two artifacts under those four names, not three: the checked-word loop and
+the `Nat` formulas in `MathView`. That pair is a real obligation. The `Nat`
+formulas are written separately, the induction has to line up `safeSub`,
+`safeAdd`, `safeMul` and `safeDiv` with their unbounded counterparts, and the
+kill-line lands.
+
+What the pair cannot see is a coordinated edit. The only lemma tying the clamp to
+the model is `wordMin_coe`, and the same file already proves `wordMax_coe`
+(`AllocCapacity.lean:223-232, 346-353`), so substituting `wordMax` in
+`secondLoop` and `max` in `MathView.capacity` is supported by the existing lemma
+set and the refinement would still go through. I did not build that pair, so I
+mark this as read and not checked, but the shape of the proof makes it clear:
+`checked_execute` is a transcription-agreement theorem between two artifacts in
+this repository, and correctness against `SRLib.sol:493-559` rests on
+`A-SOURCE-SHAPED`, whose subject is not in the tree. That is the honest reading
+of the CHECKED cell and I would put it in the row summary.
+
+**C2. The registered parent does not constrain the allocation column, and I can
+show a mutant that exploits it. Checked.** The first pass notes in passing that
+the parent observes only the capacity column. That gap is larger than it looks,
+because `Row.currentAllocation` is a returned column, not a diagnostic: the
+function is `_getModulesAllocationAndCapacity`, the legacy model notes in
+`archive/legacy-p1-p15/README.md` describe it as building one current-allocation
+row per router module, and the allocation column is the bucket fill `MinFirst`
+starts from downstream. So I mutated exactly that column and left every capacity
+computation alone:
+
+    theorem zero_allocation_column_mutant_survives_registered_parent
+        (cfg) (modules) (deposits) (isTopUp) (hBounds : CheckedBounds …) :
+        ∃ rows, executeZeroAlloc cfg modules deposits isTopUp = some rows ∧
+          rows.map (fun row => (row.capacity : Nat)) =
+            MathView.capacities cfg modules deposits isTopUp
+
+    theorem zero_allocation_column_is_observably_wrong :
+        (execute … ).map (fun rows => rows.map Row.currentAllocation)
+            = some [10, 10] ∧
+          (executeZeroAlloc … ).map (fun rows => rows.map Row.currentAllocation)
+            = some [0, 0]
+
+`executeZeroAlloc` is `secondLoop` with `currentAllocation := 0` in both arms and
+`capacity := wordMin target available` untouched, so the capacity column is
+literally unchanged (`secondLoopZeroAlloc_eq` proves the mutant is the honest
+executor post-composed with a row rewrite) and the mutant-substituted parent is
+derivable from the parent itself. The Verity cell does not catch it either,
+because `sourceView` is built from the same interpreter the transaction runs, so
+the wrong column appears on both sides of the equality.
+
+The fix is close to free, which is why I rank it first. `firstLoop_refines`
+already proves `entries.map (·.1) = modules.map (MathView.allocationEntry cfg)`
+(`AllocCapacity.lean:313-316`), and `secondLoop` copies `entry.1` straight into
+`currentAllocation`, so extending `secondLoop_refines`'s conclusion with the
+allocation column is bookkeeping over an induction that already carries the
+needed equation.
+
+**C3. The registered Verity theorem holds for an arbitrary interpreter. Checked.**
+The first pass calls the Verity plane lockstep storage plumbing. I can state
+exactly how lockstep. I generalized `allocate` and `sourceView` over an arbitrary
+function of the interpreter's type and reproved the registered theorem's script
+unchanged, with no hypothesis on that function at all:
+
+    abbrev ExecFn := Config → List BoundModule → Word → Bool → Option (List Row × Word)
+
+    theorem verity_tx_simulates_any_exec (exec : ExecFn) (cfg) (modules)
+        (deposits) (isTopUp) (state)
+        (hBind : sourceBindAll state modules.length = modules) :
+        observe modules ((allocateGen exec modules.length cfg deposits isTopUp).run state)
+          = sourceViewGen exec cfg modules deposits isTopUp
+
+This is a stronger version of the same finding recorded for P-TOPUP-2, where the
+analogous generalization at least needed the interpreter to return `none` on an
+empty batch. Here nothing is needed. So the registered Verity cell certifies the
+bind identity, the commit and revert branching, the persist and reread channel,
+and the revert-arm agreement, and exactly zero properties of the allocation
+arithmetic.
+
+The immediate consequence is that the row's one kill-line bears on one of its two
+CHECKED cells. Instantiating the generalization at the kill-line's own mutant:
+
+    theorem capacity_target_mutant_survives_registered_verity_shape … :
+        observe modules ((allocateGen execCapTarget …).run state)
+          = sourceViewGen execCapTarget cfg modules deposits isTopUp
+
+    theorem capacity_target_mutant_is_observably_wrong :
+        (sourceViewGen execCapTarget cfg killModules 10 false).capacities = [24, 24] ∧
+          (sourceView cfg killModules 10 false).capacities = [11, 11]
+
+The `capacity := target` mutant that refutes `checked_execute` satisfies
+`verity_tx_simulates_allocation`'s exact shape while committing unclamped
+capacities. `fidelity.covered` currently reads as though the kill-line covered the
+row; it covers the abstract cell.
+
+**C4. `hBind` is not a restriction on the state. Checked.** The first pass says a
+state seeded with 33 rows can satisfy the premise as easily as one seeded with
+two. It is stronger than that: *every* state satisfies it, for every count.
+
+    theorem bind_premise_is_total (state : ContractState) (count : Nat) :
+        sourceBindAll state (sourceBindAll state count).length =
+          sourceBindAll state count
+
+Take `modules := sourceBindAll state count` and the premise is discharged by
+`List.length_map` on `List.range`. So `hBind` names the module list rather than
+constraining the world, and the registered Verity theorem is total over states
+and over counts: 33 rows on a two-module seed, unseeded phantom rows reading as
+`moduleId = 0`, addresses colliding, all in scope. That is the sharp form of
+report issues 13, 15 and 19, and `fidelity.missing` already carries the count
+gap, which I would keep and reword as "the bind premise is satisfiable for every
+state and count; it identifies the row list rather than restricting it".
+
+I also checked the other direction, that the harness round-trips, because a
+premise that is trivially satisfiable is not automatically satisfied by the
+vectors: `bind_round_trip` confirms `sourceBindAll (stateFor modules) 2 = modules`
+on the mutant file's own two-module seed, so the seed/bind pair in
+`AllocationTxMutants.lean` is coherent with `isActive = (status == 0)` and
+`isType2 = (wcType == 2)` after the PR #105 repair.
+
+**C5. Observe-from-storage is a real repair, and the channel it reads is
+structurally unaliasable.** I agree with the first pass that the old result-echo
+issue is closed: `observe`'s success arm reads `state.readArray` on slots 40, 41
+and 42 plus `state.readSlot totalSlot` (`AllocationTx.lean:132-137`), and
+`persistRows_read` is what closes the proof.
+
+I would put the caveat in structural terms rather than calling it idealized.
+`ContractState` (`Verity/Core.lean:318-322`) has two separate storage fields, a
+`storageWords : StorageKey → Uint256` map and a `storageArray : Nat → List
+Uint256`. `persistRows` writes the second, the total write and every summary read
+go to the first, and the proof's last step is
+`ContractState.storageArray_writeSlot`, which is `rfl` because the two fields are
+different record components. So "the allocation and capacity columns are
+persisted and reread" is a true statement about a channel that cannot alias
+anything, including the map slots the same transaction reads. That is also why
+the packed-`ModuleStateConfig` gap (report issue 7) is not representable: the map
+bases 30 through 39 are distinct `StorageKey.mapUint` constructors, so no write
+can clobber a neighbour.
+
+Two smaller items. On the reverted arm both sides are
+`⟨reverted, [], [], modules.map moduleAddress, 0⟩`, where the address list on the
+`observe` side is the caller-supplied `before` argument and on the `sourceView`
+side is the same list from `hBind`, so that arm carries revert-condition
+agreement and nothing about state. And `PAlloc1.verity_tx_revert_restores_snapshot`
+is proved but not registered: `audit/guarantees.yaml` names two theorems for this
+row and lists "Contract.run rollback after intermediate writes" under
+`fidelity.covered`, so the atomicity obligation is claimed in the YAML prose and
+carried by a theorem the YAML does not name.
+
+**C6. The kill-line is well aimed and its statement shape is one step short.** I
+agree with the first pass on both halves. `capacity_target_kill_line_refutes_parent`
+discharges `CheckedBounds` at the witness with `decide`, shows the mutant
+commits, and shows its capacity column differs from `MathView.capacities`, which
+is the right mutation and the right observable. Since the executor is a function,
+that conjunction does refute the mutant-substituted parent, but the reader has to
+take that step: `P-DEREF-1`, `P-ALLOC-2`, `P-TOPUP-2` and `P-ADDRESS-1` all state
+their kill-lines as `¬ ∀ …` over the registered shape, and the YAML claims this
+one is "the explicit negation of the parent's predicate shape". I would restate it
+in that form for uniformity, and add C3's observation to the row so the two
+CHECKED cells are not described as sharing one kill-line.
+
+**C7. `CheckedBounds` is phrased in the vocabulary of the model it is comparing
+against.** Beyond the first pass's point that no theorem derives `CheckedBounds`
+from a reachable router state, the five fields are stated over `MathView` terms:
+`total_addition` bounds `(deposits : Nat) + (modules.map (MathView.allocationEntry
+cfg)).sum`, and `available_arithmetic` and `target_multiplication` quantify over
+`MathView.activeCount`, `MathView.allocationEntry` and
+`MathView.totalValidators` (`AllocCapacity.lean:165-178`). So discharging the
+premise for a concrete state requires computing the `Nat` model first, which is
+fine as a proof device and awkward as a deployment-facing side condition. A
+reader who wants to know whether a live router is inside the envelope has no
+predicate over storage words to evaluate.
+
+One dead branch worth noting in the same place. `MathView.allocationEntry` guards
+`maxEBType1 = 0` and returns `0` (`:132-137`), while
+`CheckedBounds.maxEBType1_nonzero` excludes that case, so the guard is
+unreachable in every theorem that uses the bounds. It is the `Nat` plane's
+stand-in for a Solidity revert, and it never fires under the hypothesis that
+makes the correspondence hold.
+
+**C8. No live summary CALL, and the Phase-3 conjunct is not on the registered
+path.** I confirm the first pass. `sourceBindOne` reads depositable, deposited,
+exited and stake from map bases 36 to 39 keyed by the bound `moduleAddress`
+(`AllocationTx.lean:78-81`), and the module docstring says so. What I would add is
+where this leaves the source map: `audit/source-map.yaml` maps
+`SRLib._getStakingModuleSummary` 372-379,
+`IStakingModule.getStakingModuleSummary` 71-81 and
+`IStakingModuleV2.getTotalModuleStake` 28-29 to P-ALLOC-1, and no registered
+theorem executes or even assumes any of them. `fidelity.missing` is honest about
+the calls, so the mismatch is in the map's `MAPPED` status rather than in the
+YAML, and the same mapped-but-not-modeled marking recommended for P-TOPUP-2's
+`_verifyValidator` span applies here.
+
+### Ranked recommendations (second pass)
+
+Ordered by claim integrity bought per unit of change. Where the first pass and I
+agree I say so instead of restating.
+
+1. Register the allocation column (C2). Extend the parent's conclusion with
+   `rows.map (fun r => (r.currentAllocation : Nat)) = modules.map
+   (MathView.allocationEntry cfg)`. The equation is already produced by
+   `firstLoop_refines`, and without it a router that returns a zeroed allocation
+   array to `MinFirst` is CHECKED.
+2. Give the Verity cell one semantic conjunct, or stop reading it as evidence for
+   the arithmetic (C3). The cheapest form composes what already exists: under
+   `CheckedBounds` on `modules.map toSourceModule`, the observed capacity column
+   equals `MathView.capacities`. That is the composed theorem the first pass asks
+   for in its recommendation 5, and it has the side effect of making the existing
+   kill-line bite on both cells.
+3. Say in the row summary that `checked_execute` is transcription agreement
+   between `AllocCapacity.execute` and `MathView`, that
+   `SolidityAllocCapacity.execute` is an alias rather than a third plane, and
+   that a coordinated edit to both is invisible (C1).
+4. Reword the `hBind` entry in `fidelity.missing` to say the premise is
+   satisfiable for every state and count (C4), and either read the count from
+   modeled router storage or keep `allocate count` described as a harness, which
+   is the first pass's recommendation 4.
+5. Restate the kill-line as `¬ ∀ …` over the registered shape, and add mutants
+   for the target and headroom arithmetic rather than only the final clamp (C6,
+   agreed with the first pass's recommendation 6).
+6. Register `verity_tx_revert_restores_snapshot` or drop the rollback line from
+   `fidelity.covered` (C5).
+7. Describe the persistence channel structurally: `storageArray` is a separate
+   record field from `storageWords`, which is why reread and non-aliasing are
+   free here and why packed router storage is unrepresentable (C5).
+8. Mark the three summary-call spans in `audit/source-map.yaml` as
+   mapped-but-not-modeled (C8), and note that `CheckedBounds` is stated in
+   `MathView` terms with one branch that its own nonzero hypothesis makes dead
+   (C7).
+
 ## Owner product note and prior audit history
 
 Theorems: `PAlloc1.checked_execute` (registered parent), `PAlloc1.active_capacity_bounded` (unregistered MathView-definitional child), `PAlloc1.verity_tx_simulates_allocation`.
