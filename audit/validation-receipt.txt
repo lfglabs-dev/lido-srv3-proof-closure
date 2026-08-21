@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 96486ebac541e3386f3520016cc3aa9019ac34bb
+validated-tree: 0ad22cba2cddbe5dbab62500c09685617f752933
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3434,3 +3434,18 @@ Auditor notes completion receipt rebind (2026-08-21)
   check` and `python3 scripts/check_public_claim_surfaces.py` exit 0.
 - `validated-tree` rebound to this branch's tracked tree excluding this receipt
   `96486ebac541e3386f3520016cc3aa9019ac34bb`.
+
+P-DEPOSIT-1 YAML honesty after Wave 4 (2026-08-21)
+-------------------------------------------------
+
+- Metadata only. `classification.work` and `next_gate` no longer promise that
+  a future ALLOC composition will discharge `LinksSource`. Wave 4 kill-line
+  `alloc_derived_linkssource_kill_line_refutes_bridge` showed P-ALLOC-1
+  `CheckedBounds` and P-ALLOC-2 step premises plus key-count composition still
+  fail `LinksSource.firstAmount`. `fidelity.missing` now states that gap.
+  Executable plane stays exactly two batches. No Lean edits.
+- `python3 scripts/audit_metadata.py generate && check` exit 0.
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-DEPOSIT-1"]` rebound to
+  `4681281de06b67f27beb369acbfe38e8d6a9b5735ee9a6063b83c8534df00c27`.
+- `validated-tree` rebound to this commit's tracked tree excluding this receipt
+  `0ad22cba2cddbe5dbab62500c09685617f752933`.
