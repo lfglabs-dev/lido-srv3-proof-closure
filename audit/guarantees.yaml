@@ -53,12 +53,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
-        "expected": "abstract explicit-\u2200 proportional-step pinned-selection correspondence-and-bound parent (\u2200 over valid model/source rows + allocationSize), +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, two named parent-shaped kill-lines refuting the registered parent (selection_kill_line_refutes_parent on the first-open scan mutant, headroom_clamp_kill_line_refutes_parent on the capacity-cap mutant), TX-observe computational evidence (mutantSourceView vs runView over-headroom witness), rollback, and two-batch mutants"
+        "expected": "registered parent combining explicit-\u2200 proportional-step pinned-selection/model-amount correspondence and bounds with fuel-bounded full sourceAllocateLoop conservation (allocated + remaining = allocationSize), +1 MinFirst selection child, and lockstep proportional memory-array Verity transaction build with amount, bound, floor, step-conjunct kill-lines, TX-observe computational evidence, rollback, and two-batch mutants"
       },
-      "summary": "forall_proportional_step_correspondence_and_bounded is the registered explicit-\u2200 proportional-step parent. Under RowsCorrespond and a successful checkedAmount, it pins the independent Model candidate to the source-selected row, proves Model.amount equals the checked word w, and proves positivity, remaining-demand boundedness, and capacity safety. The amount equality makes ceilDiv and the model clamps load-bearing conclusion content. The +1 Nat model remains a separate child. The selection and headroom-clamp kill-lines retain the strengthened full conclusion shape. Verity separately proves the memory-array transaction agrees with an independently stated copied source loop; no model-level full-loop theorem is claimed.",
+      "summary": "step_correspondence_and_full_loop_conservation is the registered parent. Its first conjunct retains the explicit-\u2200 independent Model/Source candidate correspondence, Model.amount equality, positivity, demand bound, and capacity bound. Its second conjunct proves that every successful fuel-bounded run of the independently stated proportional sourceAllocateLoop conserves the request exactly: final allocated + remaining = allocationSize. The bridge sourceAllocateLoop_eq_allocateLoop makes this conservation apply to the executor loop used by the Verity transaction. The distinct +1 Nat model remains a child; no full-loop RowsCorrespond simulation or Solidity equivalence is claimed.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation"
       },
       "verity": {
         "status": "CHECKED",
@@ -67,7 +67,8 @@
       "fidelity": {
         "covered": [
           "explicit-\u2200 proportional-step pinned-selection correspondence, equality of the checked source word with independent Model.amount, and positive/bounded/capacity-safe checked amount (\u2200 over valid model/source rows + allocationSize)",
-          "named parent-shaped kill-lines refuting the registered explicit-\u2200 parent: Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent (first-open mutant scan substituted for Model.candidate?) and Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent (checkedAmountNoCapacityCap substituted at the checkedAmount premise only); TX-level mutantSourceView vs runView retained as TX-observe computational evidence",
+          "fuel-bounded full-loop conservation for every successful sourceAllocateLoop run: final allocated + remaining = initial allocationSize; sourceAllocateLoop_eq_allocateLoop transfers the result to the executor loop",
+          "named kill-lines refuting the registered parent's proportional-step conjunct: Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent (first-open mutant scan substituted for Model.candidate?) and Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent (checkedAmountNoCapacityCap substituted at the checkedAmount premise only); TX-level mutantSourceView vs runView retained as TX-observe computational evidence",
           "handwritten +1 Strategy selection (demoted child)",
           "executor allocateLoop plus a separately defined sourceAllocateLoop with copied equations and a proved equality bridge; observe reads writeArray buckets",
           "Contract.run rollback after intermediate writes"
@@ -75,16 +76,16 @@
         "missing": [
           "Solidity allocate does not test active (filtered upstream)",
           "+1 Strategy and proportional Source are different algorithms",
-          "no registered full allocate-loop conservation/correspondence theorem",
+          "no full-loop RowsCorrespond simulation carrying a Model row list across every proportional mutation",
           "keccak memory-array oracle",
           "cross-call mutation of the decoded arrays"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the strengthened proportional-step parent and the +1-model child on their two algorithms. Add a genuine model-level full-loop conservation/correspondence theorem without merging the algorithms or claiming Solidity equivalence."
+        "work": "Keep the checked full-loop conservation and strengthened proportional-step correspondence in the parent, with the +1 model as a separate child. Next, define a proportional model loop and lift RowsCorrespond across each mutation if full model-state correspondence is required; do not merge the algorithms or claim Solidity equivalence."
       },
-      "next_gate": "Amount equality is folded into the registered parent conclusion. OPEN: register a full allocate-loop conservation/model-correspondence theorem; keep the +1 model as a child.",
+      "next_gate": "CHECKED: fuel-bounded full proportional sourceAllocateLoop conservation, bridged to allocateLoop, is in the registered parent alongside amount equality. RANKED NEXT / OPEN: define an independent proportional model loop and prove multi-step RowsCorrespond across mutations; keep the distinct +1 model as a child.",
       "roadmap_priority": "DONE"
     },
     {

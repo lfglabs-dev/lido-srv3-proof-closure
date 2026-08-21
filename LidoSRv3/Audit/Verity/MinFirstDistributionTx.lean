@@ -129,6 +129,81 @@ theorem sourceAllocateLoop_eq_allocateLoop :
             · rfl
             · simp [sourceAllocateLoop_eq_allocateLoop fuel]
 
+private theorem safeAdd_val {a b c : Word}
+    (h : Verity.Stdlib.Math.safeAdd a b = some c) :
+    c.val = a.val + b.val := by
+  by_cases hOverflow : a.val + b.val > Verity.Core.MAX_UINT256
+  · have hNone : Verity.Stdlib.Math.safeAdd a b = none := by
+      simp [Verity.Stdlib.Math.safeAdd, hOverflow]
+    rw [hNone] at h
+    cases h
+  · have hSome : Verity.Stdlib.Math.safeAdd a b = some (a + b) := by
+      simp [Verity.Stdlib.Math.safeAdd, hOverflow]
+    rw [hSome] at h
+    obtain rfl := Option.some.inj h
+    apply Verity.Core.Uint256.add_eq_of_lt
+    rw [← Verity.Core.Uint256.max_uint256_succ_eq_modulus]
+    omega
+
+private theorem safeSub_val {a b c : Word}
+    (h : Verity.Stdlib.Math.safeSub a b = some c) :
+    c.val = a.val - b.val ∧ b.val ≤ a.val := by
+  unfold Verity.Stdlib.Math.safeSub at h
+  split at h
+  · cases h
+  · rename_i hLe
+    obtain rfl := Option.some.inj h
+    have hLe' : b.val ≤ a.val := by omega
+    exact ⟨Verity.Core.Uint256.sub_eq_of_le hLe', hLe'⟩
+
+/-- Every successful fuel-bounded execution of the full proportional allocation
+loop conserves demand: the final allocated total plus the final remainder is the
+initial total plus the initial remainder.  This covers every number of
+successful mutation steps, as well as the zero-demand and zero-amount exits. -/
+theorem allocateLoop_conserves_total :
+    ∀ fuel rows remaining total after finalTotal finalRemaining,
+      allocateLoop fuel rows remaining total =
+        some (after, finalTotal, finalRemaining) →
+      finalTotal.val + finalRemaining.val = total.val + remaining.val
+  | 0, rows, remaining, total, after, finalTotal, finalRemaining => by
+      simp only [allocateLoop]
+      split
+      · intro h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        rcases h with ⟨rfl, rfl, rfl⟩
+        rfl
+      · simp
+  | fuel + 1, rows, remaining, total, after, finalTotal, finalRemaining => by
+      simp only [allocateLoop]
+      split
+      · intro h
+        simp only [Option.some.injEq, Prod.mk.injEq] at h
+        rcases h with ⟨rfl, rfl, rfl⟩
+        rfl
+      · cases hStep : allocateToBestCandidate rows remaining with
+        | none => simp
+        | some step =>
+            rcases step with ⟨nextRows, amount⟩
+            simp only
+            split
+            · intro h
+              simp only [Option.some.injEq, Prod.mk.injEq] at h
+              rcases h with ⟨rfl, rfl, rfl⟩
+              rfl
+            · cases hAdd : Verity.Stdlib.Math.safeAdd total amount with
+              | none => simp
+              | some newTotal =>
+                  cases hSub : Verity.Stdlib.Math.safeSub remaining amount with
+                  | none => simp
+                  | some newRemaining =>
+                      simp only [Option.bind_eq_bind, Option.bind_some]
+                      intro hRun
+                      have hConserve := allocateLoop_conserves_total fuel nextRows
+                        newRemaining newTotal after finalTotal finalRemaining hRun
+                      have hAddVal := safeAdd_val hAdd
+                      have hSubVal := safeSub_val hSub
+                      omega
+
 /-- Persist allocated buckets as a `uint256[]`-shaped storage array. -/
 def persistBuckets (buckets : List Word) (state : ContractState) : ContractState :=
   state.writeArray bucketsSlot buckets

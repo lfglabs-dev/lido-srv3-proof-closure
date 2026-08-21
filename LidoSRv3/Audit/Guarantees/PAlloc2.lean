@@ -189,6 +189,55 @@ theorem forall_proportional_step_correspondence_and_bounded :
   fun _ _ _ _ _ hRows hSelected hOpen hLen hSize hAmount =>
     proportional_step_correspondence_and_bounded hRows hSelected hOpen hLen hSize hAmount
 
+/-- A successful full run of the independently stated pinned-source allocation
+loop conserves the requested demand, for every fuel bound and every number of
+proportional mutation steps.  The final allocated total plus the unallocated
+remainder is exactly the initial `allocationSize`. -/
+theorem source_allocate_loop_conserves_requested
+    (fuel : Nat) (rows : List MinFirstAllocation.Source.Row)
+    (allocationSize : MinFirstAllocation.Source.Word)
+    (after : List MinFirstAllocation.Source.Row)
+    (allocated remaining : MinFirstAllocation.Source.Word)
+    (hRun : Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows
+      allocationSize 0 = some (after, allocated, remaining)) :
+    allocated.val + remaining.val = allocationSize.val := by
+  rw [Verity.MinFirstDistributionTx.sourceAllocateLoop_eq_allocateLoop] at hRun
+  simpa using Verity.MinFirstDistributionTx.allocateLoop_conserves_total
+    fuel rows allocationSize 0 after allocated remaining hRun
+
+/-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source
+candidate and proportional-amount equality from the step theorem load-bearing,
+and adds fuel-bounded conservation for every successful run of the full
+independently stated source allocation loop.  It does not identify that
+proportional loop with the separate +1 `MinFirst` child model. -/
+theorem step_correspondence_and_full_loop_conservation :
+    (∀ (model : List MinFirstAllocation.Model.Bucket)
+      (source : List MinFirstAllocation.Source.Row)
+      (best : MinFirstAllocation.Source.Row)
+      (allocationSize w : MinFirstAllocation.Source.Word),
+      MinFirstAllocation.RowsCorrespond model source →
+      MinFirstAllocation.Source.candidate? source = some best →
+      MinFirstAllocation.Source.hasFreeSpace best = true →
+      source.length < Verity.Core.Uint256.modulus →
+      allocationSize.val ≠ 0 →
+      MinFirstAllocation.Source.checkedAmount source allocationSize best = some w →
+      (Option.map (fun b => (b.allocation, b.capacity))
+          (MinFirstAllocation.Model.candidate? model) =
+        some (best.allocation.val, best.capacity.val)) ∧
+      MinFirstAllocation.Model.amount model allocationSize.val
+        ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
+      0 < w.val ∧ w.val ≤ allocationSize.val ∧
+        best.allocation.val + w.val ≤ best.capacity.val) ∧
+    (∀ (fuel : Nat) (rows : List MinFirstAllocation.Source.Row)
+      (allocationSize : MinFirstAllocation.Source.Word)
+      (after : List MinFirstAllocation.Source.Row)
+      (allocated remaining : MinFirstAllocation.Source.Word),
+      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =
+        some (after, allocated, remaining) →
+      allocated.val + remaining.val = allocationSize.val) :=
+  ⟨forall_proportional_step_correspondence_and_bounded,
+   source_allocate_loop_conserves_requested⟩
+
 /-! ## Verity transaction plane -/
 
 /--

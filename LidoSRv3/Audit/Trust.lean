@@ -95,6 +95,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_amount_totality
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.proportional_step_correspondence_and_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded
+#print axioms LidoSRv3.Audit.Verity.MinFirstDistributionTx.allocateLoop_conserves_total
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.source_allocate_loop_conserves_requested
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc2.tx_revert_restores_snapshot
