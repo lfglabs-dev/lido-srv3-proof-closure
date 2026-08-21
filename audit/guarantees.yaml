@@ -166,16 +166,16 @@
           "conservation conjunct kill-line, surgical since wave 5: dropped_conservation_assert_kill_line_refutes_parent commits a mutant run with ONLY the line-755 assert deleted at the wrapping witness with pulled \u2260 pushed -- the negation of conjunct (1)'s predicate on the mutant; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style"
         ],
         "missing": [
-          "over-target guard (line 737), zero-sum test (line 741), and Lido-side amount guards (Lido.sol 842/873) still read the exact Nat sum where the chain reads the wrapped amount: under a wrap this can change which revert fires first (or, for a sum wrapping to exactly zero, commit-vs-revert), though every wrapping batch still reverts in the model",
-          "LinksSource derivation from ALLOC deferred until live loops are in place",
+          "over-target guard (line 737), zero-sum test (line 741), and Lido-side amount guards (Lido.sol 842/873) still read the exact Nat sum where the chain reads the wrapped amount: under a wrap this can change which revert fires first (or, for a sum wrapping to exactly zero, a no-top-up commit versus a revert). The current model still has wrap implies revert because those guards read the exact sum; if they are switched to wrappedTotal = exactTotal % 2^256, the honest claim is wrap precludes a value-moving commit, not wrap implies revert",
+          "Verity parent verity_tx_simulates_source assumes NoUncheckedWrap and (run cfg inp).reverts = false, so the wrap branch is a hypothesis on that plane, not an executed observation; abstract conjunct 3 talks wrap",
           "beacon-address provenance is a named assumption, not a parent conjunct"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Route the three residual exact-reading guards (over-target line 737, zero-sum line 741, Lido-side 842/873) through the wrapped reading, derive LinksSource from ALLOC once live loops exist, and pin beacon-address provenance."
+        "work": "Keep wrap on both planes or keep the Verity no-wrap hypothesis explicit (this row now does). Route the three residual exact-reading guards through wrappedTotal = exactTotal % 2^256. Do not derive a top-up LinksSource from ALLOC. Pin beacon-address provenance."
       },
-      "next_gate": "Preserve the composed P-TOPUP-1 Contract.run correspondence over journal and allocation observables, its intermediate-effect rollback, its executable mutants, and the four surgical abstract-plane kill-lines with their characterization theorems; close the remaining fidelity gaps (residual exact-reading guards, LinksSource, beacon-address provenance) without widening the claim.",
+      "next_gate": "Preserve the four surgical abstract-plane kill-lines and the no-wrap Verity correspondence; remaining gaps are residual exact-reading guards, the Verity wrap-branch hypothesis, and beacon-address provenance, not ALLOC composition.",
       "roadmap_priority": "DONE"
     },
     {
