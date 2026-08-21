@@ -5,9 +5,9 @@
 Child of P-ETH-1 for the fee legs: `ConsolidationBus.executeConsolidation` forwards `msg.value`, and the vault pays per-request fees to the configured EIP-7251 / EIP-7002 immutables.
 
 - abstract `consolidation_fee_path_confined`: if the call target equals `cfg.consolidationRequest`, the one move in `ethTrace` is tagged `.consolidationContract`, hence not `.other`
-- Verity `bus_forward_success`: one numeral, 5 wei from bus slot to gateway slot
+- Verity `consolidation_fee_target_success`: two successful fee sends debit the vault and credit the configured consolidation-request slot
 
-`cfg.consolidationRequest` is an arbitrary Nat. Equality with the canonical `0x00…7251` is not proved. The registered Verity theorem does not read a request-contract slot. We do not cover `executeConsolidation` pending-batch / delay guards or 96-byte payloads (P-CONSOLIDATION-1).
+`cfg.consolidationRequest` is an arbitrary Nat. Equality with the canonical `0x00…7251` is named `A-CANONICAL-REQUEST-ADDRESS` and is not proved. The bus-forward numeral remains auxiliary. We do not cover `executeConsolidation` pending-batch / delay guards or 96-byte payloads (P-CONSOLIDATION-1).
 
 ## Proof limitations and recommendations
 
@@ -15,10 +15,10 @@ The abstract theorem remains a tag rename. The registered Verity theorem is now 
 
 CHECKED does not mean fees reach the EIP-7251 predeploy.
 
-Ranked next work: the fee-target witness and canonical-address assumption landed in `improve/report-recommendations-batch`; do not compose into P-CONSOLIDATION-1 from here.
+Ranked next work: the fee-target witness and canonical-address assumption landed; do not compose into P-CONSOLIDATION-1 from here.
 
-Theorems: `PEth1.consolidation_fee_path_confined` (abstract), `PEth1RequestTx.bus_forward_success` (verity).
-Assumptions: none on the child row; parent carries `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Theorems: `PEth1.consolidation_fee_path_confined` (abstract), `PEth1RequestTx.consolidation_fee_target_success` (verity).
+Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CANONICAL-REQUEST-ADDRESS`.
 
 ## Intent
 
@@ -26,8 +26,8 @@ Child of P-ETH-1 for the *fee* legs: consolidation / withdrawal-request predeplo
 
 ## Modeling
 
-- Child YAML lists no assumptions. The parent’s `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, and `A-VERITY-SCAFFOLD` still apply and are the named premises used below.
-- Abstract `Config.consolidationRequest` is an arbitrary `Nat`. Equality with the canonical EIP-7251 address is **explicitly not proved** (comment on `consolidation_fee_path_confined`; `audit/P-ETH-1-COMPOSITION.md` “standing scope”).
+- Child YAML lists `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, and `A-CANONICAL-REQUEST-ADDRESS`.
+- Abstract `Config.consolidationRequest` is an arbitrary `Nat`. Equality with the canonical EIP-7251 address is **explicitly not proved** and is named `A-CANONICAL-REQUEST-ADDRESS`.
 - `ethTrace` has length 1. Destination is `.consolidationContract` if `c.target = cfg.consolidationRequest`, else `.other c.target`.
 - Verity `PEth1RequestTx` is again a **single-contract slot ledger** (bus, gateway, vault, withdrawalRequest, consolidationRequest). `busForward` is `require gatewayOk` plus slot add/sub. `sendWithdrawalFee` / `sendTwoConsolidationFees` move fee words between slots. Deployed-vs-model simplification: no predeploy code, no 96-byte `source ‖ target` calldata, no `getConsolidationRequestFee` CALL.
 - Identifying the immutable with `0x00…007251` is left as “a separate provenance obligation.”

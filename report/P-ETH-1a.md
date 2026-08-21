@@ -15,10 +15,10 @@ The refund recipient is not one of the abstract approved tags. The ledger takes 
 
 CHECKED does not mean protocol ETH returns land only on Lido or the WithdrawalQueue.
 
-Ranked next work: the producer theorem, refund-misroute kill-line, and assumptions honesty edits landed in `improve/report-recommendations-batch`; keep VaultHub out.
+Ranked next work: the producer theorem, refund-misroute kill-line, and assumptions honesty edits landed; keep VaultHub out.
 
-Theorems: `PEth1.eth_flow_confined` (abstract), `PEth1RefundTx.gateway_refund_success_moves_value` (verity).
-Assumptions: none listed on the child row; the parent carries `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Theorems: `PEth1.eth_flow_confined` (abstract), `PEth1RefundTx.sourceGateway_committed_splits_to_vault_and_refund` (producer), `PEth1RefundTx.gateway_refund_success_moves_value` (verity), `PEth1RefundTxMutants.refund_misroute_kill_line` (kill-line).
+Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
 
@@ -26,7 +26,7 @@ Child of P-ETH-1. Restricts the *protocol-controlled stVault rebalance / redempt
 
 ## Modeling
 
-- Child YAML lists no assumptions. The parent’s `A-ABSTRACT-TX` (not EVM traces), `A-SOURCE-SHAPED` (ledger is not extracted spans), and `A-VERITY-SCAFFOLD` still apply; this file uses those names for the child as well.
+- Child YAML now lists the inherited assumptions explicitly: `A-ABSTRACT-TX` (not EVM traces), `A-SOURCE-SHAPED` (ledger is not extracted spans), and `A-VERITY-SCAFFOLD`.
 - `EthMove` / `is_approved` only allow `.lido` and `.withdrawalQueue`.
 - `StakingVault.withdraw` is **explicitly excluded** (comment on `eth_flow_confined`): the owner may pick any nonzero recipient. That is the most powerful ETH-out path on a vault.
 - Verity side is a **single-contract slot ledger** (`gatewaySlot`, `vaultSlot`, `refundSlot`, `lidoSlot`). External CALLs are `require vaultOk` / `require refundOk` booleans, not value-bearing frames.

@@ -28,6 +28,7 @@ import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Tests.TopupTxMutants
+import LidoSRv3.Audit.Guarantees.PTopup2
 import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
@@ -139,6 +140,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.AddressSourceMutants.verity_zero_amount_rejected
 #print axioms LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_not_admission_equivariant
 #print axioms LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.AddressSourceMutants.fixed_owner_writer_kill_line_refutes_parent
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity
 #print axioms
@@ -153,6 +155,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.DepositTx.run_simulates_source
 #print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
 #print axioms
@@ -192,9 +195,12 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.withdraw_success_moves_to_lido
 #print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.refund_failure_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.bus_forward_success
+#print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.consolidation_fee_target_success
 #print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.withdrawal_fee_success
 #print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.consolidation_second_failure_discards_prefix
 #print axioms LidoSRv3.Audit.Verity.PEth1RequestTx.bus_failure_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.PEth1RefundTx.sourceGateway_committed_splits_to_vault_and_refund
+#print axioms LidoSRv3.Tests.PEth1RefundTxMutants.refund_misroute_kill_line
 #print axioms LidoSRv3.Tests.PEth1RefundTxMutants.double_refund_rejected
 #print axioms LidoSRv3.Tests.PEth1RefundTxMutants.leak_on_refund_failure_rejected
 #print axioms LidoSRv3.Tests.PEth1RequestTxMutants.keep_first_consolidation_fee_rejected
@@ -230,6 +236,8 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.TopupTxMutants.dropped_wc_guard_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.TopupTxMutants.unwrapped_accumulator_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.per_key_bounded_by_candidate
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact
 #print axioms LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_restores_world

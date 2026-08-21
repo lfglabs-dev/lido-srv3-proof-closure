@@ -20,7 +20,7 @@ The forall is genuine and the tautology history is closed. Residual content is s
 
 CHECKED does not mean the deployed gateway respects `maxTopUpPerBlock`.
 
-Ranked next work: `per_key_bounded_by_candidate` and the 32-guard honesty edit landed in `improve/report-recommendations-batch`; do not compose with P-TOPUP-1; keep the live path out unless the claim is widened on purpose.
+Ranked next work: `per_key_bounded_by_candidate` and the 32-guard honesty edit landed; do not compose with P-TOPUP-1; keep the live path out unless the claim is widened on purpose.
 
 Theorems: `PTopup2.aggregate_bounded_by_block_cap` (parent), `PTopup2.verity_tx_simulates_topup2_spec`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

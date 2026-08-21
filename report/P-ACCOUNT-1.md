@@ -11,7 +11,7 @@ P-ACCOUNT-1 verifies that ordering as an execution-order discipline:
 - zero fee shares write $\mathrm{rewardsMinted} = 0$, matching the pinned skip, and the implication then holds with nothing to order
 - reverting runs carry no ordering obligation
 
-Because the tick is read from state rather than written as a call-site constant, moving a step write changes the tick it records. That is what makes `mint_order_kill_line` a control-flow fault: the mint stamp moves above the read stamp with no literal edit, mint records $2$ and read $3$, and the same predicate rejects it.
+Because the tick is read from state rather than written as a call-site constant, moving a step write changes the tick it records. That is what makes `mint_order_kill_line` a control-flow fault: the mint stamp moves above the read stamp with no literal edit, mint records $3$ and read $4$ after the stamped balance write, and the same predicate rejects it.
 
 `verity_tx_simulates_oracle_report` equates observe with an independently stated source view. We do not prove the fee amount: `sharesToMintAsFees` is an argument. Constructor order on the source plane is the demoted child `source_report_before_reward`.
 
@@ -23,7 +23,7 @@ The kill-line now uses the valid nonempty report `⟨[1], [1], [1]⟩`. The bala
 
 CHECKED does not mean the pinned path mints after reading fresh balances, that the caller is authorized, or that the minted amount is the protocol fee.
 
-Ranked next work: valid nonempty witness and balance-write stamp landed in `improve/report-recommendations-batch`; retire or independently discharge `fullReportSucceeds`; do not widen to `submitReportData`.
+Ranked next work: valid nonempty witness and balance-write stamp landed; retire or independently discharge `fullReportSucceeds`; do not widen to `submitReportData`.
 
 Theorems: `PAccount1.mint_after_read_discipline` (registered parent), `PAccount1.mint_order_kill_line` (kill-line, refutes the parent), `PAccount1.verity_tx_simulates_oracle_report` (Verity child), `PAccount1.source_report_before_reward` (child, source-plane correspondence).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.

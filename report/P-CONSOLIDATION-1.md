@@ -14,7 +14,7 @@ The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. 
 
 CHECKED does not mean eligibility in the beacon sense, that the vault paid $n \times \mathrm{fee}$, or gateway grouping.
 
-Ranked next work: the `preservesEthBalance` wording fix landed in `improve/report-recommendations-batch`; drop or relocate the gateway-value premise and make observe read payloads; keep the P-ETH-1 fence.
+Ranked next work: the `preservesEthBalance` wording fix landed; drop or relocate the gateway-value premise and make observe read payloads; keep the P-ETH-1 fence.
 
 Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
