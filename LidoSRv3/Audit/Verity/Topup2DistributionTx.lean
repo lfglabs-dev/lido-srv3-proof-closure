@@ -30,6 +30,7 @@ abbrev Word := LidoSRv3.Audit.Source.Topup2.Word
 def effectiveBase : Nat := 0x1000
 def pendingBase : Nat := 0x2000
 def requestedBase : Nat := 0x3000
+def limitsBase : Nat := 0x4000
 def allocSlot : Nat := 30
 def remainingSlot : Nat := 31
 def allocatedSlot : Nat := 32
@@ -50,7 +51,7 @@ def readWord (state : ContractState) (name : String) (base length index : Nat) :
 def readArray (state : ContractState) (name : String) (base length : Nat) : Option (List Word) :=
   (List.range length).mapM (readWord state name base length)
 
-def memoryFor (effective pending requested : List Word) : Nat → Word := fun offset =>
+def memoryFor (effective pending requested topUpLimits : List Word) : Nat → Word := fun offset =>
   if effectiveBase ≤ offset ∧ offset < effectiveBase + 32 * effective.length ∧
       (offset - effectiveBase) % 32 = 0 then
     effective.getD ((offset - effectiveBase) / 32) 0
@@ -60,10 +61,14 @@ def memoryFor (effective pending requested : List Word) : Nat → Word := fun of
   else if requestedBase ≤ offset ∧ offset < requestedBase + 32 * requested.length ∧
       (offset - requestedBase) % 32 = 0 then
     requested.getD ((offset - requestedBase) / 32) 0
+  else if limitsBase ≤ offset ∧ offset < limitsBase + 32 * topUpLimits.length ∧
+      (offset - limitsBase) % 32 = 0 then
+    topUpLimits.getD ((offset - limitsBase) / 32) 0
   else 0
 
-def stateFor (effective pending requested : List Word) (base : ContractState) : ContractState :=
-  { base with memory := memoryFor effective pending requested }
+def stateFor (effective pending requested topUpLimits : List Word)
+    (base : ContractState) : ContractState :=
+  { base with memory := memoryFor effective pending requested topUpLimits }
 
 /-- Persist per-validator allocations as a `uint256[]`-shaped storage array. -/
 def persistAllocs (allocs : List Word) (state : ContractState) : ContractState :=
@@ -83,33 +88,44 @@ def sourceConsumeIndependent : Word → List Word → Option (List Word × Word)
       let (tail, leftover) ← sourceConsumeIndependent next rest
       some (allocated :: tail, leftover)
 
-def sourceCandidatesIndependent : List Word → List Word → List Word → Word → Word →
-    Option (List Word)
-  | [], [], [], _, _ => some []
-  | e :: es, p :: ps, r :: rs, target, minTopUp => do
+def sourceLimitsIndependent : List Word → List Word → Word → Word → Option (List Word)
+  | [], [], _, _ => some []
+  | e :: es, p :: ps, target, minTopUp => do
       let limit ← evaluateTopUpLimit e p target minTopUp
-      let rest ← sourceCandidatesIndependent es ps rs target minTopUp
-      some (minWord r limit :: rest)
-  | _, _, _, _, _ => none
+      let rest ← sourceLimitsIndependent es ps target minTopUp
+      some (limit :: rest)
+  | _, _, _, _ => none
 
-def sourceRunIndependent (effective pending requested : List Word)
+def sourceCandidatesIndependent : List Word → List Word → Option (List Word)
+  | [], [] => some []
+  | r :: rs, limit :: limits => do
+      let rest ← sourceCandidatesIndependent rs limits
+      some (minWord r limit :: rest)
+  | _, _ => none
+
+def sourceRunIndependent (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
     Option (List Word × Word × Word) :=
   if effective.length == 0 then none
   else
-    match sourceCandidatesIndependent effective pending requested target minTopUp with
+    match sourceLimitsIndependent effective pending target minTopUp with
     | none => none
-    | some candidates =>
-        let budget := minWord valueGwei (minWord moduleLimit remainingCap)
-        match sourceConsumeIndependent budget candidates with
-        | none => none
-        | some (allocs, leftover) =>
-            match Verity.Stdlib.Math.safeSub budget leftover with
-            | none => none
-            | some used =>
-                match Verity.Stdlib.Math.safeSub remainingCap used with
-                | none => none
-                | some remaining => some (allocs, remaining, used)
+    | some evaluatedLimits =>
+        if evaluatedLimits != topUpLimits then none
+        else
+          match sourceCandidatesIndependent requested topUpLimits with
+          | none => none
+          | some candidates =>
+              let budget := minWord valueGwei (minWord moduleLimit remainingCap)
+              match sourceConsumeIndependent budget candidates with
+              | none => none
+              | some (allocs, leftover) =>
+                  match Verity.Stdlib.Math.safeSub budget leftover with
+                  | none => none
+                  | some used =>
+                      match Verity.Stdlib.Math.safeSub remainingCap used with
+                      | none => none
+                      | some remaining => some (allocs, remaining, used)
 
 theorem sourceConsumeIndependent_eq_sourceConsume :
     ∀ remaining candidates,
@@ -119,28 +135,38 @@ theorem sourceConsumeIndependent_eq_sourceConsume :
       simp [sourceConsumeIndependent, sourceConsume,
         sourceConsumeIndependent_eq_sourceConsume]
 
+theorem sourceLimitsIndependent_eq_sourceLimits :
+    ∀ effective pending target minTopUp,
+      sourceLimitsIndependent effective pending target minTopUp =
+        sourceLimits effective pending target minTopUp
+  | [], [], _, _ => rfl
+  | e :: es, p :: ps, target, minTopUp => by
+      simp [sourceLimitsIndependent, sourceLimits,
+        sourceLimitsIndependent_eq_sourceLimits]
+  | [], _ :: _, _, _ => rfl
+  | _ :: _, [], _, _ => rfl
+
 theorem sourceCandidatesIndependent_eq_sourceCandidates :
-    ∀ effective pending requested target minTopUp,
-      sourceCandidatesIndependent effective pending requested target minTopUp =
-        sourceCandidates effective pending requested target minTopUp
-  | [], [], [], _, _ => rfl
-  | e :: es, p :: ps, r :: rs, target, minTopUp => by
+    ∀ requested topUpLimits,
+      sourceCandidatesIndependent requested topUpLimits =
+        sourceCandidates requested topUpLimits
+  | [], [] => rfl
+  | r :: rs, limit :: limits => by
       simp [sourceCandidatesIndependent, sourceCandidates,
         sourceCandidatesIndependent_eq_sourceCandidates]
-  | [], [], _ :: _, _, _ => rfl
-  | [], _ :: _, _, _, _ => rfl
-  | _ :: _, [], _, _, _ => rfl
-  | _ :: _, _ :: _, [], _, _ => rfl
+  | [], _ :: _ => rfl
+  | _ :: _, [] => rfl
 
 theorem sourceRunIndependent_eq_sourceRun
-    (effective pending requested : List Word)
+    (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
-    sourceRunIndependent effective pending requested target minTopUp remainingCap
+    sourceRunIndependent effective pending requested topUpLimits target minTopUp remainingCap
         moduleLimit valueGwei =
-      sourceRun effective pending requested target minTopUp remainingCap
+      sourceRun effective pending requested topUpLimits target minTopUp remainingCap
         moduleLimit valueGwei := by
   unfold sourceRunIndependent sourceRun
-  simp only [sourceCandidatesIndependent_eq_sourceCandidates,
+  simp only [sourceLimitsIndependent_eq_sourceLimits,
+    sourceCandidatesIndependent_eq_sourceCandidates,
     sourceConsumeIndependent_eq_sourceConsume]
   rfl
 
@@ -160,9 +186,10 @@ def allocate (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei :
   if count > maxValidatorsPerTopUp then .revert "MaxValidatorsPerTopUpExceeded" snapshot else
   match readArray snapshot "effective" effectiveBase count,
       readArray snapshot "pending" pendingBase count,
-      readArray snapshot "requested" requestedBase count with
-  | some effective, some pending, some requested =>
-      match sourceRun effective pending requested target minTopUp remainingCap
+      readArray snapshot "requested" requestedBase count,
+      readArray snapshot "topUpLimits" limitsBase count with
+  | some effective, some pending, some requested, some topUpLimits =>
+      match sourceRun effective pending requested topUpLimits target minTopUp remainingCap
           moduleLimit valueGwei with
       | none => .revert "TOPUP_ARITHMETIC" snapshot
       | some (allocs, remaining, used) =>
@@ -170,7 +197,7 @@ def allocate (count : Nat) (target minTopUp remainingCap moduleLimit valueGwei :
           let dirty := (dirty.writeSlot remainingSlot remaining).writeSlot allocatedSlot used
           if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
           else .success ⟨allocs, remaining, used⟩ dirty
-  | _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
+  | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
 
 inductive Status where | committed | reverted deriving DecidableEq, Repr
 
@@ -190,9 +217,9 @@ def observe (beforeAllocs : List Word) (beforeRemaining : Word) :
         state.readSlot allocatedSlot⟩
   | .revert _ _ => ⟨.reverted, beforeAllocs, beforeRemaining, 0⟩
 
-def sourceView (effective pending requested : List Word)
+def sourceView (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
-  match sourceRunIndependent effective pending requested target minTopUp remainingCap
+  match sourceRunIndependent effective pending requested topUpLimits target minTopUp remainingCap
       moduleLimit valueGwei with
   | none => ⟨.reverted, List.replicate requested.length 0, remainingCap, 0⟩
   | some (allocs, remaining, used) => ⟨.committed, allocs, remaining, used⟩
@@ -201,25 +228,31 @@ def sourceView (effective pending requested : List Word)
 has the same allocation/share observables as the independently stated
 pinned-source batch. -/
 theorem verity_tx_simulates_pinned_source
-    (effective pending requested : List Word)
+    (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : ContractState)
     (hEff : readArray state "effective" effectiveBase effective.length = some effective)
     (hPend : readArray state "pending" pendingBase pending.length = some pending)
     (hReq : readArray state "requested" requestedBase requested.length = some requested)
-    (hLen : effective.length = pending.length ∧ pending.length = requested.length)
+    (hLimits : readArray state "topUpLimits" limitsBase topUpLimits.length = some topUpLimits)
+    (hLen : effective.length = pending.length ∧ pending.length = requested.length ∧
+      requested.length = topUpLimits.length)
     (hMax : requested.length ≤ maxValidatorsPerTopUp) :
     observe (List.replicate requested.length 0) remainingCap
         ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
           state) =
-      sourceView effective pending requested target minTopUp remainingCap
+      sourceView effective pending requested topUpLimits target minTopUp remainingCap
         moduleLimit valueGwei := by
-  have hER : effective.length = requested.length := hLen.1.trans hLen.2
-  have hPR : pending.length = requested.length := hLen.2
+  have hER : effective.length = requested.length := hLen.1.trans hLen.2.1
+  have hPR : pending.length = requested.length := hLen.2.1
+  have hLR : topUpLimits.length = requested.length := hLen.2.2.symm
   have hEff' : readArray state "effective" effectiveBase requested.length = some effective := by
     simpa [hER] using hEff
   have hPend' : readArray state "pending" pendingBase requested.length = some pending := by
     simpa [hPR] using hPend
+  have hLimits' : readArray state "topUpLimits" limitsBase requested.length =
+      some topUpLimits := by
+    simpa [hLR] using hLimits
   have hNotOver : ¬ maxValidatorsPerTopUp < requested.length :=
     Nat.not_lt.mpr hMax
   by_cases hZero : requested.length = 0
@@ -228,9 +261,10 @@ theorem verity_tx_simulates_pinned_source
     simp [hZero, hEffZ, observe, sourceRunIndependent]
   · have hZ : (requested.length == 0) = false := by simp [hZero]
     unfold Contract.run allocate sourceView
-    simp only [hZ, hNotOver, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq]
+    simp only [hZ, hNotOver, Bool.false_eq_true, ↓reduceIte, hEff', hPend', hReq,
+      hLimits']
     rw [sourceRunIndependent_eq_sourceRun]
-    cases hRun : sourceRun effective pending requested target minTopUp
+    cases hRun : sourceRun effective pending requested topUpLimits target minTopUp
         remainingCap moduleLimit valueGwei with
     | none =>
         simp [observe]

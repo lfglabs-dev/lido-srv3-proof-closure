@@ -3,12 +3,15 @@ import LidoSRv3.Audit.Verity.Topup2DistributionTx
 
 namespace LidoSRv3.Audit.Guarantees.PTopup2
 
-/-- If the three memory arrays decode to equal-length `effective` /
-`pending` / `requested` within `maxValidatorsPerTopUp`, then `observe` of
+/-- If the four memory arrays decode to equal-length `effective` /
+`pending` / `requested` / live per-key `topUpLimits` within
+`maxValidatorsPerTopUp`, then `observe` of
 `allocate` (persisted allocation array plus remaining/used slots) equals
-`sourceView` of the same `sourceRun`. Not live wei `topUpLimits` and not SSZ. -/
+`sourceView` of the same `sourceRun`. Limits are normalized to gwei here;
+the live wei conversion and SSZ remain outside this theorem. -/
 theorem verity_tx_simulates_topup2_spec
-    (effective pending requested : List LidoSRv3.Audit.Source.Topup2.Word)
+    (effective pending requested topUpLimits :
+      List LidoSRv3.Audit.Source.Topup2.Word)
     (target minTopUp remainingCap moduleLimit valueGwei :
       LidoSRv3.Audit.Source.Topup2.Word)
     (state : Verity.ContractState)
@@ -21,7 +24,11 @@ theorem verity_tx_simulates_topup2_spec
     (hReq : LidoSRv3.Audit.Verity.Topup2DistributionTx.readArray state "requested"
       LidoSRv3.Audit.Verity.Topup2DistributionTx.requestedBase requested.length =
         some requested)
-    (hLen : effective.length = pending.length ∧ pending.length = requested.length)
+    (hLimits : LidoSRv3.Audit.Verity.Topup2DistributionTx.readArray state "topUpLimits"
+      LidoSRv3.Audit.Verity.Topup2DistributionTx.limitsBase topUpLimits.length =
+        some topUpLimits)
+    (hLen : effective.length = pending.length ∧ pending.length = requested.length ∧
+      requested.length = topUpLimits.length)
     (hMax : requested.length ≤ LidoSRv3.Audit.Verity.Topup2DistributionTx.maxValidatorsPerTopUp) :
     LidoSRv3.Audit.Verity.Topup2DistributionTx.observe
         (List.replicate requested.length 0) remainingCap
@@ -29,9 +36,9 @@ theorem verity_tx_simulates_topup2_spec
           target minTopUp remainingCap moduleLimit valueGwei).run
         state) =
       LidoSRv3.Audit.Verity.Topup2DistributionTx.sourceView effective pending
-        requested target minTopUp remainingCap moduleLimit valueGwei :=
+        requested topUpLimits target minTopUp remainingCap moduleLimit valueGwei :=
   LidoSRv3.Audit.Verity.Topup2DistributionTx.verity_tx_simulates_pinned_source
-    effective pending requested target minTopUp remainingCap moduleLimit
-    valueGwei state hEff hPend hReq hLen hMax
+    effective pending requested topUpLimits target minTopUp remainingCap moduleLimit
+    valueGwei state hEff hPend hReq hLimits hLen hMax
 
 end LidoSRv3.Audit.Guarantees.PTopup2

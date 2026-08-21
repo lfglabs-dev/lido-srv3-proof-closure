@@ -385,7 +385,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
         "expected": "abstract leftover-budget block-cap parent (unconditional; proved by induction over the budget-consuming walk), a mutant-budget kill-line refuting the parent's own statement when the cap term is dropped, and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, two-batch mutants plus maxValidatorsPerTopUp guard kill-line max_validators_guard_kill_line_refutes_no_check (honest reverts 33-validator batch, mutant without guard commits)"
       },
-      "summary": "aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence is conditional on decoded arrays and count <= 32; the count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Not live wei topUpLimits or SSZ.",
+      "summary": "aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap"
@@ -398,13 +398,13 @@
         "covered": [
           "leftover-budget block-cap bound: consumeBudget over transitionBudget sums to at most maxTopUpPerBlockGwei, unconditionally, with a mutant-budget kill-line",
           "per-key bound per_key_bounded_by_candidate: every transition allocation is paired with and no greater than its requested/evaluated candidate",
-          "executor sourceRun plus separately copied sourceRunIndependent/sourceCandidatesIndependent/sourceConsumeIndependent equations with proved equality bridges; observe reads persisted allocations and budget slots",
+          "executor sourceRun plus separately copied sourceRunIndependent/sourceLimitsIndependent/sourceCandidatesIndependent/sourceConsumeIndependent equations with proved equality bridges; an explicit decoded gwei-normalized topUpLimits array is checked against gateway evaluation and caps each request; observe reads persisted allocations and budget slots",
           "Contract.run rollback after intermediate writes",
           "maxValidatorsPerTopUp guard enforced as checked revert on count>32; the no-check mutant is guard-necessity evidence outside the registered Verity parent's count <= 32 premise"
         ],
         "missing": [
           "_verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp",
-          "live independent per-key limits then allocateDeposits",
+          "live wei conversion and the module-selected allocateDeposits return/policy",
           "Lido withdrawDepositableEther and beacon makeBeaconChainTopUp",
           "gwei versus wei units and 48-byte pubkeys",
           "keccak memory-array oracle",
@@ -413,9 +413,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked block-cap parent, its pointwise per-key child, and the mutant-budget kill-line. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1."
+        "work": "Keep the checked block-cap parent, its pointwise per-key child, explicit gwei-normalized per-key limit input, and the mutant-budget kill-line. Next model the wei conversion and module-selected allocateDeposits result. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1."
       },
-      "next_gate": "Independent Verity sourceView is checked. OPEN: model live per-key limit inputs before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.",
+      "next_gate": "Explicit gwei-normalized per-key topUpLimits input and independent Verity sourceView correspondence are CHECKED. OPEN: model the live wei conversion and module-selected allocateDeposits return before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.",
       "roadmap_priority": "DONE"
     },
     {

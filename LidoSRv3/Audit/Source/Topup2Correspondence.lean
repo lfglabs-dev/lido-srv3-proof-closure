@@ -81,36 +81,51 @@ def sourceConsume : Word → List Word → Option (List Word × Word)
       let (tail, leftover) ← sourceConsume next rest
       some (allocated :: tail, leftover)
 
-/-- Candidates are independently capped by the evaluated validator limits. -/
-def sourceCandidates : List Word → List Word → List Word → Word → Word →
-    Option (List Word)
-  | [], [], [], _, _ => some []
-  | e :: es, p :: ps, r :: rs, target, minTopUp => do
+/-- Per-key limits produced by the gateway evaluation loop.  Keeping this list
+explicit is important: it is the live array passed to the module allocation
+boundary, rather than an implicit constant hidden in the allocator. -/
+def sourceLimits : List Word → List Word → Word → Word → Option (List Word)
+  | [], [], _, _ => some []
+  | e :: es, p :: ps, target, minTopUp => do
       let limit ← evaluateTopUpLimit e p target minTopUp
-      let rest ← sourceCandidates es ps rs target minTopUp
-      some (minWord r limit :: rest)
-  | _, _, _, _, _ => none
+      let rest ← sourceLimits es ps target minTopUp
+      some (limit :: rest)
+  | _, _, _, _ => none
 
-/-- Pinned-source batch: evaluate limits, take the share/value/block budget,
-consume it left to right.  Empty or misaligned arrays revert. -/
-def sourceRun (effective pending requested : List Word)
+/-- Module requests are independently capped by the explicit per-key limits. -/
+def sourceCandidates : List Word → List Word → Option (List Word)
+  | [], [] => some []
+  | r :: rs, limit :: limits => do
+      let rest ← sourceCandidates rs limits
+      some (minWord r limit :: rest)
+  | _, _ => none
+
+/-- Pinned-source batch: evaluate and bind the explicit per-key limit array,
+take the share/value/block budget, then consume it left to right.  Empty,
+misaligned, or inconsistent arrays revert. -/
+def sourceRun (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) :
     Option (List Word × Word × Word) :=
   if effective.length == 0 then none
   else
-    match sourceCandidates effective pending requested target minTopUp with
+    match sourceLimits effective pending target minTopUp with
     | none => none
-    | some candidates =>
-        let budget := minWord valueGwei (minWord moduleLimit remainingCap)
-        match sourceConsume budget candidates with
-        | none => none
-        | some (allocs, leftover) =>
-            match safeSub budget leftover with
-            | none => none
-            | some used =>
-                match safeSub remainingCap used with
-                | none => none
-                | some remaining => some (allocs, remaining, used)
+    | some evaluatedLimits =>
+        if evaluatedLimits != topUpLimits then none
+        else
+          match sourceCandidates requested topUpLimits with
+          | none => none
+          | some candidates =>
+              let budget := minWord valueGwei (minWord moduleLimit remainingCap)
+              match sourceConsume budget candidates with
+              | none => none
+              | some (allocs, leftover) =>
+                  match safeSub budget leftover with
+                  | none => none
+                  | some used =>
+                      match safeSub remainingCap used with
+                      | none => none
+                      | some remaining => some (allocs, remaining, used)
 
 /-- Overflow of the pinned checked addition is a source revert, not a total
 Nat wrap. -/
