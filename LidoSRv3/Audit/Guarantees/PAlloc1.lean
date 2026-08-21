@@ -151,6 +151,27 @@ theorem verity_tx_simulates_allocation
   _root_.LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_pinned_source
     cfg modules depositsToAllocate isTopUp state hBind
 
+/-- Storage-backed P-ALLOC-1 transaction closure. The router module count is
+read from `modulesCountSlot`, capped at the pinned maximum of 32, and the same
+storage-selected prefix drives both the executable observation and source
+view. Live summary returndata and packed `ModuleStateConfig` remain separate
+OPEN obligations. -/
+theorem verity_tx_simulates_allocation_count_from_storage
+    (cfg : Config) (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)
+    (state : Verity.ContractState) :
+    let count := min
+      (state.readSlot
+        _root_.LidoSRv3.Audit.Verity.AllocationTx.modulesCountSlot).val 32
+    let modules :=
+      _root_.LidoSRv3.Audit.Verity.AllocationTx.sourceBindAll state count
+    _root_.LidoSRv3.Audit.Verity.AllocationTx.observe modules
+        ((_root_.LidoSRv3.Audit.Verity.AllocationTx.allocateFromStorage
+          cfg depositsToAllocate isTopUp).run state) =
+      _root_.LidoSRv3.Audit.Verity.AllocationTx.sourceView
+        cfg modules depositsToAllocate isTopUp :=
+  _root_.LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_allocation_count_from_storage
+    cfg depositsToAllocate isTopUp state
+
 /-- Every revert of the allocation transaction, including the injected
 failure after intermediate map/slot writes, restores the pre-call snapshot. -/
 theorem verity_tx_revert_restores_snapshot

@@ -34,10 +34,10 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Checked baseline to preserve
 
-- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: OPEN: decode the live summary CALL returndata, bind packed ModuleStateConfig, and read/cap count from SRStorage without widening into P-ALLOC-2; do not refold the min-clamp child.
+- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: OPEN: decode the live summary CALL returndata and bind packed ModuleStateConfig without widening into P-ALLOC-2; storage-backed count with the 32 cap is CHECKED; do not refold the min-clamp child.
 - `P-ALLOC-2` — **IMPLEMENTATION_PENDING**: Amount equality is folded into the registered parent conclusion. OPEN: register a full allocate-loop conservation/model-correspondence theorem; keep the +1 model as a child.
 - `P-DEPOSIT-1` — **IMPLEMENTATION_PENDING**: Keep LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER from deployment artifacts; either reshape TX to one-module/n-frames or retain the explicit two-batch limitation.
-- `P-TOPUP-1` — **IMPLEMENTATION_PENDING**: OPEN: prove the general nonzero-wrap Verity revert shape; wrapped-zero execution is checked. Discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.
+- `P-TOPUP-1` — **IMPLEMENTATION_PENDING**: Concrete nonzero-wrap Verity revert/non-commit/rollback is CHECKED at [2^256-1, 2]; OPEN: generalize to a forall if needed. Discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.
 - `P-ACCOUNT-1` — **IMPLEMENTATION_PENDING**: fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Keep mint-after-read parent; do not widen to submitReportData.
 - `P-RESERVE-1` — **IMPLEMENTATION_PENDING**: The registered parent already proves the live ZERO_AMOUNT guard on every commit. OPEN: keep freshQueueCache explicit until a live WQ CALL exists, and model setDepositsReserveTarget/report-rebalance; do not treat P-RESERVE-RELATIONAL as this parent.
 - `P-CONSOLIDATION-ETH-1` — **IMPLEMENTATION_PENDING**: The canonical EIP-7251 literal is folded into the abstract parent; deployed target provenance remains OPEN under A-CANONICAL-REQUEST-ADDRESS. OPEN: register the Verity canonical-address/revert partition only with real proofs; compose only after the ABI/interpreter bridge.

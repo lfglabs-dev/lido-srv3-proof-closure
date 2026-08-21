@@ -424,4 +424,62 @@ theorem verity_wrap_to_zero_is_empty_commit
     inp.allocations state hZero hLen hAmt, ?_⟩
   simp [Verity.TopupTx.sourceObservables, hZero]
 
+/-- Executed nonzero-wrap witness on the Verity plane. For
+`[2^256 - 1, 2]`, the unchecked pull is one wei and the first value-bearing
+frame attempts `2^256 - 1` wei, so execution is observably non-committing and
+`Contract.run` restores the exact entry snapshot. This closes the concrete
+nonzero-wrap branch without claiming a general forall characterization. -/
+theorem verity_nonzero_wrap_witness_reverts_and_restores
+    (state : Verity.ContractState) :
+    let before := Verity.TopupTx.entryFrame state
+    ∃ reason,
+      (Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run before =
+          Verity.ContractResult.revert reason before ∧
+        (Verity.TopupTx.observe before 2
+          ((Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run before)).committed =
+            false := by
+  dsimp
+  rcases Verity.TopupTx.execute_nonzero_wrap_witness_reverts state with
+    ⟨reason, rollback, hRun, hRollback⟩
+  subst rollback
+  refine ⟨reason, hRun, ?_⟩
+  rw [hRun]
+  rfl
+
+/-- Predicate packaged from the existing committing-source Verity parent. -/
+def VerityCommittingSimulation (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (state : Verity.ContractState) : Prop :=
+  let before := Verity.TopupTx.entryFrame state
+  Verity.TopupTx.observe before inp.allocations.length
+      ((Verity.TopupTx.execute inp.allocations .none).run before) =
+        Verity.TopupTx.sourceObservables inp.allocations ∧
+    (run cfg inp).pulled =
+      (Verity.TopupTx.sourceObservables inp.allocations).pulled ∧
+    (run cfg inp).pushed =
+      (Verity.TopupTx.sourceObservables inp.allocations).pushed ∧
+    ∀ failure reason rollback,
+      (Verity.TopupTx.execute inp.allocations failure).run before =
+          .revert reason rollback →
+        rollback = before
+
+/-- Registered Verity parent: the full committing-source correspondence,
+including universal injected-failure rollback, conjoined with the concrete
+nonzero-wrap revert/non-commit/snapshot-restore close above. -/
+theorem verity_tx_simulates_source_with_nonzero_wrap_close
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (state : Verity.ContractState)
+    (hLen : inp.allocations.length ≤ uint256Modulus)
+    (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)
+    (hCommit : (run cfg inp).reverts = false) :
+    VerityCommittingSimulation cfg inp state ∧
+      (let before := Verity.TopupTx.entryFrame state
+        ∃ reason,
+          (Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run before =
+              Verity.ContractResult.revert reason before ∧
+            (Verity.TopupTx.observe before 2
+              ((Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run
+                before)).committed = false) :=
+  ⟨verity_tx_simulates_source cfg inp state hLen hAmt hCommit,
+    verity_nonzero_wrap_witness_reverts_and_restores state⟩
+
 end LidoSRv3.Audit.Guarantees.PTopup1

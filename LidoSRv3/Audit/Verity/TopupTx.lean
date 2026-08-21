@@ -648,6 +648,29 @@ theorem execute_observes_source_wrapped_zero_from_entry (allocations : List Nat)
       = sourceObservables allocations :=
   execute_observes_source_wrapped_zero allocations (entryFrame state) rfl hZero hLen hAmt
 
+/-- Concrete nonzero-wrap execution witness. The unchecked sum of
+`[2^256 - 1, 2]` is one, so the pull credits one wei; the first beacon push
+then attempts `2^256 - 1` wei and the real external-call frame fails closed.
+`Contract.run` restores the exact entry snapshot. -/
+theorem execute_nonzero_wrap_witness_reverts (state : ContractState) :
+    ∃ reason rollback,
+      (execute [uint256Modulus - 1, 2] .none).run (entryFrame state) =
+          ContractResult.revert reason rollback ∧
+        rollback = entryFrame state := by
+  have hmod : Core.Uint256.modulus = uint256Modulus := by decide
+  simp [execute, Contract.run, allocationStage, allocSumUnchecked,
+    pushStage, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
+    lidoPull_run, creditPull, pushLoop, beaconPush, externalCallBindTo,
+    allocationPass_selfBalance, entryFrame, hmod, uint256Modulus]
+
+/-- The witness is observably a non-commit as well as a state rollback. -/
+theorem execute_nonzero_wrap_witness_observes_noncommit (state : ContractState) :
+    (observe (entryFrame state) 2
+      ((execute [uint256Modulus - 1, 2] .none).run (entryFrame state))).committed = false := by
+  rcases execute_nonzero_wrap_witness_reverts state with ⟨reason, rollback, h, _⟩
+  rw [h]
+  rfl
+
 /-- The batch spends every wei it pulled: the executable counterpart of the
 final `assert(address(this).balance == 0)`. -/
 theorem execute_ends_with_zero_balance (allocations : List Nat) (state : ContractState)

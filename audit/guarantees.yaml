@@ -10,16 +10,16 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
-        "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), lockstep moduleAddress-binding allocation transaction, the named parent kill-line LidoSRv3.Tests.AllocationTxMutants.capacity_target_kill_line_refutes_parent (capacity := target mutant commits [24,24] against MathView [11,11] with CheckedBounds discharged at the witness), and off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
+        "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), storage-backed 32-capped module-count allocation transaction, the named parent kill-line LidoSRv3.Tests.AllocationTxMutants.capacity_target_kill_line_refutes_parent (capacity := target mutant commits [24,24] against MathView [11,11] with CheckedBounds discharged at the witness), and off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
       },
-      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named kill-line capacity_target_kill_line_refutes_parent is the explicit negation of the parent's predicate shape with the executeMutant executor (capacity := target, skipping wordMin) substituted: CheckedBounds holds at the witness, the mutant commits, and its capacity column differs from MathView.capacities. active_capacity_bounded (MathView.capacity = min(target, available), so capacity \u2264 targetValidators \u2227 capacity \u2264 availableCapacity) is a Nat.min tautology on the MathView definition, not on execute's arithmetic; it is kept as an explicit unregistered child rather than folded into the parent. Verity: if sourceBindAll recovers the module list, observe of allocate (persisted arrays) equals sourceView of the same interpreter.",
+      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named kill-line capacity_target_kill_line_refutes_parent is the explicit negation of the parent's predicate shape with the executeMutant executor (capacity := target, skipping wordMin) substituted: CheckedBounds holds at the witness, the mutant commits, and its capacity column differs from MathView.capacities. active_capacity_bounded (MathView.capacity = min(target, available), so capacity \u2264 targetValidators \u2227 capacity \u2264 availableCapacity) is a Nat.min tautology on the MathView definition, not on execute's arithmetic; it is kept as an explicit unregistered child rather than folded into the parent. Verity: allocateFromStorage reads the router module count from storage, caps it at 32, binds that prefix, persists the computed arrays, and observe equals sourceView.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage"
       },
       "fidelity": {
         "covered": [
@@ -27,6 +27,7 @@
           "named parent kill-line capacity_target_kill_line_refutes_parent: the capacity := target mutant commits a capacity column \u2260 MathView.capacities with CheckedBounds discharged at the witness",
           "active_capacity_bounded (Math.min clamp) demoted to an explicit, unregistered MathView-definitional child",
           "single bind/execute interpreter; observe reads writeArray columns",
+          "module count read from modulesCountSlot and capped by MAX_STAKING_MODULES_COUNT = 32 before binding router indices",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
@@ -34,15 +35,14 @@
           "packed ModuleStateConfig slot",
           "unique moduleAddress on addModule",
           "getDepositAllocations / MinFirst fill (see P-ALLOC-2)",
-          "reachable-router CheckedBounds",
-          "modules count is a harness argument: allocate count walks List.range count rather than SRStorage.getModulesCount(), and count is not capped by MAX_STAKING_MODULES_COUNT = 32 (report issues 13/15)"
+          "reachable-router CheckedBounds"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep the checked execute parent and lockstep bind theorems; do not widen to getDepositAllocations or live module callbacks, and do not re-fold the min-clamp tautology back into the parent."
       },
-      "next_gate": "OPEN: decode the live summary CALL returndata, bind packed ModuleStateConfig, and read/cap count from SRStorage without widening into P-ALLOC-2; do not refold the min-clamp child.",
+      "next_gate": "OPEN: decode the live summary CALL returndata and bind packed ModuleStateConfig without widening into P-ALLOC-2; storage-backed count with the 32 cap is CHECKED; do not refold the min-clamp child.",
       "roadmap_priority": "DONE"
     },
     {
@@ -147,7 +147,7 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
-        "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, intermediate-effect rollback, executable fail-closed mutants, and the abstract-parent kill-lines dropped_conservation_assert_kill_line_refutes_parent (surgical assert-drop), dropped_module_guard_kill_line_refutes_parent, dropped_wc_guard_kill_line_refutes_parent, unwrapped_accumulator_kill_line_refutes_parent (wrap-ignoring dual) plus the mutantRunNoAssert characterization theorems, the guard_discharge_at_* positive controls, and wrap_to_zero_commits_no_topup build"
+        "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, concrete [2^256-1,2] nonzero-wrap revert/non-commit/snapshot restore, intermediate-effect rollback, executable fail-closed mutants, and the abstract-parent kill-lines dropped_conservation_assert_kill_line_refutes_parent (surgical assert-drop), dropped_module_guard_kill_line_refutes_parent, dropped_wc_guard_kill_line_refutes_parent, unwrapped_accumulator_kill_line_refutes_parent (wrap-ignoring dual) plus the mutantRunNoAssert characterization theorems, the guard_discharge_at_* positive controls, and wrap_to_zero_commits_no_topup build"
       },
       "summary": "source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run -- genuinely assert-backed: run's value-moving tail and residual amount guards read the on-chain unchecked accumulator (the line-732 sum reduced mod 2^256, wrappedTotal = exactTotal % 2^256) for the over-target guard at line 737, the zero-sum test at line 741, the Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert, so reaching a value-moving commit means the assert passed with the wrapped pull equal to the exact push -- and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps mod 2^256, run itself moves no wei (pulled = pushed = 0) -- a nonzero wrap still aborts on the value-moving tail (underfunded push or line-755 assert), while a sum that wraps to exactly zero takes the line-741 empty commit committedNoTopUp, so wrap-implies-revert is false; the honest fact is wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit / source_wrap_precludes_value_moving_commit); A-TOPUP-NOWRAP lives here, in the wrap antecedent, and in the discharged-balance-guard theorems, not in conjunct (1); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants carries real kill-lines on mutants of the parent's own model: dropped_conservation_assert_kill_line_refutes_parent (a surgical mutant run with ONLY the line-755 assert deleted commits the wrapping batch with pulled = 1 \u2260 2^256+1 = pushed; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style), dropped_module_guard_kill_line_refutes_parent and dropped_wc_guard_kill_line_refutes_parent (mutants without the moduleExists / wcTypeIsType2 require commit at witnesses where the parent demands the named revert), and unwrapped_accumulator_kill_line_refutes_parent (the assert-drop mutant's dual: a wrap-ignoring mutant run commits the wrapping batch the honest run reverts via the assert). The wave-1 projections are renamed guard_discharge_at_* and are honest positive controls, not kill-lines; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control. Verity: if allocations.length \u2264 2^256, each allocation is a uint256 word, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match, including the wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis. Not P-TOPUP-2 amount computation.",
       "abstract": {
@@ -156,12 +156,13 @@
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source"
+        "theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close"
       },
       "fidelity": {
         "covered": [
           "abstract conservation/rollback",
           "pinned-source Verity correspondence for committing batches of at most 2^256 validators whose allocations are uint256 words, including wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis",
+          "concrete Verity nonzero-wrap witness [2^256-1, 2]: the one-wei wrapped pull cannot fund the first push, execute is observably non-committing, and Contract.run restores the exact entry snapshot",
           "Lido pull and beacon deposits executed through Verity external-call frames that debit contract balance",
           "observable call destinations, values, argument words and ordering plus per-validator allocation storage words",
           "rollback to the caller snapshot after allocation writes, after the journalled pull, and after the first journalled deposit",
@@ -172,15 +173,15 @@
           "conservation conjunct kill-line, surgical since wave 5: dropped_conservation_assert_kill_line_refutes_parent commits a mutant run with ONLY the line-755 assert deleted at the wrapping witness with pulled \u2260 pushed -- the negation of conjunct (1)'s predicate on the mutant; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style"
         ],
         "missing": [
-          "Verity parent verity_tx_simulates_source still assumes (run cfg inp).reverts = false, so a nonzero wrap is not universally characterized on the Verity plane; verity_wrap_to_zero_is_empty_commit executes the wrapped-zero subcase without hCommit",
+          "the general forall nonzero-wrap Verity characterization remains OPEN; the checked close is the concrete [2^256-1, 2] witness, while verity_wrap_to_zero_is_empty_commit covers wrapped zero",
           "beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Pin beacon-address provenance. Keep the Verity hCommit / nonzero-wrap gap explicit; do not advertise a naked TX forall on wrap. Do not derive a top-up LinksSource from ALLOC."
+        "work": "Pin beacon-address provenance. Generalize the checked concrete nonzero-wrap Verity witness only if useful; do not advertise a naked TX forall on wrap. Do not derive a top-up LinksSource from ALLOC."
       },
-      "next_gate": "OPEN: prove the general nonzero-wrap Verity revert shape; wrapped-zero execution is checked. Discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.",
+      "next_gate": "Concrete nonzero-wrap Verity revert/non-commit/rollback is CHECKED at [2^256-1, 2]; OPEN: generalize to a forall if needed. Discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.",
       "roadmap_priority": "DONE"
     },
     {

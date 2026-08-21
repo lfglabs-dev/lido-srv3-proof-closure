@@ -23,6 +23,9 @@ open LidoSRv3.Audit.AllocCapacity
 
 abbrev Word := Uint256
 
+/-- `SRStorage.getModulesCount()`. The source caps this count by
+`MAX_STAKING_MODULES_COUNT = 32` before walking router indices. -/
+def modulesCountSlot : Nat := 29
 /-- `SRStorage.getModuleIdAt(i)` — map from router index to module id. -/
 def moduleIdSlot : Nat := 30
 /-- `ModuleStateConfig.moduleAddress` keyed by module id. -/
@@ -119,6 +122,14 @@ def allocate (count : Nat) (cfg : Config) (depositsToAllocate : Word)
           .success ⟨rows.map Row.currentAllocation, rows.map Row.capacity,
             addresses, total⟩ dirty
 
+/-- Allocation entry point whose loop bound comes from router storage, capped
+at the pinned `MAX_STAKING_MODULES_COUNT = 32`. -/
+def allocateFromStorage (cfg : Config) (depositsToAllocate : Word)
+    (isTopUp : Bool) (failAfterWrites : Bool := false) : Contract Result :=
+  fun snapshot =>
+    allocate (min (snapshot.readSlot modulesCountSlot).val 32)
+      cfg depositsToAllocate isTopUp failAfterWrites snapshot
+
 inductive Status where | committed | reverted deriving DecidableEq, Repr
 
 structure View where
@@ -171,6 +182,27 @@ theorem verity_tx_simulates_pinned_source
       simp [observe, ContractState.readArray, totalSlot,
         ContractState.readSlot_writeSlot_same, ContractState.storageArray_writeSlot]
       exact hread
+
+/-- The transaction and specification bind exactly the router prefix selected
+by the storage-backed, 32-capped module count. No caller-supplied count
+hypothesis is needed. -/
+theorem verity_tx_simulates_allocation_count_from_storage
+    (cfg : Config) (depositsToAllocate : Word) (isTopUp : Bool)
+    (state : ContractState) :
+    let count := min (state.readSlot modulesCountSlot).val 32
+    let modules := sourceBindAll state count
+    observe modules ((allocateFromStorage cfg depositsToAllocate isTopUp).run state) =
+      sourceView cfg modules depositsToAllocate isTopUp := by
+  dsimp [allocateFromStorage]
+  change observe (sourceBindAll state (min (state.readSlot modulesCountSlot).val 32))
+      ((allocate (min (state.readSlot modulesCountSlot).val 32)
+        cfg depositsToAllocate isTopUp).run state) =
+    sourceView cfg (sourceBindAll state (min (state.readSlot modulesCountSlot).val 32))
+      depositsToAllocate isTopUp
+  simpa [sourceBindAll] using
+    (verity_tx_simulates_pinned_source cfg
+      (sourceBindAll state (min (state.readSlot modulesCountSlot).val 32))
+      depositsToAllocate isTopUp state (by simp [sourceBindAll]))
 
 theorem revert_restores_snapshot
     (count : Nat) (cfg : Config) (depositsToAllocate : Word) (isTopUp : Bool)
