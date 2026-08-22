@@ -14,7 +14,7 @@ claim EIP-4788, SHA, or Yul, or register a new guarantee.
 namespace LidoSRv3.Audit.Spec.ProductionGindexChild
 
 open LidoSRv3.Audit
-open LidoSRv3.Audit.Source (GIndexConcatCorrespondence)
+open LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 
 /-- The CL validator wrapper binds the toy slot 2, not a production
 `GI_FIRST_VALIDATOR_*` literal. -/
@@ -44,18 +44,18 @@ theorem production_gindex_binding_remains_open : True := trivial
 
 /-- Concrete SOURCE concat pair used by `GIndexConcatMutants` (index 2
 pow 7 and index 3 pow 11). Toy operands, not production `GI_*`. -/
-def toyConcatLhs : GIndexConcatCorrespondence.GIndex :=
+def toyConcatLhs : GIndex :=
   ⟨2, 7, by decide, by decide⟩
 
-def toyConcatRhs : GIndexConcatCorrespondence.GIndex :=
+def toyConcatRhs : GIndex :=
   ⟨3, 11, by decide, by decide⟩
 
 /-- Existing `source_concat_matches_spec`, instantiated on that concrete
 pair. Import of the SOURCE child; not a live verifier claim. -/
 theorem source_concat_matches_spec :
-    GIndexConcatCorrespondence.sourceConcat toyConcatLhs toyConcatRhs =
-      GIndexConcatCorrespondence.specConcat toyConcatLhs toyConcatRhs :=
-  GIndexConcatCorrespondence.source_concat_matches_spec
+    sourceConcat toyConcatLhs toyConcatRhs =
+      specConcat toyConcatLhs toyConcatRhs :=
+  LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec
     toyConcatLhs toyConcatRhs
 
 end LidoSRv3.Audit.Spec.ProductionGindexChild
