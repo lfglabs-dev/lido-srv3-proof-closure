@@ -42,10 +42,9 @@ def specJournalOfTopup (allocations : List Nat) : EthJournal :=
 theorem specJournalOfTopup_dests_restricted (allocations : List Nat) :
     ∀ leg ∈ specJournalOfTopup allocations, isTopupJournalDest leg.dest = true := by
   intro leg hmem
-  unfold specJournalOfTopup at hmem
-  split_ifs at hmem with _hZero
-  · cases hmem
-  · simp only [List.mem_cons, List.mem_map] at hmem
+  by_cases hZero : allocSumUnchecked allocations = 0
+  · simp [specJournalOfTopup, hZero] at hmem
+  · simp [specJournalOfTopup, hZero] at hmem
     rcases hmem with h | ⟨_, _, hp⟩
     · subst h; rfl
     · subst hp; rfl
