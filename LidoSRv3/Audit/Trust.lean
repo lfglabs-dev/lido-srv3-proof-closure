@@ -304,6 +304,9 @@ assumptions or proof escapes.
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.canonical_composition_witness
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_deployment_is_word_bounded
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.abstract_parent_covers_deployments_the_verity_plane_omits
 #print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
 #print axioms
   LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot
