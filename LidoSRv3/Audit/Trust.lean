@@ -40,6 +40,8 @@ import LidoSRv3.Tests.DepositParentTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.AllocationTx
+import LidoSRv3.Audit.Spec.AllocationCorrespondence
+import LidoSRv3.Tests.PackAAllocSpecMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -77,6 +79,12 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.revert_may_retain_attempts
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute
+#print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.alloc1_spec_capacity_correspondence
+#print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.alloc2_spec_step_amount_correspondence
+#print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.topup2_per_key_remains_gwei
+#print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.spec_amounts_do_not_imply_linkssource
+#print axioms LidoSRv3.Tests.PackAAllocSpecMutants.target_as_capacity_kill_line_refutes_alloc1_spec
+#print axioms LidoSRv3.Tests.PackAAllocSpecMutants.spec_amounts_kill_line_refutes_linkssource
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
