@@ -30,9 +30,9 @@ def swappedThreeJournal : List ExternalCall :=
 def journalAgreesWithPreStateReads (state : ContractState)
     (requestIds hints : List Nat) (recipient : Address)
     (journal : List ExternalCall) : Prop :=
-  ∃ payouts,
-    sourcePayouts state requestIds hints = payouts.map some ∧
-      journal = state.calls ++ payouts.map (payoutEntry recipient)
+  ∃ payouts : List Nat,
+    sourcePayouts state requestIds hints = List.map some payouts ∧
+      journal = state.calls ++ List.map (payoutEntry recipient) payouts
 
 theorem three_claim_batch_ready :
     BatchReady threeClaimState [1, 2, 3] [1, 1, 1] (2 : Address)
@@ -53,7 +53,12 @@ theorem three_claim_batch_parent_instance :
           ((executeClaimWithdrawalsTo [1, 2, 3] [1, 1, 1]
             (2 : Address)).run threeClaimState) =
         ⟨.committed, [true, true, true], 0, honestThreeJournal⟩ := by
-  simpa [honestThreeJournal] using
+  have hlocked :
+      (threeClaimState.readSlot lockedEtherAmountPosition).val = 80 := by
+    decide +kernel
+  have hcalls : threeClaimState.calls = [] := by
+    rfl
+  simpa [honestThreeJournal, hlocked, hcalls] using
     fuel_bounded_live_claim_batch_correspondence 8 threeClaimState
       [1, 2, 3] [1, 1, 1] [30, 40, 10] (2 : Address)
       (by decide) (by decide) (by decide) three_claim_batch_ready (by decide)
