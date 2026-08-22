@@ -82,8 +82,10 @@ theorem swapped_three_payout_order_kill_line_refutes_parent :
   rcases hagrees with ⟨payouts, hreads, hjournal⟩
   have hpayouts : payouts = [30, 40, 10] := by
     simpa [sourcePayouts] using
-      congrArg (List.map (Option.getD 0)) hreads
+      (congrArg (List.map (fun value : Option Nat => value.getD 0)) hreads).symm
   subst payouts
-  simpa [swappedThreeJournal] using hjournal
+  have hcalls : threeClaimState.calls = [] := by
+    rfl
+  simpa [swappedThreeJournal, hcalls] using hjournal
 
 end LidoSRv3.Tests.PackN4AddressBatchMutants
