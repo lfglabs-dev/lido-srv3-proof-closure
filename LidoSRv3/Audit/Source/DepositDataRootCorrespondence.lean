@@ -483,4 +483,22 @@ theorem source_pinned_config_discharges_deposit_data_root
     rw [structuralRoot_eq]
     rfl
 
+/-- The derived witness accepts against its structural root. -/
+theorem sourceWitness_binds_sourceNode (src : SourceDepositDataRootInput)
+    (hPublicKey : src.publicKey.length = PUBKEY_LENGTH pinnedConfig)
+    (hWithdrawalCredentials : src.withdrawalCredentials.length =
+      WITHDRAWAL_CREDENTIALS_LENGTH pinnedConfig)
+    (hSignature : src.signature.length = SIGNATURE_LENGTH pinnedConfig) :
+    Ssz.bindOperation .clValidatorVerifier structuralCombine (sourceWitness src)
+        (sourceNode src) = true := by
+  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, hGI, hTraverse⟩ :=
+    source_pinned_config_discharges_deposit_data_root src hPublicKey hWithdrawalCredentials
+      hSignature
+  have hOperation : (sourceWitness src).operation = Ssz.Operation.clValidatorVerifier := rfl
+  have hIndex : (sourceWitness src).index = Ssz.operationIndex .clValidatorVerifier := rfl
+  have hArity : (sourceWitness src).branch.length = (sourceWitness src).path.length := rfl
+  simp only [Ssz.bindOperation, Ssz.verifyValidatorWitness, Ssz.verifyProof, Bool.and_eq_true,
+    beq_iff_eq]
+  exact ⟨⟨hOperation, hIndex⟩, ⟨⟨⟨hGI.1, hGI.2.1⟩, hGI.2.2⟩, hArity⟩, hTraverse⟩
+
 end LidoSRv3.Audit.Source.DepositDataRootCorrespondence
