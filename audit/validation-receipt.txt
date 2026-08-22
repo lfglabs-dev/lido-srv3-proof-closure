@@ -1,11 +1,22 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 1aee2ca0363f576adc0a42115397467d9e75bf20
+validated-tree: c938cdaf03fbceaec8866c65f0dacce69fa88636
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Pack E OracleFrame fee/share + Eugene citation (2026-08-22)
+----------------------------------------------------------
+
+- Rebind `validated-tree` to `c938cdaf03fbceaec8866c65f0dacce69fa88636`, the
+  tracked tree of `cursor/pack-e-oracle-frame-f120` excluding this receipt.
+- Unregistered child: `OracleFrame.sharesMinted` is the fee argument;
+  `shareRateDelta` is unmodeled. ACCOUNT stays order-only. Eugene bound is
+  cited, not re-homed. No supply bound. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.OracleFrameCorrespondence
+  LidoSRv3.Tests.PackEOracleFrameMutants` exit 0.
 
 Pack D ADDRESS claim-batch strengthening (2026-08-22)
 ----------------------------------------------------
