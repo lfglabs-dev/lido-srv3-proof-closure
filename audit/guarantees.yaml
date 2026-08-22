@@ -452,6 +452,7 @@
           "premise-necessity evidence gateway_admitted_nonzero_kill_line: with the premise dropped a fee=0/msg.value=0 batch still commits sourceRun; that witness violates the premise, so it is not a refutation of the hypothesis-conditioned parent",
           "packing order kill-line: swapped source||target concat fails observe",
           "single sourceRun; observe reads state.calls / state.events",
+          "observe rereads the persisted source/target payload pair out of sourceMapSlot/targetMapSlot for each new request index (readPayloads over [beforeCount, beforeCount + calls.length)) rather than reconstructing it from the call journal",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
@@ -461,13 +462,12 @@
           "Bus publisher/executor path",
           "keccak memory-array oracle",
           "A-CONSOLIDATION-GATEWAY-NONZERO is caller-supplied at the outer P-CONSOLIDATION-ETH-1 gateway msg.value boundary, not a vault-local forwarded-totalFee fact",
-          "observe reconstructs payloads from the call journal rather than rereading sourceMapSlot/targetMapSlot payload storage",
           "composition with P-CONSOLIDATION-ETH-1 requires ABI/interpreter bridge (groups, fee fetch, failing refund, value-bearing CALLs); fence remains until then"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked vault-loop theorems. Relocate or remove hGatewayAdmittedNonzero (outer gateway msg.value surface / P-CONSOLIDATION-ETH-1 boundary, not vault totalFee). Make observe reread sourceMapSlot/targetMapSlot payloads before strengthening. Do not compose with P-CONSOLIDATION-ETH-1 until an ABI/interpreter bridge exists."
+        "work": "Keep the checked vault-loop theorems. Relocate or remove hGatewayAdmittedNonzero (outer gateway msg.value surface / P-CONSOLIDATION-ETH-1 boundary, not vault totalFee). Do not compose with P-CONSOLIDATION-ETH-1 until an ABI/interpreter bridge exists."
       },
       "next_gate": "Outer-gateway nonzero admission is explicitly relocated to A-CONSOLIDATION-GATEWAY-NONZERO. Discharge it only via the ABI/interpreter bridge; keep preservesEthBalance OPEN until CALLs move wei.",
       "roadmap_priority": "DONE"

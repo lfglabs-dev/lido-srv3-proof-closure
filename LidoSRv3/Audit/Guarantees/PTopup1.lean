@@ -405,7 +405,8 @@ theorem verity_tx_simulates_source
 /-- Executed wrap-to-zero subcase on the Verity plane. Under an actual wrap
 whose unchecked accumulator is zero, `execute` commits the empty pull/push
 schedule and its observable journal is empty. The complementary nonzero-wrap
-revert proof remains OPEN; this theorem does not use `hCommit`. -/
+case is `verity_nonzero_wrap_reverts_and_restores` below; together they
+partition wrapping batches. This theorem does not use `hCommit`. -/
 theorem verity_wrap_to_zero_is_empty_commit
     (inp : SourceTopupInput) (state : Verity.ContractState)
     (_hWrap : ¬ NoUncheckedWrap inp)

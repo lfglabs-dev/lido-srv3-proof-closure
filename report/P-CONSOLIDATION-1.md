@@ -14,10 +14,10 @@ The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. 
 
 CHECKED does not mean eligibility in the beacon sense, that the vault paid $n \times \mathrm{fee}$, or gateway grouping.
 
-Ranked next work: drop or relocate the outer-gateway nonzero-value premise; make observe read payload storage; keep the P-CONSOLIDATION-ETH-1 fence until an ABI/interpreter bridge exists.
+Ranked next work: drop or relocate the outer-gateway nonzero-value premise; keep the P-CONSOLIDATION-ETH-1 fence until an ABI/interpreter bridge exists. `observe` now rereads `sourceMapSlot`/`targetMapSlot` payload storage for the new request indices rather than reconstructing payloads from the call journal.
 
 Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
-Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`.
 
 ## Intent
 

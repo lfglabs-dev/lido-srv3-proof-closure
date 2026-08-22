@@ -453,8 +453,8 @@ def mintOrderKillLine : Prop :=
 theorem mintOrderKillLine_holds : mintOrderKillLine := by
   intro hDisc
   let witness : ReportInput := ⟨[1], [1], [1]⟩
-  have hValid : idsAndBalancesValid witness = true := by native_decide
-  have hTotal : checkedTotal256 witness.balancesGwei = some 1 := by native_decide
+  have hValid : idsAndBalancesValid witness = true := by decide
+  have hTotal : checkedTotal256 witness.balancesGwei = some 1 := by decide
   have h := hDisc witness 1 defaultState
   simp [handleOracleReportMintBeforeRead, Contract.run, witness, hValid, hTotal,
     mintAfterRead, writeAll, persistBalances, stampStep, nextTick,

@@ -28,7 +28,7 @@ CHECKED does not mean the deployed router conserves ether, that ALLOC feeds this
 Ranked next work: keep LinksSource explicit; discharge the named OPEN `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` provenance assumptions from deployment artifacts; reshape TX to one-module/n-frames or keep stating the two-batch limitation.
 
 Theorems: `PDeposit1.source_deposit_conserves_and_rolls_back` (registered abstract parent), `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` (Verity composition), `DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed` (kill-line).
-Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`.
 
 ## Intent
 
