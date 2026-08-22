@@ -1,11 +1,28 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 47a93a44c25bb116443cf1743929fa906e23227f
+validated-tree: dc75292d265ab95d95a0121a7fed6b3acd4ca789
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Leftover Wave 2 integrator (2026-08-22)
+---------------------------------------
+
+- Rebind `validated-tree` to `dc75292d265ab95d95a0121a7fed6b3acd4ca789`, the
+  tracked tree of `cursor/w2-integrate-f120` excluding this receipt.
+- Lands W2-4788 age algebra, W2-GINDEX toy slots 2/3/4, W2-DENOTE widened
+  constructors vs official revert, W2-ADDR three-item claim batch,
+  W2-TOPUP2-WEI `valueWei / GWEI`, W2-RESERVE `freshQueueCache` equality,
+  and W2-SCOPE pause / VaultHub exclusion / supplemental P-DEREF. No new
+  guarantee IDs. Named hyps stay named. Deployed artifacts, production GI,
+  EIP-4788 lookup, official denotation success, live WQ CALL, bus, and
+  P-DEREF-1 promotion stay out.
+- Verification: Wave 2 module `lake build` and Trust exit 0;
+  `scripts/check_validation_receipt.py`, `scripts/audit_metadata.py check`,
+  `scripts/check_public_claim_surfaces.py`, and
+  `scripts/check_no_python_evidence.sh` exit 0.
 
 Leftover Wave 1 integrator (2026-08-22)
 ---------------------------------------
