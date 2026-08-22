@@ -1,0 +1,48 @@
+import LidoSRv3.Audit.Verity.ConsolidationTx
+import LidoSRv3.Audit.Verity.ConsolidationCallFragment
+import LidoSRv3.Audit.Guarantees.PConsolidation1
+
+/-!
+# Leftover W2-DENOTE: widened constructors ≠ official denotation success
+
+Unregistered child. It names two already-proved facts together: `requestOne`
+still contains `externalCallBind` (widened constructors), and official
+`denoteFunction` still reverts on `Expr.call` (C-GAP). Those facts do not
+compose into official denotation success.
+
+Does not discharge `A-CONSOLIDATION-GATEWAY-NONZERO`. Does not start the
+bus. Does not invent a guarantee ID.
+-/
+
+namespace LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild
+
+open LidoSRv3.Audit.Verity
+open LidoSRv3.Audit.Guarantees
+
+/-- The `requestOne` body is the widened call/event/memory constructors.
+This is a constructor-shape fact, not official denotation success. -/
+theorem requestOne_uses_widened_call_constructor :=
+  ConsolidationTx.function_spec_bridge_constructors
+
+/-- Official `denoteFunction` still reverts on the raw-call entrypoint.
+C-GAP remains. This is not official denotation success. -/
+theorem official_raw_call_still_reverts :=
+  ConsolidationCallFragment.raw_call_entrypoint_always_reverts
+
+/-- Link-time env resolves the named predeploy. Resolution is not
+execution; official denotation still reverts. -/
+theorem functionEnv_resolves_predeploy (target fee : Nat) :
+    (ConsolidationTx.functionEnv target fee).resolve "consolidationPredeploy" =
+      some { target := target, value := fee, siteId := 0 } :=
+  rfl
+
+/-- `preservesEthBalance` stays the documented string gap: the vault must
+forward exactly `msg.value`. Closing it needs value-bearing CALL frames,
+which official denotation still does not provide. -/
+theorem preservesEthBalance_gap_remains :
+    PConsolidation1.preservesEthBalance_gap =
+      "preservesEthBalance: forwards exactly msg.value (requires value-bearing CALL frames)" ∧
+      PConsolidation1.preservesEthBalance_gap ≠ "" :=
+  ⟨rfl, by decide⟩
+
+end LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild
