@@ -1,11 +1,87 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6b6b85f230a30c5731b317763942eb181273a8a8
+validated-tree: aab948295154e22b4cd41d7cc4bba1e71fdec8f0
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 quantifier honesty (2026-08-23)
+-------------------------------------------
+
+- Rebind `validated-tree` to `aab948295154e22b4cd41d7cc4bba1e71fdec8f0`, the
+  tracked tree of `pdeposit1-quantifier-honesty` excluding this receipt.
+- Scope: one row, P-DEPOSIT-1. No new guarantee id, no status change, no
+  assumption added or removed, no other row touched.
+- The gap being corrected: the registered abstract parent
+  `source_deposit_conserves_and_rolls_back` is an unbounded forall over
+  `(cfg, inp)`, while the registered Verity parent
+  `verity_tx_composes_deposit_conservation_and_rollback` executes exactly two
+  batches. Both rows read `CHECKED`, and the asymmetry lived only in prose, so
+  the row could be quoted as an executable claim about every deployment the
+  abstract row states.
+- Conservative correction, not a lift. The exactly-two-batch theorem is
+  preserved; its finiteness is moved into the registered statement and into
+  checked theorems:
+  - conjunct (d) of the registered Verity parent now states the fixed
+    five-frame journal (two `obtainDepositData` legs, one
+    `withdrawDepositableEther` pull, exactly two `depositToBeacon` legs), the
+    two-element probe list, and the 256-bit word bound on the linked
+    deployment;
+  - `linked_deployment_is_word_bounded` derives that bound from `LinksSource`
+    and the parent's own `Preconditions.noWrap`;
+  - `abstract_parent_covers_deployments_the_verity_plane_omits` exhibits
+    `oversizedSourceInput`, a deployment where the abstract parent holds in
+    full and no `Inputs` at all satisfies `LinksSource` together with
+    `noWrap`, for any entry state. Non-vacuity
+    (`canonical_composition_witness`) now has a dual, so satisfiability is not
+    mistaken for coverage.
+- Trust disclosure widened, not narrowed: `Trust.lean` also prints axioms for
+  `PDeposit1.linked_deployment_is_word_bounded` and
+  `PDeposit1.abstract_parent_covers_deployments_the_verity_plane_omits`; both
+  depend on `[propext, Quot.sound]` only, and no `sorryAx` appears anywhere in
+  the run.
+- `EXPECTED_CANONICAL_DETAIL_SHA256["P-DEPOSIT-1"]` rebound from
+  `b99c5534cc2faf7d71956e1b306cd3646873cfc87e7d8c8d42d72f6fffb307fd` to
+  `9496a4dba26b429041819c8c2f8225a6da8c4229c54eb850eafdffd4181eb98b` for the
+  edited `summary`, `fidelity`, `classification`, and `next_gate`; the pinned
+  canonical claim tuple (statuses, theorem names, kind, assumptions) is
+  unchanged. `audit/ROADMAP.md`, `audit/STATUS.md` and `audit/REPRODUCE.md`
+  regenerated from that metadata.
+- What this does NOT do: it does not close the gap. The executable plane is
+  still exactly two batches with no n-frame `execute`, `LinksSource` is still a
+  caller hypothesis, and `A-DEPOSIT-CONTRACT` / `A-DEPOSIT-32-ETHER` are still
+  OPEN. The row's fidelity now says so in the registered statement rather than
+  only in prose.
+
+Reproduction at this head (all run locally; the branch has no CI):
+
+- `make prove` exit 0 — `verified_source_tree`
+  `50cfc74bc047db1b53892edd68cfb432ef540775`, Lean 4.31.0,
+  `lake build LidoSRv3` `Build completed successfully (1461 jobs)`, only
+  pre-existing upstream linter warnings. `proofs/logs/prove.txt` and
+  `proofs/logs/proof-report.json` regenerated from that run.
+- Focused reproduction command recorded for this row in `audit/guarantees.yaml`:
+  `lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants`
+  exit 0, `Build completed successfully (1219 jobs)`.
+- `make test` exit 0 on the tree this receipt binds, covering
+  `scripts/audit_metadata.py check` (11 canonical guarantees + 18 subordinate
+  evidence rows), `scripts/test_audit_metadata.py`,
+  `scripts/check_validation_receipt.py`,
+  `scripts/check_no_python_evidence.sh`,
+  `scripts/test_check_no_python_evidence.sh`,
+  `scripts/check_public_claim_surfaces.py`,
+  `scripts/test_public_claim_surfaces.py`,
+  `scripts/test_verity_provenance.py`,
+  `scripts/check_provenance_guards.sh`, every `LidoSRv3.Tests.*` target named
+  in the `Makefile`, and the five `fixtures/solidity-reference/*` checks.
+- `validated-tree` rebound from `6b6b85f230a30c5731b317763942eb181273a8a8` to
+  `aab948295154e22b4cd41d7cc4bba1e71fdec8f0`, the tracked tree of this commit
+  excluding this receipt per `scripts/check_validation_receipt.py`
+  (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
+  This rebind is the final commit of the change, since every other tracked file
+  is inside the tree it binds.
 
 Leftover Wave 3 integrator (2026-08-22)
 ---------------------------------------
