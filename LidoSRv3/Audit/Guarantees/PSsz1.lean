@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Ssz
+import LidoSRv3.Audit.SszDepositEquivalence
 import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Verity.SszAbstractDigest
@@ -14,8 +15,30 @@ open LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 open LidoSRv3.Audit.Verity.SszAbstractDigest
 open LidoSRv3.Audit.Verity.SszTxSimulation
 open LidoSRv3.Audit.Verity.SszEncodingTx
+open LidoSRv3.Audit.SszDepositEquivalence
 
 def guarantee : Guarantee := ⟨.pSsz1, [.model, .source, .verityTx]⟩
+
+/-- Re-export the bidirectional structural deposit-root equivalence layer. -/
+abbrev wellFormedDeposit := SszDepositEquivalence.wellFormedDeposit
+abbrev PerfectDepositEncoding := SszDepositEquivalence.PerfectDepositEncoding
+abbrev depositVerified := SszDepositEquivalence.depositVerified
+
+/-- Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: construction
+binds `sourceWitness src` to `sourceNode src`; determination recovers the
+witness and deposit uniqueness under `PerfectDepositEncoding` (`A-PERFECT-HASH`).
+SHA-256 remains opaque (`A-SHA256-FFI`). Complements the one-object
+`composed_ssz_encoding` traversal conjunct. -/
+theorem deposit_root_iff (src : SourceDepositDataRootInput)
+    (hWellFormed : wellFormedDeposit src) (hPerfect : PerfectDepositEncoding) :
+    depositVerified (sourceWitness src) (sourceNode src) ∧
+      (∀ witness root,
+        depositVerified witness root →
+          root = sourceNode src →
+            witness = sourceWitness src ∧
+              ∀ src', wellFormedDeposit src' →
+                sourceNode src' = sourceNode src → src' = src) :=
+  SszDepositEquivalence.deposit_root_iff src hWellFormed hPerfect
 
 /-! ### One-object closure for the digest / concat children
 
@@ -390,11 +413,7 @@ theorem inconsistent_witness_kill_line
   simp [Ssz.bindOperation, Ssz.verifyValidatorWitness, Ssz.verifyProof, hBeqFalse]
 
 /-- Non-vacuity: `composed_ssz_encoding`'s `hBind` hypothesis is genuinely
-satisfiable, not accidentally emptied by the tightened one-object coupling.
-Any pinned-width `src` binds its own derived witness against its own derived
-root, using exactly the arity/generalized-index/traversal facts
-`source_pinned_config_discharges_deposit_data_root` already proves for that
-same `src`. -/
+satisfiable (`DepositDataRootCorrespondence.sourceWitness_binds_sourceNode`). -/
 theorem sourceWitness_binds_sourceNode (src : SourceDepositDataRootInput)
     (hPublicKey : src.publicKey.length = PUBKEY_LENGTH pinnedConfig)
     (hWithdrawalCredentials : src.withdrawalCredentials.length =
@@ -402,15 +421,9 @@ theorem sourceWitness_binds_sourceNode (src : SourceDepositDataRootInput)
     (hSignature : src.signature.length = SIGNATURE_LENGTH pinnedConfig) :
     Ssz.bindOperation .clValidatorVerifier (sourceCombine src) (sourceWitness src)
         (sourceNode src) = true := by
-  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, hGI, hTraverse⟩ :=
-    source_pinned_config_discharges_deposit_data_root src hPublicKey hWithdrawalCredentials
-      hSignature
-  have hOperation : (sourceWitness src).operation = Ssz.Operation.clValidatorVerifier := rfl
-  have hIndex : (sourceWitness src).index = Ssz.operationIndex .clValidatorVerifier := rfl
-  have hArity : (sourceWitness src).branch.length = (sourceWitness src).path.length := rfl
-  simp only [Ssz.bindOperation, Ssz.verifyValidatorWitness, Ssz.verifyProof, Bool.and_eq_true,
-    beq_iff_eq]
-  exact ⟨⟨hOperation, hIndex⟩, ⟨⟨⟨hGI.1, hGI.2.1⟩, hGI.2.2⟩, hArity⟩, hTraverse⟩
+  simpa [sourceCombine] using
+    LidoSRv3.Audit.Source.DepositDataRootCorrespondence.sourceWitness_binds_sourceNode src
+      hPublicKey hWithdrawalCredentials hSignature
 
 /-! ### Model-mutant kill-line: swapped source combine
 
