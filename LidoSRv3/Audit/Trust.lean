@@ -52,6 +52,20 @@ import LidoSRv3.Audit.Spec.OracleFrameCorrespondence
 import LidoSRv3.Tests.PackEOracleFrameMutants
 import LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
 import LidoSRv3.Tests.PackFConsolidationObserveMutants
+import LidoSRv3.Audit.Provenance.Deposit
+import LidoSRv3.Tests.PackGDepositProvenanceMutants
+import LidoSRv3.Audit.Provenance.TopupBeacon
+import LidoSRv3.Tests.PackGTopupProvenanceMutants
+import LidoSRv3.Audit.Provenance.ConsolidationRequest
+import LidoSRv3.Tests.PackGEth1ProvenanceMutants
+import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
+import LidoSRv3.Tests.PackJDepositEthJournalMutants
+import LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence
+import LidoSRv3.Tests.PackJTopupEthJournalMutants
+import LidoSRv3.Audit.Spec.HashIdentificationChild
+import LidoSRv3.Tests.PackS1HashMutants
+import LidoSRv3.Audit.Spec.ConsolidationBridgeGap
+import LidoSRv3.Tests.PackCGapMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -113,6 +127,26 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.persist_payloads_reread
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.gateway_nonzero_remains_named_hyp
 #print axioms LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe
+#print axioms LidoSRv3.Audit.Provenance.Deposit.canonical_deposit_contract_pin
+#print axioms LidoSRv3.Audit.Provenance.Deposit.canonical_thirty_two_ether_pin
+#print axioms LidoSRv3.Audit.Provenance.Deposit.production_conserving_config_at_thirty_two_ether
+#print axioms LidoSRv3.Tests.PackGDepositProvenanceMutants.wrong_beacon_pin_kill_line
+#print axioms LidoSRv3.Audit.Provenance.TopupBeacon.topup_verity_beacon_is_production_pin
+#print axioms LidoSRv3.Audit.Provenance.TopupBeacon.topup_canonical_eq_deposit_canonical
+#print axioms LidoSRv3.Tests.PackGTopupProvenanceMutants.dead_beacon_model_kill_line_disagrees_with_pin
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.ensemble_request_is_not_canonical
+#print axioms LidoSRv3.Audit.Provenance.ConsolidationRequest.rewrite_maps_ensemble_to_canonical
+#print axioms LidoSRv3.Tests.PackGEth1ProvenanceMutants.dead_rewrite_kill_line_refutes_canonical_rewrite
+#print axioms LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence.deposit_success_journal_projects_to_spec
+#print axioms LidoSRv3.Tests.PackJDepositEthJournalMutants.third_destination_beacon_push_kill_line_refutes_projection_totality
+#print axioms LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence.topup_value_moving_journal_projects
+#print axioms LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence.topup_wrap_to_zero_journal_empty
+#print axioms LidoSRv3.Tests.PackJTopupEthJournalMutants.beacon_as_consolidation_kill_line_refutes_dest_restriction
+#print axioms LidoSRv3.Audit.Spec.HashIdentificationChild.hash_identification_agrees_on_bytes
+#print axioms LidoSRv3.Tests.PackS1HashMutants.engine_mutant_still_disagrees
+#print axioms LidoSRv3.Audit.Spec.ConsolidationBridgeGap.official_external_call_reverts
+#print axioms LidoSRv3.Audit.Spec.ConsolidationBridgeGap.gateway_nonzero_remains_named_hyp
+#print axioms LidoSRv3.Tests.PackCGapMutants.dropping_gateway_nonzero_admits_free_batch
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
