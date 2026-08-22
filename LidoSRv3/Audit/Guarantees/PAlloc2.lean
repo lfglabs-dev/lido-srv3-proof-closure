@@ -205,11 +205,34 @@ theorem source_allocate_loop_conserves_requested
   simpa using Verity.MinFirstDistributionTx.allocateLoop_conserves_total
     fuel rows allocationSize 0 after allocated remaining hRun
 
+/-- The independent proportional `Nat` model loop matches every successful
+fuel-bounded source loop run and carries `RowsCorrespond` through all
+mutations.  This is not the separate +1 `MinFirst` child model. -/
+theorem proportional_model_loop_preserves_rows
+    (fuel : Nat)
+    (model : List MinFirstAllocation.Model.Bucket)
+    (source : List MinFirstAllocation.Source.Row)
+    (allocationSize : MinFirstAllocation.Source.Word)
+    (after : List MinFirstAllocation.Source.Row)
+    (allocated remaining : MinFirstAllocation.Source.Word)
+    (hRows : MinFirstAllocation.RowsCorrespond model source)
+    (hLen : source.length < Verity.Core.Uint256.modulus)
+    (hRun : Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source
+      allocationSize 0 = some (after, allocated, remaining)) :
+    ∃ modelAfter,
+      Verity.MinFirstDistributionTx.modelAllocateLoop fuel model
+          allocationSize.val 0 =
+        some (modelAfter, allocated.val, remaining.val) ∧
+      MinFirstAllocation.RowsCorrespond modelAfter after :=
+  Verity.MinFirstDistributionTx.sourceAllocateLoop_model_correspondence
+    fuel model source allocationSize 0 after allocated remaining hRows hLen hRun
+
 /-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source
 candidate and proportional-amount equality from the step theorem load-bearing,
 and adds fuel-bounded conservation for every successful run of the full
-independently stated source allocation loop.  It does not identify that
-proportional loop with the separate +1 `MinFirst` child model. -/
+independently stated source allocation loop, plus multi-step row correspondence
+with an independently stated proportional model loop.  It does not identify
+that proportional loop with the separate +1 `MinFirst` child model. -/
 theorem step_correspondence_and_full_loop_conservation :
     (∀ (model : List MinFirstAllocation.Model.Bucket)
       (source : List MinFirstAllocation.Source.Row)
@@ -234,9 +257,25 @@ theorem step_correspondence_and_full_loop_conservation :
       (allocated remaining : MinFirstAllocation.Source.Word),
       Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =
         some (after, allocated, remaining) →
-      allocated.val + remaining.val = allocationSize.val) :=
+      allocated.val + remaining.val = allocationSize.val) ∧
+    (∀ (fuel : Nat)
+      (model : List MinFirstAllocation.Model.Bucket)
+      (source : List MinFirstAllocation.Source.Row)
+      (allocationSize : MinFirstAllocation.Source.Word)
+      (after : List MinFirstAllocation.Source.Row)
+      (allocated remaining : MinFirstAllocation.Source.Word),
+      MinFirstAllocation.RowsCorrespond model source →
+      source.length < Verity.Core.Uint256.modulus →
+      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source allocationSize 0 =
+        some (after, allocated, remaining) →
+      ∃ modelAfter,
+        Verity.MinFirstDistributionTx.modelAllocateLoop fuel model
+            allocationSize.val 0 =
+          some (modelAfter, allocated.val, remaining.val) ∧
+        MinFirstAllocation.RowsCorrespond modelAfter after) :=
   ⟨forall_proportional_step_correspondence_and_bounded,
-   source_allocate_loop_conserves_requested⟩
+   source_allocate_loop_conserves_requested,
+   proportional_model_loop_preserves_rows⟩
 
 /-! ## Verity transaction plane -/
 

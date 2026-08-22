@@ -64,6 +64,43 @@ def setAllocation (rows : List Source.Row) (i : Nat) (newAlloc : Word) :
   | none => rows
   | some r => rows.set i { r with allocation := newAlloc }
 
+theorem setAllocation_length (rows : List Source.Row) (i : Nat) (w : Word) :
+    (setAllocation rows i w).length = rows.length := by
+  unfold setAllocation
+  split <;> simp
+
+theorem setAllocation_idxOf_eq_replaceFirst
+    (rows : List Source.Row) (target : Source.Row) (updated : Word) (i : Nat)
+    (hidx : rows.idxOf? target = some i) :
+    setAllocation rows i updated = Source.replaceFirst target updated rows := by
+  induction rows generalizing i with
+  | nil => simp at hidx
+  | cons r rs ih =>
+      rw [List.idxOf?_eq_some_iff] at hidx
+      rcases hidx with ⟨hi, hget, hfirst⟩
+      cases i with
+      | zero =>
+          simp only [List.getElem_cons_zero] at hget
+          subst r
+          simp [setAllocation, Source.replaceFirst]
+      | succ i =>
+          have hiTail : i < rs.length := by simpa using hi
+          have hgetTail : rs[i] = target := by simpa using hget
+          have hr : r ≠ target := by
+            intro h
+            exact hfirst 0 (Nat.zero_lt_succ i) (by simpa [h])
+          have htail : rs.idxOf? target = some i := by
+            rw [List.idxOf?_eq_some_iff]
+            refine ⟨hiTail, hgetTail, ?_⟩
+            intro j hj heq
+            exact hfirst (j + 1) (by omega) (by simpa using heq)
+          have hopt : rs[i]? = some target := by
+            rw [List.getElem?_eq_getElem hiTail, hgetTail]
+          have hih := ih i htail
+          simp only [setAllocation, hopt] at hih
+          simpa [setAllocation, List.getElem?_cons_succ, hopt,
+            Source.replaceFirst, hr] using congrArg (r :: ·) hih
+
 /-- One `allocateToBestCandidate` step: scan, compute the share, then mutate
 the best index. A zero amount is the Solidity `break`. -/
 def allocateToBestCandidate (rows : List Source.Row) (remaining : Word) :
@@ -77,6 +114,58 @@ def allocateToBestCandidate (rows : List Source.Row) (remaining : Word) :
       match rows.idxOf? best with
       | none => none
       | some i => some (setAllocation rows i updated, amount)
+
+theorem allocateToBestCandidate_length
+    {rows after : List Source.Row} {remaining amount : Word}
+    (h : allocateToBestCandidate rows remaining = some (after, amount)) :
+    after.length = rows.length := by
+  unfold allocateToBestCandidate at h
+  split at h
+  · simp_all
+  · rename_i best hs
+    cases ha : Source.checkedAmount rows remaining best with
+    | none => simp [ha, Option.bind_eq_bind] at h
+    | some w =>
+        simp only [ha, Option.bind_eq_bind, Option.bind_some] at h
+        split at h
+        · simp_all
+        · cases hu : Verity.Stdlib.Math.safeAdd best.allocation w with
+          | none => simp [hu] at h
+          | some updated =>
+              simp only [hu, Option.bind_some] at h
+              split at h
+              · simp_all
+              · have hEq := Option.some.inj h
+                have hAfter : setAllocation rows _ updated = after :=
+                  congrArg Prod.fst hEq
+                rw [← hAfter]
+                exact setAllocation_length rows _ updated
+
+/-- Independent unbounded proportional model step.  It copies the candidate,
+amount, zero-break, and first-row mutation equations without referring to the
+source step or its checked-word result. -/
+def modelAllocateToBestCandidate (rows : List Model.Bucket) (remaining : Nat) :
+    Option (List Model.Bucket × Nat) :=
+  match Model.candidate? rows with
+  | none => some (rows, 0)
+  | some best =>
+      let amount := Model.amount rows remaining best
+      if amount = 0 then some (rows, 0)
+      else some (Model.replaceFirst best amount rows, amount)
+
+/-- Independent proportional `Nat` model loop.  This is intentionally not the
+separate +1-per-iteration `MinFirst` strategy model. -/
+def modelAllocateLoop : Nat → List Model.Bucket → Nat → Nat →
+    Option (List Model.Bucket × Nat × Nat)
+  | 0, rows, remaining, total =>
+      if remaining = 0 then some (rows, total, remaining) else none
+  | fuel + 1, rows, remaining, total =>
+      if remaining = 0 then some (rows, total, remaining) else
+      match modelAllocateToBestCandidate rows remaining with
+      | none => none
+      | some (after, amount) =>
+          if amount = 0 then some (rows, total, remaining)
+          else modelAllocateLoop fuel after (remaining - amount) (total + amount)
 
 /-- `while (allocated < allocationSize)` over `allocateToBestCandidate`.
 `fuel` is the initial demand value: positivity of every successful amount
@@ -129,6 +218,96 @@ theorem sourceAllocateLoop_eq_allocateLoop :
             · rfl
             · simp [sourceAllocateLoop_eq_allocateLoop fuel]
 
+/-- One successful checked source step is matched by the independently defined
+unbounded proportional model step, and its row mutation preserves
+`RowsCorrespond`.  The zero-amount and exhausted-capacity exits are included. -/
+theorem modelAllocateToBestCandidate_corresponds
+    {model : List Model.Bucket} {source : List Source.Row} {remaining : Word}
+    (hRows : RowsCorrespond model source)
+    (hLen : source.length < Verity.Core.Uint256.modulus) :
+    ∀ after amount,
+      allocateToBestCandidate source remaining = some (after, amount) →
+      ∃ modelAfter,
+        modelAllocateToBestCandidate model remaining.val =
+          some (modelAfter, amount.val) ∧
+        RowsCorrespond modelAfter after := by
+  intro after amount hStep
+  unfold allocateToBestCandidate at hStep
+  cases hs : Source.candidate? source with
+  | none =>
+      simp only [hs] at hStep
+      simp only [Option.some.injEq, Prod.mk.injEq] at hStep
+      rcases hStep with ⟨rfl, rfl⟩
+      have hm : Model.candidate? model = none := by
+        have h := candidate_correspondence hRows
+        rw [hs] at h
+        cases hmodel : Model.candidate? model <;> simp_all
+      exact ⟨model, by simp [modelAllocateToBestCandidate, hm], hRows⟩
+  | some best =>
+      simp only [hs] at hStep
+      have hOpen := (source_candidate_mem_and_open hs).2
+      have hm := model_candidate_eq_of_source hRows hs
+      cases hw : Source.checkedAmount source remaining best with
+      | none =>
+          rw [hw] at hStep
+          simp only [Option.bind_eq_bind, Option.bind_none] at hStep
+          cases hStep
+      | some w =>
+          rw [hw] at hStep
+          simp only [Option.bind_eq_bind, Option.bind_some] at hStep
+          have hAmount : Model.amount model remaining.val
+              ⟨best.allocation.val, best.capacity.val⟩ = w.val :=
+            amount_correspondence hRows hLen rfl rfl hw
+          by_cases hz : w = 0
+          · subst w
+            simp at hStep
+            rcases hStep with ⟨rfl, rfl⟩
+            exact ⟨model, by
+              simp [modelAllocateToBestCandidate, hm, hAmount], hRows⟩
+          · rw [if_neg hz] at hStep
+            cases hu : Verity.Stdlib.Math.safeAdd best.allocation w with
+            | none =>
+                rw [hu] at hStep
+                simp at hStep
+            | some updated =>
+                rw [hu] at hStep
+                cases hi : source.idxOf? best with
+                | none =>
+                    rw [hi] at hStep
+                    simp at hStep
+                | some i =>
+                    rw [hi] at hStep
+                    have hp :
+                        (setAllocation source i updated, w) = (after, amount) :=
+                      Option.some.inj hStep
+                    have hAfter : setAllocation source i updated = after :=
+                      congrArg Prod.fst hp
+                    have hOut : w = amount := congrArg Prod.snd hp
+                    subst after
+                    subst amount
+                    have hwval : w.val ≠ 0 := by
+                      intro hv
+                      apply hz
+                      apply Verity.Core.Uint256.ext
+                      simpa using hv
+                    have hUpdatedWord : best.allocation + w = updated := by
+                      exact Option.some.inj ((checkedAmount_safeAdd hOpen hw).symm.trans hu)
+                    have hAddLt :
+                        best.allocation.val + w.val < Verity.Core.Uint256.modulus := by
+                      exact Nat.lt_of_le_of_lt
+                        (checkedAmount_le_headroom hOpen hw) best.capacity.isLt
+                    have hUpdated :
+                        best.allocation.val + w.val = updated.val := by
+                      rw [← hUpdatedWord]
+                      exact (Verity.Core.Uint256.add_eq_of_lt hAddLt).symm
+                    refine ⟨Model.replaceFirst
+                      ⟨best.allocation.val, best.capacity.val⟩ w.val model, ?_, ?_⟩
+                    · simp [modelAllocateToBestCandidate, hm, hAmount, hwval]
+                    · rw [setAllocation_idxOf_eq_replaceFirst source best updated i hi]
+                      exact replaceFirst_correspondence hRows
+                        ⟨best.allocation.val, best.capacity.val⟩ best rfl rfl
+                        w.val updated hUpdated
+
 private theorem safeAdd_val {a b c : Word}
     (h : Verity.Stdlib.Math.safeAdd a b = some c) :
     c.val = a.val + b.val := by
@@ -155,6 +334,95 @@ private theorem safeSub_val {a b c : Word}
     obtain rfl := Option.some.inj h
     have hLe' : b.val ≤ a.val := by omega
     exact ⟨Verity.Core.Uint256.sub_eq_of_le hLe', hLe'⟩
+
+/-- Multi-step simulation of the independently copied proportional model loop
+against the independently copied source loop.  Every successful source run has
+a model run with the same mathematical totals and `RowsCorrespond` final rows. -/
+theorem sourceAllocateLoop_model_correspondence :
+    ∀ fuel model source remaining total after finalTotal finalRemaining,
+      RowsCorrespond model source →
+      source.length < Verity.Core.Uint256.modulus →
+      sourceAllocateLoop fuel source remaining total =
+        some (after, finalTotal, finalRemaining) →
+      ∃ modelAfter,
+        modelAllocateLoop fuel model remaining.val total.val =
+          some (modelAfter, finalTotal.val, finalRemaining.val) ∧
+        RowsCorrespond modelAfter after
+  | 0, model, source, remaining, total, after, finalTotal, finalRemaining => by
+      intro hRows _ hRun
+      by_cases hz : remaining = 0
+      · subst remaining
+        simp [sourceAllocateLoop] at hRun
+        rcases hRun with ⟨rfl, rfl, rfl⟩
+        exact ⟨model, by simp [modelAllocateLoop], hRows⟩
+      · have hzv : remaining.val ≠ 0 := by
+          intro hv
+          apply hz
+          apply Verity.Core.Uint256.ext
+          simpa using hv
+        simp [sourceAllocateLoop, hz] at hRun
+  | fuel + 1, model, source, remaining, total, after, finalTotal, finalRemaining => by
+      intro hRows hLen hRun
+      by_cases hz : remaining = 0
+      · subst remaining
+        simp [sourceAllocateLoop] at hRun
+        rcases hRun with ⟨rfl, rfl, rfl⟩
+        exact ⟨model, by simp [modelAllocateLoop], hRows⟩
+      · have hzv : remaining.val ≠ 0 := by
+          intro hv
+          apply hz
+          apply Verity.Core.Uint256.ext
+          simpa using hv
+        rw [sourceAllocateLoop, if_neg hz] at hRun
+        rw [modelAllocateLoop, if_neg hzv]
+        cases hStep : allocateToBestCandidate source remaining with
+        | none =>
+            simp only [hStep] at hRun
+            simp at hRun
+        | some step =>
+            rcases step with ⟨nextSource, amount⟩
+            simp only [hStep] at hRun
+            obtain ⟨nextModel, hModelStep, hNextRows⟩ :=
+              modelAllocateToBestCandidate_corresponds hRows hLen
+                nextSource amount hStep
+            by_cases ha : amount = 0
+            · subst amount
+              simp at hRun
+              rcases hRun with ⟨rfl, rfl, rfl⟩
+              exact ⟨model, by
+                simp [modelAllocateLoop, hModelStep, hzv], hRows⟩
+            · have hav : amount.val ≠ 0 := by
+                intro hv
+                apply ha
+                apply Verity.Core.Uint256.ext
+                simpa using hv
+              rw [if_neg ha] at hRun
+              simp only [modelAllocateLoop, if_neg hzv, hModelStep, if_neg hav]
+              cases hAdd : Verity.Stdlib.Math.safeAdd total amount with
+              | none =>
+                  rw [hAdd] at hRun
+                  simp at hRun
+              | some newTotal =>
+                  rw [hAdd] at hRun
+                  cases hSub : Verity.Stdlib.Math.safeSub remaining amount with
+                  | none =>
+                      rw [hSub] at hRun
+                      simp at hRun
+                  | some newRemaining =>
+                      rw [hSub] at hRun
+                      simp only [Option.bind_eq_bind, Option.bind_some] at hRun
+                      have hLenNext : nextSource.length <
+                          Verity.Core.Uint256.modulus := by
+                        rw [allocateToBestCandidate_length hStep]
+                        exact hLen
+                      obtain ⟨modelAfter, hModelRun, hFinalRows⟩ :=
+                        sourceAllocateLoop_model_correspondence fuel nextModel
+                          nextSource newRemaining newTotal after finalTotal
+                          finalRemaining hNextRows hLenNext hRun
+                      have hAddVal := safeAdd_val hAdd
+                      have hSubVal := (safeSub_val hSub).1
+                      refine ⟨modelAfter, ?_, hFinalRows⟩
+                      simpa [hAddVal, hSubVal] using hModelRun
 
 /-- Every successful fuel-bounded execution of the full proportional allocation
 loop conserves demand: the final allocated total plus the final remainder is the
