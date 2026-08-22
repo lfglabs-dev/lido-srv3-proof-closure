@@ -107,11 +107,12 @@ theorem consolidationCandidate_approved_of_projected
       | some dest =>
           rw [EthJournalCorrespondence.specJournal, List.filterMap_cons,
             EthJournalCorrespondence.specOfMove, hDest, candidateOfSpec, List.map_cons]
-          change
-            ({ dest := some dest, wei := ⟨move.amount⟩ } :: consolidationCandidate rest) =
-              ({ dest := some dest, wei := ⟨move.amount⟩ } ::
-                candidateOfSpec (EthJournalCorrespondence.specJournal rest))
-          rw [ih hRest]
+          rw [consolidationCandidate, List.map_cons, hDest]
+          have hTail := ih hRest
+          unfold consolidationCandidate candidateOfSpec at hTail
+          exact congrArg
+            (List.cons ({ dest := some dest, wei := ⟨move.amount⟩ } : CandidateLeg))
+            hTail
 
 /-- Total Spec projection also proves the named exclusion conjunct. -/
 theorem protocolReturnPathsExcluded_of_projected
