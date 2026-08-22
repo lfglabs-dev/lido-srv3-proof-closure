@@ -29,7 +29,8 @@ theorem every_modeled_success_journal_approved
     (topupAllocations : List Nat)
     (approved : ApprovedSet)
     (msgValue batchSize fee : Nat)
-    (consolidationMoves : List EthMove)
+    (consolidationMoves :
+      List LidoSRv3.Audit.Guarantees.PConsolidationEth1.EthMove)
     (_hDeposit :
       LidoSRv3.Audit.Verity.DepositParentTx.Preconditions depositInputs depositEntry)
     (_hTopupValueMoving : allocSumUnchecked topupAllocations ≠ 0)
