@@ -18,10 +18,12 @@ Three unregistered children, no new guarantee IDs, no P-DEREF-1 promotion.
 namespace LidoSRv3.Tests.PackW2ScopeMutants
 
 open LidoSRv3.Audit.SolidityAddress
+open LidoSRv3.Audit.SolidityDereference
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence
 open LidoSRv3.Audit.Spec.VaultHubScopeChild
 open LidoSRv3.Audit.Spec.DerefSupplementalChild
+open LidoSRv3.Tests.DereferenceMutants
 
 private def eligiblePause (ep : EntryPoint) : Input :=
   { entryPoint := ep, caller := 1, senderFrom := 1, recipient := 1,
@@ -68,7 +70,11 @@ example := no_vaulthub_ctor
 
 /-- Re-export of the existing P-DEREF-1 packed-config clobber kill-line.
 This node does not promote P-DEREF-1. -/
-theorem packed_config_clobber_kill_line_refutes_parent :=
+theorem packed_config_clobber_kill_line_refutes_parent :
+    ¬ ∀ (s : RegistryState) (_hs : Reachable s) (id : ModuleId)
+        (_h : Dereferenceable s id) (steps : List Interleaving),
+        sourceDeref (mutantRunInterleavingsClobber s steps) id =
+          some (s.moduleAddress id) ∧ s.moduleAddress id ≠ 0 :=
   LidoSRv3.Tests.DereferenceMutants.packed_config_clobber_kill_line_refutes_parent
 
 example := deref_closure_exists_shape

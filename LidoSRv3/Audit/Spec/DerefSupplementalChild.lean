@@ -20,7 +20,7 @@ theorem deref_closure_exists_shape
     (h : Dereferenceable s id) (steps : List Interleaving) :
     sourceDeref (runInterleavings s steps) id = some (s.moduleAddress id) ∧
     s.moduleAddress id ≠ 0 :=
-  PDeref1.closure s hs id h steps
+  LidoSRv3.Audit.Guarantees.PDeref1.closure s hs id h steps
 
 /-- P-DEREF-1 remains supplemental. This node does not register it. -/
 theorem deref_remains_supplemental : True := trivial
