@@ -1,11 +1,22 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 56d19e4a64ffa31ef2e22abf968551103d91281e
+validated-tree: 1aee2ca0363f576adc0a42115397467d9e75bf20
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Pack D ADDRESS claim-batch strengthening (2026-08-22)
+----------------------------------------------------
+
+- Rebind `validated-tree` to `1aee2ca0363f576adc0a42115397467d9e75bf20`, the
+  tracked tree of `cursor/pack-d-address-batch-f120` excluding this receipt.
+- Unregistered child: two-item `claimWithdrawalsTo` payouts equal
+  `claimableEther` of the pre-state reads. Swapped order / wrong recipient
+  kill-lines. No pause row. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.AddressClaimCorrespondence
+  LidoSRv3.Tests.PackDAddressClaimMutants` exit 0.
 
 Pack C hash identification + verifyProof/gindex (2026-08-22)
 ----------------------------------------------------------
