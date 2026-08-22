@@ -44,10 +44,18 @@ theorem specJournalOfTopup_dests_restricted (allocations : List Nat) :
   intro leg hmem
   by_cases hZero : allocSumUnchecked allocations = 0
   · simp [specJournalOfTopup, hZero] at hmem
-  · simp [specJournalOfTopup, hZero] at hmem
-    rcases hmem with rfl | ⟨_, _, rfl⟩
-    · rfl
-    · rfl
+  · have hform :
+        specJournalOfTopup allocations =
+          { dest := .lidoPull, wei := ⟨allocSumUnchecked allocations⟩ } ::
+            (sourcePushes allocations 0).map (fun p =>
+              { dest := .beaconDeposit, wei := ⟨p.2⟩ }) := by
+      simp [specJournalOfTopup, hZero]
+    rw [hform, List.mem_cons] at hmem
+    cases hmem with
+    | inl h => subst h; rfl
+    | inr h =>
+        rcases List.mem_map.mp h with ⟨_, _, hp⟩
+        subst hp; rfl
 
 /-- Concrete value-moving success: `[3, 0, 5]` wraps to 8, skips the zero
 slot, and projects `lidoPull` then two `beaconDeposit`s. The source
