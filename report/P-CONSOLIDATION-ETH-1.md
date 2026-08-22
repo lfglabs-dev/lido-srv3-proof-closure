@@ -379,7 +379,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* `refundRecipient` is a contract whose fallback reverts. Live `addConsolidationRequests` reverts and rolls back the vault fee CALL. Lean `run honest 10 2 3` still commits `⟨0,0,0,0,0,6,4⟩`. The CHECKED success numeral is not the deployed refund.
 
 12. **Gateway/vault `.mul` wraps; Solidity 0.8 reverts.**
-   `evalExpr` on `.mul` is `(lhs * rhs).val` — wrapping `Uint256` (`Verity/Core/Model/Denote.lean:712–715`). The ensemble computes `fee = batchSize * feePerRequest` that way (`PConsolidationEth1CompositionTx.lean:140, 172`). Live `requestsCount * fee` (`ConsolidationGateway.sol:212`) is checked `uint256` and panics on overflow.
+   `evalExpr` on `.mul` is `(lhs * rhs).val` — wrapping `Uint256` (`Verity/Core/Model/Denote.lean:724–727`). The ensemble computes `fee = batchSize * feePerRequest` that way (`PConsolidationEth1CompositionTx.lean:140, 172`). Live `requestsCount * fee` (`ConsolidationGateway.sol:212`) is checked `uint256` and panics on overflow.
 
    *Counterexample.* `batchSize = 2^128`, `feePerRequest = 2^128`, `msgValue = 1`. Live `totalFee` overflows and the tx reverts. Lean `mul` wraps to `0`. `require(0 ≤ 1)` passes. The run can succeed with fee 0 (no request value, full refund). The CHECKED numerals never hit this; the ensemble is not 0.8 multiplication.
 
@@ -409,12 +409,12 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* Caller sends `msg.value = 10` with a well-formed pending batch. Live forwards 10 to the gateway. Lean requires the *calldata word* `amount` to equal 10 (declared-amount convention, issue 4). A compiled bus call with the real ABI (groups, no amount) cannot even enter `busFn`. The CHECKED success numeral `run honest 10 2 3` is a different function than the mapped `executeConsolidation`.
 
 18. **Fee is a stored slot on gateway *and* vault, not `getConsolidationRequestFee`.**
-    `gatewayFn` / `vaultFn` multiply `batchSize * storage "feePerRequest"` (slot 0). `initial` writes the same seed into both accounts (`PConsolidationEth1CompositionTx.lean:317–325`). Live vault takes the fee from the EIP-7251 predeploy (`_getFeeFromContract` / `getConsolidationRequestFee`) and `_requireExactFee(count * fee)`. There is no fee `staticcall` in the ensemble.
+    `gatewayFn` / `vaultFn` multiply `batchSize * storage "feePerRequest"` (slot 0). `initial` writes the same seed into both accounts (`PConsolidationEth1CompositionTx.lean:324–332`). Live vault takes the fee from the EIP-7251 predeploy (`_getFeeFromContract` / `getConsolidationRequestFee`) and `_requireExactFee(count * fee)`. There is no fee `staticcall` in the ensemble.
 
     *Scenario.* Predeploy fee updates from `3` to `4` after the gateway computed `2·3 = 6`. Live vault reverts `IncorrectFee` / `FeeMismatch`. Lean still has slot `3` on both contracts: `run honest 10 2 3` commits `⟨0,0,0,0,0,6,4⟩`. The CHECKED split assumes a frozen, locally stored fee. A real fee change — the thing the exact-fee guard is for — cannot appear.
 
 19. **`replay` is the same dispatcher on the recorded program, not a compiled multicall.**
-    The last conjunct of `verity_tx_composes_value_flow_and_rollback` (`PConsolidationEth1.lean:300–307`) is `program.length = 6` and `replay run = observe.run.balances` for `(10,2,3)`. `replay` (`PConsolidationEth1CompositionTx.lean:388–389`) is `denoteTransaction entryWorld program` — a *different* interpreter than `step` / `run`. The equality is one numeral on which the two interpreters happen to agree.
+    The last conjunct of `verity_tx_composes_value_flow_and_rollback` (`PConsolidationEth1.lean:521–528`) is `program.length = 6` and `replay run = observe.run.balances` for `(10,2,3)`. `replay` (`PConsolidationEth1CompositionTx.lean:395–396`) is `denoteTransaction entryWorld program` — a *different* interpreter than `step` / `run`. The equality is one numeral on which the two interpreters happen to agree.
 
     *Scenario.* Change `vaultFn` to send the fee to `lidoAddr`. Both `run` and `replay` mis-route the same way if they share the body, so the equality still holds. If `denoteTransaction` and `step` ever diverged on another batch, the CHECKED conjunct would not mention it. The YAML “atomic compiled multicall” is a self-consistency check of one harness, not `solc` output of `addConsolidationRequests`. Combined with issue 4 (declared-amount) and issue 17 (wrong bus ABI), the replay cannot become the deployed transaction.
 

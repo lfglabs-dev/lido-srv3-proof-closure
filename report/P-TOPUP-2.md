@@ -20,7 +20,7 @@ The forall is genuine and the tautology history is closed. Residual content is s
 
 CHECKED does not mean the deployed gateway respects `maxTopUpPerBlock`.
 
-Ranked next work: make the Verity source view independent of its executor; model live per-key limits before widening; keep the 32-guard as premise necessity; do not compose with P-TOPUP-1.
+Ranked next work: push source/executor independence below the loop level (`sourceRunIndependent` is a separate transcription, but its per-key `evaluateTopUpLimit` and `minWord` helpers are still shared with `sourceRun`); model live per-key limits before widening; keep the 32-guard as premise necessity; do not compose with P-TOPUP-1.
 
 Theorems: `PTopup2.aggregate_bounded_by_block_cap` (parent), `PTopup2.verity_tx_simulates_topup2_spec`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
@@ -35,8 +35,8 @@ Electra compounding validators can be topped up through `TopUpGateway.topUp` (`T
 - `A-VERITY-SCAFFOLD`: `Contract.run` is a non-certified Verity 4.31 interpreter.
 - `evaluated_topup_limit` is unbounded `Nat` addition. Solidity `effective + pending` is checked `uint256` and reverts on overflow. The file says so (`PTopup2.lean:31–34`). `audit/P-TOPUP-2-CORRESPONDENCE.md` still records “Parent SOURCE and TX stay OPEN” for that reason — the YAML now says CHECKED anyway.
 - `well_formed_batch` *includes* `b.allocations = transition b cfg` as a conjunct, plus: wc = 0x02, activated, not slashed/exiting, strictly increasing indices, unique pubkeys, length caps, root age, gwei-aligned value. Those extra conjuncts are **not used** by `aggregate_bounded_by_block_cap` except the transition equality.
-- Verity `Topup2DistributionTx` reads three memory arrays (effective, pending, requested) and a numeric budget. It does not model `onlyRole`, pause, root age, or witnesses.
-- `txRun` calls `sourceCandidates` and `sourceConsume` (`Topup2DistributionTx.lean:74–78`). `txRun_eq_sourceRun` is `rfl`.
+- Verity `Topup2DistributionTx` reads four memory arrays (`effective` at `0x1000`, `pending` at `0x2000`, `requested` at `0x3000`, `topUpLimits` at `0x4000`; `Topup2DistributionTx.lean:30–33`) and a numeric budget. It does not model `onlyRole`, pause, root age, or witnesses.
+- The executor `allocate` (`:183–200`) runs the pinned `sourceRun`; the observable `sourceView` (`:220–222`) runs the separately transcribed `sourceRunIndependent` (`:106–128`), bridged by the proved `sourceRunIndependent_eq_sourceRun` (`:160–181`) rather than by `rfl` on a shared definition. Independence stops at the loop: `sourceLimitsIndependent` still calls the shared `evaluateTopUpLimit`, and both consume walks use the shared `minWord`/`safeSub`.
 
 ## Proof
 
@@ -46,7 +46,7 @@ Electra compounding validators can be topped up through `TopUpGateway.topUp` (`T
 
 **Retracted `router_require_post_condition` (Wave 1 review).** A prior revision registered a different parent: unconstrained `alloc`/`limits`, hypotheses `hEachBound : ∀ i, alloc[i] ≤ limits[i]` and `hSumBound : alloc.sum ≤ min share cfg.maxTopUpPerBlockGwei`, conclusion `⟨hEachBound, hSumBound⟩`. The conclusion is syntactically identical to the hypotheses — a pure tautology, true for any `alloc`/`limits`/`share` including ones no execution of `transition` could produce — and does not mention `transition`, `consumeBudget`, or `evaluated_topup_limit` at all. Its "kill-line mutant" fed concrete numbers into that same restated conclusion directly, never through the theorem, so it refuted a general `Nat` fact rather than the registered parent. It has been removed rather than restated (see `PTopup2.lean` for the retraction note), and `aggregate_bounded_by_block_cap` is registered again, now with the mutant-budget kill-line above closing the gap that made it vulnerable to being swapped out in the first place.
 
-**VERITY `verity_tx_simulates_topup2_spec`.** Decode three arrays of equal length, run `txRun` (= `sourceRun` by `rfl`), write allocations and remaining/used slots, compare `observe` to `sourceView`. Rollback via `Contract.run` and `failAfterWrites`. Unaffected by the parent swap above: it was never `router_require_post_condition`'s Verity plane.
+**VERITY `verity_tx_simulates_topup2_spec`.** Decode four arrays of equal length, run `sourceRun`, write allocations and remaining/used slots, compare `observe` to `sourceView` (which runs `sourceRunIndependent`, equal to `sourceRun` by the proved `sourceRunIndependent_eq_sourceRun`, not by `rfl`). Rollback via `Contract.run` and `failAfterWrites`. Unaffected by the parent swap above: it was never `router_require_post_condition`'s Verity plane.
 
 ## Issues
 
@@ -79,10 +79,10 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Counterexample to reading this as a property of TopUpGateway.* Construct `b` with `allocations = [10^18]`, `maxTopUpPerBlockGwei = 1`. `well_formed_batch` is false (transition would have allocated 1), so the theorem does not apply. The *deployed* gateway (`TopUpGateway.sol:226–232`) writes **independent** `topUpLimits[i] = _evaluateTopUpLimit(...) * 1 gwei` and sums them; it never walks a leftover budget. A bug that skipped the later router `sum ≤ cap` check would produce exactly that `b`. The CHECKED theorem cannot see the bug because such an output is excluded by the hypothesis, not refuted by the code.
 
-2. **`txRun` is not independent of `sourceRun`.**
-   The comment (`Topup2DistributionTx.lean:67–68`) says the correspondence theorem is the boundary. The definition calls `sourceCandidates` / `sourceConsume` and the equality is `rfl`.
+2. **The Verity source view is not fully independent of its executor.**
+   As originally written the observable side called the executor's own `sourceCandidates` / `sourceConsume` and the equality was `rfl`. *Partially closed:* `sourceView` now runs the separately transcribed `sourceRunIndependent` (`Topup2DistributionTx.lean:106–128`) and `sourceRunIndependent_eq_sourceRun` (`:160–181`) is a proved equation over three separately proved component equations, not `rfl` on a shared body.
 
-   *Counterexample to independence.* Change `gap < minTopUp` to `gap ≤ minTopUp` inside `sourceEvaluateLimit` (or the helper `sourceCandidates` calls). Both `txRun` and `sourceRun` change; `txRun_eq_sourceRun` remains `rfl`. The CHECKED equality cannot see a shared off-by-one on the min-top-up test.
+   *Residual counterexample to independence.* Change `gap < minTopUp` to `gap ≤ minTopUp` inside the shared `evaluateTopUpLimit` (`Topup2Correspondence.lean:68`). Both `sourceRunIndependent` and `sourceRun` change, because `sourceLimitsIndependent` (`:91–97`) calls that same helper; `sourceRunIndependent_eq_sourceRun` still holds. The CHECKED equality cannot see a shared off-by-one on the min-top-up test. Independence is at the loop shape, not the per-key arithmetic.
 
 3. **SSZ / activation / 0x02 / role / root-age are hypotheses, not executed guards.**
    `well_formed_batch` *assumes* wc = 0x02, activated, not slashed/exiting, sorted unique indices, fresh beacon root. `TopUpGateway.topUp` *enforces* those or reverts. Scenario: a caller without `TOP_UP_ROLE` or with a failed Merkle proof. Live gateway reverts. The Nat model never sees the caller; a well-formed batch can still be written down and the cap theorem applies to it. The Verity tx likewise has no role check — it will allocate if the arrays decode.
@@ -99,7 +99,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* `failAfterWrites = true` after `writeAllocs`. `Contract.run` restores the snapshot (monad). `observe` on revert returns the `beforeAllocs` argument (`List.replicate n 0` in the facade), not a storage read. A mutant that skipped `Contract.run` and left dirty maps would still present a clean View if someone only looked at `observe`.
 
 7. **Slash / exit is dropped on the executed plane.**
-   Abstract `evaluated_topup_limit` returns 0 if `v.exiting || v.slashed`. Source/Verity `sourceEvaluateLimit` (`Topup2Correspondence.lean:67–72`) is only `effective + pending` vs target / minTopUp — no slash flag. The comment says this is “after activation/exit/slash filters,” i.e. those filters are assumed, not executed.
+   Abstract `evaluated_topup_limit` returns 0 if `v.exiting || v.slashed`. Source/Verity `evaluateTopUpLimit` (`Topup2Correspondence.lean:68–73`) is only `effective + pending` vs target / minTopUp — no slash flag. The comment says this is “after activation/exit/slash filters,” i.e. those filters are assumed, not executed.
 
    *Counterexample.* One slashed validator, `effective = pending = 0`, `target = 32e9`, `minTopUp = 1`, `requested = remainingCap = moduleLimit = valueGwei = 32e9`. Solidity `_evaluateTopUpLimit` (`TopUpGateway.sol:403–404`) returns 0. `sourceRun` / `allocate` commit allocation `32e9`. `well_formed_batch` hides this by *requiring* `slashed = false`, so the abstract theorem never sees the case; Verity never sees the flag.
 
@@ -123,10 +123,12 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Scenario.* Attacker sends `msg.value` to the gateway (it is non-payable → revert) or a module `allocateDeposits` returns a permutation that is *not* left-to-right greedy. Live `StakingRouter.topUp` (lines 696–718) takes `min(moduleShare, maxTopUpPerBlockWei)`, rounds to gwei, then calls `IStakingModuleV2(moduleAddress).allocateDeposits(...)`. The module, not the gateway, picks per-key amounts. The router only checks `allocations[i] ≤ limits[i]` and `sum ≤ smDepositableEthAmountRounded`. The CHECKED `consumeBudget` walk is not that algorithm; CSM queue-cursor advancement on a zero budget is unmodeled.
 
-12. **`observe` on success reports `result.allocations`, not the allocation map.**
-   `Topup2DistributionTx.observe` (`:140–145`) copies `result.allocations` from the value `allocate` built after `txRun`. Only remaining/used are `readSlot`.
+12. **`observe` on success reported `result.allocations`, not the allocation map.**
+   As originally written, `observe` copied `result.allocations` from the value `allocate` had just built, so only remaining/used were `readSlot`.
 
-   *Counterexample mutant.* Make `writeAllocs` a no-op. `verity_tx_simulates_topup2_spec` still holds. YAML “persists allocations through writeMapUint” is not an observed fact for the allocation column.
+   *Counterexample mutant.* Make `persistAllocs` a no-op. `verity_tx_simulates_topup2_spec` would still hold, and YAML’s “persists allocations through writeMapUint” would not be an observed fact for the allocation column.
+
+   *Closed (Wave 2).* `Topup2DistributionTx.observe` (`:213–218`) now reports `state.readArray allocSlot` on success, alongside `readSlot remainingSlot` / `readSlot allocatedSlot`, so a no-op `persistAllocs` breaks the theorem. Reverts still report the caller-supplied `beforeAllocs` preimage rather than storage.
 
 13. **`_requireBlockDistancePassed` is unmodeled.**
    Live `topUp` (`:179`) reverts `MinBlockDistanceNotMet` if not enough blocks since `_setLastTopUpData`. `well_formed_batch` has no block-distance field. `allocate` has no last-top-up timestamp.
@@ -154,7 +156,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* `requestedGwei = [2^256]`, `budget = 32e9`. `consumeBudget` allocates `32e9` and continues. Solidity `_evaluateTopUpLimit` / `+=` on `uint256` would revert on the overflowed effective+pending that produced such a request, or the ABI would have wrapped the word already. The CHECKED leftover walk is not a `uint256[]` consumption.
 
 18. **Per-key limits are independent on chain and a leftover walk in Lean.**
-    Extends issue 1 to the executed plane. Live `TopUpGateway.sol:226–232` sets `topUpLimits[i] = _evaluateTopUpLimit(...) * 1 gwei` independently, then the router checks each `allocations[i] ≤ limits[i]` and `sum ≤ cap`. `transition` / `txRun` walk leftover budget left-to-right, so key `i+1` is cut because key `i` took the cap.
+    Extends issue 1 to the executed plane. Live `TopUpGateway.sol:226–232` sets `topUpLimits[i] = _evaluateTopUpLimit(...) * 1 gwei` independently, then the router checks each `allocations[i] ≤ limits[i]` and `sum ≤ cap`. `transition` / `sourceRun` walk leftover budget left-to-right, so key `i+1` is cut because key `i` took the cap.
 
     *Counterexample.* Two validators, each independently eligible for 20 gwei, `maxTopUpPerBlockGwei = 20`. Live limits `[20, 20]`; module `allocateDeposits` may return `[20, 0]` or `[10, 10]` (module policy); router accepts either if `sum ≤ 20`. Lean `consumeBudget` forces `[20, 0]`. A module that returned `[0, 20]` is in-spec on chain and is not `transition`. `well_formed_batch` then *rejects* that in-spec output (issue 1). The CHECKED cap theorem is a property of a different allocator.
 
@@ -164,7 +166,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* Operator submits `pendingBalanceGwei[i] = 0` for a validator that already has 16 ETH in-flight deposits. Live limit is `target − effective` (too large). `allocateDeposits` may send another 16 ETH and overshoot the target once pending lands. Lean `sourceRun` with the same lie commits the same inflated gap. The CHECKED limit is “gap vs the numbers you handed me,” not “gap vs CL + known pending.” Inflating pending shrinks the limit (self-DoS); deflating it is the over-allocation.
 
 20. **Live `totalLimits +=` sits in `unchecked`; Lean uses `safeAdd` / `Nat`.**
-    `TopUpGateway.sol:203–228` wraps the evaluation loop in `unchecked`, including `totalLimits += topUpLimits[i]`. `sourceConsume` / `sourceRun` use `safeSub` / `safeAdd` (`Topup2Correspondence.lean:75–108`). Abstract `consumeBudget` is unbounded `Nat`.
+    `TopUpGateway.sol:203–228` wraps the evaluation loop in `unchecked`, including `totalLimits += topUpLimits[i]`. `sourceConsume` (`Topup2Correspondence.lean:76–83`) and `sourceRun` (`:106–`) use `safeSub` / `safeAdd` (e.g. `:69`, `:72`). Abstract `consumeBudget` is unbounded `Nat`.
 
     *Counterexample.* Contrived limits whose wei sum exceeds `2^256 − 1`. Live `totalLimits` wraps (then `if (totalLimits > 0)` may be false and `_setLastTopUpData` is skipped, while `stakingRouter.topUp` still received the unwrapped per-key array). Lean `sourceRun` returns `none` on `safeAdd` overflow, or `Nat` addition stays exact. Practical batches cannot hit this (32 × 2048 ETH ≪ `2^256`); the CHECKED correspondence is still not the `unchecked` loop. The later router `sum ≤ cap` is not in `sourceRun` at all (issue 11).
 
@@ -206,7 +208,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 28. **One `count` is used for all three arrays; short memory reads as 0.**
     Live `topUp` (`:163–171`) reverts `WrongArrayLength` unless four arrays plus witnesses all have the same nonzero length. Lean `allocate count` (`Topup2DistributionTx.lean:112–117`) reads `count` words from each of three bases. `memoryFor` returns 0 outside the planted range. A short `requested` list is padded with zeros, not rejected.
 
-    *Scenario.* `count = 3`, planted `requested = [10, 10]` (two words). `readArray "requested"` returns `[10, 10, 0]`. `txRun` treats the third validator as requesting 0 and may still allocate the first two. Live would have reverted before evaluation. Combined with issue 25 (128-word alias), the CHECKED decoder can invent trailing zeros instead of `WrongArrayLength`.
+    *Scenario.* `count = 3`, planted `requested = [10, 10]` (two words). `readArray "requested"` returns `[10, 10, 0]`. `sourceRun` treats the third validator as requesting 0 and may still allocate the first two. Live would have reverted before evaluation. Combined with issue 25 (128-word alias), the CHECKED decoder can invent trailing zeros instead of `WrongArrayLength`.
 
 29. **Router `amount += allocations[i]` is `unchecked`; Lean `safeSub`s leftover.**
     Live `StakingRouter.topUp` (`:722–734`) sums module-returned wei in `unchecked`, then requires each `allocations[i] % 1 gwei == 0` and `allocations[i] ≤ _topUpLimits[i]`. `sourceConsume` uses `safeSub` on gwei words and has no wei-alignment test on the output.

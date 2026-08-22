@@ -124,7 +124,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* Live vault CALL keeps the fee, then `_refundFee` fails; the EVM reverts the whole tx. The Lean program never performs an external CALL: it writes slot 1 then `require refundOk`. Proving the slot write disappears is the monad, not `addConsolidationRequests`. Extra revert `ExactFeeHasNoRefund` does not exist in Solidity (`gatewayRefund` rejects `fee = msgValue`; source just skips `_refundFee`).
 
 10. **`sourceGateway` and `gatewayRefund` disagree on exact fee.**
-    `sourceGateway` (`PConsolidationEth1RefundTx.lean:123–128`) has no `fee != msgValue` arm: when `fee = msgValue` it returns `.committed fee 0`. `gatewayRefund` (`:39`) reverts `ExactFeeHasNoRefund` on that input. The exact-fee path is a *different* function (`gatewayExactFee`).
+    `sourceGateway` (`PConsolidationEth1RefundTx.lean:148–153`) has no `fee != msgValue` arm: when `fee = msgValue` it returns `.committed fee 0`. `gatewayRefund` (`:68`) reverts `ExactFeeHasNoRefund` on that input. The exact-fee path is a *different* function (`gatewayExactFee`).
 
     *Counterexample.* `msgValue = 5`, `fee = 5`, `vaultOk = refundOk = true`, ledger `⟨10, 1, 4, 7⟩`. `sourceGatewayView` commits `⟨10, 6, 4, 7⟩` (vault +5, refund +0). `gatewayRefund 5 5 true true` reverts. The `#guard` that compares the two interpreters uses `(5, 3)` only. There is no `∀` correspondence. CHECKED “source-shaped refund” is two programs that part on the `msg.value = fee` case the live gateway actually takes (`_refundFee` is skipped, not reverted).
 

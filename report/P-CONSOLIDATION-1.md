@@ -75,7 +75,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    `msgValue.val = requests.length * fee.val` is a guard on numbers supplied with the `Inputs` record. No account is debited. Scenario: `msg.value` on the live CALL is correct but the vault’s `call{value: fee}` to the predeploy fails after the first pair; the model’s committed branch never runs a CALL, and the revert branch is a different `Inputs` (or a Verity inject) rather than a failed predeploy. Atomicity of *real* CALLs is the OPEN item in `P-CONSOLIDATION-1-VERITY-GAPS.md` (official denotation always reverts on `Expr.call`). Promoting `Contract.run` journaling to CHECKED does not execute EIP-7251.
 
 3. **`observe` reads the journal appended to `state.calls` / `state.events` (wording refreshed 2026-08-19).**
-   `ConsolidationTx.observe` (`ConsolidationTx.lean:177–184`) drops the pre-call prefix of `state.calls` / `state.events` and maps the freshly appended journal entries; the view's payloads are the calldata of those calls, and count/fee come from `countSlot` / `feePaidSlot`. The `Result` payload is ignored on success. The earlier wording of this issue (“observe reports the `Result` payload, not the journal”, with a counterexample mutant that skips the journal `append` but returns the lists in the `Result`) is **stale**: `persist` appends to `state.calls` / `state.events` (`:123–131`) and `observe` reads that suffix, so the skip-append mutant is now caught (the Tests call-drop/event-drop/memory-drop vectors exercise exactly this). The residual gap is narrower and is issues 7/10: the journaled CALLs are pre-marked `.success` stubs with empty returndata, so the observed log is a journal of intended CALLs, not executed frames.
+   `ConsolidationTx.observe` (`ConsolidationTx.lean:191–200`) drops the pre-call prefix of `state.calls` / `state.events` and maps the freshly appended journal entries; the view's payloads are the calldata of those calls, and count/fee come from `countSlot` / `feePaidSlot`. The `Result` payload is ignored on success. The earlier wording of this issue (“observe reports the `Result` payload, not the journal”, with a counterexample mutant that skips the journal `append` but returns the lists in the `Result`) is **stale**: `persist` appends to `state.calls` / `state.events` (`:123–131`) and `observe` reads that suffix, so the skip-append mutant is now caught (the Tests call-drop/event-drop/memory-drop vectors exercise exactly this). The residual gap is narrower and is issues 7/10: the journaled CALLs are pre-marked `.success` stubs with empty returndata, so the observed log is a journal of intended CALLs, not executed frames.
 
 4. **Atomicity is the other arm of the same `if`.**
    If `sourceRun` committed, it returned `commitObservables`. If it reverted, it did not. There is no prefix-event in the abstract type at all (`SourceOutcome` is `reverted reason | committed obs`). You cannot even *write down* a partial journal in `sourceRun`. The revert conjunct is therefore “the function did not take the success arm.”
@@ -90,8 +90,8 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Scenario.* Anyone who can call the vault with `msg.sender` equal to the stored gateway address (or, in Lean, with `inputs.caller = inputs.gateway`) and exact fee commits. A request that should have been rejected by `_validatePubKeyWCProof`, quota, pause, or `ADD_CONSOLIDATION_REQUEST_ROLE` is in-model-committable. Fee is also an input, not a `staticcall` of the predeploy: if the real fee is 1 gwei and the model input is 0, Lean accepts a free batch.
 
-7. **Journaled CALLs are pre-marked `.success` and `txRun = sourceRun` by `rfl`.**
-   `toJournal` (`ConsolidationTx.lean:106–113`) builds an `ExternalCall` with `control := .success` and empty returndata. Nothing executes the predeploy. `txRun_eq_sourceRun` is `rfl` (`:97–99`).
+7. **Journaled CALLs are pre-marked `.success`, and the executor and the observable share one `sourceRun`.**
+   `toJournal` (`ConsolidationTx.lean:80–87`) builds an `ExternalCall` with `control := .success` and empty returndata. Nothing executes the predeploy. There is no separate tx-side transcription to bridge: the executor `addRequests` (`:157`) and the observable `sourceView` (`:203`) both call the same `sourceRun`, so the two planes agree by definition rather than by a proved correspondence.
 
    *Scenario.* The EIP-7251 contract reverts on a malformed 96-byte payload. Lean `persist` still appends a `.success` journal entry and `observe` reports it. The CHECKED “one CALL per pair” is a struct copy, not a frame that can fail.
 
@@ -121,7 +121,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* `countSlot` already holds `2^256 − 1`. One committed request writes `Uint256.ofNat (start + 1)` = `0`. Live vault has no such wrap because it has no such slot. `observe` on success *does* read `countSlot` / `feePaidSlot` (`:178–180`) while taking calls/events from the `Result`. The CHECKED “persisted count” is a model-local counter that can wrap and that the deployed function does not maintain.
 
 13. **`feePaid` is the input `msgValue`, not a computed debit.**
-    `commitObservables` (`ConsolidationCorrespondence.lean:112`) sets `feePaid := msgValue`. Combined with the exact-fee guard this equals `n * fee` when the success arm is taken, but no account is reduced by that amount.
+    `commitObservables` (`ConsolidationCorrespondence.lean:144–150`) sets `feePaid := msgValue`. Combined with the exact-fee guard this equals `n * fee` when the success arm is taken, but no account is reduced by that amount.
 
     *Scenario.* `n = 2`, `fee = 5`, `msgValue = 10`, vault ETH = 0. Live `call{value: 5}` fails after the first pair (or immediately) and the tx reverts. Lean `sourceRun` commits `feePaid = 10` with two journaled `.success` CALLs and never looks at a balance. The CHECKED “value conservation” conjunct is the guard `msgValue.val = n * fee.val`, not “the vault paid `n * fee` wei.”
 
@@ -294,7 +294,7 @@ kill-line; the Tests re-export is renamed
 `gateway_admitted_nonzero_premise_necessity`.
 
 **Also refreshed.** Issue 3 was stale: `observe` reads the journal appended
-to `state.calls` / `state.events` (`ConsolidationTx.lean:177–184`), not the
+to `state.calls` / `state.events` (`ConsolidationTx.lean:191–200`), not the
 `Result` payload, so the skip-append mutant it described is already caught
 by the existing call-drop/event-drop vectors.
 

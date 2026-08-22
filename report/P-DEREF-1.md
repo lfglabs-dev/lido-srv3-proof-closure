@@ -47,7 +47,7 @@ Almost every SRv3 action looks up `moduleStates[id].config.moduleAddress` after 
 
 **Facade `closure`.** Rewrite with stability, then apply `source_deref_exact_reachable` on the original state (so the address after interleaving equals the *original* `s.moduleAddress id`).
 
-**`verity_observe_refines_source`.** From `VerityRepresents`, the position map is nonzero iff registered, and the address word decodes to `s.moduleAddress id`. Then `observeDeref` succeeds, and the observation map records that word. Address round-trip uses `address < 2^160`.
+**`verity_observe_refines_source`.** From `VerityRepresents`, the position map is nonzero iff registered, and the address word decodes to `s.moduleAddress id`. Then `observeDeref` succeeds *returning* that address. It is a pure read: `getStakingModuleAddress` (`Source/DereferenceCorrespondence.lean:168–172`) yields `.success … state` with the snapshot threaded through unchanged, so nothing is written to `observedAddressesSlot` (declared at `:165`, never assigned) and the theorem constrains the returned value only. Address round-trip uses `address < 2^160`.
 
 ## Issues
 
@@ -145,10 +145,10 @@ keccak `ROUTER_STORAGE_POSITION`, `last+1`/unique-address, `uint24` vs `Nat`,
 
    *Scenario.* Old layout has `stakingModuleAddress = 0` for a still-listed module. Solidity copies 0; later deref is `address(0)`. Lean `Reachable.migrated` requires `WellFormed old`, so this state is out of `closure`. Completeness of Reachable is the hole: the interesting zero-address case is defined not to exist.
 
-11. **`observeDeref` is a writer, not a view.**
-    Live `_requireModuleIdExists` + `moduleStates[id].config.moduleAddress` is a pair of SLOADs. `observeDeref` (`DereferenceCorrespondence.lean:167–174`) on success does `writeMapUint observedAddressesSlot id (addressToWord address)`. The refinement `verity_observe_refines_source` *requires* that write (`:199`).
+11. **`observedAddressesSlot` is declared but never written — the "executable projection" is one guarded SLOAD pair, and nothing more. Historical statement corrected.**
+    Live `_requireModuleIdExists` + `moduleStates[id].config.moduleAddress` is a pair of SLOADs. `observeDeref` is an `abbrev` for `getStakingModuleAddress` (`DereferenceCorrespondence.lean:168–172, 174`), which returns `.success (wordToAddress …) state` with the entry state threaded through unchanged. The refinement `verity_observe_refines_source` (`:192–204`) concludes exactly that — same `state` on both sides — so it constrains only the returned address, not any storage effect. An earlier revision of this issue claimed `observeDeref` performed a `writeMapUint observedAddressesSlot …` logging SSTORE; that is **stale and was wrong**: `observedAddressesSlot` is declared at `:165` and never assigned anywhere in the module.
 
-    *Scenario.* A deref view used inside `getDepositAllocations` / `topUp` / status updates. Live storage is unchanged. Lean “executable mapping transaction” dirties slot 6. A later read of `observedAddressesSlot` sees a value no pinned function stored. The CHECKED Verity deref is not the router’s lookup; it is a logging SSTORE the source does not perform.
+    *Residual gap.* The projection is faithful in the narrow sense that it writes nothing, but it is also not a transaction: the pair of SLOADs is modelled as `storageMapUint` lookups under `VerityRepresents` (`:177–182`), which explicitly disclaims Solidity's keccak mapping encoding and `ROUTER_STORAGE_POSITION`. So the CHECKED Verity deref pins the guard-and-return shape, not the router's actual storage addressing.
 
 12. **`applyInterleaving` does not preserve `WellFormed`.**
     `Reachable.added` requires `address ≠ 0`, `address < 2^160`, `fresh < 2^24`. `applyInterleaving (.addFreshModule fresh address)` (`:121–123`) only rejects `registered ∨ address = 0 ∨ lastModuleId ≥ 32`. It will install `address = 2^160` or `fresh = 2^24 + 1`, and it sets `lastModuleId := fresh` (not `last + 1`).
