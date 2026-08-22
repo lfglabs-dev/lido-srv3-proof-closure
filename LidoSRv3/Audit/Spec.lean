@@ -33,12 +33,14 @@ structure Spend where
   amount : Wei
   deriving DecidableEq, Repr
 
-/-- Destinations the P-CONSOLIDATION-ETH-1 parent currently classifies as
-approved. Extra approved paths (pack B) and VaultHub owner withdraw stay out
-of this freeze. -/
+/-- Destinations a Spec ETH journal may name. Wave 0 froze consolidation
+success legs. Pack G0 adds the deposit/top-up success legs Join projects.
+VaultHub owner withdraw stays out. This is not all SRv3 ETH. -/
 inductive ApprovedDestination
   | consolidationRequest
   | refundRecipient
+  | beaconDeposit
+  | lidoPull
   deriving DecidableEq, Repr
 
 structure EthJournalLeg where
