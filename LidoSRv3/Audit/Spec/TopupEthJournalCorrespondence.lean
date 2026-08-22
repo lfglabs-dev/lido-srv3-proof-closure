@@ -45,9 +45,9 @@ theorem specJournalOfTopup_dests_restricted (allocations : List Nat) :
   by_cases hZero : allocSumUnchecked allocations = 0
   · simp [specJournalOfTopup, hZero] at hmem
   · simp [specJournalOfTopup, hZero] at hmem
-    rcases hmem with h | ⟨_, _, hp⟩
-    · subst h; rfl
-    · subst hp; rfl
+    rcases hmem with rfl | ⟨_, _, rfl⟩
+    · rfl
+    · rfl
 
 /-- Concrete value-moving success: `[3, 0, 5]` wraps to 8, skips the zero
 slot, and projects `lidoPull` then two `beaconDeposit`s. The source
