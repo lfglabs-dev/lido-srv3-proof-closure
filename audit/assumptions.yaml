@@ -177,6 +177,16 @@
       "removal_path": "Prove the configured immutable and deployed target both equal the canonical EIP-7251 address."
     },
     {
+      "id": "A-PERFECT-HASH",
+      "accepted": true,
+      "risk": "The structural deposit encoding `sourceNode` is assumed injective on pinned-width well-formed deposits; without it, determination yields witness equality but not deposit uniqueness.",
+      "justification": "SHA-256 remains opaque (`A-SHA256-FFI`); injectivity of the structural root encoding on well-formed deposits is an explicit hypothesis (`PerfectDepositEncoding`) rather than a cryptographic consequence.",
+      "severity": "HIGH",
+      "violation_impact": "Two distinct well-formed deposits could share the same structural root, breaking uniqueness in the determination direction of `deposit_root_iff`.",
+      "validation": "Recorded as `PerfectDepositEncoding` in `LidoSRv3.Audit.SszDepositEquivalence`; removal requires a proved injectivity theorem or a narrower deposit model.",
+      "removal_path": "Prove `sourceNode` injective on well-formed deposits from the structural encoding, or refine the deposit model so injectivity is definitional."
+    },
+    {
       "id": "A-SOLC-TRUSTED",
       "accepted": true,
       "risk": "Pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
