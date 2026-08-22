@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: b522d143686ac5e068ced1062a6e31060d191cc6
+validated-tree: f773404df9c33e5cb357af0dbb9a533f893a380c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -3564,3 +3564,92 @@ P-CONSOLIDATION-ETH-1 universal Verity parent (2026-08-21)
   parent name directly. Rebuilt and re-gated at the new head.
 - `validated-tree` rebound to this commit's tracked tree excluding this
   receipt `b522d143686ac5e068ced1062a6e31060d191cc6`.
+
+Certification-blocker repair on PR #160 branch (2026-08-22)
+-----------------------------------------------------------
+
+Repairs the exact-head certification blockers reproduced at
+`a62997e47cf481a545d5f0f97e4a8ef0e321d535` without merging, rebasing,
+force-pushing, or weakening any gate. No `sorry`, `admit`, new `axiom`,
+`unsafe`, or skipped proof was introduced; the allowed axiom boundary is
+unchanged.
+
+- Trust-escape closure. `LidoSRv3.Audit.Verity.AddressClaimBatchTx.
+  two_claim_batch_observe` (`:202`) and `LidoSRv3.Tests.AddressSourceMutants.
+  fixed_payout_recipient_mutant_kill_line` (`:308`) closed by `native_decide`,
+  and the first of those leaks into the public surface
+  `PAddress1.bounded_live_claim_batch_storage_call_surface`. Both now close by
+  `decide +kernel`. Plain `decide` exhausts the elaborator's recursion budget on
+  the eleven-write `twoClaimState` (the `E27` checkpoint word in particular);
+  `+kernel` defers the same `Decidable` evaluation to the kernel, which handles
+  it in about 20s and leaves no axiom behind. `HandleOracleReportTx.
+  mintOrderKillLine_holds` was closed the same way earlier in this repair.
+- Axiom audit over the whole library, parsed from the `make prove` build log
+  with continuation lines joined (`#print axioms` output wraps): of 238 printed
+  declarations, the only dependency outside `{propext, Classical.choice,
+  Quot.sound}` is `AllocCapacityPhase3.consumed_summary_function_spec_compiles.
+  _native.native_decide.ax_1_1`, reached by exactly two declarations
+  (`PAlloc1.source_capacities_and_mapped_summary_transaction` and
+  `PAlloc1Phase3.mapped_summary_call_transaction`). That is precisely the
+  P-ALLOC-1 Phase-3 exception already disclosed in `LidoSRv3/Audit/Trust.lean`
+  (`:55-71`); no new exception was created and none was removed.
+- Trust disclosure widened, not narrowed: `Trust.lean` now also prints axioms
+  for `PAddress1.bounded_live_claim_batch_storage_call_surface`,
+  `AddressClaimBatchTx.two_claim_batch_observe`,
+  `AddressClaimBatchTx.every_revert_restores_snapshot`, and the four
+  `PTopup1.verity_*` wrap/close theorems.
+- Public-claim surface allowlist (`scripts/check_public_claim_surfaces.py`)
+  resynced with the declarations and imports actually proved, and
+  `audit/guarantees.yaml` / `audit/STATUS.md` / `verity/targets/audit-manifest.json`
+  resynced with it (`EXPECTED_CANONICAL_DETAIL_SHA256` rebound accordingly).
+  The checker reports only its first mismatching file, so it was re-run to
+  fixpoint rather than once.
+- Report fidelity. Corrected citations that named theorems absent from the tree
+  or asserted effects the code does not have, in `P-ACCOUNT-1`, `P-ALLOC-1`,
+  `P-ALLOC-2`, `P-CONSOLIDATION-1`, `P-CONSOLIDATION-ETH-1`,
+  `P-CONSOLIDATION-ETH-1a`, `P-DEREF-1`, `P-RESERVE-1`, `P-SSZ-1`, `P-TOPUP-1`,
+  and `P-TOPUP-2`. Two were substantive rather than line drift: `P-DEREF-1`
+  claimed twice that `observeDeref` performs a `writeMapUint
+  observedAddressesSlot` logging SSTORE, but `observedAddressesSlot` is declared
+  at `DereferenceCorrespondence.lean:165` and never assigned anywhere — the
+  projection writes nothing and threads the entry state through unchanged, so
+  the refinement constrains the returned address only; and `P-TOPUP-1`
+  overclaimed wrap ⇒ revert beyond what the Verity theorems establish. Records
+  that are explicitly framed as historical, retracted, or renamed (for example
+  `txBindOne_eq_sourceBindOne` in `P-ALLOC-1`, `router_require_post_condition`
+  and `tx_revert_has_failed_call` in `P-TOPUP-2`) were left as-is: they are
+  self-correcting audit history, not live claims.
+- P-ETH-1 finite-vs-universal claim is honest at this head without further
+  change: `LidoSRv3/Audit/Guarantees/PConsolidationEth1.lean:320-500` proves
+  `verity_tx_universal_success_shape`, `UniversalRevertPartition`,
+  `verity_tx_universal_revert_partition`, and
+  `verity_tx_universal_zero_remainder_boundary` under seven named premises, and
+  `audit/guarantees.yaml` records the residual revert-arm characterization gap
+  rather than asserting an unproved generalization.
+
+Reproduction at this head (all run locally; the branch has no CI):
+
+- `make prove` exit 0 — `verified_source_tree`
+  `9e5e6470dd73fdc1e638672cefea2ed042125302`, Lean 4.31.0,
+  `lake build LidoSRv3` `Build completed successfully (1398 jobs)`, only
+  pre-existing upstream linter warnings. `proofs/logs/prove.txt` and
+  `proofs/logs/proof-report.json` regenerated from that run; the previous
+  `prove.txt` predated the `native_decide` removals and no longer described the
+  tree it claimed to cover.
+- `lake build` over all 27 `LidoSRv3.Tests.*` targets named in the `Makefile`:
+  exit 0, `Build completed successfully (1310 jobs)`.
+- `python3 scripts/audit_metadata.py check` exit 0 (11 canonical guarantees +
+  12 subordinate evidence rows); `python3 scripts/test_audit_metadata.py`,
+  `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/test_check_no_python_evidence.sh`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `python3 scripts/test_public_claim_surfaces.py`,
+  `python3 scripts/test_verity_provenance.py`, and
+  `bash scripts/check_provenance_guards.sh` all exit 0 on the clean tree.
+- All five `fixtures/solidity-reference/*` non-empty checks pass.
+- `validated-tree` rebound from `b522d143686ac5e068ced1062a6e31060d191cc6` to
+  `f773404df9c33e5cb357af0dbb9a533f893a380c`, the tracked tree of this commit
+  excluding this receipt per `scripts/check_validation_receipt.py`
+  (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
+  This rebind is the final commit of the repair, since every other tracked file
+  is inside the tree it binds.
