@@ -1,11 +1,28 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f773404df9c33e5cb357af0dbb9a533f893a380c
+validated-tree: 915dacd0d219145a1170149c143e3b32cb8d532f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Wave 0 honesty + Spec interfaces (2026-08-22)
+---------------------------------------------
+
+- Rebind `validated-tree` to `915dacd0d219145a1170149c143e3b32cb8d532f`, the
+  tracked tree of `cursor/wave0-honesty-interfaces-f120` excluding this
+  receipt (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt
+  && git write-tree`).
+- Wave 0 freezes `LidoSRv3/Audit/Spec.lean` (Allocation, Spend, EthJournal,
+  OracleFrame, SszWitness) and registers `deposit_root_iff` as
+  `Spec.SszWitness.Correspondence`. Deposit uniqueness is the named
+  `PerfectDepositEncoding` child. Parent-shaped kill-line
+  `sourceNode_mutant_kill_line_refutes_parent` builds. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Guarantees.PSsz1
+  LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants
+  LidoSRv3.Tests.SszRegression` exit 0; `python3 scripts/audit_metadata.py
+  check` ok. No `sorry`/`admit`/`native_decide` on the parent.
 
 Wave 3 post-merge prerequisite receipt rebind (2026-08-20)
 -----------------------------------------------------------
