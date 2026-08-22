@@ -199,7 +199,7 @@ theorem two_claim_batch_observe :
         ((executeClaimWithdrawalsTo [1, 2] [1, 1] (2 : Address)).run twoClaimState) =
       ⟨.committed, [true, true], 0,
         [payoutEntry (2 : Address) 30, payoutEntry (2 : Address) 40]⟩ := by
-  native_decide
+  decide +kernel
 
 /-- The transaction boundary restores the entry snapshot after any failed
 guard or payout frame, including failures reached during later iterations. -/

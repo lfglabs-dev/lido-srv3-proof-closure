@@ -305,7 +305,7 @@ theorem fixed_payout_recipient_mutant_kill_line :
         ((executeFixedPayoutRecipient [1, 2] [1, 1] (2 : Address)).run twoClaimState) ≠
       ⟨.committed, [true, true], 0,
         [payoutEntry (2 : Address) 30, payoutEntry (2 : Address) 40]⟩ := by
-  native_decide
+  decide +kernel
 
 #check LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance
 #check source_admission_nondiscriminatory

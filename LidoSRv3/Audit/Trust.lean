@@ -152,6 +152,9 @@ assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
+#print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_live_claim_batch_storage_call_surface
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe
+#print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot
 #print axioms LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness
 #print axioms LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back
@@ -221,6 +224,11 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_wrap_to_zero_is_empty_commit
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_witness_reverts_and_restores
+#print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_reverts_and_restores
+#print axioms
+  LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
 #print axioms LidoSRv3.Tests.TopupTxMutants.mutant_none_reproduces_execute
 #print axioms LidoSRv3.Tests.TopupTxMutants.honest_run_matches_source
 #print axioms LidoSRv3.Tests.TopupTxMutants.skipped_allocation_write_rejected
