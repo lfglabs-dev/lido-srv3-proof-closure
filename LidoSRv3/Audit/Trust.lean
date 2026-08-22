@@ -50,6 +50,8 @@ import LidoSRv3.Audit.Spec.AddressClaimCorrespondence
 import LidoSRv3.Tests.PackDAddressClaimMutants
 import LidoSRv3.Audit.Spec.OracleFrameCorrespondence
 import LidoSRv3.Tests.PackEOracleFrameMutants
+import LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
+import LidoSRv3.Tests.PackFConsolidationObserveMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -107,6 +109,10 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.account_parent_remains_order_only
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.eugene_bound_cited
 #print axioms LidoSRv3.Tests.PackEOracleFrameMutants.computed_fee_kill_line_refutes_oracle_frame
+#print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.observe_success_payloads_reread_maps
+#print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.persist_payloads_reread
+#print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.gateway_nonzero_remains_named_hyp
+#print axioms LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
