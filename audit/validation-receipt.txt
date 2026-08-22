@@ -1,11 +1,22 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d5c9d2258a9feab61e53c5bef4fe29b49d52f387
+validated-tree: fc1639d91dc85df859896991347ddbfd5b8f8117
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Pack B Spec.EthJournal projection (2026-08-22)
+---------------------------------------------
+
+- Rebind `validated-tree` to `fc1639d91dc85df859896991347ddbfd5b8f8117`, the
+  tracked tree of `cursor/pack-b-eth-journal-f120` excluding this receipt.
+- Unregistered child: successful `gatewayExecute` journals project onto
+  `Spec.EthJournal`. Third destinations (`.other`, retired `.lido`) fail the
+  projection. VaultHub stays out. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.EthJournalCorrespondence
+  LidoSRv3.Tests.PackBEthJournalMutants` exit 0.
 
 Pack A Spec.Allocation projections (2026-08-22)
 ----------------------------------------------
