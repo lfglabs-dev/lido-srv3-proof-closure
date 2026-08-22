@@ -42,6 +42,8 @@ import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.AllocationTx
 import LidoSRv3.Audit.Spec.AllocationCorrespondence
 import LidoSRv3.Tests.PackAAllocSpecMutants
+import LidoSRv3.Audit.Spec.EthJournalCorrespondence
+import LidoSRv3.Tests.PackBEthJournalMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -85,6 +87,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.spec_amounts_do_not_imply_linkssource
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.target_as_capacity_kill_line_refutes_alloc1_spec
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.spec_amounts_kill_line_refutes_linkssource
+#print axioms LidoSRv3.Audit.Spec.EthJournalCorrespondence.success_journal_projects_to_spec
+#print axioms LidoSRv3.Tests.PackBEthJournalMutants.third_destination_other_kill_line_refutes_spec_journal
+#print axioms LidoSRv3.Tests.PackBEthJournalMutants.third_destination_lido_kill_line_refutes_spec_journal
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
