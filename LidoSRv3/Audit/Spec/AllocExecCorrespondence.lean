@@ -34,7 +34,8 @@ theorem materializeBatch_amount
     (hNoWrap : batch.keys.val * depositSize.val < _root_.Verity.Core.Uint256.modulus) :
     (materializeBatch depositSize batch).amount.val =
       batch.keys.val * depositSize.val := by
-  simp [materializeBatch, _root_.Verity.Core.Uint256.mul,
-    _root_.Verity.Core.Uint256.ofNat, Nat.mod_eq_of_lt hNoWrap]
+  change (batch.keys.val * depositSize.val) %
+    _root_.Verity.Core.Uint256.modulus = batch.keys.val * depositSize.val
+  exact Nat.mod_eq_of_lt hNoWrap
 
 end LidoSRv3.Audit.Spec.AllocExecCorrespondence
