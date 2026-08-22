@@ -43,7 +43,9 @@ word is a counterexample to `∀ state live, freshQueueCache`. -/
 theorem fresh_queue_cache_is_not_vacuous :
     ¬ ∀ (state : ReserveState) (live : Word), freshQueueCache state live := by
   intro h
-  have hfresh := h mismatchedCache (Verity.Core.Uint256.ofNat 80)
+  have hfresh :=
+    (fresh_queue_cache_is_equality mismatchedCache (Verity.Core.Uint256.ofNat 80)).mp
+      (h mismatchedCache (Verity.Core.Uint256.ofNat 80))
   exact absurd hfresh (by decide)
 
 /-- Anchor: this unregistered child imports the registered parent and
