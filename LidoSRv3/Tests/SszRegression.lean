@@ -218,4 +218,12 @@ def composedExample_satisfies_composed_ssz_encoding :=
     (LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode compositionSrc
       (by decide) (by decide) (by decide))
 
+/-- Non-vacuity: the registered `deposit_root_iff` parent is inhabited on the
+same pinned-width deposit. Uniqueness is not a parent conjunct. -/
+def compositionSrc_satisfies_deposit_root_iff :=
+  deposit_root_iff compositionSrc ⟨by decide, by decide, by decide⟩
+
+/-- The parent-shaped `sourceNode + 1` kill-line builds beside the honest parent. -/
+example := sourceNode_mutant_kill_line_refutes_parent
+
 end LidoSRv3.Tests.SszRegression
