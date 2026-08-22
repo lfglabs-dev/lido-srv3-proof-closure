@@ -41,12 +41,8 @@ def mutantNonemptyOnWrapZero : EthJournal :=
 theorem wrap_to_zero_allocations_sum :
     allocSumUnchecked wrapToZeroAllocations = 0 := by
   simp [wrapToZeroAllocations, allocSumUnchecked]
-  have hOne : (1 + 0) % uint256Modulus = 1 :=
-    Nat.mod_eq_of_lt (by simp [uint256Modulus]; omega)
-  rw [hOne]
-  have hSum : uint256Modulus - 1 + 1 = uint256Modulus := by
-    simp [uint256Modulus]; omega
-  rw [hSum, Nat.mod_self]
+  have hpos : 1 ≤ uint256Modulus := by simp [uint256Modulus]
+  rw [Nat.sub_add_cancel hpos, Nat.mod_self]
 
 /-- Kill-line: tagging a beacon push as `.consolidationRequest` fails the
 Join dest restriction. Pack J-TOPUP does not reuse Pack B dests. -/
