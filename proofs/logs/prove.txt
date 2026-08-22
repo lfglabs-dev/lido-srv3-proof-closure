@@ -1,16 +1,16 @@
-verified_source_tree=9e5e6470dd73fdc1e638672cefea2ed042125302
+verified_source_tree=551003631b849f6358aff0a6356b97524bc6b708
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
-⚠ [11/76] Replayed Verity.Core
-warning: Verity/Core.lean:603:2: try 'simp' instead of 'simpa'
+⚠ [11/42] Replayed Verity.Core
+warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-warning: Verity/Core.lean:1028:2: try 'simp' instead of 'simpa'
+warning: Verity/Core.lean:1041:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-warning: Verity/Core.lean:1257:2: try 'simp' instead of 'simpa'
+warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [1166/1215] Replayed Conform.Wheels
+⚠ [1166/1178] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -23,7 +23,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1167/1215] Replayed EvmYul.Pretty
+⚠ [1167/1178] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -36,15 +36,47 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1214/1286] Replayed EvmYul.Semantics
+⚠ [1214/1312] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1215/1286] Replayed EvmYul.EVM.Semantics
+⚠ [1215/1312] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1247/1286] Replayed LidoSRv3.Audit.Verity.AddressTx
+⚠ [1236/1312] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:91:52: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:393:22: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:393:53: This simp argument is unused:
+  hzv
+
+Hint: Omit it from the simp argument list.
+  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:400:25: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:400:44: This simp argument is unused:
+  if_neg hzv
+
+Hint: Omit it from the simp argument list.
+  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1247/1312] Replayed LidoSRv3.Audit.Verity.AddressTx
 warning: LidoSRv3/Audit/Verity/AddressTx.lean:233:34: This simp argument is unused:
   AddressTxContract.paused
 
@@ -1349,7 +1381,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1255/1286] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
+⚠ [1255/1312] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
 warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:195:41: This simp argument is unused:
   List.mem_nil_iff
 
@@ -1357,7 +1389,7 @@ Hint: Omit it from the simp argument list.
   simp [List.mem_cons,̵ ̵L̵i̵s̵t̵.̵m̵e̵m̵_̵n̵i̵l̵_̵i̵f̵f̵] at hx
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1263/1286] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
+⚠ [1263/1312] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
 warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
   evalExprList
 
@@ -1832,7 +1864,7 @@ Hint: Omit it from the simp argument list.
       hstorageW, mul_ofNat_val, hdiv, hle]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1267/1286] Replayed LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
+ℹ [1267/1312] Replayed LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
 info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:69:0: LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.refund_failure_restores_snapshot (msgValue fee : Uint256)
   (vaultOk refundOk : Bool) (state rollback : ContractState) (reason : String)
   (h : (gatewayRefund msgValue fee vaultOk refundOk).run state = ContractResult.revert reason rollback) :
@@ -1840,14 +1872,37 @@ info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:69:0: LidoSRv3.Audit
 info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:70:0: LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.withdraw_failure_restores_snapshot (amount : Uint256)
   (callerIsLido : Bool) (state rollback : ContractState) (reason : String)
   (h : (withdrawToLido amount callerIsLido).run state = ContractResult.revert reason rollback) : rollback = state
-ℹ [1268/1286] Replayed LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
+ℹ [1268/1312] Replayed LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
 info: LidoSRv3/Tests/PConsolidationEth1RequestTxMutants.lean:56:0: LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.bus_failure_restores_snapshot (msgValue : Uint256) (gatewayOk : Bool)
   (state rollback : ContractState) (reason : String)
   (h : (busForward msgValue gatewayOk).run state = ContractResult.revert reason rollback) : rollback = state
 info: LidoSRv3/Tests/PConsolidationEth1RequestTxMutants.lean:57:0: LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.consolidation_prefix_failure_restores_snapshot (fee : Uint256)
   (secondOk : Bool) (state rollback : ContractState) (reason : String)
   (h : (sendTwoConsolidationFees fee secondOk).run state = ContractResult.revert reason rollback) : rollback = state
-⚠ [1277/1286] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+⚠ [1273/1312] Replayed LidoSRv3.Audit.SszDepositEquivalence
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:91:4: This simp argument is unused:
+  Ssz.traverseBranch
+
+Hint: Omit it from the simp argument list.
+  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
+  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:211:12: This simp argument is unused:
+  sourceWitness
+
+Hint: Omit it from the simp argument list.
+  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:211:27: This simp argument is unused:
+  structuralWitness
+
+Hint: Omit it from the simp argument list.
+  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1278/1312] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
 warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -1867,7 +1922,7 @@ info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationMode
   Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
     Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
       (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-⚠ [1290/1332] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+⚠ [1291/1312] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:302:53: This simp argument is unused:
   setStorage
 
@@ -2265,7 +2320,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1295/1332] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
+⚠ [1296/1312] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
 warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
   memory_writeSlot
 
@@ -2273,7 +2328,7 @@ Hint: Omit it from the simp argument list.
   simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1298/1332] Replayed LidoSRv3.Audit.Verity.DepositTx
+⚠ [1299/1312] Replayed LidoSRv3.Audit.Verity.DepositTx
 warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
   Pure.pure
 
@@ -2288,7 +2343,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1304/1332] Replayed LidoSRv3.Tests.AddressSourceMutants
+ℹ [1305/1312] Replayed LidoSRv3.Tests.AddressSourceMutants
 info: LidoSRv3/Tests/AddressSourceMutants.lean:310:0: LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance :
   (∀ (a₁ a₂ : Address),
       a₁ ≠ 0 →
@@ -2352,7 +2407,7 @@ info: LidoSRv3/Tests/AddressSourceMutants.lean:311:0: LidoSRv3.Audit.SolidityAdd
 info: LidoSRv3/Tests/AddressSourceMutants.lean:312:0: LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant (a₁ a₂ : Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
   (inp : Input) (post : PostState) (h : run inp = Outcome.committed post) :
   run (renameInput a₁ a₂ inp) = Outcome.committed (renamePost a₁ a₂ post)
-ℹ [1305/1332] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+ℹ [1306/1312] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:35:0: LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected (input : TxInputs)
   (hmutant : computedRoot input ≠ input.expectedDepositDataRoot) :
   runVerification input = VerificationOutcome.revertRootMismatch
@@ -2369,7 +2424,7 @@ info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:37:0: LidoSRv3.Audit.Veri
       (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
         (runVerification input = VerificationOutcome.revertRootMismatch →
           (transactionObservation input before after attempts trace).committedState = before)
-ℹ [1306/1332] Replayed LidoSRv3.Audit.Trust
+ℹ [1307/1312] Replayed LidoSRv3.Audit.Trust
 info: LidoSRv3/Audit/Trust.lean:74:0: 'LidoSRv3.Audit.Quantity.checkedDiv_zero' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:75:0: 'LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:76:0: 'LidoSRv3.Audit.revert_restores_state_value_and_logs' depends on axioms: [propext]
@@ -2407,6 +2462,7 @@ info: LidoSRv3/Audit/Trust.lean:97:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.forall_
 info: LidoSRv3/Audit/Trust.lean:98:0: 'LidoSRv3.Audit.Verity.MinFirstDistributionTx.allocateLoop_conserves_total' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:99:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.source_allocate_loop_conserves_requested' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:100:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation' depends on axioms: [propext,
+ Classical.choice,
  Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:101:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_matches_source' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:102:0: 'LidoSRv3.Audit.Guarantees.PAlloc2.tx_step_is_safe' depends on axioms: [propext, Quot.sound]
@@ -2661,61 +2717,62 @@ info: LidoSRv3/Audit/Trust.lean:270:0: 'LidoSRv3.Audit.Guarantees.PReserveRelati
 info: LidoSRv3/Audit/Trust.lean:271:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization' depends on axioms: [propext,
  Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:272:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:273:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:274:0: 'LidoSRv3.Audit.Guarantees.PSsz1.swapped_combine_kill_line_refutes_parent' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:273:0: 'LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:274:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:275:0: 'LidoSRv3.Audit.Guarantees.PSsz1.swapped_combine_kill_line_refutes_parent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:275:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composedEncodingOkFull_not_trivial_crossed_witness' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:276:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composedEncodingOkFull_not_trivial_crossed_witness' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:276:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_witness_kill_line' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:277:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_witness_kill_line' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:277:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_operation_index_kill_line' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:278:0: 'LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:279:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:278:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_operation_index_kill_line' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:279:0: 'LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:280:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:280:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:281:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:281:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:282:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:282:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:283:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:283:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:284:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:285:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:286:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:287:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:288:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:289:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:290:0: 'LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:284:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:285:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:286:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:287:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:288:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:289:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:290:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:291:0: 'LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:292:0: 'LidoSRv3.Audit.MinFirst.candidate_mem' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:293:0: 'LidoSRv3.Audit.MinFirst.candidate_open' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:294:0: 'LidoSRv3.Audit.MinFirst.candidate_none_no_open' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:295:0: 'LidoSRv3.Audit.MinFirst.candidate_minimal' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:296:0: 'LidoSRv3.Audit.MinFirst.candidate_router_tie' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:297:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_moduleId' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:298:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_active' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:299:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_monotone' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:300:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_eq_of_ne' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:301:0: 'LidoSRv3.Audit.MinFirst.step_preserves_length' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:302:0: 'LidoSRv3.Audit.MinFirst.step_preserves_module_order' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:303:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_length' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:304:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_module_order' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:305:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_length' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:306:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_module_order' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:307:0: 'LidoSRv3.Audit.MinFirst.run_spent_le' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:308:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_le_requested' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:309:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:310:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:311:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
-ℹ [1311/1332] Replayed LidoSRv3.Tests.GIndexConcatMutants
+info: LidoSRv3/Audit/Trust.lean:293:0: 'LidoSRv3.Audit.MinFirst.candidate_mem' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:294:0: 'LidoSRv3.Audit.MinFirst.candidate_open' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:295:0: 'LidoSRv3.Audit.MinFirst.candidate_none_no_open' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:296:0: 'LidoSRv3.Audit.MinFirst.candidate_minimal' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:297:0: 'LidoSRv3.Audit.MinFirst.candidate_router_tie' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:298:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_moduleId' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:299:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_active' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:300:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_monotone' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:301:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_eq_of_ne' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:302:0: 'LidoSRv3.Audit.MinFirst.step_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:303:0: 'LidoSRv3.Audit.MinFirst.step_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:304:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:305:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:306:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:307:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:308:0: 'LidoSRv3.Audit.MinFirst.run_spent_le' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:309:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_le_requested' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:310:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:311:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:312:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
+ℹ [1312/1364] Replayed LidoSRv3.Tests.GIndexConcatMutants
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:59:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:60:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:61:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
-ℹ [1359/1388] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
+ℹ [1360/1364] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
 info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:41:0: LidoSRv3.Audit.Verity.TopupRollback.topup_program_declared : spec.functions = [topUpEntry]
 info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:42:0: LidoSRv3.Audit.Verity.TopupRollback.topup_success_post_state_equiv (cfg : SourceTopupConfig) (inp : SourceTopupInput)
   {keys pulled pushed balanceAfter : ℕ} (hRun : run cfg inp = Outcome.committedTopUp keys pulled pushed balanceAfter) :
@@ -2738,7 +2795,7 @@ info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:46:0: LidoSRv3.Audit.Verity
     ∀ entry ∈ Compiler.CompilationModel.DenoteExternalCalls.ObservedCalls program.calls adversary state,
       Compiler.CompilationModel.DenoteExternalCalls.RollsBack adversary entry) :
   (Compiler.CompilationModel.DenoteExternalCalls.denote program.calls adversary state).2.world = state.world
-⚠ [1360/1388] Replayed LidoSRv3.Audit.Verity.TopupHybrid
+⚠ [1361/1364] Replayed LidoSRv3.Audit.Verity.TopupHybrid
 warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:136:5: Variable name `hNoWrap` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2760,7 +2817,7 @@ Hint: Omit it from the simp argument list.
   ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1361/1388] Replayed LidoSRv3.Tests.TopupHybridMutants
+ℹ [1362/1364] Replayed LidoSRv3.Tests.TopupHybridMutants
 info: LidoSRv3/Tests/TopupHybridMutants.lean:44:0: LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source (cfg : Audit.SolidityTopup.SourceTopupConfig)
   (inp : Audit.SolidityTopup.SourceTopupInput) (hNoWrap : Audit.SolidityTopup.NoUncheckedWrap inp)
   (state : ContractState) : observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state
@@ -2770,17 +2827,17 @@ info: LidoSRv3/Tests/TopupHybridMutants.lean:45:0: LidoSRv3.Audit.Verity.TopupHy
 info: LidoSRv3/Tests/TopupHybridMutants.lean:46:0: LidoSRv3.Audit.Verity.TopupHybrid.source_value_observation_adequate (cfg : Audit.SolidityTopup.SourceTopupConfig)
   (inp : Audit.SolidityTopup.SourceTopupInput) :
   (Audit.SolidityTopup.run cfg inp).pulled = (Audit.SolidityTopup.run cfg inp).pushed
-⚠ [1365/1388] Replayed LidoSRv3.Legacy.SpecProofs
+⚠ [1367/1399] Replayed LidoSRv3.Legacy.SpecProofs
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-ℹ [1367/1388] Replayed LidoSRv3.Tests.TopupParentMutants
+ℹ [1369/1399] Replayed LidoSRv3.Tests.TopupParentMutants
 info: LidoSRv3/Tests/TopupParentMutants.lean:95:0: LidoSRv3.Audit.Verity.TopupParent.parent_transaction_closure (cfg : SourceTopupConfig) (base : SourceTopupInput)
   (gateway : Address) (iface : CalleeInterface) (state : ContractState) : ParentProposition cfg base gateway iface state
 info: LidoSRv3/Tests/TopupParentMutants.lean:96:0: LidoSRv3.Audit.Verity.TopupParent.revert_restores_caller_frame (cfg : SourceTopupConfig) (base : SourceTopupInput)
   (gateway : Address) (iface : CalleeInterface) (state rollback : ContractState) (reason : String)
   (h : (execute cfg base gateway iface).run state = ContractResult.revert reason rollback) : rollback = state
-⚠ [1369/1388] Replayed LidoSRv3.Tests.Topup2DistributionTxMutants
+⚠ [1371/1399] Replayed LidoSRv3.Tests.Topup2DistributionTxMutants
 warning: LidoSRv3/Tests/Topup2DistributionTxMutants.lean:254:7: Variable name `effective` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2791,14 +2848,14 @@ warning: LidoSRv3/Tests/Topup2DistributionTxMutants.lean:254:17: Variable name `
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-ℹ [1387/1388] Replayed LidoSRv3.Tests.SszVerifierProgram
+ℹ [1389/1399] Replayed LidoSRv3.Tests.SszVerifierProgram
 info: LidoSRv3/Tests/SszVerifierProgram.lean:102:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.deposit_call_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:103:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.validator_root_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:104:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.verifier_pair_preimage_exact' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:105:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_memory_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:106:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_abi_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:107:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_sha_fails_closed' depends on axioms: [propext]
-⚠ [1394/1398] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1395/1399] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2852,10 +2909,10 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1396/1398] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+⚠ [1397/1399] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
 warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-Build completed successfully (1398 jobs).
+Build completed successfully (1399 jobs).

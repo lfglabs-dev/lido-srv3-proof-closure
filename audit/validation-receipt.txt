@@ -1,11 +1,43 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f773404df9c33e5cb357af0dbb9a533f893a380c
+validated-tree: ed35cd29b36b992ff051e8f8a10d5550a6b9fd37
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Post-merge certification evidence repair (2026-08-22)
+-----------------------------------------------------
+
+- Prerequisite repair only: the merge commit `25c6e148db6be1927f26722ce6824f2b9e644c9d`
+  (#160) advanced the tracked tree without rebinding this receipt or
+  regenerating the Lean proof evidence, so `make test` failed closed at
+  `scripts/check_validation_receipt.py` (receipt recorded tree
+  `f773404df9c33e5cb357af0dbb9a533f893a380c` while HEAD's tree excluding this
+  receipt was `f5b6a36a...`), and `proofs/logs/prove.txt` /
+  `proofs/logs/proof-report.json` recorded `verified_source_tree`
+  `9e5e6470dd73fdc1e638672cefea2ed042125302` and Verity `a063bfc8...` while
+  `scripts/verified_source_tree.sh` recomputes
+  `551003631b849f6358aff0a6356b97524bc6b708` and `lakefile.lean`,
+  `lake-manifest.json`, `audit/artifacts.lock.json`, and
+  `verity/targets/audit-manifest.json` all pin Verity
+  `e977aaad6e1a9e92e0132d41b3d33a14135a4d46`.
+- `make prove` was rerun on top of `25c6e14`: `lake build LidoSRv3` exit 0
+  (full build 1406 jobs; report-generation run 1399 replayed jobs, "Build
+  completed successfully"), and `scripts/write_proof_report.sh` regenerated
+  `proofs/logs/prove.txt` and `proofs/logs/proof-report.json` honestly against
+  the actual build: `verified_source_tree`
+  `551003631b849f6358aff0a6356b97524bc6b708`, `verity_commit`
+  `e977aaad6e1a9e92e0132d41b3d33a14135a4d46`, `exit_status` 0, Lean 4.31.0 per
+  `lean-toolchain`. That regeneration landed in the immediately preceding
+  commit on this branch; no Lean source, theorem statement, dependency pin,
+  gate script, or guarantee/metadata row is changed anywhere in this repair.
+- `validated-tree` above is rebound to this commit's tracked tree excluding
+  this receipt, computed per `scripts/check_validation_receipt.py`'s own
+  algorithm (`git read-tree HEAD`, `git rm --cached` this receipt, `git
+  write-tree`). No `sorry`/`admit`/`native_decide` is introduced (no Lean
+  files touched; scan vacuous).
 
 Wave 3 post-merge prerequisite receipt rebind (2026-08-20)
 -----------------------------------------------------------
