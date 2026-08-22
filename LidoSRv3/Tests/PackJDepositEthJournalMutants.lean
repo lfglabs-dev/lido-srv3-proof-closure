@@ -54,14 +54,15 @@ theorem consolidation_or_refund_dest_kill_line_refutes_deposit_dests :
         isDepositSuccessDest leg.dest = true) ∧
     ¬ (∀ leg, leg ∈ refundMutantJournal →
         isDepositSuccessDest leg.dest = true) := by
-  refine ⟨?_, ?_⟩
+  constructor
   · intro h
-    exact (h { dest := .consolidationRequest, wei := ⟨1⟩ } (by decide))
-      isDepositSuccessDest_consolidation
+    have ht : isDepositSuccessDest .consolidationRequest = true :=
+      h ⟨.consolidationRequest, ⟨1⟩⟩ (by decide)
+    simp [isDepositSuccessDest] at ht
   · intro h
-    exact (h { dest := .refundRecipient,
-        wei := ⟨canonicalInputs.first.amount.val⟩ } (by decide))
-      isDepositSuccessDest_refund
+    have ht : isDepositSuccessDest .refundRecipient = true :=
+      h ⟨.refundRecipient, ⟨canonicalInputs.first.amount.val⟩⟩ (by decide)
+    simp [isDepositSuccessDest] at ht
 
 /-- Kill-line: routing a beacon push to a residual third dest falsifies
 the Spec projection totality conjunct. -/
@@ -69,7 +70,6 @@ theorem third_destination_beacon_push_kill_line_refutes_projection_totality :
     ¬ (∀ m, m ∈ thirdDestMutantLegs → specDest m.dest ≠ none) := by
   intro h
   have hNone : specDest (.residual 999) = none := specDest_residual 999
-  exact (h { dest := .residual 999,
-      wei := canonicalInputs.second.amount.val } (by decide)) hNone
+  exact (h ⟨.residual 999, canonicalInputs.second.amount.val⟩ (by decide)) hNone
 
 end LidoSRv3.Tests.PackJDepositEthJournalMutants
