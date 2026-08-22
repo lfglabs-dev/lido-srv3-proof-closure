@@ -47,8 +47,14 @@ at `msg.value = 0` paying `2 * 3 = 6` wei of fees, breaking
 
 ## Verity plane
 
-Registered parent: `verity_tx_universal_success_shape` (universal success arm
-under funded / word / fuel premises). Fee-target witness
+Registered parent: `verity_tx_success_and_revert_partition`, conjoining
+`verity_tx_universal_success_shape` (universal success arm under funded / word
+/ fuel premises) with `UniversalRevertPartition` (a universal transaction-entry
+rollback arm for each of the four modeled non-success shapes: zero `msg.value`,
+wrapped product fee, underfunded batch, dispatch-fuel exhaustion), plus the
+four numeral witnesses those arms subsume.
+`verity_tx_universal_zero_remainder_boundary` closes the
+`batchSize + 3 = fuelBudget` zero-remainder corner. Fee-target witness
 `PConsolidationEth1RequestTx.consolidation_fee_target_success` is parent evidence, not a
 child registry theorem. Refund/vault-to-Lido numerals in `PConsolidationEth1RefundTx`
 remain unregistered auxiliary builds from the retired 1a row.

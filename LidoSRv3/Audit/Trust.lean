@@ -180,6 +180,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_revert_partition
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_zero_remainder_boundary
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_composes_value_flow_and_rollback
 #print axioms LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_dropped_refund_leg
 #print axioms LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_misrouted_vault_leg

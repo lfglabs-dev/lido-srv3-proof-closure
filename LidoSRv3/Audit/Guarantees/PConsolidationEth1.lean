@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Guarantees.Registry
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
 import Mathlib.Tactic.SplitIfs
 
 namespace LidoSRv3.Audit.Guarantees.PConsolidationEth1
@@ -340,9 +341,105 @@ theorem verity_tx_universal_success_shape (msgValue batchSize feePerRequest : Na
   _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal.run_success_shape
     msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hle hfuel
 
+section VerityUniversalRevert
+
+open _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx (observe run honest fuelBudget)
+open _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
+  (run_zero_value_reverts run_overflow_reverts run_underfunded_reverts run_exhausts_fuel
+    run_success_at_zero_remainder_boundary)
+
+/-- The Verity-plane non-success partition at `∀`-quantifier strength: one
+universally quantified rollback arm for each revert clause of the abstract
+parent `eth_flow_parent`, plus the model's dispatch-fuel arm.
+
+Every arm is read through `observe`, i.e. through `finalWorld`, so each arm
+asserts transaction-entry rollback of the whole balance sheet, not merely a
+control tag. The premises are the abstract parent's guard conditions stated
+positively; none is dischargeable from the others. -/
+def UniversalRevertPartition : Prop :=
+  (∀ (batchSize feePerRequest : Nat),
+      batchSize < _root_.Verity.Core.Uint256.modulus →
+      observe (run honest 0 batchSize feePerRequest) =
+        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
+          ⟨0, 0, 0, 0, 0, 0, 0⟩⟩) ∧
+  (∀ (msgValue batchSize feePerRequest : Nat),
+      0 < msgValue →
+      msgValue < _root_.Verity.Core.Uint256.modulus →
+      0 < batchSize →
+      batchSize < _root_.Verity.Core.Uint256.modulus →
+      feePerRequest < _root_.Verity.Core.Uint256.modulus →
+      _root_.Verity.Core.Uint256.modulus ≤ batchSize * feePerRequest →
+      observe (run honest msgValue batchSize feePerRequest) =
+        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
+          ⟨msgValue, 0, 0, 0, 0, 0, 0⟩⟩) ∧
+  (∀ (msgValue batchSize feePerRequest : Nat),
+      0 < msgValue →
+      msgValue < _root_.Verity.Core.Uint256.modulus →
+      batchSize < _root_.Verity.Core.Uint256.modulus →
+      feePerRequest < _root_.Verity.Core.Uint256.modulus →
+      batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus →
+      msgValue < batchSize * feePerRequest →
+      observe (run honest msgValue batchSize feePerRequest) =
+        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
+          ⟨msgValue, 0, 0, 0, 0, 0, 0⟩⟩) ∧
+  (∀ (msgValue batchSize feePerRequest : Nat),
+      0 < msgValue →
+      msgValue < _root_.Verity.Core.Uint256.modulus →
+      batchSize < _root_.Verity.Core.Uint256.modulus →
+      feePerRequest < _root_.Verity.Core.Uint256.modulus →
+      batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus →
+      batchSize * feePerRequest ≤ msgValue →
+      29 ≤ batchSize →
+      (29 < batchSize ∨ 0 < msgValue - batchSize * feePerRequest) →
+      observe (run honest msgValue batchSize feePerRequest) =
+        ⟨.exhausted, fuelBudget, ⟨msgValue, 0, 0, 0, 0, 0, 0⟩⟩)
+
+/-- **Registry-facing P-CONSOLIDATION-ETH-1 Verity-plane revert parent (universal).**
+
+Discharges `UniversalRevertPartition` from the frame-by-frame executions in
+`Verity.PConsolidationEth1CompositionTxUniversalRevert`.  This closes the former
+quantifier gap between the abstract parent's `∀`-quantified revert clauses and
+the Verity plane's four numeral rollback witnesses; those witnesses are now
+instances of these arms and are retained as regression facts. -/
+theorem verity_tx_universal_revert_partition : UniversalRevertPartition :=
+  ⟨fun batchSize feePerRequest hnM => run_zero_value_reverts batchSize feePerRequest hnM,
+   fun msgValue batchSize feePerRequest hpos hmv hn hnM hfee hover =>
+     run_overflow_reverts msgValue batchSize feePerRequest hpos hmv hn hnM hfee hover,
+   fun msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hgt =>
+     run_underfunded_reverts msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hgt,
+   fun msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hle hbig hpend =>
+     run_exhausts_fuel msgValue batchSize feePerRequest hpos hmv hnM hfee hnf hle hbig hpend⟩
+
+/-- The exact success/exhaustion boundary corner that the registered success
+parent's conservative `batchSize + 4 ≤ fuelBudget` premise excludes: a funded
+batch with zero remainder still commits when it needs exactly `batchSize + 3`
+frames.  Together with `verity_tx_universal_success_shape` and
+`UniversalRevertPartition` this leaves no word-sized input unclassified between
+the modeled success and non-success arms. -/
+theorem verity_tx_universal_zero_remainder_boundary
+    (msgValue batchSize feePerRequest : Nat)
+    (hpos : 0 < msgValue)
+    (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)
+    (hnM : batchSize < _root_.Verity.Core.Uint256.modulus)
+    (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)
+    (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)
+    (hle : batchSize * feePerRequest ≤ msgValue)
+    (hz : msgValue - batchSize * feePerRequest = 0)
+    (hfuel : batchSize + 3 ≤ fuelBudget) :
+    observe (run honest msgValue batchSize feePerRequest) =
+      ⟨.success, batchSize + 3,
+        ⟨0, 0, 0, 0, 0, batchSize * feePerRequest,
+          msgValue - batchSize * feePerRequest⟩⟩ :=
+  run_success_at_zero_remainder_boundary msgValue batchSize feePerRequest
+    hpos hmv hnM hfee hnf hle hz hfuel
+
+end VerityUniversalRevert
+
 /-- Registry-facing Verity close: the universal funded success shape conjoined
 with executable rollback shapes at all four modeled non-success boundaries
-(zero value, wrapped product, underfunding, and dispatch-fuel exhaustion). -/
+(zero value, wrapped product, underfunding, and dispatch-fuel exhaustion), both
+as the four exact numeral witnesses and — since Wave 6 — at full
+`∀`-quantifier strength via `UniversalRevertPartition`. -/
 theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest : Nat)
     (hpos : 0 < msgValue)
     (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)
@@ -379,10 +476,13 @@ theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest
             _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 30 29 1) =
         ⟨.exhausted,
           _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget,
-          ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ := by
+          ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      UniversalRevertPartition := by
   refine ⟨verity_tx_universal_success_shape msgValue batchSize feePerRequest
     hpos hmv hnM hfee hnf hle hfuel, ?_⟩
-  exact _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest_revert_partition
+  obtain ⟨h1, h2, h3, h4⟩ :=
+    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest_revert_partition
+  exact ⟨h1, h2, h3, h4, verity_tx_universal_revert_partition⟩
 
 theorem verity_tx_composes_value_flow_and_rollback :
     (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
