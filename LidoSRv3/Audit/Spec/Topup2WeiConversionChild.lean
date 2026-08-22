@@ -20,7 +20,7 @@ open PTopup2
 /-- Aligned wei is recovered by dividing by `GWEI`. -/
 theorem valueWei_div_gwei_of_aligned (gwei : Nat) :
     (gwei * GWEI) / GWEI = gwei :=
-  Nat.mul_div_cancel gwei (by decide : GWEI ≠ 0)
+  Nat.mul_div_cancel gwei (by decide : 0 < GWEI)
 
 /-- `transitionBudget` is exactly `min (valueWei / GWEI) (min module block)`.
 This is the definition; the `/ GWEI` is load-bearing, not a comment. -/
@@ -29,15 +29,22 @@ theorem transitionBudget_uses_wei_div_gwei (b : TopupBatch) (cfg : TopupConfig) 
       min (b.valueWei / GWEI) (min cfg.moduleAllocationLimitGwei cfg.maxTopUpPerBlockGwei) :=
   rfl
 
+/-- Five-gwei witness: `valueWei = 5 * GWEI`, module and block caps large. -/
+def alignedFiveGweiBatch : TopupBatch :=
+  { validators := [], requestedGwei := [], allocations := []
+    valueWei := 5 * GWEI, beaconRootTimestamp := 0, currentTimestamp := 0 }
+
+def alignedFiveGweiCfg : TopupConfig :=
+  { targetBalanceGwei := 0, minTopUpGwei := 0
+    maxTopUpPerBlockGwei := 100, maxValidatorsPerCall := 1
+    moduleAllocationLimitGwei := 100, maxRootAge := 0 }
+
 /-- Concrete: `valueWei = 5 * GWEI`, module and block caps large → budget = 5. -/
 theorem aligned_five_gwei_budget :
-    let b : TopupBatch := { validators := [], requestedGwei := [], allocations := [],
-      valueWei := 5 * GWEI, beaconRootTimestamp := 0, currentTimestamp := 0 }
-    let cfg : TopupConfig := { targetBalanceGwei := 0, minTopUpGwei := 0,
-      maxTopUpPerBlockGwei := 100, maxValidatorsPerCall := 1,
-      moduleAllocationLimitGwei := 100, maxRootAge := 0 }
+    let b : TopupBatch := alignedFiveGweiBatch
+    let cfg : TopupConfig := alignedFiveGweiCfg
     transitionBudget b cfg = 5 := by
-  simp [transitionBudget]
+  simp [transitionBudget, alignedFiveGweiBatch, alignedFiveGweiCfg]
   rw [valueWei_div_gwei_of_aligned]
   decide
 

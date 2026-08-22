@@ -22,28 +22,18 @@ open LidoSRv3.Audit.Spec.Topup2WeiConversionChild
 def mutantBudgetRawWei (b : TopupBatch) : Nat :=
   b.valueWei
 
-/-- The five-gwei witness from `aligned_five_gwei_budget`. -/
-def fiveGweiBatch : TopupBatch :=
-  { validators := [], requestedGwei := [], allocations := [],
-    valueWei := 5 * GWEI, beaconRootTimestamp := 0, currentTimestamp := 0 }
-
-def fiveGweiCfg : TopupConfig :=
-  { targetBalanceGwei := 0, minTopUpGwei := 0,
-    maxTopUpPerBlockGwei := 100, maxValidatorsPerCall := 1,
-    moduleAllocationLimitGwei := 100, maxRootAge := 0 }
-
 /-- Kill-line: raw `valueWei` on the five-gwei witness is `5 * 10^9 ≠ 5`.
 The honest conversion is `valueWei / GWEI = 5`. -/
 theorem raw_valueWei_mutant_on_five_gwei_eq_five_billion_ne_five :
-    mutantBudgetRawWei fiveGweiBatch = 5 * 10 ^ 9 ∧
-      mutantBudgetRawWei fiveGweiBatch ≠ 5 ∧
-      transitionBudget fiveGweiBatch fiveGweiCfg = 5 := by
+    mutantBudgetRawWei alignedFiveGweiBatch = 5 * 10 ^ 9 ∧
+      mutantBudgetRawWei alignedFiveGweiBatch ≠ 5 ∧
+      transitionBudget alignedFiveGweiBatch alignedFiveGweiCfg = 5 := by
   refine ⟨?eqWei, ?neFive, aligned_five_gwei_budget⟩
-  · simp [mutantBudgetRawWei, fiveGweiBatch, GWEI]
-  · simp [mutantBudgetRawWei, fiveGweiBatch, GWEI]
+  · simp [mutantBudgetRawWei, alignedFiveGweiBatch, GWEI]
+  · simp [mutantBudgetRawWei, alignedFiveGweiBatch, GWEI]
 
 /-- Honest aligned conversion still holds on that witness. -/
-example : transitionBudget fiveGweiBatch fiveGweiCfg = 5 :=
+example : transitionBudget alignedFiveGweiBatch alignedFiveGweiCfg = 5 :=
   aligned_five_gwei_budget
 
 end LidoSRv3.Tests.PackW2Topup2WeiMutants
