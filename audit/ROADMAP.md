@@ -34,7 +34,7 @@ Resume Accounting, Address, Topup2, Deposit, Topup1, ETH, Consolidation, and SSZ
 
 ## Checked baseline to preserve
 
-- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: OPEN: decode the live summary CALL returndata and bind packed ModuleStateConfig without widening into P-ALLOC-2; storage-backed count with the 32 cap is CHECKED; do not refold the min-clamp child.
+- `P-ALLOC-1` — **IMPLEMENTATION_PENDING**: CHECKED: storage-backed 32-cap, packed ModuleStateConfig decode, and live 96-byte getStakingModuleSummary returndata decode are threaded into allocation under decoded-row correspondence. OPEN: model getTotalModuleStake for type-2 rows and unique moduleAddress/reachable CheckedBounds; do not widen into P-ALLOC-2 or refold the min-clamp child.
 - `P-ALLOC-2` — **IMPLEMENTATION_PENDING**: CHECKED: fuel-bounded full proportional sourceAllocateLoop conservation, bridged to allocateLoop, is in the registered parent alongside amount equality. RANKED NEXT / OPEN: define an independent proportional model loop and prove multi-step RowsCorrespond across mutations; keep the distinct +1 model as a child.
 - `P-DEPOSIT-1` — **IMPLEMENTATION_PENDING**: Keep LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER from deployment artifacts; either reshape TX to one-module/n-frames or retain the explicit two-batch limitation.
 - `P-TOPUP-1` — **IMPLEMENTATION_PENDING**: Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.

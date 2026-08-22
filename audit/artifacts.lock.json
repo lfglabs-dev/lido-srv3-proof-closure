@@ -12,7 +12,7 @@
     },
     "verity": {
       "repository": "https://github.com/lfglabs-dev/verity.git",
-      "commit": "a063bfc869735045354ebc3862ca08859da0f56e"
+      "commit": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
     },
     "evmyullean": {
       "repository": "https://github.com/lfglabs-dev/EVMYulLean.git",

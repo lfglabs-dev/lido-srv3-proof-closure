@@ -41,7 +41,7 @@ ASSUMPTION_FIELDS = {
 }
 PINNED = {
     "lido_core": ("https://github.com/lidofinance/core.git", "af095e48bbc1c3841c2c9936219c8461af01056b"),
-    "verity": ("https://github.com/lfglabs-dev/verity.git", "a063bfc869735045354ebc3862ca08859da0f56e"),
+    "verity": ("https://github.com/lfglabs-dev/verity.git", "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"),
     "evmyullean": ("https://github.com/lfglabs-dev/EVMYulLean.git", "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"),
     "mathlib": ("https://github.com/leanprover-community/mathlib4.git", "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"),
 }
@@ -61,7 +61,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "a9bb6aa2b4c850a400d98a87fb023dde58dc80c1c2815d2147a2b293d6d31ea9",
+    "P-ALLOC-1": "8abca63138a78345a218235371611a7c1e2ab4927cd5a7808a31cf63a120be16",
     "P-ALLOC-2": "c49e1d6e1d75bc5f95a22159d4403dbe4212fd594359d75e1c56056658604159",
     "P-DEPOSIT-1": "b99c5534cc2faf7d71956e1b306cd3646873cfc87e7d8c8d42d72f6fffb307fd",
     "P-TOPUP-1": "7097df87332a3b9f4996ae897b5619947c71d4bdc547dad407759174fa62212f",
