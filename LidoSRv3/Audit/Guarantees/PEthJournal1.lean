@@ -12,15 +12,8 @@ namespace LidoSRv3.Audit.Guarantees.PEthJournal1
 
 open LidoSRv3.Audit.Guarantees.PConsolidationEth1
 open LidoSRv3.Audit.SolidityTopup
-
-namespace Confinement :=
-  LidoSRv3.Audit.Spec.EthJournalConfinement
-
-namespace ConsolidationJournal :=
-  LidoSRv3.Audit.Spec.EthJournalCorrespondence
-
-namespace DepositTx :=
-  LidoSRv3.Audit.Verity.DepositParentTx
+open LidoSRv3.Audit.Spec.EthJournalConfinement
+open LidoSRv3.Audit.Spec.EthJournalCorrespondence
 
 /-- Composition parent: every leg of each premise-satisfying modeled success
 journal has a frozen `ApprovedDestination`.
@@ -31,32 +24,33 @@ wrap-to-zero schedule.  The consolidation equation selects the successful
 fee/refund arm.  The final named conjunct keeps the former Vault-to-Lido and
 WithdrawalQueue protocol-return paths outside this parent. -/
 theorem every_modeled_success_journal_approved
-    (depositInputs : DepositTx.Inputs)
+    (depositInputs : LidoSRv3.Audit.Verity.DepositParentTx.Inputs)
     (depositEntry : _root_.Verity.ContractState)
     (topupAllocations : List Nat)
     (approved : ApprovedSet)
     (msgValue batchSize fee : Nat)
     (consolidationMoves : List EthMove)
-    (_hDeposit : DepositTx.Preconditions depositInputs depositEntry)
+    (_hDeposit :
+      LidoSRv3.Audit.Verity.DepositParentTx.Preconditions depositInputs depositEntry)
     (_hTopupValueMoving : allocSumUnchecked topupAllocations ≠ 0)
     (hDistinct : approved.refundRecipient ≠ approved.consolidationContract)
     (hConsolidation :
       gatewayExecute approved msgValue batchSize fee = .success consolidationMoves) :
-    Confinement.EveryModeledSuccessJournalApproved
-        (Confinement.depositCandidate depositInputs)
-        (Confinement.topupCandidate topupAllocations)
-        (Confinement.consolidationCandidate consolidationMoves) ∧
-      Confinement.ProtocolReturnPathsExcluded consolidationMoves := by
+    EveryModeledSuccessJournalApproved
+        (depositCandidate depositInputs)
+        (topupCandidate topupAllocations)
+        (consolidationCandidate consolidationMoves) ∧
+      ProtocolReturnPathsExcluded consolidationMoves := by
   have hProjection :=
-    ConsolidationJournal.success_journal_projects_to_spec
+    success_journal_projects_to_spec
       approved hDistinct msgValue batchSize fee
   rw [hConsolidation] at hProjection
   exact
-    ⟨⟨Confinement.depositCandidate_approved depositInputs,
-       Confinement.topupCandidate_approved topupAllocations,
-       Confinement.consolidationCandidate_approved_of_projected
+    ⟨⟨depositCandidate_approved depositInputs,
+       topupCandidate_approved topupAllocations,
+       consolidationCandidate_approved_of_projected
          consolidationMoves hProjection.1⟩,
-     Confinement.protocolReturnPathsExcluded_of_projected
+     protocolReturnPathsExcluded_of_projected
        consolidationMoves hProjection.1⟩
 
 end LidoSRv3.Audit.Guarantees.PEthJournal1
