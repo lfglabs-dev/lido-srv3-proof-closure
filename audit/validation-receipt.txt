@@ -1,11 +1,36 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: dc75292d265ab95d95a0121a7fed6b3acd4ca789
+validated-tree: 6b6b85f230a30c5731b317763942eb181273a8a8
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Leftover Wave 3 integrator (2026-08-22)
+---------------------------------------
+
+- Rebind `validated-tree` to `6b6b85f230a30c5731b317763942eb181273a8a8`, the
+  tracked tree of `cursor/w3-integrate-f120` excluding this receipt.
+- Registers six supplemental leftover-close parents. Cherry-pick only; no
+  N-way merge. Winning model: Fable on ALLOC-exec and oracle mint/supply
+  (Sol lost on statement strength — helper-not-live-run, and a two-ID
+  split with no extra strength). Sol on ETH journal, claim batch, and
+  consolidation value (single attempts). Fable on SSZ live (single).
+  Parents: `allocated_amount_times_deposit_size`,
+  `every_modeled_success_journal_approved`, `oracle_supply_mint_and_cap`,
+  `p_address_batch_1_fuel_bounded_live_claim_batch`,
+  `production_witness_admission_correspondence`,
+  `justified_interpreter_forwards_exactly_msg_value`.
+- Minimal-11 facade stays 11. P-DEREF-1 stays supplemental. Named hyps
+  stay named. Deployed artifacts, HashIdentification / A-SHA256-FFI,
+  official denotation success, bus, live WQ CALL, keccak physical maps,
+  unbounded ADDRESS equivariance, VaultHub, pause row, submitReportData
+  split, and P-DEREF-1 promotion stay out.
+- Verification: Wave 3 module `lake build` and Trust exit 0;
+  `scripts/check_validation_receipt.py`, `scripts/audit_metadata.py check`,
+  `scripts/check_public_claim_surfaces.py`, and
+  `scripts/check_no_python_evidence.sh` exit 0.
 
 Leftover Wave 2 integrator (2026-08-22)
 ---------------------------------------
