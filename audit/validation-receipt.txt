@@ -1,11 +1,22 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: fc1639d91dc85df859896991347ddbfd5b8f8117
+validated-tree: 56d19e4a64ffa31ef2e22abf968551103d91281e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Pack C hash identification + verifyProof/gindex (2026-08-22)
+----------------------------------------------------------
+
+- Rebind `validated-tree` to `56d19e4a64ffa31ef2e22abf968551103d91281e`, the
+  tracked tree of `cursor/pack-c-ssz-hash-gindex-f120` excluding this receipt.
+- Named `HashIdentification` hyp (opaque `sha256` vs `Sha256Engine.sha256`)
+  stays undischarged. `verifyProof = true` implies `HasGeneralizedIndex`.
+  Skip-gindex mutant is rejected. No deployed SHA/Yul or EIP-4788 claim.
+- Verification: `lake build LidoSRv3.Audit.Spec.SszCorrespondence
+  LidoSRv3.Tests.PackCSszMutants` exit 0.
 
 Pack B Spec.EthJournal projection (2026-08-22)
 ---------------------------------------------
