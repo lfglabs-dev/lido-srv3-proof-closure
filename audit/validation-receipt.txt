@@ -1,11 +1,23 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: c938cdaf03fbceaec8866c65f0dacce69fa88636
+validated-tree: b4b1575a3c4b95c8ae355435302212b40cb09ebd
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Pack F consolidation observe/payloads (2026-08-22)
+-------------------------------------------------
+
+- Rebind `validated-tree` to `b4b1575a3c4b95c8ae355435302212b40cb09ebd`, the
+  tracked tree of `cursor/pack-f-consolidation-observe-f120` excluding this
+  receipt.
+- Unregistered child: success `observe` rereads source/target maps via
+  `readPayloads`. Swapped-map mutant is rejected. Gateway/bus stay out.
+  No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
+  LidoSRv3.Tests.PackFConsolidationObserveMutants` exit 0.
 
 Pack E OracleFrame fee/share + Eugene citation (2026-08-22)
 ----------------------------------------------------------
