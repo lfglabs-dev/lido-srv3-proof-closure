@@ -7,6 +7,10 @@ This module gives the live `claimWithdrawalsTo` loop a list-inductive
 precondition.  Each constructor checks one request against the state produced
 by the preceding constructor, so the predicate covers every request and hint
 in the batch rather than only fixed numeral witnesses.
+
+Recipient-renaming equivariance remains open in this slice. The registered
+parent is the payout-equals-entry-read correspondence below; it does not
+replace that gap with a vacuous proposition.
 -/
 
 namespace LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
