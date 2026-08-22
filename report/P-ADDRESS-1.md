@@ -23,7 +23,7 @@ CHECKED does not mean pinned Solidity, the full claim batch, singleton-actor exc
 
 Ranked next work: generalize the live-batch source/equivariance correspondence, then bridge physical keccak mapping layout and the remaining owner-set/event/callee semantics without adding singleton-actor functions; do not call all four writers permissionless.
 
-Theorems: `PAddress1.universal_address_writer_equivariance` (parent), `PAddress1.abstract_source_verity_tx_address_equivariance` (four projections), `PAddress1.bounded_live_claim_batch_storage_call_surface` (live-shaped batch increment), `AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent` and `AddressSourceMutants.fixed_payout_recipient_mutant_kill_line` (kill-lines).
+Theorems: `PAddress1.universal_address_writer_equivariance` (parent), `PAddress1.abstract_source_verity_tx_address_equivariance` (four projections), `PAddress1.bounded_live_claim_batch_storage_call_surface` (live-shaped batch increment), `AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent` (admission-side kill-line), `AddressSourceMutants.fixed_owner_writer_kill_line_refutes_parent` (write-side kill-line), and `AddressSourceMutants.fixed_payout_recipient_mutant_kill_line` (batch journal kill-line).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent

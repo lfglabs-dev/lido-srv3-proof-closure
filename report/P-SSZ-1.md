@@ -4,13 +4,12 @@
 
 SRv3 believes facts about consensus-layer validators only through SSZ Merkle proofs. A caller hands a gateway a witness; the verifier folds the branch and compares it to a trusted root; the deposit path recomputes a deposit-data root from pubkey, withdrawal credentials, amount, and signature.
 
-P-SSZ-1 registers one conjunct of that picture, on a model where `Node = Nat` and the combiner is `Nat.pair` rather than SHA-256:
+P-SSZ-1 registers bidirectional reconstruction as the frozen Spec `SszWitness.Correspondence` on a model where `Node = Nat` and the combiner is `Nat.pair` rather than SHA-256:
 
-- reconstruction: the witness derived from one deposit $src$ folds back to that deposit's own root,
-  $\mathrm{traverseBranch}\;(\mathrm{sourceCombine}\;src)\;\ldots = \mathrm{sourceNode}\;src$
-- one object at the abstract type: concat operand, digest bytes, and tx input are derived from $src$, so a witness for one deposit cannot be paired with another deposit's root on that plane
+- construction: a well-formed deposit $src$ binds `sourceWitness src` to `sourceNode src` at `.clValidatorVerifier`
+- determination: any verified witness at that root equals `sourceWitness src`
 
-Unregistered but still proved: pinned widths, the seven-call digest shape, `sourceConcat = specConcat`, accept-iff-root-match. `swapped_combine_kill_line_refutes_parent` swaps child order at a concrete valid witness. TX persists those observables, rereads them from storage, and restores the snapshot on failure.
+Deposit uniqueness is the named `PerfectDepositEncoding` (`A-PERFECT-HASH`) child `deposit_unique_of_perfect`, not a parent conjunct. `sourceNode_mutant_kill_line_refutes_parent` increments `encode` and keeps `wellFormedDeposit`. The one-object traversal child `composed_ssz_encoding` remains; `swapped_combine_kill_line_refutes_parent` is that child's kill-line. TX persists those observables, rereads them from storage, and restores the snapshot on failure.
 
 We do not prove `SSZ.verifyProof` on production gindices, SHA-256 (`A-SHA256-FFI`), or the imported-to-deployed Yul fragment (OPEN).
 
@@ -22,8 +21,17 @@ CHECKED does not mean a Merkle proof was verified, that generalized indices are 
 
 Ranked next work: preserve the checked `txInputFromComposed` one-object TX theorem; decide separately whether to restrict the general `EncodingInput` API. Keep SHA obligations split and Yul visibly OPEN.
 
-Theorems: `PSsz1.composed_ssz_encoding` (registered parent; concludes the named predicate `PSsz1.composedEncodingOk`, stripped in wave 6 to the single mutant-exercised traversal conjunct), `PSsz1.swapped_combine_kill_line_refutes_parent` (parent kill-line: negates the `sourceCombineSwapped` model-mutant-substituted parent at a concrete witness where every premise and `hBind` hold), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness` (conclusion-non-triviality witness on the unregistered full bundle `PSsz1.composedEncodingOkFull`: the bundle discriminates the claimed operation; renamed in wave 6 from `crossed_witness_kill_line_refutes_parent`), `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle, not registered claim content), `PSsz1.verity_tx_simulates_ssz_encoding`.
-Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`.
+Theorems: `PSsz1.deposit_root_iff` (registered parent; named Spec `SszWitness.Correspondence`), `PSsz1.sourceNode_mutant_kill_line_refutes_parent` (parent-shaped kill-line), `PSsz1.deposit_unique_of_perfect` (unregistered uniqueness child under `PerfectDepositEncoding`), `PSsz1.composed_ssz_encoding` (traversal child; concludes `composedEncodingOk`), `PSsz1.swapped_combine_kill_line_refutes_parent` (traversal-child kill-line), `PSsz1.composedEncodingOkFull_not_trivial_crossed_witness`, `PSsz1.composed_ssz_encoding_full` (unregistered demoted bundle), `PSsz1.verity_tx_simulates_ssz_encoding`.
+Assumptions: `A-SHA256-FFI`, `A-PERFECT-HASH`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`.
+
+## Wave 0 (2026-08-22)
+
+Registered parent is now `deposit_root_iff` as `Spec.SszWitness.Correspondence`.
+The uniqueness conjunct that restated `PerfectDepositEncoding` is demoted to
+`deposit_unique_of_perfect`. The parent-shaped kill-line
+`sourceNode_mutant_kill_line_refutes_parent` mutates `encode` to
+`sourceNode + 1` and retains `wellFormedDeposit`. `composed_ssz_encoding`
+stays the traversal child; its kill-line is unchanged.
 
 ## Wave 6 changes (2026-08-19)
 

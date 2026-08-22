@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Ssz
+import LidoSRv3.Audit.Spec
 import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 
 /-!
@@ -7,11 +8,12 @@ import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 Structural model only: `Node = Nat`, `structuralCombine = Nat.pair`, and `sha256`
 remains opaque in `DepositDataRootCorrespondence`. This module packages the
 construction and determination directions of deposit-root binding at the
-`.clValidatorVerifier` slot.
+`.clValidatorVerifier` slot as the frozen Spec `SszWitness.Correspondence`.
 
 `PerfectDepositEncoding` records the `A-PERFECT-HASH` hypothesis: on
 well-formed deposits (pinned 48/32/96-byte widths) the encoding
-`sourceNode` is injective. SHA-256 correctness is not proved here.
+`sourceNode` is injective. It is a named hypothesis for the unregistered
+uniqueness child, not a parent conjunct. SHA-256 correctness is not proved here.
 -/
 
 namespace LidoSRv3.Audit.SszDepositEquivalence
@@ -213,7 +215,8 @@ theorem deposit_verified_witness_eq_sourceWitness
     { operation := op, validator := val, index := idx, pivotBoundary := piv, path := path,
       branch := branch } (sourceWitness src) hOperation hValidator' hIndex hPivot hPath hBranch'
 
-/-- Determination uniqueness under `PerfectDepositEncoding`. -/
+/-- Determination uniqueness under `PerfectDepositEncoding`. Unregistered
+child: this is the named hypothesis applied, not registered parent content. -/
 theorem deposit_verified_source_unique
     (src src' : SourceDepositDataRootInput)
     (hWellFormed : wellFormedDeposit src)
@@ -221,6 +224,17 @@ theorem deposit_verified_source_unique
     (hPerfect : PerfectDepositEncoding) :
     sourceNode src' = sourceNode src → src' = src :=
   fun hEq => hPerfect src' src hWellFormed' hWellFormed hEq
+
+/-- Unregistered uniqueness child under the named `PerfectDepositEncoding`
+hypothesis. Not a parent conjunct: restating the hypothesis inside
+`deposit_root_iff` was a tautology. -/
+theorem deposit_unique_of_perfect
+    (src src' : SourceDepositDataRootInput)
+    (hWellFormed : wellFormedDeposit src)
+    (hWellFormed' : wellFormedDeposit src')
+    (hPerfect : PerfectDepositEncoding) :
+    sourceNode src' = sourceNode src → src' = src :=
+  deposit_verified_source_unique src src' hWellFormed hWellFormed' hPerfect
 
 /-- Construction direction: a well-formed deposit binds its derived witness. -/
 theorem wellFormed_deposit_binds_sourceWitness (src : SourceDepositDataRootInput)
@@ -230,20 +244,74 @@ theorem wellFormed_deposit_binds_sourceWitness (src : SourceDepositDataRootInput
   simpa [depositVerified] using
     sourceWitness_binds_sourceNode src hPublicKey hWithdrawalCredentials hSignature
 
-/-- Bidirectional deposit-root equivalence at the structural layer. -/
+/-- Source instantiation of the frozen Spec SSZ interface. -/
+def depositSszWitness :
+    Spec.SszWitness SourceDepositDataRootInput Ssz.ValidatorWitness Ssz.Node where
+  encode := sourceNode
+  verify := depositVerified
+  witnessOf := sourceWitness
+
+/-- Bidirectional deposit-root equivalence at the structural layer. The
+registered conclusion is the named Spec correspondence (construction plus
+witness determination). Deposit uniqueness stays the named
+`PerfectDepositEncoding` child. -/
 theorem deposit_root_iff (src : SourceDepositDataRootInput)
-    (hWellFormed : wellFormedDeposit src) (hPerfect : PerfectDepositEncoding) :
-    depositVerified (sourceWitness src) (sourceNode src) ∧
-      (∀ witness root,
-        depositVerified witness root →
-          root = sourceNode src →
-            witness = sourceWitness src ∧
-              ∀ src', wellFormedDeposit src' →
-                sourceNode src' = sourceNode src → src' = src) := by
+    (hWellFormed : wellFormedDeposit src) :
+    Spec.SszWitness.Correspondence depositSszWitness src := by
   refine ⟨wellFormed_deposit_binds_sourceWitness src hWellFormed, ?_⟩
   intro witness root hVerified hRoot
-  refine ⟨deposit_verified_witness_eq_sourceWitness src witness root hVerified hRoot, ?_⟩
-  intro src' hWellFormed' hEq
-  exact deposit_verified_source_unique src src' hWellFormed hWellFormed' hPerfect hEq
+  exact deposit_verified_witness_eq_sourceWitness src witness root hVerified hRoot
+
+/-- Mutant of the one model function `sourceNode` / `encode`: increment the
+honest root. Premises (`wellFormedDeposit`) are retained. -/
+def sourceNodeMutant (src : SourceDepositDataRootInput) : Ssz.Node :=
+  sourceNode src + 1
+
+def depositSszWitnessMutantRoot :
+    Spec.SszWitness SourceDepositDataRootInput Ssz.ValidatorWitness Ssz.Node where
+  encode := sourceNodeMutant
+  verify := depositVerified
+  witnessOf := sourceWitness
+
+/-- Pinned-width witness inhabiting the parent. Widths match
+`Tests.SszRegression.compositionSrc`. -/
+def killLineSrc : SourceDepositDataRootInput := {
+  withdrawalCredentials := List.replicate 32 1
+  publicKey := List.replicate 48 2
+  signature := List.replicate 96 3
+  amountGwei := 32_000_000_000
+  withdrawalCredentialsBounded := by
+    intro byte h
+    simpa using (List.eq_of_mem_replicate h) ▸ (by decide : (1 : Nat) < 256)
+  publicKeyBounded := by
+    intro byte h
+    simpa using (List.eq_of_mem_replicate h) ▸ (by decide : (2 : Nat) < 256)
+  signatureBounded := by
+    intro byte h
+    simpa using (List.eq_of_mem_replicate h) ▸ (by decide : (3 : Nat) < 256)
+  amountGweiBounded := by decide }
+
+theorem killLineSrc_wellFormed : wellFormedDeposit killLineSrc :=
+  ⟨by decide, by decide, by decide⟩
+
+theorem sourceNode_mutant_not_verified (src : SourceDepositDataRootInput)
+    (hWellFormed : wellFormedDeposit src) :
+    ¬ depositVerified (sourceWitness src) (sourceNodeMutant src) := by
+  intro hMut
+  have hHonest := wellFormed_deposit_binds_sourceWitness src hWellFormed
+  have hMutRoot := (Ssz.structural_witness_binding_sound hMut).2.2.2.2
+  have hHonestRoot := (Ssz.structural_witness_binding_sound hHonest).2.2.2.2
+  have hEq : sourceNode src + 1 = sourceNode src := hMutRoot.symm.trans hHonestRoot
+  exact (Nat.succ_ne_self (sourceNode src)) hEq
+
+/-- Parent-shaped kill-line: negate `deposit_root_iff` after substituting the
+`sourceNode + 1` mutant for `encode`. `wellFormedDeposit` is retained and
+inhabited by `killLineSrc`. -/
+theorem sourceNode_mutant_kill_line_refutes_parent :
+    ¬ (∀ src, wellFormedDeposit src →
+        Spec.SszWitness.Correspondence depositSszWitnessMutantRoot src) := by
+  intro hMutantParent
+  have hCorr := hMutantParent killLineSrc killLineSrc_wellFormed
+  exact sourceNode_mutant_not_verified killLineSrc killLineSrc_wellFormed hCorr.1
 
 end LidoSRv3.Audit.SszDepositEquivalence
