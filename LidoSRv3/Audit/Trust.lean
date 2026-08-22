@@ -44,6 +44,8 @@ import LidoSRv3.Audit.Spec.AllocationCorrespondence
 import LidoSRv3.Tests.PackAAllocSpecMutants
 import LidoSRv3.Audit.Spec.EthJournalCorrespondence
 import LidoSRv3.Tests.PackBEthJournalMutants
+import LidoSRv3.Audit.Spec.SszCorrespondence
+import LidoSRv3.Tests.PackCSszMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -90,6 +92,10 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.EthJournalCorrespondence.success_journal_projects_to_spec
 #print axioms LidoSRv3.Tests.PackBEthJournalMutants.third_destination_other_kill_line_refutes_spec_journal
 #print axioms LidoSRv3.Tests.PackBEthJournalMutants.third_destination_lido_kill_line_refutes_spec_journal
+#print axioms LidoSRv3.Audit.Spec.SszCorrespondence.verifyProof_implies_gindex
+#print axioms LidoSRv3.Audit.Spec.SszCorrespondence.gindex_concat_matches_spec
+#print axioms LidoSRv3.Tests.PackCSszMutants.skip_gindex_kill_line_refutes_structural_child
+#print axioms LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
