@@ -3,6 +3,8 @@ import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Spec
 import LidoSRv3.Audit.Spec.AllocationCorrespondence
 import LidoSRv3.Tests.PackAAllocSpecMutants
+import LidoSRv3.Audit.Spec.EthJournalCorrespondence
+import LidoSRv3.Tests.PackBEthJournalMutants
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Strategy
 import LidoSRv3.Audit.StrategyProofs
