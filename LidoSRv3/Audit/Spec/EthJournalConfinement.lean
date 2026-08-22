@@ -105,9 +105,13 @@ theorem consolidationCandidate_approved_of_projected
       cases hDest : EthJournalCorrespondence.specDest move.destination with
       | none => exact absurd hDest hMove
       | some dest =>
-          simp [consolidationCandidate, candidateOfSpec,
-            EthJournalCorrespondence.specJournal, EthJournalCorrespondence.specOfMove,
-            hDest, ih hRest]
+          rw [EthJournalCorrespondence.specJournal, List.filterMap_cons,
+            EthJournalCorrespondence.specOfMove, hDest, candidateOfSpec, List.map_cons]
+          change
+            ({ dest := some dest, wei := ⟨move.amount⟩ } :: consolidationCandidate rest) =
+              ({ dest := some dest, wei := ⟨move.amount⟩ } ::
+                candidateOfSpec (EthJournalCorrespondence.specJournal rest))
+          rw [ih hRest]
 
 /-- Total Spec projection also proves the named exclusion conjunct. -/
 theorem protocolReturnPathsExcluded_of_projected
@@ -119,10 +123,12 @@ theorem protocolReturnPathsExcluded_of_projected
   have hDest := hProjected move hMem
   constructor
   · intro hLido
-    subst hLido
-    exact hDest EthJournalCorrespondence.specDest_lido
+    apply hDest
+    rw [hLido]
+    rfl
   · intro hQueue
-    subst hQueue
-    exact hDest rfl
+    apply hDest
+    rw [hQueue]
+    rfl
 
 end LidoSRv3.Audit.Spec.EthJournalConfinement
