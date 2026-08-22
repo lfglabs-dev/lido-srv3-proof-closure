@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Spec.AllocExecCorrespondence
 import LidoSRv3.Audit.Guarantees.PDeposit1
+import LidoSRv3.Audit.Guarantees.Registry
 
 /-!
 # Node 1 composition parent: allocated validator counts to executed wei
@@ -25,9 +26,8 @@ the unit multiply carried by `ExecutesAllocation` is exactly what was
 missing, and it is falsifiable
 (`LidoSRv3.Tests.PackN1AllocExecMutants.skewed_wei_falsifies_bridge`).
 
-Unregistered until the integrator writes the supplemental YAML row; no
-guarantee ID is invented here and `Registry.lean` / `AllGuarantees.lean` are
-untouched.
+Registered as supplemental `P-ALLOC-EXEC-1`; not in the immutable
+minimal-11 facade.
 -/
 
 namespace LidoSRv3.Audit.Guarantees.PAllocExec1
@@ -36,6 +36,10 @@ open LidoSRv3.Audit
 open LidoSRv3.Audit.SolidityDeposit
 open LidoSRv3.Audit.Verity.DepositParentTx
 open LidoSRv3.Audit.Spec.AllocExecCorrespondence
+
+/-- Supplemental composition parent. Abstract/source checked; no dedicated
+`Contract.run` theorem on this row. -/
+def guarantee : Guarantee := ⟨.pAllocExec1, [.model, .source]⟩
 
 /--
 Composition parent for Node 1.  For every source deposit configuration and

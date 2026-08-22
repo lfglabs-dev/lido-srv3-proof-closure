@@ -12,6 +12,8 @@ inductive Id
   | pAlloc1 | pAlloc2 | pDeposit1 | pTopup1 | pAccount1 | pReserve1
   | pConsolidationEth1 | pAddress1 | pTopup2 | pConsolidation1 | pSsz1
   | pDeref1 | pReserveRelational
+  | pAllocExec1 | pEthJournal1 | pOracleSupply1
+  | pAddressBatch1 | pSszLive1 | pConsolidationValue1
   deriving DecidableEq, Repr
 
 def Id.text : Id → String
@@ -28,6 +30,12 @@ def Id.text : Id → String
   | .pSsz1 => "P-SSZ-1"
   | .pDeref1 => "P-DEREF-1"
   | .pReserveRelational => "P-RESERVE-RELATIONAL"
+  | .pAllocExec1 => "P-ALLOC-EXEC-1"
+  | .pEthJournal1 => "P-ETH-JOURNAL-1"
+  | .pOracleSupply1 => "P-ORACLE-SUPPLY-1"
+  | .pAddressBatch1 => "P-ADDRESS-BATCH-1"
+  | .pSszLive1 => "P-SSZ-LIVE-1"
+  | .pConsolidationValue1 => "P-CONSOLIDATION-VALUE-1"
 
 inductive CheckedLayer
   /-- An abstract semantic model with machine-checked properties. -/

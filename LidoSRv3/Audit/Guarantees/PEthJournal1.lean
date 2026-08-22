@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Spec.EthJournalConfinement
+import LidoSRv3.Audit.Guarantees.Registry
 
 /-!
 # P-ETH-JOURNAL-1 composition parent
@@ -14,6 +15,10 @@ open LidoSRv3.Audit.Guarantees.PConsolidationEth1
 open LidoSRv3.Audit.SolidityTopup
 open LidoSRv3.Audit.Spec.EthJournalConfinement
 open LidoSRv3.Audit.Spec.EthJournalCorrespondence
+
+/-- Supplemental composition parent. Abstract/source checked; Vault→Lido and
+WithdrawalQueue protocol-return paths stay named-out. -/
+def guarantee : Guarantee := ⟨.pEthJournal1, [.model, .source]⟩
 
 /-- Composition parent: every leg of each premise-satisfying modeled success
 journal has a frozen `ApprovedDestination`.

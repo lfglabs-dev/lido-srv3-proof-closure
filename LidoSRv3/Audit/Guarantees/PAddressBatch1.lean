@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
+import LidoSRv3.Audit.Guarantees.Registry
 
 /-!
 # P-ADDRESS-BATCH-1: fuel-bounded live claim loop
@@ -14,6 +15,10 @@ open _root_.Verity
 open _root_.Verity.EVM.Uint256
 open LidoSRv3.Audit.Verity.AddressClaimBatchTx
 open LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
+
+/-- Supplemental fuel-bounded live-loop parent. Does not weaken
+`PAddress1.universal_address_writer_equivariance`. -/
+def guarantee : Guarantee := ⟨.pAddressBatch1, [.model, .source, .verityTx]⟩
 
 /-- Registered fuel-bounded parent for the live `claimWithdrawalsTo` loop. -/
 theorem p_address_batch_1_fuel_bounded_live_claim_batch
