@@ -1,13 +1,14 @@
-import LidoSRv3.Audit.Verity.PEth1RequestTx
+import LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx
 
 /-!
-Discriminating mutants for the P-ETH-1b bus/request `Contract.run` ledger.
+Discriminating mutants for the P-CONSOLIDATION-ETH-1 fee-leg (former P-CONSOLIDATION-ETH-1b) `Contract.run`
+ledger — parent evidence under `A-CANONICAL-REQUEST-ADDRESS`, not a sibling row.
 -/
 
-namespace LidoSRv3.Tests.PEth1RequestTxMutants
+namespace LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
 
 open _root_.Verity
-open LidoSRv3.Audit.Verity.PEth1RequestTx
+open LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx
 
 private def before : Ledger := ⟨3, 1, 20, 2, 4⟩
 
@@ -55,4 +56,4 @@ theorem keep_first_consolidation_fee_rejected :
 #check bus_failure_restores_snapshot
 #check consolidation_prefix_failure_restores_snapshot
 
-end LidoSRv3.Tests.PEth1RequestTxMutants
+end LidoSRv3.Tests.PConsolidationEth1RequestTxMutants

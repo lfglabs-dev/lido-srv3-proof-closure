@@ -30,8 +30,15 @@ CLAIMS = {
         # bridge (`LinksSource`), the two arithmetic links it needs, and the
         # witness proving its hypotheses jointly satisfiable are all part of the
         # public surface.
+        # `canonicalDepositContractAddress` / `thirtyTwoEtherWei` pin the two
+        # deployment constants named by A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER,
+        # and `verity_tx_revert_restores_snapshot` is the hypothesis-free
+        # executable rollback theorem the composed claim consumes, so all three
+        # are part of the public surface.
         "declarations": (
             ("def", "guarantee"),
+            ("def", "canonicalDepositContractAddress"),
+            ("def", "thirtyTwoEtherWei"),
             ("theorem", "revert_restores_state_value_and_logs"),
             ("theorem", "source_deposit_conserves_and_rolls_back"),
             ("theorem", "source_router_balance_unchanged"),
@@ -40,6 +47,7 @@ CLAIMS = {
             ("structure", "LinksSource"),
             ("theorem", "linked_total_eq_pushedValue"),
             ("theorem", "linked_total_eq_depositsValue"),
+            ("theorem", "verity_tx_revert_restores_snapshot"),
             ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
             ("def", "canonicalSourceConfig"),
             ("def", "canonicalSourceInput"),
@@ -50,7 +58,10 @@ CLAIMS = {
     "P-TOPUP-1": {
         "abstract_theorem": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
         "verity_status": "CHECKED",
-        "verity_theorem": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source",
+        "verity_theorem": (
+            "LidoSRv3.Audit.Guarantees.PTopup1."
+            "verity_tx_simulates_source_with_nonzero_wrap_close"
+        ),
         "module": "PTopup1",
         "layers": ".model, .abstractTx, .source, .verityTx",
         "imports": (
@@ -69,8 +80,14 @@ CLAIMS = {
         # (Wave 5: the wrap discharge moved from a statement about the
         # finer-grained parent reading to `run` itself, hence the rename.
         # Wave 6: wrap-implies-revert became wrap-precludes-value-moving-commit.)
+        # `canonicalBeaconDepositAddress` pins the A-TOPUP-BEACON-DEPOSIT
+        # constant; the three `verity_*wrap*` theorems and
+        # `VerityCommittingSimulation` are the nonzero-wrap closure the
+        # registered parent `verity_tx_simulates_source_with_nonzero_wrap_close`
+        # composes on top of `verity_tx_simulates_source`.
         "declarations": (
             ("def", "guarantee"),
+            ("def", "canonicalBeaconDepositAddress"),
             ("theorem", "valid_result_preserves_router_order"),
             ("theorem", "revert_restores_state_value_and_logs"),
             ("theorem", "source_wrap_precludes_value_moving_commit"),
@@ -83,6 +100,11 @@ CLAIMS = {
             ("theorem", "source_unchecked_accumulation_faithful"),
             ("theorem", "source_pinned_config_discharges_pubkey_guard"),
             ("theorem", "verity_tx_simulates_source"),
+            ("theorem", "verity_wrap_to_zero_is_empty_commit"),
+            ("theorem", "verity_nonzero_wrap_witness_reverts_and_restores"),
+            ("theorem", "verity_nonzero_wrap_reverts_and_restores"),
+            ("def", "VerityCommittingSimulation"),
+            ("theorem", "verity_tx_simulates_source_with_nonzero_wrap_close"),
         ),
     },
 }

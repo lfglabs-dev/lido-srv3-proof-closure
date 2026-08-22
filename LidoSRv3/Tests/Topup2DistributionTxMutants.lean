@@ -13,9 +13,9 @@ private def word (n : Nat) : Word := Verity.Core.Uint256.ofNat n
 
 private def words (xs : List Nat) : List Word := xs.map word
 
-private def runView (effective pending requested : List Word)
+private def runView (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
-  let before := stateFor effective pending requested defaultState
+  let before := stateFor effective pending requested topUpLimits defaultState
   observe (List.replicate requested.length 0) remainingCap
     ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run
       before)
@@ -24,6 +24,7 @@ private def runView (effective pending requested : List Word)
 right.  The first takes its 6-gwei request; the second is capped at 4. -/
 example :
     runView (words [32, 40]) (words [0, 0]) (words [6, 8])
+      (words [32, 24])
       (word 64) (word 1) (word 10) (word 100) (word 100) =
       ⟨.committed, words [6, 4], word 0, word 10⟩ := by native_decide
 
@@ -31,16 +32,33 @@ example :
 5. -/
 example :
     runView (words [32, 40]) (words [0, 0]) (words [6, 8])
+      (words [32, 24])
       (word 64) (word 1) (word 10) (word 100) (word 100) ≠
       ⟨.committed, words [6, 5], word 0, word 11⟩ := by native_decide
+
+/-- The decoded live per-key limit is load-bearing: a request above the
+gateway-produced 32-gwei limit is capped at 32. -/
+example :
+    runView (words [32]) (words [0]) (words [40]) (words [32])
+      (word 64) (word 1) (word 100) (word 100) (word 100) =
+      ⟨.committed, words [32], word 68, word 32⟩ := by native_decide
+
+/-- A supplied limit array that does not equal the gateway evaluation output
+fails closed instead of silently using a hidden derived constant. -/
+example :
+    runView (words [32]) (words [0]) (words [40]) (words [31])
+      (word 64) (word 1) (word 100) (word 100) (word 100) =
+      ⟨.reverted, words [0], word 100, word 0⟩ := by native_decide
 
 /-- Two-batch chaining: the second top-up batch starts from the first
 batch's remaining block cap and the first batch's pending balances. -/
 example :
     let first := runView (words [32, 40]) (words [0, 0]) (words [6, 8])
+      (words [32, 24])
       (word 64) (word 1) (word 10) (word 100) (word 100)
     first = ⟨.committed, words [6, 4], word 0, word 10⟩ ∧
       runView (words [32, 40]) first.allocations (words [6, 8])
+        (words [26, 20])
         (word 64) (word 1) first.remaining (word 100) (word 100) =
         ⟨.committed, words [0, 0], word 0, word 0⟩ := by native_decide
 
@@ -48,9 +66,11 @@ example :
 share consumption against the updated pending snapshot. -/
 example :
     let first := runView (words [32]) (words [0]) (words [4])
+      (words [32])
       (word 64) (word 1) (word 10) (word 100) (word 100)
     first = ⟨.committed, words [4], word 6, word 4⟩ ∧
       runView (words [32]) first.allocations (words [8])
+        (words [28])
         (word 64) (word 1) first.remaining (word 100) (word 100) =
         ⟨.committed, words [6], word 0, word 6⟩ := by native_decide
 
@@ -58,6 +78,7 @@ example :
 instead of wrapping into a Nat gap. -/
 example :
     runView [word _root_.Verity.Core.MAX_UINT256] [word 1] [word 10]
+      [word 0]
       (word 64) (word 1) (word 100) (word 100) (word 100) =
       ⟨.reverted, [word 0], word 100, word 0⟩ := by native_decide
 
@@ -65,13 +86,14 @@ example :
 the faithful transaction refuses that wrap. -/
 example :
     runView [word _root_.Verity.Core.MAX_UINT256] [word 1] [word 10]
+      [word 0]
       (word 64) (word 1) (word 100) (word 100) (word 100) ≠
       ⟨.committed, [word 0], word 100, word 0⟩ := by native_decide
 
 /-- Failure after allocation and budget writes is rolled back by
 `Contract.run`, not merely hidden by the observation. -/
 example :
-    let before := stateFor (words [32]) (words [0]) (words [4]) defaultState
+    let before := stateFor (words [32]) (words [0]) (words [4]) (words [32]) defaultState
     (allocate 1 (word 64) (word 1) (word 10) (word 100) (word 100) true).run before =
       .revert "INJECTED_AFTER_WRITES" before := by rfl
 
@@ -177,26 +199,28 @@ def allocateNoMaxCheck (count : Nat) (target minTopUp remainingCap moduleLimit v
   if count == 0 then .revert "WrongArrayLength" snapshot else
   match readArray snapshot "effective" effectiveBase count,
       readArray snapshot "pending" pendingBase count,
-      readArray snapshot "requested" requestedBase count with
-  | some effective, some pending, some requested =>
-      match LidoSRv3.Audit.Source.Topup2.sourceRun effective pending requested target minTopUp
-          remainingCap moduleLimit valueGwei with
+      readArray snapshot "requested" requestedBase count,
+      readArray snapshot "topUpLimits" limitsBase count with
+  | some effective, some pending, some requested, some topUpLimits =>
+      match LidoSRv3.Audit.Source.Topup2.sourceRun effective pending requested topUpLimits
+          target minTopUp remainingCap moduleLimit valueGwei with
       | none => .revert "TOPUP_ARITHMETIC" snapshot
       | some (allocs, remaining, used) =>
           let dirty := persistAllocs allocs snapshot
           let dirty := (dirty.writeSlot remainingSlot remaining).writeSlot allocatedSlot used
           if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
           else .success ⟨allocs, remaining, used⟩ dirty
-  | _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
+  | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
 
 private def overLimitCount : Nat := 33
 
 private def overLimitEffective : List Word := List.replicate overLimitCount (word 32)
 private def overLimitPending : List Word := List.replicate overLimitCount (word 0)
 private def overLimitRequested : List Word := List.replicate overLimitCount (word 1)
+private def overLimitTopUpLimits : List Word := List.replicate overLimitCount (word 32)
 
 private def overLimitState : ContractState :=
-  stateFor overLimitEffective overLimitPending overLimitRequested defaultState
+  stateFor overLimitEffective overLimitPending overLimitRequested overLimitTopUpLimits defaultState
 
 example : overLimitCount > maxValidatorsPerTopUp := by decide
 
@@ -209,19 +233,19 @@ example : (allocateNoMaxCheck overLimitCount (word 64) (word 1) (word 100) (word
       ((persistAllocs (List.replicate overLimitCount (word 1)) overLimitState).writeSlot remainingSlot (word 67) |>.writeSlot allocatedSlot (word 33)) := by
   rfl
 
-private def runViewNoMax (effective pending requested : List Word)
+private def runViewNoMax (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word) : View :=
-  let before := stateFor effective pending requested defaultState
+  let before := stateFor effective pending requested topUpLimits defaultState
   observe (List.replicate requested.length 0) remainingCap
     ((allocateNoMaxCheck requested.length target minTopUp remainingCap moduleLimit valueGwei).run
       before)
 
-example : runView overLimitEffective overLimitPending overLimitRequested
+example : runView overLimitEffective overLimitPending overLimitRequested overLimitTopUpLimits
     (word 64) (word 1) (word 100) (word 100) (word 100) =
     ⟨.reverted, List.replicate overLimitCount (word 0), word 100, word 0⟩ := by
   decide
 
-example : runViewNoMax overLimitEffective overLimitPending overLimitRequested
+example : runViewNoMax overLimitEffective overLimitPending overLimitRequested overLimitTopUpLimits
     (word 64) (word 1) (word 100) (word 100) (word 100) =
     ⟨.committed, List.replicate overLimitCount (word 1), word 67, word 33⟩ := by
   decide

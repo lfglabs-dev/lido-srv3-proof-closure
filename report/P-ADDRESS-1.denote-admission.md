@@ -19,7 +19,7 @@ CHECKED means the official denotation of this probe is caller-relative on its ad
 Ranked next work: keep the child as a denotation probe; do not implement WithdrawalQueue claim as this row; compose into the parent only after a pinned body exists.
 
 Theorem: `AddressAdmission.admission_address_equivariant`.
-Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Assumptions: `A-VERITY-SCAFFOLD`. `A-SOURCE-SHAPED` is deliberately absent: this row claims no pinned-Solidity correspondence at all, so there is no source-shaped model to assume.
 Parent `P-ADDRESS-1` is CHECKED on the four-writer equivariance row; this child is the denotation probe only.
 
 ## Intent

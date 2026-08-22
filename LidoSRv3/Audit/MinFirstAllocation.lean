@@ -242,4 +242,85 @@ theorem candidate_correspondence
         cases hs : Source.candidate? ss <;> simp_all
       split <;> simp_all
 
+theorem source_candidate_mem_and_open
+    {rows : List Source.Row} {best : Source.Row}
+    (h : Source.candidate? rows = some best) :
+    best ∈ rows ∧ Source.hasFreeSpace best = true := by
+  induction rows generalizing best with
+  | nil => simp [Source.candidate?] at h
+  | cons r rs ih =>
+      simp only [Source.candidate?] at h
+      cases hc : Source.candidate? rs with
+      | none =>
+          rw [hc] at h
+          by_cases ho : Source.hasFreeSpace r = true
+          · simp [ho] at h
+            subst best
+            simp [ho]
+          · simp [ho] at h
+      | some later =>
+          have hl := ih hc
+          rw [hc] at h
+          by_cases hcnd :
+              Source.hasFreeSpace r = true ∧ r.allocation.val ≤ later.allocation.val
+          · simp [hcnd] at h
+            subst best
+            simp [hcnd.1]
+          · simp [hcnd] at h
+            subst best
+            exact ⟨by simp [hl.1], hl.2⟩
+
+theorem model_candidate_eq_of_source
+    {model : List Model.Bucket} {source : List Source.Row} {best : Source.Row}
+    (hRows : RowsCorrespond model source)
+    (hSelected : Source.candidate? source = some best) :
+    Model.candidate? model =
+      some ⟨best.allocation.val, best.capacity.val⟩ := by
+  have h := candidate_correspondence hRows
+  rw [hSelected] at h
+  cases hm : Model.candidate? model with
+  | none => simp [hm] at h
+  | some mb =>
+      rw [hm] at h
+      simp only [Option.map_some, Option.some.injEq, Prod.mk.injEq] at h
+      rw [show mb = (⟨best.allocation.val, best.capacity.val⟩ : Model.Bucket) by
+        cases mb
+        simp_all]
+
+/-- Updating the first corresponding model/source row by equal mathematical
+amounts preserves the representation relation. -/
+theorem replaceFirst_correspondence
+    {model : List Model.Bucket} {source : List Source.Row}
+    (hRows : RowsCorrespond model source)
+    (mb : Model.Bucket) (sb : Source.Row)
+    (hAllocation : mb.allocation = sb.allocation.val)
+    (hCapacity : mb.capacity = sb.capacity.val)
+    (delta : Nat) (updated : Source.Word)
+    (hUpdated : mb.allocation + delta = updated.val) :
+    RowsCorrespond (Model.replaceFirst mb delta model)
+      (Source.replaceFirst sb updated source) := by
+  induction hRows with
+  | nil => exact .nil
+  | @cons m s ms ss hms hrest ih =>
+      rcases hms with ⟨hma, hmc⟩
+      have heq : (m = mb) ↔ (s = sb) := by
+        constructor <;> intro hz
+        · subst m
+          cases s
+          cases sb
+          congr <;> apply Verity.Core.Uint256.ext <;> simp_all
+        · subst s
+          cases m
+          cases mb
+          congr <;> simp_all
+      by_cases hm : m = mb
+      · have hs : s = sb := heq.mp hm
+        subst m
+        subst s
+        rw [Model.replaceFirst, Source.replaceFirst, if_pos rfl, if_pos rfl]
+        exact List.Forall₂.cons ⟨hUpdated, hCapacity⟩ hrest
+      · have hs : s ≠ sb := fun hs => hm (heq.mpr hs)
+        rw [Model.replaceFirst, Source.replaceFirst, if_neg hm, if_neg hs]
+        exact List.Forall₂.cons ⟨hma, hmc⟩ ih
+
 end LidoSRv3.Audit.MinFirstAllocation

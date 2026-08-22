@@ -5,7 +5,7 @@ import LidoSRv3.Audit.Verity.DepositParentTx
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PReserve1
-import LidoSRv3.Audit.Guarantees.PEth1
+import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 import LidoSRv3.Audit.Guarantees.PAddress1
 import LidoSRv3.Audit.Guarantees.PTopup2
 import LidoSRv3.Audit.Verity.Topup2Tx
@@ -31,7 +31,7 @@ def all : List Guarantee :=
   , PTopup1.guarantee
   , PAccount1.guarantee
   , PReserve1.guarantee
-  , PEth1.guarantee
+  , PConsolidationEth1.guarantee
   , PAddress1.guarantee
   , PTopup2.guarantee
   , PConsolidation1.guarantee
@@ -44,7 +44,7 @@ example : all.length = 11 := by decide
 /-- Regression guard: the public IDs and their order are the campaign's canonical 11. -/
 example : all.map (fun guarantee => guarantee.id.text) =
     ["P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1", "P-ACCOUNT-1",
-     "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1", "P-TOPUP-2",
+     "P-RESERVE-1", "P-CONSOLIDATION-ETH-1", "P-ADDRESS-1", "P-TOPUP-2",
      "P-CONSOLIDATION-1", "P-SSZ-1"] := by decide
 
 /-- Retracted transaction claims stay blocked; P-DEPOSIT-1, P-TOPUP-1 and

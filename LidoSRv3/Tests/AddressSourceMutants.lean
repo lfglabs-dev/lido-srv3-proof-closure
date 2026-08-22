@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Verity.AddressAdmission
 import LidoSRv3.Audit.Verity.AddressTx
+import LidoSRv3.Audit.Verity.AddressClaimBatchTx
 
 namespace LidoSRv3.Tests.AddressSourceMutants
 
@@ -93,7 +94,7 @@ def runFixedOwnerGated (inp : Input) : Outcome :=
 
 /-- Witness for the parent kill-line: an otherwise-eligible `requestWithdrawals`
 input from caller `1`, the mutant's fixed owner.  `requestWithdrawals` is one
-of the four modeled permissionless writers (in `addressEquivarianceEntryScope`
+of the four modeled address-bearing writers (in `addressEquivarianceEntryScope`
 under both the wave-4 and the widened wave-5 scope). -/
 private def fixedOwnerGateWitness : Input :=
   { entryPoint := .requestWithdrawals, caller := 1, senderFrom := 1, recipient := 0,
@@ -154,6 +155,44 @@ theorem fixed_owner_gate_not_admission_equivariant :
   have hcex := h 1 2 (by decide) (by decide) fixedOwnerGateWitness
   revert hcex
   decide
+
+/-! ## Write-side parent kill-line
+
+The admission-gate mutant above can falsify both parent conjuncts by rejecting
+the renamed call.  This second mutant leaves `admitted` untouched and changes
+only a committed address write, so it isolates the post-state half of the
+registered parent. -/
+
+/-- Mutant post-state: retain the honest recipient and balance-key writes but
+stomp the owner field with an unrenamed fixed address. -/
+def successfulPostFixedOwnerWriter (inp : Input) : PostState :=
+  { successfulPost inp with owner := fixedOwner }
+
+def runFixedOwnerWriter (inp : Input) : Outcome :=
+  if admitted inp then .committed (successfulPostFixedOwnerWriter inp) else .reverted
+
+/-- **Write-side kill-line refuting the registered parent.** Admission remains
+equivariant because it is the honest `admitted`; on the eligible unwrap witness
+both calls commit.  The renamed call nevertheless writes owner `1`, while
+renaming the original committed post requires owner `2`.  Thus the full parent
+shape is false solely through its committed-post conjunct. -/
+theorem fixed_owner_writer_kill_line_refutes_parent :
+    ¬ ∀ (a₁ a₂ : Address), a₁ ≠ 0 → a₂ ≠ 0 → ∀ (inp : Input),
+        succeeds (runFixedOwnerWriter (renameInput a₁ a₂ inp)) =
+          succeeds (runFixedOwnerWriter inp) ∧
+        ∀ post, runFixedOwnerWriter inp = .committed post →
+          runFixedOwnerWriter (renameInput a₁ a₂ inp) =
+            .committed (renamePost a₁ a₂ post) := by
+  intro h
+  have hcex := h 1 2 (by decide) (by decide) (eligibleUnwrap 1)
+  have hcommit :
+      runFixedOwnerWriter (eligibleUnwrap 1) = .committed ⟨1, 1, 1, 1⟩ := by
+    decide
+  have hne :
+      runFixedOwnerWriter (renameInput 1 2 (eligibleUnwrap 1)) ≠
+        .committed (renamePost 1 2 ⟨1, 1, 1, 1⟩) := by
+    decide
+  exact hne (hcex.2 ⟨1, 1, 1, 1⟩ hcommit)
 
 /-- Retained for the denote-admission subordinate row only: the disconnected
 toy `AddressAdmission.ownerGated` mutant is not a kill-line for the registered
@@ -238,6 +277,35 @@ theorem verity_zero_amount_rejected :
     (LidoSRv3.Audit.Verity.AddressTx.AddressTxContract.redeem 0 true).run state =
       .revert "ZeroAmount" state := by
   rfl
+
+/-! ## Live claim-batch payout kill-line -/
+
+open LidoSRv3.Audit.Verity.AddressClaimBatchTx in
+def claimLoopFixedPayout : List Nat → List Nat → Address → Contract Unit
+  | [], [], _ => Verity.pure ()
+  | requestId :: requestIds, hint :: hints, recipient => do
+      claimOne requestId hint (9 : Address)
+      claimLoopFixedPayout requestIds hints recipient
+  | _, _, _ => fun state => .revert "ArraysLengthMismatch" state
+
+open LidoSRv3.Audit.Verity.AddressClaimBatchTx in
+def executeFixedPayoutRecipient (requestIds hints : List Nat) (recipient : Address) :
+    Contract Unit := do
+  require (recipient != zeroAddress) "ZeroRecipient"
+  require (requestIds.length == hints.length) "ArraysLengthMismatch"
+  claimLoopFixedPayout requestIds hints recipient
+
+open LidoSRv3.Audit.Verity.AddressClaimBatchTx
+
+/-- Kill-line for the new live-batch observable: keeping all request reads,
+packed writes, values, and loop order but routing `_sendValue` to a fixed
+unrenamed address is detected by the execution-derived CALL journal. -/
+theorem fixed_payout_recipient_mutant_kill_line :
+    observe [1, 2]
+        ((executeFixedPayoutRecipient [1, 2] [1, 1] (2 : Address)).run twoClaimState) ≠
+      ⟨.committed, [true, true], 0,
+        [payoutEntry (2 : Address) 30, payoutEntry (2 : Address) 40]⟩ := by
+  decide +kernel
 
 #check LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance
 #check source_admission_nondiscriminatory

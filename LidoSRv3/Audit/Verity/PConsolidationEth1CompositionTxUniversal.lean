@@ -1,10 +1,10 @@
-import LidoSRv3.Audit.Verity.PEth1CompositionTx
+import LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 
 /-!
-# P-ETH-1: universal Verity-plane success shape
+# P-CONSOLIDATION-ETH-1: universal Verity-plane success shape
 
-This module lifts the P-ETH-1 Verity plane from the five numeral witnesses of
-`PEth1CompositionTx.verity_tx_composes_value_flow_and_rollback` to a universal
+This module lifts the P-CONSOLIDATION-ETH-1 Verity plane from the five numeral witnesses of
+`PConsolidationEth1CompositionTx.verity_tx_composes_value_flow_and_rollback` to a universal
 (`∀`) statement over funded, guard-passing, non-wrapping batches that fit the
 dispatch fuel budget:
 
@@ -15,7 +15,7 @@ observe (run honest msgValue batchSize feePerRequest) =
 ```
 
 The proof is a frame-by-frame chain through the recursive dispatcher
-(`PEth1CompositionTx.step`): the root Bus hop, the Gateway hop (which journals
+(`PConsolidationEth1CompositionTx.step`): the root Bus hop, the Gateway hop (which journals
 the vault leg and, when the remainder is positive, the refund leg), the Vault
 hop (which journals `batchSize` consolidation-request legs), an induction over
 the request phase, and the optional refund hop.  Every account balance in the
@@ -39,7 +39,7 @@ final sheet is computed symbolically from the iterated world.
   remainder is zero and `n + 4` when it is not.
 
 Each premise is refuted as droppable by an executable counterexample in
-`LidoSRv3.Tests.PEth1CompositionTxMutants` (zero-value, underfunded, and
+`LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants` (zero-value, underfunded, and
 fuel-exhaustion kill-lines), and the honest wiring is refuted as replaceable by
 four wiring-mutant kill-lines on the same universal predicate.
 
@@ -47,7 +47,7 @@ This is a model-plane ensemble.  It does not claim that the corresponding Lido
 Solidity functions have been compiled by Verity.
 -/
 
-namespace LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal
+namespace LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal
 
 open _root_.Verity
 open Compiler.CompilationModel.DenoteExternalCalls
@@ -55,7 +55,7 @@ open Compiler.CompilationModel
 open Compiler.CompilationModel.Denote
 open Compiler.CompilationModel.DenoteFunctionCalls
 open _root_.Verity.MultiContract
-open LidoSRv3.Audit.Verity.PEth1CompositionTx
+open LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 
 /-! ## MultiWorld lookup/upsert laws -/
 
@@ -1380,7 +1380,7 @@ theorem balances_final_refund (mv n fee : Nat)
       Nat.mod_eq_of_lt (Nat.lt_of_le_of_lt (Nat.sub_le mv (n * fee)) hmv)]
   simp [balances, hsender, hbus, hgateway, hvault, hlido, hrequest, hrefund]
 
-/-- **P-ETH-1 Verity-plane universal parent.**  For every funded, guard-passing,
+/-- **P-CONSOLIDATION-ETH-1 Verity-plane universal parent.**  For every funded, guard-passing,
 non-wrapping batch that fits the dispatch fuel budget, the honest wiring
 commits: the whole product fee lands at the consolidation-request predeploy,
 the remainder lands at the refund recipient, and no protocol contract on the
@@ -1433,4 +1433,4 @@ theorem run_success_shape (mv n fee : Nat)
     simp only [TxView.mk.injEq]
     exact ⟨trivial, by omega, trivial⟩
 
-end LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal
+end LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
-    "P-ACCOUNT-1", "P-RESERVE-1", "P-ETH-1", "P-ADDRESS-1",
+    "P-ACCOUNT-1", "P-RESERVE-1", "P-CONSOLIDATION-ETH-1", "P-ADDRESS-1",
     "P-TOPUP-2", "P-CONSOLIDATION-1", "P-SSZ-1",
 ]
 SUBORDINATE_IDS = [
@@ -25,7 +25,7 @@ SUBORDINATE_IDS = [
     "P-ALLOC-1.eugene-bound", "P-ADDRESS-1.yul-interface-harness",
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
-    "P-SSZ-1.tx-execution-simulation", "P-ETH-1a", "P-ETH-1b",
+    "P-SSZ-1.tx-execution-simulation",
     "P-ADDRESS-1.denote-admission", "P-DEREF-1",
     "P-RESERVE-RELATIONAL",
 ]
@@ -41,42 +41,42 @@ ASSUMPTION_FIELDS = {
 }
 PINNED = {
     "lido_core": ("https://github.com/lidofinance/core.git", "af095e48bbc1c3841c2c9936219c8461af01056b"),
-    "verity": ("https://github.com/lfglabs-dev/verity.git", "a063bfc869735045354ebc3862ca08859da0f56e"),
+    "verity": ("https://github.com/lfglabs-dev/verity.git", "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"),
     "evmyullean": ("https://github.com/lfglabs-dev/EVMYulLean.git", "f7e4ee0dc8f8d5265ce822a937ab5be771f182e9"),
     "mathlib": ("https://github.com/leanprover-community/mathlib4.git", "fabf563a7c95a166b8d7b6efca11c8b4dc9d911f"),
 }
 EXPECTED_AUTHORITY = "Lean theorem statements and proofs are authoritative; metadata classifies but never closes evidence."
 EXPECTED_OBJECTIVE = "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
 EXPECTED_CANONICAL_CLAIMS = {
-    "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.forall_proportional_step_correspondence_and_bounded", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "IMPLEMENTATION_PENDING", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD")),
-    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
+    "P-ALLOC-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-ALLOC-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation", "CHECKED", "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution", "IMPLEMENTATION_PENDING", ("A-HANDWRITTEN-MINFIRST", "A-VERITY-SCAFFOLD")),
+    "P-DEPOSIT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-DEPOSIT-CONTRACT", "A-DEPOSIT-32-ETHER")),
+    "P-TOPUP-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD", "A-TOPUP-BEACON-ADDRESS")),
     "P-ACCOUNT-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline", "CHECKED", "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
     "P-RESERVE-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve", "CHECKED", "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent", "CHECKED", "LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-CONSOLIDATION-ETH-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition", "IMPLEMENTATION_PENDING", ("A-ABSTRACT-TX", "A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CANONICAL-REQUEST-ADDRESS")),
     "P-ADDRESS-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance", "CHECKED", "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-TOPUP-NOWRAP", "A-VERITY-SCAFFOLD")),
-    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
-    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE")),
+    "P-TOPUP-2": ("CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap", "CHECKED", "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD")),
+    "P-CONSOLIDATION-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity", "CHECKED", "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation", "IMPLEMENTATION_PENDING", ("A-SOURCE-SHAPED", "A-VERITY-SCAFFOLD", "A-CONSOLIDATION-GATEWAY-NONZERO")),
+    "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-PERFECT-HASH", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "b0383f71a63a7cb3ad8037e3a6ee0786f2770c3c69091ff467001c34a2058cca",
-    "P-ALLOC-2": "e94b3877833e21030ed534725260a0c94c6994ddd842823c7bffc7086a961b91",
-    "P-DEPOSIT-1": "4681281de06b67f27beb369acbfe38e8d6a9b5735ee9a6063b83c8534df00c27",
-    "P-TOPUP-1": "be06b1ea3ac5a77f39faef7479d03df1a0c8d759c0a0fa346c601201da84536c",
-    "P-ACCOUNT-1": "a9ea6b20f5b83356e604cbc72babaacfab6cc20711b4a7ef4e4ebef6136c832a",
-    "P-RESERVE-1": "665eb9d69a0c7035b1afb7e6e378447bfb70862eef5da0f72c370e86703f6489",
-    "P-ETH-1": "0ce9c10729d9c2a4f19a00b0883475cb5c305cd8467b2374394f7218165c9d05",
-    "P-ADDRESS-1": "21f4201ce493ea0740b743687f441a7ed11b785a606fc8efffe9167b72b791c1",
-    "P-TOPUP-2": "87601621fccecd8e22a9948943f4712732ac1620d01c60a90d057520ba8e08f3",
-    "P-CONSOLIDATION-1": "278af6edb57f2712d7770be830d61159d9db9cdddf5a64b103545898000c3491",
-    "P-SSZ-1": "92da63e53e07ec36f225949c6aba62c6a91347e908663109bd24acfc62f50587",
+    "P-ALLOC-1": "8abca63138a78345a218235371611a7c1e2ab4927cd5a7808a31cf63a120be16",
+    "P-ALLOC-2": "bc8287e80206e047ee1fabbf2f968484f5b24b9effdf4d928e647ebf575e5a29",
+    "P-DEPOSIT-1": "b99c5534cc2faf7d71956e1b306cd3646873cfc87e7d8c8d42d72f6fffb307fd",
+    "P-TOPUP-1": "7097df87332a3b9f4996ae897b5619947c71d4bdc547dad407759174fa62212f",
+    "P-ACCOUNT-1": "0bfe71a24bbb39a1c72af1020f7aab17feeb628dc0889f0688ab7499e5ee1a0b",
+    "P-RESERVE-1": "5b2e39b7d0f6ae09eabea8ee1f4ff5f02337921e576bb6786bb6b9063272b010",
+    "P-CONSOLIDATION-ETH-1": "ecc8aff12380db64a1801e906aff01284958cc2749fa4b407f60740f1eb64667",
+    "P-ADDRESS-1": "2aec78330a6f136e109160e4cca2c2da6e159dc2db719d28b260134d69e447aa",
+    "P-TOPUP-2": "ab0afa6dde459f2b29f0102aada3cd2df77e376b2c48a435b4081b32a9307c6e",
+    "P-CONSOLIDATION-1": "3bb9da5740bbb942c5dff80c1728ad9efe9b83827755e2eb829279e8deac7b9f",
+    "P-SSZ-1": "a6baea37a013b9f7f519dc08922b864b79226ed432c197d2eae301bcc96d0ed5",
 }
 EXPECTED_PRIORITIES = {
     "P-RESERVE-1": "DONE",
     "P-DEPOSIT-1": "DONE", "P-TOPUP-1": "DONE", "P-ACCOUNT-1": "DONE",
-    "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-ETH-1": "DONE",
+    "P-ALLOC-1": "DONE", "P-ALLOC-2": "DONE", "P-CONSOLIDATION-ETH-1": "DONE",
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
@@ -137,9 +137,8 @@ def validate_pins(lock, manifest, source_map):
     require(isinstance(targets, list), "source-map targets must be a list")
     target_ids = [x.get("id") for x in targets]
     require(len(target_ids) == len(set(target_ids)), "duplicate source-map target")
-    required_targets = set(CANONICAL_IDS) - {"P-ETH-1"}
+    required_targets = set(CANONICAL_IDS)
     require(required_targets <= set(target_ids), "canonical source targets are incomplete")
-    require({"P-ETH-1a", "P-ETH-1b"} <= set(target_ids), "P-ETH-1 child source targets are incomplete")
     sha = PINNED["lido_core"][1]
     for target in targets:
         require(target.get("status") in {"MAPPED", "UNMAPPED"}, f"{target.get('id')}: invalid source status")

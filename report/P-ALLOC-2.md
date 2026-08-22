@@ -4,7 +4,7 @@
 
 Once P-ALLOC-1 has produced the two lists (current allocation, capacity), `MinFirstAllocationStrategy.allocate` distributes the requested amount: it repeatedly calls `allocateToBestCandidate` until demand is exhausted or no bucket can take more.
 
-P-ALLOC-2 verifies one such fill step:
+P-ALLOC-2 verifies each fill step and conservation across a successful fuel-bounded full loop:
 
 - selection: the chosen bucket $b$ is the first open bucket minimizing $\mathrm{allocation}$. Ties keep the lower index (source replaces the saved candidate only on a strict $>$).
 - amount: $\mathrm{allocated} = \min(\mathrm{share},\ \min(\mathrm{upper},\ \mathrm{capacity}[b]) - \mathrm{allocation}[b])$
@@ -15,19 +15,19 @@ P-ALLOC-2 verifies one such fill step:
 
 Note the cap at the next fill level: the served bucket rises to the level of the bucket above it and no further. That is what makes the fill proportional rather than greedy.
 
-We prove the step on the abstract model (`forall_proportional_step_correspondence_and_bounded`), then that the source-shaped Lean program computes the same word when the checked `uint256` arithmetic succeeds, then that the Verity Executable Contract of the whole loop has the same observables if execution succeeds (bucket array, allocated, remaining), otherwise revert and state from before the call. We do not prove the caps fed into it (P-ALLOC-1), and we do not prove Solidity or bytecode equivalence.
+The registered parent (`step_correspondence_and_full_loop_conservation`) keeps the abstract model/source step correspondence and checked amount equality, and adds conservation for every successful fuel-bounded run of the independently stated proportional source loop: final allocated plus remaining equals the initial request. The proved source/executor loop equality transfers that invariant to the loop used by the Verity transaction. We do not prove the caps fed into it (P-ALLOC-1), and we do not prove Solidity or bytecode equivalence.
 
 ## Proof limitations and recommendations
 
-The abstract parent is a genuine unbounded $\forall$ over finite lists and words, hypothesized on `RowsCorrespond`, source selection, openness, length $< 2^{256}$, nonzero demand, and successful `checkedAmount`. It is one step, not the outer `while`. The Verity theorem is universal over decoded lists, but both arrays are assumed decoded and `sourceView` calls the same `allocateLoop` as the transaction.
+The parent’s step conjunct is a genuine unbounded $\forall$ over finite lists and words, hypothesized on `RowsCorrespond`, source selection, openness, length $< 2^{256}$, nonzero demand, and successful `checkedAmount`. Its conclusion includes equality with independent `Model.amount`, so ceilDiv and both clamps are load-bearing. The full-loop conjunct is fuel-bounded conservation over the proportional source loop. It does not carry `RowsCorrespond` through mutations or define an independent proportional model loop.
 
 `A-HANDWRITTEN-MINFIRST` and `A-VERITY-SCAFFOLD` are load-bearing. The +1 child `selects_least_open_bucket` is a different algorithm. YAML already lists activity filtering (upstream), keccak oracle, and in-place memory mutation. Kill-lines `selection_kill_line_refutes_parent` and `headroom_clamp_kill_line_refutes_parent` are parent-shaped; they do not kill positivity, $w \le r$, or the next-level clamp, and they do not refute the Verity parent.
 
-CHECKED does not mean a full-loop conservation theorem, Solidity equivalence, or that capacities were built correctly.
+CHECKED includes full-loop allocated/remaining conservation. It does not mean full-loop model-state correspondence, Solidity equivalence, or that capacities were built correctly.
 
-Ranked next work: add the amount-correspondence conjunct so `ceilDiv` / next-level are load-bearing; register a loop-level theorem; make `sourceView` independent of `allocateLoop`; keep the +1 model as a child.
+Ranked next work: define an independent proportional model loop and prove multi-step `RowsCorrespond` across mutations; keep the +1 model as a child.
 
-Theorems: `PAlloc2.forall_proportional_step_correspondence_and_bounded` (registered parent, explicit ∀; re-registered by human PR #134), `PAlloc2.proportional_step_correspondence_and_bounded` (helper, implicit binders), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (selection kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (headroom kill-line).
+Theorems: `PAlloc2.step_correspondence_and_full_loop_conservation` (registered parent), `PAlloc2.source_allocate_loop_conserves_requested`, `MinFirstDistributionTx.allocateLoop_conserves_total`, `PAlloc2.forall_proportional_step_correspondence_and_bounded` (step conjunct), `PAlloc2.selects_least_open_bucket` (child), `PAlloc2.verity_tx_simulates_min_first_distribution`, `Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent` (step kill-line), `Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent` (step kill-line).
 Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed on the YAML row): `A-ALLOC2-TX-BOUNDARY`.
 
 ## Intent
@@ -47,13 +47,13 @@ The guarantee is meant to say the selected bucket is a least-filled open bucket,
 
 ## Proof
 
-**Abstract `forall_proportional_step_correspondence_and_bounded` (registered parent, explicit ∀).** The registered parent is the explicit-∀ closure of the pinned-source *proportional* step (re-registered by human PR #134), not the +1 model; the wave-4 implicit-binder `proportional_step_correspondence_and_bounded` is retained as the helper the parent's proof forwards to. Its first conjunct pins the selection, not merely the two scans to each other: given `RowsCorrespond` and `hSelected : Source.candidate? source = some best`, the Model scan's candidate maps to exactly `some (best.allocation.val, best.capacity.val)` — proved by rewriting `full_candidate_correspondence hRows` with `hSelected`, so the selection hypothesis is load-bearing (wave 4; it was an unused `_hSelected` before). The second conjunct is `source_amount_totality` (a successful checked amount is positive, ≤ the remaining demand, and keeps the candidate within capacity, i.e. never over headroom). Two named kill-lines in `MinFirstDistributionTxMutants.lean` refute the registered parent on its own model, each stated as the negation of the parent's FULL explicit-∀ predicate shape — explicit binders `(model) (source) (best) (allocationSize w)`, all six premises (`RowsCorrespond`, `hSelected`, `hOpen`, `hLen`, `hSize`, `hAmount`) retained and discharged on concrete non-vacuous witnesses, whole conclusion conjunction negated. `selection_kill_line_refutes_parent` substitutes a mutant Model-side scan `mutantFirstOpenCandidate?` (first open bucket wins) for `Model.candidate?`: on the `RowsCorrespond` pair `[(5, 10), (0, 10)]`, `Source.candidate?` selects the NON-first row `⟨0, 10⟩` (index 1), the row is open, the demand `10` is nonzero, and `Source.checkedAmount` succeeds with `some 5`; yet the mutant scan maps to `some (5, 10)`, falsifying the pinned-selection conjunct. `headroom_clamp_kill_line_refutes_parent` (wave 6) substitutes `checkedAmountNoCapacityCap` — `checkedAmount` with the final capacity-headroom clamp dropped — at the `checkedAmount` premise only (the conclusion speaks only of `w`, so the first conclusion conjunct keeps the honest `Model.candidate?` scan): on model `[⟨0, 3⟩]`, source `[⟨0, 3⟩]`, demand `10`, the mutant returns `some 10`, and the final conjunct `0 + 10 ≤ 3` is false, refuting the headroom conjunct. The TX-level `mutantSourceView` vs `runView` example (PR #134) is retained as TX-observe computational evidence on the same witness.
+**Abstract `step_correspondence_and_full_loop_conservation` (registered parent).** The first conjunct is the explicit-∀ closure of the pinned-source *proportional* step, not the +1 model. It pins the selected row, equates the successful checked word with independent `Model.amount`, and proves positivity, remaining-demand boundedness, and capacity safety. The existing named selection and headroom mutants refute this step conjunct. The second conjunct is `source_allocate_loop_conserves_requested`: induction over `allocateLoop` proves `finalTotal + finalRemaining = initialTotal + initialRemaining` for every successful fuel-bounded run, including zero-demand and zero-amount exits; specializing the initial total to zero yields exact request conservation. `sourceAllocateLoop_eq_allocateLoop` bridges the independently copied source equations to the executor. This is conservation, not a multi-step `RowsCorrespond` theorem.
 
 **Child `selects_least_open_bucket`.** The previous parent is demoted to a child of the +1 model. Induction on the bucket list following the recursive definition of `MinFirst.candidate?` (scan from the right; on `allocation ≤ later.allocation` keep the left open bucket). Side lemmas: the candidate is a member, is open, and a `none` result means no open bucket. The `≤` conclusion is exactly the selection rule.
 
 **Amount / SOURCE slice.** `source_amount_correspondence` is a calculation: if checked `uint256` arithmetic succeeds and `source.length < 2^256`, the Nat amount equals the word. `source_pinned_expression_shape` shows the audit’s distributed-`min` form equals the source’s “subtract once after `Math256.min`” form, by case split on the `min` arms, for any open best candidate.
 
-**VERITY `verity_tx_simulates_min_first_distribution`.** `sourceDistribute` and `txDistribute` (`MinFirstDistributionTx.lean:60–92`) are the same recursion; `txDistribute_eq_sourceDistribute` is induction + `simp`. `allocate` decodes two memory arrays, zips them into `Source.Row`s, runs `txDistribute`, writes the new bucket words. `observe` on success reports those words; on revert it reports the caller-supplied preimage, not storage. Rollback is `Contract.run`.
+**VERITY `verity_tx_simulates_min_first_distribution`.** `sourceAllocateLoop` (`MinFirstDistributionTx.lean:100–112`) and the executor `allocateLoop` (`:84–95`) are separately stated but structurally identical recursions over the shared step `allocateToBestCandidate` (`:69–79`); `sourceAllocateLoop_eq_allocateLoop` (`:114–130`) is structural recursion on `fuel` with `simp only [sourceAllocateLoop, allocateLoop]` and case splits. `allocate` (`:220–236`) decodes two memory arrays, zips them into `Source.Row`s, runs `allocateLoop`, writes the new bucket words. `observe` on success reports those words; on revert it reports the caller-supplied preimage, not storage. Rollback is `Contract.run`.
 
 ## Issues
 
@@ -71,7 +71,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 | --- | --- | --- |
 | 1 | A | `A-HANDWRITTEN-MINFIRST` kept; Solidity `active` test in `missing`. |
 | 2, 4, 13 | A | Two algorithms kept separate (`+1` vs proportional `replaceFirst`). |
-| 3 | A | `txDistribute = sourceDistribute` by lockstep. |
+| 3 | A | `sourceAllocateLoop = allocateLoop` by lockstep. |
 | 5 | A | `A-ALLOC2-TX-BOUNDARY` stays on the amount-slice child. |
 | 6 | scope | Dummy memory oracle in `missing`. |
 | 7 | A | `observe` reads result buckets; persistence not claimed. |
@@ -91,10 +91,10 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    - Proportional model: first step sees two minima, `ceil(10/2) = 5`, next-level unbounded, allocates 5 to index 0; second step allocates 5 to index 1; done.
    The two closures can both be “CHECKED” while describing different traces. The parent does not identify them.
 
-3. **`txDistribute` is not an independent executable.**
-   Comment at `MinFirstDistributionTx.lean:76–78` claims the correspondence theorem, “not a shared definition,” is the boundary. The two functions are copies; the theorem is `simp [txDistribute, sourceDistribute, ih]`.
+3. **`allocateLoop` is not an independent executable.**
+   The docstring at `MinFirstDistributionTx.lean:97–99` claims the correspondence theorem, not a shared definition, is the boundary. The two loops are transcribed copies of the same equations, and both delegate each step to the *same* `allocateToBestCandidate`; `sourceAllocateLoop_eq_allocateLoop` (`:114–130`) is `simp only [sourceAllocateLoop, allocateLoop]` plus recursion on `fuel`.
 
-   *Counterexample to independence.* Introduce an off-by-one in `Source.candidate?` (skip index 0). Both sides change; `txDistribute_eq_sourceDistribute` still holds. The CHECKED equality cannot see a shared scan bug.
+   *Counterexample to independence.* Introduce an off-by-one in `Source.candidate?` (skip index 0). Both sides change; `sourceAllocateLoop_eq_allocateLoop` still holds. The CHECKED equality cannot see a shared scan bug.
 
 4. **`replaceFirst` vs index mutation — concrete mismatch.**
    Rows `[(3,10), (3,10)]`, demand 1. `candidate?` walks from the right, both open with allocation 3; `≤` keeps the *left* row as the structural value `(3,10)`. `replaceFirst` updates the **first** structurally-equal row, which happens to be index 0 — lucky here. Solidity always writes `buckets[bestCandidateIndex]`. Duplicate fill levels (the common “many empty operators” case the library’s own comment describes) make the Lean mutation key-ambiguous.
@@ -117,7 +117,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Counterexample mutant.* Make `writeBucketsState` a no-op. `verity_tx_simulates_min_first_distribution` still holds. YAML “persists observables through writeMapUint” is not what `observe` checks for the bucket column. Solidity’s observable is the mutated memory array the caller still holds.
 
 8. **`Source.Execute` always admits revert, and `mutate` assumes conservation.**
-   `MinFirstAllocation.lean:184–203`: `| revert (i) : Execute i (.reverted i.buckets)` has no premises — every input has a revert execution. `| mutate` takes `hMutation` and `hBounds` as constructor hypotheses (the caller must already know the sum and capacity facts). The CHECKED Verity path uses `sourceDistribute` (a function), but the SOURCE relation in the same module is not that function.
+   `MinFirstAllocation.lean:184–203`: `| revert (i) : Execute i (.reverted i.buckets)` has no premises — every input has a revert execution. `| mutate` takes `hMutation` and `hBounds` as constructor hypotheses (the caller must already know the sum and capacity facts). The CHECKED Verity path uses `sourceAllocateLoop` (a function), but the SOURCE relation in the same module is not that function.
 
    *Scenario.* `Execute i (.reverted i.buckets)` holds for a well-formed successful allocation. A theorem that only assumes `Execute i result` cannot conclude success. `success_conservation` is inversion of `mutate`’s own hypothesis, not a proof that `replaceFirst` conserves. The CHECKED parent does not use `Execute`, but the SOURCE plane advertised next to it is not deterministic library semantics.
 
@@ -132,14 +132,14 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* `failAfterWrites = true` after `writeBucketsState`. `Contract.run` restores the snapshot (monad). `observe` still needs the caller to hand it the original buckets; a different preimage would make the View lie about what storage held. The CHECKED revert conjunct is “the function returned `.reverted` and we echoed our own input,” not “memory equals the pre-call arrays.”
 
 11. **Abstract `Model.amount` is unbounded `Nat`; the CHECKED Verity loop uses `safeAdd` and is a different overflow story.**
-    `MinFirstAllocation.Model.amount` (`:55–60`) is `Nat` `ceilDiv` / `+`. `selects_least_open_bucket` never mentions overflow. `sourceDistribute` / `txDistribute` (`MinFirstDistributionTx.lean:68–72`) do `safeAdd best.allocation amount` and treat `none` as `MIN_FIRST_ARITHMETIC`.
+    `MinFirstAllocation.Model.amount` (`:55–60`) is `Nat` `ceilDiv` / `+`. `selects_least_open_bucket` never mentions overflow. the step shared by `sourceAllocateLoop` / `allocateLoop`, `allocateToBestCandidate` (`MinFirstDistributionTx.lean:69–79`), does `safeAdd best.allocation amount` and the loops treat `none` as `MIN_FIRST_ARITHMETIC`.
 
     *Scenario.* Best bucket allocation `2^256 − 1`, `amount = 1`, still `allocation < capacity` (capacity also max). Abstract +1 / Nat proportional step produces `2^256`. Verity `safeAdd` reverts the whole `allocate`. Solidity 0.8 `buckets[i] += allocated` also reverts. The two CHECKED theorems disagree with each other on this input: the selection theorem still names that bucket as least-open; the Verity theorem does not commit. Issue 2’s “two algorithms” includes overflow, not just the +1 vs proportional split.
 
 12. **A zero `checkedAmount` aborts the Verity tx; Solidity `allocate` returns the prefix.**
-    Lean `sourceDistribute` (`:69`): `if amount = 0 then none`. Solidity `allocate` (`MinFirstAllocationStrategy.sol:36–40`): `if (allocatedToBestCandidate == 0) break;` then `return (allocated, buckets)` — success with whatever was already added.
+    Lean `allocateToBestCandidate`, as originally written, aborted on a zero share. Solidity `allocate` (`MinFirstAllocationStrategy.sol:36–40`): `if (allocatedToBestCandidate == 0) break;` then `return (allocated, buckets)` — success with whatever was already added.
 
-    *Scenario.* A candidate exists and `checkedAmount` returns `0` (e.g. a shared transcription of `ceilDiv` / `min` that collapsed). Live library stops and returns the partial fill. Lean `allocate` reverts `MIN_FIRST_ARITHMETIC` and `observe` reports the caller-supplied preimage (issue 10). The CHECKED correspondence is not the library’s “zero means done” loop. With the current `checkedAmount`, that zero may be a dead arm; the control-flow mismatch is still in the executed program.
+    *Scenario.* A candidate exists and `checkedAmount` returns `0` (e.g. a shared transcription of `ceilDiv` / `min` that collapsed). Live library stops and returns the partial fill. *Closed:* `allocateToBestCandidate` (`MinFirstDistributionTx.lean:75`) now returns `some (rows, 0)` on a zero share and `allocateLoop` (`:92`) exits with the accumulated `(rows, total, remaining)` prefix instead of reverting, matching the Solidity `break`. The residual gap is the *unallocated remainder*: Solidity returns success with `allocated < allocationSize`, and so does the Lean loop, so `observe` reports a partial fill rather than `MIN_FIRST_ARITHMETIC`.
 
 13. **The +1 model updates by `moduleId`; Verity `replaceFirst` is structural.**
     `MinFirst.incrementSelected` (`Strategy.lean:33–36`) increments the bucket whose `moduleId` equals the selected one. `Source.replaceFirst` (`MinFirstAllocation.lean:158–162`) writes the first row with equal `(allocation, capacity)` words. `selects_least_open_bucket` is about the +1 model; `verity_tx_simulates_min_first_distribution` uses `replaceFirst`.
@@ -164,7 +164,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 17. **`MinFirstCorrespondence.candidate?` is a third copy of the same walk; `RowsCorrespond` erases `active`.**
     `MinFirstCorrespondence.lean:33–40` is the same right-fold as `MinFirst.candidate?` and `Source.candidate?`. `RowsCorrespond` (`:45–46`) requires `hasFreeSpace b = b.open`, i.e. `allocation < capacity` iff `active ∧ allocation < capacity`. So every corresponding row with free space must have `active = true`.
 
-    *Scenario.* Inactive row `{active := false, allocation := 0, capacity := 10}` (issue 1). `RowsCorrespond` is false, so `candidate?_eq_minFirst_candidate?` does not apply. The SOURCE selection lemma only talks about rows that already agree with the +1 model’s `open` flag. Combined with issue 3 (`txDistribute` copy), there are three identical walks and a correspondence that assumes away the `active` discrepancy. The CHECKED selection theorem is `MinFirst.candidate_minimal` on the +1 model, not this third copy.
+    *Scenario.* Inactive row `{active := false, allocation := 0, capacity := 10}` (issue 1). `RowsCorrespond` is false, so `candidate?_eq_minFirst_candidate?` does not apply. The SOURCE selection lemma only talks about rows that already agree with the +1 model’s `open` flag. Combined with issue 3 (`sourceAllocateLoop` copy), there are three identical walks and a correspondence that assumes away the `active` discrepancy. The CHECKED selection theorem is `MinFirst.candidate_minimal` on the +1 model, not this third copy.
 
 18. **Decode length is `bucketCount`; short planted memory pads with 0.**
     `allocate` (`MinFirstDistributionTx.lean:116–122`) reads `bucketCount` / `capacityCount` words. `memoryFor` returns 0 outside the planted range (issue 15 aliases at 129). Live `uint256[]` length is the ABI length.

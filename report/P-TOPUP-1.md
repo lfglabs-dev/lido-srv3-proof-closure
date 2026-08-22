@@ -18,13 +18,16 @@ Over-target (line 737), zero-sum (line 741), Lido-side amount guards (Lido.sol 8
 
 The residual exact-reading gap is closed. Both planes now read $\mathrm{wrappedTotal} = \mathrm{exactTotal} \bmod 2^{256}$ at line 737, line 741, and Lido.sol 842/873. Abstract conjunct 3 is wrap precludes a value-moving commit. Verity no longer assumes `NoUncheckedWrap`; wrap-to-zero is an executed empty success.
 
-Quantifier strength still differs. The abstract parent is an unbounded $\forall$. Verity keeps `hCommit` (`(run cfg inp).reverts = false`), so a nonzero wrap is excluded because the source run reverts rather than because it is an executed Verity observation. `sourceObservables` describes the wrapped success schedule, which `execute` does not produce on a nonzero wrap (the push frame fail-closes). YAML `fidelity.missing` records that gap plus beacon-address provenance.
+The nonzero-wrap quantifier gap is closed. The committing conjunct still carries `hCommit` (`(run cfg inp).reverts = false`), but the registered Verity parent `verity_tx_simulates_source_with_nonzero_wrap_close` conjoins it with an unbounded $\forall$ over uint256-word allocation lists: whenever the exact sum reaches $2^{256}$ and the unchecked total is nonzero, `execute` reverts, `Contract.run` restores the exact entry snapshot, and `observe` reports non-committed. The nonzero-wrap case is therefore an executed Verity observation rather than a case excluded by `hCommit`. YAML `fidelity.missing` now records only beacon-address provenance.
 
 Kill-lines on module / WC / assert-drop / unwrapped-accumulator are parent-shaped. The conservation kill-line uses a wrap witness far from the pinned `uint64` config. Abstract rollback on `TxObservation` is definitional.
 
 CHECKED does not mean bytecode, extracted Solidity, Lido book-keeping, or that the amounts themselves are correct (a consistent wrong array satisfies every conjunct).
 
-Ranked next work: execute a nonzero wrap on the Verity plane; pin beacon-address provenance; do not derive a top-up `LinksSource` from ALLOC.
+Ranked next work: discharge the named `A-TOPUP-BEACON-ADDRESS` provenance assumption from deployment artifacts; do not derive a top-up LinksSource from ALLOC. The general nonzero-wrap Verity revert shape and the wrapped-zero execution subcase are both checked.
+
+Theorems: `PTopup1.source_topup_conserves_and_rolls_back` (registered abstract parent), `PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close` (registered Verity parent), `PTopup1.verity_nonzero_wrap_reverts_and_restores` (universal nonzero-wrap close), `PTopup1.verity_wrap_to_zero_is_empty_commit` (wrap-to-zero partition), `TopupTxMutants.dropped_conservation_assert_kill_line_refutes_parent` (kill-line).
+Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`, `A-TOPUP-BEACON-ADDRESS`.
 
 ## Registered Theorem
 
@@ -138,25 +141,31 @@ the routed model:
   `StakingRouter.sol` line 732's `unchecked` block and the line 744 pull.
   `routerBalanceAfter` and the `Outcome` accessors are updated consistently,
   and the exact-`Nat` reading (`totalAllocated`) remains available where the
-  earlier guards use it. The new theorem `SolidityTopup.run_reverts_of_wrap`
-  proves the honest `run` reverts on any wrapping batch: the wrapped pull is
-  strictly below the exact pushed total, so the push is underfunded or the
-  assert fires. Every other guard/branch is unchanged; the over-target
+  earlier guards use it. Wave 5 stated this as a theorem
+  `run_reverts_of_wrap`: "the honest `run` reverts on any wrapping batch."
+  **That was too strong and was corrected in wave 6** — a wrap-to-zero batch
+  takes the line-741 `committedNoTopUp` branch and does not revert. No theorem
+  of that name survives. The surviving pair is
+  `SolidityTopup.run_wrap_precludes_value_moving_commit`
+  (`TopupCorrespondence.lean:1173`), which proves any wrapping batch has
+  `pulled = 0 ∧ pushed = 0`, and `SolidityTopup.run_wrap_nonzero_reverts`
+  (`:1197`), which recovers "wrap ⇒ reverts" only under the extra hypothesis
+  `accumulated inp ≠ 0`. Every other guard/branch is unchanged; the over-target
   comparison (line 737), the zero-sum test (line 741), and the Lido-side
   amount guards (`Lido.sol` 842/873) still read the exact `Nat` sum — a
   residual fidelity gap, now recorded in `audit/guarantees.yaml`, under which
   a wrap can change *which* revert fires first but not that a wrapping batch
-  reverts.
+  moves no wei.
 - **Re-aimed parent** (`LidoSRv3/Audit/Guarantees/PTopup1.lean`): conjunct 1
   is now genuinely assert-backed — under a wrap the commit cannot happen (the
   assert fires), so conservation on the commit branch is real content, not a
-  same-array `Nat` fact. Conjunct 3 is restated as the direct
-  "wrap ⇒ `run` reverts" fact about `run` itself
-  (`¬ NoUncheckedWrap inp → (run cfg inp).reverts = true`), proved by the
-  renamed standalone lemma `source_wrap_implies_revert` (was
-  `source_wrap_implies_assert_revert`, which concluded
-  `SolidityTopupParent.accumulated ≠ pushedValue` on a separate
-  finer-grained reading). Conjuncts 2 and 4 are intact.
+  same-array `Nat` fact. Wave 5 restated conjunct 3 as "wrap ⇒ `run` reverts"
+  (`¬ NoUncheckedWrap inp → (run cfg inp).reverts = true`) under a lemma then
+  called `source_wrap_implies_revert`. **Wave 6 replaced both**: the registered
+  conjunct 3 is now `PTopup1.source_wrap_precludes_value_moving_commit`
+  (`PTopup1.lean:56–60`), concluding `(run cfg inp).pulled = 0 ∧
+  (run cfg inp).pushed = 0`, because wrap-to-zero commits empty rather than
+  reverting. Conjuncts 2 and 4 are intact.
   `SolidityTopupParent.accumulated`/`routerBalanceAfterWrapped` were retired;
   the parent module now uses the routed `SolidityTopup.accumulated` /
   `routerBalanceAfter`.
@@ -207,9 +216,23 @@ the wrapping batch.
 Verity `verity_tx_simulates_source` dropped the `NoUncheckedWrap` hypothesis.
 It keeps `hLen`, a per-allocation uint256 bound `hAmt` (strictly weaker than
 sum no-wrap), and `hCommit`. Wrap-to-zero is included as
-`execute_observes_source_wrapped_zero`. A nonzero wrap is excluded because
-the source run reverts (`hCommit`); that remaining quantifier mismatch is
-listed in YAML `fidelity.missing`.
+`execute_observes_source_wrapped_zero`.
+
+## Wave 7: closing the nonzero-wrap quantifier gap
+
+The registered Verity parent is now
+`verity_tx_simulates_source_with_nonzero_wrap_close`, the conjunction of the
+committing correspondence above with `verity_nonzero_wrap_reverts_and_restores`.
+The latter is universal in the allocation list: for every `allocations` whose
+entries are uint256 words, if `allocSum allocations ≥ 2^256` and
+`allocSumUnchecked allocations ≠ 0`, then the wrapped pull cannot fund the exact
+push schedule, so `execute` reverts with `Contract.run` returning the exact entry
+snapshot and `observe … |>.committed = false`. The old finite witness
+`[2^256 - 1, 2]` is retained as `verity_nonzero_wrap_witness_reverts_and_restores`,
+a concrete regression instance of that universal statement rather than the
+evidence for it. Together with `verity_wrap_to_zero_is_empty_commit` this
+partitions every wrapping batch on the executed plane, so nonzero wrap is no
+longer excluded by `hCommit`.
 
 ## Scope Exclusions
 

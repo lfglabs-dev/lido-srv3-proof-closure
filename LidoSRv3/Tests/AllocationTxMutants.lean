@@ -13,8 +13,9 @@ private def w (n : Nat) : Word := Verity.Core.Uint256.ofNat n
 
 private def cfg : Config := ⟨w 32, w 64⟩
 
-/-- Two active type-1 modules with distinct ids and addresses. Summaries live
-only at the bound addresses. -/
+/-- Two active type-1 modules with distinct ids and addresses. `stateFor`
+packs each router config into one word; summary maps support only the legacy
+free-count sibling tests below. -/
 private def modA : BoundModule :=
   { moduleId := w 7, moduleAddress := w 17, shareLimit := w 5000
     isActive := true, isType2 := false
@@ -55,11 +56,12 @@ example :
 mutant sees zero depositable/deposited words. -/
 def wrongBindOne (state : ContractState) (index : Nat) : BoundModule :=
   let moduleId := state.readMapUint moduleIdSlot index
+  let packed := state.readMapUint moduleConfigSlot moduleId
   { moduleId := moduleId
-    moduleAddress := state.readMapUint moduleAddressSlot moduleId
-    shareLimit := state.readMapUint shareLimitSlot moduleId
-    isActive := state.readMapUint statusSlot moduleId == 0
-    isType2 := state.readMapUint wcTypeSlot moduleId == 2
+    moduleAddress := configModuleAddress packed
+    shareLimit := configShareLimit packed
+    isActive := configStatus packed == 0
+    isType2 := configWcType packed == 2
     accountingExitedCount := state.readMapUint accountingExitedSlot moduleId
     depositableCount := state.readMapUint summaryDepositableSlot moduleId
     depositedCount := state.readMapUint summaryDepositedSlot moduleId
@@ -72,6 +74,39 @@ def wrongBindView (ms : List BoundModule) (deposits : Word) : View :=
   sourceView cfg bound deposits false
 
 example : wrongBindView modules (w 10) ≠ runView modules (w 10) false := by
+  native_decide
+
+/-- Packed-config positive control: address/share/status/WC are recovered from
+one `ModuleStateConfig` word rather than independent maps. -/
+example :
+    configModuleAddress (packConfig modA) = modA.moduleAddress ∧
+    configShareLimit (packConfig modA) = modA.shareLimit ∧
+    configStatus (packConfig modA) = 0 ∧
+    configWcType (packConfig modA) = 1 := by
+  native_decide
+
+private def summaryBytes (exited deposited depositable : Nat) : List Nat :=
+  List.replicate 31 0 ++ [exited] ++
+  List.replicate 31 0 ++ [deposited] ++
+  List.replicate 31 0 ++ [depositable]
+
+/-- Decoder mutant: swap the first two ABI return words. -/
+private def decodeSummarySwapped (data : List Nat) : Option DecodedSummary :=
+  if 96 ≤ data.length then
+    some
+      { exitedCount := decodeUint256At data 32
+        depositedCount := decodeUint256At data 0
+        depositableCount := decodeUint256At data 64 }
+  else none
+
+/-- Kill-line for the newly live summary boundary. The pinned interface order
+is `(exited, deposited, depositable)`; swapping exited/deposited changes the
+`BoundModule` fields consumed by the allocation loop. -/
+theorem summary_field_order_kill_line_refutes_decoder :
+    decodeSummary (summaryBytes 1 2 3) =
+      some ⟨w 1, w 2, w 3⟩ ∧
+    decodeSummarySwapped (summaryBytes 1 2 3) ≠
+      some ⟨w 1, w 2, w 3⟩ := by
   native_decide
 
 /-- Stale-snapshot mutant: after rebinding module 7 from address 17 to 19,

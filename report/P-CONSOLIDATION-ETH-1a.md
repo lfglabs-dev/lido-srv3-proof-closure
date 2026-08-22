@@ -1,8 +1,16 @@
-# P-ETH-1a
+# P-CONSOLIDATION-ETH-1a (retired as P-CONSOLIDATION-ETH-1 child)
+
+> Status: **retired**. This row is no longer a subordinate guarantee under P-CONSOLIDATION-ETH-1.
+
+Its real subject is vault → Lido / WithdrawalQueue protocol returns. That does not align with the P-CONSOLIDATION-ETH-1 consolidation fee/refund happy path, and it is not P-RESERVE-1 buffer/spend accounting. Lean modules (`eth_flow_confined`, `PConsolidationEth1RefundTx`) remain as **unregistered auxiliary** builds only. A future claim “protocol ETH exits only to Lido/WQ” should be a new guarantee (or folded into a relevant existing one), not restored as an ETH-1 child.
+
+The historical product note and proof audit below are retained for provenance.
+
+---
 
 > Round 2 (2026-08-21). Product note plus proof audit, arbitrated from GPT 5.6 Pro and Opus 5. Fable 5 was unavailable (data-retention gate). Kimi K3 was not an allowed Task model. No em dashes. Lean is authority.
 
-Child of P-ETH-1 for protocol-controlled ETH returns on the consolidation path: the gateway sends a total fee to the WithdrawalVault, refunds the remainder, and the vault can send an amount to Lido. This is not VaultHub or `StakingVault.withdraw`, where the owner picks the recipient.
+Child of P-CONSOLIDATION-ETH-1 for protocol-controlled ETH returns on the consolidation path: the gateway sends a total fee to the WithdrawalVault, refunds the remainder, and the vault can send an amount to Lido. This is not VaultHub or `StakingVault.withdraw`, where the owner picks the recipient.
 
 - abstract `eth_flow_confined`: if every move is already tagged Lido or WithdrawalQueue, filtering to those tags removes nothing
 - Verity `gateway_refund_success_moves_value`: one numeral, $\mathrm{msgValue}=5$, $\mathrm{fee}=3$, vault $+3$, refund recipient $+2$
@@ -11,22 +19,22 @@ The refund recipient is not one of the abstract approved tags. The ledger takes 
 
 ## Proof limitations and recommendations
 
-`eth_flow_confined` is `List.filter_eq_self` under its own hypothesis. The parent's happy path uses `.consolidationContract` and `.refundRecipient`, which `is_approved` rejects, so the child theorem does not apply to traces this repo generates. The Verity theorem is one `decide` numeral. There is no parent-shaped kill-line. Child `assumptions: []` omits the inherited three.
+`eth_flow_confined` is `List.filter_eq_self` under its own hypothesis. The parent's happy path uses `.consolidationContract` and `.refundRecipient`, which `is_approved` rejects, so the child theorem does not apply to those traces. The executable model now has the producer theorem `sourceGateway_committed_splits_to_vault_and_refund` and the named `refund_misroute_kill_line`. The child row now names its inherited assumptions explicitly.
 
 CHECKED does not mean protocol ETH returns land only on Lido or the WithdrawalQueue.
 
-Ranked next work: restate the abstract claim over destinations the models inhabit, or register a producer theorem; add a refund-misroute kill-line; keep VaultHub out.
+Ranked next work: the producer theorem, refund-misroute kill-line, and assumptions honesty edits landed; keep VaultHub out.
 
-Theorems: `PEth1.eth_flow_confined` (abstract), `PEth1RefundTx.gateway_refund_success_moves_value` (verity).
-Assumptions: none listed on the child row; the parent carries `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Theorems: `PConsolidationEth1.eth_flow_confined` (abstract), `PConsolidationEth1RefundTx.sourceGateway_committed_splits_to_vault_and_refund` (producer), `PConsolidationEth1RefundTx.gateway_refund_success_moves_value` (verity), `PConsolidationEth1RefundTxMutants.refund_misroute_kill_line` (kill-line).
+Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
 
-Child of P-ETH-1. Restricts the *protocol-controlled stVault rebalance / redemption* ETH returns: money that the protocol itself sends back should land on Lido or the WithdrawalQueue, not on an arbitrary address. In the architecture that is `WithdrawalVault.withdrawWithdrawals` → `LIDO.receiveWithdrawals`, plus the gateway’s fee send to the vault and the leftover refund to the chosen refund recipient (refund is *not* Lido/WQ — see issues).
+Child of P-CONSOLIDATION-ETH-1. Restricts the *protocol-controlled stVault rebalance / redemption* ETH returns: money that the protocol itself sends back should land on Lido or the WithdrawalQueue, not on an arbitrary address. In the architecture that is `WithdrawalVault.withdrawWithdrawals` → `LIDO.receiveWithdrawals`, plus the gateway’s fee send to the vault and the leftover refund to the chosen refund recipient (refund is *not* Lido/WQ — see issues).
 
 ## Modeling
 
-- Child YAML lists no assumptions. The parent’s `A-ABSTRACT-TX` (not EVM traces), `A-SOURCE-SHAPED` (ledger is not extracted spans), and `A-VERITY-SCAFFOLD` still apply; this file uses those names for the child as well.
+- Child YAML now lists the inherited assumptions explicitly: `A-ABSTRACT-TX` (not EVM traces), `A-SOURCE-SHAPED` (ledger is not extracted spans), and `A-VERITY-SCAFFOLD`.
 - `EthMove` / `is_approved` only allow `.lido` and `.withdrawalQueue`.
 - `StakingVault.withdraw` is **explicitly excluded** (comment on `eth_flow_confined`): the owner may pick any nonzero recipient. That is the most powerful ETH-out path on a vault.
 - Verity side is a **single-contract slot ledger** (`gatewaySlot`, `vaultSlot`, `refundSlot`, `lidoSlot`). External CALLs are `require vaultOk` / `require refundOk` booleans, not value-bearing frames.
@@ -73,7 +81,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 1. **`eth_flow_confined` is a filter tautology.**
    If you already assume every move is approved, filtering to approved moves does nothing, so the totals match. The theorem does not constrain any execution.
 
-   *Counterexample to the intended reading.* `moves = [{100, .lido}, {50, .withdrawalQueue}]` satisfies the hypothesis and the equality. `moves = [{100, .other 0xbad}]` simply makes the hypothesis false — the theorem does not *reject* that execution; it does not apply. There is no “the protocol only produces approved moves” lemma on this child. P-ETH-1’s `eth_flow_parent` is the only producer, and it never emits `.withdrawalQueue` either (its Lido-bound constructor uses `.lido`; the refund uses `.refundRecipient`, which `is_approved` **rejects**).
+   *Counterexample to the intended reading.* `moves = [{100, .lido}, {50, .withdrawalQueue}]` satisfies the hypothesis and the equality. `moves = [{100, .other 0xbad}]` simply makes the hypothesis false — the theorem does not *reject* that execution; it does not apply. There is no “the protocol only produces approved moves” lemma on this child. P-CONSOLIDATION-ETH-1’s `eth_flow_parent` is the only producer, and it never emits `.withdrawalQueue` either (its Lido-bound constructor uses `.lido`; the refund uses `.refundRecipient`, which `is_approved` **rejects**).
 
 2. **Approved-set disagrees with the Verity ledger and with the parent.**
    Parent refunds to `.refundRecipient`, which `is_approved` does not accept. Child Verity `gatewayRefund` *does* credit `refundSlot`.
@@ -88,20 +96,20 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 4. **`StakingVault.withdraw` exclusion plus unmodeled protocol withdraw.**
    The comment excludes the raw owner function. The YAML summary still claims the *protocol-controlled* stVault rebalance/redemption interface.
 
-   *Scenario.* `VaultHub.withdraw(vault, attacker, 50 ether)` (owner, fresh report, amount ≤ withdrawable) goes through `_withdrawFromVault` → `StakingVault.withdraw`. This is protocol-controlled, not the excluded raw entrypoint. ETH lands on `attacker`. The YAML “rebalance” path is `VaultHub.rebalance` → `LIDO.rebalanceExternalEtherToInternal{value:}` — also unmodeled. P-ETH-1a has no `VaultHub` / `Dashboard` model. CHECKED confinement is silent on both protocol vault exits.
+   *Scenario.* `VaultHub.withdraw(vault, attacker, 50 ether)` (owner, fresh report, amount ≤ withdrawable) goes through `_withdrawFromVault` → `StakingVault.withdraw`. This is protocol-controlled, not the excluded raw entrypoint. ETH lands on `attacker`. The YAML “rebalance” path is `VaultHub.rebalance` → `LIDO.rebalanceExternalEtherToInternal{value:}` — also unmodeled. P-CONSOLIDATION-ETH-1a has no `VaultHub` / `Dashboard` model. CHECKED confinement is silent on both protocol vault exits.
 
-5. **WithdrawalQueue is named in `is_approved` and never appears in `PEth1RefundTx`.**
+5. **WithdrawalQueue is named in `is_approved` and never appears in `PConsolidationEth1RefundTx`.**
    No theorem of this child moves wei to a WQ address. Live redemptions pay the **claimant** (`WithdrawalQueueBase._sendValue`), not the WQ contract.
 
    *Scenario.* User claims 10 ETH. Destination is the user’s EOA. `is_approved` would reject `.other user` and does not mention claimants. The abstract destination `.withdrawalQueue` is ornamental.
 
 6. **Mapped `preservesEthBalance` is not in the ledger.**
-   `audit/source-map.yaml` for P-ETH-1a includes `ConsolidationGateway.preservesEthBalance` 118–122 and `WithdrawalVault.preservesEthBalance` 81–85. Those modifiers snapshot `address(this).balance` and revert if it changed. `gatewayRefund` / `withdrawToLido` never read a self-balance; they add/sub slots.
+   `audit/source-map.yaml` for P-CONSOLIDATION-ETH-1a includes `ConsolidationGateway.preservesEthBalance` 118–122 and `WithdrawalVault.preservesEthBalance` 81–85. Those modifiers snapshot `address(this).balance` and revert if it changed. `gatewayRefund` / `withdrawToLido` never read a self-balance; they add/sub slots.
 
    *Scenario.* A vault CALL that leaves leftover wei on the gateway. Live `preservesEthBalance` reverts the whole `addConsolidationRequests`. Lean `gatewayRefund` with `vaultOk = true` commits the slot updates. The mapped modifier is not executed.
 
 7. **`withdrawToLido` spends a slot, not `address(this).balance`.**
-   Live `withdrawWithdrawals` (`WithdrawalVault.sol:107–120`) requires `_amount ≤ address(this).balance` and then `LIDO.receiveWithdrawals{value: _amount}`. Lean requires `amount ≤ vaultSlot` (`PEth1RefundTx.lean:70–79`). The slot is only what `gatewayRefund` wrote.
+   Live `withdrawWithdrawals` (`WithdrawalVault.sol:107–120`) requires `_amount ≤ address(this).balance` and then `LIDO.receiveWithdrawals{value: _amount}`. Lean requires `amount ≤ vaultSlot` (`PConsolidationEth1RefundTx.lean:70–79`). The slot is only what `gatewayRefund` wrote.
 
    *Scenario.* Vault holds 10 ETH from EL rewards / withdrawals sweep; `vaultSlot` is still 1. Live Lido call `withdrawWithdrawals(5)` succeeds. Lean `withdrawToLido 5 true` reverts `NotEnoughEther`. Conversely, Lean can “withdraw” slot credit that was never real ETH. The CHECKED `withdraw_success_moves_to_lido` numeral (`vault 8→3`) is slot arithmetic, not the vault’s ETH.
 
@@ -116,7 +124,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* Live vault CALL keeps the fee, then `_refundFee` fails; the EVM reverts the whole tx. The Lean program never performs an external CALL: it writes slot 1 then `require refundOk`. Proving the slot write disappears is the monad, not `addConsolidationRequests`. Extra revert `ExactFeeHasNoRefund` does not exist in Solidity (`gatewayRefund` rejects `fee = msgValue`; source just skips `_refundFee`).
 
 10. **`sourceGateway` and `gatewayRefund` disagree on exact fee.**
-    `sourceGateway` (`PEth1RefundTx.lean:123–128`) has no `fee != msgValue` arm: when `fee = msgValue` it returns `.committed fee 0`. `gatewayRefund` (`:39`) reverts `ExactFeeHasNoRefund` on that input. The exact-fee path is a *different* function (`gatewayExactFee`).
+    `sourceGateway` (`PConsolidationEth1RefundTx.lean:148–153`) has no `fee != msgValue` arm: when `fee = msgValue` it returns `.committed fee 0`. `gatewayRefund` (`:68`) reverts `ExactFeeHasNoRefund` on that input. The exact-fee path is a *different* function (`gatewayExactFee`).
 
     *Counterexample.* `msgValue = 5`, `fee = 5`, `vaultOk = refundOk = true`, ledger `⟨10, 1, 4, 7⟩`. `sourceGatewayView` commits `⟨10, 6, 4, 7⟩` (vault +5, refund +0). `gatewayRefund 5 5 true true` reverts. The `#guard` that compares the two interpreters uses `(5, 3)` only. There is no `∀` correspondence. CHECKED “source-shaped refund” is two programs that part on the `msg.value = fee` case the live gateway actually takes (`_refundFee` is skipped, not reverted).
 
@@ -148,9 +156,9 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 16. **`refundRecipient = 2^160` is `address(0)` and remaps to `msg.sender`.**
     Extends issue 8 (zero recipient). Live `_refundFee` (`:297–300`): `if (recipient == address(0)) recipient = msg.sender`. `address(2^160) == address(0)`. Lean always credits `refundSlot`; no 160-bit mask.
 
-    *Counterexample.* `refundRecipient = 2^160`, `msg.value = 5`, `fee = 3`, `msg.sender = 0xabc`. Live refunds 2 wei to `0xabc`. Lean `gatewayRefund` credits slot 2 regardless. `run honest 10 2 3` (P-ETH-1) still pays account `6`. CHECKED refund confinement is not 160-bit recipient resolution.
+    *Counterexample.* `refundRecipient = 2^160`, `msg.value = 5`, `fee = 3`, `msg.sender = 0xabc`. Live refunds 2 wei to `0xabc`. Lean `gatewayRefund` credits slot 2 regardless. `run honest 10 2 3` (P-CONSOLIDATION-ETH-1) still pays account `6`. CHECKED refund confinement is not 160-bit recipient resolution.
 
 17. **There is no `requestsCount * fee` in `gatewayRefund`.**
-    Live `addConsolidationRequests` (`:211–213`) does `fee = getConsolidationRequestFee()`, `totalFee = requestsCount * fee` (0.8 checked), then `_checkFee(totalFee)`. Lean `gatewayRefund` takes a single `fee` word. There is no `requestsCount` and no multiply (contrast P-ETH-1 issue 12, wrapping `Expr.mul` on the parent ensemble).
+    Live `addConsolidationRequests` (`:211–213`) does `fee = getConsolidationRequestFee()`, `totalFee = requestsCount * fee` (0.8 checked), then `_checkFee(totalFee)`. Lean `gatewayRefund` takes a single `fee` word. There is no `requestsCount` and no multiply (contrast P-CONSOLIDATION-ETH-1 issue 12, wrapping `Expr.mul` on the parent ensemble).
 
     *Scenario.* `requestsCount = 2`, per-request fee 5, `msg.value = 10`. Live `totalFee = 10`, refund 0, `_refundFee` skipped. Lean `gatewayRefund 10 5 true true` treats 5 as the *total* vault credit and refunds 5. `gateway_refund_success_moves_value` is the numeral `(5, 3)` — not `n * fee`. The CHECKED refund path cannot represent a multi-request exact-fee (refund 0) without the invented `ExactFeeHasNoRefund` revert (issue 10).

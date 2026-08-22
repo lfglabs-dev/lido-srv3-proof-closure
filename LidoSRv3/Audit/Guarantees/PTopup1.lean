@@ -15,6 +15,13 @@ The Verity transaction layer composes the pinned-source observables with the
 executable external-call frames (post-#2362/#2365). -/
 def guarantee : Guarantee := ⟨.pTopup1, [.model, .abstractTx, .source, .verityTx]⟩
 
+/-- Model-side pin used by the executable call journal. Equality of this
+literal with the production deployment is tracked separately as the OPEN
+assumption `A-TOPUP-BEACON-ADDRESS`; this definition does not discharge that
+deployment-provenance obligation. -/
+def canonicalBeaconDepositAddress : Nat :=
+  0x00000000219ab540356cBB839Cbe05303d7705Fa
+
 /-- Source-shaped allocation-model ordering fact; extraction is not established. -/
 theorem valid_result_preserves_router_order
     {snapshot : LidoSRv3.Audit.AllocationSnapshot}
@@ -394,5 +401,105 @@ theorem verity_tx_simulates_source
   · intro failure reason rollback hRevert
     exact Verity.TopupTx.revert_restores_snapshot inp.allocations failure
       _ rollback reason hRevert
+
+/-- Executed wrap-to-zero subcase on the Verity plane. Under an actual wrap
+whose unchecked accumulator is zero, `execute` commits the empty pull/push
+schedule and its observable journal is empty. The complementary nonzero-wrap
+case is `verity_nonzero_wrap_reverts_and_restores` below; together they
+partition wrapping batches. This theorem does not use `hCommit`. -/
+theorem verity_wrap_to_zero_is_empty_commit
+    (inp : SourceTopupInput) (state : Verity.ContractState)
+    (_hWrap : ¬ NoUncheckedWrap inp)
+    (hZero : allocSumUnchecked inp.allocations = 0)
+    (hLen : inp.allocations.length ≤ uint256Modulus)
+    (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus) :
+    let before := Verity.TopupTx.entryFrame state
+    Verity.TopupTx.observe before inp.allocations.length
+        ((Verity.TopupTx.execute inp.allocations .none).run before) =
+          Verity.TopupTx.sourceObservables inp.allocations ∧
+      (Verity.TopupTx.sourceObservables inp.allocations).pulled = 0 ∧
+      (Verity.TopupTx.sourceObservables inp.allocations).pushed = 0 ∧
+      (Verity.TopupTx.sourceObservables inp.allocations).callNames = [] := by
+  dsimp
+  refine ⟨Verity.TopupTx.execute_observes_source_wrapped_zero_from_entry
+    inp.allocations state hZero hLen hAmt, ?_⟩
+  simp [Verity.TopupTx.sourceObservables, hZero]
+
+/-- Executed nonzero-wrap witness retained as a concrete regression instance
+of the universal close below. -/
+theorem verity_nonzero_wrap_witness_reverts_and_restores
+    (state : Verity.ContractState) :
+    let before := Verity.TopupTx.entryFrame state
+    ∃ reason,
+      (Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run before =
+          Verity.ContractResult.revert reason before ∧
+        (Verity.TopupTx.observe before 2
+          ((Verity.TopupTx.execute [uint256Modulus - 1, 2] .none).run before)).committed =
+            false := by
+  dsimp
+  rcases Verity.TopupTx.execute_nonzero_wrap_witness_reverts state with
+    ⟨reason, rollback, hRun, hRollback⟩
+  subst rollback
+  refine ⟨reason, hRun, ?_⟩
+  rw [hRun]
+  rfl
+
+/-- Universal nonzero-wrap close on the Verity plane.  For every list of
+uint256-word allocations, if the exact sum reaches the modulus while its
+unchecked wrapped total is nonzero, the wrapped pull is strictly smaller than
+the exact push schedule.  A real value-bearing frame therefore reverts,
+`Contract.run` restores the entry snapshot, and the outcome is non-committing. -/
+theorem verity_nonzero_wrap_reverts_and_restores
+    (allocations : List Nat) (state : Verity.ContractState)
+    (hWrap : uint256Modulus ≤ allocSum allocations)
+    (hNz : allocSumUnchecked allocations ≠ 0)
+    (hAmt : ∀ a ∈ allocations, a < uint256Modulus) :
+    let before := Verity.TopupTx.entryFrame state
+    ∃ reason,
+      (Verity.TopupTx.execute allocations .none).run before =
+          Verity.ContractResult.revert reason before ∧
+        (Verity.TopupTx.observe before allocations.length
+          ((Verity.TopupTx.execute allocations .none).run before)).committed = false :=
+  Verity.TopupTx.execute_nonzero_wrap_reverts allocations state hWrap hNz hAmt
+
+/-- Predicate packaged from the existing committing-source Verity parent. -/
+def VerityCommittingSimulation (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (state : Verity.ContractState) : Prop :=
+  let before := Verity.TopupTx.entryFrame state
+  Verity.TopupTx.observe before inp.allocations.length
+      ((Verity.TopupTx.execute inp.allocations .none).run before) =
+        Verity.TopupTx.sourceObservables inp.allocations ∧
+    (run cfg inp).pulled =
+      (Verity.TopupTx.sourceObservables inp.allocations).pulled ∧
+    (run cfg inp).pushed =
+      (Verity.TopupTx.sourceObservables inp.allocations).pushed ∧
+    ∀ failure reason rollback,
+      (Verity.TopupTx.execute inp.allocations failure).run before =
+          .revert reason rollback →
+        rollback = before
+
+/-- Registered Verity parent: the full committing-source correspondence,
+including universal injected-failure rollback, conjoined with the universal
+nonzero-wrap revert/non-commit/snapshot-restore close above. -/
+theorem verity_tx_simulates_source_with_nonzero_wrap_close
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (state : Verity.ContractState)
+    (hLen : inp.allocations.length ≤ uint256Modulus)
+    (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)
+    (hCommit : (run cfg inp).reverts = false) :
+    VerityCommittingSimulation cfg inp state ∧
+      ∀ allocations : List Nat,
+        uint256Modulus ≤ allocSum allocations →
+        allocSumUnchecked allocations ≠ 0 →
+        (∀ a ∈ allocations, a < uint256Modulus) →
+        (let before := Verity.TopupTx.entryFrame state
+          ∃ reason,
+            (Verity.TopupTx.execute allocations .none).run before =
+                Verity.ContractResult.revert reason before ∧
+              (Verity.TopupTx.observe before allocations.length
+                ((Verity.TopupTx.execute allocations .none).run before)).committed = false) :=
+  ⟨verity_tx_simulates_source cfg inp state hLen hAmt hCommit,
+    fun allocations hWrap hNz hWords =>
+      verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hWords⟩
 
 end LidoSRv3.Audit.Guarantees.PTopup1

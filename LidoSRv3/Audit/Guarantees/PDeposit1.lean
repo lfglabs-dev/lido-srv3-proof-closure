@@ -12,6 +12,18 @@ open LidoSRv3.Audit.SolidityDeposit
 executable Verity transaction evidence. -/
 def guarantee : Guarantee := ⟨.pDeposit1, [.model, .abstractTx, .source, .verityTx]⟩
 
+/-! Deployment provenance is deliberately not manufactured by the source
+model. `A-DEPOSIT-CONTRACT` pins the immutable `DEPOSIT_CONTRACT` to the
+production beacon deposit contract, while `A-DEPOSIT-32-ETHER` pins both the
+BeaconChainDepositor literal and the router constructor's
+`MAX_EFFECTIVE_BALANCE_WC_TYPE_01` to 32 ether. They remain OPEN assumptions;
+`LinksSource` below remains an independent caller hypothesis. -/
+
+def canonicalDepositContractAddress : Nat :=
+  0x00000000219ab540356cBB839Cbe05303d7705Fa
+
+def thirtyTwoEtherWei : Nat := 32 * 10 ^ 18
+
 /-- Abstract transaction rollback, not an executable EVM trace.  This fact is
 definitional in the `TxObservation` model -- `committedState`/`committedTrace`
 of `.reverted` are `before`/`⟨[], [], []⟩` by definition, and `observation`
@@ -198,6 +210,21 @@ theorem linked_total_eq_depositsValue (cfg : SourceDepositConfig) (inp : SourceD
     (totalAmount inputs).val = depositsValue cfg inp := by
   rw [linked_total_eq_pushedValue cfg inp inputs hLink hNoWrap, pushedValue, loopPushed_eq,
     depositsValue, hCons]
+
+/-- Hypothesis-free executable rollback theorem. Unlike the composed parent,
+this statement takes neither `LinksSource` nor success `Preconditions`: every
+actual `execute` revert restores the exact entry snapshot and observes the idle
+boundary. -/
+theorem verity_tx_revert_restores_snapshot
+    (inputs : Inputs) (entry rollback : _root_.Verity.ContractState)
+    (reason : String)
+    (hRevert : (execute inputs).run entry = .revert reason rollback) :
+    rollback = entry ∧
+      observe entry (probes inputs) ((execute inputs).run entry) =
+        idleObservables entry (probes inputs) :=
+  ⟨revert_after_intermediate_writes_restores_snapshot
+      inputs entry rollback reason hRevert,
+    revert_observes_idle inputs entry rollback reason hRevert⟩
 
 /--
 Parent closure for P-DEPOSIT-1.  One theorem, four shared variables: the pinned

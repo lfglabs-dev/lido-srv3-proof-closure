@@ -14,6 +14,7 @@ Lido's execution-layer buffer is not one pot. `_getBufferedEtherAllocation` (`Li
 `source_spend_preserves_withdrawal_reserve` proves, on any committed call:
 
 - wrapper guards held: $\mathrm{canDeposit} \wedge \mathrm{authorizedRouter}$ (`scopedWithdrawGuards`), derived rather than assumed
+- the live `ZERO_AMOUNT` guard held: $\mathrm{amount} \ne 0$, derived from the committed wrapper
 - the spend is the pinned one (`withdrawalPartitionSpendInvariant`)
 - the queue-facing reserve is unchanged under `freshQueueCache before live` (the cached word equals a live `unfinalizedStETH()` value)
 
@@ -23,11 +24,11 @@ Lido's execution-layer buffer is not one pot. `_getBufferedEtherAllocation` (`Li
 
 Both registered theorems are genuine unbounded universals, conditional on a committed wrapper and (for the parent) freshness. `freshQueueCache` is `before.unfinalizedStETH = live`: one inhabited `live` per state. Stale-cache theorems are premise necessity, not parent kill-lines. Conjunct (3) follows from conjunct (2) plus freshness; a mutant cannot satisfy (2) and violate (3) under a fresh cache.
 
-Guards are free booleans, not bunker / pause / `msg.sender`. The zero-amount guard is not in `scopedWithdrawGuards`. `guard_drop` and `partition_spend` are parent-shaped. The Verity parent has no kill-line of its own. Buffer is a declared word, not `address(this).balance`.
+Guards are free booleans, not bunker / pause / `msg.sender`. The zero-amount guard is separate from `scopedWithdrawGuards` but is already a registered parent conjunct. `guard_drop` and `partition_spend` are parent-shaped. The Verity parent has no kill-line of its own. Buffer is a declared word, not `address(this).balance`.
 
 CHECKED does not mean the reserve cannot be driven to zero by other writers (`setDepositsReserveTarget` plus a report), or that the queue stays payable.
 
-Ranked next work: keep freshness explicit until a live WQ CALL exists; add the zero-amount guard or say it is out; name the reserve-target surface in `fidelity.missing`; do not treat P-RESERVE-RELATIONAL as this parent.
+Ranked next work: keep freshness explicit until a live WQ CALL exists; model the setDepositsReserveTarget/report-rebalance surface; do not treat P-RESERVE-RELATIONAL as this parent.
 
 Theorems: `PReserve1.source_spend_preserves_withdrawal_reserve`, `PReserve1.verity_tx_simulates_reserve_spec`. Parent kill-lines: `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` (kills the `scopedWithdrawGuards` conjunct on a `canDeposit`-dropped mutant) and `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent` (kills the partition-invariant and live-reserve conjuncts on a mutated spend transition). Premise-necessity evidence: `staleQueueCacheKillLine_holds`, `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample`.
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
@@ -138,9 +139,9 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Counterexample to independence.* Mistranscribe both counters as wrapping `+` in all three copies. `verity_tx_simulates_reserve_spec` still holds. Live 0.8 `Accounting` / 0.4.24 Lido packing would wrap or revert on `uint128` (issue 6). The CHECKED simulation cannot see a shared overflow transcription.
 
 12. **`storedDepositsReserve` update uses wrapping `sub`, not `safeSub`.**
-    `ReserveContract.withdraw` (`ReserveCorrespondence.lean:137–139`): `ite (current > amount) (sub current amount) 0`. `sub` is wrapping `Uint256` subtraction. The `>` guard makes underflow unreachable *if* `>` is a value comparison, which it is. `spendDepositableEther` (`:89–92`) uses the same `>` / `-` / `0` pattern on `Word`.
+    `ReserveContract.withdraw` (`ReserveCorrespondence.lean:117–147`, the update at `:140–142`): `ite (current > amount) (sub current amount) 0`. `sub` is wrapping `Uint256` subtraction. The `>` guard makes underflow unreachable *if* `>` is a value comparison, which it is. `spendDepositableEther` (`:75–101`, the same pattern at `:92–95`) uses the same `>` / `-` / `0` pattern on `Word`.
 
-    *Scenario.* A mutant that flipped `>` to `<` would take wrapping `sub` and write a huge `storedDepositsReserve`. The CHECKED invariant *quotes* that same `if > then - else 0` (`:437–439`), so it would hold of the mutant. Live `_spendDepositableEther` (`Lido.sol:855–858`) uses the same 0.4.24 `-` after `>` (buffer itself uses SafeMath `.sub` at 847). The CHECKED “pinned update” is a restatement of the wrapping-`sub` ite, not an independent check that the withdrawals slice was left alone (issue 1).
+    *Scenario.* A mutant that flipped `>` to `<` would take wrapping `sub` and write a huge `storedDepositsReserve`. The CHECKED invariant *quotes* that same `if > then - else 0` (`:439–442`), so it would hold of the mutant. Live `_spendDepositableEther` (`Lido.sol:855–858`) uses the same 0.4.24 `-` after `>` (buffer itself uses SafeMath `.sub` at 847). The CHECKED “pinned update” is a restatement of the wrapping-`sub` ite, not an independent check that the withdrawals slice was left alone (issue 1).
 
 13. **Depositable `+` is 0.4.24 wrap; Lean `safeAdd`s.**
     Live `_getDepositableEther` is raw `depositsReserve + unreserved` (0.4.24, wraps). Lean `getDepositableEther` (`:64–65`) is `safeAdd` → `DEPOSITABLE_OVERFLOW`. Issue 3 already covers `remaining -=`; this is the *other* operator on the same path.

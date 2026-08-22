@@ -13,9 +13,10 @@ axes `report/P-RESERVE-1.md` calls out (issues #1, #2, #5):
 
 * the premise is `modelWithdrawDepositableEther`, the full wrapper
   transition that enforces `canDeposit`/`authorizedRouter`
-  (`scopedWithdrawGuards`) before ever reaching `_spendDepositableEther`, not
-  the bare internal spend helper the original theorem quoted. The conclusion
-  now *proves* `scopedWithdrawGuards inputs`, rather than assuming it: a
+  (`scopedWithdrawGuards`) and the `amount ≠ 0` (`ZERO_AMOUNT`) guard before
+  ever reaching `_spendDepositableEther`, not the bare internal spend helper
+  the original theorem quoted. The conclusion now *proves*
+  `scopedWithdrawGuards inputs` and `amount ≠ 0`, rather than assuming them: a
   guard failure reverts, so it can never reach the `.committed` branch this
   theorem is about;
 * the conclusion adds `liveEffectiveWithdrawalsReserve after live =
@@ -58,6 +59,7 @@ theorem source_spend_preserves_withdrawal_reserve
     (hfresh : freshQueueCache before live)
     (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
     scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
       withdrawalPartitionSpendInvariant before after amount ∧
       liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live := by
   unfold modelWithdrawDepositableEther at h
@@ -67,11 +69,14 @@ theorem source_spend_preserves_withdrawal_reserve
     split at h
     · contradiction
     · rename_i hauth
-      split at h <;> try contradiction
-      refine ⟨⟨?_, ?_⟩, committed_preserves_withdrawal_reserve before after amount h,
-        committed_preserves_live_effective_withdrawals_reserve before after amount live hfresh h⟩
-      · simpa using hcan
-      · simpa using hauth
+      split at h
+      · contradiction
+      · rename_i hAmt
+        refine ⟨⟨?_, ?_⟩, ?_, committed_preserves_withdrawal_reserve before after amount h,
+          committed_preserves_live_effective_withdrawals_reserve before after amount live hfresh h⟩
+        · simpa using hcan
+        · simpa using hauth
+        · exact hAmt
 
 /--
 Faithful VERITY_TX closure for P-RESERVE-1. This theorem starts with the actual

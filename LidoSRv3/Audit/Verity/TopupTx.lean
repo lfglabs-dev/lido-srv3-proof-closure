@@ -422,6 +422,98 @@ theorem pushLoop_run (l : List Nat) :
           simp [beaconJournal, sourcePushes, ha]
         simp [hbal2, hjournal]
 
+/-- If every allocation is a uint256 word but their exact sum exceeds the
+router's balance, the first unfundable nonzero allocation makes the real
+external-call frame revert. -/
+theorem pushLoop_reverts_of_insufficient (l : List Nat) :
+    ∀ (index : Nat) (state : ContractState),
+      (∀ a ∈ l, a < uint256Modulus) →
+      state.selfBalance.val < allocSum l →
+      ∃ reason dirty,
+        pushLoop false l index state = ContractResult.revert reason dirty := by
+  induction l with
+  | nil =>
+      intro index state _ hlt
+      simp [allocSum] at hlt
+  | cons a rest ih =>
+      intro index state hAmt hlt
+      by_cases ha : a = 0
+      · subst a
+        rw [pushLoop, if_pos rfl]
+        apply ih (index + 1) state
+        · intro x hx
+          exact hAmt x (List.mem_cons_of_mem 0 hx)
+        · simpa [allocSum] using hlt
+      · have haLt : a < uint256Modulus := hAmt a List.mem_cons_self
+        have hval : ((a : Uint256)).val = a := word_val haLt
+        by_cases hleNat : a ≤ state.selfBalance.val
+        · have hle : ((a : Uint256)) ≤ state.selfBalance := by
+            show ((a : Uint256)).val ≤ state.selfBalance.val
+            rw [hval]
+            exact hleNat
+          have hnext :
+              (state.selfBalance - (a : Uint256)).val = state.selfBalance.val - a := by
+            have hleVal : (Core.Uint256.ofNat a).val ≤ state.selfBalance.val := by
+              rw [hval]
+              exact hleNat
+            rw [Verity.Core.Uint256.sub_eq_of_le hleVal, hval]
+          have hrestLt :
+              (state.selfBalance - (a : Uint256)).val < allocSum rest := by
+            rw [hnext]
+            simp only [allocSum] at hlt
+            omega
+          rcases ih (index + 1)
+              { state with
+                selfBalance := state.selfBalance - (a : Uint256)
+                calls := state.calls ++ [pushEntry (index, a)] }
+              (fun x hx => hAmt x (List.mem_cons_of_mem a hx)) hrestLt with
+            ⟨reason, dirty, hrest⟩
+          refine ⟨reason, dirty, ?_⟩
+          rw [pushLoop, if_neg ha]
+          simp only [Bind.bind, _root_.Verity.bind, beaconPush_run index a state hle]
+          simp only [Bool.not_false, _root_.Verity.require, if_pos]
+          exact hrest
+        · have hle : ¬ ((a : Uint256)) ≤ state.selfBalance := by
+            intro h
+            exact hleNat (by
+              show a ≤ state.selfBalance.val
+              rw [← hval]
+              exact h)
+          refine ⟨"insufficient balance", state, ?_⟩
+          rw [pushLoop, if_neg ha]
+          have hpush :
+              beaconPush index a state =
+                ContractResult.revert "insufficient balance" state := by
+            simp [beaconPush, Contracts.externalCallBindTo, hle]
+          simp only [Bind.bind, _root_.Verity.bind, hpush]
+
+/-- Pulling a word-sized wrapped total cannot fund allocations whose exact sum
+is larger. The pull frame and credit execute, then the push loop reverts. -/
+theorem pushStage_reverts_of_wrapped_underfunding (l : List Nat) (total : Nat)
+    (st : ContractState)
+    (hbal : st.selfBalance = 0)
+    (hTotal : total < uint256Modulus)
+    (hInsufficient : total < allocSum l)
+    (hAmt : ∀ a ∈ l, a < uint256Modulus) :
+    ∃ reason dirty,
+      pushStage l total .none st = ContractResult.revert reason dirty := by
+  let funded : ContractState :=
+    (({ st with
+          selfBalance := st.selfBalance - (0 : Uint256) + (total : Uint256)
+          calls := st.calls ++ [pullEntry total] }).writeSlot
+      pulledTotalSlot (total : Uint256))
+  have hFunded : funded.selfBalance.val = total := by
+    have hmod : Core.Uint256.modulus = uint256Modulus := by decide
+    simp [funded, hbal, Core.Uint256.val_ofNat, hmod, Nat.mod_eq_of_lt hTotal]
+  rcases pushLoop_reverts_of_insufficient l 0 funded hAmt (by
+      rw [hFunded]
+      exact hInsufficient) with ⟨reason, dirty, hLoop⟩
+  refine ⟨reason, dirty, ?_⟩
+  simp only [pushStage, Bind.bind, _root_.Verity.bind, lidoPull_run, creditPull,
+    _root_.Verity.require, ne_eq, reduceCtorEq, not_false_eq_true, decide_true, if_true,
+    decide_false]
+  exact hLoop
+
 /-! ## Running the transaction -/
 
 theorem cellsOf_writeSlot (state : ContractState) (wordSlot : Nat) (value : Uint256)
@@ -647,6 +739,74 @@ theorem execute_observes_source_wrapped_zero_from_entry (allocations : List Nat)
         ((execute allocations .none).run (entryFrame state))
       = sourceObservables allocations :=
   execute_observes_source_wrapped_zero allocations (entryFrame state) rfl hZero hLen hAmt
+
+/-- Every nonzero unchecked wrap fails closed, not only the concrete regression
+witness below.  The wrapped pull credits strictly less ether than the exact
+sum of the word-sized pushes, so one real external-call frame must revert;
+`Contract.run` then restores the exact transaction-entry snapshot. -/
+theorem execute_nonzero_wrap_reverts (allocations : List Nat) (state : ContractState)
+    (hWrap : uint256Modulus ≤ allocSum allocations)
+    (hNz : allocSumUnchecked allocations ≠ 0)
+    (hAmt : ∀ a ∈ allocations, a < uint256Modulus) :
+    ∃ reason,
+      (execute allocations .none).run (entryFrame state) =
+          ContractResult.revert reason (entryFrame state) ∧
+        (observe (entryFrame state) allocations.length
+          ((execute allocations .none).run (entryFrame state))).committed = false := by
+  have hMod :
+      allocSumUnchecked allocations = allocSum allocations % uint256Modulus :=
+    allocSumUnchecked_eq_mod allocations
+  have hModPos : 0 < uint256Modulus := by decide
+  have hInsufficient :
+      allocSumUnchecked allocations < allocSum allocations := by
+    rw [hMod]
+    exact Nat.lt_of_lt_of_le (Nat.mod_lt _ hModPos) hWrap
+  let staged :=
+    (allocationPass allocations 0 0 (entryFrame state)).writeSlot pulledTotalSlot 0
+  have hStagedBalance : staged.selfBalance = 0 := by
+    simp [staged, allocationPass_selfBalance, entryFrame]
+  have hWrappedLt : allocSumUnchecked allocations < uint256Modulus := by
+    rw [hMod]
+    exact Nat.mod_lt _ hModPos
+  rcases pushStage_reverts_of_wrapped_underfunding allocations
+      (allocSumUnchecked allocations) staged hStagedBalance hWrappedLt
+      hInsufficient hAmt with ⟨reason, dirty, hPush⟩
+  have hExecute :
+      execute allocations .none (entryFrame state) =
+        ContractResult.revert reason dirty := by
+    simp only [execute, allocationStage, Bind.bind, _root_.Verity.bind,
+      _root_.Verity.require, ne_eq, reduceCtorEq, not_false_eq_true, decide_true,
+      if_true, hNz, if_false]
+    simp only [staged] at hPush ⊢
+    exact hPush
+  refine ⟨reason, ?_, ?_⟩
+  · simp [Contract.run, hExecute]
+  · rw [show (execute allocations .none).run (entryFrame state) =
+      ContractResult.revert reason (entryFrame state) by simp [Contract.run, hExecute]]
+    rfl
+
+/-- Concrete nonzero-wrap execution witness. The unchecked sum of
+`[2^256 - 1, 2]` is one, so the pull credits one wei; the first beacon push
+then attempts `2^256 - 1` wei and the real external-call frame fails closed.
+`Contract.run` restores the exact entry snapshot. -/
+theorem execute_nonzero_wrap_witness_reverts (state : ContractState) :
+    ∃ reason rollback,
+      (execute [uint256Modulus - 1, 2] .none).run (entryFrame state) =
+          ContractResult.revert reason rollback ∧
+        rollback = entryFrame state := by
+  have hmod : Core.Uint256.modulus = uint256Modulus := by decide
+  simp [execute, Contract.run, allocationStage, allocSumUnchecked,
+    pushStage, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
+    lidoPull_run, creditPull, pushLoop, beaconPush, externalCallBindTo,
+    allocationPass_selfBalance, entryFrame, hmod, uint256Modulus]
+
+/-- The witness is observably a non-commit as well as a state rollback. -/
+theorem execute_nonzero_wrap_witness_observes_noncommit (state : ContractState) :
+    (observe (entryFrame state) 2
+      ((execute [uint256Modulus - 1, 2] .none).run (entryFrame state))).committed = false := by
+  rcases execute_nonzero_wrap_witness_reverts state with ⟨reason, rollback, h, _⟩
+  rw [h]
+  rfl
 
 /-- The batch spends every wei it pulled: the executable counterpart of the
 final `assert(address(this).balance == 0)`. -/

@@ -1,7 +1,7 @@
 import Verity.Core.Model.DenoteFunctionCalls
 
 /-!
-# P-ETH-1: composed multi-contract ETH transaction
+# P-CONSOLIDATION-ETH-1: composed multi-contract ETH transaction
 
 Recursive dispatch of source-shaped `FunctionSpec` bodies through Verity's
 external-call frames (`MultiContract.callFunction`) over one shared
@@ -33,7 +33,7 @@ This is a model-plane ensemble.  It does not claim that the corresponding Lido
 Solidity functions have been compiled by Verity.
 -/
 
-namespace LidoSRv3.Audit.Verity.PEth1CompositionTx
+namespace LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
 
 open _root_.Verity
 open Compiler.CompilationModel.DenoteExternalCalls
@@ -412,12 +412,12 @@ route retains ETH, and none reaches an address outside the approved set
 
 **Scope.** These three tuples are regression witnesses.  The general
 statement is the universal parent
-`PEth1CompositionTxUniversal.run_success_shape` (registered as
-`Guarantees.PEth1.verity_tx_universal_success_shape`), which proves this
+`PConsolidationEth1CompositionTxUniversal.run_success_shape` (registered as
+`Guarantees.PConsolidationEth1.verity_tx_universal_success_shape`), which proves this
 success shape for every funded, guard-passing, non-wrapping batch that fits
 `fuelBudget`; each witness below is that theorem instantiated.  Outside the
 premises,
-`PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget` exhibits
+`PConsolidationEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget` exhibits
 a funded, guard-passing tuple whose dispatch exhausts `fuelBudget` instead of
 reaching this success shape. -/
 theorem batch_splits_fee_and_refund :
@@ -444,6 +444,24 @@ theorem underfunded_batch_reverts_in_gateway :
       ⟨.calleeReverted gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ := by
   decide +kernel
 
+/-- Executable revert-shape partition for the four distinct non-success
+boundaries of the honest Verity ensemble.  The gateway rejects zero value,
+wrapped fee multiplication and underfunding after two entered frames; a
+guard-passing batch that exceeds dispatcher fuel reports exhaustion after
+32 frames.  Every shape reads balances through `finalWorld`, so each case also
+asserts transaction-entry rollback rather than only a control tag. -/
+theorem honest_revert_partition :
+    observe (run honest 0 2 0) =
+        ⟨.calleeReverted gatewayAddr, 2, ⟨0, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      observe (run honest 10 2 (2 ^ 255)) =
+        ⟨.calleeReverted gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      observe (run honest 10 4 3) =
+        ⟨.calleeReverted gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+      observe (run honest 30 29 1) =
+        ⟨.exhausted, fuelBudget, ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ := by
+  refine ⟨by decide +kernel, by decide +kernel, underfunded_batch_reverts_in_gateway,
+    by decide +kernel⟩
+
 /-- ETH is conserved across the ensemble on both the committing and the
 reverting route. -/
 theorem dispatch_conserves_eth :
@@ -461,7 +479,7 @@ theorem dispatch_matches_atomic_multicall :
     replay (run honest 10 2 3) = (observe (run honest 10 2 3)).balances := by
   refine ⟨by decide +kernel, by decide +kernel⟩
 
-/-- Auxiliary P-ETH-1 Verity-plane evidence (numeral witnesses plus rollback,
+/-- Auxiliary P-CONSOLIDATION-ETH-1 Verity-plane evidence (numeral witnesses plus rollback,
 conservation, and replay facts).
 
 A single root call is dispatched into a shared `MultiWorld`; every onward hop
@@ -475,16 +493,16 @@ anywhere on the route restores the transaction-entry balance sheet, and (iv)
 the recursive dispatch agrees with the atomic compiled-multicall semantics.
 
 **Scope.** The registered Verity-plane parent is the universal
-`Guarantees.PEth1.verity_tx_universal_success_shape`
-(`PEth1CompositionTxUniversal.run_success_shape`): every funded,
+`Guarantees.PConsolidationEth1.verity_tx_universal_success_shape`
+(`PConsolidationEth1CompositionTxUniversal.run_success_shape`): every funded,
 guard-passing, non-wrapping batch within `fuelBudget` reaches the success
 shape, of which the three committing witnesses below are instances.  The
 fuel-bounded recursive dispatch (`fuelBudget = 32`) and the wrapping
 `Expr.mul` in the compiled bodies (report issues 9 and 12) are exactly the
 universal parent's premises rather than silent scope limits; see
-`PEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget` for the
+`PConsolidationEth1CompositionTxMutants.large_funded_batch_exhausts_fuel_budget` for the
 fuel-premise counterexample.  Composition into `P-CONSOLIDATION-1` is out of
-scope regardless (`audit/P-ETH-1-COMPOSITION.md`). -/
+scope regardless (`audit/P-CONSOLIDATION-ETH-1-COMPOSITION.md`). -/
 theorem verity_tx_composes_value_flow_and_rollback :
     (observe (run honest 10 2 3) = ⟨.success, 6, ⟨0, 0, 0, 0, 0, 6, 4⟩⟩ ∧
       observe (run honest 10 1 3) = ⟨.success, 5, ⟨0, 0, 0, 0, 0, 3, 7⟩⟩ ∧
@@ -504,4 +522,4 @@ theorem verity_tx_composes_value_flow_and_rollback :
    dispatch_conserves_eth,
    dispatch_matches_atomic_multicall⟩
 
-end LidoSRv3.Audit.Verity.PEth1CompositionTx
+end LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx

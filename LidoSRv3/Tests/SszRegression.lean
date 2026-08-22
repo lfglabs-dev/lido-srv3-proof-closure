@@ -215,6 +215,7 @@ def composedExample_satisfies_composed_ssz_encoding :=
   composed_ssz_encoding (operation := .clValidatorVerifier)
     (combine := sourceCombine composedExample.src) composedExample
     (by decide) (by decide) (by decide) (by decide) (by decide)
-    (sourceWitness_binds_sourceNode compositionSrc (by decide) (by decide) (by decide))
+    (LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode compositionSrc
+      (by decide) (by decide) (by decide))
 
 end LidoSRv3.Tests.SszRegression

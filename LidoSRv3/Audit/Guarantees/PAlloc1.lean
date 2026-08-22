@@ -129,10 +129,12 @@ theorem source_capacities_and_mapped_summary_transaction
   exact ⟨source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds,
     _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_phase3_transaction moduleAddress⟩
 
-/-- One handwritten bind+execute: if `sourceBindAll state n` recovers
+/-- Legacy/free-count sibling: if `sourceBindAll state n` recovers
 `modules`, then `observe` of `allocate n` (which reads the persisted
 allocation/capacity/address arrays) equals `sourceView` of the same
-`AllocCapacity` interpreter. Not a live summary CALL. -/
+`AllocCapacity` interpreter. It now reads packed `ModuleStateConfig`, but its
+summary fields remain planted and `n` is a harness argument. The registered
+theorem below closes those two gaps without widening into P-ALLOC-2. -/
 theorem verity_tx_simulates_allocation
     (cfg : Config) (modules : List _root_.LidoSRv3.Audit.Verity.AllocationTx.BoundModule)
     (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)
@@ -146,6 +148,35 @@ theorem verity_tx_simulates_allocation
         cfg modules depositsToAllocate isTopUp :=
   _root_.LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_pinned_source
     cfg modules depositsToAllocate isTopUp state hBind
+
+/-- Storage-backed P-ALLOC-1 live-summary transaction closure. The router
+module count is read from storage and capped at 32. `bindLiveAll` reads each
+packed `ModuleStateConfig`, executes the mapped summary staticcall, ABI-decodes
+the returned `(exited, deposited, depositable)` words, and passes those rows to
+the allocation loop. The premise says those adversarial call observations
+decode to the source-view rows. `getTotalModuleStake` remains outside this
+claim and is not faked as checked. -/
+theorem verity_tx_simulates_allocation_count_from_storage
+    (adversary :
+      Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+    (cfg : Config)
+    (modules : List _root_.LidoSRv3.Audit.Verity.AllocationTx.BoundModule)
+    (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)
+    (state : Verity.ContractState)
+    (hLength : modules.length = min
+      (state.readSlot
+        _root_.LidoSRv3.Audit.Verity.AllocationTx.modulesCountSlot).val 32)
+    (hBind :
+      (_root_.LidoSRv3.Audit.Verity.AllocationTx.bindLiveAll
+        adversary state 0 modules.length) state =
+      .success modules state) :
+    _root_.LidoSRv3.Audit.Verity.AllocationTx.observe modules
+        ((_root_.LidoSRv3.Audit.Verity.AllocationTx.allocateLiveFromStorage
+          adversary cfg depositsToAllocate isTopUp).run state) =
+      _root_.LidoSRv3.Audit.Verity.AllocationTx.sourceView
+        cfg modules depositsToAllocate isTopUp :=
+  _root_.LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_live_summary_from_storage
+    adversary cfg modules depositsToAllocate isTopUp state hLength hBind
 
 /-- Every revert of the allocation transaction, including the injected
 failure after intermediate map/slot writes, restores the pre-call snapshot. -/

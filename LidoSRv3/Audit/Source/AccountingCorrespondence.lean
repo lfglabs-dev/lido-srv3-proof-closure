@@ -15,10 +15,11 @@ minted and distributed.  The source spans are registered in
 This module models exactly the accounting-relevant guards in the transitive
 router write: array lengths and module order, `MAX_VALUE_GWEI`, the uint64 cast,
 and the checked uint64 accumulation.  Those partial guards do not establish
-that the rest of the pinned report avoids a later revert.  Trace construction
-therefore requires an independent `fullReportSucceeds` premise supplied by the
-caller.  External-call authorization, the truthfulness of oracle calldata, and
-that full-success premise remain interface assumptions.  Yul, EVM, runtime
+that the rest of the pinned report avoids a later revert.  The demoted
+constructor-order child now uses `sourceTraceRetired`, which carries no
+load-bearing full-report success premise.  The legacy `sourceTrace` adapter is
+retained only for API compatibility. External-call authorization and the
+truthfulness of oracle calldata remain interface assumptions. Yul, EVM, runtime
 identity, cryptography, and end-to-end deployment composition are not claimed.
 -/
 
@@ -112,6 +113,18 @@ def sourceTrace (fullReportSucceeds : ReportInput → Nat → Prop)
   let accepted ← accept i
   pure (successfulSteps accepted sharesToMintAsFees)
 
+/-- Explicit marker for the retired success premise.  It is intentionally
+`True` and is not used by the demoted constructor-order child. -/
+def FullReportSucceedsRetired : ReportInput → Nat → Prop := fun _ _ => True
+
+/-- Premise-free trace projection for the demoted source child.  This says only
+what constructor order follows when the locally modeled `accept` succeeds; it
+does not claim that the full live oracle report succeeds. -/
+def sourceTraceRetired (i : ReportInput) (sharesToMintAsFees : Nat) :
+    Option (List Step) := do
+  let accepted ← accept i
+  pure (successfulSteps accepted sharesToMintAsFees)
+
 /-- Result supplied by an independent full-source executor or validator. -/
 inductive FullReportResult (successful : Prop) : Type
   | reverted
@@ -187,6 +200,17 @@ theorem source_report_before_reward
     ∃ balances, trace = [.balancesWritten balances, .accountingCalled,
       .rewardsRead balances, .rewardsMinted] := by
   simp [sourceTrace, successfulSteps, hFees, Option.bind_eq_some_iff] at h
+  rcases h with ⟨accepted, hAccepted, rfl⟩
+  exact ⟨accepted.balancesGwei, rfl⟩
+
+/-- Replacement demoted child with no caller-supplied full-success binder. -/
+theorem source_report_before_reward_retired
+    (i : ReportInput) (sharesToMintAsFees : Nat)
+    (hFees : 0 < sharesToMintAsFees) (trace : List Step)
+    (h : sourceTraceRetired i sharesToMintAsFees = some trace) :
+    ∃ balances, trace = [.balancesWritten balances, .accountingCalled,
+      .rewardsRead balances, .rewardsMinted] := by
+  simp [sourceTraceRetired, successfulSteps, hFees, Option.bind_eq_some_iff] at h
   rcases h with ⟨accepted, hAccepted, rfl⟩
   exact ⟨accepted.balancesGwei, rfl⟩
 

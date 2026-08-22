@@ -2,10 +2,14 @@ import Verity.Core
 import Verity.Stdlib.Math
 
 /-!
-# P-ETH-1a gateway/vault refund transaction
+# Retired P-CONSOLIDATION-ETH-1a gateway/vault refund transaction (unregistered)
 
-Source-shaped `Contract.run` ledger for the inventoried P-ETH-1a ETH paths at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Source-shaped `Contract.run` ledger formerly filed as child `P-CONSOLIDATION-ETH-1a`. Kept as
+buildable auxiliary evidence only: vault→Lido/WQ returns are not the
+consolidation fee/refund happy path of `P-CONSOLIDATION-ETH-1` and are not P-RESERVE-1 buffer
+accounting. Not a registry row.
+
+Pins: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
 * `ConsolidationGateway.addConsolidationRequests` (lines 185--223) sends
   `requestsCount * fee` to `WithdrawalVault`
@@ -21,7 +25,7 @@ happen before later `require`s so a failed refund discards the vault fee
 credit.
 -/
 
-namespace LidoSRv3.Audit.Verity.PEth1RefundTx
+namespace LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx
 
 open _root_.Verity
 open _root_.Verity.Stdlib.Math
@@ -147,6 +151,24 @@ def sourceGateway (msgValue fee : Nat) (vaultOk refundOk : Bool) : SourceOutcome
   else if !vaultOk then .reverted "VaultCallFailed"
   else if fee < msgValue && !refundOk then .reverted "FeeRefundFailed"
   else .committed fee (msgValue - fee)
+
+/-- Producer theorem for the destinations this executable model actually
+inhabits. Any committed gateway run names both legs explicitly: the vault gets
+the fee and the resolved refund destination gets the remainder. This avoids
+misapplying the abstract Lido/WithdrawalQueue filter to gateway traces whose
+destinations are instead vault/refund. -/
+theorem sourceGateway_committed_splits_to_vault_and_refund
+    (msgValue fee feeToVault refundToDest : Nat) (vaultOk refundOk : Bool)
+    (h : sourceGateway msgValue fee vaultOk refundOk =
+      .committed feeToVault refundToDest) :
+    feeToVault = fee ∧ refundToDest = msgValue - fee := by
+  unfold sourceGateway at h
+  split at h <;> try contradiction
+  split at h <;> try contradiction
+  split at h <;> try contradiction
+  split at h <;> try contradiction
+  injection h
+  simp_all
 
 def sourceWithdraw (amount vault : Nat) (callerIsLido : Bool) : SourceOutcome :=
   if !callerIsLido then .reverted "NotLido"
@@ -292,4 +314,4 @@ theorem withdraw_success_moves_to_lido :
   ((observe ((gatewayRefund (word 5) (word 3) true true).run
       (stateFor ⟨10, 1, 0, 7⟩ defaultState))).ledger.refundDest = 2)
 
-end LidoSRv3.Audit.Verity.PEth1RefundTx
+end LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx

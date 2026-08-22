@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: b522d143686ac5e068ced1062a6e31060d191cc6
+validated-tree: f773404df9c33e5cb357af0dbb9a533f893a380c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -273,7 +273,7 @@ Wave 2 coordinator: sequential merge closure and receipt rebind (2026-08-19)
   resolve an `EXPECTED_CANONICAL_DETAIL_SHA256` conflict with the
   already-merged `P-ACCOUNT-1` row), `P-DEPOSIT-1` (#126, `6edcb6f`, rebased
   to resolve an append-order conflict in this receipt and to rebind this
-  receipt's own `validated-tree` to the rebased commit), `P-ETH-1` (#125,
+  receipt's own `validated-tree` to the rebased commit), `P-CONSOLIDATION-ETH-1` (#125,
   `ea6c291`), and `P-SSZ-1` (#129, `fe1d7d4`).
 - Each branch was independently re-verified before merge: registered parent
   non-vacuous, kill-line mutant refutes the registered parent (not a
@@ -286,7 +286,7 @@ Wave 2 coordinator: sequential merge closure and receipt rebind (2026-08-19)
 - This entry does not change any guarantee, theorem, or metadata row itself.
   It only rebinds `validated-tree` above from the `P-DEPOSIT-1` rebase
   commit's tree (`096e83e8cd23caecd7b7b64aba257dc0a7bfc456`) to the tree
-  produced by `HEAD` after the two subsequent merges (`P-ETH-1`, `P-SSZ-1`)
+  produced by `HEAD` after the two subsequent merges (`P-CONSOLIDATION-ETH-1`, `P-SSZ-1`)
   that landed on top of it, each of which advanced the tracked tree without
   re-rebinding this append-only receipt in turn. The new value,
   `0f6a92a876288b78e0ea2082aff706fff1f5f682`, is recomputed with the same
@@ -682,10 +682,10 @@ P-RESERVE-RELATIONAL checked locked-ETH accumulator (2026-08-18)
   rebound to the post-merge tracked tree excluding this receipt.
 - The merge exposed a pre-existing metadata defect on `main`, repaired here in
   its own commit. #103's integration merge `de538a0` kept the stale
-  `EXPECTED_CANONICAL_DETAIL_SHA256` entry `9f79007c` for `P-ETH-1` (the digest
+  `EXPECTED_CANONICAL_DETAIL_SHA256` entry `9f79007c` for `P-CONSOLIDATION-ETH-1` (the digest
   of the superseded `OPEN` row) while taking main's closed `CHECKED` claims
   tuple, so `python3 scripts/audit_metadata.py check` failed on `main` with
-  "P-ETH-1: canonical assurance detail differs". The `P-ETH-1` row itself is
+  "P-CONSOLIDATION-ETH-1: canonical assurance detail differs". The `P-CONSOLIDATION-ETH-1` row itself is
   byte-identical at the merge base `1a90395`, at `main` `fff2c27`, and here;
   its digest is `eafed670`, the value `main` carried at `1a90395` when the
   check was last green. The pin is restored to `eafed670`. No guarantee row,
@@ -803,7 +803,7 @@ P-TOPUP-1 external-call-frame repair of the faithful plane (2026-08-18)
   exit 0.
 - Merged `origin/main` twice by normal merge, never rebase: first `b59c650`
   (P-SSZ-1 closure, #100, itself carrying P-CONSOLIDATION-1 closure, #101),
-  then `0ea45b1` (P-ETH-1 parent composition closure, #94). This supersedes
+  then `0ea45b1` (P-CONSOLIDATION-ETH-1 parent composition closure, #94). This supersedes
   the earlier merge of `5fcfe44` (P-ACCOUNT-1 closure, #99).
 - Verity is re-pinned by that second merge from
   `8719dc52e8c581e37bab4594fed11b11c41494b8` to
@@ -814,14 +814,14 @@ P-TOPUP-1 external-call-frame repair of the faithful plane (2026-08-18)
   `PTopup1.guarantee` docstring names.
 - `audit/guarantees.yaml` needed no hand resolution in the second merge; the
   two sides again edit disjoint entries (this branch `P-TOPUP-1` alone, main
-  `P-ETH-1` alone) and the merged file differs from main only in `P-TOPUP-1`.
+  `P-CONSOLIDATION-ETH-1` alone) and the merged file differs from main only in `P-TOPUP-1`.
   The first merge did require it, and was resolved by taking main's file in
   full and restoring only the `P-TOPUP-1` entry. That also discharged this
   branch's metadata debt: the stale `P-CONSOLIDATION-1` row carried from
   `5fcfe44` (`OPEN` / `PARTIAL` / `VERITY_FEATURE_REQUIRED` / `P2`) is replaced
   by main's merged state (`CHECKED` / `CHECKED` / `NONE` / `DONE`).
 - `scripts/audit_metadata.py` conflicted in `EXPECTED_PRIORITIES` and was
-  resolved on the same disjoint-edit principle: main retires `P-ETH-1` to
+  resolved on the same disjoint-edit principle: main retires `P-CONSOLIDATION-ETH-1` to
   `DONE`, this branch retires `P-TOPUP-1` to `DONE`, and both are kept. The
   resolved file differs from main only in the three `P-TOPUP-1` fields.
 - Pre-existing defect found on `origin/main` and repaired here, since this
@@ -848,7 +848,7 @@ P-TOPUP-1 external-call-frame repair of the faithful plane (2026-08-18)
 - Receipt subject: tracked tree excluding this receipt,
   `6fb2bb393dcbd1addd9cbc0ad70e22cd95fe27d7`.
 
-P-ETH-1 parent composition closure (2026-08-18)
+P-CONSOLIDATION-ETH-1 parent composition closure (2026-08-18)
 ------------------------------------------------
 
 - Verity is re-pinned from `8719dc52e8c581e37bab4594fed11b11c41494b8` to merged
@@ -856,11 +856,11 @@ P-ETH-1 parent composition closure (2026-08-18)
   PR #2362 (external-call frames) and PR #2365 (atomic compiled multicall). The
   lakefile request, resolved manifest `rev`/`inputRev`, artifact lock, audit
   manifest, source map, provenance fixture, and checkout all agree on that SHA.
-- `LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent` closes the abstract plane
+- `LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent` closes the abstract plane
   over `EthPath`, whose three constructors are the complete ETH-bearing
   call-site inventory. For every path it proves no wei reaches a lateral
   destination and that the committed trace totals exactly the entering value.
-- `LidoSRv3.Audit.Verity.PEth1CompositionTx.run` dispatches the compiled
+- `LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run` dispatches the compiled
   Bus/Gateway/Vault ensemble recursively over one shared
   `MultiContract.MultiWorld`. Each hop is a real PR #2362 frame: `callFunction`
   enters the callee's `FunctionSpec`, the body executes under
@@ -880,7 +880,7 @@ P-ETH-1 parent composition closure (2026-08-18)
   batch, ETH conservation on success and on revert, and equality between the
   recursively dispatched run and a PR #2365 `denoteTransaction` replay of the
   discovered `List CompiledCall`.
-- `LidoSRv3.Tests.PEth1CompositionTxMutants` runs the same ensemble and the same
+- `LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants` runs the same ensemble and the same
   dispatcher under a mutated `Wiring`, so no mutant can be killed by weakening
   the parent statement. The five mutants are drop (`emitRefund := false`),
   misroute (`vaultTarget := lidoAddr`), corrupt (`refundWholeValue := true`),
@@ -894,16 +894,16 @@ P-ETH-1 parent composition closure (2026-08-18)
   `sorry`, `admit`, `native_decide`, or project-level axiom is introduced.
 - `lake build LidoSRv3.Audit.Trust LidoSRv3.Audit.AllGuarantees`: exit 0,
   `Build completed successfully (1290 jobs)` under Lean 4.31.0.
-- `P-ETH-1` is promoted to abstract `CHECKED` / Verity `CHECKED` with a real
-  `P-ETH-1` source-map target covering all six inventory spans, so the former
-  `P-ETH-1` exemption in `scripts/audit_metadata.py` is removed rather than
-  tolerated. `P-ETH-1a` and `P-ETH-1b` stay bounded per-leg children.
+- `P-CONSOLIDATION-ETH-1` is promoted to abstract `CHECKED` / Verity `CHECKED` with a real
+  `P-CONSOLIDATION-ETH-1` source-map target covering all six inventory spans, so the former
+  `P-CONSOLIDATION-ETH-1` exemption in `scripts/audit_metadata.py` is removed rather than
+  tolerated. `P-CONSOLIDATION-ETH-1a` and `P-CONSOLIDATION-ETH-1b` stay bounded per-leg children.
 - Standing scope is unchanged: the parent is a model-plane composition under
   `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, and `A-ABSTRACT-TX`. It does not claim
   the Bus, Gateway, or Vault are the pinned Solidity contracts compiled to
   bytecode, nor that these are executable EVM trace semantics. Identifying the
   immutable `CONSOLIDATION_REQUEST` value with the canonical EIP-7251 address
-  remains the separate `P-ETH-1b` provenance obligation.
+  remains the separate `P-CONSOLIDATION-ETH-1b` provenance obligation.
 - Receipt subject: tracked tree excluding this receipt,
   `78e69c3ec590add55c38a8589a473d969b5f3263`.
 
@@ -1046,7 +1046,7 @@ Verity #2360 pin bump (2026-08-17)
 - Lakefile, manifest, artifact lock, audit manifest, source-map, and provenance
   fixtures now pin Verity `c8cbae3375580d01856efd36f3164fc4ecd05b9c`.
 - Existing ledgers compile against the storage-lens flip via `writeSlot` /
-  `writeMapUint`. Parent `P-ETH-1` stays OPEN; children stay CHECKED.
+  `writeMapUint`. Parent `P-CONSOLIDATION-ETH-1` stays OPEN; children stay CHECKED.
 - Receipt subject: tracked tree excluding this receipt,
   `d675f6c03de0b90b436cd61fd164867bf6880cd4`.
 
@@ -2351,13 +2351,13 @@ Wave 4: P-TOPUP-1 abstract-parent kill-line remediation (2026-08-19)
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree` above.
 
-Wave 4: P-ETH-1 parent kill-lines on gatewayExecute mutants (2026-08-19)
+Wave 4: P-CONSOLIDATION-ETH-1 parent kill-lines on gatewayExecute mutants (2026-08-19)
 ------------------------------------------------------------------------
 
-- Fixes P-ETH-1: the registered parent
-  `LidoSRv3.Audit.Guarantees.PEth1.eth_flow_parent` had no kill-line that
+- Fixes P-CONSOLIDATION-ETH-1: the registered parent
+  `LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent` had no kill-line that
   refutes its own predicate on a mutant of its own model. The wave-1
-  "kills" in `Tests/PEth1CompositionTxMutants.lean` were inert:
+  "kills" in `Tests/PConsolidationEth1CompositionTxMutants.lean` were inert:
   `rejects_unapproved_journal_entry` quantified over a hand-built
   one-move list the parent never mentions (the parent quantifies over
   `gatewayExecute`'s output, not over arbitrary lists), and
@@ -2365,7 +2365,7 @@ Wave 4: P-ETH-1 parent kill-lines on gatewayExecute mutants (2026-08-19)
   the parent's first clause already requires exactly that behaviour, so
   nothing was refuted. The wave-2 kills bound the Verity plane's
   finite-witness scope, not `eth_flow_parent`.
-- Fix applied: `Tests/PEth1CompositionTxMutants.lean` factors the
+- Fix applied: `Tests/PConsolidationEth1CompositionTxMutants.lean` factors the
   parent's per-outcome predicate out as `parentOutcomePredicate` and
   proves it is exactly the registered parent's conclusion
   (`parentOutcomePredicate_is_eth_flow_parent_conclusion`: on the honest
@@ -2389,23 +2389,23 @@ Wave 4: P-ETH-1 parent kill-lines on gatewayExecute mutants (2026-08-19)
   refute this parent -- its `.zeroArgument` clause is one-directional and
   an empty success at `msgValue = 0` satisfies the success conjunct -- so
   the zero-value mutant must (and does) move wei.
-- `audit/P-ETH-1-COMPOSITION.md` and `report/P-ETH-1.md`: the stale
+- `audit/P-CONSOLIDATION-ETH-1-COMPOSITION.md` and `report/P-CONSOLIDATION-ETH-1.md`: the stale
   `EthPath`/`pathTrace`/`pathFunded` narrative (definitions removed by
   the wave-1 rewrite) is replaced with the current
   `gatewayExecute`/`ApprovedSet` parent, its `split_ifs` proof, and the
   new kill-lines; issues 1, 3, 6, 10, 13, 14, 15 and the resolution
   table are rewritten against the current model.
-- `audit/guarantees.yaml`'s `P-ETH-1` row: `summary`,
+- `audit/guarantees.yaml`'s `P-CONSOLIDATION-ETH-1` row: `summary`,
   `fidelity.covered`, and `reproduction.expected` now cite the wave-4
   parent kill-lines accurately and describe the wave-1 theorems as
   honest-model confirmations; `abstract.theorem`, `verity.theorem`,
   `classification`, `assumptions`, `next_gate`, and the
-  P-ETH-1a/P-ETH-1b subordinate rows are unchanged.
+  P-CONSOLIDATION-ETH-1a/P-CONSOLIDATION-ETH-1b subordinate rows are unchanged.
   `scripts/audit_metadata.py`'s
-  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ETH-1"]` is recomputed to
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-CONSOLIDATION-ETH-1"]` is recomputed to
   `06947d32143858878146737f63a1c505bc4a0a1ce57a53ddc9c1117e8d2e31ff`,
   and `audit/REPRODUCE.md` is regenerated (the only changed view; the
-  diff is confined to the `P-ETH-1` row).
+  diff is confined to the `P-CONSOLIDATION-ETH-1` row).
 - Pre-existing main repair, required by the gates:
   `scripts/test_audit_metadata.py`'s NONE-classification mutant targeted
   `guarantees[1]` (P-ALLOC-2), which has been IMPLEMENTATION_PENDING
@@ -2416,9 +2416,9 @@ Wave 4: P-ETH-1 parent kill-lines on gatewayExecute mutants (2026-08-19)
   its intent. No guarantee's YAML entry, python dict rows, or report
   files were touched by this repair.
 - `lake build LidoSRv3` and
-  `lake build LidoSRv3.Tests.PEth1RefundTxMutants
-  LidoSRv3.Tests.PEth1RequestTxMutants
-  LidoSRv3.Tests.PEth1CompositionTxMutants`: exit 0. The new theorems
+  `lake build LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
+  LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
+  LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants`: exit 0. The new theorems
   report only `[propext]` or `[propext, Quot.sound]`; no `sorryAx` and no
   `Lean.ofReduceBool`.
 - `python3 scripts/audit_metadata.py check`, `PYTHONOPTIMIZE=1 python3
@@ -3425,7 +3425,7 @@ P-DEPOSIT-1 counterexample proof repair: `norm_num` left the key sum symbolic (2
 Auditor notes completion receipt rebind (2026-08-21)
 ----------------------------------------------------
 
-- Reports-only. Completes A+B auditor notes for P-ETH-1 and P-TOPUP-1 from live
+- Reports-only. Completes A+B auditor notes for P-CONSOLIDATION-ETH-1 and P-TOPUP-1 from live
   Lean and YAML after ChatGPT UI pool was unreachable (`SANDBOXED_API_URL`
   unset). Records the merged #153 ALLOC↛LinksSource counterexample on
   `report/P-DEPOSIT-1.md`. Round-1 GPT-5.6 Pro notes for the other eight
@@ -3492,14 +3492,14 @@ P-TOPUP-1 wrappedTotal both planes (2026-08-21)
 - `validated-tree` rebound to this commit's tracked tree excluding this receipt
   `7cceb2b4e166abeacec970f6443f1fceffe7e3fa`.
 
-P-ETH-1 universal Verity parent (2026-08-21)
+P-CONSOLIDATION-ETH-1 universal Verity parent (2026-08-21)
 --------------------------------------------
 
 - Model change disclosed: the compiled gateway body `gatewayFn` in
-  `LidoSRv3/Audit/Verity/PEth1CompositionTx.lean` gains the `ZeroArgument`
+  `LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTx.lean` gains the `ZeroArgument`
   guard (`require 0 < msg.value`) this wave, matching the pinned source
   gateway's `ZeroArgument("msg.value")` revert and the abstract plane's
-  Wave 1 guard (report/P-ETH-1.md issue 13). The guard only affects
+  Wave 1 guard (report/P-CONSOLIDATION-ETH-1.md issue 13). The guard only affects
   `msgValue = 0` runs, which lie outside the registered parent's premises,
   so it neither weakens nor strengthens the registered success claim; it is
   what makes the positivity premise load-bearing (the
@@ -3507,7 +3507,7 @@ P-ETH-1 universal Verity parent (2026-08-21)
   reverts at that guard), and it removes the pre-Wave-5 phantom zero-value
   success from the model.
 - Lean. The registered Verity parent is lifted from five numeral traces to
-  `LidoSRv3.Audit.Guarantees.PEth1.verity_tx_universal_success_shape`: for all
+  `LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape`: for all
   `(msgValue, batchSize, feePerRequest)` that are nonzero-valued, word-sized,
   non-wrapping in the product fee (`batchSize * feePerRequest < 2^256`),
   funded (`batchSize * feePerRequest ≤ msgValue`), and fuel-fit
@@ -3515,7 +3515,7 @@ P-ETH-1 universal Verity parent (2026-08-21)
   whole product fee at the consolidation-request predeploy, the remainder at
   the refund recipient, and zero retained by every protocol contract on the
   route. Proved in the new module
-  `LidoSRv3/Audit/Verity/PEth1CompositionTxUniversal.lean` by frame-by-frame
+  `LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversal.lean` by frame-by-frame
   chaining through the recursive dispatcher, with a `requestPhaseWorld`
   induction over the symbolic batch-size-driven request loop. The premises
   are exactly the abstract parent's non-revert conditions plus the fuel
@@ -3536,25 +3536,25 @@ P-ETH-1 universal Verity parent (2026-08-21)
   `fuel_exhaustion_kill_line_refutes_dropped_fuel_premise`). Wave 2 scope
   kill-lines remain as executable premise witnesses.
 - `lake build` (full default target, including
-  `LidoSRv3.Audit.Verity.PEth1CompositionTxUniversal`,
-  `LidoSRv3.Audit.Guarantees.PEth1`,
-  `LidoSRv3.Tests.PEth1CompositionTxMutants`, `LidoSRv3.Audit.Trust`,
+  `LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal`,
+  `LidoSRv3.Audit.Guarantees.PConsolidationEth1`,
+  `LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants`, `LidoSRv3.Audit.Trust`,
   `LidoSRv3.Audit.AllGuarantees`): exit 0, `Build completed successfully
   (1396 jobs)` under Lean 4.31.0; only pre-existing upstream dependency
   warnings. Trust print-axioms for the new parent and all seven kill-lines
   report `propext` / `Classical.choice` / `Quot.sound` only. No sorry/admit/
   new axiom; no `native_decide`.
 - `python3 scripts/audit_metadata.py generate && check` exit 0.
-  `EXPECTED_CANONICAL_CLAIMS["P-ETH-1"]` Verity theorem rebound to
+  `EXPECTED_CANONICAL_CLAIMS["P-CONSOLIDATION-ETH-1"]` Verity theorem rebound to
   `verity_tx_universal_success_shape`;
-  `EXPECTED_CANONICAL_DETAIL_SHA256["P-ETH-1"]` rebound to
+  `EXPECTED_CANONICAL_DETAIL_SHA256["P-CONSOLIDATION-ETH-1"]` rebound to
   `0ce9c10729d9c2a4f19a00b0883475cb5c305cd8467b2374394f7218165c9d05`.
   `fidelity.missing` replaces the quantifier-strength gap with the residual
   revert-arm characterization gap (no ∀ revert-shape theorem on the Verity
   plane). `audit/REPRODUCE.md` and `audit/STATUS.md` regenerated.
-- `python3 scripts/check_public_claim_surfaces.py` exit 0 (P-ETH-1 is not a
+- `python3 scripts/check_public_claim_surfaces.py` exit 0 (P-CONSOLIDATION-ETH-1 is not a
   tracked surface there; unchanged).
-- `report/P-ETH-1.md` and `audit/P-ETH-1-COMPOSITION.md` updated for the
+- `report/P-CONSOLIDATION-ETH-1.md` and `audit/P-CONSOLIDATION-ETH-1-COMPOSITION.md` updated for the
   changed claim (Wave 5 section, auditor note, resolution table).
 - Post-review (independent review of `07123a1`, verdict CLEAN with
   disclosure findings): the `ZeroArgument` guard addition is now disclosed
@@ -3564,3 +3564,92 @@ P-ETH-1 universal Verity parent (2026-08-21)
   parent name directly. Rebuilt and re-gated at the new head.
 - `validated-tree` rebound to this commit's tracked tree excluding this
   receipt `b522d143686ac5e068ced1062a6e31060d191cc6`.
+
+Certification-blocker repair on PR #160 branch (2026-08-22)
+-----------------------------------------------------------
+
+Repairs the exact-head certification blockers reproduced at
+`a62997e47cf481a545d5f0f97e4a8ef0e321d535` without merging, rebasing,
+force-pushing, or weakening any gate. No `sorry`, `admit`, new `axiom`,
+`unsafe`, or skipped proof was introduced; the allowed axiom boundary is
+unchanged.
+
+- Trust-escape closure. `LidoSRv3.Audit.Verity.AddressClaimBatchTx.
+  two_claim_batch_observe` (`:202`) and `LidoSRv3.Tests.AddressSourceMutants.
+  fixed_payout_recipient_mutant_kill_line` (`:308`) closed by `native_decide`,
+  and the first of those leaks into the public surface
+  `PAddress1.bounded_live_claim_batch_storage_call_surface`. Both now close by
+  `decide +kernel`. Plain `decide` exhausts the elaborator's recursion budget on
+  the eleven-write `twoClaimState` (the `E27` checkpoint word in particular);
+  `+kernel` defers the same `Decidable` evaluation to the kernel, which handles
+  it in about 20s and leaves no axiom behind. `HandleOracleReportTx.
+  mintOrderKillLine_holds` was closed the same way earlier in this repair.
+- Axiom audit over the whole library, parsed from the `make prove` build log
+  with continuation lines joined (`#print axioms` output wraps): of 238 printed
+  declarations, the only dependency outside `{propext, Classical.choice,
+  Quot.sound}` is `AllocCapacityPhase3.consumed_summary_function_spec_compiles.
+  _native.native_decide.ax_1_1`, reached by exactly two declarations
+  (`PAlloc1.source_capacities_and_mapped_summary_transaction` and
+  `PAlloc1Phase3.mapped_summary_call_transaction`). That is precisely the
+  P-ALLOC-1 Phase-3 exception already disclosed in `LidoSRv3/Audit/Trust.lean`
+  (`:55-71`); no new exception was created and none was removed.
+- Trust disclosure widened, not narrowed: `Trust.lean` now also prints axioms
+  for `PAddress1.bounded_live_claim_batch_storage_call_surface`,
+  `AddressClaimBatchTx.two_claim_batch_observe`,
+  `AddressClaimBatchTx.every_revert_restores_snapshot`, and the four
+  `PTopup1.verity_*` wrap/close theorems.
+- Public-claim surface allowlist (`scripts/check_public_claim_surfaces.py`)
+  resynced with the declarations and imports actually proved, and
+  `audit/guarantees.yaml` / `audit/STATUS.md` / `verity/targets/audit-manifest.json`
+  resynced with it (`EXPECTED_CANONICAL_DETAIL_SHA256` rebound accordingly).
+  The checker reports only its first mismatching file, so it was re-run to
+  fixpoint rather than once.
+- Report fidelity. Corrected citations that named theorems absent from the tree
+  or asserted effects the code does not have, in `P-ACCOUNT-1`, `P-ALLOC-1`,
+  `P-ALLOC-2`, `P-CONSOLIDATION-1`, `P-CONSOLIDATION-ETH-1`,
+  `P-CONSOLIDATION-ETH-1a`, `P-DEREF-1`, `P-RESERVE-1`, `P-SSZ-1`, `P-TOPUP-1`,
+  and `P-TOPUP-2`. Two were substantive rather than line drift: `P-DEREF-1`
+  claimed twice that `observeDeref` performs a `writeMapUint
+  observedAddressesSlot` logging SSTORE, but `observedAddressesSlot` is declared
+  at `DereferenceCorrespondence.lean:165` and never assigned anywhere — the
+  projection writes nothing and threads the entry state through unchanged, so
+  the refinement constrains the returned address only; and `P-TOPUP-1`
+  overclaimed wrap ⇒ revert beyond what the Verity theorems establish. Records
+  that are explicitly framed as historical, retracted, or renamed (for example
+  `txBindOne_eq_sourceBindOne` in `P-ALLOC-1`, `router_require_post_condition`
+  and `tx_revert_has_failed_call` in `P-TOPUP-2`) were left as-is: they are
+  self-correcting audit history, not live claims.
+- P-ETH-1 finite-vs-universal claim is honest at this head without further
+  change: `LidoSRv3/Audit/Guarantees/PConsolidationEth1.lean:320-500` proves
+  `verity_tx_universal_success_shape`, `UniversalRevertPartition`,
+  `verity_tx_universal_revert_partition`, and
+  `verity_tx_universal_zero_remainder_boundary` under seven named premises, and
+  `audit/guarantees.yaml` records the residual revert-arm characterization gap
+  rather than asserting an unproved generalization.
+
+Reproduction at this head (all run locally; the branch has no CI):
+
+- `make prove` exit 0 — `verified_source_tree`
+  `9e5e6470dd73fdc1e638672cefea2ed042125302`, Lean 4.31.0,
+  `lake build LidoSRv3` `Build completed successfully (1398 jobs)`, only
+  pre-existing upstream linter warnings. `proofs/logs/prove.txt` and
+  `proofs/logs/proof-report.json` regenerated from that run; the previous
+  `prove.txt` predated the `native_decide` removals and no longer described the
+  tree it claimed to cover.
+- `lake build` over all 27 `LidoSRv3.Tests.*` targets named in the `Makefile`:
+  exit 0, `Build completed successfully (1310 jobs)`.
+- `python3 scripts/audit_metadata.py check` exit 0 (11 canonical guarantees +
+  12 subordinate evidence rows); `python3 scripts/test_audit_metadata.py`,
+  `bash scripts/check_no_python_evidence.sh`,
+  `bash scripts/test_check_no_python_evidence.sh`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `python3 scripts/test_public_claim_surfaces.py`,
+  `python3 scripts/test_verity_provenance.py`, and
+  `bash scripts/check_provenance_guards.sh` all exit 0 on the clean tree.
+- All five `fixtures/solidity-reference/*` non-empty checks pass.
+- `validated-tree` rebound from `b522d143686ac5e068ced1062a6e31060d191cc6` to
+  `f773404df9c33e5cb357af0dbb9a533f893a380c`, the tracked tree of this commit
+  excluding this receipt per `scripts/check_validation_receipt.py`
+  (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
+  This rebind is the final commit of the repair, since every other tracked file
+  is inside the tree it binds.

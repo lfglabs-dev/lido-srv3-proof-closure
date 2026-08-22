@@ -79,12 +79,12 @@ test:
 	@printf '%s\n' 'P-RESERVE-RELATIONAL abstract/source correspondence, dependency mutants, and two-batch chain compiled and asserted'
 	@lake build LidoSRv3.Tests.ReserveRelationalTxMutants
 	@printf '%s\n' 'P-RESERVE-RELATIONAL faithful finalization transaction mutants, non-vacuous decoding witness, rollback, and two-batch chain compiled and asserted'
-	@lake build LidoSRv3.Tests.PEth1RefundTxMutants
-	@printf '%s\n' 'P-ETH-1a gateway/vault refund Contract.run mutants compiled and asserted'
-	@lake build LidoSRv3.Tests.PEth1RequestTxMutants
-	@printf '%s\n' 'P-ETH-1b bus/request Contract.run mutants compiled and asserted'
-	@lake build LidoSRv3.Tests.PEth1CompositionTxMutants
-	@printf '%s\n' 'P-ETH-1 recursively dispatched Bus/Gateway/Vault drop, misroute, corrupt, rollback, and two-batch mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
+	@printf '%s\n' 'P-CONSOLIDATION-ETH-1a gateway/vault refund Contract.run mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
+	@printf '%s\n' 'P-CONSOLIDATION-ETH-1b bus/request Contract.run mutants compiled and asserted'
+	@lake build LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants
+	@printf '%s\n' 'P-CONSOLIDATION-ETH-1 recursively dispatched Bus/Gateway/Vault drop, misroute, corrupt, rollback, and two-batch mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AccountingVectors
 	@printf '%s\n' 'executable accounting order/length/bound/overflow mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.HandleOracleReportTxMutants

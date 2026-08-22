@@ -2,10 +2,12 @@ import Verity.Core
 import Verity.Stdlib.Math
 
 /-!
-# P-ETH-1b ConsolidationBus / request-contract transaction
+# P-CONSOLIDATION-ETH-1 fee-leg evidence (former P-CONSOLIDATION-ETH-1b)
 
-Source-shaped `Contract.run` ledger for the inventoried P-ETH-1b ETH paths at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Source-shaped `Contract.run` ledger for the inventoried consolidation-fee ETH
+paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. These
+theorems are parent evidence under `A-CANONICAL-REQUEST-ADDRESS`, not a sibling
+guarantee row.
 
 * `ConsolidationBus.executeConsolidation` (lines 383--406) forwards
   `msg.value` to `ConsolidationGateway.addConsolidationRequests`
@@ -22,7 +24,7 @@ This is a single-contract storage ledger under official `Contract.run`. It is
 not a multi-contract EVM claim and does not use vacuous `externalCallBind`.
 -/
 
-namespace LidoSRv3.Audit.Verity.PEth1RequestTx
+namespace LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx
 
 open _root_.Verity
 open _root_.Verity.Stdlib.Math
@@ -220,6 +222,16 @@ theorem withdrawal_fee_success :
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
     ⟨.committed, ⟨3, 1, 10, 2, 14⟩⟩)
 
+/-- Registered fee-target witness: two successful EIP-7251 fee sends debit the
+vault by ten and credit the configured consolidation-request target by ten.
+This is a model-local target slot; identifying it with canonical
+`0x00…007251` remains `A-CANONICAL-REQUEST-ADDRESS`. -/
+theorem consolidation_fee_target_success :
+    observe ((sendTwoConsolidationFees (word 5) true).run
+      (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
+      ⟨.committed, ⟨3, 1, 10, 2, 14⟩⟩ := by
+  decide
+
 theorem consolidation_second_failure_discards_prefix :
     observe ((sendTwoConsolidationFees (word 5) false).run
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)) =
@@ -244,4 +256,4 @@ theorem consolidation_second_failure_discards_prefix :
     observe ((sendTwoConsolidationFees (word 5) true).run
       (stateFor ⟨3, 1, 20, 2, 4⟩ defaultState)))
 
-end LidoSRv3.Audit.Verity.PEth1RequestTx
+end LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx

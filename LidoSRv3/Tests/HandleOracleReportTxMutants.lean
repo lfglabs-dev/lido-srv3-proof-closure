@@ -45,10 +45,11 @@ private def bypassOrderGuard (i : ReportInput) (fees : Nat) : Contract Result :=
     | some total =>
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := (dirty.writeSlot totalBalanceSlot total
-          |>.writeSlot accountingCalledSlot 1
-          |>.writeSlot rewardsReadSlot 2)
+          |>.writeSlot balancesWrittenSlot 1
+          |>.writeSlot accountingCalledSlot 2
+          |>.writeSlot rewardsReadSlot 3)
         let dirty :=
-          if 0 < fees then dirty.writeSlot rewardsMintedSlot 3 else dirty
+          if 0 < fees then dirty.writeSlot rewardsMintedSlot 4 else dirty
         .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩
           dirty
 
@@ -115,9 +116,10 @@ private def mintUnconditionally (i : ReportInput) : Contract Result :=
     | some total =>
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
         let dirty := (dirty.writeSlot totalBalanceSlot total
-          |>.writeSlot accountingCalledSlot 1
-          |>.writeSlot rewardsReadSlot 2
-          |>.writeSlot rewardsMintedSlot 3)
+          |>.writeSlot balancesWrittenSlot 1
+          |>.writeSlot accountingCalledSlot 2
+          |>.writeSlot rewardsReadSlot 3
+          |>.writeSlot rewardsMintedSlot 4)
         .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
 
 /-- Kill-line: a mutant that always tags `rewardsMintedSlot`, even with zero
@@ -128,14 +130,15 @@ example :
       sourceView valid 0 := by
   native_decide
 
-/-- The honest transaction stamps the read step at clock tick `2` and the
-mint step at tick `3`. Neither number appears at a write site: both are read
+/-- The honest transaction stamps the balance write at tick `1`, the read step
+at clock tick `3`, and the mint step at tick `4`. None of these numbers appears at a write site: they are read
 back out of the step clock, so they record the order the two writes ran in. -/
 example :
     let dirty := match (handleOracleReport valid 1) defaultState with
       | .success _ s => s
       | .revert _ s => s
-    dirty.readSlot rewardsReadSlot = 2 ∧ dirty.readSlot rewardsMintedSlot = 3 := by
+    dirty.readSlot balancesWrittenSlot = 1 ∧
+      dirty.readSlot rewardsReadSlot = 3 ∧ dirty.readSlot rewardsMintedSlot = 4 := by
   native_decide
 
 /-- Reordering mutant: the mint step runs strictly before the read step, the
@@ -145,19 +148,20 @@ written balances.
 This is the mutation `report/P-ACCOUNT-1.md` issue 5 previously recorded as an
 open, disclosed gap: only the call sites move, every slot binding is
 unchanged, and no literal is edited. Both flags are still nonzero and
-`storedSteps`' presence check still cannot tell this apart from the honest
-transaction — but because `stampStep` takes its tick from the clock, the mint
-step now records `2` and the read step `3`. -/
+therefore defeat a bare presence check. Because `stampStep` takes its tick
+from the clock, the mint step records `3` and the read step `4`;
+`storedSteps`' exact-tick reconstruction and the parent both detect it. -/
 example :
     let dirty := match (handleOracleReportMintBeforeRead valid 1) defaultState with
       | .success _ s => s
       | .revert _ s => s
-    dirty.readSlot rewardsMintedSlot = 2 ∧ dirty.readSlot rewardsReadSlot = 3 := by
+    dirty.readSlot rewardsMintedSlot = 3 ∧ dirty.readSlot rewardsReadSlot = 4 := by
   native_decide
 
 /-- The reordering above is invisible to a presence-only check: the mutant's
-`storedSteps` flags are all still nonzero, exactly as in the honest run. This
-is why the parent reads the raw ticks rather than `storedSteps`. -/
+step flags are all still nonzero. `storedSteps` is no longer such a check: it
+requires exact ticks, while the parent states the raw-tick inequality
+directly. -/
 example :
     let dirty := match (handleOracleReportMintBeforeRead valid 1) defaultState with
       | .success _ s => s
@@ -166,10 +170,10 @@ example :
       dirty.readSlot rewardsMintedSlot ≠ 0 := by
   native_decide
 
-/-- The concrete ticks above (mint `2`, read `3`) witness a mint-after-read
+/-- The concrete ticks above (mint `3`, read `4`) witness a mint-after-read
 violation: `mintAfterRead` is a bare implication, not itself `Decidable`, so
 this is checked by modus ponens rather than `decide` on the whole statement. -/
-example : ¬ mintAfterRead 3 2 := by
+example : ¬ mintAfterRead 4 3 := by
   intro h
   exact absurd (h (by decide)) (by decide)
 

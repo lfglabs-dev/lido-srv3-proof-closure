@@ -57,18 +57,20 @@ branch's own `msg.value = count * fee` equality then forces a nonzero fee).
 A revert implies the un-strengthened conjunction is false. Not beacon
 eligibility and not the Bus.
 
-**Wave 1 premise, made load-bearing in Wave 3.** `hGatewayAdmittedNonzero`
-is now forwarded to the source theorem and used to derive the
-`inputs.fee.val ≠ 0` conjunct above, so the premise actually excludes the
-free-batch arm from this parent's committed case (it no longer merely sits
-in the signature unused). Two kill-lines pin the claim down:
-`gateway_admitted_nonzero_kill_line` below is premise-necessity evidence
-(dropped, the same conjunct is false of `sourceRun` on a concrete free batch
-that violates the premise), and `fee_blind_commit_kill_line_refutes_parent`
-below is the parent-refuting kill-line (on the mutant interpreter
-`sourceRunFeeBlind` with the exact-fee guard dropped, a batch that SATISFIES
-the premise commits while this parent's committed-arm conjunction is false
-of that commit). -/
+**Outer-gateway premise, recorded as `A-CONSOLIDATION-GATEWAY-NONZERO`.**
+`hGatewayAdmittedNonzero` is forwarded to the source theorem and used to
+derive the `inputs.fee.val ≠ 0` conjunct above, so the premise excludes the
+free-batch arm from this parent's committed case. The premise nevertheless
+names the **outer gateway `msg.value` surface** (and the
+`P-CONSOLIDATION-ETH-1` fee/refund plane), not the vault's forwarded
+`totalFee` call. It is therefore classified at that boundary rather than
+presented as a vault-local fact. Two kill-lines pin the present claim:
+`gateway_admitted_nonzero_kill_line` is premise-necessity evidence (dropped,
+the same conjunct is false of `sourceRun` on a concrete free batch that
+violates the premise), and `fee_blind_commit_kill_line_refutes_parent` is
+the parent-refuting kill-line (on the mutant interpreter `sourceRunFeeBlind`
+with the exact-fee guard dropped, a batch that SATISFIES the premise commits
+while this parent's committed-arm conjunction is false of that commit). -/
 theorem source_consolidation_preserves_eligibility_value_atomicity
     (inputs : Inputs)
     (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →
@@ -157,6 +159,8 @@ theorem fee_blind_commit_kill_line_refutes_parent :
 `sourceView` of the same `sourceRun`. Not 96-byte packed calldata. -/
 theorem verity_tx_simulates_consolidation (inputs : Inputs)
     (state : Verity.ContractState)
+    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
     (hTargets : readArray state "targets" targetsBase inputs.targets.length =
@@ -167,7 +171,7 @@ theorem verity_tx_simulates_consolidation (inputs : Inputs)
       inputs.targetLens.length = some inputs.targetLens) :
     observe state ((addRequests inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val :=
-  verity_tx_simulates_pinned_source inputs state
+  verity_tx_simulates_pinned_source inputs state hCountBound
     hSources hTargets hSourceLens hTargetLens
 
 /-- Every revert of the consolidation transaction, including failure after
@@ -191,10 +195,11 @@ theorem packing_order_kills_swapped_concat
     (fun x hx => by simp [List.mem_cons, List.mem_nil_iff] at hx; subst hx; exact h)
 
 /-- **Named gap: preservesEthBalance.** The Solidity modifier
-(WithdrawalVault.sol:201) snapshots address(this).balance and reverts
-if it changed after the loop. Closing the gap requires value-bearing
-CALL frames, not the current success stubs with empty returndata. -/
+(WithdrawalVault.sol:201) requires the vault to forward exactly `msg.value`
+across the request CALLs, leaving its own ETH balance unchanged after the
+loop. Closing the gap requires value-bearing CALL frames, not the current
+success stubs with empty returndata. -/
 abbrev preservesEthBalance_gap : String :=
-  "preservesEthBalance (requires value-bearing CALL frames, not success stubs)"
+  "preservesEthBalance: forwards exactly msg.value (requires value-bearing CALL frames)"
 
 end LidoSRv3.Audit.Guarantees.PConsolidation1

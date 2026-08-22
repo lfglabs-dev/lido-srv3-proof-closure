@@ -6,18 +6,18 @@ P-CONSOLIDATION-1 covers the inner half of Lido's EIP-7251 path. `ConsolidationG
 
 A batch commits only if the caller is the stored gateway, the source array is nonempty, source and target zip by index, every key carries a 48-byte length word, $n \times \mathrm{fee}$ fits in `uint256`, and $\mathrm{msg.value} = n \times \mathrm{fee}$. A commit produces one predeploy CALL and one event per pair, payload ordered source then target. Anything that fails a guard produces no CALL and no event.
 
-`source_consolidation_preserves_eligibility_value_atomicity` is that characterization, under the caller-supplied premise `caller = gateway → msg.value ≠ 0`, from which a committed run derives $\mathrm{fee} \ne 0$. `verity_tx_simulates_consolidation` matches `sourceView` when four memory arrays decode. `fee_blind_commit_kill_line_refutes_parent` drops the exact-fee guard on a premise-satisfying `fee = 0`, `msg.value = 1` batch. We do not cover beacon eligibility, grouping, quota, or the Bus. Do not compose with P-ETH-1.
+`source_consolidation_preserves_eligibility_value_atomicity` is that characterization, under the caller-supplied premise `caller = gateway → msg.value ≠ 0`, from which a committed run derives $\mathrm{fee} \ne 0$. That premise remains on the wrong outer-gateway value surface and is scheduled for relocation. `verity_tx_simulates_consolidation` matches `sourceView` when four memory arrays decode. We do not cover beacon eligibility, grouping, quota, or the Bus. Do not compose with P-CONSOLIDATION-ETH-1.
 
 ## Proof limitations and recommendations
 
-The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. The cited `ConsolidationGateway.sol:189` guards the gateway's own `msg.value`, not the vault's forwarded `totalFee`. If fee is zero the gateway can still call the vault with `value: 0`. `preservesEthBalance` is a `String` gap: journaled CALLs are pre-marked successful and move no wei. The pinned modifier asserts the vault forwarded exactly `msg.value`. Verity rollback is the `Contract.run` combinator, true of every program. `observe` does not reread payload maps.
+The parent is an unbounded $\forall$ hypothesized on `hGatewayAdmittedNonzero`. The cited `ConsolidationGateway.sol:189` guards the gateway's own `msg.value`, not the vault's forwarded `totalFee`. If fee is zero the gateway can still call the vault with `value: 0`. `preservesEthBalance` is a `String` gap: journaled CALLs are pre-marked successful and move no wei. Lean and YAML now state the pinned obligation precisely: the vault forwards exactly `msg.value`. Verity rollback is the `Contract.run` combinator, true of every program. `observe` does not reread payload maps.
 
 CHECKED does not mean eligibility in the beacon sense, that the vault paid $n \times \mathrm{fee}$, or gateway grouping.
 
-Ranked next work: drop or relocate the gateway-value premise; make observe read payloads; keep the P-ETH-1 fence; fix the `preservesEthBalance` wording to "forwards exactly msg.value" before anyone proves it.
+Ranked next work: drop or relocate the outer-gateway nonzero-value premise; keep the P-CONSOLIDATION-ETH-1 fence until an ABI/interpreter bridge exists. `observe` now rereads `sourceMapSlot`/`targetMapSlot` payload storage for the new request indices rather than reconstructing payloads from the call journal.
 
 Theorems: `PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`, `PConsolidation1.verity_tx_simulates_consolidation`, `PConsolidation1.fee_blind_commit_kill_line_refutes_parent`, `PConsolidation1.gateway_admitted_nonzero_kill_line`.
-Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
+Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`.
 
 ## Intent
 
@@ -75,7 +75,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    `msgValue.val = requests.length * fee.val` is a guard on numbers supplied with the `Inputs` record. No account is debited. Scenario: `msg.value` on the live CALL is correct but the vault’s `call{value: fee}` to the predeploy fails after the first pair; the model’s committed branch never runs a CALL, and the revert branch is a different `Inputs` (or a Verity inject) rather than a failed predeploy. Atomicity of *real* CALLs is the OPEN item in `P-CONSOLIDATION-1-VERITY-GAPS.md` (official denotation always reverts on `Expr.call`). Promoting `Contract.run` journaling to CHECKED does not execute EIP-7251.
 
 3. **`observe` reads the journal appended to `state.calls` / `state.events` (wording refreshed 2026-08-19).**
-   `ConsolidationTx.observe` (`ConsolidationTx.lean:177–184`) drops the pre-call prefix of `state.calls` / `state.events` and maps the freshly appended journal entries; the view's payloads are the calldata of those calls, and count/fee come from `countSlot` / `feePaidSlot`. The `Result` payload is ignored on success. The earlier wording of this issue (“observe reports the `Result` payload, not the journal”, with a counterexample mutant that skips the journal `append` but returns the lists in the `Result`) is **stale**: `persist` appends to `state.calls` / `state.events` (`:123–131`) and `observe` reads that suffix, so the skip-append mutant is now caught (the Tests call-drop/event-drop/memory-drop vectors exercise exactly this). The residual gap is narrower and is issues 7/10: the journaled CALLs are pre-marked `.success` stubs with empty returndata, so the observed log is a journal of intended CALLs, not executed frames.
+   `ConsolidationTx.observe` (`ConsolidationTx.lean:191–200`) drops the pre-call prefix of `state.calls` / `state.events` and maps the freshly appended journal entries; the view's payloads are the calldata of those calls, and count/fee come from `countSlot` / `feePaidSlot`. The `Result` payload is ignored on success. The earlier wording of this issue (“observe reports the `Result` payload, not the journal”, with a counterexample mutant that skips the journal `append` but returns the lists in the `Result`) is **stale**: `persist` appends to `state.calls` / `state.events` (`:123–131`) and `observe` reads that suffix, so the skip-append mutant is now caught (the Tests call-drop/event-drop/memory-drop vectors exercise exactly this). The residual gap is narrower and is issues 7/10: the journaled CALLs are pre-marked `.success` stubs with empty returndata, so the observed log is a journal of intended CALLs, not executed frames.
 
 4. **Atomicity is the other arm of the same `if`.**
    If `sourceRun` committed, it returned `commitObservables`. If it reverted, it did not. There is no prefix-event in the abstract type at all (`SourceOutcome` is `reverted reason | committed obs`). You cannot even *write down* a partial journal in `sourceRun`. The revert conjunct is therefore “the function did not take the success arm.”
@@ -90,8 +90,8 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 
    *Scenario.* Anyone who can call the vault with `msg.sender` equal to the stored gateway address (or, in Lean, with `inputs.caller = inputs.gateway`) and exact fee commits. A request that should have been rejected by `_validatePubKeyWCProof`, quota, pause, or `ADD_CONSOLIDATION_REQUEST_ROLE` is in-model-committable. Fee is also an input, not a `staticcall` of the predeploy: if the real fee is 1 gwei and the model input is 0, Lean accepts a free batch.
 
-7. **Journaled CALLs are pre-marked `.success` and `txRun = sourceRun` by `rfl`.**
-   `toJournal` (`ConsolidationTx.lean:106–113`) builds an `ExternalCall` with `control := .success` and empty returndata. Nothing executes the predeploy. `txRun_eq_sourceRun` is `rfl` (`:97–99`).
+7. **Journaled CALLs are pre-marked `.success`, and the executor and the observable share one `sourceRun`.**
+   `toJournal` (`ConsolidationTx.lean:80–87`) builds an `ExternalCall` with `control := .success` and empty returndata. Nothing executes the predeploy. There is no separate tx-side transcription to bridge: the executor `addRequests` (`:157`) and the observable `sourceView` (`:203`) both call the same `sourceRun`, so the two planes agree by definition rather than by a proved correspondence.
 
    *Scenario.* The EIP-7251 contract reverts on a malformed 96-byte payload. Lean `persist` still appends a `.success` journal entry and `observe` reports it. The CHECKED “one CALL per pair” is a struct copy, not a frame that can fail.
 
@@ -113,7 +113,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 11. **`consolidationRequestAddress` is unused.**
    The constant `0x00…7251` is defined and not read by `sourceRun`.
 
-   *Scenario.* Set `inputs.requestTarget = 0xdead`. `source_consolidation_preserves_eligibility_value_atomicity` still holds and `commitObservables` journals CALLs to `0xdead`. Same provenance hole as P-ETH-1b. A more faithful 48+48-byte model exists in `ConsolidationAbstractFlowModel` and is **not** the registered parent.
+   *Scenario.* Set `inputs.requestTarget = 0xdead`. `source_consolidation_preserves_eligibility_value_atomicity` still holds and `commitObservables` journals CALLs to `0xdead`. Same provenance hole as P-CONSOLIDATION-ETH-1b. A more faithful 48+48-byte model exists in `ConsolidationAbstractFlowModel` and is **not** the registered parent.
 
 12. **`persist` invents count / fee / payload maps the vault does not write.**
     `ConsolidationTx.persist` (`:123–131`) SSTOREs `countSlot = start + requestCount`, `feePaidSlot = obs.feePaid`, and `sourceMapSlot` / `targetMapSlot` per index. Live `WithdrawalVault.addConsolidationRequests` (`:199–208`) loops `_callAddConsolidationRequest` and emits; it does not keep a request-count word or a source/target map.
@@ -121,7 +121,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
     *Scenario.* `countSlot` already holds `2^256 − 1`. One committed request writes `Uint256.ofNat (start + 1)` = `0`. Live vault has no such wrap because it has no such slot. `observe` on success *does* read `countSlot` / `feePaidSlot` (`:178–180`) while taking calls/events from the `Result`. The CHECKED “persisted count” is a model-local counter that can wrap and that the deployed function does not maintain.
 
 13. **`feePaid` is the input `msgValue`, not a computed debit.**
-    `commitObservables` (`ConsolidationCorrespondence.lean:112`) sets `feePaid := msgValue`. Combined with the exact-fee guard this equals `n * fee` when the success arm is taken, but no account is reduced by that amount.
+    `commitObservables` (`ConsolidationCorrespondence.lean:144–150`) sets `feePaid := msgValue`. Combined with the exact-fee guard this equals `n * fee` when the success arm is taken, but no account is reduced by that amount.
 
     *Scenario.* `n = 2`, `fee = 5`, `msgValue = 10`, vault ETH = 0. Live `call{value: 5}` fails after the first pair (or immediately) and the tx reverts. Lean `sourceRun` commits `feePaid = 10` with two journaled `.success` CALLs and never looks at a balance. The CHECKED “value conservation” conjunct is the guard `msgValue.val = n * fee.val`, not “the vault paid `n * fee` wei.”
 
@@ -143,7 +143,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
 17. **Mapped `preservesEthBalance` is not in `sourceRun`.**
     Live `WithdrawalVault.addConsolidationRequests` (`:201`) is `preservesEthBalance`: snapshot `address(this).balance` and revert if it changed after the loop. Lean `sourceRun` / `addRequests` never read a self-balance. `commitObservables` journals CALLs marked `.success` without moving wei (issue 2, 13).
 
-    *Scenario.* A predeploy CALL that consumes `fee` but also leaves leftover wei on the vault (or a failed CALL that still transferred). Live modifier reverts the whole `addConsolidationRequests`. Lean `source_consolidation_preserves_eligibility_value_atomicity` commits if the input guards pass. Same hole as P-ETH-1a issue 6, on the vault parent this row actually names.
+    *Scenario.* A predeploy CALL that consumes `fee` but also leaves leftover wei on the vault (or a failed CALL that still transferred). Live modifier reverts the whole `addConsolidationRequests`. Lean `source_consolidation_preserves_eligibility_value_atomicity` commits if the input guards pass. Same hole as P-CONSOLIDATION-ETH-1a issue 6, on the vault parent this row actually names.
 
 18. **Zero fee and zero `msg.value` is a committed free batch of `sourceRun` itself.**
     `sourceRun` accepts `n ≥ 1`, `fee = 0`, `msgValue = 0` (`0 == n * 0`, mul bound holds). Live vault `_requireExactFee(0)` also passes, then `call{value: 0}`. The *gateway* (`ConsolidationGateway.sol:189`) reverts `ZeroArgument("msg.value")` before its own call proceeds.
@@ -188,7 +188,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    value-bearing CALL frames, not the current success stubs with empty
    returndata.
 
-5. **No P-ETH-1 composition.** Explicitly noted in YAML classification.work
+5. **No P-CONSOLIDATION-ETH-1 composition.** Explicitly noted in YAML classification.work
    and next_gate.
 
 ## Wave 3 changes (2026-08-19): P-CONSOLIDATION-1 unused-hypothesis remediation
@@ -294,7 +294,7 @@ kill-line; the Tests re-export is renamed
 `gateway_admitted_nonzero_premise_necessity`.
 
 **Also refreshed.** Issue 3 was stale: `observe` reads the journal appended
-to `state.calls` / `state.events` (`ConsolidationTx.lean:177–184`), not the
+to `state.calls` / `state.events` (`ConsolidationTx.lean:191–200`), not the
 `Result` payload, so the skip-append mutant it described is already caught
 by the existing call-drop/event-drop vectors.
 
