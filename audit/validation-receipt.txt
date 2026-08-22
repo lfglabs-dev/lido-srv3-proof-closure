@@ -1,11 +1,92 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ed35cd29b36b992ff051e8f8a10d5550a6b9fd37
+validated-tree: 3f37f64b091b155d7f0ac1593ab85d20b718b6d5
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Linearize Wave 0 + packs A–F onto main (2026-08-22)
+---------------------------------------------------
+
+- Rebind `validated-tree` to `3f37f64b091b155d7f0ac1593ab85d20b718b6d5`, the
+  tracked tree of `cursor/srv3-parent-strengthen-f120` excluding this receipt.
+- Stacks Wave 0 and packs A–F on current `main` `3e4aec3` (#163) so the
+  campaign is one linear history. No new guarantee IDs. Join, VaultHub,
+  pause, bus, and P-DEREF-1 promotion stay out.
+- Verification: `scripts/check_validation_receipt.py`,
+  `scripts/audit_metadata.py check`, `scripts/check_public_claim_surfaces.py`,
+  and `scripts/check_no_python_evidence.sh` exit 0. No `sorry`/`admit`/
+  `native_decide` on registered parents.
+
+Pack F consolidation observe/payloads (2026-08-22)
+-------------------------------------------------
+
+- Unregistered child: success `observe` rereads source/target maps via
+  `readPayloads`. Swapped-map mutant is rejected. Gateway/bus stay out.
+  No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
+  LidoSRv3.Tests.PackFConsolidationObserveMutants` exit 0.
+
+Pack E OracleFrame fee/share + Eugene citation (2026-08-22)
+----------------------------------------------------------
+
+- Unregistered child: `OracleFrame.sharesMinted` is the fee argument;
+  `shareRateDelta` is unmodeled. ACCOUNT stays order-only. Eugene bound is
+  cited, not re-homed. No supply bound. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.OracleFrameCorrespondence
+  LidoSRv3.Tests.PackEOracleFrameMutants` exit 0.
+
+Pack D ADDRESS claim-batch strengthening (2026-08-22)
+----------------------------------------------------
+
+- Unregistered child: two-item `claimWithdrawalsTo` payouts equal
+  `claimableEther` of the pre-state reads. Swapped order / wrong recipient
+  kill-lines. No pause row. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.AddressClaimCorrespondence
+  LidoSRv3.Tests.PackDAddressClaimMutants` exit 0.
+
+Pack C hash identification + verifyProof/gindex (2026-08-22)
+----------------------------------------------------------
+
+- Named `HashIdentification` hyp (opaque `sha256` vs `Sha256Engine.sha256`)
+  stays undischarged. `verifyProof = true` implies `HasGeneralizedIndex`.
+  Skip-gindex mutant is rejected. No deployed SHA/Yul or EIP-4788 claim.
+- Verification: `lake build LidoSRv3.Audit.Spec.SszCorrespondence
+  LidoSRv3.Tests.PackCSszMutants` exit 0.
+
+Pack B Spec.EthJournal projection (2026-08-22)
+---------------------------------------------
+
+- Unregistered child: successful `gatewayExecute` journals project onto
+  `Spec.EthJournal`. Third destinations (`.other`, retired `.lido`) fail the
+  projection. VaultHub stays out. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.EthJournalCorrespondence
+  LidoSRv3.Tests.PackBEthJournalMutants` exit 0.
+
+Pack A Spec.Allocation projections (2026-08-22)
+----------------------------------------------
+
+- Unregistered children: ALLOC-1 capacity and ALLOC-2 increment project onto
+  `Spec.Allocation`. TOPUP per-key remains gwei. Validator-count Spec amounts
+  still do not imply `LinksSource.firstAmount`. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.AllocationCorrespondence
+  LidoSRv3.Tests.PackAAllocSpecMutants` exit 0. No `sorry`/`admit`/
+  `native_decide` on registered parents.
+
+Wave 0 honesty + Spec interfaces (2026-08-22)
+---------------------------------------------
+
+- Wave 0 freezes `LidoSRv3/Audit/Spec.lean` (Allocation, Spend, EthJournal,
+  OracleFrame, SszWitness) and registers `deposit_root_iff` as
+  `Spec.SszWitness.Correspondence`. Deposit uniqueness is the named
+  `PerfectDepositEncoding` child. Parent-shaped kill-line
+  `sourceNode_mutant_kill_line_refutes_parent` builds. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Guarantees.PSsz1
+  LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants
+  LidoSRv3.Tests.SszRegression` exit 0. No `sorry`/`admit`/`native_decide`
+  on the parent.
 
 Post-merge certification evidence repair (2026-08-22)
 -----------------------------------------------------
