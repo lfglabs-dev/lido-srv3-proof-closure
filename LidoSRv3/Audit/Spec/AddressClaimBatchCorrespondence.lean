@@ -64,7 +64,7 @@ theorem three_claim_payouts_match_reads :
 theorem length_mismatch_reverts :
     (executeClaimWithdrawalsTo [1, 2] [1] (2 : Address)).run threeClaimState =
       .revert "ArraysLengthMismatch" threeClaimState := by
-  native_decide
+  rfl
 
 /-- Existing universal rollback, re-exported. This node does not re-prove
 the transaction boundary. -/
