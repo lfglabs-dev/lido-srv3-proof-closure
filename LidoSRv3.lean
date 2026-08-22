@@ -11,6 +11,8 @@ import LidoSRv3.Audit.Spec.AddressClaimCorrespondence
 import LidoSRv3.Tests.PackDAddressClaimMutants
 import LidoSRv3.Audit.Spec.OracleFrameCorrespondence
 import LidoSRv3.Tests.PackEOracleFrameMutants
+import LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
+import LidoSRv3.Tests.PackFConsolidationObserveMutants
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Strategy
 import LidoSRv3.Audit.StrategyProofs
