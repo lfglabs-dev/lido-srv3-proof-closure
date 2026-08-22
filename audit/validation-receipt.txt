@@ -1,11 +1,23 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 915dacd0d219145a1170149c143e3b32cb8d532f
+validated-tree: d5c9d2258a9feab61e53c5bef4fe29b49d52f387
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Pack A Spec.Allocation projections (2026-08-22)
+----------------------------------------------
+
+- Rebind `validated-tree` to `d5c9d2258a9feab61e53c5bef4fe29b49d52f387`, the
+  tracked tree of `cursor/pack-a-alloc-spec-f120` excluding this receipt.
+- Unregistered children: ALLOC-1 capacity and ALLOC-2 increment project onto
+  `Spec.Allocation`. TOPUP per-key remains gwei. Validator-count Spec amounts
+  still do not imply `LinksSource.firstAmount`. No new guarantee IDs.
+- Verification: `lake build LidoSRv3.Audit.Spec.AllocationCorrespondence
+  LidoSRv3.Tests.PackAAllocSpecMutants` exit 0; `python3 scripts/audit_metadata.py
+  check` ok. No `sorry`/`admit`/`native_decide` on registered parents.
 
 Wave 0 honesty + Spec interfaces (2026-08-22)
 ---------------------------------------------
