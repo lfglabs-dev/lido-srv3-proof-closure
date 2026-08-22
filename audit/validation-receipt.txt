@@ -1,11 +1,26 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 3f37f64b091b155d7f0ac1593ab85d20b718b6d5
+validated-tree: 47a93a44c25bb116443cf1743929fa906e23227f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Leftover Wave 1 integrator (2026-08-22)
+---------------------------------------
+
+- Rebind `validated-tree` to `47a93a44c25bb116443cf1743929fa906e23227f`, the
+  tracked tree of `cursor/leftover-integrate-f120` excluding this receipt.
+- Lands G0 Join destinations, G-DEPOSIT / G-TOPUP / G-ETH1 model pins,
+  J-DEPOSIT / J-TOPUP EthJournal projections, S1 named HashIdentification
+  child, and C-GAP official-denotation gap. No new guarantee IDs.
+  Named hyps stay named. VaultHub, pause, bus, live SSZ, and P-DEREF-1
+  promotion stay out.
+- Verification: leftover module `lake build` and Trust exit 0;
+  `scripts/check_validation_receipt.py`, `scripts/audit_metadata.py check`,
+  `scripts/check_public_claim_surfaces.py`, and
+  `scripts/check_no_python_evidence.sh` exit 0.
 
 Linearize Wave 0 + packs A–F onto main (2026-08-22)
 ---------------------------------------------------
