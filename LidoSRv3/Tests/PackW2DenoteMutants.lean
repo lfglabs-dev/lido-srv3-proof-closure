@@ -31,15 +31,15 @@ theorem official_revert_with_widened_bind
     simp [requestOne_uses_widened_call_constructor]⟩
 
 /-- The constructors theorem is the source of the bind fact. -/
-example := requestOne_uses_widened_call_constructor
+example := @requestOne_uses_widened_call_constructor
 
 /-- Official denotation gap stays the existing fragment theorem. -/
-example := official_raw_call_still_reverts
+example := @official_raw_call_still_reverts
 
 /-- Link-time resolve is not execution. -/
-example (target fee : Nat) := functionEnv_resolves_predeploy target fee
+example := @functionEnv_resolves_predeploy
 
 /-- The named ETH-balance gap stays the documented nonempty string. -/
-example := preservesEthBalance_gap_remains
+example := @preservesEthBalance_gap_remains
 
 end LidoSRv3.Tests.PackW2DenoteMutants
