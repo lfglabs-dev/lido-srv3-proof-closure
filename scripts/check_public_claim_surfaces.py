@@ -35,6 +35,12 @@ CLAIMS = {
         # and `verity_tx_revert_restores_snapshot` is the hypothesis-free
         # executable rollback theorem the composed claim consumes, so all three
         # are part of the public surface.
+        # `linked_deployment_is_word_bounded`, `oversizedSourceInput`,
+        # `oversized_deployment_exceeds_word` and
+        # `abstract_parent_covers_deployments_the_verity_plane_omits` state the
+        # executable plane's finiteness and the deployment range the abstract
+        # parent covers without it, so they are public too: a reader must not be
+        # able to quote the CHECKED Verity row without them.
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalDepositContractAddress"),
@@ -47,12 +53,16 @@ CLAIMS = {
             ("structure", "LinksSource"),
             ("theorem", "linked_total_eq_pushedValue"),
             ("theorem", "linked_total_eq_depositsValue"),
+            ("theorem", "linked_deployment_is_word_bounded"),
             ("theorem", "verity_tx_revert_restores_snapshot"),
             ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
             ("def", "canonicalSourceConfig"),
             ("def", "canonicalSourceInput"),
             ("theorem", "canonical_links_source"),
             ("theorem", "canonical_composition_witness"),
+            ("def", "oversizedSourceInput"),
+            ("theorem", "oversized_deployment_exceeds_word"),
+            ("theorem", "abstract_parent_covers_deployments_the_verity_plane_omits"),
         ),
     },
     "P-TOPUP-1": {

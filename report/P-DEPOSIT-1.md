@@ -13,21 +13,25 @@ P-DEPOSIT-1 verifies that this push conserves ether:
 
 These are the two conjuncts of `source_deposit_conserves_and_rolls_back`. `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` is a constructor immutable while `DEPOSIT_SIZE` is the literal `32 ether`, so their equality is a deployment fact.
 
-`verity_tx_composes_deposit_conservation_and_rollback` conforms an executable Verity transaction to that source plane under `LinksSource`, a caller hypothesis. The executable path is exactly two batches. We do not cover the allocation feeding line 953 (P-ALLOC-1, P-ALLOC-2), the top-up path (P-TOPUP-1), or per-key deposit data roots (P-SSZ-1).
+`verity_tx_composes_deposit_conservation_and_rollback` conforms an executable Verity transaction to that source plane under `LinksSource`, a caller hypothesis. The executable path is exactly two batches, and since wave 8 the registered statement says so itself: conjunct (d) pins the executable journal to the same five frames for every input (two `obtainDepositData` legs, one `withdrawDepositableEther` pull, exactly two `depositToBeacon` legs), pins the probe list to exactly two module ids, and records the 256-bit word bound the hypotheses impose on the linked deployment. We do not cover the allocation feeding line 953 (P-ALLOC-1, P-ALLOC-2), the top-up path (P-TOPUP-1), or per-key deposit data roots (P-SSZ-1).
 
 ## Proof limitations and recommendations
 
-The abstract parent is an unbounded $\forall$ over `cfg` and `inp`. Conservation is a commit-branch implication whose live content is mostly `maxEBType1 = depositSize`. The Verity parent is also quantified, but `LinksSource` and `Preconditions` (all health booleans true) make the registered rollback conjunct vacuous: `execute_run` proves success, so the revert antecedent never holds. Real rollback sits in unregistered lemmas.
+The abstract parent is an unbounded $\forall$ over `cfg` and `inp`. Conservation is a commit-branch implication whose live content is mostly `maxEBType1 = depositSize`. The Verity parent is also quantified, but it is not quantified *alike*, and that difference is now checked rather than described.
+
+`linked_deployment_is_word_bounded` proves that `LinksSource` together with the parent's own `Preconditions.noWrap` premise forces $\mathrm{actualDepositsCount} \times \mathrm{depositSize} < 2^{256}$: the composed claim only ever reaches deployments whose whole pull fits one ledger word, while the abstract parent carries no word bound at all. `abstract_parent_covers_deployments_the_verity_plane_omits` exhibits the gap concretely at `oversizedSourceInput`, the pinned conserving deployment scaled to $2^{256}$ keys. There the abstract parent holds in full, and no `Inputs` at all satisfies `LinksSource` together with the no-wrap premise, for any entry state. So `CHECKED` on the Verity row is a finite two-leg claim about a word-bounded window of the abstract row's domain, and closing the gap needs an $n$-frame executable transaction, not a wording change.
+
+`LinksSource` and `Preconditions` (all health booleans true) still make the registered rollback conjunct vacuous: `execute_run` proves success, so the revert antecedent never holds. Real rollback sits in the public hypothesis-free `verity_tx_revert_restores_snapshot`.
 
 `alloc_derived_linkssource_kill_line_refutes_bridge` shows ALLOC parents plus key-count composition still fail `LinksSource.firstAmount`. Keep `LinksSource` as a hypothesis. The two-batch TX is not an unrolling of a multi-module loop: pinned `deposit` is one module, one pull, $n$ beacon frames. Beacon-address provenance is assumed.
 
 Kill-line `dropped_conservation_assert_breaks_pulled_eq_pushed` is adequate for conjunct 1. Conjunct 2 has no kill-line.
 
-CHECKED does not mean the deployed router conserves ether, that ALLOC feeds this row, or that a reverting deposit moves no wei on chain.
+CHECKED does not mean the deployed router conserves ether, that ALLOC feeds this row, that a reverting deposit moves no wei on chain, or that the executable plane covers every deployment the abstract plane states.
 
 Ranked next work: keep LinksSource explicit; discharge the named OPEN `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` provenance assumptions from deployment artifacts; reshape TX to one-module/n-frames or keep stating the two-batch limitation.
 
-Theorems: `PDeposit1.source_deposit_conserves_and_rolls_back` (registered abstract parent), `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` (Verity composition), `DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed` (kill-line).
+Theorems: `PDeposit1.source_deposit_conserves_and_rolls_back` (registered abstract parent), `PDeposit1.verity_tx_composes_deposit_conservation_and_rollback` (Verity composition), `PDeposit1.linked_deployment_is_word_bounded` and `PDeposit1.abstract_parent_covers_deployments_the_verity_plane_omits` (checked statement of the finite executable scope and of the deployments it omits), `DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed` (kill-line).
 Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`.
 
 ## Intent
@@ -61,9 +65,10 @@ The earlier revision's second conjunct — a reverting outcome maps to the abstr
 
 - (a) the registered abstract parent for `(cfg, inp)`;
 - (b) executable rollback: every reverting `Contract.run` restores the entry snapshot and leaves the observation idle, including failure injections that revert *after* real storage writes and real journalled frames — this is the load-bearing rollback evidence;
-- (c) observable correspondence: the executable transaction reproduces the pinned source observables, and whenever the source model commits its push, its `pulled`/`pushed` are exactly the executable plane's.
+- (c) observable correspondence: the executable transaction reproduces the pinned source observables, and whenever the source model commits its push, its `pulled`/`pushed` are exactly the executable plane's;
+- (d) the finite scope of (b) and (c): the journal is the fixed five-frame list with exactly two `depositToBeacon` legs, the probe list has exactly two module ids regardless of `actualDepositsCount`, and the linked deployment's whole pull is below $2^{256}$.
 
-`canonical_composition_witness` discharges both hypothesis bundles on a conserving five-key deployment that actually commits, proving non-vacuity.
+`canonical_composition_witness` discharges both hypothesis bundles on a conserving five-key deployment that actually commits, proving non-vacuity. `abstract_parent_covers_deployments_the_verity_plane_omits` is its dual and is the honest counterweight: it names a deployment where the hypotheses are jointly unsatisfiable for every `inputs`, so non-vacuity is never mistaken for coverage.
 
 ## Kill-line mutant
 
@@ -85,7 +90,7 @@ The honest `run` on the same skewed deployment reverts at the assert (`revertAss
 
 - `LinksSource` from ALLOC output only after P-ALLOC-1 and P-ALLOC-2 parents are the live loops. Composing onto +1 MinFirst or planted capacities launders the wrong fill into conservation.
 - Beacon-address provenance: named assumption.
-- The executable transaction is an exactly-two-batch unrolling of the source deposit loop, not a proved bound on the loop.
+- The executable transaction is an exactly-two-batch unrolling of the source deposit loop, not a proved bound on the loop. Wave 8 makes that explicit and checked (conjunct (d), `linked_deployment_is_word_bounded`, `abstract_parent_covers_deployments_the_verity_plane_omits`) but does not close it. Closing it requires an `execute` over a list of batches with an inductive journal and observables correspondence, together with a no-wrap argument that survives the fold; the two-leg stage lemmas in `DepositParentTx` do not generalize for free.
 
 ## Reproduction
 

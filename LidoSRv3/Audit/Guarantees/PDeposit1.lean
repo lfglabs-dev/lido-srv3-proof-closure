@@ -211,6 +211,31 @@ theorem linked_total_eq_depositsValue (cfg : SourceDepositConfig) (inp : SourceD
   rw [linked_total_eq_pushedValue cfg inp inputs hLink hNoWrap, pushedValue, loopPushed_eq,
     depositsValue, hCons]
 
+/--
+The composed parent's own hypotheses bound the source deployment it can speak
+about.  `LinksSource` forces the two executable legs to carry
+`actualDepositsCount cfg inp` keys at `cfg.depositSize` wei each, and
+`Preconditions.noWrap` forces their sum into one 256-bit word, so the whole pull
+of any linked deployment is below `2 ^ 256`.
+
+This is the arithmetic half of the executable plane's finiteness, and it is
+stated rather than left implicit: the registered abstract parent is an unbounded
+`∀ (cfg, inp)` with no word bound at all, so every deployment above this bound is
+covered by the abstract plane and by no executable transaction.
+`abstract_parent_covers_deployments_the_verity_plane_omits` exhibits one.
+-/
+theorem linked_deployment_is_word_bounded
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : Inputs) (hLink : LinksSource cfg inp inputs)
+    (hNoWrap : inputs.first.amount.val + inputs.second.amount.val
+      < _root_.Verity.Core.Uint256.modulus) :
+    actualDepositsCount cfg inp * cfg.depositSize
+      < _root_.Verity.Core.Uint256.modulus := by
+  have hSum : inputs.first.amount.val + inputs.second.amount.val
+      = actualDepositsCount cfg inp * cfg.depositSize := by
+    rw [hLink.firstAmount, hLink.secondAmount, ← Nat.add_mul, hLink.keys]
+  omega
+
 /-- Hypothesis-free executable rollback theorem. Unlike the composed parent,
 this statement takes neither `LinksSource` nor success `Preconditions`: every
 actual `execute` revert restores the exact entry snapshot and observes the idle
@@ -254,13 +279,28 @@ destination, wei value, argument words and order -- and, whenever the source
 model commits its push, its `pulled` and `pushed` are exactly the executable
 plane's.
 
+*(d)* is the finite scope of *(b)* and *(c)*, in the registered statement rather
+than only in this docstring, so the row cannot be quoted as an unbounded loop
+claim.  The executable journal is the same five frames for every `inputs` --
+two `obtainDepositData` module legs, one `withdrawDepositableEther` pull and
+exactly two `depositToBeacon` legs -- and exactly two module ids are probed,
+however many keys the source batch holds; the pinned loop at
+`BeaconChainDepositor.sol` lines 53--63 instead performs one frame per key.
+The third component is the arithmetic bound of
+`linked_deployment_is_word_bounded`: the hypotheses admit only deployments whose
+whole pull fits one 256-bit word.
+
 Scope, stated rather than hidden: the executable plane is a Verity-EDSL
 transaction (`A-VERITY-SCAFFOLD`), not an EVM execution, and the source plane is
 `A-SOURCE-SHAPED`.  `LinksSource` is a hypothesis about the caller's allocation,
 not a proof that the pinned Solidity produces those two legs.  The transaction
 executes exactly two batches; it does not encode a universally quantified loop,
 and no ALLOC composition into `LinksSource` is claimed (see the private
-counterexample below).
+counterexample below).  Conjunct *(a)* is therefore the only unbounded half of
+this theorem: it holds for every `(cfg, inp)`, while *(b)*, *(c)* and *(d)* speak
+only about the fixed two-leg executable shape, and
+`abstract_parent_covers_deployments_the_verity_plane_omits` exhibits a
+deployment *(a)* covers and no executable transaction can represent.
 -/
 theorem verity_tx_composes_deposit_conservation_and_rollback
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
@@ -282,12 +322,19 @@ theorem verity_tx_composes_deposit_conservation_and_rollback
         ∀ keys pulled pushed balanceAfter,
           run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
             (sourceObservables inputs entry).pulled = (run cfg inp).pulled ∧
-              (sourceObservables inputs entry).pushed = (run cfg inp).pushed) := by
+              (sourceObservables inputs entry).pushed = (run cfg inp).pushed) ∧
+      ((sourceObservables inputs entry).callNames
+          = ["obtainDepositData", "obtainDepositData", "withdrawDepositableEther",
+             "depositToBeacon", "depositToBeacon"] ∧
+        (probes inputs).length = 2 ∧
+        actualDepositsCount cfg inp * cfg.depositSize
+          < _root_.Verity.Core.Uint256.modulus) := by
   refine ⟨source_deposit_conserves_and_rolls_back cfg inp,
     fun reason rollback hRevert =>
       ⟨revert_after_intermediate_writes_restores_snapshot inputs entry rollback reason hRevert,
         revert_observes_idle inputs entry rollback reason hRevert⟩,
-    execute_observes_source inputs entry hPre, ?_⟩
+    ⟨execute_observes_source inputs entry hPre, ?_⟩,
+    rfl, rfl, linked_deployment_is_word_bounded cfg inp inputs hLink hPre.noWrap⟩
   intro keys pulled pushed balanceAfter hCommit
   obtain ⟨-, -, hPulled, hPushed, -, -⟩ := committed_deposits_spec hCommit
   have hCons : ConservingConfig cfg := committed_implies_conserving hCommit
@@ -344,12 +391,78 @@ theorem canonical_composition_witness :
           = (run canonicalSourceConfig canonicalSourceInput).pushed := by
   have hRun : run canonicalSourceConfig canonicalSourceInput
       = .committedDeposits 5 160 160 0 := by decide
-  obtain ⟨-, -, hObs, hAgg⟩ :=
+  obtain ⟨-, -, ⟨hObs, hAgg⟩, -⟩ :=
     verity_tx_composes_deposit_conservation_and_rollback
       canonicalSourceConfig canonicalSourceInput
       canonicalInputs canonicalState canonical_links_source canonical_preconditions
   exact ⟨canonical_links_source, canonical_preconditions, hRun, hObs,
     (hAgg 5 160 160 0 hRun).1, (hAgg 5 160 160 0 hRun).2⟩
+
+/-! ## The quantifier gap between the two planes
+
+Non-vacuity above says the composed hypotheses are satisfiable somewhere.  It
+says nothing about *where they are not*, and the registered abstract parent is an
+unbounded `∀ (cfg, inp)`.  The witness below closes that reading in the opposite
+direction: it names a deployment the abstract parent covers and for which no
+executable transaction exists at all, so `verity: CHECKED` on this row must not
+be read as an executable claim about every deployment the abstract row states. -/
+
+/-- The pinned conserving deployment scaled to `2 ^ 256` keys: `2 ^ 256` public
+keys of `PUBKEY_LENGTH = 48` bytes each.  Nothing else changes. -/
+def oversizedSourceInput : SourceDepositInput :=
+  { canonicalSourceInput with publicKeysBatchLength := 48 * 2 ^ 256 }
+
+/-- That deployment's pull, `actualDepositsCount * DEPOSIT_SIZE`, is `2 ^ 261`
+wei: above the 256-bit word the executable ledger is built on. -/
+theorem oversized_deployment_exceeds_word :
+    actualDepositsCount canonicalSourceConfig oversizedSourceInput = 2 ^ 256 ∧
+      _root_.Verity.Core.Uint256.modulus
+        ≤ actualDepositsCount canonicalSourceConfig oversizedSourceInput
+            * canonicalSourceConfig.depositSize := by
+  have hCount : actualDepositsCount canonicalSourceConfig oversizedSourceInput = 2 ^ 256 := by
+    show 48 * 2 ^ 256 / 48 = 2 ^ 256
+    exact Nat.mul_div_cancel_left _ (by omega)
+  refine ⟨hCount, ?_⟩
+  rw [hCount]
+  show 2 ^ 256 ≤ 2 ^ 256 * 32
+  exact Nat.le_mul_of_pos_right _ (by omega)
+
+/--
+The registered abstract parent is total; the registered Verity parent is not.
+
+The first conjunct is `source_deposit_conserves_and_rolls_back` instantiated at
+`oversizedSourceInput` -- the abstract plane states commit-branch conservation
+and non-conserving-deployment revert there exactly as it does everywhere else.
+The second says no executable transaction reaches that deployment: every
+`inputs` satisfying `LinksSource` violates the composed parent's own
+`Preconditions.noWrap` premise, so the hypotheses of
+`verity_tx_composes_deposit_conservation_and_rollback` are jointly unsatisfiable
+at this `(cfg, inp)` for *every* `inputs` and *every* entry state.
+
+The gap is therefore not an artifact of the chosen witnesses: it is where the
+executable plane's finiteness -- two legs, one 256-bit ledger word -- stops
+short of the abstract plane's `∀`.  Closing it needs an `n`-frame executable
+transaction, not a metadata change.
+-/
+theorem abstract_parent_covers_deployments_the_verity_plane_omits :
+    ((∀ keys pulled pushed balanceAfter,
+        run canonicalSourceConfig oversizedSourceInput
+            = .committedDeposits keys pulled pushed balanceAfter →
+          pulled = pushed ∧
+            depositsValue canonicalSourceConfig oversizedSourceInput
+              = pushedValue canonicalSourceConfig oversizedSourceInput) ∧
+        (¬ ConservingConfig canonicalSourceConfig →
+          0 < actualDepositsCount canonicalSourceConfig oversizedSourceInput →
+          (run canonicalSourceConfig oversizedSourceInput).reverts = true)) ∧
+      ∀ inputs : Inputs,
+        LinksSource canonicalSourceConfig oversizedSourceInput inputs →
+          ¬ inputs.first.amount.val + inputs.second.amount.val
+            < _root_.Verity.Core.Uint256.modulus := by
+  refine ⟨source_deposit_conserves_and_rolls_back _ _, fun inputs hLink hNoWrap => ?_⟩
+  exact absurd
+    (linked_deployment_is_word_bounded canonicalSourceConfig oversizedSourceInput
+      inputs hLink hNoWrap)
+    (Nat.not_lt.2 oversized_deployment_exceeds_word.2)
 
 /-! ## Private non-derivability witness
 

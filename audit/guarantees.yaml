@@ -101,9 +101,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants",
-        "expected": "checked commit-branch conservation, non-conserving-deployment revert, public hypothesis-free executable snapshot rollback, bounded two-batch composition, source-plane assert-drop kill-line, and execute-level mutants"
+        "expected": "checked commit-branch conservation, non-conserving-deployment revert, public hypothesis-free executable snapshot rollback, bounded two-batch composition whose registered statement now carries its own finite scope (fixed five-frame journal with exactly two depositToBeacon legs, exactly two probed module ids, and a 256-bit word bound on the linked deployment), the abstract/Verity quantifier-gap witness abstract_parent_covers_deployments_the_verity_plane_omits, source-plane assert-drop kill-line, and execute-level mutants"
       },
-      "summary": "source_deposit_conserves_and_rolls_back proves commit-branch conservation and non-conserving-deployment revert. verity_tx_revert_restores_snapshot is now a public hypothesis-free executable child: every actual execute revert restores the entry snapshot and observes idle, with no LinksSource or Preconditions. verity_tx_composes_deposit_conservation_and_rollback still composes the bounded two-batch correspondence under LinksSource/Preconditions. The assert-drop source kill-line and executable skipped-debit sibling remain. Not an EVM claim.",
+      "summary": "source_deposit_conserves_and_rolls_back proves commit-branch conservation and non-conserving-deployment revert, for every (cfg, inp) with no word bound. verity_tx_revert_restores_snapshot is a public hypothesis-free executable child: every actual execute revert restores the entry snapshot and observes idle, with no LinksSource or Preconditions. verity_tx_composes_deposit_conservation_and_rollback composes the bounded two-batch correspondence under LinksSource/Preconditions, and its fourth conjunct now states that finiteness inside the registered claim instead of only in prose: the executable journal is the same five frames for every input (two obtainDepositData legs, one withdrawDepositableEther pull, exactly two depositToBeacon legs), exactly two module ids are probed however many keys the source batch holds, and linked_deployment_is_word_bounded shows the hypotheses admit only deployments whose whole pull actualDepositsCount * depositSize is below 2^256. The two planes are therefore NOT quantified alike, and that is checked rather than asserted: abstract_parent_covers_deployments_the_verity_plane_omits exhibits a 2^256-key deployment the abstract parent states in full and for which no Inputs satisfies LinksSource together with the parent's own noWrap premise, so CHECKED on the Verity row is a finite two-leg claim and must not be quoted as an n-frame loop result. The assert-drop source kill-line and executable skipped-debit sibling remain. Not an EVM claim.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back"
@@ -118,8 +118,11 @@
           "pinned-source correspondence",
           "authorization, allocation, dynamic deposit data, and deposit roots",
           "per-module allocation, dynamic-data, and deposit-data-root storage words",
-          "observable Lido/module/beacon call names, destinations, wei values, argument words, and order",
-          "composed correspondence over shared quantified source and transaction variables",
+          "observable Lido/module/beacon call names, destinations, wei values, argument words, and order, for the fixed five-frame journal of the two-leg executable shape",
+          "composed correspondence over shared quantified source and transaction variables, at finite executable arity: the source variables (cfg, inp) are unbounded but the executable side is the exactly-two-batch DepositParentTx.Inputs record, so the correspondence conjunct is a claim about two legs and never about n frames",
+          "the registered composed parent's own finite-scope conjunct (d): for every accepted (cfg, inp, inputs, entry) the executable journal is exactly [obtainDepositData, obtainDepositData, withdrawDepositableEther, depositToBeacon, depositToBeacon] and exactly two module ids are probed, independent of actualDepositsCount, while the pinned loop at BeaconChainDepositor.sol 53--63 performs one frame per key",
+          "linked_deployment_is_word_bounded: LinksSource plus the parent's noWrap premise force actualDepositsCount * depositSize < 2^256, so the composed claim reaches only word-bounded deployments",
+          "checked quantifier-gap witness abstract_parent_covers_deployments_the_verity_plane_omits: at a 2^256-key deployment the abstract parent holds in full while no Inputs satisfies LinksSource together with the noWrap premise, for any entry state -- the finite limitation is a theorem here, not only a fidelity note",
           "public hypothesis-free verity_tx_revert_restores_snapshot theorem: any actual execute revert restores the exact entry snapshot and idle observation, including after intermediate writes",
           "source-plane kill-line at the registered abstract parent's own predicate: dropping the line 996 assert from SolidityDeposit.run (mutantRun) commits the skewed deployment with pulled \u2260 pushed, and mutantRun = run wherever the assert passes",
           "executable-plane conservation sibling evidence: skipping the Lido debit breaks the mutant DepositParentTx's own pulled = pushed Observables equality"
@@ -128,15 +131,15 @@
           "LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength",
           "DEPOSIT_CONTRACT address provenance is assumed rather than pinned to the deployed beacon deposit contract",
           "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = literal 32 ether is a deployment/constructor fact, not derived by the parent",
-          "the executable transaction is an exactly-two-batch shape with no counterpart in the pinned one-module deposit entrypoint and no proved n-frame loop relation",
+          "the executable transaction is an exactly-two-batch shape with no counterpart in the pinned one-module deposit entrypoint and no proved n-frame loop relation; this is now stated inside the registered parent as conjunct (d) and witnessed by abstract_parent_covers_deployments_the_verity_plane_omits, but it is a disclosure, not a closure -- the quantifier gap between the unbounded abstract parent and the finite executable plane is still OPEN and needs an n-frame execute, not further metadata",
           "the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep LinksSource as a caller hypothesis. Do not claim a future ALLOC composition will discharge it: Wave 4 showed ALLOC parents plus key-count composition still fail LinksSource.firstAmount. Derive the beacon deposit contract address instead of assuming it. Keep the executable plane as exactly two batches, or prove a loop bound without advertising a fake forall."
+        "work": "Keep LinksSource as a caller hypothesis. Do not claim a future ALLOC composition will discharge it: Wave 4 showed ALLOC parents plus key-count composition still fail LinksSource.firstAmount. Derive the beacon deposit contract address instead of assuming it. The executable plane stays exactly two batches and now says so inside the registered statement; the remaining work is a real n-frame execute with an inductive journal correspondence, not a stronger wording. Do not advertise a fake forall."
       },
-      "next_gate": "Keep LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER from deployment artifacts; either reshape TX to one-module/n-frames or retain the explicit two-batch limitation.",
+      "next_gate": "Keep LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER from deployment artifacts. The two-batch limitation is now explicit in the registered parent (conjunct (d)) and checked by abstract_parent_covers_deployments_the_verity_plane_omits; closing it requires reshaping TX to one-module/n-frames with an inductive frame correspondence.",
       "roadmap_priority": "DONE"
     },
     {
