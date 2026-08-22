@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Ssz
+import LidoSRv3.Audit.Spec
 import LidoSRv3.Audit.SszDepositEquivalence
 import LidoSRv3.Audit.Source.DepositDataRootCorrespondence
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
@@ -23,22 +24,38 @@ def guarantee : Guarantee := ⟨.pSsz1, [.model, .source, .verityTx]⟩
 abbrev wellFormedDeposit := SszDepositEquivalence.wellFormedDeposit
 abbrev PerfectDepositEncoding := SszDepositEquivalence.PerfectDepositEncoding
 abbrev depositVerified := SszDepositEquivalence.depositVerified
+abbrev depositSszWitness := SszDepositEquivalence.depositSszWitness
 
-/-- Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: construction
-binds `sourceWitness src` to `sourceNode src`; determination recovers the
-witness and deposit uniqueness under `PerfectDepositEncoding` (`A-PERFECT-HASH`).
-SHA-256 remains opaque (`A-SHA256-FFI`). Complements the one-object
-`composed_ssz_encoding` traversal conjunct. -/
+/-- Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named
+Spec `SszWitness.Correspondence` (construction binds `sourceWitness src` to
+`sourceNode src`; determination recovers that witness). Deposit uniqueness
+is the named `PerfectDepositEncoding` / `A-PERFECT-HASH` child
+`deposit_unique_of_perfect`, not a parent conjunct. SHA-256 remains opaque
+(`A-SHA256-FFI`). Complements the one-object `composed_ssz_encoding`
+traversal conjunct. -/
 theorem deposit_root_iff (src : SourceDepositDataRootInput)
-    (hWellFormed : wellFormedDeposit src) (hPerfect : PerfectDepositEncoding) :
-    depositVerified (sourceWitness src) (sourceNode src) ∧
-      (∀ witness root,
-        depositVerified witness root →
-          root = sourceNode src →
-            witness = sourceWitness src ∧
-              ∀ src', wellFormedDeposit src' →
-                sourceNode src' = sourceNode src → src' = src) :=
-  SszDepositEquivalence.deposit_root_iff src hWellFormed hPerfect
+    (hWellFormed : wellFormedDeposit src) :
+    Spec.SszWitness.Correspondence depositSszWitness src :=
+  SszDepositEquivalence.deposit_root_iff src hWellFormed
+
+/-- Unregistered uniqueness child under the named `PerfectDepositEncoding`
+hypothesis. Not registered parent content. -/
+theorem deposit_unique_of_perfect
+    (src src' : SourceDepositDataRootInput)
+    (hWellFormed : wellFormedDeposit src)
+    (hWellFormed' : wellFormedDeposit src')
+    (hPerfect : PerfectDepositEncoding) :
+    sourceNode src' = sourceNode src → src' = src :=
+  SszDepositEquivalence.deposit_unique_of_perfect
+    src src' hWellFormed hWellFormed' hPerfect
+
+/-- Parent-shaped kill-line: mutate `sourceNode` / `encode` to `· + 1` and
+negate the registered correspondence. -/
+theorem sourceNode_mutant_kill_line_refutes_parent :
+    ¬ (∀ src, wellFormedDeposit src →
+        Spec.SszWitness.Correspondence
+          SszDepositEquivalence.depositSszWitnessMutantRoot src) :=
+  SszDepositEquivalence.sourceNode_mutant_kill_line_refutes_parent
 
 /-! ### One-object closure for the digest / concat children
 

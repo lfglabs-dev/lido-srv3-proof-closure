@@ -182,8 +182,8 @@
       "risk": "The structural deposit encoding `sourceNode` is assumed injective on pinned-width well-formed deposits; without it, determination yields witness equality but not deposit uniqueness.",
       "justification": "SHA-256 remains opaque (`A-SHA256-FFI`); injectivity of the structural root encoding on well-formed deposits is an explicit hypothesis (`PerfectDepositEncoding`) rather than a cryptographic consequence.",
       "severity": "HIGH",
-      "violation_impact": "Two distinct well-formed deposits could share the same structural root, breaking uniqueness in the determination direction of `deposit_root_iff`.",
-      "validation": "Recorded as `PerfectDepositEncoding` in `LidoSRv3.Audit.SszDepositEquivalence`; removal requires a proved injectivity theorem or a narrower deposit model.",
+      "violation_impact": "Two distinct well-formed deposits could share the same structural root, breaking the unregistered uniqueness child `deposit_unique_of_perfect`. The registered `deposit_root_iff` parent still yields witness equality.",
+      "validation": "Recorded as `PerfectDepositEncoding` in `LidoSRv3.Audit.SszDepositEquivalence` and used only by the unregistered uniqueness child; removal requires a proved injectivity theorem or a narrower deposit model.",
       "removal_path": "Prove `sourceNode` injective on well-formed deposits from the structural encoding, or refine the deposit model so injectivity is definitional."
     },
     {
