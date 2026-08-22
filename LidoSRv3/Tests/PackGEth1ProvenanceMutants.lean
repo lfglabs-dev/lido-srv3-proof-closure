@@ -24,8 +24,7 @@ theorem dead_rewrite_kill_line_refutes_canonical_rewrite :
     rewriteToDead ensembleRequestAddr ≠
       rewriteToCanonical ensembleRequestAddr ∧
       rewriteToDead ensembleRequestAddr = 0xDEAD ∧
-      rewriteToCanonical ensembleRequestAddr =
-        PConsolidationEth1.canonicalRequestAddress := by
+      rewriteToCanonical ensembleRequestAddr = canonicalRequestAddress := by
   decide
 
 /-- The mutant function is not `rewriteToCanonical`. -/
@@ -37,8 +36,7 @@ theorem dead_rewrite_is_not_canonical_rewrite :
 
 /-- Honest rewrite still maps ensemble 5 to the parent pin. -/
 example :
-    rewriteToCanonical ensembleRequestAddr =
-      PConsolidationEth1.canonicalRequestAddress :=
+    rewriteToCanonical ensembleRequestAddr = canonicalRequestAddress :=
   rewrite_maps_ensemble_to_canonical
 
 end LidoSRv3.Tests.PackGEth1ProvenanceMutants

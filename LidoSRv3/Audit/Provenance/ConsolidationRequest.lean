@@ -38,14 +38,14 @@ theorem verity_requestAddr_remains_ensemble :
 /-- The abstract parent pin is the EIP-7251 consolidation-request literal.
 `PConsolidationEth1.Address` is `Nat`, so this is the brief's `.toNat`. -/
 theorem canonical_request_literal :
-    PConsolidationEth1.canonicalRequestAddress =
+    canonicalRequestAddress =
       0x0000000000000000000000000000000000007251 :=
   rfl
 
 /-- Ensemble 5 is not the canonical predeploy. The registered Verity parent
 therefore does not journal `0x00…7251`. -/
 theorem ensemble_request_is_not_canonical :
-    ensembleRequestAddr ≠ PConsolidationEth1.canonicalRequestAddress := by
+    ensembleRequestAddr ≠ canonicalRequestAddress := by
   decide
 
 /-- Spec-shaped observe rewrite: map the ensemble request address to the
@@ -53,19 +53,19 @@ canonical predeploy. Every other address is unchanged. This does not edit
 the registered Verity parent. -/
 def rewriteToCanonical (addr : Nat) : Nat :=
   if addr = ensembleRequestAddr then
-    PConsolidationEth1.canonicalRequestAddress
+    canonicalRequestAddress
   else
     addr
 
 theorem rewrite_maps_ensemble_to_canonical :
-    rewriteToCanonical ensembleRequestAddr =
-      PConsolidationEth1.canonicalRequestAddress :=
+    rewriteToCanonical ensembleRequestAddr = canonicalRequestAddress :=
   rfl
 
 theorem rewrite_preserves_other (addr : Nat)
     (h : addr ≠ ensembleRequestAddr) :
     rewriteToCanonical addr = addr := by
-  simp [rewriteToCanonical, h]
+  unfold rewriteToCanonical
+  exact if_neg h
 
 /-- Honesty: `A-CANONICAL-REQUEST-ADDRESS` is deployed-target identity, not
 this Lean rewrite. The assumption remains OPEN. -/
