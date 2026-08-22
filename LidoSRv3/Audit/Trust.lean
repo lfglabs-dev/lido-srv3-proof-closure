@@ -66,6 +66,22 @@ import LidoSRv3.Audit.Spec.HashIdentificationChild
 import LidoSRv3.Tests.PackS1HashMutants
 import LidoSRv3.Audit.Spec.ConsolidationBridgeGap
 import LidoSRv3.Tests.PackCGapMutants
+import LidoSRv3.Audit.Spec.Eip4788AnchorChild
+import LidoSRv3.Tests.PackW2Eip4788Mutants
+import LidoSRv3.Audit.Spec.ProductionGindexChild
+import LidoSRv3.Tests.PackW2GindexMutants
+import LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild
+import LidoSRv3.Tests.PackW2DenoteMutants
+import LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence
+import LidoSRv3.Tests.PackW2AddressBatchMutants
+import LidoSRv3.Audit.Spec.Topup2WeiConversionChild
+import LidoSRv3.Tests.PackW2Topup2WeiMutants
+import LidoSRv3.Audit.Spec.ReserveQueueCacheChild
+import LidoSRv3.Tests.PackW2ReserveMutants
+import LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence
+import LidoSRv3.Audit.Spec.VaultHubScopeChild
+import LidoSRv3.Audit.Spec.DerefSupplementalChild
+import LidoSRv3.Tests.PackW2ScopeMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -147,6 +163,26 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.ConsolidationBridgeGap.official_external_call_reverts
 #print axioms LidoSRv3.Audit.Spec.ConsolidationBridgeGap.gateway_nonzero_remains_named_hyp
 #print axioms LidoSRv3.Tests.PackCGapMutants.dropping_gateway_nonzero_admits_free_batch
+#print axioms LidoSRv3.Audit.Spec.Eip4788AnchorChild.ageCheck_ok_of_le
+#print axioms LidoSRv3.Tests.PackW2Eip4788Mutants.skip_age_bound_kill_line
+#print axioms LidoSRv3.Audit.Spec.ProductionGindexChild.cl_validator_index_is_toy
+#print axioms LidoSRv3.Tests.PackW2GindexMutants.claimed_cl_validator_index_ten_is_false
+#print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.requestOne_uses_widened_call_constructor
+#print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.official_raw_call_still_reverts
+#print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.preservesEthBalance_gap_remains
+#print axioms LidoSRv3.Tests.PackW2DenoteMutants.official_revert_with_widened_bind
+#print axioms LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence.three_claim_payouts_match_reads
+#print axioms LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence.length_mismatch_reverts
+#print axioms LidoSRv3.Tests.PackW2AddressBatchMutants.swapped_payout_order_kill_line_refutes_three_item_batch
+#print axioms LidoSRv3.Audit.Spec.Topup2WeiConversionChild.aligned_five_gwei_budget
+#print axioms LidoSRv3.Tests.PackW2Topup2WeiMutants.raw_valueWei_mutant_on_five_gwei_eq_five_billion_ne_five
+#print axioms LidoSRv3.Audit.Spec.ReserveQueueCacheChild.fresh_queue_cache_is_equality
+#print axioms LidoSRv3.Tests.PackW2ReserveMutants.fresh_queue_cache_not_universal
+#print axioms LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence.request_or_unwrap_pause_balance_is_permissionless
+#print axioms LidoSRv3.Audit.Spec.VaultHubScopeChild.approved_destination_cases
+#print axioms LidoSRv3.Audit.Spec.DerefSupplementalChild.deref_closure_exists_shape
+#print axioms LidoSRv3.Tests.PackW2ScopeMutants.approved_destination_has_no_fifth_ctor
+#print axioms LidoSRv3.Tests.PackW2ScopeMutants.packed_config_clobber_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction
