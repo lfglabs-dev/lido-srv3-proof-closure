@@ -13,7 +13,7 @@ P-DEPOSIT-1 verifies that this push conserves ether:
 
 These are the two conjuncts of `source_deposit_conserves_and_rolls_back`. `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` is a constructor immutable while `DEPOSIT_SIZE` is the literal `32 ether`, so their equality is a deployment fact.
 
-`verity_tx_composes_deposit_conservation_and_rollback` conforms an executable Verity transaction to that source plane under `LinksSource`, a caller hypothesis. The executable path is exactly two batches, and since wave 8 the registered statement says so itself: conjunct (d) pins the executable journal to the same five frames for every input (two `obtainDepositData` legs, one `withdrawDepositableEther` pull, exactly two `depositToBeacon` legs), pins the probe list to exactly two module ids, and records the 256-bit word bound the hypotheses impose on the linked deployment. We do not cover the allocation feeding line 953 (P-ALLOC-1, P-ALLOC-2), the top-up path (P-TOPUP-1), or per-key deposit data roots (P-SSZ-1).
+`verity_tx_composes_deposit_conservation_and_rollback` conforms an executable Verity transaction to that source plane under `LinksSource`, a caller hypothesis. The executable path is exactly two batches, and the registered statement now says so itself: conjunct (d) pins the executable journal to the same five frames for every input (two `obtainDepositData` legs, one `withdrawDepositableEther` pull, exactly two `depositToBeacon` legs), pins the probe list to exactly two module ids, and records the 256-bit word bound the hypotheses impose on the linked deployment. We do not cover the allocation feeding line 953 (P-ALLOC-1, P-ALLOC-2), the top-up path (P-TOPUP-1), or per-key deposit data roots (P-SSZ-1).
 
 ## Proof limitations and recommendations
 
@@ -90,7 +90,7 @@ The honest `run` on the same skewed deployment reverts at the assert (`revertAss
 
 - `LinksSource` from ALLOC output only after P-ALLOC-1 and P-ALLOC-2 parents are the live loops. Composing onto +1 MinFirst or planted capacities launders the wrong fill into conservation.
 - Beacon-address provenance: named assumption.
-- The executable transaction is an exactly-two-batch unrolling of the source deposit loop, not a proved bound on the loop. Wave 8 makes that explicit and checked (conjunct (d), `linked_deployment_is_word_bounded`, `abstract_parent_covers_deployments_the_verity_plane_omits`) but does not close it. Closing it requires an `execute` over a list of batches with an inductive journal and observables correspondence, together with a no-wrap argument that survives the fold; the two-leg stage lemmas in `DepositParentTx` do not generalize for free.
+- The executable transaction is an exactly-two-batch unrolling of the source deposit loop, not a proved bound on the loop. That is now explicit and checked (conjunct (d), `linked_deployment_is_word_bounded`, `abstract_parent_covers_deployments_the_verity_plane_omits`) but does not close it. Closing it requires an `execute` over a list of batches with an inductive journal and observables correspondence, together with a no-wrap argument that survives the fold; the two-leg stage lemmas in `DepositParentTx` do not generalize for free.
 
 ## Reproduction
 
