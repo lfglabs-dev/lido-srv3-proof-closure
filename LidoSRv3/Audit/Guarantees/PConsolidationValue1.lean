@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence
+import LidoSRv3.Audit.Guarantees.Registry
 
 /-!
 # P-CONSOLIDATION-VALUE-1
@@ -18,6 +19,11 @@ open _root_.Verity
 open LidoSRv3.Audit.SolidityConsolidation
 open LidoSRv3.Audit.Verity.ConsolidationValueTx
 open LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence
+
+/-- Supplemental justified-interpreter value-forwarding parent.
+`A-CONSOLIDATION-GATEWAY-NONZERO` stays a premise; official denotation
+success is not claimed. -/
+def guarantee : Guarantee := ⟨.pConsolidationValue1, [.model, .source, .verityTx]⟩
 
 /-- Every successful justified execution retains all registered consolidation
 guards, journals exactly the committed request CALLs, forwards exactly

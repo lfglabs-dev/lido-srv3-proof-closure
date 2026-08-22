@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
+import LidoSRv3.Audit.Guarantees.Registry
 
 /-!
 # P-ORACLE-SUPPLY-1
@@ -28,6 +29,10 @@ namespace LidoSRv3.Audit.Guarantees.POracleSupply1
 open LidoSRv3.Audit.SolidityAccounting
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Spec.OracleMintCorrespondence
+
+/-- Supplemental mint+cap parent. Abstract/source checked; ACCOUNT stays
+order-only; no live oracle `Contract.run` on this row. -/
+def guarantee : Guarantee := ⟨.pOracleSupply1, [.model, .source]⟩
 
 /-- P-ORACLE-SUPPLY-1 parent. Universal over `feeWei`, `shareRate`, and the
 named cap `maxShareRate`. First conjunct pair: the frame's mint is the

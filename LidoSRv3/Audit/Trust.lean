@@ -82,6 +82,24 @@ import LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence
 import LidoSRv3.Audit.Spec.VaultHubScopeChild
 import LidoSRv3.Audit.Spec.DerefSupplementalChild
 import LidoSRv3.Tests.PackW2ScopeMutants
+import LidoSRv3.Audit.Spec.AllocExecCorrespondence
+import LidoSRv3.Audit.Guarantees.PAllocExec1
+import LidoSRv3.Tests.PackN1AllocExecMutants
+import LidoSRv3.Audit.Spec.EthJournalConfinement
+import LidoSRv3.Audit.Guarantees.PEthJournal1
+import LidoSRv3.Tests.PackN2EthJournalMutants
+import LidoSRv3.Audit.Spec.OracleMintCorrespondence
+import LidoSRv3.Audit.Guarantees.POracleSupply1
+import LidoSRv3.Tests.PackN3OracleMintMutants
+import LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
+import LidoSRv3.Audit.Guarantees.PAddressBatch1
+import LidoSRv3.Tests.PackN4AddressBatchMutants
+import LidoSRv3.Audit.Spec.SszLiveCorrespondence
+import LidoSRv3.Audit.Guarantees.PSszLive1
+import LidoSRv3.Tests.PackN5SszLiveMutants
+import LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence
+import LidoSRv3.Audit.Guarantees.PConsolidationValue1
+import LidoSRv3.Tests.PackN6ConsolValueMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -183,6 +201,19 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.DerefSupplementalChild.deref_closure_exists_shape
 #print axioms LidoSRv3.Tests.PackW2ScopeMutants.approved_destination_has_no_fifth_ctor
 #print axioms LidoSRv3.Tests.PackW2ScopeMutants.packed_config_clobber_kill_line_refutes_parent
+#print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.allocated_amount_times_deposit_size
+#print axioms LidoSRv3.Tests.PackN1AllocExecMutants.raw_count_as_wei_kill_line
+#print axioms LidoSRv3.Audit.Guarantees.PEthJournal1.every_modeled_success_journal_approved
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.fifth_destination_kill_line_retains_success_premises
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.sum_balances_mutant_killed
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.raw_fee_mutant_killed
+#print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
+#print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence
+#print axioms LidoSRv3.Tests.PackN5SszLiveMutants.skip_lookup_kill_line_refutes_parent
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value
+#print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_calls_refute_exact_forwarding
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction

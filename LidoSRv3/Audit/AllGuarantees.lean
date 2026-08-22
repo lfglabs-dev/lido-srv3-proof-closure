@@ -13,6 +13,12 @@ import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Guarantees.PSsz1
 import LidoSRv3.Audit.Guarantees.PDeref1
 import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
+import LidoSRv3.Audit.Guarantees.PAllocExec1
+import LidoSRv3.Audit.Guarantees.PEthJournal1
+import LidoSRv3.Audit.Guarantees.POracleSupply1
+import LidoSRv3.Audit.Guarantees.PAddressBatch1
+import LidoSRv3.Audit.Guarantees.PSszLive1
+import LidoSRv3.Audit.Guarantees.PConsolidationValue1
 
 /-!
 # Canonical minimal-11 public facade
@@ -67,6 +73,21 @@ example : LidoSRv3.Audit.Verity.DepositParentTx.Preconditions
   PDeposit1.canonical_composition_witness.2.1
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
-def supplemental : List Guarantee := [PDeref1.guarantee, PReserveRelational.guarantee]
+def supplemental : List Guarantee :=
+  [ PDeref1.guarantee
+  , PReserveRelational.guarantee
+  , PAllocExec1.guarantee
+  , PEthJournal1.guarantee
+  , POracleSupply1.guarantee
+  , PAddressBatch1.guarantee
+  , PSszLive1.guarantee
+  , PConsolidationValue1.guarantee
+  ]
+
+/-- Regression guard: Wave 3 leftover-close IDs stay supplemental. -/
+example : supplemental.map (fun guarantee => guarantee.id.text) =
+    ["P-DEREF-1", "P-RESERVE-RELATIONAL", "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1",
+     "P-ORACLE-SUPPLY-1", "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1",
+     "P-CONSOLIDATION-VALUE-1"] := by decide
 
 end LidoSRv3.Audit.Guarantees

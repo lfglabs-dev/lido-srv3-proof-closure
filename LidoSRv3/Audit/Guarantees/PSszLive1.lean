@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Ssz
 import LidoSRv3.Audit.Spec.Eip4788AnchorChild
 import LidoSRv3.Audit.Spec.SszLiveCorrespondence
+import LidoSRv3.Audit.Guarantees.Registry
 
 /-!
 # Node 5 parent: production-GI verify against the looked-up parent root
@@ -16,8 +17,8 @@ The registered parent-shaped theorem is
 production GI against the looked-up parent root (with a fresh age check)
 iff the gateway admits it.
 
-Honesty ledger: this is an unregistered leftover node, not a new registry
-row or guarantee ID. `combine` stays abstract, so SHA-256 functional
+Honesty ledger: registered as supplemental `P-SSZ-LIVE-1`; not a
+minimal-11 row. `combine` stays abstract, so SHA-256 functional
 correctness remains the named `A-SHA256-FFI` assumption. The
 `eip4788ParentRoot` lookup stays opaque (no precompile, no `block.parent`
 read is inhabited); it is consumed by the verify, and admission is false
@@ -32,6 +33,10 @@ namespace LidoSRv3.Audit.Guarantees.PSszLive1
 open LidoSRv3.Audit
 open LidoSRv3.Audit.Spec.Eip4788AnchorChild
 open LidoSRv3.Audit.Spec.SszLiveCorrespondence
+
+/-- Supplemental production-GI / EIP-4788 consume parent. Abstract/source
+checked; `A-SHA256-FFI` stays; no live Solidity gateway. -/
+def guarantee : Guarantee := ⟨.pSszLive1, [.model, .source]⟩
 
 /-- Gateway admission of a top-up / consolidation WC witness: the existing
 `ageCheck` on the anchor timestamps, conjoined with live verification at

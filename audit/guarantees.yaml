@@ -991,6 +991,239 @@
         "kind": "NONE"
       },
       "next_gate": "Replace the source-shaped decoding premise with a machine-checked correspondence to the pinned Solidity spans."
+    },
+    {
+      "id": "P-ALLOC-EXEC-1",
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-DEPOSIT-CONTRACT",
+        "A-DEPOSIT-32-ETHER",
+        "A-CLASSICAL-CHOICE"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAllocExec1 LidoSRv3.Tests.PackN1AllocExecMutants",
+        "expected": "allocated_amount_times_deposit_size builds; raw_count_as_wei_kill_line and skewed_wei_falsifies_bridge refute the unit multiply; A-DEPOSIT-32-ETHER stays OPEN"
+      },
+      "summary": "Supplemental composition parent: executed deposit wei equals Spec.Allocation.amount times the configured depositSize. Under ExecutesAllocation (key counts plus the unit multiply) the LinksSource firstAmount/secondAmount conjuncts, totalAmount, pushedValue, and committed pull/push become theorems. ALLOC parents still do not imply LinksSource without that multiply. depositSize is the configuration field; A-DEPOSIT-32-ETHER stays OPEN.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAllocExec1.allocated_amount_times_deposit_size"
+      },
+      "verity": {
+        "status": "PARTIAL",
+        "theorem": null
+      },
+      "fidelity": {
+        "covered": [
+          "executed batch wei = allocation amount * cfg.depositSize on both source and executable input planes",
+          "LinksSource firstAmount/secondAmount derived from ExecutesAllocation plus the key-count partition",
+          "parent-shaped raw-count-as-wei kill-line at the canonical 5-key / 160-wei witness; 2-key / 65-wei skew falsifies the bridge"
+        ],
+        "missing": [
+          "A-DEPOSIT-32-ETHER remains OPEN: depositSize is the configuration field, not a claimed 32-ether artifact identity",
+          "ExecutesAllocation is a caller-side bridge about how allocation amounts became batch wei; the pinned deposit path is not proved to produce those two legs",
+          "ALLOC parents still do not imply LinksSource without the unit multiply",
+          "no dedicated Contract.run composition on this row beyond the existing P-DEPOSIT-1 transaction plane"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep A-DEPOSIT-32-ETHER and the ALLOC ↛ LinksSource separation named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT."
+      },
+      "next_gate": "Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply."
+    },
+    {
+      "id": "P-ETH-JOURNAL-1",
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-CLASSICAL-CHOICE"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PEthJournal1 LidoSRv3.Tests.PackN2EthJournalMutants",
+        "expected": "every_modeled_success_journal_approved builds; fifth_destination_kill_line_retains_success_premises inserts an unapproved dest on a premise-satisfying path"
+      },
+      "summary": "Supplemental composition parent: every premise-satisfying modeled success journal is a lossless Spec.EthJournal (ApprovedDestination legs only) across the three already-modeled paths — conserving two-batch deposit, value-moving top-up, and consolidation fee/refund. ProtocolReturnPathsExcluded names Vault-to-Lido and WithdrawalQueue protocol-return paths out. Not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PEthJournal1.every_modeled_success_journal_approved"
+      },
+      "verity": {
+        "status": "PARTIAL",
+        "theorem": null
+      },
+      "fidelity": {
+        "covered": [
+          "three modeled success journals project onto Spec.EthJournal / ApprovedDestination",
+          "ProtocolReturnPathsExcluded named conjunct, not a leftover True theorem",
+          "parent-shaped fifth-destination kill-line retains deposit, value-moving top-up, and consolidation success premises"
+        ],
+        "missing": [
+          "Vault-to-Lido and WithdrawalQueue protocol-return paths remain outside this parent (ProtocolReturnPathsExcluded)",
+          "not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened",
+          "address pins do not close deposit, top-up, or request artifact identity"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep ProtocolReturnPathsExcluded named; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination or treat this row as all SRv3 ETH."
+      },
+      "next_gate": "Keep ProtocolReturnPathsExcluded named; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination."
+    },
+    {
+      "id": "P-ORACLE-SUPPLY-1",
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-CLASSICAL-CHOICE"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.POracleSupply1 LidoSRv3.Tests.PackN3OracleMintMutants",
+        "expected": "oracle_supply_mint_and_cap builds; sum_balances_mutant_killed and raw_fee_mutant_killed refute the mint and cap conjuncts; ACCOUNT stays order-only"
+      },
+      "summary": "Supplemental parent with two conjuncts: Spec.OracleFrame.sharesMinted equals mintedShares feeWei shareRate = feeWei * shareRate / E27, and under shareRate ≤ maxShareRate the minted shares are bounded by feeWei * maxShareRate / E27. The mint conjunct is definitional of specOfMint; the cap is load-bearing. Pack E sharesMinted-as-argument is not this conclusion. P-ACCOUNT-1 stays order-only.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap"
+      },
+      "verity": {
+        "status": "PARTIAL",
+        "theorem": null
+      },
+      "fidelity": {
+        "covered": [
+          "computed fee/shareRate mint on Spec.OracleFrame, not a free sharesToMintAsFees argument",
+          "non-definitional aggregate cap under a named maxShareRate",
+          "P-ACCOUNT-1 cited order-only; Eugene child cited as operator-bond only",
+          "parent-shaped sum-balances and raw-fee kill-lines"
+        ],
+        "missing": [
+          "Pack E leftover sharesMinted-as-argument is not this parent and stays a child",
+          "P-ACCOUNT-1 remains order-only; this row does not fold ACCOUNT into supply",
+          "submitReportData split and live oracle transaction mint computation remain out",
+          "no dedicated Contract.run mint/supply transaction on this row"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep P-ACCOUNT-1 order-only; do not treat the Pack E argument-as-mint child as this parent."
+      },
+      "next_gate": "Keep P-ACCOUNT-1 order-only; do not treat Pack E argument-as-mint as this parent."
+    },
+    {
+      "id": "P-ADDRESS-BATCH-1",
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-CLASSICAL-CHOICE"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAddressBatch1 LidoSRv3.Tests.PackN4AddressBatchMutants",
+        "expected": "p_address_batch_1_fuel_bounded_live_claim_batch builds; swapped_three_payout_order_kill_line_refutes_parent keeps well-formed premises and disagrees with pre-state reads"
+      },
+      "summary": "Supplemental fuel-bounded parent for live executeClaimWithdrawalsTo: on well-formed request/hint lists with length ≤ fuel, a successful run journals payouts equal to the pre-state claimableEther reads, marks those ids claimed, and decrements locked ETH by the sum. Two- and three-item receipts are instances. Does not weaken universal_address_writer_equivariance. Recipient-rename equivariance on the live loop is not this parent.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch"
+      },
+      "verity": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch"
+      },
+      "fidelity": {
+        "covered": [
+          "fuel-bounded ∀ on live executeClaimWithdrawalsTo: payouts = pre-state reads, claimed bits, locked-ETH decrement",
+          "rollback re-exported from every_revert_restores_snapshot",
+          "parent-shaped swapped [40,30,10] journal kill-line on a 3-item well-formed batch"
+        ],
+        "missing": [
+          "fuel is an explicit Nat bound; unbounded live-loop correspondence remains out",
+          "recipient-rename equivariance on the live loop is not this parent",
+          "keccak physical slot maps remain OPEN"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep universal_address_writer_equivariance unweakened; extend fuel or add recipient equivariance only with a parent-shaped kill-line."
+      },
+      "next_gate": "Keep universal_address_writer_equivariance unweakened; do not treat numeral 2/3-item receipts as the registered claim."
+    },
+    {
+      "id": "P-SSZ-LIVE-1",
+      "assumptions": [
+        "A-SHA256-FFI",
+        "A-SOURCE-SHAPED",
+        "A-CLASSICAL-CHOICE"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Tests.PackN5SszLiveMutants",
+        "expected": "production_witness_admission_correspondence builds; skip_lookup_kill_line_refutes_parent keeps ageCheck and drops the parent-root lookup"
+      },
+      "summary": "Supplemental parent: a well-formed withdrawal-credentials witness at the inhabited production generalized index (pinned core test vector 0x...0096000000000028 → index 150 * 2^40, pow 40) verifies against the looked-up EIP-4788 parent root iff the gateway admits it (ageCheck ∧ verifyAtParent). The production GI is a model constant, not an artifact-identity discharge. A-SHA256-FFI stays. ProductionGindexBinding stays OPEN.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence"
+      },
+      "verity": {
+        "status": "PARTIAL",
+        "theorem": null
+      },
+      "fidelity": {
+        "covered": [
+          "inhabited production GI from the pinned core test vector, not toy slot 2",
+          "verifyAtParent consumes eip4788ParentRoot; none lookup admits nothing",
+          "gateway admit iff ageCheck and production-GI verify",
+          "parent-shaped skip-lookup kill-line; toy-slot structural-depth disagreement"
+        ],
+        "missing": [
+          "A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed",
+          "ProductionGindexBinding stays OPEN; the inhabited production GI is a pinned test-vector model constant, not an artifact-identity discharge",
+          "eip4788ParentRoot lookup stays opaque; no precompile or block.parent read is inhabited",
+          "not a live Solidity gateway and not a bus"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep A-SHA256-FFI and ProductionGindexBinding named; do not set ProductionGindexBinding to False or treat the test-vector pin as a discharge."
+      },
+      "next_gate": "Keep A-SHA256-FFI and ProductionGindexBinding named; do not treat the test-vector pin as a discharge."
+    },
+    {
+      "id": "P-CONSOLIDATION-VALUE-1",
+      "assumptions": [
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
+        "A-CONSOLIDATION-GATEWAY-NONZERO",
+        "A-CLASSICAL-CHOICE"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants",
+        "expected": "justified_interpreter_forwards_exactly_msg_value builds; zero_value_calls_refute_exact_forwarding keeps exact-fee and gateway premises"
+      },
+      "summary": "Supplemental justified-interpreter parent: on every successful vault request batch the interpreter forwards exactly msg.value to the request predeploy, vault ETH decreases by that amount, and preservesEthBalance holds. Official denoteFunction still reverts on Expr.call; this row does not claim official denotation success. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus and no consensus-layer verify.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value"
+      },
+      "verity": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value"
+      },
+      "fidelity": {
+        "covered": [
+          "justified ConsolidationValueTx.execute journals externalCallBindTo with fee value",
+          "forwards exactly msg.value, vaultEthDelta, preservesEthBalance, noConsensusLayerVerify",
+          "PConsolidation1 source guards cited, not restated; parent-shaped zero-value CALL kill-line"
+        ],
+        "missing": [
+          "official denoteFunction still reverts on Expr.call; this parent uses a justified interpreter, not official denotation success",
+          "A-CONSOLIDATION-GATEWAY-NONZERO remains a caller premise, not discharged",
+          "no bus, no consensus-layer verify, no ETH-1 composed with CONSOLIDATION-1 ABI bridge"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not claim official denotation success or start the bus."
+      },
+      "next_gate": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not claim official denotation success or start the bus."
     }
   ],
   "objective": "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
