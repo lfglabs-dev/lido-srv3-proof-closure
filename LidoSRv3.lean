@@ -26,6 +26,7 @@ import LidoSRv3.Tests.PackJTopupEthJournalMutants
 import LidoSRv3.Audit.Spec.HashIdentificationChild
 import LidoSRv3.Tests.PackS1HashMutants
 import LidoSRv3.Audit.Spec.ConsolidationBridgeGap
+import LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess
 import LidoSRv3.Tests.PackCGapMutants
 import LidoSRv3.Audit.Spec.Eip4788AnchorChild
 import LidoSRv3.Tests.PackW2Eip4788Mutants
@@ -71,6 +72,7 @@ import LidoSRv3.Tests.PackN5SszLiveMutants
 import LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence
 import LidoSRv3.Audit.Guarantees.PConsolidationValue1
 import LidoSRv3.Tests.PackN6ConsolValueMutants
+import LidoSRv3.Tests.PackP6OfficialSuccessMutants
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.Strategy
 import LidoSRv3.Audit.StrategyProofs
