@@ -234,6 +234,23 @@ evidence for it. Together with `verity_wrap_to_zero_is_empty_commit` this
 partitions every wrapping batch on the executed plane, so nonzero wrap is no
 longer excluded by `hCommit`.
 
+## Wave 8: hybrid lane aligned, no Verity NoUncheckedWrap parent remains
+
+The hybrid bridge `TopupHybrid.verity_tx_simulates_source` still carried the
+`NoUncheckedWrap` premise the registered parents had already dropped. After the
+wrapped-total routing of `run`'s value-moving tail the premise was unreferenced
+in its proof (the build log warned so), while the guarantees row already stated
+"NoUncheckedWrap is not a Verity parent hypothesis". The premise is removed, so
+the hybrid simulation now holds for every input: a nonzero wrap executes the
+mapped revert branch and `Contract.run` restores the snapshot, wrap-to-zero
+executes the call-free empty commit, matching abstract conjunct 3 and the
+registered Verity parent. Two `TopupHybridMutants` theorems instantiate the
+generalized parent at the wrapping witnesses `wrapInput` (nonzero wrap,
+executed `ROUTER_BALANCE_CHANGED` revert to the entry snapshot) and
+`wrapToZeroInput` (empty commit), inputs the retired premise excluded;
+`Trust.lean` prints axioms for all three. Outcome: universal lifting, not a
+YAML-encoded limitation; the P-TOPUP-1 row is unchanged.
+
 ## Scope Exclusions
 
 - Per-validator amount computation and limit accounting → P-TOPUP-2.

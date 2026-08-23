@@ -126,14 +126,25 @@ def executeSource (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Contract 
   | .committedNoTopUp => TopupTxContract.executeNoTopup false 0 0
   | _ => TopupTxContract.executeNoTopup true 0 0
 
-/-- Adequacy of the hybrid boundary under the explicit source-line-732
-no-wrap premise.  That premise makes the source interpreter's `Nat`
-accumulation faithful to Solidity's unchecked `uint256` accumulation; source
-conservation then discharges the typed program's equality guard, and every
-source revert is normalized by `Contract.run` to the exact pre-call snapshot. -/
+/-- Adequacy of the hybrid boundary for *every* source input, with no no-wrap
+premise.  This is the hybrid lane's alignment with the abstract wrap/revert
+semantics of the registered parent's third conjunct
+(`Guarantees.PTopup1.source_wrap_precludes_value_moving_commit`): a nonzero
+wrap reaches the typed program through its mapped revert branch
+(`executePushRevert`, or the deliberately failing `executeTopup` tail when the
+wrapped and exact words disagree), and `Contract.run` normalizes it to the
+exact pre-call snapshot; a wrap-to-zero batch executes the call-free empty
+commit (`executeNoTopup`).  Wrap-implies-revert is false on this plane exactly
+as on the source plane; wrap precludes a value-moving commit instead.  Since
+the wrapped-total routing of `run`'s value-moving tail, `run_conserves` holds
+unconditionally and discharges the typed program's equality guard on every
+committing branch; the earlier `SolidityTopup.NoUncheckedWrap` premise had
+already become unreferenced here and is now dropped, so `NoUncheckedWrap` is
+not a hypothesis of any Verity parent, matching the registered Verity parent
+`Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close`. -/
 theorem verity_tx_simulates_source
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-    (hNoWrap : NoUncheckedWrap inp) (state : ContractState) :
+    (state : ContractState) :
     observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state := by
   have hconserves := run_conserves cfg inp
   cases hrun : run cfg inp <;>
