@@ -1160,13 +1160,13 @@
         "A-CLASSICAL-CHOICE"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Tests.PackN5SszLiveMutants",
-        "expected": "production_witness_admission_correspondence builds; skip_lookup_kill_line_refutes_parent keeps ageCheck and drops the parent-root lookup"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackW2GindexMutants",
+        "expected": "production_witness_admission_from_core_gindex builds; wrong_packed_word_is_not_production_binding and skip_lookup_kill_line_refutes_parent keep premises"
       },
-      "summary": "Supplemental parent: a well-formed withdrawal-credentials witness at the inhabited production generalized index (pinned core test vector 0x...0096000000000028 \u2192 index 150 * 2^40, pow 40) verifies against the looked-up EIP-4788 parent root iff the gateway admits it (ageCheck \u2227 verifyAtParent). The production GI is a model constant, not an artifact-identity discharge. A-SHA256-FFI stays. ProductionGindexBinding stays OPEN.",
+      "summary": "Supplemental parent: ProductionGindexBinding is the constructor-pin decode of TopUpGateway g_index_first_validator_curr (0x...0096000000000028 = (150 * 2^40 << 8) | 40), and a WC witness at that production GI verifies against the opaque eip4788ParentRoot iff the gateway admits it (ageCheck \u2227 verifyAtParent). The pin is an in-repo constructor literal, not a live-deployment identity. A-SHA256-FFI stays. eip4788ParentRoot stays opaque; this row does not claim live verify.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence"
+        "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_from_core_gindex"
       },
       "verity": {
         "status": "PARTIAL",
@@ -1174,23 +1174,24 @@
       },
       "fidelity": {
         "covered": [
-          "inhabited production GI from the pinned core test vector, not toy slot 2",
+          "ProductionGindexBinding inhabited from the TopUpGateway constructor pin, not only the test-vector constant",
+          "packed word decodes as (150 * 2^40 << 8) | 40; productionIndex is not toy slot 2",
           "verifyAtParent consumes eip4788ParentRoot; none lookup admits nothing",
           "gateway admit iff ageCheck and production-GI verify",
-          "parent-shaped skip-lookup kill-line; toy-slot structural-depth disagreement"
+          "parent-shaped wrong-packed-word kill-line; skip-lookup kill-line"
         ],
         "missing": [
           "A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed",
-          "ProductionGindexBinding stays OPEN; the inhabited production GI is a pinned test-vector model constant, not an artifact-identity discharge",
-          "eip4788ParentRoot lookup stays opaque; no precompile or block.parent read is inhabited",
+          "the constructor pin is an in-repo literal, not a live-deployment identity",
+          "eip4788ParentRoot lookup stays opaque; this row does not claim live verify",
           "not a live Solidity gateway and not a bus"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep A-SHA256-FFI and ProductionGindexBinding named; do not set ProductionGindexBinding to False or treat the test-vector pin as a discharge."
+        "work": "Keep A-SHA256-FFI named and eip4788ParentRoot opaque; do not claim live verify or treat the constructor pin as a live-deployment identity."
       },
-      "next_gate": "Keep A-SHA256-FFI and ProductionGindexBinding named; do not treat the test-vector pin as a discharge."
+      "next_gate": "Keep A-SHA256-FFI named and eip4788ParentRoot opaque; do not claim live verify."
     },
     {
       "id": "P-CONSOLIDATION-VALUE-1",

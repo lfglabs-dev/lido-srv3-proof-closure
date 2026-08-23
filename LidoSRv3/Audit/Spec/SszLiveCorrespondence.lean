@@ -13,15 +13,14 @@ labeled mainnet values in `test/0.8.25/validatorExitDelayVerifier.test.ts`;
 pack layout `(index << 8) | pow` per `contracts/common/lib/GIndex.sol`), and
 binds `Ssz.verifyProof` to a parent-root argument through `verifyAtParent`.
 
-This is a MODEL constant from the pinned test vector, NOT a discharge of a
-deployment assumption: `ProductionGindexChild.ProductionGindexBinding`
-(deployed-GI equality) stays exactly as that child records it, and the toy
-slots 2/3/4 stay the leftover record for `Ssz.operationIndex`. The parent
-root consumed here is `Eip4788AnchorChild.eip4788ParentRoot`, which stays an
-opaque lookup; when the lookup is `none`, verification is false. `combine`
-stays abstract, so SHA-256 functional correctness remains the named
-`A-SHA256-FFI` assumption; no claim about deployed SHA, Yul, the beacon-roots
-precompile, or EVM execution is made.
+`ProductionGindexChild.ProductionGindexBinding` is the constructor-pin
+decode of that same packed word (in-repo TopUpGateway constructor arg, not
+a live-deployment identity). Toy slots 2/3/4 stay the leftover record for
+`Ssz.operationIndex`. The parent root consumed here is
+`Eip4788AnchorChild.eip4788ParentRoot`, which stays an opaque lookup; when
+the lookup is `none`, verification is false. `combine` stays abstract, so
+SHA-256 functional correctness remains the named `A-SHA256-FFI`
+assumption. This module does not claim live verify.
 -/
 
 namespace LidoSRv3.Audit.Spec.SszLiveCorrespondence
@@ -59,6 +58,13 @@ theorem giFirstValidatorCurr_pow : giFirstValidatorCurr.pow = 40 := rfl
 
 theorem giFirstValidatorCurr_index :
     giFirstValidatorCurr.index = 150 * 2 ^ 40 := rfl
+
+/-- The test-vector packed word is the same constructor-pin literal the
+binding decodes. -/
+theorem giFirstValidatorCurr_eq_core_pin :
+    giFirstValidatorCurr.packed =
+      ProductionGindexChild.pinnedCoreGiFirstValidatorCurr :=
+  rfl
 
 /-- The production generalized index as the structural `Ssz` layer consumes
 it. Value `150 * 2 ^ 40`, not a toy `operationIndex` slot. -/

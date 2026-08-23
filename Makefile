@@ -95,6 +95,8 @@ test:
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressSourceMutants
 	@printf '%s\n' 'P-ADDRESS-1 executable address-writer, wrong-recipient, and admission-boundary mutants compiled and asserted'
+	@lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackW2GindexMutants
+	@printf '%s\n' 'P-SSZ-LIVE-1 constructor-pin GI parent, skip-lookup kill-line, and wrong-packed-word kill-line compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
