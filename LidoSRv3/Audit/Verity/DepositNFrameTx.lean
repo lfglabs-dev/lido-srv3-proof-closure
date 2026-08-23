@@ -241,8 +241,8 @@ theorem unitList_eq_replicate (values : List Unit) :
   | nil => rfl
   | cons value values ih =>
       cases value
-      change () :: values = () :: List.replicate values.length ()
-      rw [ih]
+      conv_lhs => rw [ih]
+      simp
 
 theorem processBatches_loop (inputs : Inputs) (batches : List Batch)
     (acc : List Unit) (state : ContractState)
@@ -275,15 +275,17 @@ theorem pullFromLido_apply (inputs : Inputs) (total : Word) (state : ContractSta
     (hCall : inputs.lidoCallOk = true)
     (hFunded : total ≤ state.readSlot lidoDepositableSlot) :
     pullFromLido inputs total state = .success () (afterPull inputs total state) := by
-  have hOld := DepositParentTx.pullFromLido_apply (pullLegacyInputs inputs total) state
-    hCall (by simpa [pullLegacyInputs, legacyInputs, DepositParentTx.totalAmount,
-      zeroBatch, lidoDepositableSlot,
-      _root_.Verity.Core.Uint256.add_zero] using hFunded)
-  simpa [pullFromLido, pullLegacyInputs, legacyInputs, DepositParentTx.pullFromLido,
-    DepositParentTx.totalAmount, DepositParentTx.afterPull, DepositParentTx.pullEntry,
-    zeroBatch, afterPull, afterCall, lidoDepositableSlot,
-    _root_.Verity.Core.Uint256.add_zero,
-    _root_.Verity.Core.Uint256.add_comm] using hOld
+  have hFrame := DepositParentTx.bindTo_apply inputs.lido 0 "withdrawDepositableEther"
+    [total] state (by decide) (DepositParentTx.zero_le _)
+  have hGuard : decide (total ≤
+      (DepositParentTx.afterCall 0
+        (linkedCallEntryTo "withdrawDepositableEther" inputs.lido 0 [total])
+        state).readSlot lidoDepositableSlot) = true :=
+    decide_eq_true hFunded
+  simp only [pullFromLido, Bind.bind, _root_.Verity.bind, DepositParentTx.callName,
+    hCall, if_true, hFrame, DepositParentTx.getState, _root_.Verity.require, hGuard,
+    setStorage, DepositParentTx.creditRouter, afterPull, afterCall]
+  try rfl
 
 theorem pushBatch_apply (inputs : Inputs) (batch : Batch) (state : ContractState)
     (hCall : batch.beaconCallOk = true) (hBal : batch.amount ≤ state.selfBalance) :
@@ -435,8 +437,9 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
       state.readSlot lidoDepositableSlot := by
     rw [show processed = afterBatches inputs inputs.batches entry from rfl,
       readSlot_afterBatches]
-    simp [entry, counterSlot, lidoDepositableSlot,
-      ContractState.readSlot_writeSlot_other]
+    exact ContractState.readSlot_writeSlot_other state
+      (slot := counterSlot) (slot' := lidoDepositableSlot) (by decide)
+      (state.readSlot counterSlot + 1)
   have hFunded : wordTotal inputs.batches ≤ processed.readSlot lidoDepositableSlot := by
     rw [hLido]
     exact h.funded
