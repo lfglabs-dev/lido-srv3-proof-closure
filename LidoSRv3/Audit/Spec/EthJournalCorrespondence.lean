@@ -38,6 +38,8 @@ theorem specDest_other (addr : Address) : specDest (.other addr) = none := rfl
 
 theorem specDest_lido : specDest .lido = none := rfl
 
+theorem specDest_withdrawalQueue : specDest .withdrawalQueue = none := rfl
+
 /-- If every move has a Spec destination, the Spec journal preserves amounts
 in order. -/
 theorem specJournal_amounts_of_projected

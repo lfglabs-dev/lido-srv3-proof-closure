@@ -101,6 +101,8 @@ test:
 	@printf '%s\n' 'P-ADDRESS-BATCH-1 fuel-bounded recipient-rename parent and fixed-dest kill-line compiled and asserted'
 	@lake build LidoSRv3.Audit.Guarantees.PAllocExec1 LidoSRv3.Tests.PackN1AllocExecMutants
 	@printf '%s\n' 'P-ALLOC-EXEC-1 router ExecutesAllocation parent and raw-count router kill-line compiled and asserted'
+	@lake build LidoSRv3.Audit.Guarantees.PEthJournal1 LidoSRv3.Tests.PackN2EthJournalMutants
+	@printf '%s\n' 'P-ETH-JOURNAL-1 JournalApproved-implies-exclusion parent and Lido-hop kill-line compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts

@@ -70,4 +70,55 @@ theorem fifth_destination_kill_line_retains_success_premises :
   have hDest := congrArg CandidateLeg.dest hLeg
   simp [fifthDestinationLeg, specDest] at hDest
 
+/-- A Vault→Lido hop is not a lossless Spec journal. Premises of the
+exclusion parent stay: this is the hop the parent says cannot be
+`JournalApproved`. -/
+def lidoHop : List EthMove :=
+  [{ amount := 1, destination := .lido }]
+
+theorem lido_hop_not_journal_approved :
+    ¬ JournalApproved (consolidationCandidate lidoHop) := by
+  intro hApproved
+  have hExcl :=
+    LidoSRv3.Audit.Guarantees.PEthJournal1.journal_approved_excludes_protocol_return_paths
+      lidoHop hApproved
+  have hMem : { amount := 1, destination := .lido } ∈ lidoHop := by
+    simp [lidoHop]
+  exact (hExcl _ hMem).1 rfl
+
+/-- Mutant projection: treat Vault→Lido as the frozen `lidoPull` dest.
+Then the Lido hop would look approved while `ProtocolReturnPathsExcluded`
+fails, so the implication depends on `specDest .lido = none`. -/
+def mutantSpecDest : EthDestination → Option LidoSRv3.Audit.Spec.ApprovedDestination
+  | .lido => some LidoSRv3.Audit.Spec.ApprovedDestination.lidoPull
+  | dest => specDest dest
+
+def mutantLidoCandidate (moves : List EthMove) : CandidateJournal :=
+  moves.map fun move =>
+    { dest := mutantSpecDest move.destination, wei := ⟨move.amount⟩ }
+
+theorem mutant_lido_maps_to_lidoPull :
+    mutantSpecDest .lido =
+      some LidoSRv3.Audit.Spec.ApprovedDestination.lidoPull := rfl
+
+def mutantLidoSpecJournal : LidoSRv3.Audit.Spec.EthJournal :=
+  [{ dest := LidoSRv3.Audit.Spec.ApprovedDestination.lidoPull, wei := ⟨1⟩ }]
+
+theorem mutant_lido_candidate_is_spec_image :
+    mutantLidoCandidate lidoHop = candidateOfSpec mutantLidoSpecJournal := by
+  simp [mutantLidoCandidate, lidoHop, mutantSpecDest, mutantLidoSpecJournal,
+    candidateOfSpec]
+
+/-- Parent-shaped kill-line: the mutant Lido hop is the image of a Spec
+journal (so "approved"), but `ProtocolReturnPathsExcluded` fails. -/
+theorem mutant_lido_approved_not_excluded_kill_line :
+    JournalApproved (mutantLidoCandidate lidoHop) ∧
+      ¬ ProtocolReturnPathsExcluded lidoHop := by
+  constructor
+  · exact ⟨mutantLidoSpecJournal, mutant_lido_candidate_is_spec_image⟩
+  · intro hExcl
+    have hMem : { amount := 1, destination := .lido } ∈ lidoHop := by
+      simp [lidoHop]
+    exact (hExcl _ hMem).1 rfl
+
 end LidoSRv3.Tests.PackN2EthJournalMutants

@@ -58,6 +58,23 @@ P-ALLOC-EXEC-1 router produces ExecutesAllocation (2026-08-23)
 - Reproduction: `lake build LidoSRv3.Audit.Guarantees.PAllocExec1
   LidoSRv3.Tests.PackN1AllocExecMutants` exit 0; metadata checks exit 0.
 
+P-ETH-JOURNAL-1 JournalApproved implies exclusion (2026-08-23)
+-------------------------------------------------------------
+
+- Rebind `validated-tree` to `7f576aeb74290587a6dddbfd7939ede4f078b23c`, the
+  tracked tree of `cursor/eth-journal-exclusion-6aad` excluding this receipt.
+- Scope: one supplemental row, P-ETH-JOURNAL-1. Same guarantee id. The
+  registered theorem is now
+  `journal_approved_excludes_protocol_return_paths`:
+  `JournalApproved (consolidationCandidate moves)` implies
+  `ProtocolReturnPathsExcluded moves`. Exclusion is the conclusion, not a
+  restated leftover. This does not claim Lido never drains ETH. Address
+  pins do not close provenance. ApprovedDestination stays four constructors.
+- Kill-line: `mutant_lido_approved_not_excluded_kill_line` (mutant specDest
+  maps `.lido` to `.lidoPull`).
+- Reproduction: `lake build LidoSRv3.Audit.Guarantees.PEthJournal1
+  LidoSRv3.Tests.PackN2EthJournalMutants` exit 0; metadata checks exit 0.
+
 P-DEPOSIT-1 guard-order honesty of the pull kill-line (2026-08-23)
 ------------------------------------------------------------------
 
