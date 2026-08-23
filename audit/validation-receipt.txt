@@ -1,11 +1,55 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: db24f3bf7ccd19d113856a8c6099c6c75851bb57
+validated-tree: 17f3e160fcf05b6775dc3bcf4a4f1c56070e6865
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 source-domain honesty of both kill-lines (2026-08-23)
+------------------------------------------------------------------
+
+- Rebind `validated-tree` to `17f3e160fcf05b6775dc3bcf4a4f1c56070e6865`, the
+  tracked tree of `pdeposit1-quantifier-honesty` excluding this receipt.
+- Scope: the same one row, P-DEPOSIT-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched. This entry repairs two
+  defects in the entries below, which remain as the historical record of what
+  was claimed at those heads.
+- Defect 1 (oversized witness outside the source domain). The committing
+  oversized witness scaled every cap to at least `2 ^ 256`
+  (`maxDepositsPerBlock`, `moduleDepositableEth`, both batch lengths,
+  `lidoDepositableEther`), so `oversizedSourceInput` is not a `uint256`-encodable
+  call: `DepositCorrespondence.lean` reads its unbounded `Nat` arithmetic as the
+  pinned Solidity only under the no-overflow reading, and this input is outside
+  that domain by construction. `oversized_run_commits` therefore proved only
+  that the unbounded Lean function commits a synthetic input, while the report
+  and metadata claimed a deployment "actually executes" the pinned path and
+  commits a real frame sequence omitted by Verity. Fixed by adding
+  `oversized_input_is_outside_the_source_domain`, a checked five-conjunct list
+  that every scaled cap sits at or above `Uint256.modulus`, and rewording every
+  claim about the witness to the honest scope: the *model's* `run` commits, the
+  exhibit is a quantifier gap of the abstract `Nat` model's unbounded `∀ (cfg,
+  inp)`, no realizable Solidity deployment encodes the call, and on chain
+  Solidity 0.8 checked arithmetic panics at the line-972 product before any
+  withdrawal or per-key frame. The witness keeps its non-vacuity content: no
+  guard turns the model away, and the abstract parent's conservation conclusion
+  fires on the model-level committed outcome.
+- Defect 2 (unencodable immutable presented as a source pull). The pull
+  kill-line `linked_hypotheses_do_not_bound_the_source_pull` set the `uint256`
+  constructor immutable `maxEBType1` to exactly `2 ^ 256`, which no Solidity
+  deployment can encode, and the docstring/read of `depositsValue` as wei the
+  router "would withdraw" at line 983 ignored that Solidity 0.8 checked
+  multiplication overflows at line 972 before that withdrawal and before the
+  line-996 assertion. Fixed by setting `maxEBType1 := 2 ^ 256 - 1`, the largest
+  `uint256`-encodable value, and adding its encodability
+  (`skewedPullConfig.maxEBType1 < Uint256.modulus`) as the theorem's first
+  conjunct, so the word boundary is left exactly at the line-972 product `5 *
+  (2 ^ 256 - 1)` where checked arithmetic panics. All prose now claims the
+  line-972 *pull quantity*, not a settled transfer, and records both why no
+  deployment settles it (checked `Panic(0x11)` at the multiplication) and why
+  the unbounded model still aborts (non-conserving deployment reverts at the
+  line-996 assert).
 
 P-DEPOSIT-1 push/pull split and committing oversized witness (2026-08-23)
 -------------------------------------------------------------------------
