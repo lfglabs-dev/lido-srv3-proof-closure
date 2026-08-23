@@ -1,11 +1,106 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 5268e1b6931aaf2933b54eca546ba3bb14374e51
+validated-tree: f10f34b865ddcd2ad053a5e7b76daea715d45353
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 full executable preconditions at the n-frame witness, PR #205
+review r3838278045 (2026-08-23)
+------------------------------------------------------------------
+
+- Rebind `validated-tree` to `f10f34b865ddcd2ad053a5e7b76daea715d45353`, the
+  tracked tree of the successor head on `pdeposit1-postmerge-honesty-2` above
+  `eef505a` excluding this receipt.
+- Scope: the same one row, P-DEPOSIT-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched. This entry repairs the
+  single P2 finding r3838278045 left by the Codex review of head `eef505a`;
+  the entries below remain the historical record of each earlier head.
+- Finding r3838278045 (P2, the n-frame witness did not kernel-check the
+  advertised admission). `manyKey_links_source_two_legs` now proves the
+  complete executable precondition bundle `Preconditions (nLinks
+  canonicalSourceConfig 4) canonicalState` alongside `LinksSource` and the
+  no-wrap inequality: every guard-health flag, `distinctModules`,
+  `valueMatches` 288 = 9 * 32, `entryBalance`, `funded` 288 <= 1000, and
+  `noWrap`, at the concrete entry state `canonicalState` (the closed entry the
+  row already pins, `DepositParentTx.lean`). Two regressions pin the entry
+  down from the other side: `manyKey_entry_state_guards_are_load_bearing`
+  refutes the whole bundle at `manyKeyUnderfundedEntry` (Lido's depositable
+  ledger one wei short, 288 <= 287 failing at the funding premise), and
+  `manyKey_underfunded_entry_reverts_at_not_enough_ether` runs the executable
+  two-leg transaction at that underfunded entry and reverts with exactly
+  `NOT_ENOUGH_ETHER` back to the entry snapshot, proved by `rfl` (kernel
+  computation). `Trust.lean` prints axioms for the strengthened witness and
+  both regressions (`[propext]` / `[propext, Classical.choice, Quot.sound]`);
+  the public claim-surface allowlist, guarantees.yaml detail, and report are
+  resynced. No registered theorem statement was weakened: the public witness
+  theorem only gained a conjunct, and no sorry/admit/axiom/unsafe was
+  introduced.
+- Validation on this tree: `make prove` exit 0
+  (`verified_source_tree=564b975687edcb8d1b88c6d6f93b7b3e7d3a973c`, Lean
+  4.31.0, `Build completed successfully (1461 jobs)`, proof report written to
+  `proofs/logs/proof-report.json`); row reproduction `lake build
+  LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx
+  LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants`
+  exit 0 (`Build completed successfully (1376 jobs)`); `make test` exit 0 on
+  the final head (metadata check 11 canonical + 18 subordinate rows, receipt
+  check, claim-surface check + regression suite, no-python-evidence checks,
+  Verity provenance checks, provenance guards, every `LidoSRv3.Tests.*`
+  target, 5/5 reference fixtures).
+
+P-DEPOSIT-1 post-merge honesty pass, PR #195 findings (2026-08-23)
+------------------------------------------------------------------
+
+- Rebind `validated-tree` to `2c9a500d00ec64978a14dc7cec8d131be3ac6440`, the
+  tracked tree of the follow-up branch to `main` at `443767b` (post PR #195)
+  excluding this receipt.
+- Scope: the same one row, P-DEPOSIT-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched. This entry repairs the
+  three actionable post-merge review findings on merged PR #195; the entries
+  below remain the historical record of each earlier head.
+- Finding r3837485173 (P1, oversized witness outside the source domain). The
+  exhibit theorems drop the deployment wording
+  (`abstract_parent_covers_inputs_the_verity_plane_omits`,
+  `oversized_input_exceeds_word`) and the new kernel-checked regression
+  `in_range_commit_is_word_bounded` proves no input whose module allocation is
+  `uint256`-encodable can commit a word-exceeding push (a committing `run`
+  passed the line-969 over-target guard, so the product is bounded by the
+  allocation, and the line-996 assert makes the deployment conserving, so the
+  committed push equals that bounded product). The word-domain gap's witness
+  therefore necessarily lives outside the source domain, checked from both
+  sides: `oversized_input_is_outside_the_source_domain` pins the exhibit out,
+  `in_range_commit_is_word_bounded` proves no in-range substitute exists.
+- Finding r3837681469 (P2, unreachable product is not a source pull). The
+  kill-line is renamed `linked_hypotheses_do_not_bound_the_line_972_product`
+  and every docstring, report, and metadata surface now states it as the
+  standalone unbounded-`Nat` formula the composed hypotheses fail to bound,
+  never a settled pull and never a reached multiplication
+  (`skewed_pull_witness_turned_away_before_line_972` remains the executable
+  regression: `run` returns `revertZeroDeposits` on exactly the quoted
+  witness).
+- Finding r3837984864 (P2, word-bound gap versus n-frame gap). The two gaps
+  are disclosed separately with distinct witnesses: the word-domain gap keeps
+  the out-of-domain oversized exhibit (no in-range substitute exists by
+  `in_range_commit_is_word_bounded`), and the missing n-frame executable
+  model gets its own in-range witness `manyKeySourceInput` -- nine
+  `uint256`-encodable keys (`manyKey_input_is_within_the_source_domain`), a
+  committed nine-frame push of 288 wei (`manyKey_run_commits`), and
+  `LinksSource` still splitting the keys 4 + 5 across the existing two
+  aggregate legs with the total inside one word
+  (`manyKey_links_source_two_legs`). Closing the word-domain gap needs the
+  abstract parent restricted to the executable word domain or an unbounded
+  executable model; closing the frame gap needs an n-frame `execute`; neither
+  substitutes for the other.
+- Axioms (Trust.lean): the renamed and added theorems depend on at most
+  `[propext, Quot.sound]` (`manyKey_input_is_within_the_source_domain` on
+  none); no `sorryAx`, no new assumptions.
+- Reproduction: `make prove` on the committed tree (lake build of the root
+  `LidoSRv3`, 1461 jobs, build completed successfully);
+  `python3 scripts/audit_metadata.py check`,
+  `python3 scripts/check_public_claim_surfaces.py`, and
+  `python3 scripts/check_validation_receipt.py` exit 0.
 
 SRv3 campaign close nodes 1–6 (2026-08-23)
 -----------------------------------------

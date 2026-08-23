@@ -321,18 +321,31 @@ assumptions or proof escapes.
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.linked_conserving_deployment_pull_is_word_bounded
 #print axioms
-  LidoSRv3.Audit.Guarantees.PDeposit1.linked_hypotheses_do_not_bound_the_source_pull
+  LidoSRv3.Audit.Guarantees.PDeposit1.linked_hypotheses_do_not_bound_the_line_972_product
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.skewed_pull_witness_turned_away_before_line_972
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.line_972_product_le_module_allocation
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.encodable_allocation_bounds_line_972_product
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.in_range_commit_is_word_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.oversized_run_commits
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_is_outside_the_source_domain
 #print axioms
-  LidoSRv3.Audit.Guarantees.PDeposit1.abstract_parent_covers_deployments_the_verity_plane_omits
+  LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_exceeds_word
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.abstract_parent_covers_inputs_the_verity_plane_omits
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_input_is_within_the_source_domain
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_run_commits
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_links_source_two_legs
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_entry_state_guards_are_load_bearing
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_underfunded_entry_reverts_at_not_enough_ether
 #print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
 #print axioms
   LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot
