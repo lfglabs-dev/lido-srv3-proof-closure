@@ -24,8 +24,8 @@ open _root_.Contracts
 abbrev Word := _root_.Verity.Core.Uint256
 abbrev Batch := DepositParentTx.Batch
 
-def counterSlot := DepositParentTx.counterSlot
-def lidoDepositableSlot := DepositParentTx.lidoDepositableSlot
+abbrev counterSlot : Nat := DepositParentTx.counterSlot
+abbrev lidoDepositableSlot : Nat := DepositParentTx.lidoDepositableSlot
 
 structure Inputs where
   authorized : Bool
@@ -164,8 +164,7 @@ theorem foldStable_bound {acc : Nat} {batches : List Batch}
   induction h with
   | nil hAcc => simpa [exactTotal] using hAcc
   | cons hStep tail ih =>
-      simp only [exactTotal, List.map_cons, List.sum_cons]
-      omega
+      simpa [exactTotal, Nat.add_assoc] using ih
 
 theorem foldStable_of_bound (acc : Nat) (batches : List Batch)
     (h : acc + exactTotal batches < _root_.Verity.Core.Uint256.modulus) :
@@ -191,10 +190,11 @@ theorem wordFold_val {acc : Nat} (start : Word) {batches : List Batch}
       cases h with
       | cons hStep tail =>
           simp only [List.foldl_cons]
-          apply ih (acc := acc + batch.amount.val) (start := start + batch.amount)
-            (by
-              apply _root_.Verity.Core.Uint256.add_eq_of_lt
-              simpa [hStart] using hStep) tail
+          have hAdd : (start + batch.amount).val = acc + batch.amount.val := by
+            rw [_root_.Verity.Core.Uint256.add_eq_of_lt (by simpa [hStart] using hStep),
+              hStart]
+          simpa [exactTotal, Nat.add_assoc] using
+            ih (acc := acc + batch.amount.val) (start := start + batch.amount) hAdd tail
 
 theorem wordTotal_val (batches : List Batch) (h : FoldStable 0 batches) :
     (wordTotal batches).val = exactTotal batches := by
@@ -235,19 +235,40 @@ theorem processBatch_apply (inputs : Inputs) (batch : Batch) (state : ContractSt
   exact DepositParentTx.processBatch_apply (legacyInputs inputs) batch state
     h.moduleCallOk h.dataValid h.rootValid
 
+theorem unitList_eq_replicate (values : List Unit) :
+    values = List.replicate values.length () := by
+  induction values with
+  | nil => rfl
+  | cons value values ih =>
+      cases value
+      simp [ih]
+
+theorem processBatches_loop (inputs : Inputs) (batches : List Batch)
+    (acc : List Unit) (state : ContractState)
+    (h : ∀ batch ∈ batches, Healthy batch) :
+    List.mapM.loop (processBatch inputs) batches acc state =
+      .success (List.replicate (batches.length + acc.length) ())
+        (afterBatches inputs batches state) := by
+  induction batches generalizing acc state with
+  | nil =>
+      have hAcc := unitList_eq_replicate acc.reverse
+      simp only [List.mapM.loop, Pure.pure, _root_.Verity.pure, afterBatches]
+      rw [hAcc, List.length_reverse]
+      simp
+  | cons batch batches ih =>
+      have hb := h batch (by simp)
+      have ht : ∀ b ∈ batches, Healthy b := fun b hmem => h b (by simp [hmem])
+      simp only [List.mapM.loop, Bind.bind, _root_.Verity.bind,
+        processBatch_apply inputs batch state hb]
+      rw [ih (acc := () :: acc) (state := afterBatch inputs batch state) ht]
+      simp [afterBatches, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+
 theorem processBatches_apply (inputs : Inputs) (batches : List Batch) (state : ContractState)
     (h : ∀ batch ∈ batches, Healthy batch) :
     batches.mapM (processBatch inputs) state =
       .success (List.replicate batches.length ()) (afterBatches inputs batches state) := by
-  induction batches generalizing state with
-  | nil => simp [_root_.Verity.pure, afterBatches]
-  | cons batch batches ih =>
-      have hb := h batch (by simp)
-      have ht : ∀ b ∈ batches, Healthy b := fun b hmem => h b (by simp [hmem])
-      rw [List.mapM_cons]
-      simp only [Bind.bind, _root_.Verity.bind, processBatch_apply inputs batch state hb]
-      rw [ih (state := afterBatch inputs batch state) ht]
-      rfl
+  change List.mapM.loop (processBatch inputs) batches [] state = _
+  simpa using processBatches_loop inputs batches [] state h
 
 theorem pullFromLido_apply (inputs : Inputs) (total : Word) (state : ContractState)
     (hCall : inputs.lidoCallOk = true)
@@ -258,7 +279,8 @@ theorem pullFromLido_apply (inputs : Inputs) (total : Word) (state : ContractSta
       zeroBatch, _root_.Verity.Core.Uint256.add_zero] using hFunded)
   simpa [pullFromLido, pullLegacyInputs, legacyInputs, DepositParentTx.pullFromLido,
     DepositParentTx.totalAmount, DepositParentTx.afterPull, DepositParentTx.pullEntry,
-    zeroBatch, afterPull, afterCall, _root_.Verity.Core.Uint256.add_zero] using hOld
+    zeroBatch, afterPull, afterCall, _root_.Verity.Core.Uint256.add_zero,
+    _root_.Verity.Core.Uint256.add_comm] using hOld
 
 theorem pushBatch_apply (inputs : Inputs) (batch : Batch) (state : ContractState)
     (hCall : batch.beaconCallOk = true) (hBal : batch.amount ≤ state.selfBalance) :
@@ -338,22 +360,31 @@ theorem selfBalance_afterPushes (inputs : Inputs) (batches : List Batch)
       have hSub : (state.selfBalance - batch.amount).val =
           state.selfBalance.val - batch.amount.val :=
         _root_.Verity.Core.Uint256.sub_eq_of_le hHead
+      have hFunds' :
+          batch.amount.val + exactTotal batches ≤ state.selfBalance.val := by
+        simpa [exactTotal] using hFunds
       have hTail : exactTotal batches ≤ (afterPush inputs batch state).selfBalance.val := by
-        simp only [afterPush, DepositParentTx.afterPush, DepositParentTx.afterCall, hSub]
-        simp only [exactTotal, List.map_cons, List.sum_cons] at hFunds
+        rw [show (afterPush inputs batch state).selfBalance =
+          state.selfBalance - batch.amount from rfl, hSub]
         omega
       rw [afterPushes, ih (state := afterPush inputs batch state) hTail]
       simp only [afterPush, DepositParentTx.afterPush, DepositParentTx.afterCall, hSub,
         exactTotal, List.map_cons, List.sum_cons]
       omega
 
-theorem pushBatches_apply (inputs : Inputs) (batches : List Batch) (state : ContractState)
+theorem pushBatches_loop (inputs : Inputs) (batches : List Batch)
+    (acc : List Unit) (state : ContractState)
     (hHealthy : ∀ batch ∈ batches, Healthy batch)
     (hFunds : exactTotal batches ≤ state.selfBalance.val) :
-    batches.mapM (pushBatch inputs) state =
-      .success (List.replicate batches.length ()) (afterPushes inputs batches state) := by
-  induction batches generalizing state with
-  | nil => simp [_root_.Verity.pure, afterPushes]
+    List.mapM.loop (pushBatch inputs) batches acc state =
+      .success (List.replicate (batches.length + acc.length) ())
+        (afterPushes inputs batches state) := by
+  induction batches generalizing acc state with
+  | nil =>
+      have hAcc := unitList_eq_replicate acc.reverse
+      simp only [List.mapM.loop, Pure.pure, _root_.Verity.pure, afterPushes]
+      rw [hAcc, List.length_reverse]
+      simp
   | cons batch batches ih =>
       have hb := hHealthy batch (by simp)
       have ht : ∀ b ∈ batches, Healthy b :=
@@ -365,15 +396,25 @@ theorem pushBatches_apply (inputs : Inputs) (batches : List Batch) (state : Cont
       have hSub : (state.selfBalance - batch.amount).val =
           state.selfBalance.val - batch.amount.val :=
         _root_.Verity.Core.Uint256.sub_eq_of_le hHeadVal
+      have hFunds' :
+          batch.amount.val + exactTotal batches ≤ state.selfBalance.val := by
+        simpa [exactTotal] using hFunds
       have hRest : exactTotal batches ≤ (afterPush inputs batch state).selfBalance.val := by
-        simp only [afterPush, DepositParentTx.afterPush, DepositParentTx.afterCall, hSub]
-        simp only [exactTotal, List.map_cons, List.sum_cons] at hFunds
+        rw [show (afterPush inputs batch state).selfBalance =
+          state.selfBalance - batch.amount from rfl, hSub]
         omega
-      rw [List.mapM_cons]
-      simp only [Bind.bind, _root_.Verity.bind,
+      simp only [List.mapM.loop, Bind.bind, _root_.Verity.bind,
         pushBatch_apply inputs batch state hb.beaconCallOk hHead]
-      rw [ih (state := afterPush inputs batch state) ht hRest]
-      rfl
+      rw [ih (acc := () :: acc) (state := afterPush inputs batch state) ht hRest]
+      simp [afterPushes, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+
+theorem pushBatches_apply (inputs : Inputs) (batches : List Batch) (state : ContractState)
+    (hHealthy : ∀ batch ∈ batches, Healthy batch)
+    (hFunds : exactTotal batches ≤ state.selfBalance.val) :
+    batches.mapM (pushBatch inputs) state =
+      .success (List.replicate batches.length ()) (afterPushes inputs batches state) := by
+  change List.mapM.loop (pushBatch inputs) batches [] state = _
+  simpa using pushBatches_loop inputs batches [] state hHealthy hFunds
 
 theorem execute_apply (inputs : Inputs) (state : ContractState)
     (h : Preconditions inputs state) :
@@ -383,7 +424,7 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
   let pulled := afterPull inputs (wordTotal inputs.batches) processed
   have hNoWrap :
       exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus :=
-    foldStable_bound h.foldStable
+    by simpa using foldStable_bound h.foldStable
   have hNoWrapGuard :
       decide (exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus) = true :=
     decide_eq_true hNoWrap
@@ -484,7 +525,7 @@ theorem nframe_deposit_parent (inputs : Inputs) (state : ContractState)
     ParentConclusion execute inputs state := by
   exact ⟨execute_observes_source inputs state h,
     wordTotal_val inputs.batches h.foldStable,
-    foldStable_bound h.foldStable, by simp, by simp⟩
+    by simpa using foldStable_bound h.foldStable, by simp, by simp⟩
 
 theorem wrapping_fold_reverts_without_journal (inputs : Inputs) (state : ContractState)
     (hAuthorized : inputs.authorized = true)
@@ -496,7 +537,10 @@ theorem wrapping_fold_reverts_without_journal (inputs : Inputs) (state : Contrac
   have hGuard :
       decide (exactTotal inputs.batches < _root_.Verity.Core.Uint256.modulus) = false :=
     decide_eq_false (Nat.not_lt.mpr hWrap)
-  simp [execute, Contract.run, hAuthorized, hActive, hAllocation, hGuard, observe]
+  have hRaw : execute inputs state = .revert "BATCH_TOTAL_OVERFLOW" state := by
+    simp only [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
+      hAuthorized, hActive, hAllocation, hGuard, if_true, if_false]
+  simp [Contract.run, hRaw, observe]
 
 def ofTwoBatches (inputs : DepositParentTx.Inputs) : Inputs :=
   { authorized := inputs.authorized, moduleActive := inputs.moduleActive,
