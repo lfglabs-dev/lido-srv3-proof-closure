@@ -342,6 +342,10 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_run_commits
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_links_source_two_legs
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_entry_state_guards_are_load_bearing
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_underfunded_entry_reverts_at_not_enough_ether
 #print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
 #print axioms
   LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot

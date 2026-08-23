@@ -859,13 +859,23 @@ The witness below is the pinned conserving deployment scaled to nine keys --
 every field `uint256`-encodable, checked -- so the frame-count omission is
 exhibited where it actually lives, without borrowing the word-bound exhibit's
 out-of-domain scaling.  Nothing here claims the two-leg transaction represents
-nine frames: `LinksSource` below shows the executable hypotheses remain
-satisfiable at this input (the keys split 4 + 5 across the two aggregate legs
-when the total fits), which is exactly why the n-frame gap is not a word-bound
-gap -- the executable plane admits the input and still journals only two
-`depositToBeacon` frames for its nine per-key source frames.  Motivating and
-specifying the n-frame `execute` that closes it is the registered
-`classification.work` item, not this witness. -/
+nine frames: the witness below shows the executable hypothesis bundle remains
+satisfiable *in full* at this input -- not just `LinksSource` and the no-wrap
+inequality, but the complete `Preconditions` structure (guard health, distinct
+modules, `valueMatches`, funding, entry balance and `noWrap`) at the concrete
+entry state `canonicalState` the row already pins, so the two-leg composed
+parent `verity_tx_composes_deposit_conservation_and_rollback` kernel-checks the
+advertised admission exactly as its hypotheses demand -- while the keys still
+split 4 + 5 across the two aggregate legs when the total fits, which is
+precisely why the n-frame gap is not a word-bound gap: the executable plane
+admits the input and still journals only two `depositToBeacon` frames for its
+nine per-key source frames.  The two regressions after the witness pin the
+entry state down from the other side: an entry ledger one wei short refutes
+the whole `Preconditions` bundle at the funding guard, and the executable
+transaction then reverts with exactly `NOT_ENOUGH_ETHER` and rolls back to the
+entry snapshot, so the admission is load-bearing, not inherited by accident.
+Motivating and specifying the n-frame `execute` that closes it is the
+registered `classification.work` item, not this witness. -/
 
 /-- Nine public keys, every field `uint256`-encodable: 9 * 48 = 432 pubkey
 bytes, 9 * 96 = 864 signature bytes, a per-block cap and module allocation
@@ -926,20 +936,61 @@ def nLinks (cfg : SourceDepositConfig) (n : Nat) : Inputs :=
       keys := _root_.Verity.Core.Uint256.ofNat (n + 1)
       amount := _root_.Verity.Core.Uint256.ofNat ((n + 1) * cfg.depositSize) } }
 
-/-- The executable hypotheses stay satisfiable at the nine-key in-range input:
-`LinksSource` assigns the nine source keys to the two aggregate legs (4 + 5) at
-`DEPOSIT_SIZE` per key, and the total 288 wei is inside one word, so the two-leg
-composed parent admits exactly the input whose nine per-key frames its fixed
-journal cannot represent.  The word bound rules nothing out here; the frame
-count does. -/
+/-- The executable hypotheses stay satisfiable *in full* at the nine-key
+in-range input: `LinksSource` assigns the nine source keys to the two
+aggregate legs (4 + 5) at `DEPOSIT_SIZE` per key, and -- at the concrete entry
+state `canonicalState` -- the transaction's own complete precondition bundle
+holds: every guard-health flag, the two distinct modules, the
+`ALLOCATION_VALUE_MISMATCH` equation `288 = 9 * 32`, the zero entry balance,
+the `NOT_ENOUGH_ETHER` funding premise `288 ≤ 1000`, and the no-wrap bound.
+This is the full hypothesis set
+`verity_tx_composes_deposit_conservation_and_rollback` demands, checked at a
+closed entry state, so the two-leg composed parent admits exactly the input
+whose nine per-key frames its fixed journal cannot represent.  The word bound
+rules nothing out here; the frame count does. -/
 theorem manyKey_links_source_two_legs :
     LinksSource canonicalSourceConfig manyKeySourceInput (nLinks canonicalSourceConfig 4) ∧
+      Preconditions (nLinks canonicalSourceConfig 4) canonicalState ∧
       (nLinks canonicalSourceConfig 4).first.amount.val
           + (nLinks canonicalSourceConfig 4).second.amount.val
         < _root_.Verity.Core.Uint256.modulus := by
-  refine ⟨⟨by decide, by decide, by decide, by decide⟩, ?_⟩
+  refine ⟨⟨by decide, by decide, by decide, by decide⟩,
+    ⟨by decide, by decide, by decide, by decide, by decide, by decide,
+      by decide, by decide, by decide, by decide, by decide, by decide,
+      by decide, by decide, by decide, by decide, by decide⟩, ?_⟩
   show 4 * 32 + 5 * 32 < _root_.Verity.Core.Uint256.modulus
   decide
+
+/-- The concrete entry state of the witness with Lido's depositable ledger one
+wei short of the 288-wei aggregate: identical to `canonicalState` except
+`lidoDepositableSlot = 287`. -/
+def manyKeyUnderfundedEntry : _root_.Verity.ContractState :=
+  (_root_.Verity.defaultState.writeSlot lidoDepositableSlot 287).writeSlot counterSlot 41
+
+/-- The admission above is load-bearing in the entry state, not inherited by
+accident: one wei short on the Lido ledger and the *complete* precondition
+bundle is refuted -- the funding premise `totalAmount ≤ readSlot
+lidoDepositableSlot` fails as `288 ≤ 287` -- so the witness really does
+kernel-check every executable guard it advertises, and an entry state that
+stops satisfying any one of them no longer satisfies the bundle. -/
+theorem manyKey_entry_state_guards_are_load_bearing :
+    ¬ Preconditions (nLinks canonicalSourceConfig 4) manyKeyUnderfundedEntry := by
+  intro h
+  exact absurd h.funded (by decide)
+
+/-- The real failing path, on the executable plane: at the underfunded entry
+state the two-leg transaction runs both `obtainDepositData` module legs and
+their storage writes, reaches the `pullFromLido` funding guard, and reverts
+with exactly the `NOT_ENOUGH_ETHER` reason at the line-105 `require`
+(`DepositParentTx.lean`), with the transaction boundary rolling the world back
+to the entry snapshot.  The admission the witness proves is therefore not
+vacuous: the same closed input either satisfies every guard and is admitted,
+or misses the funding guard by one wei and is turned away on the exact guard
+that fails. -/
+theorem manyKey_underfunded_entry_reverts_at_not_enough_ether :
+    (execute (nLinks canonicalSourceConfig 4)).run manyKeyUnderfundedEntry
+      = .revert "NOT_ENOUGH_ETHER" manyKeyUnderfundedEntry := by
+  rfl
 
 /-! ## Private non-derivability witness
 

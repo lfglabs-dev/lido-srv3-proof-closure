@@ -66,7 +66,16 @@ CLAIMS = {
         # model committing nine per-key frames of 288 wei total, `LinksSource`
         # still splitting the keys 4 + 5 across the two aggregate legs), kept
         # separate from the oversized exhibit so the quantified-domain gap and
-        # the missing n-frame executable model are never conflated.
+        # the missing n-frame executable model are never conflated.  The
+        # witness now carries the *complete* `Preconditions` bundle at the
+        # concrete entry state `canonicalState` (review r3838278045: the
+        # admission must kernel-check guard health, distinct modules,
+        # `valueMatches`, funding, entry balance and `noWrap`, not only
+        # `LinksSource` with the inequality), and `manyKeyUnderfundedEntry`
+        # with the two regressions after it pin the entry state down from the
+        # other side: one wei short on the Lido ledger refutes the whole
+        # bundle at the funding guard, and the executable transaction then
+        # reverts with exactly `NOT_ENOUGH_ETHER` back to the entry snapshot.
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalDepositContractAddress"),
@@ -103,6 +112,9 @@ CLAIMS = {
             ("theorem", "manyKey_run_commits"),
             ("def", "nLinks"),
             ("theorem", "manyKey_links_source_two_legs"),
+            ("def", "manyKeyUnderfundedEntry"),
+            ("theorem", "manyKey_entry_state_guards_are_load_bearing"),
+            ("theorem", "manyKey_underfunded_entry_reverts_at_not_enough_ether"),
         ),
     },
     "P-TOPUP-1": {
