@@ -17,6 +17,7 @@ open _root_.Verity.EVM.Uint256
 open LidoSRv3.Audit.Verity.AddressClaimBatchTx
 open LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence
 open LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
+open LidoSRv3.Audit.Guarantees
 
 def honestThreeJournal : List ExternalCall :=
   [payoutEntry (2 : Address) 30, payoutEntry (2 : Address) 40,

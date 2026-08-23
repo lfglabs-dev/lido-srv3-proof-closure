@@ -424,53 +424,74 @@ theorem ClaimReady.ignore_calls {state : ContractState}
     (h : ClaimReady state requestId hint payout)
     (calls : List ExternalCall) :
     ClaimReady { state with calls := calls } requestId hint payout := by
-  have hread : readRequest { state with calls := calls } requestId hint =
-      readRequest state requestId hint := rfl
+  rcases h with
+    ⟨hid, hfinal, hunclaimed, howner, hhint, hhintLast, hfrom, hnext,
+      hsteth, hshares, hpayout, hmarked, hlocked, hbalance⟩
+  exact ⟨hid, hfinal, hunclaimed, howner, hhint, hhintLast, hfrom, hnext,
+    hsteth, hshares, hpayout, hmarked, hlocked, hbalance⟩
+
+/-- `writeMapUint` only rewrites `storageWords`; changing `calls` first is
+the same as changing it after. -/
+theorem writeMapUint_commute_calls (state : ContractState)
+    (calls : List ExternalCall) (mapSlot : Nat) (key value : Uint256) :
+    { state with calls := calls }.writeMapUint mapSlot key value =
+      { state.writeMapUint mapSlot key value with calls := calls } := by
+  cases state
+  rfl
+
+/-- `writeSlot` only rewrites `storageWords`; changing `calls` first is
+the same as changing it after. -/
+theorem writeSlot_commute_calls (state : ContractState)
+    (calls : List ExternalCall) (wordSlot : Nat) (value : Uint256) :
+    { state with calls := calls }.writeSlot wordSlot value =
+      { state.writeSlot wordSlot value with calls := calls } := by
+  cases state
+  rfl
+
+theorem claimSuccessState_update_calls
+    (state : ContractState) (calls : List ExternalCall)
+    (requestId payout : Nat) (recipient : Address) :
+    claimSuccessState { state with calls := calls } requestId payout recipient =
+      { claimSuccessState state requestId payout recipient with
+        calls := calls ++ [payoutEntry recipient payout] } := by
   have hmeta :
       requestMetadataWord { state with calls := calls } requestId =
         requestMetadataWord state requestId := rfl
-  cases h
-  constructor
-  · exact requestId_ne_zero
-  · simpa using finalized
-  · simpa [hread] using unclaimed
-  · simpa [hread] using owned
-  · exact hint_ne_zero
-  · simpa using hint_in_range
-  · simpa [hread] using checkpoint_starts_before
-  · simpa using checkpoint_ends_after
-  · simpa [hread] using steth_monotone
-  · simpa [hread] using shares_monotone
-  · simpa [hread] using payout_read
-  · simpa [hmeta] using mark_sets_claimed
-  · simpa using locked_funded
-  · simpa using balance_funded
+  have hslot :
+      ({ state with calls := calls }.readSlot lockedEtherAmountPosition).val =
+        (state.readSlot lockedEtherAmountPosition).val := rfl
+  unfold claimSuccessState
+  rw [hmeta, hslot, writeMapUint_commute_calls, writeSlot_commute_calls]
 
+/-- Changing only the journal dest leaves storage (and therefore
+`ClaimReady`) the same. -/
 theorem claimSuccessState_calls_only
     (state : ContractState) (requestId payout : Nat)
     (r1 r2 : Address) :
     { claimSuccessState state requestId payout r1 with
         calls := (claimSuccessState state requestId payout r2).calls } =
       claimSuccessState state requestId payout r2 := by
-  simp [claimSuccessState]
+  unfold claimSuccessState
+  rfl
 
 theorem BatchReady.ignore_calls {state requestIds hints recipient payouts}
     (h : BatchReady state requestIds hints recipient payouts)
     (calls : List ExternalCall) :
     BatchReady { state with calls := calls } requestIds hints recipient payouts := by
   induction h generalizing calls with
-  | nil => exact BatchReady.nil _ _
+  | nil s r => exact BatchReady.nil { s with calls := calls } r
   | @cons state recipient requestId hint payout requestIds hints payouts
       head tail ih =>
       refine BatchReady.cons (head.ignore_calls calls) ?_
-      simpa [claimSuccessState] using ih _
+      rw [claimSuccessState_update_calls]
+      exact ih (calls ++ [payoutEntry recipient payout])
 
 theorem BatchReady.with_recipient {state requestIds hints recipient payouts}
     (h : BatchReady state requestIds hints recipient payouts)
     (recipient' : Address) :
     BatchReady state requestIds hints recipient' payouts := by
   induction h generalizing recipient' with
-  | nil => exact BatchReady.nil state recipient'
+  | nil s _ => exact BatchReady.nil s recipient'
   | @cons state recipient requestId hint payout requestIds hints payouts
       head tail ih =>
       refine BatchReady.cons head ?_
