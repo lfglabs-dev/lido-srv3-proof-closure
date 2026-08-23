@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.DepositCorrespondence
 import LidoSRv3.Audit.Verity.DepositParentTx
+import LidoSRv3.Audit.Verity.DepositNFrameTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PDeposit1
@@ -1025,5 +1026,88 @@ private theorem alloc_parents_do_not_imply_linkssource :
   -- The two executable legs carry `2 + 3` keys, while the one-key source input
   -- has `actualDepositsCount = 48 / 48 = 1`; both sides are closed terms.
   exact absurd hLink.keys (by decide)
+
+/-! ## Registered finite list-batch parent -/
+
+namespace NFrame
+
+open LidoSRv3.Audit.Verity
+open LidoSRv3.Audit.Verity.DepositNFrameTx
+
+/-- Data-only source link for arbitrary finite arity.  It does not contain a
+post-state, journal, or conclusion. -/
+structure LinksSource (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : DepositNFrameTx.Inputs) : Prop where
+  depositSize : inputs.depositSize.val = cfg.depositSize
+  keys : exactKeys inputs.batches = actualDepositsCount cfg inp
+  batchAmounts : ∀ batch ∈ inputs.batches,
+    batch.amount.val = batch.keys.val * cfg.depositSize
+
+theorem exactTotal_eq_exactKeys_mul (batches : List DepositNFrameTx.Batch)
+    (depositSize : Nat)
+    (h : ∀ batch ∈ batches, batch.amount.val = batch.keys.val * depositSize) :
+    exactTotal batches = exactKeys batches * depositSize := by
+  induction batches with
+  | nil => simp [exactTotal, exactKeys]
+  | cons batch batches ih =>
+      have hb := h batch (by simp)
+      have ht : ∀ b ∈ batches, b.amount.val = b.keys.val * depositSize :=
+        fun b hmem => h b (by simp [hmem])
+      simp only [exactTotal, exactKeys, List.map_cons, List.sum_cons]
+      rw [hb, ih ht, Nat.add_mul]
+
+theorem linked_exactTotal_eq_pushedValue
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : DepositNFrameTx.Inputs) (h : LinksSource cfg inp inputs) :
+    exactTotal inputs.batches = pushedValue cfg inp := by
+  rw [exactTotal_eq_exactKeys_mul inputs.batches cfg.depositSize h.batchAmounts,
+    h.keys, pushedValue, loopPushed_eq]
+
+theorem linked_exactTotal_eq_depositsValue
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : DepositNFrameTx.Inputs) (h : LinksSource cfg inp inputs)
+    (hCons : ConservingConfig cfg) :
+    exactTotal inputs.batches = depositsValue cfg inp := by
+  rw [linked_exactTotal_eq_pushedValue cfg inp inputs h, pushedValue, loopPushed_eq,
+    depositsValue, hCons]
+
+/--
+P-DEPOSIT-1 list-batch product parent.  Universally quantified finite batches
+produce the inductive module/pull/beacon journal, a fold equal to its exact
+`Nat` total below `2^256`, and exactly `batches.length` module and beacon legs.
+The exact total is linked to the source push (and to its pull only under the
+explicit conserving-deployment hypothesis).
+-/
+theorem verity_tx_composes_nframe_deposit
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : DepositNFrameTx.Inputs) (entry : _root_.Verity.ContractState)
+    (hLink : LinksSource cfg inp inputs)
+    (hPre : DepositNFrameTx.Preconditions inputs entry) :
+    ((∀ keys pulled pushed balanceAfter,
+        run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
+          pulled = pushed ∧ depositsValue cfg inp = pushedValue cfg inp) ∧
+        (¬ ConservingConfig cfg → 0 < actualDepositsCount cfg inp →
+          (run cfg inp).reverts = true)) ∧
+      DepositNFrameTx.ParentConclusion DepositNFrameTx.execute inputs entry ∧
+      exactTotal inputs.batches = pushedValue cfg inp ∧
+      (ConservingConfig cfg → exactTotal inputs.batches = depositsValue cfg inp) := by
+  exact ⟨source_deposit_conserves_and_rolls_back cfg inp,
+    DepositNFrameTx.nframe_deposit_parent inputs entry hPre,
+    linked_exactTotal_eq_pushedValue cfg inp inputs hLink,
+    linked_exactTotal_eq_depositsValue cfg inp inputs hLink⟩
+
+/-- The old conjunct (d) is exactly this parent's `n = 2` specialization. -/
+theorem two_batch_conjunct_d_is_n_eq_two (inputs : DepositParentTx.Inputs) :
+    (DepositNFrameTx.ofTwoBatches inputs).batches.length = 2 ∧
+      ((DepositNFrameTx.ofTwoBatches inputs).batches.map
+        (DepositNFrameTx.moduleEntry (DepositNFrameTx.ofTwoBatches inputs))).length = 2 ∧
+      ((DepositNFrameTx.ofTwoBatches inputs).batches.map
+        (DepositNFrameTx.pushEntry (DepositNFrameTx.ofTwoBatches inputs))).length = 2 ∧
+      DepositNFrameTx.expectedCalls (DepositNFrameTx.ofTwoBatches inputs) =
+        DepositParentTx.expectedCalls inputs := by
+  obtain ⟨hLength, hModules, hBeacon⟩ := DepositNFrameTx.two_batch_is_n_eq_two inputs
+  exact ⟨hLength, hModules, hBeacon, DepositNFrameTx.two_batch_expectedCalls_eq inputs⟩
+
+end NFrame
 
 end LidoSRv3.Audit.Guarantees.PDeposit1
