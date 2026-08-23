@@ -35,12 +35,17 @@ structure Spend where
 
 /-- Destinations a Spec ETH journal may name. Wave 0 froze consolidation
 success legs. Pack G0 adds the deposit/top-up success legs Join projects.
-VaultHub owner withdraw stays out. This is not all SRv3 ETH. -/
+P-VAULT-ETH-1 adds the protocol-return hops that exclusion named out:
+Vault→Lido (`receiveWithdrawals` / rebalance) and WithdrawalQueue.
+Owner-controlled VaultHub.withdraw / StakingVault.withdraw to an arbitrary
+recipient stay out. This is not all SRv3 ETH. -/
 inductive ApprovedDestination
   | consolidationRequest
   | refundRecipient
   | beaconDeposit
   | lidoPull
+  | vaultToLido
+  | vaultToWithdrawalQueue
   deriving DecidableEq, Repr
 
 structure EthJournalLeg where

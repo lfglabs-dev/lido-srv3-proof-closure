@@ -11,7 +11,8 @@ import LidoSRv3.Tests.DereferenceMutants
 Three unregistered children, no new guarantee IDs, no P-DEREF-1 promotion.
 
 * Pause: `requestWithdrawals` / `unwrap` use `permissionlessAdmission`.
-* VaultHub: `ApprovedDestination` has no fifth constructor — decide on a match.
+* VaultHub: all six approved constructors are protocol destinations; none is
+  an arbitrary owner recipient.
 * Deref: re-export of the existing packed-config clobber kill-line.
 -/
 
@@ -50,19 +51,24 @@ theorem unwrap_uses_permissionless_admission :
 
 example := request_or_unwrap_pause_balance_is_permissionless
 
-/-- Kill-line: a complete match on `ApprovedDestination` has four arms.
-Adding a VaultHub constructor would fail this match. -/
+/-- Scope guard: the complete match includes the two P-VAULT-ETH-1
+protocol-return constructors. Adding an arbitrary owner-recipient constructor
+would make this match incomplete. -/
 def destIndex : ApprovedDestination → Nat
   | .consolidationRequest => 0
   | .refundRecipient => 1
   | .beaconDeposit => 2
   | .lidoPull => 3
+  | .vaultToLido => 4
+  | .vaultToWithdrawalQueue => 5
 
-theorem approved_destination_has_no_fifth_ctor :
+theorem approved_destination_has_only_six_scoped_ctors :
     destIndex .consolidationRequest = 0 ∧
     destIndex .refundRecipient = 1 ∧
     destIndex .beaconDeposit = 2 ∧
-    destIndex .lidoPull = 3 := by
+    destIndex .lidoPull = 3 ∧
+    destIndex .vaultToLido = 4 ∧
+    destIndex .vaultToWithdrawalQueue = 5 := by
   decide
 
 example := approved_destination_cases
