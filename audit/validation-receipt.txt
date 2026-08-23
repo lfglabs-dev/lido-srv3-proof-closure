@@ -1,11 +1,16 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 663805bca2c53d54cb684458033a355427c49373
+validated-tree: 2a68034453c8daf892b6c1c491404c9abbcf372a
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ORACLE-SUPPLY-1 rebase onto main before merge (2026-08-23)
+------------------------------------------------------------
+
+- Rebind `validated-tree` to `2a68034453c8daf892b6c1c491404c9abbcf372a` after rebasing #210 onto main with #204 and #207 already merged. YAML theorem remains `oracle_supply_submit_report_data_computed_entry`. P-ACCOUNT-1 stays order-only. P-VAULT-ETH-1 is preserved.
 
 P-VAULT-ETH-1 rebase onto main before merge (2026-08-23)
 ---------------------------------------------------------
