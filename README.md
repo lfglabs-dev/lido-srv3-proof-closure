@@ -19,7 +19,7 @@ We do not claim to have verified the bytecode. `CHECKED` means the named Lean th
 | --- | --- | --- | --- |
 | 1 | `P-ALLOC-1` | CHECKED | CHECKED |
 | 2 | `P-ALLOC-2` | CHECKED | CHECKED |
-| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed bounded two-batch executable transaction |
+| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed finite list-batch executable transaction |
 | 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | CHECKED |
 | 5 | `P-ACCOUNT-1` | CHECKED | CHECKED |
 | 6 | `P-RESERVE-1` | CHECKED | CHECKED |

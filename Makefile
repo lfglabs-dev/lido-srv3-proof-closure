@@ -55,6 +55,8 @@ test:
 	@printf '%s\n' 'bounded Verity deposit transaction mutant compiled and asserted'
 	@lake build LidoSRv3.Tests.DepositParentTxMutants
 	@printf '%s\n' 'P-DEPOSIT-1 composed transaction mutants (per-module writes, journal, ledger) compiled and asserted'
+	@lake build LidoSRv3.Audit.Verity.DepositNFrameTx LidoSRv3.Audit.Spec.DepositNFrameCorrespondence LidoSRv3.Tests.DepositNFrameTxMutants
+	@printf '%s\n' 'P-DEPOSIT-1 list-batch journal, router bridge, no-wrap, and fixed-two kill-line compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstAmountTxMutants
 	@printf '%s\n' 'P-ALLOC-2 amount transaction mutants and floor-division regression compiled and asserted'
 	@lake build LidoSRv3.Tests.MinFirstDistributionTxMutants

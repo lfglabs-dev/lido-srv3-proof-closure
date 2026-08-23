@@ -16,6 +16,7 @@ import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Verity.ConsolidationTx
 import LidoSRv3.Tests.ConsolidationTxMutants
 import LidoSRv3.Audit.Guarantees.PDeposit1
+import LidoSRv3.Audit.Spec.DepositNFrameCorrespondence
 import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 import LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx
 import LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx
@@ -39,6 +40,7 @@ import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 import LidoSRv3.Tests.ReserveRelationalTxMutants
 import LidoSRv3.Tests.DepositTxMutants
 import LidoSRv3.Tests.DepositParentTxMutants
+import LidoSRv3.Tests.DepositNFrameTxMutants
 import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.AllocationTx
@@ -384,6 +386,14 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.DepositParentTxMutants.misrouted_push_rejected
 #print axioms LidoSRv3.Tests.DepositParentTxMutants.dropped_push_rejected
 #print axioms LidoSRv3.Tests.DepositParentTxMutants.root_failure_observes_idle
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit
+#print axioms LidoSRv3.Audit.Verity.DepositNFrameTx.nframe_deposit_parent
+#print axioms
+  LidoSRv3.Audit.Verity.DepositNFrameTx.wrapping_fold_reverts_without_journal
+#print axioms LidoSRv3.Audit.Spec.DepositNFrameCorrespondence.router_links_source
+#print axioms
+  LidoSRv3.Tests.DepositNFrameTxMutants.fixed_two_only_refutes_nframe_parent
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_confined
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.consolidation_fee_path_confined
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent

@@ -2,6 +2,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Verity.DepositParentTx
+import LidoSRv3.Audit.Verity.DepositNFrameTx
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PReserve1
@@ -60,13 +61,9 @@ example : PDeposit1.guarantee.checkedLayers = [.model, .abstractTx, .source, .ve
 example : PTopup1.guarantee.checkedLayers = [.model, .abstractTx, .source, .verityTx] := by decide
 example : PAccount1.guarantee.checkedLayers = [.model, .source, .verityTx] := by decide
 
-/-- P-DEPOSIT-1's `.verityTx` layer is carried by a theorem that shares its
-variables across both planes rather than by a conjunction of two unrelated
-facts: the source configuration/input, the transaction input and the entry
-`ContractState` are quantified once and linked by `LinksSource`.  Naming both
-the composition and its non-vacuity witness here keeps the aggregate surface
-honest if either is ever weakened. -/
-example := @PDeposit1.verity_tx_composes_deposit_conservation_and_rollback
+/-- P-DEPOSIT-1's `.verityTx` layer is carried by the universal list-batch
+composition over one shared source/executable quantifier scope. -/
+example := @PDeposit1.NFrame.verity_tx_composes_nframe_deposit
 
 example : LidoSRv3.Audit.Verity.DepositParentTx.Preconditions
     LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs
