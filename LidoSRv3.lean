@@ -53,6 +53,8 @@ import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Guarantees.POracleSupply1
 import LidoSRv3.Tests.PackN3OracleMintMutants
 import LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
+import LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence
+import LidoSRv3.Audit.Spec.AddressClaimKeccakSlots
 import LidoSRv3.Audit.Guarantees.PAddressBatch1
 import LidoSRv3.Tests.PackN4AddressBatchMutants
 import LidoSRv3.Audit.Spec.SszLiveCorrespondence

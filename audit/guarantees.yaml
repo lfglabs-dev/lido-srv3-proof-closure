@@ -1124,36 +1124,36 @@
         "A-CLASSICAL-CHOICE"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PAddressBatch1 LidoSRv3.Tests.PackN4AddressBatchMutants",
-        "expected": "p_address_batch_1_fuel_bounded_recipient_rename builds; fixed_dest_rename_kill_line_refutes_parent keeps well-formed premises and pays a constant dest"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PAddressBatch1 LidoSRv3.Tests.PackN4AddressBatchMutants LidoSRv3.Audit.Spec.AddressClaimKeccakSlots LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence",
+        "expected": "p_address_batch_1_unbounded_recipient_rename builds; fixed_dest_unbounded_rename_kill_line keeps well-formed premises on an arbitrary-length batch and pays a constant dest; PhysicalClaimSlots remains a caller hypothesis and keccak physical slot maps stay OPEN"
       },
-      "summary": "Supplemental fuel-bounded parent for live executeClaimWithdrawalsTo: on well-formed request/hint lists with length \u2264 fuel, \u03c1 \u00b7 executeClaimWithdrawalsTo = execute \u00b7 \u03c1 on the journal dests (payouts stay the pre-state reads). The payout-correspondence parent remains a lemma. Does not weaken universal_address_writer_equivariance. keccak physical slot maps stay OPEN.",
+      "summary": "Supplemental unbounded parent for live executeClaimWithdrawalsTo: on well-formed request/hint lists with no fuel bound, \u03c1 \u00b7 executeClaimWithdrawalsTo = execute \u00b7 \u03c1 on the journal dests (payouts stay the pre-state reads). Fuel-bounded rename stays a lemma. The keccak slot *formula* is identified; PhysicalClaimSlots is a caller hyp and the live loop still reads mapUint. Does not weaken universal_address_writer_equivariance.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename"
       },
       "fidelity": {
         "covered": [
-          "fuel-bounded \u2200 on live executeClaimWithdrawalsTo: payouts = pre-state reads, claimed bits, locked-ETH decrement",
-          "fuel-bounded recipient rename: observe at \u03c1 recipient journals payoutEntry (\u03c1 recipient), observe at recipient journals payoutEntry recipient",
+          "unbounded \u2200 on live executeClaimWithdrawalsTo: payouts = pre-state reads, claimed bits, locked-ETH decrement, no fuel bound",
+          "unbounded recipient rename: observe at \u03c1 recipient journals payoutEntry (\u03c1 recipient), observe at recipient journals payoutEntry recipient",
           "rollback re-exported from every_revert_restores_snapshot",
-          "parent-shaped fixed-dest rename kill-line; swapped [40,30,10] journal kill-line on a 3-item well-formed batch"
+          "parent-shaped \u2200 fixed-dest rename kill-line on an arbitrary-length well-formed batch"
         ],
         "missing": [
-          "fuel is an explicit Nat bound; unbounded live-loop correspondence remains out",
-          "keccak physical slot maps remain OPEN",
+          "keccak physical slot maps remain OPEN: PhysicalClaimSlots is a caller hypothesis (mapUint = readSlot of mappingSlotLocation); the slot formula is identified, but the live loop still reads mapUint and does not SLOAD keccak cells",
+          "EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, and adversarial recipient code remain out",
           "PAddress1.universal_address_writer_equivariance is not weakened"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep universal_address_writer_equivariance unweakened; do not treat numeral 2/3-item receipts as the registered claim; keccak stays OPEN."
+        "work": "Keep keccak physical slot maps OPEN until the live path SLOADs keccak cells; keep universal_address_writer_equivariance unweakened."
       },
-      "next_gate": "Keep universal_address_writer_equivariance unweakened; do not treat numeral 2/3-item receipts as the registered claim; keccak stays OPEN."
+      "next_gate": "Keccak physical slot maps remain OPEN. Keep universal_address_writer_equivariance unweakened."
     },
     {
       "id": "P-SSZ-LIVE-1",
