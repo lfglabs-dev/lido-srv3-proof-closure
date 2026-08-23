@@ -1,11 +1,20 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ee0acca91eca81f543caa26eccb0e61195a9a69f
+validated-tree: a46afd3d8687f9f426f59b979471a6abd44c9e05
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ORACLE-SUPPLY-1 live computed mint (2026-08-23)
+------------------------------------------------
+
+- Rebind `validated-tree` to `a46afd3d8687f9f426f59b979471a6abd44c9e05`, the tracked tree of
+  `cursor/oracle-live-computed-mint-6aad` excluding this receipt.
+- Scope: the same one row, P-ORACLE-SUPPLY-1. No new guarantee id. YAML theorem is
+  `oracle_supply_live_computed_mint`. P-ACCOUNT-1 stays order-only. submitReportData
+  remains out.
 
 P-DEPOSIT-1 guard-order honesty of the pull kill-line (2026-08-23)
 ------------------------------------------------------------------
