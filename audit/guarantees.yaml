@@ -1219,7 +1219,7 @@
         "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume"
       },
       "verity": {
-        "status": "PARTIAL",
+        "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume"
       },
       "fidelity": {
@@ -1234,7 +1234,7 @@
           "A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed",
           "the constructor pin is an in-repo literal, not a live-deployment identity",
           "the BEACON_ROOTS model is not a deployed-address, codehash, or bytecode identity",
-          ".verityTx is PARTIAL: Spec/Source/Verity are the same list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied",
+          ".verityTx CHECKED is the modeled list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied",
           "not a deployed Solidity gateway, not official consolidation denote success, and not a bus"
         ]
       },

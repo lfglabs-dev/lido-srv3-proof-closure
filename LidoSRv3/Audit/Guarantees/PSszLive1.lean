@@ -42,7 +42,7 @@ open LidoSRv3.Audit.Verity.BeaconRootsTx
 
 /-- Supplemental production-GI / modeled EIP-4788 consume parent.
 `A-SHA256-FFI` stays; no deployed Solidity gateway identity. -/
-def guarantee : Guarantee := ⟨.pSszLive1, [.model, .source]⟩
+def guarantee : Guarantee := ⟨.pSszLive1, [.model, .source, .verityTx]⟩
 
 /-- Gateway admission of a top-up / consolidation WC witness: the existing
 `ageCheck` on the anchor timestamps, conjoined with modeled live verification at
