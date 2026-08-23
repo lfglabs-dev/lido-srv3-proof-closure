@@ -1,11 +1,50 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f10f34b865ddcd2ad053a5e7b76daea715d45353
+validated-tree: 6411cef8a1a9f2025afe5c01ad4c7684e87b44f4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-TOPUP-1 hybrid Verity parent unwrapped (2026-08-23)
+----------------------------------------------------
+
+- Rebind `validated-tree` to `6411cef8a1a9f2025afe5c01ad4c7684e87b44f4`, the
+  tracked tree of head `7079051` on `ptopup1-hybrid-unwrap-glm` above
+  `bc6c6eb` excluding this receipt.
+- Scope: the same one row, P-TOPUP-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched; `guarantees.yaml` is
+  byte-identical to main.
+- The hybrid bridge `LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source`
+  still carried a `SolidityTopup.NoUncheckedWrap` premise that wave 6's
+  wrapped-total routing of `run`'s value-moving tail had already made
+  unreferenced in its proof (the main build log warned `Variable name 'hNoWrap'
+  is not explicitly referenced`), while the P-TOPUP-1 row already stated
+  "NoUncheckedWrap is not a Verity parent hypothesis". The premise is dropped,
+  so the hybrid simulation now holds for every input: a nonzero wrap reaches
+  the typed program through its mapped revert branch and `Contract.run`
+  restores the exact pre-call snapshot; a wrap-to-zero batch executes the
+  call-free empty commit. This aligns the hybrid lane with the abstract
+  wrap/revert semantics of registered conjunct 3
+  (`source_wrap_precludes_value_moving_commit`) and with the registered Verity
+  parent `verity_tx_simulates_source_with_nonzero_wrap_close`. Outcome:
+  universal lifting, not a YAML-encoded limitation.
+- Two regressions in `LidoSRv3/Tests/TopupHybridMutants.lean` instantiate the
+  generalized parent at the wrapping witnesses `wrapInput` (nonzero wrap;
+  executed `ROUTER_BALANCE_CHANGED` revert restoring the entry snapshot) and
+  `wrapToZeroInput` (executed empty commit) -- inputs the retired premise
+  excluded -- and `Trust.lean` prints axioms for all three: `[propext,
+  Classical.choice, Quot.sound]` only. No sorry/admit/axiom/unsafe was
+  introduced; no registered theorem statement was weakened.
+- Validation on this tree: `lake build LidoSRv3.Audit.Guarantees.PTopup1
+  LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants
+  LidoSRv3.Audit.Verity.TopupHybrid LidoSRv3.Tests.TopupHybridMutants
+  LidoSRv3.Audit.Verity.TopupRollback LidoSRv3.Audit.Verity.Tests.TopupRollback
+  LidoSRv3.Audit.Trust LidoSRv3.lean` exit 0 (`Build completed successfully
+  (1429 jobs)`); `python3 scripts/audit_metadata.py check` exit 0;
+  `python3 scripts/check_public_claim_surfaces.py` exit 0;
+  `python3 scripts/check_verity_provenance.py` exit 0.
 
 P-DEPOSIT-1 full executable preconditions at the n-frame witness, PR #205
 review r3838278045 (2026-08-23)
