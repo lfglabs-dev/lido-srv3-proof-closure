@@ -87,6 +87,7 @@ The wrapper below is the live path that *computes* that argument from
 `feeWei` and `shareRate`. It does not change `handleOracleReport`'s
 signature and does not widen P-ACCOUNT-1. -/
 
+open _root_.Verity
 open LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 /-- Live oracle-report path: mint shares are `mintedShares feeWei shareRate`,
@@ -103,25 +104,14 @@ theorem computed_tx_simulates_computed_source
       sourceView i (mintedShares feeWei shareRate) :=
   verity_tx_simulates_pinned_source i (mintedShares feeWei shareRate) state
 
-/-- On a committed computed report, the mint step is present iff the
+/-- On an accepted computed report, the mint step is present iff the
 computed mint is strictly positive. -/
-theorem computed_mint_step_iff_of_committed
+theorem computed_mint_step_iff_of_accepted
     (i : ReportInput) (feeWei shareRate : Nat)
-    (hAccept : accept i ≠ none) :
+    (accepted : AcceptedReport)
+    (hAccept : accept i = some accepted) :
     (0 < mintedShares feeWei shareRate) ↔
       .rewardsMinted ∈ (sourceView i (mintedShares feeWei shareRate)).steps := by
-  revert hAccept
-  simp only [sourceView, accept]
-  split
-  · intro h; exact (h rfl).elim
-  · intro
-    simp [successfulSteps]
-    constructor
-    · intro hpos
-      simp [hpos]
-    · intro hmem
-      by_cases hpos : 0 < mintedShares feeWei shareRate
-      · exact hpos
-      · simp [hpos] at hmem
+  simp [sourceView, hAccept, successfulSteps]
 
 end LidoSRv3.Audit.Spec.OracleMintCorrespondence

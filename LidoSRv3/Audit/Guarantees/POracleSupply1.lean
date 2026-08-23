@@ -26,6 +26,7 @@ below, not widened). No second mint/cap ID is minted.
 
 namespace LidoSRv3.Audit.Guarantees.POracleSupply1
 
+open _root_.Verity
 open LidoSRv3.Audit.SolidityAccounting
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Spec.OracleMintCorrespondence

@@ -21,6 +21,7 @@ premise of `oracle_supply_mint_and_cap` (including the
 
 namespace LidoSRv3.Tests.PackN3OracleMintMutants
 
+open _root_.Verity
 open LidoSRv3.Audit.SolidityAccounting
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Spec.OracleMintCorrespondence
@@ -136,12 +137,11 @@ theorem free_argument_does_not_satisfy_computed_observe :
     verity_tx_simulates_pinned_source report 1 defaultState
   have hMint : mintedShares 1 1 = 0 := by decide
   rw [hLeft, hMint] at hEq
+  have hAcc : accept report = some ⟨[1, 2], [10, 20], 30⟩ := by decide
   have hHas : .rewardsMinted ∈ (sourceView report 1).steps := by
-    simp [sourceView, accept, successfulSteps, idsAndBalancesValid,
-      checkedTotal64, report]
+    simp [sourceView, hAcc, successfulSteps]
   have hNone : .rewardsMinted ∉ (sourceView report 0).steps := by
-    simp [sourceView, accept, successfulSteps, idsAndBalancesValid,
-      checkedTotal64, report]
+    simp [sourceView, hAcc, successfulSteps]
   exact hNone (hEq ▸ hHas)
 
 /-- Positive control: the computed live parent holds on the same vector. -/
