@@ -78,6 +78,7 @@ theorem zero_value_frame_fails_value_bearing_conjunct :
   simp [freshFrameValues, freshCalls, afterZeroValueFrame, zeroValueEntry,
     specJournal, specLeg, specDestination, inputs, linkedCallEntryTo,
     linkedCallEntry] at hValues
+  exact (by decide : (0 : Nat) ≠ 7 % _root_.Verity.Core.Uint256.modulus) hValues
 
 /-- Parent-shaped kill-line: source success and executable success are
 retained, but changing the Vault→Lido frame from seven wei to zero falsifies
