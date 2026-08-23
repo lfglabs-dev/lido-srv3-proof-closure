@@ -109,8 +109,8 @@ test:
 	@printf '%s\n' 'P-VAULT-ETH-1 Vault-to-Lido/WQ Spec-source-value-frame parent and zero-value kill-line compiled and asserted'
 	@lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackW2GindexMutants
 	@printf '%s\n' 'P-SSZ-LIVE-1 constructor-pin GI parent, skip-lookup kill-line, and wrong-packed-word kill-line compiled and asserted'
-	@lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants
-	@printf '%s\n' 'P-CONSOLIDATION-VALUE-1 official-reverts and justified-forwards parent and kill-lines compiled and asserted'
+	@lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants LidoSRv3.Tests.PackP6OfficialSuccessMutants
+	@printf '%s\n' 'P-CONSOLIDATION-VALUE-1 official-success and justified-forwards parent and kill-lines compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts

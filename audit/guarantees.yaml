@@ -1253,36 +1253,40 @@
         "A-CLASSICAL-CHOICE"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants",
-        "expected": "official_denote_reverts_and_justified_forwards_msg_value builds; official_denote_success_kill_line_refutes_parent and zero_value_calls_refute_exact_forwarding keep premises"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants LidoSRv3.Tests.PackP6OfficialSuccessMutants",
+        "expected": "official_denote_succeeds_and_justified_forwards_msg_value builds; official_denote_mutant_still_reverts_refutes_parent, zero_value_link_mutant_refutes_value_bearing_conjunct, official_denote_success_kill_line_refutes_parent, and zero_value_calls_refute_exact_forwarding keep premises"
       },
-      "summary": "Supplemental parent: official denoteFunction reverts on the registered bind entrypoint for every oracle, transaction, and world, and the justified interpreter forwards exactly msg.value on every successful vault request batch (vaultEthDelta, preservesEthBalance, noConsensusLayerVerify). One named conjunction. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus. This row does not claim official denotation success.",
+      "summary": "Supplemental parent: the official upstream widened-call denotation (DenoteFunctionCalls.denoteFunctionWithCalls at the pinned Verity head) succeeds on the registered bind entrypoint for every oracle, accepting predeploy model, transaction, and world satisfying the source guards, journaling one fresh value-bearing CALL frame, forwarding exactly msg.value, re-establishing preservesEthBalance, and producing only request frames; independently the justified interpreter forwards exactly msg.value with noConsensusLayerVerify. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus. The base denoteFunction fragment still reverts on the bind entrypoint (kept named in ConsolidationBridgeGap).",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value"
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value"
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value"
       },
       "fidelity": {
         "covered": [
-          "official denoteFunction reverts on the registered bind entrypoint (named conclusion, not a leftover restatement)",
-          "justified ConsolidationValueTx.execute journals externalCallBindTo with fee value",
-          "forwards exactly msg.value, vaultEthDelta, preservesEthBalance, noConsensusLayerVerify",
-          "parent-shaped official-success kill-line; zero-value CALL kill-line"
+          "official denoteFunctionWithCalls succeeds on the registered bind entrypoint with a value-bearing request CALL frame (discharged OPEN: official denotation success)",
+          "fresh CALL frame carries the nonzero fee; forwarded value equals msg.value; preservesEthBalance; vault returns to its pre-credit balance; only request frames",
+          "justified ConsolidationValueTx.execute journals externalCallBindTo with fee value and keeps noConsensusLayerVerify as an explicit conjunct",
+          "base denoteFunction fragment still reverts on the bind entrypoint (kept named, not contradicted)",
+          "parent-shaped kill-lines: unlinked mutant still reverts; zero-value link mutant fails the value-bearing and exact-forwarding conjuncts; rejecting predeploy shows the accepting-model premise is load-bearing"
         ],
         "missing": [
           "A-CONSOLIDATION-GATEWAY-NONZERO remains a caller premise, not discharged",
-          "no bus, no consensus-layer verify, no ETH-1 composed with CONSOLIDATION-1 ABI bridge",
-          "this parent keeps the justified interpreter; it does not claim official denotation success"
+          "AcceptingPredeploy is a callee-model hypothesis (identity state transition and always-success returndata)",
+          "official success is the single-request bind (msg.value = 1 * fee), not an n-request batch",
+          "link target and fee are CallEnv parameters, not a deployed-address identity",
+          "no bus, no delay, no quota, no consensus-layer verify, no ETH-1 composed with CONSOLIDATION-1 ABI bridge",
+          "official success holds on the widened-call denotation fragment; the base denoteFunction fragment still maps raw calls outside its arms, and no compiled-artifact behaviour is claimed"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not start the bus; do not claim official denotation success."
+        "work": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota may start only on top of this official-success parent."
       },
-      "next_gate": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not start the bus."
+      "next_gate": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota only on top of official success."
     }
   ],
   "objective": "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."

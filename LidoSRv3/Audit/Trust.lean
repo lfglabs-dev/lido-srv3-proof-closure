@@ -105,8 +105,10 @@ import LidoSRv3.Audit.Spec.SszLiveCorrespondence
 import LidoSRv3.Audit.Guarantees.PSszLive1
 import LidoSRv3.Tests.PackN5SszLiveMutants
 import LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence
+import LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess
 import LidoSRv3.Audit.Guarantees.PConsolidationValue1
 import LidoSRv3.Tests.PackN6ConsolValueMutants
+import LidoSRv3.Tests.PackP6OfficialSuccessMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
@@ -244,10 +246,14 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence
 #print axioms LidoSRv3.Tests.PackN5SszLiveMutants.skip_lookup_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN5SszLiveMutants.ignore_timestamp_kill_line_refutes_consume_parent
-#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value
+#print axioms LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess.official_denote_succeeds_on_value_bearing_request_calls
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.official_denote_success_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_calls_refute_exact_forwarding
+#print axioms LidoSRv3.Tests.PackP6OfficialSuccessMutants.official_denote_mutant_still_reverts_refutes_parent
+#print axioms LidoSRv3.Tests.PackP6OfficialSuccessMutants.zero_value_link_mutant_refutes_value_bearing_conjunct
+#print axioms LidoSRv3.Tests.PackP6OfficialSuccessMutants.rejecting_predeploy_refutes_unpremised_success
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_and_mapped_summary_transaction

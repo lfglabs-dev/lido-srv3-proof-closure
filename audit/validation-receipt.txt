@@ -1,11 +1,16 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 76818d133f20cfa7d415164de8f27d545e4b9a46
+validated-tree: 96ed285ff7fd195296d58e2a6cb1160b58fbe4d7
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-CONSOLIDATION-VALUE-1 official success honesty before merge (2026-08-23)
+-------------------------------------------------------------------------
+
+- Rebind `validated-tree` to `96ed285ff7fd195296d58e2a6cb1160b58fbe4d7` after rebasing #212 onto main. Named leftovers: AcceptingPredeploy, single-request 1 * fee, CallEnv link params, gateway nonzero, base denoteFunction still reverts.
 
 P-SSZ-LIVE-1 honesty: modeled BEACON_ROOTS consume, Verity PARTIAL (2026-08-23)
 --------------------------------------------------------------------------
