@@ -1079,40 +1079,42 @@
       "id": "P-ORACLE-SUPPLY-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD",
         "A-CLASSICAL-CHOICE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.POracleSupply1 LidoSRv3.Tests.PackN3OracleMintMutants",
-        "expected": "oracle_supply_mint_and_cap builds; sum_balances_mutant_killed and raw_fee_mutant_killed refute the mint and cap conjuncts; ACCOUNT stays order-only"
+        "expected": "oracle_supply_live_computed_mint builds; free_argument_does_not_satisfy_computed_observe, sum_balances_mutant_killed, and raw_fee_mutant_killed refute the live and Spec conjuncts; ACCOUNT stays order-only"
       },
-      "summary": "Supplemental parent with two conjuncts: Spec.OracleFrame.sharesMinted equals mintedShares feeWei shareRate = feeWei * shareRate / E27, and under shareRate \u2264 maxShareRate the minted shares are bounded by feeWei * maxShareRate / E27. The mint conjunct is definitional of specOfMint; the cap is load-bearing. Pack E sharesMinted-as-argument is not this conclusion. P-ACCOUNT-1 stays order-only.",
+      "summary": "Supplemental parent: handleOracleReportComputed feeds mintedShares feeWei shareRate = feeWei * shareRate / E27 into handleOracleReport, so observe equals sourceView at that computed mint; Spec.OracleFrame.sharesMinted is the same conversion and is bounded by feeWei * maxShareRate / E27 under shareRate \u2264 maxShareRate. Pack E sharesMinted-as-argument is not this conclusion. submitReportData remains out. P-ACCOUNT-1 stays order-only.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap"
+        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint"
       },
       "fidelity": {
         "covered": [
+          "live handleOracleReportComputed wrapper computes sharesToMintAsFees from feeWei and shareRate",
+          "observe of the computed path equals sourceView at mintedShares feeWei shareRate",
           "computed fee/shareRate mint on Spec.OracleFrame, not a free sharesToMintAsFees argument",
           "non-definitional aggregate cap under a named maxShareRate",
           "P-ACCOUNT-1 cited order-only; Eugene child cited as operator-bond only",
-          "parent-shaped sum-balances and raw-fee kill-lines"
+          "parent-shaped free-argument, sum-balances, and raw-fee kill-lines"
         ],
         "missing": [
           "Pack E leftover sharesMinted-as-argument is not this parent and stays a child",
           "P-ACCOUNT-1 remains order-only; this row does not fold ACCOUNT into supply",
-          "submitReportData split and live oracle transaction mint computation remain out",
-          "no dedicated Contract.run mint/supply transaction on this row"
+          "submitReportData split remains out; this row is handleOracleReport with a computed mint, not a modeled submitReportData path"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep P-ACCOUNT-1 order-only; do not treat the Pack E argument-as-mint child as this parent."
+        "work": "Keep P-ACCOUNT-1 order-only; do not treat the Pack E argument-as-mint child as this parent; do not claim a submitReportData split."
       },
-      "next_gate": "Keep P-ACCOUNT-1 order-only; do not treat Pack E argument-as-mint as this parent."
+      "next_gate": "Keep P-ACCOUNT-1 order-only; do not treat Pack E argument-as-mint as this parent; do not claim a submitReportData split."
     },
     {
       "id": "P-ADDRESS-BATCH-1",

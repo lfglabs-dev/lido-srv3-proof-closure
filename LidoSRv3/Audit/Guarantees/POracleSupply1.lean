@@ -6,40 +6,40 @@ import LidoSRv3.Audit.Guarantees.Registry
 /-!
 # P-ORACLE-SUPPLY-1
 
-Node 3 parent: one theorem with two conjuncts over a Spec `OracleFrame`
-built from `feeWei` and `shareRate`.
+Strengthened parent: Spec fee/shareRate mint+cap, plus the live
+`handleOracleReportComputed` path that feeds
+`mintedShares feeWei shareRate` into `handleOracleReport`.
 
-1. Mint conjunct: `sharesMinted` is the computed
+1. Live conjunct: `observe` of the computed wrapper equals `sourceView`
+   at that computed mint.
+2. Mint conjunct: `sharesMinted` is the computed
    `mintedShares feeWei shareRate = feeWei * shareRate / E27` and
-   `shareRateDelta` is the rate. This is the fee+shareRate mint; the
-   Pack E leftover (`sharesMinted = argument` for a free
-   `sharesToMintAsFees`) is not this parent's conclusion.
-2. Bound conjunct (sanity / Eugene aggregate): under a named cap
-   `maxShareRate` on the rate, the minted shares are bounded by the fee
-   converted at the cap. This conjunct is not definitional; dropping the
-   cap premise is refuted in `PackN3OracleMintMutants`.
+   `shareRateDelta` is the rate. The Pack E leftover
+   (`sharesMinted = argument` for a free `sharesToMintAsFees`) is not
+   this parent's conclusion.
+3. Bound conjunct: under a named cap `maxShareRate` on the rate, the
+   minted shares are bounded by the fee converted at the cap.
 
-P-ACCOUNT-1 stays order-only (cited below, not widened). The existing
-Eugene child is cited only as an operator-bond fact, not re-homed as this
-parent.
+`submitReportData` remains out. P-ACCOUNT-1 stays order-only (cited
+below, not widened). No second mint/cap ID is minted.
 -/
 
 namespace LidoSRv3.Audit.Guarantees.POracleSupply1
 
+open _root_.Verity
 open LidoSRv3.Audit.SolidityAccounting
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Spec.OracleMintCorrespondence
 
-/-- Supplemental mint+cap parent. Abstract/source checked; ACCOUNT stays
-order-only; no live oracle `Contract.run` on this row. -/
-def guarantee : Guarantee := ⟨.pOracleSupply1, [.model, .source]⟩
+/-- Supplemental mint+cap parent. Abstract/source/verity-tx checked on the
+computed `handleOracleReport` wrapper. ACCOUNT stays order-only. -/
+def guarantee : Guarantee := ⟨.pOracleSupply1, [.model, .source, .verityTx]⟩
 
-/-- P-ORACLE-SUPPLY-1 parent. Universal over `feeWei`, `shareRate`, and the
-named cap `maxShareRate`. First conjunct pair: the frame's mint is the
-computed fee/shareRate conversion (definitional by construction of
-`specOfMint`) and the frame records the rate. Second conjunct: the
-non-definitional aggregate bound `sharesMinted ≤ feeWei * maxShareRate / E27`
-under the retained premise `shareRate ≤ maxShareRate`. -/
+open LidoSRv3.Audit.Verity.HandleOracleReportTx
+
+/-- Spec-only mint+cap lemma, retained so the original Pack N3 kill-lines
+keep their exact parent shape. The registered YAML theorem is the live
+strengthening below. -/
 theorem oracle_supply_mint_and_cap
     (i : ReportInput) (feeWei shareRate maxShareRate : Nat)
     (hCap : shareRate ≤ maxShareRate) :
@@ -49,6 +49,26 @@ theorem oracle_supply_mint_and_cap
       (specOfMint i feeWei shareRate).sharesMinted
         ≤ feeWei * maxShareRate / E27 :=
   ⟨⟨rfl, rfl⟩, minted_shares_le_cap feeWei shareRate maxShareRate hCap⟩
+
+/-- P-ORACLE-SUPPLY-1 parent. Universal over report input, `feeWei`,
+`shareRate`, the named cap `maxShareRate`, and the entry `ContractState`.
+Live conjunct: the computed wrapper's `observe` equals `sourceView` at
+`mintedShares feeWei shareRate`. Spec conjuncts: the frame mint is that
+computed conversion and is bounded under `shareRate ≤ maxShareRate`.
+`submitReportData` is not this path. -/
+theorem oracle_supply_live_computed_mint
+    (i : ReportInput) (feeWei shareRate maxShareRate : Nat)
+    (state : ContractState)
+    (hCap : shareRate ≤ maxShareRate) :
+    observe i ((handleOracleReportComputed i feeWei shareRate).run state) =
+        sourceView i (mintedShares feeWei shareRate) ∧
+      ((specOfMint i feeWei shareRate).sharesMinted
+          = mintedShares feeWei shareRate ∧
+        (specOfMint i feeWei shareRate).shareRateDelta = shareRate) ∧
+      (specOfMint i feeWei shareRate).sharesMinted
+          ≤ feeWei * maxShareRate / E27 :=
+  ⟨computed_tx_simulates_computed_source i feeWei shareRate state,
+    oracle_supply_mint_and_cap i feeWei shareRate maxShareRate hCap⟩
 
 /-- Citation only: P-ACCOUNT-1 remains the order-only registered parent.
 This node does not fold ACCOUNT into supply and does not widen it. -/

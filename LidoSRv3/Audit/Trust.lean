@@ -206,8 +206,10 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PEthJournal1.every_modeled_success_journal_approved
 #print axioms LidoSRv3.Tests.PackN2EthJournalMutants.fifth_destination_kill_line_retains_success_premises
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.sum_balances_mutant_killed
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.raw_fee_mutant_killed
+#print axioms LidoSRv3.Tests.PackN3OracleMintMutants.free_argument_does_not_satisfy_computed_observe
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence

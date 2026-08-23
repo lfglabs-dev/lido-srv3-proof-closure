@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Spec
 import LidoSRv3.Audit.Source.AccountingCorrespondence
 import LidoSRv3.Audit.Verity.AddressClaimBatchTx
+import LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 /-!
 # Node 3: fee/shareRate oracle mint correspondence
@@ -10,6 +11,11 @@ Spec-plane definitions for the P-ORACLE-SUPPLY-1 parent. The mint is a
 `sharesToMintAsFees` argument: the Pack E leftover
 (`OracleFrame.sharesMinted = argument`) is exactly what this module does
 not restate. P-ACCOUNT-1 stays order-only and is not widened here.
+
+The live wrapper `handleOracleReportComputed` feeds that computed mint into
+the existing `handleOracleReport` transaction. `submitReportData` remains
+out: this is the handleOracleReport path with a computed argument, not a
+modeled submitReportData split.
 -/
 
 namespace LidoSRv3.Audit.Spec.OracleMintCorrespondence
@@ -73,5 +79,39 @@ theorem minted_shares_exact_ratio (feeWei num den : Nat)
           rw [Nat.mul_assoc, Nat.mul_comm den E27, ← Nat.mul_assoc]
   unfold mintedShares
   rw [key, Nat.mul_div_cancel _ e27_pos]
+
+/-! ## Live computed path
+
+`handleOracleReport` still takes `sharesToMintAsFees` as a free argument.
+The wrapper below is the live path that *computes* that argument from
+`feeWei` and `shareRate`. It does not change `handleOracleReport`'s
+signature and does not widen P-ACCOUNT-1. -/
+
+open _root_.Verity
+open LidoSRv3.Audit.Verity.HandleOracleReportTx
+
+/-- Live oracle-report path: mint shares are `mintedShares feeWei shareRate`,
+not a caller-supplied free word. -/
+def handleOracleReportComputed (i : ReportInput) (feeWei shareRate : Nat)
+    (failAfterWrites : Bool := false) : Contract Result :=
+  handleOracleReport i (mintedShares feeWei shareRate) failAfterWrites
+
+/-- The computed live path has the same observables as the independently
+stated source view at the computed mint. -/
+theorem computed_tx_simulates_computed_source
+    (i : ReportInput) (feeWei shareRate : Nat) (state : ContractState) :
+    observe i ((handleOracleReportComputed i feeWei shareRate).run state) =
+      sourceView i (mintedShares feeWei shareRate) :=
+  verity_tx_simulates_pinned_source i (mintedShares feeWei shareRate) state
+
+/-- On an accepted computed report, the mint step is present iff the
+computed mint is strictly positive. -/
+theorem computed_mint_step_iff_of_accepted
+    (i : ReportInput) (feeWei shareRate : Nat)
+    (accepted : AcceptedReport)
+    (hAccept : accept i = some accepted) :
+    (0 < mintedShares feeWei shareRate) ↔
+      .rewardsMinted ∈ (sourceView i (mintedShares feeWei shareRate)).steps := by
+  simp [sourceView, hAccept, successfulSteps]
 
 end LidoSRv3.Audit.Spec.OracleMintCorrespondence
