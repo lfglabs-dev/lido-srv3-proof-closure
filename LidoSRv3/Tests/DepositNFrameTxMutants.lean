@@ -64,7 +64,8 @@ theorem fixed_two_only_refutes_nframe_parent :
   exact executeTwoOnly_drops_third_frame (congrArg Observables.journal h.1)
 
 def wrappingBatch : DepositNFrameTx.Batch :=
-  { batchC with amount := Word.ofNat (Word.modulus - 1) }
+  { batchC with amount := _root_.Verity.Core.Uint256.ofNat
+      (_root_.Verity.Core.Uint256.modulus - 1) }
 
 def wrappingInputs : DepositNFrameTx.Inputs :=
   { threeBatchInputs with
@@ -75,8 +76,10 @@ theorem wrapping_witness_moves_no_journal :
         .revert "BATCH_TOTAL_OVERFLOW" threeBatchState ∧
       (observe threeBatchState
         ((DepositNFrameTx.execute wrappingInputs).run threeBatchState)).journal = [] := by
-  have hWrap : Word.modulus ≤ exactTotal wrappingInputs.batches := by
-    simp [wrappingInputs, wrappingBatch, exactTotal, Word.val_ofNat]
+  have hWrap : _root_.Verity.Core.Uint256.modulus ≤
+      exactTotal wrappingInputs.batches := by
+    simp [wrappingInputs, wrappingBatch, exactTotal,
+      _root_.Verity.Core.Uint256.val_ofNat]
   obtain ⟨hRun, hObs⟩ := wrapping_fold_reverts_without_journal
     wrappingInputs threeBatchState rfl rfl rfl hWrap
   exact ⟨hRun, congrArg Observables.journal hObs⟩
