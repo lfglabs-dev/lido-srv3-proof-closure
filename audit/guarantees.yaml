@@ -1123,34 +1123,35 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddressBatch1 LidoSRv3.Tests.PackN4AddressBatchMutants",
-        "expected": "p_address_batch_1_fuel_bounded_live_claim_batch builds; swapped_three_payout_order_kill_line_refutes_parent keeps well-formed premises and disagrees with pre-state reads"
+        "expected": "p_address_batch_1_fuel_bounded_recipient_rename builds; fixed_dest_rename_kill_line_refutes_parent keeps well-formed premises and pays a constant dest"
       },
-      "summary": "Supplemental fuel-bounded parent for live executeClaimWithdrawalsTo: on well-formed request/hint lists with length \u2264 fuel, a successful run journals payouts equal to the pre-state claimableEther reads, marks those ids claimed, and decrements locked ETH by the sum. Two- and three-item receipts are instances. Does not weaken universal_address_writer_equivariance. Recipient-rename equivariance on the live loop is not this parent.",
+      "summary": "Supplemental fuel-bounded parent for live executeClaimWithdrawalsTo: on well-formed request/hint lists with length \u2264 fuel, \u03c1 \u00b7 executeClaimWithdrawalsTo = execute \u00b7 \u03c1 on the journal dests (payouts stay the pre-state reads). The payout-correspondence parent remains a lemma. Does not weaken universal_address_writer_equivariance. keccak physical slot maps stay OPEN.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename"
       },
       "fidelity": {
         "covered": [
           "fuel-bounded \u2200 on live executeClaimWithdrawalsTo: payouts = pre-state reads, claimed bits, locked-ETH decrement",
+          "fuel-bounded recipient rename: observe at \u03c1 recipient journals payoutEntry (\u03c1 recipient), observe at recipient journals payoutEntry recipient",
           "rollback re-exported from every_revert_restores_snapshot",
-          "parent-shaped swapped [40,30,10] journal kill-line on a 3-item well-formed batch"
+          "parent-shaped fixed-dest rename kill-line; swapped [40,30,10] journal kill-line on a 3-item well-formed batch"
         ],
         "missing": [
           "fuel is an explicit Nat bound; unbounded live-loop correspondence remains out",
-          "recipient-rename equivariance on the live loop is not this parent",
-          "keccak physical slot maps remain OPEN"
+          "keccak physical slot maps remain OPEN",
+          "PAddress1.universal_address_writer_equivariance is not weakened"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep universal_address_writer_equivariance unweakened; extend fuel or add recipient equivariance only with a parent-shaped kill-line."
+        "work": "Keep universal_address_writer_equivariance unweakened; do not treat numeral 2/3-item receipts as the registered claim; keccak stays OPEN."
       },
-      "next_gate": "Keep universal_address_writer_equivariance unweakened; do not treat numeral 2/3-item receipts as the registered claim."
+      "next_gate": "Keep universal_address_writer_equivariance unweakened; do not treat numeral 2/3-item receipts as the registered claim; keccak stays OPEN."
     },
     {
       "id": "P-SSZ-LIVE-1",

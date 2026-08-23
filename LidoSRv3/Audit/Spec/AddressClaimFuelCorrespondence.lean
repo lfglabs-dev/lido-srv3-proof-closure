@@ -405,6 +405,111 @@ theorem fuel_bounded_live_claim_batch_correspondence
       _
     rw [hready.final_claimed hnodup, hready.final_locked, hready.final_calls]
 
+/-! ## Recipient rename
+
+`BatchReady` / `ClaimReady` read storage, sender, and self-balance, never the
+journal dest. Changing only `calls` or the payout recipient therefore keeps
+the same well-formed batch, so
+`ρ · executeClaimWithdrawalsTo = execute · ρ` on the live observe journal.
+keccak / machine-storage slot maps stay out. -/
+
+theorem readRequest_ignore_calls (state : ContractState)
+    (calls : List ExternalCall) (requestId hint : Nat) :
+    readRequest { state with calls := calls } requestId hint =
+      readRequest state requestId hint :=
+  rfl
+
+theorem ClaimReady.ignore_calls {state : ContractState}
+    {requestId hint payout : Nat}
+    (h : ClaimReady state requestId hint payout)
+    (calls : List ExternalCall) :
+    ClaimReady { state with calls := calls } requestId hint payout := by
+  have hread : readRequest { state with calls := calls } requestId hint =
+      readRequest state requestId hint := rfl
+  have hmeta :
+      requestMetadataWord { state with calls := calls } requestId =
+        requestMetadataWord state requestId := rfl
+  cases h
+  constructor
+  · exact requestId_ne_zero
+  · simpa using finalized
+  · simpa [hread] using unclaimed
+  · simpa [hread] using owned
+  · exact hint_ne_zero
+  · simpa using hint_in_range
+  · simpa [hread] using checkpoint_starts_before
+  · simpa using checkpoint_ends_after
+  · simpa [hread] using steth_monotone
+  · simpa [hread] using shares_monotone
+  · simpa [hread] using payout_read
+  · simpa [hmeta] using mark_sets_claimed
+  · simpa using locked_funded
+  · simpa using balance_funded
+
+theorem claimSuccessState_calls_only
+    (state : ContractState) (requestId payout : Nat)
+    (r1 r2 : Address) :
+    { claimSuccessState state requestId payout r1 with
+        calls := (claimSuccessState state requestId payout r2).calls } =
+      claimSuccessState state requestId payout r2 := by
+  simp [claimSuccessState]
+
+theorem BatchReady.ignore_calls {state requestIds hints recipient payouts}
+    (h : BatchReady state requestIds hints recipient payouts)
+    (calls : List ExternalCall) :
+    BatchReady { state with calls := calls } requestIds hints recipient payouts := by
+  induction h generalizing calls with
+  | nil => exact BatchReady.nil _ _
+  | @cons state recipient requestId hint payout requestIds hints payouts
+      head tail ih =>
+      refine BatchReady.cons (head.ignore_calls calls) ?_
+      simpa [claimSuccessState] using ih _
+
+theorem BatchReady.with_recipient {state requestIds hints recipient payouts}
+    (h : BatchReady state requestIds hints recipient payouts)
+    (recipient' : Address) :
+    BatchReady state requestIds hints recipient' payouts := by
+  induction h generalizing recipient' with
+  | nil => exact BatchReady.nil state recipient'
+  | @cons state recipient requestId hint payout requestIds hints payouts
+      head tail ih =>
+      refine BatchReady.cons head ?_
+      have htail := ih recipient'
+      have htail' :=
+        htail.ignore_calls
+          (claimSuccessState state requestId payout recipient').calls
+      simpa [claimSuccessState_calls_only] using htail'
+
+/-- Fuel-bounded recipient-rename parent: running the live loop at `ρ recipient`
+journals the same payouts to the renamed dest, and running it at `recipient`
+journals them to the original dest. Same well-formedness premises as the
+payout-correspondence parent, plus `ρ recipient ≠ zeroAddress`. -/
+theorem fuel_bounded_live_claim_batch_recipient_rename
+    (fuel : Nat) (state : ContractState) (requestIds hints payouts : List Nat)
+    (recipient : Address) (ρ : Address → Address)
+    (hfuel : requestIds.length ≤ fuel)
+    (hlength : requestIds.length = hints.length)
+    (hnodup : (requestIds.map fun id => (.ofNat id : Uint256)).Nodup)
+    (hready : BatchReady state requestIds hints recipient payouts)
+    (hrecipient : recipient ≠ zeroAddress)
+    (hrenamed : ρ recipient ≠ zeroAddress) :
+    observe requestIds
+          ((executeClaimWithdrawalsTo requestIds hints (ρ recipient)).run
+            state) =
+        ⟨.committed, List.replicate requestIds.length true,
+          (state.readSlot lockedEtherAmountPosition).val - payouts.sum,
+          state.calls ++ payouts.map (payoutEntry (ρ recipient))⟩ ∧
+      observe requestIds
+          ((executeClaimWithdrawalsTo requestIds hints recipient).run state) =
+        ⟨.committed, List.replicate requestIds.length true,
+          (state.readSlot lockedEtherAmountPosition).val - payouts.sum,
+          state.calls ++ payouts.map (payoutEntry recipient)⟩ :=
+  ⟨(fuel_bounded_live_claim_batch_correspondence fuel state requestIds hints
+      payouts (ρ recipient) hfuel hlength hnodup
+      (hready.with_recipient (ρ recipient)) hrenamed).2,
+    (fuel_bounded_live_claim_batch_correspondence fuel state requestIds hints
+      payouts recipient hfuel hlength hnodup hready hrecipient).2⟩
+
 /-- Existing transaction-boundary rollback, re-exported rather than re-proved. -/
 theorem every_revert_restores_snapshot (requestIds hints : List Nat)
     (recipient : Address) (state rollback : ContractState) (reason : String)
