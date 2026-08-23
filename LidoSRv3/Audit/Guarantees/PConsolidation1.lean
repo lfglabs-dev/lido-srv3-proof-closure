@@ -194,12 +194,59 @@ theorem packing_order_kills_swapped_concat
   exact commitObservables_ne_swapped target fee msgValue [r] rfl
     (fun x hx => by simp [List.mem_cons, List.mem_nil_iff] at hx; subst hx; exact h)
 
-/-- **Named gap: preservesEthBalance.** The Solidity modifier
-(WithdrawalVault.sol:201) requires the vault to forward exactly `msg.value`
-across the request CALLs, leaving its own ETH balance unchanged after the
-loop. Closing the gap requires value-bearing CALL frames, not the current
-success stubs with empty returndata. -/
-abbrev preservesEthBalance_gap : String :=
-  "preservesEthBalance: forwards exactly msg.value (requires value-bearing CALL frames)"
+/-- **Value-bearing CALLs (lift of the formerly named
+`preservesEthBalance` gap).** On every committed run the executed
+transaction forwards exactly `msg.value` across its journaled CALL
+frames — one `.success` CALL frame per request to the consolidation
+request target, each carrying the per-request fee, the frame values
+summing to `msg.value` (the pinned `_requireExactFee` guard exported onto
+the CALL journal). The pre-lift wording of this gap ("current success
+stubs move no wei") no longer applies: the executed model's CALLs now
+move wei on the vault balance. -/
+theorem verity_tx_journal_forwards_msg_value
+    (inputs : Inputs) (state : Verity.ContractState)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens)
+    (result : Result) (after : Verity.ContractState)
+    (h : (addRequests inputs).run state = .success result after) :
+    let frames := after.calls.drop state.calls.length
+    frames.length = result.requestCount ∧
+      (∀ f ∈ frames, f.kind = .call ∧ f.control = .success ∧
+        f.target = inputs.requestTarget.val ∧ f.value = inputs.fee.val) ∧
+      (frames.map (fun f => f.value)).sum = inputs.msgValue.val :=
+  Verity.ConsolidationTx.committed_journal_forwards_msg_value inputs
+    state hSources hTargets hSourceLens hTargetLens result after h
+
+/-- **`preservesEthBalance` (`WithdrawalVault.sol:81--85`), vault side.**
+After the modeled frame-entry payable credit of `msg.value` and the
+per-request CALL debits, every committed run restores the vault's
+pre-call `selfBalance` — the modifier's `assert` in the model of record.
+Every revert restores the whole pre-call snapshot
+(`verity_tx_revert_restores_snapshot`), balance included. What remains
+outside this plane is the counterparty credit at the request predeploy
+(another contract's balance; `P-CONSOLIDATION-VALUE-1` /
+`P-CONSOLIDATION-ETH-1` own the multi-contract side) and 96-byte packed
+pubkey calldata, both named in `fidelity.missing`. -/
+theorem verity_tx_preserves_eth_balance
+    (inputs : Inputs) (state : Verity.ContractState)
+    (hSources : readArray state "sources" sourcesBase inputs.sources.length =
+      some inputs.sources)
+    (hTargets : readArray state "targets" targetsBase inputs.targets.length =
+      some inputs.targets)
+    (hSourceLens : readArray state "sourceLens" sourceLensBase
+      inputs.sourceLens.length = some inputs.sourceLens)
+    (hTargetLens : readArray state "targetLens" targetLensBase
+      inputs.targetLens.length = some inputs.targetLens)
+    (result : Result) (after : Verity.ContractState)
+    (h : (addRequests inputs).run state = .success result after) :
+    after.selfBalance = state.selfBalance :=
+  Verity.ConsolidationTx.committed_preserves_eth_balance inputs state
+    hSources hTargets hSourceLens hTargetLens result after h
 
 end LidoSRv3.Audit.Guarantees.PConsolidation1

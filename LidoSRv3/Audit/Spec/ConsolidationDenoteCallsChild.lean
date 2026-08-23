@@ -12,6 +12,12 @@ compose into official denotation success.
 
 Does not discharge `A-CONSOLIDATION-GATEWAY-NONZERO`. Does not start the
 bus. Does not invent a guarantee ID.
+
+The former `preservesEthBalance_gap` string child is retired by the
+value-bearing CALL lift: `addRequests` now credits `msg.value` at frame
+entry and debits each journaled CALL, so the registered parent closes
+`preservesEthBalance` on the vault side
+(`Guarantees.PConsolidation1.verity_tx_preserves_eth_balance`).
 -/
 
 namespace LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild
@@ -50,14 +56,5 @@ theorem functionEnv_resolves_predeploy (target fee : Nat) :
     (ConsolidationTx.functionEnv target fee).resolve "consolidationPredeploy" =
       some { target := target, value := fee, siteId := 0 } :=
   rfl
-
-/-- `preservesEthBalance` stays the documented string gap: the vault must
-forward exactly `msg.value`. Closing it needs value-bearing CALL frames,
-which official denotation still does not provide. -/
-theorem preservesEthBalance_gap_remains :
-    PConsolidation1.preservesEthBalance_gap =
-      "preservesEthBalance: forwards exactly msg.value (requires value-bearing CALL frames)" ∧
-      PConsolidation1.preservesEthBalance_gap ≠ "" :=
-  ⟨rfl, by decide⟩
 
 end LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild

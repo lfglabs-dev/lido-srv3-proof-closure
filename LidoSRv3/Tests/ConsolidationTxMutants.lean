@@ -170,6 +170,110 @@ example : function_spec_bridge_constructors =
     function_spec_bridge_constructors :=
   rfl
 
+private def stateBal (inputs : Inputs) (bal : Nat) : Verity.ContractState :=
+  { stateOf inputs with selfBalance := word bal }
+
+/-! ## Value-plane kill-lines: CALLs must move exactly msg.value
+
+Three model mutants of the same executed transaction (see
+`ConsolidationTx.lean`): `addRequestsValueBlind` keeps the payable credit
+and the journaled CALL frames but debits nothing (the pre-lift stub
+behavior), `addRequestsDoubleDebit` debits twice the journaled value per
+CALL, and `addRequestsJournalValueBlind` debits honestly but journals each
+frame with value `0`. Each witness satisfies the same memory-decode
+hypotheses as the registered parent `verity_tx_simulates_consolidation`,
+so the refutations are about the value plane, not decode plumbing. -/
+
+private def valObs : Observables :=
+  commitObservables (word consolidationRequestAddress) (word 3) (word 3)
+    [{ source := word 11
+       target := word 21
+       sourceLen := key48
+       targetLen := key48 }]
+
+private def valState : Verity.ContractState :=
+  stateBal (pair 11 21) 5
+
+private def valAfterPlain : Verity.ContractState :=
+  persistPlain 0 valObs (credited valState (pair 11 21))
+
+private def valAfterDouble : Verity.ContractState :=
+  persistDoubleDebit 0 valObs (credited valState (pair 11 21))
+
+private def valAfterJournalBlind : Verity.ContractState :=
+  persistJournalValueBlind 0 valObs (credited valState (pair 11 21))
+
+/-- **Kill-line: value-blind debit refutes `committed_preserves_eth_balance`
+on a mutant of its own model.** The pre-lift stub behavior — journaled
+CALLs that move no wei — leaves the credited `msg.value` stuck on the
+vault: the post-run `selfBalance` is pre-call + 3, not the pre-call 5.
+`sourceRun` commits the same batch, so the mutant reaches the success arm
+the registered theorem talks about. -/
+theorem value_blind_debit_kill_line_refutes_preserves_eth_balance :
+    ∃ (inputs : Inputs) (state : Verity.ContractState)
+      (result : Result) (after : Verity.ContractState),
+      readArray state "sources" sourcesBase inputs.sources.length =
+        some inputs.sources ∧
+      readArray state "targets" targetsBase inputs.targets.length =
+        some inputs.targets ∧
+      readArray state "sourceLens" sourceLensBase
+        inputs.sourceLens.length = some inputs.sourceLens ∧
+      readArray state "targetLens" targetLensBase
+        inputs.targetLens.length = some inputs.targetLens ∧
+      observe state ((addRequestsValueBlind inputs).run state) =
+        observe state (.success result after) ∧
+      after.selfBalance ≠ state.selfBalance :=
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterPlain,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide, by native_decide, by native_decide⟩
+
+/-- **Kill-line: double debit refutes `committed_preserves_eth_balance`
+on a mutant of its own model.** Debiting twice the journaled value per CALL
+drains the vault: post-run `selfBalance` is pre-call + 3 − 6 = 2, not 5. -/
+theorem double_debit_kill_line_refutes_preserves_eth_balance :
+    ∃ (inputs : Inputs) (state : Verity.ContractState)
+      (result : Result) (after : Verity.ContractState),
+      readArray state "sources" sourcesBase inputs.sources.length =
+        some inputs.sources ∧
+      readArray state "targets" targetsBase inputs.targets.length =
+        some inputs.targets ∧
+      readArray state "sourceLens" sourceLensBase
+        inputs.sourceLens.length = some inputs.sourceLens ∧
+      readArray state "targetLens" targetLensBase
+        inputs.targetLens.length = some inputs.targetLens ∧
+      observe state ((addRequestsDoubleDebit inputs).run state) =
+        observe state (.success result after) ∧
+      after.selfBalance ≠ state.selfBalance :=
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterDouble,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide, by native_decide, by native_decide⟩
+
+/-- **Kill-line: journaled value 0 refutes
+`committed_journal_forwards_msg_value` on a mutant of its own model.**
+Honest debits with zero-valued journal frames leave the balance correct
+(the mutant passes the balance assertion) but the journal claims no value
+moved: the frame-values sum is 0, not `msg.value = 3`. -/
+theorem journal_value_blind_kill_line_refutes_exact_forwarding :
+    ∃ (inputs : Inputs) (state : Verity.ContractState)
+      (result : Result) (after : Verity.ContractState),
+      readArray state "sources" sourcesBase inputs.sources.length =
+        some inputs.sources ∧
+      readArray state "targets" targetsBase inputs.targets.length =
+        some inputs.targets ∧
+      readArray state "sourceLens" sourceLensBase
+        inputs.sourceLens.length = some inputs.sourceLens ∧
+      readArray state "targetLens" targetLensBase
+        inputs.targetLens.length = some inputs.targetLens ∧
+      observe state ((addRequestsJournalValueBlind inputs).run state) =
+        observe state (.success result after) ∧
+      after.selfBalance = state.selfBalance ∧
+      ((after.calls.drop state.calls.length).map (·.value)).sum ≠
+        inputs.msgValue.val :=
+  ⟨pair 11 21, valState, ofObservables valObs, valAfterJournalBlind,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide, by native_decide, by native_decide,
+    by native_decide⟩
+
 /-- **Cheap mutant: swapped concat.** Journal calldata = source then target
 (96 bytes). A swapped target then source concat fails observe: the
 committed view with a swapped input list is not equal to the canonical

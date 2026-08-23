@@ -200,7 +200,6 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackW2GindexMutants.wrong_packed_word_is_not_production_binding
 #print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.requestOne_uses_widened_call_constructor
 #print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.official_raw_call_still_reverts
-#print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.preservesEthBalance_gap_remains
 #print axioms LidoSRv3.Tests.PackW2DenoteMutants.official_revert_with_widened_bind
 #print axioms LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence.three_claim_payouts_match_reads
 #print axioms LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence.length_mismatch_reverts
@@ -329,7 +328,19 @@ assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation
 #print axioms
   LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_revert_restores_snapshot
+#print axioms
+  LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_journal_forwards_msg_value
+#print axioms
+  LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_preserves_eth_balance
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
+#print axioms
+  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance
+#print axioms
+  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance
+#print axioms
+  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx
 #print axioms LidoSRv3.Audit.Guarantees.PAddress1.bounded_live_claim_batch_storage_call_surface
 #print axioms LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe
