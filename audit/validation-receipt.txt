@@ -1,11 +1,43 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: a46afd3d8687f9f426f59b979471a6abd44c9e05
+validated-tree: 5268e1b6931aaf2933b54eca546ba3bb14374e51
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+SRv3 campaign close nodes 1–6 (2026-08-23)
+-----------------------------------------
+
+- Rebind `validated-tree` to `5268e1b6931aaf2933b54eca546ba3bb14374e51`, the
+  tracked tree of `main` after merging PRs #197–#202 excluding this receipt.
+  Per-PR receipt hashes below remain the historical record of each branch.
+- Scope: six supplemental parents on existing guarantee ids. No leftover
+  packs. P-ORACLE-SUPPLY-1 is not re-split. P-ACCOUNT-1 stays order-only.
+  Node 7 (pause/bunker) is out of this close.
+- Parents and kill-lines:
+  - P-ALLOC-EXEC-1 `#201`: `router_produces_executes_allocation`
+    (two-batch; LinksSource is a theorem). Kill-line: raw-count
+    `amount = keys`.
+  - P-ETH-JOURNAL-1 `#202`: `journal_approved_excludes_protocol_return_paths`.
+    Does not claim Lido never drains ETH. Kill-line: mutant specDest
+    `.lido` → `.lidoPull`.
+  - P-ORACLE-SUPPLY-1 `#197`: `oracle_supply_live_computed_mint`.
+    `submitReportData` remains out. Kill-line: free argument 1 vs
+    computed 0.
+  - P-ADDRESS-BATCH-1 `#198`: `p_address_batch_1_fuel_bounded_recipient_rename`
+    (`ρ · execute = execute · ρ` on journal dests). keccak OPEN.
+    Kill-line: fixed dest 99 vs rename 2→7.
+  - P-SSZ-LIVE-1 `#199`: `production_witness_admission_from_core_gindex`.
+    `ProductionGindexBinding` is the constructor-pin decode, not `False`.
+    Does not claim live verify. Kill-line: packed `0x28`.
+  - P-CONSOLIDATION-VALUE-1 `#200`:
+    `official_denote_reverts_and_justified_forwards_msg_value`.
+    Official success is not claimed. Kill-line: claimed official success.
+- Reproduction: `lake build` of the six parent+pack targets; `python3
+  scripts/audit_metadata.py check`, `scripts/check_public_claim_surfaces.py`,
+  and `scripts/check_validation_receipt.py` exit 0.
 
 P-ORACLE-SUPPLY-1 live computed mint (2026-08-23)
 ------------------------------------------------
