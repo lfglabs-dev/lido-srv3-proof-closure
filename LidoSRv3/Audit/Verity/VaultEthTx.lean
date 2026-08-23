@@ -57,8 +57,11 @@ theorem returnFrame_apply (endpoints : Endpoints) (inputs : Inputs)
     (entry : ContractState) (hFunds : inputs.amount ≤ entry.selfBalance) :
     returnFrame endpoints inputs entry =
       .success () (afterFrame endpoints inputs entry) := by
-  simp [returnFrame, afterFrame, returnEntry, externalCallBindTo, hFunds,
-    externalCallStubSuccess]
+  cases inputs with
+  | mk route amount =>
+      cases route <;>
+        simp [returnFrame, afterFrame, returnEntry, callName, externalCallBindTo,
+          hFunds, externalCallStubSuccess, linkedCallEntryTo, linkedCallEntry]
 
 theorem execute_commits_of_preconditions
     (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
@@ -70,7 +73,7 @@ theorem execute_commits_of_preconditions
   simp only [execute,
     sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
       hNonzero hFunds]
-  exact returnFrame_apply endpoints inputs entry hFunds
+  rw [returnFrame_apply endpoints inputs entry hFunds]
 
 /-- Any successful executable run came from the source committed arm and has
 exactly the state produced by its value-bearing frame. -/
