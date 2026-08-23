@@ -1046,12 +1046,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEthJournal1 LidoSRv3.Tests.PackN2EthJournalMutants",
-        "expected": "every_modeled_success_journal_approved builds; fifth_destination_kill_line_retains_success_premises inserts an unapproved dest on a premise-satisfying path"
+        "expected": "journal_approved_excludes_protocol_return_paths builds; mutant_lido_approved_not_excluded_kill_line maps Lido to lidoPull so approved holds while exclusion fails"
       },
-      "summary": "Supplemental composition parent: every premise-satisfying modeled success journal is a lossless Spec.EthJournal (ApprovedDestination legs only) across the three already-modeled paths \u2014 conserving two-batch deposit, value-moving top-up, and consolidation fee/refund. ProtocolReturnPathsExcluded names Vault-to-Lido and WithdrawalQueue protocol-return paths out. Not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened.",
+      "summary": "Supplemental parent: JournalApproved of the source-preserving consolidation candidate implies ProtocolReturnPathsExcluded. Vault\u2192Lido and WithdrawalQueue hops therefore cannot appear in a lossless Spec.EthJournal. This does not claim Lido never drains ETH. Address pins do not close provenance. ApprovedDestination stays four constructors. The three modeled success journals remain approved under the previous composition.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PEthJournal1.every_modeled_success_journal_approved"
+        "theorem": "LidoSRv3.Audit.Guarantees.PEthJournal1.journal_approved_excludes_protocol_return_paths"
       },
       "verity": {
         "status": "PARTIAL",
@@ -1059,21 +1059,22 @@
       },
       "fidelity": {
         "covered": [
-          "three modeled success journals project onto Spec.EthJournal / ApprovedDestination",
-          "ProtocolReturnPathsExcluded named conjunct, not a leftover True theorem",
-          "parent-shaped fifth-destination kill-line retains deposit, value-moving top-up, and consolidation success premises"
+          "JournalApproved of the consolidation candidate implies ProtocolReturnPathsExcluded",
+          "Vault-to-Lido and WithdrawalQueue hops project to none and cannot inhabit a lossless Spec.EthJournal",
+          "three modeled success journals still project onto Spec.EthJournal / ApprovedDestination",
+          "parent-shaped mutant specDest Lido\u2192lidoPull kill-line; fifth-destination kill-line retained"
         ],
         "missing": [
-          "Vault-to-Lido and WithdrawalQueue protocol-return paths remain outside this parent (ProtocolReturnPathsExcluded)",
-          "not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened",
+          "this parent does not claim Lido never drains ETH; Vault-to-Lido and WithdrawalQueue stays remain outside the modeled journals",
+          "not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened; ApprovedDestination stays four constructors",
           "address pins do not close deposit, top-up, or request artifact identity"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep ProtocolReturnPathsExcluded named; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination or treat this row as all SRv3 ETH."
+        "work": "Do not claim Lido never drains ETH; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination."
       },
-      "next_gate": "Keep ProtocolReturnPathsExcluded named; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination."
+      "next_gate": "Do not claim Lido never drains ETH; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination."
     },
     {
       "id": "P-ORACLE-SUPPLY-1",

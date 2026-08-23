@@ -114,6 +114,46 @@ theorem consolidationCandidate_approved_of_projected
             (List.cons ({ dest := some dest, wei := ⟨move.amount⟩ } : CandidateLeg))
             hTail
 
+/-- A `none` dest cannot appear in the lossless image of a Spec journal. -/
+theorem candidateOfSpec_dest_is_some (journal : EthJournal)
+    (leg : CandidateLeg) (h : leg ∈ candidateOfSpec journal) :
+    leg.dest.isSome := by
+  rcases List.mem_map.mp h with ⟨specLeg, _, hEq⟩
+  subst hEq
+  simp
+
+/-- PARENT fact on the Spec plane: a lossless Spec journal of the
+source-preserving consolidation candidate cannot contain Vault→Lido or
+WithdrawalQueue hops, because those destinations project to `none`.
+Exclusion is the conclusion, not a restated leftover. This does not claim
+Lido never drains ETH. -/
+theorem journal_approved_excludes_protocol_return_paths
+    (moves : List ConsolidationMove) :
+    JournalApproved (consolidationCandidate moves) →
+      ProtocolReturnPathsExcluded moves := by
+  intro hApproved
+  rcases hApproved with ⟨specJournal, hImage⟩
+  intro move hMem
+  constructor
+  · intro hLido
+    have hNone :
+        ({ dest := none, wei := ⟨move.amount⟩ } : CandidateLeg) ∈
+          consolidationCandidate moves := by
+      refine List.mem_map.mpr ⟨move, hMem, ?_⟩
+      simp [hLido, EthJournalCorrespondence.specDest]
+    rw [hImage] at hNone
+    exact Option.not_isSome_iff_eq_none.mpr rfl
+      (candidateOfSpec_dest_is_some specJournal _ hNone)
+  · intro hQueue
+    have hNone :
+        ({ dest := none, wei := ⟨move.amount⟩ } : CandidateLeg) ∈
+          consolidationCandidate moves := by
+      refine List.mem_map.mpr ⟨move, hMem, ?_⟩
+      simp [hQueue, EthJournalCorrespondence.specDest]
+    rw [hImage] at hNone
+    exact Option.not_isSome_iff_eq_none.mpr rfl
+      (candidateOfSpec_dest_is_some specJournal _ hNone)
+
 /-- Total Spec projection also proves the named exclusion conjunct. -/
 theorem protocolReturnPathsExcluded_of_projected
     (moves : List ConsolidationMove)

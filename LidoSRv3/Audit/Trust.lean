@@ -203,7 +203,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackW2ScopeMutants.packed_config_clobber_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.allocated_amount_times_deposit_size
 #print axioms LidoSRv3.Tests.PackN1AllocExecMutants.raw_count_as_wei_kill_line
+#print axioms LidoSRv3.Audit.Guarantees.PEthJournal1.journal_approved_excludes_protocol_return_paths
 #print axioms LidoSRv3.Audit.Guarantees.PEthJournal1.every_modeled_success_journal_approved
+#print axioms LidoSRv3.Tests.PackN2EthJournalMutants.mutant_lido_approved_not_excluded_kill_line
 #print axioms LidoSRv3.Tests.PackN2EthJournalMutants.fifth_destination_kill_line_retains_success_premises
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.sum_balances_mutant_killed
