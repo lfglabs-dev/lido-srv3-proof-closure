@@ -98,11 +98,11 @@ theorem beaconRootsLookup_some_iff
     simp [beaconRootsLookup]
   · simp only [beaconRootsLookup, hZero, ↓reduceIte]
     cases hSlot : history.slots[timestamp % historyBufferLength]? with
-    | none => simp [hSlot, hZero]
+    | none => simp [hZero]
     | some slot =>
         by_cases hTimestamp : slot.timestamp = timestamp
-        · simp [hSlot, hTimestamp, hZero]
-        · simp [hSlot, hTimestamp, hZero]
+        · simp [hTimestamp, hZero]
+        · simp [hTimestamp, hZero]
 
 /-- `ageCheck` is a function of the three timestamp fields only. Root-history
 selection is consumed separately by the gateway parent. -/

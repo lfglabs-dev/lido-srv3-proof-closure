@@ -52,10 +52,10 @@ theorem source_beacon_roots_matches_spec
       hZero, ↓reduceIte, toSpecHistory]
     rw [List.getElem?_map]
     cases hCell : storage.cells[timestamp % historyBufferLength]? with
-    | none => simp [hCell]
+    | none => simp
     | some cell =>
         by_cases hTimestamp : cell.timestampWord = timestamp
-        · simp [hCell, hTimestamp]
-        · simp [hCell, hTimestamp]
+        · simp [hTimestamp]
+        · simp [hTimestamp]
 
 end LidoSRv3.Audit.Source.BeaconRootsCorrespondence
