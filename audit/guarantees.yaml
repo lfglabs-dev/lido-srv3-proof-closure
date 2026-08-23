@@ -1210,38 +1210,39 @@
         "A-CLASSICAL-CHOICE"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackW2GindexMutants",
-        "expected": "production_witness_admission_from_core_gindex builds; wrong_packed_word_is_not_production_binding and skip_lookup_kill_line_refutes_parent keep premises"
+        "command": "lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Audit.Source.BeaconRootsCorrespondence LidoSRv3.Audit.Verity.BeaconRootsTx LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackS1HashMutants LidoSRv3.Tests.PackW2GindexMutants",
+        "expected": "modeled_beacon_roots_live_ssz_consume builds as the consume parent; ignore_timestamp_kill_line_refutes_consume_parent refutes the full parent after replacing the identified BEACON_ROOTS read; A-SHA256-FFI remains named"
       },
-      "summary": "Supplemental parent: ProductionGindexBinding is the constructor-pin decode of TopUpGateway g_index_first_validator_curr (0x...0096000000000028 = (150 * 2^40 << 8) | 40), and a WC witness at that production GI verifies against the opaque eip4788ParentRoot iff the gateway admits it (ageCheck \u2227 verifyAtParent). The pin is an in-repo constructor literal, not a live-deployment identity. A-SHA256-FFI stays. eip4788ParentRoot stays opaque; this row does not claim live verify.",
+      "summary": "Modeled live-SSZ consume parent: eip4788ParentRoot is identified with the EIP-4788 BEACON_ROOTS 8191-slot timestamp-indexed history read (zero, missing, and overwritten-timestamp reads fail closed), with universal Spec\u2192Source\u2192Verity correspondence. Top-up / consolidation WC admission consumes ageCheck plus production-GI verifyAtParent against that identified root; none admits nothing. ProductionGindexBinding remains the in-repo constructor pin, not a deployed identity. A-SHA256-FFI stays: combine is abstract and no Lean literal is treated as deployed SHA-256.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_from_core_gindex"
+        "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume"
       },
       "verity": {
-        "status": "PARTIAL",
-        "theorem": null
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume"
       },
       "fidelity": {
         "covered": [
           "ProductionGindexBinding inhabited from the TopUpGateway constructor pin, not only the test-vector constant",
           "packed word decodes as (150 * 2^40 << 8) | 40; productionIndex is not toy slot 2",
-          "verifyAtParent consumes eip4788ParentRoot; none lookup admits nothing",
-          "gateway admit iff ageCheck and production-GI verify",
-          "parent-shaped wrong-packed-word kill-line; skip-lookup kill-line"
+          "eip4788ParentRoot equals the modeled EIP-4788 BEACON_ROOTS timestamp-indexed ring-history read",
+          "universal Spec\u2192Source\u2192Verity root-read correspondence",
+          "gateway admit iff ageCheck and production-GI verify against the identified root; none admits nothing",
+          "timestamp-ignoring lookup mutant refutes the full consume parent; wrong-packed-word and skip-lookup kill-lines remain"
         ],
         "missing": [
           "A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed",
           "the constructor pin is an in-repo literal, not a live-deployment identity",
-          "eip4788ParentRoot lookup stays opaque; this row does not claim live verify",
-          "not a live Solidity gateway and not a bus"
+          "the BEACON_ROOTS model is not a deployed-address, codehash, or bytecode identity",
+          "not a deployed Solidity gateway, not official consolidation denote success, and not a bus"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep A-SHA256-FFI named and eip4788ParentRoot opaque; do not claim live verify or treat the constructor pin as a live-deployment identity."
+        "work": "Keep A-SHA256-FFI named and the modeled BEACON_ROOTS result distinct from deployed address/codehash identity; do not promote the constructor pin to deployed identity."
       },
-      "next_gate": "Keep A-SHA256-FFI named and eip4788ParentRoot opaque; do not claim live verify."
+      "next_gate": "Discharge A-SHA256-FFI only with a certified SHA-256/precompile refinement; separately pin deployed BEACON_ROOTS and gateway identities."
     },
     {
       "id": "P-CONSOLIDATION-VALUE-1",

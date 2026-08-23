@@ -16,11 +16,11 @@ binds `Ssz.verifyProof` to a parent-root argument through `verifyAtParent`.
 `ProductionGindexChild.ProductionGindexBinding` is the constructor-pin
 decode of that same packed word (in-repo TopUpGateway constructor arg, not
 a live-deployment identity). Toy slots 2/3/4 stay the leftover record for
-`Ssz.operationIndex`. The parent root consumed here is
-`Eip4788AnchorChild.eip4788ParentRoot`, which stays an opaque lookup; when
-the lookup is `none`, verification is false. `combine` stays abstract, so
-SHA-256 functional correctness remains the named `A-SHA256-FFI`
-assumption. This module does not claim live verify.
+`Ssz.operationIndex`. The parent root consumed here is the modeled
+EIP-4788 `BEACON_ROOTS` history read. When the read is `none`,
+verification is false. `combine` stays abstract, so SHA-256 functional
+correctness remains the named `A-SHA256-FFI` assumption. This is modeled
+live-chain verification, not a deployed gateway identity claim.
 -/
 
 namespace LidoSRv3.Audit.Spec.SszLiveCorrespondence
@@ -154,54 +154,58 @@ theorem verifyAtParent_production_construction
     production_path_length, production_path_reconstructs_index, hArity]
 
 /-- A top-up / consolidation withdrawal-credentials proof witness: the
-structural leaf, its branch data, and the EIP-4788 anchor timestamps the
-gateway age-checks. -/
+structural leaf, its branch data, the modeled EIP-4788 history, and the
+anchor timestamps the gateway age-checks. -/
 structure WcWitness where
   leaf : Ssz.Node
   path : List Ssz.SiblingSide
   branch : List Ssz.Node
+  beaconRoots : BeaconRootsHistory
   anchor : ParentRootAnchor
   deriving DecidableEq, Repr
 
-/-- Live-chain verification: the parent root used by verify is
-`eip4788ParentRoot ts` when `some`, at the production generalized index.
-The lookup stays opaque but is consumed here, not an unused symbol. When
-the lookup is `none`, verify is false. -/
+/-- Modeled live-chain verification: the parent root used by verify is the
+timestamp-selected `BEACON_ROOTS` history entry, at the production
+generalized index. When the read is `none`, verify is false. -/
 def verifyAtLookup (combine : Ssz.Node → Ssz.Node → Ssz.Node)
     (w : WcWitness) : Bool :=
-  match eip4788ParentRoot w.anchor.beaconRootTimestamp with
+  match eip4788ParentRoot w.beaconRoots w.anchor.beaconRootTimestamp with
   | none => false
   | some parentRoot =>
       verifyAtParent combine w.leaf productionIndex parentRoot w.path w.branch
 
-/-- When the opaque lookup is `none`, verify is false. -/
+/-- When the modeled history lookup is `none`, verify is false. -/
 theorem verifyAtLookup_none (combine : Ssz.Node → Ssz.Node → Ssz.Node)
     (w : WcWitness)
-    (h : eip4788ParentRoot w.anchor.beaconRootTimestamp = none) :
+    (h : eip4788ParentRoot w.beaconRoots
+      w.anchor.beaconRootTimestamp = none) :
     verifyAtLookup combine w = false := by
   simp [verifyAtLookup, h]
 
-/-- When the opaque lookup is `some`, verify is exactly `verifyAtParent`
+/-- When the modeled history lookup is `some`, verify is exactly `verifyAtParent`
 against the looked-up parent root at the production index. -/
 theorem verifyAtLookup_some (combine : Ssz.Node → Ssz.Node → Ssz.Node)
     (w : WcWitness) (parentRoot : Ssz.Node)
-    (h : eip4788ParentRoot w.anchor.beaconRootTimestamp = some parentRoot) :
+    (h : eip4788ParentRoot w.beaconRoots
+      w.anchor.beaconRootTimestamp = some parentRoot) :
     verifyAtLookup combine w =
       verifyAtParent combine w.leaf productionIndex parentRoot
         w.path w.branch := by
   simp [verifyAtLookup, h]
 
-/-- Live verification succeeds iff the opaque lookup produced a parent root
-and the witness verifies against exactly that root at the production
-index. -/
+/-- Modeled live verification succeeds iff the timestamp-selected history
+entry produced a parent root and the witness verifies against exactly that
+root at the production index. -/
 theorem verifyAtLookup_eq_true_iff (combine : Ssz.Node → Ssz.Node → Ssz.Node)
     (w : WcWitness) :
     verifyAtLookup combine w = true ↔
       ∃ parentRoot,
-        eip4788ParentRoot w.anchor.beaconRootTimestamp = some parentRoot ∧
+        eip4788ParentRoot w.beaconRoots w.anchor.beaconRootTimestamp =
+            some parentRoot ∧
           verifyAtParent combine w.leaf productionIndex parentRoot
             w.path w.branch = true := by
-  cases hLookup : eip4788ParentRoot w.anchor.beaconRootTimestamp with
+  cases hLookup :
+      eip4788ParentRoot w.beaconRoots w.anchor.beaconRootTimestamp with
   | none => simp [verifyAtLookup, hLookup]
   | some parentRoot => simp [verifyAtLookup, hLookup]
 
