@@ -93,8 +93,11 @@ import LidoSRv3.Tests.PackN2EthJournalMutants
 import LidoSRv3.Audit.Guarantees.PVaultEth1
 import LidoSRv3.Tests.PackP2VaultEthMutants
 import LidoSRv3.Audit.Spec.OracleMintCorrespondence
+import LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence
+import LidoSRv3.Audit.Verity.SubmitReportEntryTx
 import LidoSRv3.Audit.Guarantees.POracleSupply1
 import LidoSRv3.Tests.PackN3OracleMintMutants
+import LidoSRv3.Tests.PackP3SubmitReportEntryMutants
 import LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence
 import LidoSRv3.Audit.Guarantees.PAddressBatch1
 import LidoSRv3.Tests.PackN4AddressBatchMutants
@@ -225,6 +228,12 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.sum_balances_mutant_killed
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.raw_fee_mutant_killed
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.free_argument_does_not_satisfy_computed_observe
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_submit_report_data_computed_entry
+#print axioms LidoSRv3.Audit.SolidityAccounting.SubmitReportEntry.entry_mint_le_pinned_shares
+#print axioms LidoSRv3.Audit.SolidityAccounting.SubmitReportEntry.entry_mint_eq_pinned_of_exact
+#print axioms LidoSRv3.Tests.PackP3SubmitReportEntryMutants.still_free_entry_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.PackP3SubmitReportEntryMutants.skips_simulate_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.PackP3SubmitReportEntryMutants.hash_premise_is_load_bearing
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent

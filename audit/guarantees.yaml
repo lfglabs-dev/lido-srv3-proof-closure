@@ -1124,38 +1124,44 @@
         "A-CLASSICAL-CHOICE"
       ],
       "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.POracleSupply1 LidoSRv3.Tests.PackN3OracleMintMutants",
-        "expected": "oracle_supply_live_computed_mint builds; free_argument_does_not_satisfy_computed_observe, sum_balances_mutant_killed, and raw_fee_mutant_killed refute the live and Spec conjuncts; ACCOUNT stays order-only"
+        "command": "lake build LidoSRv3.Audit.Guarantees.POracleSupply1 LidoSRv3.Tests.PackN3OracleMintMutants LidoSRv3.Tests.PackP3SubmitReportEntryMutants",
+        "expected": "oracle_supply_submit_report_data_computed_entry builds on top of oracle_supply_live_computed_mint; still_free_entry_kill_line_refutes_parent and skips_simulate_kill_line_refutes_parent refute the computed-entry conjunct on nonempty report witnesses; existing free-argument, sum-balances, and raw-fee kill-lines stay; ACCOUNT stays order-only"
       },
-      "summary": "Supplemental parent: handleOracleReportComputed feeds mintedShares feeWei shareRate = feeWei * shareRate / E27 into handleOracleReport, so observe equals sourceView at that computed mint; Spec.OracleFrame.sharesMinted is the same conversion and is bounded by feeWei * maxShareRate / E27 under shareRate \u2264 maxShareRate. Pack E sharesMinted-as-argument is not this conclusion. submitReportData remains out. P-ACCOUNT-1 stays order-only.",
+      "summary": "Supplemental parent: the modeled submitReportData entry (pinned AccountingOracle.submitReportData -> _handleConsensusReportData -> Accounting.handleOracleReport / _simulateOracleReport / _calculateProtocolFees) computes entryFeeWei and entryShareRate from report data and entry state and feeds the pair into handleOracleReportComputed, so the entry run is the computed-wrapper run, observe equals sourceView at mintedShares entryFeeWei entryShareRate, the mint never exceeds the pinned feeEther * internalShares / (postInternalEther - feeEther) division, and the named maxShareRate cap holds at the computed pair. No free sharesToMintAsFees at the entry. Pack E sharesMinted-as-argument is not this conclusion. P-ACCOUNT-1 stays order-only.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint"
+        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_submit_report_data_computed_entry"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint"
+        "theorem": "LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_submit_report_data_computed_entry"
       },
       "fidelity": {
         "covered": [
+          "modeled submitReportData entry computes entryFeeWei (LIP-12-guarded totalRewards * totalFee / precisionPoints) and entryShareRate (internalShares * E27 / (postInternalEther - feeEther)) from report data and entry state, and feeds the pair into handleOracleReportComputed with no free sharesToMintAsFees argument",
+          "entry checks the consensus-hash and sender-allowed premises; hash mismatch and disallowed sender revert with the pre-state restored, and both premises are shown load-bearing",
+          "computed-pair mint never exceeds the pinned _calculateTotalProtocolFeeShares division and equals it exactly under divisibility (entry_mint_eq_pinned_of_exact)",
           "live handleOracleReportComputed wrapper computes sharesToMintAsFees from feeWei and shareRate",
           "observe of the computed path equals sourceView at mintedShares feeWei shareRate",
           "computed fee/shareRate mint on Spec.OracleFrame, not a free sharesToMintAsFees argument",
           "non-definitional aggregate cap under a named maxShareRate",
           "P-ACCOUNT-1 cited order-only; Eugene child cited as operator-bond only",
-          "parent-shaped free-argument, sum-balances, and raw-fee kill-lines"
+          "parent-shaped still-free-entry and skipped-simulateOracleReport kill-lines on nonempty report witnesses; free-argument, sum-balances, and raw-fee kill-lines stay"
         ],
         "missing": [
+          "entry consensus hash is an opaque word equality, not keccak256 of ABI-encoded calldata; contract-version, consensus-version, ref-slot, deadline, and extra-data checks are not modeled",
+          "smoothenTokenRebase, withdrawal-queue prefinalize, and bad-debt terms enter as report-data fields, not modeled sanity-checker or withdrawal-queue executions",
+          "entryShareRate is the E27-quantized internalShares * E27 / (postInternalEther - feeEther); the wrapper mint under-approximates the pinned division by at most the quantization remainder and is exact only under divisibility",
+          "Nat subtraction truncates where pinned checked arithmetic would revert",
           "Pack E leftover sharesMinted-as-argument is not this parent and stays a child",
-          "P-ACCOUNT-1 remains order-only; this row does not fold ACCOUNT into supply",
-          "submitReportData split remains out; this row is handleOracleReport with a computed mint, not a modeled submitReportData path"
+          "P-ACCOUNT-1 remains order-only; this row does not fold ACCOUNT into supply"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep P-ACCOUNT-1 order-only; do not treat the Pack E argument-as-mint child as this parent; do not claim a submitReportData split."
+        "work": "Keep P-ACCOUNT-1 order-only; do not treat the Pack E argument-as-mint child as this parent; keep the entry guards the checked hash/sender premises and the E27 quantization disclosed."
       },
-      "next_gate": "Keep P-ACCOUNT-1 order-only; do not treat Pack E argument-as-mint as this parent; do not claim a submitReportData split."
+      "next_gate": "Keep P-ACCOUNT-1 order-only; do not treat Pack E argument-as-mint as this parent; keep the E27 quantization and unmodeled entry checks disclosed."
     },
     {
       "id": "P-ADDRESS-BATCH-1",
