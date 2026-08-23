@@ -1,11 +1,16 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6411cef8a1a9f2025afe5c01ad4c7684e87b44f4
+validated-tree: 2cb663e9985b558b996569cf7ef0b9b2a12efb85
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ADDRESS-BATCH-1 honesty restore before merge (2026-08-23)
+--------------------------------------------------------------
+
+- Rebind `validated-tree` to `2cb663e9985b558b996569cf7ef0b9b2a12efb85` after rebasing unbounded rename onto `origin/main` (`22b74f4`) and restoring the named OPEN: keccak physical slot maps remain OPEN. `PhysicalClaimSlots` is a caller hypothesis; the live loop still reads `mapUint`. The registered YAML theorem stays `p_address_batch_1_unbounded_recipient_rename`.
 
 P-TOPUP-1 hybrid Verity parent unwrapped (2026-08-23)
 ----------------------------------------------------
