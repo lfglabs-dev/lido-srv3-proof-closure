@@ -1,22 +1,24 @@
 import LidoSRv3.Audit.Spec
 
 /-!
-# Wave 2 W2-SCOPE: VaultHub is not a Spec destination
+# VaultHub owner recipients are not Spec destinations
 
-Unregistered child. `ApprovedDestination` has exactly four constructors;
-none is named VaultHub. VaultHub owner withdraw is not a Spec dest.
-This file does not add constructors and does not invent a guarantee ID.
+P-VAULT-ETH-1 widens `ApprovedDestination` to six constructors by adding two
+protocol-return provenance tags. None represents VaultHub / StakingVault
+owner-controlled withdrawal to an arbitrary recipient.
 -/
 
 namespace LidoSRv3.Audit.Spec.VaultHubScopeChild
 
 open LidoSRv3.Audit.Spec
 
-/-- Inductive cases: the four frozen destinations. No VaultHub ctor. -/
+/-- Inductive cases: the four legacy destinations plus two protocol-return
+destinations. There is still no arbitrary owner-recipient constructor. -/
 theorem approved_destination_cases (d : ApprovedDestination) :
     d = .consolidationRequest ∨ d = .refundRecipient ∨
-      d = .beaconDeposit ∨ d = .lidoPull := by
-  cases d <;> trivial
+      d = .beaconDeposit ∨ d = .lidoPull ∨
+      d = .vaultToLido ∨ d = .vaultToWithdrawalQueue := by
+  cases d <;> simp
 
 /-- VaultHub owner withdraw is not a Spec dest. There is no
 `ApprovedDestination.vaulthub` constructor. -/

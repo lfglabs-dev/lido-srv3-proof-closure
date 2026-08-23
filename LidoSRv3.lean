@@ -49,6 +49,11 @@ import LidoSRv3.Tests.PackN1AllocExecMutants
 import LidoSRv3.Audit.Spec.EthJournalConfinement
 import LidoSRv3.Audit.Guarantees.PEthJournal1
 import LidoSRv3.Tests.PackN2EthJournalMutants
+import LidoSRv3.Audit.Source.VaultEthCorrespondence
+import LidoSRv3.Audit.Spec.VaultEthCorrespondence
+import LidoSRv3.Audit.Verity.VaultEthTx
+import LidoSRv3.Audit.Guarantees.PVaultEth1
+import LidoSRv3.Tests.PackP2VaultEthMutants
 import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Guarantees.POracleSupply1
 import LidoSRv3.Tests.PackN3OracleMintMutants

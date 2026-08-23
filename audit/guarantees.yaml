@@ -1047,7 +1047,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PEthJournal1 LidoSRv3.Tests.PackN2EthJournalMutants",
         "expected": "journal_approved_excludes_protocol_return_paths builds; mutant_lido_approved_not_excluded_kill_line maps Lido to lidoPull so approved holds while exclusion fails"
       },
-      "summary": "Supplemental parent: JournalApproved of the source-preserving consolidation candidate implies ProtocolReturnPathsExcluded. Vault\u2192Lido and WithdrawalQueue hops therefore cannot appear in a lossless Spec.EthJournal. This does not claim Lido never drains ETH. Address pins do not close provenance. ApprovedDestination stays four constructors. The three modeled success journals remain approved under the previous composition.",
+      "summary": "Supplemental legacy-projection parent: JournalApproved of the source-preserving consolidation candidate implies ProtocolReturnPathsExcluded because EthJournalCorrespondence.specDest still maps Vault\u2192Lido and WithdrawalQueue to none. The widened Spec interface handles those routes separately in P-VAULT-ETH-1. This theorem does not claim Lido never drains ETH, and address pins do not close provenance.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PEthJournal1.journal_approved_excludes_protocol_return_paths"
@@ -1059,21 +1059,61 @@
       "fidelity": {
         "covered": [
           "JournalApproved of the consolidation candidate implies ProtocolReturnPathsExcluded",
-          "Vault-to-Lido and WithdrawalQueue hops project to none and cannot inhabit a lossless Spec.EthJournal",
-          "three modeled success journals still project onto Spec.EthJournal / ApprovedDestination",
-          "parent-shaped mutant specDest Lido\u2192lidoPull kill-line; fifth-destination kill-line retained"
+          "Vault-to-Lido and WithdrawalQueue hops project to none under the legacy EthJournalCorrespondence.specDest mapping",
+          "three legacy modeled success journals still project onto Spec.EthJournal / ApprovedDestination",
+          "parent-shaped mutant specDest Lido\u2192lidoPull kill-line; residual-other destination kill-line retained"
         ],
         "missing": [
-          "this parent does not claim Lido never drains ETH; Vault-to-Lido and WithdrawalQueue stays remain outside the modeled journals",
-          "not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened; ApprovedDestination stays four constructors",
+          "this parent does not model protocol-return value hops; those are the separate P-VAULT-ETH-1 parent",
+          "not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened",
           "address pins do not close deposit, top-up, or request artifact identity"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Do not claim Lido never drains ETH; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination."
+        "work": "Keep this legacy exclusion projection separate from the value-bearing P-VAULT-ETH-1 protocol-return projection."
       },
-      "next_gate": "Do not claim Lido never drains ETH; do not fold VaultHub or WithdrawalQueue returns into ApprovedDestination."
+      "next_gate": "Keep this legacy exclusion projection separate from P-VAULT-ETH-1; do not claim Lido never drains ETH."
+    },
+    {
+      "id": "P-VAULT-ETH-1",
+      "assumptions": [
+        "A-ABSTRACT-TX",
+        "A-SOURCE-SHAPED",
+        "A-VERITY-SCAFFOLD"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PVaultEth1 LidoSRv3.Tests.PackP2VaultEthMutants",
+        "expected": "protocol_return_value_hops and both constructor inhabitants build; zero_value_frame_kill_line_refutes_parent retains source/executable success but changes the Vault-to-Lido frame from seven wei to zero"
+      },
+      "summary": "P-VAULT-ETH-1: every successful modeled Vault-to-Lido or WithdrawalQueue protocol-return run has a lossless Spec.EthJournal projection, one externalCallBindTo frame whose value equals the Spec leg wei, and continued exclusion of owner-controlled arbitrary recipients. Route constructors, not endpoint address pins, carry provenance. This is not a claim that Lido never drains ETH or a claim about all SRv3 ETH.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops"
+      },
+      "verity": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops"
+      },
+      "fidelity": {
+        "covered": [
+          "new vaultToLido and vaultToWithdrawalQueue ApprovedDestination constructors",
+          "lossless source-journal projection preserves each successful route and exact wei",
+          "both constructors have concrete nonzero externalCallBindTo frame inhabitants",
+          "owner-controlled VaultHub / StakingVault arbitrary-recipient destination maps to none",
+          "parent-shaped zero-value frame kill-line retains source and executable success"
+        ],
+        "missing": [
+          "endpoint addresses are explicit runtime inputs and are not configuration identity evidence",
+          "the WithdrawalQueue protocol-return route is source-shaped rather than an extracted implementation body; no all-SRv3-ETH claim",
+          "callee execution and Lido buffered-ether accounting remain outside the caller-side frame model"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Bind the modeled route tags to extracted implementation bodies and configured endpoints without treating address equality as provenance."
+      },
+      "next_gate": "Add implementation-body and configured-endpoint linkage while preserving the value-bearing frame and owner-recipient exclusion."
     },
     {
       "id": "P-ORACLE-SUPPLY-1",
