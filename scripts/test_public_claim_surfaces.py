@@ -60,7 +60,7 @@ with tempfile.TemporaryDirectory() as tmp:
     original = readme.read_text(encoding="utf-8")
     readme.write_text(
         original.replace(
-            "| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed bounded two-batch executable transaction |",
+            "| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed finite list-batch executable transaction |",
             "| 3 | `P-DEPOSIT-1` | CHECKED | PARTIAL |",
             1,
         ),
