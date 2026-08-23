@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.AddressCorrespondence
+import Compiler.Proofs.MappingSlot
 import Contracts.Common
 
 /-!
@@ -9,12 +10,16 @@ This module models the pinned
 `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
 
 The unstructured-storage constants are the exact keccak positions from
-`WithdrawalQueueBase.sol`. `ContractState.mapUint` is used as Verity's keyed
-mapping abstraction: the two consecutive words of each Solidity mapping value
-are represented by channels at `POSITION` and `POSITION + 1`. This does not
-claim a keccak/machine-storage refinement. Within the second request word, the
-owner, timestamp, claimed byte, and report timestamp use the pinned Solidity
-packing exactly.
+`WithdrawalQueueBase.sol`. `ContractState.mapUint` is the live keyed
+channel: `POSITION` / `POSITION + 1` hold the two consecutive words of
+each mapping value. Those channels inhabit the physical keccak slots
+`mappingSlotLocation POSITION key 0 = keccak256(abi.encode(key, POSITION))`
+and `mappingSlotLocation POSITION key 1` (the next word), not the
+unstructured constant plus a raw channel offset and not a second map at
+`POSITION + 1`. The named correspondence is
+`LidoSRv3.Audit.Spec.AddressClaimKeccakSlots.PhysicalClaimSlots`.
+Within the second request word, the owner, timestamp, claimed byte, and
+report timestamp use the pinned Solidity packing exactly.
 
 The transaction checks the parallel-array lengths, iterates every request,
 reads the current and previous cumulative request words and checkpoint words,
@@ -40,6 +45,24 @@ def lastCheckpointIndexPosition : Nat :=
   0x9d8be19d6a54e40bd767aa61b0f462241f5562ef6967d7045485bccac825b240
 def lockedEtherAmountPosition : Nat :=
   0x0e27eaa2e71c8572ab988fef0b54cd45bbd1740de1e22343fb6cda7536edc12f
+
+/-- Physical keccak slot of `queue[requestId]` word 0:
+`keccak256(abi.encode(requestId, queuePosition))`. -/
+def queueAmountsPhysicalSlot (requestId : Nat) : Nat :=
+  Compiler.Proofs.mappingSlotLocation queuePosition requestId 0
+
+/-- Physical keccak slot of `queue[requestId]` word 1: the next word after
+`keccak256(abi.encode(requestId, queuePosition))`. -/
+def queueMetadataPhysicalSlot (requestId : Nat) : Nat :=
+  Compiler.Proofs.mappingSlotLocation queuePosition requestId 1
+
+/-- Physical keccak slot of `checkpoints[hint]` word 0. -/
+def checkpointFromPhysicalSlot (hint : Nat) : Nat :=
+  Compiler.Proofs.mappingSlotLocation checkpointsPosition hint 0
+
+/-- Physical keccak slot of `checkpoints[hint]` word 1. -/
+def checkpointRatePhysicalSlot (hint : Nat) : Nat :=
+  Compiler.Proofs.mappingSlotLocation checkpointsPosition hint 1
 
 def E27 : Nat := 1000000000000000000000000000
 
