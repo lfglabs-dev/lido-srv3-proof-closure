@@ -241,7 +241,8 @@ theorem unitList_eq_replicate (values : List Unit) :
   | nil => rfl
   | cons value values ih =>
       cases value
-      simp [ih]
+      change () :: values = () :: List.replicate values.length ()
+      rw [ih]
 
 theorem processBatches_loop (inputs : Inputs) (batches : List Batch)
     (acc : List Unit) (state : ContractState)
@@ -276,10 +277,12 @@ theorem pullFromLido_apply (inputs : Inputs) (total : Word) (state : ContractSta
     pullFromLido inputs total state = .success () (afterPull inputs total state) := by
   have hOld := DepositParentTx.pullFromLido_apply (pullLegacyInputs inputs total) state
     hCall (by simpa [pullLegacyInputs, legacyInputs, DepositParentTx.totalAmount,
-      zeroBatch, _root_.Verity.Core.Uint256.add_zero] using hFunded)
+      zeroBatch, lidoDepositableSlot,
+      _root_.Verity.Core.Uint256.add_zero] using hFunded)
   simpa [pullFromLido, pullLegacyInputs, legacyInputs, DepositParentTx.pullFromLido,
     DepositParentTx.totalAmount, DepositParentTx.afterPull, DepositParentTx.pullEntry,
-    zeroBatch, afterPull, afterCall, _root_.Verity.Core.Uint256.add_zero,
+    zeroBatch, afterPull, afterCall, lidoDepositableSlot,
+    _root_.Verity.Core.Uint256.add_zero,
     _root_.Verity.Core.Uint256.add_comm] using hOld
 
 theorem pushBatch_apply (inputs : Inputs) (batch : Batch) (state : ContractState)
@@ -432,7 +435,8 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
       state.readSlot lidoDepositableSlot := by
     rw [show processed = afterBatches inputs inputs.batches entry from rfl,
       readSlot_afterBatches]
-    exact ContractState.readSlot_writeSlot_other _ (by decide)
+    simp [entry, counterSlot, lidoDepositableSlot,
+      ContractState.readSlot_writeSlot_other]
   have hFunded : wordTotal inputs.batches ≤ processed.readSlot lidoDepositableSlot := by
     rw [hLido]
     exact h.funded
@@ -539,7 +543,7 @@ theorem wrapping_fold_reverts_without_journal (inputs : Inputs) (state : Contrac
     decide_eq_false (Nat.not_lt.mpr hWrap)
   have hRaw : execute inputs state = .revert "BATCH_TOTAL_OVERFLOW" state := by
     simp only [execute, Bind.bind, _root_.Verity.bind, _root_.Verity.require,
-      hAuthorized, hActive, hAllocation, hGuard, if_true, if_false]
+      hAuthorized, hActive, hAllocation, hGuard, Bool.false_eq_true, if_true, if_false]
   simp [Contract.run, hRaw, observe]
 
 def ofTwoBatches (inputs : DepositParentTx.Inputs) : Inputs :=
