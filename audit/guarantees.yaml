@@ -1008,12 +1008,12 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAllocExec1 LidoSRv3.Tests.PackN1AllocExecMutants",
-        "expected": "allocated_amount_times_deposit_size builds; raw_count_as_wei_kill_line and skewed_wei_falsifies_bridge refute the unit multiply; A-DEPOSIT-32-ETHER stays OPEN"
+        "expected": "router_produces_executes_allocation builds; raw_count_router_kill_line_refutes_parent keeps word bounds and drops the unit multiply; A-DEPOSIT-32-ETHER stays OPEN"
       },
-      "summary": "Supplemental composition parent: executed deposit wei equals Spec.Allocation.amount times the configured depositSize. Under ExecutesAllocation (key counts plus the unit multiply) the LinksSource firstAmount/secondAmount conjuncts, totalAmount, pushedValue, and committed pull/push become theorems. ALLOC parents still do not imply LinksSource without that multiply. depositSize is the configuration field; A-DEPOSIT-32-ETHER stays OPEN.",
+      "summary": "Supplemental parent: the pinned two-batch deposit path routerDepositInputs yields the two legs whose keys are the allocation amounts and whose wei equal Allocation.amount * depositSize, so ExecutesAllocation and LinksSource are theorems of the router, not caller hypotheses. Alloc-exec multiply-only remains a lemma. depositSize is the configuration field; A-DEPOSIT-32-ETHER stays OPEN. This is not an n-frame lift.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PAllocExec1.allocated_amount_times_deposit_size"
+        "theorem": "LidoSRv3.Audit.Guarantees.PAllocExec1.router_produces_executes_allocation"
       },
       "verity": {
         "status": "PARTIAL",
@@ -1021,20 +1021,19 @@
       },
       "fidelity": {
         "covered": [
-          "executed batch wei = allocation amount * cfg.depositSize on both source and executable input planes",
-          "LinksSource firstAmount/secondAmount derived from ExecutesAllocation plus the key-count partition",
-          "parent-shaped raw-count-as-wei kill-line at the canonical 5-key / 160-wei witness; 2-key / 65-wei skew falsifies the bridge"
+          "routerDepositInputs produces ExecutesAllocation: keys = allocation amounts, wei = amount * depositSize",
+          "LinksSource is a theorem of that two-batch router construction, not a caller hyp",
+          "parent-shaped raw-count router kill-line; multiply-only raw-count kill-line retained; 2-key / 65-wei skew still falsifies a free bridge"
         ],
         "missing": [
           "A-DEPOSIT-32-ETHER remains OPEN: depositSize is the configuration field, not a claimed 32-ether artifact identity",
-          "ExecutesAllocation is a caller-side bridge about how allocation amounts became batch wei; the pinned deposit path is not proved to produce those two legs",
-          "ALLOC parents still do not imply LinksSource without the unit multiply",
-          "no dedicated Contract.run composition on this row beyond the existing P-DEPOSIT-1 transaction plane"
+          "the executable transaction stays exactly two batches; this parent is not an n-frame lift",
+          "ALLOC parents still do not imply LinksSource without the unit multiply"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep A-DEPOSIT-32-ETHER and the ALLOC \u219b LinksSource separation named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT."
+        "work": "Keep A-DEPOSIT-32-ETHER named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT."
       },
       "next_gate": "Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply."
     },

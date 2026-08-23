@@ -100,4 +100,60 @@ theorem skewed_wei_falsifies_bridge :
   intro hBridge
   exact absurd hBridge.firstWei (by decide)
 
+/-- Mutant router: batch wei is the raw validator count, not
+`amount * depositSize`. -/
+def mutantRouterDepositInputs (cfg : SourceDepositConfig) (template : Inputs)
+    (first second : Allocation) : Inputs :=
+  { template with
+    depositSize := .ofNat cfg.depositSize
+    first := { template.first with
+      keys := .ofNat first.amount.value
+      amount := .ofNat first.amount.value }
+    second := { template.second with
+      keys := .ofNat second.amount.value
+      amount := .ofNat second.amount.value } }
+
+theorem canonical_router_word_bounds :
+    RouterWordBounds PDeposit1.canonicalSourceConfig
+      canonicalFirstAllocation canonicalSecondAllocation := by
+  constructor <;> decide
+
+/-- Parent-shaped kill-line: same word bounds and key-count partition, but
+the raw-count mutant does not produce `ExecutesAllocation`. -/
+theorem raw_count_router_kill_line_refutes_parent :
+    RouterWordBounds PDeposit1.canonicalSourceConfig
+        canonicalFirstAllocation canonicalSecondAllocation ∧
+      canonicalFirstAllocation.amount.value +
+          canonicalSecondAllocation.amount.value =
+        actualDepositsCount PDeposit1.canonicalSourceConfig
+          PDeposit1.canonicalSourceInput ∧
+      ¬ ExecutesAllocation
+          (mutantRouterDepositInputs PDeposit1.canonicalSourceConfig
+            canonicalInputs canonicalFirstAllocation
+            canonicalSecondAllocation)
+          canonicalFirstAllocation canonicalSecondAllocation := by
+  refine ⟨canonical_router_word_bounds, by decide, ?_⟩
+  intro hBridge
+  exact absurd hBridge.firstWei (by decide)
+
+/-- Positive control: the honest router on the canonical allocations
+satisfies the registered parent. -/
+theorem honest_router_parent_holds :
+    ExecutesAllocation
+        (routerDepositInputs PDeposit1.canonicalSourceConfig
+          canonicalInputs canonicalFirstAllocation
+          canonicalSecondAllocation)
+        canonicalFirstAllocation canonicalSecondAllocation ∧
+      PDeposit1.LinksSource PDeposit1.canonicalSourceConfig
+        PDeposit1.canonicalSourceInput
+        (routerDepositInputs PDeposit1.canonicalSourceConfig
+          canonicalInputs canonicalFirstAllocation
+          canonicalSecondAllocation) :=
+  let h :=
+    router_produces_executes_allocation
+      PDeposit1.canonicalSourceConfig PDeposit1.canonicalSourceInput
+      canonicalInputs canonicalFirstAllocation canonicalSecondAllocation
+      canonical_router_word_bounds (by decide)
+  ⟨h.1, h.2.1⟩
+
 end LidoSRv3.Tests.PackN1AllocExecMutants
