@@ -1,11 +1,42 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 4bff370c595cb6d694711530456dcd82caecddea
+validated-tree: 42da4299208a5e39008bf4510375f4f9a86a0c2e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-CONSOLIDATION-1 entry-credit overflow guard, Codex P1 r3839226133 (2026-08-23)
+------------------------------------------------------------------------
+
+- Rebind `validated-tree` to `42da4299208a5e39008bf4510375f4f9a86a0c2e` after
+  rejecting a Uint256-wrapping CALL entry credit: `addRequests` now reverts
+  ENTRY_CREDIT_OVERFLOW at the frame-entry payable credit (before decode)
+  whenever `selfBalance + msg.value` would wrap, restoring the pre-call
+  snapshot (`entry_credit_overflow_reverts`); `verity_tx_simulates_pinned_source`
+  and the registered wrapper `verity_tx_simulates_consolidation` gain the
+  matching entry no-wrap funding premise; focused executable regressions in
+  Tests/ConsolidationTxMutants reject at `2^256-2` and `2^256-3` and commit
+  the largest admissible credit `2^256-4 + 3 = MAX_UINT256`. Proof report
+  refreshed from the verified build over the committed tree. Canonical
+  digest re-derived in scripts/audit_metadata.py.
+
+
+P-CONSOLIDATION-1 value-bearing CALL / preservesEthBalance lift before merge (2026-08-23)
+----------------------------------------------------------------------------------------
+
+- Rebind `validated-tree` to `6ff5ac64b0ab1ddfa0364c86d7c580ac048711d6` after lifting value-bearing CALLs onto the
+  executed Verity TX model: frame-entry payable credit (`credited`), per-CALL
+  debits (`forwardCalls`), `committed_preserves_eth_balance` (vault-side
+  `preservesEthBalance`, the pinned modifier's assert) and
+  `committed_journal_forwards_msg_value` (exact `msg.value` forwarding onto the
+  CALL journal), with model-mutant kill-lines (value-blind debit, double debit,
+  journal-value-blind). The former string gap `preservesEthBalance_gap` is
+  retired; remaining fidelity boundary: predeploy counterparty credit (multi-
+  contract side, P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1) and 96-byte
+  packed pubkey calldata. Canonical digest re-derived in scripts/audit_metadata.py.
+
 
 Product-facts campaign close (2026-08-23)
 -----------------------------------------

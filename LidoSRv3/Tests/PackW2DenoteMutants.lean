@@ -39,7 +39,8 @@ example := @official_raw_call_still_reverts
 /-- Link-time resolve is not execution. -/
 example := @functionEnv_resolves_predeploy
 
-/-- The named ETH-balance gap stays the documented nonempty string. -/
-example := @preservesEthBalance_gap_remains
+/-- The former string gap is retired by the value-bearing CALL lift; the
+registered parent now proves the forwarding invariant it used to name. -/
+example := @LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_preserves_eth_balance
 
 end LidoSRv3.Tests.PackW2DenoteMutants
