@@ -61,7 +61,8 @@ theorem router_exactKeys (cfg : SourceDepositConfig)
     exactKeys (routerDepositInputs cfg inputTemplate batchTemplate allocations).batches =
       (allocations.map fun allocation => allocation.amount.value).sum := by
   simp only [routerDepositInputs, exactKeys, List.map_map]
-  apply List.sum_congr rfl
+  apply congrArg List.sum
+  apply List.map_congr_left
   intro allocation hAllocation
   simp [routerBatch, ofNat_val_of_lt (h.keys allocation hAllocation)]
 
@@ -71,7 +72,8 @@ theorem router_exactTotal (cfg : SourceDepositConfig)
     exactTotal (routerDepositInputs cfg inputTemplate batchTemplate allocations).batches =
       (allocations.map fun allocation => allocationWei allocation cfg.depositSize).sum := by
   simp only [routerDepositInputs, exactTotal, List.map_map]
-  apply List.sum_congr rfl
+  apply congrArg List.sum
+  apply List.map_congr_left
   intro allocation hAllocation
   simp [routerBatch, ofNat_val_of_lt (h.wei allocation hAllocation)]
 
@@ -82,7 +84,7 @@ theorem router_links_source
     (allocations : List Allocation) (hBounds : RouterWordBounds cfg allocations)
     (hCount : (allocations.map fun allocation => allocation.amount.value).sum =
       actualDepositsCount cfg inp) :
-    PDeposit1.NFrame.LinksSource cfg inp
+    LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.LinksSource cfg inp
       (routerDepositInputs cfg inputTemplate batchTemplate allocations) where
   depositSize := by
     change (Uint256.ofNat cfg.depositSize).val = cfg.depositSize

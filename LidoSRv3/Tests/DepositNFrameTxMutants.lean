@@ -104,6 +104,8 @@ theorem wrapping_witness_moves_no_journal :
       exactTotal wrappingInputs.batches := by
     simp [wrappingInputs, wrappingBatch, exactTotal,
       _root_.Verity.Core.Uint256.val_ofNat]
+    have hPositive : 1 ≤ _root_.Verity.Core.Uint256.modulus := by decide
+    omega
   obtain ⟨hRun, hObs⟩ := wrapping_fold_reverts_without_journal
     wrappingInputs threeBatchState rfl rfl rfl hWrap
   exact ⟨hRun, congrArg Observables.journal hObs⟩
