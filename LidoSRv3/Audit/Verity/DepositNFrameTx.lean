@@ -242,7 +242,8 @@ theorem unitList_eq_replicate (values : List Unit) :
   | cons value values ih =>
       cases value
       conv_lhs => rw [ih]
-      simp
+      rw [show values.length + 1 = Nat.succ values.length by omega,
+        List.replicate_succ]
 
 theorem processBatches_loop (inputs : Inputs) (batches : List Batch)
     (acc : List Unit) (state : ContractState)
@@ -437,8 +438,8 @@ theorem execute_apply (inputs : Inputs) (state : ContractState)
       state.readSlot lidoDepositableSlot := by
     rw [show processed = afterBatches inputs inputs.batches entry from rfl,
       readSlot_afterBatches]
-    exact ContractState.readSlot_writeSlot_other state
-      (slot := counterSlot) (slot' := lidoDepositableSlot) (by decide)
+    have hne : lidoDepositableSlot ≠ counterSlot := by decide
+    simpa [entry] using ContractState.readSlot_writeSlot_other state hne
       (state.readSlot counterSlot + 1)
   have hFunded : wordTotal inputs.batches ≤ processed.readSlot lidoDepositableSlot := by
     rw [hLido]
