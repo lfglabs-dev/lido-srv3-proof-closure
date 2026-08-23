@@ -28,6 +28,8 @@ import LidoSRv3.Tests.SszEncodingTxMutants
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Tests.TopupTxMutants
+import LidoSRv3.Audit.Verity.TopupHybrid
+import LidoSRv3.Tests.TopupHybridMutants
 import LidoSRv3.Audit.Guarantees.PTopup2
 import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
@@ -408,6 +410,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_reverts_and_restores
 #print axioms
   LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
+#print axioms LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source
+#print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_nonzero_wrap
+#print axioms LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_wrap_to_zero
 #print axioms LidoSRv3.Tests.TopupTxMutants.mutant_none_reproduces_execute
 #print axioms LidoSRv3.Tests.TopupTxMutants.honest_run_matches_source
 #print axioms LidoSRv3.Tests.TopupTxMutants.skipped_allocation_write_rejected
