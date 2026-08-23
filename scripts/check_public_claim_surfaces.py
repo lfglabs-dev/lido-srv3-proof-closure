@@ -37,27 +37,36 @@ CLAIMS = {
         # are part of the public surface.
         # `linked_deployment_push_is_word_bounded`,
         # `linked_conserving_deployment_pull_is_word_bounded`,
-        # `skewedPullConfig`, `linked_hypotheses_do_not_bound_the_source_pull`,
+        # `skewedPullConfig`, `linked_hypotheses_do_not_bound_the_line_972_product`,
         # `oversizedSourceInput`, `oversized_input_is_outside_the_source_domain`,
-        # `oversized_deployment_exceeds_word`,
+        # `oversized_input_exceeds_word`,
         # `oversized_run_commits` and
-        # `abstract_parent_covers_deployments_the_verity_plane_omits` state the
+        # `abstract_parent_covers_inputs_the_verity_plane_omits` state the
         # executable plane's finiteness, the separation between the bounded
-        # executable push and the unbounded source pull, the `uint256`
+        # executable push and the unbounded line-972 product, the `uint256`
         # source-domain honesty of both kill-lines (the skewed immutable is
         # encodable and checked so; the oversized input is deliberately outside
         # the domain and checked so), and the abstract-model input the abstract
         # parent commits without either, so they are public too: a
         # reader must not be able to quote the CHECKED Verity row without them.
         # `skewed_pull_witness_turned_away_before_line_972`,
-        # `line_972_product_le_module_allocation` and
-        # `encodable_allocation_bounds_line_972_product` pin the guard-order
-        # correction of the pull kill-line's on-chain reading: the skewed
-        # deployment turns away at the line-959 `ZeroDeposits` guard before the
-        # line-972 multiplication, and an encodable module allocation bounds
-        # that product inside one word, so the word-exceeding pull quantity is
-        # an unbounded-`Nat` formula value, never a reached on-chain
-        # multiplication.
+        # `line_972_product_le_module_allocation`,
+        # `encodable_allocation_bounds_line_972_product` and
+        # `in_range_commit_is_word_bounded` pin the guard-order correction of
+        # the pull kill-line's on-chain reading: the skewed deployment turns
+        # away at the line-959 `ZeroDeposits` guard before the line-972
+        # multiplication, an encodable module allocation bounds that product
+        # inside one word, and an in-range input cannot commit a word-exceeding
+        # push at all, so the word-exceeding pull quantity is an unbounded-`Nat`
+        # formula value, never a reached on-chain multiplication, and the
+        # oversized exhibit has no in-range substitute.
+        # `manyKeySourceInput`, `manyKey_input_is_within_the_source_domain`,
+        # `manyKey_run_commits`, `nLinks` and `manyKey_links_source_two_legs`
+        # are the n-frame gap's own in-range witness (nine encodable keys, the
+        # model committing nine per-key frames of 288 wei total, `LinksSource`
+        # still splitting the keys 4 + 5 across the two aggregate legs), kept
+        # separate from the oversized exhibit so the quantified-domain gap and
+        # the missing n-frame executable model are never conflated.
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalDepositContractAddress"),
@@ -79,15 +88,21 @@ CLAIMS = {
             ("theorem", "canonical_links_source"),
             ("theorem", "canonical_composition_witness"),
             ("def", "skewedPullConfig"),
-            ("theorem", "linked_hypotheses_do_not_bound_the_source_pull"),
+            ("theorem", "linked_hypotheses_do_not_bound_the_line_972_product"),
             ("theorem", "skewed_pull_witness_turned_away_before_line_972"),
             ("theorem", "line_972_product_le_module_allocation"),
             ("theorem", "encodable_allocation_bounds_line_972_product"),
+            ("theorem", "in_range_commit_is_word_bounded"),
             ("def", "oversizedSourceInput"),
             ("theorem", "oversized_input_is_outside_the_source_domain"),
-            ("theorem", "oversized_deployment_exceeds_word"),
+            ("theorem", "oversized_input_exceeds_word"),
             ("theorem", "oversized_run_commits"),
-            ("theorem", "abstract_parent_covers_deployments_the_verity_plane_omits"),
+            ("theorem", "abstract_parent_covers_inputs_the_verity_plane_omits"),
+            ("def", "manyKeySourceInput"),
+            ("theorem", "manyKey_input_is_within_the_source_domain"),
+            ("theorem", "manyKey_run_commits"),
+            ("def", "nLinks"),
+            ("theorem", "manyKey_links_source_two_legs"),
         ),
     },
     "P-TOPUP-1": {
