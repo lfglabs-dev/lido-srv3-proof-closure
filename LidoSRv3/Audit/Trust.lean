@@ -201,7 +201,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.DerefSupplementalChild.deref_closure_exists_shape
 #print axioms LidoSRv3.Tests.PackW2ScopeMutants.approved_destination_has_no_fifth_ctor
 #print axioms LidoSRv3.Tests.PackW2ScopeMutants.packed_config_clobber_kill_line_refutes_parent
+#print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.router_produces_executes_allocation
 #print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.allocated_amount_times_deposit_size
+#print axioms LidoSRv3.Tests.PackN1AllocExecMutants.raw_count_router_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN1AllocExecMutants.raw_count_as_wei_kill_line
 #print axioms LidoSRv3.Audit.Guarantees.PEthJournal1.every_modeled_success_journal_approved
 #print axioms LidoSRv3.Tests.PackN2EthJournalMutants.fifth_destination_kill_line_retains_success_premises

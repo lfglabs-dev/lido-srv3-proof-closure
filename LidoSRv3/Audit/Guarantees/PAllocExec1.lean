@@ -15,16 +15,13 @@ where `depositSize` is the existing configuration field
 32-ether deployment fact -- `A-DEPOSIT-32-ETHER` stays OPEN, and no pin is
 invented to discharge it.
 
-The bridge replaces the `firstAmount`/`secondAmount` conjuncts of
-`PDeposit1.LinksSource`: under `ExecutesAllocation` (allocation amounts are
-the batch key counts, batch wei is the allocation amount times the per-key
-deposit size) plus the already-proved key-count partition, both wei
-conjuncts -- and hence all of `LinksSource` -- become theorems rather than
-independent caller hypotheses.  The already-proved ALLOC ↛ `LinksSource`
-separation is untouched: validator counts alone still do not determine wei;
-the unit multiply carried by `ExecutesAllocation` is exactly what was
-missing, and it is falsifiable
-(`LidoSRv3.Tests.PackN1AllocExecMutants.skewed_wei_falsifies_bridge`).
+The registered parent is now the two-batch router construction
+`routerDepositInputs`: it produces the two legs whose keys are the
+allocation amounts and whose wei is `amount * depositSize`, so
+`ExecutesAllocation` and `LinksSource` are theorems of the router, not
+caller hypotheses.  The multiply-only composition
+`allocated_amount_times_deposit_size` stays as a lemma.
+`A-DEPOSIT-32-ETHER` stays OPEN.  This is not an n-frame lift.
 
 Registered as supplemental `P-ALLOC-EXEC-1`; not in the immutable
 minimal-11 facade.
@@ -121,6 +118,36 @@ theorem allocated_amount_times_deposit_size
     exact (hMoved.trans hPushedVal).trans hPushed
   · rw [hCommit]
     exact hPushedVal.trans hPushed
+
+/-- PARENT. The pinned two-batch deposit path
+`routerDepositInputs` yields the two legs whose wei equal
+`Allocation.amount * depositSize`. `ExecutesAllocation` and
+`LinksSource` are theorems of that construction, not caller
+hypotheses. `A-DEPOSIT-32-ETHER` stays named. -/
+theorem router_produces_executes_allocation
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (template : Inputs) (first second : Spec.Allocation)
+    (hBounds : RouterWordBounds cfg first second)
+    (hKeys : first.amount.value + second.amount.value =
+      actualDepositsCount cfg inp) :
+    let inputs := routerDepositInputs cfg template first second
+    ExecutesAllocation inputs first second ∧
+      PDeposit1.LinksSource cfg inp inputs ∧
+      (inputs.first.amount.val = first.amount.value * cfg.depositSize ∧
+        inputs.second.amount.val = second.amount.value * cfg.depositSize) ∧
+      (totalAmount inputs).val
+        = (first.amount.value + second.amount.value) * cfg.depositSize ∧
+      pushedValue cfg inp
+        = (first.amount.value + second.amount.value) * cfg.depositSize := by
+  intro inputs
+  have hBridge := router_executes_allocation cfg template first second hBounds
+  have hSize := router_depositSize cfg template first second hBounds
+  have hPart := router_keys cfg inp template first second hBounds hKeys
+  have hNoWrap := router_noWrap cfg template first second hBounds
+  obtain ⟨hWei, hTotal, hPushed, hLink, _⟩ :=
+    allocated_amount_times_deposit_size cfg inp inputs first second
+      hBridge hSize hPart hNoWrap
+  exact ⟨hBridge, hLink, hWei, hTotal, hPushed⟩
 
 /-! ## Non-vacuity
 
