@@ -309,6 +309,12 @@ assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PDeposit1.linked_conserving_deployment_pull_is_word_bounded
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.linked_hypotheses_do_not_bound_the_source_pull
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.skewed_pull_witness_turned_away_before_line_972
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.line_972_product_le_module_allocation
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.encodable_allocation_bounds_line_972_product
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.oversized_run_commits
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_is_outside_the_source_domain

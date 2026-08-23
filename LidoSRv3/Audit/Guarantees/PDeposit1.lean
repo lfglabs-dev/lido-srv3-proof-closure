@@ -226,8 +226,11 @@ and neither `LinksSource` nor `Preconditions` relates `cfg.maxEBType1` to
 `cfg.depositSize`.  So a deployment admitted by these hypotheses may compute a
 pull quantity far above one word while this theorem still holds:
 `linked_hypotheses_do_not_bound_the_source_pull` exhibits one (with a
-`uint256`-encodable immutable, so the word is left at the line-972 *product*
-exactly where Solidity 0.8 checked arithmetic panics), and
+`uint256`-encodable immutable, so what exceeds the word is only the line-972
+*product* read as an unbounded-`Nat` formula: the deployment itself never
+evaluates that multiplication, because its zero `maxDepositsCount` turns the
+pinned path away at the earlier line-959 guard, checked by
+`skewed_pull_witness_turned_away_before_line_972`), and
 `linked_conserving_deployment_pull_is_word_bounded` is the extra hypothesis under
 which the pull is bounded too.  Nothing here may be quoted as "every admitted
 deployment's whole pull fits one word".
@@ -484,15 +487,22 @@ conjunct checks it -- and yet the line-972 product
 `depositsValue = 5 * (2 ^ 256 - 1) = 5 * 2 ^ 256 - 5` is at or above
 `Uint256.modulus`.
 
-Stated honestly and not further: no deployment settles this pull.  On chain,
-Solidity 0.8 checked arithmetic panics at the line-972 multiplication itself
-(`Panic(0x11)`) before the line-983 withdrawal and before the line-996 `assert`
--- an `actualDepositsCount * maxEBType1` at or above `2 ^ 256` cannot be written
-to one word, so no deployment both encodes this immutable and executes the
-withdrawal.  Even inside the unbounded `Nat` model, where the product does
-compute, this deployment is non-conserving, so
-`source_nonconserving_deployment_reverts` applies and the model's path aborts at
-the line-996 `assert`.  The claim here is about the *hypotheses* and the
+Stated honestly and not further: this deployment never even reaches the
+line-972 multiplication, let alone settles the pull.  Its module allocation is
+the canonical 256 wei, so the computed cap is
+`maxDepositsCount = min 8 (256 / (2 ^ 256 - 1)) = 0`, and the pinned path turns
+away at the earlier line-959 `ZeroDeposits` guard, on chain and inside the
+model alike: `skewed_pull_witness_turned_away_before_line_972` below checks that
+`run` returns `revertZeroDeposits`, so no wei moves and no later guard -- line
+972, line 983, line 996 -- is ever evaluated.  That guard structure is not
+accidental: whenever the over-target guard at line 969 passes, the product is
+bounded by the module allocation itself (`line_972_product_le_module_allocation`),
+so a `uint256`-encodable allocation keeps the line-972 product inside one word
+(`encodable_allocation_bounds_line_972_product`).  A Solidity 0.8
+checked-arithmetic panic at line 972 is therefore unreachable from the
+encodable domain, and the word-exceeding quantity this witness exhibits exists
+only as the unbounded-`Nat` formula that `LinksSource` together with
+`Preconditions` fails to bound.  The claim here is about the *hypotheses* and the
 abstraction's arithmetic, not about a settled transfer: `LinksSource` together
 with `Preconditions` admits configurations whose line-972 pull quantity exceeds
 a word, so neither `linked_deployment_push_is_word_bounded` nor conjunct (d) of
@@ -518,6 +528,68 @@ theorem linked_hypotheses_do_not_bound_the_source_pull :
     decide
   · show _root_.Verity.Core.Uint256.modulus ≤ 240 / 48 * (2 ^ 256 - 1)
     decide
+
+/-! ## The guards the kill-line's deployment never passes
+
+The kill-line above is a statement about an unbounded-`Nat` formula, and an
+earlier revision of its prose over-claimed the on-chain reading: it asserted
+that an admitted source execution "panics at the line-972 multiplication".
+That is false, and it is now pinned shut twice.  The first theorem below is
+the executable regression: the skewed witness's computed cap is zero, so `run`
+turns away at the line-959 guard and never reaches line 972 at all.  The two
+after it are the general reason no sound witness of this shape can ever reach
+an overflowing line-972 product: the over-target guard at line 969 bounds the
+product by the module allocation, so an encodable allocation keeps it inside
+one word.  -/
+
+/-- The executable regression for the corrected claim: the skewed witness never
+reaches the line-972 multiplication.  `canonicalSourceInput`'s module
+allocation is 256 wei, so with `skewedPullConfig.maxEBType1 = 2 ^ 256 - 1` the
+computed cap is `maxDepositsCount = min 8 (256 / (2 ^ 256 - 1)) = 0`, and the
+pinned path's first-guard-wins `run` returns `revertZeroDeposits` at the
+line-959 guard (`StakingRouter.sol`), exactly as on chain.  The earlier
+revision's on-chain story -- an admitted source execution panicking at the
+line-972 checked multiplication -- is refuted by guard order on the exact
+witness the kill-line quotes, by kernel evaluation. -/
+theorem skewed_pull_witness_turned_away_before_line_972 :
+    maxDepositsCount skewedPullConfig canonicalSourceInput = 0 ∧
+      run skewedPullConfig canonicalSourceInput = .revertZeroDeposits := by
+  refine ⟨?_, ?_⟩
+  · show min 8 (256 / (2 ^ 256 - 1)) = 0
+    decide
+  · decide
+
+/-- Why the over-claimed line-972 panic cannot be reinstated with a different
+witness: whenever the pinned path passes its over-target guard at line 969
+(`actualDepositsCount ≤ maxDepositsCount`, `StakingRouter.sol`), the line-972
+product `actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01` is at most the
+module allocation, because `maxDepositsCount` is capped by
+`moduleDepositableEth / maxEBType1` and the truncated division satisfies
+`(a / b) * b ≤ a`. -/
+theorem line_972_product_le_module_allocation
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (hCap : actualDepositsCount cfg inp ≤ maxDepositsCount cfg inp) :
+    depositsValue cfg inp ≤ inp.moduleDepositableEth := by
+  have hDiv : actualDepositsCount cfg inp
+      ≤ inp.moduleDepositableEth / cfg.maxEBType1 :=
+    hCap.trans (Nat.min_le_right _ _)
+  have hMul : actualDepositsCount cfg inp * cfg.maxEBType1
+      ≤ (inp.moduleDepositableEth / cfg.maxEBType1) * cfg.maxEBType1 :=
+    Nat.mul_le_mul hDiv (Nat.le_refl _)
+  exact hMul.trans (Nat.div_mul_le_self _ _)
+
+/-- The `uint256` reading of the same bound: a module allocation one word can
+encode keeps the line-972 product inside that word, so Solidity 0.8 checked
+arithmetic cannot panic at line 972 for an encodable input.  A word-exceeding
+line-972 quantity needs a non-encodable allocation, which is the oversized
+witness's territory (`oversized_input_is_outside_the_source_domain`), not a
+deployment. -/
+theorem encodable_allocation_bounds_line_972_product
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (hCap : actualDepositsCount cfg inp ≤ maxDepositsCount cfg inp)
+    (hAlloc : inp.moduleDepositableEth < _root_.Verity.Core.Uint256.modulus) :
+    depositsValue cfg inp < _root_.Verity.Core.Uint256.modulus :=
+  Nat.lt_of_le_of_lt (line_972_product_le_module_allocation cfg inp hCap) hAlloc
 
 /-! ## The quantifier gap between the two planes
 
@@ -608,11 +680,13 @@ conservation implication has an actual outcome to fire on.
 
 Scope, stated rather than hidden: this is a theorem about the unbounded `Nat`
 model's `run`, not about the pinned Solidity source.  The input is outside the
-`uint256` source domain (`oversized_input_is_outside_the_source_domain`), and on
-chain Solidity 0.8 checked arithmetic would panic at the line-972 product
-`actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = 2 ^ 261` before any
-withdrawal or per-key frame, so no realizable deployment executes what the model
-commits here.
+`uint256` source domain (`oversized_input_is_outside_the_source_domain`), so no
+realizable deployment can even encode the call; and inside the domain there is
+no fallback route to this commit either, because a `uint256`-encodable module
+allocation keeps the line-972 product inside one word
+(`encodable_allocation_bounds_line_972_product`), so Solidity 0.8 checked
+arithmetic never panics at line 972 from an encodable input.  No realizable
+deployment executes what the model commits here.
 -/
 theorem oversized_run_commits :
     run canonicalSourceConfig oversizedSourceInput
@@ -661,9 +735,9 @@ reading of the abstract parent either: the abstract parent is *proved* for
 inputs no executable transaction can represent.  Stated strictly, it is a
 quantifier gap of the abstract `Nat` model, not a pinned-source deployment
 claim: `oversizedSourceInput` is outside the `uint256` source domain
-(`oversized_input_is_outside_the_source_domain`), and no realizable Solidity
-deployment settles a `2 ^ 256 * DEPOSIT_SIZE` wei push -- Solidity 0.8 checked
-arithmetic panics at the line-972 product first.  Closing the model-level gap
+(`oversized_input_is_outside_the_source_domain`), so no realizable Solidity
+deployment encodes the call, let alone settles a `2 ^ 256 * DEPOSIT_SIZE` wei
+push.  Closing the model-level gap
 still needs an `n`-frame executable transaction, not a metadata change.
 
 What this witness does not claim: the deployment is conserving, so the abstract

@@ -49,6 +49,15 @@ CLAIMS = {
         # the domain and checked so), and the abstract-model input the abstract
         # parent commits without either, so they are public too: a
         # reader must not be able to quote the CHECKED Verity row without them.
+        # `skewed_pull_witness_turned_away_before_line_972`,
+        # `line_972_product_le_module_allocation` and
+        # `encodable_allocation_bounds_line_972_product` pin the guard-order
+        # correction of the pull kill-line's on-chain reading: the skewed
+        # deployment turns away at the line-959 `ZeroDeposits` guard before the
+        # line-972 multiplication, and an encodable module allocation bounds
+        # that product inside one word, so the word-exceeding pull quantity is
+        # an unbounded-`Nat` formula value, never a reached on-chain
+        # multiplication.
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalDepositContractAddress"),
@@ -71,6 +80,9 @@ CLAIMS = {
             ("theorem", "canonical_composition_witness"),
             ("def", "skewedPullConfig"),
             ("theorem", "linked_hypotheses_do_not_bound_the_source_pull"),
+            ("theorem", "skewed_pull_witness_turned_away_before_line_972"),
+            ("theorem", "line_972_product_le_module_allocation"),
+            ("theorem", "encodable_allocation_bounds_line_972_product"),
             ("def", "oversizedSourceInput"),
             ("theorem", "oversized_input_is_outside_the_source_domain"),
             ("theorem", "oversized_deployment_exceeds_word"),
