@@ -1,11 +1,26 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 4bff370c595cb6d694711530456dcd82caecddea
+validated-tree: 6ff5ac64b0ab1ddfa0364c86d7c580ac048711d6
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-CONSOLIDATION-1 value-bearing CALL / preservesEthBalance lift before merge (2026-08-23)
+----------------------------------------------------------------------------------------
+
+- Rebind `validated-tree` to `6ff5ac64b0ab1ddfa0364c86d7c580ac048711d6` after lifting value-bearing CALLs onto the
+  executed Verity TX model: frame-entry payable credit (`credited`), per-CALL
+  debits (`forwardCalls`), `committed_preserves_eth_balance` (vault-side
+  `preservesEthBalance`, the pinned modifier's assert) and
+  `committed_journal_forwards_msg_value` (exact `msg.value` forwarding onto the
+  CALL journal), with model-mutant kill-lines (value-blind debit, double debit,
+  journal-value-blind). The former string gap `preservesEthBalance_gap` is
+  retired; remaining fidelity boundary: predeploy counterparty credit (multi-
+  contract side, P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1) and 96-byte
+  packed pubkey calldata. Canonical digest re-derived in scripts/audit_metadata.py.
+
 
 Product-facts campaign close (2026-08-23)
 -----------------------------------------
