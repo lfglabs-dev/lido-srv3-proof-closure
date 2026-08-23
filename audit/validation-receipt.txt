@@ -1,11 +1,21 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 5268e1b6931aaf2933b54eca546ba3bb14374e51
+validated-tree: 42c89a629e9c84e12f8940d048985258b2857070
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 n-frame product (2026-08-23)
+---------------------------------------
+
+- Rebind `validated-tree` to `42c89a629e9c84e12f8940d048985258b2857070`, the
+  tracked tree of `cursor/n-frame-deposit-b7f8` after lifting DepositParentTx
+  to List Batch, excluding this receipt.
+- Registered Verity parent is `verity_tx_composes_nframe_deposit`.
+  Kill-line: `executeTwoOnly` on the 3-batch witness.
+- `A-DEPOSIT-32-ETHER` stays named. ALLOC is not merged into DEPOSIT.
 
 SRv3 campaign close nodes 1–6 (2026-08-23)
 -----------------------------------------
