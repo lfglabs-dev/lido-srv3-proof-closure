@@ -1,11 +1,32 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ee0acca91eca81f543caa26eccb0e61195a9a69f
+validated-tree: bc2508f3fe45b8dd0ac6dd3f65c9030701ccf3a6
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-SSZ-LIVE-1 constructor-pin ProductionGindexBinding (2026-08-23)
+----------------------------------------------------------------
+
+- Rebind `validated-tree` to `bc2508f3fe45b8dd0ac6dd3f65c9030701ccf3a6`, the
+  tracked tree of `cursor/ssz-production-gindex-6aad` excluding this receipt.
+- Scope: one supplemental row, P-SSZ-LIVE-1. Same guarantee id. The
+  registered theorem is now
+  `PSszLive1.production_witness_admission_from_core_gindex`:
+  `ProductionGindexBinding` (TopUpGateway constructor pin
+  `g_index_first_validator_curr` decodes as `(150 * 2^40 << 8) | 40`)
+  and gateway admission of a WC witness is ageCheck plus production-GI
+  verify against the opaque `eip4788ParentRoot`. The pin is an in-repo
+  constructor literal, not a live-deployment identity. A-SHA256-FFI
+  stays. This row does not claim live verify.
+- Kill-line: `wrong_packed_word_is_not_production_binding` (packed `0x28`
+  is not the constructor-pin decode). Existing skip-lookup kill-line
+  retained.
+- Reproduction: `lake build LidoSRv3.Audit.Guarantees.PSszLive1
+  LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackW2GindexMutants`
+  exit 0; metadata and claim-surface checks exit 0.
 
 P-DEPOSIT-1 guard-order honesty of the pull kill-line (2026-08-23)
 ------------------------------------------------------------------
