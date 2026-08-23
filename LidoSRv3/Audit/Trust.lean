@@ -311,6 +311,8 @@ assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PDeposit1.linked_hypotheses_do_not_bound_the_source_pull
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.oversized_run_commits
 #print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_is_outside_the_source_domain
+#print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.abstract_parent_covers_deployments_the_verity_plane_omits
 #print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
 #print axioms

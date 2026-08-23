@@ -38,12 +38,16 @@ CLAIMS = {
         # `linked_deployment_push_is_word_bounded`,
         # `linked_conserving_deployment_pull_is_word_bounded`,
         # `skewedPullConfig`, `linked_hypotheses_do_not_bound_the_source_pull`,
-        # `oversizedSourceInput`, `oversized_deployment_exceeds_word`,
+        # `oversizedSourceInput`, `oversized_input_is_outside_the_source_domain`,
+        # `oversized_deployment_exceeds_word`,
         # `oversized_run_commits` and
         # `abstract_parent_covers_deployments_the_verity_plane_omits` state the
         # executable plane's finiteness, the separation between the bounded
-        # executable push and the unbounded source pull, and the deployment the
-        # abstract parent commits without either, so they are public too: a
+        # executable push and the unbounded source pull, the `uint256`
+        # source-domain honesty of both kill-lines (the skewed immutable is
+        # encodable and checked so; the oversized input is deliberately outside
+        # the domain and checked so), and the abstract-model input the abstract
+        # parent commits without either, so they are public too: a
         # reader must not be able to quote the CHECKED Verity row without them.
         "declarations": (
             ("def", "guarantee"),
@@ -68,6 +72,7 @@ CLAIMS = {
             ("def", "skewedPullConfig"),
             ("theorem", "linked_hypotheses_do_not_bound_the_source_pull"),
             ("def", "oversizedSourceInput"),
+            ("theorem", "oversized_input_is_outside_the_source_domain"),
             ("theorem", "oversized_deployment_exceeds_word"),
             ("theorem", "oversized_run_commits"),
             ("theorem", "abstract_parent_covers_deployments_the_verity_plane_omits"),
