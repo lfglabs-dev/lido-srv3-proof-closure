@@ -1,6 +1,6 @@
-verified_source_tree=7ba3783f6f0bcf4e8d0965e45e5bff62f9f583f2
+verified_source_tree=b27d41a87620d060e1a65265e0de0f69005c9a18
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
-⚠ [11/97] Replayed Verity.Core
+⚠ [11/20] Replayed Verity.Core
 warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -10,7 +10,7 @@ Note: This linter can be disabled with `set_option linter.unnecessarySimpa false
 warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [1159/1273] Replayed Conform.Wheels
+⚠ [1159/1393] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -23,7 +23,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1160/1273] Replayed EvmYul.Pretty
+⚠ [1160/1393] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -36,15 +36,15 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1207/1273] Replayed EvmYul.Semantics
+⚠ [1207/1393] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1208/1273] Replayed EvmYul.EVM.Semantics
+⚠ [1208/1393] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1232/1273] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+⚠ [1232/1393] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
 warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:91:52: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -76,7 +76,7 @@ Hint: Omit it from the simp argument list.
   simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1237/1273] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
+⚠ [1237/1393] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
 warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:265:26: This simp argument is unused:
   Nat.add_assoc
 
@@ -169,7 +169,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵l̵e̵f̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1245/1273] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
+⚠ [1245/1393] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
 warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
   evalExprList
 
@@ -644,37 +644,37 @@ Hint: Omit it from the simp argument list.
       hstorageW, mul_ofNat_val, hdiv, hle]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1268/1273] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
-warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:644:36: This simp argument is unused:
+⚠ [1268/1393] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:677:36: This simp argument is unused:
   requestCall
 
 Hint: Omit it from the simp argument list.
   simp [commitObservables,̵ ̵r̵e̵q̵u̵e̵s̵t̵C̵a̵l̵l̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:688:53: This simp argument is unused:
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:721:53: This simp argument is unused:
   payload
 
 Hint: Omit it from the simp argument list.
   simp [commitObservables, p̵a̵y̵l̵o̵a̵d̵,̵ ̵hLen]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:835:23: This simp argument is unused:
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:881:23: This simp argument is unused:
   ih
 
 Hint: Omit it from the simp argument list.
   simp ̵[̵i̵h̵]̵
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1270/1408] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
-warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:195:41: This simp argument is unused:
+⚠ [1269/1393] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
+warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:201:41: This simp argument is unused:
   List.mem_nil_iff
 
 Hint: Omit it from the simp argument list.
   simp [List.mem_cons,̵ ̵L̵i̵s̵t̵.̵m̵e̵m̵_̵n̵i̵l̵_̵i̵f̵f̵] at hx
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1305/1408] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+⚠ [1305/1393] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:302:53: This simp argument is unused:
   setStorage
 
@@ -1072,7 +1072,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1357/1408] Replayed LidoSRv3.Audit.Verity.AddressTx
+⚠ [1357/1393] Replayed LidoSRv3.Audit.Verity.AddressTx
 warning: LidoSRv3/Audit/Verity/AddressTx.lean:233:34: This simp argument is unused:
   AddressTxContract.paused
 
@@ -2377,7 +2377,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1363/1408] Replayed LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
+ℹ [1363/1393] Replayed LidoSRv3.Tests.PConsolidationEth1RefundTxMutants
 info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:69:0: LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.refund_failure_restores_snapshot (msgValue fee : Uint256)
   (vaultOk refundOk : Bool) (state rollback : ContractState) (reason : String)
   (h : (gatewayRefund msgValue fee vaultOk refundOk).run state = ContractResult.revert reason rollback) :
@@ -2385,14 +2385,14 @@ info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:69:0: LidoSRv3.Audit
 info: LidoSRv3/Tests/PConsolidationEth1RefundTxMutants.lean:70:0: LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.withdraw_failure_restores_snapshot (amount : Uint256)
   (callerIsLido : Bool) (state rollback : ContractState) (reason : String)
   (h : (withdrawToLido amount callerIsLido).run state = ContractResult.revert reason rollback) : rollback = state
-ℹ [1364/1408] Replayed LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
+ℹ [1364/1393] Replayed LidoSRv3.Tests.PConsolidationEth1RequestTxMutants
 info: LidoSRv3/Tests/PConsolidationEth1RequestTxMutants.lean:56:0: LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.bus_failure_restores_snapshot (msgValue : Uint256) (gatewayOk : Bool)
   (state rollback : ContractState) (reason : String)
   (h : (busForward msgValue gatewayOk).run state = ContractResult.revert reason rollback) : rollback = state
 info: LidoSRv3/Tests/PConsolidationEth1RequestTxMutants.lean:57:0: LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.consolidation_prefix_failure_restores_snapshot (fee : Uint256)
   (secondOk : Bool) (state rollback : ContractState) (reason : String)
   (h : (sendTwoConsolidationFees fee secondOk).run state = ContractResult.revert reason rollback) : rollback = state
-⚠ [1366/1408] Replayed LidoSRv3.Audit.SszDepositEquivalence
+⚠ [1366/1393] Replayed LidoSRv3.Audit.SszDepositEquivalence
 warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
   Ssz.traverseBranch
 
@@ -2415,7 +2415,7 @@ Hint: Omit it from the simp argument list.
   simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1369/1408] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+⚠ [1369/1393] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
 warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -2435,7 +2435,7 @@ info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationMode
   Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
     Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
       (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-⚠ [1374/1408] Replayed LidoSRv3.Audit.Verity.TopupHybrid
+⚠ [1374/1393] Replayed LidoSRv3.Audit.Verity.TopupHybrid
 warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
   _root_.Verity.pure
 
@@ -2452,7 +2452,7 @@ Hint: Omit it from the simp argument list.
   ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1375/1408] Replayed LidoSRv3.Tests.TopupHybridMutants
+ℹ [1375/1393] Replayed LidoSRv3.Tests.TopupHybridMutants
 info: LidoSRv3/Tests/TopupHybridMutants.lean:108:0: LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source (cfg : SourceTopupConfig) (inp : SourceTopupInput)
   (state : ContractState) : observeVerity state ((executeSource cfg inp).run state) = sourceTx cfg inp state
 info: LidoSRv3/Tests/TopupHybridMutants.lean:109:0: LidoSRv3.Audit.Verity.TopupHybrid.verity_revert_restores_snapshot (cfg : SourceTopupConfig) (inp : SourceTopupInput)
@@ -2460,7 +2460,7 @@ info: LidoSRv3/Tests/TopupHybridMutants.lean:109:0: LidoSRv3.Audit.Verity.TopupH
   (h : (executeSource cfg inp).run state = ContractResult.revert reason rollback) : rollback = state
 info: LidoSRv3/Tests/TopupHybridMutants.lean:110:0: LidoSRv3.Audit.Verity.TopupHybrid.source_value_observation_adequate (cfg : SourceTopupConfig) (inp : SourceTopupInput) :
   (run cfg inp).pulled = (run cfg inp).pushed
-⚠ [1382/1408] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
+⚠ [1382/1393] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
 warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
   memory_writeSlot
 
@@ -2468,7 +2468,7 @@ Hint: Omit it from the simp argument list.
   simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1385/1408] Replayed LidoSRv3.Audit.Verity.DepositTx
+⚠ [1385/1393] Replayed LidoSRv3.Audit.Verity.DepositTx
 warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
   Pure.pure
 
@@ -2483,7 +2483,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-ℹ [1391/1408] Replayed LidoSRv3.Tests.AddressSourceMutants
+ℹ [1391/1393] Replayed LidoSRv3.Tests.AddressSourceMutants
 info: LidoSRv3/Tests/AddressSourceMutants.lean:310:0: LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance :
   (∀ (a₁ a₂ : Address),
       a₁ ≠ 0 →
@@ -2547,7 +2547,7 @@ info: LidoSRv3/Tests/AddressSourceMutants.lean:311:0: LidoSRv3.Audit.SolidityAdd
 info: LidoSRv3/Tests/AddressSourceMutants.lean:312:0: LidoSRv3.Audit.SolidityAddress.source_success_post_state_equivariant (a₁ a₂ : Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
   (inp : Input) (post : PostState) (h : run inp = Outcome.committed post) :
   run (renameInput a₁ a₂ inp) = Outcome.committed (renamePost a₁ a₂ post)
-ℹ [1392/1408] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+ℹ [1392/1393] Replayed LidoSRv3.Audit.Verity.Tests.SszTxSimulation
 info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:35:0: LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected (input : TxInputs)
   (hmutant : computedRoot input ≠ input.expectedDepositDataRoot) :
   runVerification input = VerificationOutcome.revertRootMismatch
@@ -2564,7 +2564,7 @@ info: LidoSRv3/Audit/Verity/Tests/SszTxSimulation.lean:37:0: LidoSRv3.Audit.Veri
       (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
         (runVerification input = VerificationOutcome.revertRootMismatch →
           (transactionObservation input before after attempts trace).committedState = before)
-ℹ [1393/1408] Replayed LidoSRv3.Audit.Trust
+ℹ [1394/1478] Replayed LidoSRv3.Audit.Trust
 info: LidoSRv3/Audit/Trust.lean:145:0: 'LidoSRv3.Audit.Quantity.checkedDiv_zero' depends on axioms: [propext]
 info: LidoSRv3/Audit/Trust.lean:146:0: 'LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:147:0: 'LidoSRv3.Audit.revert_restores_state_value_and_logs' depends on axioms: [propext]
@@ -2859,21 +2859,22 @@ info: LidoSRv3/Audit/Trust.lean:333:0: 'LidoSRv3.Audit.Guarantees.PConsolidation
 info: LidoSRv3/Audit/Trust.lean:335:0: 'LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors' does not depend on any axioms
 info: LidoSRv3/Audit/Trust.lean:336:0: 'LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value' depends on axioms: [propext, Quot.sound]
 info: LidoSRv3/Audit/Trust.lean:337:0: 'LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:338:0: 'LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:338:0: 'LidoSRv3.Audit.Verity.ConsolidationTx.entry_credit_overflow_reverts' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:339:0: 'LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance' depends on axioms: [propext,
  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_1,
  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_2,
  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_3,
  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_4,
  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_5,
  LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_6]
-info: LidoSRv3/Audit/Trust.lean:340:0: 'LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:341:0: 'LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance' depends on axioms: [propext,
  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_1,
  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_2,
  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_3,
  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_4,
  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_5,
  LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_6]
-info: LidoSRv3/Audit/Trust.lean:342:0: 'LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:343:0: 'LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding' depends on axioms: [propext,
  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_1,
  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_2,
  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_3,
@@ -2881,305 +2882,328 @@ info: LidoSRv3/Audit/Trust.lean:342:0: 'LidoSRv3.Tests.ConsolidationTxMutants.jo
  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_5,
  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_6,
  LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_7]
-info: LidoSRv3/Audit/Trust.lean:344:0: 'LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:345:0: 'LidoSRv3.Audit.Guarantees.PAddress1.bounded_live_claim_batch_storage_call_surface' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:345:0: 'LidoSRv3.Audit.Guarantees.PAddress1.bounded_transfer_model_source_tx' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:346:0: 'LidoSRv3.Audit.Guarantees.PAddress1.bounded_live_claim_batch_storage_call_surface' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:346:0: 'LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:347:0: 'LidoSRv3.Audit.Verity.AddressClaimBatchTx.two_claim_batch_observe' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:347:0: 'LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:348:0: 'LidoSRv3.Audit.Verity.AddressClaimBatchTx.every_revert_restores_snapshot' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:348:0: 'LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:349:0: 'LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:350:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:351:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:352:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:353:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:354:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_revert_restores_snapshot' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:349:0: 'LidoSRv3.Audit.Verity.AddressTransferTx.tx_refines_source_witness' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:350:0: 'LidoSRv3.Audit.Source.AddressTransferCorrespondence.fixed_caller_mutant_rejected' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:351:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:352:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_router_balance_unchanged' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:353:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_reverting_branch_moves_no_ether' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:354:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.source_nonconserving_deployment_reverts' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:355:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_revert_restores_snapshot' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:355:0: 'LidoSRv3.Audit.Verity.DepositTx.run_simulates_source' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:356:0: 'LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:357:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:356:0: 'LidoSRv3.Audit.Verity.DepositTx.run_simulates_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:357:0: 'LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:358:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:359:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.canonical_composition_witness' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:360:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.canonical_composition_witness' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:360:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.linked_deployment_push_is_word_bounded' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:361:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.linked_conserving_deployment_pull_is_word_bounded' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:361:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.linked_deployment_push_is_word_bounded' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:362:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.linked_conserving_deployment_pull_is_word_bounded' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:363:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.linked_hypotheses_do_not_bound_the_line_972_product' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:365:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.skewed_pull_witness_turned_away_before_line_972' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:367:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.line_972_product_le_module_allocation' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:369:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.encodable_allocation_bounds_line_972_product' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:371:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.in_range_commit_is_word_bounded' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:373:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.oversized_run_commits' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:374:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_is_outside_the_source_domain' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:376:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_exceeds_word' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:378:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.abstract_parent_covers_inputs_the_verity_plane_omits' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:364:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.linked_hypotheses_do_not_bound_the_line_972_product' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:366:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.skewed_pull_witness_turned_away_before_line_972' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:368:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.line_972_product_le_module_allocation' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:370:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.encodable_allocation_bounds_line_972_product' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:372:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.in_range_commit_is_word_bounded' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:374:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.oversized_run_commits' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:375:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_is_outside_the_source_domain' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:377:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_exceeds_word' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:379:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.abstract_parent_covers_inputs_the_verity_plane_omits' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:380:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_input_is_within_the_source_domain' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:382:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_run_commits' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:383:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_links_source_two_legs' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:385:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_entry_state_guards_are_load_bearing' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:387:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_underfunded_entry_reverts_at_not_enough_ether' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:381:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_input_is_within_the_source_domain' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:383:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_run_commits' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:384:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_links_source_two_legs' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:386:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_entry_state_guards_are_load_bearing' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:388:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.manyKey_underfunded_entry_reverts_at_not_enough_ether' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:389:0: 'LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:390:0: 'LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:390:0: 'LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:391:0: 'LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:392:0: 'LidoSRv3.Audit.Verity.DepositParentTx.revert_observes_idle' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:393:0: 'LidoSRv3.Tests.DepositParentTxMutants.mutant_none_reproduces_execute' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:393:0: 'LidoSRv3.Audit.Verity.DepositParentTx.revert_observes_idle' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:394:0: 'LidoSRv3.Tests.DepositParentTxMutants.mutant_none_reproduces_execute' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:394:0: 'LidoSRv3.Tests.DepositParentTxMutants.skipped_allocation_write_rejected' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:395:0: 'LidoSRv3.Tests.DepositParentTxMutants.skipped_allocation_write_rejected' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:395:0: 'LidoSRv3.Tests.DepositParentTxMutants.skipped_dynamic_data_write_rejected' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:396:0: 'LidoSRv3.Tests.DepositParentTxMutants.skipped_dynamic_data_write_rejected' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:396:0: 'LidoSRv3.Tests.DepositParentTxMutants.skipped_root_write_rejected' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:397:0: 'LidoSRv3.Tests.DepositParentTxMutants.skipped_root_write_rejected' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:397:0: 'LidoSRv3.Tests.DepositParentTxMutants.misrouted_push_rejected' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:398:0: 'LidoSRv3.Tests.DepositParentTxMutants.misrouted_push_rejected' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:398:0: 'LidoSRv3.Tests.DepositParentTxMutants.dropped_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:399:0: 'LidoSRv3.Tests.DepositParentTxMutants.root_failure_observes_idle' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:399:0: 'LidoSRv3.Tests.DepositParentTxMutants.dropped_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:400:0: 'LidoSRv3.Tests.DepositParentTxMutants.root_failure_observes_idle' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:400:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:401:0: 'LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:402:0: 'LidoSRv3.Audit.Verity.DepositNFrameTx.nframe_deposit_parent' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:403:0: 'LidoSRv3.Audit.Verity.DepositNFrameTx.wrapping_fold_reverts_without_journal' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:403:0: 'LidoSRv3.Audit.Verity.DepositNFrameTx.nframe_deposit_parent' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:404:0: 'LidoSRv3.Audit.Verity.DepositNFrameTx.wrapping_fold_reverts_without_journal' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:405:0: 'LidoSRv3.Audit.Spec.DepositNFrameCorrespondence.router_links_source' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:406:0: 'LidoSRv3.Tests.DepositNFrameTxMutants.fixed_two_only_refutes_nframe_parent' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:406:0: 'LidoSRv3.Audit.Spec.DepositNFrameCorrespondence.router_links_source' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:407:0: 'LidoSRv3.Tests.DepositNFrameTxMutants.fixed_two_only_refutes_nframe_parent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:408:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_confined' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:409:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.consolidation_fee_path_confined' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:410:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:411:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:412:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:409:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_confined' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:410:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.consolidation_fee_path_confined' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:411:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:412:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:413:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_success_shape' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:413:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_revert_partition' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:414:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_revert_partition' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:414:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_zero_remainder_boundary' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:415:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_universal_zero_remainder_boundary' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:415:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:416:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:416:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_composes_value_flow_and_rollback' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:417:0: 'LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_composes_value_flow_and_rollback' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:417:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_dropped_refund_leg' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:418:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_dropped_refund_leg' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:418:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_misrouted_vault_leg' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:419:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_misrouted_vault_leg' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:419:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_corrupted_refund_amount' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:420:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_corrupted_refund_amount' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:420:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_preserved_prefix_after_failed_hop' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:421:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_preserved_prefix_after_failed_hop' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:421:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_single_request_for_two_request_batch' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:422:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.rejects_single_request_for_two_request_batch' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:422:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.universal_parent_is_predicate_at_honest' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:423:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.universal_parent_is_predicate_at_honest' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:423:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.dropped_refund_leg_kill_line_refutes_universal_parent' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:424:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.dropped_refund_leg_kill_line_refutes_universal_parent' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:424:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.misrouted_vault_kill_line_refutes_universal_parent' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:425:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.misrouted_vault_kill_line_refutes_universal_parent' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:425:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.corrupted_refund_kill_line_refutes_universal_parent' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:426:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.corrupted_refund_kill_line_refutes_universal_parent' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:426:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.single_request_kill_line_refutes_universal_parent' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:427:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.single_request_kill_line_refutes_universal_parent' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:427:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.zero_value_kill_line_refutes_dropped_positivity' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:428:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.zero_value_kill_line_refutes_dropped_positivity' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:428:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.underfunded_kill_line_refutes_dropped_funding' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:429:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.underfunded_kill_line_refutes_dropped_funding' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:429:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.fuel_exhaustion_kill_line_refutes_dropped_fuel_premise' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:430:0: 'LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants.fuel_exhaustion_kill_line_refutes_dropped_fuel_premise' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:430:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.gateway_refund_success_moves_value' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:431:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.gateway_refund_failure_keeps_prefix_out' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:432:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.withdraw_success_moves_to_lido' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:433:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.refund_failure_restores_snapshot' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:434:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.bus_forward_success' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:435:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.consolidation_fee_target_success' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:436:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.withdrawal_fee_success' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:437:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.consolidation_second_failure_discards_prefix' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:438:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.bus_failure_restores_snapshot' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:439:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.sourceGateway_committed_splits_to_vault_and_refund' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:440:0: 'LidoSRv3.Tests.PConsolidationEth1RefundTxMutants.refund_misroute_kill_line' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:441:0: 'LidoSRv3.Tests.PConsolidationEth1RefundTxMutants.double_refund_rejected' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:442:0: 'LidoSRv3.Tests.PConsolidationEth1RefundTxMutants.leak_on_refund_failure_rejected' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:443:0: 'LidoSRv3.Tests.PConsolidationEth1RequestTxMutants.keep_first_consolidation_fee_rejected' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:444:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_wrap_precludes_value_moving_commit' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:445:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_module_guard_required' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:446:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_wc_type2_guard_required' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:447:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:448:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_router_balance_unchanged' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:449:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_reverting_branch_moves_no_ether' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:450:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:451:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:452:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:431:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.gateway_refund_success_moves_value' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:432:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.gateway_refund_failure_keeps_prefix_out' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:433:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.withdraw_success_moves_to_lido' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:434:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.refund_failure_restores_snapshot' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:435:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.bus_forward_success' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:436:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.consolidation_fee_target_success' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:437:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.withdrawal_fee_success' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:438:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.consolidation_second_failure_discards_prefix' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:439:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx.bus_failure_restores_snapshot' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:440:0: 'LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx.sourceGateway_committed_splits_to_vault_and_refund' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:441:0: 'LidoSRv3.Tests.PConsolidationEth1RefundTxMutants.refund_misroute_kill_line' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:442:0: 'LidoSRv3.Tests.PConsolidationEth1RefundTxMutants.double_refund_rejected' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:443:0: 'LidoSRv3.Tests.PConsolidationEth1RefundTxMutants.leak_on_refund_failure_rejected' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:444:0: 'LidoSRv3.Tests.PConsolidationEth1RequestTxMutants.keep_first_consolidation_fee_rejected' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:445:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_wrap_precludes_value_moving_commit' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:446:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_module_guard_required' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:447:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_wc_type2_guard_required' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:448:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:449:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_router_balance_unchanged' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:450:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_reverting_branch_moves_no_ether' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:451:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_balance_guards_discharged' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:452:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_unchecked_accumulation_faithful' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:453:0: 'LidoSRv3.Audit.Guarantees.PTopup1.source_pinned_config_discharges_pubkey_guard' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:453:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:454:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:454:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_wrap_to_zero_is_empty_commit' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:455:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_wrap_to_zero_is_empty_commit' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:455:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_witness_reverts_and_restores' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:456:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_witness_reverts_and_restores' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:456:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_reverts_and_restores' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:457:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_nonzero_wrap_reverts_and_restores' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:457:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:458:0: 'LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:459:0: 'LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:460:0: 'LidoSRv3.Audit.Verity.TopupHybrid.verity_tx_simulates_source' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:460:0: 'LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_nonzero_wrap' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:461:0: 'LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_nonzero_wrap' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:461:0: 'LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_wrap_to_zero' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:462:0: 'LidoSRv3.Tests.TopupHybridMutants.hybrid_simulation_covers_wrap_to_zero' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:462:0: 'LidoSRv3.Tests.TopupTxMutants.mutant_none_reproduces_execute' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:463:0: 'LidoSRv3.Tests.TopupTxMutants.mutant_none_reproduces_execute' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:463:0: 'LidoSRv3.Tests.TopupTxMutants.honest_run_matches_source' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:464:0: 'LidoSRv3.Tests.TopupTxMutants.skipped_allocation_write_rejected' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:464:0: 'LidoSRv3.Tests.TopupTxMutants.honest_run_matches_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:465:0: 'LidoSRv3.Tests.TopupTxMutants.skipped_allocation_write_rejected' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:465:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:466:0: 'LidoSRv3.Tests.TopupTxMutants.misrouted_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:467:0: 'LidoSRv3.Tests.TopupTxMutants.corrupted_amount_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:468:0: 'LidoSRv3.Tests.TopupTxMutants.swapped_order_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:469:0: 'LidoSRv3.Tests.TopupTxMutants.duplicated_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:470:0: 'LidoSRv3.Tests.TopupTxMutants.allocation_write_failure_rolls_back' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:466:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:467:0: 'LidoSRv3.Tests.TopupTxMutants.misrouted_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:468:0: 'LidoSRv3.Tests.TopupTxMutants.corrupted_amount_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:469:0: 'LidoSRv3.Tests.TopupTxMutants.swapped_order_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:470:0: 'LidoSRv3.Tests.TopupTxMutants.duplicated_push_rejected' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:471:0: 'LidoSRv3.Tests.TopupTxMutants.allocation_write_failure_rolls_back' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:471:0: 'LidoSRv3.Tests.TopupTxMutants.lido_pull_failure_rolls_back' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:472:0: 'LidoSRv3.Tests.TopupTxMutants.first_beacon_failure_rolls_back' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:472:0: 'LidoSRv3.Tests.TopupTxMutants.lido_pull_failure_rolls_back' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:473:0: 'LidoSRv3.Tests.TopupTxMutants.first_beacon_failure_rolls_back' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:473:0: 'LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_wrapping_input' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:474:0: 'LidoSRv3.Tests.TopupTxMutants.wrap_to_zero_commits_no_topup' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:475:0: 'LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_unregistered_module_input' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:476:0: 'LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_non_type2_wc_input' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:477:0: 'LidoSRv3.Tests.TopupTxMutants.mutantRunNoAssert_eq_run_of_assert_passing' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:478:0: 'LidoSRv3.Tests.TopupTxMutants.mutantRunNoAssert_commits_where_assert_fires' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:479:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_conservation_assert_kill_line_refutes_parent' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:480:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_module_guard_kill_line_refutes_parent' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:481:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_wc_guard_kill_line_refutes_parent' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:482:0: 'LidoSRv3.Tests.TopupTxMutants.unwrapped_accumulator_kill_line_refutes_parent' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:483:0: 'LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:484:0: 'LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:485:0: 'LidoSRv3.Audit.Guarantees.PTopup2.per_key_bounded_by_candidate' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:486:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:487:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:488:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_restores_world' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:489:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_committed_world_is_commit_fold' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:490:0: 'LidoSRv3.Tests.Topup2TxMutants.over_cap_aggregate_rejected' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:491:0: 'LidoSRv3.Tests.Topup2TxMutants.double_send_rejected' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:492:0: 'LidoSRv3.Tests.Topup2TxMutants.reverting_adversary_cannot_leak_state' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:493:0: 'LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:494:0: 'LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:495:0: 'LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:496:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:474:0: 'LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_wrapping_input' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:475:0: 'LidoSRv3.Tests.TopupTxMutants.wrap_to_zero_commits_no_topup' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:476:0: 'LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_unregistered_module_input' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:477:0: 'LidoSRv3.Tests.TopupTxMutants.guard_discharge_at_non_type2_wc_input' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:478:0: 'LidoSRv3.Tests.TopupTxMutants.mutantRunNoAssert_eq_run_of_assert_passing' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:479:0: 'LidoSRv3.Tests.TopupTxMutants.mutantRunNoAssert_commits_where_assert_fires' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:480:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_conservation_assert_kill_line_refutes_parent' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:481:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_module_guard_kill_line_refutes_parent' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:482:0: 'LidoSRv3.Tests.TopupTxMutants.dropped_wc_guard_kill_line_refutes_parent' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:483:0: 'LidoSRv3.Tests.TopupTxMutants.unwrapped_accumulator_kill_line_refutes_parent' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:484:0: 'LidoSRv3.Audit.Source.Topup2.source_aggregate_bounded_by_block_cap' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:485:0: 'LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:486:0: 'LidoSRv3.Audit.Guarantees.PTopup2.per_key_bounded_by_candidate' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:487:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_aggregate_bounded_by_block_cap' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:488:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_all_success_value_exact' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:489:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_revert_restores_world' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:490:0: 'LidoSRv3.Audit.Verity.Topup2Tx.tx_committed_world_is_commit_fold' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:491:0: 'LidoSRv3.Tests.Topup2TxMutants.over_cap_aggregate_rejected' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:492:0: 'LidoSRv3.Tests.Topup2TxMutants.double_send_rejected' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:493:0: 'LidoSRv3.Tests.Topup2TxMutants.reverting_adversary_cannot_leak_state' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:494:0: 'LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:495:0: 'LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:496:0: 'LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_preserves_withdrawal_reserve' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:497:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:497:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.source_reserve_does_not_change_finalization' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:498:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.source_reserve_does_not_change_finalization' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:498:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_simulates_reserve_relational_spec' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:499:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_simulates_reserve_relational_spec' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:499:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_reverts_on_locked_overflow' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:500:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_slot_is_not_read' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:501:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:500:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_reverts_on_locked_overflow' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:501:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_slot_is_not_read' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:502:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_reserve_does_not_change_finalization' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:502:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:503:0: 'LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:504:0: 'LidoSRv3.Audit.Guarantees.PSsz1.deposit_unique_of_perfect' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:505:0: 'LidoSRv3.Audit.Guarantees.PSsz1.sourceNode_mutant_kill_line_refutes_parent' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:506:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:507:0: 'LidoSRv3.Audit.Guarantees.PSsz1.swapped_combine_kill_line_refutes_parent' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:503:0: 'LidoSRv3.Audit.Guarantees.PReserveRelational.verity_revert_restores_snapshot' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:504:0: 'LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:505:0: 'LidoSRv3.Audit.Guarantees.PSsz1.deposit_unique_of_perfect' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:506:0: 'LidoSRv3.Audit.Guarantees.PSsz1.sourceNode_mutant_kill_line_refutes_parent' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:507:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composed_ssz_encoding' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:508:0: 'LidoSRv3.Audit.Guarantees.PSsz1.swapped_combine_kill_line_refutes_parent' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:508:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composedEncodingOkFull_not_trivial_crossed_witness' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:509:0: 'LidoSRv3.Audit.Guarantees.PSsz1.composedEncodingOkFull_not_trivial_crossed_witness' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:509:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_witness_kill_line' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:510:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_witness_kill_line' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:510:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_operation_index_kill_line' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:511:0: 'LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:512:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:511:0: 'LidoSRv3.Audit.Guarantees.PSsz1.inconsistent_operation_index_kill_line' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:512:0: 'LidoSRv3.Audit.Guarantees.PSsz1.sourceWitness_binds_sourceNode' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:513:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:513:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:514:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:514:0: 'LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_two_batch_rolls_back' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:515:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.verity_tx_simulates_pinned_source' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:515:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:516:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.encoding_commits_structural_witness' depends on axioms: [propext,
  Classical.choice,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:516:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:517:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:518:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:519:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:520:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:521:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:522:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:523:0: 'LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root' depends on axioms: [propext,
+info: LidoSRv3/Audit/Trust.lean:517:0: 'LidoSRv3.Audit.Verity.SszEncodingTx.revert_restores_snapshot' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:518:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:519:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:520:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:521:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:522:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:523:0: 'LidoSRv3.Audit.Verity.SszTxSimulation.root_mutant_rejected' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:524:0: 'LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root' depends on axioms: [propext,
  Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:525:0: 'LidoSRv3.Audit.MinFirst.candidate_mem' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:526:0: 'LidoSRv3.Audit.MinFirst.candidate_open' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:527:0: 'LidoSRv3.Audit.MinFirst.candidate_none_no_open' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:528:0: 'LidoSRv3.Audit.MinFirst.candidate_minimal' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:529:0: 'LidoSRv3.Audit.MinFirst.candidate_router_tie' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:530:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_moduleId' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:531:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_active' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:532:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_monotone' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:533:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_eq_of_ne' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:534:0: 'LidoSRv3.Audit.MinFirst.step_preserves_length' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:535:0: 'LidoSRv3.Audit.MinFirst.step_preserves_module_order' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:536:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_length' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:537:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_module_order' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:538:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_length' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:539:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_module_order' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:540:0: 'LidoSRv3.Audit.MinFirst.run_spent_le' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:541:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_le_requested' depends on axioms: [propext, Quot.sound]
-info: LidoSRv3/Audit/Trust.lean:542:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
-info: LidoSRv3/Audit/Trust.lean:543:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
-info: LidoSRv3/Audit/Trust.lean:544:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
-ℹ [1394/1408] Replayed LidoSRv3.Tests.GIndexConcatMutants
+info: LidoSRv3/Audit/Trust.lean:526:0: 'LidoSRv3.Audit.MinFirst.candidate_mem' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:527:0: 'LidoSRv3.Audit.MinFirst.candidate_open' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:528:0: 'LidoSRv3.Audit.MinFirst.candidate_none_no_open' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:529:0: 'LidoSRv3.Audit.MinFirst.candidate_minimal' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:530:0: 'LidoSRv3.Audit.MinFirst.candidate_router_tie' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:531:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_moduleId' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:532:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_active' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:533:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_monotone' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:534:0: 'LidoSRv3.Audit.MinFirst.incrementSelected_eq_of_ne' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:535:0: 'LidoSRv3.Audit.MinFirst.step_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:536:0: 'LidoSRv3.Audit.MinFirst.step_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:537:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:538:0: 'LidoSRv3.Audit.MinFirst.loop_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:539:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_length' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:540:0: 'LidoSRv3.Audit.MinFirst.allocate_preserves_module_order' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:541:0: 'LidoSRv3.Audit.MinFirst.run_spent_le' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:542:0: 'LidoSRv3.Audit.MinFirst.totalAllocated_le_requested' depends on axioms: [propext, Quot.sound]
+info: LidoSRv3/Audit/Trust.lean:543:0: 'LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound' does not depend on any axioms
+info: LidoSRv3/Audit/Trust.lean:544:0: 'LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects' depends on axioms: [propext]
+info: LidoSRv3/Audit/Trust.lean:545:0: 'LidoSRv3.Audit.Common.success_exposes_exact_committed_effects' depends on axioms: [propext]
+ℹ [1396/1478] Replayed LidoSRv3.Tests.GIndexConcatMutants
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:59:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec' depends on axioms: [propext]
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:60:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_value_of_fits' depends on axioms: [propext]
 info: LidoSRv3/Tests/GIndexConcatMutants.lean:61:0: 'LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_depth_overflow' depends on axioms: [propext]
-⚠ [1414/1478] Replayed LidoSRv3.Legacy.SpecProofs
+ℹ [1444/1478] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:41:0: LidoSRv3.Audit.Verity.TopupRollback.topup_program_declared : spec.functions = [topUpEntry]
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:42:0: LidoSRv3.Audit.Verity.TopupRollback.topup_success_post_state_equiv (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+  {keys pulled pushed balanceAfter : ℕ} (hRun : run cfg inp = Outcome.committedTopUp keys pulled pushed balanceAfter) :
+  pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:43:0: LidoSRv3.Audit.Verity.TopupRollback.topup_rollback_restores_state {State : Type} (cfg : SourceTopupConfig)
+  (inp : SourceTopupInput) (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
+  (hRevert : (topupProgram cfg inp before).sourceOutcome.reverts = true) :
+  (transactionObservation (topupProgram cfg inp before) after attempts trace).committedState = before ∧
+    (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] ∧
+      (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.logs = []
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:44:0: LidoSRv3.Audit.Verity.TopupRollback.topup_allocation_extracted_from_pinned_source :
+  Verity.Core.Model.AllocationExtraction.extractAllocation spec topUpEntry =
+    Verity.Core.Model.AllocationExtraction.extractAllocationFromSource spec pinnedSolidityTopUp
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:45:0: LidoSRv3.Audit.Verity.TopupRollback.topup_amount_extraction_correct (inp : SourceTopupInput)
+  (hNoWrap : NoUncheckedWrap inp) : allocSumUnchecked inp.allocations = totalAllocated inp
+info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:46:0: LidoSRv3.Audit.Verity.TopupRollback.topup_call_world_rollback {State : Type} (program : TopupProgram State)
+  (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+  (state : Compiler.CompilationModel.DenoteExternalCalls.CallState)
+  (h :
+    ∀ entry ∈ Compiler.CompilationModel.DenoteExternalCalls.ObservedCalls program.calls adversary state,
+      Compiler.CompilationModel.DenoteExternalCalls.RollsBack adversary entry) :
+  (Compiler.CompilationModel.DenoteExternalCalls.denote program.calls adversary state).2.world = state.world
+⚠ [1448/1478] Replayed LidoSRv3.Legacy.SpecProofs
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-ℹ [1416/1478] Replayed LidoSRv3.Tests.TopupParentMutants
+ℹ [1450/1478] Replayed LidoSRv3.Tests.TopupParentMutants
 info: LidoSRv3/Tests/TopupParentMutants.lean:95:0: LidoSRv3.Audit.Verity.TopupParent.parent_transaction_closure (cfg : SourceTopupConfig) (base : SourceTopupInput)
   (gateway : Address) (iface : CalleeInterface) (state : ContractState) : ParentProposition cfg base gateway iface state
 info: LidoSRv3/Tests/TopupParentMutants.lean:96:0: LidoSRv3.Audit.Verity.TopupParent.revert_restores_caller_frame (cfg : SourceTopupConfig) (base : SourceTopupInput)
   (gateway : Address) (iface : CalleeInterface) (state rollback : ContractState) (reason : String)
   (h : (execute cfg base gateway iface).run state = ContractResult.revert reason rollback) : rollback = state
-⚠ [1418/1478] Replayed LidoSRv3.Tests.Topup2DistributionTxMutants
+⚠ [1452/1478] Replayed LidoSRv3.Tests.Topup2DistributionTxMutants
 warning: LidoSRv3/Tests/Topup2DistributionTxMutants.lean:254:7: Variable name `effective` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -3190,14 +3214,14 @@ warning: LidoSRv3/Tests/Topup2DistributionTxMutants.lean:254:17: Variable name `
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-ℹ [1434/1478] Replayed LidoSRv3.Tests.SszVerifierProgram
+ℹ [1468/1478] Replayed LidoSRv3.Tests.SszVerifierProgram
 info: LidoSRv3/Tests/SszVerifierProgram.lean:102:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.deposit_call_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:103:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.validator_root_preimages_exact' does not depend on any axioms
 info: LidoSRv3/Tests/SszVerifierProgram.lean:104:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.verifier_pair_preimage_exact' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:105:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_memory_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:106:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_abi_fails_closed' depends on axioms: [propext]
 info: LidoSRv3/Tests/SszVerifierProgram.lean:107:0: 'LidoSRv3.Audit.Source.SszVerifierProgram.missing_sha_fails_closed' depends on axioms: [propext]
-⚠ [1438/1478] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1474/1478] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -3251,38 +3275,10 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1440/1478] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+⚠ [1476/1478] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
 warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-✔ [1442/1478] Built Mathlib.Data.List.GetD (2.3s)
-✔ [1443/1478] Built Mathlib.Data.Nat.Bits (2.3s)
-✔ [1444/1478] Built LidoSRv3.Audit.AllGuarantees (6.3s)
-✔ [1445/1478] Built Mathlib.Data.Nat.Bitwise (4.2s)
-ℹ [1474/1478] Replayed LidoSRv3.Audit.Verity.Tests.TopupRollback
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:41:0: LidoSRv3.Audit.Verity.TopupRollback.topup_program_declared : spec.functions = [topUpEntry]
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:42:0: LidoSRv3.Audit.Verity.TopupRollback.topup_success_post_state_equiv (cfg : SourceTopupConfig) (inp : SourceTopupInput)
-  {keys pulled pushed balanceAfter : ℕ} (hRun : run cfg inp = Outcome.committedTopUp keys pulled pushed balanceAfter) :
-  pulled = pushed ∧ balanceAfter = inp.routerBalanceBefore
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:43:0: LidoSRv3.Audit.Verity.TopupRollback.topup_rollback_restores_state {State : Type} (cfg : SourceTopupConfig)
-  (inp : SourceTopupInput) (before after : State) (attempts : List CallAttempt) (trace : CommitTrace)
-  (hRevert : (topupProgram cfg inp before).sourceOutcome.reverts = true) :
-  (transactionObservation (topupProgram cfg inp before) after attempts trace).committedState = before ∧
-    (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.ethMoves = [] ∧
-      (transactionObservation (topupProgram cfg inp before) after attempts trace).committedTrace.logs = []
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:44:0: LidoSRv3.Audit.Verity.TopupRollback.topup_allocation_extracted_from_pinned_source :
-  Verity.Core.Model.AllocationExtraction.extractAllocation spec topUpEntry =
-    Verity.Core.Model.AllocationExtraction.extractAllocationFromSource spec pinnedSolidityTopUp
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:45:0: LidoSRv3.Audit.Verity.TopupRollback.topup_amount_extraction_correct (inp : SourceTopupInput)
-  (hNoWrap : NoUncheckedWrap inp) : allocSumUnchecked inp.allocations = totalAllocated inp
-info: LidoSRv3/Audit/Verity/Tests/TopupRollback.lean:46:0: LidoSRv3.Audit.Verity.TopupRollback.topup_call_world_rollback {State : Type} (program : TopupProgram State)
-  (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
-  (state : Compiler.CompilationModel.DenoteExternalCalls.CallState)
-  (h :
-    ∀ entry ∈ Compiler.CompilationModel.DenoteExternalCalls.ObservedCalls program.calls adversary state,
-      Compiler.CompilationModel.DenoteExternalCalls.RollsBack adversary entry) :
-  (Compiler.CompilationModel.DenoteExternalCalls.denote program.calls adversary state).2.world = state.world
-✔ [1477/1478] Built LidoSRv3 (2.6s)
 Build completed successfully (1478 jobs).
