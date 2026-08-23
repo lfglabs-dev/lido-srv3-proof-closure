@@ -195,8 +195,8 @@ theorem fixed_dest_unbounded_rename_kill_line
     (hlength : requestIds.length = hints.length)
     (hnodup : (requestIds.map fun id => (.ofNat id : Uint256)).Nodup)
     (hready : BatchReady state requestIds hints recipient payouts)
-    (hrecipient : recipient ≠ zeroAddress)
-    (hrenamed : ρ recipient ≠ zeroAddress)
+    (_hrecipient : recipient ≠ zeroAddress)
+    (_hrenamed : ρ recipient ≠ zeroAddress)
     (hpayouts : payouts ≠ [])
     (hmutant : (99 : Address) ≠ ρ recipient) :
     observe requestIds
@@ -223,22 +223,22 @@ theorem fixed_dest_unbounded_rename_kill_line
   have hcalls :
       state.calls ++ payouts.map (payoutEntry (99 : Address)) =
         state.calls ++ payouts.map (payoutEntry (ρ recipient)) :=
-    congrArg View.calls (hMutant.trans hEq)
+    congrArg View.calls (hMutant.symm.trans hEq)
   have hmaps :
       payouts.map (payoutEntry (99 : Address)) =
         payouts.map (payoutEntry (ρ recipient)) :=
-    (List.append_cancel_left.mp hcalls)
+    List.append_cancel_left hcalls
   cases payouts with
   | nil => exact hpayouts rfl
   | cons amount payouts =>
       have hhead :
           payoutEntry (99 : Address) amount =
             payoutEntry (ρ recipient) amount :=
-        (List.cons_inj_iff.mp hmaps).1
+        (List.cons.inj hmaps).1
       have htarget :
           ((99 : Address).toNat) = (ρ recipient).toNat :=
         congrArg ExternalCall.target hhead
-      exact hmutant (Address.toNat_injective _ _ htarget)
+      exact hmutant (Verity.Core.Address.toNat_injective _ _ htarget)
 
 /-- Raw-key mutant fails the physical-slot conjunct whenever the raw
 cell and the keccak cell hold different words. -/
