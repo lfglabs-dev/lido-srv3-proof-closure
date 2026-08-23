@@ -1,16 +1,22 @@
 import LidoSRv3.Audit.Guarantees.POracleSupply1
+import LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 /-!
 # Node 3 fail-closed vectors
 
-Parent-shaped negations for P-ORACLE-SUPPLY-1. Each mutant keeps every
-premise of the parent (including the `shareRate ≤ maxShareRate` cap) and
-negates the parent's exact conclusion shape for a mutant-built frame.
+Parent-shaped negations for P-ORACLE-SUPPLY-1. Spec mutants keep every
+premise of `oracle_supply_mint_and_cap` (including the
+`shareRate ≤ maxShareRate` cap). The live mutant keeps every premise of
+`oracle_supply_live_computed_mint` and substitutes a free
+`sharesToMintAsFees` argument for the computed mint.
 
 1. `specOfMintSumBalances`: `sharesMinted` is `sum balances`
    (the Pack E vector).
 2. `specOfMintRawFee`: `sharesMinted` is raw `feeWei * shareRate`
    without the `/ E27` normalization.
+3. `handleOracleReportStillFree`: live path still takes a free mint
+   argument, so `observe` need not equal `sourceView` at
+   `mintedShares feeWei shareRate`.
 -/
 
 namespace LidoSRv3.Tests.PackN3OracleMintMutants
@@ -19,6 +25,7 @@ open LidoSRv3.Audit.SolidityAccounting
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Spec.OracleMintCorrespondence
 open LidoSRv3.Audit.Guarantees
+open LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 private def report : ReportInput :=
   { registeredModuleIds := [1, 2]
@@ -94,12 +101,57 @@ theorem cap_premise_is_load_bearing :
   intro h
   exact absurd (h report 1 E27 0) (by decide)
 
-/-- Positive control: the honest frame satisfies the full parent shape on a
-concrete vector, via the universal parent theorem. -/
+/-- Positive control: the honest frame satisfies the Spec mint+cap shape on a
+concrete vector, via the Spec lemma. -/
 theorem honest_frame_passes_vector :
     (((specOfMint report 7 3).sharesMinted = mintedShares 7 3 ∧
       (specOfMint report 7 3).shareRateDelta = 3) ∧
       (specOfMint report 7 3).sharesMinted ≤ 7 * 5 / E27) :=
   POracleSupply1.oracle_supply_mint_and_cap report 7 3 5 (by decide)
+
+/-- Mutant live path: mint shares remain a free argument, ignoring
+`feeWei` / `shareRate`. -/
+def handleOracleReportStillFree (i : ReportInput) (_feeWei _shareRate : Nat)
+    (sharesToMintAsFees : Nat) : Contract Result :=
+  handleOracleReport i sharesToMintAsFees
+
+/-- Kill-line 3: a free mint argument does not satisfy the live parent
+shape. Premises retained (`shareRate ≤ maxShareRate`). On the Pack N3
+report with `feeWei = shareRate = maxShareRate = 1`, the computed mint
+is `0`, so `sourceView` has no `.rewardsMinted` step, while feeding the
+free argument `1` journals that step. -/
+theorem free_argument_does_not_satisfy_computed_observe :
+    ¬ ∀ (i : ReportInput) (feeWei shareRate maxShareRate : Nat)
+        (state : ContractState),
+        shareRate ≤ maxShareRate →
+        observe i ((handleOracleReportStillFree i feeWei shareRate
+            feeWei).run state) =
+          sourceView i (mintedShares feeWei shareRate) := by
+  intro h
+  have hEq := h report 1 1 1 defaultState (Nat.le_refl 1)
+  have hLeft :
+      observe report ((handleOracleReportStillFree report 1 1 1).run
+          defaultState) =
+        sourceView report 1 :=
+    verity_tx_simulates_pinned_source report 1 defaultState
+  have hMint : mintedShares 1 1 = 0 := by decide
+  rw [hLeft, hMint] at hEq
+  have hHas : .rewardsMinted ∈ (sourceView report 1).steps := by
+    simp [sourceView, accept, successfulSteps, idsAndBalancesValid,
+      checkedTotal64, report]
+  have hNone : .rewardsMinted ∉ (sourceView report 0).steps := by
+    simp [sourceView, accept, successfulSteps, idsAndBalancesValid,
+      checkedTotal64, report]
+  exact hNone (hEq ▸ hHas)
+
+/-- Positive control: the computed live parent holds on the same vector. -/
+theorem honest_computed_path_passes_vector :
+    observe report ((handleOracleReportComputed report 7 3).run defaultState) =
+        sourceView report (mintedShares 7 3) ∧
+      ((specOfMint report 7 3).sharesMinted = mintedShares 7 3 ∧
+        (specOfMint report 7 3).shareRateDelta = 3) ∧
+      (specOfMint report 7 3).sharesMinted ≤ 7 * 5 / E27 :=
+  POracleSupply1.oracle_supply_live_computed_mint
+    report 7 3 5 defaultState (by decide)
 
 end LidoSRv3.Tests.PackN3OracleMintMutants
