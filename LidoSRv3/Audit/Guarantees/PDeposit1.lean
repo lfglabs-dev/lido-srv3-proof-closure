@@ -1053,8 +1053,10 @@ theorem exactTotal_eq_exactKeys_mul (batches : List DepositNFrameTx.Batch)
       have hb := h batch (by simp)
       have ht : ∀ b ∈ batches, b.amount.val = b.keys.val * depositSize :=
         fun b hmem => h b (by simp [hmem])
+      have hTail := ih ht
+      simp only [exactTotal, exactKeys] at hTail
       simp only [exactTotal, exactKeys, List.map_cons, List.sum_cons]
-      rw [hb, ih ht, Nat.add_mul]
+      rw [hb, hTail, Nat.add_mul]
 
 theorem linked_exactTotal_eq_pushedValue
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)

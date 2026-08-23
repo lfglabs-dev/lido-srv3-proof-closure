@@ -31,8 +31,9 @@ theorem three_batch_preconditions :
   lidoCallOk := rfl
   healthy := by
     intro batch hBatch
-    simp only [threeBatchInputs, List.mem_cons, List.mem_singleton] at hBatch
-    rcases hBatch with rfl | rfl | rfl <;> exact ⟨rfl, rfl, rfl, rfl⟩
+    have hCases : batch = batchA ∨ batch = batchB ∨ batch = batchC := by
+      simpa [threeBatchInputs] using hBatch
+    rcases hCases with rfl | rfl | rfl <;> exact ⟨rfl, rfl, rfl, rfl⟩
   distinctModules := by decide
   valueMatches := by decide
   entryBalance := by decide
@@ -44,6 +45,26 @@ theorem three_batch_preconditions :
 def executeTwoOnly (inputs : DepositNFrameTx.Inputs) : Contract Unit :=
   DepositNFrameTx.execute { inputs with batches := inputs.batches.take 2 }
 
+def twoBatchInputs : DepositNFrameTx.Inputs :=
+  { threeBatchInputs with batches := [batchA, batchB] }
+
+theorem two_batch_preconditions :
+    DepositNFrameTx.Preconditions twoBatchInputs threeBatchState where
+  authorized := rfl
+  moduleActive := rfl
+  allocationValid := rfl
+  lidoCallOk := rfl
+  healthy := by
+    intro batch hBatch
+    have hCases : batch = batchA ∨ batch = batchB := by
+      simpa [twoBatchInputs, threeBatchInputs] using hBatch
+    rcases hCases with rfl | rfl <;> exact ⟨rfl, rfl, rfl, rfl⟩
+  distinctModules := by decide
+  valueMatches := by decide
+  entryBalance := by decide
+  funded := by decide
+  foldStable := .cons (by decide) (.cons (by decide) (.nil (by decide)))
+
 theorem honest_three_batch_parent :
     ParentConclusion DepositNFrameTx.execute threeBatchInputs threeBatchState :=
   nframe_deposit_parent threeBatchInputs threeBatchState three_batch_preconditions
@@ -51,6 +72,9 @@ theorem honest_three_batch_parent :
 theorem executeTwoOnly_drops_third_frame :
     (observe threeBatchState ((executeTwoOnly threeBatchInputs).run threeBatchState)).journal
       ≠ (sourceObservables threeBatchInputs threeBatchState).journal := by
+  change (observe threeBatchState
+    ((DepositNFrameTx.execute twoBatchInputs).run threeBatchState)).journal ≠ _
+  rw [execute_observes_source twoBatchInputs threeBatchState two_batch_preconditions]
   decide
 
 /-- Parent-shaped kill-line: all quantifiers and premises are retained, and a
@@ -64,8 +88,8 @@ theorem fixed_two_only_refutes_nframe_parent :
   exact executeTwoOnly_drops_third_frame (congrArg Observables.journal h.1)
 
 def wrappingBatch : DepositNFrameTx.Batch :=
-  { batchC with amount := _root_.Verity.Core.Uint256.ofNat
-      (_root_.Verity.Core.Uint256.modulus - 1) }
+  { batchC with amount := (_root_.Verity.Core.Uint256.ofNat
+      (_root_.Verity.Core.Uint256.modulus - 1)) }
 
 def wrappingInputs : DepositNFrameTx.Inputs :=
   { threeBatchInputs with
