@@ -21,6 +21,8 @@ import LidoSRv3.Audit.Provenance.ConsolidationRequest
 import LidoSRv3.Tests.PackGEth1ProvenanceMutants
 import LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence
 import LidoSRv3.Tests.PackJDepositEthJournalMutants
+import LidoSRv3.Audit.Verity.DepositNFrameTx
+import LidoSRv3.Tests.DepositNFrameTxMutants
 import LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence
 import LidoSRv3.Tests.PackJTopupEthJournalMutants
 import LidoSRv3.Audit.Spec.HashIdentificationChild

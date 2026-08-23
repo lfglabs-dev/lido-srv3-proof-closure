@@ -1,6 +1,7 @@
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Source.DepositCorrespondence
 import LidoSRv3.Audit.Verity.DepositParentTx
+import LidoSRv3.Audit.Verity.DepositNFrameTx
 import LidoSRv3.Audit.Guarantees.Registry
 
 namespace LidoSRv3.Audit.Guarantees.PDeposit1
@@ -801,5 +802,184 @@ private theorem alloc_parents_do_not_imply_linkssource :
   -- The two executable legs carry `2 + 3` keys, while the one-key source input
   -- has `actualDepositsCount = 48 / 48 = 1`; both sides are closed terms.
   exact absurd hLink.keys (by decide)
+
+/-! ## n-frame parent
+
+`DepositNFrameTx` lifts the executable plane from `first`/`second` to
+`Inputs.batches : List Batch`.  The registered Verity theorem is the
+n-frame composition below.  Today's two-batch conjunct (d) is the n=2
+case (`nframe_n2_recovers_two_batch_conjunct_d`).  `A-DEPOSIT-32-ETHER`
+stays named.  ALLOC is not merged into DEPOSIT: `LinksSourceN` remains
+a caller hypothesis, now over the list of legs. -/
+
+open LidoSRv3.Audit.Verity.DepositNFrameTx hiding Inputs Preconditions
+
+abbrev NInputs := LidoSRv3.Audit.Verity.DepositNFrameTx.Inputs
+abbrev NPreconditions := LidoSRv3.Audit.Verity.DepositNFrameTx.Preconditions
+
+/-- List-shaped source bridge: key counts partition
+`actualDepositsCount` and each leg carries `keys * depositSize` wei. -/
+structure LinksSourceN (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : NInputs) : Prop where
+  depositSize : inputs.depositSize.val = cfg.depositSize
+  keys : foldedKeysNat inputs.batches = actualDepositsCount cfg inp
+  amounts : ∀ b ∈ inputs.batches, b.amount.val = b.keys.val * cfg.depositSize
+
+theorem fold_amounts_of_per_key (batches : List Batch) (size : Nat)
+    (h : ∀ b ∈ batches, b.amount.val = b.keys.val * size) :
+    foldedAmountNat batches = foldedKeysNat batches * size := by
+  induction batches with
+  | nil => simp [foldedAmountNat, foldedKeysNat]
+  | cons b rest ih =>
+    have hB := h b (List.mem_cons_self (l := rest))
+    have hRest : ∀ b' ∈ rest, b'.amount.val = b'.keys.val * size :=
+      fun b' hb' => h b' (List.mem_cons_of_mem _ hb')
+    simp [foldedAmountNat, foldedKeysNat, hB, ih hRest, Nat.add_mul]
+
+theorem linked_nframe_total_eq_pushedValue
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : NInputs) (hLink : LinksSourceN cfg inp inputs)
+    (_hNoWrap : foldedAmountNat inputs.batches
+      < _root_.Verity.Core.Uint256.modulus) :
+    foldedAmountNat inputs.batches = pushedValue cfg inp := by
+  rw [fold_amounts_of_per_key inputs.batches cfg.depositSize hLink.amounts,
+    hLink.keys, pushedValue, loopPushed_eq]
+
+theorem linked_nframe_push_is_word_bounded
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : NInputs) (hLink : LinksSourceN cfg inp inputs)
+    (hNoWrap : foldedAmountNat inputs.batches
+      < _root_.Verity.Core.Uint256.modulus) :
+    pushedValue cfg inp < _root_.Verity.Core.Uint256.modulus := by
+  rw [← linked_nframe_total_eq_pushedValue cfg inp inputs hLink hNoWrap]
+  exact hNoWrap
+
+/-- PARENT. ∀ cfg, inp, n-frame inputs, entry, with `LinksSourceN` and
+n-frame `Preconditions` (every batch healthy, pairwise distinct module
+ids, fold-stable no-wrap):
+
+1. source conservation / non-conserving rollback
+2. revert restores the entry snapshot
+3. inductive journal correspondence
+4. fold-stable no-wrap, arity-n, and the n=2 recovery of today's
+   two-batch conjunct (d)
+
+`A-DEPOSIT-32-ETHER` stays named.  This does not merge ALLOC into
+DEPOSIT. -/
+theorem verity_tx_composes_nframe_deposit
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : NInputs) (entry : _root_.Verity.ContractState)
+    (hLink : LinksSourceN cfg inp inputs)
+    (hPre : NPreconditions inputs entry) :
+    ((∀ keys pulled pushed balanceAfter,
+        run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
+          pulled = pushed ∧ depositsValue cfg inp = pushedValue cfg inp) ∧
+        (¬ ConservingConfig cfg → 0 < actualDepositsCount cfg inp →
+          (run cfg inp).reverts = true)) ∧
+      (∀ reason rollback,
+          (execute inputs).run entry = .revert reason rollback →
+            rollback = entry ∧
+              observe entry (probes inputs) ((execute inputs).run entry)
+                = idleObservables entry (probes inputs)) ∧
+      (observe entry (probes inputs) ((execute inputs).run entry)
+          = sourceObservables inputs entry ∧
+        ∀ keys pulled pushed balanceAfter,
+          run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
+            (sourceObservables inputs entry).pulled = (run cfg inp).pulled ∧
+              (sourceObservables inputs entry).pushed = (run cfg inp).pushed) ∧
+      ((expectedCalls inputs)
+            = inputs.batches.map (moduleEntry inputs) ++
+              [pullEntry inputs] ++
+              inputs.batches.map (pushEntry inputs) ∧
+        (foldedAmount inputs.batches).val = foldedAmountNat inputs.batches ∧
+        foldedAmountNat inputs.batches < _root_.Verity.Core.Uint256.modulus ∧
+        (probes inputs).length = inputs.batches.length ∧
+        ((expectedCalls inputs).filter
+            (fun c => decide (c.name = "depositToBeacon"))).length
+          = inputs.batches.length ∧
+        (inputs.batches.length = 2 →
+          (sourceObservables inputs entry).callNames
+            = ["obtainDepositData", "obtainDepositData",
+               "withdrawDepositableEther", "depositToBeacon",
+               "depositToBeacon"] ∧
+            (probes inputs).length = 2)) := by
+  refine ⟨source_deposit_conserves_and_rolls_back cfg inp,
+    fun reason rollback hRevert =>
+      ⟨revert_after_intermediate_writes_restores_snapshot
+          inputs entry rollback reason hRevert,
+        revert_observes_idle inputs entry rollback reason hRevert⟩,
+    ⟨execute_observes_source inputs entry hPre, ?agg⟩,
+    rfl, foldedAmount_val inputs.batches hPre.noWrap, hPre.noWrap,
+    probes_length inputs, depositToBeacon_count inputs, ?n2⟩
+  · intro keys pulled pushed balanceAfter hCommit
+    obtain ⟨-, -, hPulled, hPushed, -, -⟩ := committed_deposits_spec hCommit
+    have hCons : ConservingConfig cfg := committed_implies_conserving hCommit
+    have hPush : foldedAmountNat inputs.batches = pushedValue cfg inp :=
+      linked_nframe_total_eq_pushedValue cfg inp inputs hLink hPre.noWrap
+    have hPull : (LidoSRv3.Audit.Verity.DepositNFrameTx.sourceObservables
+          inputs entry).pulled = depositsValue cfg inp := by
+      simp [LidoSRv3.Audit.Verity.DepositNFrameTx.sourceObservables,
+        LidoSRv3.Audit.Verity.DepositNFrameTx.totalAmount,
+        foldedAmount_val inputs.batches hPre.noWrap]
+      have : foldedAmountNat inputs.batches = depositsValue cfg inp := by
+        rw [hPush, pushedValue, loopPushed_eq, depositsValue, hCons]
+      exact this
+    have hPushObs : (LidoSRv3.Audit.Verity.DepositNFrameTx.sourceObservables
+          inputs entry).pushed = pushedValue cfg inp := by
+      simp [LidoSRv3.Audit.Verity.DepositNFrameTx.sourceObservables, hPush]
+    exact ⟨hPull.trans (by rw [hCommit]; exact hPulled.symm),
+      hPushObs.trans (by rw [hCommit]; exact hPushed.symm)⟩
+  · intro hLen
+    exact length_two_callNames inputs entry hLen
+
+/-- Named discharge: conjunct (d) of the two-batch parent is the n=2
+case of the n-frame parent. -/
+theorem nframe_n2_recovers_two_batch_conjunct_d
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : Inputs) (entry : _root_.Verity.ContractState)
+    (_hLink : LinksSource cfg inp inputs)
+    (_hPre : Preconditions inputs entry) :
+    (sourceObservables (ofTwoBatch inputs) entry).callNames
+        = ["obtainDepositData", "obtainDepositData",
+           "withdrawDepositableEther", "depositToBeacon", "depositToBeacon"] ∧
+      (probes (ofTwoBatch inputs)).length = 2 ∧
+      (LidoSRv3.Audit.Verity.DepositParentTx.sourceObservables inputs entry).callNames
+        = (sourceObservables (ofTwoBatch inputs) entry).callNames := by
+  have h := two_batch_journal_is_nframe_n2 inputs entry
+  exact ⟨h.1, h.2.1, h.2.2.1⟩
+
+def nframeCanonicalSourceInput : SourceDepositInput :=
+  { moduleActive := true, maxDepositsPerBlock := 8, moduleDepositableEth := 256,
+    publicKeysBatchLength := 288, signaturesBatchLength := 576,
+    routerBalanceBefore := 0, lidoCanDeposit := true, lidoDepositableEther := 1000 }
+
+theorem nframe_canonical_links :
+    LinksSourceN canonicalSourceConfig nframeCanonicalSourceInput
+      LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs where
+  depositSize := by decide
+  keys := by decide
+  amounts := by
+    intro b hb
+    simp [LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs,
+      LidoSRv3.Audit.Verity.DepositNFrameTx.batchA,
+      LidoSRv3.Audit.Verity.DepositNFrameTx.batchB,
+      LidoSRv3.Audit.Verity.DepositNFrameTx.batchC] at hb
+    rcases hb with h | h | h <;> cases h <;> decide
+
+theorem nframe_canonical_composition_witness :
+    LinksSourceN canonicalSourceConfig nframeCanonicalSourceInput
+        LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs ∧
+      NPreconditions LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs
+        LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalState ∧
+      observe LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalState
+          (probes LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs)
+          ((execute LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs).run
+            LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalState)
+        = sourceObservables LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs
+            LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalState ∧
+      (probes LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs).length = 3 :=
+  ⟨nframe_canonical_links,
+    LidoSRv3.Audit.Verity.DepositNFrameTx.canonical_preconditions,
+    LidoSRv3.Audit.Verity.DepositNFrameTx.canonical_observes_source, rfl⟩
 
 end LidoSRv3.Audit.Guarantees.PDeposit1

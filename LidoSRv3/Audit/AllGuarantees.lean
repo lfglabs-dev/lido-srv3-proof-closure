@@ -2,6 +2,7 @@ import LidoSRv3.Audit.Guarantees.PAlloc1
 import LidoSRv3.Audit.Guarantees.PAlloc2
 import LidoSRv3.Audit.Guarantees.PDeposit1
 import LidoSRv3.Audit.Verity.DepositParentTx
+import LidoSRv3.Audit.Verity.DepositNFrameTx
 import LidoSRv3.Audit.Guarantees.PTopup1
 import LidoSRv3.Audit.Guarantees.PAccount1
 import LidoSRv3.Audit.Guarantees.PReserve1
@@ -65,12 +66,19 @@ facts: the source configuration/input, the transaction input and the entry
 `ContractState` are quantified once and linked by `LinksSource`.  Naming both
 the composition and its non-vacuity witness here keeps the aggregate surface
 honest if either is ever weakened. -/
+example := @PDeposit1.verity_tx_composes_nframe_deposit
 example := @PDeposit1.verity_tx_composes_deposit_conservation_and_rollback
+example := @PDeposit1.nframe_n2_recovers_two_batch_conjunct_d
 
 example : LidoSRv3.Audit.Verity.DepositParentTx.Preconditions
     LidoSRv3.Audit.Verity.DepositParentTx.canonicalInputs
     LidoSRv3.Audit.Verity.DepositParentTx.canonicalState :=
   PDeposit1.canonical_composition_witness.2.1
+
+example : LidoSRv3.Audit.Verity.DepositNFrameTx.Preconditions
+    LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalInputs
+    LidoSRv3.Audit.Verity.DepositNFrameTx.canonicalState :=
+  PDeposit1.nframe_canonical_composition_witness.2.1
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
 def supplemental : List Guarantee :=

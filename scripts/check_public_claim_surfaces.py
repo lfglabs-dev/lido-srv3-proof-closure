@@ -16,13 +16,14 @@ CLAIMS = {
     "P-DEPOSIT-1": {
         "abstract_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
         "verity_status": "CHECKED",
-        "verity_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback",
+        "verity_theorem": "LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_nframe_deposit",
         "module": "PDeposit1",
         "layers": ".model, .abstractTx, .source, .verityTx",
         "imports": (
             "LidoSRv3.Audit.Trace",
             "LidoSRv3.Audit.Source.DepositCorrespondence",
             "LidoSRv3.Audit.Verity.DepositParentTx",
+            "LidoSRv3.Audit.Verity.DepositNFrameTx",
             "LidoSRv3.Audit.Guarantees.Registry",
         ),
         # The composed claim is a single theorem quantified over the source
@@ -88,6 +89,17 @@ CLAIMS = {
             ("theorem", "oversized_deployment_exceeds_word"),
             ("theorem", "oversized_run_commits"),
             ("theorem", "abstract_parent_covers_deployments_the_verity_plane_omits"),
+            ("abbrev", "NInputs"),
+            ("abbrev", "NPreconditions"),
+            ("structure", "LinksSourceN"),
+            ("theorem", "fold_amounts_of_per_key"),
+            ("theorem", "linked_nframe_total_eq_pushedValue"),
+            ("theorem", "linked_nframe_push_is_word_bounded"),
+            ("theorem", "verity_tx_composes_nframe_deposit"),
+            ("theorem", "nframe_n2_recovers_two_batch_conjunct_d"),
+            ("def", "nframeCanonicalSourceInput"),
+            ("theorem", "nframe_canonical_links"),
+            ("theorem", "nframe_canonical_composition_witness"),
         ),
     },
     "P-TOPUP-1": {

@@ -37,6 +37,8 @@ import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 import LidoSRv3.Tests.ReserveRelationalTxMutants
 import LidoSRv3.Tests.DepositTxMutants
 import LidoSRv3.Tests.DepositParentTxMutants
+import LidoSRv3.Tests.DepositNFrameTxMutants
+import LidoSRv3.Audit.Verity.DepositNFrameTx
 import LidoSRv3.Tests.MinFirstAmountTxMutants
 import LidoSRv3.Tests.MinFirstDistributionTxMutants
 import LidoSRv3.Audit.Verity.AllocationTx
@@ -316,6 +318,11 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.DepositTxMutants.double_beacon_send_rejected
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_deposit_conservation_and_rollback
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.verity_tx_composes_nframe_deposit
+#print axioms
+  LidoSRv3.Audit.Guarantees.PDeposit1.nframe_n2_recovers_two_batch_conjunct_d
+#print axioms LidoSRv3.Audit.Guarantees.PDeposit1.nframe_canonical_composition_witness
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.canonical_composition_witness
 #print axioms LidoSRv3.Audit.Guarantees.PDeposit1.linked_deployment_push_is_word_bounded
 #print axioms
@@ -333,6 +340,9 @@ assumptions or proof escapes.
   LidoSRv3.Audit.Guarantees.PDeposit1.oversized_input_is_outside_the_source_domain
 #print axioms
   LidoSRv3.Audit.Guarantees.PDeposit1.abstract_parent_covers_deployments_the_verity_plane_omits
+#print axioms LidoSRv3.Audit.Verity.DepositNFrameTx.execute_observes_source
+#print axioms LidoSRv3.Audit.Verity.DepositNFrameTx.wrapping_fold_does_not_commit_value_moving
+#print axioms LidoSRv3.Tests.DepositNFrameTxMutants.executeTwoOnly_refutes_nframe_parent
 #print axioms LidoSRv3.Audit.Verity.DepositParentTx.execute_observes_source
 #print axioms
   LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot
