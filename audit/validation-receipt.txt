@@ -1,11 +1,278 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6b6b85f230a30c5731b317763942eb181273a8a8
+validated-tree: ee0acca91eca81f543caa26eccb0e61195a9a69f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 guard-order honesty of the pull kill-line (2026-08-23)
+------------------------------------------------------------------
+
+- Rebind `validated-tree` to `ee0acca91eca81f543caa26eccb0e61195a9a69f`, the tracked tree of
+  `pdeposit1-quantifier-honesty` excluding this receipt.
+- Scope: the same one row, P-DEPOSIT-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched. This entry repairs one
+  defect in the entry below, which remains as the historical record of what
+  was claimed at that head.
+- Defect (unreachable line-972 panic). The pull kill-line's on-chain story
+  claimed that an admitted source execution panics at the line-972 checked
+  multiplication (`StakingRouter.sol`) before the line-983 withdrawal and the
+  line-996 assert. That is false by guard order: with the skewed immutable
+  `maxEBType1 = 2 ^ 256 - 1` and the canonical module allocation of 256 wei,
+  the computed cap is `maxDepositsCount = min 8 (256 / (2 ^ 256 - 1)) = 0`, so
+  the pinned path turns away at the earlier line-959 `ZeroDeposits` guard and
+  line 972 is never evaluated, on chain and inside the unbounded model alike.
+  Fixed by adding the executable regression
+  `skewed_pull_witness_turned_away_before_line_972` (kernel-`decide`: the cap
+  is 0 and `run` returns `revertZeroDeposits` on exactly the witness the
+  kill-line quotes) and the two guard-bound theorems
+  `line_972_product_le_module_allocation` (the line-969 over-target guard
+  bounds the line-972 product by the module allocation, since truncated
+  division satisfies `(a / b) * b ≤ a`) and
+  `encodable_allocation_bounds_line_972_product` (a `uint256`-encodable
+  allocation keeps that product inside one word, so a Solidity 0.8
+  checked-arithmetic panic at line 972 is unreachable from the encodable
+  domain). Every docstring, `report/P-DEPOSIT-1.md`, and `audit/guarantees.yaml`
+  claim of the pull kill-line now reads the word-exceeding `depositsValue` as
+  an unbounded-`Nat` formula value the composed hypotheses fail to bound --
+  never a reached on-chain multiplication; the oversized exhibit's on-chain
+  story is likewise reduced to non-encodability of the call.
+- Metadata resync: `EXPECTED_CANONICAL_DETAIL_SHA256["P-DEPOSIT-1"]` rebound
+  to `5d3f4a1365e82f3296f71a97e19c1714c0c8aec99aff762d428b2fd064e87387`;
+  `audit/ROADMAP.md`, `audit/STATUS.md`, `audit/REPRODUCE.md` regenerated;
+  the public claim-surface allowlist (`scripts/check_public_claim_surfaces.py`)
+  extended with the three new declarations in file order; `Trust.lean`
+  print-axioms widened for them (each depends on `[propext]` only).
+- Reproduction at this head (run locally; the branch has no CI):
+  `make test` exit 0 after the receipt rebind (metadata, mutants, receipt,
+  provenance guards, and all 27 executable Lean regression targets);
+  `make prove` exit 0 -- `lake build LidoSRv3` `Build completed successfully
+  (1461 jobs)` under Lean 4.31.0; the axiom audit over the fresh
+  `proofs/logs/prove.txt` shows the three new theorems depend on `[propext]`
+  only, no `sorryAx` anywhere, and no new `native_decide` (the 15
+  pre-existing `native_decide.ax` mentions are unchanged from the prior head).
+
+P-DEPOSIT-1 source-domain honesty of both kill-lines (2026-08-23)
+------------------------------------------------------------------
+
+- Rebind `validated-tree` to `17f3e160fcf05b6775dc3bcf4a4f1c56070e6865`, the
+  tracked tree of `pdeposit1-quantifier-honesty` excluding this receipt.
+- Scope: the same one row, P-DEPOSIT-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched. This entry repairs two
+  defects in the entries below, which remain as the historical record of what
+  was claimed at those heads.
+- Defect 1 (oversized witness outside the source domain). The committing
+  oversized witness scaled every cap to at least `2 ^ 256`
+  (`maxDepositsPerBlock`, `moduleDepositableEth`, both batch lengths,
+  `lidoDepositableEther`), so `oversizedSourceInput` is not a `uint256`-encodable
+  call: `DepositCorrespondence.lean` reads its unbounded `Nat` arithmetic as the
+  pinned Solidity only under the no-overflow reading, and this input is outside
+  that domain by construction. `oversized_run_commits` therefore proved only
+  that the unbounded Lean function commits a synthetic input, while the report
+  and metadata claimed a deployment "actually executes" the pinned path and
+  commits a real frame sequence omitted by Verity. Fixed by adding
+  `oversized_input_is_outside_the_source_domain`, a checked five-conjunct list
+  that every scaled cap sits at or above `Uint256.modulus`, and rewording every
+  claim about the witness to the honest scope: the *model's* `run` commits, the
+  exhibit is a quantifier gap of the abstract `Nat` model's unbounded `∀ (cfg,
+  inp)`, no realizable Solidity deployment encodes the call, and on chain
+  Solidity 0.8 checked arithmetic panics at the line-972 product before any
+  withdrawal or per-key frame. The witness keeps its non-vacuity content: no
+  guard turns the model away, and the abstract parent's conservation conclusion
+  fires on the model-level committed outcome.
+- Defect 2 (unencodable immutable presented as a source pull). The pull
+  kill-line `linked_hypotheses_do_not_bound_the_source_pull` set the `uint256`
+  constructor immutable `maxEBType1` to exactly `2 ^ 256`, which no Solidity
+  deployment can encode, and the docstring/read of `depositsValue` as wei the
+  router "would withdraw" at line 983 ignored that Solidity 0.8 checked
+  multiplication overflows at line 972 before that withdrawal and before the
+  line-996 assertion. Fixed by setting `maxEBType1 := 2 ^ 256 - 1`, the largest
+  `uint256`-encodable value, and adding its encodability
+  (`skewedPullConfig.maxEBType1 < Uint256.modulus`) as the theorem's first
+  conjunct, so the word boundary is left exactly at the line-972 product `5 *
+  (2 ^ 256 - 1)` where checked arithmetic panics. All prose now claims the
+  line-972 *pull quantity*, not a settled transfer, and records both why no
+  deployment settles it (checked `Panic(0x11)` at the multiplication) and why
+  the unbounded model still aborts (non-conserving deployment reverts at the
+  line-996 assert).
+
+P-DEPOSIT-1 push/pull split and committing oversized witness (2026-08-23)
+-------------------------------------------------------------------------
+
+- Rebind `validated-tree` to `db24f3bf7ccd19d113856a8c6099c6c75851bb57`, the
+  tracked tree of `pdeposit1-quantifier-honesty` excluding this receipt.
+- Scope: the same one row, P-DEPOSIT-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched. This entry repairs two
+  defects in the entry below, which remains as the historical record of what
+  was claimed at that head.
+- Defect 1 (vacuous witness). `oversizedSourceInput` was
+  `canonicalSourceInput` with only `publicKeysBatchLength` scaled, leaving
+  `maxDepositsPerBlock = 8` and `moduleDepositableEth = 256`. So
+  `maxDepositsCount = min 8 8 = 8 < 2 ^ 256 = actualDepositsCount` and `run`
+  returned `revertModuleReturnExceedTarget` at `StakingRouter.sol` line 969,
+  before any pull or any per-key frame. Both abstract-parent implications in
+  `abstract_parent_covers_deployments_the_verity_plane_omits` were therefore
+  vacuous, and the advertised "abstract plane covers an actual 2 ^ 256-frame
+  execution" was not substantiated. Fixed by scaling every cap the pinned path
+  checks -- `maxDepositsPerBlock`, `moduleDepositableEth`,
+  `signaturesBatchLength`, `lidoDepositableEther` -- and adding
+  `oversized_run_commits`, which proves
+  `run canonicalSourceConfig oversizedSourceInput`
+  `= .committedDeposits (2 ^ 256) (2 ^ 256 * 32) (2 ^ 256 * 32) 0`. The witness
+  now carries that committed outcome as its first conjunct and the abstract
+  parent's conservation conclusion *fired* on it as its second, so the
+  quantifier gap is exhibited at a deployment the source model actually
+  executes. The rollback conjunct was dropped rather than kept: the deployment
+  is conserving, so that implication would have held only vacuously.
+- Defect 2 (pull vs push). `linked_deployment_is_word_bounded` concluded
+  `actualDepositsCount cfg inp * cfg.depositSize < 2 ^ 256` -- the executable
+  push -- while the metadata and report read it as the source pull
+  `depositsValue cfg inp = actualDepositsCount cfg inp * cfg.maxEBType1`.
+  Neither `LinksSource` nor `Preconditions` relates `maxEBType1` to
+  `depositSize`, so that reading was unsupported. Fixed by taking both remedies:
+  - renamed to `linked_deployment_push_is_word_bounded` and restated strictly
+    as the push, now concluding `pushedValue cfg inp < 2 ^ 256` as well;
+  - added `linked_conserving_deployment_pull_is_word_bounded`, which bounds
+    `depositsValue` under the `ConservingConfig cfg` hypothesis it needs;
+  - conjunct (d) of `verity_tx_composes_deposit_conservation_and_rollback` now
+    carries the push bound unconditionally and the pull bound with
+    `ConservingConfig cfg` explicit in the statement;
+  - added the kill-line `linked_hypotheses_do_not_bound_the_source_pull`:
+    at `skewedPullConfig` (`maxEBType1 := 2 ^ 256`, `depositSize` unchanged)
+    `LinksSource` and `Preconditions` both still hold and the push is still
+    160 wei, while `depositsValue` is `5 * 2 ^ 256`. The `ConservingConfig`
+    hypothesis is therefore load-bearing, not decorative. Stated honestly in
+    the theorem's own docstring: that deployment reverts at the line-996
+    `assert`, so this is a claim about which configurations the hypotheses
+    admit, not about a settled transfer.
+- Trust disclosure widened again: `Trust.lean` prints axioms for
+  `linked_deployment_push_is_word_bounded`,
+  `linked_conserving_deployment_pull_is_word_bounded`,
+  `linked_hypotheses_do_not_bound_the_source_pull`, `oversized_run_commits`,
+  and `abstract_parent_covers_deployments_the_verity_plane_omits`. All five
+  depend on `[propext, Quot.sound]` only; no `sorryAx` appears anywhere in the
+  run. `oversized_run_commits` closes with `decide +kernel`, the existing repo
+  idiom (25 other uses under `LidoSRv3/Tests/`), which adds no axiom.
+- `scripts/check_public_claim_surfaces.py` allowlist updated in declaration
+  order for the rename and the three new public declarations
+  (`skewedPullConfig`, `linked_hypotheses_do_not_bound_the_source_pull`,
+  `oversized_run_commits`).
+- `EXPECTED_CANONICAL_DETAIL_SHA256["P-DEPOSIT-1"]` rebound from
+  `9496a4dba26b429041819c8c2f8225a6da8c4229c54eb850eafdffd4181eb98b` to
+  `e3243b4b789cca906822e53c6047ff8dcde4024be3bc74c8d09a7329b8172a7a` for the
+  edited `summary`, `fidelity`, `classification`, and `reproduction`; the
+  pinned canonical claim tuple (statuses, theorem names, kind, assumptions) is
+  unchanged. `audit/STATUS.md` and `audit/REPRODUCE.md` regenerated from that
+  metadata; `audit/ROADMAP.md` unchanged.
+- What this does NOT do: it still does not close the gap, and it does not add a
+  bound on the source pull of every admitted deployment -- there is none, and
+  the row now says so with a checked kill-line instead of claiming otherwise.
+  The executable plane is still exactly two batches with no n-frame `execute`,
+  `LinksSource` is still a caller hypothesis, and `A-DEPOSIT-CONTRACT` /
+  `A-DEPOSIT-32-ETHER` are still OPEN.
+
+Reproduction at this head (all run locally; the branch has no CI):
+
+- `make prove` exit 0 -- `verified_source_tree`
+  `469ca5bec13a297c55911d889fb051ad73c854cb`, Lean 4.31.0,
+  `lake build LidoSRv3` `Build completed successfully (1468 jobs)`, only
+  pre-existing upstream linter warnings. `proofs/logs/prove.txt` and
+  `proofs/logs/proof-report.json` regenerated from that run.
+- Focused reproduction command recorded for this row in `audit/guarantees.yaml`:
+  `lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants`
+  exit 0.
+- `make test` exit 0 on the tree this receipt binds, covering the same
+  validators, `LidoSRv3.Tests.*` targets, and reference fixtures listed in the
+  entry below.
+- `validated-tree` rebound from `aab948295154e22b4cd41d7cc4bba1e71fdec8f0` to
+  `db24f3bf7ccd19d113856a8c6099c6c75851bb57`, the tracked tree of this commit
+  excluding this receipt per `scripts/check_validation_receipt.py`. This rebind
+  is the final commit of the change, since every other tracked file is inside
+  the tree it binds.
+
+P-DEPOSIT-1 quantifier honesty (2026-08-23)
+-------------------------------------------
+
+Superseded in part by the entry above: `linked_deployment_is_word_bounded` was
+renamed to `linked_deployment_push_is_word_bounded` and restated, and
+`oversizedSourceInput` was rescaled so that it commits. The entry is kept
+verbatim as the record of what was claimed at head
+`e60337b6b1879dacade509af82cffecf838c185a`.
+
+- Rebind `validated-tree` to `aab948295154e22b4cd41d7cc4bba1e71fdec8f0`, the
+  tracked tree of `pdeposit1-quantifier-honesty` excluding this receipt.
+- Scope: one row, P-DEPOSIT-1. No new guarantee id, no status change, no
+  assumption added or removed, no other row touched.
+- The gap being corrected: the registered abstract parent
+  `source_deposit_conserves_and_rolls_back` is an unbounded forall over
+  `(cfg, inp)`, while the registered Verity parent
+  `verity_tx_composes_deposit_conservation_and_rollback` executes exactly two
+  batches. Both rows read `CHECKED`, and the asymmetry lived only in prose, so
+  the row could be quoted as an executable claim about every deployment the
+  abstract row states.
+- Conservative correction, not a lift. The exactly-two-batch theorem is
+  preserved; its finiteness is moved into the registered statement and into
+  checked theorems:
+  - conjunct (d) of the registered Verity parent now states the fixed
+    five-frame journal (two `obtainDepositData` legs, one
+    `withdrawDepositableEther` pull, exactly two `depositToBeacon` legs), the
+    two-element probe list, and the 256-bit word bound on the linked
+    deployment;
+  - `linked_deployment_is_word_bounded` derives that bound from `LinksSource`
+    and the parent's own `Preconditions.noWrap`;
+  - `abstract_parent_covers_deployments_the_verity_plane_omits` exhibits
+    `oversizedSourceInput`, a deployment where the abstract parent holds in
+    full and no `Inputs` at all satisfies `LinksSource` together with
+    `noWrap`, for any entry state. Non-vacuity
+    (`canonical_composition_witness`) now has a dual, so satisfiability is not
+    mistaken for coverage.
+- Trust disclosure widened, not narrowed: `Trust.lean` also prints axioms for
+  `PDeposit1.linked_deployment_is_word_bounded` and
+  `PDeposit1.abstract_parent_covers_deployments_the_verity_plane_omits`; both
+  depend on `[propext, Quot.sound]` only, and no `sorryAx` appears anywhere in
+  the run.
+- `EXPECTED_CANONICAL_DETAIL_SHA256["P-DEPOSIT-1"]` rebound from
+  `b99c5534cc2faf7d71956e1b306cd3646873cfc87e7d8c8d42d72f6fffb307fd` to
+  `9496a4dba26b429041819c8c2f8225a6da8c4229c54eb850eafdffd4181eb98b` for the
+  edited `summary`, `fidelity`, `classification`, and `next_gate`; the pinned
+  canonical claim tuple (statuses, theorem names, kind, assumptions) is
+  unchanged. `audit/ROADMAP.md`, `audit/STATUS.md` and `audit/REPRODUCE.md`
+  regenerated from that metadata.
+- What this does NOT do: it does not close the gap. The executable plane is
+  still exactly two batches with no n-frame `execute`, `LinksSource` is still a
+  caller hypothesis, and `A-DEPOSIT-CONTRACT` / `A-DEPOSIT-32-ETHER` are still
+  OPEN. The row's fidelity now says so in the registered statement rather than
+  only in prose.
+
+Reproduction at this head (all run locally; the branch has no CI):
+
+- `make prove` exit 0 — `verified_source_tree`
+  `50cfc74bc047db1b53892edd68cfb432ef540775`, Lean 4.31.0,
+  `lake build LidoSRv3` `Build completed successfully (1461 jobs)`, only
+  pre-existing upstream linter warnings. `proofs/logs/prove.txt` and
+  `proofs/logs/proof-report.json` regenerated from that run.
+- Focused reproduction command recorded for this row in `audit/guarantees.yaml`:
+  `lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants`
+  exit 0, `Build completed successfully (1219 jobs)`.
+- `make test` exit 0 on the tree this receipt binds, covering
+  `scripts/audit_metadata.py check` (11 canonical guarantees + 18 subordinate
+  evidence rows), `scripts/test_audit_metadata.py`,
+  `scripts/check_validation_receipt.py`,
+  `scripts/check_no_python_evidence.sh`,
+  `scripts/test_check_no_python_evidence.sh`,
+  `scripts/check_public_claim_surfaces.py`,
+  `scripts/test_public_claim_surfaces.py`,
+  `scripts/test_verity_provenance.py`,
+  `scripts/check_provenance_guards.sh`, every `LidoSRv3.Tests.*` target named
+  in the `Makefile`, and the five `fixtures/solidity-reference/*` checks.
+- `validated-tree` rebound from `6b6b85f230a30c5731b317763942eb181273a8a8` to
+  `aab948295154e22b4cd41d7cc4bba1e71fdec8f0`, the tracked tree of this commit
+  excluding this receipt per `scripts/check_validation_receipt.py`
+  (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
+  This rebind is the final commit of the change, since every other tracked file
+  is inside the tree it binds.
 
 Leftover Wave 3 integrator (2026-08-22)
 ---------------------------------------

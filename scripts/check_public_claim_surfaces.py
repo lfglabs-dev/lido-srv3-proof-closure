@@ -35,6 +35,29 @@ CLAIMS = {
         # and `verity_tx_revert_restores_snapshot` is the hypothesis-free
         # executable rollback theorem the composed claim consumes, so all three
         # are part of the public surface.
+        # `linked_deployment_push_is_word_bounded`,
+        # `linked_conserving_deployment_pull_is_word_bounded`,
+        # `skewedPullConfig`, `linked_hypotheses_do_not_bound_the_source_pull`,
+        # `oversizedSourceInput`, `oversized_input_is_outside_the_source_domain`,
+        # `oversized_deployment_exceeds_word`,
+        # `oversized_run_commits` and
+        # `abstract_parent_covers_deployments_the_verity_plane_omits` state the
+        # executable plane's finiteness, the separation between the bounded
+        # executable push and the unbounded source pull, the `uint256`
+        # source-domain honesty of both kill-lines (the skewed immutable is
+        # encodable and checked so; the oversized input is deliberately outside
+        # the domain and checked so), and the abstract-model input the abstract
+        # parent commits without either, so they are public too: a
+        # reader must not be able to quote the CHECKED Verity row without them.
+        # `skewed_pull_witness_turned_away_before_line_972`,
+        # `line_972_product_le_module_allocation` and
+        # `encodable_allocation_bounds_line_972_product` pin the guard-order
+        # correction of the pull kill-line's on-chain reading: the skewed
+        # deployment turns away at the line-959 `ZeroDeposits` guard before the
+        # line-972 multiplication, and an encodable module allocation bounds
+        # that product inside one word, so the word-exceeding pull quantity is
+        # an unbounded-`Nat` formula value, never a reached on-chain
+        # multiplication.
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalDepositContractAddress"),
@@ -47,12 +70,24 @@ CLAIMS = {
             ("structure", "LinksSource"),
             ("theorem", "linked_total_eq_pushedValue"),
             ("theorem", "linked_total_eq_depositsValue"),
+            ("theorem", "linked_deployment_push_is_word_bounded"),
+            ("theorem", "linked_conserving_deployment_pull_is_word_bounded"),
             ("theorem", "verity_tx_revert_restores_snapshot"),
             ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
             ("def", "canonicalSourceConfig"),
             ("def", "canonicalSourceInput"),
             ("theorem", "canonical_links_source"),
             ("theorem", "canonical_composition_witness"),
+            ("def", "skewedPullConfig"),
+            ("theorem", "linked_hypotheses_do_not_bound_the_source_pull"),
+            ("theorem", "skewed_pull_witness_turned_away_before_line_972"),
+            ("theorem", "line_972_product_le_module_allocation"),
+            ("theorem", "encodable_allocation_bounds_line_972_product"),
+            ("def", "oversizedSourceInput"),
+            ("theorem", "oversized_input_is_outside_the_source_domain"),
+            ("theorem", "oversized_deployment_exceeds_word"),
+            ("theorem", "oversized_run_commits"),
+            ("theorem", "abstract_parent_covers_deployments_the_verity_plane_omits"),
         ),
     },
     "P-TOPUP-1": {

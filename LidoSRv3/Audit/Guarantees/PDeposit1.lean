@@ -211,6 +211,74 @@ theorem linked_total_eq_depositsValue (cfg : SourceDepositConfig) (inp : SourceD
   rw [linked_total_eq_pushedValue cfg inp inputs hLink hNoWrap, pushedValue, loopPushed_eq,
     depositsValue, hCons]
 
+/--
+The composed parent's own hypotheses bound the wei the executable beacon legs
+**push**, and only that.  `LinksSource` forces the two legs to carry
+`actualDepositsCount cfg inp` keys at `cfg.depositSize` wei each, and
+`Preconditions.noWrap` forces their sum into one 256-bit word, so
+`pushedValue cfg inp` -- the wei the loop at `BeaconChainDepositor.sol` lines
+53--63 sends, `actualDepositsCount cfg inp * DEPOSIT_SIZE` -- is below `2 ^ 256`.
+
+This is deliberately *not* a bound on the source pull, and the two are not the
+same quantity.  The pull at `StakingRouter.sol` line 983 is the line-972
+`depositsValue cfg inp = actualDepositsCount cfg inp * MAX_EFFECTIVE_BALANCE_WC_TYPE_01`,
+and neither `LinksSource` nor `Preconditions` relates `cfg.maxEBType1` to
+`cfg.depositSize`.  So a deployment admitted by these hypotheses may compute a
+pull quantity far above one word while this theorem still holds:
+`linked_hypotheses_do_not_bound_the_source_pull` exhibits one (with a
+`uint256`-encodable immutable, so what exceeds the word is only the line-972
+*product* read as an unbounded-`Nat` formula: the deployment itself never
+evaluates that multiplication, because its zero `maxDepositsCount` turns the
+pinned path away at the earlier line-959 guard, checked by
+`skewed_pull_witness_turned_away_before_line_972`), and
+`linked_conserving_deployment_pull_is_word_bounded` is the extra hypothesis under
+which the pull is bounded too.  Nothing here may be quoted as "every admitted
+deployment's whole pull fits one word".
+
+This is the arithmetic half of the executable plane's finiteness, and it is
+stated rather than left implicit: the registered abstract parent is an unbounded
+`∀ (cfg, inp)` with no word bound at all, so every input above this bound is
+covered by the abstract plane and by no executable transaction.
+`abstract_parent_covers_deployments_the_verity_plane_omits` exhibits one; that
+exhibit is an input of the unbounded `Nat` abstraction, deliberately outside the
+`uint256` source domain, since under the no-overflow correspondence reading no
+realizable deployment settles a pull above one word in the first place.
+-/
+theorem linked_deployment_push_is_word_bounded
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : Inputs) (hLink : LinksSource cfg inp inputs)
+    (hNoWrap : inputs.first.amount.val + inputs.second.amount.val
+      < _root_.Verity.Core.Uint256.modulus) :
+    pushedValue cfg inp < _root_.Verity.Core.Uint256.modulus ∧
+      actualDepositsCount cfg inp * cfg.depositSize
+        < _root_.Verity.Core.Uint256.modulus := by
+  have hSum : inputs.first.amount.val + inputs.second.amount.val
+      = actualDepositsCount cfg inp * cfg.depositSize := by
+    rw [hLink.firstAmount, hLink.secondAmount, ← Nat.add_mul, hLink.keys]
+  have hBound : actualDepositsCount cfg inp * cfg.depositSize
+      < _root_.Verity.Core.Uint256.modulus := by omega
+  refine ⟨?_, hBound⟩
+  rw [pushedValue, loopPushed_eq]
+  exact hBound
+
+/--
+The source pull is word-bounded too, but only under a hypothesis the composed
+parent does not carry: a conserving deployment.  When
+`MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = DEPOSIT_SIZE` the line-972 `depositsValue`
+is the executable push, so `linked_deployment_push_is_word_bounded` transfers to
+it.  Off `ConservingConfig` it does not transfer, and does not hold:
+`linked_hypotheses_do_not_bound_the_source_pull`.
+-/
+theorem linked_conserving_deployment_pull_is_word_bounded
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : Inputs) (hLink : LinksSource cfg inp inputs)
+    (hNoWrap : inputs.first.amount.val + inputs.second.amount.val
+      < _root_.Verity.Core.Uint256.modulus)
+    (hCons : ConservingConfig cfg) :
+    depositsValue cfg inp < _root_.Verity.Core.Uint256.modulus := by
+  rw [depositsValue, hCons]
+  exact (linked_deployment_push_is_word_bounded cfg inp inputs hLink hNoWrap).2
+
 /-- Hypothesis-free executable rollback theorem. Unlike the composed parent,
 this statement takes neither `LinksSource` nor success `Preconditions`: every
 actual `execute` revert restores the exact entry snapshot and observes the idle
@@ -254,13 +322,37 @@ destination, wei value, argument words and order -- and, whenever the source
 model commits its push, its `pulled` and `pushed` are exactly the executable
 plane's.
 
+*(d)* is the finite scope of *(b)* and *(c)*, in the registered statement rather
+than only in this docstring, so the row cannot be quoted as an unbounded loop
+claim.  The executable journal is the same five frames for every `inputs` --
+two `obtainDepositData` module legs, one `withdrawDepositableEther` pull and
+exactly two `depositToBeacon` legs -- and exactly two module ids are probed,
+however many keys the source batch holds; the pinned loop at
+`BeaconChainDepositor.sol` lines 53--63 instead performs one frame per key.
+The third component is the arithmetic bound of
+`linked_deployment_push_is_word_bounded`: the hypotheses admit only deployments
+whose executable **push** -- `pushedValue cfg inp`, the wei the two beacon legs
+send -- fits one 256-bit word.  The fourth is the matching bound on the source
+**pull** `depositsValue cfg inp`, and it is stated with the hypothesis it
+actually needs, `ConservingConfig cfg`: off that hypothesis the pull scale
+`MAX_EFFECTIVE_BALANCE_WC_TYPE_01` is unrelated to `DEPOSIT_SIZE` and the pull is
+genuinely unbounded here (`linked_hypotheses_do_not_bound_the_source_pull`).  So
+this conjunct must not be read as bounding the whole pull of every admitted
+deployment.
+
 Scope, stated rather than hidden: the executable plane is a Verity-EDSL
 transaction (`A-VERITY-SCAFFOLD`), not an EVM execution, and the source plane is
 `A-SOURCE-SHAPED`.  `LinksSource` is a hypothesis about the caller's allocation,
 not a proof that the pinned Solidity produces those two legs.  The transaction
 executes exactly two batches; it does not encode a universally quantified loop,
 and no ALLOC composition into `LinksSource` is claimed (see the private
-counterexample below).
+counterexample below).  Conjunct *(a)* is therefore the only unbounded half of
+this theorem: it holds for every `(cfg, inp)`, while *(b)*, *(c)* and *(d)* speak
+only about the fixed two-leg executable shape, and
+`abstract_parent_covers_deployments_the_verity_plane_omits` exhibits an
+abstract-model input *(a)* covers -- one deliberately outside the `uint256`
+source domain (`oversized_input_is_outside_the_source_domain`) -- that no
+executable transaction can represent.
 -/
 theorem verity_tx_composes_deposit_conservation_and_rollback
     (cfg : SourceDepositConfig) (inp : SourceDepositInput)
@@ -282,12 +374,22 @@ theorem verity_tx_composes_deposit_conservation_and_rollback
         ∀ keys pulled pushed balanceAfter,
           run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
             (sourceObservables inputs entry).pulled = (run cfg inp).pulled ∧
-              (sourceObservables inputs entry).pushed = (run cfg inp).pushed) := by
+              (sourceObservables inputs entry).pushed = (run cfg inp).pushed) ∧
+      ((sourceObservables inputs entry).callNames
+          = ["obtainDepositData", "obtainDepositData", "withdrawDepositableEther",
+             "depositToBeacon", "depositToBeacon"] ∧
+        (probes inputs).length = 2 ∧
+        pushedValue cfg inp < _root_.Verity.Core.Uint256.modulus ∧
+        (ConservingConfig cfg →
+          depositsValue cfg inp < _root_.Verity.Core.Uint256.modulus)) := by
   refine ⟨source_deposit_conserves_and_rolls_back cfg inp,
     fun reason rollback hRevert =>
       ⟨revert_after_intermediate_writes_restores_snapshot inputs entry rollback reason hRevert,
         revert_observes_idle inputs entry rollback reason hRevert⟩,
-    execute_observes_source inputs entry hPre, ?_⟩
+    ⟨execute_observes_source inputs entry hPre, ?_⟩,
+    rfl, rfl, (linked_deployment_push_is_word_bounded cfg inp inputs hLink hPre.noWrap).1,
+    fun hCons =>
+      linked_conserving_deployment_pull_is_word_bounded cfg inp inputs hLink hPre.noWrap hCons⟩
   intro keys pulled pushed balanceAfter hCommit
   obtain ⟨-, -, hPulled, hPushed, -, -⟩ := committed_deposits_spec hCommit
   have hCons : ConservingConfig cfg := committed_implies_conserving hCommit
@@ -344,12 +446,327 @@ theorem canonical_composition_witness :
           = (run canonicalSourceConfig canonicalSourceInput).pushed := by
   have hRun : run canonicalSourceConfig canonicalSourceInput
       = .committedDeposits 5 160 160 0 := by decide
-  obtain ⟨-, -, hObs, hAgg⟩ :=
+  obtain ⟨-, -, ⟨hObs, hAgg⟩, -⟩ :=
     verity_tx_composes_deposit_conservation_and_rollback
       canonicalSourceConfig canonicalSourceInput
       canonicalInputs canonicalState canonical_links_source canonical_preconditions
   exact ⟨canonical_links_source, canonical_preconditions, hRun, hObs,
     (hAgg 5 160 160 0 hRun).1, (hAgg 5 160 160 0 hRun).2⟩
+
+/-! ## The pull the composed hypotheses do not bound
+
+`linked_deployment_push_is_word_bounded` bounds the wei the two executable beacon
+legs push.  It says nothing about the wei the source formula computes, and the
+gap between them is not academic: the witness below keeps `LinksSource` and the
+composed parent's own `Preconditions` true while the line-972 `depositsValue`
+product runs past the 256-bit word -- and it does so with every field of the
+configuration still inside the `uint256` source domain. -/
+
+/-- A skewed deployment: the router's `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`
+(`StakingRouter.sol` line 65) is the largest value one `uint256` word can
+encode, `2 ^ 256 - 1`, while the depositor's `DEPOSIT_SIZE`
+(`BeaconChainDepositor.sol` line 24) is the pinned 32.  `LinksSource`
+constrains only `DEPOSIT_SIZE`, so the bridge accepts this unchanged, and the
+immutable itself is encodable -- the first conjunct of the witness below checks
+it.  What leaves the word is the line-972 *product*
+`actualDepositsCount * maxEBType1`, not any stored quantity. -/
+def skewedPullConfig : SourceDepositConfig :=
+  { canonicalSourceConfig with maxEBType1 := 2 ^ 256 - 1 }
+
+/--
+The composed parent's hypotheses do not bound the source pull quantity.
+
+At `skewedPullConfig` the canonical five-key deployment still satisfies
+`LinksSource`, and `canonicalInputs`/`canonicalState` still satisfy
+`Preconditions`, so this `(cfg, inp, inputs, entry)` is admitted by
+`verity_tx_composes_deposit_conservation_and_rollback` exactly as the conserving
+one is.  The executable push is the same 160 wei as ever, comfortably inside one
+word, precisely as `linked_deployment_push_is_word_bounded` states.  The
+immutable `maxEBType1 = 2 ^ 256 - 1` is itself `uint256`-encodable -- the first
+conjunct checks it -- and yet the line-972 product
+`depositsValue = 5 * (2 ^ 256 - 1) = 5 * 2 ^ 256 - 5` is at or above
+`Uint256.modulus`.
+
+Stated honestly and not further: this deployment never even reaches the
+line-972 multiplication, let alone settles the pull.  Its module allocation is
+the canonical 256 wei, so the computed cap is
+`maxDepositsCount = min 8 (256 / (2 ^ 256 - 1)) = 0`, and the pinned path turns
+away at the earlier line-959 `ZeroDeposits` guard, on chain and inside the
+model alike: `skewed_pull_witness_turned_away_before_line_972` below checks that
+`run` returns `revertZeroDeposits`, so no wei moves and no later guard -- line
+972, line 983, line 996 -- is ever evaluated.  That guard structure is not
+accidental: whenever the over-target guard at line 969 passes, the product is
+bounded by the module allocation itself (`line_972_product_le_module_allocation`),
+so a `uint256`-encodable allocation keeps the line-972 product inside one word
+(`encodable_allocation_bounds_line_972_product`).  A Solidity 0.8
+checked-arithmetic panic at line 972 is therefore unreachable from the
+encodable domain, and the word-exceeding quantity this witness exhibits exists
+only as the unbounded-`Nat` formula that `LinksSource` together with
+`Preconditions` fails to bound.  The claim here is about the *hypotheses* and the
+abstraction's arithmetic, not about a settled transfer: `LinksSource` together
+with `Preconditions` admits configurations whose line-972 pull quantity exceeds
+a word, so neither `linked_deployment_push_is_word_bounded` nor conjunct (d) of
+the registered parent may be paraphrased as "every admitted deployment's whole
+pull fits one 256-bit word".  `linked_conserving_deployment_pull_is_word_bounded`
+is the statement that does bound the pull, and it carries exactly the
+`ConservingConfig` hypothesis this witness violates.
+-/
+theorem linked_hypotheses_do_not_bound_the_source_pull :
+    skewedPullConfig.maxEBType1 < _root_.Verity.Core.Uint256.modulus ∧
+      LinksSource skewedPullConfig canonicalSourceInput canonicalInputs ∧
+      Preconditions canonicalInputs canonicalState ∧
+      pushedValue skewedPullConfig canonicalSourceInput
+        < _root_.Verity.Core.Uint256.modulus ∧
+      _root_.Verity.Core.Uint256.modulus
+        ≤ depositsValue skewedPullConfig canonicalSourceInput ∧
+      ¬ ConservingConfig skewedPullConfig := by
+  refine ⟨?_, ⟨by decide, by decide, by decide, by decide⟩,
+    canonical_preconditions, ?_, ?_, by decide⟩
+  · show 2 ^ 256 - 1 < _root_.Verity.Core.Uint256.modulus
+    decide
+  · show loopPushed skewedPullConfig (240 / 48) < _root_.Verity.Core.Uint256.modulus
+    decide
+  · show _root_.Verity.Core.Uint256.modulus ≤ 240 / 48 * (2 ^ 256 - 1)
+    decide
+
+/-! ## The guards the kill-line's deployment never passes
+
+The kill-line above is a statement about an unbounded-`Nat` formula, and an
+earlier revision of its prose over-claimed the on-chain reading: it asserted
+that an admitted source execution "panics at the line-972 multiplication".
+That is false, and it is now pinned shut twice.  The first theorem below is
+the executable regression: the skewed witness's computed cap is zero, so `run`
+turns away at the line-959 guard and never reaches line 972 at all.  The two
+after it are the general reason no sound witness of this shape can ever reach
+an overflowing line-972 product: the over-target guard at line 969 bounds the
+product by the module allocation, so an encodable allocation keeps it inside
+one word.  -/
+
+/-- The executable regression for the corrected claim: the skewed witness never
+reaches the line-972 multiplication.  `canonicalSourceInput`'s module
+allocation is 256 wei, so with `skewedPullConfig.maxEBType1 = 2 ^ 256 - 1` the
+computed cap is `maxDepositsCount = min 8 (256 / (2 ^ 256 - 1)) = 0`, and the
+pinned path's first-guard-wins `run` returns `revertZeroDeposits` at the
+line-959 guard (`StakingRouter.sol`), exactly as on chain.  The earlier
+revision's on-chain story -- an admitted source execution panicking at the
+line-972 checked multiplication -- is refuted by guard order on the exact
+witness the kill-line quotes, by kernel evaluation. -/
+theorem skewed_pull_witness_turned_away_before_line_972 :
+    maxDepositsCount skewedPullConfig canonicalSourceInput = 0 ∧
+      run skewedPullConfig canonicalSourceInput = .revertZeroDeposits := by
+  refine ⟨?_, ?_⟩
+  · show min 8 (256 / (2 ^ 256 - 1)) = 0
+    decide
+  · decide
+
+/-- Why the over-claimed line-972 panic cannot be reinstated with a different
+witness: whenever the pinned path passes its over-target guard at line 969
+(`actualDepositsCount ≤ maxDepositsCount`, `StakingRouter.sol`), the line-972
+product `actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01` is at most the
+module allocation, because `maxDepositsCount` is capped by
+`moduleDepositableEth / maxEBType1` and the truncated division satisfies
+`(a / b) * b ≤ a`. -/
+theorem line_972_product_le_module_allocation
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (hCap : actualDepositsCount cfg inp ≤ maxDepositsCount cfg inp) :
+    depositsValue cfg inp ≤ inp.moduleDepositableEth := by
+  have hDiv : actualDepositsCount cfg inp
+      ≤ inp.moduleDepositableEth / cfg.maxEBType1 :=
+    hCap.trans (Nat.min_le_right _ _)
+  have hMul : actualDepositsCount cfg inp * cfg.maxEBType1
+      ≤ (inp.moduleDepositableEth / cfg.maxEBType1) * cfg.maxEBType1 :=
+    Nat.mul_le_mul hDiv (Nat.le_refl _)
+  exact hMul.trans (Nat.div_mul_le_self _ _)
+
+/-- The `uint256` reading of the same bound: a module allocation one word can
+encode keeps the line-972 product inside that word, so Solidity 0.8 checked
+arithmetic cannot panic at line 972 for an encodable input.  A word-exceeding
+line-972 quantity needs a non-encodable allocation, which is the oversized
+witness's territory (`oversized_input_is_outside_the_source_domain`), not a
+deployment. -/
+theorem encodable_allocation_bounds_line_972_product
+    (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (hCap : actualDepositsCount cfg inp ≤ maxDepositsCount cfg inp)
+    (hAlloc : inp.moduleDepositableEth < _root_.Verity.Core.Uint256.modulus) :
+    depositsValue cfg inp < _root_.Verity.Core.Uint256.modulus :=
+  Nat.lt_of_le_of_lt (line_972_product_le_module_allocation cfg inp hCap) hAlloc
+
+/-! ## The quantifier gap between the two planes
+
+Non-vacuity above says the composed hypotheses are satisfiable somewhere.  It
+says nothing about *where they are not*, and the registered abstract parent is an
+unbounded `∀ (cfg, inp)`.  The witness below closes that reading in the opposite
+direction: it names an input the abstract parent covers and for which no
+executable transaction exists at all, so `verity: CHECKED` on this row must not
+be read as an executable claim about every input the abstract row states. -/
+
+/-- The pinned conserving deployment scaled to `2 ^ 256` keys, with every cap the
+pinned path checks scaled with it so the model's `run` is not turned away by a
+guard: `2 ^ 256` public keys of `PUBKEY_LENGTH = 48` bytes, the matching
+`SIGNATURE_LENGTH = 96` signature bytes per key, a per-block cap
+(`maxDepositsPerBlock`) and module allocation (`moduleDepositableEth`) that admit
+all `2 ^ 256` keys, and Lido depositable ether covering the whole
+`2 ^ 256 * DEPOSIT_SIZE` pull.
+
+Scaling the caps is the point.  With the pinned `maxDepositsPerBlock = 8` and
+`moduleDepositableEth = 256` this input would stop at `ModuleReturnExceedTarget`
+(`StakingRouter.sol` line 969) before pulling any ether or executing a single
+per-key frame, and every statement about it would be vacuous.
+`oversized_run_commits` checks that it does not stop there.
+
+Domain honesty: several of these quantities -- the per-block cap, the module
+allocation, both batch lengths, and the Lido depositable ether -- sit at or above
+`2 ^ 256`, so `oversizedSourceInput` is *not* a `uint256`-encodable call and is
+not offered as one; `oversized_input_is_outside_the_source_domain` records that
+in a checked statement.  `DepositCorrespondence` reads its unbounded `Nat`
+arithmetic as the pinned Solidity only under the no-overflow reading, and this
+input is outside that domain by construction.  What the witness below exhibits
+is therefore a quantifier gap of the abstract `Nat` model itself -- the
+registered parent quantifies over every `(cfg, inp)` with no word bound and no
+encodability premise -- and not a pinned-source deployment executing the path. -/
+def oversizedSourceInput : SourceDepositInput :=
+  { moduleActive := true, maxDepositsPerBlock := 2 ^ 256,
+    moduleDepositableEth := 32 * 2 ^ 256,
+    publicKeysBatchLength := 48 * 2 ^ 256, signaturesBatchLength := 96 * 2 ^ 256,
+    routerBalanceBefore := 0, lidoCanDeposit := true,
+    lidoDepositableEther := 32 * 2 ^ 256 }
+
+/-- The regression that pins the domain honesty: the oversized witness is
+deliberately an input of the unbounded `Nat` abstraction only.  Its per-block
+cap, module allocation, both batch lengths, and the Lido depositable ether all
+sit at or above `Uint256.modulus`, so no `uint256` deployment can encode this
+call and the witness must never be quoted as one.  Statements about
+`oversizedSourceInput` -- `oversized_run_commits`,
+`abstract_parent_covers_deployments_the_verity_plane_omits` -- are statements
+about the abstract model's quantifier reach, not about the pinned Solidity
+source executing an oversized batch. -/
+theorem oversized_input_is_outside_the_source_domain :
+    _root_.Verity.Core.Uint256.modulus ≤ oversizedSourceInput.maxDepositsPerBlock ∧
+      _root_.Verity.Core.Uint256.modulus ≤ oversizedSourceInput.moduleDepositableEth ∧
+      _root_.Verity.Core.Uint256.modulus ≤ oversizedSourceInput.publicKeysBatchLength ∧
+      _root_.Verity.Core.Uint256.modulus ≤ oversizedSourceInput.signaturesBatchLength ∧
+      _root_.Verity.Core.Uint256.modulus ≤ oversizedSourceInput.lidoDepositableEther := by
+  decide
+
+/-- That input's pull in the unbounded model, `actualDepositsCount * DEPOSIT_SIZE`,
+is `2 ^ 261` wei: above the 256-bit word the executable ledger is built on. -/
+theorem oversized_deployment_exceeds_word :
+    actualDepositsCount canonicalSourceConfig oversizedSourceInput = 2 ^ 256 ∧
+      _root_.Verity.Core.Uint256.modulus
+        ≤ actualDepositsCount canonicalSourceConfig oversizedSourceInput
+            * canonicalSourceConfig.depositSize := by
+  have hCount : actualDepositsCount canonicalSourceConfig oversizedSourceInput = 2 ^ 256 := by
+    show 48 * 2 ^ 256 / 48 = 2 ^ 256
+    exact Nat.mul_div_cancel_left _ (by omega)
+  refine ⟨hCount, ?_⟩
+  rw [hCount]
+  show 2 ^ 256 ≤ 2 ^ 256 * 32
+  exact Nat.le_mul_of_pos_right _ (by omega)
+
+/--
+The oversized input is not turned away by a guard: the unbounded model's `run`
+reaches its committed push at `StakingRouter.sol` lines 980--996, moving
+`2 ^ 256 * DEPOSIT_SIZE` wei through `2 ^ 256` per-key deposit frames and
+retaining nothing.
+
+This is what makes the witness below substantive rather than vacuous.  Every
+`run` guard is passed rather than dodged: the module is active, the per-block cap
+and module allocation both admit `2 ^ 256` keys so line 969's
+`ModuleReturnExceedTarget` does not fire, the pubkey and signature batch lengths
+are the exact multiples `BeaconChainDepositor.sol` lines 43--48 demand, Lido
+holds the whole pull, and the line-996 `assert` passes because the deployment is
+conserving.  So `run` returns `committedDeposits`, and the abstract parent's
+conservation implication has an actual outcome to fire on.
+
+Scope, stated rather than hidden: this is a theorem about the unbounded `Nat`
+model's `run`, not about the pinned Solidity source.  The input is outside the
+`uint256` source domain (`oversized_input_is_outside_the_source_domain`), so no
+realizable deployment can even encode the call; and inside the domain there is
+no fallback route to this commit either, because a `uint256`-encodable module
+allocation keeps the line-972 product inside one word
+(`encodable_allocation_bounds_line_972_product`), so Solidity 0.8 checked
+arithmetic never panics at line 972 from an encodable input.  No realizable
+deployment executes what the model commits here.
+-/
+theorem oversized_run_commits :
+    run canonicalSourceConfig oversizedSourceInput
+      = .committedDeposits (2 ^ 256) (2 ^ 256 * 32) (2 ^ 256 * 32) 0 := by
+  have hCount : actualDepositsCount canonicalSourceConfig oversizedSourceInput = 2 ^ 256 := by
+    show 48 * 2 ^ 256 / 48 = 2 ^ 256
+    exact Nat.mul_div_cancel_left _ (by omega)
+  have hMax : maxDepositsCount canonicalSourceConfig oversizedSourceInput = 2 ^ 256 := by
+    show min (2 ^ 256) (32 * 2 ^ 256 / 32) = 2 ^ 256
+    rw [Nat.mul_div_cancel_left _ (by omega : 0 < 32), Nat.min_self]
+  have hPull : depositsValue canonicalSourceConfig oversizedSourceInput = 2 ^ 256 * 32 := by
+    rw [depositsValue, hCount]
+    rfl
+  have hPush : pushedValue canonicalSourceConfig oversizedSourceInput = 2 ^ 256 * 32 := by
+    rw [pushedValue, loopPushed_eq, hCount]
+    rfl
+  have hAfter : routerBalanceAfter canonicalSourceConfig oversizedSourceInput = 0 := by
+    rw [routerBalanceAfter, hPull, hPush]
+    show 0 + 2 ^ 256 * 32 - 2 ^ 256 * 32 = 0
+    rw [Nat.zero_add, Nat.sub_self]
+  unfold run
+  rw [hMax, hCount, hPull, hPush, hAfter]
+  decide +kernel
+
+/--
+The registered abstract parent is total; the registered Verity parent is not.
+
+The witness is an input of the unbounded `Nat` abstraction whose `run` the model
+commits rather than turns away -- Conjunct 1 is `oversized_run_commits`: at
+`oversizedSourceInput` the model's path commits a push of `2 ^ 256` per-key
+deposit frames carrying `2 ^ 256 * DEPOSIT_SIZE` wei.  Conjunct 2 is the
+registered abstract parent's conservation conclusion *fired* on that model-level
+outcome: its antecedent is discharged by conjunct 1, so the line-972 pull formula
+and the loop's own accumulation are proved equal at that committed push rather
+than agreed on vacuously.  Conjunct 3 records that the wei so moved is at or
+above `Uint256.modulus`.
+
+Conjunct 4 is the gap: no executable transaction reaches that input at all.
+Every `inputs` satisfying `LinksSource` violates the composed parent's own
+`Preconditions.noWrap` premise, so the hypotheses of
+`verity_tx_composes_deposit_conservation_and_rollback` are jointly unsatisfiable
+at this `(cfg, inp)` for *every* `inputs` and *every* entry state.
+
+The gap is therefore not an artifact of the chosen witnesses, and not a vacuous
+reading of the abstract parent either: the abstract parent is *proved* for
+inputs no executable transaction can represent.  Stated strictly, it is a
+quantifier gap of the abstract `Nat` model, not a pinned-source deployment
+claim: `oversizedSourceInput` is outside the `uint256` source domain
+(`oversized_input_is_outside_the_source_domain`), so no realizable Solidity
+deployment encodes the call, let alone settles a `2 ^ 256 * DEPOSIT_SIZE` wei
+push.  Closing the model-level gap
+still needs an `n`-frame executable transaction, not a metadata change.
+
+What this witness does not claim: the deployment is conserving, so the abstract
+parent's *rollback* implication is not exercised here and is deliberately left
+out of the statement rather than carried as a conjunct that would hold only
+because its antecedent is false.
+-/
+theorem abstract_parent_covers_deployments_the_verity_plane_omits :
+    run canonicalSourceConfig oversizedSourceInput
+        = .committedDeposits (2 ^ 256) (2 ^ 256 * 32) (2 ^ 256 * 32) 0 ∧
+      depositsValue canonicalSourceConfig oversizedSourceInput
+          = pushedValue canonicalSourceConfig oversizedSourceInput ∧
+      _root_.Verity.Core.Uint256.modulus ≤ 2 ^ 256 * 32 ∧
+      (∀ inputs : Inputs,
+        LinksSource canonicalSourceConfig oversizedSourceInput inputs →
+          ¬ inputs.first.amount.val + inputs.second.amount.val
+            < _root_.Verity.Core.Uint256.modulus) := by
+  refine ⟨oversized_run_commits,
+    ((source_deposit_conserves_and_rolls_back canonicalSourceConfig oversizedSourceInput).1
+      _ _ _ _ oversized_run_commits).2,
+    ?_, fun inputs hLink hNoWrap => ?_⟩
+  · have hCount := oversized_deployment_exceeds_word.1
+    have hBound := oversized_deployment_exceeds_word.2
+    rw [hCount] at hBound
+    exact hBound
+  · exact absurd
+      ((linked_deployment_push_is_word_bounded canonicalSourceConfig oversizedSourceInput
+        inputs hLink hNoWrap).2)
+      (Nat.not_lt.2 oversized_deployment_exceeds_word.2)
 
 /-! ## Private non-derivability witness
 
