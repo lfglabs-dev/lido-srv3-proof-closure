@@ -50,7 +50,9 @@ def SourceJournalProjectsToEthJournal
 theorem sourceJournal_projects (endpoints : Endpoints) (inputs : Inputs) :
     SourceJournalProjectsToEthJournal
       (sourceJournal endpoints inputs) (specJournal inputs) := by
-  cases inputs.route <;> rfl
+  cases inputs with
+  | mk route amount =>
+      cases route <;> rfl
 
 /-- Every successful source journal is the lossless Spec journal for the same
 modeled return input. -/
