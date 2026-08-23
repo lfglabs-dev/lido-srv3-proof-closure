@@ -103,6 +103,8 @@ test:
 	@printf '%s\n' 'P-ALLOC-EXEC-1 router ExecutesAllocation parent and raw-count router kill-line compiled and asserted'
 	@lake build LidoSRv3.Audit.Guarantees.PEthJournal1 LidoSRv3.Tests.PackN2EthJournalMutants
 	@printf '%s\n' 'P-ETH-JOURNAL-1 JournalApproved-implies-exclusion parent and Lido-hop kill-line compiled and asserted'
+	@lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackW2GindexMutants
+	@printf '%s\n' 'P-SSZ-LIVE-1 constructor-pin GI parent, skip-lookup kill-line, and wrong-packed-word kill-line compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts

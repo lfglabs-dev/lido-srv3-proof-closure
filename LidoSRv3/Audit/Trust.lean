@@ -185,6 +185,8 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackW2Eip4788Mutants.skip_age_bound_kill_line
 #print axioms LidoSRv3.Audit.Spec.ProductionGindexChild.cl_validator_index_is_toy
 #print axioms LidoSRv3.Tests.PackW2GindexMutants.claimed_cl_validator_index_ten_is_false
+#print axioms LidoSRv3.Audit.Spec.ProductionGindexChild.production_gindex_binding
+#print axioms LidoSRv3.Tests.PackW2GindexMutants.wrong_packed_word_is_not_production_binding
 #print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.requestOne_uses_widened_call_constructor
 #print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.official_raw_call_still_reverts
 #print axioms LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild.preservesEthBalance_gap_remains
@@ -218,6 +220,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
+#print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_from_core_gindex
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence
 #print axioms LidoSRv3.Tests.PackN5SszLiveMutants.skip_lookup_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value

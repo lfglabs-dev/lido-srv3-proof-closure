@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Ssz
 import LidoSRv3.Audit.Spec.Eip4788AnchorChild
+import LidoSRv3.Audit.Spec.ProductionGindexChild
 import LidoSRv3.Audit.Spec.SszLiveCorrespondence
 import LidoSRv3.Audit.Guarantees.Registry
 
@@ -22,16 +23,18 @@ minimal-11 row. `combine` stays abstract, so SHA-256 functional
 correctness remains the named `A-SHA256-FFI` assumption. The
 `eip4788ParentRoot` lookup stays opaque (no precompile, no `block.parent`
 read is inhabited); it is consumed by the verify, and admission is false
-whenever it returns `none`. The production index is a pinned test-vector
-model constant; the deployed-GI equality named by
-`ProductionGindexChild.ProductionGindexBinding` stays open and is not
-cited as discharged here. Not a live Solidity gateway. Not a bus.
+whenever it returns `none`. `ProductionGindexBinding` is inhabited from
+the in-repo TopUpGateway constructor pin, not only the test-vector
+constant; that pin is not a live-deployment identity discharge. This row
+does not claim live verify: `eip4788ParentRoot` stays opaque and
+`A-SHA256-FFI` stays. Not a live Solidity gateway. Not a bus.
 -/
 
 namespace LidoSRv3.Audit.Guarantees.PSszLive1
 
 open LidoSRv3.Audit
 open LidoSRv3.Audit.Spec.Eip4788AnchorChild
+open LidoSRv3.Audit.Spec.ProductionGindexChild
 open LidoSRv3.Audit.Spec.SszLiveCorrespondence
 
 /-- Supplemental production-GI / EIP-4788 consume parent. Abstract/source
@@ -45,12 +48,12 @@ def admitTopupOrConsolidation (combine : Ssz.Node → Ssz.Node → Ssz.Node)
     (wcProof : WcWitness) : Bool :=
   ageCheck wcProof.anchor && verifyAtLookup combine wcProof
 
-/-- PARENT. One `∀` whose conclusion is the correspondence: the witness
-age-checks and verifies at the production GI against the parent root the
-opaque EIP-4788 lookup produced, iff the gateway admits it. The lookup is
-consumed (a `none` lookup admits nothing); `combine` stays abstract
-(`A-SHA256-FFI`); the production GI is the pinned test-vector constant
-`productionIndex`, not toy slot 2. -/
+/-- Admission correspondence: the witness age-checks and verifies at the
+production GI against the parent root the opaque EIP-4788 lookup produced,
+iff the gateway admits it. The lookup is consumed (a `none` lookup admits
+nothing); `combine` stays abstract (`A-SHA256-FFI`); the production GI is
+`productionIndex`, not toy slot 2. Kept as a lemma of the registered
+constructor-pin parent below. -/
 theorem production_witness_admission_correspondence :
     ∀ (combine : Ssz.Node → Ssz.Node → Ssz.Node) (wcProof : WcWitness),
       (ageCheck wcProof.anchor = true ∧
@@ -63,6 +66,24 @@ theorem production_witness_admission_correspondence :
   intro combine wcProof
   simp only [admitTopupOrConsolidation, Bool.and_eq_true,
     verifyAtLookup_eq_true_iff]
+
+/-- PARENT. `ProductionGindexBinding` is the constructor-pin decode of
+`g_index_first_validator_curr`, and gateway admission of a top-up /
+consolidation WC witness is ageCheck plus production-GI verify against
+the opaque looked-up parent root. The pin is an in-repo constructor
+literal, not a live-deployment identity. The lookup stays opaque, so this
+is not a live-verify claim. -/
+theorem production_witness_admission_from_core_gindex :
+    ProductionGindexBinding ∧
+      ∀ (combine : Ssz.Node → Ssz.Node → Ssz.Node) (wcProof : WcWitness),
+        (ageCheck wcProof.anchor = true ∧
+            ∃ parentRoot,
+              eip4788ParentRoot wcProof.anchor.beaconRootTimestamp =
+                  some parentRoot ∧
+                verifyAtParent combine wcProof.leaf productionIndex parentRoot
+                  wcProof.path wcProof.branch = true) ↔
+          admitTopupOrConsolidation combine wcProof = true :=
+  ⟨production_gindex_binding, production_witness_admission_correspondence⟩
 
 /-- Unpacked admission soundness: an admitted witness age-checks, the
 opaque lookup produced a parent root, and the witness carries the

@@ -2,13 +2,18 @@ import LidoSRv3.Audit.Ssz
 import LidoSRv3.Audit.Source.GIndexConcatCorrespondence
 
 /-!
-# Wave 2 W2-GINDEX: toy operationIndex slots
+# Wave 2 W2-GINDEX: toy operationIndex slots and constructor-pin GI
 
-Unregistered child. There are no production `GI_*` literals in-repo.
-`Ssz.operationIndex` uses toy slots 2, 3, 4 (`Ssz.lean` 111–114). This
-module records those definitional facts and names that a deployed GI
-equality cannot be closed here. It does not invent mainnet gindices,
-claim EIP-4788, SHA, or Yul, or register a new guarantee.
+`Ssz.operationIndex` still uses toy slots 2, 3, 4 (`Ssz.lean` 111–114).
+Those remain leftover record, not a deployed GI.
+
+`ProductionGindexBinding` is now the constructor-pin decode: the packed
+word recorded in `audit/p-topup-2-runtime-provenance.json`
+`build.constructor_args.g_index_first_validator_curr` (TopUpGateway at
+lidofinance/core@af095e48) equals `(index << 8) | pow` for
+`GI_FIRST_VALIDATOR_CURR` (`150 * 2^40`, pow `40`). That is an in-repo
+constructor literal, not a live-deployment identity discharge and not a
+claim that EIP-4788, SHA, or Yul are modeled.
 -/
 
 namespace LidoSRv3.Audit.Spec.ProductionGindexChild
@@ -32,15 +37,23 @@ theorem consolidation_index_is_toy :
     (Ssz.operationIndex .consolidationGateway).value = 4 :=
   rfl
 
-/-- Named undischarged: no in-repo production literal, so a deployed-GI
-equality hyp cannot be closed here. `False` is the honest inhabitant —
-we do not have deployed GI equality. This is not a refutation of a
-mainnet constant (none is in-repo). -/
-def ProductionGindexBinding : Prop := False
+/-- Constructor-arg pin from
+`audit/p-topup-2-runtime-provenance.json`
+`build.constructor_args.g_index_first_validator_curr`. In-repo constructor
+literal; not a live-deployment identity discharge. -/
+def pinnedCoreGiFirstValidatorCurr : Nat :=
+  0x0000000000000000000000000000000000000000000000000096000000000028
 
-/-- The production binding remains open. Toy slots 2/3/4 are not a
-deployed GI equality, and this pack does not invent mainnet gindices. -/
-theorem production_gindex_binding_remains_open : True := trivial
+/-- The constructor-pin packed word decodes as `GIndex.sol`
+`(index << 8) | pow` for `GI_FIRST_VALIDATOR_CURR`. -/
+def ProductionGindexBinding : Prop :=
+  pinnedCoreGiFirstValidatorCurr = (150 * 2 ^ 40 <<< 8) ||| 40
+
+/-- Named discharge: the constructor pin equals the GIndex pack of
+index `150 * 2^40` and pow `40`. -/
+theorem production_gindex_binding : ProductionGindexBinding := by
+  unfold ProductionGindexBinding pinnedCoreGiFirstValidatorCurr
+  decide
 
 /-- Concrete SOURCE concat pair used by `GIndexConcatMutants` (index 2
 pow 7 and index 3 pow 11). Toy operands, not production `GI_*`. -/

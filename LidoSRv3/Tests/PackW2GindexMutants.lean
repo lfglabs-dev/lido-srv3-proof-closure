@@ -5,8 +5,9 @@ import LidoSRv3.Audit.Spec.ProductionGindexChild
 # Wave 2 W2-GINDEX fail-closed vectors
 
 `Ssz.operationIndex .clValidatorVerifier` is the toy slot 2. A claim that
-it equals `⟨10, _⟩` is false. There is no in-repo production `GI_*`
-binding to mutate toward.
+it equals `⟨10, _⟩` is false. The constructor-pin
+`ProductionGindexBinding` is inhabited; the kill-line is a wrong packed
+word, not uninhabited-False.
 -/
 
 namespace LidoSRv3.Tests.PackW2GindexMutants
@@ -25,10 +26,17 @@ theorem claimed_cl_validator_index_ten_is_false :
     congrArg Ssz.GeneralizedIndex.value h
   exact (by decide : (2 : Nat) ≠ 10) (hToy.symm.trans hTen)
 
-/-- The named production binding is uninhabited here: no deployed GI
-literal exists in-repo to close it. -/
-theorem production_binding_uninhabited :
-    ¬ ProductionGindexBinding :=
-  id
+/-- Mutant packed word: only the pow byte, missing the index field. -/
+def mutantPackedWord : Nat := 0x28
+
+/-- Parent-shaped kill-line: a wrong packed word is not the constructor-pin
+`ProductionGindexBinding` decode `(150 * 2^40 << 8) | 40`. -/
+theorem wrong_packed_word_is_not_production_binding :
+    ¬ (mutantPackedWord = (150 * 2 ^ 40 <<< 8) ||| 40) := by
+  decide
+
+/-- Positive control: the constructor pin satisfies the binding. -/
+theorem production_binding_holds : ProductionGindexBinding :=
+  production_gindex_binding
 
 end LidoSRv3.Tests.PackW2GindexMutants
