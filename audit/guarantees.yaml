@@ -1213,13 +1213,13 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Audit.Source.BeaconRootsCorrespondence LidoSRv3.Audit.Verity.BeaconRootsTx LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackS1HashMutants LidoSRv3.Tests.PackW2GindexMutants",
         "expected": "modeled_beacon_roots_live_ssz_consume builds as the consume parent; ignore_timestamp_kill_line_refutes_consume_parent refutes the full parent after replacing the identified BEACON_ROOTS read; A-SHA256-FFI remains named"
       },
-      "summary": "Modeled live-SSZ consume parent: eip4788ParentRoot is identified with the EIP-4788 BEACON_ROOTS 8191-slot timestamp-indexed history read (zero, missing, and overwritten-timestamp reads fail closed), with universal Spec\u2192Source\u2192Verity correspondence. Top-up / consolidation WC admission consumes ageCheck plus production-GI verifyAtParent against that identified root; none admits nothing. ProductionGindexBinding remains the in-repo constructor pin, not a deployed identity. A-SHA256-FFI stays: combine is abstract and no Lean literal is treated as deployed SHA-256.",
+      "summary": "Modeled live-SSZ consume parent: eip4788ParentRoot is identified with a caller-supplied EIP-4788 BEACON_ROOTS 8191-slot timestamp-indexed history read (zero, missing, and overwritten-timestamp reads fail closed). Top-up / consolidation WC admission consumes ageCheck plus production-GI verifyAtParent against that identified root; none admits nothing. ProductionGindexBinding remains the in-repo constructor pin, not a deployed identity. A-SHA256-FFI stays. The Verity plane is the same list lookup, not Contract.run at the EIP-4788 precompile address.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume"
       },
       "verity": {
-        "status": "CHECKED",
+        "status": "PARTIAL",
         "theorem": "LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume"
       },
       "fidelity": {
@@ -1227,7 +1227,6 @@
           "ProductionGindexBinding inhabited from the TopUpGateway constructor pin, not only the test-vector constant",
           "packed word decodes as (150 * 2^40 << 8) | 40; productionIndex is not toy slot 2",
           "eip4788ParentRoot equals the modeled EIP-4788 BEACON_ROOTS timestamp-indexed ring-history read",
-          "universal Spec\u2192Source\u2192Verity root-read correspondence",
           "gateway admit iff ageCheck and production-GI verify against the identified root; none admits nothing",
           "timestamp-ignoring lookup mutant refutes the full consume parent; wrong-packed-word and skip-lookup kill-lines remain"
         ],
@@ -1235,6 +1234,7 @@
           "A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed",
           "the constructor pin is an in-repo literal, not a live-deployment identity",
           "the BEACON_ROOTS model is not a deployed-address, codehash, or bytecode identity",
+          ".verityTx is PARTIAL: Spec/Source/Verity are the same list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied",
           "not a deployed Solidity gateway, not official consolidation denote success, and not a bus"
         ]
       },
@@ -1242,7 +1242,7 @@
         "kind": "IMPLEMENTATION_PENDING",
         "work": "Keep A-SHA256-FFI named and the modeled BEACON_ROOTS result distinct from deployed address/codehash identity; do not promote the constructor pin to deployed identity."
       },
-      "next_gate": "Discharge A-SHA256-FFI only with a certified SHA-256/precompile refinement; separately pin deployed BEACON_ROOTS and gateway identities."
+      "next_gate": "Keep A-SHA256-FFI named. Do not read .verityTx as Contract.run at the EIP-4788 address. Pin deployed BEACON_ROOTS and gateway identities separately."
     },
     {
       "id": "P-CONSOLIDATION-VALUE-1",

@@ -1,11 +1,16 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2a68034453c8daf892b6c1c491404c9abbcf372a
+validated-tree: fd56369d49ab194fb2c647ea5c0baf0cb0167ef0
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-SSZ-LIVE-1 honesty: modeled BEACON_ROOTS consume, Verity PARTIAL (2026-08-23)
+--------------------------------------------------------------------------
+
+- Rebind `validated-tree` to `fd56369d49ab194fb2c647ea5c0baf0cb0167ef0` after rebasing #206 onto main and qualifying `.verityTx` as PARTIAL: Spec/Source/Verity are the same list lookup, not Contract.run at the EIP-4788 address. A-SHA256-FFI stays. Constructor pin stays a lemma.
 
 P-ORACLE-SUPPLY-1 rebase onto main before merge (2026-08-23)
 ------------------------------------------------------------
