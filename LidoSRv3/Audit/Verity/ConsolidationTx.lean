@@ -18,8 +18,13 @@ per-request CALL debit (`forwardCalls`, the `call{value: fee}` of
 wei on the vault's balance, so committed runs forward exactly `msg.value`
 across the journaled CALLs and restore the pre-call `selfBalance` — the
 pinned `preservesEthBalance` modifier (`WithdrawalVault.sol:81--85`), vault
-side. The counterparty credit at the request predeploy is a separate
-contract's balance and is not modeled on this single-contract plane.
+side. The frame-entry credit is admissibility-guarded: a
+`selfBalance + msg.value` that would wrap the `Uint256` balance models no
+executable transfer (the credit could not land and the CALL debits could
+not be funded), so such entries are rejected before decode
+(`ENTRY_CREDIT_OVERFLOW`) instead of committing wrapped debits. The
+counterparty credit at the request predeploy is a separate contract's
+balance and is not modeled on this single-contract plane.
 -/
 
 namespace LidoSRv3.Audit.Verity.ConsolidationTx
@@ -83,7 +88,12 @@ def stateFor (sources targets sourceLens targetLens : List Word)
 /-- Frame-entry payable credit: the vault's balance receives `msg.value`
 before the body runs. This mirrors `withPayableCallContext`; the pinned
 `preservesEthBalance` modifier snapshots `address(this).balance - msg.value`
-immediately after this credit (`WithdrawalVault.sol:81--85`). -/
+immediately after this credit (`WithdrawalVault.sol:81--85`).
+
+`addRequests` applies this credit only when it does not wrap: a wrapping
+credit has no executable counterpart, exactly as the checked debit path
+`Contracts.externalCallBindTo` refuses `call.value > state.selfBalance` and
+the official consolidation theorem carries a no-wrap funding premise. -/
 def credited (state : ContractState) (inputs : Inputs) : ContractState :=
   { state with selfBalance := state.selfBalance + inputs.msgValue }
 
@@ -188,32 +198,55 @@ def ofObservables (obs : Observables) : Result :=
   ⟨obs.calls, obs.events, obs.payloads, obs.requestCount, obs.feePaid⟩
 
 /-- Executable transaction. The entry state is the payable credit of
-`msg.value` (`credited`); length mismatch, fee failure, or the injected
-failure after intermediate writes reverts to the un-credited pre-call
-snapshot. -/
+`msg.value` (`credited`); a frame entry whose credit would wrap the vault's
+`Uint256` balance is rejected before decode (`ENTRY_CREDIT_OVERFLOW`); on
+admissible entries, length mismatch, fee failure, or the injected failure
+after intermediate writes reverts to the un-credited pre-call snapshot. -/
 def addRequests (inputs : Inputs) (failAfterWrites : Bool := false) :
     Contract Result := fun snapshot =>
-  match readArray (credited snapshot inputs) "sources" sourcesBase
-      inputs.sources.length,
-      readArray (credited snapshot inputs) "targets" targetsBase
-      inputs.targets.length,
-      readArray (credited snapshot inputs) "sourceLens" sourceLensBase
-      inputs.sourceLens.length,
-      readArray (credited snapshot inputs) "targetLens" targetLensBase
-      inputs.targetLens.length with
-  | some sources, some targets, some sourceLens, some targetLens =>
-      let decoded : Inputs :=
-        { inputs with
-          sources := sources, targets := targets,
-          sourceLens := sourceLens, targetLens := targetLens }
-      match sourceRun decoded with
-      | .reverted reason => .revert reason snapshot
-      | .committed obs =>
-          let start := (snapshot.readSlot countSlot).val
-          let dirty := persist start obs (credited snapshot inputs)
-          if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
-          else .success (ofObservables obs) dirty
-  | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
+  if snapshot.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus then
+    match readArray (credited snapshot inputs) "sources" sourcesBase
+        inputs.sources.length,
+        readArray (credited snapshot inputs) "targets" targetsBase
+        inputs.targets.length,
+        readArray (credited snapshot inputs) "sourceLens" sourceLensBase
+        inputs.sourceLens.length,
+        readArray (credited snapshot inputs) "targetLens" targetLensBase
+        inputs.targetLens.length with
+    | some sources, some targets, some sourceLens, some targetLens =>
+        let decoded : Inputs :=
+          { inputs with
+            sources := sources, targets := targets,
+            sourceLens := sourceLens, targetLens := targetLens }
+        match sourceRun decoded with
+        | .reverted reason => .revert reason snapshot
+        | .committed obs =>
+            let start := (snapshot.readSlot countSlot).val
+            let dirty := persist start obs (credited snapshot inputs)
+            if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
+            else .success (ofObservables obs) dirty
+    | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
+  else .revert "ENTRY_CREDIT_OVERFLOW" snapshot
+
+/-- Entry-credit overflow rejects the transaction before any decode, guard,
+or write: when `selfBalance + msg.value` would wrap the `Uint256` balance,
+the payable credit could not land and the per-CALL debits could not be
+funded, so the batch is turned away with the exact pre-call snapshot. This
+closes the fidelity gap where a wrapping entry credit left the credited
+balance below the per-request fee yet the unconditional CALL debits
+wrapped back and the transaction still committed; the committed path now
+certifies a non-wrapping entry credit, so the checked debit guard
+`call.value ≤ state.selfBalance` of the repository's CALL interpreter is
+never violated on a success arm. -/
+theorem entry_credit_overflow_reverts (inputs : Inputs) (inject : Bool)
+    (state : ContractState)
+    (hOverflow : Verity.Core.Uint256.modulus ≤
+      state.selfBalance.val + inputs.msgValue.val) :
+    (addRequests inputs inject).run state =
+      .revert "ENTRY_CREDIT_OVERFLOW" state := by
+  unfold Contract.run addRequests
+  rw [if_neg (by omega)]
 
 inductive Status where | committed | reverted deriving DecidableEq, Repr
 
@@ -695,13 +728,16 @@ private theorem sourceRun_committed_payload_shape
               · simp at hRun
   · simp at hRun
 
-/-- Under the four decode equations the executed transaction is exactly the
-outcome of the pinned-source interpreter: revert passes the pre-call
-snapshot through, commit persists on the frame-entry credited state. The
-two sides differ only by structure eta on the decoded `Inputs` literal and
-the ground `if false` injection flag. -/
+/-- Under the entry no-wrap premise and the four decode equations the
+executed transaction is exactly the outcome of the pinned-source
+interpreter: revert passes the pre-call snapshot through, commit persists
+on the frame-entry credited state. The two sides differ only by structure
+eta on the decoded `Inputs` literal and the ground `if false` injection
+flag. -/
 private theorem addRequests_run_eq
     (inputs : Inputs) (state : ContractState)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
     (hTargets : readArray state "targets" targetsBase inputs.targets.length =
@@ -726,6 +762,7 @@ private theorem addRequests_run_eq
             (persist (state.readSlot countSlot).val obs
               (credited state inputs)) := by
     unfold addRequests
+    rw [if_pos hEntry]
     simp only [readArray_credited, hSources, hTargets, hSourceLens,
       hTargetLens]
     rfl
@@ -734,11 +771,14 @@ private theorem addRequests_run_eq
   | reverted reason => rfl
   | committed obs => rfl
 
-/-- Outcome inversion for the executed transaction under the four decode
-equations: the run is exactly the `.revert`-pass-through or the `.success`
-persistence of the pinned-source interpreter's own outcome. -/
+/-- Outcome inversion for the executed transaction under the entry no-wrap
+premise and the four decode equations: the run is exactly the
+`.revert`-pass-through or the `.success` persistence of the pinned-source
+interpreter's own outcome. -/
 private theorem addRequests_run_cases
     (inputs : Inputs) (state : ContractState)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
     (hTargets : readArray state "targets" targetsBase inputs.targets.length =
@@ -755,7 +795,7 @@ private theorem addRequests_run_cases
         r = .success (ofObservables obs)
           (persist (state.readSlot countSlot).val obs
             (credited state inputs))) := by
-  rw [addRequests_run_eq inputs state hSources hTargets hSourceLens
+  rw [addRequests_run_eq inputs state hEntry hSources hTargets hSourceLens
     hTargetLens] at h
   split at h
   · next reason hR =>
@@ -764,10 +804,16 @@ private theorem addRequests_run_cases
       exact Or.inr ⟨obs, hC, h.symm⟩
 
 /-- Composed faithful-plane theorem: the real memory-array transaction has the
-same outcome observables as the independently stated pinned-source run. -/
+same outcome observables as the independently stated pinned-source run.
+The entry no-wrap premise is the executed-plane funding condition: without
+it the frame-entry payable credit would wrap and the transaction rejects
+(`entry_credit_overflow_reverts`), so the pinned-source commit is not the
+outcome of a wrapping entry. -/
 theorem verity_tx_simulates_pinned_source
     (inputs : Inputs) (state : ContractState)
     (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
       Verity.Core.Uint256.modulus)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
@@ -779,8 +825,8 @@ theorem verity_tx_simulates_pinned_source
       inputs.targetLens.length = some inputs.targetLens) :
     observe state ((addRequests inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val := by
-  rcases addRequests_run_cases inputs state hSources hTargets hSourceLens
-      hTargetLens _ rfl with
+  rcases addRequests_run_cases inputs state hEntry hSources hTargets
+      hSourceLens hTargetLens _ rfl with
     ⟨reason, hRun, hr⟩ | ⟨obs, hRun, hr⟩
   · rw [hr]
     simp [sourceView, observe, ofNat_val, hRun]
@@ -874,7 +920,9 @@ theorem sub_foldl_replicate (B fee : Word) (n : Nat) (msgValue : Word)
 /-- Success inversion for the executed transaction: under the four decode
 equations, a `.success` outcome implies `sourceRun inputs` committed some
 `obs`, the result is that observables record, and the post-state is exactly
-`persist` applied to the frame-entry credited state. -/
+`persist` applied to the frame-entry credited state. A `.success` outcome
+additionally certifies the entry credit did not wrap — a wrapping entry is
+turned away before decode, so the success hypothesis is false there. -/
 private theorem addRequests_success_inversion
     (inputs : Inputs) (state : ContractState)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
@@ -891,11 +939,19 @@ private theorem addRequests_success_inversion
       ofObservables obs = result ∧
       persist (state.readSlot countSlot).val obs (credited state inputs) =
         after := by
-  rcases addRequests_run_cases inputs state hSources hTargets hSourceLens
-      hTargetLens _ h with ⟨reason, _, hr⟩ | ⟨obs, hsr, hr⟩
-  · simp at hr
-  · injection hr with hRes hAfter
-    exact ⟨obs, hsr, hRes.symm, hAfter.symm⟩
+  by_cases hEntry : state.selfBalance.val + inputs.msgValue.val <
+      Verity.Core.Uint256.modulus
+  · rcases addRequests_run_cases inputs state hEntry hSources hTargets
+        hSourceLens hTargetLens _ h with ⟨reason, _, hr⟩ | ⟨obs, hsr, hr⟩
+    · simp at hr
+    · injection hr with hRes hAfter
+      exact ⟨obs, hsr, hRes.symm, hAfter.symm⟩
+  · have hRevert : (addRequests inputs).run state =
+        .revert "ENTRY_CREDIT_OVERFLOW" state := by
+      unfold Contract.run addRequests
+      rw [if_neg hEntry]
+    rw [hRevert] at h
+    simp at h
 
 /-- On a committed batch the executed transaction forwards exactly
 `msg.value`: the journal suffix is one `.call` frame per request, every
@@ -953,7 +1009,10 @@ theorem committed_journal_forwards_msg_value
 /-- `preservesEthBalance` (`WithdrawalVault.sol:81--85`), vault side: after
 the modeled frame-entry payable credit of `msg.value` and the per-request
 CALL debits, every committed run restores the vault's pre-call
-`selfBalance` — the modifier's `assert`. Every revert restores the whole
+`selfBalance` — the modifier's `assert`. A committed run certifies the
+entry credit did not wrap (a wrapping `selfBalance + msg.value` is turned
+away before decode, `entry_credit_overflow_reverts`), so the debits it
+folds over are funded rather than wrapping. Every revert restores the whole
 pre-call snapshot (`revert_restores_snapshot`), balance included. The
 counterparty credit at the request predeploy is another contract's balance
 and stays on the multi-contract plane. -/

@@ -154,12 +154,18 @@ theorem fee_blind_commit_kill_line_refutes_parent :
             inputs.msgValue requests) :=
   SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent
 
-/-- If the four memory arrays decode to the `Inputs` fields, `observe`
+/-- If the four memory arrays decode to the `Inputs` fields and the
+frame-entry payable credit does not wrap the `Uint256` balance, `observe`
 (suffix of `state.calls` / `state.events` plus count/fee slots) equals
-`sourceView` of the same `sourceRun`. Not 96-byte packed calldata. -/
+`sourceView` of the same `sourceRun`. The entry no-wrap premise is the
+executed-plane funding condition: a wrapping credit is turned away at
+entry (`entry_credit_overflow_reverts`) rather than committed as wrapping
+CALL debits. Not 96-byte packed calldata. -/
 theorem verity_tx_simulates_consolidation (inputs : Inputs)
     (state : Verity.ContractState)
     (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <
+      Verity.Core.Uint256.modulus)
+    (hEntry : state.selfBalance.val + inputs.msgValue.val <
       Verity.Core.Uint256.modulus)
     (hSources : readArray state "sources" sourcesBase inputs.sources.length =
       some inputs.sources)
@@ -171,7 +177,7 @@ theorem verity_tx_simulates_consolidation (inputs : Inputs)
       inputs.targetLens.length = some inputs.targetLens) :
     observe state ((addRequests inputs).run state) =
       sourceView inputs (state.readSlot countSlot).val :=
-  verity_tx_simulates_pinned_source inputs state hCountBound
+  verity_tx_simulates_pinned_source inputs state hCountBound hEntry
     hSources hTargets hSourceLens hTargetLens
 
 /-- Every revert of the consolidation transaction, including failure after

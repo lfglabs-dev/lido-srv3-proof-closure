@@ -335,6 +335,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.function_spec_bridge_constructors
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_journal_forwards_msg_value
 #print axioms LidoSRv3.Audit.Verity.ConsolidationTx.committed_preserves_eth_balance
+#print axioms LidoSRv3.Audit.Verity.ConsolidationTx.entry_credit_overflow_reverts
 #print axioms
   LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance
 #print axioms

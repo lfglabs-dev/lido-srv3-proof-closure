@@ -274,6 +274,47 @@ theorem journal_value_blind_kill_line_refutes_exact_forwarding :
     by native_decide, by native_decide, by native_decide,
     by native_decide⟩
 
+/-! ## Entry-credit overflow: CALL-value credit must reject Uint256 wrap
+
+Codex P1 (PR #214, review r3839226133): when
+`state.selfBalance + inputs.msgValue` exceeds `Uint256`, the frame-entry
+credit used to wrap and could leave a credited balance below the
+per-request fee, yet the unconditional per-CALL debits wrapped back and
+the transaction still committed. The executed model now rejects such
+entries (`ENTRY_CREDIT_OVERFLOW`) before decode; the regressions below
+exercise the executable path at both boundaries of the wrap point. -/
+
+/-- Overflow reject: `selfBalance = 2^256 - 2` with `msgValue = 3` would
+wrap the entry credit to `1 < fee = 3`; the batch is rejected at entry and
+the pre-call snapshot is restored. -/
+example :
+    (addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2)) =
+      .revert "ENTRY_CREDIT_OVERFLOW" (stateBal (pair 11 21) (2^256 - 2)) :=
+  entry_credit_overflow_reverts _ _ _ (by native_decide)
+
+/-- The overflow reject is observed, not committed: no CALL, event,
+payload, or fee survives an entry that cannot be credited. -/
+example :
+    observe (stateBal (pair 11 21) (2^256 - 2))
+        ((addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 2))) =
+      ⟨.reverted, [], [], [], 0, 0⟩ := by native_decide
+
+/-- Boundary commit: the largest admissible credit
+`2^256 - 4 + 3 = MAX_UINT256` does not wrap, so the batch commits the full
+honest observables. -/
+example :
+    observe (stateBal (pair 11 21) (2^256 - 4))
+        ((addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 4))) =
+      ⟨.committed, [expectedCall 11 21], [expectedEvent 11 21],
+        [[word 11, word 21]], word 1, word 3⟩ := by native_decide
+
+/-- Boundary reject: one wei further, `2^256 - 3 + 3 = 2^256`, wraps and is
+rejected at entry. -/
+example :
+    (addRequests (pair 11 21)).run (stateBal (pair 11 21) (2^256 - 3)) =
+      .revert "ENTRY_CREDIT_OVERFLOW" (stateBal (pair 11 21) (2^256 - 3)) :=
+  entry_credit_overflow_reverts _ _ _ (by native_decide)
+
 /-- **Cheap mutant: swapped concat.** Journal calldata = source then target
 (96 bytes). A swapped target then source concat fails observe: the
 committed view with a swapped input list is not equal to the canonical
