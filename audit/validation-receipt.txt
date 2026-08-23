@@ -1,11 +1,29 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ee0acca91eca81f543caa26eccb0e61195a9a69f
+validated-tree: 0287b3db9ed380ece09398917ace9cb9bc710aac
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ALLOC-EXEC-1 router produces ExecutesAllocation (2026-08-23)
+-------------------------------------------------------------
+
+- Rebind `validated-tree` to `0287b3db9ed380ece09398917ace9cb9bc710aac`, the
+  tracked tree of `cursor/router-executes-allocation-6aad` excluding this
+  receipt.
+- Scope: one supplemental row, P-ALLOC-EXEC-1. Same guarantee id. The
+  registered theorem is now
+  `PAllocExec1.router_produces_executes_allocation`: the two-batch
+  `routerDepositInputs` construction yields `ExecutesAllocation` and
+  `LinksSource` (keys = allocation amounts, wei = amount * depositSize).
+  LinksSource is a theorem of the router, not a caller hyp. Alloc-exec
+  multiply-only remains a lemma. A-DEPOSIT-32-ETHER stays OPEN. Not an
+  n-frame lift.
+- Kill-line: `raw_count_router_kill_line_refutes_parent` (amount = keys).
+- Reproduction: `lake build LidoSRv3.Audit.Guarantees.PAllocExec1
+  LidoSRv3.Tests.PackN1AllocExecMutants` exit 0; metadata checks exit 0.
 
 P-DEPOSIT-1 guard-order honesty of the pull kill-line (2026-08-23)
 ------------------------------------------------------------------
