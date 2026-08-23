@@ -1,11 +1,54 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2c9a500d00ec64978a14dc7cec8d131be3ac6440
+validated-tree: f10f34b865ddcd2ad053a5e7b76daea715d45353
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 full executable preconditions at the n-frame witness, PR #205
+review r3838278045 (2026-08-23)
+------------------------------------------------------------------
+
+- Rebind `validated-tree` to `f10f34b865ddcd2ad053a5e7b76daea715d45353`, the
+  tracked tree of the successor head on `pdeposit1-postmerge-honesty-2` above
+  `eef505a` excluding this receipt.
+- Scope: the same one row, P-DEPOSIT-1. No new guarantee id, no status change,
+  no assumption added or removed, no other row touched. This entry repairs the
+  single P2 finding r3838278045 left by the Codex review of head `eef505a`;
+  the entries below remain the historical record of each earlier head.
+- Finding r3838278045 (P2, the n-frame witness did not kernel-check the
+  advertised admission). `manyKey_links_source_two_legs` now proves the
+  complete executable precondition bundle `Preconditions (nLinks
+  canonicalSourceConfig 4) canonicalState` alongside `LinksSource` and the
+  no-wrap inequality: every guard-health flag, `distinctModules`,
+  `valueMatches` 288 = 9 * 32, `entryBalance`, `funded` 288 <= 1000, and
+  `noWrap`, at the concrete entry state `canonicalState` (the closed entry the
+  row already pins, `DepositParentTx.lean`). Two regressions pin the entry
+  down from the other side: `manyKey_entry_state_guards_are_load_bearing`
+  refutes the whole bundle at `manyKeyUnderfundedEntry` (Lido's depositable
+  ledger one wei short, 288 <= 287 failing at the funding premise), and
+  `manyKey_underfunded_entry_reverts_at_not_enough_ether` runs the executable
+  two-leg transaction at that underfunded entry and reverts with exactly
+  `NOT_ENOUGH_ETHER` back to the entry snapshot, proved by `rfl` (kernel
+  computation). `Trust.lean` prints axioms for the strengthened witness and
+  both regressions (`[propext]` / `[propext, Classical.choice, Quot.sound]`);
+  the public claim-surface allowlist, guarantees.yaml detail, and report are
+  resynced. No registered theorem statement was weakened: the public witness
+  theorem only gained a conjunct, and no sorry/admit/axiom/unsafe was
+  introduced.
+- Validation on this tree: `make prove` exit 0
+  (`verified_source_tree=564b975687edcb8d1b88c6d6f93b7b3e7d3a973c`, Lean
+  4.31.0, `Build completed successfully (1461 jobs)`, proof report written to
+  `proofs/logs/proof-report.json`); row reproduction `lake build
+  LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx
+  LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants`
+  exit 0 (`Build completed successfully (1376 jobs)`); `make test` exit 0 on
+  the final head (metadata check 11 canonical + 18 subordinate rows, receipt
+  check, claim-surface check + regression suite, no-python-evidence checks,
+  Verity provenance checks, provenance guards, every `LidoSRv3.Tests.*`
+  target, 5/5 reference fixtures).
 
 P-DEPOSIT-1 post-merge honesty pass, PR #195 findings (2026-08-23)
 ------------------------------------------------------------------
