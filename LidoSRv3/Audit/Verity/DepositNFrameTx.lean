@@ -242,8 +242,7 @@ theorem unitList_eq_replicate (values : List Unit) :
   | cons value values ih =>
       cases value
       conv_lhs => rw [ih]
-      rw [show values.length + 1 = Nat.succ values.length by omega,
-        List.replicate_succ]
+      rfl
 
 theorem processBatches_loop (inputs : Inputs) (batches : List Batch)
     (acc : List Unit) (state : ContractState)
