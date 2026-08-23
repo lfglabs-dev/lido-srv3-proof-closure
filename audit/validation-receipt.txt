@@ -1,11 +1,16 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 96ed285ff7fd195296d58e2a6cb1160b58fbe4d7
+validated-tree: fb7f4614cfc16f497e258254b1a34d326ce0ba40
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-DEPOSIT-1 n-frame parent honesty before merge (2026-08-23)
+------------------------------------------------------------
+
+- Rebind `validated-tree` to `fb7f4614cfc16f497e258254b1a34d326ce0ba40` after rebasing #209 onto main (`e373e15`, including #204/#207/#210/#206/#212). YAML theorem remains `NFrame.verity_tx_composes_nframe_deposit`. `NFrame.LinksSource` stays a caller hypothesis; map-length arity, not DepositParentTx probes; A-DEPOSIT-32-ETHER stays named; word-domain gap stays named (`abstract_parent_covers_inputs_the_verity_plane_omits`). P-VAULT-ETH-1 and later product rows are preserved.
 
 P-CONSOLIDATION-VALUE-1 official success honesty before merge (2026-08-23)
 -------------------------------------------------------------------------
