@@ -16,6 +16,30 @@ P-ORACLE-SUPPLY-1 live computed mint (2026-08-23)
   `oracle_supply_live_computed_mint`. P-ACCOUNT-1 stays order-only. submitReportData
   remains out.
 
+P-ADDRESS-BATCH-1 fuel-bounded recipient rename (2026-08-23)
+-----------------------------------------------------------
+
+- Rebind `validated-tree` to `0a308b7b8cd86a86d2af0afff4f59d24886446ed`, the
+  tracked tree of `cursor/claim-batch-rename-6aad` excluding this receipt.
+- Scope: one supplemental row, P-ADDRESS-BATCH-1. Same guarantee id. The
+  registered theorem is now
+  `PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename`:
+  ∀ fuel, state, requestIds, hints, payouts, recipient, ρ, with
+  `BatchReady`, fuel, nodup, `recipient ≠ 0`, and `ρ recipient ≠ 0`,
+  `observe (execute (ρ recipient))` journals `payoutEntry (ρ recipient)`
+  at the pre-state payouts and `observe (execute recipient)` journals
+  `payoutEntry recipient`. That is `ρ · executeClaimWithdrawalsTo =
+  execute · ρ` on the live-loop dests. The earlier fuel-bounded payout
+  correspondence remains a lemma. `PAddress1.universal_address_writer_equivariance`
+  is not weakened. keccak / machine-storage slot maps stay OPEN.
+- Kill-line: `fixed_dest_rename_kill_line_refutes_parent` keeps every
+  well-formedness premise; mutant `executeClaimWithdrawalsToFixedDest`
+  always pays address 99 while `renameToSeven` sends dest 2 to 7.
+- Reproduction: `lake build LidoSRv3.Audit.Guarantees.PAddressBatch1
+  LidoSRv3.Tests.PackN4AddressBatchMutants` exit 0; `python3
+  scripts/audit_metadata.py check` and
+  `scripts/check_public_claim_surfaces.py` exit 0.
+
 P-DEPOSIT-1 guard-order honesty of the pull kill-line (2026-08-23)
 ------------------------------------------------------------------
 
