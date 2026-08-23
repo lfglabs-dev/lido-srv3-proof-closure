@@ -15,6 +15,7 @@ import LidoSRv3.Audit.Guarantees.PDeref1
 import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 import LidoSRv3.Audit.Guarantees.PAllocExec1
 import LidoSRv3.Audit.Guarantees.PEthJournal1
+import LidoSRv3.Audit.Guarantees.PVaultEth1
 import LidoSRv3.Audit.Guarantees.POracleSupply1
 import LidoSRv3.Audit.Guarantees.PAddressBatch1
 import LidoSRv3.Audit.Guarantees.PSszLive1
@@ -78,6 +79,7 @@ def supplemental : List Guarantee :=
   , PReserveRelational.guarantee
   , PAllocExec1.guarantee
   , PEthJournal1.guarantee
+  , PVaultEth1.guarantee
   , POracleSupply1.guarantee
   , PAddressBatch1.guarantee
   , PSszLive1.guarantee
@@ -87,7 +89,7 @@ def supplemental : List Guarantee :=
 /-- Regression guard: Wave 3 leftover-close IDs stay supplemental. -/
 example : supplemental.map (fun guarantee => guarantee.id.text) =
     ["P-DEREF-1", "P-RESERVE-RELATIONAL", "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1",
-     "P-ORACLE-SUPPLY-1", "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1",
+     "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1", "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1",
      "P-CONSOLIDATION-VALUE-1"] := by decide
 
 end LidoSRv3.Audit.Guarantees

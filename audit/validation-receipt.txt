@@ -1,11 +1,16 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2cb663e9985b558b996569cf7ef0b9b2a12efb85
+validated-tree: 663805bca2c53d54cb684458033a355427c49373
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-VAULT-ETH-1 rebase onto main before merge (2026-08-23)
+---------------------------------------------------------
+
+- Rebind `validated-tree` to `663805bca2c53d54cb684458033a355427c49373` after rebasing #207 onto `origin/main` including #204 honesty restore. Parent `protocol_return_value_hops` unchanged. P-ETH-JOURNAL-1 stays exclusion-only. Endpoints remain runtime inputs.
 
 P-ADDRESS-BATCH-1 honesty restore before merge (2026-08-23)
 --------------------------------------------------------------

@@ -24,7 +24,8 @@ are approved for the consolidation journal, not for the Join deposit
 success journal. -/
 def isDepositSuccessDest : ApprovedDestination → Bool
   | .lidoPull | .beaconDeposit => true
-  | .consolidationRequest | .refundRecipient => false
+  | .consolidationRequest | .refundRecipient
+  | .vaultToLido | .vaultToWithdrawalQueue => false
 
 /-- Source-level destinations of value-moving deposit legs. Residual tags
 have no Spec destination. The two `obtainDepositData` frames are not

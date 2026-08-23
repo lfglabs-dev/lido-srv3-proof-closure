@@ -4,11 +4,12 @@ import LidoSRv3.Audit.Guarantees.Registry
 /-!
 # P-ETH-JOURNAL-1 composition parent
 
-This parent composes the three existing Spec projections without widening
-`ApprovedDestination`: conserving two-batch deposit, value-moving top-up, and
-consolidation fee/refund.  The registered theorem is that a lossless Spec
-journal of the consolidation candidate excludes Vault→Lido and
-WithdrawalQueue hops.  It is not a claim that Lido never drains ETH.
+This parent composes the three legacy Spec projections: conserving two-batch
+deposit, value-moving top-up, and consolidation fee/refund. Its
+`EthJournalCorrespondence.specDest` deliberately remains narrower than the
+P-VAULT-ETH-1 projection: a lossless journal of this consolidation candidate
+excludes Vault→Lido and WithdrawalQueue hops. It is not a claim that Lido
+never drains ETH.
 -/
 
 namespace LidoSRv3.Audit.Guarantees.PEthJournal1
@@ -65,7 +66,8 @@ theorem every_modeled_success_journal_approved
 `Spec.EthJournal`, then Vault→Lido and WithdrawalQueue hops are excluded.
 Exclusion is the named conclusion of `JournalApproved`, not a restated
 leftover. This does not claim Lido never drains ETH. Address pins do not
-close provenance. `ApprovedDestination` stays four constructors. -/
+close provenance. The widened protocol-return constructors are handled by
+P-VAULT-ETH-1, not by this legacy projection. -/
 theorem journal_approved_excludes_protocol_return_paths
     (moves : List ConsolidationMove) :
     JournalApproved (consolidationCandidate moves) →

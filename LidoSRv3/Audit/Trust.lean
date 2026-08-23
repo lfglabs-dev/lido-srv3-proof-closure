@@ -90,6 +90,8 @@ import LidoSRv3.Tests.PackN1AllocExecMutants
 import LidoSRv3.Audit.Spec.EthJournalConfinement
 import LidoSRv3.Audit.Guarantees.PEthJournal1
 import LidoSRv3.Tests.PackN2EthJournalMutants
+import LidoSRv3.Audit.Guarantees.PVaultEth1
+import LidoSRv3.Tests.PackP2VaultEthMutants
 import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Guarantees.POracleSupply1
 import LidoSRv3.Tests.PackN3OracleMintMutants
@@ -203,7 +205,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence.request_or_unwrap_pause_balance_is_permissionless
 #print axioms LidoSRv3.Audit.Spec.VaultHubScopeChild.approved_destination_cases
 #print axioms LidoSRv3.Audit.Spec.DerefSupplementalChild.deref_closure_exists_shape
-#print axioms LidoSRv3.Tests.PackW2ScopeMutants.approved_destination_has_no_fifth_ctor
+#print axioms LidoSRv3.Tests.PackW2ScopeMutants.approved_destination_has_only_six_scoped_ctors
 #print axioms LidoSRv3.Tests.PackW2ScopeMutants.packed_config_clobber_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.router_produces_executes_allocation
 #print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.allocated_amount_times_deposit_size
@@ -213,6 +215,11 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PEthJournal1.every_modeled_success_journal_approved
 #print axioms LidoSRv3.Tests.PackN2EthJournalMutants.mutant_lido_approved_not_excluded_kill_line
 #print axioms LidoSRv3.Tests.PackN2EthJournalMutants.fifth_destination_kill_line_retains_success_premises
+#print axioms LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops
+#print axioms LidoSRv3.Audit.Guarantees.PVaultEth1.vault_to_lido_value_frame_inhabited
+#print axioms LidoSRv3.Audit.Guarantees.PVaultEth1.vault_to_withdrawal_queue_value_frame_inhabited
+#print axioms LidoSRv3.Tests.PackP2VaultEthMutants.zero_value_frame_kill_line_refutes_parent
+#print axioms LidoSRv3.Tests.PackP2VaultEthMutants.mutant_vault_lido_as_lidoPull_refutes_projection
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.sum_balances_mutant_killed
