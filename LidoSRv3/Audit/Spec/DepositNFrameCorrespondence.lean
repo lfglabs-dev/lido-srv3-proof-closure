@@ -64,7 +64,8 @@ theorem router_exactKeys (cfg : SourceDepositConfig)
   apply congrArg List.sum
   apply List.map_congr_left
   intro allocation hAllocation
-  simp [routerBatch, ofNat_val_of_lt (h.keys allocation hAllocation)]
+  change (Uint256.ofNat allocation.amount.value).val = allocation.amount.value
+  exact ofNat_val_of_lt (h.keys allocation hAllocation)
 
 theorem router_exactTotal (cfg : SourceDepositConfig)
     (inputTemplate : DepositNFrameTx.Inputs) (batchTemplate : Batch)
@@ -75,7 +76,9 @@ theorem router_exactTotal (cfg : SourceDepositConfig)
   apply congrArg List.sum
   apply List.map_congr_left
   intro allocation hAllocation
-  simp [routerBatch, ofNat_val_of_lt (h.wei allocation hAllocation)]
+  change (Uint256.ofNat (allocationWei allocation cfg.depositSize)).val =
+    allocationWei allocation cfg.depositSize
+  exact ofNat_val_of_lt (h.wei allocation hAllocation)
 
 /-- Spec → Source → Verity bridge for arbitrary finite arity. -/
 theorem router_links_source
