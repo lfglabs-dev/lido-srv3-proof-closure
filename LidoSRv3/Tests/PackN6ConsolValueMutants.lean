@@ -70,10 +70,12 @@ theorem zero_value_calls_refute_exact_forwarding
   intro hForwarded
   exact hMsgNonzero (hForwarded.symm.trans hForwardedZero)
 
-/-- Parent-shaped kill-line: claiming official `denoteFunction` succeeds on
-the registered bind entrypoint. Premises of the justified half are not
-needed; the official-success conjunct is already false for every oracle,
-transaction, and world. -/
+/-- Parent-shaped kill-line: claiming the *base-fragment* official
+`denoteFunction` succeeds on the registered bind entrypoint. The base
+fragment still has no `Expr.call` / `Stmt.externalCallBind` arm and reverts
+for every oracle, transaction, and world; the discharged official-success
+parent conjunct lives on the widened official fragment
+(`denoteFunctionWithCalls`), not here. -/
 theorem official_denote_success_kill_line_refutes_parent :
     ¬ ∃ (oracle : DenoteOracle) (tx : DenoteTransaction)
         (world : ContractState),
@@ -81,9 +83,7 @@ theorem official_denote_success_kill_line_refutes_parent :
         true := by
   intro h
   rcases h with ⟨oracle, tx, world, hSuccess⟩
-  have hReverts :=
-    (PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value).1
-      oracle tx world
+  have hReverts := official_external_call_reverts oracle tx world
   exact Bool.false_ne_true (hReverts.symm.trans hSuccess)
 
 end LidoSRv3.Tests.PackN6ConsolValueMutants
