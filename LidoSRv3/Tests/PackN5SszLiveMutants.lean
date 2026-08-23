@@ -6,14 +6,11 @@ import LidoSRv3.Audit.Guarantees.PSszLive1
 /-!
 # Pack N5 fail-closed vectors
 
-Two mutants of the Node 5 parent surface: a gateway that skips the
-parent-root lookup (age check only), and a verifier bound to toy slot 2
-instead of the production `150 * 2 ^ 40`. Premises retained; the
-refutations are stated against the parent shapes. Neither kill-line
-evaluates the opaque `eip4788ParentRoot` (it has no evaluation): both rely
-on the structural depth mismatch between the toy slots and the 47-deep
-production index. No SHA-256 claim (`A-SHA256-FFI` kept; `combineAdd` is a
-test-only concrete combine, not a hash).
+Three mutants of the Node 5 parent surface: a gateway that skips the
+parent-root lookup, a verifier bound to toy slot 2, and a BEACON_ROOTS read
+that ignores the requested timestamp. Premises are retained and the
+refutations are parent-shaped. No SHA-256 claim (`A-SHA256-FFI` stays;
+`combineAdd` is a test-only concrete combine, not a hash).
 -/
 
 namespace LidoSRv3.Tests.PackN5SszLiveMutants
@@ -21,6 +18,7 @@ namespace LidoSRv3.Tests.PackN5SszLiveMutants
 open LidoSRv3.Audit
 open LidoSRv3.Audit.Spec.Eip4788AnchorChild
 open LidoSRv3.Audit.Spec.SszLiveCorrespondence
+open LidoSRv3.Audit.Source.BeaconRootsCorrespondence
 open LidoSRv3.Audit.Guarantees.PSszLive1
 
 private def combineAdd (a b : Ssz.Node) : Ssz.Node := a + b
@@ -36,7 +34,8 @@ def admitSkipLookup (_combine : Ssz.Node → Ssz.Node → Ssz.Node)
 /-- A fresh-anchor witness with an empty (depth-0) path: the honest
 production verify rejects it against every claimed parent root, but its
 age check passes. -/
-def skipLookupKillWitness : WcWitness := ⟨0, [], [], ⟨0, 0, 0⟩⟩
+def skipLookupKillWitness : WcWitness :=
+  ⟨0, [], [], ⟨[]⟩, ⟨0, 0, 0⟩⟩
 
 /-- Kill-line, parent-shaped with premises retained: substituting
 `admitSkipLookup` for the honest gateway in
@@ -49,7 +48,8 @@ theorem skip_lookup_kill_line_refutes_parent :
     ¬ (∀ (combine : Ssz.Node → Ssz.Node → Ssz.Node) (wcProof : WcWitness),
       (ageCheck wcProof.anchor = true ∧
           ∃ parentRoot,
-            eip4788ParentRoot wcProof.anchor.beaconRootTimestamp =
+            eip4788ParentRoot wcProof.beaconRoots
+                wcProof.anchor.beaconRootTimestamp =
                 some parentRoot ∧
               verifyAtParent combine wcProof.leaf productionIndex parentRoot
                 wcProof.path wcProof.branch = true) ↔
@@ -73,7 +73,8 @@ theorem skip_lookup_kill_line_refutes_parent :
 of the production generalized index. -/
 def verifyAtLookupToySlot (combine : Ssz.Node → Ssz.Node → Ssz.Node)
     (wcProof : WcWitness) : Bool :=
-  match eip4788ParentRoot wcProof.anchor.beaconRootTimestamp with
+  match eip4788ParentRoot wcProof.beaconRoots
+      wcProof.anchor.beaconRootTimestamp with
   | none => false
   | some parentRoot =>
       verifyAtParent combine wcProof.leaf
@@ -119,12 +120,14 @@ theorem toy_slot_kill_line_refutes_verify_parent :
 and looked-up root, the toy-slot gateway admits the depth-1 witness the
 honest production gateway rejects. -/
 theorem toy_slot_gateway_kill_line_under_lookup
-    (anchor : ParentRootAnchor)
+    (beaconRoots : BeaconRootsHistory) (anchor : ParentRootAnchor)
     (hAge : ageCheck anchor = true)
-    (hLookup : eip4788ParentRoot anchor.beaconRootTimestamp = some 1) :
-    admitToySlot combineAdd ⟨1, [.right], [0], anchor⟩ = true ∧
-      admitTopupOrConsolidation combineAdd ⟨1, [.right], [0], anchor⟩ =
-        false := by
+    (hLookup :
+      eip4788ParentRoot beaconRoots anchor.beaconRootTimestamp = some 1) :
+    admitToySlot combineAdd
+        ⟨1, [.right], [0], beaconRoots, anchor⟩ = true ∧
+      admitTopupOrConsolidation combineAdd
+        ⟨1, [.right], [0], beaconRoots, anchor⟩ = false := by
   constructor
   · simp only [admitToySlot, verifyAtLookupToySlot, hLookup, hAge,
       Bool.true_and]
@@ -132,5 +135,43 @@ theorem toy_slot_gateway_kill_line_under_lookup
   · simp [admitTopupOrConsolidation, verifyAtLookup, hLookup,
       verifyAtParent_production_wrong_depth combineAdd 1 1 [.right] [0]
         (by decide)]
+
+/-! ## Mutant 3: ignore the requested BEACON_ROOTS timestamp -/
+
+/-- Mutant read: always returns cell zero's root and never validates the
+requested timestamp. -/
+def beaconRootsIgnoreTimestamp (storage : BeaconRootsStorage) (_timestamp : Nat) :
+    Option Ssz.Node :=
+  match storage.cells[0]? with
+  | none => none
+  | some cell => some cell.rootWord
+
+/-- Two cells that distinguish timestamp-selected slot 1 from the mutant's
+constant slot 0. -/
+def timestampKillStorage : BeaconRootsStorage :=
+  ⟨[⟨99, 11⟩, ⟨1, 7⟩]⟩
+
+/-- The honest modeled read selects slot `1 % 8191`, validates timestamp 1,
+and returns root 7; the mutant ignores timestamp and returns root 11. -/
+theorem timestamp_lookup_concrete_divergence :
+    sourceBeaconRootsRead timestampKillStorage 1 = some 7 ∧
+      beaconRootsIgnoreTimestamp timestampKillStorage 1 = some 11 := by
+  decide
+
+/-- Kill-line for the identified symbol, with the full consume-parent shape
+retained. Replacing the Verity BEACON_ROOTS read by a timestamp-ignoring
+lookup fails the parent's identified-root conjunct before admission can be
+claimed. -/
+theorem ignore_timestamp_kill_line_refutes_consume_parent :
+    ¬ LiveSszConsumeParent beaconRootsIgnoreTimestamp := by
+  intro hMutantParent
+  have hIdentified :=
+    (hMutantParent.2 timestampKillStorage combineAdd 0 [] []
+      ⟨1, 1, 0⟩).1.2
+  have hMismatch :
+      sourceBeaconRootsRead timestampKillStorage 1 ≠
+        beaconRootsIgnoreTimestamp timestampKillStorage 1 := by
+    decide
+  exact hMismatch hIdentified
 
 end LidoSRv3.Tests.PackN5SszLiveMutants
