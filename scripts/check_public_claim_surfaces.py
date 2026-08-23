@@ -35,12 +35,16 @@ CLAIMS = {
         # and `verity_tx_revert_restores_snapshot` is the hypothesis-free
         # executable rollback theorem the composed claim consumes, so all three
         # are part of the public surface.
-        # `linked_deployment_is_word_bounded`, `oversizedSourceInput`,
-        # `oversized_deployment_exceeds_word` and
+        # `linked_deployment_push_is_word_bounded`,
+        # `linked_conserving_deployment_pull_is_word_bounded`,
+        # `skewedPullConfig`, `linked_hypotheses_do_not_bound_the_source_pull`,
+        # `oversizedSourceInput`, `oversized_deployment_exceeds_word`,
+        # `oversized_run_commits` and
         # `abstract_parent_covers_deployments_the_verity_plane_omits` state the
-        # executable plane's finiteness and the deployment range the abstract
-        # parent covers without it, so they are public too: a reader must not be
-        # able to quote the CHECKED Verity row without them.
+        # executable plane's finiteness, the separation between the bounded
+        # executable push and the unbounded source pull, and the deployment the
+        # abstract parent commits without either, so they are public too: a
+        # reader must not be able to quote the CHECKED Verity row without them.
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalDepositContractAddress"),
@@ -53,15 +57,19 @@ CLAIMS = {
             ("structure", "LinksSource"),
             ("theorem", "linked_total_eq_pushedValue"),
             ("theorem", "linked_total_eq_depositsValue"),
-            ("theorem", "linked_deployment_is_word_bounded"),
+            ("theorem", "linked_deployment_push_is_word_bounded"),
+            ("theorem", "linked_conserving_deployment_pull_is_word_bounded"),
             ("theorem", "verity_tx_revert_restores_snapshot"),
             ("theorem", "verity_tx_composes_deposit_conservation_and_rollback"),
             ("def", "canonicalSourceConfig"),
             ("def", "canonicalSourceInput"),
             ("theorem", "canonical_links_source"),
             ("theorem", "canonical_composition_witness"),
+            ("def", "skewedPullConfig"),
+            ("theorem", "linked_hypotheses_do_not_bound_the_source_pull"),
             ("def", "oversizedSourceInput"),
             ("theorem", "oversized_deployment_exceeds_word"),
+            ("theorem", "oversized_run_commits"),
             ("theorem", "abstract_parent_covers_deployments_the_verity_plane_omits"),
         ),
     },
