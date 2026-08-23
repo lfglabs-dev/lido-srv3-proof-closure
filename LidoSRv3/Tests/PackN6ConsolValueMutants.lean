@@ -1,12 +1,16 @@
 import LidoSRv3.Audit.Guarantees.PConsolidationValue1
+import LidoSRv3.Audit.Spec.ConsolidationBridgeGap
 
-/-! Node 6 kill-line for zero-value consolidation request frames. -/
+/-! Node 6 kill-lines: zero-value frames, and claimed official denote success. -/
 
 namespace LidoSRv3.Tests.PackN6ConsolValueMutants
 
 open _root_.Verity
+open Compiler.CompilationModel.Denote
 open LidoSRv3.Audit.SolidityConsolidation
+open LidoSRv3.Audit.Verity.ConsolidationCallFragment
 open LidoSRv3.Audit.Verity.ConsolidationValueTx
+open LidoSRv3.Audit.Spec.ConsolidationBridgeGap
 open LidoSRv3.Audit.Guarantees
 
 @[simp] theorem zeroValueCall_value_val (call : CallObs) :
@@ -65,5 +69,21 @@ theorem zero_value_calls_refute_exact_forwarding
     ⟨requests, hZip, hValid, hProduct, hExactFee⟩, hBalance, ?_⟩
   intro hForwarded
   exact hMsgNonzero (hForwarded.symm.trans hForwardedZero)
+
+/-- Parent-shaped kill-line: claiming official `denoteFunction` succeeds on
+the registered bind entrypoint. Premises of the justified half are not
+needed; the official-success conjunct is already false for every oracle,
+transaction, and world. -/
+theorem official_denote_success_kill_line_refutes_parent :
+    ¬ ∃ (oracle : DenoteOracle) (tx : DenoteTransaction)
+        (world : ContractState),
+      (denoteFunction oracle spec spec.functions[1] tx world).success =
+        true := by
+  intro h
+  rcases h with ⟨oracle, tx, world, hSuccess⟩
+  have hReverts :=
+    (PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value).1
+      oracle tx world
+  exact Bool.false_ne_true (hReverts.symm.trans hSuccess)
 
 end LidoSRv3.Tests.PackN6ConsolValueMutants

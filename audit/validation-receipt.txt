@@ -96,6 +96,25 @@ P-SSZ-LIVE-1 constructor-pin ProductionGindexBinding (2026-08-23)
   LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackW2GindexMutants`
   exit 0; metadata and claim-surface checks exit 0.
 
+P-CONSOLIDATION-VALUE-1 official denote reverts (2026-08-23)
+-----------------------------------------------------------
+
+- Rebind `validated-tree` to `06f9bea6a4c3b8e370393f3362a70194541c12f7`, the
+  tracked tree of `cursor/consolidation-official-denote-6aad` excluding this
+  receipt.
+- Scope: one supplemental row, P-CONSOLIDATION-VALUE-1. Same guarantee id.
+  The registered theorem is now
+  `official_denote_reverts_and_justified_forwards_msg_value`: official
+  `denoteFunction` reverts on the registered bind entrypoint for every
+  oracle, transaction, and world, and the justified interpreter forwards
+  exactly `msg.value` with `noConsensusLayerVerify`. Official denotation
+  success is not claimed. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise.
+  No bus.
+- Kill-line: `official_denote_success_kill_line_refutes_parent`. Existing
+  zero-value CALL kill-line retained.
+- Reproduction: `lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1
+  LidoSRv3.Tests.PackN6ConsolValueMutants` exit 0; metadata checks exit 0.
+
 P-DEPOSIT-1 guard-order honesty of the pull kill-line (2026-08-23)
 ------------------------------------------------------------------
 

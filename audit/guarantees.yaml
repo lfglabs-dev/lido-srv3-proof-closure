@@ -1206,34 +1206,35 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants",
-        "expected": "justified_interpreter_forwards_exactly_msg_value builds; zero_value_calls_refute_exact_forwarding keeps exact-fee and gateway premises"
+        "expected": "official_denote_reverts_and_justified_forwards_msg_value builds; official_denote_success_kill_line_refutes_parent and zero_value_calls_refute_exact_forwarding keep premises"
       },
-      "summary": "Supplemental justified-interpreter parent: on every successful vault request batch the interpreter forwards exactly msg.value to the request predeploy, vault ETH decreases by that amount, and preservesEthBalance holds. Official denoteFunction still reverts on Expr.call; this row does not claim official denotation success. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus and no consensus-layer verify.",
+      "summary": "Supplemental parent: official denoteFunction reverts on the registered bind entrypoint for every oracle, transaction, and world, and the justified interpreter forwards exactly msg.value on every successful vault request batch (vaultEthDelta, preservesEthBalance, noConsensusLayerVerify). One named conjunction. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus. This row does not claim official denotation success.",
       "abstract": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value"
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value"
       },
       "verity": {
         "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value"
+        "theorem": "LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value"
       },
       "fidelity": {
         "covered": [
+          "official denoteFunction reverts on the registered bind entrypoint (named conclusion, not a leftover restatement)",
           "justified ConsolidationValueTx.execute journals externalCallBindTo with fee value",
           "forwards exactly msg.value, vaultEthDelta, preservesEthBalance, noConsensusLayerVerify",
-          "PConsolidation1 source guards cited, not restated; parent-shaped zero-value CALL kill-line"
+          "parent-shaped official-success kill-line; zero-value CALL kill-line"
         ],
         "missing": [
-          "official denoteFunction still reverts on Expr.call; this parent uses a justified interpreter, not official denotation success",
           "A-CONSOLIDATION-GATEWAY-NONZERO remains a caller premise, not discharged",
-          "no bus, no consensus-layer verify, no ETH-1 composed with CONSOLIDATION-1 ABI bridge"
+          "no bus, no consensus-layer verify, no ETH-1 composed with CONSOLIDATION-1 ABI bridge",
+          "this parent keeps the justified interpreter; it does not claim official denotation success"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not claim official denotation success or start the bus."
+        "work": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not start the bus; do not claim official denotation success."
       },
-      "next_gate": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not claim official denotation success or start the bus."
+      "next_gate": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; do not start the bus."
     }
   ],
   "objective": "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
