@@ -1,11 +1,16 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: fb7f4614cfc16f497e258254b1a34d326ce0ba40
+validated-tree: 4bff370c595cb6d694711530456dcd82caecddea
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Product-facts campaign close (2026-08-23)
+-----------------------------------------
+
+- Rebind `validated-tree` to `4bff370c595cb6d694711530456dcd82caecddea` after adding `audit/PRODUCT-DAG.md` with nodes 1–6 merge outcomes. Node 7 was not started. Named leftovers stay OPEN.
 
 P-DEPOSIT-1 n-frame parent honesty before merge (2026-08-23)
 ------------------------------------------------------------
