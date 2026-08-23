@@ -212,7 +212,9 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence
 #print axioms LidoSRv3.Tests.PackN5SszLiveMutants.skip_lookup_kill_line_refutes_parent
+#print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_reverts_and_justified_forwards_msg_value
 #print axioms LidoSRv3.Audit.Guarantees.PConsolidationValue1.justified_interpreter_forwards_exactly_msg_value
+#print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.official_denote_success_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN6ConsolValueMutants.zero_value_calls_refute_exact_forwarding
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.active_capacity_bounded
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.source_capacities_match_canonical
