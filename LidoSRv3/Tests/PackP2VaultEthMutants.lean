@@ -42,8 +42,12 @@ theorem zeroValueFrame_apply (endpoints : Endpoints) (inputs : Inputs)
     (entry : ContractState) :
     zeroValueFrame endpoints inputs entry =
       .success () (afterZeroValueFrame endpoints inputs entry) := by
-  simp [zeroValueFrame, afterZeroValueFrame, zeroValueEntry,
-    externalCallBindTo, externalCallStubSuccess]
+  cases inputs with
+  | mk route amount =>
+      cases route <;>
+        simp [zeroValueFrame, afterZeroValueFrame, zeroValueEntry, callName,
+          externalCallBindTo, externalCallStubSuccess, linkedCallEntryTo,
+          linkedCallEntry]
 
 theorem executeZeroValueMutant_commits
     (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
@@ -55,7 +59,7 @@ theorem executeZeroValueMutant_commits
   simp only [executeZeroValueMutant,
     sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
       hNonzero hFunds]
-  exact zeroValueFrame_apply endpoints inputs entry
+  rw [zeroValueFrame_apply endpoints inputs entry]
 
 private def endpoints : Endpoints :=
   { lido := 1, withdrawalQueue := 2 }
@@ -72,7 +76,8 @@ theorem zero_value_frame_fails_value_bearing_conjunct :
   intro hFrames
   have hValues := hFrames.2
   simp [freshFrameValues, freshCalls, afterZeroValueFrame, zeroValueEntry,
-    specJournal, specLeg, specDestination, inputs] at hValues
+    specJournal, specLeg, specDestination, inputs, linkedCallEntryTo,
+    linkedCallEntry] at hValues
 
 /-- Parent-shaped kill-line: source success and executable success are
 retained, but changing the Vault→Lido frame from seven wei to zero falsifies
