@@ -12,7 +12,7 @@
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
         "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), storage-backed 32-capped allocation transaction with packed ModuleStateConfig reads and live 96-byte getStakingModuleSummary ABI decoding, the parent capacity kill-line and summary_field_order_kill_line_refutes_decoder, plus off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
       },
-      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple into BoundModule, persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. The summary-field-order mutant is rejected. getTotalModuleStake remains explicitly open.",
+      "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute"
@@ -29,12 +29,11 @@
           "single bind/execute interpreter; observe reads writeArray columns",
           "module count read from modulesCountSlot and capped by MAX_STAKING_MODULES_COUNT = 32 before binding router indices",
           "packed ModuleStateConfig decoding for moduleAddress, uint16 stakeShareLimit, status, and withdrawalCredentialsType",
-          "live source-derived getStakingModuleSummary staticcall with 96-byte returndata guard and ABI decode in exited/deposited/depositable order, threaded into BoundModule and the allocation loop under an explicit decoded-row correspondence premise",
+          "live source-derived getStakingModuleSummary staticcall with 96-byte returndata guard and ABI decode in exited/deposited/depositable order, plus the distinct WC02-only getTotalModuleStake staticcall (0x0c852f5c) with a fail-closed 32-byte uint256 decode, threaded into BoundModule and the allocation loop under an explicit decoded-row correspondence premise",
           "summary_field_order_kill_line_refutes_decoder rejects an exited/deposited return-word swap",
           "Contract.run rollback after intermediate writes"
         ],
         "missing": [
-          "live getTotalModuleStake call and returndata for type-2 modules",
           "unique moduleAddress on addModule",
           "getDepositAllocations / MinFirst fill (see P-ALLOC-2)",
           "reachable-router CheckedBounds"
@@ -42,9 +41,9 @@
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked execute parent and the live-summary/packed-config transaction correspondence. Next close getTotalModuleStake for type-2 rows without widening to getDepositAllocations or P-ALLOC-2, and do not re-fold the min-clamp tautology."
+        "work": "Keep the checked execute parent and the live-summary/type-2-stake/packed-config transaction correspondence. Reachable-router CheckedBounds and unique moduleAddress remain strengthening obligations; do not widen to getDepositAllocations or P-ALLOC-2, and do not re-fold the min-clamp tautology."
       },
-      "next_gate": "CHECKED: storage-backed 32-cap, packed ModuleStateConfig decode, and live 96-byte getStakingModuleSummary returndata decode are threaded into allocation under decoded-row correspondence. OPEN: model getTotalModuleStake for type-2 rows and unique moduleAddress/reachable CheckedBounds; do not widen into P-ALLOC-2 or refold the min-clamp child.",
+      "next_gate": "CHECKED: storage-backed 32-cap, packed ModuleStateConfig decode, live 96-byte getStakingModuleSummary decoding, and WC02-only getTotalModuleStake (0x0c852f5c) 32-byte decoding are threaded into allocation under decoded-row correspondence. OPEN: unique moduleAddress and reachable-router CheckedBounds; do not widen into P-ALLOC-2 or refold the min-clamp child.",
       "roadmap_priority": "DONE"
     },
     {
@@ -79,15 +78,15 @@
         "missing": [
           "Solidity allocate does not test active (filtered upstream)",
           "+1 Strategy and proportional Source are different algorithms",
-          "keccak memory-array oracle",
+          "memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression",
           "cross-call mutation of the decoded arrays"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked proportional model/source multi-step correspondence and conservation in the parent, with the +1 model as a separate child. Close only the remaining source/deployment fidelity gaps; do not merge the algorithms or claim Solidity equivalence."
+        "work": "Keep the checked proportional model/source multi-step correspondence and conservation in the parent, with the +1 model as a separate child. The direct-memory/keccak boundary is discharged only for memoryArrayElement reads; cross-call mutation and upstream active filtering remain open. Do not merge the algorithms or claim Solidity equivalence."
       },
-      "next_gate": "CHECKED: independent proportional modelAllocateLoop and sourceAllocateLoop now match across every successful fuel-bounded mutation with final RowsCorrespond and equal totals; conservation remains bridged to allocateLoop. OPEN: keccak memory-array provenance, upstream active filtering, and cross-call mutation of decoded arrays. Keep the distinct +1 model as a separate child and do not claim Solidity equivalence.",
+      "next_gate": "CHECKED: independent proportional modelAllocateLoop and sourceAllocateLoop now match across every successful fuel-bounded mutation with final RowsCorrespond and equal totals; conservation remains bridged to allocateLoop, and direct memory-array reads are oracle-independent (no keccak expression is evaluated). OPEN: upstream active filtering and cross-call mutation of decoded arrays. Keep the distinct +1 model as a separate child and do not claim Solidity equivalence.",
       "roadmap_priority": "DONE"
     },
     {

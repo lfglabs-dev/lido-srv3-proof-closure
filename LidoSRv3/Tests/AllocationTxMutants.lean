@@ -109,6 +109,16 @@ theorem summary_field_order_kill_line_refutes_decoder :
       some ⟨w 1, w 2, w 3⟩ := by
   native_decide
 
+/-- The WC02 stake boundary has a separate selector and one-word ABI shape;
+using the summary selector or accepting a short return cannot stand in for it. -/
+theorem type2_total_stake_boundary_rejects_summary_substitution :
+    totalStakeSelector = 0x0c852f5c ∧
+    totalStakeCalldata = [0x0c, 0x85, 0x2f, 0x5c] ∧
+    totalStakeCalldata ≠ [0x9a, 0xbd, 0xdf, 0x09] ∧
+    decodeTotalStake (List.replicate 31 0 ++ [7]) = some (w 7) ∧
+    decodeTotalStake (List.replicate 31 0) = none := by
+  native_decide
+
 /-- Stale-snapshot mutant: after rebinding module 7 from address 17 to 19,
 the live transaction must observe the new address's summary. A snapshot
 taken before the rebind still reports address 17. -/
