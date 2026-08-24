@@ -119,6 +119,25 @@ theorem type2_total_stake_boundary_rejects_summary_substitution :
     decodeTotalStake (List.replicate 31 0) = none := by
   native_decide
 
+/-- A WC02 row cannot be admitted on the summary result alone: malformed
+`getTotalModuleStake` returndata reverts the whole binding transaction. -/
+private def malformedStakeAdversary :
+    Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel :=
+  { stateTransition := fun _ world => world
+    result := fun site _ =>
+      if site.siteId = 0 then .success (List.replicate 96 0) else .success (List.replicate 31 0)
+    gasUsed := fun _ _ => 0 }
+
+private def type2Module : BoundModule := { modA with isType2 := true }
+private def type2State : ContractState := stateFor [type2Module]
+
+#guard match (bindLiveOne malformedStakeAdversary type2State 0) type2State with
+  | .revert "TotalModuleStakeMalformedReturn" rollback =>
+      rollback.sender == type2State.sender &&
+      rollback.readMapUint moduleIdSlot 0 == type2State.readMapUint moduleIdSlot 0 &&
+      rollback.readMapUint moduleConfigSlot (w 7) == type2State.readMapUint moduleConfigSlot (w 7)
+  | _ => false
+
 /-- Stale-snapshot mutant: after rebinding module 7 from address 17 to 19,
 the live transaction must observe the new address's summary. A snapshot
 taken before the rebind still reports address 17. -/

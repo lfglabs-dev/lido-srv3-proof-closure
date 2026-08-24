@@ -233,7 +233,8 @@ theorem bindLiveOne_decodes_summary
       (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite
         (sourceBindConfigOne state index).moduleAddress.val) state =
       .success data)
-    (hdecode : decodeSummary data = some summary) :
+    (hdecode : decodeSummary data = some summary)
+    (htype1 : (sourceBindConfigOne state index).isType2 = false) :
     (bindLiveOne adversary state index) state =
       .success (withSummary (sourceBindConfigOne state index) summary) state := by
   have hcall :
@@ -245,7 +246,7 @@ theorem bindLiveOne_decodes_summary
         (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite
           (sourceBindConfigOne state index).moduleAddress.val) state)) state = _
     rw [hresult]
-  simp only [bindLiveOne, hcall, hdecode]
+  simp [bindLiveOne, hcall, hdecode, withSummary, htype1]
 
 /-- The single `_getModulesAllocationAndCapacity` interpreter. -/
 def sourceExecute (cfg : Config) (modules : List BoundModule)
