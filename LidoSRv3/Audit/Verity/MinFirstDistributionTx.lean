@@ -1,5 +1,6 @@
 import LidoSRv3.Audit.Source.MinFirstAmountCorrespondence
 import Verity.Core.Model.Denote
+import Compiler.Proofs.IRGeneration.DenoteAgreement
 
 /-!
 # P-ALLOC-2 faithful memory-array transaction
@@ -30,17 +31,35 @@ def bucketsSlot : Nat := 20
 def allocatedSlot : Nat := 21
 def remainingSlot : Nat := 22
 
-private def oracle : DenoteOracle where
-  mappingSlot := fun _ _ => 0
-  keccakMemorySlice := fun _ _ _ => 0
+/-! `memoryArrayElement` is a direct word-addressed memory read in Verity's
+denotation. It neither computes a mapping slot nor evaluates `keccak256`; the
+explicit source oracle makes that boundary visible rather than hiding it
+behind a dummy keccak function. -/
+private def sourceOracle : DenoteOracle where
+  mappingSlot := Compiler.Proofs.abstractMappingSlot
+  keccakMemorySlice := Compiler.Proofs.IRGeneration.SourceSemantics.keccakMemorySlice
 
 def arrayState (state : ContractState) (name : String) (base length : Nat) : DenoteState :=
   { world := state
     bindings := [(name ++ "_data_offset", base), (name ++ "_length", length)] }
 
-def readWord (state : ContractState) (name : String) (base length index : Nat) : Option Word :=
+def readWordWith (oracle : DenoteOracle) (state : ContractState) (name : String)
+    (base length index : Nat) : Option Word :=
   (evalExpr oracle [] (arrayState state name base length)
     (.memoryArrayElement name (.literal index))).map Verity.Core.Uint256.ofNat
+
+def readWord (state : ContractState) (name : String) (base length index : Nat) : Option Word :=
+  readWordWith sourceOracle state name base length index
+
+/-- The allocation arrays cross the word-addressed memory boundary only.
+Changing either oracle hook cannot change a `memoryArrayElement` observation;
+in particular this path is not a claim about Solidity mapping-slot keccak. -/
+theorem memory_array_read_is_oracle_independent
+    (oracle₁ oracle₂ : DenoteOracle) (state : ContractState) (name : String)
+    (base length index : Nat) :
+    readWordWith oracle₁ state name base length index =
+      readWordWith oracle₂ state name base length index := by
+  simp [readWordWith, evalExpr, arrayState]
 
 def readArray (state : ContractState) (name : String) (base length : Nat) : Option (List Word) :=
   (List.range length).mapM (readWord state name base length)

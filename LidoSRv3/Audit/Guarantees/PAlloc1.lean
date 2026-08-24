@@ -152,10 +152,11 @@ theorem verity_tx_simulates_allocation
 /-- Storage-backed P-ALLOC-1 live-summary transaction closure. The router
 module count is read from storage and capped at 32. `bindLiveAll` reads each
 packed `ModuleStateConfig`, executes the mapped summary staticcall, ABI-decodes
-the returned `(exited, deposited, depositable)` words, and passes those rows to
-the allocation loop. The premise says those adversarial call observations
-decode to the source-view rows. `getTotalModuleStake` remains outside this
-claim and is not faked as checked. -/
+the returned `(exited, deposited, depositable)` words, and for type-2 rows
+executes the distinct pinned `getTotalModuleStake()` staticcall and ABI-decodes
+its uint256 word before passing rows to the allocation loop. The premise says
+those adversarial call observations decode to the source-view rows. It does
+not prove reachable-router `CheckedBounds`. -/
 theorem verity_tx_simulates_allocation_count_from_storage
     (adversary :
       Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
