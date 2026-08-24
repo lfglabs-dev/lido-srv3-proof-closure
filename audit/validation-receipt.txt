@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d4ca11b042b9f2f4a9d6b752391976412cc8d996
+validated-tree: fcc2f02bc81b6be67c5cf33581daedcedd888ae3
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -10,7 +10,7 @@ negative fixtures without circularly claiming the receipt's own commit.
 Remove P-DEREF-1 from final-deliverable scope (2026-08-24)
 -----------------------------------------------------------
 
-- Rebind `validated-tree` to `d4ca11b042b9f2f4a9d6b752391976412cc8d996` after
+- Rebind `validated-tree` to `fcc2f02bc81b6be67c5cf33581daedcedd888ae3` after
   removing P-DEREF-1 and storage-migration coverage from the active campaign.
   Migration has happened and is out of final Lido scope.
 - Removed: `LidoSRv3/Audit/Guarantees/PDeref1.lean`,
