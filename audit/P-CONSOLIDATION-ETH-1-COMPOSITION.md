@@ -5,7 +5,7 @@ rows under this parent.
 
 - **Former P-CONSOLIDATION-ETH-1b** (fee → configured consolidation-request target) is
   absorbed as **parent evidence** under `A-CANONICAL-REQUEST-ADDRESS`. It is
-  not a separate guarantee. When the canonical `0x00…7251` obligation is
+  not a separate guarantee. When the pinned canonical EIP-7251-address obligation is
   discharged, that evidence should become a registered parent conjunct, not a
   sister claim.
 - **Former P-CONSOLIDATION-ETH-1a** (vault → Lido / WithdrawalQueue returns) is **retired**

@@ -330,7 +330,7 @@
           "the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness)",
           "the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning",
           "vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)",
-          "canonical consolidation-request address provenance (0x00…7251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only",
+          "pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment",
           "canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address",
           "renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee"
         ]

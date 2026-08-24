@@ -112,7 +112,7 @@ targets the configured consolidation-request address, the trace is tagged
 `.consolidationContract`. Together with
 `Verity.PConsolidationEth1RequestTx.consolidation_fee_target_success`, this is
 registered parent evidence for the fee leg, not a sibling guarantee.
-Canonical equality with `0x00…7251` remains the OPEN
+Canonical equality with the pinned EIP-7251 source literal remains the OPEN
 `A-CANONICAL-REQUEST-ADDRESS` provenance boundary. -/
 theorem consolidation_fee_path_confined (cfg : Config) (c : ConsolidationFeeCall) :
     c.target = cfg.consolidationRequest →
@@ -140,7 +140,7 @@ structure ApprovedSet where
 literal directly; identifying a deployed gateway immutable/slot with it remains
 the explicit provenance boundary `A-CANONICAL-REQUEST-ADDRESS`. -/
 def canonicalRequestAddress : Address :=
-  0x0000000000000000000000000000000000007251
+  0x0000BBdDc7CE488642fb579F8B00f3a590007251
 
 def canonicalApprovedSet (refundRecipient : Address) : ApprovedSet :=
   { consolidationContract := canonicalRequestAddress, refundRecipient }

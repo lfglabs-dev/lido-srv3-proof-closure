@@ -169,11 +169,11 @@
     {
       "id": "A-CANONICAL-REQUEST-ADDRESS",
       "accepted": true,
-      "risk": "The model-local consolidation-request target is not proved equal to the canonical EIP-7251 predeploy at 0x0000000000000000000000000000000000007251.",
-      "justification": "Fee-target proofs establish movement to a configured immutable slot; deployment provenance is a separate obligation.",
+      "risk": "The model-local consolidation-request target is not proved equal to the pinned EIP-7251 predeploy at 0x0000BBdDc7CE488642fb579F8B00f3a590007251.",
+      "justification": "The pinned upstream source names this address, but fee-target proofs establish movement only to a configured immutable slot; deployment provenance is a separate obligation.",
       "severity": "HIGH",
       "violation_impact": "A correctly accounted fee could still be sent to the wrong deployed address.",
-      "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical predeploy address.",
+      "validation": "Compare constructor/deployment artifacts with the pinned upstream predeploy literal; do not treat the source pin as deployed-immutable identity.",
       "removal_path": "Prove the configured immutable and deployed target both equal the canonical EIP-7251 address."
     },
     {

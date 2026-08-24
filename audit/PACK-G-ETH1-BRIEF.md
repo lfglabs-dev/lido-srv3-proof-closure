@@ -6,8 +6,8 @@ stay on ensemble `requestAddr` = 5.
 ## Honest claim
 
 `Verity.MultiContract.requestAddr` is 5. The model pin
-`PConsolidationEth1.canonicalRequestAddress` is the EIP-7251 literal
-`0x00…7251`. Those Nats are not equal. An unregistered observe rewrite
+`PConsolidationEth1.canonicalRequestAddress` is the pinned EIP-7251 literal
+`0x0000BBdDc7CE488642fb579F8B00f3a590007251`. Those Nats are not equal. An unregistered observe rewrite
 maps ensemble 5 to the canonical literal and leaves every other address
 unchanged.
 
@@ -18,7 +18,7 @@ registered Verity parent.
 ## Work
 
 1. Pin ensemble `requestAddr` as 5.
-2. Prove the parent model literal is `0x00…7251`.
+2. Prove the parent model literal is the pinned EIP-7251 value.
 3. Prove ensemble 5 is not that literal.
 4. Define the observe rewrite and prove it maps 5 to the literal and
    preserves every other address.
