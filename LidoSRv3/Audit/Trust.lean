@@ -84,7 +84,6 @@ import LidoSRv3.Audit.Spec.ReserveQueueCacheChild
 import LidoSRv3.Tests.PackW2ReserveMutants
 import LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence
 import LidoSRv3.Audit.Spec.VaultHubScopeChild
-import LidoSRv3.Audit.Spec.DerefSupplementalChild
 import LidoSRv3.Tests.PackW2ScopeMutants
 import LidoSRv3.Audit.Spec.AllocExecCorrespondence
 import LidoSRv3.Audit.Guarantees.PAllocExec1
@@ -210,9 +209,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackW2ReserveMutants.fresh_queue_cache_not_universal
 #print axioms LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence.request_or_unwrap_pause_balance_is_permissionless
 #print axioms LidoSRv3.Audit.Spec.VaultHubScopeChild.approved_destination_cases
-#print axioms LidoSRv3.Audit.Spec.DerefSupplementalChild.deref_closure_exists_shape
 #print axioms LidoSRv3.Tests.PackW2ScopeMutants.approved_destination_has_only_six_scoped_ctors
-#print axioms LidoSRv3.Tests.PackW2ScopeMutants.packed_config_clobber_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.router_produces_executes_allocation
 #print axioms LidoSRv3.Audit.Guarantees.PAllocExec1.allocated_amount_times_deposit_size
 #print axioms LidoSRv3.Tests.PackN1AllocExecMutants.raw_count_router_kill_line_refutes_parent

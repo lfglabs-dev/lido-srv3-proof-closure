@@ -44,7 +44,6 @@ import LidoSRv3.Audit.Spec.ReserveQueueCacheChild
 import LidoSRv3.Tests.PackW2ReserveMutants
 import LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence
 import LidoSRv3.Audit.Spec.VaultHubScopeChild
-import LidoSRv3.Audit.Spec.DerefSupplementalChild
 import LidoSRv3.Tests.PackW2ScopeMutants
 import LidoSRv3.Audit.Spec.AllocExecCorrespondence
 import LidoSRv3.Audit.Guarantees.PAllocExec1

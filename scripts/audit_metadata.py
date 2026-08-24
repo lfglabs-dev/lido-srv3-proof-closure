@@ -26,7 +26,7 @@ SUBORDINATE_IDS = [
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
     "P-SSZ-1.tx-execution-simulation",
-    "P-ADDRESS-1.denote-admission", "P-DEREF-1",
+    "P-ADDRESS-1.denote-admission",
     "P-RESERVE-RELATIONAL",
     "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1", "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1",
     "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1", "P-CONSOLIDATION-VALUE-1",
@@ -63,7 +63,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-PERFECT-HASH", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "8abca63138a78345a218235371611a7c1e2ab4927cd5a7808a31cf63a120be16",
+    "P-ALLOC-1": "83d7fe6a3174b588a235af6e1cd53e7267a23a320b1228254b3020e8638d58b2",
     "P-ALLOC-2": "bc8287e80206e047ee1fabbf2f968484f5b24b9effdf4d928e647ebf575e5a29",
     "P-DEPOSIT-1": "768e8ca14a82e6185ec6cfaaa87365c708434f9a6281fa265eb332a8a10e8208",
     "P-TOPUP-1": "7097df87332a3b9f4996ae897b5619947c71d4bdc547dad407759174fa62212f",

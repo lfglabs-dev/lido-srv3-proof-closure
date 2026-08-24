@@ -1,14 +1,13 @@
-# Pack W2-SCOPE brief — pause, VaultHub exclusion, P-DEREF pin
+# Pack W2-SCOPE brief — pause, VaultHub exclusion
 
-One node, one branch. No new guarantee IDs. Do not promote P-DEREF-1.
-Three small unregistered children.
+One node, one branch. No new guarantee IDs.
+Two small unregistered children.
 
 ## Frozen interfaces used
 
 `Spec.ApprovedDestination` from Wave 0 / G0 (`consolidationRequest` |
 `refundRecipient` | `beaconDeposit` | `lidoPull`). Pinned-source pause
-admission in `LidoSRv3.Audit.SolidityAddress`. Supplemental
-`PDeref1.closure` on `AllGuarantees.supplemental`.
+admission in `LidoSRv3.Audit.SolidityAddress`.
 
 ## Work
 
@@ -20,9 +19,6 @@ admission in `LidoSRv3.Audit.SolidityAddress`. Supplemental
    `ApprovedDestination`. Four constructors, none named VaultHub.
    `no_vaulthub_ctor` records that VaultHub owner withdraw is not a Spec
    dest. Do not add constructors.
-3. Unregistered child `deref_closure_exists_shape`: citation of
-   `PDeref1.closure`. `deref_remains_supplemental` records that P-DEREF-1
-   stays supplemental and is not promoted into the minimal-11 facade.
 
 ## Kill-lines
 
@@ -30,11 +26,9 @@ admission in `LidoSRv3.Audit.SolidityAddress`. Supplemental
   `permissionlessAdmission` (positive).
 - VaultHub: a complete match on `ApprovedDestination` has four arms;
   `decide` on that match. A fifth (VaultHub) constructor would fail it.
-- Deref: re-export of
-  `DereferenceMutants.packed_config_clobber_kill_line_refutes_parent`.
 
 ## Out of scope
 
-New guarantee IDs. Promoting P-DEREF-1. Adding `ApprovedDestination`
-constructors. Editing `Spec.lean`, `PAddress1.lean`, `PDeref1.lean`,
+New guarantee IDs. Adding `ApprovedDestination`
+constructors. Editing `Spec.lean`, `PAddress1.lean`,
 `LidoSRv3.lean`, `Trust.lean`, receipt, or yaml.

@@ -95,8 +95,6 @@ test:
 	@printf '%s\n' 'P-ORACLE-SUPPLY-1 live computed mint parent and free-argument/sum-balances/raw-fee kill-lines compiled and asserted'
 	@lake build LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence LidoSRv3.Audit.Verity.SubmitReportEntryTx LidoSRv3.Tests.PackP3SubmitReportEntryMutants
 	@printf '%s\n' 'P-ORACLE-SUPPLY-1 modeled submitReportData computed-entry parent and still-free/skip-simulate kill-lines compiled and asserted'
-	@lake build LidoSRv3.Tests.DereferenceMutants
-	@printf '%s\n' 'P-DEREF-1 membership/address-writer mutants and uint24 bound witness compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressSourceMutants

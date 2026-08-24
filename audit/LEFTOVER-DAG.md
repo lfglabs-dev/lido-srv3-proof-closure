@@ -42,7 +42,7 @@ Not VaultHub. Not all SRv3 ETH. Pack B mapping is unchanged.
 
 - Live `SSZ.verifyProof` / production gindices / EIP-4788 (needs S1 discharge + FFI)
 - ABI/interpreter so request CALLs do not revert (C1), then C2/C3/C4
-- VaultHub, pause, oracle split, promote P-DEREF-1 (new IDs)
+- VaultHub, pause, oracle split (new IDs)
 
 ## Shared-file rule
 

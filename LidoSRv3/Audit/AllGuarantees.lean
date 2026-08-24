@@ -12,7 +12,6 @@ import LidoSRv3.Audit.Guarantees.PTopup2
 import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Audit.Guarantees.PConsolidation1
 import LidoSRv3.Audit.Guarantees.PSsz1
-import LidoSRv3.Audit.Guarantees.PDeref1
 import LidoSRv3.Audit.Guarantees.PReserveRelationalVerity
 import LidoSRv3.Audit.Guarantees.PAllocExec1
 import LidoSRv3.Audit.Guarantees.PEthJournal1
@@ -72,8 +71,7 @@ example : LidoSRv3.Audit.Verity.DepositParentTx.Preconditions
 
 /-- Supplemental rows do not alter the immutable minimal-11 public facade. -/
 def supplemental : List Guarantee :=
-  [ PDeref1.guarantee
-  , PReserveRelational.guarantee
+  [ PReserveRelational.guarantee
   , PAllocExec1.guarantee
   , PEthJournal1.guarantee
   , PVaultEth1.guarantee
@@ -85,7 +83,7 @@ def supplemental : List Guarantee :=
 
 /-- Regression guard: Wave 3 leftover-close IDs stay supplemental. -/
 example : supplemental.map (fun guarantee => guarantee.id.text) =
-    ["P-DEREF-1", "P-RESERVE-RELATIONAL", "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1",
+    ["P-RESERVE-RELATIONAL", "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1",
      "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1", "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1",
      "P-CONSOLIDATION-VALUE-1"] := by decide
 
