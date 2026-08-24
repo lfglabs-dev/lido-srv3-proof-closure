@@ -20,13 +20,13 @@ We prove the invariant on the abstract model, then that the Lean program and the
 
 The registered parent is `checked_execute`, not the `min` tautology. Under `CheckedBounds` the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. `active_capacity_bounded` stays an unregistered child: it is `Nat.min_le_left` / `Nat.min_le_right` on a definition that is already a clamp. The kill-line `capacity_target_kill_line_refutes_parent` is parent-shaped: a `capacity := target` mutant commits `[24, 24]` against MathView `[11, 11]` with `CheckedBounds` discharged.
 
-`CheckedBounds` is complete for the modeled `safe*` points and unproved of any reachable router. `verity_tx_simulates_allocation` does not carry it. The registered `verity_tx_simulates_allocation_count_from_storage` now reads the stored module count with the 32 cap, decodes the packed `ModuleStateConfig`, executes the source-derived mapped `getStakingModuleSummary` staticcall for each row, checks at least 96 return bytes, and ABI-decodes `(exited, deposited, depositable)` into the `BoundModule` consumed by allocation. Its explicit premise says the adversarial call loop decodes to the source-view rows. `getTotalModuleStake` for type-2 modules is still a planted word and remains OPEN. The unregistered `verity_tx_simulates_allocation` remains the free-count/planted-summary sibling. `observe` rereads persisted arrays. SOURCE `execute` is an alias of `AllocCapacity.execute`. Unique addresses stay in `fidelity.missing`.
+`CheckedBounds` is complete for the modeled `safe*` points and unproved of any reachable router. `verity_tx_simulates_allocation` does not carry it. The registered `verity_tx_simulates_allocation_count_from_storage` now reads the stored module count with the 32 cap, decodes the packed `ModuleStateConfig`, executes the source-derived mapped `getStakingModuleSummary` staticcall for each row, checks at least 96 return bytes, and ABI-decodes `(exited, deposited, depositable)` into the `BoundModule` consumed by allocation. For WC02 rows it then executes the distinct mapped `getTotalModuleStake()` staticcall (selector `0x0c852f5c`), requires at least 32 return bytes, ABI-decodes its uint256, and threads that value into the allocation row. Its explicit premise says the adversarial call loop decodes to the source-view rows. The unregistered `verity_tx_simulates_allocation` remains the legacy free-count/summary sibling. `observe` rereads persisted arrays. SOURCE `execute` is an alias of `AllocCapacity.execute`. Unique addresses stay in `fidelity.missing`.
 
 CHECKED means those Lean theorems build. It does not mean the live view function, a lying module, or MinFirst fill.
 
-Ranked next work: keep the parent as capacity-column correspondence; do not refold the min child; close the distinct type-2 `getTotalModuleStake` call without widening into P-ALLOC-2.
+Ranked next work: keep the parent as capacity-column correspondence; do not refold the min child; strengthen unique module-address and reachable-router `CheckedBounds` obligations without widening into P-ALLOC-2.
 
-Theorems: `PAlloc1.checked_execute` (registered parent), `PAlloc1.active_capacity_bounded` (unregistered MathView-definitional child), `PAlloc1.verity_tx_simulates_allocation_count_from_storage` (registered live-summary Verity theorem), `AllocationTx.bindLiveOne_decodes_summary` (one-call ABI bridge), `PAlloc1.verity_tx_simulates_allocation` (free-`count` planted-summary sibling).
+Theorems: `PAlloc1.checked_execute` (registered parent), `PAlloc1.active_capacity_bounded` (unregistered MathView-definitional child), `PAlloc1.verity_tx_simulates_allocation_count_from_storage` (registered live-summary Verity theorem), `AllocationTx.bindLiveOne_decodes_summary` (one-call ABI bridge), `PAlloc1.verity_tx_simulates_allocation` (legacy free-`count`/summary sibling).
 Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
@@ -37,9 +37,9 @@ The registered guarantee (`checked_execute`) is an execute↔MathView capacity-c
 
 ## Modeling
 
-- `A-SOURCE-SHAPED`: the Lean `Module` record is not extracted from the pinned Solidity AST. The three summary words now come from decoded call returndata, but the type-2 stake word remains trusted model-local storage.
+- `A-SOURCE-SHAPED`: the Lean `Module` record is not extracted from the pinned Solidity AST. The three summary words and, for WC02 rows, the type-2 stake word come from decoded call returndata.
 - `A-VERITY-SCAFFOLD`: `Contract.run` is a non-certified Verity 4.31 interpreter, not compiled bytecode.
-- Live `getStakingModuleSummary()` is modeled through the mapped staticcall and ABI decoder. The adversary may lie; the correspondence theorem is conditional on its decoded rows matching the stated `sourceView`. There is still no live `getTotalModuleStake()` call.
+- Live `getStakingModuleSummary()` is modeled through the mapped staticcall and ABI decoder. For WC02 rows, the distinct `getTotalModuleStake()` staticcall is likewise modeled with selector `0x0c852f5c` and a fail-closed 32-byte ABI decode. The adversary may lie; the correspondence theorem is conditional on its decoded rows matching the stated `sourceView`.
 - Slot numbers (`moduleIdSlot = 30`, …) are a local projection, not `ROUTER_STORAGE_POSITION` / keccak map slots.
 - `AllocCapacityPhase3.executeMappedSummaryResult` supplies the source-derived call observation. `AllocationTx.bindLiveOne` consumes it, rejects failed/short results, and decodes all three words before allocation. The older Phase-3 pre-call-store theorem remains bounded rollback evidence, not the allocation parent.
 - `MathView` uses unbounded `Nat`. Solidity 0.8 checked `+`/`*` revert; `CheckedBounds` is an extra hypothesis only on the SOURCE refinement, not on the headline bound.
@@ -53,13 +53,15 @@ The registered guarantee (`checked_execute`) is an execute↔MathView capacity-c
 
 **SOURCE `source_capacities_match_canonical`.** Under `CheckedBounds` (nonzero `maxEBType1`, no underflow on exited-count, no `uint256` overflow on the sums/products), a pair of inductions on `firstLoop` / `secondLoop` show each `safe*` word equals the corresponding `Nat` operation, so the checked interpreter’s capacity column equals `MathView.capacities`. Router order is a structural list-map identity (`secondLoop_router_order`).
 
-**VERITY `verity_tx_simulates_allocation_count_from_storage`.** Assume the 32-capped `bindLiveAll` call loop succeeds with the `modules` used by `sourceView`. Each iteration loads one packed config word, derives the mapped address, runs `executeMappedSummaryResult`, and `decodeSummary` consumes the three big-endian ABI words in pinned interface order. The same resulting rows drive `AllocCapacity.firstLoop` / `secondLoop`; the transaction writes capacity/allocation/address arrays and `observe` reads them back. `bindLiveOne_decodes_summary` exposes the one-call bridge. `summary_field_order_kill_line_refutes_decoder` rejects a decoder that swaps exited and deposited. Revert-rollback still comes from `Contract.run`, including short/failing summary calls and the injected post-write failure.
+**VERITY `verity_tx_simulates_allocation_count_from_storage`.** Assume the 32-capped `bindLiveAll` call loop succeeds with the `modules` used by `sourceView`. Each iteration loads one packed config word, derives the mapped address, runs `executeMappedSummaryResult`, and `decodeSummary` consumes the three big-endian ABI words in pinned interface order. WC02 rows then run the distinct `getTotalModuleStake()` call and `decodeTotalStake` consumes its big-endian ABI word; a failed or short call reverts. The same resulting rows drive `AllocCapacity.firstLoop` / `secondLoop`; the transaction writes capacity/allocation/address arrays and `observe` reads them back. `bindLiveOne_decodes_summary` exposes the type-1 summary bridge. `summary_field_order_kill_line_refutes_decoder` rejects a decoder that swaps exited and deposited, and `type2_total_stake_boundary_rejects_summary_substitution` rejects using the summary selector or a short total-stake result in place of the WC02 boundary. Revert-rollback still comes from `Contract.run`, including short/failing calls and the injected post-write failure.
 
 ## Issues
 
 ## Resolution
 
-**2026-08-22 P-ALLOC-1 live-summary closure.** Verified the pinned `IStakingModule` return order as three uint256 values `(totalExitedValidators, totalDepositedValidators, depositableValidatorsCount)` and `SRTypes.ModuleStateConfig` as one packed slot. Added big-endian 96-byte decoding, packed address/share/status/WC extraction, a live mapped-call binding loop, allocation correspondence under decoded-row expectations, and a return-word-order kill-line. The independent type-2 `getTotalModuleStake` call remains OPEN and is not represented as checked.
+**2026-08-22 P-ALLOC-1 live-summary closure.** Verified the pinned `IStakingModule` return order as three uint256 values `(totalExitedValidators, totalDepositedValidators, depositableValidatorsCount)` and `SRTypes.ModuleStateConfig` as one packed slot. Added big-endian 96-byte decoding, packed address/share/status/WC extraction, a live mapped-call binding loop, allocation correspondence under decoded-row expectations, and a return-word-order kill-line.
+
+**2026-08-24 P-ALLOC-1 WC02 total-stake closure.** Added the distinct source-pinned `getTotalModuleStake()` staticcall for WC02 rows (selector `0x0c852f5c`), a fail-closed 32-byte uint256 decode, and a boundary check rejecting summary-selector substitution or a short return. The decoded stake is the value consumed by the type-2 allocation path under the existing decoded-row correspondence premise.
 
 **Restated Lean/English.** `active_capacity_bounded` is `MathView.capacity = min`, not a live router clamp. Verity names `hBind` and reads persisted arrays.
 
@@ -96,7 +98,7 @@ from `MathView.capacities`. No other theorem statement changed.
 | --- | --- | --- |
 | 1 | B (Wave 2) | Registered parent is now `checked_execute` (no `min` conjunct); `active_capacity_bounded` is an explicit unregistered child. `P-ALLOC-1.eugene-bound` remains an unrelated sibling. |
 | 2, 12, 16 | A | SOURCE/TX are lockstep copies. |
-| 3, 4 | scope | Live summary CALL/returndata listed in `missing`. |
+| 3, 4 | scope | Live summary and WC02 total-stake CALL/returndata are modeled under decoded-row correspondence; adversarial module behavior and full deployed-view equivalence remain outside this row. |
 | 5, 14, 17 | A | Unbounded-Nat min; `CheckedBounds` is a separate sibling. |
 | 6 | C | Fixed in PR #105: `observe` reads the persisted `writeArray` columns (`AllocationTx.lean:144–148`); the write-noop mutant `allocateNoWrite` is rejected. |
 | 7 | scope | Packed `ModuleStateConfig` in `missing`. |
@@ -115,8 +117,8 @@ from `MathView.capacities`. No other theorem statement changed.
 
    *Counterexample to “two independent artifacts” (historical).* Edit only a comment in `txBindOne`. The equality still held by `rfl`. The only way to break `verity_tx_simulates_allocation` via binding was to hand-edit one copy and leave the other. A solc that emitted the wrong key would not be one of those copies.
 
-3. **No module callback, so a lying / stale summary is in-model.**
-   Deployed `SRLib` lines 516–517 call `getIStakingModule()` then `getStakingModuleSummary`; line 529 is a **second** CALL `getIStakingModuleV2().getTotalModuleStake()` for type-2 modules. The Verity tx never performs those CALLs. Scenario: module address `0xM` is stored; the summary map at `0xM` still holds yesterday’s `depositableCount = 100` while the live module now reports `0`. `verity_tx_simulates_allocation` commits capacity 100. The deployed view function would read `0`. The guarantee as a claim about `getDepositAllocations` is false under any desynchronised summary.
+3. **Callback observations remain conditional, not deployed-view equivalence.**
+   Deployed `SRLib` lines 516–517 call `getIStakingModule()` then `getStakingModuleSummary`; line 529 is a **second** CALL `getIStakingModuleV2().getTotalModuleStake()` for type-2 modules. The registered Verity path performs mapped static calls for both boundaries, decodes their returndata, and fails closed on failed or short results. Its theorem still assumes those adversarial call observations decode to the `sourceView` rows, so it does not establish that a deployed module is honest or that the mapped-call model is bytecode-equivalent to the deployed view.
 
 4. **Phase-3 “mapped summary” does not parse return data.**
    `mappedSummaryTransaction` (PAlloc1.lean:14–54) is not used by `verity_tx_simulates_allocation`. Its `CallsIn` adversary always returns `success (replicate summaryReturnBytes 0)` and a no-op `stateTransition`. On a long-enough success, `executeObservedSummary` leaves `lastCapacitySlot` equal to the *pre-written* `depositable`. The 4-byte selector `0x9abddf09` is the real `getStakingModuleSummary()` selector; that is the honest fragment.

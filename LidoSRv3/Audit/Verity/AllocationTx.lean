@@ -12,9 +12,9 @@ One interpreter (`AllocCapacity.firstLoop` / `secondLoop`). Binding follows
 `getModuleIdAt` then the packed `moduleState.config`. `isActive` is
 `StakingModuleStatus.Active` (`status == 0`); `isType2` is
 `WithdrawalCredentials.isType2` (`wcType == 2`). The registered live path
-executes the mapped selector-only static call, ABI-decodes its three uint256
-return words, and threads them into the allocation loop. `getTotalModuleStake`
-remains a planted word and is not claimed as a live call here.
+executes the mapped selector-only summary static call, ABI-decodes its three
+uint256 return words, and on type-2 rows executes the distinct pinned
+`getTotalModuleStake` static call before entering the allocation loop.
 
 Computed columns persist as storage arrays; `observe` reads those arrays.
 -/
@@ -67,6 +67,22 @@ structure DecodedSummary where
   depositableCount : Word
   deriving DecidableEq, Repr
 
+/-- `bytes4(keccak256("getTotalModuleStake()"))`, pinned to
+`IStakingModuleV2` at the source revision named in `audit/source-map.yaml`.
+Unlike the summary tuple, this call is made only for WC type-2 rows. -/
+def totalStakeSelector : Nat := 0x0c852f5c
+def totalStakeCalldata : List Nat := [0x0c, 0x85, 0x2f, 0x5c]
+def totalStakeReturnBytes : Nat := 32
+
+/-- The second source call in the WC02 branch. It is deliberately a distinct
+site from `getStakingModuleSummary`: sharing the address does not make the
+returndata interchangeable. -/
+def sourceTotalStakeSite (moduleAddress : Nat) :
+    Compiler.CompilationModel.DenoteExternalCalls.CallSite :=
+  { siteId := 1, kind := .staticcall, target := moduleAddress, value := 0
+    calldata := totalStakeCalldata
+    gas := _root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.maxGas }
+
 /-- ABI uint256 decoding is big-endian over one 32-byte returndata word.
 `ExternalCallResult` exposes bytes as `Nat`, so `% 256` records their byte
 semantics explicitly. -/
@@ -84,6 +100,11 @@ def decodeSummary (data : List Nat) : Option DecodedSummary :=
         depositedCount := decodeUint256At data 32
         depositableCount := decodeUint256At data 64 }
   else none
+
+/-- ABI-decode the one `uint256` returned by `getTotalModuleStake`. Solidity
+accepts trailing bytes, but a short result fails closed. -/
+def decodeTotalStake (data : List Nat) : Option Word :=
+  if totalStakeReturnBytes ≤ data.length then some (decodeUint256At data 0) else none
 
 def configModuleAddress (packed : Word) : Word :=
   Verity.Core.Uint256.ofNat (packed.val % 2 ^ 160)
@@ -155,6 +176,17 @@ def withSummary (m : BoundModule) (summary : DecodedSummary) : BoundModule :=
     depositedCount := summary.depositedCount
     summaryExitedCount := summary.exitedCount }
 
+def withTotalStake (m : BoundModule) (stake : Word) : BoundModule :=
+  { m with totalModuleStake := stake }
+
+/-- Execute the exact type-2 static-call boundary and retain its returndata.
+The wrapper is separate from the summary-call adapter because the pinned
+source makes this second call only on the WC02 branch. -/
+def executeMappedTotalStakeResult
+    (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
+    (moduleAddress : Nat) : Contract (Option Compiler.CompilationModel.DenoteExternalCalls.ExternalCallResult) :=
+  fun state => .success (some (adversary.result (sourceTotalStakeSite moduleAddress) state)) state
+
 /-- Execute and consume the source-derived mapped summary call for one packed
 router row. A reverted call or short returndata fails closed. -/
 def bindLiveOne
@@ -167,7 +199,17 @@ def bindLiveOne
         adversary base.moduleAddress.val) state with
     | .success (some (.success data)) afterCall =>
         match decodeSummary data with
-        | some summary => .success (withSummary base summary) afterCall
+        | some summary =>
+            let bound := withSummary base summary
+            if bound.isType2 then
+              match (executeMappedTotalStakeResult adversary bound.moduleAddress.val) afterCall with
+              | .success (some (.success stakeData)) afterStake =>
+                  match decodeTotalStake stakeData with
+                  | some stake => .success (withTotalStake bound stake) afterStake
+                  | none => .revert "TotalModuleStakeMalformedReturn" afterStake
+              | .success _ afterStake => .revert "TotalModuleStakeCallFailed" afterStake
+              | .revert reason afterStake => .revert reason afterStake
+            else .success bound afterCall
         | none => .revert "StakingModuleSummaryMalformedReturn" afterCall
     | .success _ afterCall => .revert "StakingModuleSummaryCallFailed" afterCall
     | .revert reason afterCall => .revert reason afterCall
@@ -191,7 +233,8 @@ theorem bindLiveOne_decodes_summary
       (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite
         (sourceBindConfigOne state index).moduleAddress.val) state =
       .success data)
-    (hdecode : decodeSummary data = some summary) :
+    (hdecode : decodeSummary data = some summary)
+    (htype1 : (sourceBindConfigOne state index).isType2 = false) :
     (bindLiveOne adversary state index) state =
       .success (withSummary (sourceBindConfigOne state index) summary) state := by
   have hcall :
@@ -203,7 +246,7 @@ theorem bindLiveOne_decodes_summary
         (_root_.LidoSRv3.Audit.Verity.AllocCapacityPhase3.sourceSummarySite
           (sourceBindConfigOne state index).moduleAddress.val) state)) state = _
     rw [hresult]
-  simp only [bindLiveOne, hcall, hdecode]
+  simp [bindLiveOne, hcall, hdecode, withSummary, htype1]
 
 /-- The single `_getModulesAllocationAndCapacity` interpreter. -/
 def sourceExecute (cfg : Config) (modules : List BoundModule)
@@ -249,9 +292,8 @@ def allocateFromStorage (cfg : Config) (depositsToAllocate : Word)
     allocate (min (snapshot.readSlot modulesCountSlot).val 32)
       cfg depositsToAllocate isTopUp failAfterWrites snapshot
 
-/-- Storage-counted allocation whose three summary fields come from the live
-mapped call. This deliberately leaves the type-2 `getTotalModuleStake` word in
-the router-local harness: P-ALLOC-1 does not claim that second call. -/
+/-- Storage-counted allocation whose summary fields and type-2 stake word come
+from the live pinned calls. -/
 def allocateLiveFromStorage
     (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
     (cfg : Config) (depositsToAllocate : Word)
