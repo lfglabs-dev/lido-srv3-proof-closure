@@ -923,48 +923,6 @@
       "next_gate": "Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim."
     },
     {
-      "id": "P-DEREF-1",
-      "source_plane_scope": "registry address binding only; migration old-layout contents are explicit inputs",
-      "assumptions": [
-        "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
-      ],
-      "reproduction": {
-        "command": "lake build LidoSRv3.Audit.Guarantees.PDeref1 LidoSRv3.Tests.DereferenceMutants",
-        "expected": "reachable nonzero derivation and stability under the honest no-op interleaving (PDeref1.closure), source-to-executable Verity refinement (verity_observe_refines_source), guard/address-writer mutants, plus the registered-parent kill-lines LidoSRv3.Tests.DereferenceMutants.packed_config_clobber_kill_line_refutes_parent (setStatus wide-SSTORE clobber mutant of applyInterleaving) and reentrant_callback_overwrite_kill_line_refutes_parent (staticCallback overwrite mutant) which negate closure's full predicate shape (Reachable / Dereferenceable premises retained) at witness registeredOne/1 with decide; Yul/EVM/keccak provenance remains OPEN"
-      },
-      "summary": "Supplemental. closure says a reachable deref is the registered nonzero address and is stable under the honest (no-op) interleaving. migrateStorage is id, so any WellFormed old state is Reachable.migrated (fictional reachability gap retained). Wave 3 makes the parent load-bearing with explicit syntactic mutants of its own transition: mutantApplyInterleavingClobber changes only the setStatus arm from `s` to a packed-config clobber `{s with moduleAddress := if q = id then 0 else …}` and mutantApplyInterleavingReentrant changes only the staticCallback arm to overwrite address 1 to 0xCAFE. Both kill-lines (packed_config_clobber_kill_line_refutes_parent, reentrant_callback_overwrite_kill_line_refutes_parent) are `¬ ∀ s hs id h steps, sourceDeref (mutantRun s steps) id = some (s.moduleAddress id) ∧ …` at witness registeredOne (Reachable via migrated) / id 1 (Dereferenceable) / steps [.setStatus 1 0] or [.staticCallback] with `decide`, so the honest stability is falsifiable. Verity observeDeref is a pure Contract view (no observedAddressesSlot write) in the current model only if considered without logging; the model-local VerityRepresents remains a hypothesis, not keccak derivation. keccak ROUTER_STORAGE_POSITION and packed layout remain OPEN.",
-      "abstract": {
-        "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.Guarantees.PDeref1.closure"
-      },
-      "verity": {
-        "status": "CHECKED",
-        "theorem": "LidoSRv3.Audit.SolidityDereference.verity_observe_refines_source"
-      },
-      "fidelity": {
-        "covered": [
-          "registry address binding only; migration old-layout contents are explicit inputs",
-          "reachable nonzero derivation and stability under the honest no-op interleaving (premises Reachable / Dereferenceable)",
-          "registered-parent kill-lines: packed_config_clobber_kill_line_refutes_parent (syntactic setStatus-packed-clobber mutant of applyInterleaving) and reentrant_callback_overwrite_kill_line_refutes_parent (syntactic staticCallback-overwrite mutant) both negate closure's full predicate shape with premises retained at concrete witness registeredOne/1",
-          "source-to-executable Verity mapping refinement under model-local VerityRepresents"
-        ],
-        "missing": [
-          "keccak ROUTER_STORAGE_POSITION derivation and compiler-emitted SLOAD remain OPEN (VerityRepresents is a hypothesis on model-local slots 0/2, not a proved keccak binding)",
-          "migrateStorage = id fiction: any WellFormed old state is Reachable.migrated without executing SRLib._migrateStorage; old-layout bytes are explicit inputs and zero-address migration is excluded by WellFormed",
-          "packed ModuleStateConfig: live slot packs address with stakeShareLimit/status/WC; model stores bare address and interleavings have no packed word to clobber (kill-line mutants show the packing gap would falsify closure)",
-          "re-entrant module callback writes: honest Interleaving has no such writer (kill-line reentrant mutant shows exclusion is load-bearing); live writer set otherwise incomplete",
-          "last+1 id allocation and unique-address enforcement: model accepts any fresh < 2^24 and counts lastModuleId < 32 rather than modulesCount >= 32; ids need not be consecutive and address uniqueness is not checked",
-          "Verity DereferenceYulBridge SLOAD AST is syntax-only and unused; no theorem binds ROUTER_STORAGE_POSITION or executes it"
-        ]
-      },
-      "classification": {
-        "kind": "IMPLEMENTATION_PENDING",
-        "work": "Keep the checked reachable-deref and observe-refinement theorems and the two new syntactic-mutant kill-lines (packed clobber + re-entrant overwrite) that refute closure on its own transition; do not rebuild Reachable or keccak layout. Residual gaps are explicitly listed in missing."
-      },
-      "next_gate": "Keep the checked theorems and the two mutant kill-lines; close remaining layout/Reachability gaps only with explicit hypotheses, not by widening the current closure."
-    },
-    {
       "id": "P-RESERVE-RELATIONAL",
       "assumptions": [
         "A-SOURCE-SHAPED",

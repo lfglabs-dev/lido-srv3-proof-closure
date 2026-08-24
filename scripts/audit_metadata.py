@@ -26,7 +26,7 @@ SUBORDINATE_IDS = [
     "P-DEPOSIT-1.verity-tx-rollback.tx",
     "P-CONSOLIDATION-1.fee-refinement.tx",
     "P-SSZ-1.tx-execution-simulation",
-    "P-ADDRESS-1.denote-admission", "P-DEREF-1",
+    "P-ADDRESS-1.denote-admission",
     "P-RESERVE-RELATIONAL",
     "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1", "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1",
     "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1", "P-CONSOLIDATION-VALUE-1",

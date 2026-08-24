@@ -11,7 +11,7 @@ namespace LidoSRv3.Audit.Guarantees
 inductive Id
   | pAlloc1 | pAlloc2 | pDeposit1 | pTopup1 | pAccount1 | pReserve1
   | pConsolidationEth1 | pAddress1 | pTopup2 | pConsolidation1 | pSsz1
-  | pDeref1 | pReserveRelational
+  | pReserveRelational
   | pAllocExec1 | pEthJournal1 | pOracleSupply1
   | pAddressBatch1 | pSszLive1 | pConsolidationValue1
   | pVaultEth1
@@ -29,7 +29,6 @@ def Id.text : Id → String
   | .pTopup2 => "P-TOPUP-2"
   | .pConsolidation1 => "P-CONSOLIDATION-1"
   | .pSsz1 => "P-SSZ-1"
-  | .pDeref1 => "P-DEREF-1"
   | .pReserveRelational => "P-RESERVE-RELATIONAL"
   | .pAllocExec1 => "P-ALLOC-EXEC-1"
   | .pEthJournal1 => "P-ETH-JOURNAL-1"

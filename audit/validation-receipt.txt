@@ -1,11 +1,42 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 42da4299208a5e39008bf4510375f4f9a86a0c2e
+validated-tree: e6774d7395eb5a7f23de0b84c0cc038741f02bae
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Remove P-DEREF-1 from final-deliverable scope (2026-08-24)
+-----------------------------------------------------------
+
+- Rebind `validated-tree` to `fcc2f02bc81b6be67c5cf33581daedcedd888ae3` after
+  removing P-DEREF-1 and storage-migration coverage from the active campaign.
+  Migration has happened and is out of final Lido scope.
+- Removed: `LidoSRv3/Audit/Guarantees/PDeref1.lean`,
+  `LidoSRv3/Audit/Source/DereferenceCorrespondence.lean`,
+  `LidoSRv3/Audit/Verity/DereferenceYulBridge.lean`,
+  `LidoSRv3/Audit/Spec/DerefSupplementalChild.lean`,
+  `LidoSRv3/Tests/DereferenceMutants.lean`,
+  `audit/P-DEREF-1.md`, `report/P-DEREF-1.md`.
+- Removed P-DEREF-1 row from `audit/guarantees.yaml`, `audit/source-map.yaml`,
+  `AllGuarantees.supplemental`, `Registry.Id.pDeref1`, `Trust` axiom prints,
+  `LidoSRv3.lean` root import, `Makefile` test step, `audit-manifest.json`
+  trust description, and `scripts/audit_metadata.py` SUBORDINATE_IDS.
+- Removed deref re-exports from `PackW2ScopeMutants.lean` and
+  `PACK-W2-SCOPE-BRIEF.md`. Updated `WAVE0-BRIEF.md` and `LEFTOVER-DAG.md`.
+- Rewrote P-ALLOC-1 collision prose (`report/P-ALLOC-1.md` issue 11) to state
+  module-address uniqueness as an explicit unproved live assumption rather than
+  referencing P-DEREF-1 Reachable. Updated P-ALLOC-1 `fidelity.missing` and
+  `next_gate` in `guarantees.yaml` accordingly.
+- Regenerated `audit/STATUS.md`, `audit/ROADMAP.md`, `audit/REPRODUCE.md`.
+- Historical P-DEREF-1 mentions in this validation receipt are retained as
+  clearly historical audit log entries.
+- Verification: `scripts/audit_metadata.py check`,
+  `scripts/test_audit_metadata.py`, `scripts/check_validation_receipt.py`,
+  `scripts/check_public_claim_surfaces.py` exit 0. No `sorry`/`admit`/new
+  axiom introduced.
+
 
 P-CONSOLIDATION-1 entry-credit overflow guard, Codex P1 r3839226133 (2026-08-23)
 ------------------------------------------------------------------------

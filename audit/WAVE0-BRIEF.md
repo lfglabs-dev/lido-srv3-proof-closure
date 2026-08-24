@@ -2,8 +2,7 @@
 
 One node, one PR. Wave 0 is serial and is not Best-of-N. Lean theorems are
 authority. This brief freezes the Spec interfaces later packs may mention.
-It does not invent new guarantee IDs, does not start packs A–F, and does
-not promote P-DEREF-1.
+It does not invent new guarantee IDs and does not start packs A–F.
 
 ## Frozen Spec interfaces
 
@@ -57,12 +56,12 @@ function, premises retained, non-vacuous witness.
    retain `wellFormedDeposit`, inhabit with a pinned-width deposit.
 4. Cite P-RESERVE-RELATIONAL as the supplemental independence row, not as
    P-RESERVE-1 spend.
-5. Keep P-ACCOUNT-1 order-only. Keep P-DEREF-1 supplemental.
+5. Keep P-ACCOUNT-1 order-only.
 
 ## Out of scope until a later node brief says so
 
-Bonus IDs, VaultHub row, pause row, oracle split, bus row, promoting
-P-DEREF-1, ALLOC↔DEPOSIT composition, live SSZ.verifyProof, SHA/Yul
+Bonus IDs, VaultHub row, pause row, oracle split, bus row,
+ALLOC↔DEPOSIT composition, live SSZ.verifyProof, SHA/Yul
 identification, EIP-4788 / gateway.
 
 ## Quality gate

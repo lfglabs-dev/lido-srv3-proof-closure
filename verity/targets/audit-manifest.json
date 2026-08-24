@@ -63,7 +63,7 @@
         "LidoSRv3.Audit.Common.Atomicity",
         "LidoSRv3.Audit.Common.Bounded"
       ],
-      "trust": "Lean-proved abstract properties plus explicitly classified faithful-Verity evidence. Every top-level guarantee (P-ALLOC-1, P-ALLOC-2, P-DEPOSIT-1, P-TOPUP-1, P-TOPUP-2, P-ACCOUNT-1, P-RESERVE-1, P-RESERVE-RELATIONAL, P-CONSOLIDATION-ETH-1, P-CONSOLIDATION-1, P-ADDRESS-1, P-SSZ-1, and P-DEREF-1) is CHECKED at both objectives; the narrower sub-objectives recorded in audit/guarantees.yaml stay PARTIAL or OPEN. General Yul/EVM/deployment refinement is outside scope. SSZ retains a targeted imported-to-deployed Yul binding, currently OPEN; SHA-256 correctness remains under A-SHA256-FFI."
+      "trust": "Lean-proved abstract properties plus explicitly classified faithful-Verity evidence. Every top-level guarantee (P-ALLOC-1, P-ALLOC-2, P-DEPOSIT-1, P-TOPUP-1, P-TOPUP-2, P-ACCOUNT-1, P-RESERVE-1, P-RESERVE-RELATIONAL, P-CONSOLIDATION-ETH-1, P-CONSOLIDATION-1, P-ADDRESS-1, and P-SSZ-1) is CHECKED at both objectives; the narrower sub-objectives recorded in audit/guarantees.yaml stay PARTIAL or OPEN. General Yul/EVM/deployment refinement is outside scope. SSZ retains a targeted imported-to-deployed Yul binding, currently OPEN; SHA-256 correctness remains under A-SHA256-FFI."
     }
   },
   "proof_policy": {
