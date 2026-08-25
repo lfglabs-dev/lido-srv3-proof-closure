@@ -88,6 +88,40 @@ private def normalInput : SanityCheckInput :=
 theorem positiveControl :
     checkerAccepts testLimits normalInput = true := by native_decide
 
+/-! ### Regression: `timeElapsed` uint256 input domain
+
+The input mirrors the Codex finding: `timeElapsed = UINT256_MAX + 1`, no
+balance or share-rate change, and a zero appeared-ETH limit. Every modeled
+arithmetic guard takes a no-increase path or computes a zero proration product,
+so the pre-correction checker accepts an input that the Solidity `uint256`
+entry point cannot receive. -/
+
+private def unboundedTimeLimits : SanityLimits :=
+  { annualBalanceIncreaseBPLimit := 0
+    simulatedShareRateDeviationBPLimit := 0
+    appearedEthAmountPerDayLimit := 0
+    externalPendingBalanceCapEth := 0 }
+
+private def unboundedTimeWitness : SanityCheckInput :=
+  { normalInput with timeElapsed := UINT256_MAX + 1 }
+
+theorem parentShapedTimeMutantAcceptsWitness :
+    checkerNoTimeElapsedBound unboundedTimeLimits unboundedTimeWitness = true := by
+  native_decide
+
+theorem correctedCheckerRejectsUnboundedTime :
+    checkerAccepts unboundedTimeLimits unboundedTimeWitness = false := by
+  native_decide
+
+/-- The source-domain correction is load-bearing at the full checker parent:
+the otherwise identical parent-shaped mutant admits an unreachable input. -/
+theorem timeElapsedBoundIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      checkerNoTimeElapsedBound limits s = true ∧
+      checkerAccepts limits s = false :=
+  ⟨unboundedTimeLimits, unboundedTimeWitness,
+    parentShapedTimeMutantAcceptsWitness, correctedCheckerRejectsUnboundedTime⟩
+
 /-- The annual guard is not entailed by the other four guards. -/
 theorem annualNotRedundant :
     ¬ (∀ (l : SanityLimits) (s : SanityCheckInput),
