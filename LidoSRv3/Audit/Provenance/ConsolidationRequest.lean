@@ -6,7 +6,8 @@ import LidoSRv3.Audit.Guarantees.PConsolidationEth1
 
 Unregistered provenance children. The registered Verity ETH-1 parent journals
 `Verity.MultiContract.requestAddr` (ensemble 5). The abstract parent pins
-`canonicalRequestAddress` as the EIP-7251 literal `0x00…7251`. Those Nats
+`canonicalRequestAddress` as the pinned EIP-7251 literal
+`0x0000BBdDc7CE488642fb579F8B00f3a590007251`. Those Nats
 are not equal.
 
 `rewriteToCanonical` is a Spec-shaped observe rewrite: it maps ensemble 5 to
@@ -30,7 +31,8 @@ theorem ensemble_request_is_verity_requestAddr :
     ensembleRequestAddr = requestAddr.toNat :=
   rfl
 
-/-- The registered parent still journals ensemble 5, not `0x00…7251`. -/
+/-- The registered parent still journals ensemble 5, not the pinned EIP-7251
+predeploy literal. -/
 theorem verity_requestAddr_remains_ensemble :
     requestAddr.toNat = ensembleRequestAddr :=
   rfl
@@ -39,11 +41,11 @@ theorem verity_requestAddr_remains_ensemble :
 `PConsolidationEth1.Address` is `Nat`, so this is the brief's `.toNat`. -/
 theorem canonical_request_literal :
     canonicalRequestAddress =
-      0x0000000000000000000000000000000000007251 :=
+      0x0000BBdDc7CE488642fb579F8B00f3a590007251 :=
   rfl
 
 /-- Ensemble 5 is not the canonical predeploy. The registered Verity parent
-therefore does not journal `0x00…7251`. -/
+therefore does not journal the pinned EIP-7251 address. -/
 theorem ensemble_request_is_not_canonical :
     ensembleRequestAddr ≠ canonicalRequestAddress := by
   decide

@@ -28,7 +28,7 @@ SRv3 lets a module/operator ask the beacon chain to merge two validators (EIP-72
 - Slice starts at the **vault** entry (`ConsolidationCorrespondence.lean` header: vault lines 199–208, EIP-7685 56–73 / 113–127 / 97–101). Gateway grouping, quota, SSZ target-witness, pause, and `ADD_CONSOLIDATION_REQUEST_ROLE` are out of scope. Deployed `addConsolidationRequests` is `payable preservesEthBalance` (`WithdrawalVault.sol:201`); the Lean journal does not check that the vault’s ETH is unchanged after the loop.
 - “Eligibility” in the model is: `caller == gateway`, nonempty sources, zip-able equal-length arrays, each key length word equals 48, `n * fee` fits in `uint256`, `msg.value == n * fee`. No CL validator existence, no slash/exit, no withdrawal-credential match.
 - Public keys are `Word` (a `Nat` modulo 2^256), not 48-byte arrays. `payload = [source, target]` is two words, not 96 bytes.
-- `requestTarget` is an input. The constant `consolidationRequestAddress = 0x00…7251` is defined and unused by `sourceRun`.
+- `requestTarget` is an input. The pinned source literal `consolidationRequestAddress = 0x0000BBdDc7CE488642fb579F8B00f3a590007251` is defined and unused by `sourceRun`; it does not bind that free endpoint to a deployment.
 - `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`. Official `denoteFunction` cannot execute `Expr.call` (`audit/P-CONSOLIDATION-1-VERITY-GAPS.md` item 2); the CHECKED parent uses a handwritten `Contract.run` that *journals* CALL observables instead of performing them.
 - Verity `addRequests` decodes four memory arrays and writes journal + map/slot. No multi-contract world.
 
@@ -111,7 +111,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* Two pairs, same `requestTarget`. Both journal entries have the same `siteId`. A dispatcher that keyed frames by siteId would collapse them. The CHECKED journal is not a Verity external-call frame that can fail or be distinguished by site.
 
 11. **`consolidationRequestAddress` is unused.**
-   The constant `0x00…7251` is defined and not read by `sourceRun`.
+   The pinned source literal `0x0000BBdDc7CE488642fb579F8B00f3a590007251` is defined and not read by `sourceRun`.
 
    *Scenario.* Set `inputs.requestTarget = 0xdead`. `source_consolidation_preserves_eligibility_value_atomicity` still holds and `commitObservables` journals CALLs to `0xdead`. Same provenance hole as P-CONSOLIDATION-ETH-1b. A more faithful 48+48-byte model exists in `ConsolidationAbstractFlowModel` and is **not** the registered parent.
 

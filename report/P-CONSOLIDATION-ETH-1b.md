@@ -2,7 +2,7 @@
 
 > Status: **absorbed**. This is no longer a sibling guarantee under P-CONSOLIDATION-ETH-1.
 
-The fee → configured consolidation-request target leg is the same consolidation ETH flow as the parent. Theorems (`consolidation_fee_path_confined`, `consolidation_fee_target_success`) are **parent evidence** under `A-CANONICAL-REQUEST-ADDRESS`. Once the canonical `0x00…7251` obligation is discharged, strengthen them into registered parent conjuncts — do not reopen a sister guarantee.
+The fee → configured consolidation-request target leg is the same consolidation ETH flow as the parent. Theorems (`consolidation_fee_path_confined`, `consolidation_fee_target_success`) are **parent evidence** under `A-CANONICAL-REQUEST-ADDRESS`. Once the pinned canonical EIP-7251-address obligation is discharged, strengthen them into registered parent conjuncts — do not reopen a sister guarantee.
 
 The historical product note and proof audit below are retained for provenance.
 
@@ -15,7 +15,7 @@ Child of P-CONSOLIDATION-ETH-1 for the fee legs: `ConsolidationBus.executeConsol
 - abstract `consolidation_fee_path_confined`: if the call target equals `cfg.consolidationRequest`, the one move in `ethTrace` is tagged `.consolidationContract`, hence not `.other`
 - Verity `consolidation_fee_target_success`: two successful fee sends debit the vault and credit the configured consolidation-request slot
 
-`cfg.consolidationRequest` is an arbitrary Nat. Equality with the canonical `0x00…7251` is named `A-CANONICAL-REQUEST-ADDRESS` and is not proved. The bus-forward numeral remains auxiliary. We do not cover `executeConsolidation` pending-batch / delay guards or 96-byte payloads (P-CONSOLIDATION-1).
+`cfg.consolidationRequest` is an arbitrary Nat. Equality with the pinned source literal `0x0000BBdDc7CE488642fb579F8B00f3a590007251` is named `A-CANONICAL-REQUEST-ADDRESS` and is not proved. The bus-forward numeral remains auxiliary. We do not cover `executeConsolidation` pending-batch / delay guards or 96-byte payloads (P-CONSOLIDATION-1).
 
 ## Proof limitations and recommendations
 
@@ -110,7 +110,7 @@ repair that keeps the existing proof. `D` = register an already-proved sibling.
    *Scenario.* Vault has 20 ETH on chain and `vaultSlot = 0`. Live fee CALL succeeds. Lean `sendWithdrawalFee 5 5 true` does `subPanic` on slot 0 and cannot represent the 20 ETH. The CHECKED module’s fee legs are not the EIP-7002/7251 CALLs.
 
 8. **No link from `ethTrace` to the ledger.**
-   `eth_flow_parent` does not call `consolidation_fee_path_confined`. Parent hardcodes `.consolidationContract` in `pathTrace`. Composition uses `requestAddr = 5`; P-CONSOLIDATION-1 uses `0x00…7251`; this child uses neither in its registered theorems.
+   `eth_flow_parent` does not call `consolidation_fee_path_confined`. Parent hardcodes `.consolidationContract` in `pathTrace`. Composition uses `requestAddr = 5`; P-CONSOLIDATION-1 uses the pinned source literal; this child uses neither in its registered theorems.
 
    *Scenario.* Change `cfg.consolidationRequest` to `0xbad` (issue 1) and leave `bus_forward_success` alone. Both CHECKED theorems still hold. Three models, zero glue.
 
