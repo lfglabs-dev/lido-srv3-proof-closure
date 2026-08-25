@@ -148,7 +148,9 @@ Must be `≤ annualBalanceIncreaseBPLimit`.
 Source domain conditions:
 1. `preCLValidatorsBalance + preCLPendingBalance + deposits` must not overflow
    `uint256` (L1297 checked addition).
-2. `ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease` must not overflow
+2. `postCLValidatorsBalance + postCLPendingBalance + clWithdrawals` must not
+   overflow `uint256` (L1301 checked addition).
+3. `ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease` must not overflow
    `uint256` (L1309 checked multiplication). -/
 
 def preCLBalance (s : SanityCheckInput) : Nat :=
@@ -160,7 +162,8 @@ def annualBalanceIncreaseAccepts (limits : SanityLimits) (s : SanityCheckInput) 
     let pre := if preCLBalance s == 0 then DEFAULT_CL_BALANCE
                else preCLBalance s
     let post := s.postCLValidatorsBalance + s.postCLPendingBalance + s.clWithdrawals
-    if pre ≥ post then true
+    if post > UINT256_MAX then false
+    else if pre ≥ post then true
     else
       let balanceIncrease := post - pre
       let t := effectiveTimeElapsed s.timeElapsed
@@ -192,7 +195,13 @@ def pendingBalanceCapAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bo
 /-! ### Guard 3: Activated balance
 
 Pinned at the same function (OracleReportSanityChecker.sol L924–941).
-`activatedBalance ≤ appearedEthLimitPerPeriod + MAX_VALIDATOR_EFFECTIVE_BALANCE` -/
+`activatedBalance ≤ appearedEthLimitPerPeriod + MAX_VALIDATOR_EFFECTIVE_BALANCE`
+
+Source domain conditions:
+1. `appearedEthAmountPerDayLimit * 1 ether` must not overflow `uint256`
+   (checked multiplication at call site).
+2. `(appearedEthAmountPerDayLimit * 1 ether) * timeElapsed` must not overflow
+   `uint256` (checked multiplication in `_calculateAmountForPeriod`). -/
 
 def calculateAmountForPeriod (amountPerDay : Nat) (t : Nat) : Nat :=
   amountPerDay * t / SECONDS_PER_DAY
@@ -202,9 +211,12 @@ def activatedBalanceAccepts (limits : SanityLimits) (s : SanityCheckInput) : Boo
   let activatedBalance := if fundedPendingBalance > s.postCLPendingBalance
     then fundedPendingBalance - s.postCLPendingBalance else 0
   let t := effectiveTimeElapsed s.timeElapsed
-  let appearedLimit := calculateAmountForPeriod
-    (limits.appearedEthAmountPerDayLimit * 1000000000000000000) t
-  activatedBalance ≤ appearedLimit + MAX_VALIDATOR_EFFECTIVE_BALANCE
+  let etherScaled := limits.appearedEthAmountPerDayLimit * 1000000000000000000
+  if etherScaled > UINT256_MAX then false
+  else if etherScaled * t > UINT256_MAX then false
+  else
+    let appearedLimit := calculateAmountForPeriod etherScaled t
+    activatedBalance ≤ appearedLimit + MAX_VALIDATOR_EFFECTIVE_BALANCE
 
 /-! ### Guard 4: Validators balance increase
 
@@ -380,6 +392,34 @@ def validatorsBalanceIncreaseNoAprOverflowCheckAccepts (limits : SanityLimits) (
     let increase := s.postCLValidatorsBalance - preCLVAfterWithdrawals
     increase ≤ maxPossibleActivatedBalance limits s
   else true
+
+/-- Mutant: annual balance increase without post-CL balance sum overflow check
+(pre-correction behavior). -/
+def annualBalanceIncreaseNoPostCLOverflowCheckAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  if preCLBalance s > UINT256_MAX then false
+  else
+    let pre := if preCLBalance s == 0 then DEFAULT_CL_BALANCE
+               else preCLBalance s
+    let post := s.postCLValidatorsBalance + s.postCLPendingBalance + s.clWithdrawals
+    if pre ≥ post then true
+    else
+      let balanceIncrease := post - pre
+      let t := effectiveTimeElapsed s.timeElapsed
+      if ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease > UINT256_MAX then false
+      else
+        let annualIncrease := ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease / pre / t
+        annualIncrease ≤ limits.annualBalanceIncreaseBPLimit
+
+/-- Mutant: activated balance without appeared-ETH proration overflow checks
+(pre-correction behavior). -/
+def activatedBalanceNoProrationOverflowCheckAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  let fundedPendingBalance := s.preCLPendingBalance + s.deposits
+  let activatedBalance := if fundedPendingBalance > s.postCLPendingBalance
+    then fundedPendingBalance - s.postCLPendingBalance else 0
+  let t := effectiveTimeElapsed s.timeElapsed
+  let appearedLimit := calculateAmountForPeriod
+    (limits.appearedEthAmountPerDayLimit * 1000000000000000000) t
+  activatedBalance ≤ appearedLimit + MAX_VALIDATOR_EFFECTIVE_BALANCE
 
 /-! ### Checker conjunction -/
 

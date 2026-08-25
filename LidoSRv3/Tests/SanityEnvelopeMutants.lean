@@ -400,4 +400,75 @@ theorem aprOverflowCorrectionIsLoadBearing :
   ⟨annualOverflowLimits, aprOverflowWitness,
     noAprOverflowCheckAcceptsWitness, correctedRejectsAprOverflow⟩
 
+/-! ### Regression: post-CL balance uint256 sum overflow
+
+Witness: postCLValidatorsBalance = UINT256_MAX, postCLPendingBalance = 1.
+The post-CL balance sum overflows uint256; Solidity's checked addition at
+L1301 reverts, but Lean's unbounded Nat computes post = UINT256_MAX + 1 >
+pre = UINT256_MAX and continues with balanceIncrease = 1. Without the
+overflow guard the model accepts. -/
+
+private def postCLOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := UINT256_MAX
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := UINT256_MAX
+    postCLPendingBalance := 1
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsPostCLOverflow :
+    annualBalanceIncreaseAccepts testLimits postCLOverflowWitness = false := by native_decide
+
+theorem noPostCLOverflowCheckAcceptsWitness :
+    annualBalanceIncreaseNoPostCLOverflowCheckAccepts testLimits postCLOverflowWitness = true := by native_decide
+
+theorem postCLOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      annualBalanceIncreaseNoPostCLOverflowCheckAccepts limits s = true ∧
+      annualBalanceIncreaseAccepts limits s = false :=
+  ⟨testLimits, postCLOverflowWitness,
+    noPostCLOverflowCheckAcceptsWitness, correctedRejectsPostCLOverflow⟩
+
+/-! ### Regression: appeared-ETH proration uint256 multiplication overflow
+
+Witness: appearedEthAmountPerDayLimit = UINT256_MAX. The product
+UINT256_MAX × 1 ether overflows uint256; Solidity's checked multiplication
+reverts, but Lean's unbounded Nat computes a huge appearedLimit and accepts
+the 1 ETH activated balance. Without the overflow guard the model accepts. -/
+
+private def prorationOverflowLimits : SanityLimits :=
+  { annualBalanceIncreaseBPLimit := 100
+    simulatedShareRateDeviationBPLimit := 500
+    appearedEthAmountPerDayLimit := UINT256_MAX
+    externalPendingBalanceCapEth := 1000 }
+
+private def prorationOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 1000000000000000000
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsProrationOverflow :
+    activatedBalanceAccepts prorationOverflowLimits prorationOverflowWitness = false := by native_decide
+
+theorem noProrationOverflowCheckAcceptsWitness :
+    activatedBalanceNoProrationOverflowCheckAccepts prorationOverflowLimits prorationOverflowWitness = true := by native_decide
+
+theorem prorationOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      activatedBalanceNoProrationOverflowCheckAccepts limits s = true ∧
+      activatedBalanceAccepts limits s = false :=
+  ⟨prorationOverflowLimits, prorationOverflowWitness,
+    noProrationOverflowCheckAcceptsWitness, correctedRejectsProrationOverflow⟩
+
 end LidoSRv3.Tests.SanityEnvelopeMutants
