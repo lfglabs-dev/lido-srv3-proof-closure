@@ -137,7 +137,7 @@ private def nonExactReport : SubmitReportData :=
     precisionPoints := 100 }
 
 theorem nonExactReportDomainValid : EntryDomainValid nonExactReport :=
-  ⟨by decide, by decide, by decide, by decide, by decide, by decide⟩
+  ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
 
 /-- The non-exact report's rate denominator does NOT divide
 `internalSharesBeforeFees * E27`, confirming the divisibility premise
@@ -154,7 +154,7 @@ theorem nonExactReportMintEqualsPinned :
 
 /-- Positive control: the standard profitable report is domain-valid. -/
 theorem domainValidProfitableReport : EntryDomainValid profitableReport :=
-  ⟨by decide, by decide, by decide, by decide, by decide, by decide⟩
+  ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
 
 /-- Positive control: the strengthened parent holds on the profitable
 vector.  On this vector the E27 rate divides exactly, so the domain-
@@ -178,5 +178,106 @@ theorem existingParentStillPasses :
   (POracleSupply1.oracle_supply_submit_report_data_computed_entry
     profitableReport (entryShareRate profitableReport) defaultState
     (by decide) (by decide) (Nat.le_refl _)).2.1
+
+/-- Lossy-quantization witness: `internalSharesBeforeFees = 3`,
+`feeShareRateDenominator = 7`, `feeEther = 7`.  The E27-scaled rate
+`3 * E27 / 7` truncates, so `mintedShares 7 (3*E27/7) / E27 = 2` while
+`pinnedSharesToMintAsFees = 7 * 3 / 7 = 3`. -/
+private def lossyQuantReport : SubmitReportData :=
+  { report := routerReport
+    dataHash := 77
+    consensusHash := 77
+    senderIsMemberOrHasRole := true
+    preTotalPooledEther := 0
+    preExternalEther := 0
+    preTotalShares := 3
+    preExternalShares := 0
+    preClValidatorsBalance := 0
+    preClPendingBalance := 0
+    depositedBalance := 0
+    clValidatorsBalance := 14
+    clPendingBalance := 0
+    withdrawalsVaultTransfer := 0
+    elRewardsVaultTransfer := 0
+    totalSharesToBurn := 0
+    etherToFinalizeWQ := 0
+    totalFee := 1
+    precisionPoints := 2 }
+
+/-- Kill-line: dropping the source-domain guard (EntryDomainValid,
+divisibility) from the five-conjunct parent makes it refutable — the
+E27-quantized mint `2` is strictly less than the pinned mint `3` on
+`lossyQuantReport`, so the equality conjunct fails. -/
+theorem domain_guard_kill_line_refutes_full_parent :
+    ¬ ∀ (d : SubmitReportData) (maxShareRate : Nat) (state : ContractState),
+      senderAllowed d = true →
+      consensusHashMatches d = true →
+      entryShareRate d ≤ maxShareRate →
+      (submitReportDataTx d).run state =
+          (handleOracleReportComputed d.report (entryFeeWei d)
+            (entryShareRate d)).run state ∧
+        observe d.report ((submitReportDataTx d).run state) =
+          sourceView d.report
+            (mintedShares (entryFeeWei d) (entryShareRate d)) ∧
+        mintedShares (entryFeeWei d) (entryShareRate d)
+            ≤ pinnedSharesToMintAsFees d ∧
+        mintedShares (entryFeeWei d) (entryShareRate d)
+            ≤ entryFeeWei d * maxShareRate / E27 ∧
+        mintedShares (entryFeeWei d) (entryShareRate d)
+            = pinnedSharesToMintAsFees d := by
+  intro h
+  have hAll := h lossyQuantReport (entryShareRate lossyQuantReport)
+    defaultState (by decide) (by decide) (Nat.le_refl _)
+  exact absurd hAll.2.2.2.2 (by decide)
+
+/-- Zero-precision profitable witness: profitable branch with
+`precisionPoints = 0`.  Solidity reverts on the division, but Lean
+`Nat.div 0` yields `0`. -/
+private def zeroPrecisionProfitableReport : SubmitReportData :=
+  { profitableReport with precisionPoints := 0 }
+
+/-- The zero-precision witness is profitable yet violates
+`EntryDomainValid.precisionPos`. -/
+theorem zeroPrecisionNotDomainValid :
+    principalClBalance zeroPrecisionProfitableReport
+        < unifiedClBalance zeroPrecisionProfitableReport ∧
+      ¬ EntryDomainValid zeroPrecisionProfitableReport := by
+  constructor
+  · decide
+  · intro h; exact absurd (h.precisionPos (by decide)) (by decide)
+
+/-- Zero-denominator profitable witness: profitable branch, positive fee,
+but `postInternalEther = feeEther` so `feeShareRateDenominator = 0`.
+Solidity L317-331 always evaluates the division and would revert. -/
+private def zeroDenomProfitableReport : SubmitReportData :=
+  { report := routerReport
+    dataHash := 77
+    consensusHash := 77
+    senderIsMemberOrHasRole := true
+    preTotalPooledEther := 10
+    preExternalEther := 0
+    preTotalShares := 200
+    preExternalShares := 0
+    preClValidatorsBalance := 0
+    preClPendingBalance := 0
+    depositedBalance := 0
+    clValidatorsBalance := 20
+    clPendingBalance := 0
+    withdrawalsVaultTransfer := 0
+    elRewardsVaultTransfer := 0
+    totalSharesToBurn := 0
+    etherToFinalizeWQ := 10
+    totalFee := 100
+    precisionPoints := 100 }
+
+/-- The zero-denominator witness is profitable yet violates
+`EntryDomainValid.feeDenom`. -/
+theorem zeroDenomNotDomainValid :
+    principalClBalance zeroDenomProfitableReport
+        < unifiedClBalance zeroDenomProfitableReport ∧
+      feeShareRateDenominator zeroDenomProfitableReport = 0 ∧
+      ¬ EntryDomainValid zeroDenomProfitableReport := by
+  refine ⟨by decide, by decide, ?_⟩
+  intro h; exact absurd (h.feeDenom (by decide)) (by decide)
 
 end LidoSRv3.Tests.PackO2SupplyDomainMutants
