@@ -222,6 +222,13 @@ On the profitable branch (`principalClBalance < unifiedClBalance`):
   division — Solidity reverts on division by zero, but Lean `Nat.div 0`
   silently yields `0`, conflating a source-reverting zero-precision report
   with a legitimate non-profitable zero-fee report.
+* `feeBound` guards the `require(totalFee <= FEE_PRECISION_POINTS)` assertion
+  in `StakingRouter.getStakingRewardsDistribution` (A-REWARD-09,
+  `af095e48:870`) — Solidity reverts when `totalFee > precisionPoints`,
+  but Lean `Nat.div` silently computes
+  `totalRewards * totalFee / precisionPoints > totalRewards` as a valid
+  fee amount, conflating a source-reverting over-fee report with a
+  legitimate high-fee report.
 * `feeDenom` guards the `feeEther * internalShares / (postInternalEther -
   feeEther)` division in `_calculateTotalProtocolFeeShares` — Solidity
   L317-331 always evaluates this division on the profitable path, even
@@ -246,6 +253,7 @@ structure EntryDomainValid (d : SubmitReportData) : Prop where
       internalEtherBefore d + unifiedClBalance d - principalClBalance d
         + d.elRewardsVaultTransfer
   precisionPos : principalClBalance d < unifiedClBalance d → 0 < d.precisionPoints
+  feeBound : principalClBalance d < unifiedClBalance d → d.totalFee ≤ d.precisionPoints
   feeDenom : principalClBalance d < unifiedClBalance d → 0 < feeShareRateDenominator d
 
 /-- Under domain validity and a positive fee, the fee denominator is

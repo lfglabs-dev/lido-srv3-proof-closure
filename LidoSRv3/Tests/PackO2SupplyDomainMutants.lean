@@ -20,6 +20,10 @@ source-domain strengthening (`oracle_supply_entry_source_domain`).
    standard profitable test vector satisfies `EntryDomainValid`.
 5. `existingParentStillPasses`: regression confirming the existing
    non-domain-restricted parent is not weakened.
+6. `feeBoundIsLoadBearing`: the A-REWARD-09 counterexample
+   (`totalFee = 2, precisionPoints = 1`) satisfies every existing
+   parent conclusion but violates `EntryDomainValid.feeBound`, proving
+   the `totalFee ≤ precisionPoints` guard is non-trivial.
 
 Every test uses `decide` (not `native_decide`) and keeps witness values
 small for tractability.
@@ -137,7 +141,7 @@ private def nonExactReport : SubmitReportData :=
     precisionPoints := 100 }
 
 theorem nonExactReportDomainValid : EntryDomainValid nonExactReport :=
-  ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
+  ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
 
 /-- The non-exact report's rate denominator does NOT divide
 `internalSharesBeforeFees * E27`, confirming the divisibility premise
@@ -154,7 +158,7 @@ theorem nonExactReportMintEqualsPinned :
 
 /-- Positive control: the standard profitable report is domain-valid. -/
 theorem domainValidProfitableReport : EntryDomainValid profitableReport :=
-  ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
+  ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
 
 /-- Positive control: the strengthened parent holds on the profitable
 vector.  On this vector the E27 rate divides exactly, so the domain-
@@ -279,5 +283,64 @@ theorem zeroDenomNotDomainValid :
       ¬ EntryDomainValid zeroDenomProfitableReport := by
   refine ⟨by decide, by decide, ?_⟩
   intro h; exact absurd (h.feeDenom (by decide)) (by decide)
+
+/-- A-REWARD-09 counterexample: `totalFee = 2 > precisionPoints = 1` on the
+profitable branch.  Solidity reverts at `getStakingRewardsDistribution`
+(`af095e48:870`); the Lean model silently computes `feeEther = 2` from
+`totalRewards = 1`, exceeding total rewards. -/
+private def feeBoundWitness : SubmitReportData :=
+  { report := routerReport
+    dataHash := 77
+    consensusHash := 77
+    senderIsMemberOrHasRole := true
+    preTotalPooledEther := 2
+    preExternalEther := 0
+    preTotalShares := 1
+    preExternalShares := 0
+    preClValidatorsBalance := 0
+    preClPendingBalance := 0
+    depositedBalance := 0
+    clValidatorsBalance := 1
+    clPendingBalance := 0
+    withdrawalsVaultTransfer := 0
+    elRewardsVaultTransfer := 0
+    totalSharesToBurn := 0
+    etherToFinalizeWQ := 0
+    totalFee := 2
+    precisionPoints := 1 }
+
+/-- The feeBound witness is profitable with `totalFee > precisionPoints`,
+violating `EntryDomainValid.feeBound`. -/
+theorem feeBoundWitnessNotDomainValid :
+    principalClBalance feeBoundWitness
+        < unifiedClBalance feeBoundWitness ∧
+      feeBoundWitness.totalFee > feeBoundWitness.precisionPoints ∧
+      ¬ EntryDomainValid feeBoundWitness := by
+  refine ⟨by decide, by decide, ?_⟩
+  intro h; exact absurd (h.feeBound (by decide)) (by decide)
+
+/-- The existing bound conjunct holds on the feeBound witness (the model
+accepts it), demonstrating the gap between the model's domain and the
+Solidity `totalFee ≤ precisionPoints` assertion. -/
+theorem existingBoundHoldsOnFeeBoundWitness :
+    mintedShares (entryFeeWei feeBoundWitness)
+        (entryShareRate feeBoundWitness)
+      ≤ pinnedSharesToMintAsFees feeBoundWitness :=
+  entry_mint_le_pinned_shares feeBoundWitness
+
+/-- feeBound is load-bearing: there exists an input the model accepts
+(existing bound holds, sender allowed, consensus hash matches) but
+`EntryDomainValid` rejects because `totalFee > precisionPoints`
+(pinned A-REWARD-09). -/
+theorem feeBoundIsLoadBearing :
+    ∃ (d : SubmitReportData),
+      senderAllowed d = true ∧
+      consensusHashMatches d = true ∧
+      mintedShares (entryFeeWei d) (entryShareRate d)
+        ≤ pinnedSharesToMintAsFees d ∧
+      ¬ EntryDomainValid d :=
+  ⟨feeBoundWitness, by decide, by decide,
+    existingBoundHoldsOnFeeBoundWitness,
+    feeBoundWitnessNotDomainValid.2.2⟩
 
 end LidoSRv3.Tests.PackO2SupplyDomainMutants

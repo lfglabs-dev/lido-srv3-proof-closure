@@ -1,11 +1,37 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 2051bafa17ea0e6c2c691dccad40e861f1935d0d
+validated-tree: 74b884453d68ac67d38d987d8adb06496e67aa73
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ORACLE-SUPPLY-1 add feeBound (A-REWARD-09) to EntryDomainValid (2026-08-25)
+------------------------------------------------------------------------------
+
+- Add `feeBound : principalClBalance d < unifiedClBalance d →
+  d.totalFee ≤ d.precisionPoints` to `EntryDomainValid`, capturing the
+  A-REWARD-09 invariant: pinned `StakingRouter.getStakingRewardsDistribution`
+  at `lidofinance/core@af095e48:870` returns `totalFee ≤ precisionPoints`
+  (aggregate module-fee sum never exceeds `TOTAL_BASIS_POINTS`).
+- Without this bound the Lean model admits `totalFee > precisionPoints`,
+  making `feeEther > totalRewards` — a state the Solidity fee pipeline never
+  reaches.  Counterexample: `{totalFee:=2, precisionPoints:=1,
+  preTotalPooledEther:=2, preTotalShares:=1, clValidatorsBalance:=1,
+  all others:=0}` satisfies the previous seven-field `EntryDomainValid`
+  while Solidity reverts.
+- Added `feeBoundWitnessNotDomainValid`: the counterexample is profitable yet
+  violates `EntryDomainValid.feeBound`.
+- Added `feeBoundIsLoadBearing`: existential mutant proving the existing
+  parent bound holds on the counterexample while `feeBound` blocks —
+  the conjunct is load-bearing.
+- Updated `guarantees.yaml`: A-REWARD-09 added to assumptions, reproduction
+  expected text updated, fidelity entries document the fee-bound guard.
+- Verification: `scripts/audit_metadata.py check`,
+  `scripts/check_public_claim_surfaces.py` exit 0.  Focused lake builds of
+  `SubmitReportFeeCorrespondence`, `POracleSupply1`, and
+  `PackO2SupplyDomainMutants` pass.  No sorry/admit/new axiom introduced.
 
 P-ORACLE-SUPPLY-1 source-domain profitable-branch guard fix (2026-08-25)
 ------------------------------------------------------------------------
