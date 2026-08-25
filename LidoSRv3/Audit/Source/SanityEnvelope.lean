@@ -145,35 +145,49 @@ Pinned at `_checkAnnualBalancesIncrease` (OracleReportSanityChecker.sol L1291–
 `annualBalanceIncrease = ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease / preCLBalance / timeElapsed`
 Must be `≤ annualBalanceIncreaseBPLimit`.
 
-Source domain condition: `ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease`
-must not overflow `uint256` (L1309 checked multiplication). -/
+Source domain conditions:
+1. `preCLValidatorsBalance + preCLPendingBalance + deposits` must not overflow
+   `uint256` (L1297 checked addition).
+2. `ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease` must not overflow
+   `uint256` (L1309 checked multiplication). -/
 
 def preCLBalance (s : SanityCheckInput) : Nat :=
   s.preCLValidatorsBalance + s.preCLPendingBalance + s.deposits
 
 def annualBalanceIncreaseAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
-  let pre := if preCLBalance s == 0 then DEFAULT_CL_BALANCE
-             else preCLBalance s
-  let post := s.postCLValidatorsBalance + s.postCLPendingBalance + s.clWithdrawals
-  if pre ≥ post then true
+  if preCLBalance s > UINT256_MAX then false
   else
-    let balanceIncrease := post - pre
-    let t := effectiveTimeElapsed s.timeElapsed
-    if ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease > UINT256_MAX then false
+    let pre := if preCLBalance s == 0 then DEFAULT_CL_BALANCE
+               else preCLBalance s
+    let post := s.postCLValidatorsBalance + s.postCLPendingBalance + s.clWithdrawals
+    if pre ≥ post then true
     else
-      let annualIncrease := ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease / pre / t
-      annualIncrease ≤ limits.annualBalanceIncreaseBPLimit
+      let balanceIncrease := post - pre
+      let t := effectiveTimeElapsed s.timeElapsed
+      if ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease > UINT256_MAX then false
+      else
+        let annualIncrease := ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease / pre / t
+        annualIncrease ≤ limits.annualBalanceIncreaseBPLimit
 
 /-! ### Guard 2: Pending balance cap
 
 Pinned at `_checkCLPendingBalanceAndCalculateMaxPossibleActivatedBalance`
 (OracleReportSanityChecker.sol L918–922).
-`postCLPendingBalance ≤ fundedPendingBalance + externalPendingBalanceCap * 1 ether` -/
+`postCLPendingBalance ≤ fundedPendingBalance + externalPendingBalanceCap * 1 ether`
+
+Source domain conditions:
+1. `preCLPendingBalance + deposits` must not overflow `uint256`
+   (L920 checked addition).
+2. `fundedPendingBalance + externalPendingBalanceCap * 1 ether` must not
+   overflow `uint256` (L922 checked addition). -/
 
 def pendingBalanceCapAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
   let fundedPendingBalance := s.preCLPendingBalance + s.deposits
-  let cap := fundedPendingBalance + limits.externalPendingBalanceCapEth * 1000000000000000000
-  s.postCLPendingBalance ≤ cap
+  if fundedPendingBalance > UINT256_MAX then false
+  else
+    let cap := fundedPendingBalance + limits.externalPendingBalanceCapEth * 1000000000000000000
+    if cap > UINT256_MAX then false
+    else s.postCLPendingBalance ≤ cap
 
 /-! ### Guard 3: Activated balance
 
@@ -196,7 +210,11 @@ def activatedBalanceAccepts (limits : SanityLimits) (s : SanityCheckInput) : Boo
 
 Pinned at `_checkCLPendingAndValidatorsBalanceIncrease`
 (OracleReportSanityChecker.sol L952–974).
-`validatorsBalanceIncrease ≤ maxPossibleActivatedBalance` -/
+`validatorsBalanceIncrease ≤ maxPossibleActivatedBalance`
+
+Source domain condition: `(preCLValidatorsBalance + activatedBalance) *
+(annualBalanceIncreaseBPLimit * timeElapsed)` must not overflow `uint256`
+(L970 checked multiplication). -/
 
 def calculateValidatorsBalanceAprSafetyCap
     (preCLVBal : Nat) (annualMul : Nat) : Nat :=
@@ -218,7 +236,14 @@ def validatorsBalanceIncreaseAccepts (limits : SanityLimits) (s : SanityCheckInp
     else s.preCLValidatorsBalance - s.clWithdrawals
   if s.postCLValidatorsBalance > preCLVAfterWithdrawals then
     let increase := s.postCLValidatorsBalance - preCLVAfterWithdrawals
-    increase ≤ maxPossibleActivatedBalance limits s
+    let fundedPendingBalance := s.preCLPendingBalance + s.deposits
+    let activatedBalance := if fundedPendingBalance > s.postCLPendingBalance
+      then fundedPendingBalance - s.postCLPendingBalance else 0
+    let t := effectiveTimeElapsed s.timeElapsed
+    let aprBase := s.preCLValidatorsBalance + activatedBalance
+    let aprMul := limits.annualBalanceIncreaseBPLimit * t
+    if aprBase * aprMul > UINT256_MAX then false
+    else increase ≤ maxPossibleActivatedBalance limits s
   else true
 
 /-! ### Guard 5: Simulated share rate deviation
@@ -322,6 +347,39 @@ def simulatedShareRateNoDeviationOverflowCheckAccepts (limits : SanityLimits) (s
     let diff := absDiff actualShareRate s.simulatedShareRate
     let deviation := MAX_BASIS_POINTS * diff / actualShareRate
     deviation ≤ limits.simulatedShareRateDeviationBPLimit
+
+/-- Mutant: annual balance increase without pre-CL balance sum overflow check
+(pre-correction behavior). -/
+def annualBalanceIncreaseNoPreCLOverflowCheckAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  let pre := if preCLBalance s == 0 then DEFAULT_CL_BALANCE
+             else preCLBalance s
+  let post := s.postCLValidatorsBalance + s.postCLPendingBalance + s.clWithdrawals
+  if pre ≥ post then true
+  else
+    let balanceIncrease := post - pre
+    let t := effectiveTimeElapsed s.timeElapsed
+    if ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease > UINT256_MAX then false
+    else
+      let annualIncrease := ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease / pre / t
+      annualIncrease ≤ limits.annualBalanceIncreaseBPLimit
+
+/-- Mutant: pending balance cap without uint256 overflow checks
+(pre-correction behavior). -/
+def pendingBalanceCapNoOverflowCheckAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  let fundedPendingBalance := s.preCLPendingBalance + s.deposits
+  let cap := fundedPendingBalance + limits.externalPendingBalanceCapEth * 1000000000000000000
+  s.postCLPendingBalance ≤ cap
+
+/-- Mutant: validators balance increase without APR safety-cap product overflow
+check (pre-correction behavior). -/
+def validatorsBalanceIncreaseNoAprOverflowCheckAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  let preCLVAfterWithdrawals :=
+    if s.clWithdrawals ≥ s.preCLValidatorsBalance then 0
+    else s.preCLValidatorsBalance - s.clWithdrawals
+  if s.postCLValidatorsBalance > preCLVAfterWithdrawals then
+    let increase := s.postCLValidatorsBalance - preCLVAfterWithdrawals
+    increase ≤ maxPossibleActivatedBalance limits s
+  else true
 
 /-! ### Checker conjunction -/
 
