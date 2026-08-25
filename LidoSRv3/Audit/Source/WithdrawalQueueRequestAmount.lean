@@ -54,7 +54,7 @@ theorem requestWithdrawals_single_request_amount_bound :
   intro amount h
   unfold requestWithdrawalsSingle at h
   split at h
-  · simpa [checkedWithdrawalRequestAmount] using h_1
+  · simp_all [checkedWithdrawalRequestAmount]
   · cases h
 
 /-- Concrete lower and upper boundary regressions for the pinned predicate. -/

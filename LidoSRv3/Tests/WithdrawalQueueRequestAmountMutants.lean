@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Source.WithdrawalQueueRequestAmount
+
 /-!
 # WithdrawalQueue single-request amount mutant
 
@@ -6,8 +8,6 @@ source slice. It is deliberately limited to `_checkWithdrawalRequestAmount`:
 it does not assert completeness for approve, transfer, redeem, claim, or any
 other token surface.
 -/
-
-import LidoSRv3.Audit.Source.WithdrawalQueueRequestAmount
 
 namespace LidoSRv3.Tests.WithdrawalQueueRequestAmountMutants
 
