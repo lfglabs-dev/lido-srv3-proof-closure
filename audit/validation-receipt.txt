@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: e2755aa1d9f0569de44a5f0eed39a67cf910e1a7
+validated-tree: d38aa7ef30be8c422604a688b474df349c7bad3c
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -4503,3 +4503,35 @@ Add post-CL balance and appeared-ETH proration overflow guards (2026-08-25)
 - `validated-tree` rebound from `79a14a8c75417bab2c16f4102b27b5909e88fdcb` to
   `33b503813f372855329d73ae65671b7fd5c38462`, the tracked tree of this commit
   excluding this receipt per `scripts/check_validation_receipt.py`.
+
+Repair ETH-world inventory — intermediate hops, parent coverage, mutant soundness (2026-08-25)
+-----------------------------------------------------------------------------------------------
+
+- Add intermediate consolidation hops `busToGateway` (ConsolidationBus →
+  ConsolidationGateway, L383–406) and `gatewayToVault` (ConsolidationGateway →
+  WithdrawalVault, totalFee forward) to the ValueRoute inventory.  Both
+  covered by P-CONSOLIDATION-ETH-1.  Inventory rises from 10 to 12 routes.
+- Fix `vaultWithdrawalCall` parent: `primaryParent` returns `none` (EIP-7002
+  withdrawal-request predeploy is not covered by P-CONSOLIDATION-ETH-1 or
+  any other registered parent).  `primaryParent` return type changed from
+  `CoveringParent` to `Option CoveringParent`.
+- Replace vacuous `zeroUnmodeled_preserves_inventory` (compared via
+  `authorizedFrames` which discards owner/treasury/ops before comparison)
+  with private `zeroUnmodeled_preserves_frames` lemma.  Headline claim is
+  `zeroUnmodeled_preserves_value` plus concrete `witness_mutation_nontrivial`
+  proving the mutation is real.
+- Add parent-shaped mutants: for each primary covering parent (P-DEPOSIT-1,
+  P-TOPUP-1, P-CONSOLIDATION-ETH-1, P-CONSOLIDATION-VALUE-1, P-VAULT-ETH-1),
+  `zeroParentRoutes` zeroes routes under that parent and `native_decide`
+  witnesses prove inventory value strictly decreases.
+- Merge from main (ccf3242f) — `model: bound sanity elapsed time to uint256
+  (#220)`.
+- `lake build LidoSRv3.Audit.Model.EthWorld LidoSRv3.Tests.EthWorldMutants`
+  exit 0, `Build completed successfully (5 jobs)`.
+- `python3 scripts/audit_metadata.py check` exit 0 (11 canonical guarantees +
+  18 subordinate evidence rows).
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `validated-tree` rebound from `33b503813f372855329d73ae65671b7fd5c38462` to
+  `0910c6f1c10e7a294be411496ddc6d6cb6f65c95`, the tracked tree of this commit
+  excluding this receipt per `scripts/check_validation_receipt.py`
+  (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
