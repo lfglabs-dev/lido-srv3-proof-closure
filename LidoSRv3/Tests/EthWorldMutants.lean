@@ -4,37 +4,43 @@ import LidoSRv3.Audit.Model.EthWorld
 # ETH-world inventory mutant tests
 
 Concrete witnesses demonstrating:
-1. The owner/treasury/ops mutant is non-trivial (the zeroed list differs)
-   but preserves inventory value (non-load-bearing).
-2. Parent-shaped mutants: zeroing routes of each covering parent reduces
-   inventory value, proving every parent is load-bearing.
-3. Every route is inhabited by a positive-value frame witness.
+1. The owner/treasury/ops mutant is non-trivial: the zeroed list differs,
+   total value decreases, but modeled inventory value is preserved.
+2. Primary-parent mutants: zeroing routes of each primary covering parent
+   reduces inventory value, proving every primary parent is load-bearing.
+3. Composition-parent mutants: zeroing routes of each composition parent
+   reduces inventory value, proving every composition parent is load-bearing.
+4. Every route is inhabited by a positive-value frame witness.
 -/
 
 namespace LidoSRv3.Tests.EthWorldMutants
 
 open LidoSRv3.Audit.Model.EthWorld
 
-/-! ## Witness flow list -/
+/-! ## Witness flow list — all 11 value routes plus unmodeled flows -/
 
 private def witnessFlows : List GeneralFlow :=
-  [ .authorized ⟨.depositBeaconDeposit, 32⟩
+  [ .authorized ⟨.depositLidoPull, 32⟩
+  , .authorized ⟨.depositBeaconDeposit, 32⟩
+  , .authorized ⟨.topupLidoPull, 1⟩
   , .authorized ⟨.topupBeaconDeposit, 1⟩
-  , .authorized ⟨.consolidationFee, 3⟩
+  , .authorized ⟨.consolidationRefund, 7⟩
   , .authorized ⟨.busToGateway, 10⟩
+  , .authorized ⟨.gatewayToVault, 5⟩
   , .authorized ⟨.vaultConsolidationCall, 5⟩
   , .authorized ⟨.vaultWithdrawalCall, 2⟩
   , .authorized ⟨.vaultToLido, 7⟩
+  , .authorized ⟨.vaultToWithdrawalQueue, 4⟩
   , .ownerWithdrawal 42 100
   , .treasuryMint 50
   , .opsTransfer 25 ]
 
-/-! ## Non-vacuity: authorized frames are present -/
+/-! ## Non-vacuity: all 11 authorized frames are present -/
 
 theorem witness_has_authorized_frames :
-    (authorizedFrames witnessFlows).length = 7 := by native_decide
+    (authorizedFrames witnessFlows).length = 11 := by native_decide
 
-/-! ## Owner/treasury/ops mutant: non-trivial yet value-preserving -/
+/-! ## Owner/treasury/ops mutant: non-trivial yet inventory-preserving -/
 
 theorem witness_mutation_nontrivial :
     witnessFlows.map zeroUnmodeled ≠ witnessFlows := by native_decide
@@ -45,12 +51,22 @@ theorem witness_has_unmodeled_value :
       | _ => false).length = 3 := by native_decide
 
 theorem witness_inventory_value :
-    inventoryValue witnessFlows = 60 := by native_decide
+    inventoryValue witnessFlows = 106 := by native_decide
 
 theorem witness_mutant_inventory_value :
-    inventoryValue (witnessFlows.map zeroUnmodeled) = 60 := by native_decide
+    inventoryValue (witnessFlows.map zeroUnmodeled) = 106 := by native_decide
 
-/-! ## Parent-shaped mutants: each covering parent is load-bearing -/
+theorem witness_total_value :
+    totalValue witnessFlows = 281 := by native_decide
+
+theorem witness_mutant_total_value :
+    totalValue (witnessFlows.map zeroUnmodeled) = 106 := by native_decide
+
+theorem witness_mutant_reduces_total :
+    totalValue (witnessFlows.map zeroUnmodeled) <
+    totalValue witnessFlows := by native_decide
+
+/-! ## Primary-parent mutants: each primary covering parent is load-bearing -/
 
 theorem parent_deposit_load_bearing :
     inventoryValue (witnessFlows.map (zeroParentRoutes .pDepositOne)) <
@@ -72,15 +88,32 @@ theorem parent_vault_eth_load_bearing :
     inventoryValue (witnessFlows.map (zeroParentRoutes .pVaultEthOne)) <
     inventoryValue witnessFlows := by native_decide
 
-/-! ## EIP-7002 withdrawal predeploy is uncovered -/
+/-! ## Composition-parent mutants: each composition parent is load-bearing -/
+
+theorem composition_eth_journal_load_bearing :
+    inventoryValue (witnessFlows.map (zeroCompositionParentRoutes .pEthJournalOne)) <
+    inventoryValue witnessFlows := by native_decide
+
+theorem composition_consolidation_load_bearing :
+    inventoryValue (witnessFlows.map (zeroCompositionParentRoutes .pConsolidationOne)) <
+    inventoryValue witnessFlows := by native_decide
+
+/-! ## Uncovered routes -/
 
 theorem vaultWithdrawalCall_uncovered :
     ValueRoute.vaultWithdrawalCall.primaryParent = none := rfl
 
-theorem every_covered_route_has_parent :
-    ∀ r : ValueRoute, r ≠ .vaultWithdrawalCall →
-    (r.primaryParent).isSome = true := by
-  intro r h; cases r <;> simp_all [ValueRoute.primaryParent]
+theorem busToGateway_uncovered :
+    ValueRoute.busToGateway.primaryParent = none := rfl
+
+theorem gatewayToVault_uncovered :
+    ValueRoute.gatewayToVault.primaryParent = none := rfl
+
+theorem covered_routes_have_primary_parent :
+    ∀ r : ValueRoute,
+      r ≠ .busToGateway → r ≠ .gatewayToVault → r ≠ .vaultWithdrawalCall →
+      (r.primaryParent).isSome = true := by
+  intro r h1 h2 h3; cases r <;> simp_all [ValueRoute.primaryParent]
 
 /-! ## Route coverage: every route is inhabited by a positive-value frame -/
 
@@ -89,7 +122,6 @@ private def routeWitness : ValueRoute → AuthorizedValueFrame
   | .depositBeaconDeposit   => ⟨.depositBeaconDeposit, 32⟩
   | .topupLidoPull          => ⟨.topupLidoPull, 1⟩
   | .topupBeaconDeposit     => ⟨.topupBeaconDeposit, 1⟩
-  | .consolidationFee       => ⟨.consolidationFee, 3⟩
   | .consolidationRefund    => ⟨.consolidationRefund, 7⟩
   | .busToGateway           => ⟨.busToGateway, 10⟩
   | .gatewayToVault         => ⟨.gatewayToVault, 5⟩

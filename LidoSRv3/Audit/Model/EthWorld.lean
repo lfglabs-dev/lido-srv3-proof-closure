@@ -19,14 +19,13 @@ not widen any existing parent theorem.
 |  2 | depositBeaconDeposit    | BeaconChainDepositor.makeBeaconChainDeposits32ETH (L36–64)   |
 |  3 | topupLidoPull           | Lido.withdrawDepositableEther (L869–886)                     |
 |  4 | topupBeaconDeposit      | BeaconChainDepositor.makeBeaconChainTopUp (L66–108)          |
-|  5 | consolidationFee        | ConsolidationGateway.addConsolidationRequests (L185–223)     |
-|  6 | consolidationRefund     | ConsolidationGateway._refundFee (L295–307)                   |
-|  7 | busToGateway            | ConsolidationBus.executeConsolidation (L383–406)             |
-|  8 | gatewayToVault          | ConsolidationGateway → WithdrawalVault (totalFee forward)    |
-|  9 | vaultConsolidationCall  | WithdrawalVaultEIP7685._callAddConsolidationRequest (L113–121)|
-| 10 | vaultWithdrawalCall     | WithdrawalVaultEIP7685._callAddWithdrawalRequest (L103–111)  |
-| 11 | vaultToLido             | StakingVault → Lido via receiveWithdrawals                   |
-| 12 | vaultToWithdrawalQueue  | StakingVault → WithdrawalQueue                               |
+|  5 | consolidationRefund     | ConsolidationGateway._refundFee (L295–307)                   |
+|  6 | busToGateway            | ConsolidationBus.executeConsolidation (L383–406)             |
+|  7 | gatewayToVault          | ConsolidationGateway → WithdrawalVault (totalFee forward)    |
+|  8 | vaultConsolidationCall  | WithdrawalVaultEIP7685._callAddConsolidationRequest (L113–121)|
+|  9 | vaultWithdrawalCall     | WithdrawalVaultEIP7685._callAddWithdrawalRequest (L103–111)  |
+| 10 | vaultToLido             | StakingVault → Lido via receiveWithdrawals                   |
+| 11 | vaultToWithdrawalQueue  | StakingVault → WithdrawalQueue                               |
 
 ## Covering parents
 
@@ -36,10 +35,9 @@ not widen any existing parent theorem.
 | depositBeaconDeposit    | P-DEPOSIT-1              | P-ETH-JOURNAL-1     |
 | topupLidoPull           | P-TOPUP-1                | P-ETH-JOURNAL-1     |
 | topupBeaconDeposit      | P-TOPUP-1                | P-ETH-JOURNAL-1     |
-| consolidationFee        | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
 | consolidationRefund     | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
-| busToGateway            | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
-| gatewayToVault          | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
+| busToGateway            | —                        | —                   |
+| gatewayToVault          | —                        | —                   |
 | vaultConsolidationCall  | P-CONSOLIDATION-VALUE-1  | P-CONSOLIDATION-1   |
 | vaultWithdrawalCall     | —                        | —                   |
 | vaultToLido             | P-VAULT-ETH-1            | —                   |
@@ -74,7 +72,6 @@ inductive ValueRoute where
   | depositBeaconDeposit
   | topupLidoPull
   | topupBeaconDeposit
-  | consolidationFee
   | consolidationRefund
   | busToGateway
   | gatewayToVault
@@ -107,7 +104,6 @@ def ValueRoute.destination : ValueRoute → Destination
   | .depositBeaconDeposit   => .beaconDeposit
   | .topupLidoPull          => .lidoPull
   | .topupBeaconDeposit     => .beaconDeposit
-  | .consolidationFee       => .consolidationPredeploy
   | .consolidationRefund    => .refundRecipient
   | .busToGateway           => .consolidationGateway
   | .gatewayToVault         => .withdrawalVault
@@ -187,22 +183,38 @@ def CoveringParent.id : CoveringParent → String
   | .pVaultEthOne          => "P-VAULT-ETH-1"
   | .pEthJournalOne        => "P-ETH-JOURNAL-1"
 
-/-- Primary covering parent for each route.  The withdrawal-request
-predeploy (EIP-7002) is not covered by any registered parent and returns
-`none`. -/
+/-- Primary covering parent for each route.  Intermediate consolidation
+hops (busToGateway, gatewayToVault) and the withdrawal-request predeploy
+(EIP-7002) are not covered by any registered primary parent. -/
 def ValueRoute.primaryParent : ValueRoute → Option CoveringParent
   | .depositLidoPull        => some .pDepositOne
   | .depositBeaconDeposit   => some .pDepositOne
   | .topupLidoPull          => some .pTopupOne
   | .topupBeaconDeposit     => some .pTopupOne
-  | .consolidationFee       => some .pConsolidationEthOne
   | .consolidationRefund    => some .pConsolidationEthOne
-  | .busToGateway           => some .pConsolidationEthOne
-  | .gatewayToVault         => some .pConsolidationEthOne
+  | .busToGateway           => none
+  | .gatewayToVault         => none
   | .vaultConsolidationCall => some .pConsolidationValueOne
   | .vaultWithdrawalCall    => none
   | .vaultToLido            => some .pVaultEthOne
   | .vaultToWithdrawalQueue => some .pVaultEthOne
+
+/-- Composition parent for routes covered by a broader parent theorem
+that composes the primary parent's result.  Deposit, topup, and
+consolidation-refund routes compose through P-ETH-JOURNAL-1;
+vaultConsolidationCall composes through P-CONSOLIDATION-1. -/
+def ValueRoute.compositionParent : ValueRoute → Option CoveringParent
+  | .depositLidoPull        => some .pEthJournalOne
+  | .depositBeaconDeposit   => some .pEthJournalOne
+  | .topupLidoPull          => some .pEthJournalOne
+  | .topupBeaconDeposit     => some .pEthJournalOne
+  | .consolidationRefund    => some .pEthJournalOne
+  | .busToGateway           => none
+  | .gatewayToVault         => none
+  | .vaultConsolidationCall => some .pConsolidationOne
+  | .vaultWithdrawalCall    => none
+  | .vaultToLido            => none
+  | .vaultToWithdrawalQueue => none
 
 /-! ## Spec-layer coverage -/
 
@@ -212,7 +224,7 @@ surjectivity of the existing constructors. -/
 theorem spec_destination_surjective (d : ApprovedDestination) :
     ∃ r : ValueRoute, r.destination.toSpec = some d := by
   cases d with
-  | consolidationRequest  => exact ⟨.consolidationFee, rfl⟩
+  | consolidationRequest  => exact ⟨.vaultConsolidationCall, rfl⟩
   | refundRecipient       => exact ⟨.consolidationRefund, rfl⟩
   | beaconDeposit         => exact ⟨.depositBeaconDeposit, rfl⟩
   | lidoPull              => exact ⟨.depositLidoPull, rfl⟩
@@ -243,7 +255,7 @@ theorem terminal_destinations_in_spec (d : Destination)
 def allRoutes : List ValueRoute :=
   [ .depositLidoPull, .depositBeaconDeposit
   , .topupLidoPull, .topupBeaconDeposit
-  , .consolidationFee, .consolidationRefund
+  , .consolidationRefund
   , .busToGateway, .gatewayToVault
   , .vaultConsolidationCall, .vaultWithdrawalCall
   , .vaultToLido, .vaultToWithdrawalQueue ]
@@ -252,7 +264,7 @@ def allUnsupportedRoutes : List UnsupportedRoute :=
   [ .ownerWithdrawal, .stVaultInternal, .valueBoundedExit
   , .governanceLifecycle, .fallbackReceive, .treasuryMint ]
 
-theorem inventory_count : allRoutes.length = 12 := rfl
+theorem inventory_count : allRoutes.length = 11 := rfl
 
 theorem unsupported_count : allUnsupportedRoutes.length = 6 := rfl
 
@@ -304,22 +316,38 @@ private theorem zeroUnmodeled_preserves_frames : ∀ (flows : List GeneralFlow),
 def inventoryValue (flows : List GeneralFlow) : Nat :=
   (authorizedFrames flows).foldl (fun acc f => acc + f.value) 0
 
-/-- Zeroing non-modeled values preserves total inventory value.  Combined
-with a concrete witness that the zeroed list differs from the original,
-this proves owner/treasury/ops flows are non-load-bearing. -/
+/-- Total value of all flows including unmodeled owner/treasury/ops. -/
+def totalValue : List GeneralFlow → Nat
+  | []                            => 0
+  | .authorized f :: rest         => f.value + totalValue rest
+  | .ownerWithdrawal _ v :: rest  => v + totalValue rest
+  | .treasuryMint v :: rest       => v + totalValue rest
+  | .opsTransfer v :: rest        => v + totalValue rest
+
+/-- Zeroing non-modeled values preserves modeled inventory value. -/
 theorem zeroUnmodeled_preserves_value (flows : List GeneralFlow) :
     inventoryValue (flows.map zeroUnmodeled) = inventoryValue flows := by
   unfold inventoryValue
   rw [zeroUnmodeled_preserves_frames]
 
-/-! ## Parent-shaped mutant -/
+/-! ## Parent-shaped mutants -/
 
 /-- Zero the value of every authorized frame whose route has a given
-primary parent.  Used by parent-shaped mutants to show each covering
-parent is load-bearing. -/
+primary parent.  Used by parent-shaped mutants to show each primary
+covering parent is load-bearing. -/
 def zeroParentRoutes (p : CoveringParent) : GeneralFlow → GeneralFlow
   | .authorized f          =>
     if f.route.primaryParent = some p then .authorized ⟨f.route, 0⟩
+    else .authorized f
+  | .ownerWithdrawal r v   => .ownerWithdrawal r v
+  | .treasuryMint v        => .treasuryMint v
+  | .opsTransfer v         => .opsTransfer v
+
+/-- Zero the value of every authorized frame whose route has a given
+composition parent.  Used by composition-parent mutants. -/
+def zeroCompositionParentRoutes (p : CoveringParent) : GeneralFlow → GeneralFlow
+  | .authorized f          =>
+    if f.route.compositionParent = some p then .authorized ⟨f.route, 0⟩
     else .authorized f
   | .ownerWithdrawal r v   => .ownerWithdrawal r v
   | .treasuryMint v        => .treasuryMint v
