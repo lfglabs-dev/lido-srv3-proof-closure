@@ -1,11 +1,39 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d38aa7ef30be8c422604a688b474df349c7bad3c
+validated-tree: 2051bafa17ea0e6c2c691dccad40e861f1935d0d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-ORACLE-SUPPLY-1 source-domain profitable-branch guard fix (2026-08-25)
+------------------------------------------------------------------------
+
+- Rebind `validated-tree` to `2051bafa17ea0e6c2c691dccad40e861f1935d0d` after
+  conditioning EntryDomainValid.precisionPos and EntryDomainValid.feeDenom on
+  the profitable branch (`principalClBalance < unifiedClBalance`) rather than
+  on positive fee (`0 < entryFeeWei`).  Solidity Accounting.sol@af095e48
+  L317-331 always evaluates the feeShareRateDenominator division on the
+  profitable path even when feeEther = 0; conditioning on profitability avoids
+  conflating a zero-fee profitable report with a non-profitable report whose
+  fee is trivially zero.
+- Added `precisionPos` field to EntryDomainValid (Lean `Nat.div 0` yields 0,
+  Solidity reverts on division by zero).
+- Updated `domain_valid_denominator_pos` and `entry_mint_eq_pinned_of_domain`
+  proofs to derive profitability from positive fee.
+- Added kill-line `domain_guard_kill_line_refutes_full_parent` refuting the
+  complete five-conjunct parent on `lossyQuantReport` when domain guard is
+  dropped.
+- Added `zeroPrecisionNotDomainValid` and `zeroDenomNotDomainValid` witnesses
+  showing the guards exclude source-reverting profitable inputs.
+- Updated guarantees.yaml: registered theorem now
+  `oracle_supply_entry_source_domain`, reproduction command includes
+  `PackO2SupplyDomainMutants`, fidelity entries document domain guard.
+- Verification: `scripts/audit_metadata.py check`,
+  `scripts/check_public_claim_surfaces.py` exit 0.  Focused lake builds of
+  `SubmitReportFeeCorrespondence`, `POracleSupply1`, and
+  `PackO2SupplyDomainMutants` pass.  No sorry/admit/new axiom introduced.
 
 Remove P-DEREF-1 from final-deliverable scope (2026-08-24)
 -----------------------------------------------------------
