@@ -127,4 +127,101 @@ theorem zeroDomainGuardIsLoadBearing :
   ⟨testLimits, zeroShareDomainWitness,
     zeroDomainMutantAcceptsWitness, sourceDomainRejectsZeroEtherAndShares⟩
 
+/-! ### Regression: clWithdrawals in annual balance increase (Finding 2)
+
+Witness: validators balance drops from 100 to 95 ETH, but 10 ETH was
+withdrawn. Solidity reconstructs post = 95+0+10 = 105 > pre = 100,
+annualized at 182 500 BP (far above 100 BP limit). Without clWithdrawals
+in post, the model sees post = 95 ≤ pre = 100 and accepts unconditionally. -/
+
+private def withdrawalWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 100000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 95000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 10000000000000000000
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem annualWithWithdrawalsRejectsWitness :
+    annualBalanceIncreaseAccepts testLimits withdrawalWitness = false := by native_decide
+
+theorem annualNoWithdrawalsAcceptsWitness :
+    annualBalanceIncreaseNoWithdrawalsAccepts testLimits withdrawalWitness = true := by native_decide
+
+theorem withdrawalsCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      annualBalanceIncreaseNoWithdrawalsAccepts limits s = true ∧
+      annualBalanceIncreaseAccepts limits s = false :=
+  ⟨testLimits, withdrawalWitness,
+    annualNoWithdrawalsAcceptsWitness, annualWithWithdrawalsRejectsWitness⟩
+
+/-! ### Regression: zero computed actual share rate (Finding 1)
+
+Witness: postInternalEther = 1, postInternalShares = 10^28. Both nonzero,
+but actualShareRate = 1×10^27 / 10^28 = 0 in Nat division. Solidity's
+checked division by actualShareRate at L1346 would revert. Without the
+zero-rate domain condition the model accepts (Lean's 0/0 = 0 ≤ limit). -/
+
+private def zeroComputedRateWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1
+    postInternalShares := 10000000000000000000000000000
+    simulatedShareRate := 0 }
+
+theorem correctedRejectsZeroComputedRate :
+    simulatedShareRateAccepts testLimits zeroComputedRateWitness = false := by native_decide
+
+theorem noZeroRateCheckAcceptsWitness :
+    simulatedShareRateNoZeroRateCheckAccepts testLimits zeroComputedRateWitness = true := by native_decide
+
+theorem zeroRateCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      simulatedShareRateNoZeroRateCheckAccepts limits s = true ∧
+      simulatedShareRateAccepts limits s = false :=
+  ⟨testLimits, zeroComputedRateWitness,
+    noZeroRateCheckAcceptsWitness, correctedRejectsZeroComputedRate⟩
+
+/-! ### Regression: uint256 multiplication overflow (Finding 3)
+
+Witness: postInternalEther = postInternalShares = UINT256_MAX. Lean's
+unbounded Nat computes actualShareRate = UINT256_MAX×10^27 / UINT256_MAX =
+10^27, matching simulatedShareRate. But Solidity's checked multiplication
+UINT256_MAX * 10^27 overflows uint256 and reverts. Without the overflow
+domain condition the model accepts. -/
+
+private def overflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := UINT256_MAX
+    postInternalShares := UINT256_MAX
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsOverflow :
+    simulatedShareRateAccepts testLimits overflowWitness = false := by native_decide
+
+theorem noOverflowCheckAcceptsWitness :
+    simulatedShareRateNoOverflowCheckAccepts testLimits overflowWitness = true := by native_decide
+
+theorem overflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      simulatedShareRateNoOverflowCheckAccepts limits s = true ∧
+      simulatedShareRateAccepts limits s = false :=
+  ⟨testLimits, overflowWitness,
+    noOverflowCheckAcceptsWitness, correctedRejectsOverflow⟩
+
 end LidoSRv3.Tests.SanityEnvelopeMutants

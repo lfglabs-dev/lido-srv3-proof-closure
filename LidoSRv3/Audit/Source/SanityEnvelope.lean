@@ -104,6 +104,7 @@ abbrev DEFAULT_TIME_ELAPSED : Nat := 3600
 abbrev DEFAULT_CL_BALANCE : Nat := 1000000000
 abbrev SHARE_RATE_PRECISION_E27 : Nat := 1000000000000000000000000000
 abbrev MAX_VALIDATOR_EFFECTIVE_BALANCE : Nat := 2048000000000000000000
+abbrev UINT256_MAX : Nat := 2^256 - 1
 
 /-- Subset of `AccountingCoreLimitsPacked` fields consumed by modeled guards.
 Pinned at OracleReportSanityChecker.sol L124–135. -/
@@ -140,6 +141,7 @@ def effectiveTimeElapsed (t : Nat) : Nat :=
 /-! ### Guard 1: Annual balance increase
 
 Pinned at `_checkAnnualBalancesIncrease` (OracleReportSanityChecker.sol L1291–1314).
+`postCLBalance = postCLValidators + postCLPending + clWithdrawals` (L1301).
 `annualBalanceIncrease = ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease / preCLBalance / timeElapsed`
 Must be `≤ annualBalanceIncreaseBPLimit`. -/
 
@@ -149,7 +151,7 @@ def preCLBalance (s : SanityCheckInput) : Nat :=
 def annualBalanceIncreaseAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
   let pre := if preCLBalance s == 0 then DEFAULT_CL_BALANCE
              else preCLBalance s
-  let post := s.postCLValidatorsBalance + s.postCLPendingBalance
+  let post := s.postCLValidatorsBalance + s.postCLPendingBalance + s.clWithdrawals
   if pre ≥ post then true
   else
     let balanceIncrease := post - pre
@@ -219,16 +221,23 @@ def validatorsBalanceIncreaseAccepts (limits : SanityLimits) (s : SanityCheckInp
 Pinned at `_checkSimulatedShareRate` (OracleReportSanityChecker.sol L1331–1374).
 `simulatedShareDeviation ≤ simulatedShareRateDeviationBPLimit`.
 
-The source first `assert`s `_noWithdrawalsPostInternalEther != 0`
-(L1337), then Solidity's checked division rejects zero
-`_noWithdrawalsPostInternalShares` at L1338–1340. Lean `Nat` division instead
-returns zero on a zero denominator, so this model makes that source domain
-explicit and rejects both invalid inputs before any division. -/
+Source domain conditions modeled:
+1. `_noWithdrawalsPostInternalEther != 0` (L1337 assert).
+2. `_noWithdrawalsPostInternalShares != 0` (L1338–1340 checked division).
+3. `_noWithdrawalsPostInternalEther * SHARE_RATE_PRECISION_E27` must not
+   overflow `uint256` (L1340 checked multiplication).
+4. The computed `actualShareRate` must be nonzero (L1346 divides by it
+   under checked arithmetic).
+
+Lean `Nat` arithmetic is unbounded and its division returns zero on a zero
+denominator, so this model makes all four source domain conditions explicit. -/
 
 def absDiff (a b : Nat) : Nat := if a ≥ b then a - b else b - a
 
 def simulatedShareRateSourceDomain (s : SanityCheckInput) : Bool :=
-  s.postInternalEther != 0 && s.postInternalShares != 0
+  s.postInternalEther != 0 && s.postInternalShares != 0 &&
+  s.postInternalEther * SHARE_RATE_PRECISION_E27 ≤ UINT256_MAX &&
+  s.postInternalEther * SHARE_RATE_PRECISION_E27 / s.postInternalShares != 0
 
 def simulatedShareRateAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
   if !simulatedShareRateSourceDomain s then false
@@ -245,6 +254,41 @@ def simulatedShareRateNoSourceDomainAccepts (limits : SanityLimits) (s : SanityC
   let diff := absDiff actualShareRate s.simulatedShareRate
   let deviation := MAX_BASIS_POINTS * diff / actualShareRate
   deviation ≤ limits.simulatedShareRateDeviationBPLimit
+
+/-- Mutant: annual balance increase without clWithdrawals in post
+(pre-correction behavior, Finding 2). -/
+def annualBalanceIncreaseNoWithdrawalsAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  let pre := if preCLBalance s == 0 then DEFAULT_CL_BALANCE
+             else preCLBalance s
+  let post := s.postCLValidatorsBalance + s.postCLPendingBalance
+  if pre ≥ post then true
+  else
+    let balanceIncrease := post - pre
+    let t := effectiveTimeElapsed s.timeElapsed
+    let annualIncrease := ANNUAL_BALANCE_INCREASE_DENOMINATOR * balanceIncrease / pre / t
+    annualIncrease ≤ limits.annualBalanceIncreaseBPLimit
+
+/-- Mutant: old source domain without computed-rate-nonzero check
+(pre-correction behavior, Finding 1). -/
+def simulatedShareRateNoZeroRateCheckAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  if !(s.postInternalEther != 0 && s.postInternalShares != 0 &&
+       s.postInternalEther * SHARE_RATE_PRECISION_E27 ≤ UINT256_MAX) then false
+  else
+    let actualShareRate := s.postInternalEther * SHARE_RATE_PRECISION_E27 / s.postInternalShares
+    let diff := absDiff actualShareRate s.simulatedShareRate
+    let deviation := MAX_BASIS_POINTS * diff / actualShareRate
+    deviation ≤ limits.simulatedShareRateDeviationBPLimit
+
+/-- Mutant: source domain without uint256 overflow check
+(pre-correction behavior, Finding 3). -/
+def simulatedShareRateNoOverflowCheckAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  if !(s.postInternalEther != 0 && s.postInternalShares != 0 &&
+       s.postInternalEther * SHARE_RATE_PRECISION_E27 / s.postInternalShares != 0) then false
+  else
+    let actualShareRate := s.postInternalEther * SHARE_RATE_PRECISION_E27 / s.postInternalShares
+    let diff := absDiff actualShareRate s.simulatedShareRate
+    let deviation := MAX_BASIS_POINTS * diff / actualShareRate
+    deviation ≤ limits.simulatedShareRateDeviationBPLimit
 
 /-! ### Checker conjunction -/
 
