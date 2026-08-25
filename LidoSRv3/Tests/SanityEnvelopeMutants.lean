@@ -1,0 +1,474 @@
+import LidoSRv3.Audit.Source.SanityEnvelope
+
+/-!
+# Sanity envelope guard-drop mutants
+
+Focused fail-closed vectors for the sanity-envelope skeleton. Each test
+demonstrates that at least one modeled guard is load-bearing: there exists a
+concrete input accepted by the guard-drop mutant but rejected by the full
+checker.
+
+## Design
+
+The annual balance increase guard is the surgical target. The witness uses:
+- A scenario where CL pending balance surges (external pending deposits appear)
+  with no change in validators balance. The pending-cap guard accepts because
+  the increase is within `externalPendingBalanceCapEth`, the validators-balance
+  guard accepts trivially (no validators increase), and the remaining guards
+  are satisfied. But the annual guard sees the total CL balance jump from
+  32 ETH to 532 ETH and rejects it at 57 031 250 BP annualized, far above
+  the 100 BP limit.
+
+This proves the annual guard is not entailed by the remaining four guards:
+dropping it widens the accepted set.
+-/
+
+namespace LidoSRv3.Tests.SanityEnvelopeMutants
+
+open LidoSRv3.Audit.SolidityAccounting.SanityEnvelope
+
+/-- Limits: 1% annual (100 BP), generous other limits. -/
+private def testLimits : SanityLimits :=
+  { annualBalanceIncreaseBPLimit := 100
+    simulatedShareRateDeviationBPLimit := 500
+    appearedEthAmountPerDayLimit := 1000000
+    externalPendingBalanceCapEth := 1000 }
+
+/-- Witness: pending balance surges from 0 to 500 ETH with no change in
+validators (32 ETH). The total CL balance jumps from 32 ETH to 532 ETH,
+which the annual guard rejects (57 031 250 BP annualized ≫ 100 BP limit).
+The remaining four guards accept: no validators increase, pending within
+the 1000 ETH external cap, no activation, and share rates match. -/
+private def annualWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 32000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 32000000000000000000
+    postCLPendingBalance := 500000000000000000000
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+/-- The annual guard rejects the witness. -/
+theorem annualGuardRejectsWitness :
+    annualBalanceIncreaseAccepts testLimits annualWitness = false := by native_decide
+
+/-- The remaining guards accept the witness. -/
+theorem otherGuardsAcceptWitness :
+    checkerNoAnnual testLimits annualWitness = true := by native_decide
+
+/-- The full checker rejects the witness. -/
+theorem fullCheckerRejectsWitness :
+    checkerAccepts testLimits annualWitness = false := by native_decide
+
+/-- The annual guard is load-bearing: the mutant accepts but the full checker
+rejects. -/
+theorem annualGuardIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      checkerNoAnnual limits s = true ∧
+      checkerAccepts limits s = false :=
+  ⟨testLimits, annualWitness, otherGuardsAcceptWitness, fullCheckerRejectsWitness⟩
+
+/-- Positive control: a well-behaved input passes all guards. No balance
+change, rates match. -/
+private def normalInput : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem positiveControl :
+    checkerAccepts testLimits normalInput = true := by native_decide
+
+/-- The annual guard is not entailed by the other four guards. -/
+theorem annualNotRedundant :
+    ¬ (∀ (l : SanityLimits) (s : SanityCheckInput),
+        checkerNoAnnual l s = true → annualBalanceIncreaseAccepts l s = true) := by
+  intro h
+  have := h testLimits annualWitness otherGuardsAcceptWitness
+  simp [annualGuardRejectsWitness] at this
+
+/-- This is outside the pinned Solidity execution domain: L1337 asserts a
+nonzero ether numerator and L1338–1340 rejects a zero shares denominator.
+The source-faithful predicate must reject it before Lean `Nat` division can
+silently return zero. -/
+private def zeroShareDomainWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 0
+    postInternalShares := 0
+    simulatedShareRate := 0 }
+
+theorem sourceDomainRejectsZeroEtherAndShares :
+    simulatedShareRateAccepts testLimits zeroShareDomainWitness = false := by native_decide
+
+/-- Dropping the source-domain guard admits the zero/zero input because Lean
+`Nat` division returns zero. This makes the correction load-bearing. -/
+theorem zeroDomainMutantAcceptsWitness :
+    simulatedShareRateNoSourceDomainAccepts testLimits zeroShareDomainWitness = true := by native_decide
+
+theorem zeroDomainGuardIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      simulatedShareRateNoSourceDomainAccepts limits s = true ∧
+      simulatedShareRateAccepts limits s = false :=
+  ⟨testLimits, zeroShareDomainWitness,
+    zeroDomainMutantAcceptsWitness, sourceDomainRejectsZeroEtherAndShares⟩
+
+/-! ### Regression: clWithdrawals in annual balance increase (Finding 2)
+
+Witness: validators balance drops from 100 to 95 ETH, but 10 ETH was
+withdrawn. Solidity reconstructs post = 95+0+10 = 105 > pre = 100,
+annualized at 182 500 BP (far above 100 BP limit). Without clWithdrawals
+in post, the model sees post = 95 ≤ pre = 100 and accepts unconditionally. -/
+
+private def withdrawalWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 100000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 95000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 10000000000000000000
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem annualWithWithdrawalsRejectsWitness :
+    annualBalanceIncreaseAccepts testLimits withdrawalWitness = false := by native_decide
+
+theorem annualNoWithdrawalsAcceptsWitness :
+    annualBalanceIncreaseNoWithdrawalsAccepts testLimits withdrawalWitness = true := by native_decide
+
+theorem withdrawalsCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      annualBalanceIncreaseNoWithdrawalsAccepts limits s = true ∧
+      annualBalanceIncreaseAccepts limits s = false :=
+  ⟨testLimits, withdrawalWitness,
+    annualNoWithdrawalsAcceptsWitness, annualWithWithdrawalsRejectsWitness⟩
+
+/-! ### Regression: zero computed actual share rate (Finding 1)
+
+Witness: postInternalEther = 1, postInternalShares = 10^28. Both nonzero,
+but actualShareRate = 1×10^27 / 10^28 = 0 in Nat division. Solidity's
+checked division by actualShareRate at L1346 would revert. Without the
+zero-rate domain condition the model accepts (Lean's 0/0 = 0 ≤ limit). -/
+
+private def zeroComputedRateWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1
+    postInternalShares := 10000000000000000000000000000
+    simulatedShareRate := 0 }
+
+theorem correctedRejectsZeroComputedRate :
+    simulatedShareRateAccepts testLimits zeroComputedRateWitness = false := by native_decide
+
+theorem noZeroRateCheckAcceptsWitness :
+    simulatedShareRateNoZeroRateCheckAccepts testLimits zeroComputedRateWitness = true := by native_decide
+
+theorem zeroRateCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      simulatedShareRateNoZeroRateCheckAccepts limits s = true ∧
+      simulatedShareRateAccepts limits s = false :=
+  ⟨testLimits, zeroComputedRateWitness,
+    noZeroRateCheckAcceptsWitness, correctedRejectsZeroComputedRate⟩
+
+/-! ### Regression: uint256 multiplication overflow (Finding 3)
+
+Witness: postInternalEther = postInternalShares = UINT256_MAX. Lean's
+unbounded Nat computes actualShareRate = UINT256_MAX×10^27 / UINT256_MAX =
+10^27, matching simulatedShareRate. But Solidity's checked multiplication
+UINT256_MAX * 10^27 overflows uint256 and reverts. Without the overflow
+domain condition the model accepts. -/
+
+private def overflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := UINT256_MAX
+    postInternalShares := UINT256_MAX
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsOverflow :
+    simulatedShareRateAccepts testLimits overflowWitness = false := by native_decide
+
+theorem noOverflowCheckAcceptsWitness :
+    simulatedShareRateNoOverflowCheckAccepts testLimits overflowWitness = true := by native_decide
+
+theorem overflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      simulatedShareRateNoOverflowCheckAccepts limits s = true ∧
+      simulatedShareRateAccepts limits s = false :=
+  ⟨testLimits, overflowWitness,
+    noOverflowCheckAcceptsWitness, correctedRejectsOverflow⟩
+
+/-! ### Regression: annual-increase numerator uint256 overflow
+
+Witness: preCLValidatorsBalance = 2^255, postCLValidatorsBalance = UINT256_MAX.
+balanceIncrease = 2^255 - 1. Over one year with a 10 000 BP (100%) limit,
+Lean's unbounded Nat computes annualIncrease = 9999 ≤ 10000 and accepts.
+Solidity's ANNUAL_BALANCE_INCREASE_DENOMINATOR * (2^255 - 1) overflows
+uint256 and reverts. Without the overflow guard the model accepts. -/
+
+private def annualOverflowLimits : SanityLimits :=
+  { annualBalanceIncreaseBPLimit := MAX_BASIS_POINTS
+    simulatedShareRateDeviationBPLimit := 500
+    appearedEthAmountPerDayLimit := 1000000
+    externalPendingBalanceCapEth := 1000 }
+
+private def annualOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 365 * SECONDS_PER_DAY
+    preCLValidatorsBalance := 2^255
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := UINT256_MAX
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedAnnualRejectsOverflow :
+    annualBalanceIncreaseAccepts annualOverflowLimits annualOverflowWitness = false := by native_decide
+
+theorem annualNoOverflowCheckAcceptsWitness :
+    annualBalanceIncreaseNoOverflowCheckAccepts annualOverflowLimits annualOverflowWitness = true := by native_decide
+
+theorem annualOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      annualBalanceIncreaseNoOverflowCheckAccepts limits s = true ∧
+      annualBalanceIncreaseAccepts limits s = false :=
+  ⟨annualOverflowLimits, annualOverflowWitness,
+    annualNoOverflowCheckAcceptsWitness, correctedAnnualRejectsOverflow⟩
+
+/-! ### Regression: share-rate deviation uint256 multiplication overflow
+
+Witness: postInternalEther = UINT256_MAX / SHARE_RATE_PRECISION_E27,
+postInternalShares = 1, simulatedShareRate = 0. actualShareRate is maximal
+within the ether×precision domain, so diff equals actualShareRate and
+MAX_BASIS_POINTS × diff overflows uint256. Lean's unbounded Nat computes
+deviation = 10 000 ≤ 10 000 and accepts, while Solidity reverts. -/
+
+private def deviationOverflowLimits : SanityLimits :=
+  { annualBalanceIncreaseBPLimit := 100
+    simulatedShareRateDeviationBPLimit := MAX_BASIS_POINTS
+    appearedEthAmountPerDayLimit := 1000000
+    externalPendingBalanceCapEth := 1000 }
+
+private def deviationOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := UINT256_MAX / SHARE_RATE_PRECISION_E27
+    postInternalShares := 1
+    simulatedShareRate := 0 }
+
+theorem correctedRejectsDeviationOverflow :
+    simulatedShareRateAccepts deviationOverflowLimits deviationOverflowWitness = false := by native_decide
+
+theorem noDeviationOverflowCheckAcceptsWitness :
+    simulatedShareRateNoDeviationOverflowCheckAccepts deviationOverflowLimits deviationOverflowWitness = true := by native_decide
+
+theorem deviationOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      simulatedShareRateNoDeviationOverflowCheckAccepts limits s = true ∧
+      simulatedShareRateAccepts limits s = false :=
+  ⟨deviationOverflowLimits, deviationOverflowWitness,
+    noDeviationOverflowCheckAcceptsWitness, correctedRejectsDeviationOverflow⟩
+
+/-! ### Regression: pre-CL balance uint256 sum overflow
+
+Witness: preCLValidatorsBalance = UINT256_MAX, deposits = 1. The pre-balance
+sum overflows uint256; Solidity's checked addition at L1297 reverts, but Lean's
+unbounded Nat computes pre = UINT256_MAX + 1 > post = UINT256_MAX and accepts
+via the no-increase branch. Without the overflow guard the model accepts. -/
+
+private def preCLOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := UINT256_MAX
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := UINT256_MAX
+    postCLPendingBalance := 0
+    deposits := 1
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsPreCLOverflow :
+    annualBalanceIncreaseAccepts testLimits preCLOverflowWitness = false := by native_decide
+
+theorem noPreCLOverflowCheckAcceptsWitness :
+    annualBalanceIncreaseNoPreCLOverflowCheckAccepts testLimits preCLOverflowWitness = true := by native_decide
+
+theorem preCLOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      annualBalanceIncreaseNoPreCLOverflowCheckAccepts limits s = true ∧
+      annualBalanceIncreaseAccepts limits s = false :=
+  ⟨testLimits, preCLOverflowWitness,
+    noPreCLOverflowCheckAcceptsWitness, correctedRejectsPreCLOverflow⟩
+
+/-! ### Regression: pending-balance cap uint256 overflow
+
+Witness: preCLPendingBalance = postCLPendingBalance = UINT256_MAX, zero
+deposits. fundedPendingBalance = UINT256_MAX, so
+fundedPendingBalance + externalCap × 1 ether overflows uint256. Solidity's
+checked addition reverts, but Lean's unbounded Nat accepts because
+UINT256_MAX ≤ UINT256_MAX + 1e21. -/
+
+private def pendingCapOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := UINT256_MAX
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := UINT256_MAX
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsPendingCapOverflow :
+    pendingBalanceCapAccepts testLimits pendingCapOverflowWitness = false := by native_decide
+
+theorem noPendingCapOverflowCheckAcceptsWitness :
+    pendingBalanceCapNoOverflowCheckAccepts testLimits pendingCapOverflowWitness = true := by native_decide
+
+theorem pendingCapOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      pendingBalanceCapNoOverflowCheckAccepts limits s = true ∧
+      pendingBalanceCapAccepts limits s = false :=
+  ⟨testLimits, pendingCapOverflowWitness,
+    noPendingCapOverflowCheckAcceptsWitness, correctedRejectsPendingCapOverflow⟩
+
+/-! ### Regression: validators APR safety-cap product uint256 overflow
+
+Witness: preCLValidatorsBalance = UINT256_MAX / 2, one-wei validator increase,
+one-year interval, 100% annual BP limit. The APR safety-cap product
+(UINT256_MAX / 2) × 315 360 000 000 overflows uint256. Solidity's checked
+multiplication reverts, but Lean's unbounded Nat computes the cap as
+UINT256_MAX / 2 and accepts the 1-wei increase. -/
+
+private def aprOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 365 * SECONDS_PER_DAY
+    preCLValidatorsBalance := UINT256_MAX / 2
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := UINT256_MAX / 2 + 1
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsAprOverflow :
+    validatorsBalanceIncreaseAccepts annualOverflowLimits aprOverflowWitness = false := by native_decide
+
+theorem noAprOverflowCheckAcceptsWitness :
+    validatorsBalanceIncreaseNoAprOverflowCheckAccepts annualOverflowLimits aprOverflowWitness = true := by native_decide
+
+theorem aprOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      validatorsBalanceIncreaseNoAprOverflowCheckAccepts limits s = true ∧
+      validatorsBalanceIncreaseAccepts limits s = false :=
+  ⟨annualOverflowLimits, aprOverflowWitness,
+    noAprOverflowCheckAcceptsWitness, correctedRejectsAprOverflow⟩
+
+/-! ### Regression: post-CL balance uint256 sum overflow
+
+Witness: postCLValidatorsBalance = UINT256_MAX, postCLPendingBalance = 1.
+The post-CL balance sum overflows uint256; Solidity's checked addition at
+L1301 reverts, but Lean's unbounded Nat computes post = UINT256_MAX + 1 >
+pre = UINT256_MAX and continues with balanceIncrease = 1. Without the
+overflow guard the model accepts. -/
+
+private def postCLOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := UINT256_MAX
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := UINT256_MAX
+    postCLPendingBalance := 1
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsPostCLOverflow :
+    annualBalanceIncreaseAccepts testLimits postCLOverflowWitness = false := by native_decide
+
+theorem noPostCLOverflowCheckAcceptsWitness :
+    annualBalanceIncreaseNoPostCLOverflowCheckAccepts testLimits postCLOverflowWitness = true := by native_decide
+
+theorem postCLOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      annualBalanceIncreaseNoPostCLOverflowCheckAccepts limits s = true ∧
+      annualBalanceIncreaseAccepts limits s = false :=
+  ⟨testLimits, postCLOverflowWitness,
+    noPostCLOverflowCheckAcceptsWitness, correctedRejectsPostCLOverflow⟩
+
+/-! ### Regression: appeared-ETH proration uint256 multiplication overflow
+
+Witness: appearedEthAmountPerDayLimit = UINT256_MAX. The product
+UINT256_MAX × 1 ether overflows uint256; Solidity's checked multiplication
+reverts, but Lean's unbounded Nat computes a huge appearedLimit and accepts
+the 1 ETH activated balance. Without the overflow guard the model accepts. -/
+
+private def prorationOverflowLimits : SanityLimits :=
+  { annualBalanceIncreaseBPLimit := 100
+    simulatedShareRateDeviationBPLimit := 500
+    appearedEthAmountPerDayLimit := UINT256_MAX
+    externalPendingBalanceCapEth := 1000 }
+
+private def prorationOverflowWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 1000000000000000000
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 1000000000000000000000
+    postInternalShares := 1000000000000000000000
+    simulatedShareRate := SHARE_RATE_PRECISION_E27 }
+
+theorem correctedRejectsProrationOverflow :
+    activatedBalanceAccepts prorationOverflowLimits prorationOverflowWitness = false := by native_decide
+
+theorem noProrationOverflowCheckAcceptsWitness :
+    activatedBalanceNoProrationOverflowCheckAccepts prorationOverflowLimits prorationOverflowWitness = true := by native_decide
+
+theorem prorationOverflowCorrectionIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      activatedBalanceNoProrationOverflowCheckAccepts limits s = true ∧
+      activatedBalanceAccepts limits s = false :=
+  ⟨prorationOverflowLimits, prorationOverflowWitness,
+    noProrationOverflowCheckAcceptsWitness, correctedRejectsProrationOverflow⟩
+
+end LidoSRv3.Tests.SanityEnvelopeMutants
