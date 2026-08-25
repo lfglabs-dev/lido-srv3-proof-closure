@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: f88bd6083d33061c3fa750eabddbe334b886c0ac
+validated-tree: 79a14a8c75417bab2c16f4102b27b5909e88fdcb
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -4461,3 +4461,25 @@ Reproduction at this head (all run locally; the branch has no CI):
   (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
   This rebind is the final commit of the repair, since every other tracked file
   is inside the tree it binds.
+
+Add pre-CL balance, pending-cap, and APR safety-cap overflow guards (2026-08-25)
+---------------------------------------------------------------------------------
+
+- Three new uint256 overflow source-domain checks in the oracle sanity envelope:
+  1. `annualBalanceIncreaseAccepts` rejects when `preCLValidatorsBalance +
+     preCLPendingBalance + deposits` exceeds uint256 (L1297 checked addition).
+  2. `pendingBalanceCapAccepts` rejects when `fundedPendingBalance` or the cap
+     sum exceeds uint256 (L920, L922 checked additions).
+  3. `validatorsBalanceIncreaseAccepts` rejects when the APR safety-cap product
+     `(preCLVBal + activatedBalance) * (bpLimit * timeElapsed)` exceeds uint256
+     (L970 checked multiplication).
+- Each new guard has a parent-shaped mutant (pre-correction version without the
+  new check) and a load-bearing witness proven via `native_decide`.
+- Share-rate multiplication overflow guard (line 247, 255) verified as already
+  implemented; no changes needed.
+- `lake build LidoSRv3.Audit.Source.SanityEnvelope
+  LidoSRv3.Tests.SanityEnvelopeMutants` exit 0,
+  `Build completed successfully (17 jobs)`.
+- `validated-tree` rebound from `f88bd6083d33061c3fa750eabddbe334b886c0ac` to
+  `79a14a8c75417bab2c16f4102b27b5909e88fdcb`, the tracked tree of this commit
+  excluding this receipt per `scripts/check_validation_receipt.py`.
