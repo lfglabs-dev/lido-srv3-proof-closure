@@ -95,6 +95,8 @@ test:
 	@printf '%s\n' 'P-ORACLE-SUPPLY-1 live computed mint parent and free-argument/sum-balances/raw-fee kill-lines compiled and asserted'
 	@lake build LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence LidoSRv3.Audit.Verity.SubmitReportEntryTx LidoSRv3.Tests.PackP3SubmitReportEntryMutants
 	@printf '%s\n' 'P-ORACLE-SUPPLY-1 modeled submitReportData computed-entry parent and still-free/skip-simulate kill-lines compiled and asserted'
+	@lake build LidoSRv3.Tests.PackO2SupplyDomainMutants
+	@printf '%s\n' 'P-ORACLE-SUPPLY-1 source-domain strengthening, domain-guard load-bearing mutant, and quantization-gap witness compiled and asserted'
 	@lake build LidoSRv3.Audit.Source.SanityEnvelope LidoSRv3.Tests.SanityEnvelopeMutants
 	@printf '%s\n' 'oracle sanity-envelope source-domain and guard-drop mutants compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance

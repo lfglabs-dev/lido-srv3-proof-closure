@@ -130,6 +130,43 @@ theorem oracle_supply_submit_report_data_computed_entry
     entry_mint_le_pinned_shares d,
     minted_shares_le_cap (entryFeeWei d) (entryShareRate d) maxShareRate hCap⟩
 
+/-- Source-domain strengthened entry parent: under `EntryDomainValid` the
+existing four conjuncts hold AND, when the E27 scaling divides exactly, the
+computed-pair mint *equals* the pinned `_calculateTotalProtocolFeeShares`
+formula — upgrading the third conjunct from `≤` to `=`.  The
+`0 < feeShareRateDenominator` prerequisite of `entry_mint_eq_pinned_of_exact`
+is absorbed: domain validity gives it when the fee is positive, and when the
+fee is zero both sides are trivially zero.
+
+`EntryDomainValid` captures the Solidity checked-arithmetic non-underflow
+conditions at `af095e48`; see the source module for the pinned source-span
+mapping.  uint256 overflow on intermediate products remains unmodeled. -/
+theorem oracle_supply_entry_source_domain
+    (d : SubmitReportData) (maxShareRate : Nat) (state : ContractState)
+    (hSender : senderAllowed d = true)
+    (hHash : consensusHashMatches d = true)
+    (hCap : entryShareRate d ≤ maxShareRate)
+    (hDom : EntryDomainValid d)
+    (hExact : feeShareRateDenominator d ∣ internalSharesBeforeFees d * E27)
+    (hDiv : feeShareRateDenominator d
+      ∣ entryFeeWei d * internalSharesBeforeFees d) :
+    (submitReportDataTx d).run state =
+        (handleOracleReportComputed d.report (entryFeeWei d)
+          (entryShareRate d)).run state ∧
+      observe d.report ((submitReportDataTx d).run state) =
+        sourceView d.report
+          (mintedShares (entryFeeWei d) (entryShareRate d)) ∧
+      mintedShares (entryFeeWei d) (entryShareRate d)
+          ≤ pinnedSharesToMintAsFees d ∧
+      mintedShares (entryFeeWei d) (entryShareRate d)
+          ≤ entryFeeWei d * maxShareRate / E27 ∧
+      mintedShares (entryFeeWei d) (entryShareRate d)
+          = pinnedSharesToMintAsFees d :=
+  let base := oracle_supply_submit_report_data_computed_entry
+    d maxShareRate state hSender hHash hCap
+  ⟨base.1, base.2.1, base.2.2.1, base.2.2.2,
+    entry_mint_eq_pinned_of_domain d hDom hExact hDiv⟩
+
 /-- Citation only: P-ACCOUNT-1 remains the order-only registered parent.
 This node does not fold ACCOUNT into supply and does not widen it. -/
 theorem account_parent_cited_order_only :

@@ -210,4 +210,60 @@ theorem entry_mint_eq_pinned_of_exact (d : SubmitReportData)
   minted_shares_exact_ratio (entryFeeWei d) (internalSharesBeforeFees d)
     (feeShareRateDenominator d) hpos hExact hDiv
 
+/-- Checked-arithmetic non-underflow conditions matching the pinned Solidity
+fee pipeline at `af095e48`.  When every field holds, each Nat subtraction
+in `internalEtherBefore`, `internalSharesBeforeFees`, `postInternalEther`,
+and `feeShareRateDenominator` agrees with the Solidity checked arithmetic
+— none silently truncates to a value the source would never reach.
+
+On the profitable branch (`0 < entryFeeWei`), the fee denominator
+`postInternalEther − feeEther` is positive, so the division that produces
+`pinnedSharesToMintAsFees` and `entryShareRate` is well-defined.  On the
+non-profitable branch the fee is zero, so both the computed and pinned
+mints are trivially zero regardless of the denominator.
+
+This predicate does NOT capture uint256 overflow on intermediate products
+(`feeEther * internalSharesBeforeFees`, `internalSharesBeforeFees * E27`);
+those remain unmodeled. -/
+structure EntryDomainValid (d : SubmitReportData) : Prop where
+  internalEther : d.preExternalEther ≤ d.preTotalPooledEther
+  internalShares1 : d.preExternalShares ≤ d.preTotalShares
+  internalShares2 : d.totalSharesToBurn ≤ d.preTotalShares - d.preExternalShares
+  postEther1 : principalClBalance d ≤ internalEtherBefore d + unifiedClBalance d
+  postEther2 :
+    d.etherToFinalizeWQ ≤
+      internalEtherBefore d + unifiedClBalance d - principalClBalance d
+        + d.elRewardsVaultTransfer
+  feeDenom : 0 < entryFeeWei d → 0 < feeShareRateDenominator d
+
+/-- Under domain validity and a positive fee, the fee denominator is
+positive — the division that computes `pinnedSharesToMintAsFees` and
+`entryShareRate` is well-defined (not degenerate Nat-division-by-zero). -/
+theorem domain_valid_denominator_pos (d : SubmitReportData)
+    (hDom : EntryDomainValid d) (hFee : 0 < entryFeeWei d) :
+    0 < feeShareRateDenominator d :=
+  hDom.feeDenom hFee
+
+/-- Strengthened exactness: under domain validity and divisibility, the
+E27-quantized mint *equals* the pinned `_calculateTotalProtocolFeeShares`
+formula.  Unlike `entry_mint_eq_pinned_of_exact`, the explicit
+`0 < feeShareRateDenominator` premise is absorbed: domain validity gives
+it when the fee is positive, and when the fee is zero both sides are
+trivially zero.
+
+This resolves the `hpos` prerequisite gap: auditors no longer need a
+separate denominator-positivity argument to close the exactness claim on
+domain-valid inputs. -/
+theorem entry_mint_eq_pinned_of_domain (d : SubmitReportData)
+    (hDom : EntryDomainValid d)
+    (hExact : feeShareRateDenominator d ∣ internalSharesBeforeFees d * E27)
+    (hDiv : feeShareRateDenominator d
+      ∣ entryFeeWei d * internalSharesBeforeFees d) :
+    mintedShares (entryFeeWei d) (entryShareRate d)
+      = pinnedSharesToMintAsFees d := by
+  by_cases hFee : 0 < entryFeeWei d
+  · exact entry_mint_eq_pinned_of_exact d (hDom.feeDenom hFee) hExact hDiv
+  · have hFee0 : feeEther d = 0 := show entryFeeWei d = 0 by omega
+    simp [mintedShares, pinnedSharesToMintAsFees, entryFeeWei, hFee0]
+
 end LidoSRv3.Audit.SolidityAccounting.SubmitReportEntry
