@@ -28,6 +28,19 @@ Executable predicates for the commit-path sanity checks in
   decrease check. Depends on `reportData[]` storage array, `_calcWindowDiff`,
   and `_findWindowBaselineIndex` loop. Stateful; needs storage model.
 
+* **`_getCLWithdrawals`** (L1165–1169): derives CL withdrawals from the
+  current withdrawal-vault balance and `lastVaultBalanceAfterTransfer`, and
+  reverts when that stateful baseline is larger. The model's `clWithdrawals`
+  input does not read or maintain this state.
+
+* **`_checkWithdrawalsVaultTransfer`** (L1172–1182): rejects a withdrawal-vault
+  transfer larger than the reported vault balance. This commit-path input
+  relation is not modeled.
+
+* **`_finalizePostReportState`** (L1192–1198): commits the post-transfer vault
+  balance and flips the post-migration first-report flag. These persistent
+  updates are not modeled.
+
 * **`_askSecondOpinion`** (L1251–1289): second-opinion oracle external call.
   Opaque cross-contract call to `ISecondOpinionOracle.getReport`.
 
@@ -204,11 +217,30 @@ def validatorsBalanceIncreaseAccepts (limits : SanityLimits) (s : SanityCheckInp
 /-! ### Guard 5: Simulated share rate deviation
 
 Pinned at `_checkSimulatedShareRate` (OracleReportSanityChecker.sol L1331–1374).
-`simulatedShareDeviation ≤ simulatedShareRateDeviationBPLimit` -/
+`simulatedShareDeviation ≤ simulatedShareRateDeviationBPLimit`.
+
+The source first `assert`s `_noWithdrawalsPostInternalEther != 0`
+(L1337), then Solidity's checked division rejects zero
+`_noWithdrawalsPostInternalShares` at L1338–1340. Lean `Nat` division instead
+returns zero on a zero denominator, so this model makes that source domain
+explicit and rejects both invalid inputs before any division. -/
 
 def absDiff (a b : Nat) : Nat := if a ≥ b then a - b else b - a
 
+def simulatedShareRateSourceDomain (s : SanityCheckInput) : Bool :=
+  s.postInternalEther != 0 && s.postInternalShares != 0
+
 def simulatedShareRateAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  if !simulatedShareRateSourceDomain s then false
+  else
+    let actualShareRate := s.postInternalEther * SHARE_RATE_PRECISION_E27 / s.postInternalShares
+    let diff := absDiff actualShareRate s.simulatedShareRate
+    let deviation := MAX_BASIS_POINTS * diff / actualShareRate
+    deviation ≤ limits.simulatedShareRateDeviationBPLimit
+
+/-- Deliberately unsound mutant: the pre-division Solidity revert domain is
+dropped, exposing Lean `Nat` division's zero-denominator behavior. -/
+def simulatedShareRateNoSourceDomainAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
   let actualShareRate := s.postInternalEther * SHARE_RATE_PRECISION_E27 / s.postInternalShares
   let diff := absDiff actualShareRate s.simulatedShareRate
   let deviation := MAX_BASIS_POINTS * diff / actualShareRate
@@ -302,6 +334,8 @@ Residual blockers before P-ORACLE-SANITY-1 registration:
 - per-module validators balance increase check (external state)
 - second opinion oracle cross-contract call
 - consensus hash / keccak opaqueness declaration
+- `_getCLWithdrawals`, `_checkWithdrawalsVaultTransfer`, and
+  `_finalizePostReportState` withdrawal-vault accounting/commit path
 -/
 
 end LidoSRv3.Audit.SolidityAccounting.SanityEnvelope

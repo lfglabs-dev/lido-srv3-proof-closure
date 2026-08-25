@@ -113,6 +113,7 @@ import LidoSRv3.Tests.PackP6OfficialSuccessMutants
 import LidoSRv3.Tests.AllocationTxMutants
 import LidoSRv3.Tests.AddressSourceMutants
 import LidoSRv3.Audit.Verity.Tests.SszTxSimulation
+import LidoSRv3.Audit.Source.SanityEnvelope
 
 /-!
 Machine-readable-in-build trust report for the first audit slice.
@@ -142,6 +143,7 @@ assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
+#print axioms LidoSRv3.Audit.SolidityAccounting.SanityEnvelope.checker_implies_simulated
 #print axioms LidoSRv3.Audit.Quantity.saturatingSub_zero_of_le
 #print axioms LidoSRv3.Audit.revert_restores_state_value_and_logs
 #print axioms LidoSRv3.Audit.revert_may_retain_attempts

@@ -96,4 +96,35 @@ theorem annualNotRedundant :
   have := h testLimits annualWitness otherGuardsAcceptWitness
   simp [annualGuardRejectsWitness] at this
 
+/-- This is outside the pinned Solidity execution domain: L1337 asserts a
+nonzero ether numerator and L1338–1340 rejects a zero shares denominator.
+The source-faithful predicate must reject it before Lean `Nat` division can
+silently return zero. -/
+private def zeroShareDomainWitness : SanityCheckInput :=
+  { timeElapsed := 86400
+    preCLValidatorsBalance := 1000000000000000000000
+    preCLPendingBalance := 0
+    postCLValidatorsBalance := 1000000000000000000000
+    postCLPendingBalance := 0
+    deposits := 0
+    clWithdrawals := 0
+    postInternalEther := 0
+    postInternalShares := 0
+    simulatedShareRate := 0 }
+
+theorem sourceDomainRejectsZeroEtherAndShares :
+    simulatedShareRateAccepts testLimits zeroShareDomainWitness = false := by native_decide
+
+/-- Dropping the source-domain guard admits the zero/zero input because Lean
+`Nat` division returns zero. This makes the correction load-bearing. -/
+theorem zeroDomainMutantAcceptsWitness :
+    simulatedShareRateNoSourceDomainAccepts testLimits zeroShareDomainWitness = true := by native_decide
+
+theorem zeroDomainGuardIsLoadBearing :
+    ∃ (limits : SanityLimits) (s : SanityCheckInput),
+      simulatedShareRateNoSourceDomainAccepts limits s = true ∧
+      simulatedShareRateAccepts limits s = false :=
+  ⟨testLimits, zeroShareDomainWitness,
+    zeroDomainMutantAcceptsWitness, sourceDomainRejectsZeroEtherAndShares⟩
+
 end LidoSRv3.Tests.SanityEnvelopeMutants
