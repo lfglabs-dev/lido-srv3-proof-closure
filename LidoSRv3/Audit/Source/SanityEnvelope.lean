@@ -78,7 +78,8 @@ Executable predicates for the commit-path sanity checks in
 ## Design notes
 
 Each guard is a named `Bool` predicate (executable decision procedure).
-`checkerAccepts` is the conjunction of all modeled guards.
+`checkerAccepts` requires the report's `timeElapsed` input to fit its pinned
+Solidity `uint256` type, then conjoins all modeled guards.
 
 `commitImpliesEnvelope` is the theorem form: if the sanity checker accepts,
 then each individual guard holds. This is *not* the same as
@@ -423,7 +424,22 @@ def activatedBalanceNoProrationOverflowCheckAccepts (limits : SanityLimits) (s :
 
 /-! ### Checker conjunction -/
 
+/-- Source entry-point domain for the report interval. Although Lean models the
+value as `Nat`, Solidity receives it as `uint256`. -/
+def timeElapsedFitsUint256 (s : SanityCheckInput) : Bool :=
+  s.timeElapsed ≤ UINT256_MAX
+
 def checkerAccepts (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  timeElapsedFitsUint256 s &&
+  annualBalanceIncreaseAccepts limits s &&
+  pendingBalanceCapAccepts limits s &&
+  activatedBalanceAccepts limits s &&
+  validatorsBalanceIncreaseAccepts limits s &&
+  simulatedShareRateAccepts limits s
+
+/-- Parent-shaped mutant: the checker conjunction without the source
+`uint256` bound on `timeElapsed` (pre-correction behavior). -/
+def checkerNoTimeElapsedBound (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
   annualBalanceIncreaseAccepts limits s &&
   pendingBalanceCapAccepts limits s &&
   activatedBalanceAccepts limits s &&
@@ -450,36 +466,44 @@ def ValidatorsBalanceIncreaseHolds (limits : SanityLimits) (s : SanityCheckInput
 def SimulatedShareRateHolds (limits : SanityLimits) (s : SanityCheckInput) : Prop :=
   simulatedShareRateAccepts limits s = true
 
-private theorem and5 {a b c d e : Bool}
-    (h : (a && b && c && d && e) = true) :
-    a = true ∧ b = true ∧ c = true ∧ d = true ∧ e = true := by
+def TimeElapsedFitsUint256 (s : SanityCheckInput) : Prop :=
+  timeElapsedFitsUint256 s = true
+
+private theorem and6 {a b c d e f : Bool}
+    (h : (a && b && c && d && e && f) = true) :
+    a = true ∧ b = true ∧ c = true ∧ d = true ∧ e = true ∧ f = true := by
   simp [Bool.and_eq_true] at h
-  exact ⟨h.1.1.1.1, h.1.1.1.2, h.1.1.2, h.1.2, h.2⟩
+  exact ⟨h.1.1.1.1.1, h.1.1.1.1.2, h.1.1.1.2, h.1.1.2, h.1.2, h.2⟩
+
+theorem checker_implies_time_elapsed_bound (limits : SanityLimits) (s : SanityCheckInput)
+    (h : checkerAccepts limits s = true) :
+    TimeElapsedFitsUint256 s :=
+  (and6 h).1
 
 theorem checker_implies_annual (limits : SanityLimits) (s : SanityCheckInput)
     (h : checkerAccepts limits s = true) :
     AnnualBalanceIncreaseHolds limits s :=
-  (and5 h).1
+  (and6 h).2.1
 
 theorem checker_implies_pending (limits : SanityLimits) (s : SanityCheckInput)
     (h : checkerAccepts limits s = true) :
     PendingBalanceCapHolds limits s :=
-  (and5 h).2.1
+  (and6 h).2.2.1
 
 theorem checker_implies_activated (limits : SanityLimits) (s : SanityCheckInput)
     (h : checkerAccepts limits s = true) :
     ActivatedBalanceHolds limits s :=
-  (and5 h).2.2.1
+  (and6 h).2.2.2.1
 
 theorem checker_implies_validators (limits : SanityLimits) (s : SanityCheckInput)
     (h : checkerAccepts limits s = true) :
     ValidatorsBalanceIncreaseHolds limits s :=
-  (and5 h).2.2.2.1
+  (and6 h).2.2.2.2.1
 
 theorem checker_implies_simulated (limits : SanityLimits) (s : SanityCheckInput)
     (h : checkerAccepts limits s = true) :
     SimulatedShareRateHolds limits s :=
-  (and5 h).2.2.2.2
+  (and6 h).2.2.2.2.2
 
 /-! ### Guard-drop mutant: annual balance increase
 
@@ -488,6 +512,7 @@ load-bearing, there exists an input that the mutant accepts but the real
 checker rejects. -/
 
 def checkerNoAnnual (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  timeElapsedFitsUint256 s &&
   pendingBalanceCapAccepts limits s &&
   activatedBalanceAccepts limits s &&
   validatorsBalanceIncreaseAccepts limits s &&
@@ -495,12 +520,15 @@ def checkerNoAnnual (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
 
 /-! ### Candidate theorem list for completeness review
 
-1. `checker_implies_annual`: checkerAccepts → annualBalanceIncreaseAccepts
-2. `checker_implies_pending`: checkerAccepts → pendingBalanceCapAccepts
-3. `checker_implies_activated`: checkerAccepts → activatedBalanceAccepts
-4. `checker_implies_validators`: checkerAccepts → validatorsBalanceIncreaseAccepts
-5. `checker_implies_simulated`: checkerAccepts → simulatedShareRateAccepts
-6. `annualGuardIsLoadBearing` (Tests): ∃ input, mutant accepts ∧ checker rejects
+1. `checker_implies_time_elapsed_bound`: checkerAccepts → timeElapsed ≤ UINT256_MAX
+2. `checker_implies_annual`: checkerAccepts → annualBalanceIncreaseAccepts
+3. `checker_implies_pending`: checkerAccepts → pendingBalanceCapAccepts
+4. `checker_implies_activated`: checkerAccepts → activatedBalanceAccepts
+5. `checker_implies_validators`: checkerAccepts → validatorsBalanceIncreaseAccepts
+6. `checker_implies_simulated`: checkerAccepts → simulatedShareRateAccepts
+7. `timeElapsedBoundIsLoadBearing` (Tests): ∃ input, parent-shaped mutant
+   accepts ∧ checker rejects
+8. `annualGuardIsLoadBearing` (Tests): ∃ input, mutant accepts ∧ checker rejects
 
 Residual blockers before P-ORACLE-SANITY-1 registration:
 - smoothenTokenRebase limiter model
