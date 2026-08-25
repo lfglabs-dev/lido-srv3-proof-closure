@@ -21,10 +21,12 @@ not widen any existing parent theorem.
 |  4 | topupBeaconDeposit      | BeaconChainDepositor.makeBeaconChainTopUp (L66–108)          |
 |  5 | consolidationFee        | ConsolidationGateway.addConsolidationRequests (L185–223)     |
 |  6 | consolidationRefund     | ConsolidationGateway._refundFee (L295–307)                   |
-|  7 | vaultConsolidationCall  | WithdrawalVaultEIP7685._callAddConsolidationRequest (L113–121)|
-|  8 | vaultWithdrawalCall     | WithdrawalVaultEIP7685._callAddWithdrawalRequest (L103–111)  |
-|  9 | vaultToLido             | StakingVault → Lido via receiveWithdrawals                   |
-| 10 | vaultToWithdrawalQueue  | StakingVault → WithdrawalQueue                               |
+|  7 | busToGateway            | ConsolidationBus.executeConsolidation (L383–406)             |
+|  8 | gatewayToVault          | ConsolidationGateway → WithdrawalVault (totalFee forward)    |
+|  9 | vaultConsolidationCall  | WithdrawalVaultEIP7685._callAddConsolidationRequest (L113–121)|
+| 10 | vaultWithdrawalCall     | WithdrawalVaultEIP7685._callAddWithdrawalRequest (L103–111)  |
+| 11 | vaultToLido             | StakingVault → Lido via receiveWithdrawals                   |
+| 12 | vaultToWithdrawalQueue  | StakingVault → WithdrawalQueue                               |
 
 ## Covering parents
 
@@ -36,8 +38,10 @@ not widen any existing parent theorem.
 | topupBeaconDeposit      | P-TOPUP-1                | P-ETH-JOURNAL-1     |
 | consolidationFee        | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
 | consolidationRefund     | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
+| busToGateway            | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
+| gatewayToVault          | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
 | vaultConsolidationCall  | P-CONSOLIDATION-VALUE-1  | P-CONSOLIDATION-1   |
-| vaultWithdrawalCall     | P-CONSOLIDATION-ETH-1    | —                   |
+| vaultWithdrawalCall     | —                        | —                   |
 | vaultToLido             | P-VAULT-ETH-1            | —                   |
 | vaultToWithdrawalQueue  | P-VAULT-ETH-1            | —                   |
 
@@ -49,12 +53,11 @@ and receive()/fallback() ETH are explicitly excluded.
 
 ## Spec boundary
 
-Six of seven destinations map onto `Spec.ApprovedDestination`.  The
-withdrawal-request predeploy (EIP-7002) is approved by the
-P-CONSOLIDATION-ETH-1 abstract `parentApproved` predicate but has no
-constructor in `Spec.ApprovedDestination`.  This is a documented scope
-boundary, not a gap: it is covered by P-CONSOLIDATION-ETH-1's source map
-at `_callAddWithdrawalRequest` (WithdrawalVaultEIP7685.sol L103–111).
+Six of nine destinations map onto `Spec.ApprovedDestination`.  Three do
+not: the withdrawal-request predeploy (EIP-7002, not covered by any
+registered parent), the ConsolidationGateway (intermediate Bus→Gateway
+hop), and the WithdrawalVault (intermediate Gateway→Vault hop).  These
+three are documented scope boundaries, not gaps.
 -/
 
 namespace LidoSRv3.Audit.Model.EthWorld
@@ -73,6 +76,8 @@ inductive ValueRoute where
   | topupBeaconDeposit
   | consolidationFee
   | consolidationRefund
+  | busToGateway
+  | gatewayToVault
   | vaultConsolidationCall
   | vaultWithdrawalCall
   | vaultToLido
@@ -81,14 +86,17 @@ inductive ValueRoute where
 
 /-! ## Destination classification -/
 
-/-- Unified destination for all modeled ETH-bearing call sites.  Seven
-constructors cover every target contract or predeploy in the inventory. -/
+/-- Unified destination for all modeled ETH-bearing call sites.  Nine
+constructors cover every target contract, predeploy, or intermediate
+protocol hop in the inventory. -/
 inductive Destination where
   | lidoPull
   | beaconDeposit
   | consolidationPredeploy
   | withdrawalPredeploy
   | refundRecipient
+  | consolidationGateway
+  | withdrawalVault
   | vaultToLido
   | vaultToWithdrawalQueue
   deriving DecidableEq, Repr
@@ -101,21 +109,26 @@ def ValueRoute.destination : ValueRoute → Destination
   | .topupBeaconDeposit     => .beaconDeposit
   | .consolidationFee       => .consolidationPredeploy
   | .consolidationRefund    => .refundRecipient
+  | .busToGateway           => .consolidationGateway
+  | .gatewayToVault         => .withdrawalVault
   | .vaultConsolidationCall => .consolidationPredeploy
   | .vaultWithdrawalCall    => .withdrawalPredeploy
   | .vaultToLido            => .vaultToLido
   | .vaultToWithdrawalQueue => .vaultToWithdrawalQueue
 
 /-- Project a destination to `Spec.ApprovedDestination` where one exists.
-The withdrawal-request predeploy (EIP-7002) maps to `none`: it is approved
-by P-CONSOLIDATION-ETH-1's abstract `parentApproved` predicate but does not
-have its own `Spec.ApprovedDestination` constructor. -/
+The withdrawal-request predeploy (EIP-7002), ConsolidationGateway
+(intermediate Bus→Gateway hop), and WithdrawalVault (intermediate
+Gateway→Vault hop) map to `none`: they have no constructor in
+`Spec.ApprovedDestination`. -/
 def Destination.toSpec : Destination → Option ApprovedDestination
   | .lidoPull               => some .lidoPull
   | .beaconDeposit          => some .beaconDeposit
   | .consolidationPredeploy => some .consolidationRequest
   | .withdrawalPredeploy    => none
   | .refundRecipient        => some .refundRecipient
+  | .consolidationGateway   => none
+  | .withdrawalVault        => none
   | .vaultToLido            => some .vaultToLido
   | .vaultToWithdrawalQueue => some .vaultToWithdrawalQueue
 
@@ -174,20 +187,22 @@ def CoveringParent.id : CoveringParent → String
   | .pVaultEthOne          => "P-VAULT-ETH-1"
   | .pEthJournalOne        => "P-ETH-JOURNAL-1"
 
-/-- Primary covering parent for each route.  Routes may be covered by
-additional parents (listed in the module-level table); this records the
-tightest binding. -/
-def ValueRoute.primaryParent : ValueRoute → CoveringParent
-  | .depositLidoPull        => .pDepositOne
-  | .depositBeaconDeposit   => .pDepositOne
-  | .topupLidoPull          => .pTopupOne
-  | .topupBeaconDeposit     => .pTopupOne
-  | .consolidationFee       => .pConsolidationEthOne
-  | .consolidationRefund    => .pConsolidationEthOne
-  | .vaultConsolidationCall => .pConsolidationValueOne
-  | .vaultWithdrawalCall    => .pConsolidationEthOne
-  | .vaultToLido            => .pVaultEthOne
-  | .vaultToWithdrawalQueue => .pVaultEthOne
+/-- Primary covering parent for each route.  The withdrawal-request
+predeploy (EIP-7002) is not covered by any registered parent and returns
+`none`. -/
+def ValueRoute.primaryParent : ValueRoute → Option CoveringParent
+  | .depositLidoPull        => some .pDepositOne
+  | .depositBeaconDeposit   => some .pDepositOne
+  | .topupLidoPull          => some .pTopupOne
+  | .topupBeaconDeposit     => some .pTopupOne
+  | .consolidationFee       => some .pConsolidationEthOne
+  | .consolidationRefund    => some .pConsolidationEthOne
+  | .busToGateway           => some .pConsolidationEthOne
+  | .gatewayToVault         => some .pConsolidationEthOne
+  | .vaultConsolidationCall => some .pConsolidationValueOne
+  | .vaultWithdrawalCall    => none
+  | .vaultToLido            => some .pVaultEthOne
+  | .vaultToWithdrawalQueue => some .pVaultEthOne
 
 /-! ## Spec-layer coverage -/
 
@@ -209,9 +224,17 @@ EIP-7002 withdrawal-request predeploy. -/
 theorem withdrawal_predeploy_outside_spec :
     Destination.toSpec .withdrawalPredeploy = none := rfl
 
-/-- All other destinations project into the Spec layer. -/
-theorem non_withdrawal_destinations_in_spec (d : Destination)
-    (h : d ≠ .withdrawalPredeploy) :
+/-- Intermediate protocol hops also have no Spec projection. -/
+theorem intermediate_hops_outside_spec :
+    Destination.toSpec .consolidationGateway = none ∧
+    Destination.toSpec .withdrawalVault = none := ⟨rfl, rfl⟩
+
+/-- All destinations except the three without Spec constructors project
+into the Spec layer. -/
+theorem terminal_destinations_in_spec (d : Destination)
+    (h1 : d ≠ .withdrawalPredeploy)
+    (h2 : d ≠ .consolidationGateway)
+    (h3 : d ≠ .withdrawalVault) :
     (Destination.toSpec d).isSome = true := by
   cases d <;> simp_all [Destination.toSpec]
 
@@ -221,6 +244,7 @@ def allRoutes : List ValueRoute :=
   [ .depositLidoPull, .depositBeaconDeposit
   , .topupLidoPull, .topupBeaconDeposit
   , .consolidationFee, .consolidationRefund
+  , .busToGateway, .gatewayToVault
   , .vaultConsolidationCall, .vaultWithdrawalCall
   , .vaultToLido, .vaultToWithdrawalQueue ]
 
@@ -228,7 +252,7 @@ def allUnsupportedRoutes : List UnsupportedRoute :=
   [ .ownerWithdrawal, .stVaultInternal, .valueBoundedExit
   , .governanceLifecycle, .fallbackReceive, .treasuryMint ]
 
-theorem inventory_count : allRoutes.length = 10 := rfl
+theorem inventory_count : allRoutes.length = 12 := rfl
 
 theorem unsupported_count : allUnsupportedRoutes.length = 6 := rfl
 
@@ -247,16 +271,14 @@ inductive GeneralFlow where
   deriving DecidableEq, Repr
 
 /-- Zero all non-modeled values.  Authorized frames pass through unchanged;
-owner, treasury, and ops values are set to zero.  This demonstrates that
-the unmodeled paths carry no load-bearing value for the inventory. -/
+owner, treasury, and ops values are set to zero. -/
 def zeroUnmodeled : GeneralFlow → GeneralFlow
   | .authorized f         => .authorized f
   | .ownerWithdrawal r _  => .ownerWithdrawal r 0
   | .treasuryMint _       => .treasuryMint 0
   | .opsTransfer _        => .opsTransfer 0
 
-/-- Extract authorized frames from a mixed flow list.  Unmodeled flows
-contribute nothing to the inventory. -/
+/-- Extract authorized frames from a mixed flow list. -/
 def authorizedFrames : List GeneralFlow → List AuthorizedValueFrame
   | []                          => []
   | .authorized f :: rest       => f :: authorizedFrames rest
@@ -264,32 +286,43 @@ def authorizedFrames : List GeneralFlow → List AuthorizedValueFrame
   | .treasuryMint _ :: rest     => authorizedFrames rest
   | .opsTransfer _ :: rest      => authorizedFrames rest
 
-/-- **Owner/treasury/ops mutant preservation.**  Zeroing all non-modeled
-values does not affect the authorized frame list.  This proves that owner
-withdrawals, treasury mints, and ops transfers are non-load-bearing for
-the ETH-world inventory. -/
-theorem zeroUnmodeled_preserves_inventory : ∀ (flows : List GeneralFlow),
+private theorem zeroUnmodeled_preserves_frames : ∀ (flows : List GeneralFlow),
     authorizedFrames (flows.map zeroUnmodeled) = authorizedFrames flows
   | [] => rfl
   | .authorized f :: rest => by
       show f :: authorizedFrames (rest.map zeroUnmodeled) =
            f :: authorizedFrames rest
-      rw [zeroUnmodeled_preserves_inventory rest]
+      rw [zeroUnmodeled_preserves_frames rest]
   | .ownerWithdrawal _ _ :: rest =>
-      zeroUnmodeled_preserves_inventory rest
+      zeroUnmodeled_preserves_frames rest
   | .treasuryMint _ :: rest =>
-      zeroUnmodeled_preserves_inventory rest
+      zeroUnmodeled_preserves_frames rest
   | .opsTransfer _ :: rest =>
-      zeroUnmodeled_preserves_inventory rest
+      zeroUnmodeled_preserves_frames rest
 
 /-- Total value of authorized frames. -/
 def inventoryValue (flows : List GeneralFlow) : Nat :=
   (authorizedFrames flows).foldl (fun acc f => acc + f.value) 0
 
-/-- The mutant also preserves total inventory value. -/
+/-- Zeroing non-modeled values preserves total inventory value.  Combined
+with a concrete witness that the zeroed list differs from the original,
+this proves owner/treasury/ops flows are non-load-bearing. -/
 theorem zeroUnmodeled_preserves_value (flows : List GeneralFlow) :
     inventoryValue (flows.map zeroUnmodeled) = inventoryValue flows := by
   unfold inventoryValue
-  rw [zeroUnmodeled_preserves_inventory]
+  rw [zeroUnmodeled_preserves_frames]
+
+/-! ## Parent-shaped mutant -/
+
+/-- Zero the value of every authorized frame whose route has a given
+primary parent.  Used by parent-shaped mutants to show each covering
+parent is load-bearing. -/
+def zeroParentRoutes (p : CoveringParent) : GeneralFlow → GeneralFlow
+  | .authorized f          =>
+    if f.route.primaryParent = some p then .authorized ⟨f.route, 0⟩
+    else .authorized f
+  | .ownerWithdrawal r v   => .ownerWithdrawal r v
+  | .treasuryMint v        => .treasuryMint v
+  | .opsTransfer v         => .opsTransfer v
 
 end LidoSRv3.Audit.Model.EthWorld
