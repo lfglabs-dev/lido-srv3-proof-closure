@@ -111,6 +111,8 @@ test:
 	@printf '%s\n' 'P-SSZ-LIVE-1 constructor-pin GI parent, skip-lookup kill-line, and wrong-packed-word kill-line compiled and asserted'
 	@lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants LidoSRv3.Tests.PackP6OfficialSuccessMutants
 	@printf '%s\n' 'P-CONSOLIDATION-VALUE-1 official-success and justified-forwards parent and kill-lines compiled and asserted'
+	@lake build LidoSRv3.Tests.WithdrawalQueueRequestAmountMutants
+	@printf '%s\n' 'WithdrawalQueue single-request amount-bound mutant compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts
