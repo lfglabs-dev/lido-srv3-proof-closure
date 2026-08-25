@@ -9,7 +9,7 @@ Concrete witnesses demonstrating:
 2. Primary-parent mutants: zeroing routes of each primary covering parent
    reduces inventory value, proving every primary parent is load-bearing.
 3. Composition-parent mutants: zeroing routes of each composition parent
-   reduces inventory value, proving every composition parent is load-bearing.
+   reduces inventory value, including the terminal consolidation-fee leg.
 4. Every route is inhabited by a positive-value frame witness.
 -/
 
@@ -98,6 +98,19 @@ theorem composition_consolidation_load_bearing :
     inventoryValue (witnessFlows.map (zeroCompositionParentRoutes .pConsolidationOne)) <
     inventoryValue witnessFlows := by native_decide
 
+/-- The terminal fee route has both advertised composition parents. -/
+theorem vault_consolidation_composition_parents :
+    ValueRoute.vaultConsolidationCall.compositionParents =
+      [.pEthJournalOne, .pConsolidationOne] := rfl
+
+/-- A fee-only witness ensures the ETH-journal composition mutant exercises
+the terminal consolidation fee, not only its refund leg. -/
+theorem composition_eth_journal_fee_leg_load_bearing :
+    inventoryValue
+      ([.authorized ⟨.vaultConsolidationCall, 5⟩].map
+        (zeroCompositionParentRoutes .pEthJournalOne)) <
+    inventoryValue [.authorized ⟨.vaultConsolidationCall, 5⟩] := by native_decide
+
 /-! ## Uncovered routes -/
 
 theorem vaultWithdrawalCall_uncovered :
@@ -108,6 +121,16 @@ theorem busToGateway_uncovered :
 
 theorem gatewayToVault_uncovered :
     ValueRoute.gatewayToVault.primaryParent = none := rfl
+
+/-! ## Provenance and unsupported-route inventory -/
+
+theorem vault_routes_are_source_shaped_runtime :
+    ValueRoute.vaultToLido.provenance = .sourceShapedRuntime ∧
+    ValueRoute.vaultToWithdrawalQueue.provenance = .sourceShapedRuntime := by
+  exact ⟨rfl, rfl⟩
+
+theorem ops_transfer_is_explicitly_unsupported :
+    allUnsupportedRoutes.contains .opsTransfer = true := by native_decide
 
 theorem covered_routes_have_primary_parent :
     ∀ r : ValueRoute,

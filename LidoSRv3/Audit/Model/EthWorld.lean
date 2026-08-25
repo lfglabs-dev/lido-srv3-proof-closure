@@ -3,7 +3,7 @@ import LidoSRv3.Audit.Spec
 /-!
 # E1 ETH-world inventory model
 
-Complete inventory of every pinned in-scope positive-value Solidity route
+Complete inventory of every modeled in-scope positive-value route
 in the Lido SRv3 audit scope at `lidofinance/core@af095e48`.
 
 This model classifies all value-bearing external calls into modeled routes
@@ -13,7 +13,7 @@ not widen any existing parent theorem.
 
 ## Pinned source routes
 
-| #  | ValueRoute              | Solidity call site                                           |
+| #  | ValueRoute              | Evidence                                                     |
 |----|-------------------------|--------------------------------------------------------------|
 |  1 | depositLidoPull         | Lido.withdrawDepositableEther (L869–886)                     |
 |  2 | depositBeaconDeposit    | BeaconChainDepositor.makeBeaconChainDeposits32ETH (L36–64)   |
@@ -24,8 +24,8 @@ not widen any existing parent theorem.
 |  7 | gatewayToVault          | ConsolidationGateway → WithdrawalVault (totalFee forward)    |
 |  8 | vaultConsolidationCall  | WithdrawalVaultEIP7685._callAddConsolidationRequest (L113–121)|
 |  9 | vaultWithdrawalCall     | WithdrawalVaultEIP7685._callAddWithdrawalRequest (L103–111)  |
-| 10 | vaultToLido             | StakingVault → Lido via receiveWithdrawals                   |
-| 11 | vaultToWithdrawalQueue  | StakingVault → WithdrawalQueue                               |
+| 10 | vaultToLido             | WithdrawalVault → Lido.receiveWithdrawals (source-shaped; runtime endpoint) |
+| 11 | vaultToWithdrawalQueue  | Vault → WithdrawalQueue (source-shaped; runtime endpoint)   |
 
 ## Covering parents
 
@@ -38,7 +38,7 @@ not widen any existing parent theorem.
 | consolidationRefund     | P-CONSOLIDATION-ETH-1    | P-ETH-JOURNAL-1     |
 | busToGateway            | —                        | —                   |
 | gatewayToVault          | —                        | —                   |
-| vaultConsolidationCall  | P-CONSOLIDATION-VALUE-1  | P-CONSOLIDATION-1   |
+| vaultConsolidationCall  | P-CONSOLIDATION-VALUE-1  | P-ETH-JOURNAL-1; P-CONSOLIDATION-1 |
 | vaultWithdrawalCall     | —                        | —                   |
 | vaultToLido             | P-VAULT-ETH-1            | —                   |
 | vaultToWithdrawalQueue  | P-VAULT-ETH-1            | —                   |
@@ -47,7 +47,8 @@ not widen any existing parent theorem.
 
 Owner-controlled withdrawals (VaultHub.withdraw / StakingVault.withdraw),
 stVault internal accounting, value-based exit bounds, governance lifecycle,
-and receive()/fallback() ETH are explicitly excluded.
+receive()/fallback() ETH, treasury minting, and operations transfers are
+explicitly excluded.
 
 ## Spec boundary
 
@@ -64,9 +65,9 @@ open LidoSRv3.Audit.Spec
 
 /-! ## Value route inventory -/
 
-/-- Every pinned in-scope positive-value Solidity route.  Each constructor
-corresponds to a distinct value-bearing external call site in the pinned
-source `lidofinance/core@af095e48`. -/
+/-- Every modeled in-scope positive-value route.  The route provenance
+explicitly distinguishes pinned Solidity call sites from source-shaped routes
+whose endpoints are runtime inputs. -/
 inductive ValueRoute where
   | depositLidoPull
   | depositBeaconDeposit
@@ -80,6 +81,20 @@ inductive ValueRoute where
   | vaultToLido
   | vaultToWithdrawalQueue
   deriving DecidableEq, Repr, Inhabited
+
+/-- Provenance available for a modeled value route.  `sourceShapedRuntime`
+does not claim an extracted implementation call site or endpoint identity. -/
+inductive RouteProvenance where
+  | pinnedSolidityCall
+  | sourceShapedRuntime
+  deriving DecidableEq, Repr
+
+/-- The two P-VAULT-ETH-1 routes are source-shaped schedules with runtime
+endpoints; all other inventory routes denote pinned Solidity call sites. -/
+def ValueRoute.provenance : ValueRoute → RouteProvenance
+  | .vaultToLido            => .sourceShapedRuntime
+  | .vaultToWithdrawalQueue => .sourceShapedRuntime
+  | _                       => .pinnedSolidityCall
 
 /-! ## Destination classification -/
 
@@ -140,6 +155,7 @@ inductive UnsupportedRoute where
   | governanceLifecycle
   | fallbackReceive
   | treasuryMint
+  | opsTransfer
   deriving DecidableEq, Repr
 
 /-! ## Authorized value frame -/
@@ -199,22 +215,21 @@ def ValueRoute.primaryParent : ValueRoute → Option CoveringParent
   | .vaultToLido            => some .pVaultEthOne
   | .vaultToWithdrawalQueue => some .pVaultEthOne
 
-/-- Composition parent for routes covered by a broader parent theorem
-that composes the primary parent's result.  Deposit, topup, and
-consolidation-refund routes compose through P-ETH-JOURNAL-1;
-vaultConsolidationCall composes through P-CONSOLIDATION-1. -/
-def ValueRoute.compositionParent : ValueRoute → Option CoveringParent
-  | .depositLidoPull        => some .pEthJournalOne
-  | .depositBeaconDeposit   => some .pEthJournalOne
-  | .topupLidoPull          => some .pEthJournalOne
-  | .topupBeaconDeposit     => some .pEthJournalOne
-  | .consolidationRefund    => some .pEthJournalOne
-  | .busToGateway           => none
-  | .gatewayToVault         => none
-  | .vaultConsolidationCall => some .pConsolidationOne
-  | .vaultWithdrawalCall    => none
-  | .vaultToLido            => none
-  | .vaultToWithdrawalQueue => none
+/-- All composition parents for routes covered by broader parent theorems
+that compose the primary parent's result.  The terminal consolidation fee is
+jointly represented by P-ETH-JOURNAL-1 and P-CONSOLIDATION-1. -/
+def ValueRoute.compositionParents : ValueRoute → List CoveringParent
+  | .depositLidoPull        => [.pEthJournalOne]
+  | .depositBeaconDeposit   => [.pEthJournalOne]
+  | .topupLidoPull          => [.pEthJournalOne]
+  | .topupBeaconDeposit     => [.pEthJournalOne]
+  | .consolidationRefund    => [.pEthJournalOne]
+  | .busToGateway           => []
+  | .gatewayToVault         => []
+  | .vaultConsolidationCall => [.pEthJournalOne, .pConsolidationOne]
+  | .vaultWithdrawalCall    => []
+  | .vaultToLido            => []
+  | .vaultToWithdrawalQueue => []
 
 /-! ## Spec-layer coverage -/
 
@@ -262,11 +277,11 @@ def allRoutes : List ValueRoute :=
 
 def allUnsupportedRoutes : List UnsupportedRoute :=
   [ .ownerWithdrawal, .stVaultInternal, .valueBoundedExit
-  , .governanceLifecycle, .fallbackReceive, .treasuryMint ]
+  , .governanceLifecycle, .fallbackReceive, .treasuryMint, .opsTransfer ]
 
 theorem inventory_count : allRoutes.length = 11 := rfl
 
-theorem unsupported_count : allUnsupportedRoutes.length = 6 := rfl
+theorem unsupported_count : allUnsupportedRoutes.length = 7 := rfl
 
 theorem allRoutes_nodup : allRoutes.Nodup := by native_decide
 
@@ -347,7 +362,7 @@ def zeroParentRoutes (p : CoveringParent) : GeneralFlow → GeneralFlow
 composition parent.  Used by composition-parent mutants. -/
 def zeroCompositionParentRoutes (p : CoveringParent) : GeneralFlow → GeneralFlow
   | .authorized f          =>
-    if f.route.compositionParent = some p then .authorized ⟨f.route, 0⟩
+    if p ∈ f.route.compositionParents then .authorized ⟨f.route, 0⟩
     else .authorized f
   | .ownerWithdrawal r v   => .ownerWithdrawal r v
   | .treasuryMint v        => .treasuryMint v
