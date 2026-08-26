@@ -134,8 +134,9 @@ theorem lido_caller_endpoint_binding_of_success
       simp only [LidoCallerEndpointBinding]
       intro _
       have hCaller : caller = endpoints.lido := by
-        cases hEqual : caller == endpoints.lido <;>
-          simp [sourceRun, callerAuthorized, hEqual] at hSuccess ⊢
+        cases hEqual : caller == endpoints.lido with
+        | false => simp [sourceRun, callerAuthorized, hEqual] at hSuccess
+        | true => exact beq_iff_eq.mp hEqual
       exact ⟨hCaller, rfl⟩
   | withdrawalQueueReturn => simp [LidoCallerEndpointBinding]
 

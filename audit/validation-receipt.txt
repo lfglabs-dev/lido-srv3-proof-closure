@@ -1,27 +1,33 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 8c41754edc2f7b941914e27d9ff7cc5401d42c4c
+validated-tree: 97e38c3c62c1856392a7299f582c7e36748cb83f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
-P-VAULT-ETH-1 compile repair after body-tag claim narrowing (2026-08-26)
--------------------------------------------------------------------------
+P-VAULT-ETH-1 caller-guard metadata synchronization (2026-08-26)
+----------------------------------------------------------------
 
-- Replace the unavailable `by_contra` tactic in
-  `lido_caller_endpoint_binding_of_success` by first destructuring the route
-  and then exhaustively splitting the existing Boolean caller equality. The
-  false branch contradicts committed execution and the true branch reduces to
-  the required address equality; no claim, assumption, or mutant is weakened
-  or added.
-- Local gates: `python3 scripts/audit_metadata.py check`,
+- The compiled source parent retains its non-removable
+  `LidoCallerEndpointBinding` conjunct: a successful modeled Vault→Lido route
+  entails both `caller = endpoints.lido` and the runtime Lido target equality.
+  Its proof explicitly converts the true Boolean caller comparison with
+  `beq_iff_eq`; the false branch contradicts committed source execution.
+  The exact-parent `missing_lido_caller_guard_refutes_exact_parent` mutant
+  keeps a successful seven-wei runtime-Lido frame while refuting that
+  conjunct.
+- Synchronize the canonical P-VAULT-ETH-1 row's summary, covered fidelity,
+  reproduction expectation, and next gate with that parent and mutant. Record
+  the honest remaining gap: no extracted implementation-body binding exists,
+  and the runtime endpoint is not deployment identity evidence.
+- Local metadata/public-surface gates: `python3 scripts/audit_metadata.py check`,
   `python3 scripts/check_public_claim_surfaces.py`,
   `python3 scripts/test_public_claim_surfaces.py`, and
   `python3 scripts/test_audit_metadata.py` exit 0. The changed-Lean forbidden
   proof-escape scan and `git diff --check` are clean. Focused and trust Lean
-  gates are dispatched only after this repaired head is published.
+  gates are recorded only after their remote receipts complete.
 
 P-VAULT-ETH-1 tautological body-tag claim repair (2026-08-26)
 ----------------------------------------------------------------
