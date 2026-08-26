@@ -1,11 +1,29 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 39550c93d942578d69da866b5fa337a4e768f865
+validated-tree: bf80f3d5942d54e24edf1547c6d202461c521e29
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-VAULT-ETH-1 tautological body-tag claim repair (2026-08-26)
+----------------------------------------------------------------
+
+- Remove the unsupported `bodyOf .lidoReceiveWithdrawals =
+  .withdrawalVaultWithdrawWithdrawals` claim: both names were local model
+  definitions, so the equality was discharged by reduction and did not bind an
+  extracted Solidity implementation body.
+- Retain the non-tautological modeled Lido caller guard, runtime endpoint,
+  successful source-to-Spec projection, value-bearing frame equality, and the
+  owner-recipient exclusion. The caller-guard-drop and zero-value-frame mutants
+  remain load-bearing; no deployment identity, bytecode identity, global ETH
+  confinement, or WithdrawalQueue body claim is added.
+- Focused P-VAULT-ETH-1 Lean build was dispatched to the remote fleet for the
+  repaired commit; a node-side fetch failure remains recorded separately from
+  this receipt. Metadata and public-surface checks pass locally.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `bf80f3d5942d54e24edf1547c6d202461c521e29`.
 
 Deposit constructor fixture upstream-blob binding (2026-08-26)
 --------------------------------------------------------------
