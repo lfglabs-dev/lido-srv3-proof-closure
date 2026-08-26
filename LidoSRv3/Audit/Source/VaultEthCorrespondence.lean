@@ -118,16 +118,18 @@ theorem sourceRun_reverts_on_zero
 /-- The modeled Lido-route constraints retained by this slice.  This is a
 caller-guard/runtime-endpoint relation, not an implementation-body binding or
 a claim that either runtime address identifies a deployed contract. -/
-def LidoCallerEndpointBinding (endpoints : Endpoints) (inputs : Inputs) : Prop :=
+def LidoCallerEndpointBinding (endpoints : Endpoints) (inputs : Inputs)
+    (entry : ContractState) : Prop :=
   inputs.route = .lidoReceiveWithdrawals →
-    inputs.caller = endpoints.lido ∧
+    entry.sender = endpoints.lido ∧
+      inputs.caller = entry.sender ∧
       targetOf endpoints inputs.route = endpoints.lido
 
 theorem lido_caller_endpoint_binding_of_success
     (endpoints : Endpoints) (inputs : Inputs) (vaultBalance : Word)
-    (journal : SourceJournal)
+    (entry : ContractState) (journal : SourceJournal)
     (hSuccess : sourceRun endpoints inputs vaultBalance = .committed journal) :
-    LidoCallerEndpointBinding endpoints inputs := by
+    inputs.caller = entry.sender → LidoCallerEndpointBinding endpoints inputs entry := by
   rcases inputs with ⟨route, caller, amount⟩
   cases route with
   | lidoReceiveWithdrawals =>
@@ -137,7 +139,8 @@ theorem lido_caller_endpoint_binding_of_success
         cases hEqual : caller == endpoints.lido with
         | false => simp [sourceRun, callerAuthorized, hEqual] at hSuccess
         | true => exact beq_iff_eq.mp hEqual
-      exact ⟨hCaller, rfl⟩
+      intro hEntryCaller
+      exact ⟨hEntryCaller ▸ hCaller, hEntryCaller, rfl⟩
   | withdrawalQueueReturn => simp [LidoCallerEndpointBinding]
 
 theorem sourceJournal_destination (endpoints : Endpoints) (inputs : Inputs) :

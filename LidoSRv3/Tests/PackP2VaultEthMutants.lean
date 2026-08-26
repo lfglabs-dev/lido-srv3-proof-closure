@@ -75,7 +75,7 @@ private def inputs : Inputs :=
   { route := .lidoReceiveWithdrawals, caller := 1, amount := .ofNat 7 }
 
 private def entry : ContractState :=
-  { defaultState with selfBalance := .ofNat 10 }
+  { defaultState with selfBalance := .ofNat 10, sender := 1 }
 
 theorem zero_value_frame_fails_value_bearing_conjunct :
     ¬ ValueBearingFrames endpoints inputs entry
@@ -105,8 +105,8 @@ theorem zero_value_frame_kill_line_refutes_parent :
 
 /-! ## Exact-parent caller/endpoint kill-line -/
 
-/-- Mutated executable route: it preserves the runtime target and value-bearing
-frame, but skips the modeled `msg.sender == address(LIDO)` guard. -/
+/-- Exact-parent mutant: it retains the source guard over the supplied input
+but skips the execution-boundary binding to `entry.sender`. -/
 def executeWithoutLidoCallerGuard
     (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
   if inputs.amount = 0 then .revert "ZeroAmount" entry
@@ -114,27 +114,28 @@ def executeWithoutLidoCallerGuard
   else .revert "NotEnoughEther" entry
 
 private def unauthorizedLidoInputs : Inputs :=
-  { route := .lidoReceiveWithdrawals, caller := 9, amount := .ofNat 7 }
+  { route := .lidoReceiveWithdrawals, caller := 1, amount := .ofNat 7 }
+
+private def unauthorizedEntry : ContractState :=
+  { entry with sender := 9 }
 
 theorem unauthorized_lido_mutant_commits :
-    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run entry =
-      .success () (afterFrame endpoints unauthorizedLidoInputs entry) := by
+    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run unauthorizedEntry =
+      .success () (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) := by
   rw [Contract.run]
   have hNonzero : unauthorizedLidoInputs.amount ≠ 0 := by decide
-  have hFunds : unauthorizedLidoInputs.amount ≤ entry.selfBalance := by decide
+  have hFunds : unauthorizedLidoInputs.amount ≤ unauthorizedEntry.selfBalance := by decide
   simp only [executeWithoutLidoCallerGuard, if_neg hNonzero, if_pos hFunds]
-  rw [returnFrame_apply endpoints unauthorizedLidoInputs entry hFunds]
+  rw [returnFrame_apply endpoints unauthorizedLidoInputs unauthorizedEntry hFunds]
 
-/-- **Exact-parent mutant.** The guard-dropping route still emits the same
-seven-wei Lido frame, but its successful unauthorized input falsifies the
-registered `LidoCallerEndpointBinding` conjunct. This is intentionally only a
-caller/runtime-endpoint counterexample; it says nothing about deployed contract
-identity or the source-shaped WithdrawalQueue route. -/
+/-- **Exact-parent mutant.** With an unauthorized executable sender, the
+binding-dropping route still emits the same seven-wei Lido frame and refutes
+the registered `LidoCallerEndpointBinding` conjunct. -/
 theorem missing_lido_caller_guard_refutes_exact_parent :
-    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run entry =
-        .success () (afterFrame endpoints unauthorizedLidoInputs entry) ∧
-      ¬ ValueHopConclusion endpoints unauthorizedLidoInputs entry
-        (afterFrame endpoints unauthorizedLidoInputs entry) := by
+    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run unauthorizedEntry =
+        .success () (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) ∧
+      ¬ ValueHopConclusion endpoints unauthorizedLidoInputs unauthorizedEntry
+        (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) := by
   refine ⟨unauthorized_lido_mutant_commits, ?_⟩
   intro hParent
   have hBinding := hParent.2.2.1 rfl

@@ -53,7 +53,7 @@ def ValueHopConclusion
     (entry after : ContractState) : Prop :=
   EverySuccessfulJournalProjects endpoints inputs entry ∧
     ValueBearingFrames endpoints inputs entry after ∧
-    LidoCallerEndpointBinding endpoints inputs ∧
+    LidoCallerEndpointBinding endpoints inputs entry ∧
     OwnerWithdrawalRecipientsExcluded
 
 /-- **P-VAULT-ETH-1 parent.** Universal over modeled vault-return inputs and
@@ -63,7 +63,7 @@ theorem protocol_return_value_hops
     (endpoints : Endpoints) (inputs : Inputs) (entry after : ContractState)
     (hSuccess : (execute endpoints inputs).run entry = .success () after) :
     ValueHopConclusion endpoints inputs entry after := by
-  obtain ⟨hSource, hAfter⟩ :=
+  obtain ⟨hSource, hAfter, hEntryCaller⟩ :=
     execute_success_corresponds_to_source endpoints inputs entry after hSuccess
   refine ⟨?_, ?_, ?_, owner_withdrawal_recipients_excluded⟩
   · intro journal hJournal
@@ -76,7 +76,7 @@ theorem protocol_return_value_hops
         simp [freshFrameValues, afterFrame_freshCalls, returnEntry_value,
           specJournal, specLeg, specDestination]
   · exact lido_caller_endpoint_binding_of_success
-      endpoints inputs entry.selfBalance (sourceJournal endpoints inputs) hSource
+      endpoints inputs entry.selfBalance entry (sourceJournal endpoints inputs) hSource hEntryCaller
 
 private def witnessEndpoints : Endpoints :=
   { lido := 1, withdrawalQueue := 2 }
@@ -99,7 +99,7 @@ theorem vault_to_lido_value_frame_inhabited :
       specDestination lidoWitnessInput.route = .vaultToLido ∧
       (returnEntry witnessEndpoints lidoWitnessInput).value = 7 := by
   refine ⟨execute_commits_of_preconditions
-    witnessEndpoints lidoWitnessInput witnessEntry (by decide) (by decide) (by decide), rfl, rfl⟩
+    witnessEndpoints lidoWitnessInput witnessEntry (by decide) (by decide) (by decide) (by decide), rfl, rfl⟩
 
 /-- Non-vacuity: the WithdrawalQueue return constructor is inhabited by a
 successful seven-wei `externalCallBindTo` frame. -/
@@ -110,6 +110,6 @@ theorem vault_to_withdrawal_queue_value_frame_inhabited :
       specDestination queueWitnessInput.route = .vaultToWithdrawalQueue ∧
       (returnEntry witnessEndpoints queueWitnessInput).value = 7 := by
   refine ⟨execute_commits_of_preconditions
-    witnessEndpoints queueWitnessInput witnessEntry (by decide) (by decide) (by decide), rfl, rfl⟩
+    witnessEndpoints queueWitnessInput witnessEntry (by decide) (by decide) (by decide) (by decide), rfl, rfl⟩
 
 end LidoSRv3.Audit.Guarantees.PVaultEth1

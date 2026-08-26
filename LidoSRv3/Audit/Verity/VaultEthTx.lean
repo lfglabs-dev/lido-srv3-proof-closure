@@ -40,12 +40,14 @@ def afterFrame (endpoints : Endpoints) (inputs : Inputs)
     selfBalance := entry.selfBalance - inputs.amount
     calls := entry.calls ++ [returnEntry endpoints inputs] }
 
-/-- Source guards choose commit/revert.  The committed arm is performed by the
-actual value-bearing frame, rather than by directly editing a call journal. -/
+/-- The source schedule carries its caller as a source-model input, but the
+executable entry is authoritative for `msg.sender`. Bind them at this boundary
+before evaluating the source guards. -/
 def execute (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
-  match sourceRun endpoints inputs entry.selfBalance with
-  | .reverted reason => .revert reason entry
-  | .committed _ => returnFrame endpoints inputs entry
+  if inputs.caller != entry.sender then .revert "CallerInputMismatch" entry
+  else match sourceRun endpoints inputs entry.selfBalance with
+    | .reverted reason => .revert reason entry
+    | .committed _ => returnFrame endpoints inputs entry
 
 def freshCalls (entry after : ContractState) : List ExternalCall :=
   after.calls.drop entry.calls.length
@@ -66,13 +68,14 @@ theorem returnFrame_apply (endpoints : Endpoints) (inputs : Inputs)
 
 theorem execute_commits_of_preconditions
     (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
+    (hEntryCaller : inputs.caller = entry.sender)
     (hCaller : callerAuthorized endpoints inputs = true)
     (hNonzero : inputs.amount ≠ 0)
     (hFunds : inputs.amount ≤ entry.selfBalance) :
     (execute endpoints inputs).run entry =
       .success () (afterFrame endpoints inputs entry) := by
   rw [Contract.run]
-  simp only [execute,
+  simp only [execute, if_neg (ne_of_eq hEntryCaller),
     sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
       hCaller hNonzero hFunds]
   rw [returnFrame_apply endpoints inputs entry hFunds]
@@ -84,7 +87,10 @@ theorem execute_success_corresponds_to_source
     (hExecute : (execute endpoints inputs).run entry = .success () after) :
     sourceRun endpoints inputs entry.selfBalance =
         .committed (sourceJournal endpoints inputs) ∧
-      after = afterFrame endpoints inputs entry := by
+      after = afterFrame endpoints inputs entry ∧
+      inputs.caller = entry.sender := by
+  by_cases hEntryCaller : inputs.caller = entry.sender
+  ·
   by_cases hCaller : callerAuthorized endpoints inputs
   · by_cases hNonzero : inputs.amount = 0
     · have hSource :
@@ -96,9 +102,9 @@ theorem execute_success_corresponds_to_source
       · have hSource :=
           sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
             hCaller hNonzero hFunds
-        refine ⟨hSource, ?_⟩
+        refine ⟨hSource, ?_, hEntryCaller⟩
         have hExpected :=
-          execute_commits_of_preconditions endpoints inputs entry hCaller hNonzero hFunds
+          execute_commits_of_preconditions endpoints inputs entry hEntryCaller hCaller hNonzero hFunds
         rw [hExecute] at hExpected
         injection hExpected
       · have hSource :
@@ -109,7 +115,8 @@ theorem execute_success_corresponds_to_source
   · have hSource :
         sourceRun endpoints inputs entry.selfBalance = .reverted "NotLido" := by
       simp [sourceRun, hCaller]
-    simp [execute, hSource, Contract.run] at hExecute
+    simp [execute, if_neg (ne_of_eq hEntryCaller), hSource, Contract.run] at hExecute
+  · simp [execute, if_pos (ne_of_not_eq hEntryCaller), Contract.run] at hExecute
 
 theorem afterFrame_freshCalls (endpoints : Endpoints) (inputs : Inputs)
     (entry : ContractState) :
