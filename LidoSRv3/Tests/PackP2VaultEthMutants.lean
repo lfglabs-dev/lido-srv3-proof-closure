@@ -146,11 +146,18 @@ theorem withdrawal_queue_distinct_caller_commits :
 theorem unauthorized_lido_mutant_commits :
     (executeWithInputCallerGuard endpoints unauthorizedLidoInputs).run unauthorizedEntry =
       .success () (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) := by
-  rw [Contract.run]
   have hFunds : unauthorizedLidoInputs.amount ≤ unauthorizedEntry.selfBalance := by decide
-  simp [executeWithInputCallerGuard, sourceRunWithInputCaller,
-    callerAuthorizedFromInputs, hFunds]
-  rw [returnFrame_apply endpoints unauthorizedLidoInputs unauthorizedEntry hFunds]
+  have hNonzero : Core.Uint256.ofNat 7 ≠ 0 := by decide
+  have hConcreteFunds : 7 % Core.Uint256.modulus ≤ 10 % Core.Uint256.modulus := by decide
+  have hSource :
+      sourceRunWithInputCaller endpoints unauthorizedLidoInputs unauthorizedEntry =
+        .committed (sourceJournal endpoints unauthorizedLidoInputs) := by
+    simp [sourceRunWithInputCaller, callerAuthorizedFromInputs,
+      unauthorizedLidoInputs, unauthorizedEntry, entry, endpoints,
+      hNonzero, hConcreteFunds]
+  rw [Contract.run]
+  simp [executeWithInputCallerGuard, hSource,
+    returnFrame_apply endpoints unauthorizedLidoInputs unauthorizedEntry hFunds]
 
 /-- **Exact-parent mutant.** With an unauthorized executable sender, restoring
 the exact-parent input-field guard still emits the same seven-wei Lido frame

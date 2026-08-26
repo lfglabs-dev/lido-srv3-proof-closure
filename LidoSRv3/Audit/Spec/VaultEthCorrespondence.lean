@@ -58,7 +58,7 @@ theorem sourceJournal_projects (endpoints : Endpoints) (inputs : Inputs) :
 /-- Every successful source journal is the lossless Spec journal for the same
 modeled return input. -/
 theorem every_source_success_journal_projects
-    (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
+    (endpoints : Endpoints) (inputs : Inputs) (entry : Verity.ContractState)
     (journal : SourceJournal)
     (hSuccess : sourceRun endpoints inputs entry = .committed journal) :
     SourceJournalProjectsToEthJournal journal (specJournal inputs) := by

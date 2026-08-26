@@ -82,7 +82,7 @@ private def witnessEndpoints : Endpoints :=
   { lido := 1, withdrawalQueue := 2 }
 
 private def witnessEntry : ContractState :=
-  { defaultState with selfBalance := .ofNat 10 }
+  { defaultState with selfBalance := .ofNat 10, sender := 1 }
 
 private def lidoWitnessInput : Inputs :=
   { route := .lidoReceiveWithdrawals, caller := 1, amount := .ofNat 7 }

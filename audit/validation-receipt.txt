@@ -1,11 +1,36 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ae1f7dc195132170e80a9c573c78d9a5724f0c05
+validated-tree: 3190c986a3095a4082dd893815ca52ca32483a04
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-VAULT-ETH-1 Source/Spec state-type repair (2026-08-27)
+----------------------------------------------------------
+
+- Correct `every_source_success_journal_projects` to quantify its executable
+  entry as `Verity.ContractState`.  The unqualified name at
+  `VaultEthCorrespondence.lean:63` resolved to the distinct Spec state and
+  made `sourceRun endpoints inputs entry` ill-typed.  The correction preserves
+  the executable `entry.sender == endpoints.lido` authorization; the auxiliary
+  `inputs.caller` remains unauthorized for Vault→Lido, while WithdrawalQueue
+  remains source-shaped.
+- Align the parent’s successful Lido witness with that executable sender guard,
+  and make the exact-parent input-caller mutant explicitly reduce its retained
+  seven-wei source success before applying the value-bearing frame.
+- Lean 4.31 command exits 0:
+  `lake build +LidoSRv3.Audit.Source.VaultEthCorrespondence
+  +LidoSRv3.Audit.Spec.VaultEthCorrespondence
+  +LidoSRv3.Audit.Verity.VaultEthTx
+  +LidoSRv3.Audit.Guarantees.PVaultEth1
+  +LidoSRv3.Tests.PackP2VaultEthMutants +LidoSRv3.Audit.Trust`.
+  This compiles the focused source and Spec correspondence, transaction,
+  registered parent, exact-parent bypass mutant, and Trust `#print axioms`
+  chain. Metadata/YAML/public-surface/provenance, changed-Lean proof-escape,
+  `git diff --check`, and this receipt validator exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded below.
 
 P-VAULT-ETH-1 executable-sender guard repair (2026-08-27)
 ------------------------------------------------------------
