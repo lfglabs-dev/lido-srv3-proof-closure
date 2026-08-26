@@ -131,8 +131,8 @@ theorem lido_caller_endpoint_binding_of_success
   intro hRoute
   cases hRoute
   have hCaller : inputs.caller = endpoints.lido := by
-    by_contra hNotCaller
-    simp [sourceRun, callerAuthorized, hNotCaller] at hSuccess
+    cases hEqual : inputs.caller == endpoints.lido <;>
+      simp [sourceRun, callerAuthorized, hEqual] at hSuccess ⊢
   exact ⟨hCaller, rfl⟩
 
 theorem sourceJournal_destination (endpoints : Endpoints) (inputs : Inputs) :

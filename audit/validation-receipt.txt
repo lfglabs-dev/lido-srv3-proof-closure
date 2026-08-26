@@ -1,11 +1,26 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: bf80f3d5942d54e24edf1547c6d202461c521e29
+validated-tree: a0fb0d983b62974a67c3d7a4f6a4c5061e2d8968
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-VAULT-ETH-1 compile repair after body-tag claim narrowing (2026-08-26)
+-------------------------------------------------------------------------
+
+- Replace the unavailable `by_contra` tactic in
+  `lido_caller_endpoint_binding_of_success` with an exhaustive split over the
+  existing Boolean caller equality. The false branch contradicts committed
+  execution and the true branch reduces to the required address equality; no
+  claim, assumption, or mutant is weakened or added.
+- Local gates: `python3 scripts/audit_metadata.py check`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `python3 scripts/test_public_claim_surfaces.py`, and
+  `python3 scripts/test_audit_metadata.py` exit 0. The changed-Lean forbidden
+  proof-escape scan and `git diff --check` are clean. Focused and trust Lean
+  gates are dispatched only after this repaired head is published.
 
 P-VAULT-ETH-1 tautological body-tag claim repair (2026-08-26)
 ----------------------------------------------------------------
