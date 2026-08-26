@@ -72,6 +72,17 @@ def main():
         invoke(fixture, False, "constructor Lean predicate differs")
         deposit_lean.write_text(deposit_lean_source, encoding="utf-8")
 
+        deposit_lean.write_text(
+            deposit_lean_source.replace(
+                "inputs.maxEBType1 ≠ 0",
+                "inputs.maxEBType1 ≠ 0 ∧ inputs.depositContract = 0xDEAD",
+                1,
+            ),
+            encoding="utf-8",
+        )
+        invoke(fixture, False, "constructor Lean predicate differs")
+        deposit_lean.write_text(deposit_lean_source, encoding="utf-8")
+
         deposit = next(target for target in source["targets"] if target["id"] == "P-DEPOSIT-1")
         constructor_span = next(span for span in deposit["spans"] if span["function"] == "constructor")
         deposit["spans"].remove(constructor_span)

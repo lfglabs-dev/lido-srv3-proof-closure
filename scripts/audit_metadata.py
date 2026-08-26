@@ -127,11 +127,13 @@ def validate_deposit_constructor_fixture():
             "pinned StakingRouter constructor correspondence differs")
     lean = DEPOSIT_PROVENANCE_LEAN.read_text(encoding="utf-8")
     predicate = re.search(
-        r"def PinnedConstructorAdmitted \(inputs : ConstructorInputs\) : Prop :=\s*"
-        r"inputs\.depositContract ≠ 0 ∧ inputs\.maxEBType1 ≠ 0",
+        r"^def PinnedConstructorAdmitted \(inputs : ConstructorInputs\) : Prop :="
+        r"(?P<body>.*?)(?=\n\s*\n)",
         lean,
+        re.MULTILINE | re.DOTALL,
     )
-    require(predicate is not None,
+    expected_body = r"\s*inputs\.depositContract ≠ 0 ∧ inputs\.maxEBType1 ≠ 0\s*"
+    require(predicate is not None and re.fullmatch(expected_body, predicate.group("body")) is not None,
             "pinned StakingRouter constructor Lean predicate differs")
 
 
