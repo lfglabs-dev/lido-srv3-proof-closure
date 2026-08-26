@@ -10,8 +10,8 @@ execution, one named conclusion connects:
 
 1. the successful source journal losslessly to `Spec.EthJournal`;
 2. the fresh `externalCallBindTo` frame value to the Spec leg's wei; and
-3. the pinned WithdrawalVault body tag, Lido-caller guard, and runtime Lido
-   endpoint for the Vault→Lido route; and
+3. the modeled Lido-caller guard and runtime Lido endpoint for the
+   Vault→Lido route; and
 4. the continued exclusion of owner-controlled arbitrary recipients.
 
 The new constructors are provenance tags backed by executable value-bearing
@@ -53,7 +53,7 @@ def ValueHopConclusion
     (entry after : ContractState) : Prop :=
   EverySuccessfulJournalProjects endpoints inputs entry ∧
     ValueBearingFrames endpoints inputs entry after ∧
-    LidoTagBodyEndpointBinding endpoints inputs ∧
+    LidoCallerEndpointBinding endpoints inputs ∧
     OwnerWithdrawalRecipientsExcluded
 
 /-- **P-VAULT-ETH-1 parent.** Universal over modeled vault-return inputs and
@@ -75,7 +75,7 @@ theorem protocol_return_value_hops
     · cases inputs.route <;>
         simp [freshFrameValues, afterFrame_freshCalls, returnEntry_value,
           specJournal, specLeg, specDestination]
-  · exact lido_tag_body_endpoint_binding_of_success
+  · exact lido_caller_endpoint_binding_of_success
       endpoints inputs entry.selfBalance (sourceJournal endpoints inputs) hSource
 
 private def witnessEndpoints : Endpoints :=

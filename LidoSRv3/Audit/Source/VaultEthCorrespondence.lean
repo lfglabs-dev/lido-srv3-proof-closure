@@ -37,19 +37,6 @@ inductive Route
   | withdrawalQueueReturn
   deriving DecidableEq, Repr
 
-/-- Body provenance available to this narrow source interpreter.
-
-`withdrawalVaultWithdrawWithdrawals` records the pinned
-`WithdrawalVault.withdrawWithdrawals` body (core pin, lines 107--121): it
-admits only Lido as caller and value-CALLs the runtime `LIDO` endpoint.
-`withdrawalQueueReturnSourceShaped` deliberately records the remaining OPEN:
-there is no extracted WithdrawalQueue return body or configured endpoint
-identity in this slice. -/
-inductive BodyTag
-  | withdrawalVaultWithdrawWithdrawals
-  | withdrawalQueueReturnSourceShaped
-  deriving DecidableEq, Repr
-
 /-- Source destinations. The owner-withdraw residual stays unapproved. -/
 inductive Destination
   | lidoReceiveWithdrawals
@@ -81,10 +68,6 @@ inductive SourceOutcome where
 def destinationOf : Route → Destination
   | .lidoReceiveWithdrawals => .lidoReceiveWithdrawals
   | .withdrawalQueueReturn => .withdrawalQueueReturn
-
-def bodyOf : Route → BodyTag
-  | .lidoReceiveWithdrawals => .withdrawalVaultWithdrawWithdrawals
-  | .withdrawalQueueReturn => .withdrawalQueueReturnSourceShaped
 
 def targetOf (endpoints : Endpoints) : Route → Address
   | .lidoReceiveWithdrawals => endpoints.lido
@@ -132,26 +115,25 @@ theorem sourceRun_reverts_on_zero
     sourceRun endpoints inputs vaultBalance = .reverted "ZeroAmount" := by
   simp [sourceRun, hCaller, hZero]
 
-/-- Strongest body/endpoint fact available from the pinned source in this
-slice. It is a tag/body/runtime-endpoint relation, not a claim that either
-runtime address identifies a deployed contract. -/
-def LidoTagBodyEndpointBinding (endpoints : Endpoints) (inputs : Inputs) : Prop :=
+/-- The modeled Lido-route constraints retained by this slice.  This is a
+caller-guard/runtime-endpoint relation, not an implementation-body binding or
+a claim that either runtime address identifies a deployed contract. -/
+def LidoCallerEndpointBinding (endpoints : Endpoints) (inputs : Inputs) : Prop :=
   inputs.route = .lidoReceiveWithdrawals →
-    bodyOf inputs.route = .withdrawalVaultWithdrawWithdrawals ∧
-      inputs.caller = endpoints.lido ∧
+    inputs.caller = endpoints.lido ∧
       targetOf endpoints inputs.route = endpoints.lido
 
-theorem lido_tag_body_endpoint_binding_of_success
+theorem lido_caller_endpoint_binding_of_success
     (endpoints : Endpoints) (inputs : Inputs) (vaultBalance : Word)
     (journal : SourceJournal)
     (hSuccess : sourceRun endpoints inputs vaultBalance = .committed journal) :
-    LidoTagBodyEndpointBinding endpoints inputs := by
+    LidoCallerEndpointBinding endpoints inputs := by
   intro hRoute
   cases hRoute
   have hCaller : inputs.caller = endpoints.lido := by
     by_contra hNotCaller
     simp [sourceRun, callerAuthorized, hNotCaller] at hSuccess
-  exact ⟨rfl, hCaller, rfl⟩
+  exact ⟨hCaller, rfl⟩
 
 theorem sourceJournal_destination (endpoints : Endpoints) (inputs : Inputs) :
     (sourceJournal endpoints inputs).map SourceLeg.destination =

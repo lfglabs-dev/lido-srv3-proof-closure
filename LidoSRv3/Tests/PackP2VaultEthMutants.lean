@@ -8,9 +8,9 @@ and executable external-call primitive, but sends zero wei in the fresh frame.
 It therefore refutes the new parent's value-bearing conjunct.  This is not the
 older exclusion-only Lido mutant.
 
-The second mutant keeps the exact body tag and value frame but drops the
-source-backed `msg.sender == address(LIDO)` admission check.  It refutes the
-new parent conjunct itself, without claiming an endpoint is deployment
+The second mutant keeps the route, runtime target, and value frame but drops
+the modeled `msg.sender == address(LIDO)` admission check. It refutes the
+caller/endpoint parent conjunct without claiming an endpoint is deployment
 identity or widening the WithdrawalQueue route.
 -/
 
@@ -103,11 +103,10 @@ theorem zero_value_frame_kill_line_refutes_parent :
   intro hParent
   exact zero_value_frame_fails_value_bearing_conjunct hParent.2.1
 
-/-! ## Exact-parent caller/body/endpoint kill-line -/
+/-! ## Exact-parent caller/endpoint kill-line -/
 
-/-- Mutated executable body: it preserves the Lido route tag, runtime target,
-and value-bearing frame, but skips the pinned `msg.sender == address(LIDO)`
-guard before the frame. -/
+/-- Mutated executable route: it preserves the runtime target and value-bearing
+frame, but skips the modeled `msg.sender == address(LIDO)` guard. -/
 def executeWithoutLidoCallerGuard
     (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
   if inputs.amount = 0 then .revert "ZeroAmount" entry
@@ -124,11 +123,11 @@ theorem unauthorized_lido_mutant_commits :
   simp [executeWithoutLidoCallerGuard, unauthorizedLidoInputs,
     returnFrame_apply endpoints unauthorizedLidoInputs entry (by decide)]
 
-/-- **Exact-parent mutant.** The guard-dropping body still emits the same
+/-- **Exact-parent mutant.** The guard-dropping route still emits the same
 seven-wei Lido frame, but its successful unauthorized input falsifies the
-registered `LidoTagBodyEndpointBinding` conjunct. This is intentionally only
-a body/tag/runtime-endpoint counterexample; it says nothing about deployed
-contract identity or the source-shaped WithdrawalQueue route. -/
+registered `LidoCallerEndpointBinding` conjunct. This is intentionally only a
+caller/runtime-endpoint counterexample; it says nothing about deployed contract
+identity or the source-shaped WithdrawalQueue route. -/
 theorem missing_lido_caller_guard_refutes_exact_parent :
     (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run entry =
         .success () (afterFrame endpoints unauthorizedLidoInputs entry) ∧
@@ -137,7 +136,7 @@ theorem missing_lido_caller_guard_refutes_exact_parent :
   refine ⟨unauthorized_lido_mutant_commits, ?_⟩
   intro hParent
   have hBinding := hParent.2.2.1 rfl
-  exact (by decide : (9 : Address) ≠ 1) hBinding.2.1
+  exact (by decide : (9 : Address) ≠ 1) hBinding.1
 
 /-- Mutant projection: keep the Vault→Lido source hop and wei, but journal
 it as the deposit/top-up `lidoPull` constructor. That is not the new
