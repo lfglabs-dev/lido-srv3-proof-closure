@@ -146,10 +146,10 @@ theorem execute_success_corresponds_to_source
         · have hSource :=
             sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
               hCaller hNonzero hFunds
-          refine ⟨hSource, ?_, fun h => by rw [hRoute] at h; cases h⟩
+          refine ⟨hSource, ?_, fun h => by cases hRoute; cases h⟩
           have hExpected :=
             execute_commits_of_preconditions endpoints inputs entry
-              (fun h => by rw [hRoute] at h; cases h) hCaller hNonzero hFunds
+              (fun h => by cases hRoute; cases h) hCaller hNonzero hFunds
           rw [hExecute] at hExpected
           injection hExpected
         · have hSource :

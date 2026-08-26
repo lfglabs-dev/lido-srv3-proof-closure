@@ -1,11 +1,28 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 5dbd8b87dc54f011a5e2d0ee28536f8ed538926e
+validated-tree: 941ebf9c4b99ca4356de9e6fd3ecc834817ff9c3
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-VAULT-ETH-1 focused Lean repair (2026-08-26)
+-------------------------------------------------
+
+- Repair the WithdrawalQueue success arm in `VaultEthTx`: after route case
+  reduction, its Lido-only caller premise is discharged by constructor
+  elimination (`cases hRoute; cases h`) rather than trying to rewrite the
+  already-reduced `inputs.route`. The executable caller constraint, source
+  route distinction, parent, and exact-parent caller-guard mutant are
+  unchanged.
+- One bounded Lean invocation exits 0:
+  `lake build LidoSRv3.Audit.Source.VaultEthCorrespondence
+  LidoSRv3.Audit.Verity.VaultEthTx
+  LidoSRv3.Audit.Guarantees.PVaultEth1
+  LidoSRv3.Tests.PackP2VaultEthMutants LidoSRv3.Audit.Trust`.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `941ebf9c4b99ca4356de9e6fd3ecc834817ff9c3`.
 
 P-VAULT-ETH-1 route-sensitive executable caller-binding repair (2026-08-26)
 -----------------------------------------------------------------------------
