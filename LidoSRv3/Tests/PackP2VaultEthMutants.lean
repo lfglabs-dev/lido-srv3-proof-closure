@@ -120,8 +120,10 @@ theorem unauthorized_lido_mutant_commits :
     (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run entry =
       .success () (afterFrame endpoints unauthorizedLidoInputs entry) := by
   rw [Contract.run]
-  simp [executeWithoutLidoCallerGuard, unauthorizedLidoInputs,
-    returnFrame_apply endpoints unauthorizedLidoInputs entry (by decide)]
+  have hNonzero : unauthorizedLidoInputs.amount ≠ 0 := by decide
+  have hFunds : unauthorizedLidoInputs.amount ≤ entry.selfBalance := by decide
+  simp only [executeWithoutLidoCallerGuard, if_neg hNonzero, if_pos hFunds]
+  rw [returnFrame_apply endpoints unauthorizedLidoInputs entry hFunds]
 
 /-- **Exact-parent mutant.** The guard-dropping route still emits the same
 seven-wei Lido frame, but its successful unauthorized input falsifies the
@@ -136,7 +138,7 @@ theorem missing_lido_caller_guard_refutes_exact_parent :
   refine ⟨unauthorized_lido_mutant_commits, ?_⟩
   intro hParent
   have hBinding := hParent.2.2.1 rfl
-  exact (by decide : (9 : Address) ≠ 1) hBinding.1
+  exact (by decide : (9 : _root_.Verity.Core.Address) ≠ 1) hBinding.1
 
 /-- Mutant projection: keep the Vault→Lido source hop and wei, but journal
 it as the deposit/top-up `lidoPull` constructor. That is not the new

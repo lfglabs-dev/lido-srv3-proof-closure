@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d5cec71bbb9fc0e3901363d40a65dbf0203e62fa
+validated-tree: 655573bd51cbe8f1d84f32b46fc91047b5516f99
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -18,6 +18,8 @@ P-VAULT-ETH-1 caller-guard metadata synchronization (2026-08-26)
   The dependent lossless-projection proof now also eliminates the final
   funds branch before constructor injection, so successful source journals
   reduce to the exact `sourceJournal` on the current interface.
+  The guard-drop mutant's successful-run witness now eliminates its own
+  nonzero and funded branches before applying the existing frame theorem.
   The exact-parent `missing_lido_caller_guard_refutes_exact_parent` mutant
   keeps a successful seven-wei runtime-Lido frame while refuting that
   conjunct.
