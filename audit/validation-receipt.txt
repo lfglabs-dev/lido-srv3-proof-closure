@@ -1,11 +1,35 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 941ebf9c4b99ca4356de9e6fd3ecc834817ff9c3
+validated-tree: ae1f7dc195132170e80a9c573c78d9a5724f0c05
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-VAULT-ETH-1 executable-sender guard repair (2026-08-27)
+------------------------------------------------------------
+
+- Replace the prior input-field authorization with the pinned Lido-route
+  guard over `entry.sender`; `sourceRun` now receives the executable entry
+  state, and `execute` delegates to that same state-bound interpreter.
+  `inputs.caller` remains auxiliary and cannot authorize Vault→Lido.
+- Add `input_caller_guard_refutes_exact_parent`: the exact-parent mutant
+  restores the old `inputs.caller == endpoints.lido` check, admits a
+  seven-wei Lido frame from `entry.sender = 9`, and refutes
+  `LidoCallerEndpointBinding`. WithdrawalQueue still accepts a distinct
+  auxiliary caller.
+- Lean 4.31 focused build exits 0:
+  `lake build LidoSRv3.Audit.Source.VaultEthCorrespondence
+  LidoSRv3.Audit.Verity.VaultEthTx
+  LidoSRv3.Audit.Guarantees.PVaultEth1
+  LidoSRv3.Tests.PackP2VaultEthMutants LidoSRv3.Audit.Trust`.
+- `python3 scripts/audit_metadata.py generate && check`, metadata/public
+  surface/provenance checks, and `git diff --check` exit 0. The canonical
+  YAML remains Lean-consistent; generated views were unchanged because this
+  is a subordinate row.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `ae1f7dc195132170e80a9c573c78d9a5724f0c05`.
 
 P-VAULT-ETH-1 focused Lean repair (2026-08-26)
 -------------------------------------------------
