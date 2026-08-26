@@ -1,11 +1,28 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 883f32ecdb1b2fe01406076a419cf8401c784eff
+validated-tree: 39550c93d942578d69da866b5fa337a4e768f865
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Deposit constructor fixture upstream-blob binding (2026-08-26)
+--------------------------------------------------------------
+
+- Bind `fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol`
+  directly to lines 88--106 of the immutable
+  `lidofinance/core@af095e48` `StakingRouter.sol` Git blob. The metadata audit
+  now fails closed when that pinned object cannot be read or its slice differs.
+- Add a regression mutant that changes both the vendored fixture and the
+  digest embedded in the validator; the independent upstream comparison still
+  rejects the coupled mutation.
+- P-DEPOSIT-1 assumptions and statuses remain unchanged: all A-DEPOSIT-* rows
+  stay OPEN, and no `LinksSource` claim is added.
+- Verification: `scripts/audit_metadata.py check`,
+  `scripts/test_audit_metadata.py`, `scripts/check_public_claim_surfaces.py`,
+  `scripts/test_public_claim_surfaces.py`, and
+  `scripts/check_validation_receipt.py` exit 0.
 
 P-ORACLE-SUPPLY-1 add feeBound to EntryDomainValid (2026-08-25)
 -----------------------------------------------------------------
@@ -4589,3 +4606,60 @@ Repair ETH-world inventory — intermediate hops, parent coverage, mutant soundn
   `0910c6f1c10e7a294be411496ddc6d6cb6f65c95`, the tracked tree of this commit
   excluding this receipt per `scripts/check_validation_receipt.py`
   (`git read-tree HEAD && git rm --cached -- audit/validation-receipt.txt && git write-tree`).
+
+P-DEPOSIT-1 deployment provenance remains OPEN (2026-08-26)
+------------------------------------------------------------
+
+- Record outcome (b): the repository pins source but no reproducible deployed
+  `StakingRouter` runtime bytecode or constructor transaction.
+- Keep `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` explicitly OPEN; do not
+  derive `LinksSource` from ALLOC and do not register a stronger public parent.
+- Add a checked source-level counterexample: nonzero constructor inputs
+  `0xDEAD` and `64 ether` pass the pinned constructor guards while violating
+  the canonical beacon deposit address and 32-ether identities.
+- `lake build LidoSRv3.Audit.Provenance.Deposit
+  LidoSRv3.Tests.PackGDepositProvenanceMutants` exit 0 (1,218 jobs).
+- `make audit-check` and `git diff --check` exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `336707ba1f9d9b5cc658a2b9833d7309473e62a2`.
+
+P-DEPOSIT-1 pinned constructor guard binding repair (2026-08-26)
+----------------------------------------------------------------
+
+- Vendor the exact `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`
+  `StakingRouter.sol` L88--L106 constructor slice and pin its SHA-256 as
+  `41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9`.
+- Bind `P-DEPOSIT-1` to that source span in `audit/source-map.yaml`. The
+  metadata checker mechanically verifies the source guard sequence, direct
+  immutable assignments, and the corresponding two-conjunct Lean predicate.
+- Add a parent-shaped guard-drop mutant whose zero `_maxEBType1` witness is
+  admitted by the mutant and rejected by the bound source predicate.
+- Keep `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` OPEN. No deployed artifact
+  is asserted and no `LinksSource` is derived.
+- `lake env lean LidoSRv3/Audit/Provenance/Deposit.lean` exit 0.
+- `lake env lean LidoSRv3/Tests/PackGDepositProvenanceMutants.lean` exit 0.
+- `python3 scripts/test_audit_metadata.py` exit 0.
+- `python3 scripts/audit_metadata.py check` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `git diff --check` exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `6e090032b4a882115d7f00b422001153afa0426e`.
+
+P-DEPOSIT-1 constructor predicate correspondence gate repair (2026-08-26)
+----------------------------------------------------------------------------
+
+- Make the metadata correspondence gate fail closed by extracting the complete
+  `PinnedConstructorAdmitted` definition body and requiring an exact full-body
+  match for the two pinned constructor guards.
+- Add a regression mutant that appends
+  `∧ inputs.depositContract = 0xDEAD`; the former prefix regex accepted this
+  strengthened predicate, while the repaired gate rejects it.
+- Keep `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` OPEN. No `LinksSource` is
+  derived.
+- `python3 scripts/test_audit_metadata.py` exit 0.
+- `python3 scripts/audit_metadata.py check` exit 0.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/check_validation_receipt.py` exit 0 after this rebind.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `243a416743a68a0fd3e8f2ecb692c5b20075337f`.

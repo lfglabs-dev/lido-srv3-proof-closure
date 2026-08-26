@@ -11,6 +11,8 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
@@ -82,6 +84,25 @@ EXPECTED_PRIORITIES = {
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
+DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
+DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
+DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256 = "41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9"
+DEPOSIT_UPSTREAM_SOURCE_URL = (
+    "https://raw.githubusercontent.com/lidofinance/core/"
+    f"{PINNED['lido_core'][1]}/contracts/0.8.25/sr/StakingRouter.sol"
+)
+DEPOSIT_CONSTRUCTOR_SPAN = {
+    "repository": "lidofinance/core",
+    "source_sha": PINNED["lido_core"][1],
+    "path": "contracts/0.8.25/sr/StakingRouter.sol",
+    "function": "constructor",
+    "start_line": 88,
+    "end_line": 106,
+    "permalink": (
+        "https://github.com/lidofinance/core/blob/"
+        f"{PINNED['lido_core'][1]}/contracts/0.8.25/sr/StakingRouter.sol#L88-L106"
+    ),
+}
 
 
 def load(path):
@@ -95,6 +116,43 @@ def require(condition, message):
 
 def nonempty_strings(value):
     return isinstance(value, list) and all(isinstance(x, str) and x.strip() for x in value)
+
+
+def validate_deposit_constructor_fixture():
+    require(DEPOSIT_CONSTRUCTOR_FIXTURE.is_file(), "pinned StakingRouter constructor fixture is missing")
+    source = DEPOSIT_CONSTRUCTOR_FIXTURE.read_bytes()
+    require(hashlib.sha256(source).hexdigest() == DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256,
+            "pinned StakingRouter constructor fixture hash differs")
+    try:
+        request = Request(DEPOSIT_UPSTREAM_SOURCE_URL, headers={"User-Agent": "lido-srv3-audit-metadata"})
+        with urlopen(request, timeout=30) as response:
+            upstream_source = response.read()
+    except (HTTPError, URLError, TimeoutError, OSError) as error:
+        raise SystemExit(
+            "audit metadata error: cannot read pinned upstream StakingRouter Git blob: "
+            f"{error}"
+        ) from error
+    upstream_slice = b"\n".join(upstream_source.splitlines()[87:106]) + b"\n"
+    require(source == upstream_slice,
+            "pinned StakingRouter constructor fixture differs from pinned upstream Git blob")
+    text = source.decode("utf-8")
+    guards = re.findall(r"SRUtils\._requireNotZero\((_[A-Za-z0-9]+)\);", text)
+    require(guards == ["_depositContract", "_lido", "_lidoLocator", "_maxEBType1", "_maxEBType2"],
+            "pinned StakingRouter constructor guard sequence differs")
+    bindings = re.findall(r"(DEPOSIT_CONTRACT|MAX_EFFECTIVE_BALANCE_WC_TYPE_01)\s*=\s*(?:IDepositContract\()?(_[A-Za-z0-9]+)\)?;", text)
+    require(bindings == [("DEPOSIT_CONTRACT", "_depositContract"),
+                         ("MAX_EFFECTIVE_BALANCE_WC_TYPE_01", "_maxEBType1")],
+            "pinned StakingRouter constructor correspondence differs")
+    lean = DEPOSIT_PROVENANCE_LEAN.read_text(encoding="utf-8")
+    predicate = re.search(
+        r"^def PinnedConstructorAdmitted \(inputs : ConstructorInputs\) : Prop :="
+        r"(?P<body>.*?)(?=\n\s*\n)",
+        lean,
+        re.MULTILINE | re.DOTALL,
+    )
+    expected_body = r"\s*inputs\.depositContract ≠ 0 ∧ inputs\.maxEBType1 ≠ 0\s*"
+    require(predicate is not None and re.fullmatch(expected_body, predicate.group("body")) is not None,
+            "pinned StakingRouter constructor Lean predicate differs")
 
 
 def validate_pins(lock, manifest, source_map):
@@ -158,6 +216,9 @@ def validate_pins(lock, manifest, source_map):
             key = tuple(sorted(span.items()))
             require(key not in seen, f"{target.get('id')}: duplicate source span")
             seen.add(key)
+    deposit_target = next(target for target in targets if target.get("id") == "P-DEPOSIT-1")
+    require(DEPOSIT_CONSTRUCTOR_SPAN in deposit_target["spans"],
+            "P-DEPOSIT-1: pinned constructor source span is missing")
 
 
 def validate_assumptions(data):
@@ -260,6 +321,7 @@ def validate_guarantees(data, assumption_ids):
 
 
 def validate():
+    validate_deposit_constructor_fixture()
     registry = load(AUDIT / "guarantees.yaml")
     assumptions = load(AUDIT / "assumptions.yaml")
     lock = load(AUDIT / "artifacts.lock.json")
