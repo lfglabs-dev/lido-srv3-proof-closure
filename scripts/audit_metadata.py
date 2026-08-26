@@ -82,6 +82,21 @@ EXPECTED_PRIORITIES = {
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
+DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
+DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
+DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256 = "41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9"
+DEPOSIT_CONSTRUCTOR_SPAN = {
+    "repository": "lidofinance/core",
+    "source_sha": PINNED["lido_core"][1],
+    "path": "contracts/0.8.25/sr/StakingRouter.sol",
+    "function": "constructor",
+    "start_line": 88,
+    "end_line": 106,
+    "permalink": (
+        "https://github.com/lidofinance/core/blob/"
+        f"{PINNED['lido_core'][1]}/contracts/0.8.25/sr/StakingRouter.sol#L88-L106"
+    ),
+}
 
 
 def load(path):
@@ -95,6 +110,29 @@ def require(condition, message):
 
 def nonempty_strings(value):
     return isinstance(value, list) and all(isinstance(x, str) and x.strip() for x in value)
+
+
+def validate_deposit_constructor_fixture():
+    require(DEPOSIT_CONSTRUCTOR_FIXTURE.is_file(), "pinned StakingRouter constructor fixture is missing")
+    source = DEPOSIT_CONSTRUCTOR_FIXTURE.read_bytes()
+    require(hashlib.sha256(source).hexdigest() == DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256,
+            "pinned StakingRouter constructor fixture hash differs")
+    text = source.decode("utf-8")
+    guards = re.findall(r"SRUtils\._requireNotZero\((_[A-Za-z0-9]+)\);", text)
+    require(guards == ["_depositContract", "_lido", "_lidoLocator", "_maxEBType1", "_maxEBType2"],
+            "pinned StakingRouter constructor guard sequence differs")
+    bindings = re.findall(r"(DEPOSIT_CONTRACT|MAX_EFFECTIVE_BALANCE_WC_TYPE_01)\s*=\s*(?:IDepositContract\()?(_[A-Za-z0-9]+)\)?;", text)
+    require(bindings == [("DEPOSIT_CONTRACT", "_depositContract"),
+                         ("MAX_EFFECTIVE_BALANCE_WC_TYPE_01", "_maxEBType1")],
+            "pinned StakingRouter constructor correspondence differs")
+    lean = DEPOSIT_PROVENANCE_LEAN.read_text(encoding="utf-8")
+    predicate = re.search(
+        r"def PinnedConstructorAdmitted \(inputs : ConstructorInputs\) : Prop :=\s*"
+        r"inputs\.depositContract ≠ 0 ∧ inputs\.maxEBType1 ≠ 0",
+        lean,
+    )
+    require(predicate is not None,
+            "pinned StakingRouter constructor Lean predicate differs")
 
 
 def validate_pins(lock, manifest, source_map):
@@ -158,6 +196,9 @@ def validate_pins(lock, manifest, source_map):
             key = tuple(sorted(span.items()))
             require(key not in seen, f"{target.get('id')}: duplicate source span")
             seen.add(key)
+    deposit_target = next(target for target in targets if target.get("id") == "P-DEPOSIT-1")
+    require(DEPOSIT_CONSTRUCTOR_SPAN in deposit_target["spans"],
+            "P-DEPOSIT-1: pinned constructor source span is missing")
 
 
 def validate_assumptions(data):
@@ -260,6 +301,7 @@ def validate_guarantees(data, assumption_ids):
 
 
 def validate():
+    validate_deposit_constructor_fixture()
     registry = load(AUDIT / "guarantees.yaml")
     assumptions = load(AUDIT / "assumptions.yaml")
     lock = load(AUDIT / "artifacts.lock.json")

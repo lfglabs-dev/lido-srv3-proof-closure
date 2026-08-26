@@ -32,7 +32,13 @@ def main():
         (fixture / "scripts").mkdir()
         (fixture / "audit").mkdir()
         (fixture / "verity/targets").mkdir(parents=True)
+        (fixture / "LidoSRv3/Audit/Provenance").mkdir(parents=True)
+        (fixture / "fixtures/solidity-reference").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
+        shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
+                     fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
+        shutil.copy2(ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean",
+                     fixture / "LidoSRv3/Audit/Provenance/Deposit.lean")
         for name in ("guarantees.yaml", "assumptions.yaml", "artifacts.lock.json", "source-map.yaml"):
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")
@@ -50,6 +56,29 @@ def main():
 
         invoke(fixture, True)
         invoke(fixture, True, command="check")
+
+        constructor_fixture = fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
+        constructor_source = constructor_fixture.read_text(encoding="utf-8")
+        constructor_fixture.write_text(constructor_source.replace("_maxEBType1);", "_maxEBType2);", 1), encoding="utf-8")
+        invoke(fixture, False, "constructor fixture hash differs")
+        constructor_fixture.write_text(constructor_source, encoding="utf-8")
+
+        deposit_lean = fixture / "LidoSRv3/Audit/Provenance/Deposit.lean"
+        deposit_lean_source = deposit_lean.read_text(encoding="utf-8")
+        deposit_lean.write_text(
+            deposit_lean_source.replace("inputs.maxEBType1 ≠ 0", "inputs.maxEBType1 = 0", 1),
+            encoding="utf-8",
+        )
+        invoke(fixture, False, "constructor Lean predicate differs")
+        deposit_lean.write_text(deposit_lean_source, encoding="utf-8")
+
+        deposit = next(target for target in source["targets"] if target["id"] == "P-DEPOSIT-1")
+        constructor_span = next(span for span in deposit["spans"] if span["function"] == "constructor")
+        deposit["spans"].remove(constructor_span)
+        write(spath, source)
+        invoke(fixture, False, "pinned constructor source span is missing")
+        deposit["spans"].insert(0, constructor_span)
+        write(spath, source)
 
         mutants = []
         x = copy.deepcopy(guarantees); x["schema"] = "legacy-seven-planes"; mutants.append((gpath, x, "guarantee schema differs"))

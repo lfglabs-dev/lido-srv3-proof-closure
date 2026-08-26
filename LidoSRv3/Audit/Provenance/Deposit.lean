@@ -38,18 +38,22 @@ theorem canonical_thirty_two_ether_pin :
     remains OPEN. -/
 theorem deposit_contract_assumption_remains_open : True := trivial
 
-/-- The only constructor restrictions in the pinned `StakingRouter.sol`
-    source are nonzero checks.  This record is a source-level constructor
-    witness, not a claim that such a router was deployed. -/
+/-- Projection of the two deployment-relevant inputs from pinned
+    `StakingRouter.sol` lines 88--106.  The exact source fixture, its SHA-256,
+    guard sequence, and direct immutable assignments are checked by
+    `scripts/audit_metadata.py`.  This is source correspondence, not a claim
+    that any particular router was deployed. -/
 structure ConstructorInputs where
   depositContract : Nat
   maxEBType1 : Nat
   deriving Repr, DecidableEq
 
-/-- The admission predicate copied from the two relevant constructor guards:
-    `_depositContract` and `_maxEBType1` must be nonzero.  The constructor does
-    not compare either value with the canonical address or `DEPOSIT_SIZE`. -/
-def ConstructorAdmitted (inputs : ConstructorInputs) : Prop :=
+/-- Bound projection of the pinned guards
+    `SRUtils._requireNotZero(_depositContract)` and
+    `SRUtils._requireNotZero(_maxEBType1)`.  The fixture checker binds those
+    guarded parameters to `DEPOSIT_CONTRACT` and
+    `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`, respectively. -/
+def PinnedConstructorAdmitted (inputs : ConstructorInputs) : Prop :=
   inputs.depositContract ≠ 0 ∧ inputs.maxEBType1 ≠ 0
 
 /-- A source-admitted constructor input that violates both deployment facts.
@@ -60,10 +64,10 @@ def openAssumptionsCounterexample : ConstructorInputs :=
     maxEBType1 := 64 * 10 ^ 18 }
 
 theorem source_constructor_does_not_discharge_deployment_facts :
-    ConstructorAdmitted openAssumptionsCounterexample ∧
+    PinnedConstructorAdmitted openAssumptionsCounterexample ∧
       openAssumptionsCounterexample.depositContract ≠ productionBeaconDeposit ∧
       openAssumptionsCounterexample.maxEBType1 ≠ thirtyTwoEtherWei := by
-  norm_num [ConstructorAdmitted, openAssumptionsCounterexample,
+  norm_num [PinnedConstructorAdmitted, openAssumptionsCounterexample,
     productionBeaconDeposit, thirtyTwoEtherWei]
 
 /-- A conserving source config exists at the 32-ether scale. Both fields

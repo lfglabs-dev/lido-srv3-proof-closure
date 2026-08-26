@@ -19,6 +19,12 @@ The source proves only that `BeaconChainDepositor.DEPOSIT_SIZE` is the literal
 and `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`. It does not enforce the canonical
 beacon deposit address or equality with `DEPOSIT_SIZE`.
 
+The exact `StakingRouter.sol` L88--L106 source slice is vendored at
+`fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol`.
+`scripts/audit_metadata.py` checks its pinned SHA-256, the complete constructor
+guard sequence, the two relevant guards, and their direct immutable bindings;
+`audit/source-map.yaml` pins the same immutable source span.
+
 `Deposit.openAssumptionsCounterexample` is the checked source-level negative
 control: nonzero constructor inputs `0xDEAD` and `64 ether` satisfy the pinned
 constructor guards while violating both desired identities. It is deliberately
