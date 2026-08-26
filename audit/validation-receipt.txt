@@ -1,11 +1,28 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 243a416743a68a0fd3e8f2ecb692c5b20075337f
+validated-tree: 39550c93d942578d69da866b5fa337a4e768f865
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Deposit constructor fixture upstream-blob binding (2026-08-26)
+--------------------------------------------------------------
+
+- Bind `fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol`
+  directly to lines 88--106 of the immutable
+  `lidofinance/core@af095e48` `StakingRouter.sol` Git blob. The metadata audit
+  now fails closed when that pinned object cannot be read or its slice differs.
+- Add a regression mutant that changes both the vendored fixture and the
+  digest embedded in the validator; the independent upstream comparison still
+  rejects the coupled mutation.
+- P-DEPOSIT-1 assumptions and statuses remain unchanged: all A-DEPOSIT-* rows
+  stay OPEN, and no `LinksSource` claim is added.
+- Verification: `scripts/audit_metadata.py check`,
+  `scripts/test_audit_metadata.py`, `scripts/check_public_claim_surfaces.py`,
+  `scripts/test_public_claim_surfaces.py`, and
+  `scripts/check_validation_receipt.py` exit 0.
 
 P-ORACLE-SUPPLY-1 add feeBound to EntryDomainValid (2026-08-25)
 -----------------------------------------------------------------
