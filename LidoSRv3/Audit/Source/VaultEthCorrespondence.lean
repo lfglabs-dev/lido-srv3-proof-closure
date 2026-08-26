@@ -128,12 +128,16 @@ theorem lido_caller_endpoint_binding_of_success
     (journal : SourceJournal)
     (hSuccess : sourceRun endpoints inputs vaultBalance = .committed journal) :
     LidoCallerEndpointBinding endpoints inputs := by
-  intro hRoute
-  cases hRoute
-  have hCaller : inputs.caller = endpoints.lido := by
-    cases hEqual : inputs.caller == endpoints.lido <;>
-      simp [sourceRun, callerAuthorized, hEqual] at hSuccess ⊢
-  exact ⟨hCaller, rfl⟩
+  rcases inputs with ⟨route, caller, amount⟩
+  cases route with
+  | lidoReceiveWithdrawals =>
+      simp only [LidoCallerEndpointBinding]
+      intro _
+      have hCaller : caller = endpoints.lido := by
+        cases hEqual : caller == endpoints.lido <;>
+          simp [sourceRun, callerAuthorized, hEqual] at hSuccess ⊢
+      exact ⟨hCaller, rfl⟩
+  | withdrawalQueueReturn => simp [LidoCallerEndpointBinding]
 
 theorem sourceJournal_destination (endpoints : Endpoints) (inputs : Inputs) :
     (sourceJournal endpoints inputs).map SourceLeg.destination =
