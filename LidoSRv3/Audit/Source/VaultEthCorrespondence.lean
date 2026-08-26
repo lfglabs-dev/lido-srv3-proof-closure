@@ -135,13 +135,13 @@ theorem lido_caller_endpoint_binding_of_success
   cases route with
   | lidoReceiveWithdrawals =>
       simp only [LidoCallerEndpointBinding]
-      intro _
+      intro hCallerEntry
       have hCaller : caller = endpoints.lido := by
         cases hEqual : caller == endpoints.lido with
         | false => simp [sourceRun, callerAuthorized, hEqual] at hSuccess
         | true => exact beq_iff_eq.mp hEqual
-      intro hEntryCaller
-      exact ⟨hEntryCaller True.intro ▸ hCaller, hEntryCaller True.intro, rfl⟩
+      intro _
+      exact ⟨hCallerEntry ▸ hCaller, hCallerEntry, rfl⟩
   | withdrawalQueueReturn => simp [LidoCallerEndpointBinding]
 
 theorem sourceJournal_destination (endpoints : Endpoints) (inputs : Inputs) :
