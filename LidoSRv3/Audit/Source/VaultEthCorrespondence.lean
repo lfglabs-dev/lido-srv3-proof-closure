@@ -141,7 +141,7 @@ theorem lido_caller_endpoint_binding_of_success
         | false => simp [sourceRun, callerAuthorized, hEqual] at hSuccess
         | true => exact beq_iff_eq.mp hEqual
       intro hEntryCaller
-      exact ⟨hEntryCaller rfl ▸ hCaller, hEntryCaller rfl, rfl⟩
+      exact ⟨hEntryCaller True.intro ▸ hCaller, hEntryCaller True.intro, rfl⟩
   | withdrawalQueueReturn => simp [LidoCallerEndpointBinding]
 
 theorem sourceJournal_destination (endpoints : Endpoints) (inputs : Inputs) :
