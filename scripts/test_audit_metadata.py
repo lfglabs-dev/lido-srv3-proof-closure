@@ -2,6 +2,7 @@
 """Optimized fail-closed mutants for the v4 assurance contract."""
 
 import copy
+import hashlib
 import json
 import shutil
 import subprocess
@@ -62,6 +63,24 @@ def main():
         constructor_fixture.write_text(constructor_source.replace("_maxEBType1);", "_maxEBType2);", 1), encoding="utf-8")
         invoke(fixture, False, "constructor fixture hash differs")
         constructor_fixture.write_text(constructor_source, encoding="utf-8")
+
+        # Regression: changing both the vendored slice and its local digest used
+        # to pass.  The independently fetched pinned Git blob must still reject it.
+        mutated_constructor = constructor_source.replace("_maxEBType1);", "_maxEBType2);", 1)
+        constructor_fixture.write_text(mutated_constructor, encoding="utf-8")
+        audit_script = fixture / "scripts/audit_metadata.py"
+        audit_source = audit_script.read_text(encoding="utf-8")
+        audit_script.write_text(
+            audit_source.replace(
+                hashlib.sha256(constructor_source.encode()).hexdigest(),
+                hashlib.sha256(mutated_constructor.encode()).hexdigest(),
+                1,
+            ),
+            encoding="utf-8",
+        )
+        invoke(fixture, False, "fixture differs from pinned upstream Git blob")
+        constructor_fixture.write_text(constructor_source, encoding="utf-8")
+        audit_script.write_text(audit_source, encoding="utf-8")
 
         deposit_lean = fixture / "LidoSRv3/Audit/Provenance/Deposit.lean"
         deposit_lean_source = deposit_lean.read_text(encoding="utf-8")

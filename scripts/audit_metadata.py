@@ -11,6 +11,8 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
@@ -85,6 +87,10 @@ EXPECTED_PRIORITIES = {
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
 DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256 = "41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9"
+DEPOSIT_UPSTREAM_SOURCE_URL = (
+    "https://raw.githubusercontent.com/lidofinance/core/"
+    f"{PINNED['lido_core'][1]}/contracts/0.8.25/sr/StakingRouter.sol"
+)
 DEPOSIT_CONSTRUCTOR_SPAN = {
     "repository": "lidofinance/core",
     "source_sha": PINNED["lido_core"][1],
@@ -117,6 +123,18 @@ def validate_deposit_constructor_fixture():
     source = DEPOSIT_CONSTRUCTOR_FIXTURE.read_bytes()
     require(hashlib.sha256(source).hexdigest() == DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256,
             "pinned StakingRouter constructor fixture hash differs")
+    try:
+        request = Request(DEPOSIT_UPSTREAM_SOURCE_URL, headers={"User-Agent": "lido-srv3-audit-metadata"})
+        with urlopen(request, timeout=30) as response:
+            upstream_source = response.read()
+    except (HTTPError, URLError, TimeoutError, OSError) as error:
+        raise SystemExit(
+            "audit metadata error: cannot read pinned upstream StakingRouter Git blob: "
+            f"{error}"
+        ) from error
+    upstream_slice = b"\n".join(upstream_source.splitlines()[87:106]) + b"\n"
+    require(source == upstream_slice,
+            "pinned StakingRouter constructor fixture differs from pinned upstream Git blob")
     text = source.decode("utf-8")
     guards = re.findall(r"SRUtils\._requireNotZero\((_[A-Za-z0-9]+)\);", text)
     require(guards == ["_depositContract", "_lido", "_lidoLocator", "_maxEBType1", "_maxEBType2"],
