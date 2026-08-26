@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 97e38c3c62c1856392a7299f582c7e36748cb83f
+validated-tree: d5cec71bbb9fc0e3901363d40a65dbf0203e62fa
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -15,6 +15,9 @@ P-VAULT-ETH-1 caller-guard metadata synchronization (2026-08-26)
   entails both `caller = endpoints.lido` and the runtime Lido target equality.
   Its proof explicitly converts the true Boolean caller comparison with
   `beq_iff_eq`; the false branch contradicts committed source execution.
+  The dependent lossless-projection proof now also eliminates the final
+  funds branch before constructor injection, so successful source journals
+  reduce to the exact `sourceJournal` on the current interface.
   The exact-parent `missing_lido_caller_guard_refutes_exact_parent` mutant
   keeps a successful seven-wei runtime-Lido frame while refuting that
   conjunct.

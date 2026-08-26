@@ -65,6 +65,7 @@ theorem every_source_success_journal_projects
   unfold sourceRun at hSuccess
   split at hSuccess <;> try contradiction
   split at hSuccess <;> try contradiction
+  split at hSuccess <;> try contradiction
   injection hSuccess with hJournal
   subst journal
   exact sourceJournal_projects endpoints inputs
