@@ -1,36 +1,29 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: d50e3bc50f948e9834842908de0b4d8fb7dfc12b
+validated-tree: 170e4f7c944ca8cdab40b3bbb25f2ec2484d00b7
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
 
-P-VAULT-ETH-1 executable sender binding repair (2026-08-26)
----------------------------------------------------------------
+P-VAULT-ETH-1 route-sensitive executable caller-binding repair (2026-08-26)
+-----------------------------------------------------------------------------
 
-- Bind the source-model `inputs.caller` to the executable `entry.sender` at
-  `VaultEthTx.execute` before the source schedule is evaluated. A successful
-  Vault→Lido execution now entails `inputs.caller = entry.sender` and
-  `entry.sender = endpoints.lido`; the latter is the caller guard claimed by
+- Bind the source-model `inputs.caller` to executable `entry.sender` only on
+  the pinned WithdrawalVault→Lido route. Successful Vault→Lido executions
+  entail `inputs.caller = entry.sender` and `entry.sender = endpoints.lido`;
+  the source-shaped WithdrawalQueue route intentionally permits a distinct
+  caller.
+- `withdrawal_queue_distinct_caller_commits` is the regression for that route
+  distinction. The exact-parent
+  `missing_lido_caller_guard_refutes_exact_parent` mutant retains the source
+  schedule but removes only the Lido-only execution-boundary bind, so it
+  succeeds from an unauthorized `entry.sender` and refutes
   `LidoCallerEndpointBinding`.
-- Update the exact-parent regression
-  `missing_lido_caller_guard_refutes_exact_parent`: it retains the source
-  caller guard and the seven-wei runtime-Lido frame, but removes only the
-  boundary binding and succeeds from an unauthorized `entry.sender`.
-- Synchronize the canonical P-VAULT-ETH-1 summary, `fidelity.covered`, and
-  reproduction expectation; regenerate derived audit views. Deployment
-  identity remains OPEN: runtime endpoint equality is not deployment identity.
-- Gates: `lake build LidoSRv3.Audit.Guarantees.PVaultEth1
-  LidoSRv3.Tests.PackP2VaultEthMutants` exit 0; `make audit-check`,
-  `python3 scripts/test_audit_metadata.py`,
-  `python3 scripts/check_public_claim_surfaces.py`,
-  `python3 scripts/test_public_claim_surfaces.py`,
-  `bash scripts/check_no_python_evidence.sh`,
-  `bash scripts/test_check_no_python_evidence.sh`, and `git diff --check`
-  exit 0. Changed-Lean proof-escape scan found no `sorry`, `admit`, `axiom`,
-  or `native_decide`.
+- Canonical YAML, generated audit views, and this receipt are synchronized.
+  Deployment identity remains OPEN: runtime endpoint equality is not
+  deployment identity.
 
 P-VAULT-ETH-1 caller-guard metadata synchronization (2026-08-26)
 ----------------------------------------------------------------

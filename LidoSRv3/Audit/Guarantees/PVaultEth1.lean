@@ -99,7 +99,8 @@ theorem vault_to_lido_value_frame_inhabited :
       specDestination lidoWitnessInput.route = .vaultToLido ∧
       (returnEntry witnessEndpoints lidoWitnessInput).value = 7 := by
   refine ⟨execute_commits_of_preconditions
-    witnessEndpoints lidoWitnessInput witnessEntry (by decide) (by decide) (by decide) (by decide), rfl, rfl⟩
+    witnessEndpoints lidoWitnessInput witnessEntry (fun _ => by decide)
+      (by decide) (by decide) (by decide), rfl, rfl⟩
 
 /-- Non-vacuity: the WithdrawalQueue return constructor is inhabited by a
 successful seven-wei `externalCallBindTo` frame. -/
@@ -110,6 +111,7 @@ theorem vault_to_withdrawal_queue_value_frame_inhabited :
       specDestination queueWitnessInput.route = .vaultToWithdrawalQueue ∧
       (returnEntry witnessEndpoints queueWitnessInput).value = 7 := by
   refine ⟨execute_commits_of_preconditions
-    witnessEndpoints queueWitnessInput witnessEntry (by decide) (by decide) (by decide) (by decide), rfl, rfl⟩
+    witnessEndpoints queueWitnessInput witnessEntry (fun h => by cases h)
+      (by decide) (by decide) (by decide), rfl, rfl⟩
 
 end LidoSRv3.Audit.Guarantees.PVaultEth1

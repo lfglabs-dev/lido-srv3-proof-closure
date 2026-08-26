@@ -8,8 +8,8 @@ and executable external-call primitive, but sends zero wei in the fresh frame.
 It therefore refutes the new parent's value-bearing conjunct.  This is not the
 older exclusion-only Lido mutant.
 
-The second mutant keeps the route, runtime target, and value frame but drops
-the modeled `msg.sender == address(LIDO)` admission check. It refutes the
+The second mutant keeps the source schedule, route, runtime target, and value
+frame but drops the executable Lido-only caller binding. It refutes the
 caller/endpoint parent conjunct without claiming an endpoint is deployment
 identity or widening the WithdrawalQueue route.
 -/
@@ -103,15 +103,16 @@ theorem zero_value_frame_kill_line_refutes_parent :
   intro hParent
   exact zero_value_frame_fails_value_bearing_conjunct hParent.2.1
 
-/-! ## Exact-parent caller/endpoint kill-line -/
+/-! ## Route-sensitive caller-binding regression and exact-parent kill-line -/
 
-/-- Exact-parent mutant: it retains the source guard over the supplied input
-but skips the execution-boundary binding to `entry.sender`. -/
-def executeWithoutLidoCallerGuard
+/-- Exact-parent mutant: it retains the whole source schedule, including its
+Lido caller guard, but skips the executable Lido-only binding to `entry.sender`.
+-/
+def executeWithoutLidoCallerBinding
     (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
-  if inputs.amount = 0 then .revert "ZeroAmount" entry
-  else if inputs.amount ≤ entry.selfBalance then returnFrame endpoints inputs entry
-  else .revert "NotEnoughEther" entry
+  match sourceRun endpoints inputs entry.selfBalance with
+  | .reverted reason => .revert reason entry
+  | .committed _ => returnFrame endpoints inputs entry
 
 private def unauthorizedLidoInputs : Inputs :=
   { route := .lidoReceiveWithdrawals, caller := 1, amount := .ofNat 7 }
@@ -119,20 +120,32 @@ private def unauthorizedLidoInputs : Inputs :=
 private def unauthorizedEntry : ContractState :=
   { entry with sender := 9 }
 
+private def queueInputsWithDistinctCaller : Inputs :=
+  { route := .withdrawalQueueReturn, caller := 9, amount := .ofNat 7 }
+
+/-- WithdrawalQueue remains source-shaped: a distinct model caller and
+executable sender must not be rejected by the Lido-only boundary guard. -/
+theorem withdrawal_queue_distinct_caller_commits :
+    (execute endpoints queueInputsWithDistinctCaller).run entry =
+      .success () (afterFrame endpoints queueInputsWithDistinctCaller entry) := by
+  exact execute_commits_of_preconditions endpoints queueInputsWithDistinctCaller entry
+    (fun h => by cases h) (by decide) (by decide) (by decide)
+
 theorem unauthorized_lido_mutant_commits :
-    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run unauthorizedEntry =
+    (executeWithoutLidoCallerBinding endpoints unauthorizedLidoInputs).run unauthorizedEntry =
       .success () (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) := by
   rw [Contract.run]
-  have hNonzero : unauthorizedLidoInputs.amount ≠ 0 := by decide
   have hFunds : unauthorizedLidoInputs.amount ≤ unauthorizedEntry.selfBalance := by decide
-  simp only [executeWithoutLidoCallerGuard, if_neg hNonzero, if_pos hFunds]
+  simp only [executeWithoutLidoCallerBinding,
+    sourceRun_commits_of_preconditions endpoints unauthorizedLidoInputs
+      unauthorizedEntry.selfBalance (by decide) (by decide) hFunds]
   rw [returnFrame_apply endpoints unauthorizedLidoInputs unauthorizedEntry hFunds]
 
 /-- **Exact-parent mutant.** With an unauthorized executable sender, the
 binding-dropping route still emits the same seven-wei Lido frame and refutes
 the registered `LidoCallerEndpointBinding` conjunct. -/
 theorem missing_lido_caller_guard_refutes_exact_parent :
-    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run unauthorizedEntry =
+    (executeWithoutLidoCallerBinding endpoints unauthorizedLidoInputs).run unauthorizedEntry =
         .success () (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) ∧
       ¬ ValueHopConclusion endpoints unauthorizedLidoInputs unauthorizedEntry
         (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) := by
