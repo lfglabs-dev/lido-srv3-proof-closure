@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 6e090032b4a882115d7f00b422001153afa0426e
+validated-tree: 243a416743a68a0fd3e8f2ecb692c5b20075337f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -4628,3 +4628,21 @@ P-DEPOSIT-1 pinned constructor guard binding repair (2026-08-26)
 - `git diff --check` exit 0.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `6e090032b4a882115d7f00b422001153afa0426e`.
+
+P-DEPOSIT-1 constructor predicate correspondence gate repair (2026-08-26)
+----------------------------------------------------------------------------
+
+- Make the metadata correspondence gate fail closed by extracting the complete
+  `PinnedConstructorAdmitted` definition body and requiring an exact full-body
+  match for the two pinned constructor guards.
+- Add a regression mutant that appends
+  `∧ inputs.depositContract = 0xDEAD`; the former prefix regex accepted this
+  strengthened predicate, while the repaired gate rejects it.
+- Keep `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` OPEN. No `LinksSource` is
+  derived.
+- `python3 scripts/test_audit_metadata.py` exit 0.
+- `python3 scripts/audit_metadata.py check` exit 0.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/check_validation_receipt.py` exit 0 after this rebind.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `243a416743a68a0fd3e8f2ecb692c5b20075337f`.
