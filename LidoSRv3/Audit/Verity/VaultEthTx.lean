@@ -66,6 +66,7 @@ theorem returnFrame_apply (endpoints : Endpoints) (inputs : Inputs)
 
 theorem execute_commits_of_preconditions
     (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
+    (hCaller : callerAuthorized endpoints inputs = true)
     (hNonzero : inputs.amount ≠ 0)
     (hFunds : inputs.amount ≤ entry.selfBalance) :
     (execute endpoints inputs).run entry =
@@ -73,7 +74,7 @@ theorem execute_commits_of_preconditions
   rw [Contract.run]
   simp only [execute,
     sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
-      hNonzero hFunds]
+      hCaller hNonzero hFunds]
   rw [returnFrame_apply endpoints inputs entry hFunds]
 
 /-- Any successful executable run came from the source committed arm and has
@@ -84,26 +85,31 @@ theorem execute_success_corresponds_to_source
     sourceRun endpoints inputs entry.selfBalance =
         .committed (sourceJournal endpoints inputs) ∧
       after = afterFrame endpoints inputs entry := by
-  by_cases hNonzero : inputs.amount = 0
-  · have hSource :
-        sourceRun endpoints inputs entry.selfBalance =
-          .reverted "ZeroAmount" := by
-      simp [sourceRun, hNonzero]
-    simp [execute, hSource, Contract.run] at hExecute
-  · by_cases hFunds : inputs.amount ≤ entry.selfBalance
-    · have hSource :=
-        sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
-          hNonzero hFunds
-      refine ⟨hSource, ?_⟩
-      have hExpected :=
-        execute_commits_of_preconditions endpoints inputs entry hNonzero hFunds
-      rw [hExecute] at hExpected
-      injection hExpected
+  by_cases hCaller : callerAuthorized endpoints inputs
+  · by_cases hNonzero : inputs.amount = 0
     · have hSource :
           sourceRun endpoints inputs entry.selfBalance =
-            .reverted "NotEnoughEther" := by
-        simp [sourceRun, hNonzero, hFunds]
+            .reverted "ZeroAmount" := by
+        simp [sourceRun, hCaller, hNonzero]
       simp [execute, hSource, Contract.run] at hExecute
+    · by_cases hFunds : inputs.amount ≤ entry.selfBalance
+      · have hSource :=
+          sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
+            hCaller hNonzero hFunds
+        refine ⟨hSource, ?_⟩
+        have hExpected :=
+          execute_commits_of_preconditions endpoints inputs entry hCaller hNonzero hFunds
+        rw [hExecute] at hExpected
+        injection hExpected
+      · have hSource :
+          sourceRun endpoints inputs entry.selfBalance =
+            .reverted "NotEnoughEther" := by
+          simp [sourceRun, hCaller, hNonzero, hFunds]
+        simp [execute, hSource, Contract.run] at hExecute
+  · have hSource :
+        sourceRun endpoints inputs entry.selfBalance = .reverted "NotLido" := by
+      simp [sourceRun, hCaller]
+    simp [execute, hSource, Contract.run] at hExecute
 
 theorem afterFrame_freshCalls (endpoints : Endpoints) (inputs : Inputs)
     (entry : ContractState) :

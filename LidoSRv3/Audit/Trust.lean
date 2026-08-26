@@ -225,6 +225,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Guarantees.PVaultEth1.vault_to_withdrawal_queue_value_frame_inhabited
 #print axioms LidoSRv3.Tests.PackP2VaultEthMutants.zero_value_frame_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackP2VaultEthMutants.mutant_vault_lido_as_lidoPull_refutes_projection
+#print axioms LidoSRv3.Tests.PackP2VaultEthMutants.missing_lido_caller_guard_refutes_exact_parent
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.sum_balances_mutant_killed

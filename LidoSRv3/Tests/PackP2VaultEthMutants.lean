@@ -1,12 +1,17 @@
 import LidoSRv3.Audit.Guarantees.PVaultEth1
 
 /-!
-# P-VAULT-ETH-1 value-frame kill-line
+# P-VAULT-ETH-1 value-frame and exact-parent kill-lines
 
 The mutant keeps the same nonzero source amount, route, target, source success,
 and executable external-call primitive, but sends zero wei in the fresh frame.
 It therefore refutes the new parent's value-bearing conjunct.  This is not the
 older exclusion-only Lido mutant.
+
+The second mutant keeps the exact body tag and value frame but drops the
+source-backed `msg.sender == address(LIDO)` admission check.  It refutes the
+new parent conjunct itself, without claiming an endpoint is deployment
+identity or widening the WithdrawalQueue route.
 -/
 
 namespace LidoSRv3.Tests.PackP2VaultEthMutants
@@ -52,6 +57,7 @@ theorem zeroValueFrame_apply (endpoints : Endpoints) (inputs : Inputs)
 
 theorem executeZeroValueMutant_commits
     (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
+    (hCaller : callerAuthorized endpoints inputs = true)
     (hNonzero : inputs.amount ≠ 0)
     (hFunds : inputs.amount ≤ entry.selfBalance) :
     (executeZeroValueMutant endpoints inputs).run entry =
@@ -59,14 +65,14 @@ theorem executeZeroValueMutant_commits
   rw [Contract.run]
   simp only [executeZeroValueMutant,
     sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
-      hNonzero hFunds]
+      hCaller hNonzero hFunds]
   rw [zeroValueFrame_apply endpoints inputs entry]
 
 private def endpoints : Endpoints :=
   { lido := 1, withdrawalQueue := 2 }
 
 private def inputs : Inputs :=
-  { route := .lidoReceiveWithdrawals, amount := .ofNat 7 }
+  { route := .lidoReceiveWithdrawals, caller := 1, amount := .ofNat 7 }
 
 private def entry : ContractState :=
   { defaultState with selfBalance := .ofNat 10 }
@@ -92,10 +98,46 @@ theorem zero_value_frame_kill_line_refutes_parent :
       ¬ ValueHopConclusion endpoints inputs entry
         (afterZeroValueFrame endpoints inputs entry) := by
   refine ⟨sourceRun_commits_of_preconditions
-      endpoints inputs entry.selfBalance (by decide) (by decide),
-    executeZeroValueMutant_commits endpoints inputs entry (by decide) (by decide), ?_⟩
+      endpoints inputs entry.selfBalance (by decide) (by decide) (by decide),
+    executeZeroValueMutant_commits endpoints inputs entry (by decide) (by decide) (by decide), ?_⟩
   intro hParent
   exact zero_value_frame_fails_value_bearing_conjunct hParent.2.1
+
+/-! ## Exact-parent caller/body/endpoint kill-line -/
+
+/-- Mutated executable body: it preserves the Lido route tag, runtime target,
+and value-bearing frame, but skips the pinned `msg.sender == address(LIDO)`
+guard before the frame. -/
+def executeWithoutLidoCallerGuard
+    (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
+  if inputs.amount = 0 then .revert "ZeroAmount" entry
+  else if inputs.amount ≤ entry.selfBalance then returnFrame endpoints inputs entry
+  else .revert "NotEnoughEther" entry
+
+private def unauthorizedLidoInputs : Inputs :=
+  { route := .lidoReceiveWithdrawals, caller := 9, amount := .ofNat 7 }
+
+theorem unauthorized_lido_mutant_commits :
+    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run entry =
+      .success () (afterFrame endpoints unauthorizedLidoInputs entry) := by
+  rw [Contract.run]
+  simp [executeWithoutLidoCallerGuard, unauthorizedLidoInputs,
+    returnFrame_apply endpoints unauthorizedLidoInputs entry (by decide)]
+
+/-- **Exact-parent mutant.** The guard-dropping body still emits the same
+seven-wei Lido frame, but its successful unauthorized input falsifies the
+registered `LidoTagBodyEndpointBinding` conjunct. This is intentionally only
+a body/tag/runtime-endpoint counterexample; it says nothing about deployed
+contract identity or the source-shaped WithdrawalQueue route. -/
+theorem missing_lido_caller_guard_refutes_exact_parent :
+    (executeWithoutLidoCallerGuard endpoints unauthorizedLidoInputs).run entry =
+        .success () (afterFrame endpoints unauthorizedLidoInputs entry) ∧
+      ¬ ValueHopConclusion endpoints unauthorizedLidoInputs entry
+        (afterFrame endpoints unauthorizedLidoInputs entry) := by
+  refine ⟨unauthorized_lido_mutant_commits, ?_⟩
+  intro hParent
+  have hBinding := hParent.2.2.1 rfl
+  exact (by decide : (9 : Address) ≠ 1) hBinding.2.1
 
 /-- Mutant projection: keep the Vault→Lido source hop and wei, but journal
 it as the deposit/top-up `lidoPull` constructor. That is not the new
