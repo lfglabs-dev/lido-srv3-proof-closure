@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 336707ba1f9d9b5cc658a2b9833d7309473e62a2
+validated-tree: 6e090032b4a882115d7f00b422001153afa0426e
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -4605,3 +4605,26 @@ P-DEPOSIT-1 deployment provenance remains OPEN (2026-08-26)
 - `make audit-check` and `git diff --check` exit 0.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `336707ba1f9d9b5cc658a2b9833d7309473e62a2`.
+
+P-DEPOSIT-1 pinned constructor guard binding repair (2026-08-26)
+----------------------------------------------------------------
+
+- Vendor the exact `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`
+  `StakingRouter.sol` L88--L106 constructor slice and pin its SHA-256 as
+  `41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9`.
+- Bind `P-DEPOSIT-1` to that source span in `audit/source-map.yaml`. The
+  metadata checker mechanically verifies the source guard sequence, direct
+  immutable assignments, and the corresponding two-conjunct Lean predicate.
+- Add a parent-shaped guard-drop mutant whose zero `_maxEBType1` witness is
+  admitted by the mutant and rejected by the bound source predicate.
+- Keep `A-DEPOSIT-CONTRACT` and `A-DEPOSIT-32-ETHER` OPEN. No deployed artifact
+  is asserted and no `LinksSource` is derived.
+- `lake env lean LidoSRv3/Audit/Provenance/Deposit.lean` exit 0.
+- `lake env lean LidoSRv3/Tests/PackGDepositProvenanceMutants.lean` exit 0.
+- `python3 scripts/test_audit_metadata.py` exit 0.
+- `python3 scripts/audit_metadata.py check` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `git diff --check` exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `6e090032b4a882115d7f00b422001153afa0426e`.
