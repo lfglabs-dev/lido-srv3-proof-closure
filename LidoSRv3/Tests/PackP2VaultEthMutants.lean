@@ -40,7 +40,7 @@ def afterZeroValueFrame (endpoints : Endpoints) (inputs : Inputs)
 
 def executeZeroValueMutant
     (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
-  match sourceRun endpoints inputs entry.selfBalance with
+  match sourceRun endpoints inputs entry with
   | .reverted reason => .revert reason entry
   | .committed _ => zeroValueFrame endpoints inputs entry
 
@@ -57,14 +57,14 @@ theorem zeroValueFrame_apply (endpoints : Endpoints) (inputs : Inputs)
 
 theorem executeZeroValueMutant_commits
     (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
-    (hCaller : callerAuthorized endpoints inputs = true)
+    (hCaller : callerAuthorized endpoints inputs entry.sender = true)
     (hNonzero : inputs.amount ≠ 0)
     (hFunds : inputs.amount ≤ entry.selfBalance) :
     (executeZeroValueMutant endpoints inputs).run entry =
       .success () (afterZeroValueFrame endpoints inputs entry) := by
   rw [Contract.run]
   simp only [executeZeroValueMutant,
-    sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
+    sourceRun_commits_of_preconditions endpoints inputs entry
       hCaller hNonzero hFunds]
   rw [zeroValueFrame_apply endpoints inputs entry]
 
@@ -91,26 +91,38 @@ theorem zero_value_frame_fails_value_bearing_conjunct :
 retained, but changing the Vault→Lido frame from seven wei to zero falsifies
 the registered three-conjunct conclusion. -/
 theorem zero_value_frame_kill_line_refutes_parent :
-    sourceRun endpoints inputs entry.selfBalance =
+    sourceRun endpoints inputs entry =
         .committed (sourceJournal endpoints inputs) ∧
       (executeZeroValueMutant endpoints inputs).run entry =
         .success () (afterZeroValueFrame endpoints inputs entry) ∧
       ¬ ValueHopConclusion endpoints inputs entry
         (afterZeroValueFrame endpoints inputs entry) := by
   refine ⟨sourceRun_commits_of_preconditions
-      endpoints inputs entry.selfBalance (by decide) (by decide) (by decide),
+      endpoints inputs entry (by decide) (by decide) (by decide),
     executeZeroValueMutant_commits endpoints inputs entry (by decide) (by decide) (by decide), ?_⟩
   intro hParent
   exact zero_value_frame_fails_value_bearing_conjunct hParent.2.1
 
 /-! ## Route-sensitive caller-binding regression and exact-parent kill-line -/
 
-/-- Exact-parent mutant: it retains the whole source schedule, including its
-Lido caller guard, but skips the executable Lido-only binding to `entry.sender`.
--/
-def executeWithoutLidoCallerBinding
+/-- Exact-parent regression mutant: the former source guard read the auxiliary
+input field instead of the executable state's sender. -/
+def callerAuthorizedFromInputs (endpoints : Endpoints) (inputs : Inputs) : Bool :=
+  match inputs.route with
+  | .lidoReceiveWithdrawals => inputs.caller == endpoints.lido
+  | .withdrawalQueueReturn => true
+
+def sourceRunWithInputCaller
+    (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState) : SourceOutcome :=
+  if !callerAuthorizedFromInputs endpoints inputs then .reverted "NotLido"
+  else if inputs.amount = 0 then .reverted "ZeroAmount"
+  else if inputs.amount ≤ entry.selfBalance then
+    .committed (sourceJournal endpoints inputs)
+  else .reverted "NotEnoughEther"
+
+def executeWithInputCallerGuard
     (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
-  match sourceRun endpoints inputs entry.selfBalance with
+  match sourceRunWithInputCaller endpoints inputs entry with
   | .reverted reason => .revert reason entry
   | .committed _ => returnFrame endpoints inputs entry
 
@@ -129,23 +141,22 @@ theorem withdrawal_queue_distinct_caller_commits :
     (execute endpoints queueInputsWithDistinctCaller).run entry =
       .success () (afterFrame endpoints queueInputsWithDistinctCaller entry) := by
   exact execute_commits_of_preconditions endpoints queueInputsWithDistinctCaller entry
-    (fun h => by cases h) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide)
 
 theorem unauthorized_lido_mutant_commits :
-    (executeWithoutLidoCallerBinding endpoints unauthorizedLidoInputs).run unauthorizedEntry =
+    (executeWithInputCallerGuard endpoints unauthorizedLidoInputs).run unauthorizedEntry =
       .success () (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) := by
   rw [Contract.run]
   have hFunds : unauthorizedLidoInputs.amount ≤ unauthorizedEntry.selfBalance := by decide
-  simp only [executeWithoutLidoCallerBinding,
-    sourceRun_commits_of_preconditions endpoints unauthorizedLidoInputs
-      unauthorizedEntry.selfBalance (by decide) (by decide) hFunds]
+  simp [executeWithInputCallerGuard, sourceRunWithInputCaller,
+    callerAuthorizedFromInputs, hFunds]
   rw [returnFrame_apply endpoints unauthorizedLidoInputs unauthorizedEntry hFunds]
 
-/-- **Exact-parent mutant.** With an unauthorized executable sender, the
-binding-dropping route still emits the same seven-wei Lido frame and refutes
-the registered `LidoCallerEndpointBinding` conjunct. -/
-theorem missing_lido_caller_guard_refutes_exact_parent :
-    (executeWithoutLidoCallerBinding endpoints unauthorizedLidoInputs).run unauthorizedEntry =
+/-- **Exact-parent mutant.** With an unauthorized executable sender, restoring
+the exact-parent input-field guard still emits the same seven-wei Lido frame
+and refutes the registered `LidoCallerEndpointBinding` conjunct. -/
+theorem input_caller_guard_refutes_exact_parent :
+    (executeWithInputCallerGuard endpoints unauthorizedLidoInputs).run unauthorizedEntry =
         .success () (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) ∧
       ¬ ValueHopConclusion endpoints unauthorizedLidoInputs unauthorizedEntry
         (afterFrame endpoints unauthorizedLidoInputs unauthorizedEntry) := by

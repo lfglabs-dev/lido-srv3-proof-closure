@@ -40,20 +40,12 @@ def afterFrame (endpoints : Endpoints) (inputs : Inputs)
     selfBalance := entry.selfBalance - inputs.amount
     calls := entry.calls ++ [returnEntry endpoints inputs] }
 
-/-- Only the pinned WithdrawalVault→Lido route binds the source-model caller
-to the executable `msg.sender`.  WithdrawalQueue remains source-shaped, so it
-does not impose this executable caller relation. -/
+/-- Only the pinned WithdrawalVault→Lido route evaluates its caller guard
+against the executable `msg.sender`.  WithdrawalQueue remains source-shaped. -/
 def execute (endpoints : Endpoints) (inputs : Inputs) : Contract Unit := fun entry =>
-  match inputs.route with
-  | .lidoReceiveWithdrawals =>
-      if inputs.caller != entry.sender then .revert "CallerInputMismatch" entry
-      else match sourceRun endpoints inputs entry.selfBalance with
-        | .reverted reason => .revert reason entry
-        | .committed _ => returnFrame endpoints inputs entry
-  | .withdrawalQueueReturn =>
-      match sourceRun endpoints inputs entry.selfBalance with
-      | .reverted reason => .revert reason entry
-      | .committed _ => returnFrame endpoints inputs entry
+  match sourceRun endpoints inputs entry with
+  | .reverted reason => .revert reason entry
+  | .committed _ => returnFrame endpoints inputs entry
 
 def freshCalls (entry after : ContractState) : List ExternalCall :=
   after.calls.drop entry.calls.length
@@ -74,86 +66,71 @@ theorem returnFrame_apply (endpoints : Endpoints) (inputs : Inputs)
 
 theorem execute_commits_of_preconditions
     (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
-    (hEntryCaller : inputs.route = .lidoReceiveWithdrawals →
-      inputs.caller = entry.sender)
-    (hCaller : callerAuthorized endpoints inputs = true)
+    (hCaller : callerAuthorized endpoints inputs entry.sender = true)
     (hNonzero : inputs.amount ≠ 0)
     (hFunds : inputs.amount ≤ entry.selfBalance) :
     (execute endpoints inputs).run entry =
       .success () (afterFrame endpoints inputs entry) := by
   rw [Contract.run]
-  cases hRoute : inputs.route
-  · have hCallerEq : inputs.caller = entry.sender := hEntryCaller hRoute
-    simp [execute, hRoute, hCallerEq,
-      sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
-        hCaller hNonzero hFunds,
-      returnFrame_apply endpoints inputs entry hFunds]
-  · simp [execute, hRoute,
-      sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
-        hCaller hNonzero hFunds,
-      returnFrame_apply endpoints inputs entry hFunds]
+  simp [execute, sourceRun_commits_of_preconditions endpoints inputs entry
+    hCaller hNonzero hFunds, returnFrame_apply endpoints inputs entry hFunds]
 
 /-- Any successful executable run came from the source committed arm and has
 exactly the state produced by its value-bearing frame. -/
 theorem execute_success_corresponds_to_source
     (endpoints : Endpoints) (inputs : Inputs) (entry after : ContractState)
     (hExecute : (execute endpoints inputs).run entry = .success () after) :
-    sourceRun endpoints inputs entry.selfBalance =
+    sourceRun endpoints inputs entry =
         .committed (sourceJournal endpoints inputs) ∧
-      after = afterFrame endpoints inputs entry ∧
-      (inputs.route = .lidoReceiveWithdrawals →
-        inputs.caller = entry.sender) := by
+      after = afterFrame endpoints inputs entry := by
   cases hRoute : inputs.route with
   | lidoReceiveWithdrawals =>
-    have hEntryCaller : inputs.caller = entry.sender := by
-      by_contra hMismatch
-      simp [execute, hRoute, if_pos hMismatch, Contract.run] at hExecute
-    by_cases hCaller : callerAuthorized endpoints inputs
+    by_cases hCaller : callerAuthorized endpoints inputs entry.sender
     · by_cases hNonzero : inputs.amount = 0
       · have hSource :
-            sourceRun endpoints inputs entry.selfBalance =
+            sourceRun endpoints inputs entry =
               .reverted "ZeroAmount" := by
           simp [sourceRun, hCaller, hNonzero]
-        simp [execute, hRoute, hEntryCaller, hSource, Contract.run] at hExecute
+        simp [execute, hRoute, hSource, Contract.run] at hExecute
       · by_cases hFunds : inputs.amount ≤ entry.selfBalance
         · have hSource :=
-            sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
+            sourceRun_commits_of_preconditions endpoints inputs entry
               hCaller hNonzero hFunds
-          refine ⟨hSource, ?_, fun _ => hEntryCaller⟩
+          refine ⟨hSource, ?_⟩
           have hExpected :=
             execute_commits_of_preconditions endpoints inputs entry
-              (fun _ => hEntryCaller) hCaller hNonzero hFunds
+              hCaller hNonzero hFunds
           rw [hExecute] at hExpected
           injection hExpected
         · have hSource :
-            sourceRun endpoints inputs entry.selfBalance =
+            sourceRun endpoints inputs entry =
               .reverted "NotEnoughEther" := by
             simp [sourceRun, hCaller, hNonzero, hFunds]
-          simp [execute, hRoute, hEntryCaller, hSource, Contract.run] at hExecute
+          simp [execute, hRoute, hSource, Contract.run] at hExecute
     · have hSource :
-          sourceRun endpoints inputs entry.selfBalance = .reverted "NotLido" := by
+          sourceRun endpoints inputs entry = .reverted "NotLido" := by
         simp [sourceRun, hCaller]
-      simp [execute, hRoute, hEntryCaller, hSource, Contract.run] at hExecute
+      simp [execute, hRoute, hSource, Contract.run] at hExecute
   | withdrawalQueueReturn =>
-    by_cases hCaller : callerAuthorized endpoints inputs
+    by_cases hCaller : callerAuthorized endpoints inputs entry.sender
     · by_cases hNonzero : inputs.amount = 0
       · have hSource :
-          sourceRun endpoints inputs entry.selfBalance =
+          sourceRun endpoints inputs entry =
             .reverted "ZeroAmount" := by
           simp [sourceRun, hCaller, hNonzero]
         simp [execute, hRoute, hSource, Contract.run] at hExecute
       · by_cases hFunds : inputs.amount ≤ entry.selfBalance
         · have hSource :=
-            sourceRun_commits_of_preconditions endpoints inputs entry.selfBalance
+            sourceRun_commits_of_preconditions endpoints inputs entry
               hCaller hNonzero hFunds
-          refine ⟨hSource, ?_, fun h => by cases hRoute; cases h⟩
+          refine ⟨hSource, ?_⟩
           have hExpected :=
             execute_commits_of_preconditions endpoints inputs entry
-              (fun h => by cases hRoute; cases h) hCaller hNonzero hFunds
+              hCaller hNonzero hFunds
           rw [hExecute] at hExpected
           injection hExpected
         · have hSource :
-            sourceRun endpoints inputs entry.selfBalance =
+          sourceRun endpoints inputs entry =
               .reverted "NotEnoughEther" := by
             simp [sourceRun, hCaller, hNonzero, hFunds]
           simp [execute, hRoute, hSource, Contract.run] at hExecute

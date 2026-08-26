@@ -1044,9 +1044,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PVaultEth1 LidoSRv3.Tests.PackP2VaultEthMutants",
-    "expected": "protocol_return_value_hops and both constructor inhabitants build; withdrawal_queue_distinct_caller_commits preserves a successful source-shaped WithdrawalQueue route when inputs.caller differs from entry.sender; zero_value_frame_kill_line_refutes_parent changes the Vault-to-Lido frame from seven wei to zero; missing_lido_caller_guard_refutes_exact_parent drops only the Lido-route execution-boundary inputs.caller == entry.sender binding while retaining the source caller guard and a successful seven-wei runtime-Lido frame from an unauthorized entry.sender; mutant_vault_lido_as_lidoPull_refutes_projection retags the hop as lidoPull"
+    "expected": "protocol_return_value_hops and both constructor inhabitants build; withdrawal_queue_distinct_caller_commits preserves a successful source-shaped WithdrawalQueue route when inputs.caller differs from entry.sender; zero_value_frame_kill_line_refutes_parent changes the Vault-to-Lido frame from seven wei to zero; input_caller_guard_refutes_exact_parent restores the exact-parent inputs.caller-to-runtime-Lido guard and admits a successful seven-wei frame from an unauthorized entry.sender, refuting LidoCallerEndpointBinding; mutant_vault_lido_as_lidoPull_refutes_projection retags the hop as lidoPull"
       },
-  "summary": "P-VAULT-ETH-1: every successful modeled Vault-to-Lido or WithdrawalQueue protocol-return run has a lossless Spec.EthJournal projection and one externalCallBindTo frame whose value equals the Spec leg wei. Only the pinned Vault-to-Lido route binds inputs.caller == entry.sender and entry.sender == the runtime Lido endpoint; WithdrawalQueue intentionally remains source-shaped and may have a distinct caller. Owner-controlled arbitrary recipients remain excluded. Route constructors, not endpoint address pins, carry provenance. This is not a claim that Lido never drains ETH or a claim about all SRv3 ETH.",
+  "summary": "P-VAULT-ETH-1: every successful modeled Vault-to-Lido or WithdrawalQueue protocol-return run has a lossless Spec.EthJournal projection and one externalCallBindTo frame whose value equals the Spec leg wei. Only the pinned Vault-to-Lido route binds the executable entry.sender to the runtime Lido endpoint; inputs.caller is auxiliary and cannot authorize that route. WithdrawalQueue intentionally remains source-shaped and may have a distinct caller. Owner-controlled arbitrary recipients remain excluded. Route constructors, not endpoint address pins, carry provenance. This is not a claim that Lido never drains ETH or a claim about all SRv3 ETH.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops"
@@ -1060,11 +1060,11 @@
           "new vaultToLido and vaultToWithdrawalQueue ApprovedDestination constructors",
           "lossless source-journal projection preserves each successful route and exact wei",
           "both constructors have concrete nonzero externalCallBindTo frame inhabitants",
-      "successful modeled Vault-to-Lido route entails inputs.caller == entry.sender, entry.sender == endpoints.lido, and targetOf endpoints route == endpoints.lido",
+      "successful modeled Vault-to-Lido route entails entry.sender == endpoints.lido and targetOf endpoints route == endpoints.lido; inputs.caller is not an authorization input",
           "source-shaped WithdrawalQueue success permits inputs.caller different from entry.sender",
           "owner-controlled VaultHub / StakingVault arbitrary-recipient destination maps to none",
           "parent-shaped zero-value frame kill-line retains source and executable success",
-      "exact-parent missing_lido_caller_guard_refutes_exact_parent mutant retains the source schedule and a successful seven-wei runtime-Lido frame from an unauthorized entry.sender, but refutes LidoCallerEndpointBinding",
+      "exact-parent input_caller_guard_refutes_exact_parent mutant restores the former inputs.caller guard, admits a successful seven-wei runtime-Lido frame from an unauthorized entry.sender, and refutes LidoCallerEndpointBinding",
           "parent-shaped dest kill-line: Vault-to-Lido hop retagged as lidoPull fails lossless projection"
         ],
         "missing": [

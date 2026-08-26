@@ -46,8 +46,8 @@ inductive Destination
 
 structure Inputs where
   route : Route
-  /-- `msg.sender` at the modeled vault entry.  It is checked only for the
-  source-backed WithdrawalVault→Lido body. -/
+  /-- Legacy auxiliary caller input. It never authorizes the source-backed
+  WithdrawalVault→Lido body; that guard reads `ContractState.sender`. -/
   caller : Address
   amount : Word
   deriving Repr
@@ -74,11 +74,13 @@ def targetOf (endpoints : Endpoints) : Route → Address
   | .withdrawalQueueReturn => endpoints.withdrawalQueue
 
 /-- The exact caller guard present in the pinned
-`WithdrawalVault.withdrawWithdrawals` body.  The WithdrawalQueue constructor
-has no such body binding yet, so it remains source-shaped. -/
-def callerAuthorized (endpoints : Endpoints) (inputs : Inputs) : Bool :=
+`WithdrawalVault.withdrawWithdrawals` body.  Its subject is the executable
+entry state's `msg.sender`, never the auxiliary `Inputs.caller` field.
+The WithdrawalQueue constructor has no such body binding yet, so it remains
+source-shaped. -/
+def callerAuthorized (endpoints : Endpoints) (inputs : Inputs) (sender : Address) : Bool :=
   match inputs.route with
-  | .lidoReceiveWithdrawals => inputs.caller == endpoints.lido
+  | .lidoReceiveWithdrawals => sender == endpoints.lido
   | .withdrawalQueueReturn => true
 
 /-- Successful source schedule: one hop whose dest is the route constructor
@@ -88,31 +90,31 @@ def sourceJournal (endpoints : Endpoints) (inputs : Inputs) : SourceJournal :=
      target := targetOf endpoints inputs.route
      value := inputs.amount }]
 
-/-- Source guards: the exact pinned Lido-caller check where a body is known,
-then nonzero amount and enough vault ETH. Endpoints are runtime inputs, not
-deployment identity evidence. -/
-def sourceRun (endpoints : Endpoints) (inputs : Inputs) (vaultBalance : Word) :
+/-- Source guards: the exact pinned Lido-caller check over the executable
+entry sender where a body is known, then nonzero amount and enough vault ETH.
+Endpoints are runtime inputs, not deployment identity evidence. -/
+def sourceRun (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState) :
     SourceOutcome :=
-  if !callerAuthorized endpoints inputs then .reverted "NotLido"
+  if !callerAuthorized endpoints inputs entry.sender then .reverted "NotLido"
   else if inputs.amount = 0 then .reverted "ZeroAmount"
-  else if inputs.amount ≤ vaultBalance then
+  else if inputs.amount ≤ entry.selfBalance then
     .committed (sourceJournal endpoints inputs)
   else .reverted "NotEnoughEther"
 
 theorem sourceRun_commits_of_preconditions
-    (endpoints : Endpoints) (inputs : Inputs) (vaultBalance : Word)
-    (hCaller : callerAuthorized endpoints inputs = true)
+    (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
+    (hCaller : callerAuthorized endpoints inputs entry.sender = true)
     (hNonzero : inputs.amount ≠ 0)
-    (hFunds : inputs.amount ≤ vaultBalance) :
-    sourceRun endpoints inputs vaultBalance =
+    (hFunds : inputs.amount ≤ entry.selfBalance) :
+    sourceRun endpoints inputs entry =
       .committed (sourceJournal endpoints inputs) := by
   simp [sourceRun, hCaller, hNonzero, hFunds]
 
 theorem sourceRun_reverts_on_zero
-    (endpoints : Endpoints) (inputs : Inputs) (vaultBalance : Word)
-    (hCaller : callerAuthorized endpoints inputs = true)
+    (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
+    (hCaller : callerAuthorized endpoints inputs entry.sender = true)
     (hZero : inputs.amount = 0) :
-    sourceRun endpoints inputs vaultBalance = .reverted "ZeroAmount" := by
+    sourceRun endpoints inputs entry = .reverted "ZeroAmount" := by
   simp [sourceRun, hCaller, hZero]
 
 /-- The modeled Lido-route constraints retained by this slice.  This is a
@@ -122,27 +124,23 @@ def LidoCallerEndpointBinding (endpoints : Endpoints) (inputs : Inputs)
     (entry : ContractState) : Prop :=
   inputs.route = .lidoReceiveWithdrawals →
     entry.sender = endpoints.lido ∧
-      inputs.caller = entry.sender ∧
       targetOf endpoints inputs.route = endpoints.lido
 
 theorem lido_caller_endpoint_binding_of_success
-    (endpoints : Endpoints) (inputs : Inputs) (vaultBalance : Word)
-    (entry : ContractState) (journal : SourceJournal)
-    (hSuccess : sourceRun endpoints inputs vaultBalance = .committed journal) :
-    (inputs.route = .lidoReceiveWithdrawals → inputs.caller = entry.sender) →
-      LidoCallerEndpointBinding endpoints inputs entry := by
+    (endpoints : Endpoints) (inputs : Inputs) (entry : ContractState)
+    (journal : SourceJournal)
+    (hSuccess : sourceRun endpoints inputs entry = .committed journal) :
+    LidoCallerEndpointBinding endpoints inputs entry := by
   rcases inputs with ⟨route, caller, amount⟩
   cases route with
   | lidoReceiveWithdrawals =>
       simp only [LidoCallerEndpointBinding]
-      intro hCallerEntry
-      have hCaller : caller = endpoints.lido := by
-        cases hEqual : caller == endpoints.lido with
+      intro _
+      have hSender : entry.sender = endpoints.lido := by
+        cases hEqual : entry.sender == endpoints.lido with
         | false => simp [sourceRun, callerAuthorized, hEqual] at hSuccess
         | true => exact beq_iff_eq.mp hEqual
-      intro _
-      have hCallerEntry' : caller = entry.sender := hCallerEntry True.intro
-      exact ⟨hCallerEntry' ▸ hCaller, hCallerEntry', rfl⟩
+      exact ⟨hSender, rfl⟩
   | withdrawalQueueReturn => simp [LidoCallerEndpointBinding]
 
 theorem sourceJournal_destination (endpoints : Endpoints) (inputs : Inputs) :
