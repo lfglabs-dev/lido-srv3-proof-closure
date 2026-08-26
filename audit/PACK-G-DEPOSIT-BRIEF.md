@@ -13,6 +13,12 @@ model-side pins.
 has no deployed bytecode artifacts that can identify the live
 `DEPOSIT_CONTRACT` immutable or the production constructor scales.
 
+The pinned constructor source is a counterexample to discharging either fact
+from source alone: it checks only that `_depositContract` and `_maxEBType1` are
+nonzero, then assigns them directly. `openAssumptionsCounterexample` supplies
+`0xDEAD` and `64 ether`; both pass those guards while violating the desired
+canonical-address and 32-ether identities. This is not a deployment artifact.
+
 ## Work
 
 1. Pin the production beacon deposit address and 32 ether as provenance
@@ -27,6 +33,8 @@ has no deployed bytecode artifacts that can identify the live
 
 - A wrong pin `0xDEAD` is not the canonical P-DEPOSIT-1 address.
 - The same wrong pin is not `productionBeaconDeposit`.
+- Nonzero `0xDEAD` / `64 ether` constructor inputs are source-admitted while
+  violating both deployment facts.
 
 ## Out of scope
 

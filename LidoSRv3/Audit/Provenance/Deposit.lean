@@ -38,6 +38,34 @@ theorem canonical_thirty_two_ether_pin :
     remains OPEN. -/
 theorem deposit_contract_assumption_remains_open : True := trivial
 
+/-- The only constructor restrictions in the pinned `StakingRouter.sol`
+    source are nonzero checks.  This record is a source-level constructor
+    witness, not a claim that such a router was deployed. -/
+structure ConstructorInputs where
+  depositContract : Nat
+  maxEBType1 : Nat
+  deriving Repr, DecidableEq
+
+/-- The admission predicate copied from the two relevant constructor guards:
+    `_depositContract` and `_maxEBType1` must be nonzero.  The constructor does
+    not compare either value with the canonical address or `DEPOSIT_SIZE`. -/
+def ConstructorAdmitted (inputs : ConstructorInputs) : Prop :=
+  inputs.depositContract ≠ 0 ∧ inputs.maxEBType1 ≠ 0
+
+/-- A source-admitted constructor input that violates both deployment facts.
+    This is the counterexample showing why pinned source alone cannot discharge
+    `A-DEPOSIT-CONTRACT` or `A-DEPOSIT-32-ETHER`. -/
+def openAssumptionsCounterexample : ConstructorInputs :=
+  { depositContract := 0xDEAD
+    maxEBType1 := 64 * 10 ^ 18 }
+
+theorem source_constructor_does_not_discharge_deployment_facts :
+    ConstructorAdmitted openAssumptionsCounterexample ∧
+      openAssumptionsCounterexample.depositContract ≠ productionBeaconDeposit ∧
+      openAssumptionsCounterexample.maxEBType1 ≠ thirtyTwoEtherWei := by
+  norm_num [ConstructorAdmitted, openAssumptionsCounterexample,
+    productionBeaconDeposit, thirtyTwoEtherWei]
+
 /-- A conserving source config exists at the 32-ether scale. Both fields
     match, so `ConservingConfig` holds in the model. This does not prove
     that production `MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and `DEPOSIT_SIZE`
