@@ -17,8 +17,8 @@ PY
 {
   first=1
   for theorem in "${checked[@]}"; do
-    if [[ "$theorem" == 'LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length' ]]; then
-      # This is the real registered theorem whose Lean report has no axioms.
+    if [[ "$theorem" == 'LidoSRv3.Audit.MinFirst.incrementSelected_moduleId' ]]; then
+      # Lean's empty-set spelling must remain a named report, not an omission.
       printf "'%s' does not depend on any axioms\n" "$theorem"
       continue
     fi
@@ -34,6 +34,8 @@ PY
 } > "$tmp/ok"
 python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok" >/dev/null
 
+# The newly registered digest theorem must be emitted and checked by the
+# normal Trust command; its actual dependency set is not fabricated here.
 grep -Fqx '#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length' \
   LidoSRv3/Audit/Trust.lean
 
