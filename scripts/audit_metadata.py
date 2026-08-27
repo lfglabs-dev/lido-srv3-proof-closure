@@ -98,6 +98,7 @@ EXPECTED_PRIORITIES = {
 }
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
+TRUST_NATIVE_DECIDE_ALLOWLIST = AUDIT / "trust-native-decide-allowlist.txt"
 DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256 = "41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9"
 DEPOSIT_UPSTREAM_SOURCE_URL = (
     "https://raw.githubusercontent.com/lidofinance/core/"
@@ -194,6 +195,15 @@ def validate_pins(lock, manifest, source_map):
             policy.get("admit") == 0 and policy.get("unsafe_proof_escapes") == 0,
             "manifest proof policy permits proof escapes")
     require(policy.get("report_entrypoint") == "LidoSRv3.Audit.Trust", "Trust report entrypoint differs")
+    require(policy.get("trust_native_decide_allowlist") == "audit/trust-native-decide-allowlist.txt",
+            "Trust native-decision allowlist differs")
+    trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
+                   if line.strip() and not line.lstrip().startswith("#")]
+    require(len(trust_names) == len(set(trust_names)) and trust_names,
+            "Trust native-decision allowlist must be nonempty and unique")
+    phase3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
+    require(phase3 in trust_names and all(name == phase3 or name.startswith("LidoSRv3.Tests.") for name in trust_names),
+            "Trust native-decision allowlist contains an undisclosed production dependency")
     require(source_map.get("schema") == "lido-srv3-minimal-11-source-map-v3", "source-map schema differs")
     require(source_map.get("pinned_source") == f"lidofinance/core@{PINNED['lido_core'][1]}", "source-map pin differs")
     require(source_map.get("scope") == {
@@ -420,6 +430,8 @@ def rendered(rows, source_map):
     # auditor slice derived from the same structured registry as STATUS and
     # REPRODUCE so it cannot quietly widen a claim or omit a registered child.
     spans_by_id = {target["id"]: target for target in source_map["targets"]}
+    trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
+                   if line.strip() and not line.lstrip().startswith("#")]
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
         f"Review basis: certified `main` `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
@@ -454,7 +466,8 @@ def rendered(rows, source_map):
         "- **Broad token semantics:** `P-TOKEN-1` remains NOT YET and is not registered. The scoped address and claim rows do not establish general ERC-20/ERC-721/WstETH approvals, balances, transfers, events, or adversarial recipient semantics.\n",
         "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance is out of scope; the SSZ targeted binding remains OPEN.\n\n",
         "## Proof-escape and receipt acceptance\n\n",
-        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`), except for the recorded generated Phase-3 native-decide dependency. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
+        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the recorded Phase-3 native-decision dependency. The emitted Trust output additionally contains the exact test/mutant-only native-decision names below; `scripts/check_trust_axioms.py` rebuilds and reruns Trust and fails closed on any difference, including a production-parent name. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
+        "### Exact emitted native-decision axioms\n\n```text\n" + "\n".join(trust_names) + "\n```\n\n",
         "## Recommendation\n\n",
         "**Q1:** close the first end-to-end fidelity gap rather than adding claims: independently bind one production deployment artifact (constructor inputs, runtime codehash, chain/address) to the already pinned source and one modeled value-moving endpoint, then prove the correspondence or retain it explicitly NOT YET.\n",
     ])

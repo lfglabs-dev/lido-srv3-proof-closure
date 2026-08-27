@@ -71,7 +71,8 @@
     "sorry": 0,
     "admit": 0,
     "unsafe_proof_escapes": 0,
-    "report_entrypoint": "LidoSRv3.Audit.Trust"
+    "report_entrypoint": "LidoSRv3.Audit.Trust",
+    "trust_native_decide_allowlist": "audit/trust-native-decide-allowlist.txt"
   },
   "theorems": [
     {

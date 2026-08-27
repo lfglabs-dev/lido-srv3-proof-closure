@@ -357,8 +357,8 @@ theorem gateway_admitted_nonzero_kill_line :
         [{ source := Verity.Core.Uint256.ofNat 11
            target := Verity.Core.Uint256.ofNat 21
            sourceLen := publicKeyBytes, targetLen := publicKeyBytes }]) := by
-    native_decide
-  exact h freeBatchWitness _ hcommit (by native_decide)
+    decide
+  exact h freeBatchWitness _ hcommit (by decide)
 
 /-- Concrete batch for the fee-blind mutant: gateway-authorized, one valid
 48-byte pair, `fee = 0`, and `msg.value = 1`. Unlike `freeBatchWitness`,

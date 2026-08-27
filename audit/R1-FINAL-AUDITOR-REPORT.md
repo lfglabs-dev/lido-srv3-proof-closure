@@ -55,7 +55,36 @@ Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01
 
 ## Proof-escape and receipt acceptance
 
-`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`), except for the recorded generated Phase-3 native-decide dependency. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.
+`LidoSRv3.Audit.Trust` is the public axiom surface. It permits Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the recorded Phase-3 native-decision dependency. The emitted Trust output additionally contains the exact test/mutant-only native-decision names below; `scripts/check_trust_axioms.py` rebuilds and reruns Trust and fails closed on any difference, including a production-parent name. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.
+
+### Exact emitted native-decision axioms
+
+```text
+LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1
+LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_1
+LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_2
+LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_3
+LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_4
+LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_5
+LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_6
+LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_1
+LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_2
+LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_3
+LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_4
+LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_5
+LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_6
+LidoSRv3.Tests.ConsolidationTxMutants.journal_value_blind_kill_line_refutes_exact_forwarding._native.native_decide.ax_1_7
+LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_1
+LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_2
+LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_3
+LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_4
+LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_5
+LidoSRv3.Tests.ConsolidationTxMutants.value_blind_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_6
+LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine._native.native_decide.ax_1_1
+LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe._native.native_decide.ax_1_1
+LidoSRv3.Tests.PackGTopupProvenanceMutants.dead_beacon_model_kill_line_disagrees_with_pin._native.native_decide.ax_1_1
+LidoSRv3.Tests.PackJTopupEthJournalMutants.beacon_as_consolidation_kill_line_refutes_dest_restriction._native.native_decide.ax_1_1
+```
 
 ## Recommendation
 

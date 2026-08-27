@@ -131,15 +131,18 @@ named here rather than folded silently into "Lean foundations" so that a
 reviewer reading this report sees the same three-axiom boundary that the
 assurance metadata records.
 
-Anything outside those three is a proof escape and is *not* accepted.  In
+Anything outside those three is a proof escape and is *not* accepted. In
 particular `sorryAx`, `Lean.ofReduceBool`, and any project-introduced `axiom`
-must not appear in the output below.  The single disclosed exception is the
-canonical P-ALLOC-1 Phase-3 compilation theorems, which additionally report the
-generated `consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
-dependency recorded in the target manifest.
+must not appear in the output below. The canonical P-ALLOC-1 Phase-3
+compilation theorem has one recorded generated native-decision dependency.
+Some explicitly printed mutant regressions also expose native-decision axioms;
+they are classified as test-only and are listed by exact generated name in
+`audit/trust-native-decide-allowlist.txt`. `scripts/check_trust_axioms.py`
+reruns this entrypoint and rejects any missing, extra, or production-parent
+native-decision name.
 
-Subject to that one recorded exception, there are no undisclosed project-level
-assumptions or proof escapes.
+Subject to that recorded production exception and the exact test-only list,
+there are no undisclosed project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero

@@ -71,7 +71,7 @@ theorem topup_value_moving_journal_projects :
       obs.callTargets =
         [lidoAddress.toNat, beaconAddress.toNat, beaconAddress.toNat] ∧
       obs.callValues = [0, 3, 5] := by
-  native_decide
+  decide
 
 /-- Wrap-to-zero (or any unchecked total of 0) projects to the empty
 journal. This does not discharge `A-TOPUP-NOWRAP`. -/
