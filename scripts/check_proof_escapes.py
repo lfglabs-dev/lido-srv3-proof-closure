@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import re
 from pathlib import Path
@@ -82,14 +83,21 @@ def fail(message: str) -> None:
 
 
 def main() -> None:
-    source_root = ROOT / SOURCE_ROOT
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--native-decide-policy", choices=("enforce", "forbid"), default="enforce")
+    args = parser.parse_args()
+    root = args.root.resolve()
+    source_root = root / SOURCE_ROOT
     files = sorted(source_root.rglob("*.lean"))
     if not files:
         fail(f"no Lean sources below {SOURCE_ROOT}/")
     native_records: list[str] = []
     for path in files:
-        clean = strip_comments_and_strings(path.read_text(encoding="utf-8"))
-        relative = path.relative_to(ROOT).as_posix()
+        source = path.read_text(encoding="utf-8")
+        clean = strip_comments_and_strings(source)
+        lines = source.splitlines()
+        relative = path.relative_to(root).as_posix()
         for name, pattern in ESCAPES:
             match = pattern.search(clean)
             if match:
@@ -97,10 +105,12 @@ def main() -> None:
                 fail(f"{relative}:{line}: forbidden {name}")
         for match in re.finditer(r"\bnative_decide\b", clean):
             line = clean.count("\n", 0, match.start()) + 1
-            original = path.read_text(encoding="utf-8").splitlines()[line - 1].strip()
+            original = lines[line - 1].strip()
             native_records.append(f"{relative}:{line}:{original}")
     digest = hashlib.sha256("\n".join(native_records).encode()).hexdigest()
-    if len(native_records) != NATIVE_DECIDE_COUNT or digest != NATIVE_DECIDE_SHA256:
+    if args.native_decide_policy == "forbid" and native_records:
+        fail("forbidden native_decide")
+    if args.native_decide_policy == "enforce" and (len(native_records) != NATIVE_DECIDE_COUNT or digest != NATIVE_DECIDE_SHA256):
         fail("native_decide inventory differs from the recorded project baseline")
     print(f"proof-escape check ok: {len(files)} project Lean files; no sorry/admit/axiom/unsafe/Lean.ofReduceBool; native_decide inventory {digest}")
 
