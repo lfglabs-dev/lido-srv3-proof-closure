@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -16,6 +17,8 @@ TRUST = ROOT / "LidoSRv3/Audit/Trust.lean"
 ALLOWLIST = ROOT / "audit/trust-native-decide-allowlist.txt"
 NATIVE_AXIOM = re.compile(r"\b(?:[A-Za-z_][\w]*\.)+_native\.native_decide\.ax_\d+(?:_\d+)*\b")
 AXIOM_REPORT = re.compile(r"depends on axioms:\s*\[([^\]]*)\]")
+NAMED_AXIOM_REPORT = re.compile(r"'([^']+)' depends on axioms:\s*\[([^\]]*)\]")
+TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
 FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
@@ -38,16 +41,44 @@ def disclosed_names() -> set[str]:
     return names
 
 
-def observed_axioms(output: str) -> set[str]:
+def checked_theorems() -> set[str]:
+    registry = ROOT / "audit/guarantees.yaml"
+    if not registry.is_file():
+        fail(f"missing registry: {registry.relative_to(ROOT)}")
+    try:
+        rows = json.loads(registry.read_text(encoding="utf-8"))["guarantees"]
+        names = {
+            plane["theorem"]
+            for row in rows
+            for plane in (row["abstract"], row["verity"])
+            if plane["status"] == "CHECKED"
+        }
+    except (KeyError, TypeError, ValueError) as error:
+        fail(f"invalid checked-theorem registry: {error}")
+    if not names or not all(isinstance(name, str) and name.startswith("LidoSRv3.") for name in names):
+        fail("checked-theorem registry is incomplete")
+    return names
+
+
+def trust_printed_theorems() -> set[str]:
+    if not TRUST.is_file():
+        fail(f"missing Trust source: {TRUST.relative_to(ROOT)}")
+    return set(TRUST_PRINT.findall(TRUST.read_text(encoding="utf-8")))
+
+
+def observed_axioms(output: str) -> tuple[set[str], set[str]]:
     reports = AXIOM_REPORT.findall(output)
     if not reports:
         fail("Trust output contains no axiom reports")
-    return {
+    named_reports = NAMED_AXIOM_REPORT.findall(output)
+    if not named_reports:
+        fail("Trust output contains no named axiom reports")
+    return ({
         axiom.strip()
         for report in reports
         for axiom in report.split(",")
         if axiom.strip()
-    }
+    }, {name for name, _ in named_reports})
 
 
 def main() -> None:
@@ -77,7 +108,15 @@ def main() -> None:
             sys.stderr.write(result.stdout)
             fail(f"Trust command exited {result.returncode}")
         output = result.stdout
-    observed = observed_axioms(output)
+    registered = checked_theorems()
+    printed = trust_printed_theorems()
+    source_missing = sorted(registered - printed)
+    if source_missing:
+        fail("Trust omits #print axioms for registered CHECKED theorem(s): " + ", ".join(source_missing))
+    observed, reported = observed_axioms(output)
+    output_missing = sorted(registered - reported)
+    if output_missing:
+        fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
     disclosed = disclosed_names()
     allowed = FOUNDATIONAL_AXIOMS | disclosed
     if observed != allowed:

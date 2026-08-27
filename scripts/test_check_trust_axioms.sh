@@ -6,12 +6,26 @@ trap 'rm -rf "$tmp"' EXIT
 
 names="$tmp/names"
 grep -v '^#\|^$' audit/trust-native-decide-allowlist.txt > "$names"
+mapfile -t checked < <(python3 - <<'PY'
+import json
+for row in json.load(open("audit/guarantees.yaml", encoding="utf-8"))["guarantees"]:
+    for plane in (row["abstract"], row["verity"]):
+        if plane["status"] == "CHECKED":
+            print(plane["theorem"])
+PY
+)
 {
-  printf 'Trust theorem depends on axioms: [propext, Classical.choice, Quot.sound'
-  while IFS= read -r name; do
-    printf ', %s' "$name"
-  done < "$names"
-  printf ']\n'
+  first=1
+  for theorem in "${checked[@]}"; do
+    printf "'%s' depends on axioms: [propext, Classical.choice, Quot.sound" "$theorem"
+    if (( first )); then
+      while IFS= read -r name; do
+        printf ', %s' "$name"
+      done < "$names"
+      first=0
+    fi
+    printf ']\n'
+  done
 } > "$tmp/ok"
 python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok" >/dev/null
 
@@ -22,4 +36,13 @@ if python3 scripts/check_trust_axioms.py --trust-output "$tmp/bad" >/dev/null 2>
   exit 1
 fi
 
-printf '%s\n' 'trust-axiom negative regression rejected an undisclosed opaque axiom'
+# The old union-only checker accepted this: the omitted registered theorem
+# could have had an opaque dependency, while every emitted report remained
+# within the allowlist.  Completeness must reject that hidden theorem.
+sed '1d' "$tmp/ok" > "$tmp/unprinted-registered-opaque"
+if python3 scripts/check_trust_axioms.py --trust-output "$tmp/unprinted-registered-opaque" >/dev/null 2>&1; then
+  echo 'trust-axiom negative regression unexpectedly accepted an unprinted registered theorem with an opaque dependency' >&2
+  exit 1
+fi
+
+printf '%s\n' 'trust-axiom negative regressions rejected an undisclosed opaque axiom and an unprinted registered theorem with an opaque dependency'
