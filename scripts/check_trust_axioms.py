@@ -16,8 +16,13 @@ ROOT = Path(__file__).resolve().parents[1]
 TRUST = ROOT / "LidoSRv3/Audit/Trust.lean"
 ALLOWLIST = ROOT / "audit/trust-native-decide-allowlist.txt"
 NATIVE_AXIOM = re.compile(r"\b(?:[A-Za-z_][\w]*\.)+_native\.native_decide\.ax_\d+(?:_\d+)*\b")
-AXIOM_REPORT = re.compile(r"depends on axioms:\s*\[([^\]]*)\]")
-NAMED_AXIOM_REPORT = re.compile(r"'([^']+)' depends on axioms:\s*\[([^\]]*)\]")
+# Lean emits either a bracketed dependency list or the equally authoritative
+# "does not depend on any axioms" spelling.  Both are named reports; the
+# latter means precisely the empty dependency set, not a missing report.
+NAMED_AXIOM_REPORT = re.compile(
+    r"^'([^']+)' (depends on axioms:\s*\[([^\]]*)\]|does not depend on any axioms)\s*$",
+    re.MULTILINE,
+)
 TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
 FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
@@ -66,19 +71,24 @@ def trust_printed_theorems() -> set[str]:
     return set(TRUST_PRINT.findall(TRUST.read_text(encoding="utf-8")))
 
 
-def observed_axioms(output: str) -> tuple[set[str], set[str]]:
-    reports = AXIOM_REPORT.findall(output)
-    if not reports:
-        fail("Trust output contains no axiom reports")
+def observed_axioms(output: str) -> tuple[set[str], list[tuple[str, set[str]]]]:
     named_reports = NAMED_AXIOM_REPORT.findall(output)
     if not named_reports:
         fail("Trust output contains no named axiom reports")
-    return ({
-        axiom.strip()
-        for report in reports
-        for axiom in report.split(",")
-        if axiom.strip()
-    }, {name for name, _ in named_reports})
+    # A dependency line without a parsed named report must not be silently
+    # discarded.  This also fails closed if Lean's report syntax changes.
+    dependency_lines = re.findall(r"^.*depends on axioms:.*$", output, re.MULTILINE)
+    parsed_dependency_lines = [report for report in named_reports if report[1].startswith("depends on axioms:")]
+    if len(dependency_lines) != len(parsed_dependency_lines):
+        fail("Trust output contains an unnamed or malformed axiom report")
+    reports: list[tuple[str, set[str]]] = []
+    for name, _, rendered_axioms in named_reports:
+        reports.append((name, {
+            axiom.strip()
+            for axiom in (rendered_axioms or "").split(",")
+            if axiom.strip()
+        }))
+    return set().union(*(axioms for _, axioms in reports)), reports
 
 
 def main() -> None:
@@ -113,12 +123,16 @@ def main() -> None:
     source_missing = sorted(registered - printed)
     if source_missing:
         fail("Trust omits #print axioms for registered CHECKED theorem(s): " + ", ".join(source_missing))
-    observed, reported = observed_axioms(output)
-    output_missing = sorted(registered - reported)
+    observed, reports = observed_axioms(output)
+    output_missing = sorted(registered - {name for name, _ in reports})
     if output_missing:
         fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
     disclosed = disclosed_names()
     allowed = FOUNDATIONAL_AXIOMS | disclosed
+    for theorem, axioms in reports:
+        unexpected = sorted(axioms - allowed)
+        if unexpected:
+            fail(f"{theorem} emits undisclosed axiom(s): " + ", ".join(unexpected))
     if observed != allowed:
         missing = sorted(allowed - observed)
         unexpected = sorted(observed - allowed)

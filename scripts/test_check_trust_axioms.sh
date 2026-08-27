@@ -17,6 +17,11 @@ PY
 {
   first=1
   for theorem in "${checked[@]}"; do
+    if [[ "$theorem" == 'LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length' ]]; then
+      # This is the real registered theorem whose Lean report has no axioms.
+      printf "'%s' does not depend on any axioms\n" "$theorem"
+      continue
+    fi
     printf "'%s' depends on axioms: [propext, Classical.choice, Quot.sound" "$theorem"
     if (( first )); then
       while IFS= read -r name; do
@@ -28,6 +33,9 @@ PY
   done
 } > "$tmp/ok"
 python3 scripts/check_trust_axioms.py --trust-output "$tmp/ok" >/dev/null
+
+grep -Fqx '#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length' \
+  LidoSRv3/Audit/Trust.lean
 
 cp "$tmp/ok" "$tmp/bad"
 printf '%s\n' 'Injected theorem depends on axioms: [LidoSRv3.Injected.opaque_false]' >> "$tmp/bad"
