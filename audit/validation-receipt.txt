@@ -1,11 +1,25 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 29d5179a2bfceca2985dcde539ebb0d3d88d7ce4
+validated-tree: ed5f37a73692b9eacc225ff08e9512a82312e1c4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Proof-escape rejection gate (2026-08-27)
+-----------------------------------------
+
+- `scripts/check_proof_escapes.py` lexically scans all project Lean sources
+  after removing comments and strings. It rejects `sorry`, `admit`, `axiom`,
+  `unsafe`, and `Lean.ofReduceBool` fail closed; its complete existing
+  `native_decide` inventory is pinned, so a new use also fails closed.
+- `scripts/test_check_proof_escapes.sh` mutates both an imported project module
+  and `LidoSRv3.Audit.Trust`; representative `sorry`, `admit`, `axiom`,
+  `unsafe`, `Lean.ofReduceBool`, and `native_decide` injections are rejected.
+- Metadata generation/check and its stale certified-review-basis and Markdown
+  table-cell escaping family regressions exit 0. Receipt subject: tracked tree
+  excluding this receipt, recorded above.
 
 P-VAULT-ETH-1 Source/Spec state-type repair (2026-08-27)
 ----------------------------------------------------------
