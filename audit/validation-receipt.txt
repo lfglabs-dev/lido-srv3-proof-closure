@@ -1,11 +1,140 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 39550c93d942578d69da866b5fa337a4e768f865
+validated-tree: 3190c986a3095a4082dd893815ca52ca32483a04
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+P-VAULT-ETH-1 Source/Spec state-type repair (2026-08-27)
+----------------------------------------------------------
+
+- Correct `every_source_success_journal_projects` to quantify its executable
+  entry as `Verity.ContractState`.  The unqualified name at
+  `VaultEthCorrespondence.lean:63` resolved to the distinct Spec state and
+  made `sourceRun endpoints inputs entry` ill-typed.  The correction preserves
+  the executable `entry.sender == endpoints.lido` authorization; the auxiliary
+  `inputs.caller` remains unauthorized for Vault→Lido, while WithdrawalQueue
+  remains source-shaped.
+- Align the parent’s successful Lido witness with that executable sender guard,
+  and make the exact-parent input-caller mutant explicitly reduce its retained
+  seven-wei source success before applying the value-bearing frame.
+- Lean 4.31 command exits 0:
+  `lake build +LidoSRv3.Audit.Source.VaultEthCorrespondence
+  +LidoSRv3.Audit.Spec.VaultEthCorrespondence
+  +LidoSRv3.Audit.Verity.VaultEthTx
+  +LidoSRv3.Audit.Guarantees.PVaultEth1
+  +LidoSRv3.Tests.PackP2VaultEthMutants +LidoSRv3.Audit.Trust`.
+  This compiles the focused source and Spec correspondence, transaction,
+  registered parent, exact-parent bypass mutant, and Trust `#print axioms`
+  chain. Metadata/YAML/public-surface/provenance, changed-Lean proof-escape,
+  `git diff --check`, and this receipt validator exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded below.
+
+P-VAULT-ETH-1 executable-sender guard repair (2026-08-27)
+------------------------------------------------------------
+
+- Replace the prior input-field authorization with the pinned Lido-route
+  guard over `entry.sender`; `sourceRun` now receives the executable entry
+  state, and `execute` delegates to that same state-bound interpreter.
+  `inputs.caller` remains auxiliary and cannot authorize Vault→Lido.
+- Add `input_caller_guard_refutes_exact_parent`: the exact-parent mutant
+  restores the old `inputs.caller == endpoints.lido` check, admits a
+  seven-wei Lido frame from `entry.sender = 9`, and refutes
+  `LidoCallerEndpointBinding`. WithdrawalQueue still accepts a distinct
+  auxiliary caller.
+- Lean 4.31 focused build exits 0:
+  `lake build LidoSRv3.Audit.Source.VaultEthCorrespondence
+  LidoSRv3.Audit.Verity.VaultEthTx
+  LidoSRv3.Audit.Guarantees.PVaultEth1
+  LidoSRv3.Tests.PackP2VaultEthMutants LidoSRv3.Audit.Trust`.
+- `python3 scripts/audit_metadata.py generate && check`, metadata/public
+  surface/provenance checks, and `git diff --check` exit 0. The canonical
+  YAML remains Lean-consistent; generated views were unchanged because this
+  is a subordinate row.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `ae1f7dc195132170e80a9c573c78d9a5724f0c05`.
+
+P-VAULT-ETH-1 focused Lean repair (2026-08-26)
+-------------------------------------------------
+
+- Repair the WithdrawalQueue success arm in `VaultEthTx`: after route case
+  reduction, its Lido-only caller premise is discharged by constructor
+  elimination (`cases hRoute; cases h`) rather than trying to rewrite the
+  already-reduced `inputs.route`. The executable caller constraint, source
+  route distinction, parent, and exact-parent caller-guard mutant are
+  unchanged.
+- One bounded Lean invocation exits 0:
+  `lake build LidoSRv3.Audit.Source.VaultEthCorrespondence
+  LidoSRv3.Audit.Verity.VaultEthTx
+  LidoSRv3.Audit.Guarantees.PVaultEth1
+  LidoSRv3.Tests.PackP2VaultEthMutants LidoSRv3.Audit.Trust`.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `941ebf9c4b99ca4356de9e6fd3ecc834817ff9c3`.
+
+P-VAULT-ETH-1 route-sensitive executable caller-binding repair (2026-08-26)
+-----------------------------------------------------------------------------
+
+- Bind the source-model `inputs.caller` to executable `entry.sender` only on
+  the pinned WithdrawalVault→Lido route. Successful Vault→Lido executions
+  entail `inputs.caller = entry.sender` and `entry.sender = endpoints.lido`;
+  the source-shaped WithdrawalQueue route intentionally permits a distinct
+  caller.
+- `withdrawal_queue_distinct_caller_commits` is the regression for that route
+  distinction. The exact-parent
+  `missing_lido_caller_guard_refutes_exact_parent` mutant retains the source
+  schedule but removes only the Lido-only execution-boundary bind, so it
+  succeeds from an unauthorized `entry.sender` and refutes
+  `LidoCallerEndpointBinding`.
+- Canonical YAML, generated audit views, and this receipt are synchronized.
+  Deployment identity remains OPEN: runtime endpoint equality is not
+  deployment identity.
+
+P-VAULT-ETH-1 caller-guard metadata synchronization (2026-08-26)
+----------------------------------------------------------------
+
+- The compiled source parent retains its non-removable
+  `LidoCallerEndpointBinding` conjunct: a successful modeled Vault→Lido route
+  entails both `caller = endpoints.lido` and the runtime Lido target equality.
+  Its proof explicitly converts the true Boolean caller comparison with
+  `beq_iff_eq`; the false branch contradicts committed source execution.
+  The dependent lossless-projection proof now also eliminates the final
+  funds branch before constructor injection, so successful source journals
+  reduce to the exact `sourceJournal` on the current interface.
+  The guard-drop mutant's successful-run witness now eliminates its own
+  nonzero and funded branches before applying the existing frame theorem.
+  The exact-parent `missing_lido_caller_guard_refutes_exact_parent` mutant
+  keeps a successful seven-wei runtime-Lido frame while refuting that
+  conjunct.
+- Synchronize the canonical P-VAULT-ETH-1 row's summary, covered fidelity,
+  reproduction expectation, and next gate with that parent and mutant. Record
+  the honest remaining gap: no extracted implementation-body binding exists,
+  and the runtime endpoint is not deployment identity evidence.
+- Local metadata/public-surface gates: `python3 scripts/audit_metadata.py check`,
+  `python3 scripts/check_public_claim_surfaces.py`,
+  `python3 scripts/test_public_claim_surfaces.py`, and
+  `python3 scripts/test_audit_metadata.py` exit 0. The changed-Lean forbidden
+  proof-escape scan and `git diff --check` are clean. Focused and trust Lean
+  gates are recorded only after their remote receipts complete.
+
+P-VAULT-ETH-1 tautological body-tag claim repair (2026-08-26)
+----------------------------------------------------------------
+
+- Remove the unsupported `bodyOf .lidoReceiveWithdrawals =
+  .withdrawalVaultWithdrawWithdrawals` claim: both names were local model
+  definitions, so the equality was discharged by reduction and did not bind an
+  extracted Solidity implementation body.
+- Retain the non-tautological modeled Lido caller guard, runtime endpoint,
+  successful source-to-Spec projection, value-bearing frame equality, and the
+  owner-recipient exclusion. The caller-guard-drop and zero-value-frame mutants
+  remain load-bearing; no deployment identity, bytecode identity, global ETH
+  confinement, or WithdrawalQueue body claim is added.
+- Focused P-VAULT-ETH-1 Lean build was dispatched to the remote fleet for the
+  repaired commit; a node-side fetch failure remains recorded separately from
+  this receipt. Metadata and public-surface checks pass locally.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `bf80f3d5942d54e24edf1547c6d202461c521e29`.
 
 Deposit constructor fixture upstream-blob binding (2026-08-26)
 --------------------------------------------------------------

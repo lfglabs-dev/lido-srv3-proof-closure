@@ -58,11 +58,12 @@ theorem sourceJournal_projects (endpoints : Endpoints) (inputs : Inputs) :
 /-- Every successful source journal is the lossless Spec journal for the same
 modeled return input. -/
 theorem every_source_success_journal_projects
-    (endpoints : Endpoints) (inputs : Inputs) (vaultBalance : Word)
+    (endpoints : Endpoints) (inputs : Inputs) (entry : Verity.ContractState)
     (journal : SourceJournal)
-    (hSuccess : sourceRun endpoints inputs vaultBalance = .committed journal) :
+    (hSuccess : sourceRun endpoints inputs entry = .committed journal) :
     SourceJournalProjectsToEthJournal journal (specJournal inputs) := by
   unfold sourceRun at hSuccess
+  split at hSuccess <;> try contradiction
   split at hSuccess <;> try contradiction
   split at hSuccess <;> try contradiction
   injection hSuccess with hJournal

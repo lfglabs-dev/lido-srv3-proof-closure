@@ -1044,9 +1044,9 @@
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PVaultEth1 LidoSRv3.Tests.PackP2VaultEthMutants",
-        "expected": "protocol_return_value_hops and both constructor inhabitants build; zero_value_frame_kill_line_refutes_parent changes the Vault-to-Lido frame from seven wei to zero; mutant_vault_lido_as_lidoPull_refutes_projection retags the hop as lidoPull"
+    "expected": "protocol_return_value_hops and both constructor inhabitants build; withdrawal_queue_distinct_caller_commits preserves a successful source-shaped WithdrawalQueue route when inputs.caller differs from entry.sender; zero_value_frame_kill_line_refutes_parent changes the Vault-to-Lido frame from seven wei to zero; input_caller_guard_refutes_exact_parent restores the exact-parent inputs.caller-to-runtime-Lido guard and admits a successful seven-wei frame from an unauthorized entry.sender, refuting LidoCallerEndpointBinding; mutant_vault_lido_as_lidoPull_refutes_projection retags the hop as lidoPull"
       },
-      "summary": "P-VAULT-ETH-1: every successful modeled Vault-to-Lido or WithdrawalQueue protocol-return run has a lossless Spec.EthJournal projection, one externalCallBindTo frame whose value equals the Spec leg wei, and continued exclusion of owner-controlled arbitrary recipients. Route constructors, not endpoint address pins, carry provenance. This is not a claim that Lido never drains ETH or a claim about all SRv3 ETH.",
+  "summary": "P-VAULT-ETH-1: every successful modeled Vault-to-Lido or WithdrawalQueue protocol-return run has a lossless Spec.EthJournal projection and one externalCallBindTo frame whose value equals the Spec leg wei. Only the pinned Vault-to-Lido route binds the executable entry.sender to the runtime Lido endpoint; inputs.caller is auxiliary and cannot authorize that route. WithdrawalQueue intentionally remains source-shaped and may have a distinct caller. Owner-controlled arbitrary recipients remain excluded. Route constructors, not endpoint address pins, carry provenance. This is not a claim that Lido never drains ETH or a claim about all SRv3 ETH.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops"
@@ -1060,21 +1060,25 @@
           "new vaultToLido and vaultToWithdrawalQueue ApprovedDestination constructors",
           "lossless source-journal projection preserves each successful route and exact wei",
           "both constructors have concrete nonzero externalCallBindTo frame inhabitants",
+      "successful modeled Vault-to-Lido route entails entry.sender == endpoints.lido and targetOf endpoints route == endpoints.lido; inputs.caller is not an authorization input",
+          "source-shaped WithdrawalQueue success permits inputs.caller different from entry.sender",
           "owner-controlled VaultHub / StakingVault arbitrary-recipient destination maps to none",
           "parent-shaped zero-value frame kill-line retains source and executable success",
+      "exact-parent input_caller_guard_refutes_exact_parent mutant restores the former inputs.caller guard, admits a successful seven-wei runtime-Lido frame from an unauthorized entry.sender, and refutes LidoCallerEndpointBinding",
           "parent-shaped dest kill-line: Vault-to-Lido hop retagged as lidoPull fails lossless projection"
         ],
         "missing": [
           "endpoint addresses are explicit runtime inputs and are not configuration identity evidence",
+      "no extracted implementation-body binding exists; the executable-sender/runtime-endpoint conjunct does not establish deployment identity",
           "the WithdrawalQueue protocol-return route is source-shaped rather than an extracted implementation body; no all-SRv3-ETH claim",
           "callee execution and Lido buffered-ether accounting remain outside the caller-side frame model"
         ]
       },
       "classification": {
         "kind": "IMPLEMENTATION_PENDING",
-        "work": "Bind the modeled route tags to extracted implementation bodies and configured endpoints without treating address equality as provenance."
+    "work": "Bind the modeled route tags to extracted implementation bodies and configured endpoints without treating executable sender equality as provenance."
       },
-      "next_gate": "Add implementation-body and configured-endpoint linkage while preserving the value-bearing frame and owner-recipient exclusion."
+  "next_gate": "Add extracted implementation-body and configured-endpoint linkage while preserving the executable-sender/runtime-endpoint guard, value-bearing frame, and owner-recipient exclusion."
     },
     {
       "id": "P-ORACLE-SUPPLY-1",
