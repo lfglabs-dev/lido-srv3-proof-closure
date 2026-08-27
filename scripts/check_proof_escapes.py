@@ -20,8 +20,8 @@ LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # addition, deletion, or move of a project `native_decide` use must be reviewed
 # by deliberately updating this guard.  The existing uses are separately
 # disclosed by the Trust report's axiom output.
-NATIVE_DECIDE_COUNT = 222
-NATIVE_DECIDE_SHA256 = "d5683baf091837853642374e44e584e3f8818e6d134b055feb8c9f7e9dcbc243"
+NATIVE_DECIDE_COUNT = 218
+NATIVE_DECIDE_SHA256 = "187f9bad4a1f96e8919eba8d5feca034ccde6f01b6ce268e26066e57ced14e81"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),
