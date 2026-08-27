@@ -4792,3 +4792,21 @@ P-DEPOSIT-1 constructor predicate correspondence gate repair (2026-08-26)
 - `python3 scripts/check_validation_receipt.py` exit 0 after this rebind.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `243a416743a68a0fd3e8f2ecb692c5b20075337f`.
+
+R1 final auditor report slice (2026-08-27)
+-------------------------------------------
+
+- Generated `audit/R1-FINAL-AUDITOR-REPORT.md` from the canonical assurance
+  registry and source map. It records all 11 canonical guarantees and all 18
+  registered supplemental rows, with their named theorem planes, proof shapes,
+  assumptions, fidelity limitations, and next gates.
+- The report is explicit that it is not audit certification, bytecode
+  verification, or deployment identity evidence. ETH confinement, oracle
+  sanity, broad token semantics, and deployment identity remain NOT YET.
+- No semantic Lean source or guarantee metadata was edited. Generated views
+  were refreshed only through `python3 scripts/audit_metadata.py generate`.
+- Focused checks: `python3 scripts/audit_metadata.py check`,
+  `python3 scripts/check_public_claim_surfaces.py`, proof-escape/provenance
+  guards, and `git diff --check`.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `a2fbbc05e69afe4187cb4f1231fe92ee652a9338`.
