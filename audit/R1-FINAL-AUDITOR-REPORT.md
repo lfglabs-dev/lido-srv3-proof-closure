@@ -55,7 +55,7 @@ Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01
 
 ## Proof-escape and receipt acceptance
 
-`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`), except for the recorded generated Phase-3 native-decide dependency. `scripts/check_proof_escapes.py` mechanically scans every project Lean source after removing comments and strings: project `sorry`, `admit`, `axiom`, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates both an imported project module and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.
+`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`), except for the recorded generated Phase-3 native-decide dependency. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.
 
 ## Recommendation
 

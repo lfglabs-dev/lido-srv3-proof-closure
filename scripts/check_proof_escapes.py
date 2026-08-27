@@ -11,7 +11,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# The default library has both the `LidoSRv3/` module tree and the
+# `LidoSRv3.lean` umbrella module at the project root.  Keep this inventory
+# explicit: the root module is compiled production code, not a fixture.
 SOURCE_ROOT = "LidoSRv3"
+LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # This is an inventory, rather than a permission to introduce the tactic: any
 # addition, deletion, or move of a project `native_decide` use must be reviewed
 # by deliberately updating this guard.  The existing uses are separately
@@ -22,6 +26,8 @@ ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),
     ("axiom", re.compile(r"\baxiom\b")),
+    # `constant foo : T` is Lean's equivalent axiom declaration spelling.
+    ("constant", re.compile(r"\bconstant\b")),
     ("unsafe", re.compile(r"\bunsafe\b")),
     ("Lean.ofReduceBool", re.compile(r"\bLean\.ofReduceBool\b")),
 )
@@ -90,13 +96,17 @@ def main() -> None:
     args = parser.parse_args()
     root = args.root.resolve()
     source_root = root / SOURCE_ROOT
-    files = sorted(source_root.rglob("*.lean"))
+    files = sorted([*source_root.rglob("*.lean"),
+                    *(root / relative for relative in LIBRARY_ROOTS)])
+    missing_roots = [path.relative_to(root).as_posix() for path in files if not path.is_file()]
+    if missing_roots:
+        fail(f"missing production Lean source(s): {', '.join(missing_roots)}")
     if not files:
         fail(f"no Lean sources below {SOURCE_ROOT}/")
     native_records: list[str] = []
     for path in files:
         source = path.read_text(encoding="utf-8")
-        if not any(token in source for token in ("sorry", "admit", "axiom", "unsafe", "Lean.ofReduceBool", "native_decide")):
+        if not any(token in source for token in ("sorry", "admit", "axiom", "constant", "unsafe", "Lean.ofReduceBool", "native_decide")):
             continue
         clean = strip_comments_and_strings(source)
         lines = source.splitlines()
@@ -116,7 +126,7 @@ def main() -> None:
         fail("forbidden native_decide")
     if args.native_decide_policy == "enforce" and (len(native_records) != NATIVE_DECIDE_COUNT or digest != NATIVE_DECIDE_SHA256):
         fail("native_decide inventory differs from the recorded project baseline")
-    print(f"proof-escape check ok: {len(files)} project Lean files; no sorry/admit/axiom/unsafe/Lean.ofReduceBool; native_decide inventory {digest}")
+    print(f"proof-escape check ok: {len(files)} project Lean files; no sorry/admit/axiom/constant/unsafe/Lean.ofReduceBool; native_decide inventory {digest}")
 
 
 if __name__ == "__main__":

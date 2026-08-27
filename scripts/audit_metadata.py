@@ -21,7 +21,10 @@ R1_REVIEW_BASE = "b481cfff5fc92175657e144198a80e4820425d60"
 # The report calls this commit its certified review basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry/source map must not be presented as if it had that review.
-R1_REVIEW_INPUT_SHA256 = {
+# This exact family is every structured input used to render the R1 review
+# report.  A normal regeneration may never pair changed family content with a
+# stale certified basis.
+R1_REPORT_INPUT_SHA256 = {
     "audit/guarantees.yaml": "39fb757cbc896a2cbae21830a633e1cb6831fbcc993b832bce4ea1f5f4215948",
     "audit/source-map.yaml": "ee8847bdf481fad77e8d99bad5be050d723eaa9e3287ec6930417b334d715857",
 }
@@ -241,8 +244,8 @@ def validate_pins(lock, manifest, source_map):
 
 
 def validate_r1_review_basis():
-    """Require the report inputs to be exactly those reviewed at R1's basis."""
-    for relative, expected_digest in R1_REVIEW_INPUT_SHA256.items():
+    """Require the complete rendered-report input family at R1's basis."""
+    for relative, expected_digest in R1_REPORT_INPUT_SHA256.items():
         result = subprocess.run(
             ["git", "-C", str(ROOT), "show", f"{R1_REVIEW_BASE}:{relative}"],
             text=False,
@@ -257,7 +260,7 @@ def validate_r1_review_basis():
                 f"R1 review basis digest differs for {relative}")
         current_canonical = canonical_metadata_bytes((ROOT / relative).read_bytes())
         require(current_canonical == reviewed_canonical,
-                f"R1 review basis inputs differ for {relative}")
+                f"R1 review basis input family differs for {relative}")
 
 
 def validate_assumptions(data):
@@ -451,7 +454,7 @@ def rendered(rows, source_map):
         "- **Broad token semantics:** `P-TOKEN-1` remains NOT YET and is not registered. The scoped address and claim rows do not establish general ERC-20/ERC-721/WstETH approvals, balances, transfers, events, or adversarial recipient semantics.\n",
         "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance is out of scope; the SSZ targeted binding remains OPEN.\n\n",
         "## Proof-escape and receipt acceptance\n\n",
-        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`), except for the recorded generated Phase-3 native-decide dependency. `scripts/check_proof_escapes.py` mechanically scans every project Lean source after removing comments and strings: project `sorry`, `admit`, `axiom`, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates both an imported project module and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
+        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`), except for the recorded generated Phase-3 native-decide dependency. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
         "## Recommendation\n\n",
         "**Q1:** close the first end-to-end fidelity gap rather than adding claims: independently bind one production deployment artifact (constructor inputs, runtime codehash, chain/address) to the already pinned source and one modeled value-moving endpoint, then prove the correspondence or retain it explicitly NOT YET.\n",
     ])

@@ -114,17 +114,28 @@ def main():
             if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
                 raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
 
-        # The review-basis language is only valid for the exact registry and
-        # source map committed at that basis.  These are otherwise-valid edits.
+        # The review-basis language is only valid for the complete structured
+        # report-input family committed at that basis.  These are otherwise-
+        # valid edits, including a simultaneous ordinary update of both
+        # families: regeneration must not silently retain the stale basis.
         x = copy.deepcopy(guarantees)
         x["guarantees"][11]["summary"] += " changed"
         write(gpath, x)
-        invoke(fixture, False, "R1 review basis inputs differ for audit/guarantees.yaml")
+        invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
         write(gpath, guarantees)
         x = copy.deepcopy(source)
         x["targets"][0]["spans"][0]["function"] += " changed"
         write(spath, x)
-        invoke(fixture, False, "R1 review basis inputs differ for audit/source-map.yaml")
+        invoke(fixture, False, "R1 review basis input family differs for audit/source-map.yaml")
+        write(spath, source)
+        changed_guarantees = copy.deepcopy(guarantees)
+        changed_guarantees["guarantees"][11]["summary"] += " synchronized family change"
+        changed_source = copy.deepcopy(source)
+        changed_source["targets"][0]["spans"][0]["function"] += " synchronized family change"
+        write(gpath, changed_guarantees)
+        write(spath, changed_source)
+        invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
+        write(gpath, guarantees)
         write(spath, source)
 
         constructor_fixture = fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
