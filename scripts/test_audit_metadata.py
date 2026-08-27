@@ -3,7 +3,9 @@
 
 import copy
 import hashlib
+import importlib.util
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -44,6 +46,30 @@ def main():
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")
 
+        # Give the isolated generator an immutable review-basis object.  The
+        # production script names the real R1 commit; this fixture substitutes
+        # its own baseline solely so its negative mutations can exercise the
+        # same Git-object binding.
+        subprocess.run(["git", "init", "--quiet"], cwd=fixture, check=True)
+        subprocess.run(["git", "config", "user.email", "audit-test@example.invalid"], cwd=fixture, check=True)
+        subprocess.run(["git", "config", "user.name", "audit metadata test"], cwd=fixture, check=True)
+        subprocess.run(["git", "add", "."], cwd=fixture, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "R1 review basis"], cwd=fixture, check=True)
+        fixture_review_base = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=fixture, check=True,
+            text=True, stdout=subprocess.PIPE,
+        ).stdout.strip()
+        audit_script = fixture / "scripts/audit_metadata.py"
+        audit_source = audit_script.read_text(encoding="utf-8")
+        audit_script.write_text(
+            audit_source.replace(
+                'R1_REVIEW_BASE = "b481cfff5fc92175657e144198a80e4820425d60"',
+                f'R1_REVIEW_BASE = "{fixture_review_base}"',
+                1,
+            ),
+            encoding="utf-8",
+        )
+
         gpath = fixture / "audit/guarantees.yaml"
         apath = fixture / "audit/assumptions.yaml"
         lpath = fixture / "audit/artifacts.lock.json"
@@ -58,6 +84,31 @@ def main():
         invoke(fixture, True)
         invoke(fixture, True, command="check")
 
+        # Metadata is untrusted Markdown-table content: pipes must remain
+        # literal cell data, including adjacent pipes that would add columns.
+        x = copy.deepcopy(guarantees)
+        x["guarantees"][11]["summary"] = "source||target"
+        spec = importlib.util.spec_from_file_location("fixture_audit_metadata", audit_script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        report = module.rendered(x["guarantees"], source)["R1-FINAL-AUDITOR-REPORT.md"]
+        escaped_row = next(line for line in report.splitlines() if "| source\\|\\|target |" in line)
+        if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
+            raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
+
+        # The review-basis language is only valid for the exact registry and
+        # source map committed at that basis.  These are otherwise-valid edits.
+        x = copy.deepcopy(guarantees)
+        x["guarantees"][11]["summary"] += " changed"
+        write(gpath, x)
+        invoke(fixture, False, "R1 review basis inputs differ for audit/guarantees.yaml")
+        write(gpath, guarantees)
+        x = copy.deepcopy(source)
+        x["targets"][0]["spans"][0]["function"] += " changed"
+        write(spath, x)
+        invoke(fixture, False, "R1 review basis inputs differ for audit/source-map.yaml")
+        write(spath, source)
+
         constructor_fixture = fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
         constructor_source = constructor_fixture.read_text(encoding="utf-8")
         constructor_fixture.write_text(constructor_source.replace("_maxEBType1);", "_maxEBType2);", 1), encoding="utf-8")
@@ -68,7 +119,6 @@ def main():
         # to pass.  The independently fetched pinned Git blob must still reject it.
         mutated_constructor = constructor_source.replace("_maxEBType1);", "_maxEBType2);", 1)
         constructor_fixture.write_text(mutated_constructor, encoding="utf-8")
-        audit_script = fixture / "scripts/audit_metadata.py"
         audit_source = audit_script.read_text(encoding="utf-8")
         audit_script.write_text(
             audit_source.replace(

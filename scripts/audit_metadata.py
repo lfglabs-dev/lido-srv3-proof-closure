@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -17,6 +18,13 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
 R1_REVIEW_BASE = "b481cfff5fc92175657e144198a80e4820425d60"
+# The report calls this commit its certified review basis.  Keep the exact
+# generator inputs bound both to that Git object and to their expected bytes:
+# a changed registry/source map must not be presented as if it had that review.
+R1_REVIEW_INPUT_SHA256 = {
+    "audit/guarantees.yaml": "39fb757cbc896a2cbae21830a633e1cb6831fbcc993b832bce4ea1f5f4215948",
+    "audit/source-map.yaml": "ee8847bdf481fad77e8d99bad5be050d723eaa9e3287ec6930417b334d715857",
+}
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
     "P-ACCOUNT-1", "P-RESERVE-1", "P-CONSOLIDATION-ETH-1", "P-ADDRESS-1",
@@ -113,6 +121,16 @@ def load(path):
 def require(condition, message):
     if not condition:
         raise SystemExit(f"audit metadata error: {message}")
+
+
+def markdown_table_cell(value):
+    """Render metadata as one Markdown table cell, never as table syntax."""
+    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\r\n", "<br>").replace("\n", "<br>").replace("\r", "<br>")
+
+
+def canonical_metadata_bytes(value):
+    """Ignore JSON whitespace while binding every metadata value and shape."""
+    return json.dumps(json.loads(value), sort_keys=True, separators=(",", ":")).encode()
 
 
 def nonempty_strings(value):
@@ -220,6 +238,26 @@ def validate_pins(lock, manifest, source_map):
     deposit_target = next(target for target in targets if target.get("id") == "P-DEPOSIT-1")
     require(DEPOSIT_CONSTRUCTOR_SPAN in deposit_target["spans"],
             "P-DEPOSIT-1: pinned constructor source span is missing")
+
+
+def validate_r1_review_basis():
+    """Require the report inputs to be exactly those reviewed at R1's basis."""
+    for relative, expected_digest in R1_REVIEW_INPUT_SHA256.items():
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "show", f"{R1_REVIEW_BASE}:{relative}"],
+            text=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        require(result.returncode == 0,
+                f"R1 review basis cannot read {R1_REVIEW_BASE}:{relative}")
+        reviewed = result.stdout
+        reviewed_canonical = canonical_metadata_bytes(reviewed)
+        require(hashlib.sha256(reviewed_canonical).hexdigest() == expected_digest,
+                f"R1 review basis digest differs for {relative}")
+        current_canonical = canonical_metadata_bytes((ROOT / relative).read_bytes())
+        require(current_canonical == reviewed_canonical,
+                f"R1 review basis inputs differ for {relative}")
 
 
 def validate_assumptions(data):
@@ -330,7 +368,9 @@ def validate():
     source_map = load(AUDIT / "source-map.yaml")
     assumption_ids = validate_assumptions(assumptions)
     validate_pins(lock, manifest, source_map)
-    return validate_guarantees(registry, assumption_ids)
+    rows = validate_guarantees(registry, assumption_ids)
+    validate_r1_review_basis()
+    return rows
 
 
 def rendered(rows, source_map):
@@ -364,9 +404,13 @@ def rendered(rows, source_map):
     roadmap = "".join(roadmap_parts)
     lines = ["# STATUS", "", "| ID | Abstract Lean | Verity Executable Contract | Fidelity gap | Classification | Assumptions |", "| --- | --- | --- | --- | --- | --- |"]
     for r in canonical:
-        missing = "; ".join(r["fidelity"]["missing"]) or "—"
-        assumptions = ", ".join(f"`{x}`" for x in r["assumptions"]) or "—"
-        lines.append(f"| `{r['id']}` | {r['abstract']['status']} | {r['verity']['status']} | {missing} | {r['classification']['kind']} | {assumptions} |")
+        missing = markdown_table_cell("; ".join(r["fidelity"]["missing"]) or "—")
+        assumptions = markdown_table_cell(", ".join(f"`{x}`" for x in r["assumptions"]) or "—")
+        lines.append(
+            f"| `{markdown_table_cell(r['id'])}` | {markdown_table_cell(r['abstract']['status'])} | "
+            f"{markdown_table_cell(r['verity']['status'])} | {missing} | "
+            f"{markdown_table_cell(r['classification']['kind'])} | {assumptions} |"
+        )
     status = header + "\n".join(lines) + "\n"
     reproduce = header + "# REPRODUCE\n\n" + "\n".join(f"- `{r['id']}`: `{r['reproduction']['command']}` — {r['reproduction']['expected']}" for r in canonical) + "\n"
     # This is a review surface, not another source of truth.  Keep the final
@@ -394,9 +438,11 @@ def rendered(rows, source_map):
                  f"Verity `{verity['status']}`: `{verity['theorem'] or '—'}`")
         limitations = "; ".join(row["fidelity"]["missing"])
         report.append(
-            f"| `{row['id']}` | {plane} | {row['summary']} | {provenance}. "
-            f"Assumptions: {', '.join('`' + a + '`' for a in row['assumptions']) or '—'}. | "
-            f"**{row['classification']['kind']}**. {limitations} Next gate: {row['next_gate']} |\n"
+            f"| `{markdown_table_cell(row['id'])}` | {markdown_table_cell(plane)} | "
+            f"{markdown_table_cell(row['summary'])} | {markdown_table_cell(provenance)}. "
+            f"Assumptions: {markdown_table_cell(', '.join('`' + a + '`' for a in row['assumptions']) or '—')}. | "
+            f"**{markdown_table_cell(row['classification']['kind'])}**. "
+            f"{markdown_table_cell(limitations)} Next gate: {markdown_table_cell(row['next_gate'])} |\n"
         )
     report.extend([
         "\n## Explicit NOT YET boundaries\n\n",
