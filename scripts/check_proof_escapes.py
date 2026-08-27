@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import bisect
 import hashlib
 import re
 from pathlib import Path
@@ -95,16 +96,19 @@ def main() -> None:
     native_records: list[str] = []
     for path in files:
         source = path.read_text(encoding="utf-8")
+        if not any(token in source for token in ("sorry", "admit", "axiom", "unsafe", "Lean.ofReduceBool", "native_decide")):
+            continue
         clean = strip_comments_and_strings(source)
         lines = source.splitlines()
+        newlines = [index for index, char in enumerate(clean) if char == "\n"]
         relative = path.relative_to(root).as_posix()
         for name, pattern in ESCAPES:
             match = pattern.search(clean)
             if match:
-                line = clean.count("\n", 0, match.start()) + 1
+                line = bisect.bisect_right(newlines, match.start()) + 1
                 fail(f"{relative}:{line}: forbidden {name}")
         for match in re.finditer(r"\bnative_decide\b", clean):
-            line = clean.count("\n", 0, match.start()) + 1
+            line = bisect.bisect_right(newlines, match.start()) + 1
             original = lines[line - 1].strip()
             native_records.append(f"{relative}:{line}:{original}")
     digest = hashlib.sha256("\n".join(native_records).encode()).hexdigest()
