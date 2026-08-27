@@ -210,8 +210,13 @@ def validate_pins(lock, manifest, source_map):
                    if line.strip() and not line.lstrip().startswith("#")]
     require(len(trust_names) == len(set(trust_names)) and trust_names,
             "Trust native-decision allowlist must be nonempty and unique")
-    phase3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
-    require(phase3 in trust_names and all(name == phase3 or name.startswith("LidoSRv3.Tests.") for name in trust_names),
+    production_native = {
+        "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1",
+        "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1",
+        "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1",
+    }
+    require(production_native <= set(trust_names) and
+            all(name in production_native or name.startswith("LidoSRv3.Tests.") for name in trust_names),
             "Trust native-decision allowlist contains an undisclosed production dependency")
     require(source_map.get("schema") == "lido-srv3-minimal-11-source-map-v3", "source-map schema differs")
     require(source_map.get("pinned_source") == f"lidofinance/core@{PINNED['lido_core'][1]}", "source-map pin differs")
@@ -475,7 +480,7 @@ def rendered(rows, source_map):
         "- **Broad token semantics:** `P-TOKEN-1` remains NOT YET and is not registered. The scoped address and claim rows do not establish general ERC-20/ERC-721/WstETH approvals, balances, transfers, events, or adversarial recipient semantics.\n",
         "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance is out of scope; the SSZ targeted binding remains OPEN.\n\n",
         "## Proof-escape and receipt acceptance\n\n",
-        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the recorded Phase-3 native-decision dependency and the exact test/mutant-only native-decision names below. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted axiom report, and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
+        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the explicitly recorded production and exact test/mutant-only native-decision names below. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted named axiom report (including Lean's empty-set spelling), and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
         "### Exact emitted native-decision axioms\n\n```text\n" + "\n".join(trust_names) + "\n```\n\n",
         "## Recommendation\n\n",
         "**Q1:** close the first end-to-end fidelity gap rather than adding claims: independently bind one production deployment artifact (constructor inputs, runtime codehash, chain/address) to the already pinned source and one modeled value-moving endpoint, then prove the correspondence or retain it explicitly NOT YET.\n",

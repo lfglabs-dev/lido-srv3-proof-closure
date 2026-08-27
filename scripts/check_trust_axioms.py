@@ -25,6 +25,9 @@ NAMED_AXIOM_REPORT = re.compile(
 )
 TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
+SSZ_DIGEST = "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1"
+CONSOLIDATION_FLOW = "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1"
+PRODUCTION_NATIVE_AXIOMS = {PHASE3, SSZ_DIGEST, CONSOLIDATION_FLOW}
 FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
 
@@ -39,9 +42,9 @@ def disclosed_names() -> set[str]:
         line.strip() for line in ALLOWLIST.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     }
-    if PHASE3 not in names:
-        fail("allowlist omits the documented Phase-3 dependency")
-    if any(name != PHASE3 and not name.startswith("LidoSRv3.Tests.") for name in names):
+    if not PRODUCTION_NATIVE_AXIOMS <= names:
+        fail("allowlist omits a documented production native-decision dependency")
+    if any(name not in PRODUCTION_NATIVE_AXIOMS and not name.startswith("LidoSRv3.Tests.") for name in names):
         fail("allowlist contains a non-test native-decision dependency")
     return names
 

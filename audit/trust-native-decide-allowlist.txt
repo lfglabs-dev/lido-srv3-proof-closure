@@ -1,9 +1,13 @@
 # Exact native-decision axioms mechanically emitted by Audit.Trust.
 #
-# The first entry is the documented P-ALLOC-1 Phase-3 production exception.
-# Every other entry is emitted only by a theorem in LidoSRv3.Tests and is
+# The first three entries are the documented P-ALLOC-1 Phase-3, P-SSZ-1
+# abstract-digest, and P-CONSOLIDATION-1 abstract-flow production exceptions.
+# Every other entry is emitted only by
+# a theorem in LidoSRv3.Tests and is
 # mutant-regression evidence, never a production-parent dependency.
 LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1
+LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1
+LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1
 LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_1
 LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_2
 LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_3
