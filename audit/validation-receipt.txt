@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: dccc69f9eb52501d7af488e66bb27b7f6676089f
+validated-tree: 29d5179a2bfceca2985dcde539ebb0d3d88d7ce4
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -4810,3 +4810,24 @@ R1 final auditor report slice (2026-08-27)
   guards, and `git diff --check`.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `a2fbbc05e69afe4187cb4f1231fe92ee652a9338`.
+
+R1 report review-basis and Markdown-table closure (2026-08-27)
+----------------------------------------------------------------
+
+- Escape every metadata-derived Markdown table cell in the generated status
+  and R1 auditor-report views, so literal pipes (including `source||target`)
+  cannot create columns.
+- Bind the R1 report's certified-review-basis language to the exact canonical
+  `audit/guarantees.yaml` and `audit/source-map.yaml` JSON values at
+  `b481cfff5fc92175657e144198a80e4820425d60`; generation/check rejects either
+  otherwise-valid input drift.
+- Family-level negative regressions inject adjacent pipes into each
+  metadata-derived R1 table-cell family, and independently reject registry and
+  source-map drift from the certified review basis.
+- `python3 scripts/audit_metadata.py generate`, `python3
+  scripts/audit_metadata.py check`, `PYTHONOPTIMIZE=1 python3
+  scripts/test_audit_metadata.py`, `python3 scripts/check_public_claim_surfaces.py`,
+  and `lake build LidoSRv3.Audit.Trust` exit 0. No production Lean files
+  changed; the `sorry`/`admit`/new-axiom/`native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `29d5179a2bfceca2985dcde539ebb0d3d88d7ce4`.

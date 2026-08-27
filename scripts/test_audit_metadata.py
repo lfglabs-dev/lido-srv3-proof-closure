@@ -84,17 +84,35 @@ def main():
         invoke(fixture, True)
         invoke(fixture, True, command="check")
 
-        # Metadata is untrusted Markdown-table content: pipes must remain
-        # literal cell data, including adjacent pipes that would add columns.
-        x = copy.deepcopy(guarantees)
-        x["guarantees"][11]["summary"] = "source||target"
+        # Metadata is untrusted Markdown-table content: a pipe in every
+        # family of metadata-derived report cells must remain literal data,
+        # including adjacent pipes that would add columns.
         spec = importlib.util.spec_from_file_location("fixture_audit_metadata", audit_script)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        report = module.rendered(x["guarantees"], source)["R1-FINAL-AUDITOR-REPORT.md"]
-        escaped_row = next(line for line in report.splitlines() if "| source\\|\\|target |" in line)
-        if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
-            raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
+        def set_id(row): row["id"] = "left||right"
+        def set_abstract_status(row): row["abstract"]["status"] = "left||right"
+        def set_abstract_theorem(row): row["abstract"]["theorem"] = "left||right"
+        def set_verity_status(row): row["verity"]["status"] = "left||right"
+        def set_verity_theorem(row): row["verity"]["theorem"] = "left||right"
+        def set_summary(row): row["summary"] = "left||right"
+        def set_assumptions(row): row["assumptions"] = ["left||right"]
+        def set_classification(row): row["classification"]["kind"] = "left||right"
+        def set_missing(row): row["fidelity"]["missing"] = ["left||right"]
+        def set_next_gate(row): row["next_gate"] = "left||right"
+
+        cell_families = (
+            set_id, set_abstract_status, set_abstract_theorem,
+            set_verity_status, set_verity_theorem, set_summary,
+            set_assumptions, set_classification, set_missing, set_next_gate,
+        )
+        for mutate in cell_families:
+            x = copy.deepcopy(guarantees)
+            mutate(x["guarantees"][11])
+            report = module.rendered(x["guarantees"], source)["R1-FINAL-AUDITOR-REPORT.md"]
+            escaped_row = next(line for line in report.splitlines() if "left\\|\\|right" in line)
+            if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
+                raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
 
         # The review-basis language is only valid for the exact registry and
         # source map committed at that basis.  These are otherwise-valid edits.
