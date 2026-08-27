@@ -42,7 +42,10 @@ def main():
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
         shutil.copy2(ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean",
                      fixture / "LidoSRv3/Audit/Provenance/Deposit.lean")
-        for name in ("guarantees.yaml", "assumptions.yaml", "artifacts.lock.json", "source-map.yaml"):
+        for name in (
+            "guarantees.yaml", "assumptions.yaml", "artifacts.lock.json",
+            "source-map.yaml", "trust-native-decide-allowlist.txt",
+        ):
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")
 
