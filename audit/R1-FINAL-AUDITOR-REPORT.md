@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: certified R1 input set `50551d98ec03ef7fc20747b8d42c03964bbaa28e`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
+Review basis: certified R1 input set `25fbc6e0493948a866a49cda2962d3e897fa00e3`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.
 
 ## Architecture and evidence boundary
 
@@ -55,12 +55,14 @@ Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01
 
 ## Proof-escape and receipt acceptance
 
-`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the recorded Phase-3 native-decision dependency and the exact test/mutant-only native-decision names below. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted axiom report, and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.
+`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the explicitly recorded production and exact test/mutant-only native-decision names below. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted named axiom report (including Lean's empty-set spelling), and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.
 
 ### Exact emitted native-decision axioms
 
 ```text
 LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1
+LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1
+LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1
 LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_1
 LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_2
 LidoSRv3.Tests.ConsolidationTxMutants.double_debit_kill_line_refutes_preserves_eth_balance._native.native_decide.ax_1_3

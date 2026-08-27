@@ -66,7 +66,7 @@ def main():
         audit_source = audit_script.read_text(encoding="utf-8")
         audit_script.write_text(
             audit_source.replace(
-                'R1_REVIEW_BASE = "50551d98ec03ef7fc20747b8d42c03964bbaa28e"',
+                'R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"',
                 f'R1_REVIEW_BASE = "{fixture_review_base}"',
                 1,
             ),

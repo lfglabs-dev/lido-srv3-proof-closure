@@ -17,7 +17,7 @@ from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "50551d98ec03ef7fc20747b8d42c03964bbaa28e"
+R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"
 # The report calls this commit its certified review basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
@@ -28,7 +28,7 @@ R1_REVIEW_BASE = "50551d98ec03ef7fc20747b8d42c03964bbaa28e"
 R1_REPORT_INPUT_SHA256 = {
     "audit/guarantees.yaml": "39fb757cbc896a2cbae21830a633e1cb6831fbcc993b832bce4ea1f5f4215948",
     "audit/source-map.yaml": "ee8847bdf481fad77e8d99bad5be050d723eaa9e3287ec6930417b334d715857",
-    "audit/trust-native-decide-allowlist.txt": "30aa17475c56db64817f0ffa1a5c1314b75fda3def58277569a7fc121bc07bd3",
+    "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
