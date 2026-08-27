@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed unless Trust's emitted native-decision boundary is disclosed."""
+"""Fail closed unless every axiom emitted by Trust is explicitly allowed."""
 
 from __future__ import annotations
 
@@ -15,7 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 TRUST = ROOT / "LidoSRv3/Audit/Trust.lean"
 ALLOWLIST = ROOT / "audit/trust-native-decide-allowlist.txt"
 NATIVE_AXIOM = re.compile(r"\b(?:[A-Za-z_][\w]*\.)+_native\.native_decide\.ax_\d+(?:_\d+)*\b")
+AXIOM_REPORT = re.compile(r"depends on axioms:\s*\[([^\]]*)\]")
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
+FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
 
 def fail(message: str) -> None:
@@ -36,8 +38,16 @@ def disclosed_names() -> set[str]:
     return names
 
 
-def observed_names(output: str) -> set[str]:
-    return set(NATIVE_AXIOM.findall(output))
+def observed_axioms(output: str) -> set[str]:
+    reports = AXIOM_REPORT.findall(output)
+    if not reports:
+        fail("Trust output contains no axiom reports")
+    return {
+        axiom.strip()
+        for report in reports
+        for axiom in report.split(",")
+        if axiom.strip()
+    }
 
 
 def main() -> None:
@@ -67,18 +77,22 @@ def main() -> None:
             sys.stderr.write(result.stdout)
             fail(f"Trust command exited {result.returncode}")
         output = result.stdout
-    observed = observed_names(output)
-    allowed = disclosed_names()
+    observed = observed_axioms(output)
+    disclosed = disclosed_names()
+    allowed = FOUNDATIONAL_AXIOMS | disclosed
     if observed != allowed:
         missing = sorted(allowed - observed)
         unexpected = sorted(observed - allowed)
         details = []
         if missing:
-            details.append("disclosed but not emitted: " + ", ".join(missing))
+            details.append("allowed but not emitted: " + ", ".join(missing))
         if unexpected:
             details.append("emitted but undisclosed: " + ", ".join(unexpected))
         fail("; ".join(details))
-    print(f"trust-axiom check ok: {len(observed)} exact native-decision axioms ({len(observed) - 1} test/mutant-only + Phase-3)")
+    observed_native = set(NATIVE_AXIOM.findall(output))
+    if observed_native != disclosed:
+        fail("native-decision extraction disagrees with the complete axiom report")
+    print(f"trust-axiom check ok: {len(observed)} exact axioms ({len(observed_native) - 1} test/mutant-only native-decision axioms + Phase-3 + foundations)")
 
 
 if __name__ == "__main__":
