@@ -66,7 +66,7 @@ def main():
         audit_source = audit_script.read_text(encoding="utf-8")
         audit_script.write_text(
             audit_source.replace(
-                'R1_REVIEW_BASE = "b481cfff5fc92175657e144198a80e4820425d60"',
+                'R1_REVIEW_BASE = "50551d98ec03ef7fc20747b8d42c03964bbaa28e"',
                 f'R1_REVIEW_BASE = "{fixture_review_base}"',
                 1,
             ),
@@ -77,6 +77,7 @@ def main():
         apath = fixture / "audit/assumptions.yaml"
         lpath = fixture / "audit/artifacts.lock.json"
         spath = fixture / "audit/source-map.yaml"
+        tpath = fixture / "audit/trust-native-decide-allowlist.txt"
         mpath = fixture / "verity/targets/audit-manifest.json"
         guarantees = json.loads(gpath.read_text())
         assumptions = json.loads(apath.read_text())
@@ -140,6 +141,13 @@ def main():
         invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
         write(gpath, guarantees)
         write(spath, source)
+        trust_allowlist = tpath.read_text(encoding="utf-8")
+        tpath.write_text(
+            trust_allowlist + "LidoSRv3.Tests.Injected.review_basis.native_decide.ax_9\n",
+            encoding="utf-8",
+        )
+        invoke(fixture, False, "R1 review basis input family differs for audit/trust-native-decide-allowlist.txt")
+        tpath.write_text(trust_allowlist, encoding="utf-8")
 
         constructor_fixture = fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
         constructor_source = constructor_fixture.read_text(encoding="utf-8")

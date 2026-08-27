@@ -17,16 +17,18 @@ from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "b481cfff5fc92175657e144198a80e4820425d60"
+R1_REVIEW_BASE = "50551d98ec03ef7fc20747b8d42c03964bbaa28e"
 # The report calls this commit its certified review basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
-# a changed registry/source map must not be presented as if it had that review.
+# a changed registry, source map, or Trust allowlist must not be presented as
+# if it had that review.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
     "audit/guarantees.yaml": "39fb757cbc896a2cbae21830a633e1cb6831fbcc993b832bce4ea1f5f4215948",
     "audit/source-map.yaml": "ee8847bdf481fad77e8d99bad5be050d723eaa9e3287ec6930417b334d715857",
+    "audit/trust-native-decide-allowlist.txt": "30aa17475c56db64817f0ffa1a5c1314b75fda3def58277569a7fc121bc07bd3",
 }
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
@@ -135,6 +137,13 @@ def markdown_table_cell(value):
 def canonical_metadata_bytes(value):
     """Ignore JSON whitespace while binding every metadata value and shape."""
     return json.dumps(json.loads(value), sort_keys=True, separators=(",", ":")).encode()
+
+
+def canonical_review_input_bytes(relative, value):
+    """Normalize structured review inputs while retaining exact text inputs."""
+    if relative.endswith((".yaml", ".json")):
+        return canonical_metadata_bytes(value)
+    return value
 
 
 def nonempty_strings(value):
@@ -265,10 +274,10 @@ def validate_r1_review_basis():
         require(result.returncode == 0,
                 f"R1 review basis cannot read {R1_REVIEW_BASE}:{relative}")
         reviewed = result.stdout
-        reviewed_canonical = canonical_metadata_bytes(reviewed)
+        reviewed_canonical = canonical_review_input_bytes(relative, reviewed)
         require(hashlib.sha256(reviewed_canonical).hexdigest() == expected_digest,
                 f"R1 review basis digest differs for {relative}")
-        current_canonical = canonical_metadata_bytes((ROOT / relative).read_bytes())
+        current_canonical = canonical_review_input_bytes(relative, (ROOT / relative).read_bytes())
         require(current_canonical == reviewed_canonical,
                 f"R1 review basis input family differs for {relative}")
 
@@ -434,7 +443,7 @@ def rendered(rows, source_map):
                    if line.strip() and not line.lstrip().startswith("#")]
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: certified `main` `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
