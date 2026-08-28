@@ -89,12 +89,7 @@ def fail(message: str) -> None:
     raise SystemExit(f"proof-escape check failed: {message}")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--native-decide-policy", choices=("enforce", "forbid"), default="enforce")
-    args = parser.parse_args()
-    root = args.root.resolve()
+def project_sources(root: Path) -> list[Path]:
     source_root = root / SOURCE_ROOT
     files = sorted([*source_root.rglob("*.lean"),
                     *(root / relative for relative in LIBRARY_ROOTS)])
@@ -103,13 +98,48 @@ def main() -> None:
         fail(f"missing production Lean source(s): {', '.join(missing_roots)}")
     if not files:
         fail(f"no Lean sources below {SOURCE_ROOT}/")
-    native_records: list[str] = []
-    for path in files:
+    return files
+
+
+def native_decide_sites(root: Path, files: list[Path] | None = None) -> list[tuple[str, int, str]]:
+    """Every `native_decide` tactic site in project source, as `(path, line, text)`.
+
+    Comments and string literals are blanked first, so a site here is a real
+    tactic occurrence Lean can mint a native-decision axiom from.
+    """
+    sites: list[tuple[str, int, str]] = []
+    for path in (project_sources(root) if files is None else files):
         source = path.read_text(encoding="utf-8")
-        if not any(token in source for token in ("sorry", "admit", "axiom", "constant", "unsafe", "Lean.ofReduceBool", "native_decide")):
+        if "native_decide" not in source:
             continue
         clean = strip_comments_and_strings(source)
         lines = source.splitlines()
+        newlines = [index for index, char in enumerate(clean) if char == "\n"]
+        relative = path.relative_to(root).as_posix()
+        for match in re.finditer(r"\bnative_decide\b", clean):
+            line = bisect.bisect_right(newlines, match.start()) + 1
+            sites.append((relative, line, lines[line - 1].strip()))
+    return sites
+
+
+def native_decide_digest(sites: list[tuple[str, int, str]]) -> str:
+    return hashlib.sha256(
+        "\n".join(f"{path}:{line}:{text}" for path, line, text in sites).encode()
+    ).hexdigest()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--native-decide-policy", choices=("enforce", "forbid"), default="enforce")
+    args = parser.parse_args()
+    root = args.root.resolve()
+    files = project_sources(root)
+    for path in files:
+        source = path.read_text(encoding="utf-8")
+        if not any(token in source for token in ("sorry", "admit", "axiom", "constant", "unsafe", "Lean.ofReduceBool")):
+            continue
+        clean = strip_comments_and_strings(source)
         newlines = [index for index, char in enumerate(clean) if char == "\n"]
         relative = path.relative_to(root).as_posix()
         for name, pattern in ESCAPES:
@@ -117,11 +147,8 @@ def main() -> None:
             if match:
                 line = bisect.bisect_right(newlines, match.start()) + 1
                 fail(f"{relative}:{line}: forbidden {name}")
-        for match in re.finditer(r"\bnative_decide\b", clean):
-            line = bisect.bisect_right(newlines, match.start()) + 1
-            original = lines[line - 1].strip()
-            native_records.append(f"{relative}:{line}:{original}")
-    digest = hashlib.sha256("\n".join(native_records).encode()).hexdigest()
+    native_records = native_decide_sites(root)
+    digest = native_decide_digest(native_records)
     if args.native_decide_policy == "forbid" and native_records:
         fail("forbidden native_decide")
     if args.native_decide_policy == "enforce" and (len(native_records) != NATIVE_DECIDE_COUNT or digest != NATIVE_DECIDE_SHA256):

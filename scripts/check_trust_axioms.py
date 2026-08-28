@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -29,6 +30,55 @@ NAMED_AXIOM_REPORT = re.compile(
     re.MULTILINE,
 )
 TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
+LEAN_MODULE = re.compile(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*")
+# Rows this checker's own Lean probe emits, one per disclosed name, plus a
+# terminating count so a truncated or partially-elaborated probe fails closed.
+PROBE_ROW = re.compile(
+    r"^NDP\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$",
+    re.MULTILINE,
+)
+PROBE_END = re.compile(r"^NDP-END\t(\d+)$", re.MULTILINE)
+# `Lean.Meta.nativeEqTrue` — the sole minter of `_native.<tactic>.ax_*` axioms —
+# adds `Declaration.axiomDecl` whose type is `mkApp3 (Eq) Bool e Bool.true` and
+# then calls `addDeclarationRangesFromSyntax` with the deciding tactic's own
+# syntax ref.  Both facts are recorded in the environment, so an axiom's kind,
+# type shape, module and declaration line are compiler-written provenance that
+# a project source cannot restate for itself.
+NATIVE_PROVENANCE_PROBE = r"""import <<MODULE>>
+import Lean
+
+open Lean Elab Command
+
+private def nativeProvenanceRow (env : Environment) (name : Name) :
+    CommandElabM String := do
+  let some info := env.find? name
+    | return s!"NDP\t{name}\tmissing\t-\t-\t-\t-"
+  let kind := match info with
+    | .axiomInfo _ => "axiom"
+    | .thmInfo _ => "theorem"
+    | .defnInfo _ => "definition"
+    | .opaqueInfo _ => "opaque"
+    | _ => "other"
+  let safety := if info.isUnsafe then "unsafe" else "safe"
+  let type := info.type
+  let shape :=
+    if type.isAppOfArity ``Eq 3 && (type.getArg! 0).isConstOf ``Bool
+        && (type.getArg! 2).isConstOf ``Bool.true then "eq-bool-true" else "other"
+  let srcModule := match env.getModuleIdxFor? name with
+    | some idx => toString env.header.moduleNames[idx.toNat]!
+    | none => "-"
+  let srcLine := match (← findDeclarationRanges? name) with
+    | some ranges => toString ranges.range.pos.line
+    | none => "-"
+  return s!"NDP\t{name}\t{kind}\t{safety}\t{shape}\t{srcModule}\t{srcLine}"
+
+#eval show CommandElabM Unit from do
+  let env ← getEnv
+  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
+  for name in names do
+    IO.println (← nativeProvenanceRow env name.toName)
+  IO.println s!"NDP-END\t{names.length}"
+"""
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
 SSZ_DIGEST = "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1"
 CONSOLIDATION_FLOW = "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1"
@@ -67,6 +117,110 @@ def reject_source_declared_native_names() -> None:
     if offenders:
         fail("project source declares a name in Lean's generated native-decision "
              "namespace, which only the compiler may mint: " + "; ".join(offenders))
+
+
+def native_decide_sites(root: Path, pinned: bool) -> dict[str, set[int]]:
+    """`source path -> native_decide line numbers` Lean could have minted from.
+
+    For the project tree this is the same inventory `check_proof_escapes.py`
+    pins by count and digest, so widening it to legitimise a forged axiom's
+    declaration line requires deliberately re-baselining that guard.
+    """
+    # Imported lazily: saved-output validation is self-contained, and its
+    # negative regressions exercise this script on its own.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import check_proof_escapes
+
+    files = None if pinned else sorted(root.rglob("*.lean"))
+    sites = check_proof_escapes.native_decide_sites(root, files)
+    if pinned:
+        digest = check_proof_escapes.native_decide_digest(sites)
+        if (len(sites) != check_proof_escapes.NATIVE_DECIDE_COUNT
+                or digest != check_proof_escapes.NATIVE_DECIDE_SHA256):
+            fail("native_decide inventory differs from the recorded project baseline")
+    index: dict[str, set[int]] = {}
+    for path, line, _ in sites:
+        index.setdefault(path, set()).add(line)
+    return index
+
+
+def native_provenance_output(module: str, names: list[str], fixture: Path | None) -> str:
+    """Ask Lean itself what the disclosed names actually are in the environment."""
+    if not LEAN_MODULE.fullmatch(module):
+        fail(f"refusing to probe a malformed module name: {module}")
+    with tempfile.TemporaryDirectory() as scratch:
+        names_file = Path(scratch) / "names.txt"
+        names_file.write_text("\n".join(names) + "\n", encoding="utf-8")
+        probe = Path(scratch) / "native_provenance_probe.lean"
+        probe.write_text(
+            NATIVE_PROVENANCE_PROBE
+            .replace("<<MODULE>>", module)
+            .replace("<<NAMES>>", str(names_file).replace("\\", "\\\\").replace('"', '\\"')),
+            encoding="utf-8",
+        )
+        env = os.environ.copy()
+        env.setdefault("SANDBOXED_REMOTE_EXECUTION", "1")
+        if fixture is None:
+            command = ["lake", "env", "lean", str(probe)]
+        else:
+            command = ["lean", str(probe)]
+            env["LEAN_PATH"] = os.pathsep.join(
+                [str(fixture.resolve()), *filter(None, [env.get("LEAN_PATH")])])
+        result = subprocess.run(
+            command, cwd=ROOT, env=env, text=True,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        )
+        if result.returncode:
+            sys.stderr.write(result.stdout)
+            fail(f"native-decision provenance probe exited {result.returncode}")
+        return result.stdout
+
+
+def verify_native_provenance(names: list[str], output: str, sites: dict[str, set[int]]) -> None:
+    """Require every disclosed name to be a declaration `native_decide` minted.
+
+    Rejecting project sources that spell `_native` is necessary but not
+    sufficient: a project command elaborator can assemble the very same name
+    from fragments and `addDecl` a `Declaration.axiomDecl` under it, leaving no
+    literal token to scan for.  Disclosure is therefore vouched for by what the
+    environment records about each name — that Lean holds it as a safe axiom,
+    typed as the `e = true` reflection `nativeEqTrue` is the only source of, and
+    minted at a `native_decide` site in the module its own name lives in.
+    """
+    rows: dict[str, tuple[str, ...]] = {}
+    for name, kind, safety, shape, module, line in PROBE_ROW.findall(output):
+        if name in rows:
+            fail(f"native-decision provenance probe reported {name} more than once")
+        rows[name] = (kind, safety, shape, module, line)
+    counted = PROBE_END.findall(output)
+    if len(counted) != 1 or int(counted[0]) != len(names):
+        fail("native-decision provenance probe did not report on every disclosed name")
+    unreported = sorted(set(names) - set(rows))
+    if unreported:
+        fail("native-decision provenance is unreported for: " + ", ".join(unreported))
+    for name in sorted(names):
+        kind, safety, shape, module, line = rows[name]
+        if kind == "missing":
+            fail(f"{name} is disclosed as a native-decision axiom but no such "
+                 f"declaration exists in the built environment")
+        if kind != "axiom" or safety != "safe":
+            fail(f"{name} is disclosed as a native-decision axiom but Lean holds it as "
+                 f"a {safety} {kind}")
+        if shape != "eq-bool-true":
+            fail(f"{name} does not carry the `_ = true` reflection type Lean mints "
+                 f"native-decision axioms with, so native_decide did not generate it")
+        if not LEAN_MODULE.fullmatch(module) or not name.startswith(module + "."):
+            fail(f"{name} was minted by module {module}, which does not own its name")
+        source = module.replace(".", "/") + ".lean"
+        if not line.isdigit() or int(line) not in sites.get(source, set()):
+            fail(f"{name} is not bound to a compiler-generated native_decide site: "
+                 f"Lean minted it at {source}:{line}")
+
+
+def check_native_provenance(names: list[str], module: str, fixture: Path | None) -> None:
+    ordered = sorted(names)
+    sites = native_decide_sites(ROOT if fixture is None else fixture, pinned=fixture is None)
+    verify_native_provenance(ordered, native_provenance_output(module, ordered, fixture), sites)
 
 
 def disclosed_names() -> set[str]:
@@ -138,7 +292,23 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--trust-output", type=Path,
                         help="validate saved Trust output instead of invoking Lean")
+    parser.add_argument("--provenance-fixture", type=Path,
+                        help="verify native-decision provenance only, against modules "
+                             "compiled into this directory instead of the project build")
+    parser.add_argument("--provenance-module", default="LidoSRv3.Audit.Trust",
+                        help="module the provenance probe imports")
+    parser.add_argument("--provenance-names", type=Path,
+                        help="names to verify provenance for (default: the disclosure allowlist)")
     args = parser.parse_args()
+    if args.provenance_fixture or args.provenance_names:
+        names = (disclosed_names() if args.provenance_names is None else {
+            line.strip()
+            for line in args.provenance_names.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        })
+        check_native_provenance(sorted(names), args.provenance_module, args.provenance_fixture)
+        print(f"native-decision provenance ok: {len(names)} compiler-generated axioms")
+        return
     if args.trust_output:
         output = args.trust_output.read_text(encoding="utf-8")
     else:
@@ -174,6 +344,12 @@ def main() -> None:
     # as a Lean-generated dependency if no project source declared it.
     reject_source_declared_native_names()
     disclosed = disclosed_names()
+    # ...and the lexical guard above only rules out the spellings a source can
+    # be scanned for, so the disclosed names are additionally checked against
+    # what Lean recorded when it generated them.  Saved-output mode validates a
+    # report, not an environment, and cannot reach the declarations.
+    if not args.trust_output:
+        check_native_provenance(sorted(disclosed), args.provenance_module, None)
     allowed = FOUNDATIONAL_AXIOMS | disclosed
     for theorem, axioms in reports:
         unexpected = sorted(axioms - allowed)
@@ -191,7 +367,8 @@ def main() -> None:
     observed_native = set(NATIVE_AXIOM.findall(output))
     if observed_native != disclosed:
         fail("native-decision extraction disagrees with the complete axiom report")
-    print(f"trust-axiom check ok: {len(observed)} exact axioms ({len(observed_native) - 1} test/mutant-only native-decision axioms + Phase-3 + foundations)")
+    provenance = "report-only" if args.trust_output else "compiler-generated"
+    print(f"trust-axiom check ok: {len(observed)} exact axioms ({len(observed_native) - 1} test/mutant-only native-decision axioms + Phase-3 + foundations); native-decision provenance {provenance}")
 
 
 if __name__ == "__main__":

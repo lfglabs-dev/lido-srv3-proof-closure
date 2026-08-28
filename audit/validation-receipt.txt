@@ -1,11 +1,57 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: a7f267c1e7055a25ce3bdea36359e3d7dd2d31da
+validated-tree: 229c4e301625954ac44e9683744168e756d44a91
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Disclosed native-decision names checked against generated declarations (2026-08-28)
+------------------------------------------------------------------------------------
+
+- The lexical guard below is necessary but not sufficient. A project command
+  elaborator can assemble the generated name out of fragments, as in
+  `(parent.str ("_" ++ "native")).str "native_decide" |>.str "ax_1_1"`, and
+  `addDecl` a `Declaration.axiomDecl` under it. No `_native` token then exists
+  in any source for `reject_source_declared_native_names` to find, and
+  `scripts/check_proof_escapes.py` does not match the embedded word in
+  `axiomDecl` because its pattern is the `axiom` keyword. Both lexical guards
+  therefore pass on a project axiom the compiler never minted, which could
+  carry an allowed native-decision name into a registered theorem's report.
+- `check_native_provenance` stops treating the absence of one source token as
+  provenance and asks Lean what each disclosed name actually is. A Lean probe
+  built by this checker reports, per name, the declaration kind and safety, the
+  type shape, the owning module, and the declaration line. A name is accepted
+  only when Lean holds it as a safe axiom, its type is the `_ = true`
+  reflection that `Lean.Meta.nativeEqTrue` is the only source of, the minting
+  module owns its name prefix, and its declaration line is one of the
+  `native_decide` sites in that module. Those sites are read through
+  `check_proof_escapes.native_decide_sites` and re-verified against the pinned
+  count and digest, so legitimising a forged line requires deliberately
+  re-baselining the proof-escape guard as well.
+- `scripts/test_check_trust_axioms.sh` carries the claim as an executable
+  fixture rather than a description. It compiles a module that mints exactly
+  the two forged axioms above through `addDecl`, asserts up front that neither
+  lexical guard has anything to find (no `_native` substring, and no
+  proof-escape pattern matches although `axiomDecl` is present), and then
+  requires each forged name to be rejected for its own reason: `mistyped` for
+  not carrying the reflection type, and `fake` — which does wear that type and
+  forges its declaration range from the minting command's own syntax — for not
+  being bound to a `native_decide` site. A real `native_decide` theorem in the
+  same module is asserted to be accepted, so the negatives are carried by
+  provenance and not by an unusable fixture.
+- Both gates were confirmed load-bearing by mutation: with the declaration-site
+  binding removed, the same fixture reports `native-decision provenance ok: 1
+  compiler-generated axioms` for the forged `fake` axiom; with the type-shape
+  check removed, `mistyped` falls through to the site binding and is still
+  rejected.
+- Scope: this gate governs whether a disclosed native-decision name may be
+  treated as compiler-generated. Saved-output validation (`--trust-output`)
+  inspects a report rather than an environment and is reported as
+  `report-only`; the full Trust path reports `compiler-generated`. No
+  guarantee's plane status, disclosed allowlist entry, or R1 review basis
+  changes, and all NOT YET boundaries stand.
 
 Native-decision disclosure bound to provenance, not spelling (2026-08-28)
 --------------------------------------------------------------------------

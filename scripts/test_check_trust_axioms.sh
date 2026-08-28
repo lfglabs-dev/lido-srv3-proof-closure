@@ -141,6 +141,102 @@ reject "$tmp/laundered-shape-report" \
 rm "$launder/LidoSRv3/Tests/Injected.lean"
 python3 "$launder/scripts/check_trust_axioms.py" --trust-output "$tmp/laundered-shape-report" >/dev/null
 
+# Executable provenance regression.  Scanning sources for the literal `_native`
+# token is necessary but not sufficient: a project command elaborator can build
+# the very same name out of fragments and `addDecl` a `Declaration.axiomDecl`
+# under it, so the generated spelling never appears in the source at all.  This
+# fixture is that elaborator.  `mistyped` mints an outright `False`; `fake` also
+# wears the `e = true` reflection type, so only binding the name to a real
+# `native_decide` site can reject it.  `genuine` is a real `native_decide` proof
+# in the same module, which must still be accepted.
+minted="$tmp/minted"
+mkdir -p "$minted/LidoSRv3/Tests"
+cat > "$minted/LidoSRv3/Tests/Injected.lean" <<'LEAN'
+import Lean
+open Lean Elab Command
+
+namespace LidoSRv3.Tests.Injected
+
+theorem genuine : (10000 : Nat) + 1 = 10001 := by
+  native_decide
+
+private def generatedName (parent : Name) : Name :=
+  -- Assembled from fragments: no `_ native` token (sans space) is ever spelled.
+  (parent.str ("_" ++ "native")).str "native_decide" |>.str "ax_1_1"
+
+elab "mint_forged_axioms" : command => do
+  liftCoreM <| addDecl (.axiomDecl {
+    name := generatedName `LidoSRv3.Tests.Injected.mistyped
+    levelParams := [], type := mkConst ``False, isUnsafe := false })
+  let forged := generatedName `LidoSRv3.Tests.Injected.fake
+  liftCoreM <| addDecl (.axiomDecl {
+    name := forged, levelParams := [], isUnsafe := false
+    type := mkApp3 (mkConst ``Eq [1]) (mkConst ``Bool)
+      (mkConst ``Bool.false) (mkConst ``Bool.true) })
+  -- Even the declaration range is forged, from this command's own syntax.
+  Lean.Elab.addDeclarationRangesFromSyntax forged (← getRef)
+
+mint_forged_axioms
+
+end LidoSRv3.Tests.Injected
+LEAN
+
+# The premise of this regression: both lexical guards have nothing to find.
+# The generated namespace is never spelled, and `axiomDecl` is not the `axiom`
+# keyword, so the proof-escape scanner does not match the embedded word either.
+if grep -q '_native' "$minted/LidoSRv3/Tests/Injected.lean"; then
+  echo 'minted-axiom fixture must not spell the generated namespace literally' >&2
+  exit 1
+fi
+python3 - "$minted/LidoSRv3/Tests/Injected.lean" <<'PY'
+import pathlib
+import sys
+
+sys.path.insert(0, "scripts")
+import check_proof_escapes as scanner
+
+clean = scanner.strip_comments_and_strings(
+    pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+if "axiomDecl" not in clean:
+    raise SystemExit("fixture must mint its axioms through addDecl")
+caught = [name for name, pattern in scanner.ESCAPES if pattern.search(clean)]
+if caught:
+    raise SystemExit("fixture is caught lexically, so it does not reproduce the "
+                     "claim: " + ", ".join(caught))
+PY
+lean -R "$minted" -o "$minted/LidoSRv3/Tests/Injected.olean" "$minted/LidoSRv3/Tests/Injected.lean"
+
+probe_names() { printf '%s\n' "$1" > "$minted/names.txt"; }
+probe() {
+  python3 scripts/check_trust_axioms.py --provenance-fixture "$minted" \
+    --provenance-module LidoSRv3.Tests.Injected --provenance-names "$minted/names.txt"
+}
+reject_probe() {
+  local needle="$1" label="$2" captured status
+  captured="$(probe 2>&1)" && status=0 || status=$?
+  if (( status == 0 )); then
+    echo "trust-axiom provenance regression unexpectedly accepted $label" >&2
+    exit 1
+  fi
+  if [[ "$captured" != *"$needle"* ]]; then
+    echo "trust-axiom provenance regression rejected $label for the wrong reason: $captured" >&2
+    exit 1
+  fi
+}
+
+probe_names 'LidoSRv3.Tests.Injected.mistyped._native.native_decide.ax_1_1'
+reject_probe 'does not carry the `_ = true` reflection type Lean mints native-decision axioms with' \
+  'an elaborator-minted axiom that native_decide never generated'
+
+probe_names 'LidoSRv3.Tests.Injected.fake._native.native_decide.ax_1_1'
+reject_probe 'is not bound to a compiler-generated native_decide site' \
+  'an elaborator-minted axiom wearing the generated type and a forged declaration range'
+
+# The genuine `native_decide` axiom in the very same module is accepted, so the
+# two negatives are carried by provenance and not by the fixture being unusable.
+probe_names 'LidoSRv3.Tests.Injected.genuine._native.native_decide.ax_1_1'
+probe >/dev/null
+
 # An unnamed dependency line must fail closed rather than be discarded, so a
 # report Lean did emit can never go unparsed.
 cp "$tmp/ok" "$tmp/unnamed-report"
@@ -154,4 +250,4 @@ sed '1d' "$tmp/ok" > "$tmp/unprinted-registered-opaque"
 reject "$tmp/unprinted-registered-opaque" 'Trust output omits registered CHECKED theorem report(s)' \
   'an unprinted registered theorem with an opaque dependency'
 
-printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), an unnamed report, and an unprinted registered theorem'
+printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an unnamed report, and an unprinted registered theorem'
