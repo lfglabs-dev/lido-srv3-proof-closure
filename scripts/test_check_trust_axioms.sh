@@ -295,6 +295,73 @@ reject_probe 'asserts a Bool claim that evaluates to false' \
 probe_names 'LidoSRv3.Tests.Sited.decoy._native.native_decide.ax_1_1'
 probe >/dev/null
 
+# Re-evaluating a claim is only evidence if the audited module cannot decide
+# what the re-evaluating probe's own source means.  This fixture is the `sited`
+# forgery again -- a `false = true` axiom wearing the generated name and the
+# genuine site -- plus a macro bound to the evaluator's token sequence.  A probe
+# that imports the module gets a substitute which affirms every claim, so the
+# claim check reports the forgery as re-evaluated.
+shadowed_eval="$tmp/shadowed-eval"
+mkdir -p "$shadowed_eval/LidoSRv3/Tests"
+cat > "$shadowed_eval/LidoSRv3/Tests/ShadowedEval.lean" <<'LEAN'
+import Lean
+open Lean Elab Command
+
+namespace LidoSRv3.Tests.ShadowedEval
+
+theorem decoy : (10000 : Nat) + 1 = 10001 := by
+  native_decide
+
+private def generatedName (parent : Name) : Name :=
+  (parent.str ("_" ++ "native")).str "native_decide" |>.str "ax_1_1"
+
+elab "mint_false_axiom_at_genuine_site" : command => do
+  let genuine := generatedName `LidoSRv3.Tests.ShadowedEval.decoy
+  let some ranges ← findDeclarationRanges? genuine
+    | throwError "fixture lost its genuine native-decision axiom"
+  let forged := generatedName `LidoSRv3.Tests.ShadowedEval.shadowedEval
+  liftCoreM <| addDecl (.axiomDecl {
+    name := forged, levelParams := [], isUnsafe := false
+    type := mkApp3 (mkConst ``Eq [1]) (mkConst ``Bool)
+      (mkConst ``Bool.false) (mkConst ``Bool.true) })
+  addDeclarationRanges forged ranges
+
+mint_false_axiom_at_genuine_site
+
+/-- A drop-in for the probe's evaluator: it ignores the expression it is handed
+and affirms the claim, which is all a forged axiom needs. -/
+def affirm (_α : Type) (_expected : Lean.Expr) (_value : Lean.Expr) :
+    Lean.MetaM Bool := return true
+
+end LidoSRv3.Tests.ShadowedEval
+
+macro "evalExpr" : term => `(LidoSRv3.Tests.ShadowedEval.affirm)
+macro "Lean.Meta.evalExpr" : term => `(LidoSRv3.Tests.ShadowedEval.affirm)
+macro "_root_.Lean.Meta.evalExpr" : term => `(LidoSRv3.Tests.ShadowedEval.affirm)
+LEAN
+lean -R "$shadowed_eval" -o "$shadowed_eval/LidoSRv3/Tests/ShadowedEval.olean" \
+  "$shadowed_eval/LidoSRv3/Tests/ShadowedEval.lean"
+
+probe_names() { printf '%s\n' "$1" > "$shadowed_eval/names.txt"; }
+probe() {
+  python3 scripts/check_trust_axioms.py --provenance-fixture "$shadowed_eval" \
+    --provenance-module LidoSRv3.Tests.ShadowedEval \
+    --provenance-names "$shadowed_eval/names.txt"
+}
+
+# This probe imports only `Lean` and loads the fixture as data, so the
+# substitute is inert and the forged claim is evaluated as written.  The
+# predecessor probe, which imported the module, reported this same axiom as
+# re-evaluated.
+probe_names 'LidoSRv3.Tests.ShadowedEval.shadowedEval._native.native_decide.ax_1_1'
+reject_probe 'asserts a Bool claim that evaluates to false' \
+  'a false claim affirmed by a macro that shadows the evaluator'
+
+# The genuine axiom from the same shadowing fixture is still accepted, so the
+# rejection is carried by the re-evaluated claim and not by the fixture.
+probe_names 'LidoSRv3.Tests.ShadowedEval.decoy._native.native_decide.ax_1_1'
+probe >/dev/null
+
 # Disclosure must come from commands Lean will actually run.  A `#print axioms`
 # line reads identically inside a `/- -/` block, so matching raw source let a
 # registered theorem stay "disclosed" by inert text while its dependencies were
@@ -516,4 +583,4 @@ sed '1d' "$tmp/ok" > "$tmp/unprinted-registered-opaque"
 reject "$tmp/unprinted-registered-opaque" 'Trust output omits registered CHECKED theorem report(s)' \
   'an unprinted registered theorem with an opaque dependency'
 
-printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, a registered theorem disclosed only by a commented-out #print axioms command, a fabricated report hiding a real opaque dependency, a report invented for an unprinted theorem, a report hiding a dependency behind a macro that shadows the collector in every spelling, an unnamed report, and an unprinted registered theorem'
+printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, a false claim affirmed by a macro that shadows the evaluator, a registered theorem disclosed only by a commented-out #print axioms command, a fabricated report hiding a real opaque dependency, a report invented for an unprinted theorem, a report hiding a dependency behind a macro that shadows the collector in every spelling, an unnamed report, and an unprinted registered theorem'

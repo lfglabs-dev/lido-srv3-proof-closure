@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 40a1181931474e5e68f3765e6088bae23c2537fe
+validated-tree: 05b5d3710e3fde32c8c76b1d402daa3c47cac61b
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -36,11 +36,18 @@ Recomputation probes elaborate outside the audited module (2026-08-28)
   the interception rather than trying to out-spell it. Both entry points became
   `unsafe` implementations behind `@[implemented_by]` `opaque` wrappers, since
   `importModules` with initializers and `evalExpr` are unsafe.
-- The same exposure is closed in the provenance probe. Had it kept importing
-  the audited module, a `macro "Lean.Meta.evalExpr"` could have answered `true`
-  for every claim, silently undoing the re-evaluation recorded further below
-  while that section's own regressions continued to pass.
-- `scripts/test_check_trust_axioms.sh` carries the negative. It first proves
+- The same exposure is closed in the provenance probe, and is measured rather
+  than argued. A second fixture is the `sited` forgery again — an axiom
+  asserting `false = true`, wearing the generated name and registered at the
+  genuine `native_decide` site — plus a macro bound to the evaluator's token
+  sequence. Against the predecessor checker at 6f95055 that fixture printed
+  `native-decision claims ok: 1 re-evaluated axioms` and exited 0, so the
+  re-evaluation recorded further below was itself undoable while that section's
+  own regressions continued to pass. The current probe rejects it with
+  `asserts a Bool claim that evaluates to false`, and still accepts the genuine
+  axiom from that same shadowing fixture.
+- `scripts/test_check_trust_axioms.sh` carries both negatives. For the
+  dependency probe it first proves
   the qualification-only fix would not have closed the hole: a witness that
   imports the fixture exactly as the old probe did asks for `registered`'s
   axioms in the bare, `Lean.`-qualified, and `_root_.Lean.`-qualified spellings
