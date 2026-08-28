@@ -411,6 +411,98 @@ reject_confirm 'reports on theorem(s) no active #print axioms command requests' 
 } > "$spoofed/truthful"
 confirm "$spoofed/truthful" >/dev/null
 
+# Executable shadowing regression.  Recomputation is only evidence if the
+# audited module cannot decide what the recomputing probe's own source means.
+# A module may declare `macro "collectAxioms" ...`, and a macro matches a token
+# sequence rather than a resolved name, so a probe that imports the module gets
+# the substitute -- one that delegates to the real collector and then drops a
+# chosen axiom, returning a well-formed answer that is quietly short.
+shadowed="$tmp/shadowed"
+mkdir -p "$shadowed/LidoSRv3/Tests"
+cat > "$shadowed/LidoSRv3/Tests/Shadowed.lean" <<'LEAN'
+import Lean
+
+namespace LidoSRv3.Tests.Shadowed
+
+axiom hidden : (1 : Nat) = 1
+
+theorem registered : (1 : Nat) = 1 := hidden
+
+theorem clean : (2 : Nat) = 2 := rfl
+
+/-- A drop-in for `Lean.collectAxioms`: same signature, real answer, one axiom
+poorer.  Matching that signature is what lets it stand in at any call site. -/
+def filtered {m : Type → Type} [Monad m] [Lean.MonadEnv m] [Lean.MonadError m]
+    (name : Lean.Name) : m (Array Lean.Name) := do
+  let axioms ← Lean.collectAxioms name
+  return axioms.filter (· != ``LidoSRv3.Tests.Shadowed.hidden)
+
+end LidoSRv3.Tests.Shadowed
+
+macro "collectAxioms" : term => `(LidoSRv3.Tests.Shadowed.filtered)
+macro "Lean.collectAxioms" : term => `(LidoSRv3.Tests.Shadowed.filtered)
+macro "_root_.Lean.collectAxioms" : term => `(LidoSRv3.Tests.Shadowed.filtered)
+LEAN
+lean -R "$shadowed" -o "$shadowed/LidoSRv3/Tests/Shadowed.olean" \
+  "$shadowed/LidoSRv3/Tests/Shadowed.lean"
+printf '%s\n' 'LidoSRv3.Tests.Shadowed.registered' 'LidoSRv3.Tests.Shadowed.clean' \
+  > "$shadowed/names"
+
+# First, why qualifying the call is not the fix.  This witness imports the
+# fixture exactly as the old probe did and asks for `registered`'s axioms in all
+# three spellings; every one answers `#[]` for a theorem that really does depend
+# on `hidden`.  Spelling the name more fully cannot escape a macro, so only
+# refusing to elaborate under the audited module closes this.
+cat > "$shadowed/witness.lean" <<'LEAN'
+import LidoSRv3.Tests.Shadowed
+
+open Lean in
+#eval show CoreM Unit from do
+  let bare ← collectAxioms ``LidoSRv3.Tests.Shadowed.registered
+  let qualified ← Lean.collectAxioms ``LidoSRv3.Tests.Shadowed.registered
+  let rooted ← _root_.Lean.collectAxioms ``LidoSRv3.Tests.Shadowed.registered
+  IO.println s!"SHADOWED\t{bare.size}\t{qualified.size}\t{rooted.size}"
+LEAN
+witness="$(LEAN_PATH="$shadowed${LEAN_PATH:+:$LEAN_PATH}" lean "$shadowed/witness.lean")"
+if [[ "$witness" != *"$(printf 'SHADOWED\t0\t0\t0')"* ]]; then
+  echo "shadowing witness did not reproduce the bypass: $witness" >&2
+  exit 1
+fi
+
+shadow_confirm() {
+  python3 scripts/check_trust_axioms.py --trust-output "$1" \
+    --dependency-fixture "$shadowed" --dependency-names "$shadowed/names" \
+    --provenance-module LidoSRv3.Tests.Shadowed
+}
+
+# The probe this checker runs imports only `Lean` and loads the audited module
+# as data, so the substitute is inert and the hidden dependency is recomputed.
+# The predecessor probe, which imported the module, accepted this same report.
+{
+  printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Shadowed.registered'
+  printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Shadowed.clean'
+} > "$shadowed/fabricated"
+shadow_captured="$(shadow_confirm "$shadowed/fabricated" 2>&1)" && shadow_status=0 \
+  || shadow_status=$?
+if (( shadow_status == 0 )); then
+  echo "shadowing regression unexpectedly accepted a report hiding a dependency" \
+    "behind a macro that shadows the collector" >&2
+  exit 1
+fi
+if [[ "$shadow_captured" != *"disagrees with LidoSRv3.Tests.Shadowed.registered's actual dependencies: hides LidoSRv3.Tests.Shadowed.hidden"* ]]; then
+  echo "shadowing regression rejected for the wrong reason: $shadow_captured" >&2
+  exit 1
+fi
+
+# The truthful report over the same shadowing fixture is accepted, so the
+# rejection is carried by the recomputed dependency and not by the fixture.
+{
+  printf "'%s' depends on axioms: [%s]\n" \
+    'LidoSRv3.Tests.Shadowed.registered' 'LidoSRv3.Tests.Shadowed.hidden'
+  printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Shadowed.clean'
+} > "$shadowed/truthful"
+shadow_confirm "$shadowed/truthful" >/dev/null
+
 # An unnamed dependency line must fail closed rather than be discarded, so a
 # report Lean did emit can never go unparsed.
 cp "$tmp/ok" "$tmp/unnamed-report"
@@ -424,4 +516,4 @@ sed '1d' "$tmp/ok" > "$tmp/unprinted-registered-opaque"
 reject "$tmp/unprinted-registered-opaque" 'Trust output omits registered CHECKED theorem report(s)' \
   'an unprinted registered theorem with an opaque dependency'
 
-printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, a registered theorem disclosed only by a commented-out #print axioms command, a fabricated report hiding a real opaque dependency, a report invented for an unprinted theorem, an unnamed report, and an unprinted registered theorem'
+printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, a registered theorem disclosed only by a commented-out #print axioms command, a fabricated report hiding a real opaque dependency, a report invented for an unprinted theorem, a report hiding a dependency behind a macro that shadows the collector in every spelling, an unnamed report, and an unprinted registered theorem'

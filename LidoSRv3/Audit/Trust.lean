@@ -146,7 +146,9 @@ name in `audit/trust-native-decide-allowlist.txt`.
 missing, extra, or production-parent native-decision name. It does not take
 this log at its word: the report below is confirmed against dependencies the
 checker recomputes itself, so a command commented out here cannot be stood in
-for by a printed line.
+for by a printed line. That recomputation runs in a probe which imports only
+`Lean` and loads this module as data, so nothing declared here participates in
+elaborating the probe that measures it.
 
 Subject to those three recorded production exceptions and the exact test-only
 list, there are no undisclosed project-level assumptions or proof escapes.

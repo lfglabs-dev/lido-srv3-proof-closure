@@ -1,11 +1,55 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 944b1d7447aff05af4f7ef37d63aa4ad9c4cd0a6
+validated-tree: 40a1181931474e5e68f3765e6088bae23c2537fe
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Recomputation probes elaborate outside the audited module (2026-08-28)
+---------------------------------------------------------------------------
+
+- The recomputation recorded below was itself decidable by the module it
+  audits. Both probes imported the audited module and then called
+  `Lean.collectAxioms` and `Lean.Meta.evalExpr` inside that scope, so the
+  audited code got to say what the probe's own source meant. A macro matches a
+  token sequence rather than a resolved name, which is why qualifying the call
+  is not a fix: `macro "collectAxioms"`, `macro "Lean.collectAxioms"`, and
+  `macro "_root_.Lean.collectAxioms"` each intercept their spelling. The
+  substitute need not lie outright — it delegates to the real collector and
+  drops one chosen axiom, so the reply is well formed and quietly short.
+- Measured against the predecessor checker at
+  6f95055ae3d3bdcdb64151be3eee1da99fe52b2f: a compiled fixture module declares
+  `registered`, which really depends on the opaque `hidden`, and shadows the
+  collector as above. Handed a fabricated report claiming `registered`
+  `does not depend on any axioms`, the predecessor printed
+  `trust dependencies ok: 2 reports confirmed against the built environment`
+  and exited 0. The reported mechanism, a root-level `def collectAxioms`, does
+  not reproduce: it makes the probe fail with `error: Ambiguous term`, which is
+  a closed failure. Macro shadowing is the silent variant, and no spelling
+  escapes it.
+- The correction is structural rather than orthographic. Both probes now import
+  only `Lean` and obtain the audited environment through `Lean.importModules`,
+  loading the module as data. The audited code contributes declarations and
+  contributes nothing to elaborating the probe that measures it, which removes
+  the interception rather than trying to out-spell it. Both entry points became
+  `unsafe` implementations behind `@[implemented_by]` `opaque` wrappers, since
+  `importModules` with initializers and `evalExpr` are unsafe.
+- The same exposure is closed in the provenance probe. Had it kept importing
+  the audited module, a `macro "Lean.Meta.evalExpr"` could have answered `true`
+  for every claim, silently undoing the re-evaluation recorded further below
+  while that section's own regressions continued to pass.
+- `scripts/test_check_trust_axioms.sh` carries the negative. It first proves
+  the qualification-only fix would not have closed the hole: a witness that
+  imports the fixture exactly as the old probe did asks for `registered`'s
+  axioms in the bare, `Lean.`-qualified, and `_root_.Lean.`-qualified spellings
+  and gets `SHADOWED 0 0 0` for a theorem that does depend on `hidden`. It then
+  requires the checker to reject the fabricated report with
+  `disagrees with LidoSRv3.Tests.Shadowed.registered's actual dependencies:
+  hides LidoSRv3.Tests.Shadowed.hidden`, and to accept the truthful report over
+  that same shadowing fixture. Run with the predecessor checker restored in
+  place, the suite fails at exactly this case and nowhere earlier.
 
 Trust reports recomputed, not read; production exceptions counted (2026-08-28)
 ---------------------------------------------------------------------------

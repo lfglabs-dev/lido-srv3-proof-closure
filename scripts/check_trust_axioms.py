@@ -42,31 +42,47 @@ DEP_END = re.compile(r"^TAX-END\t(\d+)$", re.MULTILINE)
 # printed theorem's dependencies itself, through the very API `#print axioms`
 # uses (`Lean.collectAxioms`), in a process it controls, and confirms the log
 # against that.  A fabricated line is then a disagreement, not a pass.
-TRUST_DEPENDENCY_PROBE = r"""import <<MODULE>>
-import Lean
+#
+# The audited module is loaded as *data* and is never imported into the probe's
+# syntactic scope.  Importing it would let it decide what the probe's own source
+# means: a module may declare `macro "collectAxioms" ...`, and a macro matches a
+# token sequence rather than a resolved name, so qualifying the call does not
+# escape it -- `Lean.collectAxioms` and `_root_.Lean.collectAxioms` are just as
+# interceptable as the bare spelling, and the substitute silently returns a
+# filtered dependency set.  `Lean.importModules` gives the probe the audited
+# environment without giving the audited code a say in how the probe elaborates,
+# which removes the possibility instead of trying to out-spell it.
+TRUST_DEPENDENCY_PROBE = r"""import Lean
 
-open Lean Elab Command
-
-private def trustDependencyRow (env : Environment) (name : Name) :
-    CommandElabM String := do
-  let some info := env.find? name
-    | return s!"TAX\t{name}\tmissing\t"
-  let kind := match info with
-    | .thmInfo _ => "theorem"
-    | .axiomInfo _ => "axiom"
-    | .defnInfo _ => "definition"
-    | .opaqueInfo _ => "opaque"
-    | _ => "other"
-  let axioms ← collectAxioms name
-  let rendered := String.intercalate "," ((axioms.qsort Name.lt).map toString).toList
-  return s!"TAX\t{name}\t{kind}\t{rendered}"
-
-#eval show CommandElabM Unit from do
-  let env ← getEnv
-  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
-  for name in names do
-    IO.println (← trustDependencyRow env name.toName)
+private unsafe def trustDependenciesImpl (names : List Lean.Name) : IO Unit := do
+  Lean.initSearchPath (← Lean.findSysroot)
+  Lean.enableInitializersExecution
+  let env ← Lean.importModules #[{ module := `<<MODULE>> }] {} (loadExts := true)
+  let collect : Lean.CoreM Unit := do
+    for name in names do
+      match (← Lean.getEnv).find? name with
+      | none => IO.println s!"TAX\t{name}\tmissing\t"
+      | some info =>
+        let kind := match info with
+          | .thmInfo _ => "theorem"
+          | .axiomInfo _ => "axiom"
+          | .defnInfo _ => "definition"
+          | .opaqueInfo _ => "opaque"
+          | _ => "other"
+        let axioms ← Lean.collectAxioms name
+        let rendered :=
+          String.intercalate "," ((axioms.qsort Lean.Name.lt).map toString).toList
+        IO.println s!"TAX\t{name}\t{kind}\t{rendered}"
+  let _ ← collect.toIO
+    { fileName := "<trust-dependency-probe>", fileMap := default } { env := env }
   IO.println s!"TAX-END\t{names.length}"
+
+@[implemented_by trustDependenciesImpl]
+private opaque trustDependencies (names : List Lean.Name) : IO Unit
+
+#eval do
+  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
+  trustDependencies (names.map String.toName)
 """
 # Rows this checker's own Lean probe emits, one per disclosed name, plus a
 # terminating count so a truncated or partially-elaborated probe fails closed.
@@ -85,22 +101,25 @@ PROBE_END = re.compile(r"^NDP-END\t(\d+)$", re.MULTILINE)
 # `native_decide` did.  An axiom whose own claim re-evaluates to `true` is worth
 # precisely what a compiler-minted one is worth, whoever wrote it; one that does
 # not is rejected no matter how convincing its recorded provenance looks.
-NATIVE_PROVENANCE_PROBE = r"""import <<MODULE>>
-import Lean
+#
+# Like the dependency probe, this file imports only `Lean` and loads the audited
+# module as data.  The re-evaluation below is exactly what a dishonest module
+# would want to answer for: were it imported here, a `macro "Lean.Meta.evalExpr"`
+# could return `true` for every claim and this whole check would attest to
+# nothing.
+NATIVE_PROVENANCE_PROBE = r"""import Lean
 
-open Lean Elab Command Meta
-
-private unsafe def claimVerdictImpl (e : Expr) : MetaM String := do
+private unsafe def claimVerdictImpl (e : Lean.Expr) : Lean.MetaM String := do
   if e.hasFVar || e.hasMVar || e.hasLevelParam then return "open"
   try
-    return if (← evalExpr Bool (mkConst ``Bool) e) then "true" else "false"
+    return if (← Lean.Meta.evalExpr Bool (Lean.mkConst ``Bool) e) then "true" else "false"
   catch _ => return "unevaluated"
 
 @[implemented_by claimVerdictImpl]
-private opaque claimVerdict (e : Expr) : MetaM String
+private opaque claimVerdict (e : Lean.Expr) : Lean.MetaM String
 
-private def nativeProvenanceRow (env : Environment) (name : Name) :
-    CommandElabM String := do
+private def nativeProvenanceRow (name : Lean.Name) : Lean.MetaM String := do
+  let env ← Lean.getEnv
   let some info := env.find? name
     | return s!"NDP\t{name}\tmissing\t-\t-\t-\t-\t-"
   let kind := match info with
@@ -117,20 +136,31 @@ private def nativeProvenanceRow (env : Environment) (name : Name) :
   let srcModule := match env.getModuleIdxFor? name with
     | some idx => toString env.header.moduleNames[idx.toNat]!
     | none => "-"
-  let srcLine := match (← findDeclarationRanges? name) with
+  let srcLine := match (← Lean.findDeclarationRanges? name) with
     | some ranges => toString ranges.range.pos.line
     | none => "-"
   let verdict ← if shape == "eq-bool-true" then
-      liftTermElabM (claimVerdict (type.getArg! 1))
+      claimVerdict (type.getArg! 1)
     else pure "-"
   return s!"NDP\t{name}\t{kind}\t{safety}\t{shape}\t{srcModule}\t{srcLine}\t{verdict}"
 
-#eval show CommandElabM Unit from do
-  let env ← getEnv
-  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
-  for name in names do
-    IO.println (← nativeProvenanceRow env name.toName)
+private unsafe def nativeProvenanceImpl (names : List Lean.Name) : IO Unit := do
+  Lean.initSearchPath (← Lean.findSysroot)
+  Lean.enableInitializersExecution
+  let env ← Lean.importModules #[{ module := `<<MODULE>> }] {} (loadExts := true)
+  let rows : Lean.CoreM Unit := do
+    for name in names do
+      IO.println (← Lean.Meta.MetaM.run' (nativeProvenanceRow name))
+  let _ ← rows.toIO
+    { fileName := "<native-provenance-probe>", fileMap := default } { env := env }
   IO.println s!"NDP-END\t{names.length}"
+
+@[implemented_by nativeProvenanceImpl]
+private opaque nativeProvenance (names : List Lean.Name) : IO Unit
+
+#eval do
+  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
+  nativeProvenance (names.map String.toName)
 """
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
 SSZ_DIGEST = "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1"
@@ -314,7 +344,9 @@ def environment_dependencies(names: list[str], module: str,
     This is the checker's own answer, obtained through `Lean.collectAxioms` --
     the same call `#print axioms` makes -- in a process this script spawns and
     hands the name list to.  Nothing here reads Trust's source or its log, so a
-    commented-out command or a fabricated `IO.println` cannot influence it.
+    commented-out command or a fabricated `IO.println` cannot influence it, and
+    the probe never imports the audited module, so nothing the module declares
+    can influence how that call is elaborated either.
     """
     ordered = sorted(names)
     output = lean_probe_output(TRUST_DEPENDENCY_PROBE, "trust-dependency",
