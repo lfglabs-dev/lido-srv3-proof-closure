@@ -1,11 +1,48 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 48214a91a7b7abc61018e8be81f658fb2df92af9
+validated-tree: 0f64d208bffc6aeffc8f036a39f2e042d05dba89
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Trust emitted-axiom validation and disclosure shape (2026-08-28)
+-----------------------------------------------------------------
+
+- `scripts/check_trust_axioms.py` validates every axiom Lean emits for a
+  printed theorem against `FOUNDATIONAL_AXIOMS` plus the disclosed allowlist.
+  A non-native project axiom, such as one introduced by an `opaque` declaration
+  that the lexical proof-escape scanner does not forbid, is therefore rejected
+  as undisclosed rather than skipped for not matching the native-decision name
+  shape.
+- Disclosure itself is now shape-checked: an allowlist entry must be a
+  native-decision axiom name, so an arbitrary project axiom cannot be laundered
+  into the allowed set. `scripts/audit_metadata.py` applies the same rule,
+  because the generated report publishes that list as the exact emitted
+  native-decision axioms.
+- `scripts/test_check_trust_axioms.sh` asserts each negative is rejected for
+  its own recorded reason, not merely with a nonzero exit: an injected opaque
+  dependency on a printed theorem, the same dependency inside a registered
+  CHECKED theorem's report, that dependency laundered through a mutated
+  disclosure in an isolated fixture tree, an unnamed dependency line, and an
+  unprinted registered theorem.
+- Scope: this gate governs the axioms Lean reports for printed theorems and the
+  disclosure that names them. It is not a claim about deployment, bytecode, or
+  runtime identity, and it does not widen any guarantee's plane status.
+
+Trust allowlist bound into the R1 review basis (2026-08-28)
+------------------------------------------------------------
+
+- `audit/trust-native-decide-allowlist.txt` is a rendered-report input: it
+  decides the report's exact accepted-axiom section. `validate_r1_review_basis`
+  binds it alongside `audit/guarantees.yaml` and `audit/source-map.yaml`, so an
+  allowlist change cannot regenerate the report while retaining the certified
+  basis.
+- `scripts/test_audit_metadata.py` mutates the allowlist with an
+  otherwise-valid entry (unique, test-scoped, correctly native-decision shaped)
+  and requires both `generate` and `check` to reject it, so a widened
+  disclosure cannot still certify as the recorded R1 input set.
 
 Proof-escape rejection gate (2026-08-27)
 -----------------------------------------

@@ -141,12 +141,26 @@ def main():
         invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
         write(gpath, guarantees)
         write(spath, source)
+        # The Trust allowlist is a rendered-report input: it decides the exact
+        # accepted-axiom section.  This mutation is otherwise entirely valid
+        # (unique, test-scoped, correctly native-decision shaped), so only the
+        # basis binding can reject it -- and it must reject `check` too, not
+        # just `generate`, or a widened allowlist would still certify as R1.
         trust_allowlist = tpath.read_text(encoding="utf-8")
-        tpath.write_text(
-            trust_allowlist + "LidoSRv3.Tests.Injected.review_basis.native_decide.ax_9\n",
-            encoding="utf-8",
+        widened = trust_allowlist + (
+            "LidoSRv3.Tests.Injected.review_basis_widening"
+            "._native.native_decide.ax_1_1\n"
         )
+        tpath.write_text(widened, encoding="utf-8")
         invoke(fixture, False, "R1 review basis input family differs for audit/trust-native-decide-allowlist.txt")
+        invoke(fixture, False, "R1 review basis input family differs for audit/trust-native-decide-allowlist.txt",
+               command="check")
+        tpath.write_text(trust_allowlist, encoding="utf-8")
+
+        # A disclosure that is not a native-decision axiom must never reach the
+        # report's exact accepted-axiom section, whatever the review basis says.
+        tpath.write_text(trust_allowlist + "LidoSRv3.Tests.Injected.injected\n", encoding="utf-8")
+        invoke(fixture, False, "Trust native-decision allowlist documents a non-native axiom")
         tpath.write_text(trust_allowlist, encoding="utf-8")
 
         constructor_fixture = fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"

@@ -101,6 +101,7 @@ EXPECTED_PRIORITIES = {
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
 TRUST_NATIVE_DECIDE_ALLOWLIST = AUDIT / "trust-native-decide-allowlist.txt"
+NATIVE_DECIDE_AXIOM = re.compile(r"(?:[A-Za-z_]\w*\.)+_native\.native_decide\.ax_\d+(?:_\d+)*")
 DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256 = "41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9"
 DEPOSIT_UPSTREAM_SOURCE_URL = (
     "https://raw.githubusercontent.com/lidofinance/core/"
@@ -218,6 +219,10 @@ def validate_pins(lock, manifest, source_map):
     require(production_native <= set(trust_names) and
             all(name in production_native or name.startswith("LidoSRv3.Tests.") for name in trust_names),
             "Trust native-decision allowlist contains an undisclosed production dependency")
+    # The report publishes these as the exact emitted native-decision axioms.
+    # An arbitrary project axiom must not be presentable as one of them.
+    require(all(NATIVE_DECIDE_AXIOM.fullmatch(name) for name in trust_names),
+            "Trust native-decision allowlist documents a non-native axiom")
     require(source_map.get("schema") == "lido-srv3-minimal-11-source-map-v3", "source-map schema differs")
     require(source_map.get("pinned_source") == f"lidofinance/core@{PINNED['lido_core'][1]}", "source-map pin differs")
     require(source_map.get("scope") == {

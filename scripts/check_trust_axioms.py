@@ -42,6 +42,12 @@ def disclosed_names() -> set[str]:
         line.strip() for line in ALLOWLIST.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     }
+    # Disclosure may only document a native-decision axiom.  Without this the
+    # allowed set below could be widened to an arbitrary project axiom, which
+    # is exactly the foundations-only boundary this check exists to hold.
+    unshaped = sorted(name for name in names if not NATIVE_AXIOM.fullmatch(name))
+    if unshaped:
+        fail("allowlist documents non-native axiom(s): " + ", ".join(unshaped))
     if not PRODUCTION_NATIVE_AXIOMS <= names:
         fail("allowlist omits a documented production native-decision dependency")
     if any(name not in PRODUCTION_NATIVE_AXIOMS and not name.startswith("LidoSRv3.Tests.") for name in names):
