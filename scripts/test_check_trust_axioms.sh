@@ -99,6 +99,48 @@ reject "$tmp/injected-opaque-report" \
   'allowlist documents non-native axiom(s): LidoSRv3.Audit.Injected.injected' \
   'an allowlist disclosing a non-native project axiom' "$fixture/scripts/check_trust_axioms.py"
 
+# Matching the generated name shape must not be enough.  A project `opaque`
+# can be *spelled* exactly like a Lean-generated native-decision axiom, which
+# satisfies both the allowlist shape rule and the LidoSRv3.Tests. scope rule
+# while Lean generated nothing.  Before provenance was checked, disclosing that
+# name and adding it to a registered CHECKED theorem's report made this exit
+# successfully; only the source declaration distinguishes it.
+launder="$tmp/laundered-shape-fixture"
+mkdir -p "$launder/scripts" "$launder/audit" "$launder/LidoSRv3/Audit" "$launder/LidoSRv3/Tests"
+cp scripts/check_trust_axioms.py "$launder/scripts/check_trust_axioms.py"
+cp audit/guarantees.yaml "$launder/audit/guarantees.yaml"
+cp LidoSRv3/Audit/Trust.lean "$launder/LidoSRv3/Audit/Trust.lean"
+cp audit/trust-native-decide-allowlist.txt "$launder/audit/trust-native-decide-allowlist.txt"
+laundered='LidoSRv3.Tests.Injected.fake._native.native_decide.ax_1_1'
+printf '%s\n' "$laundered" >> "$launder/audit/trust-native-decide-allowlist.txt"
+cat > "$launder/LidoSRv3/Tests/Injected.lean" <<'LEAN'
+namespace LidoSRv3.Tests.Injected
+
+opaque fake._native.native_decide.ax_1_1 : False
+
+end LidoSRv3.Tests.Injected
+LEAN
+python3 - "$tmp/ok" "$tmp/laundered-shape-report" "$laundered" <<'PY'
+import sys
+lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
+for index, line in enumerate(lines):
+    if line.endswith("]"):
+        lines[index] = line[:-1] + ", " + sys.argv[3] + "]"
+        break
+else:
+    raise SystemExit("fixture has no dependency report to mutate")
+open(sys.argv[2], "w", encoding="utf-8").write("\n".join(lines) + "\n")
+PY
+reject "$tmp/laundered-shape-report" \
+  "LidoSRv3/Tests/Injected.lean:3: opaque fake._native.native_decide.ax_1_1 : False" \
+  'a source-declared axiom wearing generated native-decision spelling' \
+  "$launder/scripts/check_trust_axioms.py"
+
+# The same fixture without the source declaration is accepted, so the negative
+# above is carried by provenance alone and not by some unrelated rejection.
+rm "$launder/LidoSRv3/Tests/Injected.lean"
+python3 "$launder/scripts/check_trust_axioms.py" --trust-output "$tmp/laundered-shape-report" >/dev/null
+
 # An unnamed dependency line must fail closed rather than be discarded, so a
 # report Lean did emit can never go unparsed.
 cp "$tmp/ok" "$tmp/unnamed-report"
@@ -112,4 +154,4 @@ sed '1d' "$tmp/ok" > "$tmp/unprinted-registered-opaque"
 reject "$tmp/unprinted-registered-opaque" 'Trust output omits registered CHECKED theorem report(s)' \
   'an unprinted registered theorem with an opaque dependency'
 
-printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, and laundered through disclosure), an unnamed report, and an unprinted registered theorem'
+printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), an unnamed report, and an unprinted registered theorem'

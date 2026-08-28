@@ -1,11 +1,41 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 0f64d208bffc6aeffc8f036a39f2e042d05dba89
+validated-tree: a7f267c1e7055a25ce3bdea36359e3d7dd2d31da
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Native-decision disclosure bound to provenance, not spelling (2026-08-28)
+--------------------------------------------------------------------------
+
+- Shape alone was forgeable. `LidoSRv3.Tests.Injected.fake._native.native_decide.ax_1_1`
+  is a legal project declaration name: it satisfies the allowlist's
+  native-decision `fullmatch` and the `LidoSRv3.Tests.` scope rule while Lean
+  generated nothing. `opaque` introduces such a constant and is not one of the
+  proof-escape scanner's forbidden spellings, so disclosing that name and
+  adding it to a registered CHECKED theorem's report previously made
+  `scripts/check_trust_axioms.py` exit 0 on the saved-output path.
+- `reject_source_declared_native_names` closes that path. `_native` is the
+  namespace segment Lean's compiler mints native-decision axioms under, and
+  every name the disclosure pattern can match contains it, so no project Lean
+  source may mention it. Provenance is verified before any disclosed
+  native-decision shape is trusted.
+- `scripts/test_check_trust_axioms.sh` adds the exact laundering path as a
+  negative in an isolated fixture tree: the allowlist and a registered
+  theorem's report both carry the laundered name, and the fixture also
+  declares it in `LidoSRv3/Tests/Injected.lean`. The rejection is asserted
+  against the provenance message and file:line, and the same fixture with the
+  source declaration removed is asserted to be accepted, so the negative is
+  carried by provenance alone rather than an unrelated rejection. Without the
+  checker change this negative reports
+  `unexpectedly accepted a source-declared axiom wearing generated
+  native-decision spelling` and exits 1.
+- Scope: this gate governs whether a native-decision name may be treated as
+  Lean-generated. It does not widen any guarantee's plane status, does not
+  change the disclosed allowlist, and leaves the R1 certified review basis and
+  its bound generator inputs unchanged. All NOT YET boundaries stand.
 
 Trust emitted-axiom validation and disclosure shape (2026-08-28)
 -----------------------------------------------------------------

@@ -16,6 +16,11 @@ ROOT = Path(__file__).resolve().parents[1]
 TRUST = ROOT / "LidoSRv3/Audit/Trust.lean"
 ALLOWLIST = ROOT / "audit/trust-native-decide-allowlist.txt"
 NATIVE_AXIOM = re.compile(r"\b(?:[A-Za-z_][\w]*\.)+_native\.native_decide\.ax_\d+(?:_\d+)*\b")
+# `_native` is the namespace segment Lean's compiler mints native-decision
+# axioms under; every name NATIVE_AXIOM can match contains it.  Only Lean may
+# introduce it, so its presence in a project source means a declaration is
+# wearing generated spelling without generated provenance.
+RESERVED_NATIVE_SEGMENT = re.compile(r"\b_native\b")
 # Lean emits either a bracketed dependency list or the equally authoritative
 # "does not depend on any axioms" spelling.  Both are named reports; the
 # latter means precisely the empty dependency set, not a missing report.
@@ -33,6 +38,35 @@ FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
 def fail(message: str) -> None:
     raise SystemExit(f"trust-axiom check failed: {message}")
+
+
+def reject_source_declared_native_names() -> None:
+    """Reject project declarations spelled like Lean-generated native axioms.
+
+    Shape is forgeable: `opaque LidoSRv3.Tests.X.fake._native.native_decide.ax_1_1`
+    satisfies NATIVE_AXIOM and the test-scope prefix while Lean generated
+    nothing, and `opaque` is not one of the proof-escape scanner's forbidden
+    spellings.  Disclosure may therefore only vouch for a native-decision name
+    once no project source declares anything in the generated namespace.
+    """
+    sources = sorted(
+        path for path in ROOT.rglob("*.lean")
+        if ".lake" not in path.relative_to(ROOT).parts
+    )
+    if not sources:
+        fail("no project Lean sources to verify native-decision provenance against")
+    offenders: list[str] = []
+    for path in sources:
+        text = path.read_text(encoding="utf-8")
+        if "_native" not in text:
+            continue
+        relative = path.relative_to(ROOT).as_posix()
+        for number, line in enumerate(text.splitlines(), 1):
+            if RESERVED_NATIVE_SEGMENT.search(line):
+                offenders.append(f"{relative}:{number}: {line.strip()}")
+    if offenders:
+        fail("project source declares a name in Lean's generated native-decision "
+             "namespace, which only the compiler may mint: " + "; ".join(offenders))
 
 
 def disclosed_names() -> set[str]:
@@ -136,6 +170,9 @@ def main() -> None:
     output_missing = sorted(registered - {name for name, _ in reports})
     if output_missing:
         fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
+    # Provenance precedes disclosure: a native-decision name is only credible
+    # as a Lean-generated dependency if no project source declared it.
+    reject_source_declared_native_names()
     disclosed = disclosed_names()
     allowed = FOUNDATIONAL_AXIOMS | disclosed
     for theorem, axioms in reports:
