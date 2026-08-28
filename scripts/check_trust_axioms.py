@@ -31,6 +31,43 @@ NAMED_AXIOM_REPORT = re.compile(
 )
 TRUST_PRINT = re.compile(r"^\s*#print\s+axioms\s+(\S+)\s*$", re.MULTILINE)
 LEAN_MODULE = re.compile(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*")
+# Rows this checker's own dependency probe emits, one per disclosed theorem,
+# plus a terminating count so a truncated probe fails closed.
+DEP_ROW = re.compile(r"^TAX\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$", re.MULTILINE)
+DEP_END = re.compile(r"^TAX-END\t(\d+)$", re.MULTILINE)
+# Trust's own stdout is not evidence of anything: `#print axioms T` can be
+# wrapped in a block comment while `#eval IO.println "'T' does not depend on any
+# axioms"` prints a report Lean never computed, and the resulting log is
+# indistinguishable from an authentic one.  So the checker recomputes each
+# printed theorem's dependencies itself, through the very API `#print axioms`
+# uses (`Lean.collectAxioms`), in a process it controls, and confirms the log
+# against that.  A fabricated line is then a disagreement, not a pass.
+TRUST_DEPENDENCY_PROBE = r"""import <<MODULE>>
+import Lean
+
+open Lean Elab Command
+
+private def trustDependencyRow (env : Environment) (name : Name) :
+    CommandElabM String := do
+  let some info := env.find? name
+    | return s!"TAX\t{name}\tmissing\t"
+  let kind := match info with
+    | .thmInfo _ => "theorem"
+    | .axiomInfo _ => "axiom"
+    | .defnInfo _ => "definition"
+    | .opaqueInfo _ => "opaque"
+    | _ => "other"
+  let axioms ← collectAxioms name
+  let rendered := String.intercalate "," ((axioms.qsort Name.lt).map toString).toList
+  return s!"TAX\t{name}\t{kind}\t{rendered}"
+
+#eval show CommandElabM Unit from do
+  let env ← getEnv
+  let names := (← IO.FS.readFile "<<NAMES>>").splitOn "\n" |>.filter (· != "")
+  for name in names do
+    IO.println (← trustDependencyRow env name.toName)
+  IO.println s!"TAX-END\t{names.length}"
+"""
 # Rows this checker's own Lean probe emits, one per disclosed name, plus a
 # terminating count so a truncated or partially-elaborated probe fails closed.
 PROBE_ROW = re.compile(
@@ -98,7 +135,17 @@ private def nativeProvenanceRow (env : Environment) (name : Name) :
 PHASE3 = "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1"
 SSZ_DIGEST = "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1"
 CONSOLIDATION_FLOW = "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1"
-PRODUCTION_NATIVE_AXIOMS = {PHASE3, SSZ_DIGEST, CONSOLIDATION_FLOW}
+# Every production native-decision exception, each with the label the summary
+# reports it under.  The set is derived from this map so a new exception cannot
+# be recorded in one place and silently omitted from the audit summary in the
+# other, which is how the SSZ digest and consolidation flow came to be counted
+# as test evidence.
+PRODUCTION_NATIVE_LABELS = {
+    PHASE3: "Phase-3 capacity",
+    SSZ_DIGEST: "SSZ digest",
+    CONSOLIDATION_FLOW: "consolidation flow",
+}
+PRODUCTION_NATIVE_AXIOMS = set(PRODUCTION_NATIVE_LABELS)
 FOUNDATIONAL_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 
 
@@ -162,16 +209,17 @@ def native_decide_sites(root: Path, pinned: bool) -> dict[str, set[int]]:
     return index
 
 
-def native_provenance_output(module: str, names: list[str], fixture: Path | None) -> str:
-    """Have Lean re-run each disclosed name's own Bool claim in a fresh process."""
+def lean_probe_output(template: str, label: str, module: str, names: list[str],
+                      fixture: Path | None) -> str:
+    """Run one of this checker's own Lean probes over `names` in a fresh process."""
     if not LEAN_MODULE.fullmatch(module):
         fail(f"refusing to probe a malformed module name: {module}")
     with tempfile.TemporaryDirectory() as scratch:
         names_file = Path(scratch) / "names.txt"
         names_file.write_text("\n".join(names) + "\n", encoding="utf-8")
-        probe = Path(scratch) / "native_provenance_probe.lean"
+        probe = Path(scratch) / f"{label}_probe.lean"
         probe.write_text(
-            NATIVE_PROVENANCE_PROBE
+            template
             .replace("<<MODULE>>", module)
             .replace("<<NAMES>>", str(names_file).replace("\\", "\\\\").replace('"', '\\"')),
             encoding="utf-8",
@@ -190,7 +238,7 @@ def native_provenance_output(module: str, names: list[str], fixture: Path | None
         )
         if result.returncode:
             sys.stderr.write(result.stdout)
-            fail(f"native-decision claim probe exited {result.returncode}")
+            fail(f"{label} probe exited {result.returncode}")
         return result.stdout
 
 
@@ -254,7 +302,68 @@ def verify_native_provenance(names: list[str], output: str, sites: dict[str, set
 def check_native_provenance(names: list[str], module: str, fixture: Path | None) -> None:
     ordered = sorted(names)
     sites = native_decide_sites(ROOT if fixture is None else fixture, pinned=fixture is None)
-    verify_native_provenance(ordered, native_provenance_output(module, ordered, fixture), sites)
+    output = lean_probe_output(NATIVE_PROVENANCE_PROBE, "native-decision claim",
+                               module, ordered, fixture)
+    verify_native_provenance(ordered, output, sites)
+
+
+def environment_dependencies(names: list[str], module: str,
+                             fixture: Path | None) -> dict[str, set[str]]:
+    """Recompute each named theorem's axiom dependencies from the built environment.
+
+    This is the checker's own answer, obtained through `Lean.collectAxioms` --
+    the same call `#print axioms` makes -- in a process this script spawns and
+    hands the name list to.  Nothing here reads Trust's source or its log, so a
+    commented-out command or a fabricated `IO.println` cannot influence it.
+    """
+    ordered = sorted(names)
+    output = lean_probe_output(TRUST_DEPENDENCY_PROBE, "trust-dependency",
+                               module, ordered, fixture)
+    rows: dict[str, set[str]] = {}
+    for name, kind, rendered in DEP_ROW.findall(output):
+        if name in rows:
+            fail(f"trust-dependency probe reported {name} more than once")
+        if kind == "missing":
+            fail(f"Trust prints axioms for {name}, which does not exist in the built "
+                 f"environment")
+        rows[name] = {axiom for axiom in rendered.split(",") if axiom}
+    counted = DEP_END.findall(output)
+    if len(counted) != 1 or int(counted[0]) != len(ordered):
+        fail("trust-dependency probe did not report on every printed theorem")
+    unreported = sorted(set(ordered) - set(rows))
+    if unreported:
+        fail("trust-dependency probe reported nothing for: " + ", ".join(unreported))
+    return rows
+
+
+def confirm_reported_dependencies(reports: list[tuple[str, set[str]]],
+                                  computed: dict[str, set[str]]) -> None:
+    """Require Trust's log to say exactly what the environment says.
+
+    Trust's log is a convenience for readers, not evidence.  Any theorem it
+    reports on must be one Trust actually prints for, and the dependency set it
+    shows must equal the set this checker recomputed; either way round, a
+    disagreement means the log describes something other than the code.
+    """
+    reported = {name for name, _ in reports}
+    fabricated = sorted(reported - set(computed))
+    if fabricated:
+        fail("Trust output reports on theorem(s) no active #print axioms command "
+             "requests, so the report was not produced by Trust: " + ", ".join(fabricated))
+    silent = sorted(set(computed) - reported)
+    if silent:
+        fail("Trust output omits report(s) for printed theorem(s): " + ", ".join(silent))
+    for name, axioms in sorted(reports):
+        if axioms != computed[name]:
+            missing = sorted(computed[name] - axioms)
+            extra = sorted(axioms - computed[name])
+            details = []
+            if missing:
+                details.append("hides " + ", ".join(missing))
+            if extra:
+                details.append("invents " + ", ".join(extra))
+            fail(f"Trust output disagrees with {name}'s actual dependencies: "
+                 + "; ".join(details))
 
 
 def disclosed_names() -> set[str]:
@@ -297,9 +406,22 @@ def checked_theorems() -> set[str]:
 
 
 def trust_printed_theorems() -> set[str]:
+    """Theorems Trust *actually* prints axioms for, ignoring inert command text.
+
+    A `#print axioms T` line reads the same whether it is elaborated or sitting
+    inside a `/- -/` block, so matching raw source would let a theorem be
+    disclosed by commented-out text alone.  Comments and string literals are
+    blanked first, exactly as the proof-escape scanner does, so only commands
+    Lean will run count as disclosure.
+    """
     if not TRUST.is_file():
         fail(f"missing Trust source: {TRUST.relative_to(ROOT)}")
-    return set(TRUST_PRINT.findall(TRUST.read_text(encoding="utf-8")))
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import check_proof_escapes
+
+    active = check_proof_escapes.strip_comments_and_strings(
+        TRUST.read_text(encoding="utf-8"))
+    return set(TRUST_PRINT.findall(active))
 
 
 def observed_axioms(output: str) -> tuple[set[str], list[tuple[str, set[str]]]]:
@@ -333,7 +455,27 @@ def main() -> None:
                         help="module the provenance probe imports")
     parser.add_argument("--provenance-names", type=Path,
                         help="names to verify provenance for (default: the disclosure allowlist)")
+    parser.add_argument("--dependency-fixture", type=Path,
+                        help="confirm --trust-output against modules compiled into this "
+                             "directory instead of the project build")
+    parser.add_argument("--dependency-names", type=Path,
+                        help="printed theorems to confirm dependencies for")
     args = parser.parse_args()
+    if args.dependency_fixture or args.dependency_names:
+        if not (args.trust_output and args.dependency_names):
+            fail("confirming dependencies needs both --trust-output and --dependency-names")
+        names = [
+            line.strip()
+            for line in args.dependency_names.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+        _, reports = observed_axioms(args.trust_output.read_text(encoding="utf-8"))
+        computed = environment_dependencies(names, args.provenance_module,
+                                            args.dependency_fixture)
+        confirm_reported_dependencies(reports, computed)
+        print(f"trust dependencies ok: {len(computed)} reports confirmed against the "
+              f"built environment")
+        return
     if args.provenance_fixture or args.provenance_names:
         names = (disclosed_names() if args.provenance_names is None else {
             line.strip()
@@ -374,6 +516,16 @@ def main() -> None:
     output_missing = sorted(registered - {name for name, _ in reports})
     if output_missing:
         fail("Trust output omits registered CHECKED theorem report(s): " + ", ".join(output_missing))
+    # Trust's log has said nothing verifiable so far: every line in it is just
+    # text some command printed.  Recompute what each printed theorem really
+    # depends on and require the log to match, so the axioms checked below are
+    # the environment's and not the log's.  Saved-output mode has no environment
+    # to consult and therefore certifies a report, not a build.
+    if not args.trust_output:
+        computed = environment_dependencies(sorted(printed), args.provenance_module, None)
+        confirm_reported_dependencies(reports, computed)
+        reports = sorted(computed.items())
+        observed = set().union(*computed.values())
     # Provenance precedes disclosure: a native-decision name is only credible
     # as a Lean-generated dependency if no project source declared it.
     reject_source_declared_native_names()
@@ -401,8 +553,18 @@ def main() -> None:
     observed_native = set(NATIVE_AXIOM.findall(output))
     if observed_native != disclosed:
         fail("native-decision extraction disagrees with the complete axiom report")
+    # Only the recorded production exceptions are production evidence; every
+    # other disclosed native-decision axiom is test/mutant-only.  Subtracting a
+    # single name would bury the exceptions this summary exists to surface.
+    production = sorted(PRODUCTION_NATIVE_AXIOMS & observed_native)
+    test_only = observed_native - PRODUCTION_NATIVE_AXIOMS
+    exceptions = ", ".join(PRODUCTION_NATIVE_LABELS[name] for name in production)
     claims = "report-only" if args.trust_output else "re-evaluated"
-    print(f"trust-axiom check ok: {len(observed)} exact axioms ({len(observed_native) - 1} test/mutant-only native-decision axioms + Phase-3 + foundations); native-decision claims {claims}")
+    source = "saved report" if args.trust_output else "recomputed from the built environment"
+    print(f"trust-axiom check ok: {len(observed)} exact axioms "
+          f"({len(test_only)} test/mutant-only native-decision axioms + "
+          f"{len(production)} production exceptions ({exceptions}) + foundations); "
+          f"dependencies {source}; native-decision claims {claims}")
 
 
 if __name__ == "__main__":

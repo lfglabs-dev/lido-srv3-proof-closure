@@ -1,11 +1,66 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: aa0d626ab45c5a3ec4fdb36dba6af4ab4d71e995
+validated-tree: 944b1d7447aff05af4f7ef37d63aa4ad9c4cd0a6
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Trust reports recomputed, not read; production exceptions counted (2026-08-28)
+---------------------------------------------------------------------------
+
+- Trust's own artifacts were both trusted without authentication. Disclosure
+  was matched against raw source, where `#print axioms T` reads identically
+  whether Lean elaborates it or it sits between `/-` and `-/` on their own
+  lines, so the command text survives byte for byte. The axiom sets were taken
+  from Trust's stdout, which any `#eval IO.println` can write. Wrapping one
+  registered theorem's command in a block comment and appending
+  `#eval IO.println "'T' does not depend on any axioms"` therefore removed that
+  theorem's real dependency computation and substituted a fabricated report.
+  Measured against the predecessor checker at
+  f6ef1024aa5d3aae4e3b89dbcccfd06472c9fe45 on the real entrypoint with
+  T = `LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute`, the full gate
+  printed `trust-axiom check ok: 29 exact axioms ...` and exited 0. The
+  theorem's actual dependencies were never computed by anything.
+- Disclosure is now read from active commands only: comments and strings are
+  blanked with the proof-escape scanner's `strip_comments_and_strings` before
+  `#print axioms` targets are collected, so commented-out text is an omission.
+  Independently, the checker no longer believes the log. It spawns its own Lean
+  process importing the built Trust module and recomputes every printed
+  theorem's dependencies through `Lean.collectAxioms` — the same call
+  `#print axioms` makes — then requires the log to agree name for name and
+  axiom for axiom. A report that hides, invents, or misstates a dependency is
+  a disagreement, not a pass.
+- Both corrections are load-bearing and neither is carrying the other. With the
+  comment-stripping mutated away, the same spoofed entrypoint is still rejected
+  by the recomputation alone: `trust-axiom check failed: Trust output disagrees
+  with LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute's actual dependencies:
+  hides Quot.sound, propext`. With the recomputation mutated away, the
+  commented-out command is still rejected as `Trust omits #print axioms for
+  registered CHECKED theorem(s)`. Saved-output mode has no environment to
+  consult and now says so, reporting `dependencies saved report` rather than
+  claiming a build.
+- `scripts/test_check_trust_axioms.sh` carries both negatives. A fixture wraps
+  one registered theorem's command in `/-` / `-/` with the line intact and
+  asserts the raw text is still `grep -Fqx`-findable, so only active-command
+  parsing distinguishes it; restoring that one command makes the same fixture
+  pass. A compiled fixture module declares `registered` with a real opaque
+  dependency and `clean` with none: the fabricated empty-set report is rejected
+  for hiding `LidoSRv3.Tests.Spoofed.hidden`, a report naming an unprinted
+  theorem is rejected as not produced by Trust, and the truthful report over the
+  same module is accepted.
+- The run summary counted production exceptions as test evidence. Subtracting a
+  single name left the SSZ digest and consolidation flow inside the
+  "test/mutant-only" figure and named neither: the predecessor printed
+  `25 test/mutant-only native-decision axioms + Phase-3`. The count is now
+  derived as `observed_native - PRODUCTION_NATIVE_AXIOMS`, and that set is
+  itself derived from the label map so an exception cannot be recorded in one
+  place and omitted from the summary in the other. The gate now prints
+  `23 test/mutant-only native-decision axioms + 3 production exceptions
+  (Phase-3 capacity, consolidation flow, SSZ digest)`. Trust's own header prose,
+  which described a single recorded production exception, is corrected to name
+  all three.
 
 Disclosed native-decision claims re-evaluated, not attributed (2026-08-28)
 ---------------------------------------------------------------------------

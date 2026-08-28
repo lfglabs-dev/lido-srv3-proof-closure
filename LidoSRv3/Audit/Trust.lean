@@ -136,16 +136,20 @@ assurance metadata records.
 
 Anything outside those three is a proof escape and is *not* accepted. In
 particular `sorryAx`, `Lean.ofReduceBool`, and any project-introduced `axiom`
-must not appear in the output below. The canonical P-ALLOC-1 Phase-3
-compilation theorem has one recorded generated native-decision dependency.
-Some explicitly printed mutant regressions also expose native-decision axioms;
-they are classified as test-only and are listed by exact generated name in
-`audit/trust-native-decide-allowlist.txt`. `scripts/check_trust_axioms.py`
-reruns this entrypoint and rejects any missing, extra, or production-parent
-native-decision name.
+must not appear in the output below. Three production compilation theorems
+have one recorded generated native-decision dependency each: P-ALLOC-1
+Phase-3 capacity, the SSZ abstract digest, and the consolidation abstract
+flow. Some explicitly printed mutant regressions also expose native-decision
+axioms; they are classified as test-only and are listed by exact generated
+name in `audit/trust-native-decide-allowlist.txt`.
+`scripts/check_trust_axioms.py` reruns this entrypoint and rejects any
+missing, extra, or production-parent native-decision name. It does not take
+this log at its word: the report below is confirmed against dependencies the
+checker recomputes itself, so a command commented out here cannot be stood in
+for by a printed line.
 
-Subject to that recorded production exception and the exact test-only list,
-there are no undisclosed project-level assumptions or proof escapes.
+Subject to those three recorded production exceptions and the exact test-only
+list, there are no undisclosed project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero

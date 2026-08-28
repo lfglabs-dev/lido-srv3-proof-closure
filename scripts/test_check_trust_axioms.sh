@@ -90,7 +90,7 @@ reject "$tmp/injected-opaque-registered" 'emits undisclosed axiom(s): LidoSRv3.A
 # disclosure stays authoritative for every other case here.
 fixture="$tmp/laundering-fixture"
 mkdir -p "$fixture/scripts" "$fixture/audit" "$fixture/LidoSRv3/Audit"
-cp scripts/check_trust_axioms.py "$fixture/scripts/check_trust_axioms.py"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$fixture/scripts/"
 cp audit/guarantees.yaml "$fixture/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$fixture/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$fixture/audit/trust-native-decide-allowlist.txt"
@@ -107,7 +107,7 @@ reject "$tmp/injected-opaque-report" \
 # successfully; only the source declaration distinguishes it.
 launder="$tmp/laundered-shape-fixture"
 mkdir -p "$launder/scripts" "$launder/audit" "$launder/LidoSRv3/Audit" "$launder/LidoSRv3/Tests"
-cp scripts/check_trust_axioms.py "$launder/scripts/check_trust_axioms.py"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$launder/scripts/"
 cp audit/guarantees.yaml "$launder/audit/guarantees.yaml"
 cp LidoSRv3/Audit/Trust.lean "$launder/LidoSRv3/Audit/Trust.lean"
 cp audit/trust-native-decide-allowlist.txt "$launder/audit/trust-native-decide-allowlist.txt"
@@ -295,6 +295,122 @@ reject_probe 'asserts a Bool claim that evaluates to false' \
 probe_names 'LidoSRv3.Tests.Sited.decoy._native.native_decide.ax_1_1'
 probe >/dev/null
 
+# Disclosure must come from commands Lean will actually run.  A `#print axioms`
+# line reads identically inside a `/- -/` block, so matching raw source let a
+# registered theorem stay "disclosed" by inert text while its dependencies were
+# never computed -- the other half of the spoof exercised below.
+commented="$tmp/commented-fixture"
+mkdir -p "$commented/scripts" "$commented/audit" "$commented/LidoSRv3/Audit"
+cp scripts/check_trust_axioms.py scripts/check_proof_escapes.py "$commented/scripts/"
+cp audit/guarantees.yaml "$commented/audit/guarantees.yaml"
+cp audit/trust-native-decide-allowlist.txt "$commented/audit/trust-native-decide-allowlist.txt"
+smothered="$(python3 - "$commented/LidoSRv3/Audit/Trust.lean" <<'PY'
+import json
+import pathlib
+import sys
+
+registered = {
+    plane["theorem"]
+    for row in json.load(open("audit/guarantees.yaml", encoding="utf-8"))["guarantees"]
+    for plane in (row["abstract"], row["verity"])
+    if plane["status"] == "CHECKED"
+}
+lines = pathlib.Path("LidoSRv3/Audit/Trust.lean").read_text(encoding="utf-8").splitlines()
+for index, line in enumerate(lines):
+    target = line.strip().removeprefix("#print axioms ").strip()
+    if line.strip().startswith("#print axioms ") and target in registered:
+        # Delimiters on their own lines: the command line survives byte for
+        # byte, so only elaboration order tells the two apart.
+        lines[index:index + 1] = ["/-", line, "-/"]
+        pathlib.Path(sys.argv[1]).write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(target)
+        break
+else:
+    raise SystemExit("Trust prints no registered theorem on a single line")
+PY
+)"
+# The premise: the command line survives byte for byte, so a raw-source scan
+# finds it and only parsing active commands can tell the difference.  Before
+# comments were stripped this fixture exited successfully.
+grep -Fqx "#print axioms $smothered" "$commented/LidoSRv3/Audit/Trust.lean"
+reject "$tmp/ok" \
+  "Trust omits #print axioms for registered CHECKED theorem(s): $smothered" \
+  'a registered theorem disclosed only by a commented-out #print axioms command' \
+  "$commented/scripts/check_trust_axioms.py"
+
+# Restoring that one command makes the same fixture pass, so the rejection is
+# carried by the comment and not by anything else in the copied tree.
+cp LidoSRv3/Audit/Trust.lean "$commented/LidoSRv3/Audit/Trust.lean"
+python3 "$commented/scripts/check_trust_axioms.py" --trust-output "$tmp/ok" >/dev/null
+
+# Executable spoofing regression.  Trust's log is only text some command
+# printed: `#eval IO.println` can emit a well-formed report for a theorem whose
+# dependencies Lean never computed, and the log then reads exactly like an
+# authentic one.  Confirming it against dependencies this checker recomputes
+# itself -- through the same `collectAxioms` call `#print axioms` makes -- is
+# what makes the log unforgeable.  `registered` carries a real opaque
+# dependency; `clean` carries none, so both spellings are exercised.
+spoofed="$tmp/spoofed"
+mkdir -p "$spoofed/LidoSRv3/Tests"
+cat > "$spoofed/LidoSRv3/Tests/Spoofed.lean" <<'LEAN'
+namespace LidoSRv3.Tests.Spoofed
+
+axiom hidden : (1 : Nat) = 1
+
+theorem registered : (1 : Nat) = 1 := hidden
+
+theorem clean : (2 : Nat) = 2 := rfl
+
+end LidoSRv3.Tests.Spoofed
+LEAN
+lean -R "$spoofed" -o "$spoofed/LidoSRv3/Tests/Spoofed.olean" "$spoofed/LidoSRv3/Tests/Spoofed.lean"
+printf '%s\n' 'LidoSRv3.Tests.Spoofed.registered' 'LidoSRv3.Tests.Spoofed.clean' > "$spoofed/names"
+
+confirm() {
+  python3 scripts/check_trust_axioms.py --trust-output "$1" \
+    --dependency-fixture "$spoofed" --dependency-names "$spoofed/names" \
+    --provenance-module LidoSRv3.Tests.Spoofed
+}
+reject_confirm() {
+  local needle="$1" label="$2" report="$3" captured status
+  captured="$(confirm "$report" 2>&1)" && status=0 || status=$?
+  if (( status == 0 )); then
+    echo "trust-dependency regression unexpectedly accepted $label" >&2
+    exit 1
+  fi
+  if [[ "$captured" != *"$needle"* ]]; then
+    echo "trust-dependency regression rejected $label for the wrong reason: $captured" >&2
+    exit 1
+  fi
+}
+
+# Lean's empty-set spelling, fabricated for a theorem that really does depend on
+# an opaque axiom: precisely what a commented-out command plus an `IO.println`
+# produces, and what the log-only checker accepted.
+{
+  printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Spoofed.registered'
+  printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Spoofed.clean'
+} > "$spoofed/fabricated"
+reject_confirm \
+  "disagrees with LidoSRv3.Tests.Spoofed.registered's actual dependencies: hides LidoSRv3.Tests.Spoofed.hidden" \
+  'a fabricated empty-dependency report for a theorem with an opaque dependency' \
+  "$spoofed/fabricated"
+
+# A report naming a theorem no active command prints is not a Trust report.
+cp "$spoofed/fabricated" "$spoofed/extra"
+printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Spoofed.unprinted' >> "$spoofed/extra"
+reject_confirm 'reports on theorem(s) no active #print axioms command requests' \
+  'a report invented for a theorem Trust does not print' "$spoofed/extra"
+
+# The truthful report over the same fixture is accepted, so the negatives are
+# carried by the comparison rather than by an unusable fixture.
+{
+  printf "'%s' depends on axioms: [%s]\n" \
+    'LidoSRv3.Tests.Spoofed.registered' 'LidoSRv3.Tests.Spoofed.hidden'
+  printf "'%s' does not depend on any axioms\n" 'LidoSRv3.Tests.Spoofed.clean'
+} > "$spoofed/truthful"
+confirm "$spoofed/truthful" >/dev/null
+
 # An unnamed dependency line must fail closed rather than be discarded, so a
 # report Lean did emit can never go unparsed.
 cp "$tmp/ok" "$tmp/unnamed-report"
@@ -308,4 +424,4 @@ sed '1d' "$tmp/ok" > "$tmp/unprinted-registered-opaque"
 reject "$tmp/unprinted-registered-opaque" 'Trust output omits registered CHECKED theorem report(s)' \
   'an unprinted registered theorem with an opaque dependency'
 
-printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, an unnamed report, and an unprinted registered theorem'
+printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, a registered theorem disclosed only by a commented-out #print axioms command, a fabricated report hiding a real opaque dependency, a report invented for an unprinted theorem, an unnamed report, and an unprinted registered theorem'
