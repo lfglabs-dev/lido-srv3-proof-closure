@@ -229,12 +229,70 @@ reject_probe 'does not carry the `_ = true` reflection type Lean mints native-de
   'an elaborator-minted axiom that native_decide never generated'
 
 probe_names 'LidoSRv3.Tests.Injected.fake._native.native_decide.ax_1_1'
-reject_probe 'is not bound to a compiler-generated native_decide site' \
+reject_probe 'is not recorded at a reviewed native_decide site' \
   'an elaborator-minted axiom wearing the generated type and a forged declaration range'
 
 # The genuine `native_decide` axiom in the very same module is accepted, so the
-# two negatives are carried by provenance and not by the fixture being unusable.
+# two negatives are carried by the checks under test and not by an unusable
+# fixture.
 probe_names 'LidoSRv3.Tests.Injected.genuine._native.native_decide.ax_1_1'
+probe >/dev/null
+
+# Recorded-metadata regression.  Every field the environment holds *about* a
+# declaration is written by whoever declared it, so none of it is evidence that
+# `native_decide` elaborated anything.  This fixture mints an axiom with the
+# generated name, the owning module, the `Eq Bool e true` shape, and — by
+# copying the genuine axiom's own `DeclarationRanges` — a declaration position
+# that really is a `native_decide` site in the pinned inventory.  It therefore
+# satisfies every check that inspects recorded provenance, and is caught only
+# because its claim is re-evaluated: it asserts `false = true`.
+sited="$tmp/sited"
+mkdir -p "$sited/LidoSRv3/Tests"
+cat > "$sited/LidoSRv3/Tests/Sited.lean" <<'LEAN'
+import Lean
+open Lean Elab Command
+
+namespace LidoSRv3.Tests.Sited
+
+theorem decoy : (10000 : Nat) + 1 = 10001 := by
+  native_decide
+
+private def generatedName (parent : Name) : Name :=
+  (parent.str ("_" ++ "native")).str "native_decide" |>.str "ax_1_1"
+
+elab "mint_axiom_at_genuine_site" : command => do
+  let genuine := generatedName `LidoSRv3.Tests.Sited.decoy
+  let some ranges ← findDeclarationRanges? genuine
+    | throwError "fixture lost its genuine native-decision axiom"
+  let forged := generatedName `LidoSRv3.Tests.Sited.sited
+  liftCoreM <| addDecl (.axiomDecl {
+    name := forged, levelParams := [], isUnsafe := false
+    type := mkApp3 (mkConst ``Eq [1]) (mkConst ``Bool)
+      (mkConst ``Bool.false) (mkConst ``Bool.true) })
+  -- The forged axiom is registered at the genuine `native_decide` site itself.
+  addDeclarationRanges forged ranges
+
+mint_axiom_at_genuine_site
+
+end LidoSRv3.Tests.Sited
+LEAN
+lean -R "$sited" -o "$sited/LidoSRv3/Tests/Sited.olean" "$sited/LidoSRv3/Tests/Sited.lean"
+
+probe_names() { printf '%s\n' "$1" > "$sited/names.txt"; }
+probe() {
+  python3 scripts/check_trust_axioms.py --provenance-fixture "$sited" \
+    --provenance-module LidoSRv3.Tests.Sited --provenance-names "$sited/names.txt"
+}
+
+# Rejected for the claim, which is only reachable once the kind, safety, type,
+# module-ownership and declaration-site checks have all passed on this axiom.
+probe_names 'LidoSRv3.Tests.Sited.sited._native.native_decide.ax_1_1'
+reject_probe 'asserts a Bool claim that evaluates to false' \
+  'an axiom registered at a genuine native_decide site whose claim is false'
+
+# The genuine axiom from the same site is accepted, so the negative is carried
+# by re-evaluating the claim rather than by rejecting the site.
+probe_names 'LidoSRv3.Tests.Sited.decoy._native.native_decide.ax_1_1'
 probe >/dev/null
 
 # An unnamed dependency line must fail closed rather than be discarded, so a
@@ -250,4 +308,4 @@ sed '1d' "$tmp/ok" > "$tmp/unprinted-registered-opaque"
 reject "$tmp/unprinted-registered-opaque" 'Trust output omits registered CHECKED theorem report(s)' \
   'an unprinted registered theorem with an opaque dependency'
 
-printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an unnamed report, and an unprinted registered theorem'
+printf '%s\n' 'trust-axiom negative regressions rejected injected opaque dependencies (printed, registered, laundered through disclosure, and laundered by wearing generated native-decision spelling), elaborator-minted axioms carrying no literal generated spelling (mistyped and type-shaped with a forged declaration range), an axiom registered at a genuine native_decide site whose re-evaluated claim is false, an unnamed report, and an unprinted registered theorem'

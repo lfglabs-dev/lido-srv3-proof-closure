@@ -34,25 +34,38 @@ LEAN_MODULE = re.compile(r"[A-Za-z_][\w']*(?:\.[A-Za-z_][\w']*)*")
 # Rows this checker's own Lean probe emits, one per disclosed name, plus a
 # terminating count so a truncated or partially-elaborated probe fails closed.
 PROBE_ROW = re.compile(
-    r"^NDP\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$",
+    r"^NDP\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)\t([^\t\n]*)$",
     re.MULTILINE,
 )
 PROBE_END = re.compile(r"^NDP-END\t(\d+)$", re.MULTILINE)
-# `Lean.Meta.nativeEqTrue` — the sole minter of `_native.<tactic>.ax_*` axioms —
-# adds `Declaration.axiomDecl` whose type is `mkApp3 (Eq) Bool e Bool.true` and
-# then calls `addDeclarationRangesFromSyntax` with the deciding tactic's own
-# syntax ref.  Both facts are recorded in the environment, so an axiom's kind,
-# type shape, module and declaration line are compiler-written provenance that
-# a project source cannot restate for itself.
+# Every field the environment records *about* a declaration is forgeable by the
+# project code that declares it: a command elaborator may `addDecl` an
+# `axiomDecl` under any name, give it any type, and `addDeclarationRanges` it
+# onto any position, including a line that genuinely contains `native_decide`.
+# So the probe does not ask who minted an axiom.  It re-establishes what the
+# axiom asserts: a native-decision axiom says `e = true` for a closed `Bool`
+# expression, and `evalExpr` compiles and runs that same `e` exactly as
+# `native_decide` did.  An axiom whose own claim re-evaluates to `true` is worth
+# precisely what a compiler-minted one is worth, whoever wrote it; one that does
+# not is rejected no matter how convincing its recorded provenance looks.
 NATIVE_PROVENANCE_PROBE = r"""import <<MODULE>>
 import Lean
 
-open Lean Elab Command
+open Lean Elab Command Meta
+
+private unsafe def claimVerdictImpl (e : Expr) : MetaM String := do
+  if e.hasFVar || e.hasMVar || e.hasLevelParam then return "open"
+  try
+    return if (← evalExpr Bool (mkConst ``Bool) e) then "true" else "false"
+  catch _ => return "unevaluated"
+
+@[implemented_by claimVerdictImpl]
+private opaque claimVerdict (e : Expr) : MetaM String
 
 private def nativeProvenanceRow (env : Environment) (name : Name) :
     CommandElabM String := do
   let some info := env.find? name
-    | return s!"NDP\t{name}\tmissing\t-\t-\t-\t-"
+    | return s!"NDP\t{name}\tmissing\t-\t-\t-\t-\t-"
   let kind := match info with
     | .axiomInfo _ => "axiom"
     | .thmInfo _ => "theorem"
@@ -70,7 +83,10 @@ private def nativeProvenanceRow (env : Environment) (name : Name) :
   let srcLine := match (← findDeclarationRanges? name) with
     | some ranges => toString ranges.range.pos.line
     | none => "-"
-  return s!"NDP\t{name}\t{kind}\t{safety}\t{shape}\t{srcModule}\t{srcLine}"
+  let verdict ← if shape == "eq-bool-true" then
+      liftTermElabM (claimVerdict (type.getArg! 1))
+    else pure "-"
+  return s!"NDP\t{name}\t{kind}\t{safety}\t{shape}\t{srcModule}\t{srcLine}\t{verdict}"
 
 #eval show CommandElabM Unit from do
   let env ← getEnv
@@ -120,11 +136,13 @@ def reject_source_declared_native_names() -> None:
 
 
 def native_decide_sites(root: Path, pinned: bool) -> dict[str, set[int]]:
-    """`source path -> native_decide line numbers` Lean could have minted from.
+    """`source path -> native_decide line numbers`, the reviewed tactic inventory.
 
-    For the project tree this is the same inventory `check_proof_escapes.py`
-    pins by count and digest, so widening it to legitimise a forged axiom's
-    declaration line requires deliberately re-baselining that guard.
+    This is a lexical inventory of lines carrying the token, not evidence that a
+    declaration recorded at one of them was elaborated by `native_decide`; an
+    arbitrary declaration can be registered at a matching line.  It is used only
+    to keep disclosed names inside the inventory `check_proof_escapes.py` pins by
+    count and digest, so a new tactic use requires re-baselining that guard.
     """
     # Imported lazily: saved-output validation is self-contained, and its
     # negative regressions exercise this script on its own.
@@ -145,7 +163,7 @@ def native_decide_sites(root: Path, pinned: bool) -> dict[str, set[int]]:
 
 
 def native_provenance_output(module: str, names: list[str], fixture: Path | None) -> str:
-    """Ask Lean itself what the disclosed names actually are in the environment."""
+    """Have Lean re-run each disclosed name's own Bool claim in a fresh process."""
     if not LEAN_MODULE.fullmatch(module):
         fail(f"refusing to probe a malformed module name: {module}")
     with tempfile.TemporaryDirectory() as scratch:
@@ -172,34 +190,41 @@ def native_provenance_output(module: str, names: list[str], fixture: Path | None
         )
         if result.returncode:
             sys.stderr.write(result.stdout)
-            fail(f"native-decision provenance probe exited {result.returncode}")
+            fail(f"native-decision claim probe exited {result.returncode}")
         return result.stdout
 
 
 def verify_native_provenance(names: list[str], output: str, sites: dict[str, set[int]]) -> None:
-    """Require every disclosed name to be a declaration `native_decide` minted.
+    """Require every disclosed name to assert a claim that re-evaluates to `true`.
 
-    Rejecting project sources that spell `_native` is necessary but not
-    sufficient: a project command elaborator can assemble the very same name
-    from fragments and `addDecl` a `Declaration.axiomDecl` under it, leaving no
-    literal token to scan for.  Disclosure is therefore vouched for by what the
-    environment records about each name — that Lean holds it as a safe axiom,
-    typed as the `e = true` reflection `nativeEqTrue` is the only source of, and
-    minted at a `native_decide` site in the module its own name lives in.
+    Nothing the environment records *about* a declaration is evidence of who
+    created it.  A project command elaborator can `addDecl` an `axiomDecl` under
+    an assembled generated name, give it the `e = true` reflection type, and
+    `addDeclarationRanges` it onto a line that really does contain
+    `native_decide`; every recorded field then matches while the compiler minted
+    nothing.  The decisive check is therefore not provenance but the claim
+    itself: `e` is compiled and run, and the axiom is accepted only if it
+    evaluates to `true`, which is exactly the evidence `native_decide` relies on.
+    An axiom that passes is sound whoever declared it, and one that fails is
+    rejected however authentic its recorded origin looks.
+
+    The kind, type, module and declaration-site conditions are retained as
+    containment, not as provenance: they keep a disclosed name inside the
+    reviewed `native_decide` inventory so a new use cannot appear unnoticed.
     """
     rows: dict[str, tuple[str, ...]] = {}
-    for name, kind, safety, shape, module, line in PROBE_ROW.findall(output):
+    for name, kind, safety, shape, module, line, verdict in PROBE_ROW.findall(output):
         if name in rows:
-            fail(f"native-decision provenance probe reported {name} more than once")
-        rows[name] = (kind, safety, shape, module, line)
+            fail(f"native-decision claim probe reported {name} more than once")
+        rows[name] = (kind, safety, shape, module, line, verdict)
     counted = PROBE_END.findall(output)
     if len(counted) != 1 or int(counted[0]) != len(names):
-        fail("native-decision provenance probe did not report on every disclosed name")
+        fail("native-decision claim probe did not report on every disclosed name")
     unreported = sorted(set(names) - set(rows))
     if unreported:
-        fail("native-decision provenance is unreported for: " + ", ".join(unreported))
+        fail("native-decision claims are unreported for: " + ", ".join(unreported))
     for name in sorted(names):
-        kind, safety, shape, module, line = rows[name]
+        kind, safety, shape, module, line, verdict = rows[name]
         if kind == "missing":
             fail(f"{name} is disclosed as a native-decision axiom but no such "
                  f"declaration exists in the built environment")
@@ -213,8 +238,17 @@ def verify_native_provenance(names: list[str], output: str, sites: dict[str, set
             fail(f"{name} was minted by module {module}, which does not own its name")
         source = module.replace(".", "/") + ".lean"
         if not line.isdigit() or int(line) not in sites.get(source, set()):
-            fail(f"{name} is not bound to a compiler-generated native_decide site: "
-                 f"Lean minted it at {source}:{line}")
+            fail(f"{name} is not recorded at a reviewed native_decide site: "
+                 f"Lean reports it at {source}:{line}")
+        if verdict == "open":
+            fail(f"{name} does not assert a closed Bool claim, so no evaluation can "
+                 f"stand in for the decision native_decide would have made")
+        if verdict == "unevaluated":
+            fail(f"{name} asserts a claim the compiler could not evaluate, so it is "
+                 f"not the reflection of a completed native decision")
+        if verdict != "true":
+            fail(f"{name} asserts a Bool claim that evaluates to {verdict}, so no "
+                 f"native decision could have produced it")
 
 
 def check_native_provenance(names: list[str], module: str, fixture: Path | None) -> None:
@@ -293,7 +327,7 @@ def main() -> None:
     parser.add_argument("--trust-output", type=Path,
                         help="validate saved Trust output instead of invoking Lean")
     parser.add_argument("--provenance-fixture", type=Path,
-                        help="verify native-decision provenance only, against modules "
+                        help="verify native-decision claims only, against modules "
                              "compiled into this directory instead of the project build")
     parser.add_argument("--provenance-module", default="LidoSRv3.Audit.Trust",
                         help="module the provenance probe imports")
@@ -307,7 +341,7 @@ def main() -> None:
             if line.strip() and not line.lstrip().startswith("#")
         })
         check_native_provenance(sorted(names), args.provenance_module, args.provenance_fixture)
-        print(f"native-decision provenance ok: {len(names)} compiler-generated axioms")
+        print(f"native-decision claims ok: {len(names)} re-evaluated axioms")
         return
     if args.trust_output:
         output = args.trust_output.read_text(encoding="utf-8")
@@ -344,10 +378,10 @@ def main() -> None:
     # as a Lean-generated dependency if no project source declared it.
     reject_source_declared_native_names()
     disclosed = disclosed_names()
-    # ...and the lexical guard above only rules out the spellings a source can
-    # be scanned for, so the disclosed names are additionally checked against
-    # what Lean recorded when it generated them.  Saved-output mode validates a
-    # report, not an environment, and cannot reach the declarations.
+    # ...and neither that lexical guard nor any recorded declaration metadata is
+    # evidence of who minted a name, so each disclosed axiom's own Bool claim is
+    # re-evaluated by the compiler.  Saved-output mode validates a report, not an
+    # environment, and cannot reach the declarations.
     if not args.trust_output:
         check_native_provenance(sorted(disclosed), args.provenance_module, None)
     allowed = FOUNDATIONAL_AXIOMS | disclosed
@@ -367,8 +401,8 @@ def main() -> None:
     observed_native = set(NATIVE_AXIOM.findall(output))
     if observed_native != disclosed:
         fail("native-decision extraction disagrees with the complete axiom report")
-    provenance = "report-only" if args.trust_output else "compiler-generated"
-    print(f"trust-axiom check ok: {len(observed)} exact axioms ({len(observed_native) - 1} test/mutant-only native-decision axioms + Phase-3 + foundations); native-decision provenance {provenance}")
+    claims = "report-only" if args.trust_output else "re-evaluated"
+    print(f"trust-axiom check ok: {len(observed)} exact axioms ({len(observed_native) - 1} test/mutant-only native-decision axioms + Phase-3 + foundations); native-decision claims {claims}")
 
 
 if __name__ == "__main__":

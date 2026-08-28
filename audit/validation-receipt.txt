@@ -1,11 +1,55 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 229c4e301625954ac44e9683744168e756d44a91
+validated-tree: aa0d626ab45c5a3ec4fdb36dba6af4ab4d71e995
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
 negative fixtures without circularly claiming the receipt's own commit.
+
+Disclosed native-decision claims re-evaluated, not attributed (2026-08-28)
+---------------------------------------------------------------------------
+
+- The declaration checks recorded below were still attribution, and attribution
+  is forgeable end to end. `native_decide_sites` is a regex inventory of lines
+  carrying the token, not proof that Lean's native-decision elaborator created
+  anything at one. A project command elaborator can `addDecl` a safe
+  `axiomDecl` under the assembled generated name, give it the `Eq Bool e true`
+  shape, and copy a genuine axiom's own `DeclarationRanges` so the forged axiom
+  is registered at a real `native_decide` site inside the pinned inventory.
+  Every field the previous gate inspected then matches. Measured against the
+  predecessor checker at 142b24bf9903eb9631a810c0bc45a01ea083fd5d, such an
+  axiom asserting `false = true` is reported
+  `native-decision provenance ok: 1 compiler-generated axioms` — an allowlisted
+  project axiom proving `False` would have passed the Trust gate.
+- The gate no longer asks who minted a name; it re-establishes what the name
+  asserts. A native-decision axiom states `e = true` for a closed `Bool`
+  expression, so the probe compiles and runs that same `e` through `evalExpr`
+  and accepts the axiom only when it evaluates to `true`. Open, unevaluable,
+  and false claims are each rejected with their own message. This is the
+  evidence `native_decide` itself relies on, so an axiom that passes is worth
+  exactly what a compiler-minted one is worth whoever declared it, and an axiom
+  that fails is rejected however authentic its recorded origin looks.
+- The kind, safety, type-shape, module-ownership, and declaration-site
+  conditions are retained, but as containment rather than provenance: they keep
+  a disclosed name inside the reviewed `native_decide` inventory that
+  `scripts/check_proof_escapes.py` pins by count and digest, so a new tactic use
+  cannot appear unnoticed. The soundness argument rests on the re-evaluated
+  claim alone, and the code and this receipt say so.
+- `scripts/test_check_trust_axioms.sh` carries the defeat as an executable
+  fixture: it mints the forged axiom at the genuine site described above and
+  requires it to be rejected specifically for asserting a claim that evaluates
+  to `false`. Because the checks run in order and each fails with its own
+  message, that needle is reachable only after kind, safety, type shape,
+  module ownership, and the site binding have all passed on the forged axiom,
+  which is precisely the premise of the finding. The genuine axiom minted at the
+  same site is asserted to be accepted, so the negative is carried by
+  re-evaluation and not by rejecting the site.
+- Scope: this changes how a disclosed native-decision name is justified. It does
+  not widen any guarantee's plane status, does not change the disclosed
+  allowlist, adds no Lean axiom, `sorry`, `admit`, or production
+  `native_decide`, and leaves the R1 certified review basis and its bound
+  generator inputs unchanged. All NOT YET boundaries stand.
 
 Disclosed native-decision names checked against generated declarations (2026-08-28)
 ------------------------------------------------------------------------------------
