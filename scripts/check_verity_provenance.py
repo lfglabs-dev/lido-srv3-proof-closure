@@ -40,14 +40,19 @@ def load_json(path: Path) -> dict[str, object]:
 
 
 def _strip_non_rendered(text: str) -> str:
-    """Remove HTML comments and CommonMark fenced code blocks from Markdown text.
+    """Remove CommonMark fenced code blocks then HTML comments from Markdown text.
 
-    Fenced-block rules followed (CommonMark §4.5):
+    Fences are stripped first: fenced-code contents are literal, so an unclosed
+    ``<!--`` inside a fence must not be treated as an HTML comment opener.
+
+    Fenced-block rules (CommonMark §4.5):
     - opener: 0–3 spaces of indentation, then 3+ identical `` ` `` or ``~`` chars
     - closer: same character, at least as many chars as the opener, optional trailing space
     - unclosed fence: extends to EOF
+    Any line whose leading backtick or tilde run matches the opener pattern enters
+    non-rendered state; lines with a backtick in the info string also form multiline
+    code spans and are equally non-table content.
     """
-    text = re.sub(r"<!--.*?(?:-->|\Z)", "", text, flags=re.DOTALL)
     out: list[str] = []
     in_fence = False
     fence_char = ""
@@ -56,7 +61,7 @@ def _strip_non_rendered(text: str) -> str:
         stripped = line.rstrip("\r\n")
         if not in_fence:
             m = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)", stripped)
-            if m and not (m.group(1)[0] == "`" and "`" in m.group(2)):
+            if m:
                 fence_char = m.group(1)[0]
                 fence_min_len = len(m.group(1))
                 in_fence = True
@@ -68,7 +73,7 @@ def _strip_non_rendered(text: str) -> str:
                 stripped,
             ):
                 in_fence = False
-    return "".join(out)
+    return re.sub(r"<!--.*?(?:-->|\Z)", "", "".join(out), flags=re.DOTALL)
 
 
 def check(root: Path) -> str:
