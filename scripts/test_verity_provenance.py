@@ -455,6 +455,39 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive family (P2 unopened-link-label, discussion_r3890407986): a '](' only
+    # opens a link when an unescaped '[' label is actually open.  Each shape below
+    # leaves no valid opener, so CommonMark forms no link and the Verity row that
+    # follows is rendered; treating the '](' as a link suppressed the row until a
+    # later title closer and rejected a valid lockfile.
+    for prefix in (
+        "](url \"bad",          # bare '](' with no opening '[' at all
+        "\\](url \"bad",        # §2.4 escaped ']' cannot close a label
+        "\\[a](url \"bad",      # §2.4 escaped '[' opens no label
+        "[x] and ](url \"bad",  # the earlier ']' already consumed its opener
+    ):
+        lockfile_path.write_text(
+            without_active + f'| Lido core | {prefix}\n{verity_row.rstrip()}\n| n | x " ) |\n',
+            encoding="utf-8",
+        )
+        run(fixture, True)
+    # Control (discussion_r3890407986): an even-length backslash run leaves the
+    # bracket unescaped, so these ARE valid links whose multiline title is link
+    # metadata.  Title suppression must be preserved, so a file whose only pin
+    # appearance is inside such a title must still be rejected.
+    for prefix in ("\\\\[x](url \"bad", "[x\\\\](url \"bad"):
+        lockfile_path.write_text(
+            without_active + f'| Lido core | {prefix}\n{verity_row.rstrip()}\n| n | x " ) |\n',
+            encoding="utf-8",
+        )
+        run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (discussion_r3890407986): the unopened-label shapes render
+    # literally, so a wrong pin exposed by one must still be rejected.
+    lockfile_path.write_text(
+        without_active + f'| Lido core | \\](url "bad\n| Verity | `{OTHER}` |\n| n | x " ) |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -476,7 +509,8 @@ print(
     "escaped-close-paren-link-title, escaped-open-paren-link-title, "
     "blank-line-closed-link-title-wrong-pin, "
     "backslash-terminated-title-line-wrong-pin, "
-    "backslash-newline-multiline-title); "
+    "backslash-newline-multiline-title, "
+    "escaped-bracket-link-title, unopened-label-wrong-pin); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -494,6 +528,7 @@ print(
     "unescaped-paren-in-paren-title, "
     "backslash-terminated-title-line, "
     "backslash-terminated-single-quoted-title, "
-    "backslash-terminated-paren-title; "
+    "backslash-terminated-paren-title, "
+    "unopened-link-label-family; "
     "checkout identity agree"
 )

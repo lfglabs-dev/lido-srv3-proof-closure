@@ -39,6 +39,16 @@ def load_json(path: Path) -> dict[str, object]:
     return value
 
 
+def _escaped_at(text: str, i: int) -> bool:
+    """CommonMark §2.4: a character preceded by an odd backslash run is literal."""
+    num_bs = 0
+    p = i - 1
+    while p >= 0 and text[p] == "\\":
+        num_bs += 1
+        p -= 1
+    return num_bs % 2 == 1
+
+
 def _strip_html_comments(text: str) -> str:
     """Remove HTML comments, skipping backtick code spans (CommonMark §6.1).
 
@@ -68,8 +78,16 @@ def _strip_html_comments(text: str) -> str:
     re-scanned and emitted normally, matching Markdown's literal rendering of the
     broken construct.
 
-    CommonMark inline links: when a ``](`` construct is encountered, the link
-    destination and optional title are scanned.  The title interior (between
+    CommonMark inline links: a ``](`` only opens a link when an unescaped ``[``
+    label is actually open, so ``[`` openers are tracked on a stack and both
+    brackets are checked for §2.4 escape state before the destination/title
+    scanner runs.  A bare ``](``, an escaped ``\\](``, or a ``](`` whose only
+    candidate opener is an escaped ``\\[`` forms no link, and an unescaped ``]``
+    consumes its opener whether or not a link is formed; in each case the
+    intervening text stays visible exactly as CommonMark renders it.
+
+    When a ``](`` does open a link, the link destination and optional title are
+    scanned.  The title interior (between
     quote or parenthesis delimiters) is suppressed — only newlines are preserved —
     so that a Verity row placed inside a multiline link title cannot match as a
     rendered row.  CommonMark §2.4 backslash escapes inside the title are honoured:
@@ -87,6 +105,7 @@ def _strip_html_comments(text: str) -> str:
     does not exist in the rendered Markdown.
     """
     result: list[str] = []
+    open_labels: list[int] = []
     i = 0
     n = len(text)
     while i < n:
@@ -196,7 +215,21 @@ def _strip_html_comments(text: str) -> str:
             else:
                 result.append("<")
                 i += 1
-        elif text[i] == "]" and i + 1 < n and text[i + 1] == "(":
+        elif text[i] == "[" and not _escaped_at(text, i):
+            # Only an unescaped '[' opens a link label.  Openers consumed by an
+            # earlier branch (code span, HTML comment, tag, link body) never reach
+            # here, matching CommonMark's rule that they open no label.
+            open_labels.append(i)
+            result.append("[")
+            i += 1
+        elif text[i] == "]" and not _escaped_at(text, i) and open_labels:
+            # An unescaped ']' consumes its opener whether or not an inline link is
+            # formed, so a later '](' left without an opener stays literal text.
+            open_labels.pop()
+            if i + 1 >= n or text[i + 1] != "(":
+                result.append("]")
+                i += 1
+                continue
             # CommonMark inline link ](destination "title"): suppress title
             # interior while preserving physical line boundaries so a Verity row
             # embedded in a multiline link title cannot match as a rendered row.
