@@ -3,7 +3,9 @@
 
 import copy
 import hashlib
+import importlib.util
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -40,14 +42,42 @@ def main():
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
         shutil.copy2(ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean",
                      fixture / "LidoSRv3/Audit/Provenance/Deposit.lean")
-        for name in ("guarantees.yaml", "assumptions.yaml", "artifacts.lock.json", "source-map.yaml"):
+        for name in (
+            "guarantees.yaml", "assumptions.yaml", "artifacts.lock.json",
+            "source-map.yaml", "trust-native-decide-allowlist.txt",
+        ):
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")
+
+        # Give the isolated generator an immutable review-basis object.  The
+        # production script names the real R1 commit; this fixture substitutes
+        # its own baseline solely so its negative mutations can exercise the
+        # same Git-object binding.
+        subprocess.run(["git", "init", "--quiet"], cwd=fixture, check=True)
+        subprocess.run(["git", "config", "user.email", "audit-test@example.invalid"], cwd=fixture, check=True)
+        subprocess.run(["git", "config", "user.name", "audit metadata test"], cwd=fixture, check=True)
+        subprocess.run(["git", "add", "."], cwd=fixture, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "R1 review basis"], cwd=fixture, check=True)
+        fixture_review_base = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=fixture, check=True,
+            text=True, stdout=subprocess.PIPE,
+        ).stdout.strip()
+        audit_script = fixture / "scripts/audit_metadata.py"
+        audit_source = audit_script.read_text(encoding="utf-8")
+        audit_script.write_text(
+            audit_source.replace(
+                'R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"',
+                f'R1_REVIEW_BASE = "{fixture_review_base}"',
+                1,
+            ),
+            encoding="utf-8",
+        )
 
         gpath = fixture / "audit/guarantees.yaml"
         apath = fixture / "audit/assumptions.yaml"
         lpath = fixture / "audit/artifacts.lock.json"
         spath = fixture / "audit/source-map.yaml"
+        tpath = fixture / "audit/trust-native-decide-allowlist.txt"
         mpath = fixture / "verity/targets/audit-manifest.json"
         guarantees = json.loads(gpath.read_text())
         assumptions = json.loads(apath.read_text())
@@ -57,6 +87,81 @@ def main():
 
         invoke(fixture, True)
         invoke(fixture, True, command="check")
+
+        # Metadata is untrusted Markdown-table content: a pipe in every
+        # family of metadata-derived report cells must remain literal data,
+        # including adjacent pipes that would add columns.
+        spec = importlib.util.spec_from_file_location("fixture_audit_metadata", audit_script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        def set_id(row): row["id"] = "left||right"
+        def set_abstract_status(row): row["abstract"]["status"] = "left||right"
+        def set_abstract_theorem(row): row["abstract"]["theorem"] = "left||right"
+        def set_verity_status(row): row["verity"]["status"] = "left||right"
+        def set_verity_theorem(row): row["verity"]["theorem"] = "left||right"
+        def set_summary(row): row["summary"] = "left||right"
+        def set_assumptions(row): row["assumptions"] = ["left||right"]
+        def set_classification(row): row["classification"]["kind"] = "left||right"
+        def set_missing(row): row["fidelity"]["missing"] = ["left||right"]
+        def set_next_gate(row): row["next_gate"] = "left||right"
+
+        cell_families = (
+            set_id, set_abstract_status, set_abstract_theorem,
+            set_verity_status, set_verity_theorem, set_summary,
+            set_assumptions, set_classification, set_missing, set_next_gate,
+        )
+        for mutate in cell_families:
+            x = copy.deepcopy(guarantees)
+            mutate(x["guarantees"][11])
+            report = module.rendered(x["guarantees"], source)["R1-FINAL-AUDITOR-REPORT.md"]
+            escaped_row = next(line for line in report.splitlines() if "left\\|\\|right" in line)
+            if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
+                raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
+
+        # The review-basis language is only valid for the complete structured
+        # report-input family committed at that basis.  These are otherwise-
+        # valid edits, including a simultaneous ordinary update of both
+        # families: regeneration must not silently retain the stale basis.
+        x = copy.deepcopy(guarantees)
+        x["guarantees"][11]["summary"] += " changed"
+        write(gpath, x)
+        invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
+        write(gpath, guarantees)
+        x = copy.deepcopy(source)
+        x["targets"][0]["spans"][0]["function"] += " changed"
+        write(spath, x)
+        invoke(fixture, False, "R1 review basis input family differs for audit/source-map.yaml")
+        write(spath, source)
+        changed_guarantees = copy.deepcopy(guarantees)
+        changed_guarantees["guarantees"][11]["summary"] += " synchronized family change"
+        changed_source = copy.deepcopy(source)
+        changed_source["targets"][0]["spans"][0]["function"] += " synchronized family change"
+        write(gpath, changed_guarantees)
+        write(spath, changed_source)
+        invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
+        write(gpath, guarantees)
+        write(spath, source)
+        # The Trust allowlist is a rendered-report input: it decides the exact
+        # accepted-axiom section.  This mutation is otherwise entirely valid
+        # (unique, test-scoped, correctly native-decision shaped), so only the
+        # basis binding can reject it -- and it must reject `check` too, not
+        # just `generate`, or a widened allowlist would still certify as R1.
+        trust_allowlist = tpath.read_text(encoding="utf-8")
+        widened = trust_allowlist + (
+            "LidoSRv3.Tests.Injected.review_basis_widening"
+            "._native.native_decide.ax_1_1\n"
+        )
+        tpath.write_text(widened, encoding="utf-8")
+        invoke(fixture, False, "R1 review basis input family differs for audit/trust-native-decide-allowlist.txt")
+        invoke(fixture, False, "R1 review basis input family differs for audit/trust-native-decide-allowlist.txt",
+               command="check")
+        tpath.write_text(trust_allowlist, encoding="utf-8")
+
+        # A disclosure that is not a native-decision axiom must never reach the
+        # report's exact accepted-axiom section, whatever the review basis says.
+        tpath.write_text(trust_allowlist + "LidoSRv3.Tests.Injected.injected\n", encoding="utf-8")
+        invoke(fixture, False, "Trust native-decision allowlist documents a non-native axiom")
+        tpath.write_text(trust_allowlist, encoding="utf-8")
 
         constructor_fixture = fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
         constructor_source = constructor_fixture.read_text(encoding="utf-8")
@@ -68,7 +173,6 @@ def main():
         # to pass.  The independently fetched pinned Git blob must still reject it.
         mutated_constructor = constructor_source.replace("_maxEBType1);", "_maxEBType2);", 1)
         constructor_fixture.write_text(mutated_constructor, encoding="utf-8")
-        audit_script = fixture / "scripts/audit_metadata.py"
         audit_source = audit_script.read_text(encoding="utf-8")
         audit_script.write_text(
             audit_source.replace(

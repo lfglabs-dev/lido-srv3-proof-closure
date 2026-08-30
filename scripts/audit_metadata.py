@@ -10,12 +10,26 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
+R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"
+# The report calls this commit its certified review basis.  Keep the exact
+# generator inputs bound both to that Git object and to their expected bytes:
+# a changed registry, source map, or Trust allowlist must not be presented as
+# if it had that review.
+# This exact family is every structured input used to render the R1 review
+# report.  A normal regeneration may never pair changed family content with a
+# stale certified basis.
+R1_REPORT_INPUT_SHA256 = {
+    "audit/guarantees.yaml": "39fb757cbc896a2cbae21830a633e1cb6831fbcc993b832bce4ea1f5f4215948",
+    "audit/source-map.yaml": "ee8847bdf481fad77e8d99bad5be050d723eaa9e3287ec6930417b334d715857",
+    "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
+}
 CANONICAL_IDS = [
     "P-ALLOC-1", "P-ALLOC-2", "P-DEPOSIT-1", "P-TOPUP-1",
     "P-ACCOUNT-1", "P-RESERVE-1", "P-CONSOLIDATION-ETH-1", "P-ADDRESS-1",
@@ -86,6 +100,8 @@ EXPECTED_PRIORITIES = {
 }
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
+TRUST_NATIVE_DECIDE_ALLOWLIST = AUDIT / "trust-native-decide-allowlist.txt"
+NATIVE_DECIDE_AXIOM = re.compile(r"(?:[A-Za-z_]\w*\.)+_native\.native_decide\.ax_\d+(?:_\d+)*")
 DEPOSIT_CONSTRUCTOR_FIXTURE_SHA256 = "41278266ceadd14837f7f1b81e4ab26d7634be2673af7c9b9775f28b231cfee9"
 DEPOSIT_UPSTREAM_SOURCE_URL = (
     "https://raw.githubusercontent.com/lidofinance/core/"
@@ -112,6 +128,23 @@ def load(path):
 def require(condition, message):
     if not condition:
         raise SystemExit(f"audit metadata error: {message}")
+
+
+def markdown_table_cell(value):
+    """Render metadata as one Markdown table cell, never as table syntax."""
+    return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\r\n", "<br>").replace("\n", "<br>").replace("\r", "<br>")
+
+
+def canonical_metadata_bytes(value):
+    """Ignore JSON whitespace while binding every metadata value and shape."""
+    return json.dumps(json.loads(value), sort_keys=True, separators=(",", ":")).encode()
+
+
+def canonical_review_input_bytes(relative, value):
+    """Normalize structured review inputs while retaining exact text inputs."""
+    if relative.endswith((".yaml", ".json")):
+        return canonical_metadata_bytes(value)
+    return value
 
 
 def nonempty_strings(value):
@@ -172,6 +205,24 @@ def validate_pins(lock, manifest, source_map):
             policy.get("admit") == 0 and policy.get("unsafe_proof_escapes") == 0,
             "manifest proof policy permits proof escapes")
     require(policy.get("report_entrypoint") == "LidoSRv3.Audit.Trust", "Trust report entrypoint differs")
+    require(policy.get("trust_native_decide_allowlist") == "audit/trust-native-decide-allowlist.txt",
+            "Trust native-decision allowlist differs")
+    trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
+                   if line.strip() and not line.lstrip().startswith("#")]
+    require(len(trust_names) == len(set(trust_names)) and trust_names,
+            "Trust native-decision allowlist must be nonempty and unique")
+    production_native = {
+        "LidoSRv3.Audit.Verity.AllocCapacityPhase3.consumed_summary_function_spec_compiles._native.native_decide.ax_1_1",
+        "LidoSRv3.Audit.Verity.SszAbstractDigest.deposit_data_root_compiles._native.native_decide.ax_1_1",
+        "LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.forward_compiles._native.native_decide.ax_1_1",
+    }
+    require(production_native <= set(trust_names) and
+            all(name in production_native or name.startswith("LidoSRv3.Tests.") for name in trust_names),
+            "Trust native-decision allowlist contains an undisclosed production dependency")
+    # The report publishes these as the exact emitted native-decision axioms.
+    # An arbitrary project axiom must not be presentable as one of them.
+    require(all(NATIVE_DECIDE_AXIOM.fullmatch(name) for name in trust_names),
+            "Trust native-decision allowlist documents a non-native axiom")
     require(source_map.get("schema") == "lido-srv3-minimal-11-source-map-v3", "source-map schema differs")
     require(source_map.get("pinned_source") == f"lidofinance/core@{PINNED['lido_core'][1]}", "source-map pin differs")
     require(source_map.get("scope") == {
@@ -219,6 +270,26 @@ def validate_pins(lock, manifest, source_map):
     deposit_target = next(target for target in targets if target.get("id") == "P-DEPOSIT-1")
     require(DEPOSIT_CONSTRUCTOR_SPAN in deposit_target["spans"],
             "P-DEPOSIT-1: pinned constructor source span is missing")
+
+
+def validate_r1_review_basis():
+    """Require the complete rendered-report input family at R1's basis."""
+    for relative, expected_digest in R1_REPORT_INPUT_SHA256.items():
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "show", f"{R1_REVIEW_BASE}:{relative}"],
+            text=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        require(result.returncode == 0,
+                f"R1 review basis cannot read {R1_REVIEW_BASE}:{relative}")
+        reviewed = result.stdout
+        reviewed_canonical = canonical_review_input_bytes(relative, reviewed)
+        require(hashlib.sha256(reviewed_canonical).hexdigest() == expected_digest,
+                f"R1 review basis digest differs for {relative}")
+        current_canonical = canonical_review_input_bytes(relative, (ROOT / relative).read_bytes())
+        require(current_canonical == reviewed_canonical,
+                f"R1 review basis input family differs for {relative}")
 
 
 def validate_assumptions(data):
@@ -329,10 +400,12 @@ def validate():
     source_map = load(AUDIT / "source-map.yaml")
     assumption_ids = validate_assumptions(assumptions)
     validate_pins(lock, manifest, source_map)
-    return validate_guarantees(registry, assumption_ids)
+    rows = validate_guarantees(registry, assumption_ids)
+    validate_r1_review_basis()
+    return rows
 
 
-def rendered(rows):
+def rendered(rows, source_map):
     canonical = rows[:len(CANONICAL_IDS)]
     header = "<!-- GENERATED by scripts/audit_metadata.py; edit structured metadata, not this view. Lean is theorem authority. -->\n\n"
     roadmap_parts = [header + "# ROADMAP\n\n"
@@ -363,12 +436,62 @@ def rendered(rows):
     roadmap = "".join(roadmap_parts)
     lines = ["# STATUS", "", "| ID | Abstract Lean | Verity Executable Contract | Fidelity gap | Classification | Assumptions |", "| --- | --- | --- | --- | --- | --- |"]
     for r in canonical:
-        missing = "; ".join(r["fidelity"]["missing"]) or "—"
-        assumptions = ", ".join(f"`{x}`" for x in r["assumptions"]) or "—"
-        lines.append(f"| `{r['id']}` | {r['abstract']['status']} | {r['verity']['status']} | {missing} | {r['classification']['kind']} | {assumptions} |")
+        missing = markdown_table_cell("; ".join(r["fidelity"]["missing"]) or "—")
+        assumptions = markdown_table_cell(", ".join(f"`{x}`" for x in r["assumptions"]) or "—")
+        lines.append(
+            f"| `{markdown_table_cell(r['id'])}` | {markdown_table_cell(r['abstract']['status'])} | "
+            f"{markdown_table_cell(r['verity']['status'])} | {missing} | "
+            f"{markdown_table_cell(r['classification']['kind'])} | {assumptions} |"
+        )
     status = header + "\n".join(lines) + "\n"
     reproduce = header + "# REPRODUCE\n\n" + "\n".join(f"- `{r['id']}`: `{r['reproduction']['command']}` — {r['reproduction']['expected']}" for r in canonical) + "\n"
-    return {"ROADMAP.md": roadmap, "STATUS.md": status, "REPRODUCE.md": reproduce}
+    # This is a review surface, not another source of truth.  Keep the final
+    # auditor slice derived from the same structured registry as STATUS and
+    # REPRODUCE so it cannot quietly widen a claim or omit a registered child.
+    spans_by_id = {target["id"]: target for target in source_map["targets"]}
+    trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
+                   if line.strip() and not line.lstrip().startswith("#")]
+    report = [header + "# R1 final auditor report\n\n",
+        "## Decision\n\n",
+        f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        "## Architecture and evidence boundary\n\n",
+        "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
+        "Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
+        "## Acceptance table — every registered claim\n\n",
+        "| Claim | Accepted theorem plane | Proof shape / exact domain statement | Source/artifact provenance | Acceptance and exact limitation |\n",
+        "| --- | --- | --- | --- | --- |\n"]
+    for row in rows:
+        source = spans_by_id.get(row["id"])
+        if source:
+            provenance = f"{source['status']}; {len(source['spans'])} immutable pinned source span(s)"
+        else:
+            provenance = "No independent source-map target; supplemental evidence only"
+        abstract = row["abstract"]
+        verity = row["verity"]
+        plane = (f"abstract `{abstract['status']}`: `{abstract['theorem'] or '—'}`; "
+                 f"Verity `{verity['status']}`: `{verity['theorem'] or '—'}`")
+        limitations = "; ".join(row["fidelity"]["missing"])
+        report.append(
+            f"| `{markdown_table_cell(row['id'])}` | {markdown_table_cell(plane)} | "
+            f"{markdown_table_cell(row['summary'])} | {markdown_table_cell(provenance)}. "
+            f"Assumptions: {markdown_table_cell(', '.join('`' + a + '`' for a in row['assumptions']) or '—')}. | "
+            f"**{markdown_table_cell(row['classification']['kind'])}**. "
+            f"{markdown_table_cell(limitations)} Next gate: {markdown_table_cell(row['next_gate'])} |\n"
+        )
+    report.extend([
+        "\n## Explicit NOT YET boundaries\n\n",
+        "- **ETH confinement:** `P-ETH-JOURNAL-1` is a modeled journal exclusion result, not global ETH confinement across live contracts, arbitrary calls, or deployment state.\n",
+        "- **Oracle sanity:** `P-ORACLE-SUPPLY-1` covers the registered source-domain/computed-mint model; it does not prove oracle-report truth, committee/oracle authorization, all report sanity, or live storage/execution correspondence.\n",
+        "- **Broad token semantics:** `P-TOKEN-1` remains NOT YET and is not registered. The scoped address and claim rows do not establish general ERC-20/ERC-721/WstETH approvals, balances, transfers, events, or adversarial recipient semantics.\n",
+        "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance is out of scope; the SSZ targeted binding remains OPEN.\n\n",
+        "## Proof-escape and receipt acceptance\n\n",
+        "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the three explicitly recorded production exceptions (P-ALLOC-1 Phase-3 capacity, SSZ digest, consolidation flow) and the exact test/mutant-only native-decision names below; the run summary reports each production exception by name rather than folding it into the test-only count. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted named axiom report (including Lean's empty-set spelling), and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. Neither Trust's source text nor its log is taken as evidence: a `#print axioms` line reads the same inside a `/- -/` block, and an `#eval IO.println` can emit a report Lean never computed, so disclosure is read from active commands only, with comments and strings blanked first, and every printed theorem's dependencies are recomputed by the checker itself through the same `Lean.collectAxioms` call `#print axioms` makes, in a probe it spawns that imports only `Lean` and loads the audited module as data, so audited code contributes declarations but never elaborates the probe measuring it — a macro bound to the collector's token sequence would otherwise intercept that call in every spelling, fully qualified ones included. The published log is then confirmed against that recomputation, and a report that hides, invents, or misstates a dependency fails closed. A disclosed native-decision name is bound to provenance rather than spelling: no project Lean source may declare a name in Lean's compiler-generated `_native.native_decide` namespace, so an `opaque` merely spelled like a generated axiom cannot be laundered into the allowed set. That lexical guard only rules out spellings a source can be scanned for, and nothing the environment records about a declaration is evidence of who created it: an elaborator can assemble the name from fragments, give it the reflection type, and register it at a line that genuinely contains `native_decide`. Each disclosed name is therefore vouched for by re-establishing its own claim rather than its origin — the checker recompiles and runs the `Bool` expression the axiom asserts is `true`, which is the same evidence `native_decide` itself relies on — while the recorded kind, type, module, and site conditions are retained only to keep the disclosed set inside the pinned tactic inventory. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",
+        "### Exact emitted native-decision axioms\n\n```text\n" + "\n".join(trust_names) + "\n```\n\n",
+        "## Recommendation\n\n",
+        "**Q1:** close the first end-to-end fidelity gap rather than adding claims: independently bind one production deployment artifact (constructor inputs, runtime codehash, chain/address) to the already pinned source and one modeled value-moving endpoint, then prove the correspondence or retain it explicitly NOT YET.\n",
+    ])
+    return {"ROADMAP.md": roadmap, "STATUS.md": status, "REPRODUCE.md": reproduce,
+            "R1-FINAL-AUDITOR-REPORT.md": "".join(report)}
 
 
 def main():
@@ -379,11 +502,12 @@ def main():
     rows = validate()
     if args.expect_canonical_count is not None:
         require(len(CANONICAL_IDS) == args.expect_canonical_count, f"canonical guarantee count is {len(CANONICAL_IDS)}, expected {args.expect_canonical_count}")
-    views = rendered(rows)
+    source_map = load(AUDIT / "source-map.yaml")
+    views = rendered(rows, source_map)
     if args.command == "generate":
         for name, content in views.items():
             (AUDIT / name).write_text(content, encoding="utf-8")
-        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md")
+        print("generated audit/ROADMAP.md audit/STATUS.md audit/REPRODUCE.md audit/R1-FINAL-AUDITOR-REPORT.md")
     else:
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content, f"{name} is stale; run scripts/audit_metadata.py generate")

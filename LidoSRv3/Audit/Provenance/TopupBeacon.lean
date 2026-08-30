@@ -23,7 +23,7 @@ This is model-literal agreement, not a deployed-artifact identity. -/
 theorem topup_verity_beacon_is_production_pin :
     LidoSRv3.Audit.Verity.TopupTx.beaconAddress.toNat =
       PTopup1.canonicalBeaconDepositAddress := by
-  native_decide
+  decide
 
 /-- Top-up and deposit canonical pins are the same Nat. Both remain model
 pins; neither statement identifies a deployed immutable. -/

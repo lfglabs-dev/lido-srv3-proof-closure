@@ -31,6 +31,9 @@ We do not claim to have verified the bytecode. `CHECKED` means the named Lean th
 
 Wording, assumptions, source spans, next gates: `audit/guarantees.yaml`.
 Generated views: `audit/STATUS.md`, `audit/ROADMAP.md`, `audit/REPRODUCE.md`.
+The generated R1 acceptance record is `audit/R1-FINAL-AUDITOR-REPORT.md`; it
+covers every registered canonical and supplemental row without promoting it to
+a deployment, bytecode, or audit-certification claim.
 
 ## Reproduce
 

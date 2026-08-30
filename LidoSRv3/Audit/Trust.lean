@@ -32,6 +32,7 @@ import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Tests.TopupHybridMutants
 import LidoSRv3.Audit.Guarantees.PTopup2
+import LidoSRv3.Audit.Guarantees.PTopup2Verity
 import LidoSRv3.Audit.Verity.Topup2Tx
 import LidoSRv3.Tests.Topup2TxMutants
 import LidoSRv3.Audit.Guarantees.PReserve1
@@ -55,6 +56,7 @@ import LidoSRv3.Tests.PackDAddressClaimMutants
 import LidoSRv3.Audit.Spec.OracleFrameCorrespondence
 import LidoSRv3.Tests.PackEOracleFrameMutants
 import LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence
+import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
 import LidoSRv3.Tests.PackFConsolidationObserveMutants
 import LidoSRv3.Audit.Provenance.Deposit
 import LidoSRv3.Tests.PackGDepositProvenanceMutants
@@ -120,8 +122,9 @@ Machine-readable-in-build trust report for the first audit slice.
 
 ## Allowed axioms
 
-Every theorem printed below may depend only on the three Lean foundational
-axioms `propext`, `Classical.choice`, and `Quot.sound`.
+Every registered `CHECKED` theorem is printed below and may depend only on
+the three Lean foundational axioms `propext`, `Classical.choice`, and
+`Quot.sound`.
 
 `Classical.choice` is an **accepted** dependency, disclosed in
 `audit/assumptions.yaml` as `A-CLASSICAL-CHOICE`: it is a standard Lean 4 /
@@ -131,15 +134,24 @@ named here rather than folded silently into "Lean foundations" so that a
 reviewer reading this report sees the same three-axiom boundary that the
 assurance metadata records.
 
-Anything outside those three is a proof escape and is *not* accepted.  In
+Anything outside those three is a proof escape and is *not* accepted. In
 particular `sorryAx`, `Lean.ofReduceBool`, and any project-introduced `axiom`
-must not appear in the output below.  The single disclosed exception is the
-canonical P-ALLOC-1 Phase-3 compilation theorems, which additionally report the
-generated `consumed_summary_function_spec_compiles._native.native_decide.ax_1_1`
-dependency recorded in the target manifest.
+must not appear in the output below. Three production compilation theorems
+have one recorded generated native-decision dependency each: P-ALLOC-1
+Phase-3 capacity, the SSZ abstract digest, and the consolidation abstract
+flow. Some explicitly printed mutant regressions also expose native-decision
+axioms; they are classified as test-only and are listed by exact generated
+name in `audit/trust-native-decide-allowlist.txt`.
+`scripts/check_trust_axioms.py` reruns this entrypoint and rejects any
+missing, extra, or production-parent native-decision name. It does not take
+this log at its word: the report below is confirmed against dependencies the
+checker recomputes itself, so a command commented out here cannot be stood in
+for by a printed line. That recomputation runs in a probe which imports only
+`Lean` and loads this module as data, so nothing declared here participates in
+elaborating the probe that measures it.
 
-Subject to that one recorded exception, there are no undisclosed project-level
-assumptions or proof escapes.
+Subject to those three recorded production exceptions and the exact test-only
+list, there are no undisclosed project-level assumptions or proof escapes.
 -/
 
 #print axioms LidoSRv3.Audit.Quantity.checkedDiv_zero
@@ -149,9 +161,11 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.revert_may_retain_attempts
 #print axioms LidoSRv3.Audit.valid_result_preserves_router_order
 #print axioms LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute
+#print axioms LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.alloc1_spec_capacity_correspondence
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.alloc2_spec_step_amount_correspondence
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.topup2_per_key_remains_gwei
+#print axioms LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec
 #print axioms LidoSRv3.Audit.Spec.AllocationCorrespondence.spec_amounts_do_not_imply_linkssource
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.target_as_capacity_kill_line_refutes_alloc1_spec
 #print axioms LidoSRv3.Tests.PackAAllocSpecMutants.spec_amounts_kill_line_refutes_linkssource
@@ -160,6 +174,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackBEthJournalMutants.third_destination_lido_kill_line_refutes_spec_journal
 #print axioms LidoSRv3.Audit.Spec.SszCorrespondence.verifyProof_implies_gindex
 #print axioms LidoSRv3.Audit.Spec.SszCorrespondence.gindex_concat_matches_spec
+#print axioms LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement
 #print axioms LidoSRv3.Tests.PackCSszMutants.skip_gindex_kill_line_refutes_structural_child
 #print axioms LidoSRv3.Tests.PackCSszMutants.engine_mutant_disagrees_with_sha256engine
 #print axioms LidoSRv3.Audit.Spec.AddressClaimCorrespondence.two_claim_payouts_match_reads
@@ -170,6 +185,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Spec.OracleFrameCorrespondence.eugene_bound_cited
 #print axioms LidoSRv3.Tests.PackEOracleFrameMutants.computed_fee_kill_line_refutes_oracle_frame
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.observe_success_payloads_reread_maps
+#print axioms LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.persist_payloads_reread
 #print axioms LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence.gateway_nonzero_remains_named_hyp
 #print axioms LidoSRv3.Tests.PackFConsolidationObserveMutants.swapped_map_reread_kill_line_refutes_observe
@@ -227,6 +243,7 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackP2VaultEthMutants.mutant_vault_lido_as_lidoPull_refutes_projection
 #print axioms LidoSRv3.Tests.PackP2VaultEthMutants.input_caller_guard_refutes_exact_parent
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
+#print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_entry_source_domain
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.sum_balances_mutant_killed
 #print axioms LidoSRv3.Tests.PackN3OracleMintMutants.raw_fee_mutant_killed
@@ -238,10 +255,12 @@ assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackP3SubmitReportEntryMutants.skips_simulate_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackP3SubmitReportEntryMutants.hash_premise_is_load_bearing
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_live_claim_batch
+#print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename
 #print axioms LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_fuel_bounded_recipient_rename
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.swapped_three_payout_order_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackN4AddressBatchMutants.fixed_dest_rename_kill_line_refutes_parent
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume
+#print axioms LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length
 #print axioms LidoSRv3.Audit.Spec.Eip4788AnchorChild.eip4788_parent_root_identified
 #print axioms LidoSRv3.Audit.Verity.BeaconRootsTx.spec_source_verity_beacon_roots
 #print axioms LidoSRv3.Audit.Guarantees.PSszLive1.production_witness_admission_correspondence

@@ -33,6 +33,10 @@ test:
 	@python3 scripts/audit_metadata.py check
 	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
 	@python3 scripts/check_validation_receipt.py
+	@python3 scripts/check_proof_escapes.py
+	@bash scripts/test_check_proof_escapes.sh
+	@bash scripts/test_check_trust_axioms.sh
+	@python3 scripts/check_trust_axioms.py
 	@bash scripts/check_no_python_evidence.sh
 	@bash scripts/test_check_no_python_evidence.sh
 	@python3 scripts/check_public_claim_surfaces.py
