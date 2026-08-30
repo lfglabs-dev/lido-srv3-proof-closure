@@ -113,9 +113,30 @@ def _unescaped_pipes(line: str) -> list[int]:
     return [k for k, ch in enumerate(line) if ch == "|" and not _escaped_at(line, k)]
 
 
+def _indent_width(line: str) -> int:
+    """Columns of leading whitespace, expanding tabs to the next four-column stop."""
+    width = 0
+    for ch in line:
+        if ch == " ":
+            width += 1
+        elif ch == "\t":
+            width += 4 - (width % 4)
+        else:
+            break
+    return width
+
+
 def _table_cells(line: str) -> list[str]:
-    """Split a GFM table row into cells; leading and trailing pipes are optional."""
-    if not _unescaped_pipes(line):
+    """Split a GFM table row into cells; leading and trailing pipes are optional.
+
+    A row indented four or more columns is an indented chunk, not table markup,
+    so it yields no cells.  Stripping the indentation unconditionally let a line
+    such as ``    | --- | --- |`` pass as a delimiter row, conjuring a table that
+    GFM does not render; the phantom cell and row separators then cleared a live
+    link opener, so the link never formed and a Verity row hidden inside its
+    multiline title was exposed as a canonical pin.
+    """
+    if _indent_width(line) >= 4 or not _unescaped_pipes(line):
         return []
     body = line.strip(" \t")
     if body.startswith("|"):
@@ -139,11 +160,13 @@ def _ends_table(line: str) -> bool:
     inline contexts GFM keeps together and could expose content hidden in a link
     title, whereas ending a region early only leaves inline state uncleared,
     which over-suppresses.  A continuation row must therefore carry an unescaped
-    pipe and start no other block structure.
+    pipe, sit within three columns of indentation and start no other block
+    structure; at four columns GFM closes the table and opens an indented chunk.
     """
     return (
         not _unescaped_pipes(line)
         or line.strip(" \t") == ""
+        or _indent_width(line) >= 4
         or bool(_ATX_HEADING.match(line))
         or bool(_THEMATIC_BREAK.match(line))
         or bool(_BLOCK_QUOTE.match(line))

@@ -652,6 +652,43 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Adversarial family (P2 indented delimiter row, discussion_r3890810634): a row
+    # indented four or more columns is an indented chunk, not table markup, so GFM
+    # renders no table.  Accepting one as a delimiter row conjured a phantom table
+    # whose separators cleared a live link opener, leaving the '](' literal and
+    # exposing the pin inside the link's multiline title as a canonical row.
+    for indent in ("    ", "\t", " \t", "     ", "  \t"):
+        lockfile_path.write_text(
+            without_active
+            + f'[x](url "bad\n| a | b |\n{indent}| --- | --- |\n{verity_row.rstrip()}\ncontinued")\n',
+            encoding="utf-8",
+        )
+        run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (discussion_r3890810634): the same bypass via an over-indented
+    # header row, which likewise cannot open a table.
+    lockfile_path.write_text(
+        without_active
+        + f'[x](url "bad\n    | a | b |\n| --- | --- |\n{verity_row.rstrip()}\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive family (discussion_r3890810634): up to three columns of indentation is
+    # still a valid GFM table, so the row separators really do break the link and the
+    # genuinely rendered Verity row must remain visible.
+    for indent in ("", " ", "  ", "   "):
+        lockfile_path.write_text(
+            without_active
+            + f'[x](url "bad\n{indent}| a | b |\n{indent}| --- | --- |\n{verity_row.rstrip()}\ncontinued")\n',
+            encoding="utf-8",
+        )
+        run(fixture, True)
+    # Positive (discussion_r3890810634): an over-indented row closes the table, so a
+    # genuine pin row is unaffected by trailing indented pipe-shaped text.
+    lockfile_path.write_text(
+        original_lockfile + "    | e | f |\n",
+        encoding="utf-8",
+    )
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -679,7 +716,8 @@ print(
     "nested-link-outer-opener-wrong-pin, unnested-outer-link-title, "
     "nested-image-outer-link-title-family, nonblank-boundary-opener-wrong-pin, "
     "no-space-hash-same-block-opener-title, block-quote-continuation-title, "
-    "non-table-pipe-lines-title, table-row-wrong-pin); "
+    "non-table-pipe-lines-title, table-row-wrong-pin, "
+    "indented-delimiter-row-title-family, indented-header-row-title); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -703,6 +741,7 @@ print(
     "nested-link-outer-deactivation-family, "
     "nested-image-outer-link-row-after, nonblank-leaf-boundary-opener-family, "
     "block-quote-interrupt-family, block-quote-title-row-after, "
-    "gfm-table-row-boundary, gfm-table-cell-boundary; "
+    "gfm-table-row-boundary, gfm-table-cell-boundary, "
+    "short-indent-delimiter-row-family, over-indented-row-closes-table; "
     "checkout identity agree"
 )
