@@ -152,6 +152,16 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # the enclosed row must be rejected.
     lockfile_path.write_text(without_active + f"````foo`\n{verity_row}````\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (P2 inline-closer, discussion_r3889585498): exact-length backtick run
+    # embedded in surrounding text on the closer line closes the code span; the enclosed
+    # Verity row is non-rendered and must be rejected.
+    lockfile_path.write_text(without_active + f"```foo`\n{verity_row}suffix ``` end\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive adversarial (P2 unequal-inline-run, discussion_r3889585498): an unequal
+    # backtick run embedded inline does not close the code span; the opener is literal
+    # and the enclosed row remains rendered.
+    lockfile_path.write_text(without_active + f"```foo`\n{verity_row}suffix ```` end\n", encoding="utf-8")
+    run(fixture, True)
     # Positive regression (discussion_r3889515387): a literal `<!--` inside a backtick
     # code span is code content, not an HTML comment opener; the real Verity row
     # appearing after it must still be found.
@@ -167,9 +177,10 @@ print(
     "manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, "
     "lockfile Verity pin (HTML comment, unclosed-HTML-comment-to-EOF, equal fence, "
     "indented opener, longer closer, unclosed-at-EOF, backtick-code-span-suppressor, "
-    "exact-close-4bt-code-span); "
+    "exact-close-4bt-code-span, inline-exact-close-3bt-code-span); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "unequal-run-code-span-3bt, unequal-run-code-span-4bt, "
+    "unequal-inline-run-code-span-3bt, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span; "
     "checkout identity agree"
 )

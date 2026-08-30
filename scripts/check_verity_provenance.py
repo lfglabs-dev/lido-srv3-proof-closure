@@ -95,10 +95,11 @@ def _strip_non_rendered(text: str) -> str:
     - unclosed fence: extends to EOF
     For backtick openers whose info string contains a backtick, CommonMark treats the
     run as a code-span opener (§6.1) rather than a fence opener.  Code-span closers
-    must have the same exact length as their opener (not merely ≥), so the fence
-    ``{N,}`` closer rule does not apply.  If no exact-length closer is found before
-    EOF the code span is unmatched, the opener is literal, and all enclosed lines are
-    restored as rendered content.
+    must have the same exact length as their opener (not merely ≥), and may appear
+    anywhere on a line (not only occupying a whole line), so the fence ``{N,}``
+    closer rule and the whole-line anchor both do not apply.  If no exact-length
+    closer is found before EOF the code span is unmatched, the opener is literal,
+    and all enclosed lines are restored as rendered content.
     """
     out: list[str] = []
     in_fence = False
@@ -123,17 +124,24 @@ def _strip_non_rendered(text: str) -> str:
                 out.append(line)
         else:
             if is_code_span:
-                closes = re.match(
-                    r"^ {0,3}"
+                # CommonMark §6.1: the closer is an exact-length backtick run and
+                # may appear anywhere on the line, not only as a whole-line match.
+                closes = re.search(
+                    r"(?<!"
+                    + re.escape(fence_char)
+                    + r")"
                     + re.escape(fence_char)
                     + r"{"
                     + str(fence_min_len)
                     + r"}(?!"
                     + re.escape(fence_char)
-                    + r")\s*$",
+                    + r")",
                     stripped,
                 )
                 if closes:
+                    remainder = line[closes.end():]
+                    if remainder.strip("\r\n"):
+                        out.append(remainder)
                     in_fence = False
                     is_code_span = False
                     code_span_buffer = []
