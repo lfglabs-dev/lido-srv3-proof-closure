@@ -139,15 +139,16 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # (discussion_r3889471379)
     lockfile_path.write_text(without_active + f"```foo`\n{verity_row}```\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
-    # Positive regression (discussion_r3889515392): invalid-info opener followed by a
-    # longer-run close — the run lengths differ so the code span is never closed; the
-    # opener is treated as literal and all enclosed lines remain rendered.
+    # Adversarial (discussion_r3889515392 + r3889768393): invalid-info opener followed by
+    # a longer-run close — the fence code span is never closed so the buffer is restored,
+    # but the trailing backtick in the info string (e.g. ``foo` ``) creates a real
+    # CommonMark §6.1 inline code span that spans into the Verity row, suppressing
+    # ``| Verity | `` from rendered content; must be rejected.
     lockfile_path.write_text(without_active + f"```foo`\n{verity_row}````\n", encoding="utf-8")
-    run(fixture, True)
-    # Adversarial variant: same rule at 4-backtick opener length — 5-backtick run does
-    # not close the 4-backtick code span, so the row remains rendered.
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Same rule at 4-backtick opener length.
     lockfile_path.write_text(without_active + f"````foo`\n{verity_row}`````\n", encoding="utf-8")
-    run(fixture, True)
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     # Adversarial variant: exact 4-backtick close does close the 4-backtick code span;
     # the enclosed row must be rejected.
     lockfile_path.write_text(without_active + f"````foo`\n{verity_row}````\n", encoding="utf-8")
@@ -157,11 +158,11 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # Verity row is non-rendered and must be rejected.
     lockfile_path.write_text(without_active + f"```foo`\n{verity_row}suffix ``` end\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
-    # Positive adversarial (P2 unequal-inline-run, discussion_r3889585498): an unequal
-    # backtick run embedded inline does not close the code span; the opener is literal
-    # and the enclosed row remains rendered.
+    # Adversarial (discussion_r3889585498 + r3889768393): unequal inline run does not
+    # close the fence code span; however, the trailing backtick in the opener info string
+    # creates an inline code span covering the Verity row — must be rejected.
     lockfile_path.write_text(without_active + f"```foo`\n{verity_row}suffix ```` end\n", encoding="utf-8")
-    run(fixture, True)
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     # Positive regression (discussion_r3889515387): a literal `<!--` inside a backtick
     # code span is code content, not an HTML comment opener; the real Verity row
     # appearing after it must still be found.
@@ -183,6 +184,39 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # Positive: Verity row after a blank-line-closed Type 6 block is rendered.
     lockfile_path.write_text(without_active + f"<div>\nsome content\n\n{verity_row}", encoding="utf-8")
     run(fixture, True)
+    # Regression (P2 multiline-code-span, discussion_r3889768393): a multiline inline
+    # backtick code span (opener and closer on different lines) contains the Verity row;
+    # the span interior must be suppressed so the row is not exposed to the regex.
+    lockfile_path.write_text(without_active + f"``\n{verity_row}``\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: Verity row after a closed multiline backtick span is still rendered.
+    lockfile_path.write_text(without_active + f"``some\nspanning content``\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Regression (P2 Type-7-HTML-block, discussion_r3889768395): CommonMark §4.6 Type 7
+    # block (custom tag on a line by itself) swallows the Verity row; must be rejected.
+    lockfile_path.write_text(without_active + f"<custom-element>\n{verity_row}", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: Verity row after a blank-line-terminated Type 7 block is rendered.
+    lockfile_path.write_text(without_active + f"<custom-element>\nsome content\n\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Regression (P2 whitespace-only-blank-line, discussion_r3889768399): a line with
+    # only spaces/tabs must terminate a blank-line-terminated block; Verity row after it
+    # is rendered (was incorrectly hidden when the line was non-empty but whitespace-only).
+    lockfile_path.write_text(without_active + f"<div>\nsome content\n   \n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Same rule applies for Type 7 blocks.
+    lockfile_path.write_text(without_active + f"<custom-element>\nsome content\n   \n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Regression (P2 same-line-opener-closer, discussion_r3889768402): invalid-fence
+    # opener whose info string already closes the code span on the opener line must not
+    # enter span state; subsequent lines remain rendered.
+    lockfile_path.write_text(without_active + f"```foo```\n{verity_row}```\n", encoding="utf-8")
+    run(fixture, True)
+    # Adversarial: invalid-fence opener whose info string does NOT close the span on the
+    # opener line enters span state; a whole-line closer on a subsequent line discards
+    # the buffered Verity row.
+    lockfile_path.write_text(without_active + f"```foo`\n{verity_row}```\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -191,11 +225,15 @@ print(
     "lockfile Verity pin (HTML comment, unclosed-HTML-comment-to-EOF, equal fence, "
     "indented opener, longer closer, unclosed-at-EOF, backtick-code-span-suppressor, "
     "exact-close-4bt-code-span, inline-exact-close-3bt-code-span, "
-    "script-html-block, div-html-block-to-EOF); "
+    "unequal-3bt-info-backtick-inline-span, unequal-4bt-info-backtick-inline-span, "
+    "unequal-inline-run-info-backtick-span, "
+    "script-html-block, div-html-block-to-EOF, "
+    "multiline-code-span, type-7-html-block, whole-line-closer-code-span); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
-    "unequal-run-code-span-3bt, unequal-run-code-span-4bt, "
-    "unequal-inline-run-code-span-3bt, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
-    "after-closed-script-block, after-blank-line-div-block; "
+    "after-closed-script-block, after-blank-line-div-block, "
+    "after-closed-multiline-span, after-blank-line-type-7-block, "
+    "whitespace-blank-type-6, whitespace-blank-type-7, "
+    "same-line-opener-closer-code-span; "
     "checkout identity agree"
 )

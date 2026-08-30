@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: df7b6cadea85b3fe75b009cd9464d257bd24ccdf
+validated-tree: a747c7b35d1ad3d0f004d7441f931157250928c6
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5224,6 +5224,95 @@ PR #227 P2: CommonMark §4.6 raw HTML block suppression (2026-08-30)
   checkout (`.lake/packages/verity`), not built in this environment; unit-level
   `_strip_non_rendered` tests for all prior and new HTML-block cases verified
   in isolation (13 cases, all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2 batch: multiline code spans, Type 7 HTML blocks, whitespace
+blank lines, same-line fence code-span closer (2026-08-30)
+-----------------------------------------------------------------------
+
+- Bugs (Codex P2, four discussions):
+
+  discussion_r3889768393 — `_strip_html_comments` appended the entire backtick
+  code-span (opener + content + closer) unchanged even when the span's interior
+  crossed a newline.  An adversary could embed the Verity row inside a
+  2-backtick (or higher) multiline inline code span:
+  `` ``\n| Verity | `...` |\n`` ``.  GitHub renders the interior as inline
+  code, not a table row, so the row is not visible; yet the regex matched it
+  inside the old appended span.
+  Fix: in `_strip_html_comments`, when the interior text between the opener's
+  trailing backtick position and the closer's leading backtick position contains
+  `\n`, suppress the entire span (don't append to result).
+
+  discussion_r3889768395 — CommonMark §4.6 Type 7 HTML blocks (an open or
+  close tag on a line by itself, blank-line-terminated) were not detected.  An
+  adversary could use a custom element (`<custom-element>`) to suppress a
+  following Verity row.
+  Fix: add `_HTML7` pattern (`^ {0,3}</?[a-zA-Z][a-zA-Z0-9-]*…[ \t]*$`)
+  and detect it in `_strip_non_rendered`'s HTML-block branch, with
+  `html_block_end = None` (blank-line-terminated, same as Type 6).
+
+  discussion_r3889768399 — The blank-line termination check for Types 6/7
+  used `if not stripped:` (truly empty string), which missed lines containing
+  only spaces or tabs.  CommonMark defines a blank line as one containing only
+  spaces and tabs.
+  Fix: change to `if not stripped.strip():`.
+
+  discussion_r3889768402 — When an invalid fence opener's info string contains
+  a backtick (making it a code-span opener rather than a fence opener), the
+  code immediately entered span state even if the exact-length closer already
+  appeared on the opener line itself.  Lines following the opener were buffered
+  and either hidden (if a subsequent closer was found) or restored (if no
+  closer before EOF).  The same-line-closer case should not enter span state
+  at all — the span opens and closes on one line, making the line rendered
+  content and the following lines (including the Verity row) also rendered.
+  Fix: before entering code-span state, search for an exact-length closer in
+  `m.group(2)` (the info string / rest of the opener line); if found, add
+  the opener line to `out` and set `is_code_span = False`.
+
+- Side effect of discussion_r3889768393 fix: the trailing backtick in info
+  strings such as `` ```foo` `` forms a real CommonMark §6.1 inline code span
+  in `_strip_html_comments` that covers `| Verity | ` in the restored buffer.
+  Three tests previously marked positive (discussions r3889515392 and
+  r3889585498 "unequal run" variants) are now correctly rejected: the Verity
+  row in those inputs is not in a rendered table row.  Their test comments and
+  expected values have been updated accordingly.
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (r3889768393): `` ``\n{verity_row}``\n `` — row inside
+    multiline 2-bt code span → rejected.
+  - Positive: `` ``some\nspanning content``\n{verity_row} `` — row after a
+    closed multiline span is rendered → accepted.
+  - Negative (r3889768395): `<custom-element>\n{verity_row}` — row inside
+    Type 7 block (extends to EOF) → rejected.
+  - Positive: `<custom-element>\ncontent\n\n{verity_row}` — row after
+    blank-line-closed Type 7 block → accepted.
+  - Positive (r3889768399): `<div>\ncontent\n   \n{verity_row}` — whitespace-
+    only blank line terminates Type 6 block → row after it accepted.
+  - Positive: `<custom-element>\ncontent\n   \n{verity_row}` — same for
+    Type 7 block.
+  - Positive (r3889768402): `` ```foo```\n{verity_row}```\n `` — same-line
+    closer on opener line; row after opener is rendered → accepted.
+  - Negative: `` ```foo`\n{verity_row}```\n `` — no same-line closer;
+    whole-line closer hides row → rejected.
+  - Updated negative: three former positive "unequal-run" variants
+    (discussions r3889515392, r3889585498) now correctly rejected due to
+    info-backtick inline span covering `| Verity | `.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  28 prior and new cases verified in isolation (all pass).
 - No production Lean files changed; the `sorry`/`admit`/new-axiom/
   `native_decide` scan is empty.
 - Receipt subject: tracked tree excluding this receipt, recorded as

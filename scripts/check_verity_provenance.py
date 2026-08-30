@@ -44,7 +44,9 @@ def _strip_html_comments(text: str) -> str:
 
     A literal ``<!--`` inside a code span such as ``Literal `<!--` marker`` is code
     content, not an HTML comment opener; the active rendered row following it must
-    not be suppressed.
+    not be suppressed.  Multiline code spans (opener and closer on different lines)
+    have their interior suppressed so that a Verity row inside the span cannot be
+    exposed to the caller's regex.
     """
     result: list[str] = []
     i = 0
@@ -62,7 +64,11 @@ def _strip_html_comments(text: str) -> str:
                     while lo < n and text[lo] == "`":
                         lo += 1
                     if lo - k == run_len:
-                        result.append(text[i:lo])
+                        # Multiline code spans: content between opener and closer
+                        # spans multiple lines; suppress the interior so that a
+                        # Verity row inside the span is not exposed to the regex.
+                        if "\n" not in text[j:k]:
+                            result.append(text[i:lo])
                         i = lo
                         break
                     k = lo
@@ -112,6 +118,11 @@ _HTML6 = re.compile(
     r")(?:[\s>]|/>|$)",
     re.IGNORECASE,
 )
+# Type 7: any other open/close tag on a line by itself (blank-line-terminated).
+# Must not start a paragraph (i.e. must be on a line by itself with no following text).
+_HTML7 = re.compile(
+    r"^ {0,3}</?[a-zA-Z][a-zA-Z0-9-]*(?:\s[^<>]*)?\s*/?>[ \t]*$"
+)
 
 
 def _strip_non_rendered(text: str) -> str:
@@ -135,16 +146,19 @@ def _strip_non_rendered(text: str) -> str:
     closer is found before EOF the code span is unmatched, the opener is literal,
     and all enclosed lines are restored as rendered content.
 
-    HTML block rules (CommonMark §4.6, Types 1, 3–6):
+    HTML block rules (CommonMark §4.6, Types 1, 3–7):
     - Type 1: ``<script|pre|style|textarea>`` … ``</tag>``
     - Type 3: ``<?`` … ``?>``
     - Type 4: ``<!UPPER`` … ``>``
     - Type 5: ``<![CDATA[`` … ``]]>``
     - Type 6: block-level open/close tag … blank line
+    - Type 7: any other open/close tag alone on a line … blank line
     The opener line and all lines up to and including the end-condition line are
-    suppressed.  For blank-line-terminated blocks (Type 6) the blank line itself
-    is not part of the block.  Type 2 (``<!-- … -->``) is handled separately by
-    _strip_html_comments, which correctly skips code-span content.
+    suppressed.  For blank-line-terminated blocks (Types 6–7) the blank line itself
+    is not part of the block; CommonMark defines a blank line as containing only
+    spaces and tabs, not merely the empty string.  Type 2 (``<!-- … -->``) is
+    handled separately by _strip_html_comments, which correctly skips code-span
+    content, including multiline code spans whose interior spans multiple lines.
     """
     out: list[str] = []
     in_fence = False
@@ -189,9 +203,10 @@ def _strip_non_rendered(text: str) -> str:
                     in_fence = False
         elif in_html_block:
             if html_block_end is None:
-                # Type 6: blank-line-terminated; blank line ends the block but is
-                # not itself part of it.
-                if not stripped:
+                # Type 6/7: blank-line-terminated; blank line ends the block but is
+                # not itself part of it.  CommonMark defines a blank line as one
+                # containing only spaces and tabs (not merely the empty string).
+                if not stripped.strip():
                     in_html_block = False
                     out.append(line)
             elif html_block_end.search(stripped):
@@ -206,10 +221,26 @@ def _strip_non_rendered(text: str) -> str:
                 # fence opener (§4.5); it forms a code span (§6.1) whose closer must
                 # be the exact same backtick-run length, not merely ≥.
                 is_code_span = fence_char == "`" and "`" in m.group(2)
-                code_span_buffer = [line] if is_code_span else []
-                in_fence = True
+                if is_code_span:
+                    # §6.1: if the exact-length closer already appears on the opener
+                    # line (in the info string / remaining text), the code span opens
+                    # and closes on the same line; treat the line as rendered content.
+                    closes_on_opener = re.search(
+                        r"(?<!" + re.escape(fence_char) + r")"
+                        + re.escape(fence_char) + r"{" + str(fence_min_len) + r"}(?!"
+                        + re.escape(fence_char) + r")",
+                        m.group(2),
+                    )
+                    if closes_on_opener:
+                        out.append(line)
+                        is_code_span = False
+                    else:
+                        code_span_buffer = [line]
+                        in_fence = True
+                else:
+                    in_fence = True
             else:
-                # CommonMark §4.6 HTML block detection (Types 1, 3–6).
+                # CommonMark §4.6 HTML block detection (Types 1, 3–7).
                 # Opener line is always suppressed; if the end condition is also met
                 # on the opener line the block closes immediately without entering
                 # the in_html_block state.
@@ -233,6 +264,9 @@ def _strip_non_rendered(text: str) -> str:
                         in_html_block = True
                         html_block_end = _HTML4_END
                 elif _HTML6.match(stripped):
+                    in_html_block = True
+                    html_block_end = None
+                elif _HTML7.match(stripped):
                     in_html_block = True
                     html_block_end = None
                 else:
