@@ -324,6 +324,39 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Adversarial (P2 escaped-link-title-delimiter, discussion_r3890135509): a
+    # backslash-escaped quote before the Verity row in a quoted link title is title
+    # content (CommonMark §2.4), not the closing delimiter; the scanner must not stop
+    # early and expose the following lines.  A file whose only pin appearance is
+    # inside such a title must be rejected.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "note \\"\n{verity_row.rstrip()}\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive (discussion_r3890135509): real Verity row after a link whose title
+    # contains an escaped delimiter is rendered and must be accepted.
+    lockfile_path.write_text(
+        without_active + f'[link](url "note \\"\ncontinued")\n{verity_row}',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive (P2 unterminated-link-title, discussion_r3890135511): a blank line
+    # before the Verity row terminates the link-title attempt (CommonMark does not
+    # allow titles to span blank lines); the row that follows the blank line is
+    # rendered at the start of a new line and must be accepted.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "bad\n\n{verity_row}',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Adversarial (discussion_r3890135511): unterminated link title followed by a
+    # blank line exposing a wrong pin renders literally; the checker must reject.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "bad\n\n| Verity | `{OTHER}` |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -340,7 +373,8 @@ print(
     "unicode-whitespace-fence-close, multiline-inline-html-tag, "
     "invalid-tag-before-comment, double-backslash-comment, "
     "comment-synthesis, span-synthesis, "
-    "multiline-link-title, unterminated-quoted-tag-wrong-pin); "
+    "multiline-link-title, unterminated-quoted-tag-wrong-pin, "
+    "escaped-link-title-delimiter, unterminated-link-title-wrong-pin); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -351,6 +385,7 @@ print(
     "ascii-space-fence-close, after-single-line-inline-html-tag, "
     "valid-inline-tag-within-text, backslash-escaped-comment-opener, "
     "single-line-comment-in-verity-row, "
-    "after-multiline-link-title, unterminated-quoted-tag-real-pin; "
+    "after-multiline-link-title, unterminated-quoted-tag-real-pin, "
+    "after-escaped-link-title-delimiter, unterminated-link-title-real-pin; "
     "checkout identity agree"
 )

@@ -72,7 +72,12 @@ def _strip_html_comments(text: str) -> str:
     destination and optional title are scanned.  The title interior (between
     quote or parenthesis delimiters) is suppressed — only newlines are preserved —
     so that a Verity row placed inside a multiline link title cannot match as a
-    rendered row.
+    rendered row.  CommonMark §2.4 backslash escapes inside the title are honoured:
+    a ``\\"`` or ``\\'`` is title content, not the closing delimiter, so the scan
+    continues past it.  An unterminated title (no closing delimiter before EOF) or
+    a link missing its closing ``)`` is not a valid CommonMark link; suppression is
+    deferred: the ``]`` is re-emitted and ``(`` re-scanned, leaving any Verity row
+    that follows visible to the regex.
 
     Line-boundary invariant: every stripped region (HTML comment, multiline code
     span, link title interior) is replaced by exactly as many ``\\n`` characters
@@ -195,21 +200,24 @@ def _strip_html_comments(text: str) -> str:
             # CommonMark inline link ](destination "title"): suppress title
             # interior while preserving physical line boundaries so a Verity row
             # embedded in a multiline link title cannot match as a rendered row.
-            result.append("](")
+            # All output is buffered; only committed to result when the full link
+            # syntax (destination + optional title + closing ')') is validated so
+            # that an unterminated title or missing ')' leaves content visible.
+            link_buf: list[str] = ["]("]
             j = i + 2
             # Pass through leading whitespace (preserving newlines)
             while j < n and text[j] in (" ", "\t", "\n"):
-                result.append(text[j])
+                link_buf.append(text[j])
                 j += 1
             # Destination: <...> or undelimited (no spaces, balanced parens)
             if j < n and text[j] == "<":
-                result.append("<")
+                link_buf.append("<")
                 j += 1
                 while j < n and text[j] not in (">", "\n"):
-                    result.append(text[j])
+                    link_buf.append(text[j])
                     j += 1
                 if j < n and text[j] == ">":
-                    result.append(">")
+                    link_buf.append(">")
                     j += 1
             else:
                 depth = 0
@@ -221,26 +229,43 @@ def _strip_html_comments(text: str) -> str:
                         depth += 1
                     elif c == ")":
                         depth -= 1
-                    result.append(c)
+                    link_buf.append(c)
                     j += 1
             # Whitespace between destination and optional title
             while j < n and text[j] in (" ", "\t", "\n"):
-                result.append(text[j])
+                link_buf.append(text[j])
                 j += 1
-            # Optional title: suppress interior, preserve newlines only
+            # Optional title: suppress interior, preserve newlines only.
+            # CommonMark §2.4: a backslash-escaped delimiter is title content, not
+            # the closing delimiter; skip both so an escaped quote cannot prematurely
+            # end the scan.  Unterminated titles set title_valid=False so the ']' is
+            # re-emitted and '(' re-scanned, leaving subsequent content visible.
+            title_valid = True
             if j < n and text[j] in ('"', "'"):
                 q = text[j]
-                result.append(q)
+                link_buf.append(q)
                 j += 1
-                while j < n and text[j] != q:
+                while j < n:
+                    if text[j] == "\\":
+                        # §2.4: skip backslash and the escaped character; an escaped
+                        # delimiter is title content, not the closer.
+                        j += 1
+                        if j < n:
+                            if text[j] == "\n":
+                                link_buf.append("\n")
+                            j += 1
+                        continue
+                    if text[j] == q:
+                        link_buf.append(q)
+                        j += 1
+                        break
                     if text[j] == "\n":
-                        result.append("\n")
+                        link_buf.append("\n")
                     j += 1
-                if j < n:
-                    result.append(q)
-                    j += 1
+                else:
+                    title_valid = False
             elif j < n and text[j] == "(":
-                result.append("(")
+                link_buf.append("(")
                 j += 1
                 depth = 0
                 while j < n:
@@ -251,20 +276,30 @@ def _strip_html_comments(text: str) -> str:
                             break
                         depth -= 1
                     if text[j] == "\n":
-                        result.append("\n")
+                        link_buf.append("\n")
                     j += 1
                 if j < n:
-                    result.append(")")
+                    link_buf.append(")")
                     j += 1
+                else:
+                    title_valid = False
+            if not title_valid:
+                result.append("]")
+                i += 1
+                continue
             # Skip trailing whitespace before closing ')'
             while j < n and text[j] in (" ", "\t"):
-                result.append(text[j])
+                link_buf.append(text[j])
                 j += 1
-            # Closing ')'
+            # Closing ')': only commit link_buf if found; otherwise re-emit ']'.
             if j < n and text[j] == ")":
-                result.append(")")
+                link_buf.append(")")
                 j += 1
-            i = j
+                result.extend(link_buf)
+                i = j
+            else:
+                result.append("]")
+                i += 1
         else:
             result.append(text[i])
             i += 1
