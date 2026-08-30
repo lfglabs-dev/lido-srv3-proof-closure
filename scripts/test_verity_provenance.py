@@ -255,6 +255,26 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # attribute) is rendered.
     lockfile_path.write_text(without_active + f'<span title="foo">\n{verity_row}', encoding="utf-8")
     run(fixture, True)
+    # Regression (P2 invalid-tag-before-comment, discussion_r3889941662): '<x ' is not
+    # a valid CommonMark §6.6 inline tag (a '<' in attribute position is invalid); the
+    # inline-tag scanner must abort so that the following '<!--' is re-scanned as a real
+    # HTML comment opener and the Verity row inside the comment is stripped.
+    lockfile_path.write_text(without_active + f"<x <!--\n{verity_row}-->\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: '<x>' is a well-formed inline tag (no invalid chars); Verity row after it
+    # is rendered.
+    lockfile_path.write_text(without_active + f"<x>\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Regression (P2 backslash-escaped-comment-opener, discussion_r3889941663): CommonMark
+    # §2.4 backslash before '<' makes it a literal character; '\<!--' must NOT be treated
+    # as an HTML comment opener.  Falsely treating it as one would strip everything to EOF
+    # including the real Verity row — a false positive rejection of a valid lockfile.
+    lockfile_path.write_text(without_active + f"\\<!--\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Adversarial: even number of preceding backslashes (escaped backslash + unescaped '<');
+    # '\\<!--' IS a real HTML comment; Verity row inside it must be stripped.
+    lockfile_path.write_text(without_active + f"\\\\<!--\n{verity_row}-->\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -268,7 +288,8 @@ print(
     "script-html-block, div-html-block-to-EOF, "
     "multiline-code-span, type-7-html-block, whole-line-closer-code-span, "
     "escaped-backtick-html-comment, type-7-quoted-angle-bracket, "
-    "unicode-whitespace-fence-close, multiline-inline-html-tag); "
+    "unicode-whitespace-fence-close, multiline-inline-html-tag, "
+    "invalid-tag-before-comment, double-backslash-comment); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -276,6 +297,7 @@ print(
     "whitespace-blank-type-6, whitespace-blank-type-7, "
     "same-line-opener-closer-code-span, "
     "double-backslash-backtick-code-span, after-blank-line-type-7-quoted-angle, "
-    "ascii-space-fence-close, after-single-line-inline-html-tag; "
+    "ascii-space-fence-close, after-single-line-inline-html-tag, "
+    "valid-inline-tag-no-attrs, backslash-escaped-comment-opener; "
     "checkout identity agree"
 )

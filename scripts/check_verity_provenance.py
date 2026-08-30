@@ -52,6 +52,17 @@ def _strip_html_comments(text: str) -> str:
     backslashes is a literal character, not a code-span delimiter.  Escaped
     backticks such as ``\\`<!--\\`` do not form a code span, so the ``<!--``
     between them is correctly recognised as an HTML comment opener.
+
+    The same §2.4 rule applies to ``<``: a ``<`` preceded by an odd number of
+    backslashes is literal text, so ``\\<!--`` must NOT be treated as an HTML
+    comment opener.  The preceding backslash run is counted before entering the
+    comment branch, identical to the handling for escaped backticks.
+
+    CommonMark §6.6 inline HTML tags: when scanning an open/close tag, a ``<``
+    appearing in attribute position (outside a quoted value) means the tag is not
+    a valid CommonMark inline tag.  The scanner aborts and falls back to emitting
+    only the initial ``<`` so that subsequent constructs (e.g. ``<!--``) are
+    re-scanned and handled correctly.
     """
     result: list[str] = []
     i = 0
@@ -95,11 +106,23 @@ def _strip_html_comments(text: str) -> str:
                 result.append(text[i:j])
                 i = j
         elif text[i : i + 4] == "<!--":
-            end = text.find("-->", i + 4)
-            if end >= 0:
-                i = end + 3
+            # CommonMark §2.4: a '<' preceded by an odd number of backslashes is
+            # escaped (literal '<'); '<!--' is then NOT an HTML comment opener and
+            # must not consume subsequent content.
+            num_bs = 0
+            p = i - 1
+            while p >= 0 and text[p] == "\\":
+                num_bs += 1
+                p -= 1
+            if num_bs % 2 == 1:
+                result.append("<")
+                i += 1
             else:
-                break
+                end = text.find("-->", i + 4)
+                if end >= 0:
+                    i = end + 3
+                else:
+                    break
         elif text[i] == "<" and i + 1 < n and (text[i + 1].isalpha() or text[i + 1] == "/"):
             # CommonMark §6.6 inline HTML open/close tag: scan through attributes,
             # suppressing any quoted attribute value whose content spans multiple lines.
@@ -109,6 +132,7 @@ def _strip_html_comments(text: str) -> str:
             while j < n and (text[j].isalnum() or text[j] in "-:_/"):
                 j += 1
             tag_out: list[str] = [text[i:j]]
+            valid = True
             while j < n:
                 if text[j] in ('"', "'"):
                     q = text[j]
@@ -124,11 +148,20 @@ def _strip_html_comments(text: str) -> str:
                     tag_out.append(">")
                     j += 1
                     break
+                elif text[j] == "<":
+                    # '<' in attribute position is not valid CommonMark §6.6 inline-tag
+                    # grammar; abort so the '<' and any following '<!--' are re-scanned.
+                    valid = False
+                    break
                 else:
                     tag_out.append(text[j])
                     j += 1
-            result.extend(tag_out)
-            i = j
+            if valid:
+                result.extend(tag_out)
+                i = j
+            else:
+                result.append("<")
+                i += 1
         else:
             result.append(text[i])
             i += 1
