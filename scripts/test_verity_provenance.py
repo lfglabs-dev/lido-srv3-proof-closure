@@ -589,6 +589,69 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (P2 block-quote continuation, discussion_r3890609664): consecutive
+    # '>'-prefixed lines continue one block quote rather than starting a new block, so
+    # a label opener stays live across them and the link's multiline title really is
+    # link metadata.  Clearing the opener at the continuation marker left the ']('
+    # literal and exposed the pin inside the title as if it were a canonical row.
+    lockfile_path.write_text(
+        without_active + f'> [outer\n> ](url "bad\n{verity_row.rstrip()}\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive family (discussion_r3890609664): a line holding only block-quote markers
+    # is blank inside the quote, and a deeper marker opens a nested quote; both end the
+    # paragraph, so no link forms and the Verity row is rendered and must be accepted.
+    for interrupt in (">", ">>", "> \t"):
+        lockfile_path.write_text(
+            without_active + f'> [outer\n{interrupt}\n> ](url "bad\n{verity_row.rstrip()}\ncontinued")\n',
+            encoding="utf-8",
+        )
+        run(fixture, True)
+    lockfile_path.write_text(
+        without_active + f'> [outer\n>> ](url "bad\n{verity_row.rstrip()}\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive (discussion_r3890609664): suppressing the block-quote link title must not
+    # reach past it, so a genuine row after the quote is still seen even though the
+    # title holds a wrong pin.
+    lockfile_path.write_text(
+        without_active + f'> [outer\n> ](url "bad\n| Verity | `{OTHER}` |\ncontinued")\n\n{verity_row}',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive family (P2 GFM table boundaries, discussion_r3890624447): GFM splits a
+    # table row into cells before parsing inlines, so a link may span neither the
+    # newline between two rows nor a '|' cell separator.  Retaining link state across
+    # them let an unterminated title in an earlier cell swallow the genuinely rendered
+    # Verity row and reject a valid lockfile.
+    lido_row = next(l for l in original_lockfile.splitlines(keepends=True) if "| Lido core |" in l)
+    for broken in ('| Lido core | [x](url "bad\n', '| Lido core [x | ](url "bad |\n'):
+        lockfile_path.write_text(
+            original_lockfile.replace(lido_row, broken).replace(
+                verity_row, verity_row + '| n | x ") |\n'
+            ),
+            encoding="utf-8",
+        )
+        run(fixture, True)
+    # Control (discussion_r3890624447): the same pipe-shaped lines in a paragraph are
+    # not a GFM table — no delimiter row — so the link does form and its multiline
+    # title is still suppressed; the file must stay rejected.
+    lockfile_path.write_text(
+        without_active + f'| Lido core | [x](url "bad\n{verity_row.rstrip()}\n| n | x ") |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (discussion_r3890624447): a wrong pin on a rendered table row is not
+    # hidden by a neighbouring cell's broken link and must still be rejected.
+    lockfile_path.write_text(
+        original_lockfile.replace(lido_row, '| Lido core | [x](url "bad\n').replace(
+            verity_row, f'| Verity | `{OTHER}` |\n| n | x ") |\n'
+        ),
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -615,7 +678,8 @@ print(
     "cross-block-label-opener-wrong-pin, same-block-label-opener-title, "
     "nested-link-outer-opener-wrong-pin, unnested-outer-link-title, "
     "nested-image-outer-link-title-family, nonblank-boundary-opener-wrong-pin, "
-    "no-space-hash-same-block-opener-title); "
+    "no-space-hash-same-block-opener-title, block-quote-continuation-title, "
+    "non-table-pipe-lines-title, table-row-wrong-pin); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -637,6 +701,8 @@ print(
     "unopened-link-label-family, "
     "cross-block-label-opener, whitespace-blank-cross-block-label-opener, "
     "nested-link-outer-deactivation-family, "
-    "nested-image-outer-link-row-after, nonblank-leaf-boundary-opener-family; "
+    "nested-image-outer-link-row-after, nonblank-leaf-boundary-opener-family, "
+    "block-quote-interrupt-family, block-quote-title-row-after, "
+    "gfm-table-row-boundary, gfm-table-cell-boundary; "
     "checkout identity agree"
 )

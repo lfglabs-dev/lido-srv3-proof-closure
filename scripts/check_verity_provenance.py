@@ -8,6 +8,7 @@ import json
 import re
 import subprocess
 import sys
+from bisect import bisect_left
 from pathlib import Path
 from typing import NoReturn
 
@@ -57,28 +58,143 @@ def _escaped_at(text: str, i: int) -> bool:
 _ATX_HEADING = re.compile(r"^ {0,3}#{1,6}(?:[ \t]|$)")
 _THEMATIC_BREAK = re.compile(r"^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$")
 _BLOCK_QUOTE = re.compile(r"^ {0,3}>")
+_BLOCK_QUOTE_PREFIX = re.compile(r"^ {0,3}(?:>[ \t]?)+")
+
+
+def _block_quote_split(line: str) -> tuple[int, str]:
+    """Return the block-quote nesting depth of ``line`` and its content."""
+    marker = _BLOCK_QUOTE_PREFIX.match(line)
+    if marker is None:
+        return 0, line
+    return marker.group(0).count(">"), line[marker.end():]
 
 
 def _crosses_block_boundary(text: str, i: int) -> bool:
     """True when the newline at ``i`` separates two CommonMark leaf blocks.
 
-    A blank line always ends a block.  An ATX heading or thematic break is a
-    one-line leaf block, so a newline ending one is a boundary even when the next
-    line is ordinary text; conversely those forms and a block quote begin a new
-    leaf block, so a newline preceding one is a boundary too.
+    Block-quote markers are stripped from both lines first, because a ``>``
+    marker only starts a new block quote when it is *deeper* than the one
+    already open: at equal depth it continues the block, and at lower depth (or
+    with no marker at all) the line is a lazy continuation of the same
+    paragraph.  Treating every ``>`` line as a new block cleared label openers
+    mid-paragraph, so ``> [outer\\n> ](url "…")`` formed no link and a Verity row
+    hidden in its multiline title was wrongly exposed as a canonical pin.
+
+    The remaining tests run against the content after the markers.  A blank line
+    always ends a block, and so does a line holding only block-quote markers.  An
+    ATX heading or thematic break is a one-line leaf block, so a newline ending
+    one is a boundary even when the next line is ordinary text; conversely those
+    forms begin a new leaf block, so a newline preceding one is a boundary too.
     """
     end = text.find("\n", i + 1)
     following = text[i + 1:] if end < 0 else text[i + 1:end]
-    if following.strip(" \t") == "":
-        return True
     ended = text[text.rfind("\n", 0, i) + 1:i]
-    if _ATX_HEADING.match(ended) or _THEMATIC_BREAK.match(ended):
+    ended_depth, ended_content = _block_quote_split(ended)
+    following_depth, following_content = _block_quote_split(following)
+    if following_content.strip(" \t") == "":
+        return True
+    if _ATX_HEADING.match(ended_content) or _THEMATIC_BREAK.match(ended_content):
+        return True
+    if following_depth > ended_depth:
         return True
     return bool(
-        _ATX_HEADING.match(following)
-        or _THEMATIC_BREAK.match(following)
-        or _BLOCK_QUOTE.match(following)
+        _ATX_HEADING.match(following_content)
+        or _THEMATIC_BREAK.match(following_content)
     )
+
+
+# GFM §4.10 tables.  A delimiter cell is a run of '-' with optional alignment colons.
+_TABLE_DELIMITER_CELL = re.compile(r"^[ \t]*:?-+:?[ \t]*$")
+_LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d{1,9}[.)])(?:[ \t]|$)")
+
+
+def _unescaped_pipes(line: str) -> list[int]:
+    """Offsets within ``line`` of the ``|`` characters that delimit GFM cells."""
+    return [k for k, ch in enumerate(line) if ch == "|" and not _escaped_at(line, k)]
+
+
+def _table_cells(line: str) -> list[str]:
+    """Split a GFM table row into cells; leading and trailing pipes are optional."""
+    if not _unescaped_pipes(line):
+        return []
+    body = line.strip(" \t")
+    if body.startswith("|"):
+        body = body[1:]
+    if body.endswith("|") and not _escaped_at(body, len(body) - 1):
+        body = body[:-1]
+    cells: list[str] = []
+    start = 0
+    for k in _unescaped_pipes(body):
+        cells.append(body[start:k])
+        start = k + 1
+    cells.append(body[start:])
+    return cells
+
+
+def _ends_table(line: str) -> bool:
+    """True when ``line`` cannot continue a GFM table body.
+
+    Deliberately stricter than _crosses_block_boundary, because the two err in
+    opposite directions.  Running a table region past its real end would split
+    inline contexts GFM keeps together and could expose content hidden in a link
+    title, whereas ending a region early only leaves inline state uncleared,
+    which over-suppresses.  A continuation row must therefore carry an unescaped
+    pipe and start no other block structure.
+    """
+    return (
+        not _unescaped_pipes(line)
+        or line.strip(" \t") == ""
+        or bool(_ATX_HEADING.match(line))
+        or bool(_THEMATIC_BREAK.match(line))
+        or bool(_BLOCK_QUOTE.match(line))
+        or bool(_LIST_ITEM.match(line))
+    )
+
+
+def _table_separators(text: str) -> list[int]:
+    """Ascending offsets of the GFM table cell and row separators in ``text``.
+
+    GFM splits a table row into cells before inline parsing, so a link label,
+    destination or title may not span a ``|`` cell separator nor the newline
+    between two rows.  Recognition is conservative — a header row plus a
+    delimiter row with the same cell count is required — so a construct that is
+    not certainly a table leaves inline parsing unchanged.
+    """
+    lines: list[tuple[int, str, int]] = []
+    offset = 0
+    for raw in text.splitlines(keepends=True):
+        line = raw.rstrip("\n").rstrip("\r")
+        lines.append((offset, line, offset + len(raw) - 1 if raw.endswith("\n") else -1))
+        offset += len(raw)
+    separators: list[int] = []
+    row = 0
+    while row + 1 < len(lines):
+        columns = len(_table_cells(lines[row][1]))
+        delimiter = _table_cells(lines[row + 1][1])
+        if (
+            columns == 0
+            or _ends_table(lines[row][1])
+            or len(delimiter) != columns
+            or not all(_TABLE_DELIMITER_CELL.match(cell) for cell in delimiter)
+        ):
+            row += 1
+            continue
+        end = row + 2
+        while end < len(lines) and not _ends_table(lines[end][1]):
+            end += 1
+        for index in range(row, end):
+            start, line, newline = lines[index]
+            separators.extend(start + k for k in _unescaped_pipes(line))
+            if index + 1 < end and newline >= 0:
+                separators.append(newline)
+        row = end
+    return separators
+
+
+def _separator_in(separators: list[int], low: int, high: int) -> bool:
+    """True when any recorded separator offset lies in ``[low, high)``."""
+    k = bisect_left(separators, low)
+    return k < len(separators) and separators[k] < high
 
 
 def _strip_html_comments(text: str) -> str:
@@ -121,11 +237,19 @@ def _strip_html_comments(text: str) -> str:
     Inlines are parsed independently within each block, so pending label openers
     are cleared as the scan crosses a leaf-block boundary.  A blank line ends a
     block; so do the nonblank transitions recognised by _crosses_block_boundary
-    (ATX heading, thematic break, block quote).  An unmatched ``[`` in an earlier
-    block therefore cannot be consumed by a ``](`` in a later one; the later text
-    is not a link and any Verity row inside its apparent title stays visible.  No
-    valid link spans a block boundary, so clearing there cannot expose genuine
-    link metadata.
+    (ATX heading, thematic break, deeper block quote).  An unmatched ``[`` in an
+    earlier block therefore cannot be consumed by a ``](`` in a later one; the
+    later text is not a link and any Verity row inside its apparent title stays
+    visible.  No valid link spans a block boundary, so clearing there cannot
+    expose genuine link metadata.
+
+    GFM applies the same rule one level finer inside a table: a row is split into
+    cells before its inlines are parsed, so no link may span a ``|`` cell
+    separator or the newline between two rows.  Openers are cleared at those
+    separators too, and a link whose destination or title would reach across one
+    is not formed — the ``]`` is re-emitted so that a genuinely rendered Verity
+    row on a later table row is never suppressed by an unterminated title in an
+    earlier cell.
 
     Links may not contain links, but they may contain images.  Openers therefore
     record whether they are image (``![``) or link (``[``) openers: forming a link
@@ -159,6 +283,7 @@ def _strip_html_comments(text: str) -> str:
     # still consumes its ']' but can no longer form a link.  Image openers ('![')
     # are tracked separately because links may contain images.
     open_labels: list[tuple[bool, bool]] = []
+    table_separators = _table_separators(text)
     i = 0
     n = len(text)
     while i < n:
@@ -276,12 +401,16 @@ def _strip_html_comments(text: str) -> str:
             open_labels.append((i > 0 and text[i - 1] == "!" and not _escaped_at(text, i - 1), True))
             result.append("[")
             i += 1
-        elif text[i] == "\n" and _crosses_block_boundary(text, i):
-            # CommonMark parses inlines independently within each block.  A label
-            # opener left unmatched in an earlier block cannot be consumed by a '('
-            # in a later one, so pending openers are cleared at the boundary.
+        elif text[i] in ("\n", "|") and (
+            _separator_in(table_separators, i, i + 1)
+            or (text[i] == "\n" and _crosses_block_boundary(text, i))
+        ):
+            # CommonMark parses inlines independently within each block, and GFM
+            # parses each table cell independently within a row.  A label opener
+            # left unmatched before either kind of boundary cannot be consumed by
+            # a '(' after it, so pending openers are cleared at both.
             open_labels.clear()
-            result.append("\n")
+            result.append(text[i])
             i += 1
         elif text[i] == "]" and not _escaped_at(text, i) and open_labels:
             # An unescaped ']' consumes its opener whether or not an inline link is
@@ -398,8 +527,11 @@ def _strip_html_comments(text: str) -> str:
             while j < n and text[j] in (" ", "\t"):
                 link_buf.append(text[j])
                 j += 1
-            # Closing ')': only commit link_buf if found; otherwise re-emit ']'.
-            if j < n and text[j] == ")":
+            # Closing ')': only commit link_buf if found and the whole construct
+            # stays inside one GFM table cell; otherwise re-emit ']'.  A link that
+            # would span a cell or row separator is not formed by GFM, so its
+            # apparent title must stay visible rather than suppress a rendered row.
+            if j < n and text[j] == ")" and not _separator_in(table_separators, i, j):
                 link_buf.append(")")
                 j += 1
                 result.extend(link_buf)
