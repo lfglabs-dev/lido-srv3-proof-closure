@@ -91,6 +91,13 @@ def check(root: Path) -> str:
     if source_map_revision != requested_revision:
         fail("source-map Verity revision differs from the lakefile request")
 
+    lockfile_text = (root / "proofs/LOCKFILE.md").read_text(encoding="utf-8")
+    lockfile_matches = re.findall(r"^\|\s*Verity\s*\|\s*`([0-9a-f]{40})`\s*\|", lockfile_text, re.MULTILINE)
+    if len(lockfile_matches) != 1:
+        fail("proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    if lockfile_matches[0] != requested_revision:
+        fail(f"proofs/LOCKFILE.md Verity pin {lockfile_matches[0]!r} differs from the lakefile request")
+
     checkout = root / ".lake/packages/verity"
     if not checkout.is_dir():
         fail(f"resolved Verity checkout {checkout} not found")

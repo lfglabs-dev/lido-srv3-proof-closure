@@ -10,7 +10,7 @@ import Verity.Core.Model.Denote
 `FunctionSpec` performing an external call cannot be connected to the
 external-call trace.  This module re-establishes the load-bearing half of that
 claim as a *machine-checked fact at the currently pinned head*
-`04729a9de9099e065dd09283e4f733a5fd4c2a16`, so that it cannot silently rot the
+`e977aaad6e1a9e92e0132d41b3d33a14135a4d46`, so that it cannot silently rot the
 way the prose document did.
 
 The pinned deep EDSL does have first-class external calls: `Expr.call`,
