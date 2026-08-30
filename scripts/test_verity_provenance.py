@@ -139,13 +139,37 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # (discussion_r3889471379)
     lockfile_path.write_text(without_active + f"```foo`\n{verity_row}```\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive regression (discussion_r3889515392): invalid-info opener followed by a
+    # longer-run close — the run lengths differ so the code span is never closed; the
+    # opener is treated as literal and all enclosed lines remain rendered.
+    lockfile_path.write_text(without_active + f"```foo`\n{verity_row}````\n", encoding="utf-8")
+    run(fixture, True)
+    # Adversarial variant: same rule at 4-backtick opener length — 5-backtick run does
+    # not close the 4-backtick code span, so the row remains rendered.
+    lockfile_path.write_text(without_active + f"````foo`\n{verity_row}`````\n", encoding="utf-8")
+    run(fixture, True)
+    # Adversarial variant: exact 4-backtick close does close the 4-backtick code span;
+    # the enclosed row must be rejected.
+    lockfile_path.write_text(without_active + f"````foo`\n{verity_row}````\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive regression (discussion_r3889515387): a literal `<!--` inside a backtick
+    # code span is code content, not an HTML comment opener; the real Verity row
+    # appearing after it must still be found.
+    lockfile_path.write_text(without_active + f"Literal `<!--` marker\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Adversarial variant: double-backtick code span with `<!--` inside.
+    lockfile_path.write_text(without_active + f"Literal ``<!--`` marker\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
     "Verity provenance mutants rejected: exact lakefile request, request uniqueness, "
     "manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, "
     "lockfile Verity pin (HTML comment, unclosed-HTML-comment-to-EOF, equal fence, "
-    "indented opener, longer closer, unclosed-at-EOF, backtick-code-span-suppressor); "
-    "positive gates: baseline, fenced-literal-unclosed-HTML-comment; "
+    "indented opener, longer closer, unclosed-at-EOF, backtick-code-span-suppressor, "
+    "exact-close-4bt-code-span); "
+    "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
+    "unequal-run-code-span-3bt, unequal-run-code-span-4bt, "
+    "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span; "
     "checkout identity agree"
 )

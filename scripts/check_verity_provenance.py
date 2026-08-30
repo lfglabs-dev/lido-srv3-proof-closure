@@ -39,6 +39,50 @@ def load_json(path: Path) -> dict[str, object]:
     return value
 
 
+def _strip_html_comments(text: str) -> str:
+    """Remove HTML comments, skipping backtick code spans (CommonMark §6.1).
+
+    A literal ``<!--`` inside a code span such as ``Literal `<!--` marker`` is code
+    content, not an HTML comment opener; the active rendered row following it must
+    not be suppressed.
+    """
+    result: list[str] = []
+    i = 0
+    n = len(text)
+    while i < n:
+        if text[i] == "`":
+            j = i
+            while j < n and text[j] == "`":
+                j += 1
+            run_len = j - i
+            k = j
+            while k < n:
+                if text[k] == "`":
+                    lo = k
+                    while lo < n and text[lo] == "`":
+                        lo += 1
+                    if lo - k == run_len:
+                        result.append(text[i:lo])
+                        i = lo
+                        break
+                    k = lo
+                else:
+                    k += 1
+            else:
+                result.append(text[i:j])
+                i = j
+        elif text[i : i + 4] == "<!--":
+            end = text.find("-->", i + 4)
+            if end >= 0:
+                i = end + 3
+            else:
+                break
+        else:
+            result.append(text[i])
+            i += 1
+    return "".join(result)
+
+
 def _strip_non_rendered(text: str) -> str:
     """Remove CommonMark fenced code blocks then HTML comments from Markdown text.
 
@@ -49,14 +93,19 @@ def _strip_non_rendered(text: str) -> str:
     - opener: 0–3 spaces of indentation, then 3+ identical `` ` `` or ``~`` chars
     - closer: same character, at least as many chars as the opener, optional trailing space
     - unclosed fence: extends to EOF
-    Any line whose leading backtick or tilde run matches the opener pattern enters
-    non-rendered state; lines with a backtick in the info string also form multiline
-    code spans and are equally non-table content.
+    For backtick openers whose info string contains a backtick, CommonMark treats the
+    run as a code-span opener (§6.1) rather than a fence opener.  Code-span closers
+    must have the same exact length as their opener (not merely ≥), so the fence
+    ``{N,}`` closer rule does not apply.  If no exact-length closer is found before
+    EOF the code span is unmatched, the opener is literal, and all enclosed lines are
+    restored as rendered content.
     """
     out: list[str] = []
     in_fence = False
     fence_char = ""
     fence_min_len = 0
+    is_code_span = False
+    code_span_buffer: list[str] = []
     for line in text.splitlines(keepends=True):
         stripped = line.rstrip("\r\n")
         if not in_fence:
@@ -64,16 +113,42 @@ def _strip_non_rendered(text: str) -> str:
             if m:
                 fence_char = m.group(1)[0]
                 fence_min_len = len(m.group(1))
+                # Backtick opener with a backtick in its info string is not a valid
+                # fence opener (§4.5); it forms a code span (§6.1) whose closer must
+                # be the exact same backtick-run length, not merely ≥.
+                is_code_span = fence_char == "`" and "`" in m.group(2)
+                code_span_buffer = [line] if is_code_span else []
                 in_fence = True
             else:
                 out.append(line)
         else:
-            if re.match(
-                r"^ {0,3}" + re.escape(fence_char) + r"{" + str(fence_min_len) + r",}\s*$",
-                stripped,
-            ):
-                in_fence = False
-    return re.sub(r"<!--.*?(?:-->|\Z)", "", "".join(out), flags=re.DOTALL)
+            if is_code_span:
+                closes = re.match(
+                    r"^ {0,3}"
+                    + re.escape(fence_char)
+                    + r"{"
+                    + str(fence_min_len)
+                    + r"}(?!"
+                    + re.escape(fence_char)
+                    + r")\s*$",
+                    stripped,
+                )
+                if closes:
+                    in_fence = False
+                    is_code_span = False
+                    code_span_buffer = []
+                else:
+                    code_span_buffer.append(line)
+            else:
+                if re.match(
+                    r"^ {0,3}" + re.escape(fence_char) + r"{" + str(fence_min_len) + r",}\s*$",
+                    stripped,
+                ):
+                    in_fence = False
+    # Unmatched code span: the opener was literal in CommonMark; restore all lines.
+    if in_fence and is_code_span:
+        out.extend(code_span_buffer)
+    return _strip_html_comments("".join(out))
 
 
 def check(root: Path) -> str:
