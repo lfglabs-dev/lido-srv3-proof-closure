@@ -63,6 +63,12 @@ def _strip_html_comments(text: str) -> str:
     a valid CommonMark inline tag.  The scanner aborts and falls back to emitting
     only the initial ``<`` so that subsequent constructs (e.g. ``<!--``) are
     re-scanned and handled correctly.
+
+    Line-boundary invariant: every stripped region (HTML comment, multiline code
+    span) is replaced by exactly as many ``\\n`` characters as the region contained.
+    This ensures that content on different physical source lines remains on different
+    lines in the output and cannot be concatenated by stripping into a synthesized
+    ``| Verity | pin |`` row that does not exist in the rendered Markdown.
     """
     result: list[str] = []
     i = 0
@@ -92,11 +98,13 @@ def _strip_html_comments(text: str) -> str:
                     while lo < n and text[lo] == "`":
                         lo += 1
                     if lo - k == run_len:
-                        # Multiline code spans: content between opener and closer
-                        # spans multiple lines; suppress the interior so that a
-                        # Verity row inside the span is not exposed to the regex.
                         if "\n" not in text[j:k]:
                             result.append(text[i:lo])
+                        else:
+                            # Multiline code span: suppress the interior but preserve
+                            # physical line boundaries so that content on different
+                            # physical lines cannot be concatenated by span removal.
+                            result.append("\n" * text[i:lo].count("\n"))
                         i = lo
                         break
                     k = lo
@@ -120,6 +128,10 @@ def _strip_html_comments(text: str) -> str:
             else:
                 end = text.find("-->", i + 4)
                 if end >= 0:
+                    # Preserve physical line boundaries: replace the stripped comment
+                    # with the same number of newlines it contained so that content on
+                    # different physical lines is not concatenated by comment removal.
+                    result.append("\n" * text[i : end + 3].count("\n"))
                     i = end + 3
                 else:
                     break
@@ -415,7 +427,9 @@ def check(root: Path) -> str:
         fail("source-map Verity revision differs from the lakefile request")
 
     lockfile_text = (root / "proofs/LOCKFILE.md").read_text(encoding="utf-8")
-    lockfile_matches = re.findall(r"^\|\s*Verity\s*\|\s*`([0-9a-f]{40})`\s*\|", _strip_non_rendered(lockfile_text), re.MULTILINE)
+    # Use [ \t]* instead of \s* so the match is confined to a single physical line;
+    # \s* would match \n and allow stripped regions to be bridged across line boundaries.
+    lockfile_matches = re.findall(r"^\|[ \t]*Verity[ \t]*\|[ \t]*`([0-9a-f]{40})`[ \t]*\|", _strip_non_rendered(lockfile_text), re.MULTILINE)
     if len(lockfile_matches) != 1:
         fail("proofs/LOCKFILE.md must contain exactly one Verity pin row")
     if lockfile_matches[0] != requested_revision:

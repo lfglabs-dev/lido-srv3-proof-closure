@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 1b2220317e57f79c650a49f6dcf4963e6331744f
+validated-tree: 5b9f28a37e11e74e984ac276728807e3ea41fb7d
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5487,6 +5487,79 @@ PR #227 P2: abort inline-tag scan on invalid char; honour §2.4 escape before
   checkout (`.lake/packages/verity`), not built in this environment;
   unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
   41 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: preserve line boundaries when stripping HTML comments and code spans;
+confine lockfile row regex to single physical line (2026-08-30)
+------------------------------------------------------------------------
+
+- Bug (Codex P2, discussion_r3889978820):
+
+  `_strip_html_comments` removed HTML comments (and suppressed multiline code
+  spans) by discarding the matched region entirely, including any embedded newlines.
+  This caused content from two separate physical source lines to be concatenated
+  in the output.  For example, a file containing:
+
+      | Verity <!-- anything
+      --> | `<pin>` |
+
+  After stripping the comment `<!-- anything\n-->`, the function returned
+  `| Verity  | `<pin>` |` — a single synthesized line that matches the Verity row
+  regex, producing a false-positive acceptance despite the Verity label and pin
+  living on different physical lines and therefore never forming a rendered table
+  row.
+
+  The same synthesis was possible with a suppressed multiline code span:
+
+      | Verity ``anycontent
+      `` | `<pin>` |
+
+  Fix 1 — Line-boundary invariant: replace any stripped region (HTML comment or
+  multiline code-span interior) with exactly as many `"\n"` characters as the
+  region contained.  Single-line spans and comments produce no newlines and are
+  unaffected.  Multiline regions now leave behind the newline skeleton, so content
+  from different physical lines stays on different lines.
+
+  Fix 2 — Confine lockfile row regex to a single physical line: change `\s*` to
+  `[ \t]*` in the `re.findall` call that extracts Verity pins.  In `re.MULTILINE`
+  mode, `\s*` matches `\n`, so even with the newline preserved in the stripped
+  output the pattern could still bridge across it.  `[ \t]*` matches only ASCII
+  space and horizontal tab, keeping each match within one physical line.
+
+  Both fixes are necessary: Fix 1 alone cannot prevent synthesis if the regex
+  can span newlines; Fix 2 alone cannot prevent synthesis if the stripping
+  itself erases the newline separator.
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (comment-synthesis, r3889978820): `| Verity <!-- anything\n--> |
+    \`<pin>\` |\n` — multiline comment stripped with newline preserved; row
+    regex confined to one line → rejected.
+  - Positive (single-line comment): `| Verity <!-- note --> | \`<pin>\` |\n` —
+    single-line comment stripped; synthesized row is the real row on one line →
+    accepted.
+  - Negative (span-synthesis, r3889978820): `| Verity ``anycontent\n`` |
+    \`<pin>\` |\n` — multiline code span suppressed with newline preserved;
+    row regex confined to one line → rejected.
+  - Also corrected a Round 6 positive test whose input `<x>\n{verity_row}` was
+    incorrect: `<x>` alone on its own line is a CommonMark Type 7 HTML block
+    opener that suppresses the following row; corrected to `text <x> end\n{verity_row}`
+    (inline tag in mixed-text context) which is rendered normally.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  54 prior and new cases verified in isolation (all pass).
 - No production Lean files changed; the `sorry`/`admit`/new-axiom/
   `native_decide` scan is empty.
 - Receipt subject: tracked tree excluding this receipt, recorded as
