@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 97735f48987412e74d7021cc92e15b9724915c00
+validated-tree: 1895628615cb32a8e0496606b341882e78d1eb51
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5371,6 +5371,64 @@ attributes (2026-08-30)
   checkout (`.lake/packages/verity`), not built in this environment;
   unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
   33 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: ASCII-only fence-close whitespace; multiline inline HTML tag
+suppression (2026-08-30)
+------------------------------------------------------------------------
+
+- Bugs (Codex P2, two discussions):
+
+  discussion_r3889901971 — The closing-fence regex used `\s*$` to allow trailing
+  whitespace after the fence character run.  Python's `\s` matches any Unicode
+  whitespace, including characters such as U+2003 EM SPACE.  CommonMark §4.5
+  explicitly restricts the trailing portion to "spaces only" (ASCII U+0020); any
+  other whitespace character means the line is not a valid closer and the fence
+  remains open.  An attacker could write ```` ``` ```` + EM SPACE so the checker
+  mistakenly closed the fence, exposing a Verity row placed on the following line
+  (which CommonMark still treats as inside the open fence).
+  Fix: replace `\s*$` with `[ ]*$` in the fence-closer regex; only ASCII spaces
+  are allowed as trailing whitespace on a closing fence line.
+
+  discussion_r3889901979 — `_strip_html_comments` did not handle inline HTML open
+  tags (CommonMark §6.6) that span multiple lines via quoted attribute values.
+  An attacker could write `<span title="\n| Verity | … |\n">` so that the Verity
+  row is the content of the quoted attribute value, not rendered table content.
+  `_strip_non_rendered` only removes block-level HTML; the inline tag was left
+  intact, and `_strip_html_comments` passed the attribute content through to the
+  regex unchanged.
+  Fix: add a new branch in `_strip_html_comments` for `<[A-Za-z]` / `</[A-Za-z]`
+  that scans through the tag character by character.  When a quoted attribute value
+  (`"…"` or `'…'`) contains `\n`, its interior is suppressed (replaced by the
+  empty string between the two quote characters) so that a Verity row inside it
+  cannot be seen by the caller's regex.  Single-line attribute values and tag
+  content outside quotes are preserved unchanged.
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (r3889901971): ```` ``` ````\nsome content\n```` ``` ````+EM SPACE\n{verity_row}
+    — Unicode whitespace does not close the fence; Verity row suppressed → rejected.
+  - Positive: ```` ``` ````\nsome content\n```` ``` ````+three ASCII spaces\n{verity_row}
+    — ASCII trailing spaces are valid; fence closed, Verity row rendered → accepted.
+  - Negative (r3889901979): `<span title="\n{verity_row}">\n`
+    — Verity row inside multiline quoted attribute is raw HTML → rejected.
+  - Positive: `<span title="foo">\n{verity_row}`
+    — Verity row after a single-line inline HTML tag is rendered → accepted.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  37 prior and new cases verified in isolation (all pass).
 - No production Lean files changed; the `sorry`/`admit`/new-axiom/
   `native_decide` scan is empty.
 - Receipt subject: tracked tree excluding this receipt, recorded as

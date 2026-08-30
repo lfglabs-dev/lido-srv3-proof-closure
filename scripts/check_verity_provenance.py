@@ -100,6 +100,35 @@ def _strip_html_comments(text: str) -> str:
                 i = end + 3
             else:
                 break
+        elif text[i] == "<" and i + 1 < n and (text[i + 1].isalpha() or text[i + 1] == "/"):
+            # CommonMark §6.6 inline HTML open/close tag: scan through attributes,
+            # suppressing any quoted attribute value whose content spans multiple lines.
+            # A Verity row placed inside a multiline quoted attribute (e.g.
+            # <span title="\n| Verity |…\n">) is raw HTML, not rendered table content.
+            j = i + 1
+            while j < n and (text[j].isalnum() or text[j] in "-:_/"):
+                j += 1
+            tag_out: list[str] = [text[i:j]]
+            while j < n:
+                if text[j] in ('"', "'"):
+                    q = text[j]
+                    j += 1
+                    qs = j
+                    while j < n and text[j] != q:
+                        j += 1
+                    content = text[qs:j]
+                    if j < n:
+                        j += 1  # skip closing quote
+                    tag_out.append(q + ("" if "\n" in content else content) + q)
+                elif text[j] == ">":
+                    tag_out.append(">")
+                    j += 1
+                    break
+                else:
+                    tag_out.append(text[j])
+                    j += 1
+            result.extend(tag_out)
+            i = j
         else:
             result.append(text[i])
             i += 1
@@ -220,7 +249,7 @@ def _strip_non_rendered(text: str) -> str:
                     code_span_buffer.append(line)
             else:
                 if re.match(
-                    r"^ {0,3}" + re.escape(fence_char) + r"{" + str(fence_min_len) + r",}\s*$",
+                    r"^ {0,3}" + re.escape(fence_char) + r"{" + str(fence_min_len) + r",}[ ]*$",
                     stripped,
                 ):
                     in_fence = False

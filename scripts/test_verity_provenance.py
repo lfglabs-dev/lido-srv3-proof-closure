@@ -237,6 +237,24 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # contains a quoted ">" attribute is rendered.
     lockfile_path.write_text(without_active + f'<custom-element title="a > b">\nsome content\n\n{verity_row}', encoding="utf-8")
     run(fixture, True)
+    # Regression (P2 unicode-whitespace-fence-close, discussion_r3889901971): CommonMark
+    # §4.5 permits only ASCII spaces after a closing fence, not Unicode whitespace.  A
+    # "closer" followed by U+2003 EM SPACE must not close the fence; the Verity row inside
+    # the open fence must remain suppressed.
+    lockfile_path.write_text(without_active + f"```\nsome content\n``` \n{verity_row}", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: fence closer followed by ASCII spaces only is valid; Verity row after it is rendered.
+    lockfile_path.write_text(without_active + f"```\nsome content\n```   \n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Regression (P2 multiline-inline-html-tag, discussion_r3889901979): a Verity row
+    # embedded inside a multiline quoted attribute value of an inline HTML open tag is
+    # raw HTML (CommonMark §6.6), not rendered table content; must be rejected.
+    lockfile_path.write_text(without_active + f'<span title="\n{verity_row}">\n', encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: Verity row that follows an inline HTML open tag (single-line, no multiline
+    # attribute) is rendered.
+    lockfile_path.write_text(without_active + f'<span title="foo">\n{verity_row}', encoding="utf-8")
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -249,13 +267,15 @@ print(
     "unequal-inline-run-info-backtick-span, "
     "script-html-block, div-html-block-to-EOF, "
     "multiline-code-span, type-7-html-block, whole-line-closer-code-span, "
-    "escaped-backtick-html-comment, type-7-quoted-angle-bracket); "
+    "escaped-backtick-html-comment, type-7-quoted-angle-bracket, "
+    "unicode-whitespace-fence-close, multiline-inline-html-tag); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
     "after-closed-multiline-span, after-blank-line-type-7-block, "
     "whitespace-blank-type-6, whitespace-blank-type-7, "
     "same-line-opener-closer-code-span, "
-    "double-backslash-backtick-code-span, after-blank-line-type-7-quoted-angle; "
+    "double-backslash-backtick-code-span, after-blank-line-type-7-quoted-angle, "
+    "ascii-space-fence-close, after-single-line-inline-html-tag; "
     "checkout identity agree"
 )
