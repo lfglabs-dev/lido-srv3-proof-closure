@@ -117,10 +117,20 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # Regression: row only inside a fenced code block must not qualify
     lockfile_path.write_text(without_active + f"```\n{verity_row}```\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Regression: opener indented up to 3 spaces is still a valid fence opener
+    lockfile_path.write_text(without_active + f"   ```\n{verity_row}```\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Regression: closer longer than opener still closes the fence
+    lockfile_path.write_text(without_active + f"```\n{verity_row}````\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Regression: unclosed fence at EOF swallows remaining content
+    lockfile_path.write_text(without_active + f"```\n{verity_row}", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
     "Verity provenance mutants rejected: exact lakefile request, request uniqueness, "
     "manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, "
-    "lockfile Verity pin, and checkout identity agree"
+    "lockfile Verity pin (HTML comment, equal fence, indented opener, longer closer, "
+    "unclosed-at-EOF), and checkout identity agree"
 )

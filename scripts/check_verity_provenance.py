@@ -40,10 +40,35 @@ def load_json(path: Path) -> dict[str, object]:
 
 
 def _strip_non_rendered(text: str) -> str:
-    """Remove HTML comments and fenced code blocks from Markdown text."""
+    """Remove HTML comments and CommonMark fenced code blocks from Markdown text.
+
+    Fenced-block rules followed (CommonMark §4.5):
+    - opener: 0–3 spaces of indentation, then 3+ identical `` ` `` or ``~`` chars
+    - closer: same character, at least as many chars as the opener, optional trailing space
+    - unclosed fence: extends to EOF
+    """
     text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
-    text = re.sub(r"^(`{3,}|~{3,})[^\n]*\n.*?^\1[ \t]*$", "", text, flags=re.MULTILINE | re.DOTALL)
-    return text
+    out: list[str] = []
+    in_fence = False
+    fence_char = ""
+    fence_min_len = 0
+    for line in text.splitlines(keepends=True):
+        stripped = line.rstrip("\r\n")
+        if not in_fence:
+            m = re.match(r"^ {0,3}(`{3,}|~{3,})", stripped)
+            if m:
+                fence_char = m.group(1)[0]
+                fence_min_len = len(m.group(1))
+                in_fence = True
+            else:
+                out.append(line)
+        else:
+            if re.match(
+                r"^ {0,3}" + re.escape(fence_char) + r"{" + str(fence_min_len) + r",}\s*$",
+                stripped,
+            ):
+                in_fence = False
+    return "".join(out)
 
 
 def check(root: Path) -> str:
