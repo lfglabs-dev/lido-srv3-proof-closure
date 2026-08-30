@@ -47,7 +47,7 @@ def _strip_non_rendered(text: str) -> str:
     - closer: same character, at least as many chars as the opener, optional trailing space
     - unclosed fence: extends to EOF
     """
-    text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+    text = re.sub(r"<!--.*?(?:-->|\Z)", "", text, flags=re.DOTALL)
     out: list[str] = []
     in_fence = False
     fence_char = ""
@@ -55,8 +55,8 @@ def _strip_non_rendered(text: str) -> str:
     for line in text.splitlines(keepends=True):
         stripped = line.rstrip("\r\n")
         if not in_fence:
-            m = re.match(r"^ {0,3}(`{3,}|~{3,})", stripped)
-            if m:
+            m = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)", stripped)
+            if m and not (m.group(1)[0] == "`" and "`" in m.group(2)):
                 fence_char = m.group(1)[0]
                 fence_min_len = len(m.group(1))
                 in_fence = True

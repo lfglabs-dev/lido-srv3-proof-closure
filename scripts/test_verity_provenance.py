@@ -114,6 +114,9 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     without_active = original_lockfile.replace(verity_row, "")
     lockfile_path.write_text(without_active + f"<!-- {verity_row.rstrip()} -->\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Regression: unclosed HTML comment running to EOF swallows remaining content (discussion_r3889427978)
+    lockfile_path.write_text(without_active + f"<!--\n{verity_row}", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     # Regression: row only inside a fenced code block must not qualify
     lockfile_path.write_text(without_active + f"```\n{verity_row}```\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
@@ -126,11 +129,17 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # Regression: unclosed fence at EOF swallows remaining content
     lockfile_path.write_text(without_active + f"```\n{verity_row}", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Regression: backtick-fence opener with a backtick in the info string is not a valid
+    # fence opener per CommonMark §4.5; it must not suppress the real rendered Verity row
+    # that follows (discussion_r3889427983)
+    lockfile_path.write_text(without_active + f"```foo`\n{verity_row}```\n", encoding="utf-8")
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
     "Verity provenance mutants rejected: exact lakefile request, request uniqueness, "
     "manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, "
-    "lockfile Verity pin (HTML comment, equal fence, indented opener, longer closer, "
-    "unclosed-at-EOF), and checkout identity agree"
+    "lockfile Verity pin (HTML comment, unclosed-HTML-comment-to-EOF, equal fence, "
+    "indented opener, longer closer, unclosed-at-EOF, backtick-in-info-string-non-fence), "
+    "and checkout identity agree"
 )
