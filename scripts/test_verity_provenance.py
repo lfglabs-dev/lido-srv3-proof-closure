@@ -488,6 +488,63 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Positive (P2 cross-block-label-opener, discussion_r3890483435): CommonMark
+    # parses inlines independently within each block and a blank line ends the
+    # block, so an unmatched '[' in earlier prose cannot be consumed by a '](' in a
+    # later block.  No link exists across that boundary, so the Verity row inside
+    # the apparent title is rendered and must be accepted.
+    lockfile_path.write_text(
+        without_active + f'Intro [ unmatched opener\n\n| Lido core | ](url "bad\n{verity_row.rstrip()}\n| n | x " ) |\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive (discussion_r3890483435): a whitespace-only line is a blank line and
+    # ends the block just the same.
+    lockfile_path.write_text(
+        without_active + f'Intro [ unmatched opener\n \t\n| Lido core | ](url "bad\n{verity_row.rstrip()}\n| n | x " ) |\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Adversarial (discussion_r3890483435): the same cross-block shape exposing a
+    # wrong pin renders literally; the checker must reject it.
+    lockfile_path.write_text(
+        without_active + f'Intro [ unmatched opener\n\n| Lido core | ](url "bad\n| Verity | `{OTHER}` |\n| n | x " ) |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Control (discussion_r3890483435): with no blank line between them the opener
+    # and the '](' share one block, so a genuine link forms.  Title suppression must
+    # be preserved, so a file whose only pin appearance is inside such a title must
+    # still be rejected.
+    lockfile_path.write_text(
+        without_active + f'Intro [ unmatched opener | ](url "bad\n{verity_row.rstrip()}\n| n | x " ) |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive family (P2 nested-link-outer-opener, discussion_r3890483440): links
+    # may not contain links, so forming the inner link deactivates the outer opener
+    # and leaves the second '](' literal.  The Verity row in the apparent title is
+    # rendered and must be accepted, for each title delimiter form.
+    for title in (f'"bad\n{verity_row.rstrip()}\n"', f"'bad\n{verity_row.rstrip()}\n'"):
+        lockfile_path.write_text(
+            without_active + f"[outer [inner](x)](url {title})\n", encoding="utf-8",
+        )
+        run(fixture, True)
+    # Adversarial (discussion_r3890483440): the same nested shape exposing a wrong
+    # pin renders literally; the checker must reject it.
+    lockfile_path.write_text(
+        without_active + f'[outer [inner](x)](url "bad\n| Verity | `{OTHER}` |\n")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Control (discussion_r3890483440): with no nested inner link the outer opener
+    # stays active and forms a genuine link, so its multiline title is still
+    # suppressed and a file whose only pin appearance is inside it stays rejected.
+    lockfile_path.write_text(
+        without_active + f'[outer](url "bad\n{verity_row.rstrip()}\n")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -510,7 +567,9 @@ print(
     "blank-line-closed-link-title-wrong-pin, "
     "backslash-terminated-title-line-wrong-pin, "
     "backslash-newline-multiline-title, "
-    "escaped-bracket-link-title, unopened-label-wrong-pin); "
+    "escaped-bracket-link-title, unopened-label-wrong-pin, "
+    "cross-block-label-opener-wrong-pin, same-block-label-opener-title, "
+    "nested-link-outer-opener-wrong-pin, unnested-outer-link-title); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -529,6 +588,8 @@ print(
     "backslash-terminated-title-line, "
     "backslash-terminated-single-quoted-title, "
     "backslash-terminated-paren-title, "
-    "unopened-link-label-family; "
+    "unopened-link-label-family, "
+    "cross-block-label-opener, whitespace-blank-cross-block-label-opener, "
+    "nested-link-outer-deactivation-family; "
     "checkout identity agree"
 )

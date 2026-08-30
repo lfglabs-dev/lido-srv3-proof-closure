@@ -49,6 +49,14 @@ def _escaped_at(text: str, i: int) -> bool:
     return num_bs % 2 == 1
 
 
+def _blank_line_at(text: str, i: int) -> bool:
+    """True when the line starting at ``i`` holds only spaces and tabs (or is EOF)."""
+    k = i
+    while k < len(text) and text[k] in (" ", "\t"):
+        k += 1
+    return k >= len(text) or text[k] == "\n"
+
+
 def _strip_html_comments(text: str) -> str:
     """Remove HTML comments, skipping backtick code spans (CommonMark §6.1).
 
@@ -86,6 +94,18 @@ def _strip_html_comments(text: str) -> str:
     consumes its opener whether or not a link is formed; in each case the
     intervening text stays visible exactly as CommonMark renders it.
 
+    Inlines are parsed independently within each block, and a blank line ends the
+    current block, so pending label openers are cleared as the scan crosses that
+    boundary.  An unmatched ``[`` in an earlier paragraph therefore cannot be
+    consumed by a ``](`` in a later one; the later text is not a link and any
+    Verity row inside its apparent title stays visible.  No valid link can span a
+    blank line, so clearing there cannot expose genuine link metadata.
+
+    Links may not contain links: once a link is formed, every still-open outer
+    opener is deactivated.  In ``[outer [inner](x)](url "…")`` CommonMark forms
+    the inner link and leaves the second ``](`` literal, so a deactivated opener
+    is still consumed by its ``]`` but forms no link and suppresses nothing.
+
     When a ``](`` does open a link, the link destination and optional title are
     scanned.  The title interior (between
     quote or parenthesis delimiters) is suppressed — only newlines are preserved —
@@ -105,7 +125,9 @@ def _strip_html_comments(text: str) -> str:
     does not exist in the rendered Markdown.
     """
     result: list[str] = []
-    open_labels: list[int] = []
+    # Each entry is the opener's "active" flag: an opener deactivated by a nested
+    # link still consumes its ']' but can no longer form a link.
+    open_labels: list[bool] = []
     i = 0
     n = len(text)
     while i < n:
@@ -219,13 +241,26 @@ def _strip_html_comments(text: str) -> str:
             # Only an unescaped '[' opens a link label.  Openers consumed by an
             # earlier branch (code span, HTML comment, tag, link body) never reach
             # here, matching CommonMark's rule that they open no label.
-            open_labels.append(i)
+            open_labels.append(True)
             result.append("[")
+            i += 1
+        elif text[i] == "\n" and _blank_line_at(text, i + 1):
+            # CommonMark parses inlines independently within each block, and a blank
+            # line ends the current block.  A label opener left unmatched in an
+            # earlier block cannot be consumed by a '](' in a later one, so pending
+            # openers are cleared as the scan crosses the boundary.
+            open_labels.clear()
+            result.append("\n")
             i += 1
         elif text[i] == "]" and not _escaped_at(text, i) and open_labels:
             # An unescaped ']' consumes its opener whether or not an inline link is
             # formed, so a later '](' left without an opener stays literal text.
-            open_labels.pop()
+            # An inactive opener (one deactivated by a nested link) is consumed too,
+            # but forms no link: its ']' stays literal.
+            if not open_labels.pop():
+                result.append("]")
+                i += 1
+                continue
             if i + 1 >= n or text[i + 1] != "(":
                 result.append("]")
                 i += 1
@@ -337,6 +372,9 @@ def _strip_html_comments(text: str) -> str:
                 j += 1
                 result.extend(link_buf)
                 i = j
+                # Links may not contain links: forming this one deactivates every
+                # still-open outer opener, so its later '](' stays literal text.
+                open_labels = [False] * len(open_labels)
             else:
                 result.append("]")
                 i += 1
