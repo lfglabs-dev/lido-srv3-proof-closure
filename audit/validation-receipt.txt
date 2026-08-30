@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: a747c7b35d1ad3d0f004d7441f931157250928c6
+validated-tree: 97735f48987412e74d7021cc92e15b9724915c00
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5313,6 +5313,64 @@ blank lines, same-line fence code-span closer (2026-08-30)
   checkout (`.lake/packages/verity`), not built in this environment;
   unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
   28 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: escaped backticks before HTML comments; quoted ">" in Type 7
+attributes (2026-08-30)
+------------------------------------------------------------------------
+
+- Bugs (Codex P2, two discussions):
+
+  discussion_r3889868433 — `_strip_html_comments` did not honour CommonMark §2.4
+  backslash escapes for backtick characters.  The sequence `\`<!--\`` contains
+  two backslash-escaped backticks (literals), not a code span.  But the loop
+  treated the first `` ` `` as a code-span opener, matching the second `` ` ``
+  as the closer with `<!--` as the (single-line, non-multiline) content.  The
+  `<!--` was therefore never seen as an HTML comment opener; the Verity row
+  between `\`<!--\`` and `-->` remained visible to the regex.
+  Fix: before treating a `` ` `` as a code-span opener, count consecutive
+  preceding backslashes; if the count is odd the backtick is escaped
+  (CommonMark §2.4) and treated as a literal character, not a delimiter.
+
+  discussion_r3889868441 — The `_HTML7` pattern used `[^<>]*` for the
+  attribute portion of a Type 7 tag opener.  This rejected any `>` in the
+  attribute text, even a `>` inside a quoted attribute value such as
+  `title="a > b"`.  CommonMark §4.6 explicitly allows quoted values to contain
+  `>`; an attacker could use `<custom-element title="a > b">` as an opener
+  that the old pattern did not recognise, leaving the Verity row visible.
+  Fix: replace `[^<>]*` with the full CommonMark §4.6 attribute grammar:
+  zero-or-more attribute tokens each of the form `name` or `name=value` where
+  value is double-quoted (`"[^"]*"`), single-quoted (`'[^']*'`), or unquoted
+  (`[^"'=<>` `` ` `` `\x00-\x1f\s]+`).
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (r3889868433): `\`<!--\`\n{verity_row}-->\n` — escaped backticks
+    do not form a code span; `<!--...-->` is an HTML comment and the Verity row
+    inside it is stripped → rejected.
+  - Positive: `\\``<!--``\n{verity_row}` — even number of backslashes (escaped
+    backslash + unescaped backtick) → code span still forms, `<!--` suppressed,
+    Verity row after code span remains visible → accepted.
+  - Negative (r3889868441): `<custom-element title="a > b">\n{verity_row}` —
+    quoted `>` in attribute is now recognised as a valid Type 7 opener; row
+    inside block → rejected.
+  - Positive: `<custom-element title="a > b">\ncontent\n\n{verity_row}` — row
+    after blank-line-terminated Type 7 block with quoted `>` → accepted.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  33 prior and new cases verified in isolation (all pass).
 - No production Lean files changed; the `sorry`/`admit`/new-axiom/
   `native_decide` scan is empty.
 - Receipt subject: tracked tree excluding this receipt, recorded as

@@ -217,6 +217,26 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # the buffered Verity row.
     lockfile_path.write_text(without_active + f"```foo`\n{verity_row}```\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Regression (P2 escaped-backtick, discussion_r3889868433): backslash-escaped
+    # backticks are literals (CommonMark §2.4), not code-span delimiters.  The sequence
+    # \`<!--\` must not form a code span; the enclosed <!-- must be treated as an HTML
+    # comment opener and the Verity row inside the comment must be stripped.
+    lockfile_path.write_text(without_active + f"\\`<!--\\`\n{verity_row}-->\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: an even number of backslashes before a backtick leaves the backtick
+    # unescaped (code-span delimiter); the `` \`<!--\` `` form still protects the `<!--`
+    # from being treated as a comment opener.
+    lockfile_path.write_text(without_active + f"\\\\`<!--`\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Regression (P2 quoted-angle-bracket, discussion_r3889868441): Type 7 HTML block
+    # openers may contain quoted attribute values with ">"; the [^<>]* attribute pattern
+    # rejected these, leaving the Verity row visible after the opener.
+    lockfile_path.write_text(without_active + f'<custom-element title="a > b">\n{verity_row}', encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: Verity row after a blank-line-terminated Type 7 block whose opener
+    # contains a quoted ">" attribute is rendered.
+    lockfile_path.write_text(without_active + f'<custom-element title="a > b">\nsome content\n\n{verity_row}', encoding="utf-8")
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -228,12 +248,14 @@ print(
     "unequal-3bt-info-backtick-inline-span, unequal-4bt-info-backtick-inline-span, "
     "unequal-inline-run-info-backtick-span, "
     "script-html-block, div-html-block-to-EOF, "
-    "multiline-code-span, type-7-html-block, whole-line-closer-code-span); "
+    "multiline-code-span, type-7-html-block, whole-line-closer-code-span, "
+    "escaped-backtick-html-comment, type-7-quoted-angle-bracket); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
     "after-closed-multiline-span, after-blank-line-type-7-block, "
     "whitespace-blank-type-6, whitespace-blank-type-7, "
-    "same-line-opener-closer-code-span; "
+    "same-line-opener-closer-code-span, "
+    "double-backslash-backtick-code-span, after-blank-line-type-7-quoted-angle; "
     "checkout identity agree"
 )

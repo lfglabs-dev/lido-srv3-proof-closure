@@ -47,12 +47,29 @@ def _strip_html_comments(text: str) -> str:
     not be suppressed.  Multiline code spans (opener and closer on different lines)
     have their interior suppressed so that a Verity row inside the span cannot be
     exposed to the caller's regex.
+
+    CommonMark §2.4 backslash escapes: a backtick preceded by an odd number of
+    backslashes is a literal character, not a code-span delimiter.  Escaped
+    backticks such as ``\\`<!--\\`` do not form a code span, so the ``<!--``
+    between them is correctly recognised as an HTML comment opener.
     """
     result: list[str] = []
     i = 0
     n = len(text)
     while i < n:
         if text[i] == "`":
+            # CommonMark §2.4: a backtick preceded by an odd number of backslashes
+            # is a literal character, not a code-span delimiter.  Count consecutive
+            # preceding backslashes; if the count is odd, the backtick is escaped.
+            num_bs = 0
+            p = i - 1
+            while p >= 0 and text[p] == "\\":
+                num_bs += 1
+                p -= 1
+            if num_bs % 2 == 1:
+                result.append("`")
+                i += 1
+                continue
             j = i
             while j < n and text[j] == "`":
                 j += 1
@@ -119,9 +136,15 @@ _HTML6 = re.compile(
     re.IGNORECASE,
 )
 # Type 7: any other open/close tag on a line by itself (blank-line-terminated).
-# Must not start a paragraph (i.e. must be on a line by itself with no following text).
+# Uses the full CommonMark §4.6 attribute grammar so that quoted attribute values
+# containing ">" are recognised (e.g. title="a > b").  Attribute values may be
+# double-quoted ("[^"]*"), single-quoted ('[^']*'), or unquoted (no whitespace,
+# quotes, =, <, >, or backtick).
 _HTML7 = re.compile(
-    r"^ {0,3}</?[a-zA-Z][a-zA-Z0-9-]*(?:\s[^<>]*)?\s*/?>[ \t]*$"
+    r"^ {0,3}"
+    r"</?[A-Za-z][A-Za-z0-9-]*"
+    r'(?:\s+[A-Za-z_:][A-Za-z0-9_.:-]*(?:\s*=\s*(?:[^"\'=<>`\x00-\x1f\s]+|"[^"]*"|\'[^\']*\'))?)*'
+    r"\s*/?>[ \t]*$"
 )
 
 
