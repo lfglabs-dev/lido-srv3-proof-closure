@@ -83,11 +83,45 @@ def _strip_html_comments(text: str) -> str:
     return "".join(result)
 
 
-def _strip_non_rendered(text: str) -> str:
-    """Remove CommonMark fenced code blocks then HTML comments from Markdown text.
+# CommonMark §4.6 HTML block openers and their end-condition patterns (Types 1, 3–6).
+# Type 2 (<!-- … -->) is handled inline by _strip_html_comments; only the block forms
+# that _strip_html_comments does not cover need the line-by-line pass below.
+_HTML1 = re.compile(
+    r"^ {0,3}<(script|pre|style|textarea)(?:[\s>]|$)", re.IGNORECASE
+)
+_HTML1_END: dict[str, re.Pattern[str]] = {
+    "script": re.compile(r"</script>", re.IGNORECASE),
+    "pre": re.compile(r"</pre>", re.IGNORECASE),
+    "style": re.compile(r"</style>", re.IGNORECASE),
+    "textarea": re.compile(r"</textarea>", re.IGNORECASE),
+}
+_HTML5 = re.compile(r"^ {0,3}<!\[CDATA\[")   # checked before Type 4 (<![)
+_HTML5_END = re.compile(r"\]\]>")
+_HTML3 = re.compile(r"^ {0,3}<\?")
+_HTML3_END = re.compile(r"\?>")
+_HTML4 = re.compile(r"^ {0,3}<![A-Z]")
+_HTML4_END = re.compile(r">")
+_HTML6 = re.compile(
+    r"^ {0,3}</?(?:"
+    r"address|article|aside|base|basefont|blockquote|body|caption|center|"
+    r"col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|"
+    r"figure|footer|form|frame|frameset|h1|h2|h3|h4|h5|h6|head|header|"
+    r"hr|html|iframe|legend|li|link|main|menu|menuitem|meta|nav|noframes|"
+    r"ol|optgroup|option|p|param|search|section|summary|table|tbody|td|"
+    r"tfoot|th|thead|title|tr|track|ul"
+    r")(?:[\s>]|/>|$)",
+    re.IGNORECASE,
+)
 
-    Fences are stripped first: fenced-code contents are literal, so an unclosed
-    ``<!--`` inside a fence must not be treated as an HTML comment opener.
+
+def _strip_non_rendered(text: str) -> str:
+    """Remove CommonMark fenced code blocks, HTML blocks, then HTML comments.
+
+    Processing order: fenced code blocks (§4.5) → HTML blocks (§4.6) → HTML
+    comments (§4.6 Type 2, handled inline by _strip_html_comments).  Each layer
+    is stripped before the next so that a ``<!--`` inside a fence is not treated
+    as a comment opener, and HTML block contents are suppressed before comment
+    scanning.
 
     Fenced-block rules (CommonMark §4.5):
     - opener: 0–3 spaces of indentation, then 3+ identical `` ` `` or ``~`` chars
@@ -100,6 +134,17 @@ def _strip_non_rendered(text: str) -> str:
     closer rule and the whole-line anchor both do not apply.  If no exact-length
     closer is found before EOF the code span is unmatched, the opener is literal,
     and all enclosed lines are restored as rendered content.
+
+    HTML block rules (CommonMark §4.6, Types 1, 3–6):
+    - Type 1: ``<script|pre|style|textarea>`` … ``</tag>``
+    - Type 3: ``<?`` … ``?>``
+    - Type 4: ``<!UPPER`` … ``>``
+    - Type 5: ``<![CDATA[`` … ``]]>``
+    - Type 6: block-level open/close tag … blank line
+    The opener line and all lines up to and including the end-condition line are
+    suppressed.  For blank-line-terminated blocks (Type 6) the blank line itself
+    is not part of the block.  Type 2 (``<!-- … -->``) is handled separately by
+    _strip_html_comments, which correctly skips code-span content.
     """
     out: list[str] = []
     in_fence = False
@@ -107,22 +152,11 @@ def _strip_non_rendered(text: str) -> str:
     fence_min_len = 0
     is_code_span = False
     code_span_buffer: list[str] = []
+    in_html_block = False
+    html_block_end: "re.Pattern[str] | None" = None  # None = blank-line-terminated (Type 6)
     for line in text.splitlines(keepends=True):
         stripped = line.rstrip("\r\n")
-        if not in_fence:
-            m = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)", stripped)
-            if m:
-                fence_char = m.group(1)[0]
-                fence_min_len = len(m.group(1))
-                # Backtick opener with a backtick in its info string is not a valid
-                # fence opener (§4.5); it forms a code span (§6.1) whose closer must
-                # be the exact same backtick-run length, not merely ≥.
-                is_code_span = fence_char == "`" and "`" in m.group(2)
-                code_span_buffer = [line] if is_code_span else []
-                in_fence = True
-            else:
-                out.append(line)
-        else:
+        if in_fence:
             if is_code_span:
                 # CommonMark §6.1: the closer is an exact-length backtick run and
                 # may appear anywhere on the line, not only as a whole-line match.
@@ -153,6 +187,56 @@ def _strip_non_rendered(text: str) -> str:
                     stripped,
                 ):
                     in_fence = False
+        elif in_html_block:
+            if html_block_end is None:
+                # Type 6: blank-line-terminated; blank line ends the block but is
+                # not itself part of it.
+                if not stripped:
+                    in_html_block = False
+                    out.append(line)
+            elif html_block_end.search(stripped):
+                # Types 1, 3–5: closing line is consumed by the block.
+                in_html_block = False
+        else:
+            m = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)", stripped)
+            if m:
+                fence_char = m.group(1)[0]
+                fence_min_len = len(m.group(1))
+                # Backtick opener with a backtick in its info string is not a valid
+                # fence opener (§4.5); it forms a code span (§6.1) whose closer must
+                # be the exact same backtick-run length, not merely ≥.
+                is_code_span = fence_char == "`" and "`" in m.group(2)
+                code_span_buffer = [line] if is_code_span else []
+                in_fence = True
+            else:
+                # CommonMark §4.6 HTML block detection (Types 1, 3–6).
+                # Opener line is always suppressed; if the end condition is also met
+                # on the opener line the block closes immediately without entering
+                # the in_html_block state.
+                m1 = _HTML1.match(stripped)
+                if m1:
+                    tag = m1.group(1).lower()
+                    end_re = _HTML1_END[tag]
+                    if not end_re.search(stripped):
+                        in_html_block = True
+                        html_block_end = end_re
+                elif _HTML5.match(stripped):
+                    if not _HTML5_END.search(stripped):
+                        in_html_block = True
+                        html_block_end = _HTML5_END
+                elif _HTML3.match(stripped):
+                    if not _HTML3_END.search(stripped):
+                        in_html_block = True
+                        html_block_end = _HTML3_END
+                elif _HTML4.match(stripped):
+                    if not _HTML4_END.search(stripped):
+                        in_html_block = True
+                        html_block_end = _HTML4_END
+                elif _HTML6.match(stripped):
+                    in_html_block = True
+                    html_block_end = None
+                else:
+                    out.append(line)
     # Unmatched code span: the opener was literal in CommonMark; restore all lines.
     if in_fence and is_code_span:
         out.extend(code_span_buffer)

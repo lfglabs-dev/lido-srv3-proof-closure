@@ -170,6 +170,19 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # Adversarial variant: double-backtick code span with `<!--` inside.
     lockfile_path.write_text(without_active + f"Literal ``<!--`` marker\n{verity_row}", encoding="utf-8")
     run(fixture, True)
+    # Regression (P2 HTML-block, discussion_r3889642189): CommonMark §4.6 Type 1 raw
+    # HTML block (<script>) swallows the Verity row; must be rejected.
+    lockfile_path.write_text(without_active + f"<script>\n{verity_row}</script>\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: Verity row appearing after the closed <script> block is rendered.
+    lockfile_path.write_text(without_active + f"<script>\nsome script\n</script>\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
+    # Type 6 (block-level tag, blank-line terminated) also suppresses the enclosed row.
+    lockfile_path.write_text(without_active + f"<div>\n{verity_row}", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive: Verity row after a blank-line-closed Type 6 block is rendered.
+    lockfile_path.write_text(without_active + f"<div>\nsome content\n\n{verity_row}", encoding="utf-8")
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -177,10 +190,12 @@ print(
     "manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, "
     "lockfile Verity pin (HTML comment, unclosed-HTML-comment-to-EOF, equal fence, "
     "indented opener, longer closer, unclosed-at-EOF, backtick-code-span-suppressor, "
-    "exact-close-4bt-code-span, inline-exact-close-3bt-code-span); "
+    "exact-close-4bt-code-span, inline-exact-close-3bt-code-span, "
+    "script-html-block, div-html-block-to-EOF); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "unequal-run-code-span-3bt, unequal-run-code-span-4bt, "
     "unequal-inline-run-code-span-3bt, "
-    "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span; "
+    "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
+    "after-closed-script-block, after-blank-line-div-block; "
     "checkout identity agree"
 )

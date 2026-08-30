@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: a0d7967fc5dc3cbdc060044ead46dbe26647a946
+validated-tree: df7b6cadea85b3fe75b009cd9464d257bd24ccdf
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5174,6 +5174,56 @@ PR #227 P2: CommonMark inline code-span closer recognition (2026-08-30)
   checkout (`.lake/packages/verity`), which is not built in this environment;
   unit-level `_strip_non_rendered` tests for all prior and new inline-closer
   cases verified in isolation (exit 0).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: CommonMark §4.6 raw HTML block suppression (2026-08-30)
+--------------------------------------------------------------------
+
+- Bug (Codex P2, discussion_r3889642189): `_strip_non_rendered` stripped
+  fenced code blocks and HTML comments (§4.6 Type 2) but left raw HTML block
+  types 1, 3–6 in place.  An adversary could place the Verity row inside e.g.
+  ``<script>\n| Verity | `…` |\n</script>`` — GitHub Markdown does not render
+  the table row inside a raw HTML block, but the regex still matched it, so
+  the provenance check would incorrectly succeed.
+- Fix: add CommonMark §4.6 HTML block detection to `_strip_non_rendered`.
+  Module-level compiled patterns detect the opener of each type (Types 1, 3–6)
+  and suppress subsequent lines until the type-specific end condition is met:
+  - Type 1 (``<script|pre|style|textarea>``): closes on first line containing
+    the corresponding ``</tag>`` pattern.
+  - Type 3 (``<?``): closes on first line containing ``?>``.
+  - Type 4 (``<!UPPERCASE``): closes on first line containing ``>``.
+  - Type 5 (``<![CDATA[``): closes on first line containing ``]]>``.
+  - Type 6 (block-level open/close tags): blank-line-terminated; the blank
+    line itself is not part of the block.
+  If the opener line also satisfies the end condition, the block closes
+  immediately (one-line block) without entering the multi-line state.  Type 2
+  (``<!-- … -->``) remains handled by `_strip_html_comments`, which already
+  correctly skips code-span content.
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (Type 1): ``<script>\n{verity_row}</script>`` — row inside script
+    block → rejected.
+  - Positive: ``<script>…</script>\n{verity_row}`` — row after closed script
+    block is rendered → accepted.
+  - Negative (Type 6): ``<div>\n{verity_row}`` (no blank line, extends to
+    EOF) → rejected.
+  - Positive: ``<div>\ncontent\n\n{verity_row}`` — row after blank-line-closed
+    div block is rendered → accepted.
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_validation_receipt.py` exit 0.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment; unit-level
+  `_strip_non_rendered` tests for all prior and new HTML-block cases verified
+  in isolation (13 cases, all pass).
 - No production Lean files changed; the `sorry`/`admit`/new-axiom/
   `native_decide` scan is empty.
 - Receipt subject: tracked tree excluding this receipt, recorded as
