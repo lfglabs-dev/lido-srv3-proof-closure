@@ -417,6 +417,44 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, True)
+    # Positive (P2 backslash-terminated-title-line, discussion_r3890306337): a
+    # backslash immediately before a newline must not consume that newline as a
+    # §2.4 escape and skip the blank-line check.  The blank line still voids the
+    # title (CommonMark §6.3), so no link is formed and the Verity row that
+    # follows is rendered and must be accepted.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "bad\\\n\n{verity_row.rstrip()}\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Adversarial (discussion_r3890306337): the same shape exposing a wrong pin
+    # renders literally; the checker must reject it.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "bad\\\n\n| Verity | `{OTHER}` |\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Positive (discussion_r3890306337): the rule holds for the single-quoted form
+    # with a whitespace-only blank line, and for the parenthesized form.
+    lockfile_path.write_text(
+        without_active + f"[anchor](url 'bad\\\n \t\n{verity_row.rstrip()}\ncontinued')\n",
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    lockfile_path.write_text(
+        without_active + f'[anchor](url (bad\\\n\n{verity_row.rstrip()}\ncontinued))\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Control (discussion_r3890306337): a backslash-terminated line NOT followed by
+    # a blank line is a genuine multiline title; the §2.4 escape path must be
+    # preserved and the enclosed row stays suppressed, so a file whose only pin
+    # appearance is inside such a title must still be rejected.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "bad\\\n{verity_row.rstrip()}\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -436,7 +474,9 @@ print(
     "multiline-link-title, unterminated-quoted-tag-wrong-pin, "
     "escaped-link-title-delimiter, unterminated-link-title-wrong-pin, "
     "escaped-close-paren-link-title, escaped-open-paren-link-title, "
-    "blank-line-closed-link-title-wrong-pin); "
+    "blank-line-closed-link-title-wrong-pin, "
+    "backslash-terminated-title-line-wrong-pin, "
+    "backslash-newline-multiline-title); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -451,6 +491,9 @@ print(
     "after-escaped-link-title-delimiter, unterminated-link-title-real-pin, "
     "after-escaped-paren-link-title, blank-line-closed-quoted-title-real-pin, "
     "blank-line-closed-single-quoted-title, blank-line-closed-paren-title, "
-    "unescaped-paren-in-paren-title; "
+    "unescaped-paren-in-paren-title, "
+    "backslash-terminated-title-line, "
+    "backslash-terminated-single-quoted-title, "
+    "backslash-terminated-paren-title; "
     "checkout identity agree"
 )

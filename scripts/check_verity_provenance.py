@@ -258,6 +258,15 @@ def _strip_html_comments(text: str) -> str:
                         if j < n:
                             if text[j] == "\n":
                                 link_buf.append("\n")
+                                # §6.3: escaping the newline must not skip the
+                                # blank-line check; a blank line still voids the
+                                # title even when the preceding line ends in '\'.
+                                k = j + 1
+                                while k < n and text[k] in (" ", "\t"):
+                                    k += 1
+                                if k >= n or text[k] == "\n":
+                                    title_valid = False
+                                    break
                             j += 1
                         continue
                     if ch == closer:
