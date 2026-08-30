@@ -357,6 +357,66 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Adversarial (P2 escaped-paren-link-title, discussion_r3890213116): in a
+    # parenthesized title a backslash-escaped ')' is title content (CommonMark §2.4),
+    # not the closing delimiter.  The scanner must not stop at it and expose the
+    # following lines, so a file whose only pin appearance is inside such a title
+    # must be rejected.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url (note \\)\n{verity_row.rstrip()}\ncontinued))\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (discussion_r3890213116): an escaped '(' inside a parenthesized
+    # title is likewise content and must not disturb delimiter tracking.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url (note \\(\n{verity_row.rstrip()}\ncontinued))\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive (discussion_r3890213116): a real Verity row after a link whose
+    # parenthesized title contains an escaped delimiter is rendered and accepted.
+    lockfile_path.write_text(
+        without_active + f'[link](url (note \\)\ncontinued))\n{verity_row}',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive (P2 blank-line-link-title, discussion_r3890213120): a blank line
+    # inside an attempted title voids the title (CommonMark §6.3) even when a
+    # matching quote and ')' appear later, so the paragraph ends at the blank line
+    # and the following Verity row is rendered and must be accepted.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "bad\n\n{verity_row.rstrip()}\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Adversarial (discussion_r3890213120): the same closed-title shape exposing a
+    # wrong pin renders literally; the checker must reject it.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url "bad\n\n| Verity | `{OTHER}` |\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Positive (discussion_r3890213120): the blank-line rule holds for the
+    # single-quoted and parenthesized title forms as well.
+    lockfile_path.write_text(
+        without_active + f"[anchor](url 'bad\n\n{verity_row.rstrip()}\ncontinued')\n",
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    lockfile_path.write_text(
+        without_active + f'[anchor](url (bad\n\n{verity_row.rstrip()}\ncontinued))\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive (discussion_r3890213116): an unescaped '(' may not appear in a
+    # parenthesized title (CommonMark §6.3), so no link is formed and the Verity
+    # row inside the attempted title stays rendered.
+    lockfile_path.write_text(
+        without_active + f'[anchor](url (note (x)\n{verity_row.rstrip()}\ncontinued))\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -374,7 +434,9 @@ print(
     "invalid-tag-before-comment, double-backslash-comment, "
     "comment-synthesis, span-synthesis, "
     "multiline-link-title, unterminated-quoted-tag-wrong-pin, "
-    "escaped-link-title-delimiter, unterminated-link-title-wrong-pin); "
+    "escaped-link-title-delimiter, unterminated-link-title-wrong-pin, "
+    "escaped-close-paren-link-title, escaped-open-paren-link-title, "
+    "blank-line-closed-link-title-wrong-pin); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -386,6 +448,9 @@ print(
     "valid-inline-tag-within-text, backslash-escaped-comment-opener, "
     "single-line-comment-in-verity-row, "
     "after-multiline-link-title, unterminated-quoted-tag-real-pin, "
-    "after-escaped-link-title-delimiter, unterminated-link-title-real-pin; "
+    "after-escaped-link-title-delimiter, unterminated-link-title-real-pin, "
+    "after-escaped-paren-link-title, blank-line-closed-quoted-title-real-pin, "
+    "blank-line-closed-single-quoted-title, blank-line-closed-paren-title, "
+    "unescaped-paren-in-paren-title; "
     "checkout identity agree"
 )

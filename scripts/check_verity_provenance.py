@@ -236,17 +236,22 @@ def _strip_html_comments(text: str) -> str:
                 link_buf.append(text[j])
                 j += 1
             # Optional title: suppress interior, preserve newlines only.
-            # CommonMark §2.4: a backslash-escaped delimiter is title content, not
-            # the closing delimiter; skip both so an escaped quote cannot prematurely
-            # end the scan.  Unterminated titles set title_valid=False so the ']' is
-            # re-emitted and '(' re-scanned, leaving subsequent content visible.
+            # CommonMark §6.3 admits three title forms ("…", '…', (…)); §2.4 makes a
+            # backslash-escaped delimiter title content rather than the closer, so an
+            # escaped quote or paren cannot prematurely end the scan.  No title is
+            # formed when it is unterminated, when it spans a blank line, or when a
+            # parenthesized title holds an unescaped '('.  Each of those sets
+            # title_valid=False so the ']' is re-emitted and '(' re-scanned, leaving
+            # the subsequent content visible exactly as CommonMark renders it.
             title_valid = True
-            if j < n and text[j] in ('"', "'"):
-                q = text[j]
-                link_buf.append(q)
+            if j < n and text[j] in ('"', "'", "("):
+                opener = text[j]
+                closer = ")" if opener == "(" else opener
+                link_buf.append(opener)
                 j += 1
                 while j < n:
-                    if text[j] == "\\":
+                    ch = text[j]
+                    if ch == "\\":
                         # §2.4: skip backslash and the escaped character; an escaped
                         # delimiter is title content, not the closer.
                         j += 1
@@ -255,31 +260,24 @@ def _strip_html_comments(text: str) -> str:
                                 link_buf.append("\n")
                             j += 1
                         continue
-                    if text[j] == q:
-                        link_buf.append(q)
+                    if ch == closer:
+                        link_buf.append(closer)
                         j += 1
                         break
-                    if text[j] == "\n":
+                    if ch == "(" and opener == "(":
+                        # §6.3: an unescaped '(' may not appear in a parenthesized
+                        # title, so the link is not formed.
+                        title_valid = False
+                        break
+                    if ch == "\n":
                         link_buf.append("\n")
-                    j += 1
-                else:
-                    title_valid = False
-            elif j < n and text[j] == "(":
-                link_buf.append("(")
-                j += 1
-                depth = 0
-                while j < n:
-                    if text[j] == "(":
-                        depth += 1
-                    elif text[j] == ")":
-                        if depth == 0:
+                        k = j + 1
+                        while k < n and text[k] in (" ", "\t"):
+                            k += 1
+                        if k >= n or text[k] == "\n":
+                            # §6.3: a title may not contain a blank line.
+                            title_valid = False
                             break
-                        depth -= 1
-                    if text[j] == "\n":
-                        link_buf.append("\n")
-                    j += 1
-                if j < n:
-                    link_buf.append(")")
                     j += 1
                 else:
                     title_valid = False
