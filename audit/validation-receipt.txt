@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 049bdf9a61796022104fc34c2474ef28cfddb3c5
+validated-tree: cabac8f89cf76e5cdbe5eb56f7fbced223ceab62
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5108,3 +5108,29 @@ R1 report review-basis and Markdown-table closure (2026-08-27)
   changed; the `sorry`/`admit`/new-axiom/`native_decide` scan is empty.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `29d5179a2bfceca2985dcde539ebb0d3d88d7ce4`.
+
+PR #227 LOCKFILE non-rendered-row parser repair (2026-08-30)
+------------------------------------------------------------
+
+- `check_verity_provenance.py` used a raw `re.MULTILINE` regex to find the
+  Verity row in `proofs/LOCKFILE.md`. Because `.` does not match newlines in
+  that mode the pattern still matched a row that was present only inside an
+  HTML comment (`<!-- | Verity | `...` | -->`) or a fenced code block
+  (`` ``` `` / `~~~` delimiters), where GitHub Markdown does not render it.
+  The check would then pass even though no canonical Verity pin appeared in
+  the rendered table.
+- Fix: add `_strip_non_rendered` (strips HTML comments via `re.DOTALL` and
+  fenced blocks via backreference-terminated `re.MULTILINE | re.DOTALL`
+  substitution) and pass its output to the existing `re.findall` instead of
+  the raw file text. No other logic changed.
+- Regression: `test_verity_provenance.py` gains two new mutants that remove
+  the active Verity row and re-insert it exclusively inside an HTML comment
+  and inside a fenced code block; both must be rejected with diagnostic
+  `proofs/LOCKFILE.md must contain exactly one Verity pin row`.
+- `python3 scripts/check_verity_provenance.py` exit 0.
+- `python3 scripts/test_verity_provenance.py` exit 0 (all prior mutants plus
+  the two new non-rendered-region mutants).
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `bash scripts/check_provenance_guards.sh` exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.

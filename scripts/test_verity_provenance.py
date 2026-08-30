@@ -109,6 +109,16 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     run(fixture, False, "proofs/LOCKFILE.md Verity pin")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
+    # Regression: row only inside an HTML comment must not qualify
+    verity_row = next(l for l in original_lockfile.splitlines(keepends=True) if "| Verity |" in l)
+    without_active = original_lockfile.replace(verity_row, "")
+    lockfile_path.write_text(without_active + f"<!-- {verity_row.rstrip()} -->\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Regression: row only inside a fenced code block must not qualify
+    lockfile_path.write_text(without_active + f"```\n{verity_row}```\n", encoding="utf-8")
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    lockfile_path.write_text(original_lockfile, encoding="utf-8")
+
 print(
     "Verity provenance mutants rejected: exact lakefile request, request uniqueness, "
     "manifest rev/inputRev/uniqueness, canonical artifact/audit/source-map pins, "

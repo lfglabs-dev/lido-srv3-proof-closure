@@ -39,6 +39,13 @@ def load_json(path: Path) -> dict[str, object]:
     return value
 
 
+def _strip_non_rendered(text: str) -> str:
+    """Remove HTML comments and fenced code blocks from Markdown text."""
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+    text = re.sub(r"^(`{3,}|~{3,})[^\n]*\n.*?^\1[ \t]*$", "", text, flags=re.MULTILINE | re.DOTALL)
+    return text
+
+
 def check(root: Path) -> str:
     lakefile = (root / "lakefile.lean").read_text(encoding="utf-8")
     requests = re.findall(
@@ -92,7 +99,7 @@ def check(root: Path) -> str:
         fail("source-map Verity revision differs from the lakefile request")
 
     lockfile_text = (root / "proofs/LOCKFILE.md").read_text(encoding="utf-8")
-    lockfile_matches = re.findall(r"^\|\s*Verity\s*\|\s*`([0-9a-f]{40})`\s*\|", lockfile_text, re.MULTILINE)
+    lockfile_matches = re.findall(r"^\|\s*Verity\s*\|\s*`([0-9a-f]{40})`\s*\|", _strip_non_rendered(lockfile_text), re.MULTILINE)
     if len(lockfile_matches) != 1:
         fail("proofs/LOCKFILE.md must contain exactly one Verity pin row")
     if lockfile_matches[0] != requested_revision:
