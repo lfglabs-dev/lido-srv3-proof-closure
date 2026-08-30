@@ -545,6 +545,50 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Negative family (P2 image-vs-link opener, discussion_r3890568409): links may
+    # contain images, so a nested image never deactivates an outer opener and the
+    # outer link still forms.  Its multiline title stays suppressed, so a file whose
+    # only pin appearance is inside it must be rejected in both nesting directions.
+    for shape in ("[outer ![inner](x)]", "![outer [inner](x)]"):
+        lockfile_path.write_text(
+            without_active + f'{shape}(url "bad\n{verity_row.rstrip()}\n")\n',
+            encoding="utf-8",
+        )
+        run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive (discussion_r3890568409): suppressing that title must not reach past
+    # it, so a genuine row after the link is still seen even though the title holds a
+    # wrong pin.
+    lockfile_path.write_text(
+        without_active + f'[outer ![inner](x)](url "bad\n| Verity | `{OTHER}` |\n")\n{verity_row}',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive family (P2 nonblank block boundary, discussion_r3890568411): an ATX
+    # heading, a thematic break and a block quote each start or end a leaf block
+    # without any blank line, so a '[' left open before one cannot be consumed by a
+    # '](' after it.  No link forms, so the Verity row is rendered and must be
+    # accepted.
+    for boundary in ("# Intro [\n", "Intro [\n***\n", "Intro [\n> quoted\n"):
+        lockfile_path.write_text(
+            without_active + f'{boundary}| Lido core | ](url "bad\n{verity_row.rstrip()}\n| n | x " ) |\n',
+            encoding="utf-8",
+        )
+        run(fixture, True)
+    # Adversarial (discussion_r3890568411): the same heading-boundary shape exposing a
+    # wrong pin renders literally; the checker must reject it.
+    lockfile_path.write_text(
+        without_active + f'# Intro [\n| Lido core | ](url "bad\n| Verity | `{OTHER}` |\n| n | x " ) |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
+    # Control (discussion_r3890568411): '#' without a following space is not an ATX
+    # heading, so the lines share one block and a genuine link forms.  Title
+    # suppression must be preserved and the file stays rejected.
+    lockfile_path.write_text(
+        without_active + f'Intro [\n#notheading\n| Lido core | ](url "bad\n{verity_row.rstrip()}\n| n | x " ) |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -569,7 +613,9 @@ print(
     "backslash-newline-multiline-title, "
     "escaped-bracket-link-title, unopened-label-wrong-pin, "
     "cross-block-label-opener-wrong-pin, same-block-label-opener-title, "
-    "nested-link-outer-opener-wrong-pin, unnested-outer-link-title); "
+    "nested-link-outer-opener-wrong-pin, unnested-outer-link-title, "
+    "nested-image-outer-link-title-family, nonblank-boundary-opener-wrong-pin, "
+    "no-space-hash-same-block-opener-title); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -590,6 +636,7 @@ print(
     "backslash-terminated-paren-title, "
     "unopened-link-label-family, "
     "cross-block-label-opener, whitespace-blank-cross-block-label-opener, "
-    "nested-link-outer-deactivation-family; "
+    "nested-link-outer-deactivation-family, "
+    "nested-image-outer-link-row-after, nonblank-leaf-boundary-opener-family; "
     "checkout identity agree"
 )

@@ -49,12 +49,36 @@ def _escaped_at(text: str, i: int) -> bool:
     return num_bs % 2 == 1
 
 
-def _blank_line_at(text: str, i: int) -> bool:
-    """True when the line starting at ``i`` holds only spaces and tabs (or is EOF)."""
-    k = i
-    while k < len(text) and text[k] in (" ", "\t"):
-        k += 1
-    return k >= len(text) or text[k] == "\n"
+# CommonMark leaf-block starters that interrupt a paragraph without a blank line.
+# Only unambiguous forms are listed: list items (whose interruption rules are
+# conditional) and setext underlines (which depend on the preceding line) are
+# deliberately omitted.  Omitting a boundary can only leave a link formed that
+# CommonMark does not form, which over-suppresses; it can never expose content.
+_ATX_HEADING = re.compile(r"^ {0,3}#{1,6}(?:[ \t]|$)")
+_THEMATIC_BREAK = re.compile(r"^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$")
+_BLOCK_QUOTE = re.compile(r"^ {0,3}>")
+
+
+def _crosses_block_boundary(text: str, i: int) -> bool:
+    """True when the newline at ``i`` separates two CommonMark leaf blocks.
+
+    A blank line always ends a block.  An ATX heading or thematic break is a
+    one-line leaf block, so a newline ending one is a boundary even when the next
+    line is ordinary text; conversely those forms and a block quote begin a new
+    leaf block, so a newline preceding one is a boundary too.
+    """
+    end = text.find("\n", i + 1)
+    following = text[i + 1:] if end < 0 else text[i + 1:end]
+    if following.strip(" \t") == "":
+        return True
+    ended = text[text.rfind("\n", 0, i) + 1:i]
+    if _ATX_HEADING.match(ended) or _THEMATIC_BREAK.match(ended):
+        return True
+    return bool(
+        _ATX_HEADING.match(following)
+        or _THEMATIC_BREAK.match(following)
+        or _BLOCK_QUOTE.match(following)
+    )
 
 
 def _strip_html_comments(text: str) -> str:
@@ -94,17 +118,23 @@ def _strip_html_comments(text: str) -> str:
     consumes its opener whether or not a link is formed; in each case the
     intervening text stays visible exactly as CommonMark renders it.
 
-    Inlines are parsed independently within each block, and a blank line ends the
-    current block, so pending label openers are cleared as the scan crosses that
-    boundary.  An unmatched ``[`` in an earlier paragraph therefore cannot be
-    consumed by a ``](`` in a later one; the later text is not a link and any
-    Verity row inside its apparent title stays visible.  No valid link can span a
-    blank line, so clearing there cannot expose genuine link metadata.
+    Inlines are parsed independently within each block, so pending label openers
+    are cleared as the scan crosses a leaf-block boundary.  A blank line ends a
+    block; so do the nonblank transitions recognised by _crosses_block_boundary
+    (ATX heading, thematic break, block quote).  An unmatched ``[`` in an earlier
+    block therefore cannot be consumed by a ``](`` in a later one; the later text
+    is not a link and any Verity row inside its apparent title stays visible.  No
+    valid link spans a block boundary, so clearing there cannot expose genuine
+    link metadata.
 
-    Links may not contain links: once a link is formed, every still-open outer
-    opener is deactivated.  In ``[outer [inner](x)](url "…")`` CommonMark forms
-    the inner link and leaves the second ``](`` literal, so a deactivated opener
-    is still consumed by its ``]`` but forms no link and suppresses nothing.
+    Links may not contain links, but they may contain images.  Openers therefore
+    record whether they are image (``![``) or link (``[``) openers: forming a link
+    deactivates every still-open outer *link* opener, while forming an image
+    deactivates nothing.  In ``[outer [inner](x)](url "…")`` the inner link
+    deactivates the outer opener and the second ``](`` stays literal, whereas in
+    ``[outer ![inner](x)](url "…")`` the outer link is valid and its title is
+    still suppressed.  A deactivated opener is consumed by its ``]`` but forms no
+    link.
 
     When a ``](`` does open a link, the link destination and optional title are
     scanned.  The title interior (between
@@ -125,9 +155,10 @@ def _strip_html_comments(text: str) -> str:
     does not exist in the rendered Markdown.
     """
     result: list[str] = []
-    # Each entry is the opener's "active" flag: an opener deactivated by a nested
-    # link still consumes its ']' but can no longer form a link.
-    open_labels: list[bool] = []
+    # Each entry is (is_image, active).  An opener deactivated by a nested link
+    # still consumes its ']' but can no longer form a link.  Image openers ('![')
+    # are tracked separately because links may contain images.
+    open_labels: list[tuple[bool, bool]] = []
     i = 0
     n = len(text)
     while i < n:
@@ -241,14 +272,14 @@ def _strip_html_comments(text: str) -> str:
             # Only an unescaped '[' opens a link label.  Openers consumed by an
             # earlier branch (code span, HTML comment, tag, link body) never reach
             # here, matching CommonMark's rule that they open no label.
-            open_labels.append(True)
+            # A '[' directly preceded by an unescaped '!' opens an image, not a link.
+            open_labels.append((i > 0 and text[i - 1] == "!" and not _escaped_at(text, i - 1), True))
             result.append("[")
             i += 1
-        elif text[i] == "\n" and _blank_line_at(text, i + 1):
-            # CommonMark parses inlines independently within each block, and a blank
-            # line ends the current block.  A label opener left unmatched in an
-            # earlier block cannot be consumed by a '](' in a later one, so pending
-            # openers are cleared as the scan crosses the boundary.
+        elif text[i] == "\n" and _crosses_block_boundary(text, i):
+            # CommonMark parses inlines independently within each block.  A label
+            # opener left unmatched in an earlier block cannot be consumed by a '('
+            # in a later one, so pending openers are cleared at the boundary.
             open_labels.clear()
             result.append("\n")
             i += 1
@@ -257,7 +288,8 @@ def _strip_html_comments(text: str) -> str:
             # formed, so a later '](' left without an opener stays literal text.
             # An inactive opener (one deactivated by a nested link) is consumed too,
             # but forms no link: its ']' stays literal.
-            if not open_labels.pop():
+            opener_is_image, opener_active = open_labels.pop()
+            if not opener_active:
                 result.append("]")
                 i += 1
                 continue
@@ -372,9 +404,10 @@ def _strip_html_comments(text: str) -> str:
                 j += 1
                 result.extend(link_buf)
                 i = j
-                # Links may not contain links: forming this one deactivates every
-                # still-open outer opener, so its later '](' stays literal text.
-                open_labels = [False] * len(open_labels)
+                # Links may not contain links, but they may contain images, so only
+                # a formed link deactivates outer openers, and only the link ones.
+                if not opener_is_image:
+                    open_labels = [(img, act and img) for img, act in open_labels]
             else:
                 result.append("]")
                 i += 1
