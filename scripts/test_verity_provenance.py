@@ -252,8 +252,9 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     lockfile_path.write_text(without_active + f'<span title="\n{verity_row}">\n', encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
     # Positive: Verity row that follows an inline HTML open tag (single-line, no multiline
-    # attribute) is rendered.
-    lockfile_path.write_text(without_active + f'<span title="foo">\n{verity_row}', encoding="utf-8")
+    # attribute) is rendered.  The tag is inline within a table cell (not alone on a line
+    # that would be classified as a Type 7 HTML block opener).
+    lockfile_path.write_text(without_active + f'| col | <span title="foo"> |\n{verity_row}', encoding="utf-8")
     run(fixture, True)
     # Regression (P2 invalid-tag-before-comment, discussion_r3889941662): '<x ' is not
     # a valid CommonMark §6.6 inline tag (a '<' in attribute position is invalid); the
@@ -292,6 +293,37 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
     # physical lines must not synthesize a matching row; the span's newlines are preserved.
     lockfile_path.write_text(without_active + f"| Verity ``anycontent\n`` | `{PIN}` |\n", encoding="utf-8")
     run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (P2 multiline-link-title, discussion_r3890040884): a Verity row
+    # embedded inside a multiline inline link title is link metadata, not rendered table
+    # content; the checker must reject a lockfile where the only pin appearance is in a
+    # link title.
+    lockfile_path.write_text(
+        without_active + f'[anchor](https://example.com "{verity_row.rstrip()}\n")\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive (discussion_r3890040884): a real Verity row in a rendered table is found
+    # even when a link with a multiline title appears elsewhere in the file.
+    lockfile_path.write_text(
+        without_active + f'[link](https://example.com "note\ncontinued")\n{verity_row}',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive (P2 unterminated-quoted-tag, discussion_r3890040889): an unterminated
+    # quoted HTML attribute renders literally in Markdown; the canonical Verity row that
+    # follows on the next line remains active and must be accepted.
+    lockfile_path.write_text(
+        without_active + f'| col | <span title="\n{verity_row}',
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Adversarial (discussion_r3890040889): re-scanning after an unterminated quoted
+    # attribute still rejects a wrong pin exposed on the next line.
+    lockfile_path.write_text(
+        without_active + f'| col | <span title="\n| Verity | `{OTHER}` |\n',
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md Verity pin")
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -307,7 +339,8 @@ print(
     "escaped-backtick-html-comment, type-7-quoted-angle-bracket, "
     "unicode-whitespace-fence-close, multiline-inline-html-tag, "
     "invalid-tag-before-comment, double-backslash-comment, "
-    "comment-synthesis, span-synthesis); "
+    "comment-synthesis, span-synthesis, "
+    "multiline-link-title, unterminated-quoted-tag-wrong-pin); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -317,6 +350,7 @@ print(
     "double-backslash-backtick-code-span, after-blank-line-type-7-quoted-angle, "
     "ascii-space-fence-close, after-single-line-inline-html-tag, "
     "valid-inline-tag-within-text, backslash-escaped-comment-opener, "
-    "single-line-comment-in-verity-row; "
+    "single-line-comment-in-verity-row, "
+    "after-multiline-link-title, unterminated-quoted-tag-real-pin; "
     "checkout identity agree"
 )

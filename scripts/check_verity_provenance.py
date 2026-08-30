@@ -62,13 +62,24 @@ def _strip_html_comments(text: str) -> str:
     appearing in attribute position (outside a quoted value) means the tag is not
     a valid CommonMark inline tag.  The scanner aborts and falls back to emitting
     only the initial ``<`` so that subsequent constructs (e.g. ``<!--``) are
-    re-scanned and handled correctly.
+    re-scanned and handled correctly.  A quoted attribute value whose closing
+    quote is never found before end of text is also treated as invalid: the tag
+    is aborted and subsequent content (including a canonical Verity row) is
+    re-scanned and emitted normally, matching Markdown's literal rendering of the
+    broken construct.
+
+    CommonMark inline links: when a ``](`` construct is encountered, the link
+    destination and optional title are scanned.  The title interior (between
+    quote or parenthesis delimiters) is suppressed — only newlines are preserved —
+    so that a Verity row placed inside a multiline link title cannot match as a
+    rendered row.
 
     Line-boundary invariant: every stripped region (HTML comment, multiline code
-    span) is replaced by exactly as many ``\\n`` characters as the region contained.
-    This ensures that content on different physical source lines remains on different
-    lines in the output and cannot be concatenated by stripping into a synthesized
-    ``| Verity | pin |`` row that does not exist in the rendered Markdown.
+    span, link title interior) is replaced by exactly as many ``\\n`` characters
+    as the region contained.  This ensures that content on different physical
+    source lines remains on different lines in the output and cannot be
+    concatenated by stripping into a synthesized ``| Verity | pin |`` row that
+    does not exist in the rendered Markdown.
     """
     result: list[str] = []
     i = 0
@@ -155,7 +166,13 @@ def _strip_html_comments(text: str) -> str:
                     content = text[qs:j]
                     if j < n:
                         j += 1  # skip closing quote
-                    tag_out.append(q + ("" if "\n" in content else content) + q)
+                        tag_out.append(q + ("" if "\n" in content else content) + q)
+                    else:
+                        # Unterminated quoted attribute: not a valid CommonMark §6.6
+                        # inline tag.  Subsequent content (e.g. a canonical Verity row)
+                        # must not be suppressed; abort and re-scan from the '<'.
+                        valid = False
+                        break
                 elif text[j] == ">":
                     tag_out.append(">")
                     j += 1
@@ -174,6 +191,80 @@ def _strip_html_comments(text: str) -> str:
             else:
                 result.append("<")
                 i += 1
+        elif text[i] == "]" and i + 1 < n and text[i + 1] == "(":
+            # CommonMark inline link ](destination "title"): suppress title
+            # interior while preserving physical line boundaries so a Verity row
+            # embedded in a multiline link title cannot match as a rendered row.
+            result.append("](")
+            j = i + 2
+            # Pass through leading whitespace (preserving newlines)
+            while j < n and text[j] in (" ", "\t", "\n"):
+                result.append(text[j])
+                j += 1
+            # Destination: <...> or undelimited (no spaces, balanced parens)
+            if j < n and text[j] == "<":
+                result.append("<")
+                j += 1
+                while j < n and text[j] not in (">", "\n"):
+                    result.append(text[j])
+                    j += 1
+                if j < n and text[j] == ">":
+                    result.append(">")
+                    j += 1
+            else:
+                depth = 0
+                while j < n:
+                    c = text[j]
+                    if depth == 0 and (c in (" ", "\t", "\n") or c == ")"):
+                        break
+                    if c == "(":
+                        depth += 1
+                    elif c == ")":
+                        depth -= 1
+                    result.append(c)
+                    j += 1
+            # Whitespace between destination and optional title
+            while j < n and text[j] in (" ", "\t", "\n"):
+                result.append(text[j])
+                j += 1
+            # Optional title: suppress interior, preserve newlines only
+            if j < n and text[j] in ('"', "'"):
+                q = text[j]
+                result.append(q)
+                j += 1
+                while j < n and text[j] != q:
+                    if text[j] == "\n":
+                        result.append("\n")
+                    j += 1
+                if j < n:
+                    result.append(q)
+                    j += 1
+            elif j < n and text[j] == "(":
+                result.append("(")
+                j += 1
+                depth = 0
+                while j < n:
+                    if text[j] == "(":
+                        depth += 1
+                    elif text[j] == ")":
+                        if depth == 0:
+                            break
+                        depth -= 1
+                    if text[j] == "\n":
+                        result.append("\n")
+                    j += 1
+                if j < n:
+                    result.append(")")
+                    j += 1
+            # Skip trailing whitespace before closing ')'
+            while j < n and text[j] in (" ", "\t"):
+                result.append(text[j])
+                j += 1
+            # Closing ')'
+            if j < n and text[j] == ")":
+                result.append(")")
+                j += 1
+            i = j
         else:
             result.append(text[i])
             i += 1
