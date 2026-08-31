@@ -924,8 +924,17 @@ equality with any deployed module address is claimed. -/
 def moduleAddress : Address := (0x5140 : Address)
 
 /-- The journalled `allocateDeposits` frame: a zero-value call to the module
-carrying the key count, whose `returndata` words are the allocation array the
-router then guards and spends. -/
+whose `returndata` words are the allocation array the router then guards and
+spends.
+
+Calldata fidelity is *partial* and deliberately so.  The pinned call at source
+line 718 passes
+`(smDepositableEthAmountRounded, _pubkeys, _keyIndices, _operatorIds, _topUpLimits)`;
+this frame carries a single key-count word.  The correction being made here is
+about where the guarded array comes from and which guards run on it, so the
+argument words are modelled only far enough to make the frame observable and
+distinguishable.  No theorem below reads the calldata for anything except that
+observation, and none claims ABI-exact encoding of the module call. -/
 def allocateEntry (keyCount : Nat) (returndata : List Nat) : ExternalCall :=
   linkedCallEntryTo "allocateDeposits" moduleAddress 0 [(keyCount : Uint256)]
     .success returndata
