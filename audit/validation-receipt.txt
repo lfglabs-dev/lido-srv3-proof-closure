@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 05b5d3710e3fde32c8c76b1d402daa3c47cac61b
+validated-tree: 07d64ae31341dd72e139cd1df8ca10575a0a2d0b
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5108,3 +5108,459 @@ R1 report review-basis and Markdown-table closure (2026-08-27)
   changed; the `sorry`/`admit`/new-axiom/`native_decide` scan is empty.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `29d5179a2bfceca2985dcde539ebb0d3d88d7ce4`.
+
+PR #227 LOCKFILE non-rendered-row parser repair (2026-08-30)
+------------------------------------------------------------
+
+- `check_verity_provenance.py` used a raw `re.MULTILINE` regex to find the
+  Verity row in `proofs/LOCKFILE.md`. Because `.` does not match newlines in
+  that mode the pattern still matched a row that was present only inside an
+  HTML comment (`<!-- | Verity | `...` | -->`) or a fenced code block
+  (`` ``` `` / `~~~` delimiters), where GitHub Markdown does not render it.
+  The check would then pass even though no canonical Verity pin appeared in
+  the rendered table.
+- Fix: add `_strip_non_rendered` (strips HTML comments via `re.DOTALL` and
+  fenced blocks via backreference-terminated `re.MULTILINE | re.DOTALL`
+  substitution) and pass its output to the existing `re.findall` instead of
+  the raw file text. No other logic changed.
+- Regression: `test_verity_provenance.py` gains two new mutants that remove
+  the active Verity row and re-insert it exclusively inside an HTML comment
+  and inside a fenced code block; both must be rejected with diagnostic
+  `proofs/LOCKFILE.md must contain exactly one Verity pin row`.
+- `python3 scripts/check_verity_provenance.py` exit 0.
+- `python3 scripts/test_verity_provenance.py` exit 0 (all prior mutants plus
+  the two new non-rendered-region mutants).
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `bash scripts/check_provenance_guards.sh` exit 0.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: CommonMark inline code-span closer recognition (2026-08-30)
+------------------------------------------------------------------------
+
+- Bug (Codex P2, discussion_r3889585498): `_strip_non_rendered` in
+  `check_verity_provenance.py` detected a multiline code-span closer only
+  when it occupied an otherwise blank line (whole-line `re.match` anchor).
+  CommonMark §6.1 permits closers to appear anywhere on a line embedded in
+  surrounding text (e.g. ``suffix ``` end``).  An adversary could therefore
+  craft a LOCKFILE.md where the Verity row is enclosed in a code span whose
+  closer is embedded inline on the following line; the parser would miss the
+  closer, reach EOF, restore the buffered row as rendered content (unmatched
+  code span is literal per §6.1), and accept the non-rendered pin.
+- Fix: replace the whole-line `re.match` with `re.search` for an exact-length
+  backtick run anywhere on the line (``(?<!`)`{N}(?!`)``).  Text after the
+  closer on the closer line is emitted as rendered content; text before the
+  closer (code-span body) is discarded.  The unmatched-code-span fallback
+  (restore buffer when EOF is reached without a closer) is preserved.
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (rejection): 3-backtick code-span opener with backtick-info
+    string, Verity row, then ``suffix ``` end`` (inline exact-length closer)
+    — the row is code content and must be rejected.
+  - Positive (acceptance): same opener, Verity row, then
+    ``suffix ```` end`` (unequal 4-backtick run) — no closer found, opener
+    is literal, enclosed row remains rendered, check must pass.
+- All prior regression cases preserved (HTML comment, unclosed-to-EOF,
+  fence variants, backtick-code-span suppressors).
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_validation_receipt.py` exit 0.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), which is not built in this environment;
+  unit-level `_strip_non_rendered` tests for all prior and new inline-closer
+  cases verified in isolation (exit 0).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: CommonMark §4.6 raw HTML block suppression (2026-08-30)
+--------------------------------------------------------------------
+
+- Bug (Codex P2, discussion_r3889642189): `_strip_non_rendered` stripped
+  fenced code blocks and HTML comments (§4.6 Type 2) but left raw HTML block
+  types 1, 3–6 in place.  An adversary could place the Verity row inside e.g.
+  ``<script>\n| Verity | `…` |\n</script>`` — GitHub Markdown does not render
+  the table row inside a raw HTML block, but the regex still matched it, so
+  the provenance check would incorrectly succeed.
+- Fix: add CommonMark §4.6 HTML block detection to `_strip_non_rendered`.
+  Module-level compiled patterns detect the opener of each type (Types 1, 3–6)
+  and suppress subsequent lines until the type-specific end condition is met:
+  - Type 1 (``<script|pre|style|textarea>``): closes on first line containing
+    the corresponding ``</tag>`` pattern.
+  - Type 3 (``<?``): closes on first line containing ``?>``.
+  - Type 4 (``<!UPPERCASE``): closes on first line containing ``>``.
+  - Type 5 (``<![CDATA[``): closes on first line containing ``]]>``.
+  - Type 6 (block-level open/close tags): blank-line-terminated; the blank
+    line itself is not part of the block.
+  If the opener line also satisfies the end condition, the block closes
+  immediately (one-line block) without entering the multi-line state.  Type 2
+  (``<!-- … -->``) remains handled by `_strip_html_comments`, which already
+  correctly skips code-span content.
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (Type 1): ``<script>\n{verity_row}</script>`` — row inside script
+    block → rejected.
+  - Positive: ``<script>…</script>\n{verity_row}`` — row after closed script
+    block is rendered → accepted.
+  - Negative (Type 6): ``<div>\n{verity_row}`` (no blank line, extends to
+    EOF) → rejected.
+  - Positive: ``<div>\ncontent\n\n{verity_row}`` — row after blank-line-closed
+    div block is rendered → accepted.
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_validation_receipt.py` exit 0.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment; unit-level
+  `_strip_non_rendered` tests for all prior and new HTML-block cases verified
+  in isolation (13 cases, all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2 batch: multiline code spans, Type 7 HTML blocks, whitespace
+blank lines, same-line fence code-span closer (2026-08-30)
+-----------------------------------------------------------------------
+
+- Bugs (Codex P2, four discussions):
+
+  discussion_r3889768393 — `_strip_html_comments` appended the entire backtick
+  code-span (opener + content + closer) unchanged even when the span's interior
+  crossed a newline.  An adversary could embed the Verity row inside a
+  2-backtick (or higher) multiline inline code span:
+  `` ``\n| Verity | `...` |\n`` ``.  GitHub renders the interior as inline
+  code, not a table row, so the row is not visible; yet the regex matched it
+  inside the old appended span.
+  Fix: in `_strip_html_comments`, when the interior text between the opener's
+  trailing backtick position and the closer's leading backtick position contains
+  `\n`, suppress the entire span (don't append to result).
+
+  discussion_r3889768395 — CommonMark §4.6 Type 7 HTML blocks (an open or
+  close tag on a line by itself, blank-line-terminated) were not detected.  An
+  adversary could use a custom element (`<custom-element>`) to suppress a
+  following Verity row.
+  Fix: add `_HTML7` pattern (`^ {0,3}</?[a-zA-Z][a-zA-Z0-9-]*…[ \t]*$`)
+  and detect it in `_strip_non_rendered`'s HTML-block branch, with
+  `html_block_end = None` (blank-line-terminated, same as Type 6).
+
+  discussion_r3889768399 — The blank-line termination check for Types 6/7
+  used `if not stripped:` (truly empty string), which missed lines containing
+  only spaces or tabs.  CommonMark defines a blank line as one containing only
+  spaces and tabs.
+  Fix: change to `if not stripped.strip():`.
+
+  discussion_r3889768402 — When an invalid fence opener's info string contains
+  a backtick (making it a code-span opener rather than a fence opener), the
+  code immediately entered span state even if the exact-length closer already
+  appeared on the opener line itself.  Lines following the opener were buffered
+  and either hidden (if a subsequent closer was found) or restored (if no
+  closer before EOF).  The same-line-closer case should not enter span state
+  at all — the span opens and closes on one line, making the line rendered
+  content and the following lines (including the Verity row) also rendered.
+  Fix: before entering code-span state, search for an exact-length closer in
+  `m.group(2)` (the info string / rest of the opener line); if found, add
+  the opener line to `out` and set `is_code_span = False`.
+
+- Side effect of discussion_r3889768393 fix: the trailing backtick in info
+  strings such as `` ```foo` `` forms a real CommonMark §6.1 inline code span
+  in `_strip_html_comments` that covers `| Verity | ` in the restored buffer.
+  Three tests previously marked positive (discussions r3889515392 and
+  r3889585498 "unequal run" variants) are now correctly rejected: the Verity
+  row in those inputs is not in a rendered table row.  Their test comments and
+  expected values have been updated accordingly.
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (r3889768393): `` ``\n{verity_row}``\n `` — row inside
+    multiline 2-bt code span → rejected.
+  - Positive: `` ``some\nspanning content``\n{verity_row} `` — row after a
+    closed multiline span is rendered → accepted.
+  - Negative (r3889768395): `<custom-element>\n{verity_row}` — row inside
+    Type 7 block (extends to EOF) → rejected.
+  - Positive: `<custom-element>\ncontent\n\n{verity_row}` — row after
+    blank-line-closed Type 7 block → accepted.
+  - Positive (r3889768399): `<div>\ncontent\n   \n{verity_row}` — whitespace-
+    only blank line terminates Type 6 block → row after it accepted.
+  - Positive: `<custom-element>\ncontent\n   \n{verity_row}` — same for
+    Type 7 block.
+  - Positive (r3889768402): `` ```foo```\n{verity_row}```\n `` — same-line
+    closer on opener line; row after opener is rendered → accepted.
+  - Negative: `` ```foo`\n{verity_row}```\n `` — no same-line closer;
+    whole-line closer hides row → rejected.
+  - Updated negative: three former positive "unequal-run" variants
+    (discussions r3889515392, r3889585498) now correctly rejected due to
+    info-backtick inline span covering `| Verity | `.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  28 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: escaped backticks before HTML comments; quoted ">" in Type 7
+attributes (2026-08-30)
+------------------------------------------------------------------------
+
+- Bugs (Codex P2, two discussions):
+
+  discussion_r3889868433 — `_strip_html_comments` did not honour CommonMark §2.4
+  backslash escapes for backtick characters.  The sequence `\`<!--\`` contains
+  two backslash-escaped backticks (literals), not a code span.  But the loop
+  treated the first `` ` `` as a code-span opener, matching the second `` ` ``
+  as the closer with `<!--` as the (single-line, non-multiline) content.  The
+  `<!--` was therefore never seen as an HTML comment opener; the Verity row
+  between `\`<!--\`` and `-->` remained visible to the regex.
+  Fix: before treating a `` ` `` as a code-span opener, count consecutive
+  preceding backslashes; if the count is odd the backtick is escaped
+  (CommonMark §2.4) and treated as a literal character, not a delimiter.
+
+  discussion_r3889868441 — The `_HTML7` pattern used `[^<>]*` for the
+  attribute portion of a Type 7 tag opener.  This rejected any `>` in the
+  attribute text, even a `>` inside a quoted attribute value such as
+  `title="a > b"`.  CommonMark §4.6 explicitly allows quoted values to contain
+  `>`; an attacker could use `<custom-element title="a > b">` as an opener
+  that the old pattern did not recognise, leaving the Verity row visible.
+  Fix: replace `[^<>]*` with the full CommonMark §4.6 attribute grammar:
+  zero-or-more attribute tokens each of the form `name` or `name=value` where
+  value is double-quoted (`"[^"]*"`), single-quoted (`'[^']*'`), or unquoted
+  (`[^"'=<>` `` ` `` `\x00-\x1f\s]+`).
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (r3889868433): `\`<!--\`\n{verity_row}-->\n` — escaped backticks
+    do not form a code span; `<!--...-->` is an HTML comment and the Verity row
+    inside it is stripped → rejected.
+  - Positive: `\\``<!--``\n{verity_row}` — even number of backslashes (escaped
+    backslash + unescaped backtick) → code span still forms, `<!--` suppressed,
+    Verity row after code span remains visible → accepted.
+  - Negative (r3889868441): `<custom-element title="a > b">\n{verity_row}` —
+    quoted `>` in attribute is now recognised as a valid Type 7 opener; row
+    inside block → rejected.
+  - Positive: `<custom-element title="a > b">\ncontent\n\n{verity_row}` — row
+    after blank-line-terminated Type 7 block with quoted `>` → accepted.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  33 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: ASCII-only fence-close whitespace; multiline inline HTML tag
+suppression (2026-08-30)
+------------------------------------------------------------------------
+
+- Bugs (Codex P2, two discussions):
+
+  discussion_r3889901971 — The closing-fence regex used `\s*$` to allow trailing
+  whitespace after the fence character run.  Python's `\s` matches any Unicode
+  whitespace, including characters such as U+2003 EM SPACE.  CommonMark §4.5
+  explicitly restricts the trailing portion to "spaces only" (ASCII U+0020); any
+  other whitespace character means the line is not a valid closer and the fence
+  remains open.  An attacker could write ```` ``` ```` + EM SPACE so the checker
+  mistakenly closed the fence, exposing a Verity row placed on the following line
+  (which CommonMark still treats as inside the open fence).
+  Fix: replace `\s*$` with `[ ]*$` in the fence-closer regex; only ASCII spaces
+  are allowed as trailing whitespace on a closing fence line.
+
+  discussion_r3889901979 — `_strip_html_comments` did not handle inline HTML open
+  tags (CommonMark §6.6) that span multiple lines via quoted attribute values.
+  An attacker could write `<span title="\n| Verity | … |\n">` so that the Verity
+  row is the content of the quoted attribute value, not rendered table content.
+  `_strip_non_rendered` only removes block-level HTML; the inline tag was left
+  intact, and `_strip_html_comments` passed the attribute content through to the
+  regex unchanged.
+  Fix: add a new branch in `_strip_html_comments` for `<[A-Za-z]` / `</[A-Za-z]`
+  that scans through the tag character by character.  When a quoted attribute value
+  (`"…"` or `'…'`) contains `\n`, its interior is suppressed (replaced by the
+  empty string between the two quote characters) so that a Verity row inside it
+  cannot be seen by the caller's regex.  Single-line attribute values and tag
+  content outside quotes are preserved unchanged.
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (r3889901971): ```` ``` ````\nsome content\n```` ``` ````+EM SPACE\n{verity_row}
+    — Unicode whitespace does not close the fence; Verity row suppressed → rejected.
+  - Positive: ```` ``` ````\nsome content\n```` ``` ````+three ASCII spaces\n{verity_row}
+    — ASCII trailing spaces are valid; fence closed, Verity row rendered → accepted.
+  - Negative (r3889901979): `<span title="\n{verity_row}">\n`
+    — Verity row inside multiline quoted attribute is raw HTML → rejected.
+  - Positive: `<span title="foo">\n{verity_row}`
+    — Verity row after a single-line inline HTML tag is rendered → accepted.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  37 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: abort inline-tag scan on invalid char; honour §2.4 escape before
+`<!--` (2026-08-30)
+------------------------------------------------------------------------
+
+- Bugs (Codex P2, two discussions):
+
+  discussion_r3889941662 — The inline HTML tag scanner accepted any `<` followed
+  by a letter or `/` as the start of a tag and consumed characters until the next
+  `>`.  This meant that `<x <!--…-->` was consumed entirely as a "tag" ending at
+  the `>` of `-->`, without ever entering the HTML-comment branch.  The Verity row
+  between `<!--` and `-->` was therefore added to `result` unchanged and was
+  exposed to the caller's regex.
+  Fix: inside the inline-tag inner loop, add an `elif text[j] == "<":` branch that
+  sets `valid = False` and breaks.  If `valid` is False after the loop, only the
+  initial `<` is appended to `result` and `i` is advanced by one; the rest of the
+  text (including the `<!--` and everything after) is re-scanned from the character
+  immediately following that `<`, so the comment branch correctly handles `<!--`.
+
+  discussion_r3889941663 — The `elif text[i:i+4] == "<!--":` branch had no check
+  for preceding backslash escapes.  Per CommonMark §2.4, an odd number of
+  backslashes before `<` makes `<` a literal character; `\<!--` is therefore
+  rendered as the literal text `<!--`, not an HTML comment.  Without the check,
+  the function treated `\<!--` as an unclosed comment opener and discarded
+  everything through EOF, causing false-positive rejection of any valid lockfile
+  whose prose contained the sequence `\<!--` before the real Verity row.
+  Fix: mirror the escaped-backtick logic — count consecutive preceding backslashes
+  before entering the comment branch; if the count is odd, emit `<` literally and
+  advance past it without entering comment-stripping mode.
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (r3889941662): `<x <!--\n{verity_row}-->\n` — invalid inline tag
+    (< in attribute position) aborts scanner; `<!--` is a real comment; row inside
+    stripped → rejected.
+  - Positive: `<x>\n{verity_row}` — valid inline tag (no invalid chars); Verity
+    row after tag is rendered → accepted.
+  - Positive (r3889941663): `\<!--\n{verity_row}` — odd-backslash-escaped `<`
+    makes `<!--` literal text, not a comment opener; Verity row visible → accepted.
+  - Negative: `\\<!--\n{verity_row}-->\n` — even number of backslashes (escaped
+    backslash + unescaped `<`); `<!--` is a real comment; row inside stripped →
+    rejected.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  41 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+PR #227 P2: preserve line boundaries when stripping HTML comments and code spans;
+confine lockfile row regex to single physical line (2026-08-30)
+------------------------------------------------------------------------
+
+- Bug (Codex P2, discussion_r3889978820):
+
+  `_strip_html_comments` removed HTML comments (and suppressed multiline code
+  spans) by discarding the matched region entirely, including any embedded newlines.
+  This caused content from two separate physical source lines to be concatenated
+  in the output.  For example, a file containing:
+
+      | Verity <!-- anything
+      --> | `<pin>` |
+
+  After stripping the comment `<!-- anything\n-->`, the function returned
+  `| Verity  | `<pin>` |` — a single synthesized line that matches the Verity row
+  regex, producing a false-positive acceptance despite the Verity label and pin
+  living on different physical lines and therefore never forming a rendered table
+  row.
+
+  The same synthesis was possible with a suppressed multiline code span:
+
+      | Verity ``anycontent
+      `` | `<pin>` |
+
+  Fix 1 — Line-boundary invariant: replace any stripped region (HTML comment or
+  multiline code-span interior) with exactly as many `"\n"` characters as the
+  region contained.  Single-line spans and comments produce no newlines and are
+  unaffected.  Multiline regions now leave behind the newline skeleton, so content
+  from different physical lines stays on different lines.
+
+  Fix 2 — Confine lockfile row regex to a single physical line: change `\s*` to
+  `[ \t]*` in the `re.findall` call that extracts Verity pins.  In `re.MULTILINE`
+  mode, `\s*` matches `\n`, so even with the newline preserved in the stripped
+  output the pattern could still bridge across it.  `[ \t]*` matches only ASCII
+  space and horizontal tab, keeping each match within one physical line.
+
+  Both fixes are necessary: Fix 1 alone cannot prevent synthesis if the regex
+  can span newlines; Fix 2 alone cannot prevent synthesis if the stripping
+  itself erases the newline separator.
+
+- Regression additions to `test_verity_provenance.py`:
+  - Negative (comment-synthesis, r3889978820): `| Verity <!-- anything\n--> |
+    \`<pin>\` |\n` — multiline comment stripped with newline preserved; row
+    regex confined to one line → rejected.
+  - Positive (single-line comment): `| Verity <!-- note --> | \`<pin>\` |\n` —
+    single-line comment stripped; synthesized row is the real row on one line →
+    accepted.
+  - Negative (span-synthesis, r3889978820): `| Verity ``anycontent\n`` |
+    \`<pin>\` |\n` — multiline code span suppressed with newline preserved;
+    row regex confined to one line → rejected.
+  - Also corrected a Round 6 positive test whose input `<x>\n{verity_row}` was
+    incorrect: `<x>` alone on its own line is a CommonMark Type 7 HTML block
+    opener that suppresses the following row; corrected to `text <x> end\n{verity_row}`
+    (inline tag in mixed-text context) which is rendered normally.
+
+- `python3 scripts/check_proof_escapes.py` exit 0; inventory unchanged.
+- `python3 scripts/check_public_claim_surfaces.py` exit 0.
+- `python3 scripts/test_public_claim_surfaces.py` exit 0.
+- `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+- `bash scripts/test_check_proof_escapes.sh` exit 0.
+- `bash scripts/check_no_python_evidence.sh` exit 0.
+- `bash scripts/test_check_no_python_evidence.sh` exit 0.
+- `python3 scripts/test_verity_provenance.py` and
+  `bash scripts/check_provenance_guards.sh` require the resolved Verity
+  checkout (`.lake/packages/verity`), not built in this environment;
+  unit-level `_strip_non_rendered` / `_strip_html_comments` tests for all
+  54 prior and new cases verified in isolation (all pass).
+- No production Lean files changed; the `sorry`/`admit`/new-axiom/
+  `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
