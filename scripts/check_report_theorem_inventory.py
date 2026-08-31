@@ -57,7 +57,12 @@ def _character_class(ranges):
 _LETTER_LIKE = _without(LETTER_LIKE, LETTER_LIKE_HOLES)
 ID_FIRST = "A-Za-z_" + _character_class(_LETTER_LIKE)
 ID_REST = "A-Za-z0-9_'!?" + _character_class(_LETTER_LIKE + list(SUBSCRIPT_ALNUM))
-ATOM = rf"(?:[{ID_FIRST}][{ID_REST}]*|«[^»\n]*»)"
+# `idBeginEscape`/`idEndEscape`.  The lexical pass below has to agree with this
+# spelling exactly: whatever the declaration parser accepts as an escaped atom,
+# the comment scanner must read as a name rather than as code.
+ESCAPE_BEGIN = "«"
+ESCAPE_END = "»"
+ATOM = rf"(?:[{ID_FIRST}][{ID_REST}]*|{ESCAPE_BEGIN}[^{ESCAPE_END}\n]*{ESCAPE_END})"
 IDENT = rf"{ATOM}(?:\.{ATOM})*"
 
 ROW = re.compile(
@@ -75,7 +80,18 @@ ROW = re.compile(
 # ever finds more declarations to demand rows for, so it cannot loosen the gate.
 # `\s+` after the keyword keeps `theorem_like_name` from matching, and
 # `-- theorem ...` still cannot, since `--` is neither attribute nor modifier.
-MODIFIERS = ("private", "protected", "scoped", "local", "nonrec", "noncomputable")
+#
+# Only these three elaborate in front of a `theorem` under the pinned toolchain,
+# so only these can hide a declaration that Lean actually accepts.
+MODIFIERS_ON_THEOREM = ("private", "protected", "nonrec")
+# Lean parses or rejects the rest at the declaration itself rather than at the
+# prefix (`'unsafe' theorems are not allowed`, `'partial' theorems are not
+# allowed`, `'theorem' subsumes 'noncomputable'`; `scoped`/`local` prefix other
+# commands entirely).  They stay in the table because matching a prefix Lean
+# would reject only ever demands an extra inventory row and never hides one, and
+# because the set is a toolchain detail that may widen.
+MODIFIERS_REJECTED_ON_THEOREM = ("scoped", "local", "noncomputable", "unsafe", "partial")
+MODIFIERS = MODIFIERS_ON_THEOREM + MODIFIERS_REJECTED_ON_THEOREM
 DECL = re.compile(
     r"^[ \t]*"
     r"(?:@\[[^\]]*\][ \t]*)*"
@@ -98,9 +114,10 @@ def strip_block_comments(text):
     tracked here instead.
 
     `/-` only opens a comment where code is actually being read.  Inside a `--`
-    line comment or a string literal it is ordinary text, and treating one as an
-    opener would blank the real declarations that follow — the failure direction
-    that matters, since it hides theorems rather than inventing them.
+    line comment, a string literal, or a «guillemet-escaped» identifier it is
+    ordinary text, and treating one as an opener would blank the real
+    declarations that follow — the failure direction that matters, since it
+    hides theorems rather than inventing them.
     """
     out = []
     index = 0
@@ -124,6 +141,23 @@ def strip_block_comments(text):
             index += 2
         elif pair == "--":
             while index < end and text[index] != "\n":
+                out.append(text[index])
+                index += 1
+        elif text[index] == ESCAPE_BEGIN:
+            # `«…»` escapes an atom, so its contents are a name rather than
+            # code: `theorem «undisclosed /- name»` declares one ordinary
+            # theorem and opens no comment.  Lexing the `/-` anyway made a
+            # valid module read as an unterminated comment, and a later `-/`
+            # inside another escaped atom would rebalance the depth and blank
+            # the real declarations in between instead.  The escape cannot span
+            # a newline, so an unclosed `«` is ordinary text and must advance by
+            # one rather than swallow the rest of the file.
+            close = text.find(ESCAPE_END, index + 1)
+            newline = text.find("\n", index + 1)
+            if close != -1 and (newline == -1 or close < newline):
+                out.append(text[index:close + 1])
+                index = close + 1
+            else:
                 out.append(text[index])
                 index += 1
         elif text[index] == '"':
