@@ -20,8 +20,48 @@ REGISTRY = ROOT / "audit/guarantees.yaml"
 GUARANTEE_ID = "P-ALLOC-1"
 NAMESPACE = "LidoSRv3.Audit.Guarantees.PAlloc1."
 
+# A declaration name is not always ASCII.  Lean identifiers admit letter-like
+# characters (Greek, Coptic, Latin-1/Extended-A, script and double-struck),
+# subscript alphanumerics, `!`/`?`, «guillemet-escaped» atoms, and `.`-joined
+# compound names.  An `[A-Za-z0-9_']+` capture does not recognize such a
+# declaration at all, so `theorem αUndisclosed` read as no declaration and the
+# inventory could omit an ordinary Lean theorem while this gate still reported
+# success.  The ranges below are transcribed from the pinned toolchain's
+# `Init/Meta/Defs.lean` (`isIdFirst`, `isIdRest`, `isLetterLike`,
+# `isSubScriptAlnum`, `idBeginEscape`/`idEndEscape`) so the inventory reads the
+# same identifiers Lean does.
+LETTER_LIKE = ((0x3B1, 0x3C9), (0x391, 0x3A9), (0x3CA, 0x3FB), (0x1F00, 0x1FFE),
+               (0x2100, 0x214F), (0x1D49C, 0x1D59F), (0xC0, 0xFF), (0x100, 0x17F))
+# Lean excludes these from the letter-like ranges: they are notation, not names.
+LETTER_LIKE_HOLES = (0x3BB, 0x3A0, 0x3A3, 0xD7, 0xF7)  # λ, Π, Σ, ×, ÷
+SUBSCRIPT_ALNUM = ((0x2080, 0x2089), (0x2090, 0x209C), (0x1D62, 0x1D6A), (0x2C7C, 0x2C7C))
+
+
+def _without(ranges, holes):
+    kept = []
+    for low, high in ranges:
+        start = low
+        for hole in sorted(h for h in holes if low <= h <= high):
+            if hole > start:
+                kept.append((start, hole - 1))
+            start = hole + 1
+        if start <= high:
+            kept.append((start, high))
+    return kept
+
+
+def _character_class(ranges):
+    return "".join(rf"\U{low:08X}-\U{high:08X}" for low, high in ranges)
+
+
+_LETTER_LIKE = _without(LETTER_LIKE, LETTER_LIKE_HOLES)
+ID_FIRST = "A-Za-z_" + _character_class(_LETTER_LIKE)
+ID_REST = "A-Za-z0-9_'!?" + _character_class(_LETTER_LIKE + list(SUBSCRIPT_ALNUM))
+ATOM = rf"(?:[{ID_FIRST}][{ID_REST}]*|«[^»\n]*»)"
+IDENT = rf"{ATOM}(?:\.{ATOM})*"
+
 ROW = re.compile(
-    r"^\| `(?P<name>[A-Za-z0-9_']+)` \| (?P<line>\d+) \| (?P<plane>[^|]+?) \| "
+    rf"^\| `(?P<name>{IDENT})` \| (?P<line>\d+) \| (?P<plane>[^|]+?) \| "
     r"(?P<registered>[^|]+?) \| (?P<role>[^|]+?) \|$",
     re.MULTILINE,
 )
@@ -40,7 +80,7 @@ DECL = re.compile(
     r"^[ \t]*"
     r"(?:@\[[^\]]*\][ \t]*)*"
     rf"(?:(?:{'|'.join(MODIFIERS)})[ \t]+)*"
-    r"(?:theorem|lemma)\s+([A-Za-z0-9_']+)"
+    rf"(?:theorem|lemma)\s+({IDENT})"
 )
 
 

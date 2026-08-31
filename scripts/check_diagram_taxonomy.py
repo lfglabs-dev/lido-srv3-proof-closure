@@ -26,8 +26,11 @@ CLASSES = ("el", "proof", "com", "bot", "sys", "cl")
 # is: rewording one drops its TAXONOMY entry and the rule with it.  An on-chain
 # address cannot be moved by rewording, so the taxonomy-critical entities are
 # bound here to their deployed identity as well.  Every entry must still be
-# found somewhere on the map, so deleting or renaming a box fails closed
-# instead of quietly retiring its rule.
+# found on the canvas *and* on the notes cards, so deleting or renaming a box
+# fails closed instead of quietly retiring its rule.  Searching the two surfaces
+# together instead let a surviving notes card vouch for a deleted canvas node,
+# so the primary architecture drawing could lose an entity while this gate still
+# reported success; the surfaces are therefore required separately.
 IDENTITY = {
     "0x852deD011285fe67063a08005c71a85690503Cee": ("AccountingOracle", "el"),
     "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e": ("ValidatorsExitBusOracle", "el"),
@@ -157,21 +160,24 @@ def main():
         if kind == "cl" and name not in CONSENSUS_LAYER:
             fail(f"{name!r} is drawn as consensus layer; only {CONSENSUS_LAYER} is")
 
-    located = set()
-    for address, (entity, expected) in IDENTITY.items():
-        forms = (address.lower(), abbreviated(address).lower())
-        for name, kind, identity in nodes + cards:
-            if not any(form in identity.lower() for form in forms):
-                continue
-            located.add(address)
-            if kind != expected:
-                fail(f"{entity} ({address}) is drawn as {kind!r} under the label "
-                     f"{name!r}, must be {expected!r}")
-    absent = [f"{entity} ({address})" for address, (entity, _) in IDENTITY.items()
-              if address not in located]
-    if absent:
-        fail(f"the map no longer identifies {', '.join(absent)}; a taxonomy-critical "
-             "entity must stay addressable so its class rule cannot lapse")
+    for surface, boxes in (("canvas", nodes), ("notes cards", cards)):
+        absent = []
+        for address, (entity, expected) in IDENTITY.items():
+            forms = (address.lower(), abbreviated(address).lower())
+            located = False
+            for name, kind, identity in boxes:
+                if not any(form in identity.lower() for form in forms):
+                    continue
+                located = True
+                if kind != expected:
+                    fail(f"{entity} ({address}) is drawn as {kind!r} under the label "
+                         f"{name!r}, must be {expected!r}")
+            if not located:
+                absent.append(f"{entity} ({address})")
+        if absent:
+            fail(f"the map no longer identifies {', '.join(absent)} on the {surface}; "
+                 "a taxonomy-critical entity must stay addressable on the canvas and "
+                 "on the notes cards so its class rule cannot lapse")
 
     drawn = {kind for _, kind, _ in nodes + cards}
     legend = set(LEGEND.findall(html)) & set(CLASSES)
@@ -212,7 +218,8 @@ def main():
             fail(f"the `bot` legend pill never mentions {phrase!r}: {why}")
 
     print(f"diagram taxonomy ok: {len(nodes)} nodes, {len(cards)} cards, "
-          f"{len(legend)} legend classes, {len(IDENTITY)} address-bound entities")
+          f"{len(legend)} legend classes, {len(IDENTITY)} address-bound entities "
+          "on the canvas and on the notes cards")
 
 
 if __name__ == "__main__":
