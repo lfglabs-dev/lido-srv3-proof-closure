@@ -661,6 +661,21 @@ def _strip_non_rendered(text: str) -> str:
     spaces and tabs, not merely the empty string.  Type 2 (``<!-- … -->``) is
     handled separately by _strip_html_comments, which correctly skips code-span
     content, including multiline code spans whose interior spans multiple lines.
+
+    Removing a block leaves a blank line in its place, because the later passes
+    read only the stripped text and would otherwise see content from either side
+    of the block as adjacent.  That synthetic adjacency was exploitable: a fence
+    between a table and a paragraph made the paragraph look like more table rows,
+    whose newlines then cleared a ``[`` opener, leaving a multiline link title
+    unsuppressed so that a lone canonical Verity line inside it counted as
+    rendered.  The blank line restores the boundary GFM has there.
+
+    The boundary is emitted for fenced code blocks and HTML Types 1 and 3–6,
+    which can all interrupt a paragraph, so a boundary is always faithful.  It is
+    *not* emitted for Type 7, which cannot interrupt a paragraph (§4.6): mid
+    paragraph GFM sees no block at all, and a boundary there would wrongly split
+    an inline context that GFM keeps together.  Code spans get none either, being
+    inline rather than blocks.
     """
     out: list[str] = []
     in_fence = False
@@ -740,6 +755,7 @@ def _strip_non_rendered(text: str) -> str:
                         code_span_buffer = [line]
                         in_fence = True
                 else:
+                    out.append("\n")
                     in_fence = True
             else:
                 # CommonMark §4.6 HTML block detection (Types 1, 3–7).
@@ -750,22 +766,27 @@ def _strip_non_rendered(text: str) -> str:
                 if m1:
                     tag = m1.group(1).lower()
                     end_re = _HTML1_END[tag]
+                    out.append("\n")
                     if not end_re.search(stripped):
                         in_html_block = True
                         html_block_end = end_re
                 elif _HTML5.match(stripped):
+                    out.append("\n")
                     if not _HTML5_END.search(stripped):
                         in_html_block = True
                         html_block_end = _HTML5_END
                 elif _HTML3.match(stripped):
+                    out.append("\n")
                     if not _HTML3_END.search(stripped):
                         in_html_block = True
                         html_block_end = _HTML3_END
                 elif _HTML4.match(stripped):
+                    out.append("\n")
                     if not _HTML4_END.search(stripped):
                         in_html_block = True
                         html_block_end = _HTML4_END
                 elif _HTML6.match(stripped):
+                    out.append("\n")
                     in_html_block = True
                     html_block_end = None
                 elif _HTML7.match(stripped):

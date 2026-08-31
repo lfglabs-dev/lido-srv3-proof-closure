@@ -776,6 +776,48 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, True)
+    # Adversarial (discussion_r3891024469): _strip_non_rendered deletes a block's lines,
+    # so without a replacement boundary the content on either side of it became adjacent
+    # to the later passes.  A block between a table and a paragraph then let the table
+    # swallow the paragraph as further rows, whose newlines cleared the '[' opener and
+    # left a multiline link title unsuppressed, so the sole canonical pin hidden inside
+    # that title counted as rendered and the lockfile was accepted.
+    stripped_blocks = (
+        "```lang\nhidden\n```\n",
+        "<script>\nhidden\n</script>\n",
+        "<?php hidden ?>\n",
+        "<!DOCTYPE html>\n",
+        "<![CDATA[\nhidden\n]]>\n",
+        "<div>\nhidden\n</div>\n\n",
+    )
+    for block in stripped_blocks:
+        lockfile_path.write_text(
+            without_active.replace(
+                lean_row, f'{lean_row}{block}[x](url "bad\n{verity_row}continued")\n'
+            ),
+            encoding="utf-8",
+        )
+        run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive (discussion_r3891024469): the converse direction.  Each of these blocks
+    # interrupts a paragraph in GFM, so the '[' opener before it dies at the paragraph
+    # end and the genuine Verity row after it is rendered; erasing the block joined the
+    # two sides into one link title that swallowed the row and rejected a valid file.
+    for block in stripped_blocks:
+        lockfile_path.write_text(
+            without_active + f'\n[x](url "bad\n{block}{verity_row}continued")\n',
+            encoding="utf-8",
+        )
+        run(fixture, True)
+    # Positive (discussion_r3891024469): the boundary must not be emitted for an HTML
+    # Type 7 tag, which alone among these cannot interrupt a paragraph.  Mid-paragraph
+    # GFM sees no block at all, so the title still forms and the wrong pin inside it
+    # stays suppressed; a boundary here would expose it and reject a valid lockfile.
+    lockfile_path.write_text(
+        original_lockfile
+        + f'\n[x](url "bad\n<custom-tag>\n| Verity | `{OTHER}` |\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -806,7 +848,8 @@ print(
     "non-table-pipe-lines-title, table-row-wrong-pin, "
     "indented-delimiter-row-title-family, indented-header-row-title, "
     "table-closing-newline-opener-family, table-closing-newline-opener-shape-family, "
-    "unpiped-row-opener-depth-family, unpiped-row-after-delimiter-opener); "
+    "unpiped-row-opener-depth-family, unpiped-row-after-delimiter-opener, "
+    "stripped-block-boundary-family); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -833,6 +876,7 @@ print(
     "gfm-table-row-boundary, gfm-table-cell-boundary, "
     "short-indent-delimiter-row-family, over-indented-row-closes-table, "
     "table-closing-newline-row-after, after-table-multiline-title, "
-    "unpiped-row-opener-row-after; "
+    "unpiped-row-opener-row-after, stripped-block-boundary-row-after-family, "
+    "type-7-keeps-paragraph-inline; "
     "checkout identity agree"
 )
