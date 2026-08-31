@@ -271,7 +271,7 @@ non-type-2 witness, projected from the registered parent's fourth conjunct. -/
 theorem guard_discharge_at_non_type2_wc_input :
     run killCfg wcType1Input = .revertWrongWithdrawalCredentialsType :=
   (LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
-      (State := Unit) killCfg wcType1Input () () [] ⟨[], [], []⟩).2.2.2
+      (State := Unit) killCfg wcType1Input () () [] ⟨[], [], []⟩).2.2.2.1
     (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
 
 /-- MUTANT of the value-moving tail `SolidityTopup.runPush`: the
@@ -668,5 +668,440 @@ theorem unwrapped_accumulator_kill_line_refutes_parent :
       (mutantRunUnwrapped killCfg wrapInput).pulled ≠ 0 := by
   unfold NoUncheckedWrap
   decide
+
+/-! ## Wave 7: the returndata guards (source lines 722--737)
+
+The three guards the router applies to what `IStakingModuleV2.allocateDeposits`
+returned -- gwei alignment (source line 724), the per-index `_topUpLimits[i]`
+bound and its out-of-bounds read (source line 728), and the aggregate
+over-target comparison (source line 737) -- were previously covered by no
+registered conjunct and no kill-line, on either plane.  The mutants below are
+the exact-parent duals of the two new source conjuncts and of the two guard
+conjuncts of `VerityGuardedReturndataSimulation`.
+
+`guardCfg` uses the real `1 gwei` so that alignment is a live guard rather than
+vacuous (`killCfg` above sets `gwei := 1`, under which every `Nat` is
+aligned). -/
+
+/-- Shared configuration for the returndata-guard witnesses: pubkey constants
+at 48, the real `1 gwei`, `MIN_DEPOSIT` 1, and the `uint64` bound raised so the
+push loop is not the guard under test. -/
+private def guardCfg : SourceTopupConfig := ⟨48, 48, 1000000000, 1, uint256Modulus⟩
+
+/-- Module returndata whose single entry is one wei off a gwei boundary, so the
+alignment test at source line 724 fires.  Every other guard passes. -/
+private def misalignedInput : SourceTopupInput :=
+  { callerIsTopUpGateway := true, keyIndicesLength := 1, operatorIdsLength := 1,
+    topUpLimits := [2000000000], pubkeyLengths := [48], moduleExists := true,
+    moduleActive := true, wcTypeIsType2 := true, maxTopUpPerBlockGwei := 3,
+    moduleAllocationEth := 3000000000, lidoCanDeposit := true,
+    allocations := [1000000001], routerBalanceBefore := 0,
+    lidoDepositableEther := 3000000000 }
+
+/-- Aligned returndata that exceeds its own `_topUpLimits[0]`, so the per-index
+bound at source line 728 fires. -/
+private def overLimitInput : SourceTopupInput :=
+  { misalignedInput with
+    topUpLimits := [1000000000], allocations := [2000000000] }
+
+/-- The module returns MORE entries than there are keys, so the
+`_topUpLimits[i]` read at source line 728 goes out of bounds.  `_topUpLimits`,
+`_pubkeys` and `_operatorIds` are all length 1 -- the line 773 length guard
+compares them against `n`, never against the module's returndata -- so this
+witness passes `_validateTopUpInputs` and reaches the allocation loop. -/
+private def overLongInput : SourceTopupInput :=
+  { misalignedInput with
+    maxTopUpPerBlockGwei := 5, moduleAllocationEth := 5000000000,
+    lidoDepositableEther := 5000000000,
+    allocations := [1000000000, 1000000000] }
+
+/-- Aligned, within every per-index limit, but the aggregate exceeds
+`smDepositableEthAmountRounded`, so the over-target comparison at source line
+737 fires. -/
+private def overTargetInput : SourceTopupInput :=
+  { misalignedInput with
+    topUpLimits := [3000000000], allocations := [2000000000],
+    maxTopUpPerBlockGwei := 1, moduleAllocationEth := 1000000000 }
+
+/-- A returndata array that passes all three guards and commits. -/
+private def honestInput : SourceTopupInput :=
+  { misalignedInput with allocations := [1000000000] }
+
+/-- MUTANT of `SolidityTopup.run`: the allocation loop of source lines
+722--734 is deleted, so whatever the untrusted module returned is spent
+unguarded.  SINGLE edit: the `match allocationLoop …` is replaced by its `none`
+branch; every other guard and the honest `runPush` tail are unchanged. -/
+private def mutantRunNoAllocationGuards (cfg : SourceTopupConfig)
+    (inp : SourceTopupInput) : Outcome :=
+  if inp.callerIsTopUpGateway = false then
+    .revertNotAuthorized
+  else if inp.keyIndicesLength = 0 then
+    .revertEmptyKeysList
+  else if inp.operatorIdsLength ≠ inp.keyIndicesLength
+      ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+      ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength then
+    .revertArraysLengthMismatch
+  else if inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) then
+    .revertWrongPubkeyLength
+  else if inp.moduleExists = false then
+    .revertStakingModuleUnregistered
+  else if inp.moduleActive = false then
+    .revertStakingModuleNotActive
+  else if inp.wcTypeIsType2 = false then
+    .revertWrongWithdrawalCredentialsType
+  else if cfg.gwei = 0 then
+    .revertGweiModuloByZero
+  else if smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false then
+    .revertLidoDepositsPaused
+  else
+    if smDepositableEthAmountRounded cfg inp < accumulated inp then
+      .revertModuleReturnExceedTarget
+    else if accumulated inp = 0 then
+      .committedNoTopUp
+    else
+      runPush cfg inp
+
+/-- MUTANT of `SolidityTopup.run`: the aggregate over-target comparison at
+source line 737 is deleted.  SINGLE edit; the allocation loop and the honest
+`runPush` tail are unchanged. -/
+private def mutantRunNoOverTargetGuard (cfg : SourceTopupConfig)
+    (inp : SourceTopupInput) : Outcome :=
+  if inp.callerIsTopUpGateway = false then
+    .revertNotAuthorized
+  else if inp.keyIndicesLength = 0 then
+    .revertEmptyKeysList
+  else if inp.operatorIdsLength ≠ inp.keyIndicesLength
+      ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+      ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength then
+    .revertArraysLengthMismatch
+  else if inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) then
+    .revertWrongPubkeyLength
+  else if inp.moduleExists = false then
+    .revertStakingModuleUnregistered
+  else if inp.moduleActive = false then
+    .revertStakingModuleNotActive
+  else if inp.wcTypeIsType2 = false then
+    .revertWrongWithdrawalCredentialsType
+  else if cfg.gwei = 0 then
+    .revertGweiModuloByZero
+  else if smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false then
+    .revertLidoDepositsPaused
+  else match allocationLoop cfg inp.allocations inp.topUpLimits with
+    | some o => o
+    | none =>
+      if accumulated inp = 0 then
+        .committedNoTopUp
+      else
+        runPush cfg inp
+
+/-- The allocation-loop mutation is surgical: wherever the honest loop runs to
+completion, the mutant coincides with `run` branch for branch. -/
+theorem mutantRunNoAllocationGuards_eq_run_of_loop_clean {cfg : SourceTopupConfig}
+    {inp : SourceTopupInput}
+    (h : allocationLoop cfg inp.allocations inp.topUpLimits = none) :
+    mutantRunNoAllocationGuards cfg inp = run cfg inp := by
+  rw [mutantRunNoAllocationGuards, run]
+  by_cases hAuth : inp.callerIsTopUpGateway = false
+  · rw [if_pos hAuth, if_pos hAuth]
+  rw [if_neg hAuth, if_neg hAuth]
+  by_cases hKeys : inp.keyIndicesLength = 0
+  · rw [if_pos hKeys, if_pos hKeys]
+  rw [if_neg hKeys, if_neg hKeys]
+  by_cases hLens : inp.operatorIdsLength ≠ inp.keyIndicesLength
+      ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+      ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength
+  · rw [if_pos hLens, if_pos hLens]
+  rw [if_neg hLens, if_neg hLens]
+  by_cases hPub : (inp.pubkeyLengths.any fun l => l != cfg.pubkeyLength) = true
+  · rw [if_pos hPub, if_pos hPub]
+  rw [if_neg hPub, if_neg hPub]
+  by_cases hMod : inp.moduleExists = false
+  · rw [if_pos hMod, if_pos hMod]
+  rw [if_neg hMod, if_neg hMod]
+  by_cases hActive : inp.moduleActive = false
+  · rw [if_pos hActive, if_pos hActive]
+  rw [if_neg hActive, if_neg hActive]
+  by_cases hWc : inp.wcTypeIsType2 = false
+  · rw [if_pos hWc, if_pos hWc]
+  rw [if_neg hWc, if_neg hWc]
+  by_cases hGwei : cfg.gwei = 0
+  · rw [if_pos hGwei, if_pos hGwei]
+  rw [if_neg hGwei, if_neg hGwei]
+  by_cases hPaused : smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false
+  · rw [if_pos hPaused, if_pos hPaused]
+  rw [if_neg hPaused, if_neg hPaused, h]
+
+/-- The over-target mutation is surgical: wherever the honest comparison
+passes, the mutant coincides with `run` branch for branch. -/
+theorem mutantRunNoOverTargetGuard_eq_run_of_within_target {cfg : SourceTopupConfig}
+    {inp : SourceTopupInput}
+    (h : ¬ smDepositableEthAmountRounded cfg inp < accumulated inp) :
+    mutantRunNoOverTargetGuard cfg inp = run cfg inp := by
+  rw [mutantRunNoOverTargetGuard, run]
+  by_cases hAuth : inp.callerIsTopUpGateway = false
+  · rw [if_pos hAuth, if_pos hAuth]
+  rw [if_neg hAuth, if_neg hAuth]
+  by_cases hKeys : inp.keyIndicesLength = 0
+  · rw [if_pos hKeys, if_pos hKeys]
+  rw [if_neg hKeys, if_neg hKeys]
+  by_cases hLens : inp.operatorIdsLength ≠ inp.keyIndicesLength
+      ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+      ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength
+  · rw [if_pos hLens, if_pos hLens]
+  rw [if_neg hLens, if_neg hLens]
+  by_cases hPub : (inp.pubkeyLengths.any fun l => l != cfg.pubkeyLength) = true
+  · rw [if_pos hPub, if_pos hPub]
+  rw [if_neg hPub, if_neg hPub]
+  by_cases hMod : inp.moduleExists = false
+  · rw [if_pos hMod, if_pos hMod]
+  rw [if_neg hMod, if_neg hMod]
+  by_cases hActive : inp.moduleActive = false
+  · rw [if_pos hActive, if_pos hActive]
+  rw [if_neg hActive, if_neg hActive]
+  by_cases hWc : inp.wcTypeIsType2 = false
+  · rw [if_pos hWc, if_pos hWc]
+  rw [if_neg hWc, if_neg hWc]
+  by_cases hGwei : cfg.gwei = 0
+  · rw [if_pos hGwei, if_pos hGwei]
+  rw [if_neg hGwei, if_neg hGwei]
+  by_cases hPaused : smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false
+  · rw [if_pos hPaused, if_pos hPaused]
+  rw [if_neg hPaused, if_neg hPaused]
+  cases hLoop : allocationLoop cfg inp.allocations inp.topUpLimits with
+  | some o => rfl
+  | none => rw [if_neg h]
+
+/-- Positive control (NOT a kill-line): the honest `run` rejects each of the
+four returndata witnesses with exactly the source guard's outcome, projected
+from the registered parent's fifth conjunct. -/
+theorem guard_discharge_at_returndata_witnesses :
+    run guardCfg misalignedInput = .revertAmountNotAlignedToGwei ∧
+      run guardCfg overLimitInput = .revertAllocationExceedsLimit ∧
+      run guardCfg overLongInput = .revertTopUpLimitIndexOutOfBounds ∧
+      run guardCfg overTargetInput = .revertModuleReturnExceedTarget :=
+  ⟨((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+        (State := Unit) guardCfg misalignedInput () () [] ⟨[], [], []⟩).2.2.2.2
+      (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+      (by decide) (by decide)).1 _ (by decide),
+   ((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+        (State := Unit) guardCfg overLimitInput () () [] ⟨[], [], []⟩).2.2.2.2
+      (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+      (by decide) (by decide)).1 _ (by decide),
+   ((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+        (State := Unit) guardCfg overLongInput () () [] ⟨[], [], []⟩).2.2.2.2
+      (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+      (by decide) (by decide)).1 _ (by decide),
+   ((LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back
+        (State := Unit) guardCfg overTargetInput () () [] ⟨[], [], []⟩).2.2.2.2
+      (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+      (by decide) (by decide)).2 (by decide) (by decide)⟩
+
+/-- KILL-LINE for the registered parent's fifth conjunct, first half (the
+allocation loop of source lines 722--734).  At each of the three witnesses the
+conjunct's antecedents hold and `allocationLoop` names a specific revert, yet
+the mutant without the loop does NOT return it: at the two length-matched
+witnesses it COMMITS and moves the misaligned / over-limit wei the honest run
+refuses, and at the over-long witness it falls through to the deposit loop's
+own array-length mismatch instead of the line 728 bounds panic.  Antecedents
+conjoined with the negated consequent refute the conjunct's implication on the
+mutant. -/
+theorem dropped_allocation_guards_kill_line_refutes_parent :
+    allocationLoop guardCfg misalignedInput.allocations misalignedInput.topUpLimits
+        = some .revertAmountNotAlignedToGwei ∧
+      (mutantRunNoAllocationGuards guardCfg misalignedInput).reverts = false ∧
+      (mutantRunNoAllocationGuards guardCfg misalignedInput).pushed = 1000000001 ∧
+      allocationLoop guardCfg overLimitInput.allocations overLimitInput.topUpLimits
+        = some .revertAllocationExceedsLimit ∧
+      (mutantRunNoAllocationGuards guardCfg overLimitInput).reverts = false ∧
+      (mutantRunNoAllocationGuards guardCfg overLimitInput).pushed = 2000000000 ∧
+      allocationLoop guardCfg overLongInput.allocations overLongInput.topUpLimits
+        = some .revertTopUpLimitIndexOutOfBounds ∧
+      mutantRunNoAllocationGuards guardCfg overLongInput
+        ≠ .revertTopUpLimitIndexOutOfBounds := by
+  decide
+
+/-- KILL-LINE for the registered parent's fifth conjunct, second half (the
+aggregate over-target comparison at source line 737).  At `overTargetInput` the
+antecedents hold, the loop is clean, and the aggregate exceeds
+`smDepositableEthAmountRounded`, yet the mutant without the comparison COMMITS
+and pulls 2 ETH against a 1 ETH rounded target. -/
+theorem dropped_over_target_guard_kill_line_refutes_parent :
+    allocationLoop guardCfg overTargetInput.allocations overTargetInput.topUpLimits = none ∧
+      smDepositableEthAmountRounded guardCfg overTargetInput < accumulated overTargetInput ∧
+      (mutantRunNoOverTargetGuard guardCfg overTargetInput).reverts = false ∧
+      (mutantRunNoOverTargetGuard guardCfg overTargetInput).pulled = 2000000000 ∧
+      mutantRunNoOverTargetGuard guardCfg overTargetInput
+        ≠ .revertModuleReturnExceedTarget := by
+  decide
+
+/-! ## Wave 7: the same three guards on the executable Verity plane -/
+
+/-- The same four witnesses as `TopupCall`s: key count, module returndata,
+per-index limits, rounded target. -/
+private def misalignedCall : TopupCall := ⟨1, [1000000001], [2000000000], 3000000000⟩
+private def overLimitCall : TopupCall := ⟨1, [2000000000], [1000000000], 3000000000⟩
+private def overLongCall : TopupCall := ⟨1, [1000000000, 1000000000], [2000000000], 5000000000⟩
+private def overTargetCall : TopupCall := ⟨1, [2000000000], [3000000000], 1000000000⟩
+private def honestCall : TopupCall := ⟨1, [1000000000], [2000000000], 3000000000⟩
+
+/-- Single-edit mutations of the corrected executable transaction. -/
+inductive GuardMutation where
+  | none
+  | noAlignment
+  | noLimit
+  | noBoundsPanic
+  | noOverTarget
+  | noModuleFrame
+  deriving DecidableEq, Repr
+
+private def mutantGuardLoop (m : GuardMutation) (cfg : SourceTopupConfig) :
+    List Nat → List Nat → Contract Unit
+  | [], _ => Verity.pure ()
+  | a :: _, [] => do
+      if m ≠ .noAlignment then
+        require (decide (a % cfg.gwei = 0)) "AmountNotAlignedToGwei"
+      else Verity.pure ()
+      if m ≠ .noBoundsPanic then require false "TopUpLimitIndexOutOfBounds"
+      else Verity.pure ()
+  | a :: as, l :: ls => do
+      if m ≠ .noAlignment then
+        require (decide (a % cfg.gwei = 0)) "AmountNotAlignedToGwei"
+      else Verity.pure ()
+      if m ≠ .noLimit then require (decide (a ≤ l)) "AllocationExceedsLimit"
+      else Verity.pure ()
+      mutantGuardLoop m cfg as ls
+
+private def mutantGuardedStage (m : GuardMutation) (cfg : SourceTopupConfig)
+    (limits : List Nat) (roundedTarget : Nat) (returned : List Nat)
+    (failure : FailurePoint) : Contract Unit := do
+  mutantGuardLoop m cfg returned limits
+  if m ≠ .noOverTarget then
+    require (decide (allocSumUnchecked returned ≤ roundedTarget)) "ModuleReturnExceedTarget"
+  else Verity.pure ()
+  execute returned failure
+
+/-- `.noModuleFrame` is the fidelity-gap mutant itself: the guards remain, but
+the guarded array is taken as a free input rather than bound from a journalled
+`allocateDeposits` frame.  That is exactly the pre-wave-7 `execute` shape. -/
+private def mutantExecuteGuarded (m : GuardMutation) (cfg : SourceTopupConfig)
+    (call : TopupCall) (failure : FailurePoint) : Contract Unit :=
+  if m = .noModuleFrame then
+    mutantGuardedStage m cfg call.topUpLimits call.roundedTarget call.moduleReturndata failure
+  else do
+    let returned ← allocateDeposits call.keyCount call.moduleReturndata
+    mutantGuardedStage m cfg call.topUpLimits call.roundedTarget returned failure
+
+/-- The unmutated mutant *is* the corrected transaction. -/
+theorem guard_mutant_none_reproduces_executeGuarded :
+    (mutantExecuteGuarded .none guardCfg honestCall .none).run frame
+      = (executeGuarded guardCfg honestCall .none).run frame := by rfl
+
+/-- Positive control (NOT a kill-line): the corrected transaction reverts at
+each guard witness with the source guard's own reason, and the reason is the
+one `guardReason` pairs with the source `Outcome`. -/
+theorem guarded_transaction_reverts_at_each_guard :
+    (executeGuarded guardCfg misalignedCall .none).run frame
+        = .revert (guardReason .revertAmountNotAlignedToGwei) frame ∧
+      (executeGuarded guardCfg overLimitCall .none).run frame
+        = .revert (guardReason .revertAllocationExceedsLimit) frame ∧
+      (executeGuarded guardCfg overLongCall .none).run frame
+        = .revert (guardReason .revertTopUpLimitIndexOutOfBounds) frame ∧
+      (executeGuarded guardCfg overTargetCall .none).run frame
+        = .revert "ModuleReturnExceedTarget" frame :=
+  ⟨rfl, rfl, rfl, rfl⟩
+
+/-- Positive control (NOT a kill-line): on a returndata array that passes all
+three guards, the corrected transaction commits and its journal is
+`guardedObservables` -- the source-shaped journal with the `allocateDeposits`
+frame in front.  Projected from the registered parent's Verity conjunct. -/
+theorem guarded_journal_starts_with_the_module_call :
+    observe frame honestCall.moduleReturndata.length
+        ((executeGuarded guardCfg honestCall .none).run frame)
+      = guardedObservables honestCall ∧
+    (guardedObservables honestCall).callNames
+      = ["allocateDeposits", "withdrawDepositableEther", "makeBeaconChainTopUp"] ∧
+    (allocateEntry honestCall.keyCount honestCall.moduleReturndata).returndata
+      = honestCall.moduleReturndata :=
+  ⟨((LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close
+        guardCfg honestInput defaultState (by decide) (by decide) (by decide)).2.2
+      honestCall).2.2.2 (by decide) (by decide) (by decide) (by decide),
+   by decide,
+   allocateEntry_returndata _ _⟩
+
+/-- KILL-LINE for the registered parent's Verity conjunct (2), the executable
+dual of the source allocation-loop kill-line.  Each single-guard mutant COMMITS
+at the witness where the corrected transaction reverts with the paired
+`guardReason`, and moves the wei the guard exists to stop. -/
+theorem verity_dropped_allocation_guards_kill_line_refutes_parent :
+    (observe frame 1
+        ((mutantExecuteGuarded .noAlignment guardCfg misalignedCall .none).run frame)).pushed
+        = 1000000001 ∧
+      (observe frame 1
+        ((executeGuarded guardCfg misalignedCall .none).run frame)).committed = false ∧
+      (observe frame 1
+        ((mutantExecuteGuarded .noLimit guardCfg overLimitCall .none).run frame)).pushed
+        = 2000000000 ∧
+      (observe frame 1
+        ((executeGuarded guardCfg overLimitCall .none).run frame)).committed = false ∧
+      (observe frame 2
+        ((mutantExecuteGuarded .noBoundsPanic guardCfg overLongCall .none).run frame)).pushed
+        = 2000000000 ∧
+      (observe frame 2
+        ((executeGuarded guardCfg overLongCall .none).run frame)).committed = false := by
+  decide
+
+/-- KILL-LINE for the registered parent's Verity conjunct (3): dropping the
+aggregate comparison lets the transaction pull and push 2 ETH against a 1 ETH
+rounded target. -/
+theorem verity_dropped_over_target_guard_kill_line_refutes_parent :
+    (observe frame 1
+        ((mutantExecuteGuarded .noOverTarget guardCfg overTargetCall .none).run frame)).pulled
+        = 2000000000 ∧
+      (observe frame 1
+        ((mutantExecuteGuarded .noOverTarget guardCfg overTargetCall .none).run frame)).pushed
+        = 2000000000 ∧
+      (observe frame 1
+        ((executeGuarded guardCfg overTargetCall .none).run frame)).committed = false := by
+  decide
+
+/-- KILL-LINE for the registered parent's Verity conjunct (1), the binding
+conjunct.  `.noModuleFrame` keeps all three guards but takes the guarded array
+as a free input, so no `allocateDeposits` frame is journalled.
+
+The first component is the negation of conjunct (1) itself at `failure = .none`:
+its right-hand side is the guard-and-spend stage run on the *journalled frame's*
+returndata from the post-frame state, exactly as
+`executeGuarded_binds_returndata` states it, and the mutant does not equal it.
+So the refuted equality is the binding one, not a liveness observable.
+
+The second component is the decidable witness that separates the two sides --
+the observed call sequence loses its `allocateDeposits` head -- and is in its
+own right a kill-line for liveness conjunct (4).  One missing journal head
+therefore refutes both conjuncts, and conjunct (1) is refuted on its own
+statement. -/
+theorem dropped_module_frame_kill_line_refutes_parent :
+    mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none frame
+        ≠ guardedStage guardCfg honestCall.topUpLimits honestCall.roundedTarget
+            (allocateEntry honestCall.keyCount honestCall.moduleReturndata).returndata .none
+          { frame with
+            calls := frame.calls
+              ++ [allocateEntry honestCall.keyCount honestCall.moduleReturndata] } ∧
+      observe frame honestCall.moduleReturndata.length
+          ((mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none).run frame)
+        ≠ guardedObservables honestCall :=
+  ⟨fun h =>
+    absurd (congrArg (observe frame honestCall.moduleReturndata.length) h) (by decide),
+   by decide⟩
+
+/-- The gap as an exhibit: the free-allocation `execute` -- the pre-wave-7
+executable model, still used by the wrap-plane theorems -- COMMITS the very
+batch the returndata guards reject, because nothing there conditions on what
+the module returned. -/
+theorem free_allocation_execute_commits_what_the_guards_reject :
+    (observe frame 1 ((execute misalignedCall.moduleReturndata .none).run frame)).committed
+        = true ∧
+      (executeGuarded guardCfg misalignedCall .none).run frame
+        = .revert "AmountNotAlignedToGwei" frame := by
+  exact ⟨by decide, rfl⟩
 
 end LidoSRv3.Tests.TopupTxMutants

@@ -894,4 +894,364 @@ theorem revert_observes_nothing (allocations : List Nat) (failure : FailurePoint
       = ⟨false, [], 0, 0, 0, [], [], [], []⟩ := by
   rw [h]; rfl
 
+/-! ## The module call and its returndata guards
+
+`execute` above takes the allocation list as a free argument.  Nothing in it
+records that the array is the returndata of
+`IStakingModuleV2.allocateDeposits` (source lines 717--718), and nothing
+enforces the three guards the router applies to that returndata *before* any
+wei moves:
+
+* the gwei alignment test at source line 724;
+* the per-index `_topUpLimits[i]` bound at source line 728, whose read panics
+  when the module returns more entries than there are keys;
+* the aggregate over-target comparison at source line 737, read on the
+  `unchecked` accumulator of line 732.
+
+That is the reviewed P-TOPUP-1 fidelity gap.  The definitions below close it on
+the executable plane: the allocation array becomes the journalled module
+frame's `returndata`, and the guards are conditioned on exactly that array.
+
+The residual boundary is stated rather than hidden: Verity's single-contract
+`Contract` surface has no callee, so the returned words are still chosen by
+whoever instantiates the frame.  That is the correct modelling of an
+*untrusted* module -- the theorems below quantify over every possible
+returndata -- but it is not an executed callee, and no claim here says
+otherwise. -/
+
+/-- Model pin for the staking module the router calls at source line 717.  No
+equality with any deployed module address is claimed. -/
+def moduleAddress : Address := (0x5140 : Address)
+
+/-- The journalled `allocateDeposits` frame: a zero-value call to the module
+whose `returndata` words are the allocation array the router then guards and
+spends.
+
+Calldata fidelity is *partial* and deliberately so.  The pinned call at source
+line 718 passes
+`(smDepositableEthAmountRounded, _pubkeys, _keyIndices, _operatorIds, _topUpLimits)`;
+this frame carries a single key-count word.  The correction being made here is
+about where the guarded array comes from and which guards run on it, so the
+argument words are modelled only far enough to make the frame observable and
+distinguishable.  No theorem below reads the calldata for anything except that
+observation, and none claims ABI-exact encoding of the module call. -/
+def allocateEntry (keyCount : Nat) (returndata : List Nat) : ExternalCall :=
+  linkedCallEntryTo "allocateDeposits" moduleAddress 0 [(keyCount : Uint256)]
+    .success returndata
+
+theorem allocateEntry_name (keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry keyCount returndata).name = "allocateDeposits" := rfl
+theorem allocateEntry_target (keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry keyCount returndata).target = moduleAddress.toNat := rfl
+theorem allocateEntry_value (keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry keyCount returndata).value = 0 := rfl
+theorem allocateEntry_calldata (keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry keyCount returndata).calldata = [evmWord keyCount] := rfl
+
+/-- The fact the whole correction turns on: the words the guarded transaction
+consumes *are* the journalled frame's returndata. -/
+theorem allocateEntry_returndata (keyCount : Nat) (returndata : List Nat) :
+    (allocateEntry keyCount returndata).returndata = returndata := rfl
+
+/-- The module call as a transaction step: it journals the frame and binds the
+frame's returndata.  Callers of `executeGuarded` supply the module's return,
+never the guarded array directly. -/
+def allocateDeposits (keyCount : Nat) (returndata : List Nat) : Contract (List Nat) :=
+  fun state =>
+    .success (allocateEntry keyCount returndata).returndata
+      { state with calls := state.calls ++ [allocateEntry keyCount returndata] }
+
+/-- The router's returndata guards, source lines 722--734, as a transaction
+step.  Guard order is source order: the alignment test at line 724 precedes the
+`_topUpLimits[i]` read at line 728, so an over-long returndata array trips
+alignment for its extra entry first and the out-of-bounds panic second. -/
+def guardLoop (cfg : SourceTopupConfig) : List Nat → List Nat → Contract Unit
+  | [], _ => Verity.pure ()
+  | a :: _, [] => do
+      require (decide (a % cfg.gwei = 0)) "AmountNotAlignedToGwei"
+      require false "TopUpLimitIndexOutOfBounds"
+  | a :: as, l :: ls => do
+      require (decide (a % cfg.gwei = 0)) "AmountNotAlignedToGwei"
+      require (decide (a ≤ l)) "AllocationExceedsLimit"
+      guardLoop cfg as ls
+
+/-- The revert string each source guard outcome maps to.  Pairing the two
+makes the executable guard and the source `Outcome` constructor the *same*
+guard rather than two independently drifting ones. -/
+def guardReason : Outcome → String
+  | .revertAmountNotAlignedToGwei => "AmountNotAlignedToGwei"
+  | .revertTopUpLimitIndexOutOfBounds => "TopUpLimitIndexOutOfBounds"
+  | .revertAllocationExceedsLimit => "AllocationExceedsLimit"
+  | _ => "NOT_AN_ALLOCATION_LOOP_GUARD"
+
+theorem guardLoop_success (cfg : SourceTopupConfig) :
+    ∀ (allocations limits : List Nat) (state : ContractState),
+      allocationLoop cfg allocations limits = none →
+        guardLoop cfg allocations limits state = ContractResult.success () state := by
+  intro allocations
+  induction allocations with
+  | nil => intro limits state _; rfl
+  | cons a as ih =>
+      intro limits state h
+      cases limits with
+      | nil =>
+          rw [allocationLoop] at h
+          split at h <;> simp at h
+      | cons l ls =>
+          rw [allocationLoop] at h
+          split at h
+          · simp at h
+          · rename_i hAlign
+            split at h
+            · simp at h
+            · rename_i hLimit
+              simp only [ne_eq, not_not] at hAlign
+              simp only [Nat.not_lt] at hLimit
+              rw [guardLoop]
+              simp only [Bind.bind, _root_.Verity.bind, _root_.Verity.require,
+                hAlign, decide_true, if_true, hLimit]
+              exact ih ls state h
+
+theorem guardLoop_revert (cfg : SourceTopupConfig) :
+    ∀ (allocations limits : List Nat) (o : Outcome) (state : ContractState),
+      allocationLoop cfg allocations limits = some o →
+        guardLoop cfg allocations limits state
+          = ContractResult.revert (guardReason o) state := by
+  intro allocations
+  induction allocations with
+  | nil => intro limits o state h; rw [allocationLoop] at h; simp at h
+  | cons a as ih =>
+      intro limits o state h
+      cases limits with
+      | nil =>
+          rw [allocationLoop] at h
+          rw [guardLoop]
+          split at h
+          · rename_i hAlign
+            cases h
+            simp [Bind.bind, _root_.Verity.bind, _root_.Verity.require, guardReason, hAlign]
+          · rename_i hAlign
+            cases h
+            simp only [ne_eq, not_not] at hAlign
+            simp [Bind.bind, _root_.Verity.bind, _root_.Verity.require, guardReason, hAlign]
+      | cons l ls =>
+          rw [allocationLoop] at h
+          rw [guardLoop]
+          split at h
+          · rename_i hAlign
+            cases h
+            simp [Bind.bind, _root_.Verity.bind, _root_.Verity.require, guardReason, hAlign]
+          · rename_i hAlign
+            simp only [ne_eq, not_not] at hAlign
+            split at h
+            · rename_i hLimit
+              cases h
+              simp [Bind.bind, _root_.Verity.bind, _root_.Verity.require, guardReason,
+                hAlign, Nat.not_le.mpr hLimit]
+            · rename_i hLimit
+              simp only [Nat.not_lt] at hLimit
+              simp only [Bind.bind, _root_.Verity.bind, _root_.Verity.require,
+                hAlign, decide_true, if_true, hLimit]
+              exact ih ls o state h
+
+/-- One top-up call's returndata-facing data: the key count the router passes
+to the module, the words the module returns, the per-index limits it is held
+to, and the rounded module target of source line 737. -/
+structure TopupCall where
+  /-- `n = _keyIndices.length`, the argument word at source lines 717--718. -/
+  keyCount : Nat
+  /-- The words `IStakingModuleV2.allocateDeposits` returns at source lines
+  717--718.  Unconstrained: the module is untrusted. -/
+  moduleReturndata : List Nat
+  /-- `_topUpLimits`, the per-index bounds read at source line 728. -/
+  topUpLimits : List Nat
+  /-- `smDepositableEthAmountRounded`, the target compared at source line 737. -/
+  roundedTarget : Nat
+  deriving Repr, DecidableEq
+
+/-- Everything the router does *to* the module's returndata: guard it, then
+spend it. -/
+def guardedStage (cfg : SourceTopupConfig) (limits : List Nat) (roundedTarget : Nat)
+    (returned : List Nat) (failure : FailurePoint) : Contract Unit := do
+  guardLoop cfg returned limits
+  require (decide (allocSumUnchecked returned ≤ roundedTarget)) "ModuleReturnExceedTarget"
+  execute returned failure
+
+/-- The corrected executable top-up: call the module, then guard and spend
+exactly what it returned. -/
+def executeGuarded (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint) :
+    Contract Unit := do
+  let returned ← allocateDeposits call.keyCount call.moduleReturndata
+  guardedStage cfg call.topUpLimits call.roundedTarget returned failure
+
+/-- The binding statement.  `executeGuarded` journals the module frame and then
+runs the guard-and-spend stage on *that frame's returndata*; the allocation
+array is not a free argument of the guarded transaction. -/
+theorem executeGuarded_binds_returndata (cfg : SourceTopupConfig) (call : TopupCall)
+    (failure : FailurePoint) (state : ContractState) :
+    executeGuarded cfg call failure state =
+      guardedStage cfg call.topUpLimits call.roundedTarget
+          (allocateEntry call.keyCount call.moduleReturndata).returndata failure
+        { state with
+          calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } :=
+  rfl
+
+/-- Alignment, per-index limit, and out-of-bounds all fail closed with the
+source guard's own name, and `Contract.run` restores the entry snapshot. -/
+theorem executeGuarded_reverts_on_allocation_guard (cfg : SourceTopupConfig)
+    (call : TopupCall) (o : Outcome) (failure : FailurePoint) (state : ContractState)
+    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = some o) :
+    (executeGuarded cfg call failure).run state
+      = ContractResult.revert (guardReason o) state := by
+  have hStage : executeGuarded cfg call failure state
+      = ContractResult.revert (guardReason o)
+          { state with
+            calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+    rw [executeGuarded_binds_returndata, allocateEntry_returndata]
+    simp only [guardedStage, Bind.bind, _root_.Verity.bind]
+    rw [guardLoop_revert cfg call.moduleReturndata call.topUpLimits o _ hLoop]
+  simp [Contract.run, hStage]
+
+/-- The aggregate over-target guard at source line 737 fails closed on the
+same accumulator the source reads (`allocSumUnchecked`, mod 2^256). -/
+theorem executeGuarded_reverts_on_over_target (cfg : SourceTopupConfig)
+    (call : TopupCall) (failure : FailurePoint) (state : ContractState)
+    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
+    (hOver : call.roundedTarget < allocSumUnchecked call.moduleReturndata) :
+    (executeGuarded cfg call failure).run state
+      = ContractResult.revert "ModuleReturnExceedTarget" state := by
+  have hStage : executeGuarded cfg call failure state
+      = ContractResult.revert "ModuleReturnExceedTarget"
+          { state with
+            calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+    rw [executeGuarded_binds_returndata, allocateEntry_returndata]
+    simp only [guardedStage, Bind.bind, _root_.Verity.bind]
+    rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
+    simp [_root_.Verity.require, Nat.not_le.mpr hOver]
+  simp [Contract.run, hStage]
+
+/-- With every returndata guard passed, the guarded transaction is exactly the
+unguarded one run on the module's returndata from the post-frame state. -/
+theorem executeGuarded_apply_of_guards_pass (cfg : SourceTopupConfig) (call : TopupCall)
+    (failure : FailurePoint) (state : ContractState)
+    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
+    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata) :
+    executeGuarded cfg call failure state =
+      execute call.moduleReturndata failure
+        { state with
+          calls := state.calls ++ [allocateEntry call.keyCount call.moduleReturndata] } := by
+  rw [executeGuarded_binds_returndata, allocateEntry_returndata]
+  simp only [guardedStage, Bind.bind, _root_.Verity.bind]
+  rw [guardLoop_success cfg call.moduleReturndata call.topUpLimits _ hLoop]
+  simp [_root_.Verity.require, Nat.not_lt.mp hTarget]
+
+/-- Whatever the guarded transaction mutated, `Contract.run` hands back the
+entry snapshot. -/
+theorem executeGuarded_revert_restores_snapshot (cfg : SourceTopupConfig) (call : TopupCall)
+    (failure : FailurePoint) (state rollback : ContractState) (reason : String)
+    (h : (executeGuarded cfg call failure).run state
+      = ContractResult.revert reason rollback) : rollback = state := by
+  unfold Contract.run at h
+  split at h <;> simp_all
+
+/-! ## Observables of the guarded transaction -/
+
+/-- The unguarded schedule with the module frame prepended. -/
+def guardedObservables (call : TopupCall) : OutcomeObservables :=
+  let base := sourceObservables call.moduleReturndata
+  { base with
+    callNames := "allocateDeposits" :: base.callNames
+    callTargets := moduleAddress.toNat :: base.callTargets
+    callValues := 0 :: base.callValues
+    callArgs := [evmWord call.keyCount] :: base.callArgs }
+
+/-- The unguarded run always ends with the journal it started from extended by
+`expectedCalls`; both the zero and the nonzero branch. -/
+theorem execute_run_calls (allocations : List Nat) (state : ContractState)
+    (hBalance : state.selfBalance = 0)
+    (hNoWrap : allocSum allocations < uint256Modulus) :
+    ∃ after, (execute allocations .none).run state = ContractResult.success () after ∧
+      after.calls = state.calls ++ expectedCalls allocations := by
+  have hEq : allocSumUnchecked allocations = allocSum allocations :=
+    allocSumUnchecked_eq_allocSum hNoWrap
+  by_cases hZero : allocSum allocations = 0
+  · refine ⟨_, execute_run_zero allocations state (by rw [hEq]; exact hZero), ?_⟩
+    have hcalls : ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0).calls
+        = state.calls := allocationPass_calls _ _ _ _
+    show ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0).calls = _
+    rw [hcalls, expectedCalls, hEq, if_pos hZero, List.append_nil]
+  · exact ⟨_, execute_run_nonzero allocations state hBalance hNoWrap hZero, rfl⟩
+
+/-- Observing across one extra leading journal entry.  The entry shows up as
+the head of every journal projection; every other observable is read off the
+post-state and is untouched. -/
+theorem observe_after_leading_entry (before after : ContractState) (entry : ExternalCall)
+    (tail : List ExternalCall) (count : Nat)
+    (hName : entry.name ≠ "makeBeaconChainTopUp")
+    (hCalls : after.calls = (before.calls ++ [entry]) ++ tail) :
+    observe before count (ContractResult.success () after) =
+      (let base := observe { before with calls := before.calls ++ [entry] } count
+        (ContractResult.success () after)
+       { base with
+         callNames := entry.name :: base.callNames
+         callTargets := entry.target :: base.callTargets
+         callValues := entry.value :: base.callValues
+         callArgs := entry.calldata :: base.callArgs }) := by
+  have hOuter : after.calls.drop before.calls.length = entry :: tail := by
+    rw [hCalls, List.append_assoc, List.drop_left]
+    rfl
+  have hInner : after.calls.drop (before.calls ++ [entry]).length = tail := by
+    rw [hCalls, List.drop_left]
+  simp only [observe, hOuter, hInner, callValueOf, beq_iff_eq, hName, if_false,
+    Nat.zero_add, List.map_cons]
+
+/-- The corrected transaction, run through `Contract.run` with every
+returndata guard passed, produces exactly the pinned source schedule *plus*
+the `allocateDeposits` frame it read its allocations from. -/
+theorem executeGuarded_observes_source (cfg : SourceTopupConfig) (call : TopupCall)
+    (state : ContractState)
+    (hLoop : allocationLoop cfg call.moduleReturndata call.topUpLimits = none)
+    (hTarget : ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata)
+    (hNoWrap : allocSum call.moduleReturndata < uint256Modulus)
+    (hLen : call.moduleReturndata.length ≤ uint256Modulus) :
+    observe (entryFrame state) call.moduleReturndata.length
+        ((executeGuarded cfg call .none).run (entryFrame state))
+      = guardedObservables call := by
+  have hStagedBalance :
+      ({ entryFrame state with
+          calls := (entryFrame state).calls
+            ++ [allocateEntry call.keyCount call.moduleReturndata] } : ContractState).selfBalance
+        = 0 := rfl
+  obtain ⟨after, hRun, hCalls⟩ :=
+    execute_run_calls call.moduleReturndata
+      { entryFrame state with
+        calls := (entryFrame state).calls
+          ++ [allocateEntry call.keyCount call.moduleReturndata] } hStagedBalance hNoWrap
+  have hRaw : execute call.moduleReturndata .none
+      { entryFrame state with
+        calls := (entryFrame state).calls
+          ++ [allocateEntry call.keyCount call.moduleReturndata] }
+      = ContractResult.success () after := by
+    unfold Contract.run at hRun
+    split at hRun <;> simp_all
+  have hGuardedRaw : (executeGuarded cfg call .none).run (entryFrame state)
+      = ContractResult.success () after := by
+    unfold Contract.run
+    rw [executeGuarded_apply_of_guards_pass cfg call .none (entryFrame state) hLoop hTarget, hRaw]
+  have hName : (allocateEntry call.keyCount call.moduleReturndata).name
+      ≠ "makeBeaconChainTopUp" := by rw [allocateEntry_name]; decide
+  have hInner : observe
+      { entryFrame state with
+        calls := (entryFrame state).calls
+          ++ [allocateEntry call.keyCount call.moduleReturndata] }
+      call.moduleReturndata.length (ContractResult.success () after)
+      = sourceObservables call.moduleReturndata := by
+    rw [← hRun]
+    exact execute_observes_source call.moduleReturndata _ hStagedBalance hNoWrap hLen
+  rw [hGuardedRaw, observe_after_leading_entry (entryFrame state) after
+    (allocateEntry call.keyCount call.moduleReturndata)
+    (expectedCalls call.moduleReturndata) call.moduleReturndata.length hName hCalls]
+  simp only [hInner, guardedObservables, allocateEntry_name, allocateEntry_target,
+    allocateEntry_value, allocateEntry_calldata]
+
 end LidoSRv3.Audit.Verity.TopupTx

@@ -157,6 +157,19 @@ CLAIMS = {
         # `VerityCommittingSimulation` are the nonzero-wrap closure the
         # registered parent `verity_tx_simulates_source_with_nonzero_wrap_close`
         # composes on top of `verity_tx_simulates_source`.
+        # `source_allocation_guards_required` /
+        # `source_over_target_guard_required` are the abstract parent's fifth
+        # conjunct -- the guards the router applies to the untrusted
+        # `allocateDeposits` returndata (gwei alignment at source line 724, the
+        # per-index `_topUpLimits[i]` bound and its out-of-bounds panic at line
+        # 728) and the aggregate over-target comparison at line 737 -- so they
+        # precede the parent for the same reason the three above do.
+        # `VerityGuardedReturndataSimulation` is the executable
+        # returndata-conditioned plane the registered Verity parent now
+        # quantifies over, and it is what makes that parent a claim about
+        # `executeGuarded` (module frame + guards) rather than only about the
+        # free-allocation `execute`.  A reader must not be able to quote either
+        # CHECKED row without all three.
         "declarations": (
             ("def", "guarantee"),
             ("def", "canonicalBeaconDepositAddress"),
@@ -165,6 +178,8 @@ CLAIMS = {
             ("theorem", "source_wrap_precludes_value_moving_commit"),
             ("theorem", "source_module_guard_required"),
             ("theorem", "source_wc_type2_guard_required"),
+            ("theorem", "source_allocation_guards_required"),
+            ("theorem", "source_over_target_guard_required"),
             ("theorem", "source_topup_conserves_and_rolls_back"),
             ("theorem", "source_router_balance_unchanged"),
             ("theorem", "source_reverting_branch_moves_no_ether"),
@@ -176,6 +191,7 @@ CLAIMS = {
             ("theorem", "verity_nonzero_wrap_witness_reverts_and_restores"),
             ("theorem", "verity_nonzero_wrap_reverts_and_restores"),
             ("def", "VerityCommittingSimulation"),
+            ("def", "VerityGuardedReturndataSimulation"),
             ("theorem", "verity_tx_simulates_source_with_nonzero_wrap_close"),
         ),
     },
