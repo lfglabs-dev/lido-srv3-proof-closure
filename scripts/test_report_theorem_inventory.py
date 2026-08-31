@@ -89,15 +89,73 @@ def main():
             invoke(fixture, False, f"omits declared theorem(s): {hidden}")
             lean_path.write_text(lean, encoding="utf-8")
 
+        # Lean identifiers are not ASCII.  A name may begin with a letter-like
+        # character (Greek, Coptic, Latin-1/Extended-A, script, double-struck),
+        # carry subscripts or `!`/`?`, be «guillemet-escaped», or be a `.`-joined
+        # compound name.  An ASCII-only capture does not recognize such a
+        # declaration at all, so the module could gain an ordinary Lean theorem
+        # that the report never lists while this gate still reported success.
+        # Every spelling below compiles under the pinned toolchain.
+        for spelling, hidden in (
+            ("theorem αUndisclosed", "αUndisclosed"),
+            ("theorem Δundisclosed", "Δundisclosed"),
+            ("theorem ℕundisclosed", "ℕundisclosed"),
+            ("theorem éundisclosed", "éundisclosed"),
+            ("theorem undisclosed₁", "undisclosed₁"),
+            ("theorem undisclosedᵢ", "undisclosedᵢ"),
+            ("theorem undisclosed?", "undisclosed?"),
+            ("theorem undisclosed!", "undisclosed!"),
+            ("theorem «undisclosed escaped»", "«undisclosed escaped»"),
+            ("theorem Undisclosed.dotted", "Undisclosed.dotted"),
+            ("lemma αundisclosed_lemma", "αundisclosed_lemma"),
+            ("  @[simp] private lemma αundisclosed_combined", "αundisclosed_combined"),
+        ):
+            report_path.write_text(report, encoding="utf-8")
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{spelling} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {hidden}")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # Reading Lean's identifiers must leave the gate satisfiable: the row
+        # parser has to accept every name the Lean parser can now find.  Were
+        # only one side widened, the gate would demand an inventory row it could
+        # never read, and no edit to the report could satisfy it.
+        declaration = "theorem αdisclosed : True := trivial"
+        widened_lean = lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                                    f"{declaration}\n\n"
+                                    "end LidoSRv3.Audit.Guarantees.PAlloc1", 1)
+        if widened_lean == lean:
+            raise AssertionError("unicode round-trip mutant changed nothing")
+        anchor = next(line for line in report.splitlines()
+                      if line.startswith("| `router_order_preserved` |"))
+        widened_report = report.replace(
+            anchor,
+            f"{anchor}\n| `αdisclosed` | "
+            f"{widened_lean.splitlines().index(declaration) + 1} | Abstract | "
+            "unregistered | Letter-like identifier round-trip fixture. |", 1)
+        lean_path.write_text(widened_lean, encoding="utf-8")
+        report_path.write_text(widened_report, encoding="utf-8")
+        invoke(fixture, True, "9 P-ALLOC-1 theorems")
+        lean_path.write_text(lean, encoding="utf-8")
+        report_path.write_text(report, encoding="utf-8")
+
         # The other direction: widening the parser to cover those variants must
         # not start counting lines that declare nothing.  A commented-out
         # declaration and an identifier that merely begins with the keyword are
-        # both still non-declarations.
+        # both still non-declarations.  `theoremαUndisclosed` is the case the
+        # Unicode widening introduces: α is an identifier character, so the
+        # whole word is one ordinary Lean name, not the keyword plus a theorem.
         for not_a_declaration in (
             "  -- theorem commented_out : True := trivial",
             "  -- lemma commented_out_lemma : True := trivial",
+            "  -- theorem αcommented_out : True := trivial",
             "def theorem_like_name : Nat := 0",
             "def lemma_like_name : Nat := 0",
+            "def theoremαUndisclosed : Nat := 0",
+            "def lemmaαUndisclosed : Nat := 0",
         ):
             lean_path.write_text(
                 lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
@@ -203,10 +261,12 @@ def main():
 
     print("report theorem inventory mutants rejected: dropped row, undisclosed theorem "
           "(column-zero, indented, tabbed, attributed, private, protected, nonrec, "
-          "`lemma`, and combined), declaration after a nested comment, `/-` in a line "
+          "`lemma`, and combined), letter-like/subscript/`!`/`?`/escaped/dotted Lean "
+          "identifiers, declaration after a nested comment, `/-` in a line "
           "comment and in a string literal, unterminated comment, report-only promotion, "
           "registry drift, stale line, missing plane; commented-out declarations, "
-          "theorem-like identifiers, and prose inside nested block comments not miscounted")
+          "theorem-like identifiers (ASCII and letter-like), and prose inside nested "
+          "block comments not miscounted; a letter-like name round-trips to a row")
 
 
 if __name__ == "__main__":

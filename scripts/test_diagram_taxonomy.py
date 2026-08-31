@@ -13,6 +13,26 @@ DIAGRAM = "diagram/index.html"
 DIAGRAM_README = "diagram/README.md"
 
 
+NODE = re.compile(r'<g class="node ([a-z]+)"(.*?)</g>', re.DOTALL)
+CARD = re.compile(r'<div class="c ([a-z]+)"><div class="n">(.*?)</div>(.*?</div>)</div>')
+
+
+def excise(diagram, pattern, needle, surface):
+    """Delete the single node or card that carries `needle`, leaving the rest."""
+    matches = [m for m in pattern.finditer(diagram) if needle in m.group(0)]
+    if len(matches) != 1:
+        raise AssertionError(f"expected one {surface} carrying {needle!r}, got {len(matches)}")
+    return diagram[:matches[0].start()] + diagram[matches[0].end():]
+
+
+def drop_node(diagram, needle):
+    return excise(diagram, NODE, needle, "node")
+
+
+def drop_card(diagram, needle):
+    return excise(diagram, CARD, needle, "card")
+
+
 def invoke(root, ok, needle=None):
     result = subprocess.run(
         ["python3", CHECKER], cwd=root,
@@ -124,6 +144,22 @@ def main():
             (diagram.replace("0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288", f"0x{'0' * 40}")
                     .replace("0xD624…B288", "0x0000…0000"),
              "the map no longer identifies HashConsensus"),
+            # The same entity dropped from one surface only.  Searching the
+            # canvas and the notes cards together let whichever surface survived
+            # vouch for the one that did not, so the primary drawing could lose
+            # a box while its card kept the gate green.  Each surface is
+            # asserted separately, in both directions.
+            (drop_node(diagram, "0x852deD"),
+             "the map no longer identifies AccountingOracle "
+             "(0x852deD011285fe67063a08005c71a85690503Cee) on the canvas"),
+            (drop_card(diagram, "0x852d"),
+             "the map no longer identifies AccountingOracle "
+             "(0x852deD011285fe67063a08005c71a85690503Cee) on the notes cards"),
+            # A predeploy is drawn as one node but named by three addresses;
+            # dropping that node must strand every identity bound to it rather
+            # than only the one that happens to be checked first.
+            (drop_node(diagram, "0x00000961Ef480Eb55e80D19ad83579A64c007002"),
+             "on the canvas"),
         ):
             if mutated == diagram:
                 raise AssertionError(f"diagram mutant for {needle!r} changed nothing")
@@ -171,7 +207,10 @@ def main():
           "oracle as quorum-held, HashConsensus demoted, guardian veto, 5/9 constant, "
           "EasyTrack veto, conflated verifiers, untooltipped node, undocumented class; "
           "relabelled node and card repaints and a dropped entity still caught by "
-          "address; `bot` compromise collapsed to a class-wide invariant rejected on "
+          "address; an entity dropped from one surface only (canvas node deleted with "
+          "its card kept, card deleted with its node kept, and a multi-address "
+          "predeploy node deleted) rejected per surface; `bot` compromise collapsed "
+          "to a class-wide invariant rejected on "
           "the README entry and on the rendered legend pill (restated, stripped, and "
           "with the slashable consequence dropped)")
 
