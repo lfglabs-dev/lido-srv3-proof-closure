@@ -689,6 +689,54 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, True)
+    # Adversarial family (P2 table-closing newline, discussion_r3890857888): recording
+    # only the newlines *between* rows left the newline that closes the table region
+    # unrecorded, so a final body row dropping its trailing pipe kept an unmatched
+    # '[' opener live across the boundary.  The following '](url "…' then formed a
+    # link GFM never forms and hid a second, genuinely rendered Verity row inside its
+    # apparent title, leaving the checker to see exactly one pin and accept the file.
+    # The variants differ in why the region closes: an unpiped line, a list item and
+    # an over-indented line all end it while carrying pipes of their own.
+    lean_row = next(l for l in original_lockfile.splitlines(keepends=True) if "| Lean |" in l)
+    for closer in ('](url "bad\n', '- ](url "bad | z\n', '    ](url "bad | z\n'):
+        lockfile_path.write_text(
+            original_lockfile.replace(
+                lean_row,
+                f'| Lean | [outer\n{closer}| Verity | `{OTHER}` |\ncontinued")\n',
+            ),
+            encoding="utf-8",
+        )
+        run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (discussion_r3890857888): the same bypass with the opener trailing
+    # other cell text, and with a single-cell final row.
+    for final in ('| Lean | v4 [outer\n', '| [outer\n'):
+        lockfile_path.write_text(
+            original_lockfile.replace(
+                lean_row, f'{final}](url "bad\n| Verity | `{OTHER}` |\ncontinued")\n'
+            ),
+            encoding="utf-8",
+        )
+        run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive (discussion_r3890857888): the converse direction of the same defect.
+    # GFM forms no link across the table boundary, so the sole genuine Verity row
+    # after the apparent title is rendered and the lockfile must be accepted; before
+    # the closing newline was recorded it was swallowed and a valid file rejected.
+    lockfile_path.write_text(
+        without_active.replace(
+            lean_row, f'| Lean | [outer\n](url "bad\n{verity_row}continued")\n'
+        ),
+        encoding="utf-8",
+    )
+    run(fixture, True)
+    # Positive (discussion_r3890857888): the closing newline is a boundary only at the
+    # table's edge.  A multiline link title opened in a later paragraph still forms and
+    # is still suppressed, so a wrong pin held there is link metadata, not a rendered
+    # row, and the genuine row inside the table keeps the file accepted.
+    lockfile_path.write_text(
+        original_lockfile + f'\n[x](url "bad\n| Verity | `{OTHER}` |\ncontinued")\n',
+        encoding="utf-8",
+    )
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -717,7 +765,8 @@ print(
     "nested-image-outer-link-title-family, nonblank-boundary-opener-wrong-pin, "
     "no-space-hash-same-block-opener-title, block-quote-continuation-title, "
     "non-table-pipe-lines-title, table-row-wrong-pin, "
-    "indented-delimiter-row-title-family, indented-header-row-title); "
+    "indented-delimiter-row-title-family, indented-header-row-title, "
+    "table-closing-newline-opener-family, table-closing-newline-opener-shape-family); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -742,6 +791,7 @@ print(
     "nested-image-outer-link-row-after, nonblank-leaf-boundary-opener-family, "
     "block-quote-interrupt-family, block-quote-title-row-after, "
     "gfm-table-row-boundary, gfm-table-cell-boundary, "
-    "short-indent-delimiter-row-family, over-indented-row-closes-table; "
+    "short-indent-delimiter-row-family, over-indented-row-closes-table, "
+    "table-closing-newline-row-after, after-table-multiline-title; "
     "checkout identity agree"
 )

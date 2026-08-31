@@ -158,8 +158,10 @@ def _ends_table(line: str) -> bool:
     Deliberately stricter than _crosses_block_boundary, because the two err in
     opposite directions.  Running a table region past its real end would split
     inline contexts GFM keeps together and could expose content hidden in a link
-    title, whereas ending a region early only leaves inline state uncleared,
-    which over-suppresses.  A continuation row must therefore carry an unescaped
+    title, whereas ending a region early only closes it at a newline GFM still
+    treats as a row separator, which over-suppresses — provided _table_separators
+    records that closing newline, without which an opener in the final row leaks
+    into the next block.  A continuation row must therefore carry an unescaped
     pipe, sit within three columns of indentation and start no other block
     structure; at four columns GFM closes the table and opens an indented chunk.
     """
@@ -182,6 +184,17 @@ def _table_separators(text: str) -> list[int]:
     between two rows.  Recognition is conservative — a header row plus a
     delimiter row with the same cell count is required — so a construct that is
     not certainly a table leaves inline parsing unchanged.
+
+    The newline that *closes* the region is recorded too, not only the ones
+    between rows.  Whichever way the region ends it is a real inline boundary:
+    if _ends_table stopped at the table's true end the newline separates the
+    table from the next leaf block, and if it stopped early — it is deliberately
+    stricter than GFM, which continues a table across an ordinary unpiped line —
+    the newline is still a row separator in the table GFM actually renders.
+    Omitting it let a final body row that drops its trailing pipe leave an
+    opener such as ``[outer`` live across the boundary, so a following
+    ``](url "…`` formed a link that GFM never forms and hid a rendered Verity
+    row inside its apparent title.
     """
     lines: list[tuple[int, str, int]] = []
     offset = 0
@@ -208,7 +221,7 @@ def _table_separators(text: str) -> list[int]:
         for index in range(row, end):
             start, line, newline = lines[index]
             separators.extend(start + k for k in _unescaped_pipes(line))
-            if index + 1 < end and newline >= 0:
+            if newline >= 0:
                 separators.append(newline)
         row = end
     return separators
