@@ -1066,14 +1066,32 @@ theorem verity_dropped_over_target_guard_kill_line_refutes_parent :
 
 /-- KILL-LINE for the registered parent's Verity conjunct (1), the binding
 conjunct.  `.noModuleFrame` keeps all three guards but takes the guarded array
-as a free input, so no `allocateDeposits` frame is journalled: the observed
-call sequence loses its head and no longer equals `guardedObservables`.  This
-is the fidelity gap itself, exhibited as a rejected mutant. -/
+as a free input, so no `allocateDeposits` frame is journalled.
+
+The first component is the negation of conjunct (1) itself at `failure = .none`:
+its right-hand side is the guard-and-spend stage run on the *journalled frame's*
+returndata from the post-frame state, exactly as
+`executeGuarded_binds_returndata` states it, and the mutant does not equal it.
+So the refuted equality is the binding one, not a liveness observable.
+
+The second component is the decidable witness that separates the two sides --
+the observed call sequence loses its `allocateDeposits` head -- and is in its
+own right a kill-line for liveness conjunct (4).  One missing journal head
+therefore refutes both conjuncts, and conjunct (1) is refuted on its own
+statement. -/
 theorem dropped_module_frame_kill_line_refutes_parent :
-    observe frame honestCall.moduleReturndata.length
-        ((mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none).run frame)
-      ≠ guardedObservables honestCall := by
-  decide
+    mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none frame
+        ≠ guardedStage guardCfg honestCall.topUpLimits honestCall.roundedTarget
+            (allocateEntry honestCall.keyCount honestCall.moduleReturndata).returndata .none
+          { frame with
+            calls := frame.calls
+              ++ [allocateEntry honestCall.keyCount honestCall.moduleReturndata] } ∧
+      observe frame honestCall.moduleReturndata.length
+          ((mutantExecuteGuarded .noModuleFrame guardCfg honestCall .none).run frame)
+        ≠ guardedObservables honestCall :=
+  ⟨fun h =>
+    absurd (congrArg (observe frame honestCall.moduleReturndata.length) h) (by decide),
+   by decide⟩
 
 /-- The gap as an exhibit: the free-allocation `execute` -- the pre-wave-7
 executable model, still used by the wrap-plane theorems -- COMMITS the very
