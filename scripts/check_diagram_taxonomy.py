@@ -78,8 +78,15 @@ SURFACE_REQUIRED = {
     "notes cards": {"TopUpGateway": "proof", "ConsolidationGateway": "proof"},
 }
 
-# Only the validator set is consensus layer.  Anything else painted `cl` is the
-# taxonomy error this map was corrected for.
+# Only the validator set is consensus layer, and the validator set must stay
+# consensus layer: those are the two halves of one claim.  Anything else painted
+# `cl` is the taxonomy error this map was corrected for, but rejecting only that
+# half left the sole genuine `cl` entity free to be repainted `el`, `bot` or
+# anything else with the legend and the documentation intact and this gate still
+# reporting success — the reader would then meet the validator set drawn inside
+# a trust boundary it does not sit in.  The validator set carries no address, so
+# IDENTITY cannot reach it and the label it wears is the only handle its class
+# rule has; both directions are enforced against that label below.
 CONSENSUS_LAYER = ("Validators 0x01 / 0x02",)
 
 BANNED = {
@@ -215,6 +222,13 @@ def main():
             fail(f"{name!r} is drawn as {kind!r}, must be {expected!r}")
         if kind == "cl" and name not in CONSENSUS_LAYER:
             fail(f"{name!r} is drawn as consensus layer; only {CONSENSUS_LAYER} is")
+
+    consensus = {name for name, kind, _ in nodes + cards if kind == "cl"}
+    demoted = [name for name in CONSENSUS_LAYER if name not in consensus]
+    if demoted:
+        fail(f"{demoted} is not drawn as consensus layer anywhere on the map; the "
+             "validator set is the one genuine `cl` entity, so repainting or "
+             "renaming it moves the only consensus-layer box out of its class")
 
     for surface, boxes in (("canvas", nodes), ("notes cards", cards)):
         absent = []

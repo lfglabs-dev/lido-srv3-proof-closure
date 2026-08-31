@@ -294,6 +294,38 @@ def main():
                     f"{label!r} is no longer drawn on the {surface}",
                 ))
 
+        # The consensus-layer rule is one claim with two halves: nothing else may
+        # be painted `cl`, and the validator set must keep it.  Only the first
+        # was enforced, so repainting the sole genuine `cl` entity — or deleting
+        # it outright — left the legend and the documentation intact with this
+        # gate still reporting success.  The validator set carries no address, so
+        # no IDENTITY rule can catch the repaint on its behalf.  Every class it
+        # could be repainted to is driven from the checker's own table, so a
+        # class added later arrives with its adversarial case already demanded.
+        for label in CHECK.CONSENSUS_LAYER:
+            boxes = [m for m in NODE.finditer(diagram)
+                     if NODE_LABEL.search(m.group(2)).group(2).strip() == label]
+            if len(boxes) != 1:
+                raise AssertionError(
+                    f"expected one canvas box labelled {label!r}, got {len(boxes)}")
+            box = boxes[0]
+            needle = f"[{label!r}] is not drawn as consensus layer"
+            for kind in CHECK.CLASSES:
+                if kind == "cl":
+                    continue
+                family.append((
+                    splice(diagram, box,
+                           box.group(0).replace('"node cl"', f'"node {kind}"', 1)),
+                    needle,
+                ))
+            family.append((splice(diagram, box, ""), needle))
+            # Merely rewording it keeps the colour but retires the name the rule
+            # is keyed to, so the other half of the same claim has to catch it.
+            family.append((
+                splice(diagram, box, reword_node(box, "cl")),
+                f"{REWORDED!r} is drawn as consensus layer; only",
+            ))
+
         # A reworded label must not retire its class rule.  Renaming a box while
         # leaving its address and its colour untouched satisfies every
         # address-bound rule, so only the taxonomy-coverage check can catch it.
@@ -412,7 +444,10 @@ def main():
           "and deleted per surface, every proof-gated box repainted, deleted and merely "
           "reworded per surface (the combined `Consolidation pipeline` canvas node and "
           "the `ConsolidationGateway` card bound independently), and a rename that keeps "
-          "its address and colour still rejected for retiring its taxonomy rule")
+          "its address and colour still rejected for retiring its taxonomy rule; "
+          f"the addressless consensus-layer box repainted to each of the "
+          f"{len(CHECK.CLASSES) - 1} other classes, deleted, and merely reworded, "
+          "rejected in both directions of the one-genuine-`cl`-entity rule")
 
 
 if __name__ == "__main__":

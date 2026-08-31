@@ -435,6 +435,32 @@ def main():
         invoke(fixture, False, "REGISTERED; registry names")
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
 
+        # A repeated row was dropped rather than checked, because indexing the
+        # matches by name keeps only the last one.  Every cell the gate reads can
+        # be falsified in an earlier copy while the surviving copy stays correct,
+        # so each is asserted rather than trusting the REGISTERED case to stand
+        # for the rest — and the repeat is asserted in both orders, since a rule
+        # that only caught the trailing copy would still let the leading one
+        # publish a false claim.
+        repeated_anchor = next(line for line in report.splitlines()
+                               if line.startswith("| `active_capacity_bounded` |"))
+        for label, wrong in (
+            ("promoted to REGISTERED",
+             repeated_anchor.replace("| unregistered |",
+                                     "| REGISTERED as `abstract.theorem` |", 1)),
+            ("stale line", repeated_anchor.replace("| 69 |", "| 6900 |", 1)),
+            ("no recognized plane", repeated_anchor.replace("| Abstract |", "| n/a |", 1)),
+            ("verbatim repeat", repeated_anchor),
+        ):
+            if label != "verbatim repeat" and wrong == repeated_anchor:
+                raise AssertionError(f"duplicate-row mutant {label!r} changed nothing")
+            for duplicated in (f"{wrong}\n{repeated_anchor}", f"{repeated_anchor}\n{wrong}"):
+                report_path.write_text(report.replace(repeated_anchor, duplicated, 1),
+                                       encoding="utf-8")
+                invoke(fixture, False,
+                       "lists theorem(s) more than once: active_capacity_bounded")
+                report_path.write_text(report, encoding="utf-8")
+
         # A stale line number: the citation must point at the real declaration.
         stale = report.replace("| `checked_execute` | 103 |", "| `checked_execute` | 104 |", 1)
         if stale == report:
@@ -462,7 +488,9 @@ def main():
           "letter-like/subscript/`!`/`?`/escaped/dotted Lean "
           "identifiers, declaration after a nested comment, `/-` in a line "
           "comment and in a string literal, unterminated comment, report-only promotion, "
-          "registry drift, stale line, missing plane; commented-out declarations, "
+          "registry drift, stale line, missing plane, a row repeated with each "
+          "checked cell falsified in one copy (REGISTERED, line, plane, and a "
+          "verbatim repeat) in either order; commented-out declarations, "
           "theorem-like identifiers (ASCII and letter-like), and prose inside nested "
           "block comments not miscounted; a letter-like name round-trips to a row; "
           f"each of the {len(CHECK.MODIFIERS_ON_THEOREM)} modifiers Lean elaborates on a "

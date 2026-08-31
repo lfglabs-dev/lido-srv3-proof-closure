@@ -11,6 +11,7 @@ cells assert.  Both directions fail closed here.
 import json
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -206,7 +207,21 @@ def main():
         fail(f"no theorem declarations parsed from {LEAN.relative_to(ROOT)}")
 
     report = REPORT.read_text(encoding="utf-8")
-    rows = {m.group("name"): m for m in ROW.finditer(report)}
+    # A reader meets every row the table prints, but a name-indexed mapping keeps
+    # only the last one: a repeated row was silently discarded rather than
+    # checked, so an earlier copy claiming an unregistered theorem is REGISTERED,
+    # citing a line the declaration is not on, or naming no recognized plane
+    # stayed in the published inventory while the surviving copy kept this gate
+    # green.  Every cell the gate reads is shadowed that way, so the repeat
+    # itself is rejected before the matches are indexed at all.
+    matches = list(ROW.finditer(report))
+    repeated = sorted(name for name, count in
+                      Counter(m.group("name") for m in matches).items() if count > 1)
+    if repeated:
+        fail(f"{REPORT.relative_to(ROOT)} lists theorem(s) more than once: "
+             f"{', '.join(repeated)}; every printed row is a published claim and "
+             "must not be shadowed by whichever copy happens to come last")
+    rows = {m.group("name"): m for m in matches}
 
     missing = sorted(set(lean) - set(rows))
     if missing:
