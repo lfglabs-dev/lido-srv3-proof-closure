@@ -111,6 +111,72 @@ theorem source_wc_type2_guard_required
   simp [hLens.1, hLens.2.1, hLens.2.2]
 
 /--
+**The returndata guards of source lines 722--734 are exercised.**
+
+`IStakingModuleV2.allocateDeposits` (source lines 717--718) is an *untrusted*
+module call: its returndata is arbitrary.  The router guards it before any wei
+moves -- the gwei alignment at source line 724 and the per-index
+`_topUpLimits[i]` bound at source line 728, whose read panics when the module
+returns more entries than there are keys.  This lemma is guard *liveness*: once
+the earlier guards pass, whichever of those three the returndata trips is the
+outcome of the whole call.
+
+Folded into `source_topup_conserves_and_rolls_back` below as the first half of
+its fifth conjunct, so deleting the loop from `run` breaks the *registered*
+claim. -/
+theorem source_allocation_guards_required
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput) (o : SolidityTopup.Outcome)
+    (hAuth : inp.callerIsTopUpGateway = true)
+    (hKeys : inp.keyIndicesLength ≠ 0)
+    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
+    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false)
+    (hMod : inp.moduleExists = true)
+    (hActive : inp.moduleActive = true)
+    (hWc : inp.wcTypeIsType2 = true)
+    (hGwei : cfg.gwei ≠ 0)
+    (hPaused : ¬(smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false))
+    (hLoop : allocationLoop cfg inp.allocations inp.topUpLimits = some o) :
+    run cfg inp = o := by
+  unfold run
+  rw [if_neg (by simp [hAuth]), if_neg hKeys, if_neg hLens, if_neg (by simp [hPub]),
+    if_neg (by simp [hMod]), if_neg (by simp [hActive]), if_neg (by simp [hWc]),
+    if_neg hGwei, if_neg hPaused, hLoop]
+
+/--
+**The aggregate over-target guard of source line 737 is exercised.**
+
+Even a returndata array that passes every per-index guard is rejected when its
+`unchecked` accumulation (source line 732, read mod 2^256 as
+`SolidityTopup.accumulated`) exceeds the rounded module target.  This is the
+sum guard the reviewers found uncovered.
+
+Folded into `source_topup_conserves_and_rolls_back` below as the second half of
+its fifth conjunct. -/
+theorem source_over_target_guard_required
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (hAuth : inp.callerIsTopUpGateway = true)
+    (hKeys : inp.keyIndicesLength ≠ 0)
+    (hLens : ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+        ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+        ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength))
+    (hPub : inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false)
+    (hMod : inp.moduleExists = true)
+    (hActive : inp.moduleActive = true)
+    (hWc : inp.wcTypeIsType2 = true)
+    (hGwei : cfg.gwei ≠ 0)
+    (hPaused : ¬(smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false))
+    (hLoop : allocationLoop cfg inp.allocations inp.topUpLimits = none)
+    (hOver : smDepositableEthAmountRounded cfg inp < accumulated inp) :
+    run cfg inp = .revertModuleReturnExceedTarget := by
+  unfold run
+  rw [if_neg (by simp [hAuth]), if_neg hKeys, if_neg hLens, if_neg (by simp [hPub]),
+    if_neg (by simp [hMod]), if_neg (by simp [hActive]), if_neg (by simp [hWc]),
+    if_neg hGwei, if_neg hPaused, hLoop]
+  exact if_pos hOver
+
+/--
 `run cfg inp` conserves `pulled = pushed`. If that run reverts, the abstract
 `TxObservation` (`A-ABSTRACT-TX`) restores `before` and erases ETH moves and
 logs.  The registered claim additionally folds in the wrap-plane discharge
@@ -202,6 +268,17 @@ Caveats, stated rather than hidden:
   guards pass and the named condition fails, so a regression that drops either
   guard from `run` breaks this registered theorem directly, not only a sibling
   lemma that the assurance registry never cites.
+* The guards the router applies to the *untrusted* module returndata are
+  covered by the fifth conjunct: the gwei alignment at source line 724, the
+  per-index `_topUpLimits[i]` bound and its out-of-bounds panic at source line
+  728, and the aggregate over-target comparison at source line 737 read on the
+  line 732 `unchecked` accumulator.  Deleting the loop or the over-target
+  branch from `run` refutes this theorem
+  (`LidoSRv3.Tests.TopupTxMutants.dropped_allocation_guards_kill_line_refutes_parent`
+  and `…dropped_over_target_guard_kill_line_refutes_parent`).  What the
+  conjunct does *not* claim is anything about where the returndata came from:
+  `_amounts` enters the model as an input, and the module-side allocation
+  algorithm remains P-ALLOC-1/P-ALLOC-2.
 * The empty-top-up branch at source line 741 is a *commit*, not a revert:
   `SolidityTopup.committedNoTopUp_is_not_a_rollback` records this, so no reader
   can mistake the rollback theorem for a claim that a zero-amount top-up aborts.
@@ -239,12 +316,33 @@ theorem source_topup_conserves_and_rolls_back {State : Type}
       inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
       inp.moduleExists = true →
       inp.moduleActive = true →
-      run cfg inp = .revertWrongWithdrawalCredentialsType) :=
+      run cfg inp = .revertWrongWithdrawalCredentialsType) ∧
+    (inp.callerIsTopUpGateway = true →
+      inp.keyIndicesLength ≠ 0 →
+      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →
+      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
+      inp.moduleExists = true →
+      inp.moduleActive = true →
+      inp.wcTypeIsType2 = true →
+      cfg.gwei ≠ 0 →
+      ¬(smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false) →
+      (∀ o : SolidityTopup.Outcome,
+          allocationLoop cfg inp.allocations inp.topUpLimits = some o → run cfg inp = o) ∧
+        (allocationLoop cfg inp.allocations inp.topUpLimits = none →
+          smDepositableEthAmountRounded cfg inp < accumulated inp →
+          run cfg inp = .revertModuleReturnExceedTarget)) :=
   ⟨⟨run_conserves cfg inp, fun h => reverting_outcome_rolls_back before after attempts trace h⟩,
    fun hMod hAuth hKeys hLens hPub => source_module_guard_required cfg inp hMod hAuth hKeys hLens hPub,
    fun hWrap => source_wrap_precludes_value_moving_commit cfg inp hWrap,
    fun hWc hAuth hKeys hLens hPub hMod hActive =>
-     source_wc_type2_guard_required cfg inp hWc hAuth hKeys hLens hPub hMod hActive⟩
+     source_wc_type2_guard_required cfg inp hWc hAuth hKeys hLens hPub hMod hActive,
+   fun hAuth hKeys hLens hPub hMod hActive hWc hGwei hPaused =>
+     ⟨fun o hLoop => source_allocation_guards_required cfg inp o hAuth hKeys hLens hPub hMod
+        hActive hWc hGwei hPaused hLoop,
+      fun hLoop hOver => source_over_target_guard_required cfg inp hAuth hKeys hLens hPub hMod
+        hActive hWc hGwei hPaused hLoop hOver⟩⟩
 
 /--
 The `assert(etherBalanceBeforeTopUp == etherBalanceAfterTopUp)` at
@@ -478,9 +576,68 @@ def VerityCommittingSimulation (cfg : SourceTopupConfig) (inp : SourceTopupInput
           .revert reason rollback →
         rollback = before
 
+/--
+Executable returndata plane: what `Verity.TopupTx.executeGuarded` does with the
+words `IStakingModuleV2.allocateDeposits` returns at source lines 717--718.
+
+`verity_tx_simulates_source` above is stated about `Verity.TopupTx.execute`,
+which takes the allocation array as a free argument -- it has no module frame
+and no returndata guards.  This predicate is the correction, and it is
+quantified over *every* returndata array, because the module is untrusted:
+
+1. **Binding.**  `executeGuarded` journals the `allocateDeposits` frame and
+   then runs the guard-and-spend stage on *that frame's* `returndata`.  The
+   guarded array is not a separate input.
+2. **Alignment / per-index limit / out-of-bounds fail closed**, each with the
+   source guard's own name (`Verity.TopupTx.guardReason` pairs the executable
+   revert string with the `SolidityTopup.Outcome` constructor), and
+   `Contract.run` restores the entry snapshot.
+3. **Aggregate over-target fails closed**, read on the same mod-2^256
+   accumulator the source line 737 comparison uses.
+4. **Liveness.**  When every guard passes, the transaction really runs: its
+   observables are the pinned source schedule with the module frame at the
+   head.  Without this the three fail-closed conjuncts would be satisfied by a
+   transaction that always reverts.
+
+Boundary, stated rather than hidden: Verity's single-contract `Contract`
+surface has no callee, so the returned words are supplied by whoever
+instantiates the frame rather than computed by an executed module.  Quantifying
+over all returndata is the honest reading of an untrusted module, but it is not
+an executed callee and nothing here claims otherwise; the module-side
+allocation algorithm stays P-ALLOC-1/P-ALLOC-2. -/
+def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
+    (call : Verity.TopupTx.TopupCall) (state : Verity.ContractState) : Prop :=
+  let before := Verity.TopupTx.entryFrame state
+  (∀ failure : Verity.TopupTx.FailurePoint,
+      Verity.TopupTx.executeGuarded cfg call failure before =
+        Verity.TopupTx.guardedStage cfg call.topUpLimits call.roundedTarget
+            (Verity.TopupTx.allocateEntry call.keyCount call.moduleReturndata).returndata
+            failure
+          { before with
+            calls := before.calls
+              ++ [Verity.TopupTx.allocateEntry call.keyCount call.moduleReturndata] }) ∧
+    (∀ (o : SolidityTopup.Outcome) (failure : Verity.TopupTx.FailurePoint),
+        allocationLoop cfg call.moduleReturndata call.topUpLimits = some o →
+          (Verity.TopupTx.executeGuarded cfg call failure).run before =
+            Verity.ContractResult.revert (Verity.TopupTx.guardReason o) before) ∧
+    (∀ failure : Verity.TopupTx.FailurePoint,
+        allocationLoop cfg call.moduleReturndata call.topUpLimits = none →
+          call.roundedTarget < allocSumUnchecked call.moduleReturndata →
+          (Verity.TopupTx.executeGuarded cfg call failure).run before =
+            Verity.ContractResult.revert "ModuleReturnExceedTarget" before) ∧
+    (allocationLoop cfg call.moduleReturndata call.topUpLimits = none →
+      ¬ call.roundedTarget < allocSumUnchecked call.moduleReturndata →
+      allocSum call.moduleReturndata < uint256Modulus →
+      call.moduleReturndata.length ≤ uint256Modulus →
+      Verity.TopupTx.observe before call.moduleReturndata.length
+          ((Verity.TopupTx.executeGuarded cfg call .none).run before) =
+        Verity.TopupTx.guardedObservables call)
+
 /-- Registered Verity parent: the full committing-source correspondence,
 including universal injected-failure rollback, conjoined with the universal
-nonzero-wrap revert/non-commit/snapshot-restore close above. -/
+nonzero-wrap revert/non-commit/snapshot-restore close above and with the
+returndata-conditioned module-call plane, quantified over every possible
+`allocateDeposits` return. -/
 theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (state : Verity.ContractState)
@@ -488,7 +645,7 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)
     (hCommit : (run cfg inp).reverts = false) :
     VerityCommittingSimulation cfg inp state ∧
-      ∀ allocations : List Nat,
+      (∀ allocations : List Nat,
         uint256Modulus ≤ allocSum allocations →
         allocSumUnchecked allocations ≠ 0 →
         (∀ a ∈ allocations, a < uint256Modulus) →
@@ -497,9 +654,21 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
             (Verity.TopupTx.execute allocations .none).run before =
                 Verity.ContractResult.revert reason before ∧
               (Verity.TopupTx.observe before allocations.length
-                ((Verity.TopupTx.execute allocations .none).run before)).committed = false) :=
+                ((Verity.TopupTx.execute allocations .none).run before)).committed = false)) ∧
+      ∀ call : Verity.TopupTx.TopupCall,
+        VerityGuardedReturndataSimulation cfg call state :=
   ⟨verity_tx_simulates_source cfg inp state hLen hAmt hCommit,
-    fun allocations hWrap hNz hWords =>
-      verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hWords⟩
+    (fun allocations hWrap hNz hWords =>
+      verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hWords),
+    fun call =>
+      ⟨fun failure =>
+          Verity.TopupTx.executeGuarded_binds_returndata cfg call failure _,
+        fun o failure hLoop =>
+          Verity.TopupTx.executeGuarded_reverts_on_allocation_guard cfg call o failure _ hLoop,
+        fun failure hLoop hOver =>
+          Verity.TopupTx.executeGuarded_reverts_on_over_target cfg call failure _ hLoop hOver,
+        fun hLoop hTarget hNoWrap hLenRd =>
+          Verity.TopupTx.executeGuarded_observes_source cfg call state hLoop hTarget
+            hNoWrap hLenRd⟩⟩
 
 end LidoSRv3.Audit.Guarantees.PTopup1
