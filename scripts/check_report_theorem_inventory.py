@@ -26,6 +26,23 @@ ROW = re.compile(
     re.MULTILINE,
 )
 
+# A top-level declaration is not always a bare `theorem` in column zero.  Lean
+# accepts leading whitespace, attribute blocks, visibility/reducibility
+# modifiers, and `lemma` as an alias for `theorem`; every one of those is
+# ordinary formatting rather than an exotic spelling.  Matching only the bare
+# form would let any of them hide a declaration from the inventory while this
+# gate still reported success, so the whole prefix is parsed.  Widening only
+# ever finds more declarations to demand rows for, so it cannot loosen the gate.
+# `\s+` after the keyword keeps `theorem_like_name` from matching, and
+# `-- theorem ...` still cannot, since `--` is neither attribute nor modifier.
+MODIFIERS = ("private", "protected", "scoped", "local", "nonrec", "noncomputable")
+DECL = re.compile(
+    r"^[ \t]*"
+    r"(?:@\[[^\]]*\][ \t]*)*"
+    rf"(?:(?:{'|'.join(MODIFIERS)})[ \t]+)*"
+    r"(?:theorem|lemma)\s+([A-Za-z0-9_']+)"
+)
+
 
 def fail(message):
     raise SystemExit(f"report theorem inventory: {message}")
@@ -38,11 +55,7 @@ def declared_theorems():
                   LEAN.read_text(encoding="utf-8"), flags=re.DOTALL)
     found = {}
     for number, line in enumerate(text.splitlines(), start=1):
-        # Indentation is legal on a top-level `theorem`, so anchoring at column
-        # zero would let an indented declaration slip past this gate unlisted.
-        # `\s+` after the keyword keeps `theorem_like_name` from matching, and a
-        # `-- theorem ...` comment still cannot, since `--` precedes the keyword.
-        match = re.match(r"^\s*theorem\s+([A-Za-z0-9_']+)", line)
+        match = DECL.match(line)
         if match:
             found[match.group(1)] = number
     return found

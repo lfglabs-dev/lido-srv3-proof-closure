@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fail-closed mutants for the architecture-map taxonomy checker."""
 
+import re
 import shutil
 import subprocess
 import tempfile
@@ -76,6 +77,35 @@ def main():
                 '<g class="node com" data-flows="f4 f5 f7"><title>',
                 '<g class="node com" data-flows="f4 f5 f7"><notitle>', 1),
              "carries no hover tooltip"),
+            # The relabelling bypass.  Reformatting a label used to drop that
+            # box's taxonomy entry and its rule with it, so a repaint rode
+            # through unnoticed.  The address does not move when the wording
+            # does, so the class must still be enforced against it.
+            (diagram.replace('<g class="node el" data-flows="f4 f5 f7"><title>0x852deD',
+                             '<g class="node com" data-flows="f4 f5 f7"><title>0x852deD', 1)
+                    .replace('<text class="nm" x="850" y="160">AccountingOracle</text>',
+                             '<text class="nm" x="850" y="160">Accounting Oracle</text>', 1),
+             "AccountingOracle (0x852deD011285fe67063a08005c71a85690503Cee) "
+             "is drawn as 'com' under the label 'Accounting Oracle', must be 'el'"),
+            # The same bypass on the notes card, which carries the abbreviated
+            # address rather than the full one.
+            (diagram.replace('<div class="c el"><div class="n">AccountingOracle</div>',
+                             '<div class="c com"><div class="n">Accounting Oracle</div>', 1),
+             "AccountingOracle (0x852deD011285fe67063a08005c71a85690503Cee) is drawn as 'com'"),
+            # A renamed predeploy repainted as quorum-held.
+            (diagram.replace('<div class="c sys"><div class="n">EIP-4788 / 7002 / 7251</div>',
+                             '<div class="c com"><div class="n">Beacon roots and requests</div>', 1),
+             "EIP-4788 beacon roots (0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02) "
+             "is drawn as 'com'"),
+            # A renamed committee demoted to a plain contract.
+            (diagram.replace('<div class="c com"><div class="n">HashConsensus</div>',
+                             '<div class="c el"><div class="n">Hash Consensus</div>', 1),
+             "HashConsensus (0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288) is drawn as 'el'"),
+            # A taxonomy-critical entity that leaves the map entirely: its rule
+            # must not retire quietly along with it.
+            (diagram.replace("0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288", f"0x{'0' * 40}")
+                    .replace("0xD624…B288", "0x0000…0000"),
+             "the map no longer identifies HashConsensus"),
         ):
             if mutated == diagram:
                 raise AssertionError(f"diagram mutant for {needle!r} changed nothing")
@@ -92,11 +122,38 @@ def main():
         invoke(fixture, False, "does not document class 'sys'")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # The `bot` class covers node operators, who hold validator signing
+        # keys.  Collapsing it back to one consequence for the whole class reads
+        # a signing-key compromise as liveness-only, when it can sign slashable
+        # messages and so reduce validator balances.
+        collapsed = re.sub(
+            r"^- `bot` —.*?(?=^- `)",
+            "- `bot` — off-chain: picks when and what, never how much. Compromise is a\n"
+            "  liveness problem, not a funds problem.\n",
+            readme, flags=re.MULTILINE | re.DOTALL)
+        if collapsed == readme:
+            raise AssertionError("README bot-class mutant changed nothing")
+        readme_path.write_text(collapsed, encoding="utf-8")
+        invoke(fixture, False, "never mentions 'Node operators'")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # The qualification must survive as a claim, not merely as a name: the
+        # slashable consequence is the part that breaks the liveness-only
+        # reading, so dropping it alone must still fail closed.
+        unslashable = readme.replace("can sign slashable messages", "can be rotated")
+        if unslashable == readme:
+            raise AssertionError("README slashable mutant changed nothing")
+        readme_path.write_text(unslashable, encoding="utf-8")
+        invoke(fixture, False, "never mentions 'slashable'")
+        readme_path.write_text(readme, encoding="utf-8")
+
         invoke(fixture, True)
 
     print("diagram taxonomy mutants rejected: predeploy as consensus layer (card and node), "
           "oracle as quorum-held, HashConsensus demoted, guardian veto, 5/9 constant, "
-          "EasyTrack veto, conflated verifiers, untooltipped node, undocumented class")
+          "EasyTrack veto, conflated verifiers, untooltipped node, undocumented class; "
+          "relabelled node and card repaints and a dropped entity still caught by "
+          "address; `bot` compromise collapsed to a class-wide invariant rejected")
 
 
 if __name__ == "__main__":

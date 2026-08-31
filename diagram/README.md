@@ -45,8 +45,17 @@ easy to conflate, so the five classes are pinned here and enforced by
   `staticcall` (`CLValidatorVerifier.sol:104`,
   `TriggerableWithdrawals.sol:51,131,144`), so drawing them as consensus layer
   overstates how far outside the EL trust boundary they sit.
-- `bot` — off-chain: picks when and what, never how much. Compromise is a
-  liveness problem, not a funds problem.
+- `bot` — off-chain: picks when and what, never how much. No actor in this
+  class can redirect principal: every Lido validator's withdrawal credentials
+  point at the `WithdrawalVault` and are write-once. What a compromise costs is
+  then per actor and not an invariant of the class. For the staker and the
+  depositor bot it is liveness only — they choose module and timing, so a
+  compromise stalls or mistimes a deposit and nothing else. Node operators are
+  the exception: they hold the validator signing keys, and a compromised
+  signing key can sign slashable messages, so validator balances can be reduced
+  even though the principal itself stays out of the attacker's reach. The
+  oracle daemons compute a deterministic, replayable report and hold no quorum
+  of their own; the quorum they must reach lives in `HashConsensus` (`com`).
 - `cl` — genuinely consensus layer: the validator set itself.
 
 Two authority claims in the consolidation pipeline are easy to get backwards

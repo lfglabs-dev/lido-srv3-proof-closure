@@ -62,27 +62,50 @@ def main():
         invoke(fixture, False, "omits declared theorem(s): undisclosed_sibling")
         lean_path.write_text(lean, encoding="utf-8")
 
-        # The same omission, but indented.  Leading whitespace is legal on a
-        # top-level Lean declaration, so the parser must not anchor at column
-        # zero and let a formatting variant hide a theorem from the inventory.
-        report_path.write_text(report, encoding="utf-8")
-        lean_path.write_text(
-            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
-                         "  theorem undisclosed_indented : True := trivial\n\n"
-                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
-            encoding="utf-8")
-        invoke(fixture, False, "omits declared theorem(s): undisclosed_indented")
-        lean_path.write_text(lean, encoding="utf-8")
+        # The same omission dressed in ordinary Lean formatting.  Indentation,
+        # an attribute block, a visibility or reducibility modifier, and the
+        # `lemma` alias are all everyday spellings of a top-level declaration.
+        # None of them may hide a theorem from the inventory while the gate
+        # still reports success, so each is asserted separately rather than
+        # trusting one representative spelling to stand for the rest.
+        for spelling, hidden in (
+            ("  theorem undisclosed_indented", "undisclosed_indented"),
+            ("\ttheorem undisclosed_tabbed", "undisclosed_tabbed"),
+            ("@[simp] theorem undisclosed_attributed", "undisclosed_attributed"),
+            ("  @[simp, norm_cast] theorem undisclosed_multi_attributed",
+             "undisclosed_multi_attributed"),
+            ("private theorem undisclosed_private", "undisclosed_private"),
+            ("protected theorem undisclosed_protected", "undisclosed_protected"),
+            ("nonrec theorem undisclosed_nonrec", "undisclosed_nonrec"),
+            ("lemma undisclosed_lemma", "undisclosed_lemma"),
+            ("  @[simp] private lemma undisclosed_combined", "undisclosed_combined"),
+        ):
+            report_path.write_text(report, encoding="utf-8")
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{spelling} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {hidden}")
+            lean_path.write_text(lean, encoding="utf-8")
 
-        # A commented-out declaration is not a declaration: allowing indentation
-        # must not start counting `-- theorem ...` lines as real ones.
-        lean_path.write_text(
-            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
-                         "  -- theorem commented_out : True := trivial\n\n"
-                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
-            encoding="utf-8")
-        invoke(fixture, True, "8 P-ALLOC-1 theorems")
-        lean_path.write_text(lean, encoding="utf-8")
+        # The other direction: widening the parser to cover those variants must
+        # not start counting lines that declare nothing.  A commented-out
+        # declaration and an identifier that merely begins with the keyword are
+        # both still non-declarations.
+        for not_a_declaration in (
+            "  -- theorem commented_out : True := trivial",
+            "  -- lemma commented_out_lemma : True := trivial",
+            "def theorem_like_name : Nat := 0",
+            "def lemma_like_name : Nat := 0",
+        ):
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{not_a_declaration}\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            lean_path.write_text(lean, encoding="utf-8")
 
         # An unregistered theorem promoted to REGISTERED in the report only.
         promoted = report.replace(
@@ -123,8 +146,10 @@ def main():
         invoke(fixture, True)
 
     print("report theorem inventory mutants rejected: dropped row, undisclosed theorem "
-          "(column-zero and indented), report-only promotion, registry drift, stale line, "
-          "missing plane; commented-out declaration not miscounted")
+          "(column-zero, indented, tabbed, attributed, private, protected, nonrec, "
+          "`lemma`, and combined), report-only promotion, registry drift, stale line, "
+          "missing plane; commented-out declarations and theorem-like identifiers "
+          "not miscounted")
 
 
 if __name__ == "__main__":
