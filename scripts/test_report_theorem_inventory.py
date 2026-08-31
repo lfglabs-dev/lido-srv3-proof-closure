@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fail-closed mutants for the P-ALLOC-1 report theorem inventory."""
 
+import importlib.util
 import json
 import re
 import shutil
@@ -13,6 +14,23 @@ CHECKER = "scripts/check_report_theorem_inventory.py"
 LEAN = "LidoSRv3/Audit/Guarantees/PAlloc1.lean"
 REPORT = "report/P-ALLOC-1.md"
 REGISTRY = "audit/guarantees.yaml"
+
+
+def _load_checker():
+    """Drive the modifier family from the checker's own table.
+
+    Listing the spellings by hand left `scoped`, `local` and `noncomputable`
+    accepted by the gate but never asserted, so a modifier added later would
+    arrive with no adversarial case at all.  Reading the table here keeps the
+    two in step.
+    """
+    spec = importlib.util.spec_from_file_location("_inventory_checker", ROOT / CHECKER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+CHECK = _load_checker()
 
 
 def invoke(root, ok, needle=None):
@@ -211,6 +229,129 @@ def main():
             invoke(fixture, False, f"omits declared theorem(s): {name}")
             lean_path.write_text(lean, encoding="utf-8")
 
+        # Every modifier that elaborates in front of a `theorem` must be
+        # asserted, not just the ones that happened to be listed above: a
+        # spelling the gate tolerates but the suite never exercises is a spelling
+        # that can hide a theorem from the inventory the day it is used.  The
+        # loop reads the checker's own table so a modifier added later arrives
+        # with its case already demanded.
+        for modifier in CHECK.MODIFIERS_ON_THEOREM:
+            hidden = f"undisclosed_{modifier}_modifier"
+            report_path.write_text(report, encoding="utf-8")
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{modifier} theorem {hidden} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {hidden}")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # The remaining table entries cannot be driven end to end, because Lean
+        # refuses the declaration they prefix (`'unsafe' theorems are not
+        # allowed`, `'theorem' subsumes 'noncomputable'`, and `scoped`/`local`
+        # do not parse before `theorem` at all), so no compiling module can
+        # contain one.  They are kept as parser widening, and widening is only
+        # sound while it still recognizes the declaration rather than skipping
+        # past it, which is what is asserted here.
+        for modifier in CHECK.MODIFIERS_REJECTED_ON_THEOREM:
+            hidden = f"undisclosed_{modifier}_modifier"
+            match = CHECK.DECL.match(f"{modifier} theorem {hidden} : True := trivial")
+            if not match or match.group(1) != hidden:
+                raise AssertionError(
+                    f"modifier {modifier!r} is listed but the declaration parser "
+                    f"does not read {hidden!r} behind it")
+
+        # A «guillemet-escaped» identifier is a name, not code, so the comment
+        # markers a Lean author may legally put inside one must not be lexed as
+        # comment delimiters.  Reading `«undisclosed /- name»` as an opener
+        # rejected a valid module outright, and — worse — a later escaped atom
+        # carrying `-/` rebalanced the depth and blanked the real declarations
+        # in between, so the inventory could omit them with the gate still
+        # green.  Both directions are asserted: the escaped name is demanded,
+        # and nothing around it is swallowed.
+        for spelling, hidden in (
+            ("theorem «undisclosed /- name»", "«undisclosed /- name»"),
+            ("theorem «undisclosed -/ name»", "«undisclosed -/ name»"),
+            ("theorem «undisclosed -- name»", "«undisclosed -- name»"),
+            ('theorem «undisclosed " name»', '«undisclosed " name»'),
+            ("theorem «undisclosed /-- name»", "«undisclosed /-- name»"),
+        ):
+            report_path.write_text(report, encoding="utf-8")
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{spelling} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {hidden}")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # The fail-open direction: an escaped `/-` followed by an escaped `-/`
+        # balances to depth zero, so a scanner that lexes them would blank every
+        # declaration between the two and report success on an inventory that
+        # omits all three.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "theorem «opener /- escaped» : True := trivial\n"
+                         "theorem undisclosed_between_escapes : True := trivial\n"
+                         "theorem «closer -/ escaped» : True := trivial\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "undisclosed_between_escapes")
+        lean_path.write_text(lean, encoding="utf-8")
+
+        # An unclosed `«` is ordinary text rather than an escape, so it must not
+        # swallow the declarations that follow it.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "-- a stray « never closed on this line\n"
+                         "theorem undisclosed_after_stray_escape : True := trivial\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "omits declared theorem(s): undisclosed_after_stray_escape")
+        lean_path.write_text(lean, encoding="utf-8")
+
+        # A `«` inside a real block comment is still comment text: it must not
+        # start an escape that runs past the comment's `-/` and swallows code.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "/- prose mentioning « an escape -/\n"
+                         "theorem undisclosed_after_commented_escape : True := trivial\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "omits declared theorem(s): undisclosed_after_commented_escape")
+        lean_path.write_text(lean, encoding="utf-8")
+
+        # Prose inside a real block comment that merely names an escaped
+        # identifier still declares nothing.  Reading the `«` as an escape would
+        # run past the comment's own `-/` and count the prose as a declaration.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "/- theorem «only prose escaped» : True := trivial -/\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "8 P-ALLOC-1 theorems")
+        lean_path.write_text(lean, encoding="utf-8")
+
+        # And the escaped name must round-trip: the row parser has to accept the
+        # very spelling the declaration parser now finds, or the gate would
+        # demand a row no edit to the report could satisfy.
+        escaped = "theorem «disclosed /- name» : True := trivial"
+        escaped_lean = lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                                    f"{escaped}\n\n"
+                                    "end LidoSRv3.Audit.Guarantees.PAlloc1", 1)
+        anchor_row = next(line for line in report.splitlines()
+                          if line.startswith("| `router_order_preserved` |"))
+        escaped_report = report.replace(
+            anchor_row,
+            f"{anchor_row}\n| `«disclosed /- name»` | "
+            f"{escaped_lean.splitlines().index(escaped) + 1} | Abstract | "
+            "unregistered | Escaped-identifier round-trip fixture. |", 1)
+        lean_path.write_text(escaped_lean, encoding="utf-8")
+        report_path.write_text(escaped_report, encoding="utf-8")
+        invoke(fixture, True, "9 P-ALLOC-1 theorems")
+        lean_path.write_text(lean, encoding="utf-8")
+        report_path.write_text(report, encoding="utf-8")
+
         # An unterminated block comment leaves the rest of the file unreadable;
         # it must fail closed rather than silently inventorying nothing.
         lean_path.write_text(
@@ -266,7 +407,15 @@ def main():
           "comment and in a string literal, unterminated comment, report-only promotion, "
           "registry drift, stale line, missing plane; commented-out declarations, "
           "theorem-like identifiers (ASCII and letter-like), and prose inside nested "
-          "block comments not miscounted; a letter-like name round-trips to a row")
+          "block comments not miscounted; a letter-like name round-trips to a row; "
+          f"each of the {len(CHECK.MODIFIERS_ON_THEOREM)} modifiers Lean elaborates on a "
+          f"theorem driven end to end and the {len(CHECK.MODIFIERS_REJECTED_ON_THEOREM)} "
+          "kept only as parser widening asserted to still read the name behind them, both "
+          "from the checker's own table; comment markers inside escaped identifiers "
+          "(`/-`, `-/`, `--`, `\"`, `/--`) kept as name text, a balancing pair of them "
+          "not allowed to blank the declarations in between, a stray `«` and a `«` "
+          "inside a real comment not allowed to swallow code, and an escaped name "
+          "carrying `/-` round-trips to a row")
 
 
 if __name__ == "__main__":

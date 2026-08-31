@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fail-closed mutants for the architecture-map taxonomy checker."""
 
+import importlib.util
 import re
 import shutil
 import subprocess
@@ -13,8 +14,27 @@ DIAGRAM = "diagram/index.html"
 DIAGRAM_README = "diagram/README.md"
 
 
+def _load_checker():
+    """Drive the family loops from the checker's own tables.
+
+    Naming the mutated entities by hand let a table entry added later inherit
+    coverage it never had: the suite kept asserting the same three samples while
+    the gate had grown to eight.  Reading the tables here means a new entry
+    arrives with its adversarial cases already demanded.
+    """
+    spec = importlib.util.spec_from_file_location("_diagram_checker", ROOT / CHECKER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+CHECK = _load_checker()
+
 NODE = re.compile(r'<g class="node ([a-z]+)"(.*?)</g>', re.DOTALL)
 CARD = re.compile(r'<div class="c ([a-z]+)"><div class="n">(.*?)</div>(.*?</div>)</div>')
+NODE_LABEL = re.compile(r'(<text class="nm"[^>]*>)(.*?)(</text>)', re.DOTALL)
+
+REWORDED = "Reworded box"
 
 
 def excise(diagram, pattern, needle, surface):
@@ -31,6 +51,40 @@ def drop_node(diagram, needle):
 
 def drop_card(diagram, needle):
     return excise(diagram, CARD, needle, "card")
+
+
+def sole(diagram, pattern, forms, surface):
+    """The one box on `surface` carrying any spelling in `forms`."""
+    matches = [m for m in pattern.finditer(diagram)
+               if any(form in m.group(0).lower() for form in forms)]
+    if len(matches) != 1:
+        raise AssertionError(f"expected one {surface} carrying {forms!r}, got {len(matches)}")
+    return matches[0]
+
+
+def address_forms(address):
+    return (address.lower(), CHECK.abbreviated(address).lower())
+
+
+def wrong_class(expected):
+    # Never `cl` (that trips the consensus-layer rule first) and never the
+    # expected class, so the repaint is the only thing the gate can object to.
+    return "com" if expected != "com" else "el"
+
+
+def reword_node(match, kind):
+    body = NODE_LABEL.sub(lambda m: m.group(1) + REWORDED + m.group(3), match.group(0), count=1)
+    return body.replace(f'<g class="node {match.group(1)}"', f'<g class="node {kind}"', 1)
+
+
+def reword_card(match, kind):
+    return match.group(0).replace(
+        f'<div class="c {match.group(1)}"><div class="n">{match.group(2)}</div>',
+        f'<div class="c {kind}"><div class="n">{REWORDED}</div>', 1)
+
+
+def splice(diagram, match, replacement):
+    return diagram[:match.start()] + replacement + diagram[match.end():]
 
 
 def invoke(root, ok, needle=None):
@@ -167,6 +221,79 @@ def main():
             invoke(fixture, False, needle)
             diagram_path.write_text(diagram, encoding="utf-8")
 
+        # Every address-bound entity, not just the three sampled above, must
+        # survive a relabelling repaint and a deletion on each surface
+        # independently.  The label is rewritten in each repaint so that only
+        # the address can be what catches it.
+        family = []
+        for address, (entity, expected) in CHECK.IDENTITY.items():
+            forms = address_forms(address)
+            kind = wrong_class(expected)
+            for surface, pattern, reword in (
+                ("canvas", NODE, reword_node),
+                ("notes cards", CARD, reword_card),
+            ):
+                box = sole(diagram, pattern, forms, surface)
+                family.append((
+                    splice(diagram, box, reword(box, kind)),
+                    f"is drawn as {kind!r} under the label {REWORDED!r}",
+                ))
+                family.append((
+                    splice(diagram, box, ""),
+                    f"{entity} ({address})",
+                ))
+
+        # The proof-gated boxes carry no address, so the label each surface
+        # wears is the only handle their class rule has.  Repainting one,
+        # deleting it, or merely rewording it must each fail closed on that
+        # surface alone — the combined `Consolidation pipeline` canvas node and
+        # the `ConsolidationGateway` card are the same entity spelled two ways,
+        # and neither spelling may vouch for the other.
+        for surface, pattern, reword, label_of, prefix in (
+            ("canvas", NODE, reword_node,
+             lambda m: NODE_LABEL.search(m.group(2)).group(2).strip(), "node "),
+            ("notes cards", CARD, reword_card, lambda m: m.group(2).strip(), "c "),
+        ):
+            for label, expected in CHECK.SURFACE_REQUIRED[surface].items():
+                # Match the box's own label field: the same name also occurs in
+                # neighbouring prose, which is not what carries the class.
+                boxes = [m for m in pattern.finditer(diagram) if label_of(m) == label]
+                if len(boxes) != 1:
+                    raise AssertionError(
+                        f"expected one {surface} box labelled {label!r}, got {len(boxes)}")
+                box = boxes[0]
+                repainted = wrong_class(expected)
+                family.append((
+                    splice(diagram, box, box.group(0).replace(
+                        f'"{prefix}{expected}"', f'"{prefix}{repainted}"', 1)),
+                    f"{label!r} is drawn as {repainted!r}, must be {expected!r}",
+                ))
+                family.append((
+                    splice(diagram, box, ""),
+                    f"{label!r} is no longer drawn on the {surface}",
+                ))
+                family.append((
+                    splice(diagram, box, reword(box, expected)),
+                    f"{label!r} is no longer drawn on the {surface}",
+                ))
+
+        # A reworded label must not retire its class rule.  Renaming a box while
+        # leaving its address and its colour untouched satisfies every
+        # address-bound rule, so only the taxonomy-coverage check can catch it.
+        renamed = next(m for m in NODE.finditer(diagram)
+                       if NODE_LABEL.search(m.group(2)).group(2).strip() == "EIP-4788")
+        family.append((
+            splice(diagram, renamed, reword_node(renamed, "sys")),
+            "taxonomy name(s) ['EIP-4788'] are no longer drawn on either surface",
+        ))
+
+        for mutated, needle in family:
+            if mutated == diagram:
+                raise AssertionError(f"family mutant for {needle!r} changed nothing")
+            diagram_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, False, needle)
+            diagram_path.write_text(diagram, encoding="utf-8")
+
         # The README carries the citations; a class it stops documenting is a
         # colour the reader can no longer resolve to a source claim.
         stripped = readme.replace("- `sys` —", "- sys:")
@@ -212,7 +339,12 @@ def main():
           "predeploy node deleted) rejected per surface; `bot` compromise collapsed "
           "to a class-wide invariant rejected on "
           "the README entry and on the rendered legend pill (restated, stripped, and "
-          "with the slashable consequence dropped)")
+          "with the slashable consequence dropped); "
+          f"every one of {len(CHECK.IDENTITY)} address-bound entities relabel-repainted "
+          "and deleted per surface, every proof-gated box repainted, deleted and merely "
+          "reworded per surface (the combined `Consolidation pipeline` canvas node and "
+          "the `ConsolidationGateway` card bound independently), and a rename that keeps "
+          "its address and colour still rejected for retiring its taxonomy rule")
 
 
 if __name__ == "__main__":
