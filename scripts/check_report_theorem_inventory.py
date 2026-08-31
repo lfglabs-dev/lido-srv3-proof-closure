@@ -20,7 +20,7 @@ REGISTRY = ROOT / "audit/guarantees.yaml"
 GUARANTEE_ID = "P-ALLOC-1"
 NAMESPACE = "LidoSRv3.Audit.Guarantees.PAlloc1."
 
-# A declaration name is not always ASCII.  Lean identifiers admit letter-like
+# A declaration name is not always ASCII.  Lean identifiers allow letter-like
 # characters (Greek, Coptic, Latin-1/Extended-A, script and double-struck),
 # subscript alphanumerics, `!`/`?`, «guillemet-escaped» atoms, and `.`-joined
 # compound names.  An `[A-Za-z0-9_']+` capture does not recognize such a
