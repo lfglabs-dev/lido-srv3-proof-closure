@@ -108,8 +108,10 @@ def main():
 
         diagram_path = fixture / DIAGRAM
         readme_path = fixture / DIAGRAM_README
+        checker_path = fixture / CHECKER
         diagram = diagram_path.read_text(encoding="utf-8")
         readme = readme_path.read_text(encoding="utf-8")
+        checker = checker_path.read_text(encoding="utf-8")
 
         invoke(fixture, True, "diagram taxonomy ok")
 
@@ -318,6 +320,51 @@ def main():
         invoke(fixture, False, "does not document class 'sys'")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # Documenting every class is not the same claim as the intro's count.
+        # The intro promises the list is exhaustive, so a stale number tells a
+        # reader to stop looking one class early while every class still has an
+        # entry — the per-class loop above passes throughout.  Every wrong
+        # spelling of the count is driven from the checker's own word table so a
+        # class added later arrives with this case already demanded.
+        correct = CHECK.NUMBER_WORDS[len(CHECK.CLASSES)]
+        for word in CHECK.NUMBER_WORDS:
+            if word == correct:
+                continue
+            miscounted = readme.replace(f"the {correct} classes are pinned here",
+                                        f"the {word} classes are pinned here", 1)
+            if miscounted == readme:
+                raise AssertionError("README class-count mutant changed nothing")
+            readme_path.write_text(miscounted, encoding="utf-8")
+            invoke(fixture, False, f"says {word!r} classes are pinned but "
+                                   f"{len(CHECK.CLASSES)} are enforced")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Dropping the sentence rather than misnumbering it retires the claim
+        # instead of contradicting it, so it must fail closed too.
+        uncounted = readme.replace(f"the {correct} classes are pinned here",
+                                   "the classes below are pinned", 1)
+        if uncounted == readme:
+            raise AssertionError("README uncounted mutant changed nothing")
+        readme_path.write_text(uncounted, encoding="utf-8")
+        invoke(fixture, False, "no longer states how many classes are pinned")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # The count is bound to the enforced set, not to the literal `six`:
+        # growing CLASSES and documenting the new class leaves the intro stale,
+        # which is the direction a future taxonomy edit actually takes.
+        grown, substitutions = re.subn(
+            r"^CLASSES = .*$",
+            f"CLASSES = {CHECK.CLASSES + ('mpc',)!r}",
+            checker, count=1, flags=re.MULTILINE)
+        if substitutions != 1:
+            raise AssertionError("checker CLASSES mutant changed nothing")
+        checker_path.write_text(grown, encoding="utf-8")
+        readme_path.write_text(readme + "\n- `mpc` — a newly pinned class.\n",
+                               encoding="utf-8")
+        invoke(fixture, False, f"but {len(CHECK.CLASSES) + 1} are enforced")
+        checker_path.write_text(checker, encoding="utf-8")
+        readme_path.write_text(readme, encoding="utf-8")
+
         # The `bot` class covers node operators, who hold validator signing
         # keys.  Collapsing it back to one consequence for the whole class reads
         # a signing-key compromise as liveness-only, when it can sign slashable
@@ -350,6 +397,10 @@ def main():
           "spelling, the same claim retypeset with a curly apostrophe, and a "
           "reattribution no banned list names, rejected per surface), 5/9 constant, "
           "EasyTrack veto, conflated verifiers, untooltipped node, undocumented class; "
+          f"a taxonomy intro miscounted to each of the other "
+          f"{len(CHECK.NUMBER_WORDS) - 1} words the checker knows, and one that drops the "
+          "count instead of misstating it, rejected while every class stays documented, "
+          "and the count shown bound to the enforced set by growing CLASSES; "
           "relabelled node and card repaints and a dropped entity still caught by "
           "address; an entity dropped from one surface only (canvas node deleted with "
           "its card kept, card deleted with its node kept, and a multi-address "

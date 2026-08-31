@@ -25,7 +25,7 @@ docs.lido.fi/deployed-contracts (July 2026). SRv3 contracts are marked
 ## Taxonomy
 
 A node's colour says what makes it trustworthy, not where it runs. The two are
-easy to conflate, so the five classes are pinned here and enforced by
+easy to conflate, so the six classes are pinned here and enforced by
 `scripts/check_diagram_taxonomy.py`:
 
 - `el` — an EL contract whose behaviour is fixed by its own code.

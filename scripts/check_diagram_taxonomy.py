@@ -112,6 +112,16 @@ TYPOGRAPHY = str.maketrans({
 VETO_WINDOW = re.compile(r"veto window")
 VETO_OWNED = re.compile(r"committee's veto window")
 
+# The README's taxonomy intro promises the reader an exhaustive list, so the
+# count it states is a claim about CLASSES and not decoration: adding a class
+# without renumbering leaves the prose asserting the list is complete when it is
+# one short, and a reader who trusts it stops looking.  Requiring the two agree
+# fails closed on either edit; checking only that each class is documented, as
+# the loop below does, cannot notice a stale count.
+NUMBER_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven",
+                "eight", "nine", "ten")
+CLASS_COUNT = re.compile(r"the (\w+) classes are pinned here")
+
 REQUIRED = (
     ("ALLOW_PAIR_ROLE", "EasyTrack's allow-only consolidation power must be named"),
     ("REMOVE_ROLE", "the batch veto role must be named"),
@@ -278,6 +288,14 @@ def main():
     for kind in CLASSES:
         if f"`{kind}`" not in readme:
             fail(f"{DIAGRAM_README.relative_to(ROOT)} does not document class {kind!r}")
+
+    counted = CLASS_COUNT.search(readme)
+    if not counted:
+        fail(f"{DIAGRAM_README.relative_to(ROOT)} no longer states how many classes "
+             "are pinned, so the list cannot be read as exhaustive")
+    if counted.group(1) != NUMBER_WORDS[len(CLASSES)]:
+        fail(f"the taxonomy intro says {counted.group(1)!r} classes are pinned but "
+             f"{len(CLASSES)} are enforced; the list reads as exhaustive and is not")
 
     entry = BOT_ENTRY.search(readme)
     if not entry:

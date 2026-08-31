@@ -96,7 +96,8 @@ DECL = re.compile(
     r"^[ \t]*"
     r"(?:@\[[^\]]*\][ \t]*)*"
     rf"(?:(?:{'|'.join(MODIFIERS)})[ \t]+)*"
-    rf"(?:theorem|lemma)\s+({IDENT})"
+    rf"(?:theorem|lemma)\s+({IDENT})",
+    re.MULTILINE,
 )
 
 
@@ -186,10 +187,16 @@ def declared_theorems():
     # out first while preserving line numbering.
     text = strip_block_comments(LEAN.read_text(encoding="utf-8"))
     found = {}
-    for number, line in enumerate(text.splitlines(), start=1):
-        match = DECL.match(line)
-        if match:
-            found[match.group(1)] = number
+    # Lean separates the keyword from the name by whitespace, and a newline is
+    # whitespace: `theorem\n  name` is one ordinary declaration.  Reading the
+    # module a physical line at a time split exactly that form into two halves
+    # that each matched nothing — the keyword line carries no name and the name
+    # line carries no keyword — so the declaration stayed out of the inventory
+    # while this gate reported success.  The stream is scanned instead, and a
+    # declaration is recorded at the line its keyword opens, which is where the
+    # single-line forms already sat.
+    for match in DECL.finditer(text):
+        found[match.group(1)] = text.count("\n", 0, match.start()) + 1
     return found
 
 

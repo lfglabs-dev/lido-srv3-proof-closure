@@ -107,6 +107,60 @@ def main():
             invoke(fixture, False, f"omits declared theorem(s): {hidden}")
             lean_path.write_text(lean, encoding="utf-8")
 
+        # Lean separates the keyword from the name by whitespace, and a newline
+        # is whitespace: `theorem\n  name` is one ordinary declaration.  Read a
+        # physical line at a time, it splits into a keyword line carrying no
+        # name and a name line carrying no keyword, so neither half matches and
+        # the theorem stays out of the inventory with the gate still reporting
+        # success.  Every prefix that may precede the keyword is asserted in
+        # this form too, since wrapping is exactly what a long prefix invites.
+        for spelling, hidden in (
+            ("theorem\n  undisclosed_wrapped", "undisclosed_wrapped"),
+            ("lemma\n  undisclosed_wrapped_lemma", "undisclosed_wrapped_lemma"),
+            ("theorem\n\n  undisclosed_blank_line", "undisclosed_blank_line"),
+            ("  @[simp] private theorem\n    undisclosed_wrapped_combined",
+             "undisclosed_wrapped_combined"),
+            ("theorem\n  «undisclosed wrapped escaped»", "«undisclosed wrapped escaped»"),
+            ("theorem\n  αundisclosed_wrapped", "αundisclosed_wrapped"),
+        ):
+            report_path.write_text(report, encoding="utf-8")
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{spelling} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {hidden}")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # A wrapped declaration must also be citable, and it is cited at the
+        # line its keyword opens — the same line the unwrapped forms occupy.
+        # Were it recorded at the name's line instead, the report could only be
+        # satisfied by a number that points at no keyword.
+        wrapped = "theorem disclosed_wrapped\n    : True := trivial"
+        wrapped_lean = lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                                    f"{wrapped}\n\n"
+                                    "end LidoSRv3.Audit.Guarantees.PAlloc1", 1)
+        if wrapped_lean == lean:
+            raise AssertionError("wrapped round-trip mutant changed nothing")
+        keyword_line = wrapped_lean.splitlines().index("theorem disclosed_wrapped") + 1
+        anchor = next(line for line in report.splitlines()
+                      if line.startswith("| `router_order_preserved` |"))
+        lean_path.write_text(wrapped_lean, encoding="utf-8")
+        report_path.write_text(report.replace(
+            anchor,
+            f"{anchor}\n| `disclosed_wrapped` | {keyword_line} | Abstract | "
+            "unregistered | Wrapped-declaration round-trip fixture. |", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "9 P-ALLOC-1 theorems")
+        report_path.write_text(report.replace(
+            anchor,
+            f"{anchor}\n| `disclosed_wrapped` | {keyword_line + 1} | Abstract | "
+            "unregistered | Wrapped-declaration round-trip fixture. |", 1),
+            encoding="utf-8")
+        invoke(fixture, False, f"disclosed_wrapped is declared at Lean line {keyword_line}")
+        lean_path.write_text(lean, encoding="utf-8")
+        report_path.write_text(report, encoding="utf-8")
+
         # Lean identifiers are not ASCII.  A name may begin with a letter-like
         # character (Greek, Coptic, Latin-1/Extended-A, script, double-struck),
         # carry subscripts or `!`/`?`, be «guillemet-escaped», or be a `.`-joined
@@ -402,7 +456,10 @@ def main():
 
     print("report theorem inventory mutants rejected: dropped row, undisclosed theorem "
           "(column-zero, indented, tabbed, attributed, private, protected, nonrec, "
-          "`lemma`, and combined), letter-like/subscript/`!`/`?`/escaped/dotted Lean "
+          "`lemma`, and combined), a name wrapped onto the line after its keyword "
+          "(bare, `lemma`, blank-line-separated, prefixed, escaped and letter-like) "
+          "with the wrapped form cited at its keyword's line, "
+          "letter-like/subscript/`!`/`?`/escaped/dotted Lean "
           "identifiers, declaration after a nested comment, `/-` in a line "
           "comment and in a string literal, unterminated comment, report-only promotion, "
           "registry drift, stale line, missing plane; commented-out declarations, "
