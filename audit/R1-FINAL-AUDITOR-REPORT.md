@@ -14,7 +14,7 @@ Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01
 
 ## Acceptance index — every registered claim
 
-One row per registered claim, with the number of fidelity gaps the registry still records against it. No row is gap-free. The full assumptions, limitations, and source provenance for each claim are expanded in the per-claim sections below; nothing that qualifies a claim is left folded into a table cell.
+One row per registered claim, with the number of fidelity gaps the registry still records against it. Every one of the 11 canonical claims still records at least one open gap. The rows `P-DEPOSIT-1.verity-tx-rollback.tx` and `P-RESERVE-RELATIONAL` print `0 open` because they are supplemental: the count covers only the narrow slice each such row closes, and the residual gaps stay recorded against its parent canonical claim. The full assumptions, limitations, and source provenance for each claim are expanded in the per-claim sections below; nothing that qualifies a claim is left folded into a table cell.
 
 | Claim | Abstract | Verity | Fidelity gaps | Classification |
 | --- | --- | --- | --- | --- |

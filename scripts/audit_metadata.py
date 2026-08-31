@@ -485,6 +485,25 @@ def rendered(rows, source_map):
     spans_by_id = {target["id"]: target for target in source_map["targets"]}
     trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
                    if line.strip() and not line.lstrip().startswith("#")]
+    # Every canonical row is held gap-bearing by validate_readme_fidelity_disclosure,
+    # but a supplemental row may legitimately record none: it closes one narrow
+    # slice and its parent carries the residue.  Naming those rows keeps this
+    # sentence from contradicting the `0 open` cells the table prints for them.
+    gap_free = [r["id"] for r in rows if not r["fidelity"]["missing"]]
+    if gap_free:
+        quoted = [f"`{markdown_table_cell(i)}`" for i in gap_free]
+        listed = quoted[0] if len(quoted) == 1 else \
+            ", ".join(quoted[:-1]) + (" and " if len(quoted) == 2 else ", and ") + quoted[-1]
+        gap_note = (
+            f"Every one of the {len(canonical)} canonical claims still records at "
+            f"least one open gap. The {'row' if len(quoted) == 1 else 'rows'} "
+            f"{listed} print `0 open` because {'it is' if len(quoted) == 1 else 'they are'} "
+            "supplemental: the count covers only the narrow slice each such row "
+            "closes, and the residual gaps stay recorded against its parent "
+            "canonical claim."
+        )
+    else:
+        gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
         f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
@@ -493,7 +512,7 @@ def rendered(rows, source_map):
         "Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
         "## Acceptance index — every registered claim\n\n",
         "One row per registered claim, with the number of fidelity gaps the "
-        "registry still records against it. No row is gap-free. The full "
+        f"registry still records against it. {gap_note} The full "
         "assumptions, limitations, and source provenance for each claim are "
         "expanded in the per-claim sections below; nothing that qualifies a "
         "claim is left folded into a table cell.\n\n",

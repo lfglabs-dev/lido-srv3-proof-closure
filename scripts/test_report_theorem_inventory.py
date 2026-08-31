@@ -62,6 +62,28 @@ def main():
         invoke(fixture, False, "omits declared theorem(s): undisclosed_sibling")
         lean_path.write_text(lean, encoding="utf-8")
 
+        # The same omission, but indented.  Leading whitespace is legal on a
+        # top-level Lean declaration, so the parser must not anchor at column
+        # zero and let a formatting variant hide a theorem from the inventory.
+        report_path.write_text(report, encoding="utf-8")
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "  theorem undisclosed_indented : True := trivial\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "omits declared theorem(s): undisclosed_indented")
+        lean_path.write_text(lean, encoding="utf-8")
+
+        # A commented-out declaration is not a declaration: allowing indentation
+        # must not start counting `-- theorem ...` lines as real ones.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "  -- theorem commented_out : True := trivial\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "8 P-ALLOC-1 theorems")
+        lean_path.write_text(lean, encoding="utf-8")
+
         # An unregistered theorem promoted to REGISTERED in the report only.
         promoted = report.replace(
             "| `active_capacity_bounded` | 69 | Abstract | unregistered |",
@@ -100,8 +122,9 @@ def main():
 
         invoke(fixture, True)
 
-    print("report theorem inventory mutants rejected: dropped row, undisclosed theorem, "
-          "report-only promotion, registry drift, stale line, missing plane")
+    print("report theorem inventory mutants rejected: dropped row, undisclosed theorem "
+          "(column-zero and indented), report-only promotion, registry drift, stale line, "
+          "missing plane; commented-out declaration not miscounted")
 
 
 if __name__ == "__main__":

@@ -38,7 +38,11 @@ def declared_theorems():
                   LEAN.read_text(encoding="utf-8"), flags=re.DOTALL)
     found = {}
     for number, line in enumerate(text.splitlines(), start=1):
-        match = re.match(r"^theorem\s+([A-Za-z0-9_']+)", line)
+        # Indentation is legal on a top-level `theorem`, so anchoring at column
+        # zero would let an indented declaration slip past this gate unlisted.
+        # `\s+` after the keyword keeps `theorem_like_name` from matching, and a
+        # `-- theorem ...` comment still cannot, since `--` precedes the keyword.
+        match = re.match(r"^\s*theorem\s+([A-Za-z0-9_']+)", line)
         if match:
             found[match.group(1)] = number
     return found
