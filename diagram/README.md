@@ -31,7 +31,10 @@ easy to conflate, so the five classes are pinned here and enforced by
 - `el` — an EL contract whose behaviour is fixed by its own code.
 - `proof` — an EL contract that additionally gates on an EIP-4788 beacon-root
   proof (`TopUpGateway` via `CLValidatorVerifier`, `ConsolidationGateway` via
-  the separate `CLProofVerifier`).
+  the separate `CLProofVerifier`). The canvas draws the consolidation path as
+  one combined `Consolidation pipeline` box and the notes card names its
+  `ConsolidationGateway`; both spellings are required in this class, on their
+  own surface, so repainting either one fails the check.
 - `com` — an EL contract whose power is held by a quorum or a committee, i.e.
   the contract that itself stores the member set and the threshold:
   `HashConsensus` (`_quorum`, `HashConsensus.sol:225,455-461,945`),

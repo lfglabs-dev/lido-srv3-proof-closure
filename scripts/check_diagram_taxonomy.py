@@ -7,7 +7,9 @@ EIP-7002, EIP-7251) as consensus layer, which puts it outside the EL trust
 boundary it actually sits inside; and drawing an oracle contract as
 quorum-held, which moves the committee off `HashConsensus` where it lives.  A
 third is attributing the consolidation batch veto to the DSM guardians when
-`ConsolidationBus.REMOVE_ROLE` belongs to the consolidation committee.
+`ConsolidationBus.REMOVE_ROLE` belongs to the consolidation committee.  A
+fourth is dropping a box out of the `proof` class, which is the claim that it
+only acts behind a beacon-root proof.
 
 Each is pinned here against `diagram/README.md`, which carries the citations.
 """
@@ -59,6 +61,21 @@ TAXONOMY = {
     "EasyTrack · EVMScriptExecutor": "com",
     "TopUpGateway": "proof",
     "ConsolidationGateway": "proof",
+    "Consolidation pipeline": "proof",
+}
+
+# The `proof` boxes are what SRv3 adds and has not deployed, so they carry no
+# address and IDENTITY cannot reach them — yet `proof` is exactly the claim a
+# reader must not see weakened, since it says the box only acts behind a
+# beacon-root proof.  The canvas draws the consolidation path as one combined
+# `Consolidation pipeline` box while the notes card names its gateway, so the
+# same entity is spelled differently per surface; pinning one label left the
+# other surface free to be repainted with this gate still reporting success.
+# Each surface is therefore required to carry its own spelling at class `proof`,
+# which also makes a rewording fail closed instead of quietly retiring the rule.
+SURFACE_REQUIRED = {
+    "canvas": {"TopUpGateway": "proof", "Consolidation pipeline": "proof"},
+    "notes cards": {"TopUpGateway": "proof", "ConsolidationGateway": "proof"},
 }
 
 # Only the validator set is consensus layer.  Anything else painted `cl` is the
@@ -179,6 +196,26 @@ def main():
                  "a taxonomy-critical entity must stay addressable on the canvas and "
                  "on the notes cards so its class rule cannot lapse")
 
+    for surface, boxes in (("canvas", nodes), ("notes cards", cards)):
+        drawn_here = {name: kind for name, kind, _ in boxes}
+        for label, expected in SURFACE_REQUIRED[surface].items():
+            if label not in drawn_here:
+                fail(f"{label!r} is no longer drawn on the {surface}; a proof-gated box "
+                     "carries no address, so its class rule can only be held by the label "
+                     f"it wears on the {surface}")
+            if drawn_here[label] != expected:
+                fail(f"{label!r} is drawn as {drawn_here[label]!r} on the {surface}, "
+                     f"must be {expected!r}")
+
+    # A rule keyed by a label retires itself the moment that label is reworded.
+    # Every taxonomy name must therefore still be found somewhere on the map, so
+    # a rename fails closed here instead of silently dropping its class rule.
+    labelled = {name for name, _, _ in nodes + cards}
+    orphaned = sorted(set(TAXONOMY) - labelled)
+    if orphaned:
+        fail(f"taxonomy name(s) {orphaned} are no longer drawn on either surface; "
+             "a reworded label must not retire its class rule")
+
     drawn = {kind for _, kind, _ in nodes + cards}
     legend = set(LEGEND.findall(html)) & set(CLASSES)
     if not drawn <= legend:
@@ -219,7 +256,9 @@ def main():
 
     print(f"diagram taxonomy ok: {len(nodes)} nodes, {len(cards)} cards, "
           f"{len(legend)} legend classes, {len(IDENTITY)} address-bound entities "
-          "on the canvas and on the notes cards")
+          "on the canvas and on the notes cards, "
+          f"{len(SURFACE_REQUIRED['canvas'])} proof-gated boxes bound per surface, "
+          f"{len(TAXONOMY)} taxonomy names still drawn")
 
 
 if __name__ == "__main__":
