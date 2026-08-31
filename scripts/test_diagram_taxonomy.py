@@ -136,6 +136,21 @@ def main():
             # The consolidation veto handed back to the DSM guardians.
             (diagram.replace("the committee's veto window", "the guardians' veto window"),
              "the consolidation veto is the committee's REMOVE_ROLE"),
+            # The same reattribution, retypeset.  A curly apostrophe reads
+            # identically and used to slip the banned ASCII spelling on every
+            # surface at once, so the wording rule has to fold typography first.
+            (diagram.replace("committee's veto window", "guardians’ veto window"),
+             "the consolidation veto is the committee's REMOVE_ROLE"),
+            # The window handed to a holder the banned list never names.  Banning
+            # spellings only removes the ones enumerated, so each surface has to
+            # name the committee affirmatively instead.
+            (diagram.replace("committee's veto window", "DSM's veto window"),
+             "names the committee as its owner only 0 time(s)"),
+            # Only the notes card reattributed.  The canvas spells the owner
+            # `consolidation committee's`, so this leaves that surface intact and
+            # fails only if the notes are read as their own surface.
+            (diagram.replace("the committee's veto window", "the DSM's veto window"),
+             "the notes cards raises the veto window"),
             # The quorum restated as a constant.
             (diagram.replace("handleOracleReport", "handleOracleReport · 5/9 quorum"),
              "quorum lives in HashConsensus"),
@@ -331,7 +346,9 @@ def main():
         invoke(fixture, True)
 
     print("diagram taxonomy mutants rejected: predeploy as consensus layer (card and node), "
-          "oracle as quorum-held, HashConsensus demoted, guardian veto, 5/9 constant, "
+          "oracle as quorum-held, HashConsensus demoted, guardian veto (the banned "
+          "spelling, the same claim retypeset with a curly apostrophe, and a "
+          "reattribution no banned list names, rejected per surface), 5/9 constant, "
           "EasyTrack veto, conflated verifiers, untooltipped node, undocumented class; "
           "relabelled node and card repaints and a dropped entity still caught by "
           "address; an entity dropped from one surface only (canvas node deleted with "

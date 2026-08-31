@@ -89,6 +89,29 @@ BANNED = {
     "(ext. repo)": "the IStakingModuleV2 interface is in the pinned repo; only the impl is external",
 }
 
+# A rule written as one ASCII spelling retires itself the moment the prose is
+# retypeset: `guardians’ veto window` with a curly apostrophe reads identically
+# to a reader and no longer matches `guardians' veto`.  Punctuation that only
+# varies typographically is folded to its ASCII form before any wording rule is
+# applied, so a rule survives ordinary editing.  Only marks that are purely
+# typographic are folded: the README's class entries are delimited by an em dash
+# that BOT_ENTRY keys on and name their class in backticks that the class-doc
+# check looks for, so neither is a spelling variant of anything here.
+TYPOGRAPHY = str.maketrans({
+    "‘": "'", "’": "'", "ʼ": "'", "´": "'",
+    "“": '"', "”": '"',
+})
+
+# Banning the guardians' spelling only removes one way to misattribute the
+# consolidation veto; the claim can be handed to any other holder by rewording.
+# The Bus delay is the consolidation committee's window because `removeBatches`
+# is `REMOVE_ROLE`, so each surface that raises the window must also name the
+# committee as its owner, and every mention must carry that owner rather than
+# leaving one attributed elsewhere.  Requiring the attribution affirmatively
+# fails closed under rewording; a banned list only catches what it enumerates.
+VETO_WINDOW = re.compile(r"veto window")
+VETO_OWNED = re.compile(r"committee's veto window")
+
 REQUIRED = (
     ("ALLOW_PAIR_ROLE", "EasyTrack's allow-only consolidation power must be named"),
     ("REMOVE_ROLE", "the batch veto role must be named"),
@@ -136,6 +159,10 @@ def fail(message):
     raise SystemExit(f"diagram taxonomy: {message}")
 
 
+def fold(text):
+    return text.translate(TYPOGRAPHY)
+
+
 def abbreviated(address):
     # Cards print the address the way the map does.  Deriving the short form
     # from the full one keeps one identity per entity, so the node surface and
@@ -144,7 +171,7 @@ def abbreviated(address):
 
 
 def main():
-    html = DIAGRAM.read_text(encoding="utf-8")
+    html = fold(DIAGRAM.read_text(encoding="utf-8"))
 
     nodes = []
     for match in NODE.finditer(html):
@@ -162,9 +189,11 @@ def main():
         fail(f"no nodes parsed from {DIAGRAM.relative_to(ROOT)}")
 
     cards = []
+    card_bodies = []
     for m in CARD.finditer(html):
         address = CARD_ADDRESS.search(m.group(3))
         cards.append((m.group(2).strip(), m.group(1), address.group(1) if address else ""))
+        card_bodies.append(m.group(0))
     if not cards:
         fail(f"no notes cards parsed from {DIAGRAM.relative_to(ROOT)}")
 
@@ -225,7 +254,22 @@ def main():
         if phrase in html:
             fail(f"{phrase!r} still appears: {why}")
 
-    readme = DIAGRAM_README.read_text(encoding="utf-8")
+    # The canvas and the notes cards are read independently, so an attribution
+    # that survives on one surface must not vouch for the other.
+    for surface, text in (("canvas", "".join(body for _, _, body in nodes)),
+                          ("notes cards", "".join(card_bodies))):
+        mentions = len(VETO_WINDOW.findall(text))
+        owned = len(VETO_OWNED.findall(text))
+        if not mentions:
+            fail(f"the {surface} no longer raises the consolidation veto window; the "
+                 "Bus delay is the committee's REMOVE_ROLE window and must be named "
+                 "where a reader meets the box")
+        if owned != mentions:
+            fail(f"the {surface} raises the veto window {mentions} time(s) but names the "
+                 f"committee as its owner only {owned} time(s); the window is the "
+                 "consolidation committee's REMOVE_ROLE, not the DSM guardians'")
+
+    readme = fold(DIAGRAM_README.read_text(encoding="utf-8"))
     for phrase, why in REQUIRED:
         if phrase not in html:
             fail(f"{DIAGRAM.relative_to(ROOT)} never mentions {phrase!r}: {why}")

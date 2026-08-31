@@ -156,9 +156,11 @@
   <div class="kicker">Lido protocol · SRv3 · af095e48</div>
   <h1>How Lido fits together</h1>
   <p>Every box is a contract (source file plus mainnet address, hover for the full story) or an off-chain actor,
-  colored by <b>what makes it trustworthy</b>. Only the purple boxes are consensus-layer; everything else,
-  <b>including EIP-4788 / 7002 / 7251</b>, executes on the EL and is reached by ordinary
-  <code>call</code>&nbsp;/&nbsp;<code>staticcall</code>. Edge labels are the real function calls at
+  colored by <b>what makes it trustworthy</b>. Only the purple boxes are consensus-layer; every other
+  <b>on-chain</b> box, <b>including EIP-4788 / 7002 / 7251</b>, executes on the EL and is reached by ordinary
+  <code>call</code>&nbsp;/&nbsp;<code>staticcall</code>. The gray boxes are the off-chain actors of the
+  <code>bot</code> class: they run no EL code and reach these contracts only by sending transactions to them.
+  Edge labels are the real function calls at
   <b>lidofinance/core@af095e48</b> (SRv3, PR&nbsp;#1811; those contracts are not deployed yet).</p>
   <div class="legend">
     <span class="el">EL contract · held by code</span>
