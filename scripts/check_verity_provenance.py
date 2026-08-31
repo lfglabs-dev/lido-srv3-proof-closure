@@ -155,19 +155,22 @@ def _table_cells(line: str) -> list[str]:
 def _ends_table(line: str) -> bool:
     """True when ``line`` cannot continue a GFM table body.
 
-    Deliberately stricter than _crosses_block_boundary, because the two err in
-    opposite directions.  Running a table region past its real end would split
-    inline contexts GFM keeps together and could expose content hidden in a link
-    title, whereas ending a region early only closes it at a newline GFM still
-    treats as a row separator, which over-suppresses — provided _table_separators
-    records that closing newline, without which an opener in the final row leaks
-    into the next block.  A continuation row must therefore carry an unescaped
-    pipe, sit within three columns of indentation and start no other block
-    structure; at four columns GFM closes the table and opens an indented chunk.
+    GFM §4.10 breaks a table body at the first blank line or at the start of
+    another block-level structure, and nowhere else.  In particular an ordinary
+    line carrying no pipe does *not* end the table: it renders as a further row
+    whose single cell is padded out.  Requiring a pipe therefore ended the region
+    early while GFM kept parsing rows, and the newlines inside those excluded
+    rows were never recorded as separators, so a label opener on one of them
+    stayed live across a real row boundary and formed a link GFM does not form.
+    Recording only the newline that closed the region could not fix that, because
+    an opener may sit any number of rows past the early end.
+
+    The conditions below are exactly the block starters that do break a table:
+    a blank line, four columns of indentation (an indented chunk), an ATX
+    heading, a thematic break, a block quote and a list item.
     """
     return (
-        not _unescaped_pipes(line)
-        or line.strip(" \t") == ""
+        line.strip(" \t") == ""
         or _indent_width(line) >= 4
         or bool(_ATX_HEADING.match(line))
         or bool(_THEMATIC_BREAK.match(line))
@@ -186,11 +189,8 @@ def _table_separators(text: str) -> list[int]:
     not certainly a table leaves inline parsing unchanged.
 
     The newline that *closes* the region is recorded too, not only the ones
-    between rows.  Whichever way the region ends it is a real inline boundary:
-    if _ends_table stopped at the table's true end the newline separates the
-    table from the next leaf block, and if it stopped early — it is deliberately
-    stricter than GFM, which continues a table across an ordinary unpiped line —
-    the newline is still a row separator in the table GFM actually renders.
+    between rows.  The region ends where GFM breaks the table, so that newline
+    separates the table from the next leaf block and no inline may span it.
     Omitting it let a final body row that drops its trailing pipe leave an
     opener such as ``[outer`` live across the boundary, so a following
     ``](url "…`` formed a link that GFM never forms and hid a rendered Verity

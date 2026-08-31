@@ -737,6 +737,45 @@ with tempfile.TemporaryDirectory(prefix="verity-provenance-mutants-") as tmp:
         encoding="utf-8",
     )
     run(fixture, True)
+    # Adversarial (discussion_r3890968538): a body line carrying no pipe does not end a
+    # GFM table, it renders as one more row.  Ending the region there left the newlines
+    # of the rows GFM still parsed unrecorded, so a '[' opener on such a row stayed live
+    # across a real row boundary and formed a link GFM never forms, hiding a second
+    # rendered Verity row in its apparent title.  The opener may sit any number of rows
+    # past the wrongly chosen end, so recording only that one newline is not enough.
+    for body in (
+        'ordinary [outer\n',
+        'ordinary\nanother [outer\n',
+        'ordinary\nstill ordinary\nlast [outer\n',
+    ):
+        lockfile_path.write_text(
+            original_lockfile.replace(
+                lean_row, f'{body}](url "bad\n| Verity | `{OTHER}` |\ncontinued")\n'
+            ),
+            encoding="utf-8",
+        )
+        run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Adversarial (discussion_r3890968538): the same shape with the unpiped row placed
+    # immediately after the delimiter row, where the table body has produced no row yet.
+    lido_row = next(l for l in original_lockfile.splitlines(keepends=True) if "| Lido core |" in l)
+    lockfile_path.write_text(
+        original_lockfile.replace(
+            lido_row, f'ordinary [outer\n](url "bad\n| Verity | `{OTHER}` |\ncontinued")\n'
+        ),
+        encoding="utf-8",
+    )
+    run(fixture, False, "proofs/LOCKFILE.md must contain exactly one Verity pin row")
+    # Positive (discussion_r3890968538): the converse direction.  GFM keeps parsing rows
+    # past the unpiped line, so no link forms and the sole genuine Verity row after the
+    # apparent title is rendered; ending the region early suppressed it and rejected a
+    # valid lockfile.
+    lockfile_path.write_text(
+        without_active.replace(
+            lean_row, f'ordinary [outer\n](url "bad\n{verity_row}continued")\n'
+        ),
+        encoding="utf-8",
+    )
+    run(fixture, True)
     lockfile_path.write_text(original_lockfile, encoding="utf-8")
 
 print(
@@ -766,7 +805,8 @@ print(
     "no-space-hash-same-block-opener-title, block-quote-continuation-title, "
     "non-table-pipe-lines-title, table-row-wrong-pin, "
     "indented-delimiter-row-title-family, indented-header-row-title, "
-    "table-closing-newline-opener-family, table-closing-newline-opener-shape-family); "
+    "table-closing-newline-opener-family, table-closing-newline-opener-shape-family, "
+    "unpiped-row-opener-depth-family, unpiped-row-after-delimiter-opener); "
     "positive gates: baseline, fenced-literal-unclosed-HTML-comment, "
     "html-comment-in-1bt-code-span, html-comment-in-2bt-code-span, "
     "after-closed-script-block, after-blank-line-div-block, "
@@ -792,6 +832,7 @@ print(
     "block-quote-interrupt-family, block-quote-title-row-after, "
     "gfm-table-row-boundary, gfm-table-cell-boundary, "
     "short-indent-delimiter-row-family, over-indented-row-closes-table, "
-    "table-closing-newline-row-after, after-table-multiline-title; "
+    "table-closing-newline-row-after, after-table-multiline-title, "
+    "unpiped-row-opener-row-after; "
     "checkout identity agree"
 )
