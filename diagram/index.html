@@ -164,7 +164,7 @@
     <span class="el">EL contract · held by code</span>
     <span class="proof">EL contract · EIP-4788 proof-gated</span>
     <span class="com">EL contract · quorum / committee-held</span>
-    <span class="bot">off-chain · liveness only</span>
+    <span class="bot" title="No bot-class actor can redirect principal: withdrawal credentials are write-once and point at the WithdrawalVault. What a compromise costs is per actor, not class-wide. Staker and depositor bot: liveness only. Node operators: they hold validator signing keys, and a compromised key can sign slashable messages, so validator balances can still be reduced.">off-chain · cannot redirect principal</span>
     <span class="sys">EL system predeploy</span>
     <span class="cl">consensus layer</span>
   </div>
@@ -296,7 +296,7 @@
     <text class="nm" x="850" y="282">ValidatorsExitBus</text><text class="fl" x="850" y="298">oracle/ValidatorsExitBusOracle.sol</text><text class="ad" x="850" y="312">0x0De4…5c6e · quorum: HashConsensus</text></g>
   <g class="node com" data-flows="f4 f5 f7"><title>0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288: this is where the quorum lives, not in the oracles. HashConsensus.sol:225 stores _quorum; :455-461 read and set it under MANAGE_MEMBERS_AND_QUORUM_ROLE (:172-173). A report is processable only when the 9 members reach quorum on an identical hash. Both BaseOracle contracts reach this address through getConsensusContract() (BaseOracle.sol:115-116).</title><rect class="box" x="1075" y="140" width="155" height="62" rx="9"/>
     <text class="nm" x="1085" y="160">HashConsensus</text><text class="fl" x="1085" y="176">oracle/HashConsensus.sol</text><text class="ad" x="1085" y="190">0xD624…B288 · ×9 · quorum</text></g>
-  <g class="node bot" data-flows="f5"><title>Hold signing keys only; principal is out of reach</title><rect class="box" x="840" y="735" width="190" height="48" rx="9"/>
+  <g class="node bot" data-flows="f5"><title>Hold validator signing keys only; principal is out of reach, but a compromised signing key can sign slashable messages, so validator balances can be reduced</title><rect class="box" x="840" y="735" width="190" height="48" rx="9"/>
     <text class="nm" x="850" y="755">Node operators</text><text class="ad" x="850" y="771">off-chain · signing keys only</text></g>
 
   <g class="node proof" data-flows="f6"><title>SRv3, not deployed. Migrator validates operator pairs allowed through ALLOW_PAIR_ROLE (ConsolidationMigrator.sol:118,181-185). Bus enforces commit-delay-execute; the delay is the consolidation committee's veto window, since removeBatches is REMOVE_ROLE (ConsolidationBus.sol:168,250) and that role is held by the consolidation committee, not by the DSM guardians (UpgradeTemporaryAdmin.sol:99; UpgradeTemplate.sol:330). Gateway is a CLProofVerifier (ConsolidationGateway.sol:12,34,133): it verifies target WC proofs against the EIP-4788 beacon root and additionally reverts if DSM deposits are paused (:276-277).</title><rect class="box" x="1075" y="262" width="165" height="76" rx="9"/>
@@ -318,7 +318,7 @@
   <div class="band">
     <div class="c bot"><div class="n">Depositor Bot</div><div class="r">collects guardian signatures, picks module &amp; timing, builds top-up Merkle proofs. Compromise = liveness problem, not funds.</div></div>
     <div class="c bot"><div class="n">Oracle daemons ×9</div><div class="r">compute reports on a shared reference slot: deterministic and replayable by anyone.</div></div>
-    <div class="c bot"><div class="n">Node operators</div><div class="r">hold signing keys only; withdrawal credentials of every Lido validator point to the WithdrawalVault, so principal is out of reach.</div></div>
+    <div class="c bot"><div class="n">Node operators</div><div class="r">hold validator signing keys only; withdrawal credentials of every Lido validator point to the WithdrawalVault, so principal is out of reach. A compromised signing key can still sign slashable messages, reducing validator balances — so this is not liveness only.</div></div>
   </div>
 
   <h2>Governance &amp; committees</h2>

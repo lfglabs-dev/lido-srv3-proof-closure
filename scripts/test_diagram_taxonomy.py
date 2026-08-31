@@ -101,6 +101,24 @@ def main():
             (diagram.replace('<div class="c com"><div class="n">HashConsensus</div>',
                              '<div class="c el"><div class="n">Hash Consensus</div>', 1),
              "HashConsensus (0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288) is drawn as 'el'"),
+            # The rendered legend restating one compromise consequence for the
+            # whole `bot` class.  This is the surface the reader looks at, so a
+            # corrected README does not excuse it.
+            (diagram.replace("off-chain · cannot redirect principal",
+                             "off-chain · liveness only", 1),
+             "the `bot` legend pill reads 'liveness only'"),
+            (diagram.replace("off-chain · cannot redirect principal",
+                             "off-chain · liveness, not funds", 1),
+             "the `bot` legend pill reads 'liveness, not funds'"),
+            # The pill stripped back to a bare colour swatch: the class-wide
+            # reading would return by omission rather than by wording.
+            (re.sub(r'<span class="bot"[^>]*>', '<span class="bot">', diagram, count=1),
+             "the `bot` legend pill never mentions 'Node operators'"),
+            # The qualification must survive on the map as a claim and not just
+            # as a name: the slashable consequence is the part that breaks the
+            # liveness-only reading of the node operators' signing keys.
+            (diagram.replace("can sign slashable messages", "can be rotated"),
+             "the `bot` legend pill never mentions 'slashable'"),
             # A taxonomy-critical entity that leaves the map entirely: its rule
             # must not retire quietly along with it.
             (diagram.replace("0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288", f"0x{'0' * 40}")
@@ -153,7 +171,9 @@ def main():
           "oracle as quorum-held, HashConsensus demoted, guardian veto, 5/9 constant, "
           "EasyTrack veto, conflated verifiers, untooltipped node, undocumented class; "
           "relabelled node and card repaints and a dropped entity still caught by "
-          "address; `bot` compromise collapsed to a class-wide invariant rejected")
+          "address; `bot` compromise collapsed to a class-wide invariant rejected on "
+          "the README entry and on the rendered legend pill (restated, stripped, and "
+          "with the slashable consequence dropped)")
 
 
 if __name__ == "__main__":

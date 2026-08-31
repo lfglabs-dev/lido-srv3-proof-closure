@@ -107,6 +107,62 @@ def main():
             invoke(fixture, True, "8 P-ALLOC-1 theorems")
             lean_path.write_text(lean, encoding="utf-8")
 
+        # Lean block comments nest.  Prose inside a comment that merely begins a
+        # line with `theorem` declares nothing, so demanding an inventory row for
+        # it would fail the gate on valid source.  The nested cases are the ones
+        # a first-`-/` scan gets wrong; each must still read as commented out.
+        for commented in (
+            "/- outer\n   /- nested -/\n   theorem only_prose : True := trivial\n-/",
+            "/- outer\n   /- a -/ /- b -/\n   lemma only_prose_lemma : True := trivial\n-/",
+            "/- /- /- deep -/ -/\n   theorem only_prose_deep : True := trivial\n-/",
+            "/-- doc\n    /- nested -/\n    theorem only_prose_doc : True := trivial\n-/",
+        ):
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{commented}\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # The scanner must resume reading source at the outer comment's real
+        # end, not run on to EOF: a declaration after a nested comment is still
+        # a declaration and must still be demanded.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "/- outer\n   /- nested -/\n   theorem only_prose : True := trivial\n-/\n"
+                         "theorem undisclosed_after_nested : True := trivial\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "omits declared theorem(s): undisclosed_after_nested")
+        lean_path.write_text(lean, encoding="utf-8")
+
+        # A `/-` that is not an opener must not blank the source after it.
+        # This is the direction that fails open: swallowing real declarations
+        # would let the inventory omit them while the gate still passed.
+        for not_an_opener in (
+            "-- prose mentioning /- an opener\ntheorem undisclosed_after_line_comment",
+            'def commentish : String := "/-"\ntheorem undisclosed_after_string',
+        ):
+            body, name = not_an_opener.rsplit("theorem ", 1)
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{body}theorem {name} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {name}")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # An unterminated block comment leaves the rest of the file unreadable;
+        # it must fail closed rather than silently inventorying nothing.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "/- outer /- nested -/\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "unterminated block comment")
+        lean_path.write_text(lean, encoding="utf-8")
+
         # An unregistered theorem promoted to REGISTERED in the report only.
         promoted = report.replace(
             "| `active_capacity_bounded` | 69 | Abstract | unregistered |",
@@ -147,9 +203,10 @@ def main():
 
     print("report theorem inventory mutants rejected: dropped row, undisclosed theorem "
           "(column-zero, indented, tabbed, attributed, private, protected, nonrec, "
-          "`lemma`, and combined), report-only promotion, registry drift, stale line, "
-          "missing plane; commented-out declarations and theorem-like identifiers "
-          "not miscounted")
+          "`lemma`, and combined), declaration after a nested comment, `/-` in a line "
+          "comment and in a string literal, unterminated comment, report-only promotion, "
+          "registry drift, stale line, missing plane; commented-out declarations, "
+          "theorem-like identifiers, and prose inside nested block comments not miscounted")
 
 
 if __name__ == "__main__":

@@ -93,9 +93,21 @@ BOT_QUALIFICATION = (
     ("slashable", "a compromised signing key can sign slashable messages"),
 )
 
+# The README carries the citations, but the legend pill is the surface a reader
+# actually looks at.  Pinning the qualification to the README alone left the map
+# free to go on asserting one consequence for the whole class, which is how a
+# `liveness only` pill outlived the corrected README entry.  The pill's visible
+# text must not make the class-wide claim, and the pill must carry the
+# qualification itself rather than leave it elsewhere in the document.
+BOT_LEGEND = re.compile(r'<span class="bot"[^>]*>(.*?)</span>', re.DOTALL)
+BOT_LEGEND_BANNED = (
+    ("liveness only", "node operators hold signing keys that can sign slashable messages"),
+    ("liveness, not funds", "slashing reduces validator balances, which is a funds outcome"),
+)
+
 NODE = re.compile(r'<g class="node ([a-z]+)"(.*?)</g>', re.DOTALL)
 CARD = re.compile(r'<div class="c ([a-z]+)"><div class="n">(.*?)</div>(.*?</div>)</div>')
-LEGEND = re.compile(r'<span class="([a-z]+)">')
+LEGEND = re.compile(r'<span class="([a-z]+)"[^>]*>')
 LABEL = re.compile(r'<text class="nm"[^>]*>(.*?)</text>', re.DOTALL)
 CARD_ADDRESS = re.compile(r'<div class="a">(.*?)</div>')
 
@@ -187,6 +199,17 @@ def main():
         if phrase not in entry.group(0):
             fail(f"the `bot` entry states one compromise consequence for the whole "
                  f"class and never mentions {phrase!r}: {why}")
+
+    pill = BOT_LEGEND.search(html)
+    if not pill:
+        fail(f"{DIAGRAM.relative_to(ROOT)} has no `bot` legend entry to qualify")
+    for phrase, why in BOT_LEGEND_BANNED:
+        if phrase in pill.group(1).lower():
+            fail(f"the `bot` legend pill reads {phrase!r}, one compromise consequence "
+                 f"for the whole class: {why}")
+    for phrase, why in BOT_QUALIFICATION:
+        if phrase not in pill.group(0):
+            fail(f"the `bot` legend pill never mentions {phrase!r}: {why}")
 
     print(f"diagram taxonomy ok: {len(nodes)} nodes, {len(cards)} cards, "
           f"{len(legend)} legend classes, {len(IDENTITY)} address-bound entities")

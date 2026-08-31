@@ -48,11 +48,69 @@ def fail(message):
     raise SystemExit(f"report theorem inventory: {message}")
 
 
+def strip_block_comments(text):
+    """Blank Lean block comments, preserving every newline and column.
+
+    Lean block comments nest, so `/-.*?-/` closes an outer comment at the first
+    inner `-/` and hands the rest of that comment back as source: a prose line
+    beginning `theorem ...` inside it is then demanded as an inventory row for a
+    theorem Lean never declares, failing the gate on valid source.  Depth is
+    tracked here instead.
+
+    `/-` only opens a comment where code is actually being read.  Inside a `--`
+    line comment or a string literal it is ordinary text, and treating one as an
+    opener would blank the real declarations that follow — the failure direction
+    that matters, since it hides theorems rather than inventing them.
+    """
+    out = []
+    index = 0
+    depth = 0
+    end = len(text)
+    while index < end:
+        pair = text[index:index + 2]
+        if depth:
+            if pair in ("/-", "-/"):
+                depth += 1 if pair == "/-" else -1
+                out.append("  ")
+                index += 2
+                continue
+            # Blanking the body to spaces rather than dropping it keeps every
+            # declaration at the line and column it occupies on disk.
+            out.append("\n" if text[index] == "\n" else " ")
+            index += 1
+        elif pair == "/-":
+            depth = 1
+            out.append("  ")
+            index += 2
+        elif pair == "--":
+            while index < end and text[index] != "\n":
+                out.append(text[index])
+                index += 1
+        elif text[index] == '"':
+            out.append(text[index])
+            index += 1
+            while index < end:
+                if text[index] == "\\" and index + 1 < end:
+                    out.append(text[index:index + 2])
+                    index += 2
+                    continue
+                out.append(text[index])
+                index += 1
+                if text[index - 1] == '"':
+                    break
+        else:
+            out.append(text[index])
+            index += 1
+    if depth:
+        fail(f"{LEAN.relative_to(ROOT)} has an unterminated block comment; the "
+             "declarations after it cannot be read, so the inventory cannot be checked")
+    return "".join(out)
+
+
 def declared_theorems():
-    # Doc comments wrap prose that can begin a line with "theorem", so blank
-    # them out first while preserving line numbering.
-    text = re.sub(r"/-.*?-/", lambda m: "\n" * m.group(0).count("\n"),
-                  LEAN.read_text(encoding="utf-8"), flags=re.DOTALL)
+    # Comments wrap prose that can begin a line with "theorem", so blank them
+    # out first while preserving line numbering.
+    text = strip_block_comments(LEAN.read_text(encoding="utf-8"))
     found = {}
     for number, line in enumerate(text.splitlines(), start=1):
         match = DECL.match(line)
