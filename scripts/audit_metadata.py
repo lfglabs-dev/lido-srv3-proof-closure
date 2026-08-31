@@ -391,6 +391,39 @@ def validate_guarantees(data, assumption_ids):
     return rows
 
 
+def validate_readme_fidelity_disclosure(rows):
+    """Bind the README headline table to the registry's own fidelity counts.
+
+    The headline table is the first thing a reader sees, and every canonical row
+    reads CHECKED/CHECKED.  Without a per-row gap count next to those cells the
+    surface reads as "finished" while the registry still records open gaps, so
+    the count is part of the published claim and may not drift from
+    `fidelity.missing`.
+    """
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    canonical = rows[:len(CANONICAL_IDS)]
+    total = 0
+    for position, row in enumerate(canonical, start=1):
+        expected = len(row["fidelity"]["missing"])
+        require(expected > 0, f"{row['id']}: registry records no fidelity gap to disclose")
+        total += expected
+        cell = re.compile(
+            rf"^\|\s*{position}\s*\|\s*`{re.escape(row['id'])}`\s*\|[^\n|]*\|[^\n|]*\|"
+            rf"\s*(\d+) open\s*\|$",
+            re.MULTILINE,
+        )
+        found = cell.search(readme)
+        require(found is not None,
+                f"README: {row['id']} row is missing its `N open` fidelity-gap cell")
+        require(int(found.group(1)) == expected,
+                f"README: {row['id']} discloses {found.group(1)} fidelity gaps, "
+                f"registry records {expected}")
+    require(f"{total} in total" in readme,
+            f"README: headline boundary must disclose the {total} total fidelity gaps")
+    require("not about a deployed contract" in readme,
+            "README: headline must state the model-vs-deployed boundary")
+
+
 def validate():
     validate_deposit_constructor_fixture()
     registry = load(AUDIT / "guarantees.yaml")
@@ -402,6 +435,7 @@ def validate():
     validate_pins(lock, manifest, source_map)
     rows = validate_guarantees(registry, assumption_ids)
     validate_r1_review_basis()
+    validate_readme_fidelity_disclosure(rows)
     return rows
 
 
@@ -457,27 +491,54 @@ def rendered(rows, source_map):
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
-        "## Acceptance table — every registered claim\n\n",
-        "| Claim | Accepted theorem plane | Proof shape / exact domain statement | Source/artifact provenance | Acceptance and exact limitation |\n",
+        "## Acceptance index — every registered claim\n\n",
+        "One row per registered claim, with the number of fidelity gaps the "
+        "registry still records against it. No row is gap-free. The full "
+        "assumptions, limitations, and source provenance for each claim are "
+        "expanded in the per-claim sections below; nothing that qualifies a "
+        "claim is left folded into a table cell.\n\n",
+        "| Claim | Abstract | Verity | Fidelity gaps | Classification |\n",
         "| --- | --- | --- | --- | --- |\n"]
+    for row in rows:
+        # Registry IDs are untrusted table content; keep only the characters a
+        # GitHub heading anchor can contain so a link target cannot add columns.
+        anchor = re.sub(r"[^a-z0-9-]", "", row["id"].lower())
+        report.append(
+            f"| [`{markdown_table_cell(row['id'])}`](#{anchor}) | "
+            f"{markdown_table_cell(row['abstract']['status'])} | "
+            f"{markdown_table_cell(row['verity']['status'])} | "
+            f"{len(row['fidelity']['missing'])} open | "
+            f"**{markdown_table_cell(row['classification']['kind'])}** |\n"
+        )
+    report.append("\n## Per-claim acceptance — assumptions, limitations, and source\n\n")
     for row in rows:
         source = spans_by_id.get(row["id"])
         if source:
-            provenance = f"{source['status']}; {len(source['spans'])} immutable pinned source span(s)"
+            provenance = (f"`{source['status']}`; {len(source['spans'])} immutable pinned "
+                          f"source span(s) in `audit/source-map.yaml`")
         else:
             provenance = "No independent source-map target; supplemental evidence only"
         abstract = row["abstract"]
         verity = row["verity"]
-        plane = (f"abstract `{abstract['status']}`: `{abstract['theorem'] or '—'}`; "
-                 f"Verity `{verity['status']}`: `{verity['theorem'] or '—'}`")
-        limitations = "; ".join(row["fidelity"]["missing"])
+        missing = row["fidelity"]["missing"]
+        report.append(f"### `{row['id']}`\n\n")
         report.append(
-            f"| `{markdown_table_cell(row['id'])}` | {markdown_table_cell(plane)} | "
-            f"{markdown_table_cell(row['summary'])} | {markdown_table_cell(provenance)}. "
-            f"Assumptions: {markdown_table_cell(', '.join('`' + a + '`' for a in row['assumptions']) or '—')}. | "
-            f"**{markdown_table_cell(row['classification']['kind'])}**. "
-            f"{markdown_table_cell(limitations)} Next gate: {markdown_table_cell(row['next_gate'])} |\n"
-        )
+            f"**Accepted theorem planes.** Abstract `{abstract['status']}`: "
+            f"`{abstract['theorem'] or '—'}`. Verity `{verity['status']}`: "
+            f"`{verity['theorem'] or '—'}`.\n\n")
+        report.append(f"**Proof shape / exact domain statement.** {row['summary']}\n\n")
+        report.append(f"**Source/artifact provenance.** {provenance}. A source-map entry is "
+                      f"source provenance, not deployed-artifact provenance.\n\n")
+        report.append("**Assumptions.** " + (", ".join(
+            f"`{a}`" for a in row["assumptions"]) or "None recorded.") + "\n\n")
+        report.append(f"**Limitations — {len(missing)} open fidelity gap(s).** "
+                      f"Surfaces the accepted theorems above do *not* cover:\n\n")
+        report.extend(f"- {item}\n" for item in missing)
+        classification = row["classification"]
+        remaining = classification.get("work")
+        report.append(f"\n**Classification.** **{classification['kind']}**"
+                      + (f" — {remaining}" if remaining else "") + "\n\n")
+        report.append(f"**Next gate.** {row['next_gate']}\n\n")
     report.extend([
         "\n## Explicit NOT YET boundaries\n\n",
         "- **ETH confinement:** `P-ETH-JOURNAL-1` is a modeled journal exclusion result, not global ETH confinement across live contracts, arbitrary calls, or deployment state.\n",

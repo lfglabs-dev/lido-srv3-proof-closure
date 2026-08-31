@@ -38,6 +38,7 @@ def main():
         (fixture / "LidoSRv3/Audit/Provenance").mkdir(parents=True)
         (fixture / "fixtures/solidity-reference").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
+        shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
         shutil.copy2(ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean",
@@ -96,19 +97,11 @@ def main():
         spec.loader.exec_module(module)
         def set_id(row): row["id"] = "left||right"
         def set_abstract_status(row): row["abstract"]["status"] = "left||right"
-        def set_abstract_theorem(row): row["abstract"]["theorem"] = "left||right"
         def set_verity_status(row): row["verity"]["status"] = "left||right"
-        def set_verity_theorem(row): row["verity"]["theorem"] = "left||right"
-        def set_summary(row): row["summary"] = "left||right"
-        def set_assumptions(row): row["assumptions"] = ["left||right"]
         def set_classification(row): row["classification"]["kind"] = "left||right"
-        def set_missing(row): row["fidelity"]["missing"] = ["left||right"]
-        def set_next_gate(row): row["next_gate"] = "left||right"
 
         cell_families = (
-            set_id, set_abstract_status, set_abstract_theorem,
-            set_verity_status, set_verity_theorem, set_summary,
-            set_assumptions, set_classification, set_missing, set_next_gate,
+            set_id, set_abstract_status, set_verity_status, set_classification,
         )
         for mutate in cell_families:
             x = copy.deepcopy(guarantees)
@@ -117,6 +110,29 @@ def main():
             escaped_row = next(line for line in report.splitlines() if "left\\|\\|right" in line)
             if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
                 raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
+
+        # Assumptions, limitations, source and next gate no longer live in table
+        # cells: the acceptance record expands them per claim.  Each must reach
+        # the reader verbatim, outside any table row, so nothing that qualifies a
+        # claim can be truncated or hidden by the index table.
+        def set_abstract_theorem(row): row["abstract"]["theorem"] = "left||right"
+        def set_verity_theorem(row): row["verity"]["theorem"] = "left||right"
+        def set_summary(row): row["summary"] = "left||right"
+        def set_assumptions(row): row["assumptions"] = ["left||right"]
+        def set_missing(row): row["fidelity"]["missing"] = ["left||right"]
+        def set_next_gate(row): row["next_gate"] = "left||right"
+
+        for mutate in (set_abstract_theorem, set_verity_theorem, set_summary,
+                       set_assumptions, set_missing, set_next_gate):
+            x = copy.deepcopy(guarantees)
+            mutate(x["guarantees"][11])
+            report = module.rendered(x["guarantees"], source)["R1-FINAL-AUDITOR-REPORT.md"]
+            carriers = [line for line in report.splitlines() if "left||right" in line]
+            if not carriers:
+                raise AssertionError("qualifying metadata never reached the expanded report")
+            for line in carriers:
+                if line.lstrip().startswith("|"):
+                    raise AssertionError(f"qualifying metadata folded back into a table cell:\n{line}")
 
         # The review-basis language is only valid for the complete structured
         # report-input family committed at that basis.  These are otherwise-
@@ -255,11 +271,34 @@ def main():
         x = copy.deepcopy(source); x["targets"][0]["spans"][0]["permalink"] = "https://github.com/lidofinance/core/blob/main/x"; write(spath, x); invoke(fixture, False, "permalink is not immutable/exact"); write(spath, source)
         x = copy.deepcopy(source); x["targets"][0]["spans"][0]["source_sha"] = "0" * 40; write(spath, x); invoke(fixture, False, "source span pin differs"); write(spath, source)
 
+        # The README headline table is a published claim surface: every canonical
+        # row reads CHECKED/CHECKED, so the per-row gap count is the only thing
+        # keeping it from reading as finished.  Mutate each way it can be silenced.
+        readme_path = fixture / "README.md"
+        readme = readme_path.read_text(encoding="utf-8")
+        for mutated, needle in (
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 3 open |",
+                            "| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 0 open |"),
+             "P-ALLOC-1 discloses 0 fidelity gaps"),
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 3 open |",
+                            "| 1 | `P-ALLOC-1` | CHECKED | CHECKED |"),
+             "P-ALLOC-1 row is missing its `N open` fidelity-gap cell"),
+            (readme.replace("67 in total", "some in total"),
+             "must disclose the 67 total fidelity gaps"),
+            (readme.replace("not about a deployed contract", "about a deployed contract"),
+             "must state the model-vs-deployed boundary"),
+        ):
+            if mutated == readme:
+                raise AssertionError(f"README mutant for {needle!r} changed nothing")
+            readme_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, False, needle)
+        readme_path.write_text(readme, encoding="utf-8")
+
         invoke(fixture, True, command="generate")
         (fixture / "audit/STATUS.md").write_text("stale\n", encoding="utf-8")
         invoke(fixture, False, "STATUS.md is stale", command="check")
 
-    print("optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, and stale views")
+    print("optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, README fidelity-gap disclosure, and stale views")
 
 
 if __name__ == "__main__":

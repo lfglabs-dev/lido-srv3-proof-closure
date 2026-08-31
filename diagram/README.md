@@ -21,3 +21,42 @@ Edges were checked against pinned source under `tmp/core-af095e48.../contracts`
 `ConsolidationGateway.sol:220`). Mainnet addresses follow
 docs.lido.fi/deployed-contracts (July 2026). SRv3 contracts are marked
 “not deployed”.
+
+## Taxonomy
+
+A node's colour says what makes it trustworthy, not where it runs. The two are
+easy to conflate, so the five classes are pinned here and enforced by
+`scripts/check_diagram_taxonomy.py`:
+
+- `el` — an EL contract whose behaviour is fixed by its own code.
+- `proof` — an EL contract that additionally gates on an EIP-4788 beacon-root
+  proof (`TopUpGateway` via `CLValidatorVerifier`, `ConsolidationGateway` via
+  the separate `CLProofVerifier`).
+- `com` — an EL contract whose power is held by a quorum or a committee, i.e.
+  the contract that itself stores the member set and the threshold:
+  `HashConsensus` (`_quorum`, `HashConsensus.sol:225,455-461,945`),
+  `DepositSecurityModule` (`:97-98`, `getGuardianQuorum :227-231`), EasyTrack,
+  the Aragon DAO. `AccountingOracle` and `ValidatorsExitBusOracle` are **not**
+  in this class: both are `BaseOracle` (`AccountingOracle.sol:69`,
+  `ValidatorsExitBusOracle.sol:16`) and defer the quorum to `HashConsensus`
+  (`BaseOracle.sol:38,115-116`).
+- `sys` — an Ethereum system predeploy. EIP-4788, EIP-7002 and EIP-7251 belong
+  here. They execute on the EL and are reached by ordinary `call` /
+  `staticcall` (`CLValidatorVerifier.sol:104`,
+  `TriggerableWithdrawals.sol:51,131,144`), so drawing them as consensus layer
+  overstates how far outside the EL trust boundary they sit.
+- `bot` — off-chain: picks when and what, never how much. Compromise is a
+  liveness problem, not a funds problem.
+- `cl` — genuinely consensus layer: the validator set itself.
+
+Two authority claims in the consolidation pipeline are easy to get backwards
+and are stated here for the record. Adding a CMv1→CMv2 operator pair is
+`ConsolidationMigrator.ALLOW_PAIR_ROLE` (`:118,181-185`), granted only to the
+EasyTrack `EVMScriptExecutor` (`UpgradeTemporaryAdmin.sol:68,91-92`;
+`UpgradeTemplate.sol:339-340`) — an allow-only power. Removing a committed
+batch is `ConsolidationBus.REMOVE_ROLE` (`:168,250`), held by the consolidation
+committee (`UpgradeTemporaryAdmin.sol:99`; `UpgradeTemplate.sol:330`), so the
+Bus execution delay is that committee's veto window and not the DSM guardians'.
+The guardians' only reach into consolidation is the `isDepositsPaused()` flag
+(`DepositSecurityModule.sol:88`) that `ConsolidationGateway` reads
+(`:276-277`).
