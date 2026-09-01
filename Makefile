@@ -123,6 +123,10 @@ test:
 	@printf '%s\n' 'P-CONSOLIDATION-VALUE-1 official-success and justified-forwards parent and kill-lines compiled and asserted'
 	@lake build LidoSRv3.Tests.WithdrawalQueueRequestAmountMutants
 	@printf '%s\n' 'WithdrawalQueue single-request amount-bound mutant compiled and asserted'
+	@lake build LidoSRv3.Audit.Source.WithdrawalQueueSingleRequestControl LidoSRv3.Tests.WithdrawalQueueSingleRequestControlMutants
+	@printf '%s\n' 'WithdrawalQueue single-request control-prefix slice and owner-fallback mutant compiled and asserted'
+	@lake build LidoSRv3.Audit.Guarantees.PToken1 LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants
+	@printf '%s\n' 'P-TOKEN-1 bounded request-ownership custody parent and three exact-parent kill-lines compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts

@@ -95,6 +95,8 @@ import LidoSRv3.Audit.Guarantees.PEthJournal1
 import LidoSRv3.Tests.PackN2EthJournalMutants
 import LidoSRv3.Audit.Guarantees.PVaultEth1
 import LidoSRv3.Tests.PackP2VaultEthMutants
+import LidoSRv3.Audit.Guarantees.PToken1
+import LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants
 import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence
 import LidoSRv3.Audit.Verity.SubmitReportEntryTx
@@ -242,6 +244,13 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.PackP2VaultEthMutants.zero_value_frame_kill_line_refutes_parent
 #print axioms LidoSRv3.Tests.PackP2VaultEthMutants.mutant_vault_lido_as_lidoPull_refutes_projection
 #print axioms LidoSRv3.Tests.PackP2VaultEthMutants.input_caller_guard_refutes_exact_parent
+#print axioms LidoSRv3.Audit.Guarantees.PToken1.request_owner_custody_invariant
+#print axioms LidoSRv3.Audit.Guarantees.PToken1.custody_premises_inhabited
+#print axioms LidoSRv3.Audit.Guarantees.PToken1.supplied_owner_premises_inhabited
+#print axioms LidoSRv3.Audit.Source.WithdrawalQueueRequestCustody.custody_chain_preserved
+#print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.zero_recipient_drop_kill_line_refutes_exact_parent
+#print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.caller_authorization_drop_kill_line_refutes_exact_parent
+#print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.owner_fallback_drop_kill_line_refutes_exact_parent
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_entry_source_domain
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint

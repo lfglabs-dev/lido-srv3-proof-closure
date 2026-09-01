@@ -56,6 +56,8 @@ import LidoSRv3.Audit.Spec.VaultEthCorrespondence
 import LidoSRv3.Audit.Verity.VaultEthTx
 import LidoSRv3.Audit.Guarantees.PVaultEth1
 import LidoSRv3.Tests.PackP2VaultEthMutants
+import LidoSRv3.Audit.Guarantees.PToken1
+import LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants
 import LidoSRv3.Audit.Spec.OracleMintCorrespondence
 import LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence
 import LidoSRv3.Audit.Verity.SubmitReportEntryTx

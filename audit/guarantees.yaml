@@ -1252,6 +1252,57 @@
         "work": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota may start only on top of this official-success parent."
       },
       "next_gate": "Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota only on top of official success."
+    },
+    {
+      "id": "P-TOKEN-1",
+      "assumptions": [
+        "A-SOURCE-SHAPED"
+      ],
+      "reproduction": {
+        "command": "lake build LidoSRv3.Audit.Guarantees.PToken1 LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants",
+        "expected": "request_owner_custody_invariant builds together with custody_premises_inhabited and supplied_owner_premises_inhabited, which exhibit nonempty premises for the zero-owner fallback and the explicitly supplied owner; zero_recipient_drop_kill_line_refutes_exact_parent deletes only WithdrawalQueueERC721.sol:231 and burns a live request to address(0); caller_authorization_drop_kill_line_refutes_exact_parent deletes only WithdrawalQueueERC721.sol:241-245 and lets account 9 move account 7's request; owner_fallback_drop_kill_line_refutes_exact_parent deletes only WithdrawalQueue.sol:130 and creates an ownerless request. All three refute the same RequestOwnerCustodyInvariant predicate proved for the honest composition"
+      },
+      "summary": "P-TOKEN-1 (bounded, subordinate): over the pinned WithdrawalQueue request-creation control prefix composed with an arbitrary-length chain of owner-operated WithdrawalQueueERC721 transferFrom hops, every reachable state satisfies one named conclusion: the amount is inside the two-sided _checkWithdrawalRequestAmount range, the created owner is exactly the line-130 msg.sender fallback, the request owner is never address(0) after any number of hops, and every hop that executed was operated by the then-current owner to a distinct nonzero recipient. The unmodeled _enqueue/_emitTransfer owner binding is an explicit universally quantified mint argument with the single named hypothesis that minting binds a request to its created owner. This is NOT a broad ERC-20 or token guarantee: approve, allowance state, STETH.transferFrom, share conversion, queue storage, finalization, claim/redeem, WstETH paths, pause, and whole-transaction rollback are unmodeled, so no transferability, redeemability, or balance claim follows.",
+      "abstract": {
+        "status": "CHECKED",
+        "theorem": "LidoSRv3.Audit.Guarantees.PToken1.request_owner_custody_invariant"
+      },
+      "verity": {
+        "status": "PARTIAL",
+        "theorem": null
+      },
+      "fidelity": {
+        "covered": [
+          "two-sided _checkWithdrawalRequestAmount bound (WithdrawalQueue.sol:395-402) survives composition with later custody hops",
+          "created owner is exactly the WithdrawalQueue.sol:130 msg.sender fallback for every nonzero caller",
+          "request ownership is never address(0) after an arbitrary-length chain of owner-operated transferFrom hops",
+          "every executed hop is owner-operated to a recipient distinct from the sender and from address(0) (WithdrawalQueueERC721.sol:231-248)",
+          "the unmodeled _enqueue/_emitTransfer owner binding is a universally quantified mint argument under one named hypothesis, and the minted approval field stays unconstrained",
+          "non-vacuity: concrete two-hop and one-hop custody chains inhabit the premises at both pinned amount boundaries",
+          "exact-parent kill-line: deleting only WithdrawalQueueERC721.sol:231 burns a live request to address(0)",
+          "exact-parent kill-line: deleting only WithdrawalQueueERC721.sol:241-245 lets a non-owner move another account's request",
+          "exact-parent kill-line: deleting only WithdrawalQueue.sol:130 creates an ownerless request"
+        ],
+        "missing": [
+          "approve and ERC-20 allowance state are entirely unrepresented, so no approval-path claim follows",
+          "the STETH.transferFrom external call at WithdrawalQueue.sol:134 and all token balances are unmodeled, so no ERC-20 movement is established",
+          "getSharesByPooledEth share conversion at WithdrawalQueue.sol:376 and _enqueue request-id storage at line 378 are outside the slice",
+          "claimWithdrawals, finalization, and every redeem path are unmodeled, so redeemability is not claimed",
+          "requestWithdrawalsWstETH, WstETH unwrap, and permit entrypoints are excluded",
+          "_checkResumed pause at WithdrawalQueue.sol:129 and whole-transaction rollback are not represented",
+          "the approved-operator and isApprovedForAll branches at WithdrawalQueueERC721.sol:242 are excluded; only the owner-operated branch is modeled",
+          "request-id validity and claimed checks at WithdrawalQueueERC721.sol:233 and 236, and the owner-indexed EnumerableSet updates at lines 250-251, are outside the slice",
+          "events at WithdrawalQueue.sol:380 and WithdrawalQueueERC721.sol:253 are not modeled",
+          "only one request list item is modeled; multi-item requestWithdrawals batches are not composed",
+          "no Verity Executable Contract exists for the WithdrawalQueue surface, so the verity plane stays PARTIAL",
+          "P-TOKEN-1 is registered as a subordinate bounded row only; broad ERC-20 token behaviour remains NOT YET and is neither claimed nor implied"
+        ]
+      },
+      "classification": {
+        "kind": "IMPLEMENTATION_PENDING",
+        "work": "Model the STETH.transferFrom call, share conversion, and _enqueue storage writes as an executable Verity WithdrawalQueue contract, then compose approve/transfer/redeem before any broad token parent is proposed."
+      },
+      "next_gate": "Add an executable WithdrawalQueue request transaction that discharges the mint hypothesis from real _enqueue storage writes and composes the STETH.transferFrom call, before widening beyond the bounded custody parent."
     }
   ],
   "objective": "Prove an abstract Lean model, a Verity Lean library program, and a Verity Executable Contract for each guarantee, or classify the gap. General Yul/EVM/deployment closure is out of scope; SSZ alone carries a targeted Yul binding."
