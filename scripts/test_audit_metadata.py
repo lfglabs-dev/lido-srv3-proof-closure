@@ -42,6 +42,9 @@ def main():
         # table reader, so the fixture tree must carry it or every mutant would
         # fail on an import error rather than on the claim it is testing.
         shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
+        # And it reduces the headline blockquote to the text a reader is shown
+        # through the shared link-metadata reducer, for the same reason.
+        shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
@@ -461,10 +464,36 @@ def main():
                 # are invisible; only the display text renders, so a
                 # qualification hidden in the title must not satisfy the check.
                 f'> [see here](http://example.com "{sentence}")\n',
+                # Thread r3909071230: a CommonMark destination may carry
+                # balanced parentheses.  A pattern that stopped at the first
+                # `)` consumed `foo(bar` and left the title standing as
+                # ordinary text, so a headline rendering only the word
+                # "details" satisfied the check for both qualifications.
+                f'> [details](foo(bar) "{sentence}")\n',
+                f'> [details](foo(bar(baz)) "{sentence}")\n',
+                f"> [details](foo(bar) '{sentence}')\n",
+                f'> [details](foo(bar) ({sentence}))\n',
+                f'> [details](<foo(bar> "{sentence}")\n',
+                f'> [outer [inner](u "{sentence}") label](v)\n',
             ):
                 readme_path.write_text(
                     readme.replace(block, muted_block + concealed, 1), encoding="utf-8")
                 invoke(fixture, False, needle)
+
+            # The mirror of that family: a qualification carried in the link
+            # *label* is text a reader is shown, so removing the metadata must
+            # not remove it too.  Otherwise the gate would reject a headline a
+            # reader plainly meets and no edit to the README could satisfy it.
+            for shown in (
+                f'> [The evidence is {sentence}.](http://example.com)\n',
+                f'> [The evidence is {sentence}.](foo(bar) "hidden")\n',
+                f'> [The evidence is {sentence}.][note]\n\n[note]: http://example.com\n',
+                f'> The evidence is {sentence}. [see](foo(bar) "hidden")\n',
+                f'> The evidence is {sentence}. [unterminated](foo "x\n',
+            ):
+                readme_path.write_text(
+                    readme.replace(block, muted_block + shown, 1), encoding="utf-8")
+                invoke(fixture, True, command="check")
 
             # And dropped from the README outright.
             readme_path.write_text(quieted, encoding="utf-8")
@@ -628,12 +657,17 @@ def main():
           "block by each of 12 constructs that publish no visible text (single- and "
           "multi-line comments, a processing instruction, CDATA, a declaration, "
           "`script`, `style` and `textarea` bodies, `title`/`alt` attribute "
-          "values, Markdown link reference definition titles, and inline link "
-          "destination/title fields), with the opening blockquote demoted to prose, pushed below an "
+          "values, Markdown link reference definition titles, inline link "
+          "destination/title fields, and six inline-link shapes whose destination "
+          "carries balanced or angle-bracketed parentheses — the form a `[^)]*` "
+          "pattern stopped short of, leaving the title standing as ordinary text, "
+          "including one hidden in a nested label), with the opening blockquote "
+          "demoted to prose, pushed below an "
           "introduction, deleted, unheaded and its title demoted all rejected, while a "
           "renamed title, a longer block, a redundant restatement, and each "
-          "qualification restated through inline markup that still renders it stay "
-          "accepted; and the delimiter row that makes the headline a table deleted, "
+          "qualification restated through inline markup that still renders it, and each "
+          "carried in a link label or beside an unterminated link — text a reader is "
+          "shown — stay accepted; and the delimiter row that makes the headline a table deleted, "
           "blanked to pipes and spaces, narrowed, widened, and indented into a "
           "four-column chunk all rejected, with alignment colons and up to three "
           "columns of indentation on the delimiter, the header and a row all still "

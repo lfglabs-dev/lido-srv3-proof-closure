@@ -13,6 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CHECKER = "scripts/check_diagram_taxonomy.py"
 DIAGRAM = "diagram/index.html"
 DIAGRAM_README = "diagram/README.md"
+# The checker reduces the README to the text a reader is shown through the
+# shared link-metadata reducer, so the fixture tree must carry it.
+READER = "scripts/markdown_text.py"
 
 
 def _load_checker():
@@ -120,7 +123,7 @@ def invoke(root, ok, needle=None):
 def main():
     with tempfile.TemporaryDirectory(prefix="diagram-taxonomy-mutants-") as tmp:
         fixture = Path(tmp)
-        for relative in (CHECKER, DIAGRAM, DIAGRAM_README):
+        for relative in (CHECKER, READER, DIAGRAM, DIAGRAM_README):
             target = fixture / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / relative, target)
@@ -631,6 +634,51 @@ def main():
         invoke(fixture, False, "no longer states how many classes are pinned")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # Thread r3909071242: a link's destination and title render as nothing,
+        # so moving a claim into one hides it exactly as a comment does while
+        # leaving its characters in the raw source.  Each README claim the gate
+        # reads is driven through both title delimiters and through a
+        # balanced-parenthesis destination, and the same claim carried in the
+        # visible *label* must still be read or the gate would reject a README a
+        # reader plainly meets.
+        proof_match_for_links = CHECK.PROOF_ENTRY.search(readme)
+        if not proof_match_for_links:
+            raise AssertionError("proof entry not found in README")
+        # A reference definition renders as nothing only at the start of its own
+        # line, so whether that form hides a claim depends on where the claim
+        # sits.  Each entry records that, and both answers are asserted.
+        hideable = (
+            (count_sentence, "no longer states how many classes are pinned", False),
+            (proof_match_for_links.group(0), "does not document class 'proof'", True),
+        )
+        for claim, needle, at_line_start in hideable:
+            flat = " ".join(claim.split()).replace('"', "'")
+            for hidden in (
+                f'[details](target "{flat}")',
+                f"[details](target '{flat}')",
+                f'[details](foo(bar) "{flat}")',
+                f'[details](<foo(bar> "{flat}")',
+            ):
+                mutated = readme.replace(claim, hidden, 1)
+                if mutated == readme:
+                    raise AssertionError(f"link-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+            definition = readme.replace(claim, f'[details]: target "{flat}"', 1)
+            if definition == readme:
+                raise AssertionError("reference-definition mutant changed nothing")
+            readme_path.write_text(definition, encoding="utf-8")
+            invoke(fixture, not at_line_start,
+                   needle if at_line_start else "diagram taxonomy ok")
+
+            # The label is visible text, so the same claim there must pass.
+            shown = readme.replace(claim, f'[{claim}](target "hidden")', 1)
+            if shown == readme:
+                raise AssertionError(f"link-label control for {needle!r} changed nothing")
+            readme_path.write_text(shown, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+            readme_path.write_text(readme, encoding="utf-8")
+
         # Similarly, the `proof` entry hidden in a comment must also fail.
         proof_match = CHECK.PROOF_ENTRY.search(readme)
         if not proof_match:
@@ -773,7 +821,13 @@ def main():
           "(each rejected separately per surface), and the README `proof` entry "
           "had the pairing swapped, either half of it dropped, and a verifier named with "
           "no gateway to attribute it to; the README class-count sentence and the "
-          "README `proof` entry hidden in HTML comments each rejected")
+          "README `proof` entry hidden in HTML comments each rejected, and each "
+          "also hidden in an inline link's title through both quote delimiters "
+          "and through balanced and angle-bracketed destinations — the shapes a "
+          "`[^)]*` pattern stops short of — with a reference definition rejected "
+          "where it starts its own line and accepted mid-sentence, where it is "
+          "literal text, and the same claim carried in a visible link label "
+          "still read")
 
 
 if __name__ == "__main__":

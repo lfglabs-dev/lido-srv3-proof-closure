@@ -21,6 +21,10 @@ import sys
 from html import unescape
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import markdown_text  # noqa: E402  (sibling module, located above)
+
 ROOT = Path(__file__).resolve().parents[1]
 DIAGRAM = ROOT / "diagram/index.html"
 DIAGRAM_README = ROOT / "diagram/README.md"
@@ -531,7 +535,13 @@ def main():
 
     # Strip HTML comments before all README checks: text inside <!-- … --> is
     # not rendered to a reader and must not satisfy any documentation claim.
-    readme = _COMMENT.sub(" ", fold(DIAGRAM_README.read_text(encoding="utf-8")))
+    # Link metadata is the same kind of hiding place one construct along: a
+    # destination and a title render as nothing, so moving the gateway/verifier
+    # pairing into `[verifier details](target "TopUpGateway CLValidatorVerifier,
+    # …")` left the rendered entry showing two words and no pairing while this
+    # gate still found one.  Both are removed before any claim is read.
+    readme = markdown_text.visible_text(
+        _COMMENT.sub(" ", fold(DIAGRAM_README.read_text(encoding="utf-8"))))
     for phrase, why in REQUIRED:
         if phrase not in html:
             fail(f"{DIAGRAM.relative_to(ROOT)} never mentions {phrase!r}: {why}")

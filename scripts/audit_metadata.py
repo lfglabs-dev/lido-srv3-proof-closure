@@ -19,6 +19,7 @@ from urllib.request import Request, urlopen
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import gfm_table  # noqa: E402  (sibling module, located above)
+import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
@@ -482,23 +483,6 @@ README_UNRENDERED = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 
-# A Markdown link reference definition (`[label]: url "title"`) is metadata;
-# it renders as nothing.  Hiding a required qualification inside a link title
-# left `README_UNRENDERED` (which only strips HTML) unable to remove it, so
-# the blockquote check found the text in a position a reader never sees.
-# This pattern matches a definition line inside a blockquote (the `> ` prefix
-# is preserved from `README_HEADLINE_BLOCK`'s capture group).
-_BLOCKQUOTE_LINK_DEF = re.compile(
-    r"^>[^\S\n]* {0,3}\[(?:[^\[\]\n]|\\.)*\][^\S\n]*:[^\n]*\n",
-    re.MULTILINE,
-)
-
-# An inline link `[text](destination "title")` renders only the link text;
-# the destination and title are invisible to a reader.  Replacing each
-# occurrence with the bare display text removes hidden metadata while
-# preserving every character a reader actually sees.
-_INLINE_LINK_META = re.compile(r"\[([^\[\]]*)\]\([^)]*\)")
-
 # CommonMark type-6 HTML block openers: a line that starts with one of these
 # block-level element names causes everything until the next blank line to be
 # emitted as raw HTML, not parsed as Markdown.  Pipe characters on those
@@ -665,15 +649,16 @@ def validate_readme_fidelity_disclosure(rows):
             f"README: the fidelity table is printed below `{heading.strip()}`, not in the "
             "headline above the first section; the gap counts qualify the CHECKED cells a "
             "reader meets first and cannot do that from an appendix")
-    # Strip HTML constructs, link reference definition lines, and inline link
-    # destinations/titles — all three classes render as no visible text.  Each
+    # Strip HTML constructs, then the link metadata a reader never meets — the
+    # reference definition lines and the inline destinations and titles.  Each
     # pass only deletes characters, so a qualification that survives is one a
-    # reader actually sees.  Inline link replacement keeps the display text
-    # (`[text](url "title")` → `text`) so a qualification carried in the
-    # clickable label is still accepted.
-    block = README_UNRENDERED.sub("", opening.group("block"))
-    block = _BLOCKQUOTE_LINK_DEF.sub("", block)
-    block = _INLINE_LINK_META.sub(r"\1", block)
+    # reader actually sees, and the display text is kept (`[text](url "title")`
+    # → `text`) so a qualification carried in the clickable label still counts.
+    # `scripts/markdown_text.py` does the second half: a destination may carry
+    # balanced parentheses, and a pattern that stopped at the first `)` left the
+    # title of `[details](foo(bar) "…")` standing as ordinary text, so a
+    # headline rendering only the word "details" satisfied this check.
+    block = markdown_text.visible_text(README_UNRENDERED.sub("", opening.group("block")))
     require(f"{total} in total" in block,
             f"README: the headline blockquote must render the {total} total fidelity "
             "gaps as visible text; a count stated only further down, or only inside a "

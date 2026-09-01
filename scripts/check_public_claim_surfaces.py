@@ -213,14 +213,17 @@ CLAIMS = {
 # read through the cells that reader lays out.
 README_STATUS_COLUMNS = ("#", "ID", "Fidelity gaps")
 README_ID_CELL = re.compile(r"^`([^`]+)`$")
-# `| # | ID | Abstract Lean | Verity Executable Contract | Fidelity gaps |`: the
-# Verity cell is the fourth, and reading it by position is what binds the status
-# to the column a reader meets it in rather than to anywhere on the line.
-VERITY_COLUMN = 3
+# The Verity status is read from the column the header names, not from a fixed
+# index.  Pinning the fourth cell bound the status to a position rather than to
+# a column: inserting a `Published status` column after `Abstract Lean` shifted
+# the real Verity cells one to the right while this gate went on reading the
+# fourth, so the table could print `OPEN` where the registry records `CHECKED`
+# and still pass.  The header must name this column exactly once.
+VERITY_HEADING = "Verity Executable Contract"
 
 
-def readme_status_rows(readme: str) -> dict[str, list[list[str]]]:
-    """The rows the README's rendered status table prints, indexed by claim ID."""
+def readme_status_rows(readme: str) -> dict[str, list[tuple[int, list[str]]]]:
+    """The rendered status rows, indexed by claim ID, with the Verity column."""
     tables = [t for t in gfm_table.find_tables(readme)
               if (t.header.cells[0].strip(), t.header.cells[1].strip(),
                   t.header.cells[-1].strip()) == README_STATUS_COLUMNS]
@@ -229,13 +232,20 @@ def readme_status_rows(readme: str) -> dict[str, list[list[str]]]:
              "a claim is published where the table renders it, and a header whose "
              "delimiter row is not exactly as wide renders no table at all")
     table = tables[0]
+    headings = [cell.strip() for cell in table.header.cells]
+    if headings.count(VERITY_HEADING) != 1:
+        fail(f"README: the rendered status table names {VERITY_HEADING!r} "
+             f"{headings.count(VERITY_HEADING)} time(s) in its header {headings}; the "
+             "faithful Verity status is read from the column a reader meets it under, "
+             "so exactly one column must carry that name")
+    verity = headings.index(VERITY_HEADING)
     printed: dict[str, list[list[str]]] = {}
     for line in table.rows:
         cells = [cell.strip() for cell in line.cells][:table.columns]
         cells += [""] * (table.columns - len(cells))
         named = README_ID_CELL.match(cells[1])
         if named:
-            printed.setdefault(named.group(1), []).append(cells)
+            printed.setdefault(named.group(1), []).append((verity, cells))
     return printed
 
 
@@ -389,7 +399,8 @@ def check(root: Path) -> None:
         if len(printed) != 1:
             fail(f"README: the rendered status table prints {len(printed)} row(s) for "
                  f"{claim_id}, expected exactly one")
-        if not printed[0][VERITY_COLUMN].startswith(expected_verity_status):
+        verity_column, cells = printed[0]
+        if not cells[verity_column].startswith(expected_verity_status):
             fail(f"README: {claim_id} faithful Verity status differs")
 
         module = expected["module"]

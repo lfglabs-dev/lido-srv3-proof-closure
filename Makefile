@@ -32,6 +32,7 @@ check: test
 test:
 	@python3 scripts/audit_metadata.py check
 	@python3 scripts/test_gfm_table.py
+	@python3 scripts/test_markdown_text.py
 	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
 	@python3 scripts/check_validation_receipt.py
 	@python3 scripts/check_proof_escapes.py

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 import tempfile
@@ -13,6 +14,9 @@ ROOT = Path(__file__).resolve().parent.parent
 CHECKER = ROOT / "scripts/check_public_claim_surfaces.py"
 FILES = (
     "README.md",
+    # The checker reads the published status table through the shared
+    # cmark-gfm table reader, so the fixture tree must carry it.
+    "scripts/gfm_table.py",
     "audit/guarantees.yaml",
     "LidoSRv3/Audit/AllGuarantees.lean",
     "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
@@ -67,6 +71,45 @@ with tempfile.TemporaryDirectory() as tmp:
         encoding="utf-8",
     )
     run(fixture, False, "README: P-DEPOSIT-1")
+    readme.write_text(original, encoding="utf-8")
+
+    # Thread r3909116459: the faithful Verity status is read from the column the
+    # header names, not from a fixed index.  Inserting a column before
+    # `Verity Executable Contract` shifts every real Verity cell one to the
+    # right, so a gate reading the fourth cell read the inserted one instead and
+    # the table could print `OPEN` where the registry records `CHECKED`.
+    header = "| # | ID | Abstract Lean | Verity Executable Contract | Fidelity gaps |"
+    delimiter = "| --- | --- | --- | --- | --- |"
+    if original.count(header) != 1 or original.count(delimiter) != 1:
+        raise SystemExit("fixture README must print exactly one status header")
+    shifted = original.replace(
+        f"{header}\n{delimiter}\n",
+        "| # | ID | Abstract Lean | Published status | Verity Executable Contract "
+        "| Fidelity gaps |\n| --- | --- | --- | --- | --- | --- |\n", 1)
+    shifted = re.sub(r"^(\| \d+ \| `[^`]+` \| CHECKED[^|]*\| )([^|]*)\|( \d+ open \|)$",
+                     r"\1CHECKED | OPEN |\3", shifted, flags=re.MULTILINE)
+    readme.write_text(shifted, encoding="utf-8")
+    run(fixture, False, "faithful Verity status differs")
+
+    # The same insertion with the real cells left intact renders a wider table
+    # that still says what the registry says, so it must be read, not rejected:
+    # the column is located by name and its contents are what is checked.
+    widened = original.replace(
+        f"{header}\n{delimiter}\n",
+        "| # | ID | Abstract Lean | Published status | Verity Executable Contract "
+        "| Fidelity gaps |\n| --- | --- | --- | --- | --- | --- |\n", 1)
+    widened = re.sub(r"^(\| \d+ \| `[^`]+` \| CHECKED[^|]*\| )", r"\1CHECKED | ",
+                     widened, flags=re.MULTILINE)
+    if widened == original or shifted == original:
+        raise SystemExit("column-insertion mutants changed nothing")
+    readme.write_text(widened, encoding="utf-8")
+    run(fixture, True)
+
+    # And the column the status is read from must be named exactly once.
+    for renamed in (header.replace("Verity Executable Contract", "Verity Contract"),
+                    header.replace("Abstract Lean", "Verity Executable Contract")):
+        readme.write_text(original.replace(header, renamed, 1), encoding="utf-8")
+        run(fixture, False, "Verity Executable Contract")
     readme.write_text(original, encoding="utf-8")
 
     guarantees = fixture / "audit/guarantees.yaml"
@@ -171,5 +214,9 @@ with tempfile.TemporaryDirectory() as tmp:
 
 print(
     "public claim surface regressions ok: allowed declarations pass; "
-    "ASCII/quoted/Unicode/escaped/whitespace/attribute/import-modifier/multiline-import/registry/README/missing-file mutants fail closed"
+    "ASCII/quoted/Unicode/escaped/whitespace/attribute/import-modifier/"
+    "multiline-import/registry/README/missing-file mutants fail closed; a column "
+    "inserted before `Verity Executable Contract` with the real cells set to OPEN "
+    "is rejected, the same insertion with the real cells intact is still read, and "
+    "a header that names that column zero or twice is refused"
 )
