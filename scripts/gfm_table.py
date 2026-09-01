@@ -93,8 +93,7 @@ _HTML_BLOCK_START = re.compile(
     rf"^ {{0,3}}(?:"
     rf"<(?:{_HTML_RAW_TEXT_NAMES})(?:[ \t]|>|$)"
     rf"|<\?"
-    rf"|<!\[CDATA\["
-    rf"|<!"
+    rf"|<!(?:--|\[CDATA\[|[A-Za-z])"
     rf"|</?(?:{_HTML_BLOCK_NAMES})(?:[ \t]|/?>|$)"
     rf"|{_HTML_TAG}[ \t]*$"
     rf")",
@@ -127,8 +126,7 @@ _HTML_BLOCK_INTERRUPTING = re.compile(
     rf"^ {{0,3}}(?:"
     rf"<(?:{_HTML_RAW_TEXT_NAMES})(?:[ \t]|>|$)"
     rf"|<\?"
-    rf"|<!\[CDATA\["
-    rf"|<!"
+    rf"|<!(?:--|\[CDATA\[|[A-Za-z])"
     rf"|</?(?:{_HTML_BLOCK_NAMES})(?:[ \t]|/?>|$)"
     rf")",
     re.IGNORECASE,
