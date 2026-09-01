@@ -480,6 +480,27 @@ def main():
                     readme.replace(block, muted_block + concealed, 1), encoding="utf-8")
                 invoke(fixture, False, needle)
 
+            # Thread r3909320734: a full or collapsed reference link names its
+            # definition in a second bracket group, which renders as nothing.
+            # Recognising only the `(` form left the whole sentence standing in
+            # `[details][not about a deployed contract; 67 in total]` as if a
+            # reader met it.  The definition is appended so the link really does
+            # form and CommonMark really does render only "details".
+            readme_path.write_text(
+                readme.replace(block, muted_block + f"> [details][{sentence}]\n", 1)
+                .rstrip("\n") + f'\n\n[{sentence}]: http://example.com\n',
+                encoding="utf-8")
+            invoke(fixture, False, needle)
+
+            # A collapsed reference link renders its own label, so the same
+            # sentence written as `[sentence][]` is text a reader is shown and
+            # must still be accepted.
+            readme_path.write_text(
+                readme.replace(block, muted_block + f"> [{sentence}][]\n", 1)
+                .rstrip("\n") + f'\n\n[{sentence}]: http://example.com\n',
+                encoding="utf-8")
+            invoke(fixture, True, command="check")
+
             # The mirror of that family: a qualification carried in the link
             # *label* is text a reader is shown, so removing the metadata must
             # not remove it too.  Otherwise the gate would reject a headline a
@@ -661,7 +682,10 @@ def main():
           "destination/title fields, and six inline-link shapes whose destination "
           "carries balanced or angle-bracketed parentheses — the form a `[^)]*` "
           "pattern stopped short of, leaving the title standing as ordinary text, "
-          "including one hidden in a nested label), with the opening blockquote "
+          "including one hidden in a nested label, and a full reference link whose "
+          "second bracket group names a definition that renders as nothing), with a "
+          "collapsed reference link still read because it renders its own label, "
+          "with the opening blockquote "
           "demoted to prose, pushed below an "
           "introduction, deleted, unheaded and its title demoted all rejected, while a "
           "renamed title, a longer block, a redundant restatement, and each "

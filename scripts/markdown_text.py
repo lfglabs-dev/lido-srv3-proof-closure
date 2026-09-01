@@ -23,6 +23,7 @@ exactly as it is -- which is also what CommonMark does with it.
 from __future__ import annotations
 
 import re
+from html import unescape
 
 # `[label]: destination "title"` is metadata; it renders as nothing at all.  The
 # leading `>` markers are matched so a definition inside a block quote is
@@ -31,6 +32,16 @@ LINK_REFERENCE_DEFINITION = re.compile(
     r"^(?:[^\S\n]*>)*[^\S\n]* {0,3}\[(?:[^\[\]\n]|\\.)*\][^\S\n]*:[^\n]*\n?",
     re.MULTILINE,
 )
+
+# A complete HTML tag, spelled tightly enough that ordinary prose carrying a
+# `<` is not mistaken for one: a name, then attributes, then the close.  A loose
+# `<[^>]*>` would eat from `a < b` to the next `>` and delete text a reader sees.
+_HTML_ATTRIBUTE = (
+    r"""(?:\s+[A-Za-z_:][A-Za-z0-9_.:-]*"""
+    r"""(?:\s*=\s*(?:[^\s"'=<>`]+|'[^']*'|"[^"]*"))?)"""
+)
+INLINE_HTML_TAG = re.compile(
+    rf"<[A-Za-z][A-Za-z0-9-]*{_HTML_ATTRIBUTE}*\s*/?>|</[A-Za-z][A-Za-z0-9-]*\s*>")
 
 # An inline link may not span a blank line, so a scan that reaches one has not
 # found a link and must not consume the text past it.
@@ -139,6 +150,19 @@ def _strip_inline_links(text: str) -> str:
                     out.append(text[index + 1:close])
                     index = after
                     continue
+            if close != -1 and text[close + 1:close + 2] == "[":
+                # A full or collapsed reference link, `[label][ref]` or
+                # `[label][]`.  The second group names a definition and renders
+                # as nothing, so recognising only the `(` form left the whole
+                # sentence hidden in `[details][not about a deployed contract;
+                # 67 in total]` standing as if a reader met it.  CommonMark
+                # allows no space between the two groups, so only an immediately
+                # following `[` is one.
+                reference = _matching_bracket(text, close + 1)
+                if reference != -1:
+                    out.append(text[index + 1:close])
+                    index = reference + 1
+                    continue
         out.append(char)
         index += 1
     return "".join(out)
@@ -153,3 +177,17 @@ def visible_text(text: str) -> str:
             break
         text = reduced
     return text
+
+
+def rendered_text(text: str) -> str:
+    """``text`` reduced to what a reader is shown, inline HTML included.
+
+    An attribute is markup, not content: `<span title="…">visible</span>` shows
+    the word "visible" and nothing else, so prose checked as raw Markdown
+    accepted a claim written into a `title=` and missed a banned one written
+    there.  Tags collapse to a space rather than to nothing, because two
+    separately marked-up runs sit adjacent in the source without being one word
+    on the page, and character references are decoded because `&#84;` is
+    punctuation to a pattern and a letter to a reader.
+    """
+    return unescape(INLINE_HTML_TAG.sub(" ", visible_text(text)))

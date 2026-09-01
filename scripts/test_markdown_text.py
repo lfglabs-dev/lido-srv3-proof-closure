@@ -61,7 +61,38 @@ CASES = (
     (f'\\[details](target "{HIDDEN}")', f'\\[details](target "{HIDDEN}")'),
     # Text with no link at all is returned unchanged.
     (f"plain {HIDDEN} prose", f"plain {HIDDEN} prose"),
+    # A full or collapsed reference link names a definition in its second
+    # group, which renders as nothing; recognising only the `(` form left the
+    # whole sentence standing in `[details][…]` as if a reader met it.
+    (f"[details][{HIDDEN}]", "details"),
+    (f"[{HIDDEN}][]", HIDDEN),
+    (f"[details][{HIDDEN}] and [more][{HIDDEN}]", "details and more"),
+    # A shortcut reference renders its own label, so there is nothing to remove.
+    (f"[{HIDDEN}]", f"[{HIDDEN}]"),
 )
+
+# `rendered_text` goes one construct further: inline HTML is markup, and an
+# attribute is never shown.  Character references are decoded, because `&#84;`
+# is punctuation to a pattern and a letter to a reader.
+RENDERED_CASES = (
+    (f'<span title="{HIDDEN}">visible</span>', "visible"),
+    (f"<img alt='{HIDDEN}' src='x.png'>", ""),
+    (f'<a href="u" data-note="{HIDDEN}">shown</a>', "shown"),
+    (f"prose {HIDDEN} prose", f"prose {HIDDEN} prose"),
+    ("&#84;opUpGateway", "TopUpGateway"),
+    # Prose carrying a bare `<` is not a tag; a loose `<[^>]*>` would eat to the
+    # next `>` and delete text a reader sees.
+    (f"a < b and {HIDDEN} > c", f"a < b and {HIDDEN} > c"),
+)
+
+
+def check_rendered():
+    for source, expected in RENDERED_CASES:
+        actual = " ".join(markdown_text.rendered_text(source).split())
+        if actual != " ".join(expected.split()):
+            raise SystemExit(
+                f"markdown text: rendered_text({source!r})\n  = {actual!r}\n"
+                f"  want {expected!r}")
 
 
 def main():
@@ -77,8 +108,11 @@ def main():
     if concealed < 12 or shown < 6:
         raise SystemExit(f"markdown text: implausible case split "
                          f"({concealed} concealed, {shown} shown)")
+    check_rendered()
     print(f"markdown text reducer ok: {len(CASES)} pinned cases, {concealed} shapes that "
-          f"publish the sentence to no reader and {shown} that do")
+          f"publish the sentence to no reader and {shown} that do; "
+          f"{len(RENDERED_CASES)} inline-HTML cases where an attribute is markup and "
+          "a bare `<` is not a tag")
 
 
 if __name__ == "__main__":

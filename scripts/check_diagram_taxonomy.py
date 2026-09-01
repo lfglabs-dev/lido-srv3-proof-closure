@@ -540,7 +540,13 @@ def main():
     # pairing into `[verifier details](target "TopUpGateway CLValidatorVerifier,
     # …")` left the rendered entry showing two words and no pairing while this
     # gate still found one.  Both are removed before any claim is read.
-    readme = markdown_text.visible_text(
+    # Inline HTML is the same hiding place one construct further along: an
+    # attribute is markup, not content, so moving the pairing into
+    # `<span title="…">an EL contract…</span>` left the rendered entry showing
+    # prose and no pairing while this gate still found one.  `rendered_text`
+    # removes the tags and decodes the character references too, so what is read
+    # here is what the page shows.
+    readme = markdown_text.rendered_text(
         _COMMENT.sub(" ", fold(DIAGRAM_README.read_text(encoding="utf-8"))))
     for phrase, why in REQUIRED:
         if phrase not in html:

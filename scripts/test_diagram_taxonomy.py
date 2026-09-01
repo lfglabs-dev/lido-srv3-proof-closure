@@ -664,6 +664,20 @@ def main():
                     raise AssertionError(f"link-hiding mutant for {needle!r} changed nothing")
                 readme_path.write_text(mutated, encoding="utf-8")
                 invoke(fixture, False, needle)
+            # Thread r3909320740: an attribute is markup, never content.  The
+            # claim moved into a `title=` leaves the rendered entry showing the
+            # element's text and nothing of the claim.
+            for attributed in (
+                f'<span title="{flat}">an EL contract that gates on a proof</span>',
+                f"<a href='u' data-note='{flat}'>an EL contract</a>",
+                f'<img alt="{flat}" src="x.png">',
+            ):
+                mutated = readme.replace(claim, attributed, 1)
+                if mutated == readme:
+                    raise AssertionError(f"attribute-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
             definition = readme.replace(claim, f'[details]: target "{flat}"', 1)
             if definition == readme:
                 raise AssertionError("reference-definition mutant changed nothing")
@@ -827,7 +841,9 @@ def main():
           "`[^)]*` pattern stops short of — with a reference definition rejected "
           "where it starts its own line and accepted mid-sentence, where it is "
           "literal text, and the same claim carried in a visible link label "
-          "still read")
+          "still read, and each moved into an HTML attribute — a `title=`, a "
+          "`data-` note and an `alt=` — rejected, since an attribute is markup "
+          "and never content")
 
 
 if __name__ == "__main__":
