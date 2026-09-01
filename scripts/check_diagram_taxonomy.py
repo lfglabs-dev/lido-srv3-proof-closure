@@ -18,6 +18,7 @@ Each is pinned here against `diagram/README.md`, which carries the citations.
 
 import re
 import sys
+from html import unescape
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -258,30 +259,44 @@ _COMMENT = re.compile(r'<!--.*?-->', re.DOTALL)
 _TOKEN_CHAR = r'[0-9A-Za-z_…]'
 
 
-def _address_in(text, addr):
-    """True iff addr appears in text as a standalone address token.
+_CONTINUES = re.compile(_TOKEN_CHAR)
 
-    Substring containment lets a malformed address that merely extends a
-    valid one (e.g. the full address with a trailing `0`) satisfy the
-    check, because the valid prefix is still present inside the longer
-    string.  Requiring no adjacent token character on either side enforces
-    token boundaries without depending on surrounding punctuation, and
-    without assuming the extra character is itself a hex digit.
+# Markup and character references are not what a reader copies.  `&#103;` is
+# three punctuation-looking characters to a regex and a `g` to a browser, so a
+# boundary check run over raw HTML reads the reference as the gap it needs and
+# accepts `0x852d…3Cee&#103;` — which the map then publishes as `0x852d…3Ceeg`.
+# Tags collapse to a space rather than to nothing: two separately positioned
+# text elements sit side by side in the source without being one token on the
+# page, and joining them would invent corruption that no reader can see.
+_TAG = re.compile(r'<[^>]*>')
+
+
+def rendered(fragment):
+    """The text a reader is actually shown: markup removed, references decoded."""
+    return unescape(_TAG.sub(" ", _COMMENT.sub(" ", fragment)))
+
+
+def _address_occurrences(text, addr):
+    """Count the standalone and the extended publications of addr in text.
+
+    Asking only whether *some* standalone occurrence exists lets an intact form
+    vouch for a corrupted one printed beside it: `0x852d…3Cee · 0x852d…3Ceeg`
+    answers yes on the first form while the second is an address a reader would
+    copy and fail to look up.  Every occurrence is therefore judged on its own
+    boundaries, so locating an entity and rejecting a corrupted publication stay
+    independent questions.  Any letter, digit or underscore continues the token,
+    as does the ellipsis the abbreviated form elides its middle with, so the
+    extension does not have to be a hex digit to be caught.
     """
-    return bool(re.search(f'(?<!{_TOKEN_CHAR})' + re.escape(addr) + f'(?!{_TOKEN_CHAR})', text))
-
-
-def _address_corrupted_in(text, addr):
-    """True iff text carries addr only as part of a longer address token.
-
-    Locating an entity accepts either the full or the abbreviated form, so a
-    box that publishes both can have one of them corrupted and still be found
-    by the other: the intact tooltip vouches for a visible row that reads
-    `0x852d…3Ceeg`.  A form present as a substring but not as a standalone
-    token is a corrupted publication of that form, which is judged on its own
-    rather than excused by the form beside it.
-    """
-    return addr in text and not _address_in(text, addr)
+    standalone = extended = 0
+    for match in re.finditer(re.escape(addr), text):
+        before = text[match.start() - 1:match.start()]
+        after = text[match.end():match.end() + 1]
+        if _CONTINUES.match(before) or _CONTINUES.match(after):
+            extended += 1
+        else:
+            standalone += 1
+    return standalone, extended
 
 
 def fail(message):
@@ -383,18 +398,25 @@ def main():
             belongs = labels[surface]
             located = False
             for name, kind, identity in boxes:
-                identity = identity.lower()
+                # Read the box the way it is published: a reference that renders
+                # to a letter continues the token a reader copies, even though
+                # the raw source shows punctuation at that boundary.
+                identity = rendered(identity).lower()
+                intact = 0
                 # Judged before the box is located, and on every box rather
                 # than only this entity's: a corrupted token is what a reader
                 # copies, so it must fail wherever it is published and whether
                 # or not an intact form sits beside it.
                 for form in forms:
-                    if _address_corrupted_in(identity, form):
+                    standalone, extended = _address_occurrences(identity, form)
+                    if extended:
                         fail(f"the {name!r} box on the {surface} publishes {entity}'s "
                              f"address as part of a longer token; {form!r} is extended "
-                             "there rather than printed as itself, and a reader copying "
+                             f"there rather than printed as itself in {extended} of its "
+                             f"{standalone + extended} occurrence(s), and a reader copying "
                              "what is drawn would look up an address that does not exist")
-                if not any(_address_in(identity, form) for form in forms):
+                    intact += standalone
+                if not intact:
                     continue
                 if kind != expected:
                     fail(f"{entity} ({address}) is drawn as {kind!r} under the label "

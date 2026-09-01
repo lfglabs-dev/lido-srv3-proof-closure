@@ -333,6 +333,39 @@ def main():
                             splice(diagram, box, prefixed_box),
                             f"{entity}",
                         ))
+                # The continuation need not be written as a literal character.
+                # A character reference is punctuation to a regex and a letter
+                # on the page, so `…3Cee&#103;` shows a clean boundary in the
+                # source while the map publishes `0x852d…3Ceeg`; the boundary
+                # has to be judged on what is rendered, in decimal and hex
+                # spellings alike, and on each form alone as well as together.
+                for reference in ("&#103;", "&#x67;", "&#48;"):
+                    for referenced_box in (
+                        box.group(0).replace(address, address + reference)
+                                    .replace(abbr, abbr + reference),
+                        box.group(0).replace(address, address + reference),
+                        box.group(0).replace(abbr, abbr + reference),
+                    ):
+                        if referenced_box == box.group(0):
+                            continue
+                        family.append((
+                            splice(diagram, box, referenced_box),
+                            f"{entity}",
+                        ))
+                # A corrupted publication printed beside an intact one.  Asking
+                # whether *some* standalone occurrence exists let the good form
+                # answer for the bad, so a box could draw
+                # `0x852d…3Cee · 0x852d…3Ceeg` — an address a reader copies and
+                # fails to look up — with this gate still reporting success.
+                # Each occurrence has to be judged on its own boundaries.
+                for form in (address, abbr):
+                    beside = box.group(0).replace(form, f"{form} · {form}g", 1)
+                    if beside == box.group(0):
+                        continue
+                    family.append((
+                        splice(diagram, box, beside),
+                        f"{entity}",
+                    ))
 
         # The same exchange read as a family, one surface at a time.  Every
         # same-class pair the checker's own table carries is swapped, so a pair
@@ -685,9 +718,15 @@ def main():
           "8 trailing characters — hex and non-hex alike — applied to both forms "
           "together and to the full and abbreviated form alone, plus a leading "
           "character on each form (a malformed address must not satisfy a "
-          "token-boundary check via substring containment, the extension is not always "
-          "a hex digit, and an intact form must not vouch for a corrupted one beside "
-          "it); "
+          "token-boundary check via substring containment, and the extension is not "
+          "always a hex digit); every one extended per surface by each of 3 character "
+          "references — decimal and hex — again on both forms together and on each "
+          "alone (a reference is punctuation in the source and a letter on the page, "
+          "so `…3Cee&#103;` publishes `0x852d…3Ceeg` while the raw boundary reads "
+          "clean); and every one published per surface in both forms as an intact "
+          "token beside a corrupted copy of itself (`0x852d…3Cee · 0x852d…3Ceeg`), "
+          "which a check asking only whether some standalone occurrence exists "
+          "excuses — an intact form must not vouch for a corrupted one beside it; "
           f"{exchanges} same-class address exchanges — every pair the table carries whose "
           "entities are drawn under different labels on that surface — rejected on each "
           "surface alone (both boxes keep their class, so only binding the address to the "
