@@ -415,6 +415,16 @@ README_HEADLINE_TABLE = re.compile(
     re.MULTILINE,
 )
 
+# The model-vs-deployed boundary and the total gap count are headline claims:
+# they qualify the CHECKED table before a reader reaches it, which is the whole
+# reason they are stated up front.  Searching the README for those sentences
+# bound them to nothing in particular, so relocating either one into an appendix
+# below the table — or into any prose paragraph a reader scrolls past — left
+# this gate green while the headline no longer carried the qualification at all.
+# The opening blockquote is located by its position instead: the leading `>`
+# block immediately under the title, and nowhere else.
+README_HEADLINE_BLOCK = re.compile(r"\A# [^\n]*\n\n(?P<block>(?:>[^\n]*\n)+)")
+
 
 def validate_readme_fidelity_disclosure(rows):
     """Bind the README headline table to the registry's own fidelity counts.
@@ -476,10 +486,17 @@ def validate_readme_fidelity_disclosure(rows):
             f"README: the headline table prints a fidelity-gap row for {', '.join(extra)}, "
             "which the registry does not record as a canonical claim; a published gap "
             "count qualifies a published CHECKED cell and must have one to qualify")
-    require(f"{total} in total" in readme,
-            f"README: headline boundary must disclose the {total} total fidelity gaps")
-    require("not about a deployed contract" in readme,
-            "README: headline must state the model-vs-deployed boundary")
+    opening = README_HEADLINE_BLOCK.match(readme)
+    require(opening is not None,
+            "README: no headline blockquote under the title, so the qualifications a "
+            "reader meets before the CHECKED table cannot be located")
+    block = opening.group("block")
+    require(f"{total} in total" in block,
+            f"README: the headline blockquote must disclose the {total} total fidelity "
+            "gaps; a count stated only further down does not qualify the table above it")
+    require("not about a deployed contract" in block,
+            "README: the headline blockquote must state the model-vs-deployed boundary; "
+            "a boundary stated only further down does not qualify the table above it")
 
 
 def validate():

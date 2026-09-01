@@ -132,6 +132,90 @@ def main():
             invoke(fixture, False, f"omits declared theorem(s): {hidden}")
             lean_path.write_text(lean, encoding="utf-8")
 
+        # A comment is whitespace to the Lean parser, so it may sit anywhere
+        # whitespace may — including between the keyword and the name.  Copying
+        # comment text through left `-- why` wedged in that gap, so no
+        # declaration was read across it and the theorem stayed out of the
+        # inventory while this gate reported success.  Every prefix that may
+        # precede the keyword is asserted in this form, since a long prefix is
+        # exactly what invites a trailing note.
+        for spelling, hidden in (
+            ("theorem -- why\n  undisclosed_after_note", "undisclosed_after_note"),
+            ("lemma -- why\n  undisclosed_lemma_after_note", "undisclosed_lemma_after_note"),
+            ("theorem -- one\n  -- two\n  undisclosed_after_two_notes",
+             "undisclosed_after_two_notes"),
+            ("theorem /- why -/ undisclosed_after_block_note", "undisclosed_after_block_note"),
+            ("theorem -- why\n  /- and why -/ undisclosed_after_mixed_notes",
+             "undisclosed_after_mixed_notes"),
+            ("private -- why\n  theorem undisclosed_note_after_modifier",
+             "undisclosed_note_after_modifier"),
+            ("@[simp] -- why\n  theorem undisclosed_note_after_attribute",
+             "undisclosed_note_after_attribute"),
+            ("  @[simp] private theorem -- why\n    undisclosed_combined_after_note",
+             "undisclosed_combined_after_note"),
+            ("theorem -- why\n  «undisclosed escaped after note»",
+             "«undisclosed escaped after note»"),
+            ("theorem -- why\n  αundisclosed_after_note", "αundisclosed_after_note"),
+        ):
+            report_path.write_text(report, encoding="utf-8")
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{spelling} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {hidden}")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # Blanking a line comment must stay inside that line and must not join
+        # text across it into a keyword that was never written.  Both directions
+        # are asserted: the comment ends at its newline, and a keyword appearing
+        # only as comment prose still declares nothing.
+        for source, name in (
+            ("-- a note\ntheorem undisclosed_after_note_line", "undisclosed_after_note_line"),
+            ('def dashes : String := "-- theorem prose"\n'
+             "theorem undisclosed_after_dash_string", "undisclosed_after_dash_string"),
+        ):
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{source} : True := trivial\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {name}")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        for not_a_declaration in (
+            "def keyword_free : Nat := 0 -- theorem\n  spliced_name : True := trivial",
+            "def also_keyword_free : Nat := 0 -- lemma\n  spliced_lemma : True := trivial",
+        ):
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                             f"{not_a_declaration}\n\n"
+                             "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+                encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            lean_path.write_text(lean, encoding="utf-8")
+
+        # Blanking must preserve the line the keyword sits on, or the row that
+        # discloses such a declaration could only cite a line it is not on.
+        noted = "theorem disclosed_noted -- why\n    : True := trivial"
+        noted_lean = lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                                  f"{noted}\n\n"
+                                  "end LidoSRv3.Audit.Guarantees.PAlloc1", 1)
+        if noted_lean == lean:
+            raise AssertionError("noted round-trip mutant changed nothing")
+        noted_line = noted_lean.splitlines().index("theorem disclosed_noted -- why") + 1
+        anchor = next(line for line in report.splitlines()
+                      if line.startswith("| `router_order_preserved` |"))
+        lean_path.write_text(noted_lean, encoding="utf-8")
+        report_path.write_text(report.replace(
+            anchor,
+            f"{anchor}\n| `disclosed_noted` | {noted_line} | Abstract | "
+            "unregistered | Line-comment round-trip fixture. |", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "9 P-ALLOC-1 theorems")
+        lean_path.write_text(lean, encoding="utf-8")
+        report_path.write_text(report, encoding="utf-8")
+
         # A wrapped declaration must also be citable, and it is cited at the
         # line its keyword opens — the same line the unwrapped forms occupy.
         # Were it recorded at the name's line instead, the report could only be
@@ -725,6 +809,82 @@ def main():
             invoke(fixture, False, "has no `## Theorems` section")
             report_path.write_text(report, encoding="utf-8")
 
+        # A row is a published claim only where Markdown renders one.  Inside a
+        # code fence the pipes are printed as literal characters, and inside an
+        # HTML comment nothing is printed at all, so reading the raw file counted
+        # rows a reader never meets: any row could be fenced or commented out —
+        # leaving the rendered table short while the file still spelled the row —
+        # with this gate green.  Every canonical row is driven through every
+        # construct, since one the suite never exercises is one that can hide a
+        # row the day it is used.
+        non_rendered = (
+            lambda line: f"```\n{line}\n```",
+            lambda line: f"```text\n{line}\n```",
+            lambda line: f"~~~\n{line}\n~~~",
+            lambda line: f"   ```\n{line}\n   ```",
+            lambda line: f"````\n```\n{line}\n```\n````",
+            lambda line: f"```\n{line}\n``````",
+            lambda line: f"<!-- {line} -->",
+            lambda line: f"<!--\n{line}\n-->",
+            lambda line: f"<!-- a --> <!--\n{line}\n-->",
+            lambda line: f"    {line}",
+            lambda line: f"\t{line}",
+        )
+        for line in inventory_rows:
+            name = CHECK.ROW.match(line).group("name")
+            for hide in non_rendered:
+                hidden = report.replace(line, hide(line), 1)
+                if hidden == report:
+                    raise AssertionError(f"non-rendered mutant for {name} changed nothing")
+                report_path.write_text(hidden, encoding="utf-8")
+                invoke(fixture, False, f"omits declared theorem(s): {name}")
+                report_path.write_text(report, encoding="utf-8")
+
+        # An unterminated HTML comment runs to the end of the document, so it
+        # hides every row below it rather than only the one it opens on.
+        report_path.write_text(report.replace(inventory_rows[0],
+                                              f"<!--\n{inventory_rows[0]}", 1),
+                               encoding="utf-8")
+        invoke(fixture, False, "omits declared theorem(s)")
+        report_path.write_text(report, encoding="utf-8")
+
+        # A heading quoted inside a fence is not a heading, so it must not
+        # relocate the section onto a table no reader meets.
+        report_path.write_text(report.replace(
+            "## Theorems",
+            f"```\n## Theorems\n\n{inventory_rows[0]}\n```\n\n## Theorems", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "8 P-ALLOC-1 theorems")
+        report_path.write_text(report, encoding="utf-8")
+
+        # And a fenced row outside the section publishes nothing either, so it
+        # is not the stray claim an unfenced copy would be.
+        report_path.write_text(report.replace(
+            elsewhere, f"{elsewhere}\n\n```\n{inventory_rows[0]}\n```\n", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "8 P-ALLOC-1 theorems")
+        report_path.write_text(report, encoding="utf-8")
+
+        # The opposite failure is worse than the one being fixed: masking text
+        # that Markdown does render would blank the real table and leave a gate
+        # no edit to the report could satisfy.  Each construct below only looks
+        # like an opener, so the inventory beneath it must still be read.
+        for still_rendered in (
+            "```\nprose in a closed fence\n```",
+            "``\nnot a fence: two backticks\n``",
+            "```a`b\nnot a fence: backtick in the info string\n",
+            "```\nclosed by a longer fence\n````",
+            "~~~\n```\na tilde fence holds a backtick fence\n```\n~~~",
+            "<!-- a closed comment -->",
+            "<!-- a\n  closed\n  multi-line comment -->",
+            "    ```\n    an indented block that is not a fence\n",
+        ):
+            report_path.write_text(
+                report.replace("## Theorems", f"{still_rendered}\n\n## Theorems", 1),
+                encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            report_path.write_text(report, encoding="utf-8")
+
         # A mis-nested scope would qualify the declarations that follow under the
         # wrong name, and an unbalanced one leaves the qualification undefined;
         # each fails closed rather than guessing at the reader's expense.
@@ -750,6 +910,11 @@ def main():
           "`lemma`, and combined), a name wrapped onto the line after its keyword "
           "(bare, `lemma`, blank-line-separated, prefixed, escaped and letter-like) "
           "with the wrapped form cited at its keyword's line, "
+          "a line or block comment standing as the whitespace between a keyword "
+          "and its name (bare, `lemma`, doubled, mixed, behind a modifier, behind "
+          "an attribute, combined, escaped and letter-like) with that form cited "
+          "at its keyword's line and neither the comment's newline nor a keyword "
+          "written only as comment prose allowed to splice a declaration, "
           "letter-like/subscript/`!`/`?`/escaped/dotted Lean "
           "identifiers, declaration after a nested comment, `/-` in a line "
           "comment and in a string literal, unterminated comment, report-only promotion, "
@@ -781,7 +946,15 @@ def main():
           "stays printable by an unregistered row; and every one of "
           f"{len(inventory_rows)} rows relocated out of the `## Theorems` section "
           "and copied outside it, a second inventory filed further down, and the "
-          "section heading renamed, demoted and unheaded all rejected")
+          "section heading renamed, demoted and unheaded all rejected; and every "
+          f"one of those rows hidden in each of {len(non_rendered)} constructs "
+          "Markdown does not render as a row (backtick, info-string, tilde, "
+          "indented, over-long and over-closed fences, inline, block and "
+          "reopened HTML comments, and space- and tab-indented code) rejected, "
+          "with an unterminated comment hiding the rows below it, a fenced "
+          "heading not allowed to relocate the section, a fenced row outside it "
+          "not counted as a stray claim, and 8 look-alike openers asserted to "
+          "leave the real table rendered")
 
 
 if __name__ == "__main__":

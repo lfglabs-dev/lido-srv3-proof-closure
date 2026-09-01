@@ -84,12 +84,26 @@ IDENT = rf"{ATOM}(?:\.{ATOM})*"
 # with tolerant padding instead, and `[^|\n]` keeps a cell from spanning lines so
 # a row is still one physical line.
 CELL = r"[ \t]*\|[ \t]*"
+# A block only starts where Markdown lets one start: at most three spaces of
+# indentation, and no tab, since a tab advances to column four.  Accepting any
+# leading whitespace read a row out of an indented code block, which renders as
+# literal text rather than as a table, so a row a reader never meets still
+# counted toward the inventory.
 ROW = re.compile(
-    rf"^[ \t]*\|[ \t]*`(?P<name>{IDENT})`{CELL}(?P<line>\d+){CELL}"
+    rf"^ {{0,3}}\|[ \t]*`(?P<name>{IDENT})`{CELL}(?P<line>\d+){CELL}"
     rf"(?P<plane>[^|\n]*?){CELL}(?P<registered>[^|\n]*?){CELL}"
     rf"(?P<role>[^|\n]*?)[ \t]*\|[ \t]*$",
     re.MULTILINE,
 )
+
+# Code fences and HTML comments publish nothing: a reader meets the literal
+# characters of a fenced block and meets no part of a comment at all.  A closing
+# fence repeats the opening character at least as many times, and a backtick
+# fence carries no backtick in its info string.
+FENCE_OPEN = re.compile(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$")
+FENCE_CLOSE = re.compile(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$")
+COMMENT_OPEN = "<!--"
+COMMENT_CLOSE = "-->"
 
 # The inventory a reader meets is the `## Theorems` section: that heading is what
 # introduces the table as every theorem the module declares, and what explains
@@ -149,6 +163,67 @@ def fail(message):
     raise SystemExit(f"report theorem inventory: {message}")
 
 
+def _comment_spans(line, open_comment):
+    """Whether `line` carries comment text, and whether one stays open past it."""
+    touched = open_comment
+    position = 0
+    while True:
+        if open_comment:
+            close = line.find(COMMENT_CLOSE, position)
+            if close == -1:
+                return True, True
+            open_comment = False
+            position = close + len(COMMENT_CLOSE)
+        else:
+            opened = line.find(COMMENT_OPEN, position)
+            if opened == -1:
+                return touched, False
+            touched = True
+            open_comment = True
+            position = opened + len(COMMENT_OPEN)
+
+
+def mask_non_rendered(text):
+    """Blank the lines Markdown does not render, preserving every offset.
+
+    A row inside a code fence is printed as literal characters and a row inside
+    an HTML comment is printed not at all, so neither is a claim a reader ever
+    meets.  Reading the raw file let either one stand in for the published
+    table: the inventory could satisfy this gate with a row no reader can see
+    while the rendered table silently omitted the theorem, and a `## Theorems`
+    heading quoted inside a fence could relocate the section itself.
+
+    Whole lines are blanked rather than the exact spans.  Blanking only the
+    characters of `<!--x-->| ... |` would leave a line that opens with a pipe
+    and invent a row Markdown renders as raw HTML — the one direction that
+    loosens the gate.  Line-at-a-time masking can only ever hide a row, which
+    surfaces as a declared theorem the inventory omits.
+    """
+    lines = text.splitlines(keepends=True)
+    fence = None
+    open_comment = False
+    for index, raw in enumerate(lines):
+        line = raw.rstrip("\n").rstrip("\r")
+        masked = False
+        if open_comment or COMMENT_OPEN in line:
+            masked, open_comment = _comment_spans(line, open_comment)
+        elif fence is not None:
+            masked = True
+            closing = FENCE_CLOSE.match(line)
+            if (closing and closing.group("seq")[0] == fence[0]
+                    and len(closing.group("seq")) >= fence[1]):
+                fence = None
+        else:
+            opening = FENCE_OPEN.match(line)
+            if opening and not (opening.group("seq")[0] == "`"
+                                and "`" in opening.group("info")):
+                fence = (opening.group("seq")[0], len(opening.group("seq")))
+                masked = True
+        if masked:
+            lines[index] = "".join(" " if c not in "\r\n" else c for c in raw)
+    return "".join(lines)
+
+
 def strip_block_comments(text):
     """Blank Lean block comments, preserving every newline and column.
 
@@ -185,8 +260,17 @@ def strip_block_comments(text):
             out.append("  ")
             index += 2
         elif pair == "--":
+            # Lean separates a keyword from its name by whitespace, and a line
+            # comment is whitespace to the parser: `theorem -- why\n  name` is
+            # one ordinary declaration.  Copying the comment text through left
+            # `-- why` sitting between the keyword and the name, so `DECL` could
+            # not match across it and the declaration stayed out of the
+            # inventory while this gate reported success.  The body is blanked
+            # to spaces instead, which keeps every column and the terminating
+            # newline, still refuses to let a `/-` inside a comment open one,
+            # and cannot invent a declaration: `-- theorem x` blanks away too.
             while index < end and text[index] != "\n":
-                out.append(text[index])
+                out.append(" ")
                 index += 1
         elif text[index] == ESCAPE_BEGIN:
             # `«…»` escapes an atom, so its contents are a name rather than
@@ -291,7 +375,7 @@ def main():
     if not lean:
         fail(f"no theorem declarations parsed from {LEAN.relative_to(ROOT)}")
 
-    report = REPORT.read_text(encoding="utf-8")
+    report = mask_non_rendered(REPORT.read_text(encoding="utf-8"))
     # A reader meets every row the table prints, but a name-indexed mapping keeps
     # only the last one: a repeated row was silently discarded rather than
     # checked, so an earlier copy claiming an unregistered theorem is REGISTERED,

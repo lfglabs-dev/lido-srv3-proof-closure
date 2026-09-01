@@ -370,6 +370,79 @@ def main():
         invoke(fixture, False, "found 0 headline fidelity tables, expected exactly one")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # The boundary sentence and the total gap count are headline claims:
+        # they qualify the CHECKED table before a reader reaches it, which is
+        # the only reason they are stated up front.  Searching the whole README
+        # for them bound them to nothing in particular, so either one could be
+        # relocated below the table — into an appendix, into loose prose, into a
+        # second blockquote — and go on satisfying this gate while the headline
+        # a reader meets no longer carried the qualification at all.
+        opening = module.README_HEADLINE_BLOCK.match(readme)
+        if not opening:
+            raise AssertionError("canonical README has no headline blockquote to scope to")
+        block = opening.group("block")
+        title = readme.split("\n", 1)[0]
+        for sentence, muted, needle in (
+            ("67 in total", "counted below",
+             "headline blockquote must disclose the 67 total fidelity gaps"),
+            ("not about a deployed contract", "about a Lean model",
+             "headline blockquote must state the model-vs-deployed boundary"),
+        ):
+            if readme.count(sentence) != 1 or block.count(sentence) != 1:
+                raise AssertionError(f"expected {sentence!r} once, inside the headline block")
+            quieted = readme.replace(block, block.replace(sentence, muted, 1), 1)
+            if quieted == readme:
+                raise AssertionError(f"headline mutant for {sentence!r} changed nothing")
+
+            # Still published, just no longer where it qualifies anything.
+            for relocated in (
+                f"{quieted}\n## Appendix\n\nThe evidence is {sentence}.\n",
+                quieted.replace(header, f"The evidence is {sentence}.\n\n{header}", 1),
+                f"{quieted}\n> The evidence is {sentence}.\n",
+            ):
+                if relocated == quieted:
+                    raise AssertionError(f"relocation mutant for {sentence!r} changed nothing")
+                readme_path.write_text(relocated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
+            # And dropped from the README outright.
+            readme_path.write_text(quieted, encoding="utf-8")
+            invoke(fixture, False, needle)
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # The block has to be locatable at all, and it is located by its
+        # position: the blockquote directly under the title.  Demote it to
+        # ordinary prose, push it below an introduction, or unhead it, and the
+        # qualifications no longer lead the document even though every sentence
+        # is still spelled in it.
+        for displaced in (
+            readme.replace(block, re.sub(r"^> ?", "", block, flags=re.MULTILINE), 1),
+            readme.replace(block, f"Introductory prose.\n\n{block}", 1),
+            readme.replace(block, "", 1),
+            readme.replace(f"{title}\n\n", "", 1),
+            readme.replace(f"{title}\n", f"#{title}\n", 1),
+        ):
+            if displaced == readme:
+                raise AssertionError("headline-block displacement mutant changed nothing")
+            readme_path.write_text(displaced, encoding="utf-8")
+            invoke(fixture, False, "no headline blockquote under the title")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Scoping must not make the README unwritable: the title is not the
+        # claim, the block may grow, and repeating a qualification further down
+        # is redundant rather than wrong.
+        for still_qualified in (
+            readme.replace(title, "# Renamed Heading", 1),
+            readme.replace(block, f"{block}> - An extra headline note.\n", 1),
+            f"{readme}\n## Appendix\n\nRestated: these are proofs "
+            "not about a deployed contract, with 67 in total.\n",
+        ):
+            if still_qualified == readme:
+                raise AssertionError("headline-block control changed nothing")
+            readme_path.write_text(still_qualified, encoding="utf-8")
+            invoke(fixture, True)
+            readme_path.write_text(readme, encoding="utf-8")
+
         invoke(fixture, True, command="generate")
         (fixture / "audit/STATUS.md").write_text("stale\n", encoding="utf-8")
         invoke(fixture, False, "STATUS.md is stale", command="check")
@@ -380,7 +453,12 @@ def main():
           f"views; and every one of {len(rows)} headline rows re-filed into a later "
           "table, re-filed into loose prose, and dropped outright, plus a non-canonical "
           "row printed inside the table, a second table claiming the headline's own "
-          "columns, and the gap column repainted so the table cannot be located")
+          "columns, and the gap column repainted so the table cannot be located; and "
+          "each headline qualification re-filed into an appendix, into prose above the "
+          "table, into a later blockquote and dropped outright, with the opening "
+          "blockquote demoted to prose, pushed below an introduction, deleted, "
+          "unheaded and its title demoted all rejected, while a renamed title, a "
+          "longer block and a redundant restatement stay accepted")
 
 
 if __name__ == "__main__":
