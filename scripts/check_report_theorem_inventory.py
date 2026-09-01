@@ -20,6 +20,9 @@ REPORT = ROOT / "report/P-ALLOC-1.md"
 REGISTRY = ROOT / "audit/guarantees.yaml"
 GUARANTEE_ID = "P-ALLOC-1"
 NAMESPACE = "LidoSRv3.Audit.Guarantees.PAlloc1."
+# Registry field -> the plane label an inventory row registered against it must print.
+PLANES = {"abstract": "Abstract", "verity": "Verity"}
+REGISTRATION = re.compile(r"^REGISTERED as `(?P<plane>[a-z]+)\.theorem`$")
 
 # A declaration name is not always ASCII.  Lean identifiers allow letter-like
 # characters (Greek, Coptic, Latin-1/Extended-A, script and double-struck),
@@ -305,19 +308,41 @@ def main():
 
     row = next(g for g in json.loads(REGISTRY.read_text(encoding="utf-8"))["guarantees"]
                if g["id"] == GUARANTEE_ID)
-    registered = set()
-    for plane in ("abstract", "verity"):
+    registered = {}
+    for plane in PLANES:
         theorem = row[plane].get("theorem")
         if theorem and theorem.startswith(NAMESPACE):
-            registered.add(theorem[len(NAMESPACE):])
+            registered[plane] = theorem[len(NAMESPACE):]
     if not registered:
         fail(f"registry records no {NAMESPACE}* theorem for {GUARANTEE_ID}")
 
-    claimed = {name for name, match in rows.items()
-               if match.group("registered").strip().startswith("REGISTERED")}
+    # A REGISTERED cell does not just assert that some registry field names the
+    # theorem; it prints which one.  Comparing unordered name sets read only half
+    # of that claim, so swapping the two labels left the same set and this gate
+    # stayed green while the inventory misidentified which theorem backs each
+    # published CHECKED plane.  Each cell is bound to the field it names, and to
+    # the plane column the same row prints.
+    claimed = {}
+    for name, match in rows.items():
+        cell = match.group("registered").strip()
+        if not cell.startswith("REGISTERED"):
+            continue
+        registration = REGISTRATION.match(cell)
+        if not registration:
+            fail(f"{name} claims registration as {cell!r}, which names none of the "
+                 f"registry fields {', '.join(f'`{p}.theorem`' for p in PLANES)}")
+        plane = registration.group("plane")
+        if plane in claimed:
+            fail(f"{name} and {claimed[plane]} both claim registry field "
+                 f"`{plane}.theorem`, which records a single theorem")
+        if PLANES[plane] not in match.group("plane"):
+            fail(f"{name} is registered as `{plane}.theorem` but its inventory row "
+                 f"prints plane {match.group('plane').strip()!r}, so the row and its "
+                 "registration disagree about which plane the theorem backs")
+        claimed[plane] = name
     if claimed != registered:
-        fail(f"inventory marks {sorted(claimed)} REGISTERED; "
-             f"registry names {sorted(registered)}")
+        fail(f"inventory marks {sorted(claimed.items())} REGISTERED; "
+             f"registry names {sorted(registered.items())}")
 
     print(f"report theorem inventory ok: {len(rows)} {GUARANTEE_ID} theorems, "
           f"{len(registered)} registered")

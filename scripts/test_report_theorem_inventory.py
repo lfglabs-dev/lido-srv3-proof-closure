@@ -416,11 +416,17 @@ def main():
         invoke(fixture, False, "unterminated block comment")
         lean_path.write_text(lean, encoding="utf-8")
 
-        # An unregistered theorem promoted to REGISTERED in the report only.
+        # An unregistered theorem promoted to REGISTERED in the report only.  The
+        # incumbent is demoted in the same edit so the field it vacates is free:
+        # otherwise the two rows collide and the narrower duplicate-field rule
+        # answers first, leaving the registry-mapping rule itself unasserted.
         promoted = report.replace(
             "| `active_capacity_bounded` | 69 | Abstract | unregistered |",
             "| `active_capacity_bounded` | 69 | Abstract | REGISTERED as `abstract.theorem` |", 1)
-        if promoted == report:
+        promoted = promoted.replace(
+            "| `checked_execute` | 103 | Abstract | REGISTERED as `abstract.theorem` |",
+            "| `checked_execute` | 103 | Abstract | unregistered |", 1)
+        if promoted == report or "`checked_execute` | 103 | Abstract | unregistered" not in promoted:
             raise AssertionError("promotion mutant changed nothing")
         report_path.write_text(promoted, encoding="utf-8")
         invoke(fixture, False, "REGISTERED; registry names")
@@ -434,6 +440,74 @@ def main():
         registry_path.write_text(json.dumps(mutated, indent=2) + "\n", encoding="utf-8")
         invoke(fixture, False, "REGISTERED; registry names")
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+
+        # A REGISTERED cell prints which registry field backs the theorem, and the
+        # row prints which plane it lives on.  Comparing unordered name sets read
+        # neither, so exchanging the two labels published a report that
+        # misidentifies which theorem backs each CHECKED plane while this gate
+        # stayed green.  Drive every pairing from the checker's own plane table so
+        # a plane added later arrives with its case already demanded.
+        registered_rows = {}
+        for line in report.splitlines():
+            claim = CHECK.ROW.match(line)
+            if claim and claim.group("registered").strip().startswith("REGISTERED"):
+                field = CHECK.REGISTRATION.match(claim.group("registered").strip())
+                if not field:
+                    raise AssertionError(f"canonical row registers no known field: {line}")
+                registered_rows[field.group("plane")] = line
+        if set(registered_rows) != set(CHECK.PLANES):
+            raise AssertionError(f"canonical report registers {sorted(registered_rows)}, "
+                                 f"checker knows {sorted(CHECK.PLANES)}")
+
+        def refile(line, was, now, plane=False):
+            """Re-file a row under another registry field, optionally relabelling it."""
+            rewritten = line.replace(f"`{was}.theorem`", f"`{now}.theorem`", 1)
+            if plane:
+                rewritten = rewritten.replace(f"| {CHECK.PLANES[was]} |",
+                                              f"| {CHECK.PLANES[now]} |", 1)
+            if rewritten == line:
+                raise AssertionError(f"re-filing {was} as {now} changed nothing in: {line}")
+            return rewritten
+
+        def mutate(needle, *edits):
+            mutated_report = report
+            for line, rewritten in edits:
+                mutated_report = mutated_report.replace(line, rewritten, 1)
+            report_path.write_text(mutated_report, encoding="utf-8")
+            invoke(fixture, False, needle)
+            report_path.write_text(report, encoding="utf-8")
+
+        for held, other in ((a, b) for a in registered_rows for b in registered_rows if a != b):
+            kept, swapped = registered_rows[held], registered_rows[other]
+
+            # Exchanging the registrations while each row keeps its printed plane
+            # leaves the row contradicting its own registration.
+            mutate("disagree about which plane the theorem backs",
+                   (kept, refile(kept, held, other)),
+                   (swapped, refile(swapped, other, held)))
+
+            # Exchanging the plane labels alone is the same contradiction read
+            # from the other side.
+            mutate("disagree about which plane the theorem backs",
+                   (kept, kept.replace(f"| {CHECK.PLANES[held]} |",
+                                       f"| {CHECK.PLANES[other]} |", 1)),
+                   (swapped, swapped.replace(f"| {CHECK.PLANES[other]} |",
+                                             f"| {CHECK.PLANES[held]} |", 1)))
+
+            # Exchanging both leaves two internally consistent rows that name the
+            # wrong registry theorems — the swap an unordered name set could not
+            # see at all.
+            mutate("REGISTERED; registry names",
+                   (kept, refile(kept, held, other, plane=True)),
+                   (swapped, refile(swapped, other, held, plane=True)))
+
+            # Both rows filed under one field, which records a single theorem.
+            mutate(f"both claim registry field `{held}.theorem`",
+                   (swapped, refile(swapped, other, held, plane=True)))
+
+            # A registration naming no registry field at all.
+            mutate("names none of the registry fields",
+                   (kept, kept.replace(f"REGISTERED as `{held}.theorem`", "REGISTERED", 1)))
 
         # A repeated row was dropped rather than checked, because indexing the
         # matches by name keeps only the last one.  Every cell the gate reads can
@@ -609,7 +683,11 @@ def main():
           "each rejected rather than slipping past the parser on padding; "
           "same-leaf theorems in sibling namespaces demanded as distinct "
           "qualified names, qualified and sectioned names round-tripping to rows, "
-          "and mis-nested, dangling and stray scope commands rejected")
+          "and mis-nested, dangling and stray scope commands rejected; each "
+          "REGISTERED row bound to the registry field and the plane it prints, "
+          "with the registrations exchanged, the plane labels exchanged, both "
+          "exchanged, two rows filed under one field, and a registration naming "
+          "no field all rejected, driven from the checker's own plane table")
 
 
 if __name__ == "__main__":
