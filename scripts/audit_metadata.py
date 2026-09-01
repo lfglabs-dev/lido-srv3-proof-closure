@@ -464,6 +464,27 @@ _BLOCKQUOTE_LINK_DEF = re.compile(
     re.MULTILINE,
 )
 
+# An inline link `[text](destination "title")` renders only the link text;
+# the destination and title are invisible to a reader.  Replacing each
+# occurrence with the bare display text removes hidden metadata while
+# preserving every character a reader actually sees.
+_INLINE_LINK_META = re.compile(r"\[([^\[\]]*)\]\([^)]*\)")
+
+# CommonMark type-6 HTML block openers: a line that starts with one of these
+# block-level element names causes everything until the next blank line to be
+# emitted as raw HTML, not parsed as Markdown.  Pipe characters on those
+# interior lines never render as table rows.
+_HTML_BLOCK_TAG = re.compile(
+    r"^ {0,3}</?(?:address|article|aside|base|basefont|blockquote|body|"
+    r"caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|"
+    r"fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|"
+    r"head|header|hr|html|iframe|legend|li|link|main|menu(?:item)?|"
+    r"meta|nav|noframes|ol|optgroup|option|p|param|section|source|"
+    r"summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)"
+    r"(?:[ \t>]|/>|$)",
+    re.IGNORECASE,
+)
+
 
 def _mask_readme(text):
     """Position-preserving blank of non-rendered regions in the README.
@@ -479,27 +500,42 @@ def _mask_readme(text):
     def blank(m):
         return "".join(" " if c != "\n" else "\n" for c in m.group(0))
 
-    # Blank HTML constructs first, preserving positions.
+    # Blank inline HTML constructs (types 1–5) first, preserving positions.
     masked = README_UNRENDERED.sub(blank, text)
 
-    # Blank Markdown code fences.  A closing fence repeats the opening
-    # character at least as many times; a backtick fence carries no backtick
-    # in its info string (to exclude inline code spans on the same line).
-    lines = masked.splitlines(True)
+    # Line-by-line pass: blank code fences and CommonMark type-6 HTML blocks.
+    # Code fences: a closing sequence repeats the opening character at least as
+    # many times; a backtick fence carries no backtick in its info string.
+    # Type-6 HTML blocks: a line whose first non-space token is a block-level
+    # element open/close tag causes everything until the next blank line to be
+    # raw HTML.  The detection uses the original line (before step 1 blanked
+    # the opening tag) so the block-tag pattern fires on the actual characters.
+    lines_m = masked.splitlines(True)   # output lines (positions preserved)
+    lines_o = text.splitlines(True)     # original lines (for HTML-block detection)
     fence = None
-    for index, line in enumerate(lines):
-        stripped = line.rstrip("\r\n")
+    html_block = False
+    for i, (ml, ol) in enumerate(zip(lines_m, lines_o)):
+        msk = ml.rstrip("\r\n")
+        orig = ol.rstrip("\r\n")
         if fence is not None:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$", stripped)
+            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$", msk)
             if m and m.group("seq")[0] == fence[0] and len(m.group("seq")) >= fence[1]:
                 fence = None
-            lines[index] = "".join(" " if c not in "\r\n" else c for c in line)
+            lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
+        elif html_block:
+            if orig == "":  # blank line ends the HTML block
+                html_block = False
+            else:
+                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
         else:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$", stripped)
+            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$", msk)
             if m and not (m.group("seq")[0] == "`" and "`" in m.group("info")):
                 fence = (m.group("seq")[0], len(m.group("seq")))
-                lines[index] = "".join(" " if c not in "\r\n" else c for c in line)
-    return "".join(lines)
+                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
+            elif _HTML_BLOCK_TAG.match(orig):
+                html_block = True
+                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
+    return "".join(lines_m)
 
 
 def validate_readme_fidelity_disclosure(rows):
@@ -573,12 +609,15 @@ def validate_readme_fidelity_disclosure(rows):
     require(opening is not None,
             "README: no headline blockquote under the title, so the qualifications a "
             "reader meets before the CHECKED table cannot be located")
-    # Strip HTML constructs that publish no visible text, then also strip
-    # Markdown link reference definitions whose titles could carry the required
-    # phrases while rendering as nothing.  Both passes remove text, so a
-    # qualification that survives is one a reader actually sees.
+    # Strip HTML constructs, link reference definition lines, and inline link
+    # destinations/titles — all three classes render as no visible text.  Each
+    # pass only deletes characters, so a qualification that survives is one a
+    # reader actually sees.  Inline link replacement keeps the display text
+    # (`[text](url "title")` → `text`) so a qualification carried in the
+    # clickable label is still accepted.
     block = README_UNRENDERED.sub("", opening.group("block"))
     block = _BLOCKQUOTE_LINK_DEF.sub("", block)
+    block = _INLINE_LINK_META.sub(r"\1", block)
     require(f"{total} in total" in block,
             f"README: the headline blockquote must render the {total} total fidelity "
             "gaps as visible text; a count stated only further down, or only inside a "

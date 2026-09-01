@@ -385,6 +385,15 @@ def main():
         invoke(fixture, False, "found 0 headline fidelity tables, expected exactly one")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # A CommonMark type-6 HTML block (a block-level element like <div>)
+        # eats every line until the next blank line as raw HTML.  The table
+        # rows become HTML block content rather than Markdown rows, so they
+        # never render as a table — the gate must detect this and reject it.
+        divd = readme.replace(raw_table, f"<div>\n{raw_table}\n</div>", 1)
+        readme_path.write_text(divd, encoding="utf-8")
+        invoke(fixture, False, "found 0 headline fidelity tables, expected exactly one")
+        readme_path.write_text(readme, encoding="utf-8")
+
         # The boundary sentence and the total gap count are headline claims:
         # they qualify the CHECKED table before a reader reaches it, which is
         # the only reason they are stated up front.  Searching the whole README
@@ -444,6 +453,10 @@ def main():
                 # nothing; its title is invisible to a reader but present in
                 # the raw source a naïve regex would search.
                 f'> [note]: http://example.com "{sentence}"\n',
+                # Thread r3901367508: an inline link's destination and title
+                # are invisible; only the display text renders, so a
+                # qualification hidden in the title must not satisfy the check.
+                f'> [see here](http://example.com "{sentence}")\n',
             ):
                 readme_path.write_text(
                     readme.replace(block, muted_block + concealed, 1), encoding="utf-8")
@@ -515,13 +528,16 @@ def main():
           f"views; and every one of {len(rows)} headline rows re-filed into a later "
           "table, re-filed into loose prose, and dropped outright, plus a non-canonical "
           "row printed inside the table, a second table claiming the headline's own "
-          "columns, and the gap column repainted so the table cannot be located; and "
+          "columns, the gap column repainted so the table cannot be located, the table "
+          "wrapped in an HTML comment, and the table wrapped in a block-level HTML "
+          "element (`<div>`); and "
           "each headline qualification re-filed into an appendix, into prose above the "
           "table, into a later blockquote and dropped outright, and spelled inside the "
-          "block by each of 11 constructs that publish no visible text (single- and "
+          "block by each of 12 constructs that publish no visible text (single- and "
           "multi-line comments, a processing instruction, CDATA, a declaration, "
           "`script`, `style` and `textarea` bodies, `title`/`alt` attribute "
-          "values, and Markdown link reference definition titles), with the opening blockquote demoted to prose, pushed below an "
+          "values, Markdown link reference definition titles, and inline link "
+          "destination/title fields), with the opening blockquote demoted to prose, pushed below an "
           "introduction, deleted, unheaded and its title demoted all rejected, while a "
           "renamed title, a longer block, a redundant restatement, and each "
           "qualification restated through inline markup that still renders it stay "
