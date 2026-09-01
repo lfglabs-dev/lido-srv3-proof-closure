@@ -105,6 +105,8 @@ test:
 	@printf '%s\n' 'P-ORACLE-SUPPLY-1 source-domain strengthening, domain-guard load-bearing mutant, and quantization-gap witness compiled and asserted'
 	@lake build LidoSRv3.Audit.Source.SanityEnvelope LidoSRv3.Tests.SanityEnvelopeMutants
 	@printf '%s\n' 'oracle sanity-envelope source-domain and guard-drop mutants compiled and asserted'
+	@lake build LidoSRv3.Audit.Guarantees.POracleSanity1 LidoSRv3.Tests.SanityEnvelopeParentMutants
+	@printf '%s\n' 'P-ORACLE-SANITY-1 bounded commit-envelope parent and six exact-parent kill-lines compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressEquivariance
 	@printf '%s\n' 'abstract address-renaming field and mutant regressions compiled and asserted'
 	@lake build LidoSRv3.Tests.AddressSourceMutants

@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: e2686d526231e6cc4cdf77c25036cfa26dab4c12
+validated-tree: da8d5bb53bda8d95a0e438089715471869edcacb
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5562,5 +5562,174 @@ confine lockfile row regex to single physical line (2026-08-30)
   54 prior and new cases verified in isolation (all pass).
 - No production Lean files changed; the `sorry`/`admit`/new-axiom/
   `native_decide` scan is empty.
+- Receipt subject: tracked tree excluding this receipt, recorded as
+  `validated-tree`.
+
+P-ORACLE-SANITY-1: bounded commit-envelope parent and exact-parent kill-lines
+(2026-09-01)
+------------------------------------------------------------------------
+
+- Scope registered. `P-ORACLE-SANITY-1` is registered as a **bounded**
+  supplemental guarantee at `[.model, .source]`. Its scope is exactly the five
+  modeled `OracleReportSanityChecker` commit-path guards
+  (`annualBalanceIncreaseAccepts`, `pendingBalanceCapAccepts`,
+  `activatedBalanceAccepts`, `validatorsBalanceIncreaseAccepts`,
+  `simulatedShareRateAccepts`) plus the `uint256` entry bound on `timeElapsed`.
+  It is not a completeness claim about `OracleReportSanityChecker.sol`.
+
+- Why the previous `checker_implies_*` theorems were not a parent. Each of
+  them projects one conjunct out of `checkerAccepts`'s `&&`-chain and restates
+  it as a `Prop` that mentions the same `...Accepts` `Bool`. Their conclusions
+  carry no information a reader could not obtain by reduction, so registering
+  any of them would have been tautological.
+
+- The registered parent. `LidoSRv3/Audit/Guarantees/POracleSanity1.lean`
+  declares
+
+      theorem oracle_sanity_commit_envelope (limits) (s)
+          (h : checkerAccepts limits s = true) : CommitEnvelope limits s
+
+  `CommitEnvelope` is fifteen `Nat` facts about the report window and the
+  configured limits. It mentions **no** `...Accepts` `Bool` and no
+  `if`-expression from the guard bodies. Each Solidity integer-division guard
+  is carried across as a multiplicative bound, e.g.
+
+      ANNUAL_BALANCE_INCREASE_DENOMINATOR * (postCLTotal s - effectivePreCLBalance s)
+        < (limits.annualBalanceIncreaseBPLimit + 1)
+          * effectiveTimeElapsed s.timeElapsed * effectivePreCLBalance s
+
+  which is what `annualIncrease ≤ limit` actually means once `EVM` truncating
+  division is discharged. The conversion is `lt_mul_of_div_le` /
+  `lt_mul_of_div_div_le`, with the required divisor positivity supplied by
+  `effectiveTimeElapsed_pos` (Solidity's `timeElapsed == 0 → 3600` default) and
+  `effectivePreCLBalance_pos` (its `preCLBalance == 0 → 1e9` default). Neither
+  positivity fact is assumed; both are theorems about the modeled defaults.
+
+- Refolding note (method, not a claim). `simp only [← postCLTotal]` cannot
+  refold a `def`; Lean rejects the `←` modifier on a declaration name. Each
+  guard body is therefore restated over the named derived quantities by an
+  equation lemma proved `:= rfl` (`annualBalanceIncreaseAccepts_eq` and four
+  siblings). Because the lemmas are `rfl`, they add no trust surface: they
+  assert only that the two spellings are definitionally the same term. They
+  also keep the derived quantities opaque to `split_ifs`, so the extraction
+  proofs branch on the guard's own decision structure rather than on unfolded
+  `let`-bodies.
+
+- Branch-structure note (method, not a claim). `split_ifs at h` discharges by
+  itself every guard branch whose body is the literal `false`, because the
+  rewritten hypothesis becomes `false = true`. The extraction proofs therefore
+  carry exactly one bullet per *accepting* branch: two for
+  `annual_bounds` (no-increase and division paths) and `validators_bound`
+  (increase and no-increase paths), one each for `pending_bounds`,
+  `activated_bounds` and `simulated_bounds`. Getting this count wrong is a
+  compile error, not a soundness hole.
+
+- Exact-parent kill-lines. `LidoSRv3/Tests/SanityEnvelopeMutants.lean` already
+  showed each guard is load-bearing for *the checker* (a mutant accepts where
+  `checkerAccepts` rejects). That is strictly weaker than what is needed to
+  justify registering this parent. `LidoSRv3/Tests/SanityEnvelopeParentMutants.lean`
+  adds six theorems of the exact-parent shape
+
+      ∃ limits s, checkerNoX limits s = true ∧ ¬ CommitEnvelope limits s
+
+  one per modeled premise, each refuting a **named** envelope conjunct so the
+  kill-line fails loudly if the envelope is ever weakened:
+
+  - `timeElapsedBoundKillLineRefutesParent` — `timeElapsed = UINT256_MAX + 1`;
+    every arithmetic guard takes a no-increase or zero-proration path, so the
+    bound-free mutant accepts while conjunct 1 is false.
+  - `annualKillLineRefutesParent` — CL pending surges 0 → 500 ETH against a
+    32 ETH validators balance; refutes the annual multiplicative bound
+    (conjunct 4) by a factor of more than 5e5.
+  - `pendingCapKillLineRefutesParent` — 1 ETH of pending balance appears with
+    no deposits under a zero external cap; refutes conjunct 6.
+  - `activatedBalanceKillLineRefutesParent` — 5000 ETH activated in one window
+    against a zero appeared-ETH-per-day limit; refutes conjunct 8
+    (`appearedEthLimitPerPeriod + MAX_VALIDATOR_EFFECTIVE_BALANCE`).
+  - `validatorsIncreaseKillLineRefutesParent` — one wei of validators balance
+    appears against a 1e30 base, small enough that the annual guard's integer
+    division rounds to zero; refutes conjunct 9 by exactly one wei.
+  - `simulatedShareRateKillLineRefutesParent` — the reported simulated share
+    rate is twice the rate the report's own ether and shares compute; refutes
+    the deviation bound (conjunct 15).
+
+  So no conjunct of the parent survives dropping its premise: the parent is not
+  provable from any proper subset of the modeled guards, and it is not
+  discharged by reduction.
+
+- Non-vacuity. `parentAcceptsPositiveControl` applies the parent to a
+  well-behaved report, so the premise `checkerAccepts limits s = true` is
+  inhabited and the envelope is not vacuously true on an empty domain.
+
+- All seven witnesses are closed by kernel `decide`; no `native_decide` was
+  introduced and the proof-escape inventory digest is unchanged.
+
+- Metadata: deliberately Lean-only. No `audit/guarantees.yaml` row was added.
+  Adding one fails the gate:
+
+      $ python3 scripts/audit_metadata.py check
+      audit metadata error: R1 review basis input family differs for audit/guarantees.yaml
+
+  `validate_r1_review_basis()` byte-pins the registry to the certified R1 input
+  set `25fbc6e0493948a866a49cda2962d3e897fa00e3`, which the R1 report cites as
+  its review basis. `git diff 25fbc6e0 HEAD -- audit/guarantees.yaml` is empty,
+  so the pin currently holds. The only two ways to add the row are to advance
+  `R1_REVIEW_BASE`/`R1_REPORT_INPUT_SHA256` — which would present unreviewed
+  content as R1 certified, exactly the failure mode that check exists to
+  prevent — or to obtain a fresh human R1 review, which is out of scope here.
+  This is consistent with the repository's stated doctrine that Lean theorem
+  statements and proofs are authoritative while metadata classifies but never
+  closes evidence. The residual is recorded here rather than papered over.
+
+- No `report/P-ORACLE-SANITY-1.md` was added: no supplemental ID carries a
+  report file (P-ORACLE-SUPPLY-1, P-VAULT-ETH-1 and the rest have none), so
+  creating one would introduce an unsupported public surface.
+
+- Residuals explicitly **not** claimed by `CommitEnvelope`, each named in the
+  module header of `LidoSRv3/Audit/Source/SanityEnvelope.lean`: the
+  `smoothenTokenRebase` limiter, the sliding-window CL balance decrease check,
+  the vault/burn attestation guards, the per-module validators balance increase
+  check, the second-opinion oracle call, keccak opaqueness, and the
+  `_getCLWithdrawals` / `_checkWithdrawalsVaultTransfer` /
+  `_finalizePostReportState` commit-path helpers.
+
+- Commands run:
+  - `lake build LidoSRv3.Audit.Source.SanityEnvelope
+    LidoSRv3.Audit.Guarantees.POracleSanity1
+    LidoSRv3.Tests.SanityEnvelopeParentMutants LidoSRv3.Audit.AllGuarantees`
+    dispatched to the remote Lean runner (toolchain `leanprover/lean4:v4.31.0`)
+    as job `8734eda8-5184-45c4-978d-fd82101784fe`. **At the time this section
+    was written the job had not yet reached a terminal state**: it was queued
+    behind two superseded jobs for earlier revisions of the same file, and the
+    runner exposes no cancellation path. The exit code is therefore not
+    recorded here and this receipt does not assert one. The PR is opened as a
+    draft for exactly this reason.
+  - Corroborating local elaboration (not a substitute for the runner):
+    `lean` 4.31.0 from `/root/.elan/toolchains/leanprover--lean4---v4.31.0`
+    — the same toolchain the runner pins — elaborated
+    `LidoSRv3/Audit/Source/SanityEnvelope.lean` (with its
+    `AccountingCorrespondence` import dropped, which it does not use),
+    `Registry.lean`, `POracleSanity1.lean` and
+    `SanityEnvelopeParentMutants.lean` as a four-module chain with zero errors,
+    including all seven kernel `decide` witnesses. `Mathlib.Tactic.SplitIfs`
+    was resolved against a *different* Mathlib revision than this repo's pin
+    (`fabf563a`), so this check corroborates the proofs but does not certify
+    the pinned dependency set.
+  - `python3 scripts/audit_metadata.py check` exit 0
+    (`audit metadata v4 ok: 11 canonical guarantees + 18 subordinate evidence rows`).
+  - `python3 scripts/check_proof_escapes.py` exit 0; `native_decide` inventory
+    digest unchanged at `187f9bad…d14e81`.
+  - `python3 scripts/check_public_claim_surfaces.py` exit 0.
+  - `python3 scripts/test_public_claim_surfaces.py` exit 0.
+  - `PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py` exit 0.
+  - `bash scripts/test_check_proof_escapes.sh` exit 0.
+  - `bash scripts/check_no_python_evidence.sh` exit 0.
+  - `bash scripts/test_check_no_python_evidence.sh` exit 0.
+  - `python3 scripts/test_verity_provenance.py` and
+    `bash scripts/check_provenance_guards.sh` require the resolved Verity
+    checkout (`.lake/packages/verity`), which is not materialized in this
+    environment; unchanged by this work.
+- The canonical minimal-11 public facade is unchanged: `all.length = 11` and
+  its ID/order regression still hold. This work only extends `supplemental`.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree`.
