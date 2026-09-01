@@ -408,9 +408,16 @@ README_FIDELITY_ROW = re.compile(
 # skip from 6 to 8 with `P-CONSOLIDATION-ETH-1` re-filed in an appendix and every
 # check below still passed.  The table is located by its own header, so its rows
 # are read from it and from nowhere else.
+# A header line alone does not make a table.  Markdown renders one only when the
+# next line is a delimiter row whose every cell is one or more hyphens, with
+# optional alignment colons; `|     |     |     |` is pipes and spaces and
+# delimits nothing, so accepting `[ \t\-|]+` let the headline and its gap counts
+# collapse into paragraph text while this gate still read them as a table.  The
+# cell counts must agree too: Markdown drops the table entirely when the
+# delimiter row is not as wide as the header it underlines.
 README_HEADLINE_TABLE = re.compile(
-    r"^\|\s*#\s*\|\s*ID\s*\|[^\n]*\|\s*Fidelity gaps\s*\|[ \t]*\n"
-    r"\|[ \t\-|]+\|[ \t]*\n"
+    r"^(?P<header>\|\s*#\s*\|\s*ID\s*\|[^\n]*\|\s*Fidelity gaps\s*\|)[ \t]*\n"
+    r"(?P<delimiter>\|(?:[ \t]*:?-+:?[ \t]*\|)+)[ \t]*\n"
     r"(?P<body>(?:\|[^\n]*\|[ \t]*\n)+)",
     re.MULTILINE,
 )
@@ -561,6 +568,15 @@ def validate_readme_fidelity_disclosure(rows):
             "the gap counts qualify the CHECKED cells a reader meets first, and a second "
             "table claiming those columns would compete with that disclosure")
     headline = tables[0]
+    # Markdown only renders the table when the delimiter row underlines exactly
+    # the columns the header declares; a narrower or wider one drops the whole
+    # block to paragraph text, taking the published gap counts with it.
+    columns = headline.group("header").count("|") - 1
+    delimiters = headline.group("delimiter").count("|") - 1
+    require(columns == delimiters,
+            f"README: the headline table's delimiter row underlines {delimiters} column(s) "
+            f"but its header declares {columns}; Markdown renders neither the CHECKED "
+            "cells nor the gap counts that qualify them as a table at all")
     table = headline.group("body")
     canonical = rows[:len(CANONICAL_IDS)]
     printed = [m.group(1) for m in README_FIDELITY_ROW.finditer(table)]

@@ -175,6 +175,22 @@ HTML_BLOCK_BARE_TAG = re.compile(rf"^ {{0,3}}{HTML_TAG}[ \t]*$")
 # toward the section it is no longer in.
 SECTION = re.compile(r"^## Theorems$(?P<body>.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL)
 
+# Being pipe-shaped and inside the section is not enough to be a row: Markdown
+# renders a table only where a header is underlined by a delimiter row whose
+# every cell is one or more hyphens, alignment colons optional.  Reading rows
+# from the section body directly meant deleting that one delimiter line left the
+# whole inventory rendering as a single paragraph of literal text — no table,
+# no rows, nothing a reader could read as the published inventory — while this
+# gate went on parsing the lines and reporting success.  The table is located
+# first and rows are read from its body alone.
+THEOREM_TABLE = re.compile(
+    r"^ {0,3}(?P<header>\|[^\n]*\|[ \t]*Line[ \t]*\|[ \t]*Plane[ \t]*\|"
+    r"[ \t]*Registered[ \t]*\|[ \t]*Role[ \t]*\|)[ \t]*\n"
+    r" {0,3}(?P<delimiter>\|(?:[ \t]*:?-+:?[ \t]*\|)+)[ \t]*\n"
+    r"(?P<body>(?: {0,3}\|[^\n]*\n)*)",
+    re.MULTILINE,
+)
+
 # A top-level declaration is not always a bare `theorem` in column zero.  Lean
 # accepts leading whitespace, attribute blocks, visibility/reducibility
 # modifiers, and `lemma` as an alias for `theorem`; every one of those is
@@ -468,14 +484,35 @@ def main():
     if not section:
         fail(f"{REPORT.relative_to(ROOT)} has no `## Theorems` section, so the "
              "inventory a reader meets cannot be located")
+    tables = list(THEOREM_TABLE.finditer(section.group("body")))
+    if len(tables) != 1:
+        fail(f"{REPORT.relative_to(ROOT)} has {len(tables)} rendered theorem tables in "
+             "its `## Theorems` section, expected exactly one; without a header "
+             "underlined by a delimiter row the inventory renders as literal text "
+             "rather than as the table it is published as")
+    table = tables[0]
+    # Markdown drops the table when the delimiter row does not underline exactly
+    # the columns the header declares, so a row-shaped line under a mismatched
+    # delimiter is paragraph text too.
+    columns = table.group("header").count("|") - 1
+    delimiters = table.group("delimiter").count("|") - 1
+    if columns != delimiters:
+        fail(f"{REPORT.relative_to(ROOT)} underlines {delimiters} column(s) beneath a "
+             f"theorem-table header declaring {columns}; Markdown renders no table at "
+             "all, so the inventory a reader meets is literal text")
+    # The inventory begins where the delimiter row ends: a row printed above the
+    # header shares the section but is not in the table a reader reads, so the
+    # window runs from the table's first row to the end of the section rather
+    # than from the section's own start.
+    start = section.start("body") + table.start("body")
+    end = section.end("body")
     stray = sorted({m.group("name") for m in ROW.finditer(report)
-                    if not section.start("body") <= m.start() < section.end("body")})
+                    if not start <= m.start() < end})
     if stray:
-        fail(f"{REPORT.relative_to(ROOT)} prints inventory row(s) outside the "
-             f"`## Theorems` section: {', '.join(stray)}; a row filed elsewhere is "
-             "still a published claim, and the section is what a reader reads as the "
-             "inventory")
-    matches = list(ROW.finditer(section.group("body")))
+        fail(f"{REPORT.relative_to(ROOT)} prints inventory row(s) outside the rendered "
+             f"theorem table: {', '.join(stray)}; a row filed elsewhere is still a "
+             "published claim, and that table is what a reader reads as the inventory")
+    matches = list(ROW.finditer(report[start:end]))
     repeated = sorted(name for name, count in
                       Counter(m.group("name") for m in matches).items() if count > 1)
     if repeated:

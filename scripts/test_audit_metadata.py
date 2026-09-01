@@ -518,6 +518,30 @@ def main():
                 invoke(fixture, True)
                 readme_path.write_text(readme, encoding="utf-8")
 
+        # The headline is a table only because one delimiter row underlines it.
+        # Blank its cells or make it disagree with the header's width and
+        # Markdown renders the CHECKED cells and the gap counts that qualify
+        # them as a run of paragraph text instead.
+        delimiter = "| --- | --- | --- | --- | --- |"
+        for mutant, needle in (
+            ("", "found 0 headline fidelity tables"),
+            ("|     |     |     |     |     |", "found 0 headline fidelity tables"),
+            ("| --- | --- |", "underlines 2 column(s)"),
+            ("| --- | --- | --- | --- | --- | --- |", "underlines 6 column(s)"),
+        ):
+            body = readme.replace(f"{delimiter}\n", f"{mutant}\n" if mutant else "", 1)
+            readme_path.write_text(body, encoding="utf-8")
+            invoke(fixture, False, needle, command="check")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Alignment colons belong to a valid delimiter, so the table must still
+        # be located through them; otherwise no aligned headline could pass.
+        readme_path.write_text(
+            readme.replace(delimiter, "| :--- | ---: | :-: | --- | --- |", 1),
+            encoding="utf-8")
+        invoke(fixture, True, command="check")
+        readme_path.write_text(readme, encoding="utf-8")
+
         invoke(fixture, True, command="generate")
         (fixture / "audit/STATUS.md").write_text("stale\n", encoding="utf-8")
         invoke(fixture, False, "STATUS.md is stale", command="check")
@@ -541,7 +565,10 @@ def main():
           "introduction, deleted, unheaded and its title demoted all rejected, while a "
           "renamed title, a longer block, a redundant restatement, and each "
           "qualification restated through inline markup that still renders it stay "
-          "accepted")
+          "accepted; and the delimiter row that makes the headline a table deleted, "
+          "blanked to pipes and spaces, and narrowed and widened away from the "
+          "header's column count all rejected, with alignment colons still located "
+          "as the table they render")
 
 
 if __name__ == "__main__":

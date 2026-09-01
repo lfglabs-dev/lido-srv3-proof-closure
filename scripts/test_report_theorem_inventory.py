@@ -817,7 +817,7 @@ def main():
             raise AssertionError(f"expected 8 inventory rows, read {len(inventory_rows)}")
         for line in inventory_rows:
             name = CHECK.ROW.match(line).group("name")
-            needle = ("prints inventory row(s) outside the `## Theorems` section: "
+            needle = ("prints inventory row(s) outside the rendered theorem table: "
                       f"{name}")
 
             relocated = report.replace(f"{line}\n", "", 1).replace(
@@ -839,7 +839,7 @@ def main():
         report_path.write_text(report.replace(
             elsewhere, f"## Theorems\n\n{section.group('body').strip()}\n\n{elsewhere}", 1),
             encoding="utf-8")
-        invoke(fixture, False, "prints inventory row(s) outside the `## Theorems` section")
+        invoke(fixture, False, "prints inventory row(s) outside the rendered theorem table")
         report_path.write_text(report, encoding="utf-8")
 
         # And the section has to be locatable at all: renaming or demoting the
@@ -1001,6 +1001,31 @@ def main():
             invoke(fixture, False, needle)
             lean_path.write_text(lean, encoding="utf-8")
 
+        # The header and its rows are only a table because one delimiter line
+        # underlines them.  Delete it, blank its cells, or make it disagree with
+        # the header's width and Markdown renders the whole inventory as a
+        # paragraph of literal text, so the rows a reader meets are not rows.
+        delimiter = "| --- | --- | --- | --- | --- |"
+        for mutant, needle in (
+            ("", "0 rendered theorem tables"),
+            ("|     |     |     |     |     |", "0 rendered theorem tables"),
+            ("| --- | --- |", "underlines 2 column(s)"),
+            ("| --- | --- | --- | --- | --- | --- |", "underlines 6 column(s)"),
+        ):
+            body = report.replace(f"{delimiter}\n", f"{mutant}\n" if mutant else "", 1)
+            report_path.write_text(body, encoding="utf-8")
+            invoke(fixture, False, needle)
+            report_path.write_text(report, encoding="utf-8")
+
+        # Alignment colons are part of a valid delimiter, so a table that carries
+        # them must still be read: rejecting it would leave no way to publish a
+        # left-, right- or centre-aligned inventory.
+        report_path.write_text(
+            report.replace(delimiter, "| :--- | ---: | :-: | --- | --- |", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "8 P-ALLOC-1 theorems")
+        report_path.write_text(report, encoding="utf-8")
+
         invoke(fixture, True)
 
     print("report theorem inventory mutants rejected: dropped row, undisclosed theorem "
@@ -1068,7 +1093,10 @@ def main():
           "either outside it not counted as a stray claim, and 17 look-alike "
           "openers — 13 above the section and 4 directly above the first row, "
           "where a block would blank the whole inventory — asserted to leave the "
-          "real table rendered")
+          "real table rendered; and the one delimiter row that makes the header "
+          "and its rows a table deleted, blanked to pipes and spaces, and "
+          "narrowed and widened away from the header's column count all "
+          "rejected, with alignment colons still read as the table they render")
 
 
 if __name__ == "__main__":
