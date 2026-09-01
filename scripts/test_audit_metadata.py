@@ -532,12 +532,24 @@ def main():
             "|     |     |     |     |     |",
             "| --- | --- |",
             "| --- | --- | --- | --- | --- | --- |",
-            "  | --- | --- | --- | --- | --- |",
             "    | --- | --- | --- | --- | --- |",
         ):
             body = readme.replace(f"{delimiter}\n", f"{mutant}\n" if mutant else "", 1)
             readme_path.write_text(body, encoding="utf-8")
             invoke(fixture, False, "found 0 headline fidelity tables", command="check")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Up to three columns of indentation is ordinary block markup, and the
+        # fourth is what makes an indented chunk: the delimiter, the header and a
+        # row are each indented in turn and the headline must still be located,
+        # or the gate would reject a table cmark-gfm plainly renders.
+        for indented in (readme.replace(delimiter, f"  {delimiter}", 1),
+                         readme.replace(header, f"   {header}", 1),
+                         readme.replace(rows[0], f" {rows[0]}", 1)):
+            if indented == readme:
+                raise AssertionError("short-indent control changed nothing")
+            readme_path.write_text(indented, encoding="utf-8")
+            invoke(fixture, True, command="check")
             readme_path.write_text(readme, encoding="utf-8")
 
         # Adversarial (certified defect 2 family): an escaped pipe is a `|`
@@ -622,9 +634,10 @@ def main():
           "renamed title, a longer block, a redundant restatement, and each "
           "qualification restated through inline markup that still renders it stay "
           "accepted; and the delimiter row that makes the headline a table deleted, "
-          "blanked to pipes and spaces, narrowed, widened, and indented to two and to "
-          "four columns all rejected, with alignment colons still located as the table "
-          "they render; the escaped pipe that delimits no cell driven through every "
+          "blanked to pipes and spaces, narrowed, widened, and indented into a "
+          "four-column chunk all rejected, with alignment colons and up to three "
+          "columns of indentation on the delimiter, the header and a row all still "
+          "located as the table they render; the escaped pipe that delimits no cell driven through every "
           "header cell in three spellings under a delimiter widened to match its "
           "characters — the shape that rendered no table on the page while every gap "
           "count below was checked against it — rejected, with the same header at its "

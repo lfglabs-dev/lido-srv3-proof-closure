@@ -1064,12 +1064,26 @@ def main():
             "|     |     |     |     |     |",
             "| --- | --- |",
             "| --- | --- | --- | --- | --- | --- |",
-            "  | --- | --- | --- | --- | --- |",
             "    | --- | --- | --- | --- | --- |",
         ):
             body = report.replace(f"{delimiter}\n", f"{mutant}\n" if mutant else "", 1)
             report_path.write_text(body, encoding="utf-8")
             invoke(fixture, False, "0 rendered theorem tables")
+            report_path.write_text(report, encoding="utf-8")
+
+        # Up to three columns of indentation is ordinary block markup, and the
+        # fourth is what makes an indented chunk: the delimiter, the header and a
+        # row are each indented in turn and the inventory must still be read, or
+        # the gate would reject a table cmark-gfm plainly renders.
+        header_line = next(line for line in section.group("body").splitlines()
+                           if line.endswith("| Line | Plane | Registered | Role |"))
+        for indented in (report.replace(delimiter, f"  {delimiter}", 1),
+                         report.replace(header_line, f"   {header_line}", 1),
+                         report.replace(inventory_rows[0], f" {inventory_rows[0]}", 1)):
+            if indented == report:
+                raise AssertionError("short-indent control changed nothing")
+            report_path.write_text(indented, encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
 
         # Adversarial (certified defect 1 family): an escaped pipe is a `|`
@@ -1081,8 +1095,7 @@ def main():
         # gate reported eight theorems and two registrations.  Each cell of the
         # header is driven, and each is also driven with the delimiter left at
         # its true width, where the table does render and must still be read.
-        header = next(line for line in section.group("body").splitlines()
-                      if line.endswith("| Line | Plane | Registered | Role |"))
+        header = header_line
         wide = "| --- | --- | --- | --- | --- | --- |"
         escapes = ("\\|", "\\\\|", "\\\\\\|")
         cells = [cell for cell in header.strip("|").split("|")]
@@ -1219,8 +1232,9 @@ def main():
           "asserted to take the rows below it out of the rendered table too; and "
           "the one delimiter row that makes the header and its rows a table "
           "deleted, blanked to pipes and spaces, narrowed, widened, and indented "
-          "to two and to four columns all rejected, with alignment colons still "
-          "read as the table they render; and the escaped pipe that delimits no "
+          "into a four-column chunk all rejected, with alignment colons and up to "
+          "three columns of indentation on the delimiter, the header and a row all "
+          "still read as the table they render; and the escaped pipe that delimits no "
           "cell driven through every header cell in three spellings under a "
           "delimiter widened to match its characters — the shape that rendered "
           "no table at all while the gate reported eight theorems — rejected, "

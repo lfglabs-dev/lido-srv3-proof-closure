@@ -356,7 +356,7 @@ def _literal_lines(lines: list[Row]) -> list[bool]:
     return literal
 
 
-def find_tables(text: str) -> list[Table]:
+def find_tables(text: str, *, interrupting: bool = False) -> list[Table]:
     """Every block of ``text`` cmark-gfm renders as a table, in source order.
 
     Recognition is the renderer's own: a header row, then a delimiter row whose
@@ -370,11 +370,38 @@ def find_tables(text: str) -> list[Table]:
     line above, and never opens a table in that paragraph again, so a widened
     delimiter does not merely drop its own table: it also stops any later
     header/delimiter pair in the same paragraph from becoming one.
+
+    ``interrupting`` selects which way to be wrong where the two are exclusive.
+    A table may legitimately interrupt a paragraph -- cmark-gfm takes the
+    paragraph's last line as the header -- but reading one means reconstructing
+    what opened that paragraph, and the residual disagreements this reader has
+    with cmark-gfm are all of that shape.  Left false, a header that does not
+    begin its own block is declined, which cost nothing in 200k differentially
+    fuzzed documents; that is what a caller asking *which rows does this
+    published table print* wants, because declining makes the gate report the
+    table missing and fail closed.  Set true by a caller asking *where does GFM
+    place its cell and row separators*, where omitting a table omits separators
+    and so leaves an inline construct joined that GFM may split -- the
+    over-suppressing direction, which can hide a published row but can never
+    invent one.
     """
     lines = _lines(text)
     literal = _literal_lines(lines)
-    container = [bool(_BLOCK_QUOTE.match(row.text) or _LIST_ITEM.match(row.text))
-                 for row in lines]
+    # Whether each line may sit inside a list item or a block quote.  A
+    # container opens at its marker and keeps holding indented and blank lines
+    # after it -- a blank line does not close a list -- so looking only at the
+    # current chunk let an indented header two lines below a `- ` marker pose as
+    # a top-level table.  A line that returns to column zero without a marker of
+    # its own is outside again.  The rule is deliberately coarse: it can only
+    # decline a table, never invent one.
+    container = []
+    inside = False
+    for row in lines:
+        if _BLOCK_QUOTE.match(row.text) or _LIST_ITEM.match(row.text):
+            inside = True
+        elif row.text.strip() and not row.text[:1].isspace():
+            inside = False
+        container.append(inside)
     # Where each paragraph begins: a table this reader will read must be a
     # paragraph's own first line, so the header is never a continuation whose
     # container it would have to reconstruct.
@@ -414,28 +441,33 @@ def find_tables(text: str) -> list[Table]:
             and not ends_table(delimiter_line)
             and not _SETEXT_UNDERLINE.match(delimiter_line)
         )
-        if not header_cells or underlines_heading or not delimits:
+        if underlines_heading or not delimits:
             index += 1
             continue
-        if len(delimiter_cells) != len(header_cells):
+        # The paragraph is burned by the *attempt*, not by the match.  A line
+        # that declares no cell at all -- a lone `|` -- is still the header
+        # cmark-gfm measures the delimiter against, so a delimiter row under one
+        # spends the paragraph's single attempt exactly as a mismatched width
+        # does, and no later pair in that paragraph can open a table.
+        if not header_cells or len(delimiter_cells) != len(header_cells):
             burned = True
             index += 1
             continue
-        # A table indented at all, or sharing a chunk with a list or quote
-        # marker, may sit inside a container this reader does not descend into;
-        # the whole chunk back to the last blank line is checked so a lazy
-        # continuation of a list paragraph cannot pose as a header.  A header
-        # that does not itself begin a block is declined for the same reason:
-        # only a paragraph's own first line can be read without tracking what
-        # opened the paragraph.
+        # A table that may sit inside a list item or a block quote is declined:
+        # this reader does not strip a container prefix, so it cannot read one
+        # faithfully.  Two views of "may" are taken together, because each
+        # catches what the other misses: the running span, which keeps a list
+        # open across the blank lines and indented lines that follow its marker,
+        # and the current chunk back to the last blank line, which catches a
+        # marker on a line the running span has already closed.  A header that
+        # does not itself begin a block is declined for the same reason unless
+        # the caller asks otherwise -- see ``interrupting`` above.
         chunk = index
         while chunk > 0 and lines[chunk - 1].text.strip():
             chunk -= 1
         if (burned
-                or not begins_paragraph[index]
-                or header_line[:1] in (" ", "\t")
-                or delimiter_line[:1] in (" ", "\t")
-                or any(container[chunk:index + 1])):
+                or not (interrupting or begins_paragraph[index])
+                or any(container[chunk:index + 2])):
             index += 1
             continue
         # A body line that declares no cell at all -- a lone `|`, or a line
