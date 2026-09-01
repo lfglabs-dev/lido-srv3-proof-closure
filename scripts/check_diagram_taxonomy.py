@@ -206,9 +206,21 @@ CARD_ADDRESS = re.compile(r'<div class="a">(.*?)</div>')
 
 # HTML comments render as nothing.  A verifier name or a required phrase
 # hidden inside <!-- … --> is not visible to a reader and must not satisfy
-# any check.  Applied before scanning for mentions (verifier_claims) and
-# before searching the README for required taxonomy content.
+# any check.  Applied to the full HTML before any scan, and before
+# searching the README for required taxonomy content.
 _COMMENT = re.compile(r'<!--.*?-->', re.DOTALL)
+
+
+def _address_in(text, addr):
+    """True iff addr appears in text as a standalone hex address token.
+
+    Substring containment lets a malformed address that merely extends a
+    valid one (e.g. the full address with a trailing `0`) satisfy the
+    check, because the valid prefix is still present inside the longer
+    string.  Requiring no adjacent hex character on either side enforces
+    token boundaries without depending on surrounding punctuation.
+    """
+    return bool(re.search(r'(?<![0-9a-f])' + re.escape(addr) + r'(?![0-9a-f])', text))
 
 
 def fail(message):
@@ -258,7 +270,10 @@ def verifier_claims(where, text, own):
 
 
 def main():
-    html = fold(DIAGRAM.read_text(encoding="utf-8"))
+    # Strip HTML comments before all scans: content inside <!-- … --> is not
+    # rendered to a reader and must not contribute to any check — whether
+    # identifying an entity, enforcing a class, or verifying required text.
+    html = _COMMENT.sub(" ", fold(DIAGRAM.read_text(encoding="utf-8")))
 
     nodes = []
     for match in NODE.finditer(html):
@@ -306,7 +321,7 @@ def main():
             forms = (address.lower(), abbreviated(address).lower())
             located = False
             for name, kind, identity in boxes:
-                if not any(form in identity.lower() for form in forms):
+                if not any(_address_in(identity.lower(), form) for form in forms):
                     continue
                 located = True
                 if kind != expected:

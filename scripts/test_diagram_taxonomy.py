@@ -261,6 +261,24 @@ def main():
                     splice(diagram, box, ""),
                     f"{entity} ({address})",
                 ))
+                # An entity wrapped in an HTML comment is invisible to a
+                # reader; the checker must not count it as present.
+                family.append((
+                    splice(diagram, box, f"<!-- {box.group(0)} -->"),
+                    f"{entity} ({address})",
+                ))
+                # An address extended by an adjacent hex digit is a
+                # different, invalid address; substring containment accepts
+                # it while token-boundary matching does not.
+                abbr = CHECK.abbreviated(address)
+                extended_box = (box.group(0)
+                    .replace(address, address + "0")
+                    .replace(abbr, abbr + "0"))
+                if extended_box != box.group(0):
+                    family.append((
+                        splice(diagram, box, extended_box),
+                        f"{entity} ({address})",
+                    ))
 
         # The proof-gated boxes carry no address, so the label each surface
         # wears is the only handle their class rule has.  Repainting one,
@@ -542,7 +560,11 @@ def main():
           "the README entry and on the rendered legend pill (restated, stripped, and "
           "with the slashable consequence dropped); "
           f"every one of {len(CHECK.IDENTITY)} address-bound entities relabel-repainted "
-          "and deleted per surface, every proof-gated box repainted, deleted and merely "
+          "and deleted per surface, every one comment-wrapped per surface "
+          "(entity inside <!-- … --> is invisible to a reader and must not be counted "
+          "as present), and every one with its address extended by a trailing hex digit "
+          "per surface (malformed address must not satisfy a token-boundary check via "
+          "substring containment); every proof-gated box repainted, deleted and merely "
           "reworded per surface (the combined `Consolidation pipeline` canvas node and "
           "the `ConsolidationGateway` card bound independently), and a rename that keeps "
           "its address and colour still rejected for retiring its taxonomy rule; "
