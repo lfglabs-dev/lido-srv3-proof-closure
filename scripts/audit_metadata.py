@@ -453,6 +453,54 @@ README_UNRENDERED = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 
+# A Markdown link reference definition (`[label]: url "title"`) is metadata;
+# it renders as nothing.  Hiding a required qualification inside a link title
+# left `README_UNRENDERED` (which only strips HTML) unable to remove it, so
+# the blockquote check found the text in a position a reader never sees.
+# This pattern matches a definition line inside a blockquote (the `> ` prefix
+# is preserved from `README_HEADLINE_BLOCK`'s capture group).
+_BLOCKQUOTE_LINK_DEF = re.compile(
+    r"^>[^\S\n]* {0,3}\[(?:[^\[\]\n]|\\.)*\][^\S\n]*:[^\n]*\n",
+    re.MULTILINE,
+)
+
+
+def _mask_readme(text):
+    """Position-preserving blank of non-rendered regions in the README.
+
+    A pipe line inside a code fence or HTML block is printed as raw text,
+    not as a table row.  Searching the raw README let a table wrapped in
+    `<!--` … `-->` or a code fence satisfy the headline-table gate while the
+    rendered page showed nothing.  Each masked character is replaced with a
+    space so every position in the result corresponds to the same position in
+    the original; this keeps the body-position range the stray-row detection
+    compares against consistent with `README_FIDELITY_ROW.finditer(readme)`.
+    """
+    def blank(m):
+        return "".join(" " if c != "\n" else "\n" for c in m.group(0))
+
+    # Blank HTML constructs first, preserving positions.
+    masked = README_UNRENDERED.sub(blank, text)
+
+    # Blank Markdown code fences.  A closing fence repeats the opening
+    # character at least as many times; a backtick fence carries no backtick
+    # in its info string (to exclude inline code spans on the same line).
+    lines = masked.splitlines(True)
+    fence = None
+    for index, line in enumerate(lines):
+        stripped = line.rstrip("\r\n")
+        if fence is not None:
+            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$", stripped)
+            if m and m.group("seq")[0] == fence[0] and len(m.group("seq")) >= fence[1]:
+                fence = None
+            lines[index] = "".join(" " if c not in "\r\n" else c for c in line)
+        else:
+            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$", stripped)
+            if m and not (m.group("seq")[0] == "`" and "`" in m.group("info")):
+                fence = (m.group("seq")[0], len(m.group("seq")))
+                lines[index] = "".join(" " if c not in "\r\n" else c for c in line)
+    return "".join(lines)
+
 
 def validate_readme_fidelity_disclosure(rows):
     """Bind the README headline table to the registry's own fidelity counts.
@@ -464,7 +512,14 @@ def validate_readme_fidelity_disclosure(rows):
     `fidelity.missing`.
     """
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    tables = list(README_HEADLINE_TABLE.finditer(readme))
+    # A pipe line inside a code fence or HTML block renders as literal text, not
+    # as a table row, so wrapping the headline table in `<!--` … `-->` or a code
+    # fence left the raw-text search finding it while the rendered page showed
+    # nothing.  The masked version blanks every non-rendered region character-
+    # for-character (preserving newlines), so positions in `masked_readme` are
+    # identical to positions in `readme` and stray-row detection remains sound.
+    masked_readme = _mask_readme(readme)
+    tables = list(README_HEADLINE_TABLE.finditer(masked_readme))
     require(len(tables) == 1,
             f"README: found {len(tables)} headline fidelity tables, expected exactly one; "
             "the gap counts qualify the CHECKED cells a reader meets first, and a second "
@@ -518,7 +573,12 @@ def validate_readme_fidelity_disclosure(rows):
     require(opening is not None,
             "README: no headline blockquote under the title, so the qualifications a "
             "reader meets before the CHECKED table cannot be located")
+    # Strip HTML constructs that publish no visible text, then also strip
+    # Markdown link reference definitions whose titles could carry the required
+    # phrases while rendering as nothing.  Both passes remove text, so a
+    # qualification that survives is one a reader actually sees.
     block = README_UNRENDERED.sub("", opening.group("block"))
+    block = _BLOCKQUOTE_LINK_DEF.sub("", block)
     require(f"{total} in total" in block,
             f"README: the headline blockquote must render the {total} total fidelity "
             "gaps as visible text; a count stated only further down, or only inside a "

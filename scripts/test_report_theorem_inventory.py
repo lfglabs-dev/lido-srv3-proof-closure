@@ -732,12 +732,17 @@ def main():
         # The qualified name must round-trip: the row parser has to accept the
         # very name the scope tracker produces, or the gate would demand a row no
         # edit to the report could satisfy.  A `section` closes like any other
-        # scope but contributes nothing to a name, named or not.
+        # scope but contributes nothing to a name, named or not.  A bare `end`
+        # is valid Lean regardless of whether the opening label was named, so
+        # `namespace Inner … end` and `section Named … end` must both succeed
+        # here; the checker previously compared `None != "Inner"` and rejected.
         for opener, closer, qualified in (
             ("namespace Inner", "end Inner", "Inner.scoped_thm"),
             ("namespace Outer.Deep", "end Outer.Deep", "Outer.Deep.scoped_thm"),
+            ("namespace Inner", "end", "Inner.scoped_thm"),
             ("section", "end", "scoped_thm"),
             ("section Named", "end Named", "scoped_thm"),
+            ("section Named", "end", "scoped_thm"),
         ):
             declaration = "theorem scoped_thm : True := trivial"
             scoped_lean = lean.replace(
@@ -992,7 +997,8 @@ def main():
           "whitespace layouts still read, with a repeat and a Lean-absent row in "
           "each rejected rather than slipping past the parser on padding; "
           "same-leaf theorems in sibling namespaces demanded as distinct "
-          "qualified names, qualified and sectioned names round-tripping to rows, "
+          "qualified names, qualified and sectioned names round-tripping to rows "
+          "(including named namespaces and named sections closed with a bare `end`), "
           "and mis-nested, dangling and stray scope commands rejected; each "
           "REGISTERED row bound to the registry field and the plane it prints, "
           "with the registrations exchanged, the plane labels exchanged, both "

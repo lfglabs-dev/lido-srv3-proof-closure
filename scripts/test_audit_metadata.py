@@ -370,6 +370,21 @@ def main():
         invoke(fixture, False, "found 0 headline fidelity tables, expected exactly one")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # The table has to be rendered, not merely present in raw source.
+        # Wrapping it in an HTML comment preserves every raw pipe character but
+        # removes the table from the rendered page; a raw-text search would
+        # still find all eleven rows while a reader sees nothing.  The gate
+        # must search the rendered text and reject a table that lives only
+        # inside a comment.
+        table_header_pos = readme.index(header)
+        # The table runs to the first blank line after the header.
+        table_end = readme.index("\n\n", table_header_pos)
+        raw_table = readme[table_header_pos:table_end]
+        commented = readme.replace(raw_table, f"<!--\n{raw_table}\n-->", 1)
+        readme_path.write_text(commented, encoding="utf-8")
+        invoke(fixture, False, "found 0 headline fidelity tables, expected exactly one")
+        readme_path.write_text(readme, encoding="utf-8")
+
         # The boundary sentence and the total gap count are headline claims:
         # they qualify the CHECKED table before a reader reaches it, which is
         # the only reason they are stated up front.  Searching the whole README
@@ -425,6 +440,10 @@ def main():
                 f"> <textarea>{sentence}</textarea>\n",
                 f'> <span title="{sentence}">See the note.</span>\n',
                 f'> <img alt="{sentence}" src="x.png">\n',
+                # Thread 14: a Markdown link reference definition renders as
+                # nothing; its title is invisible to a reader but present in
+                # the raw source a naïve regex would search.
+                f'> [note]: http://example.com "{sentence}"\n',
             ):
                 readme_path.write_text(
                     readme.replace(block, muted_block + concealed, 1), encoding="utf-8")
@@ -499,10 +518,10 @@ def main():
           "columns, and the gap column repainted so the table cannot be located; and "
           "each headline qualification re-filed into an appendix, into prose above the "
           "table, into a later blockquote and dropped outright, and spelled inside the "
-          "block by each of 10 constructs that publish no visible text (single- and "
+          "block by each of 11 constructs that publish no visible text (single- and "
           "multi-line comments, a processing instruction, CDATA, a declaration, "
-          "`script`, `style` and `textarea` bodies, and `title`/`alt` attribute "
-          "values), with the opening blockquote demoted to prose, pushed below an "
+          "`script`, `style` and `textarea` bodies, `title`/`alt` attribute "
+          "values, and Markdown link reference definition titles), with the opening blockquote demoted to prose, pushed below an "
           "introduction, deleted, unheaded and its title demoted all rejected, while a "
           "renamed title, a longer block, a redundant restatement, and each "
           "qualification restated through inline markup that still renders it stay "

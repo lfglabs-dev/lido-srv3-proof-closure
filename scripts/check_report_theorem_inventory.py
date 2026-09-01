@@ -420,10 +420,12 @@ def declared_theorems():
                     fail(f"{LEAN.relative_to(ROOT)}:{line} closes a scope that was never "
                          "opened, so the names that follow cannot be qualified")
                 _, opened = scopes.pop()
-                if label != opened:
-                    closing = label or "an anonymous scope"
+                # A bare `end` is valid Lean: it closes the nearest open scope
+                # regardless of whether that scope was given a label.  Only
+                # reject when an explicit label was supplied but does not match.
+                if label is not None and label != opened:
                     open_scope = opened or "an anonymous scope"
-                    fail(f"{LEAN.relative_to(ROOT)}:{line} closes {closing} but "
+                    fail(f"{LEAN.relative_to(ROOT)}:{line} closes {label} but "
                          f"{open_scope} is open; the names declared here would be "
                          "qualified under the wrong scope")
             continue
