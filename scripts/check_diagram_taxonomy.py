@@ -204,6 +204,12 @@ LEGEND = re.compile(r'<span class="([a-z]+)"[^>]*>')
 LABEL = re.compile(r'<text class="nm"[^>]*>(.*?)</text>', re.DOTALL)
 CARD_ADDRESS = re.compile(r'<div class="a">(.*?)</div>')
 
+# HTML comments render as nothing.  A verifier name or a required phrase
+# hidden inside <!-- … --> is not visible to a reader and must not satisfy
+# any check.  Applied before scanning for mentions (verifier_claims) and
+# before searching the README for required taxonomy content.
+_COMMENT = re.compile(r'<!--.*?-->', re.DOTALL)
+
 
 def fail(message):
     raise SystemExit(f"diagram taxonomy: {message}")
@@ -230,6 +236,9 @@ def verifier_claims(where, text, own):
     with no box of its own passes `own=None`, so every mention there must name
     its gateway.
     """
+    # A verifier name inside an HTML comment is not visible to a reader and
+    # must not count as a published claim.
+    text = _COMMENT.sub(" ", text)
     holder = own
     claimed = set()
     for match in MENTION.finditer(text):
@@ -371,7 +380,9 @@ def main():
                  f"committee as its owner only {owned} time(s); the window is the "
                  "consolidation committee's REMOVE_ROLE, not the DSM guardians'")
 
-    readme = fold(DIAGRAM_README.read_text(encoding="utf-8"))
+    # Strip HTML comments before all README checks: text inside <!-- … --> is
+    # not rendered to a reader and must not satisfy any documentation claim.
+    readme = _COMMENT.sub(" ", fold(DIAGRAM_README.read_text(encoding="utf-8")))
     for phrase, why in REQUIRED:
         if phrase not in html:
             fail(f"{DIAGRAM.relative_to(ROOT)} never mentions {phrase!r}: {why}")

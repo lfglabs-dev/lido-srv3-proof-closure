@@ -330,6 +330,13 @@ def main():
                     splice(diagram, box, body.replace(verifier, f"{verifier} and {sibling}", 1)),
                     misattributed,
                 ))
+                # A verifier name hidden in an HTML comment is not visible to a
+                # reader and must not count as a published claim: the box must
+                # spell it in rendered text, not in a comment the reader never sees.
+                family.append((
+                    splice(diagram, box, body.replace(verifier, f"<!-- {verifier} -->")),
+                    f"the {label!r} box on the {surface} never names {verifier!r}",
+                ))
 
         # The consensus-layer rule is one claim with two halves: nothing else may
         # be painted `cl`, and the validator set must keep it.  Only the first
@@ -416,6 +423,33 @@ def main():
             raise AssertionError("README uncounted mutant changed nothing")
         readme_path.write_text(uncounted, encoding="utf-8")
         invoke(fixture, False, "no longer states how many classes are pinned")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # The README is checked as rendered Markdown; text inside an HTML
+        # comment is not shown to a reader and must not satisfy any check.
+        # Hiding the class-count sentence in a comment must be rejected even
+        # though the raw text still contains the right words.
+        count_sentence = f"the {correct} classes are pinned here"
+        if count_sentence not in readme:
+            raise AssertionError("README class-count sentence not found")
+        commented_count = readme.replace(count_sentence,
+                                         f"<!-- {count_sentence} -->", 1)
+        if commented_count == readme:
+            raise AssertionError("README comment-hiding mutant changed nothing")
+        readme_path.write_text(commented_count, encoding="utf-8")
+        invoke(fixture, False, "no longer states how many classes are pinned")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # Similarly, the `proof` entry hidden in a comment must also fail.
+        proof_match = CHECK.PROOF_ENTRY.search(readme)
+        if not proof_match:
+            raise AssertionError("proof entry not found in README")
+        proof_text = proof_match.group(0)
+        commented_proof = readme.replace(proof_text, f"<!-- {proof_text} -->", 1)
+        if commented_proof == readme:
+            raise AssertionError("README proof-entry comment mutant changed nothing")
+        readme_path.write_text(commented_proof, encoding="utf-8")
+        invoke(fixture, False, "does not document class 'proof'")
         readme_path.write_text(readme, encoding="utf-8")
 
         # The count is bound to the enforced set, not to the literal `six`:
@@ -517,9 +551,11 @@ def main():
           "rejected in both directions of the one-genuine-`cl`-entity rule; "
           f"each of the {sum(len(s) for s in CHECK.VERIFIER_SURFACE.values())} gateway "
           "boxes had the verifier it inherits relocated off the box, exchanged for its "
-          "sibling's, and claimed alongside its sibling's, and the README `proof` entry "
+          "sibling's, claimed alongside its sibling's, and hidden in an HTML comment "
+          "(each rejected separately per surface), and the README `proof` entry "
           "had the pairing swapped, either half of it dropped, and a verifier named with "
-          "no gateway to attribute it to")
+          "no gateway to attribute it to; the README class-count sentence and the "
+          "README `proof` entry hidden in HTML comments each rejected")
 
 
 if __name__ == "__main__":
