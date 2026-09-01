@@ -38,6 +38,10 @@ def main():
         (fixture / "LidoSRv3/Audit/Provenance").mkdir(parents=True)
         (fixture / "fixtures/solidity-reference").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
+        # The generator reads the published table through the shared cmark-gfm
+        # table reader, so the fixture tree must carry it or every mutant would
+        # fail on an import error rather than on the claim it is testing.
+        shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
@@ -523,15 +527,67 @@ def main():
         # Markdown renders the CHECKED cells and the gap counts that qualify
         # them as a run of paragraph text instead.
         delimiter = "| --- | --- | --- | --- | --- |"
-        for mutant, needle in (
-            ("", "found 0 headline fidelity tables"),
-            ("|     |     |     |     |     |", "found 0 headline fidelity tables"),
-            ("| --- | --- |", "underlines 2 column(s)"),
-            ("| --- | --- | --- | --- | --- | --- |", "underlines 6 column(s)"),
+        for mutant in (
+            "",
+            "|     |     |     |     |     |",
+            "| --- | --- |",
+            "| --- | --- | --- | --- | --- | --- |",
+            "  | --- | --- | --- | --- | --- |",
+            "    | --- | --- | --- | --- | --- |",
         ):
             body = readme.replace(f"{delimiter}\n", f"{mutant}\n" if mutant else "", 1)
             readme_path.write_text(body, encoding="utf-8")
-            invoke(fixture, False, needle, command="check")
+            invoke(fixture, False, "found 0 headline fidelity tables", command="check")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Adversarial (certified defect 2 family): an escaped pipe is a `|`
+        # character that delimits no cell.  Writing one into the header narrows
+        # the header by a column while leaving the character count unchanged, so
+        # a delimiter row widened to match the *characters* balanced the old
+        # count-the-pipes check exactly — and cmark-gfm, reading a five-cell
+        # header under a six-cell delimiter, rendered no table on the page while
+        # every gap count below was checked against it.  Each cell of the header
+        # is driven, and each is also driven at the header's true width, where
+        # the table does render and must still be read.
+        wide = "| --- | --- | --- | --- | --- | --- |"
+        cells = header.strip("|").split("|")
+        if len(cells) != 5:
+            raise AssertionError(f"expected a 5-cell headline header, read {cells}")
+        for position in range(len(cells)):
+            for escape in ("\\|", "\\\\|", "\\\\\\|"):
+                mutated = list(cells)
+                mutated[position] = f"{mutated[position].rstrip()} {escape} alias "
+                spoiled = "|" + "|".join(mutated) + "|"
+                readme_path.write_text(
+                    readme.replace(header, spoiled, 1).replace(delimiter, wide, 1),
+                    encoding="utf-8")
+                invoke(fixture, False, "found 0 headline fidelity tables", command="check")
+                # The middle two columns are free text; the index, the ID and
+                # the gap-count column are what the disclosure is bound to, so
+                # rewording one of those retires the table this gate checks.
+                readme_path.write_text(readme.replace(header, spoiled, 1), encoding="utf-8")
+                free = position in (2, 3)
+                invoke(fixture, free, None if free else "found 0 headline fidelity tables",
+                       command="check")
+                readme_path.write_text(readme, encoding="utf-8")
+
+        # Adversarial (certified defect 4 family): the headline is a position,
+        # not just a shape.  A table that renders perfectly but sits under a
+        # trailing heading publishes its gap counts after the CHECKED cells they
+        # qualify, and the headline a reader meets first carries none of them.
+        table_start = readme.index(header)
+        table_end = readme.index("\n\n", table_start)
+        whole_table = readme[table_start:table_end + 1]
+        for relocated in (
+            readme.replace(whole_table, "", 1).rstrip("\n") + f"\n\n## Appendix\n\n{whole_table}",
+            readme.replace(whole_table, "", 1).replace(
+                "## Reproduce", f"## Status\n\n{whole_table}\n## Reproduce", 1),
+        ):
+            if whole_table in relocated.split("## ")[0]:
+                raise AssertionError("headline-table relocation mutant changed nothing")
+            readme_path.write_text(relocated, encoding="utf-8")
+            invoke(fixture, False, "not in the headline above the first section",
+                   command="check")
             readme_path.write_text(readme, encoding="utf-8")
 
         # Alignment colons belong to a valid delimiter, so the table must still
@@ -566,9 +622,17 @@ def main():
           "renamed title, a longer block, a redundant restatement, and each "
           "qualification restated through inline markup that still renders it stay "
           "accepted; and the delimiter row that makes the headline a table deleted, "
-          "blanked to pipes and spaces, and narrowed and widened away from the "
-          "header's column count all rejected, with alignment colons still located "
-          "as the table they render")
+          "blanked to pipes and spaces, narrowed, widened, and indented to two and to "
+          "four columns all rejected, with alignment colons still located as the table "
+          "they render; the escaped pipe that delimits no cell driven through every "
+          "header cell in three spellings under a delimiter widened to match its "
+          "characters — the shape that rendered no table on the page while every gap "
+          "count below was checked against it — rejected, with the same header at its "
+          "own true width still located when the escape is in a free-text column and "
+          "rejected when it rewords the index, the ID or the gap-count column; and the "
+          "whole table relocated under a trailing appendix and under a later section "
+          "rejected, since a gap count a reader reaches only after the CHECKED cells "
+          "it was written to qualify no longer qualifies them")
 
 
 if __name__ == "__main__":
