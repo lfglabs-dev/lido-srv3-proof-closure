@@ -9,7 +9,9 @@ quorum-held, which moves the committee off `HashConsensus` where it lives.  A
 third is attributing the consolidation batch veto to the DSM guardians when
 `ConsolidationBus.REMOVE_ROLE` belongs to the consolidation committee.  A
 fourth is dropping a box out of the `proof` class, which is the claim that it
-only acts behind a beacon-root proof.
+only acts behind a beacon-root proof.  A fifth is printing one entity's
+deployed address on another's box: the class stays right, so no colour rule
+notices, while the reader is told to look up the wrong contract.
 
 Each is pinned here against `diagram/README.md`, which carries the citations.
 """
@@ -24,25 +26,61 @@ DIAGRAM_README = ROOT / "diagram/README.md"
 
 CLASSES = ("el", "proof", "com", "bot", "sys", "cl")
 
-# address -> (entity, required class).  A label is how a box reads, not what it
-# is: rewording one drops its TAXONOMY entry and the rule with it.  An on-chain
-# address cannot be moved by rewording, so the taxonomy-critical entities are
-# bound here to their deployed identity as well.  Every entry must still be
-# found on the canvas *and* on the notes cards, so deleting or renaming a box
-# fails closed instead of quietly retiring its rule.  Searching the two surfaces
-# together instead let a surviving notes card vouch for a deleted canvas node,
-# so the primary architecture drawing could lose an entity while this gate still
-# reported success; the surfaces are therefore required separately.
+SURFACES = ("canvas", "notes cards")
+
+# address -> (entity, required class, {surface: the label that address belongs
+# under}).  A label is how a box reads, not what it is: rewording one drops its
+# TAXONOMY entry and the rule with it.  An on-chain address cannot be moved by
+# rewording, so the taxonomy-critical entities are bound here to their deployed
+# identity as well.  Every entry must still be found on the canvas *and* on the
+# notes cards, so deleting or renaming a box fails closed instead of quietly
+# retiring its rule.  Searching the two surfaces together instead let a
+# surviving notes card vouch for a deleted canvas node, so the primary
+# architecture drawing could lose an entity while this gate still reported
+# success; the surfaces are therefore required separately.
+#
+# The class alone is not the identity.  Checking only the class of the box an
+# address was found in let two same-class entities exchange addresses with this
+# gate still reporting success: AccountingOracle and ValidatorsExitBusOracle are
+# both `el`, so swapping their full and abbreviated addresses left every class
+# rule satisfied while both boxes published a reader-facing address against the
+# wrong contract — the exact misreading an address is pinned here to prevent.
+# Each address is therefore bound to the label its entity wears, per surface,
+# since the two surfaces spell the same entity differently.
 IDENTITY = {
-    "0x852deD011285fe67063a08005c71a85690503Cee": ("AccountingOracle", "el"),
-    "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e": ("ValidatorsExitBusOracle", "el"),
-    "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288": ("HashConsensus", "com"),
-    "0xF573E9E3de1f86B085417ab294f56E7920B4e9Be": ("DepositSecurityModule", "com"),
-    "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea": ("EasyTrack EVMScriptExecutor", "com"),
-    "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02": ("EIP-4788 beacon roots", "sys"),
-    "0x00000961Ef480Eb55e80D19ad83579A64c007002": ("EIP-7002 withdrawals", "sys"),
-    "0x0000BBdDc7CE488642fb579F8B00f3a590007251": ("EIP-7251 consolidations", "sys"),
+    "0x852deD011285fe67063a08005c71a85690503Cee": (
+        "AccountingOracle", "el",
+        {"canvas": "AccountingOracle", "notes cards": "AccountingOracle"}),
+    "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e": (
+        "ValidatorsExitBusOracle", "el",
+        {"canvas": "ValidatorsExitBus", "notes cards": "ValidatorsExitBus(Oracle)"}),
+    "0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288": (
+        "HashConsensus", "com",
+        {"canvas": "HashConsensus", "notes cards": "HashConsensus"}),
+    "0xF573E9E3de1f86B085417ab294f56E7920B4e9Be": (
+        "DepositSecurityModule", "com",
+        {"canvas": "DepositSecurityModule",
+         "notes cards": "DepositSecurityModule + guardians"}),
+    "0xF0211b7660680B49De1A7E9f25C65660F0a13Fea": (
+        "EasyTrack EVMScriptExecutor", "com",
+        {"canvas": "EasyTrack", "notes cards": "EasyTrack · EVMScriptExecutor"}),
+    "0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02": (
+        "EIP-4788 beacon roots", "sys",
+        {"canvas": "EIP-4788", "notes cards": "EIP-4788 / 7002 / 7251"}),
+    "0x00000961Ef480Eb55e80D19ad83579A64c007002": (
+        "EIP-7002 withdrawals", "sys",
+        {"canvas": "EIP-7002 · 7251", "notes cards": "EIP-4788 / 7002 / 7251"}),
+    "0x0000BBdDc7CE488642fb579F8B00f3a590007251": (
+        "EIP-7251 consolidations", "sys",
+        {"canvas": "EIP-7002 · 7251", "notes cards": "EIP-4788 / 7002 / 7251"}),
 }
+
+# A missing surface entry would skip the binding for that surface rather than
+# enforce it, so an entry added later must name both surfaces to be admitted.
+for _address, (_entity, _class, _labels) in IDENTITY.items():
+    if set(_labels) != set(SURFACES):
+        raise SystemExit(f"diagram taxonomy: {_entity} ({_address}) binds labels for "
+                         f"{sorted(_labels)}, must bind one for each of {list(SURFACES)}")
 
 # name -> required class.  Names are matched against the node label and the
 # notes-card heading; an entity may appear as either or both.  This layer reads
@@ -317,16 +355,26 @@ def main():
 
     for surface, boxes in (("canvas", nodes), ("notes cards", cards)):
         absent = []
-        for address, (entity, expected) in IDENTITY.items():
+        for address, (entity, expected, labels) in IDENTITY.items():
             forms = (address.lower(), abbreviated(address).lower())
+            belongs = labels[surface]
             located = False
             for name, kind, identity in boxes:
                 if not any(_address_in(identity.lower(), form) for form in forms):
                     continue
-                located = True
                 if kind != expected:
                     fail(f"{entity} ({address}) is drawn as {kind!r} under the label "
                          f"{name!r}, must be {expected!r}")
+                # The class is not the identity.  Two entities of one class can
+                # exchange addresses with every class rule still satisfied, and
+                # the reader then meets a published address against the wrong
+                # contract, so the address must be found under its own entity.
+                if name != belongs:
+                    fail(f"{entity} ({address}) is published on the {surface} under the "
+                         f"label {name!r}, which names a different entity; the address "
+                         f"belongs to {belongs!r}, and an address printed against "
+                         "another box misidentifies the contract a reader would look up")
+                located = True
             if not located:
                 absent.append(f"{entity} ({address})")
         if absent:
@@ -447,8 +495,9 @@ def main():
             fail(f"the `bot` legend pill never mentions {phrase!r}: {why}")
 
     print(f"diagram taxonomy ok: {len(nodes)} nodes, {len(cards)} cards, "
-          f"{len(legend)} legend classes, {len(IDENTITY)} address-bound entities "
-          "on the canvas and on the notes cards, "
+          f"{len(legend)} legend classes, {len(IDENTITY)} entities bound to their "
+          "class and to the label they are published under, on the canvas and on "
+          "the notes cards, "
           f"{len(SURFACE_REQUIRED['canvas'])} proof-gated boxes bound per surface, "
           f"{bound} gateway boxes bound to the verifier they inherit, "
           f"{len(TAXONOMY)} taxonomy names still drawn")

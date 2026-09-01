@@ -30,6 +30,15 @@ PLANES = {"abstract": "Abstract", "verity": "Verity"}
 COMPOSITE_PLANE = "Abstract and Verity (composite)"
 PLANE_COLUMNS = tuple(PLANES.values()) + (COMPOSITE_PLANE,)
 REGISTRATION = re.compile(r"^REGISTERED as `(?P<plane>[a-z]+)\.theorem`$")
+# The Registered column publishes exactly two markers, and a reader reads the
+# cell, not the checker's parse of it.  Skipping every cell that did not start
+# with `REGISTERED` treated an unrecognized spelling as a silent "no claim", so
+# a row could print a lookalike — lowercase `registered` is the plain case — and
+# be read as promoted while this gate stayed green and the registry recorded
+# nothing.  The unregistered marker is therefore matched exactly and
+# case-sensitively as the whole cell, and anything that is neither marker is
+# rejected rather than skipped.
+UNREGISTERED = "unregistered"
 
 # A declaration name is not always ASCII.  Lean identifiers allow letter-like
 # characters (Greek, Coptic, Latin-1/Extended-A, script and double-struck),
@@ -509,12 +518,15 @@ def main():
     claimed = {}
     for name, match in rows.items():
         cell = match.group("registered").strip()
-        if not cell.startswith("REGISTERED"):
+        if cell == UNREGISTERED:
             continue
         registration = REGISTRATION.match(cell)
         if not registration or registration.group("plane") not in PLANES:
-            fail(f"{name} claims registration as {cell!r}, which names none of the "
-                 f"registry fields {', '.join(f'`{p}.theorem`' for p in PLANES)}")
+            fail(f"{name} prints {cell!r} in the Registered column, which is neither the "
+                 f"exact marker {UNREGISTERED!r} nor a registration: it names none of the "
+                 f"registry fields {', '.join(f'`{p}.theorem`' for p in PLANES)}; the "
+                 "column publishes one of two markers, and a lookalike reads to a "
+                 "reader as a promotion the registry does not record")
         plane = registration.group("plane")
         if plane in claimed:
             fail(f"{name} and {claimed[plane]} both claim registry field "

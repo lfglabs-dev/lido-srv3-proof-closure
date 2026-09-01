@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+from itertools import combinations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,6 +65,24 @@ def sole(diagram, pattern, forms, surface):
 
 def address_forms(address):
     return (address.lower(), CHECK.abbreviated(address).lower())
+
+
+def rewrite_address(text, one, other):
+    """Rewrite `one`'s address as `other`'s, in both the full and short spelling."""
+    swapped = text.replace(one, other).replace(CHECK.abbreviated(one),
+                                               CHECK.abbreviated(other))
+    if swapped == text:
+        raise AssertionError(f"rewriting {one} as {other} changed nothing")
+    return swapped
+
+
+def exchange(diagram, one, other):
+    """Swap two entities' addresses wherever the map draws them, both spellings."""
+    hold = "0x" + "f" * 40
+    swapped = diagram
+    for source, target in ((one, hold), (other, one), (hold, other)):
+        swapped = rewrite_address(swapped, source, target)
+    return swapped
 
 
 def wrong_class(expected):
@@ -233,6 +252,17 @@ def main():
             # than only the one that happens to be checked first.
             (drop_node(diagram, "0x00000961Ef480Eb55e80D19ad83579A64c007002"),
              "on the canvas"),
+            # The two oracles exchange deployed addresses on both surfaces at
+            # once.  Both are `el`, so every class rule stays satisfied and the
+            # entity set is unchanged; what moves is which contract each box
+            # tells a reader to look up, and both boxes now publish against the
+            # wrong one.  Reading only the class of the box an address turned up
+            # in could not see this at all.
+            (exchange(diagram,
+                      "0x852deD011285fe67063a08005c71a85690503Cee",
+                      "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"),
+             "AccountingOracle (0x852deD011285fe67063a08005c71a85690503Cee) is published "
+             "on the canvas under the label 'ValidatorsExitBus'"),
         ):
             if mutated == diagram:
                 raise AssertionError(f"diagram mutant for {needle!r} changed nothing")
@@ -245,7 +275,7 @@ def main():
         # independently.  The label is rewritten in each repaint so that only
         # the address can be what catches it.
         family = []
-        for address, (entity, expected) in CHECK.IDENTITY.items():
+        for address, (entity, expected, _labels) in CHECK.IDENTITY.items():
             forms = address_forms(address)
             kind = wrong_class(expected)
             for surface, pattern, reword in (
@@ -279,6 +309,40 @@ def main():
                         splice(diagram, box, extended_box),
                         f"{entity} ({address})",
                     ))
+
+        # The same exchange read as a family, one surface at a time.  Every
+        # same-class pair the checker's own table carries is swapped, so a pair
+        # added later arrives with its adversarial case already demanded, and
+        # each surface is asserted alone: a swap confined to the notes cards
+        # leaves the canvas correct, and a check that read the two surfaces
+        # together would let the intact one vouch for the corrupted one.  A pair
+        # drawn inside one box on a surface is skipped there — the combined
+        # predeploy node names three addresses under a single label, so
+        # exchanging two of them inside it changes nothing a reader could read.
+        exchanges = 0
+        for surface, pattern in (("canvas", NODE), ("notes cards", CARD)):
+            for left, right in combinations(CHECK.IDENTITY, 2):
+                left_entity, left_class, left_labels = CHECK.IDENTITY[left]
+                _, right_class, right_labels = CHECK.IDENTITY[right]
+                if left_class != right_class:
+                    continue
+                if left_labels[surface] == right_labels[surface]:
+                    continue
+                left_box = sole(diagram, pattern, address_forms(left), surface)
+                right_box = sole(diagram, pattern, address_forms(right), surface)
+                mutated = diagram.replace(
+                    left_box.group(0), rewrite_address(left_box.group(0), left, right), 1)
+                mutated = mutated.replace(
+                    right_box.group(0), rewrite_address(right_box.group(0), right, left), 1)
+                # IDENTITY is walked in table order within a surface, so the
+                # earlier entry of the pair is the one that answers.
+                family.append((mutated,
+                               f"{left_entity} ({left}) is published on the {surface} "
+                               f"under the label {right_labels[surface]!r}"))
+                exchanges += 1
+        if not exchanges:
+            raise AssertionError("no same-class address exchange was constructed, so the "
+                                 "family asserts nothing")
 
         # The proof-gated boxes carry no address, so the label each surface
         # wears is the only handle their class rule has.  Repainting one,
@@ -389,13 +453,14 @@ def main():
             ))
 
         # A reworded label must not retire its class rule.  Renaming a box while
-        # leaving its address and its colour untouched satisfies every
-        # address-bound rule, so only the taxonomy-coverage check can catch it.
+        # leaving its address and its colour untouched is now caught by the
+        # address-to-label binding, which is the stronger reading: the address
+        # is published under a name that is not its entity's.
         renamed = next(m for m in NODE.finditer(diagram)
                        if NODE_LABEL.search(m.group(2)).group(2).strip() == "EIP-4788")
         family.append((
             splice(diagram, renamed, reword_node(renamed, "sys")),
-            "taxonomy name(s) ['EIP-4788'] are no longer drawn on either surface",
+            f"is published on the canvas under the label {REWORDED!r}",
         ))
 
         for mutated, needle in family:
@@ -404,6 +469,36 @@ def main():
             diagram_path.write_text(mutated, encoding="utf-8")
             invoke(fixture, False, needle)
             diagram_path.write_text(diagram, encoding="utf-8")
+
+        # The taxonomy-coverage rule is a separate claim from the address
+        # binding, and every name it guards happens to sit on an address-bound
+        # box, so the binding answers first for all of them and would leave the
+        # coverage rule unasserted.  Following the rename through the checker's
+        # own table satisfies the binding and isolates it: the entity is then
+        # correctly identified under its new name, and only the coverage rule is
+        # left to object that a TAXONOMY name has stopped being drawn.
+        followed = checker.replace('{"canvas": "EIP-4788",',
+                                   f'{{"canvas": "{REWORDED}",', 1)
+        if followed == checker:
+            raise AssertionError("checker IDENTITY label mutant changed nothing")
+        checker_path.write_text(followed, encoding="utf-8")
+        diagram_path.write_text(splice(diagram, renamed, reword_node(renamed, "sys")),
+                                encoding="utf-8")
+        invoke(fixture, False,
+               "taxonomy name(s) ['EIP-4788'] are no longer drawn on either surface")
+        checker_path.write_text(checker, encoding="utf-8")
+        diagram_path.write_text(diagram, encoding="utf-8")
+
+        # An IDENTITY entry that names only one surface would skip the binding
+        # on the other rather than enforce it, so an entry added later must be
+        # refused at load rather than silently half-bound.
+        halved = checker.replace(', "notes cards": "EIP-4788 / 7002 / 7251"}),\n'
+                                 '    "0x00000961', '}),\n    "0x00000961', 1)
+        if halved == checker:
+            raise AssertionError("checker IDENTITY surface mutant changed nothing")
+        checker_path.write_text(halved, encoding="utf-8")
+        invoke(fixture, False, "must bind one for each of")
+        checker_path.write_text(checker, encoding="utf-8")
 
         # The README carries the citations; a class it stops documenting is a
         # colour the reader can no longer resolve to a source claim.
@@ -564,7 +659,15 @@ def main():
           "(entity inside <!-- … --> is invisible to a reader and must not be counted "
           "as present), and every one with its address extended by a trailing hex digit "
           "per surface (malformed address must not satisfy a token-boundary check via "
-          "substring containment); every proof-gated box repainted, deleted and merely "
+          "substring containment); "
+          f"{exchanges} same-class address exchanges — every pair the table carries whose "
+          "entities are drawn under different labels on that surface — rejected on each "
+          "surface alone (both boxes keep their class, so only binding the address to the "
+          "entity it names can see the swap), with the two oracles also exchanged on both "
+          "surfaces at once; a taxonomy name whose rename is followed through IDENTITY "
+          "still rejected for no longer being drawn, and an IDENTITY entry that binds "
+          "only one surface refused at load; "
+          "every proof-gated box repainted, deleted and merely "
           "reworded per surface (the combined `Consolidation pipeline` canvas node and "
           "the `ConsolidationGateway` card bound independently), and a rename that keeps "
           "its address and colour still rejected for retiring its taxonomy rule; "

@@ -628,6 +628,41 @@ def main():
                    (composite_row, composite_row.replace(
                        "| unregistered |", f"| REGISTERED as `{plane}.theorem` |", 1)))
 
+        # The Registered column publishes exactly two markers, and a reader reads
+        # the cell rather than the checker's parse of it.  Skipping every cell
+        # that did not begin with `REGISTERED` treated an unrecognized spelling
+        # as a silent "no claim", so a row could print a lookalike — lowercase
+        # `registered` is the plain case — and be read as promoted while the
+        # registry recorded nothing and this gate stayed green.  Every row the
+        # inventory prints is put through every lookalike, so a row or a plane
+        # added later arrives with its case already demanded, and the marker is
+        # asserted to be matched case-sensitively as the whole cell rather than
+        # by a prefix that a longer or differently-cased word satisfies.
+        marker_rows = [line for line in report.splitlines() if CHECK.ROW.match(line)]
+        if len(marker_rows) != len(set(marker_rows)):
+            raise AssertionError("the canonical inventory prints a row twice")
+
+        def recell(line, marker):
+            """Reprint `line` with `marker` in the Registered column, padding kept."""
+            cells = CHECK.ROW.match(line)
+            return line[:cells.start("registered")] + marker + line[cells.end("registered"):]
+
+        lookalikes = ["registered", "Registered", "REGISTERED", "UNREGISTERED",
+                      "Unregistered", "un-registered", "not registered", "unregistered."]
+        lookalikes += [spelling.format(plane=plane) for plane in CHECK.PLANES
+                       for spelling in ("registered as `{plane}.theorem`",
+                                        "Registered as `{plane}.theorem`",
+                                        "REGISTERED AS `{plane}.theorem`",
+                                        "REGISTERED as `{plane}.theorem` (pending)")]
+        for line in marker_rows:
+            name = CHECK.ROW.match(line).group("name")
+            for marker in lookalikes:
+                rewritten = recell(line, marker)
+                if rewritten == line:
+                    raise AssertionError(f"lookalike {marker!r} changed nothing in: {line}")
+                mutate(f"{name} prints {marker!r} in the Registered column",
+                       (line, rewritten))
+
         # A repeated row was dropped rather than checked, because indexing the
         # matches by name keeps only the last one.  Every cell the gate reads can
         # be falsified in an earlier copy while the surviving copy stays correct,
@@ -1007,7 +1042,14 @@ def main():
           f"each registered row widened to each of the {len(supersets) // len(registered_rows)} "
           "plane column(s) its own label is spelled inside, and the composite row "
           "promoted to each field in turn, rejected while the composite column "
-          "stays printable by an unregistered row; and every one of "
+          "stays printable by an unregistered row; "
+          f"every one of {len(marker_rows)} rows printed with each of "
+          f"{len(lookalikes)} Registered-column lookalikes — case variants of both "
+          "markers, a bare `REGISTERED`, a negated and a hyphenated spelling, a trailing "
+          "stop, and a lower- or mixed-cased registration naming each plane — rejected "
+          "rather than skipped as an unrecognized cell, so the two markers are matched "
+          "case-sensitively as the whole cell and a lookalike cannot promote a theorem "
+          "the registry does not record; and every one of "
           f"{len(inventory_rows)} rows relocated out of the `## Theorems` section "
           "and copied outside it, a second inventory filed further down, and the "
           "section heading renamed, demoted and unheaded all rejected; and every "
