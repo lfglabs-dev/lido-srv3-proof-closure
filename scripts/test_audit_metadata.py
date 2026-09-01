@@ -312,11 +312,75 @@ def main():
                 invoke(fixture, False, "headline fidelity rows")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # The disclosure is a claim about one table.  Reading gap rows from
+        # anywhere in the README bound them to nothing in particular, so a row
+        # re-filed into a later table or into loose prose went on satisfying this
+        # gate while the table a reader meets had silently dropped it — the
+        # headline could skip an ID outright.  Every row the table prints is
+        # driven through both relocations and through outright deletion, so a
+        # guarantee added later arrives with its case already demanded.
+        header = "| # | ID | Abstract Lean | Verity Executable Contract | Fidelity gaps |"
+        if readme.count(header) != 1:
+            raise AssertionError("expected exactly one headline table header in README")
+        appendix = ("\n## Appendix\n\n"
+                    "| Row | Claim | Abstract | Verity | Gaps |\n"
+                    "| --- | --- | --- | --- | --- |\n")
+        for row in rows:
+            claim_id = re.search(r"`([^`]+)`", row).group(1)
+            outside = f"README: {claim_id} print(s) a fidelity-gap row outside the headline"
+            without = readme.replace(f"{row}\n", "", 1)
+            if row in without:
+                raise AssertionError(f"relocation mutant for {claim_id} changed nothing")
+
+            # Re-filed into a second table that does not claim the headline's
+            # own columns, so nothing but reading the headline table can see it.
+            readme_path.write_text(f"{without}{appendix}{row}\n", encoding="utf-8")
+            invoke(fixture, False, outside)
+
+            # Re-filed into loose prose, which is not a table at all.
+            readme_path.write_text(f"{without}\n{row}\n", encoding="utf-8")
+            invoke(fixture, False, outside)
+
+            # Dropped from the headline table without being re-filed anywhere:
+            # the row set the table prints is itself part of the disclosure.
+            readme_path.write_text(without, encoding="utf-8")
+            invoke(fixture, False, f"README: {claim_id} row is missing its `N open`")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # A row the registry does not record as canonical, printed inside the
+        # headline table: the table must disclose the canonical claims and no
+        # more, or it publishes a gap count that stands behind nothing.
+        foreign = "| 99 | `P-NOT-CANONICAL-1` | CHECKED | CHECKED | 4 open |"
+        readme_path.write_text(readme.replace(rows[-1], f"{rows[-1]}\n{foreign}", 1),
+                               encoding="utf-8")
+        invoke(fixture, False, "prints a fidelity-gap row for P-NOT-CANONICAL-1")
+
+        # A second table claiming the headline's own columns competes with the
+        # disclosure: whichever one this gate read, the other published
+        # unchecked counts to a reader who meets both.
+        second = (f"\n## Appendix\n\n{header}\n| --- | --- | --- | --- | --- |\n"
+                  f"{rows[0]}\n")
+        readme_path.write_text(readme + second, encoding="utf-8")
+        invoke(fixture, False, "found 2 headline fidelity tables, expected exactly one")
+
+        # And the table has to be locatable at all: repainting the column the
+        # counts live in leaves the disclosure with no table to bind to.
+        readme_path.write_text(
+            readme.replace("| Fidelity gaps |\n", "| Gaps |\n", 1), encoding="utf-8")
+        invoke(fixture, False, "found 0 headline fidelity tables, expected exactly one")
+        readme_path.write_text(readme, encoding="utf-8")
+
         invoke(fixture, True, command="generate")
         (fixture / "audit/STATUS.md").write_text("stale\n", encoding="utf-8")
         invoke(fixture, False, "STATUS.md is stale", command="check")
 
-    print("optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, README fidelity-gap disclosure, duplicate headline rows, and stale views")
+    print("optimized assurance-v4 mutants rejected: objective, canonical claims, "
+          "classifications, assumptions, SSZ-only binding, pins, source spans, proof "
+          "policy, README fidelity-gap disclosure, duplicate headline rows, and stale "
+          f"views; and every one of {len(rows)} headline rows re-filed into a later "
+          "table, re-filed into loose prose, and dropped outright, plus a non-canonical "
+          "row printed inside the table, a second table claiming the headline's own "
+          "columns, and the gap column repainted so the table cannot be located")
 
 
 if __name__ == "__main__":

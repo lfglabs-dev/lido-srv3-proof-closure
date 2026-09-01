@@ -160,9 +160,11 @@ def main():
             (diagram.replace("the executor is the sole grantee",
                              "vetoable motions; the executor is the sole grantee"),
              "EasyTrack holds ALLOW_PAIR_ROLE only"),
-            # The two beacon-proof verifiers conflated again.
+            # The two beacon-proof verifiers conflated again.  Both spellings
+            # survive a document-wide substring check when one is rewritten to
+            # the other, so this has to be caught where the claim is made.
             (diagram.replace("CLValidatorVerifier", "CLProofVerifier"),
-             "never mentions 'CLValidatorVerifier'"),
+             "attributes 'CLProofVerifier' to TopUpGateway"),
             # An on-chain box that no longer says where it comes from.
             (diagram.replace(
                 '<g class="node com" data-flows="f4 f5 f7"><title>',
@@ -294,6 +296,41 @@ def main():
                     f"{label!r} is no longer drawn on the {surface}",
                 ))
 
+        # Which verifier a gateway inherits is a per-box claim, and requiring
+        # both names as document-wide substrings could not read it: exchanging
+        # the pair leaves both spellings in place, and dropping one from a
+        # gateway box leaves it cited on the unrelated EIP-4788 box.  Every
+        # gateway box is driven from the checker's own tables and put through
+        # all three families — the verifier relocated off the box, the sibling's
+        # verifier claimed in its place, and both claimed at once.
+        for surface, pattern, label_of in (
+            ("canvas", NODE, lambda m: NODE_LABEL.search(m.group(2)).group(2).strip()),
+            ("notes cards", CARD, lambda m: m.group(2).strip()),
+        ):
+            for label, gateway in CHECK.VERIFIER_SURFACE[surface].items():
+                verifier = CHECK.GATEWAY_VERIFIER[gateway]
+                sibling = next(v for g, v in CHECK.GATEWAY_VERIFIER.items() if g != gateway)
+                boxes = [m for m in pattern.finditer(diagram) if label_of(m) == label]
+                if len(boxes) != 1:
+                    raise AssertionError(
+                        f"expected one {surface} box labelled {label!r}, got {len(boxes)}")
+                box = boxes[0]
+                body = box.group(0)
+                misattributed = (f"the {label!r} box on the {surface} attributes "
+                                 f"{sibling!r} to {gateway}")
+                family.append((
+                    splice(diagram, box, body.replace(verifier, "its own verifier")),
+                    f"the {label!r} box on the {surface} never names {verifier!r}",
+                ))
+                family.append((
+                    splice(diagram, box, body.replace(verifier, sibling)),
+                    misattributed,
+                ))
+                family.append((
+                    splice(diagram, box, body.replace(verifier, f"{verifier} and {sibling}", 1)),
+                    misattributed,
+                ))
+
         # The consensus-layer rule is one claim with two halves: nothing else may
         # be painted `cl`, and the validator set must keep it.  Only the first
         # was enforced, so repainting the sole genuine `cl` entity — or deleting
@@ -397,6 +434,36 @@ def main():
         checker_path.write_text(checker, encoding="utf-8")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # The README's `proof` entry is where the two verifiers are told apart
+        # for the record, and prose has no box to make a bare mention default
+        # to, so every mention there has to name its gateway.  Exchanging the
+        # pairing, dropping either half of it, and naming a verifier with no
+        # gateway at all must each fail closed.
+        entry = CHECK.PROOF_ENTRY.search(readme).group(0)
+        verifiers = list(CHECK.GATEWAY_VERIFIER.values())
+        swap = {v: verifiers[(i + 1) % len(verifiers)] for i, v in enumerate(verifiers)}
+        readme_family = [(
+            readme.replace(entry, re.sub("|".join(map(re.escape, verifiers)),
+                                         lambda m: swap[m.group(0)], entry)),
+            f"attributes {swap[CHECK.GATEWAY_VERIFIER['TopUpGateway']]!r} to TopUpGateway",
+        )]
+        for gateway, verifier in CHECK.GATEWAY_VERIFIER.items():
+            readme_family.append((
+                readme.replace(entry, entry.replace(verifier, "its own verifier")),
+                f"never states that {gateway} gates through {verifier!r}",
+            ))
+        readme_family.append((
+            readme.replace("- `proof` — an EL contract",
+                           f"- `proof` — a {verifiers[0]} contract", 1),
+            f"names {verifiers[0]!r} without saying whose verifier it is",
+        ))
+        for mutated, needle in readme_family:
+            if mutated == readme:
+                raise AssertionError(f"README proof-entry mutant for {needle!r} changed nothing")
+            readme_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, False, needle)
+            readme_path.write_text(readme, encoding="utf-8")
+
         # The `bot` class covers node operators, who hold validator signing
         # keys.  Collapsing it back to one consequence for the whole class reads
         # a signing-key compromise as liveness-only, when it can sign slashable
@@ -447,7 +514,12 @@ def main():
           "its address and colour still rejected for retiring its taxonomy rule; "
           f"the addressless consensus-layer box repainted to each of the "
           f"{len(CHECK.CLASSES) - 1} other classes, deleted, and merely reworded, "
-          "rejected in both directions of the one-genuine-`cl`-entity rule")
+          "rejected in both directions of the one-genuine-`cl`-entity rule; "
+          f"each of the {sum(len(s) for s in CHECK.VERIFIER_SURFACE.values())} gateway "
+          "boxes had the verifier it inherits relocated off the box, exchanged for its "
+          "sibling's, and claimed alongside its sibling's, and the README `proof` entry "
+          "had the pairing swapped, either half of it dropped, and a verifier named with "
+          "no gateway to attribute it to")
 
 
 if __name__ == "__main__":

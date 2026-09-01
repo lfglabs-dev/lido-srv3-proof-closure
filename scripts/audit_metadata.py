@@ -400,6 +400,21 @@ README_FIDELITY_ROW = re.compile(
     re.MULTILINE,
 )
 
+# The disclosure is a claim about one table: the headline status table, whose
+# CHECKED cells the gap counts are there to qualify.  Matching those rows
+# anywhere in the README bound them to nothing in particular, so a row moved out
+# of the headline table into any later table went on satisfying this gate while
+# the table a reader actually meets had silently dropped it — the headline could
+# skip from 6 to 8 with `P-CONSOLIDATION-ETH-1` re-filed in an appendix and every
+# check below still passed.  The table is located by its own header, so its rows
+# are read from it and from nowhere else.
+README_HEADLINE_TABLE = re.compile(
+    r"^\|\s*#\s*\|\s*ID\s*\|[^\n]*\|\s*Fidelity gaps\s*\|[ \t]*\n"
+    r"\|[ \t\-|]+\|[ \t]*\n"
+    r"(?P<body>(?:\|[^\n]*\|[ \t]*\n)+)",
+    re.MULTILINE,
+)
+
 
 def validate_readme_fidelity_disclosure(rows):
     """Bind the README headline table to the registry's own fidelity counts.
@@ -411,8 +426,21 @@ def validate_readme_fidelity_disclosure(rows):
     `fidelity.missing`.
     """
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    tables = list(README_HEADLINE_TABLE.finditer(readme))
+    require(len(tables) == 1,
+            f"README: found {len(tables)} headline fidelity tables, expected exactly one; "
+            "the gap counts qualify the CHECKED cells a reader meets first, and a second "
+            "table claiming those columns would compete with that disclosure")
+    headline = tables[0]
+    table = headline.group("body")
     canonical = rows[:len(CANONICAL_IDS)]
-    printed = [m.group(1) for m in README_FIDELITY_ROW.finditer(readme)]
+    printed = [m.group(1) for m in README_FIDELITY_ROW.finditer(table)]
+    strays = sorted({m.group(1) for m in README_FIDELITY_ROW.finditer(readme)
+                     if not headline.start("body") <= m.start() < headline.end("body")})
+    require(not strays,
+            f"README: {', '.join(strays)} print(s) a fidelity-gap row outside the headline "
+            "table; a row filed elsewhere is still a published gap count and is not the "
+            "disclosure the headline table makes")
     total = 0
     for position, row in enumerate(canonical, start=1):
         expected = len(row["fidelity"]["missing"])
@@ -433,13 +461,21 @@ def validate_readme_fidelity_disclosure(rows):
         require(appearances <= 1,
                 f"README: {row['id']} names {appearances} headline fidelity rows; "
                 "every printed row is a published claim and exactly one must carry it")
-        found = cell.findall(readme)
+        found = cell.findall(table)
         require(len(found) == 1,
                 f"README: {row['id']} row is missing its `N open` fidelity-gap cell "
                 f"at headline position {position}")
         require(int(found[0]) == expected,
                 f"README: {row['id']} discloses {found[0]} fidelity gaps, "
                 f"registry records {expected}")
+    # Every canonical claim now has exactly one row, so anything else the table
+    # prints is a gap count standing behind no registry row at all.  Checked
+    # last so the per-row rules above keep naming their own failures precisely.
+    extra = sorted(set(printed) - {row["id"] for row in canonical})
+    require(not extra,
+            f"README: the headline table prints a fidelity-gap row for {', '.join(extra)}, "
+            "which the registry does not record as a canonical claim; a published gap "
+            "count qualifies a published CHECKED cell and must have one to qualify")
     require(f"{total} in total" in readme,
             f"README: headline boundary must disclose the {total} total fidelity gaps")
     require("not about a deployed contract" in readme,

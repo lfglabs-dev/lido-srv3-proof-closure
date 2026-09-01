@@ -132,11 +132,44 @@ CLASS_COUNT = re.compile(r"the (\w+) classes are pinned here")
 REQUIRED = (
     ("ALLOW_PAIR_ROLE", "EasyTrack's allow-only consolidation power must be named"),
     ("REMOVE_ROLE", "the batch veto role must be named"),
-    ("CLValidatorVerifier", "TopUpGateway's verifier must be distinguished"),
-    ("CLProofVerifier", "ConsolidationGateway's verifier must be distinguished"),
     ("isDepositsPaused", "the DSM's only reach into consolidation must be named"),
     ("BaseOracle", "the oracles must be shown deferring quorum to HashConsensus"),
 )
+
+# The two gateways gate on the same beacon root through *different* verifiers,
+# and which one a gateway inherits is the claim a reader takes away.  Requiring
+# both names as document-wide substrings, the way REQUIRED above does, cannot
+# read that claim: both spellings survive when the pair is exchanged, so the
+# TopUpGateway box could be repainted with the ConsolidationGateway's verifier
+# and this gate still reported success; both also survive when a gateway box
+# drops its verifier entirely, since the unrelated EIP-4788 box cites both `.sol`
+# files.  Each mention is therefore bound to the gateway it is claimed for.
+GATEWAY_VERIFIER = {
+    "TopUpGateway": "CLValidatorVerifier",
+    "ConsolidationGateway": "CLProofVerifier",
+}
+
+# Surface -> box label -> the gateway whose verifier claim that box carries.
+# The canvas draws the consolidation path as one combined box, so the label a
+# reader meets differs per surface while the claim underneath is the same.
+VERIFIER_SURFACE = {
+    "canvas": {"TopUpGateway": "TopUpGateway",
+               "Consolidation pipeline": "ConsolidationGateway"},
+    "notes cards": {"TopUpGateway": "TopUpGateway",
+                    "ConsolidationGateway": "ConsolidationGateway"},
+}
+
+# Gateway and verifier names in one pass, longest first so `ConsolidationGateway`
+# is never read as a bare prefix.  A mention is attributed to the nearest gateway
+# named before it; inside a gateway's own box an unqualified mention is that
+# box's own claim, which is how `inherits CLValidatorVerifier` reads.
+MENTION = re.compile("|".join(re.escape(name) for name in sorted(
+    set(GATEWAY_VERIFIER) | set(GATEWAY_VERIFIER.values()), key=len, reverse=True)))
+
+# The README's `proof` entry is where the pairing is stated for the record, so it
+# must carry both pairings and attribute each one explicitly: prose has no box to
+# make an unqualified mention default to.
+PROOF_ENTRY = re.compile(r"^- `proof` —.*?(?=^- `)", re.MULTILINE | re.DOTALL)
 
 # The `bot` class collects off-chain actors whose compromise does not cost the
 # same thing, so its README entry must qualify per actor instead of asserting
@@ -185,6 +218,34 @@ def abbreviated(address):
     # from the full one keeps one identity per entity, so the node surface and
     # the card surface cannot drift apart.
     return f"{address[:6]}…{address[-4:]}"
+
+
+def verifier_claims(where, text, own):
+    """Return the (gateway, verifier) pairs `text` claims, rejecting mismatches.
+
+    `own` is the gateway whose box this is, and it holds until the prose names
+    another gateway: that is what lets a box say `inherits CLValidatorVerifier`
+    without repeating whose it is, and still read `the ConsolidationGateway's
+    CLProofVerifier` as the contrast it is rather than as a second claim.  Prose
+    with no box of its own passes `own=None`, so every mention there must name
+    its gateway.
+    """
+    holder = own
+    claimed = set()
+    for match in MENTION.finditer(text):
+        token = match.group(0)
+        if token in GATEWAY_VERIFIER:
+            holder = token
+            continue
+        if holder is None:
+            fail(f"{where} names {token!r} without saying whose verifier it is; the "
+                 "two gateways inherit different verifiers and the pairing is the claim")
+        if GATEWAY_VERIFIER[holder] != token:
+            fail(f"{where} attributes {token!r} to {holder}, which inherits "
+                 f"{GATEWAY_VERIFIER[holder]!r}; the gateways gate on the same beacon "
+                 "root through different verifiers and exchanging them misstates both")
+        claimed.add((holder, token))
+    return claimed
 
 
 def main():
@@ -260,6 +321,23 @@ def main():
                 fail(f"{label!r} is drawn as {drawn_here[label]!r} on the {surface}, "
                      f"must be {expected!r}")
 
+    bound = 0
+    for surface, boxes in (("canvas", [(name, body) for name, _, body in nodes]),
+                           ("notes cards", [(name, body) for (name, _, _), body
+                                            in zip(cards, card_bodies)])):
+        for label, gateway in VERIFIER_SURFACE[surface].items():
+            verifier = GATEWAY_VERIFIER[gateway]
+            for name, body in boxes:
+                if name != label:
+                    continue
+                if (gateway, verifier) not in verifier_claims(
+                        f"the {label!r} box on the {surface}", body, gateway):
+                    fail(f"the {label!r} box on the {surface} never names {verifier!r}; "
+                         f"{gateway} gates on the beacon root through that verifier and "
+                         "not through the other gateway's, so the box a reader meets "
+                         "must say which one it inherits")
+                bound += 1
+
     # A rule keyed by a label retires itself the moment that label is reworded.
     # Every taxonomy name must therefore still be found somewhere on the map, so
     # a rename fails closed here instead of silently dropping its class rule.
@@ -303,6 +381,18 @@ def main():
         if f"`{kind}`" not in readme:
             fail(f"{DIAGRAM_README.relative_to(ROOT)} does not document class {kind!r}")
 
+    proof_entry = PROOF_ENTRY.search(readme)
+    if not proof_entry:
+        fail(f"{DIAGRAM_README.relative_to(ROOT)} has no `proof` class entry to carry "
+             "the gateway/verifier pairing the citations rest on")
+    stated = verifier_claims(f"the `proof` entry in {DIAGRAM_README.relative_to(ROOT)}",
+                             proof_entry.group(0), None)
+    for gateway, verifier in GATEWAY_VERIFIER.items():
+        if (gateway, verifier) not in stated:
+            fail(f"the `proof` entry never states that {gateway} gates through "
+                 f"{verifier!r}; the entry is where the two verifiers are told apart "
+                 "for the record, so dropping a pairing retires the distinction")
+
     counted = CLASS_COUNT.search(readme)
     if not counted:
         fail(f"{DIAGRAM_README.relative_to(ROOT)} no longer states how many classes "
@@ -334,6 +424,7 @@ def main():
           f"{len(legend)} legend classes, {len(IDENTITY)} address-bound entities "
           "on the canvas and on the notes cards, "
           f"{len(SURFACE_REQUIRED['canvas'])} proof-gated boxes bound per surface, "
+          f"{bound} gateway boxes bound to the verifier they inherit, "
           f"{len(TAXONOMY)} taxonomy names still drawn")
 
 

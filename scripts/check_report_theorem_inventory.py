@@ -22,6 +22,13 @@ GUARANTEE_ID = "P-ALLOC-1"
 NAMESPACE = "LidoSRv3.Audit.Guarantees.PAlloc1."
 # Registry field -> the plane label an inventory row registered against it must print.
 PLANES = {"abstract": "Abstract", "verity": "Verity"}
+# A theorem may span both planes, but no registry field records that: `abstract`
+# and `verity` each name one theorem for one plane.  The composite label is
+# therefore printable by an unregistered row only, and it is not a spelling of
+# either plane — checking containment made it one, since it has both labels
+# inside it.
+COMPOSITE_PLANE = "Abstract and Verity (composite)"
+PLANE_COLUMNS = tuple(PLANES.values()) + (COMPOSITE_PLANE,)
 REGISTRATION = re.compile(r"^REGISTERED as `(?P<plane>[a-z]+)\.theorem`$")
 
 # A declaration name is not always ASCII.  Lean identifiers allow letter-like
@@ -83,6 +90,16 @@ ROW = re.compile(
     rf"(?P<role>[^|\n]*?)[ \t]*\|[ \t]*$",
     re.MULTILINE,
 )
+
+# The inventory a reader meets is the `## Theorems` section: that heading is what
+# introduces the table as every theorem the module declares, and what explains
+# what a REGISTERED cell asserts.  Scanning the whole document instead counted a
+# row wherever it happened to sit, so a row moved out of that section — filed
+# under `## Resolution`, say — still satisfied the inventory while the published
+# table a reader reads had silently dropped it.  Rows are read from the section
+# body, and a row printed outside it is rejected rather than quietly counted
+# toward the section it is no longer in.
+SECTION = re.compile(r"^## Theorems$(?P<body>.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL)
 
 # A top-level declaration is not always a bare `theorem` in column zero.  Lean
 # accepts leading whitespace, attribute blocks, visibility/reducibility
@@ -282,7 +299,18 @@ def main():
     # stayed in the published inventory while the surviving copy kept this gate
     # green.  Every cell the gate reads is shadowed that way, so the repeat
     # itself is rejected before the matches are indexed at all.
-    matches = list(ROW.finditer(report))
+    section = SECTION.search(report)
+    if not section:
+        fail(f"{REPORT.relative_to(ROOT)} has no `## Theorems` section, so the "
+             "inventory a reader meets cannot be located")
+    stray = sorted({m.group("name") for m in ROW.finditer(report)
+                    if not section.start("body") <= m.start() < section.end("body")})
+    if stray:
+        fail(f"{REPORT.relative_to(ROOT)} prints inventory row(s) outside the "
+             f"`## Theorems` section: {', '.join(stray)}; a row filed elsewhere is "
+             "still a published claim, and the section is what a reader reads as the "
+             "inventory")
+    matches = list(ROW.finditer(section.group("body")))
     repeated = sorted(name for name, count in
                       Counter(m.group("name") for m in matches).items() if count > 1)
     if repeated:
@@ -303,7 +331,7 @@ def main():
             fail(f"{name} is declared at Lean line {lean[name]}, "
                  f"inventory says {match.group('line')}")
         plane = match.group("plane").strip()
-        if plane not in ("Abstract", "Verity", "Abstract and Verity (composite)"):
+        if plane not in PLANE_COLUMNS:
             fail(f"{name} has no recognized abstract/Verity plane: {plane!r}")
 
     row = next(g for g in json.loads(REGISTRY.read_text(encoding="utf-8"))["guarantees"]
@@ -328,17 +356,22 @@ def main():
         if not cell.startswith("REGISTERED"):
             continue
         registration = REGISTRATION.match(cell)
-        if not registration:
+        if not registration or registration.group("plane") not in PLANES:
             fail(f"{name} claims registration as {cell!r}, which names none of the "
                  f"registry fields {', '.join(f'`{p}.theorem`' for p in PLANES)}")
         plane = registration.group("plane")
         if plane in claimed:
             fail(f"{name} and {claimed[plane]} both claim registry field "
                  f"`{plane}.theorem`, which records a single theorem")
-        if PLANES[plane] not in match.group("plane"):
+        # The row must print the registered plane and nothing wider.  Containment
+        # let the composite label stand in for either one, since both are spelled
+        # inside it, so a row registered for one plane could publish a claim on
+        # both while this gate stayed green.
+        if match.group("plane").strip() != PLANES[plane]:
             fail(f"{name} is registered as `{plane}.theorem` but its inventory row "
-                 f"prints plane {match.group('plane').strip()!r}, so the row and its "
-                 "registration disagree about which plane the theorem backs")
+                 f"prints plane {match.group('plane').strip()!r}, not "
+                 f"{PLANES[plane]!r}; the row and its registration disagree about "
+                 "which plane the theorem backs")
         claimed[plane] = name
     if claimed != registered:
         fail(f"inventory marks {sorted(claimed.items())} REGISTERED; "

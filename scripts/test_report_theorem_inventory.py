@@ -509,6 +509,41 @@ def main():
             mutate("names none of the registry fields",
                    (kept, kept.replace(f"REGISTERED as `{held}.theorem`", "REGISTERED", 1)))
 
+        # A registration names one plane, and the row must print that plane and
+        # nothing wider.  Testing containment made every column the plane's label
+        # is spelled inside an acceptable spelling of it, so the composite column
+        # — which spells both — stood in for either registration and a row
+        # registered for one plane could publish a claim on both with this gate
+        # still green.  The wider columns are derived from the checker's own
+        # table, so one added later arrives with its case already demanded.
+        supersets = [(plane, column) for plane in registered_rows
+                     for column in CHECK.PLANE_COLUMNS
+                     if column != CHECK.PLANES[plane] and CHECK.PLANES[plane] in column]
+        if not supersets:
+            raise AssertionError("no plane column contains a registered plane's label, "
+                                 "so the containment family asserts nothing")
+        for plane, column in supersets:
+            kept = registered_rows[plane]
+            mutate("disagree about which plane the theorem backs",
+                   (kept, kept.replace(f"| {CHECK.PLANES[plane]} |", f"| {column} |", 1)))
+
+        # Read from the other side: the same widening claimed by promoting the
+        # row that legitimately prints the composite column.  Demoting the
+        # incumbent in the same edit frees the field, so the plane rule answers
+        # rather than the narrower duplicate-field rule.
+        composite_row = next((line for line in report.splitlines()
+                              if f"| {CHECK.COMPOSITE_PLANE} |" in line), None)
+        if composite_row is None:
+            raise AssertionError(
+                f"canonical report prints no {CHECK.COMPOSITE_PLANE!r} row, so demanding "
+                "an exact plane may have outlawed a column the report needs")
+        for plane, incumbent in registered_rows.items():
+            mutate("disagree about which plane the theorem backs",
+                   (incumbent, incumbent.replace(
+                       f"REGISTERED as `{plane}.theorem`", "unregistered", 1)),
+                   (composite_row, composite_row.replace(
+                       "| unregistered |", f"| REGISTERED as `{plane}.theorem` |", 1)))
+
         # A repeated row was dropped rather than checked, because indexing the
         # matches by name keeps only the last one.  Every cell the gate reads can
         # be falsified in an earlier copy while the surviving copy stays correct,
@@ -638,6 +673,58 @@ def main():
             lean_path.write_text(lean, encoding="utf-8")
             report_path.write_text(report, encoding="utf-8")
 
+        # The inventory a reader meets is the table under `## Theorems`, and the
+        # section says in prose that it lists every theorem in the module.
+        # Counting rows anywhere in the document read a row filed under an
+        # unrelated heading as if it were in that table, so any row could be
+        # moved off the section — leaving the inventory short while the document
+        # still spelled the row somewhere — with this gate green.  Every
+        # canonical row is driven through it, relocated and copied.
+        section = CHECK.SECTION.search(report)
+        if not section:
+            raise AssertionError("canonical report has no `## Theorems` section")
+        elsewhere = "## Resolution"
+        if elsewhere not in report[section.end("body"):]:
+            raise AssertionError(f"canonical report has no {elsewhere!r} heading "
+                                 "after the inventory to relocate a row into")
+        inventory_rows = [line for line in section.group("body").splitlines()
+                          if CHECK.ROW.match(line)]
+        if len(inventory_rows) != 8:
+            raise AssertionError(f"expected 8 inventory rows, read {len(inventory_rows)}")
+        for line in inventory_rows:
+            name = CHECK.ROW.match(line).group("name")
+            needle = ("prints inventory row(s) outside the `## Theorems` section: "
+                      f"{name}")
+
+            relocated = report.replace(f"{line}\n", "", 1).replace(
+                elsewhere, f"{elsewhere}\n\n{line}\n", 1)
+            if line in relocated.split(elsewhere)[0]:
+                raise AssertionError(f"relocation mutant for {name} changed nothing")
+            report_path.write_text(relocated, encoding="utf-8")
+            invoke(fixture, False, needle)
+
+            # The same claim published twice: the table a reader meets stays
+            # correct, so only reading the section can see the second copy.
+            report_path.write_text(report.replace(elsewhere, f"{elsewhere}\n\n{line}\n", 1),
+                                   encoding="utf-8")
+            invoke(fixture, False, needle)
+            report_path.write_text(report, encoding="utf-8")
+
+        # A whole second inventory filed further down: whichever copy the gate
+        # read, the other published unchecked rows.
+        report_path.write_text(report.replace(
+            elsewhere, f"## Theorems\n\n{section.group('body').strip()}\n\n{elsewhere}", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "prints inventory row(s) outside the `## Theorems` section")
+        report_path.write_text(report, encoding="utf-8")
+
+        # And the section has to be locatable at all: renaming or demoting the
+        # heading leaves the rows in the document with no inventory to be in.
+        for renamed in ("## Theorem inventory", "### Theorems", "**Theorems**"):
+            report_path.write_text(report.replace("## Theorems", renamed, 1), encoding="utf-8")
+            invoke(fixture, False, "has no `## Theorems` section")
+            report_path.write_text(report, encoding="utf-8")
+
         # A mis-nested scope would qualify the declarations that follow under the
         # wrong name, and an unbalanced one leaves the qualification undefined;
         # each fails closed rather than guessing at the reader's expense.
@@ -687,7 +774,14 @@ def main():
           "REGISTERED row bound to the registry field and the plane it prints, "
           "with the registrations exchanged, the plane labels exchanged, both "
           "exchanged, two rows filed under one field, and a registration naming "
-          "no field all rejected, driven from the checker's own plane table")
+          "no field all rejected, driven from the checker's own plane table; "
+          f"each registered row widened to each of the {len(supersets) // len(registered_rows)} "
+          "plane column(s) its own label is spelled inside, and the composite row "
+          "promoted to each field in turn, rejected while the composite column "
+          "stays printable by an unregistered row; and every one of "
+          f"{len(inventory_rows)} rows relocated out of the `## Theorems` section "
+          "and copied outside it, a second inventory filed further down, and the "
+          "section heading renamed, demoted and unheaded all rejected")
 
 
 if __name__ == "__main__":
