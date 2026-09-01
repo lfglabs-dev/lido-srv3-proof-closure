@@ -297,6 +297,27 @@ def main():
                     splice(diagram, box, f"<!-- {box.group(0)} -->"),
                     f"{entity} ({address})",
                 ))
+                # Adversarial (certified defect 5 family): each surface owes one
+                # form of the address.  Accepting either form on either surface
+                # made them interchangeable, so a canvas tooltip rewritten to the
+                # card's elision left this gate reporting the entity bound while
+                # the canvas published no address a reader could look up — and a
+                # card rewritten to the full form loses the spelling the card is
+                # laid out for.  Both directions are driven, per entity and per
+                # surface, from the checker's own form table.
+                other = (CHECK.ABBREVIATED if CHECK.SURFACE_FORM[surface] == CHECK.FULL
+                         else CHECK.FULL)
+                elided_box = (box.group(0).replace(address, CHECK.abbreviated(address))
+                              if other == CHECK.ABBREVIATED
+                              else box.group(0).replace(CHECK.abbreviated(address), address))
+                if elided_box == box.group(0):
+                    raise AssertionError(
+                        f"address-form mutant for {entity} on the {surface} changed nothing")
+                family.append((
+                    splice(diagram, box, elided_box),
+                    f"on the {surface}, only the {other} address of {entity} "
+                    f"({address}) is printed",
+                ))
                 # An address extended by an adjacent character is a different,
                 # invalid address; substring containment accepts it while
                 # token-boundary matching does not.  The extension is not
@@ -714,7 +735,12 @@ def main():
           f"every one of {len(CHECK.IDENTITY)} address-bound entities relabel-repainted "
           "and deleted per surface, every one comment-wrapped per surface "
           "(entity inside <!-- … --> is invisible to a reader and must not be counted "
-          "as present), and every one with its address extended per surface by each of "
+          "as present), every one rewritten on each surface into the form the other "
+          "surface publishes — a canvas tooltip elided to the card's `0x852d…3Cee`, a "
+          "card expanded to the full forty digits — rejected, since a surface that owes "
+          "one form and prints the other leaves a reader who goes to it for an address "
+          "holding a spelling that looks up no contract, and every one with its address "
+          "extended per surface by each of "
           "8 trailing characters — hex and non-hex alike — applied to both forms "
           "together and to the full and abbreviated form alone, plus a leading "
           "character on each form (a malformed address must not satisfy a "

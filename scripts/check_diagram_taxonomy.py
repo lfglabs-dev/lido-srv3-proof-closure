@@ -29,6 +29,20 @@ CLASSES = ("el", "proof", "com", "bot", "sys", "cl")
 
 SURFACES = ("canvas", "notes cards")
 
+# Each surface publishes one form of an address, and the form is the point.  A
+# canvas node carries its address in the hover tooltip, where there is room for
+# all forty hex digits and where a reader goes precisely to copy them; a notes
+# card prints the elided `0x852d…3Cee` that fits the card.  Accepting either
+# form on either surface made the two interchangeable, so shortening a tooltip
+# to the card's spelling left this gate reporting eight entities bound while the
+# canvas published no full address at all and a reader hovering for one found an
+# elision they cannot look up.  The form each surface owes is pinned here.
+FULL, ABBREVIATED = "full", "abbreviated"
+SURFACE_FORM = {"canvas": FULL, "notes cards": ABBREVIATED}
+if set(SURFACE_FORM) != set(SURFACES):
+    raise SystemExit("diagram taxonomy: every surface must pin the address form it "
+                     f"publishes; {sorted(SURFACE_FORM)} does not cover {list(SURFACES)}")
+
 # address -> (entity, required class, {surface: the label that address belongs
 # under}).  A label is how a box reads, not what it is: rewording one drops its
 # TAXONOMY entry and the rule with it.  An on-chain address cannot be moved by
@@ -393,21 +407,23 @@ def main():
 
     for surface, boxes in (("canvas", nodes), ("notes cards", cards)):
         absent = []
+        elided = []
+        required = SURFACE_FORM[surface]
         for address, (entity, expected, labels) in IDENTITY.items():
-            forms = (address.lower(), abbreviated(address).lower())
+            forms = {FULL: address.lower(), ABBREVIATED: abbreviated(address).lower()}
             belongs = labels[surface]
-            located = False
+            located = wrong_form = False
             for name, kind, identity in boxes:
                 # Read the box the way it is published: a reference that renders
                 # to a letter continues the token a reader copies, even though
                 # the raw source shows punctuation at that boundary.
                 identity = rendered(identity).lower()
-                intact = 0
+                intact = {}
                 # Judged before the box is located, and on every box rather
                 # than only this entity's: a corrupted token is what a reader
                 # copies, so it must fail wherever it is published and whether
                 # or not an intact form sits beside it.
-                for form in forms:
+                for spelling, form in forms.items():
                     standalone, extended = _address_occurrences(identity, form)
                     if extended:
                         fail(f"the {name!r} box on the {surface} publishes {entity}'s "
@@ -415,8 +431,8 @@ def main():
                              f"there rather than printed as itself in {extended} of its "
                              f"{standalone + extended} occurrence(s), and a reader copying "
                              "what is drawn would look up an address that does not exist")
-                    intact += standalone
-                if not intact:
+                    intact[spelling] = standalone
+                if not any(intact.values()):
                     continue
                 if kind != expected:
                     fail(f"{entity} ({address}) is drawn as {kind!r} under the label "
@@ -430,9 +446,23 @@ def main():
                          f"label {name!r}, which names a different entity; the address "
                          f"belongs to {belongs!r}, and an address printed against "
                          "another box misidentifies the contract a reader would look up")
-                located = True
-            if not located:
-                absent.append(f"{entity} ({address})")
+                # Being findable is not the same as being published.  Only the
+                # form this surface owes counts as the entity's identity here;
+                # the other form locates the box for the rules above and leaves
+                # the surface still owing its own.
+                if intact[required]:
+                    located = True
+                else:
+                    wrong_form = True
+            if located:
+                continue
+            (elided if wrong_form else absent).append(f"{entity} ({address})")
+        if elided:
+            other = ABBREVIATED if required == FULL else FULL
+            fail(f"on the {surface}, only the {other} address of {', '.join(elided)} is "
+                 f"printed; that surface publishes the {required} form, and a reader who "
+                 "goes to it for an address a contract can be looked up by finds a "
+                 "spelling that identifies no contract")
         if absent:
             fail(f"the map no longer identifies {', '.join(absent)} on the {surface}; "
                  "a taxonomy-critical entity must stay addressable on the canvas and "
@@ -552,8 +582,8 @@ def main():
 
     print(f"diagram taxonomy ok: {len(nodes)} nodes, {len(cards)} cards, "
           f"{len(legend)} legend classes, {len(IDENTITY)} entities bound to their "
-          "class and to the label they are published under, on the canvas and on "
-          "the notes cards, "
+          "class and to the label they are published under, in the full address form "
+          "on the canvas and the abbreviated form on the notes cards, "
           f"{len(SURFACE_REQUIRED['canvas'])} proof-gated boxes bound per surface, "
           f"{bound} gateway boxes bound to the verifier they inherit, "
           f"{len(TAXONOMY)} taxonomy names still drawn")
