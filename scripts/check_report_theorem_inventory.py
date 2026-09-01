@@ -13,6 +13,11 @@ import re
 import sys
 from collections import Counter
 from pathlib import Path
+from typing import NamedTuple
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import gfm_table  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 LEAN = ROOT / "LidoSRv3/Audit/Guarantees/PAlloc1.lean"
@@ -105,6 +110,23 @@ ROW = re.compile(
     re.MULTILINE,
 )
 
+# Inside the rendered table the cells are read from the renderer's own split, so
+# only the two cells that carry a machine-checked value need a pattern: the name
+# the row publishes and the Lean line it cites.
+NAME_CELL = re.compile(rf"^`(?P<name>{IDENT})`$")
+LINE_CELL = re.compile(r"^\d+$")
+
+
+class Inventory(NamedTuple):
+    """One rendered inventory row, read through the cells GFM lays out."""
+
+    name: str
+    line: int
+    plane: str
+    registered: str
+    role: str
+
+
 # Code fences and HTML comments publish nothing: a reader meets the literal
 # characters of a fenced block and meets no part of a comment at all.  A closing
 # fence repeats the opening character at least as many times, and a backtick
@@ -181,15 +203,22 @@ SECTION = re.compile(r"^## Theorems$(?P<body>.*?)(?=^## |\Z)", re.MULTILINE | re
 # from the section body directly meant deleting that one delimiter line left the
 # whole inventory rendering as a single paragraph of literal text — no table,
 # no rows, nothing a reader could read as the published inventory — while this
-# gate went on parsing the lines and reporting success.  The table is located
-# first and rows are read from its body alone.
-THEOREM_TABLE = re.compile(
-    r"^ {0,3}(?P<header>\|[^\n]*\|[ \t]*Line[ \t]*\|[ \t]*Plane[ \t]*\|"
-    r"[ \t]*Registered[ \t]*\|[ \t]*Role[ \t]*\|)[ \t]*\n"
-    r" {0,3}(?P<delimiter>\|(?:[ \t]*:?-+:?[ \t]*\|)+)[ \t]*\n"
-    r"(?P<body>(?: {0,3}\|[^\n]*\n)*)",
-    re.MULTILINE,
-)
+# gate went on parsing the lines and reporting success.
+#
+# Locating the table with a pattern of its own repeated the same mistake one
+# level down.  The pattern compared the header's and the delimiter's `|` counts,
+# and an escaped pipe is a `|` character that delimits no cell: a header reading
+# `| Theorem \| alias | Line | … |` under a delimiter row widened by one column
+# balanced the character counts exactly while cmark-gfm, finding a five-cell
+# header under a six-cell delimiter, rendered no table at all.  The gate
+# reported eight rows and two registrations; the page showed a paragraph.  The
+# table is now located by `scripts/gfm_table.py`, which splits cells the way the
+# renderer does, so a block this gate reads as a table is a block a reader is
+# shown as one.
+#
+# The header is identified by the four columns it ends with rather than by its
+# first cell, which prints the module namespace and is free to be reworded.
+INVENTORY_COLUMNS = ("Line", "Plane", "Registered", "Role")
 
 # A top-level declaration is not always a bare `theorem` in column zero.  Lean
 # accepts leading whitespace, attribute blocks, visibility/reducibility
@@ -484,42 +513,58 @@ def main():
     if not section:
         fail(f"{REPORT.relative_to(ROOT)} has no `## Theorems` section, so the "
              "inventory a reader meets cannot be located")
-    tables = list(THEOREM_TABLE.finditer(section.group("body")))
+    tables = [t for t in gfm_table.find_tables(section.group("body"))
+              if tuple(cell.strip() for cell in t.header.cells[-4:]) == INVENTORY_COLUMNS
+              and t.columns == len(INVENTORY_COLUMNS) + 1]
     if len(tables) != 1:
         fail(f"{REPORT.relative_to(ROOT)} has {len(tables)} rendered theorem tables in "
              "its `## Theorems` section, expected exactly one; without a header "
-             "underlined by a delimiter row the inventory renders as literal text "
-             "rather than as the table it is published as")
+             "underlined by a delimiter row of exactly the same width the inventory "
+             "renders as literal text rather than as the table it is published as, and "
+             "an escaped pipe in the header narrows that width without removing the "
+             "character")
     table = tables[0]
-    # Markdown drops the table when the delimiter row does not underline exactly
-    # the columns the header declares, so a row-shaped line under a mismatched
-    # delimiter is paragraph text too.
-    columns = table.group("header").count("|") - 1
-    delimiters = table.group("delimiter").count("|") - 1
-    if columns != delimiters:
-        fail(f"{REPORT.relative_to(ROOT)} underlines {delimiters} column(s) beneath a "
-             f"theorem-table header declaring {columns}; Markdown renders no table at "
-             "all, so the inventory a reader meets is literal text")
-    # The inventory begins where the delimiter row ends: a row printed above the
-    # header shares the section but is not in the table a reader reads, so the
-    # window runs from the table's first row to the end of the section rather
-    # than from the section's own start.
-    start = section.start("body") + table.start("body")
-    end = section.end("body")
+    # The inventory is the table's own body, and nothing else.  Running the
+    # window on to the end of the section instead let a row moved below the
+    # table — under a blank line, into the prose that follows it — go on being
+    # counted as an inventory row: the section still held it, the rendered table
+    # no longer did, and a reader met seven rows while this gate reported eight.
+    start = section.start("body") + table.body_start
+    end = section.start("body") + table.body_end
     stray = sorted({m.group("name") for m in ROW.finditer(report)
                     if not start <= m.start() < end})
     if stray:
         fail(f"{REPORT.relative_to(ROOT)} prints inventory row(s) outside the rendered "
              f"theorem table: {', '.join(stray)}; a row filed elsewhere is still a "
              "published claim, and that table is what a reader reads as the inventory")
-    matches = list(ROW.finditer(report[start:end]))
+    # Every row the table renders is read through the cells the renderer lays
+    # out, not through a pattern of this gate's own.  Matching the raw line let
+    # the two disagree: a role cell publishing an escaped pipe renders as one
+    # ordinary five-cell row, while a pattern spelling cells as `[^|]*` could not
+    # cross it and dropped the row from the inventory.  A row-shaped line the
+    # cells cannot be read from is rejected rather than skipped, since a line
+    # inside the published table is a published claim; a line carrying no pipe is
+    # prose GFM pads out into a one-cell row, and is left to the omission and
+    # stray rules instead.
+    printed = []
+    for line in table.rows:
+        cells = [cell.strip() for cell in line.cells]
+        name = NAME_CELL.match(cells[0]) if len(cells) == table.columns else None
+        if not name or not LINE_CELL.match(cells[1]):
+            if line.text.lstrip(" \t").startswith("|"):
+                fail(f"{REPORT.relative_to(ROOT)} renders a row in the theorem table "
+                     f"that is not an inventory row: {line.text.strip()!r}; every row "
+                     "the table prints is read as the inventory, so none may sit in it "
+                     "unchecked")
+            continue
+        printed.append(Inventory(name.group("name"), int(cells[1]), *cells[2:5]))
     repeated = sorted(name for name, count in
-                      Counter(m.group("name") for m in matches).items() if count > 1)
+                      Counter(row.name for row in printed).items() if count > 1)
     if repeated:
         fail(f"{REPORT.relative_to(ROOT)} lists theorem(s) more than once: "
              f"{', '.join(repeated)}; every printed row is a published claim and "
              "must not be shadowed by whichever copy happens to come last")
-    rows = {m.group("name"): m for m in matches}
+    rows = {row.name: row for row in printed}
 
     missing = sorted(set(lean) - set(rows))
     if missing:
@@ -528,13 +573,12 @@ def main():
     if extra:
         fail(f"{REPORT.relative_to(ROOT)} lists theorem(s) absent from Lean: {', '.join(extra)}")
 
-    for name, match in rows.items():
-        if int(match.group("line")) != lean[name]:
+    for name, printed_row in rows.items():
+        if printed_row.line != lean[name]:
             fail(f"{name} is declared at Lean line {lean[name]}, "
-                 f"inventory says {match.group('line')}")
-        plane = match.group("plane").strip()
-        if plane not in PLANE_COLUMNS:
-            fail(f"{name} has no recognized abstract/Verity plane: {plane!r}")
+                 f"inventory says {printed_row.line}")
+        if printed_row.plane not in PLANE_COLUMNS:
+            fail(f"{name} has no recognized abstract/Verity plane: {printed_row.plane!r}")
 
     row = next(g for g in json.loads(REGISTRY.read_text(encoding="utf-8"))["guarantees"]
                if g["id"] == GUARANTEE_ID)
@@ -553,8 +597,8 @@ def main():
     # published CHECKED plane.  Each cell is bound to the field it names, and to
     # the plane column the same row prints.
     claimed = {}
-    for name, match in rows.items():
-        cell = match.group("registered").strip()
+    for name, printed_row in rows.items():
+        cell = printed_row.registered
         if cell == UNREGISTERED:
             continue
         registration = REGISTRATION.match(cell)
@@ -572,9 +616,9 @@ def main():
         # let the composite label stand in for either one, since both are spelled
         # inside it, so a row registered for one plane could publish a claim on
         # both while this gate stayed green.
-        if match.group("plane").strip() != PLANES[plane]:
+        if printed_row.plane != PLANES[plane]:
             fail(f"{name} is registered as `{plane}.theorem` but its inventory row "
-                 f"prints plane {match.group('plane').strip()!r}, not "
+                 f"prints plane {printed_row.plane!r}, not "
                  f"{PLANES[plane]!r}; the row and its registration disagree about "
                  "which plane the theorem backs")
         claimed[plane] = name
