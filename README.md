@@ -59,12 +59,16 @@ lake build         # production library (no Tests, Legacy, or Trust)
 lake build LidoSRv3Test   # mutants, vectors, nested Verity tests
 make audit-check   # registry, pins, source map, generated views
 make test          # metadata, trust, import DAG, then LidoSRv3Test
-make prove         # production LidoSRv3 build; writes proofs/logs/proof-report.json
+make prove         # builds LidoSRv3 and LidoSRv3Legacy; writes proofs/logs/proof-report.json
 ```
 
 `proofs/logs/proof-report.json` is a build receipt for the superseded
 SRV3-P1–P15 lane (`target_scope: legacy-srv3-p1-p15-superseded`). It is not
 evidence for the eleven guarantees above. Use `audit/guarantees.yaml` for those.
+Those theorems live in `LidoSRv3Legacy`, so `make prove` builds it alongside the
+production facade: `scripts/write_proof_report.sh` declares the target set, the
+recipe builds exactly that set, and the receipt is refused unless the build log
+records every declared target.
 
 One guarantee:
 

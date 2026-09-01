@@ -6,9 +6,22 @@ set -euo pipefail
 # "lean_checked" claims when `lake build` was never run, failed, or errored.
 #
 # Inputs (from `make prove`):
-#   BUILD_LOG     path to the captured `lake build LidoSRv3` output
+#   BUILD_LOG     path to the captured `lake build` output
 #                 (default: proofs/logs/prove.txt)
 #   BUILD_STATUS  the exit status of that build (default: unknown -> rejected)
+
+# Every Lake target that must be compiled before this receipt may mark any of
+# its theorems `lean_checked`. `LidoSRv3.P1..P15` live in `LidoSRv3/Legacy`,
+# which is the `LidoSRv3Legacy` library and shares no module with the
+# production facade, so building `LidoSRv3` alone is no evidence for them.
+# `make prove` reads this list (`--targets`) instead of naming targets itself,
+# so the built set cannot drift below the claimed set.
+RECEIPT_TARGETS=(LidoSRv3 LidoSRv3Legacy)
+
+if [ "${1:-}" = "--targets" ]; then
+  printf '%s\n' "${RECEIPT_TARGETS[*]}"
+  exit 0
+fi
 
 BUILD_LOG="${BUILD_LOG:-proofs/logs/prove.txt}"
 BUILD_STATUS="${BUILD_STATUS:-}"
@@ -17,7 +30,7 @@ fail() { printf 'write_proof_report: %s\n' "$1" >&2; exit 1; }
 
 # 1. A build log must exist.
 [ -f "$BUILD_LOG" ] || \
-  fail "build log '$BUILD_LOG' not found; run 'make prove' (which runs 'lake build LidoSRv3') first"
+  fail "build log '$BUILD_LOG' not found; run 'make prove' first"
 
 # 2. The recorded build exit status must be present and successful.
 [ -n "$BUILD_STATUS" ] || \
@@ -35,6 +48,17 @@ fi
 #    target was already up to date).
 grep -Eq 'Built LidoSRv3|Build completed successfully' "$BUILD_LOG" || \
   fail "build log '$BUILD_LOG' does not record a successful build; refusing to emit report"
+
+# 5. That success must cover every target this receipt marks `lean_checked`.
+#    Lake prints no per-target line for an up-to-date target, so bind to the
+#    target set the build was invoked with, which `make prove` records.
+RECORDED_TARGETS="$(sed -nE 's/^proof_targets=(.*)$/\1/p' "$BUILD_LOG")"
+[ "$(printf '%s\n' "$RECORDED_TARGETS" | sed '/^$/d' | wc -l | tr -d ' ')" = "1" ] || \
+  fail "build log '$BUILD_LOG' must contain exactly one proof_targets=<lake targets> line"
+for target in "${RECEIPT_TARGETS[@]}"; do
+  printf '%s\n' $RECORDED_TARGETS | grep -Fqx "$target" || \
+    fail "build log '$BUILD_LOG' built '$RECORDED_TARGETS'; this receipt marks theorems from '$target' lean_checked, so that target must be built too"
+done
 
 BUILD_SHA256="$(sha256sum "$BUILD_LOG" | awk '{print $1}')"
 VERIFIED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -73,7 +97,7 @@ cat <<JSON
     "lean": "${LEAN_VERSION}",
     "verity_commit": "${VERITY_COMMIT}"
   },
-  "command": "lake build LidoSRv3",
+  "command": "lake build ${RECEIPT_TARGETS[*]}",
   "build": {
     "log": "${BUILD_LOG}",
     "log_sha256": "${BUILD_SHA256}",
