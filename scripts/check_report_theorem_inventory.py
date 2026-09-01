@@ -6,6 +6,10 @@ module but is missing from the inventory reads as if the guarantee had fewer
 moving parts than it has, and an inventory row that claims REGISTERED without a
 matching `audit/guarantees.yaml` theorem overstates what the published CHECKED
 cells assert.  Both directions fail closed here.
+
+Temporary: this file reimplements Lean identifier grammar. Do not extend the
+lexer. It will be deleted once the environment inventory (Lean.importModules)
+drives the theorem table.
 """
 
 import json

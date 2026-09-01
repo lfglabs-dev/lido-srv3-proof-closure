@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Bind the architecture map's colour taxonomy to what the pinned source says.
 
+Temporary: this file reverse-parses rendered HTML. Do not extend the HTML /
+CommonMark grammar. It will be replaced by a check against generated diagram
+JSON once the environment inventory exists.
+
 The map colours a box by what makes it trustworthy.  Two mistakes are cheap to
 make and expensive for a reader: drawing an EL system predeploy (EIP-4788,
 EIP-7002, EIP-7251) as consensus layer, which puts it outside the EL trust
