@@ -391,6 +391,16 @@ def validate_guarantees(data, assumption_ids):
     return rows
 
 
+# Every headline-table row that discloses a gap count, whatever index it claims.
+# The per-ID pattern below binds an ID to the position it must carry, so a
+# duplicate published under a *different* index does not match that pattern at
+# all and would go on asserting a contradictory count unchecked.
+README_FIDELITY_ROW = re.compile(
+    r"^\|\s*\d+\s*\|\s*`([^`]+)`\s*\|[^\n|]*\|[^\n|]*\|\s*\d+ open\s*\|$",
+    re.MULTILINE,
+)
+
+
 def validate_readme_fidelity_disclosure(rows):
     """Bind the README headline table to the registry's own fidelity counts.
 
@@ -402,6 +412,7 @@ def validate_readme_fidelity_disclosure(rows):
     """
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     canonical = rows[:len(CANONICAL_IDS)]
+    printed = [m.group(1) for m in README_FIDELITY_ROW.finditer(readme)]
     total = 0
     for position, row in enumerate(canonical, start=1):
         expected = len(row["fidelity"]["missing"])
@@ -412,11 +423,22 @@ def validate_readme_fidelity_disclosure(rows):
             rf"\s*(\d+) open\s*\|$",
             re.MULTILINE,
         )
-        found = cell.search(readme)
-        require(found is not None,
-                f"README: {row['id']} row is missing its `N open` fidelity-gap cell")
-        require(int(found.group(1)) == expected,
-                f"README: {row['id']} discloses {found.group(1)} fidelity gaps, "
+        # A reader meets every row the table prints, but `search` read only the
+        # first: a duplicated row published a second, contradictory gap count
+        # while the first copy kept this gate green.  No canonical ID may name a
+        # repeat, so a second copy is rejected rather than shadowed by whichever
+        # one happens to come first.  Absence is left to the position-bound
+        # `cell` check below, which names the missing cell precisely.
+        appearances = printed.count(row["id"])
+        require(appearances <= 1,
+                f"README: {row['id']} names {appearances} headline fidelity rows; "
+                "every printed row is a published claim and exactly one must carry it")
+        found = cell.findall(readme)
+        require(len(found) == 1,
+                f"README: {row['id']} row is missing its `N open` fidelity-gap cell "
+                f"at headline position {position}")
+        require(int(found[0]) == expected,
+                f"README: {row['id']} discloses {found[0]} fidelity gaps, "
                 f"registry records {expected}")
     require(f"{total} in total" in readme,
             f"README: headline boundary must disclose the {total} total fidelity gaps")

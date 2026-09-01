@@ -292,13 +292,31 @@ def main():
                 raise AssertionError(f"README mutant for {needle!r} changed nothing")
             readme_path.write_text(mutated, encoding="utf-8")
             invoke(fixture, False, needle)
+
+        # A duplicate row is a second published claim, not a harmless echo.  Drive
+        # this from every row the table actually prints so a guarantee added later
+        # arrives with its case already demanded, and cover both orderings plus a
+        # copy filed under another index, which no per-ID position pattern matches.
+        rows = re.findall(r"^\| *\d+ *\| *`[^`]+` *\|[^\n|]*\|[^\n|]*\| *\d+ open *\|$",
+                          readme, flags=re.MULTILINE)
+        if not rows:
+            raise AssertionError("no canonical README fidelity rows found to duplicate")
+        for row in rows:
+            contradictory = re.sub(r"\d+ open", "0 open", row)
+            reindexed = re.sub(r"^\| *\d+", "| 99", contradictory)
+            for duplicated in (f"{row}\n{contradictory}",
+                               f"{contradictory}\n{row}",
+                               f"{row}\n{reindexed}",
+                               f"{row}\n{row}"):
+                readme_path.write_text(readme.replace(row, duplicated, 1), encoding="utf-8")
+                invoke(fixture, False, "headline fidelity rows")
         readme_path.write_text(readme, encoding="utf-8")
 
         invoke(fixture, True, command="generate")
         (fixture / "audit/STATUS.md").write_text("stale\n", encoding="utf-8")
         invoke(fixture, False, "STATUS.md is stale", command="check")
 
-    print("optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, README fidelity-gap disclosure, and stale views")
+    print("optimized assurance-v4 mutants rejected: objective, canonical claims, classifications, assumptions, SSZ-only binding, pins, source spans, proof policy, README fidelity-gap disclosure, duplicate headline rows, and stale views")
 
 
 if __name__ == "__main__":

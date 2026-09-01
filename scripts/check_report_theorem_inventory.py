@@ -66,9 +66,18 @@ ESCAPE_END = "»"
 ATOM = rf"(?:[{ID_FIRST}][{ID_REST}]*|{ESCAPE_BEGIN}[^{ESCAPE_END}\n]*{ESCAPE_END})"
 IDENT = rf"{ATOM}(?:\.{ATOM})*"
 
+# Markdown renders a row by its pipes, not by its padding: `| `n`| 1 | ... |` and
+# `|  `n`  |  1  | ... |` publish the same table to a reader.  Keying on one exact
+# whitespace layout meant a row that renders identically was not seen by this
+# gate at all, so a false claim could be printed beside the correct row and
+# escape both the cell checks and the duplicate check.  Delimiters are matched
+# with tolerant padding instead, and `[^|\n]` keeps a cell from spanning lines so
+# a row is still one physical line.
+CELL = r"[ \t]*\|[ \t]*"
 ROW = re.compile(
-    rf"^\| `(?P<name>{IDENT})` \| (?P<line>\d+) \| (?P<plane>[^|]+?) \| "
-    r"(?P<registered>[^|]+?) \| (?P<role>[^|]+?) \|$",
+    rf"^[ \t]*\|[ \t]*`(?P<name>{IDENT})`{CELL}(?P<line>\d+){CELL}"
+    rf"(?P<plane>[^|\n]*?){CELL}(?P<registered>[^|\n]*?){CELL}"
+    rf"(?P<role>[^|\n]*?)[ \t]*\|[ \t]*$",
     re.MULTILINE,
 )
 
@@ -97,7 +106,21 @@ DECL = re.compile(
     r"^[ \t]*"
     r"(?:@\[[^\]]*\][ \t]*)*"
     rf"(?:(?:{'|'.join(MODIFIERS)})[ \t]+)*"
-    rf"(?:theorem|lemma)\s+({IDENT})",
+    rf"(?:theorem|lemma)\s+(?P<name>{IDENT})",
+    re.MULTILINE,
+)
+
+# A declaration's name is its leaf, not its identity: `namespace A` and
+# `namespace B` can each declare `collision`, and Lean knows them apart as
+# `A.collision` and `B.collision`.  Recording leaves alone let the second
+# silently overwrite the first, so one row could stand for two distinct declared
+# theorems and the inventory could omit one while this gate reported success.
+# The scope commands are tracked here so every theorem is inventoried under the
+# fully qualified name Lean gives it.  A `section` opens a scope that closes like
+# any other but contributes nothing to a name.
+SCOPE = re.compile(
+    rf"^[ \t]*(?P<kind>namespace|section|end)"
+    rf"(?:[ \t]+(?P<label>{IDENT}))?[ \t]*(?:--[^\n]*)?$",
     re.MULTILINE,
 )
 
@@ -196,8 +219,50 @@ def declared_theorems():
     # while this gate reported success.  The stream is scanned instead, and a
     # declaration is recorded at the line its keyword opens, which is where the
     # single-line forms already sat.
-    for match in DECL.finditer(text):
-        found[match.group(1)] = text.count("\n", 0, match.start()) + 1
+    # Scope commands and declarations are replayed in source order so each
+    # theorem is recorded under the name Lean gives it rather than under its
+    # leaf.  The report names theorems relative to this module's own namespace,
+    # which is the prefix its table header prints, so that prefix is dropped and
+    # anything declared outside it keeps its fully qualified name.
+    events = sorted(
+        [(m.start(), "scope", m) for m in SCOPE.finditer(text)]
+        + [(m.start(), "decl", m) for m in DECL.finditer(text)],
+        key=lambda event: event[0],
+    )
+    scopes = []
+    for position, kind, match in events:
+        line = text.count("\n", 0, position) + 1
+        if kind == "scope":
+            command = match.group("kind")
+            label = match.group("label")
+            if command == "namespace":
+                if not label:
+                    fail(f"{LEAN.relative_to(ROOT)}:{line} opens a namespace with no name")
+                scopes.append((label, label))
+            elif command == "section":
+                scopes.append((None, label))
+            else:
+                if not scopes:
+                    fail(f"{LEAN.relative_to(ROOT)}:{line} closes a scope that was never "
+                         "opened, so the names that follow cannot be qualified")
+                _, opened = scopes.pop()
+                if label != opened:
+                    closing = label or "an anonymous scope"
+                    open_scope = opened or "an anonymous scope"
+                    fail(f"{LEAN.relative_to(ROOT)}:{line} closes {closing} but "
+                         f"{open_scope} is open; the names declared here would be "
+                         "qualified under the wrong scope")
+            continue
+        qualified = ".".join([name for name, _ in scopes if name] + [match.group("name")])
+        relative = qualified[len(NAMESPACE):] if qualified.startswith(NAMESPACE) else qualified
+        if relative in found:
+            fail(f"{LEAN.relative_to(ROOT)} declares {relative} at lines {found[relative]} "
+                 f"and {line}; two declarations sharing one inventory name would let a "
+                 "single row stand for both")
+        found[relative] = line
+    if scopes:
+        fail(f"{LEAN.relative_to(ROOT)} leaves {len(scopes)} scope(s) open at end of file, "
+             "so the declarations inside them cannot be qualified")
     return found
 
 

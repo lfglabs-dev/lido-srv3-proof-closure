@@ -478,6 +478,110 @@ def main():
         invoke(fixture, False, "no recognized abstract/Verity plane")
         report_path.write_text(report, encoding="utf-8")
 
+        # A Markdown row is delimited by its pipes, not by its padding: the same
+        # row rendered tighter or looser publishes the same table to a reader.
+        # Keying on one exact whitespace layout meant such a row was not parsed
+        # at all, so a false claim printed beside the correct one escaped every
+        # cell check and the duplicate check with it.  Each layout is asserted
+        # three ways: the canonical row re-rendered in it must still be read (or
+        # its theorem would report as omitted), a repeat in it must be rejected,
+        # and a row naming no Lean theorem must be rejected.
+        layout_anchor = next(line for line in report.splitlines()
+                             if line.startswith("| `active_capacity_bounded` |"))
+        cells = CHECK.ROW.match(layout_anchor)
+        if not cells:
+            raise AssertionError("the checker cannot parse its own canonical row")
+        parts = {key: cells.group(key)
+                 for key in ("name", "line", "plane", "registered", "role")}
+
+        for layout in (
+            "|`{name}`|{line}|{plane}|{registered}|{role}|",
+            "| `{name}`| {line} | {plane} | {registered} | {role} |",
+            "|   `{name}`   |   {line}   |   {plane}   |   {registered}   |   {role}   |",
+            "|\t`{name}`\t|\t{line}\t|\t{plane}\t|\t{registered}\t|\t{role}\t|",
+            "   | `{name}` | {line} | {plane} | {registered} | {role} |",
+            "| `{name}` | {line} | {plane} | {registered} | {role} |  ",
+        ):
+            rendered = layout.format(**parts)
+            report_path.write_text(report.replace(layout_anchor, rendered, 1),
+                                   encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+
+            report_path.write_text(
+                report.replace(layout_anchor, f"{layout_anchor}\n{rendered}", 1),
+                encoding="utf-8")
+            invoke(fixture, False,
+                   "lists theorem(s) more than once: active_capacity_bounded")
+
+            bogus = layout.format(name="bogus_absent_theorem", line="999", plane="Bogus",
+                                  registered="REGISTERED", role="False claim.")
+            report_path.write_text(
+                report.replace(layout_anchor, f"{layout_anchor}\n{bogus}", 1),
+                encoding="utf-8")
+            invoke(fixture, False,
+                   "lists theorem(s) absent from Lean: bogus_absent_theorem")
+            report_path.write_text(report, encoding="utf-8")
+
+        # A declaration's leaf is not its identity.  `namespace A` and
+        # `namespace B` may each declare `collision`; Lean knows them apart, and
+        # recording leaves alone let the second silently overwrite the first, so
+        # one row stood for two distinct theorems and the inventory could omit
+        # one with this gate still green.  Both must be demanded by name.
+        lean_path.write_text(
+            lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1",
+                         "namespace A\ntheorem collision : True := trivial\nend A\n\n"
+                         "namespace B\ntheorem collision : True := trivial\nend B\n\n"
+                         "end LidoSRv3.Audit.Guarantees.PAlloc1", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "omits declared theorem(s): A.collision, B.collision")
+        lean_path.write_text(lean, encoding="utf-8")
+
+        # The qualified name must round-trip: the row parser has to accept the
+        # very name the scope tracker produces, or the gate would demand a row no
+        # edit to the report could satisfy.  A `section` closes like any other
+        # scope but contributes nothing to a name, named or not.
+        for opener, closer, qualified in (
+            ("namespace Inner", "end Inner", "Inner.scoped_thm"),
+            ("namespace Outer.Deep", "end Outer.Deep", "Outer.Deep.scoped_thm"),
+            ("section", "end", "scoped_thm"),
+            ("section Named", "end Named", "scoped_thm"),
+        ):
+            declaration = "theorem scoped_thm : True := trivial"
+            scoped_lean = lean.replace(
+                "end LidoSRv3.Audit.Guarantees.PAlloc1",
+                f"{opener}\n{declaration}\n{closer}\n\n"
+                "end LidoSRv3.Audit.Guarantees.PAlloc1", 1)
+            keyword_line = scoped_lean.splitlines().index(declaration) + 1
+            lean_path.write_text(scoped_lean, encoding="utf-8")
+            report_path.write_text(report, encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {qualified}")
+            report_path.write_text(report.replace(
+                layout_anchor,
+                f"{layout_anchor}\n| `{qualified}` | {keyword_line} | Abstract | "
+                "unregistered | Scope round-trip fixture. |", 1),
+                encoding="utf-8")
+            invoke(fixture, True, "9 P-ALLOC-1 theorems")
+            lean_path.write_text(lean, encoding="utf-8")
+            report_path.write_text(report, encoding="utf-8")
+
+        # A mis-nested scope would qualify the declarations that follow under the
+        # wrong name, and an unbalanced one leaves the qualification undefined;
+        # each fails closed rather than guessing at the reader's expense.
+        for broken, needle in (
+            ("namespace A\ntheorem scoped_thm : True := trivial\nend B\n\n"
+             "end LidoSRv3.Audit.Guarantees.PAlloc1",
+             "closes B but A is open"),
+            ("end LidoSRv3.Audit.Guarantees.PAlloc1\n\nnamespace Dangling",
+             "leaves 1 scope(s) open at end of file"),
+            ("end LidoSRv3.Audit.Guarantees.PAlloc1\n\nend Stray",
+             "closes a scope that was never opened"),
+        ):
+            lean_path.write_text(
+                lean.replace("end LidoSRv3.Audit.Guarantees.PAlloc1", broken, 1),
+                encoding="utf-8")
+            invoke(fixture, False, needle)
+            lean_path.write_text(lean, encoding="utf-8")
+
         invoke(fixture, True)
 
     print("report theorem inventory mutants rejected: dropped row, undisclosed theorem "
@@ -500,7 +604,12 @@ def main():
           "(`/-`, `-/`, `--`, `\"`, `/--`) kept as name text, a balancing pair of them "
           "not allowed to blank the declarations in between, a stray `«` and a `«` "
           "inside a real comment not allowed to swallow code, and an escaped name "
-          "carrying `/-` round-trips to a row")
+          "carrying `/-` round-trips to a row; a row re-rendered in each of 6 "
+          "whitespace layouts still read, with a repeat and a Lean-absent row in "
+          "each rejected rather than slipping past the parser on padding; "
+          "same-leaf theorems in sibling namespaces demanded as distinct "
+          "qualified names, qualified and sectioned names round-tripping to rows, "
+          "and mis-nested, dangling and stray scope commands rejected")
 
 
 if __name__ == "__main__":
