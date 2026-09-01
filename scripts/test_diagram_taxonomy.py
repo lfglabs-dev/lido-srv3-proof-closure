@@ -297,18 +297,42 @@ def main():
                     splice(diagram, box, f"<!-- {box.group(0)} -->"),
                     f"{entity} ({address})",
                 ))
-                # An address extended by an adjacent hex digit is a
-                # different, invalid address; substring containment accepts
-                # it while token-boundary matching does not.
+                # An address extended by an adjacent character is a different,
+                # invalid address; substring containment accepts it while
+                # token-boundary matching does not.  The extension is not
+                # always a hex digit: a boundary class of hex alone let `g`,
+                # `z`, `Z`, `_` and `X` through, so the published token read
+                # `0x852d…3Ceeg` while this gate still reported success.  Both
+                # forms are extended together and then each one alone, because
+                # locating an entity accepts either form: with only the pair
+                # corrupted, an intact tooltip could vouch for a corrupted
+                # visible row and the reader-facing surface would go unchecked.
                 abbr = CHECK.abbreviated(address)
-                extended_box = (box.group(0)
-                    .replace(address, address + "0")
-                    .replace(abbr, abbr + "0"))
-                if extended_box != box.group(0):
-                    family.append((
-                        splice(diagram, box, extended_box),
-                        f"{entity} ({address})",
-                    ))
+                for suffix in ("0", "a", "f", "g", "z", "Z", "_", "X"):
+                    for what, extended_box in (
+                        ("both forms", box.group(0)
+                            .replace(address, address + suffix)
+                            .replace(abbr, abbr + suffix)),
+                        ("full form", box.group(0)
+                            .replace(address, address + suffix)),
+                        ("abbreviated form", box.group(0)
+                            .replace(abbr, abbr + suffix)),
+                    ):
+                        if extended_box == box.group(0):
+                            continue
+                        family.append((
+                            splice(diagram, box, extended_box),
+                            f"{entity}",
+                        ))
+                # A character prepended to the token corrupts it just as a
+                # trailing one does, and the boundary must hold on both sides.
+                for prefixed_box in (box.group(0).replace(address, "X" + address),
+                                     box.group(0).replace(abbr, "X" + abbr)):
+                    if prefixed_box != box.group(0):
+                        family.append((
+                            splice(diagram, box, prefixed_box),
+                            f"{entity}",
+                        ))
 
         # The same exchange read as a family, one surface at a time.  Every
         # same-class pair the checker's own table carries is swapped, so a pair
@@ -657,9 +681,13 @@ def main():
           f"every one of {len(CHECK.IDENTITY)} address-bound entities relabel-repainted "
           "and deleted per surface, every one comment-wrapped per surface "
           "(entity inside <!-- … --> is invisible to a reader and must not be counted "
-          "as present), and every one with its address extended by a trailing hex digit "
-          "per surface (malformed address must not satisfy a token-boundary check via "
-          "substring containment); "
+          "as present), and every one with its address extended per surface by each of "
+          "8 trailing characters — hex and non-hex alike — applied to both forms "
+          "together and to the full and abbreviated form alone, plus a leading "
+          "character on each form (a malformed address must not satisfy a "
+          "token-boundary check via substring containment, the extension is not always "
+          "a hex digit, and an intact form must not vouch for a corrupted one beside "
+          "it); "
           f"{exchanges} same-class address exchanges — every pair the table carries whose "
           "entities are drawn under different labels on that surface — rejected on each "
           "surface alone (both boxes keep their class, so only binding the address to the "

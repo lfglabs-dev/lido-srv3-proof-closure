@@ -249,16 +249,39 @@ CARD_ADDRESS = re.compile(r'<div class="a">(.*?)</div>')
 _COMMENT = re.compile(r'<!--.*?-->', re.DOTALL)
 
 
+# What continues an address token rather than ending it.  A corrupted address
+# is not corrupted only with hex: `…3Ceeg`, `…3Cee_`, `…3CeeZ` and `X0x852d…`
+# all publish a token a reader would copy and fail to look up, and a boundary
+# class of hex alone accepts every one of them because the valid address is
+# still a substring.  Any letter, digit or underscore therefore continues the
+# token, as does the ellipsis the abbreviated form elides its middle with.
+_TOKEN_CHAR = r'[0-9A-Za-z_…]'
+
+
 def _address_in(text, addr):
-    """True iff addr appears in text as a standalone hex address token.
+    """True iff addr appears in text as a standalone address token.
 
     Substring containment lets a malformed address that merely extends a
     valid one (e.g. the full address with a trailing `0`) satisfy the
     check, because the valid prefix is still present inside the longer
-    string.  Requiring no adjacent hex character on either side enforces
-    token boundaries without depending on surrounding punctuation.
+    string.  Requiring no adjacent token character on either side enforces
+    token boundaries without depending on surrounding punctuation, and
+    without assuming the extra character is itself a hex digit.
     """
-    return bool(re.search(r'(?<![0-9a-f])' + re.escape(addr) + r'(?![0-9a-f])', text))
+    return bool(re.search(f'(?<!{_TOKEN_CHAR})' + re.escape(addr) + f'(?!{_TOKEN_CHAR})', text))
+
+
+def _address_corrupted_in(text, addr):
+    """True iff text carries addr only as part of a longer address token.
+
+    Locating an entity accepts either the full or the abbreviated form, so a
+    box that publishes both can have one of them corrupted and still be found
+    by the other: the intact tooltip vouches for a visible row that reads
+    `0x852d…3Ceeg`.  A form present as a substring but not as a standalone
+    token is a corrupted publication of that form, which is judged on its own
+    rather than excused by the form beside it.
+    """
+    return addr in text and not _address_in(text, addr)
 
 
 def fail(message):
@@ -360,7 +383,18 @@ def main():
             belongs = labels[surface]
             located = False
             for name, kind, identity in boxes:
-                if not any(_address_in(identity.lower(), form) for form in forms):
+                identity = identity.lower()
+                # Judged before the box is located, and on every box rather
+                # than only this entity's: a corrupted token is what a reader
+                # copies, so it must fail wherever it is published and whether
+                # or not an intact form sits beside it.
+                for form in forms:
+                    if _address_corrupted_in(identity, form):
+                        fail(f"the {name!r} box on the {surface} publishes {entity}'s "
+                             f"address as part of a longer token; {form!r} is extended "
+                             "there rather than printed as itself, and a reader copying "
+                             "what is drawn would look up an address that does not exist")
+                if not any(_address_in(identity, form) for form in forms):
                     continue
                 if kind != expected:
                     fail(f"{entity} ({address}) is drawn as {kind!r} under the label "
