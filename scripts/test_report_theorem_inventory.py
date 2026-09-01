@@ -810,13 +810,18 @@ def main():
             report_path.write_text(report, encoding="utf-8")
 
         # A row is a published claim only where Markdown renders one.  Inside a
-        # code fence the pipes are printed as literal characters, and inside an
-        # HTML comment nothing is printed at all, so reading the raw file counted
-        # rows a reader never meets: any row could be fenced or commented out —
-        # leaving the rendered table short while the file still spelled the row —
-        # with this gate green.  Every canonical row is driven through every
-        # construct, since one the suite never exercises is one that can hide a
-        # row the day it is used.
+        # code fence the pipes are printed as literal characters, inside an HTML
+        # comment nothing is printed at all, and inside any other HTML block the
+        # line is passed through as raw HTML rather than parsed as a row, so
+        # reading the raw file counted rows a reader never meets: any row could
+        # be fenced, commented out or wrapped in `<div>` — leaving the rendered
+        # table short while the file still spelled the row — with this gate
+        # green.  Every canonical row is driven through every construct, since
+        # one the suite never exercises is one that can hide a row the day it is
+        # used, and every one of CommonMark's seven HTML block start conditions
+        # appears here because recognizing six of them leaves the seventh able to
+        # carry the row.  Each mutant ends its block before the next row so the
+        # gate names exactly the theorem it hid.
         non_rendered = (
             lambda line: f"```\n{line}\n```",
             lambda line: f"```text\n{line}\n```",
@@ -827,6 +832,18 @@ def main():
             lambda line: f"<!-- {line} -->",
             lambda line: f"<!--\n{line}\n-->",
             lambda line: f"<!-- a --> <!--\n{line}\n-->",
+            lambda line: f"<script>\n{line}\n</script>",
+            lambda line: f"<pre>\n{line}\n</pre>",
+            lambda line: f"<?php\n{line}\n?>",
+            lambda line: f"<!DOCTYPE html\n{line}\n>",
+            lambda line: f"<![CDATA[\n{line}\n]]>",
+            lambda line: f"<div>\n{line}\n</div>\n",
+            lambda line: f'<div class="inventory">\n{line}\n</div>\n',
+            lambda line: f"<DIV>\n{line}\n</DIV>\n",
+            lambda line: f"   <div>\n{line}\n</div>\n",
+            lambda line: f"<table>\n{line}\n</table>\n",
+            lambda line: f"</div>\n{line}\n",
+            lambda line: f'\n<span class="hidden">\n{line}\n',
             lambda line: f"    {line}",
             lambda line: f"\t{line}",
         )
@@ -840,30 +857,49 @@ def main():
                 invoke(fixture, False, f"omits declared theorem(s): {name}")
                 report_path.write_text(report, encoding="utf-8")
 
+        # Condition 6 is a list of tag names, and a name the suite never
+        # exercises is a name that can hide a row the day it is used.  Each is
+        # driven once, from the checker's own list, so a name a later CommonMark
+        # revision adds arrives with its case already demanded.
+        first = inventory_rows[0]
+        first_name = CHECK.ROW.match(first).group("name")
+        block_names = CHECK.HTML_BLOCK_NAMES.split("|")
+        if "div" not in block_names or len(block_names) < 60:
+            raise AssertionError(f"implausible HTML block name list: {block_names}")
+        for tag in block_names:
+            report_path.write_text(report.replace(first, f"<{tag}>\n{first}\n</{tag}>\n", 1),
+                                   encoding="utf-8")
+            invoke(fixture, False, f"omits declared theorem(s): {first_name}")
+        report_path.write_text(report, encoding="utf-8")
+
         # An unterminated HTML comment runs to the end of the document, so it
-        # hides every row below it rather than only the one it opens on.
-        report_path.write_text(report.replace(inventory_rows[0],
-                                              f"<!--\n{inventory_rows[0]}", 1),
-                               encoding="utf-8")
-        invoke(fixture, False, "omits declared theorem(s)")
-        report_path.write_text(report, encoding="utf-8")
+        # hides every row below it rather than only the one it opens on.  The
+        # same holds for a raw-text element, which ends on its own closing tag
+        # and so is not stopped by the blank line that ends a `<div>`.
+        for runaway in ("<!--", "<script>"):
+            report_path.write_text(report.replace(inventory_rows[0],
+                                                  f"{runaway}\n{inventory_rows[0]}", 1),
+                                   encoding="utf-8")
+            invoke(fixture, False, "omits declared theorem(s)")
+            report_path.write_text(report, encoding="utf-8")
 
-        # A heading quoted inside a fence is not a heading, so it must not
-        # relocate the section onto a table no reader meets.
-        report_path.write_text(report.replace(
-            "## Theorems",
-            f"```\n## Theorems\n\n{inventory_rows[0]}\n```\n\n## Theorems", 1),
-            encoding="utf-8")
-        invoke(fixture, True, "8 P-ALLOC-1 theorems")
-        report_path.write_text(report, encoding="utf-8")
+        # A heading quoted inside a fence or an HTML block is not a heading, so
+        # it must not relocate the section onto a table no reader meets.
+        for quoted in (f"```\n## Theorems\n\n{inventory_rows[0]}\n```",
+                       f"<div>\n## Theorems\n{inventory_rows[0]}\n</div>"):
+            report_path.write_text(report.replace(
+                "## Theorems", f"{quoted}\n\n## Theorems", 1), encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            report_path.write_text(report, encoding="utf-8")
 
-        # And a fenced row outside the section publishes nothing either, so it
-        # is not the stray claim an unfenced copy would be.
-        report_path.write_text(report.replace(
-            elsewhere, f"{elsewhere}\n\n```\n{inventory_rows[0]}\n```\n", 1),
-            encoding="utf-8")
-        invoke(fixture, True, "8 P-ALLOC-1 theorems")
-        report_path.write_text(report, encoding="utf-8")
+        # And a row outside the section publishes nothing either when it is
+        # fenced or raw HTML, so it is not the stray claim a bare copy would be.
+        for quoted in (f"```\n{inventory_rows[0]}\n```",
+                       f"<div>\n{inventory_rows[0]}\n</div>"):
+            report_path.write_text(report.replace(
+                elsewhere, f"{elsewhere}\n\n{quoted}\n", 1), encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            report_path.write_text(report, encoding="utf-8")
 
         # The opposite failure is worse than the one being fixed: masking text
         # that Markdown does render would blank the real table and leave a gate
@@ -878,9 +914,31 @@ def main():
             "<!-- a closed comment -->",
             "<!-- a\n  closed\n  multi-line comment -->",
             "    ```\n    an indented block that is not a fence\n",
+            "<div>\na block that ends at the blank line below it\n</div>",
+            "<script>\na raw-text element that ends on its own tag\n</script>",
+            "<?php echo 'a processing instruction'; ?>",
+            "<!DOCTYPE html>",
+            "<![CDATA[ a character data section ]]>",
         ):
             report_path.write_text(
                 report.replace("## Theorems", f"{still_rendered}\n\n## Theorems", 1),
+                encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            report_path.write_text(report, encoding="utf-8")
+
+        # The sharpest form of that failure is a line that only resembles an
+        # opener sitting directly above the table: were it read as one, the block
+        # would run to the blank line past the last row and blank the whole
+        # inventory at once.  Each of these is inserted immediately before the
+        # first row, so all eight must still be read.
+        for inert in (
+            "prose that mentions <div> in the middle of a line",
+            '<span class="x">an inline tag with text after it</span> is not a block',
+            "<3 is not a tag",
+            "a paragraph line\n<span>",
+        ):
+            report_path.write_text(
+                report.replace(inventory_rows[0], f"{inert}\n{inventory_rows[0]}", 1),
                 encoding="utf-8")
             invoke(fixture, True, "8 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
@@ -949,12 +1007,20 @@ def main():
           "section heading renamed, demoted and unheaded all rejected; and every "
           f"one of those rows hidden in each of {len(non_rendered)} constructs "
           "Markdown does not render as a row (backtick, info-string, tilde, "
-          "indented, over-long and over-closed fences, inline, block and "
-          "reopened HTML comments, and space- and tab-indented code) rejected, "
-          "with an unterminated comment hiding the rows below it, a fenced "
-          "heading not allowed to relocate the section, a fenced row outside it "
-          "not counted as a stray claim, and 8 look-alike openers asserted to "
-          "leave the real table rendered")
+          "indented, over-long and over-closed fences, space- and tab-indented "
+          "code, and all seven HTML block conditions: raw-text elements, "
+          "processing instructions, declarations, CDATA, inline, block and "
+          "reopened comments, named blocks plain, attributed, uppercased, "
+          "indented and closing-tag-first, and a bare tag after a blank line) "
+          f"rejected, with each of the {len(block_names)} named-block spellings "
+          "the checker's own list carries driven once, an unterminated comment "
+          "and an unclosed raw-text "
+          "element each hiding the rows below them, a heading quoted in a fence "
+          "or an HTML block not allowed to relocate the section, a row quoted in "
+          "either outside it not counted as a stray claim, and 17 look-alike "
+          "openers — 13 above the section and 4 directly above the first row, "
+          "where a block would blank the whole inventory — asserted to leave the "
+          "real table rendered")
 
 
 if __name__ == "__main__":

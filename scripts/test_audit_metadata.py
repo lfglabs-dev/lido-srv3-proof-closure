@@ -284,9 +284,9 @@ def main():
                             "| 1 | `P-ALLOC-1` | CHECKED | CHECKED |"),
              "P-ALLOC-1 row is missing its `N open` fidelity-gap cell"),
             (readme.replace("67 in total", "some in total"),
-             "must disclose the 67 total fidelity gaps"),
+             "must render the 67 total fidelity gaps as visible text"),
             (readme.replace("not about a deployed contract", "about a deployed contract"),
-             "must state the model-vs-deployed boundary"),
+             "must render the model-vs-deployed boundary as visible text"),
         ):
             if mutated == readme:
                 raise AssertionError(f"README mutant for {needle!r} changed nothing")
@@ -384,13 +384,15 @@ def main():
         title = readme.split("\n", 1)[0]
         for sentence, muted, needle in (
             ("67 in total", "counted below",
-             "headline blockquote must disclose the 67 total fidelity gaps"),
+             "headline blockquote must render the 67 total fidelity gaps as visible text"),
             ("not about a deployed contract", "about a Lean model",
-             "headline blockquote must state the model-vs-deployed boundary"),
+             "headline blockquote must render the model-vs-deployed boundary as "
+             "visible text"),
         ):
             if readme.count(sentence) != 1 or block.count(sentence) != 1:
                 raise AssertionError(f"expected {sentence!r} once, inside the headline block")
-            quieted = readme.replace(block, block.replace(sentence, muted, 1), 1)
+            muted_block = block.replace(sentence, muted, 1)
+            quieted = readme.replace(block, muted_block, 1)
             if quieted == readme:
                 raise AssertionError(f"headline mutant for {sentence!r} changed nothing")
 
@@ -403,6 +405,29 @@ def main():
                 if relocated == quieted:
                     raise AssertionError(f"relocation mutant for {sentence!r} changed nothing")
                 readme_path.write_text(relocated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
+            # Or spelled inside the block and published by none of it.  The
+            # block's contents were searched as raw Markdown, so a qualification
+            # whose characters render as no visible text satisfied the search
+            # while the headline a reader meets carried nothing: an HTML comment
+            # was enough, and every other construct below prints just as little.
+            # Each is driven for both sentences, since one the suite never
+            # exercises is one that can carry a qualification the day it is used.
+            for concealed in (
+                f"> <!-- The evidence is {sentence}. -->\n",
+                f"> <!-- a note\n> continued: {sentence}\n> -->\n",
+                f"> <?php echo 'The evidence is {sentence}.'; ?>\n",
+                f"> <![CDATA[The evidence is {sentence}.]]>\n",
+                f"> <!DOCTYPE note SYSTEM {sentence}>\n",
+                f"> <script>var note = '{sentence}';</script>\n",
+                f"> <style>/* {sentence} */</style>\n",
+                f"> <textarea>{sentence}</textarea>\n",
+                f'> <span title="{sentence}">See the note.</span>\n',
+                f'> <img alt="{sentence}" src="x.png">\n',
+            ):
+                readme_path.write_text(
+                    readme.replace(block, muted_block + concealed, 1), encoding="utf-8")
                 invoke(fixture, False, needle)
 
             # And dropped from the README outright.
@@ -443,6 +468,24 @@ def main():
             invoke(fixture, True)
             readme_path.write_text(readme, encoding="utf-8")
 
+        # Removing what does not render must not take visible text with it, or
+        # the gate would reject a headline a reader plainly meets and no edit to
+        # the README could satisfy it.  Each sentence is muted in place and
+        # restated in a form whose rendered characters still spell it exactly.
+        for sentence, muted in (("67 in total", "counted below"),
+                                ("not about a deployed contract", "about a Lean model")):
+            muted_block = block.replace(sentence, muted, 1)
+            for restated in (
+                f"> The evidence is <b>{sentence}</b>.\n",
+                f'> <span class="note">The evidence is {sentence}.</span>\n',
+                f"> The evidence is {sentence.replace(' ', '<b> </b>', 1)}.\n",
+                f"> The evidence is {sentence}. <!-- and nowhere else -->\n",
+            ):
+                readme_path.write_text(
+                    readme.replace(block, muted_block + restated, 1), encoding="utf-8")
+                invoke(fixture, True)
+                readme_path.write_text(readme, encoding="utf-8")
+
         invoke(fixture, True, command="generate")
         (fixture / "audit/STATUS.md").write_text("stale\n", encoding="utf-8")
         invoke(fixture, False, "STATUS.md is stale", command="check")
@@ -455,10 +498,15 @@ def main():
           "row printed inside the table, a second table claiming the headline's own "
           "columns, and the gap column repainted so the table cannot be located; and "
           "each headline qualification re-filed into an appendix, into prose above the "
-          "table, into a later blockquote and dropped outright, with the opening "
-          "blockquote demoted to prose, pushed below an introduction, deleted, "
-          "unheaded and its title demoted all rejected, while a renamed title, a "
-          "longer block and a redundant restatement stay accepted")
+          "table, into a later blockquote and dropped outright, and spelled inside the "
+          "block by each of 10 constructs that publish no visible text (single- and "
+          "multi-line comments, a processing instruction, CDATA, a declaration, "
+          "`script`, `style` and `textarea` bodies, and `title`/`alt` attribute "
+          "values), with the opening blockquote demoted to prose, pushed below an "
+          "introduction, deleted, unheaded and its title demoted all rejected, while a "
+          "renamed title, a longer block, a redundant restatement, and each "
+          "qualification restated through inline markup that still renders it stay "
+          "accepted")
 
 
 if __name__ == "__main__":

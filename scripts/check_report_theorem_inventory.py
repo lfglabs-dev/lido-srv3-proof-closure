@@ -105,6 +105,57 @@ FENCE_CLOSE = re.compile(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$")
 COMMENT_OPEN = "<!--"
 COMMENT_CLOSE = "-->"
 
+# A comment is only one of CommonMark's seven HTML blocks, and every one of them
+# is a non-Markdown region: its lines are passed through as raw HTML, so a pipe
+# line inside one is printed as literal text rather than parsed as a row of the
+# theorem table.  Recognizing comments alone left every other construct able to
+# carry a row that satisfied this gate while the rendered inventory silently
+# omitted the theorem — wrapping a required row in `<div>` and `</div>` was
+# enough.  All seven start conditions are read here.
+#
+# Condition 6's tag list is the union of the names the CommonMark revisions give
+# it — `search` arrived and `source` left between 0.30 and 0.31.2, and `meta` is
+# the spelling `scripts/check_verity_provenance.py` already masks — so a name any
+# of them treats as a block still masks here.  Widening it is the safe direction:
+# masking a line that in fact renders can only hide a row, which surfaces as a
+# declared theorem the inventory omits, while missing a block spelling is what
+# lets an unrendered row count.
+HTML_BLOCK_NAMES = (
+    "address|article|aside|base|basefont|blockquote|body|caption|center|col|"
+    "colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|"
+    "form|frame|frameset|h1|h2|h3|h4|h5|h6|head|header|hr|html|iframe|legend|li|"
+    "link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option|p|param|search|"
+    "section|source|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul"
+)
+# Condition 1's elements carry raw text to their own closing tag rather than to
+# a blank line, so they are matched before the condition-6 names they overlap.
+HTML_RAW_TEXT_NAMES = "script|pre|style|textarea"
+HTML_ATTRIBUTE = (
+    r"""(?:[ \t]+[A-Za-z_:][A-Za-z0-9_.:-]*"""
+    r"""(?:[ \t]*=[ \t]*(?:[^ \t"'=<>`]+|'[^']*'|"[^"]*"))?)"""
+)
+HTML_TAG = (rf"(?:<[A-Za-z][A-Za-z0-9-]*{HTML_ATTRIBUTE}*[ \t]*/?>"
+            rf"|</[A-Za-z][A-Za-z0-9-]*[ \t]*>)")
+# Conditions 6 and 7 run to the next blank line; blanking that line is a no-op,
+# so an inclusive end pattern spells both endings with one rule.
+HTML_BLOCK_BLANK_END = re.compile(r"^[ \t]*$")
+HTML_BLOCK_STARTS = (
+    (re.compile(rf"^ {{0,3}}<(?:{HTML_RAW_TEXT_NAMES})(?:[ \t]|>|$)", re.IGNORECASE),
+     re.compile(rf"</(?:{HTML_RAW_TEXT_NAMES})>", re.IGNORECASE)),
+    (re.compile(r"^ {0,3}<\?"), re.compile(r"\?>")),
+    (re.compile(r"^ {0,3}<!\[CDATA\["), re.compile(r"\]\]>")),
+    # CommonMark 0.30 requires an uppercase letter here and 0.31.2 any ASCII
+    # letter; the wider spelling masks a declaration either version accepts.
+    (re.compile(r"^ {0,3}<![A-Za-z]"), re.compile(r">")),
+    (re.compile(rf"^ {{0,3}}</?(?:{HTML_BLOCK_NAMES})(?:[ \t]|/?>|$)", re.IGNORECASE),
+     HTML_BLOCK_BLANK_END),
+)
+# Condition 7 is a complete tag alone on its line.  It is the one start that may
+# not interrupt a paragraph, so it opens a block only after a blank line; a
+# pipe line following a tag that opened no block is a paragraph continuation
+# rather than a table row either way.
+HTML_BLOCK_BARE_TAG = re.compile(rf"^ {{0,3}}{HTML_TAG}[ \t]*$")
+
 # The inventory a reader meets is the `## Theorems` section: that heading is what
 # introduces the table as every theorem the module declares, and what explains
 # what a REGISTERED cell asserts.  Scanning the whole document instead counted a
@@ -186,12 +237,14 @@ def _comment_spans(line, open_comment):
 def mask_non_rendered(text):
     """Blank the lines Markdown does not render, preserving every offset.
 
-    A row inside a code fence is printed as literal characters and a row inside
-    an HTML comment is printed not at all, so neither is a claim a reader ever
-    meets.  Reading the raw file let either one stand in for the published
-    table: the inventory could satisfy this gate with a row no reader can see
-    while the rendered table silently omitted the theorem, and a `## Theorems`
-    heading quoted inside a fence could relocate the section itself.
+    A row inside a code fence is printed as literal characters, a row inside an
+    HTML comment is printed not at all, and a row inside any other HTML block is
+    passed through as raw HTML rather than parsed as a table row.  None of the
+    three is a claim a reader ever meets.  Reading the raw file let any of them
+    stand in for the published table: the inventory could satisfy this gate with
+    a row no reader can see while the rendered table silently omitted the
+    theorem, and a `## Theorems` heading quoted inside a fence could relocate the
+    section itself.
 
     Whole lines are blanked rather than the exact spans.  Blanking only the
     characters of `<!--x-->| ... |` would leave a line that opens with a pipe
@@ -201,7 +254,9 @@ def mask_non_rendered(text):
     """
     lines = text.splitlines(keepends=True)
     fence = None
+    html_block = None
     open_comment = False
+    previous_blank = True
     for index, raw in enumerate(lines):
         line = raw.rstrip("\n").rstrip("\r")
         masked = False
@@ -213,14 +268,29 @@ def mask_non_rendered(text):
             if (closing and closing.group("seq")[0] == fence[0]
                     and len(closing.group("seq")) >= fence[1]):
                 fence = None
+        elif html_block is not None:
+            masked = True
+            if html_block.search(line):
+                html_block = None
         else:
             opening = FENCE_OPEN.match(line)
             if opening and not (opening.group("seq")[0] == "`"
                                 and "`" in opening.group("info")):
                 fence = (opening.group("seq")[0], len(opening.group("seq")))
                 masked = True
+            else:
+                for start, end in HTML_BLOCK_STARTS:
+                    if start.match(line):
+                        masked = True
+                        html_block = None if end.search(line) else end
+                        break
+                else:
+                    if previous_blank and HTML_BLOCK_BARE_TAG.match(line):
+                        masked = True
+                        html_block = HTML_BLOCK_BLANK_END
         if masked:
             lines[index] = "".join(" " if c not in "\r\n" else c for c in raw)
+        previous_blank = not line.strip()
     return "".join(lines)
 
 

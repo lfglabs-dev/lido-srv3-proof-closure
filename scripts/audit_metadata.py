@@ -425,6 +425,34 @@ README_HEADLINE_TABLE = re.compile(
 # block immediately under the title, and nowhere else.
 README_HEADLINE_BLOCK = re.compile(r"\A# [^\n]*\n\n(?P<block>(?:>[^\n]*\n)+)")
 
+# Locating the block is only half of it: its contents were then searched as raw
+# Markdown, and text a reader never meets satisfied that search.  Dropping the
+# visible count and boundary and adding a line such as
+# `> <!-- not about a deployed contract; 67 in total -->` left both
+# qualifications present in the source and absent from the rendered page, so the
+# headline CHECKED table published itself unqualified while this gate stayed
+# green.  Every construct whose characters render as no visible text is removed
+# before the block is tested — comments, processing instructions, declarations
+# and CDATA, the raw-text elements whose bodies are never shown as prose, and
+# the tags themselves, so a sentence cannot hide in an attribute value either.
+# Removal only ever deletes text, so a qualification can vanish from this view
+# but can never be invented in it; the failure direction is a real disclosure
+# reported missing, never a missing one reported present.
+_HTML_ATTRIBUTE = (
+    r"""(?:\s+[A-Za-z_:][A-Za-z0-9_.:-]*"""
+    r"""(?:\s*=\s*(?:[^\s"'=<>`]+|'[^']*'|"[^"]*"))?)"""
+)
+README_UNRENDERED = re.compile(
+    r"<!--.*?(?:-->|\Z)"
+    r"|<\?.*?(?:\?>|\Z)"
+    r"|<!\[CDATA\[.*?(?:\]\]>|\Z)"
+    r"|<![A-Za-z].*?(?:>|\Z)"
+    r"|<(script|style|textarea)\b.*?(?:</\1\s*>|\Z)"
+    rf"|<[A-Za-z][A-Za-z0-9-]*{_HTML_ATTRIBUTE}*\s*/?>"
+    r"|</[A-Za-z][A-Za-z0-9-]*\s*>",
+    re.DOTALL | re.IGNORECASE,
+)
+
 
 def validate_readme_fidelity_disclosure(rows):
     """Bind the README headline table to the registry's own fidelity counts.
@@ -490,13 +518,15 @@ def validate_readme_fidelity_disclosure(rows):
     require(opening is not None,
             "README: no headline blockquote under the title, so the qualifications a "
             "reader meets before the CHECKED table cannot be located")
-    block = opening.group("block")
+    block = README_UNRENDERED.sub("", opening.group("block"))
     require(f"{total} in total" in block,
-            f"README: the headline blockquote must disclose the {total} total fidelity "
-            "gaps; a count stated only further down does not qualify the table above it")
+            f"README: the headline blockquote must render the {total} total fidelity "
+            "gaps as visible text; a count stated only further down, or only inside a "
+            "comment or other unrendered markup, does not qualify the table above it")
     require("not about a deployed contract" in block,
-            "README: the headline blockquote must state the model-vs-deployed boundary; "
-            "a boundary stated only further down does not qualify the table above it")
+            "README: the headline blockquote must render the model-vs-deployed boundary "
+            "as visible text; a boundary stated only further down, or only inside a "
+            "comment or other unrendered markup, does not qualify the table above it")
 
 
 def validate():
