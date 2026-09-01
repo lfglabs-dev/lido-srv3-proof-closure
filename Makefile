@@ -123,6 +123,8 @@ test:
 	@printf '%s\n' 'P-CONSOLIDATION-VALUE-1 official-success and justified-forwards parent and kill-lines compiled and asserted'
 	@lake build LidoSRv3.Tests.WithdrawalQueueRequestAmountMutants
 	@printf '%s\n' 'WithdrawalQueue single-request amount-bound mutant compiled and asserted'
+	@lake build LidoSRv3.Audit.Model.EthConfinement LidoSRv3.Tests.EthConfinementMutants
+	@printf '%s\n' 'P-ETH-CONFINEMENT-1 candidate parent (UNREGISTERED; see audit/P-ETH-CONFINEMENT-1-BRIEF.md) and four one-line kill-lines with positive controls compiled and asserted'
 	@test -s fixtures/solidity-reference/stakingRouter.getDepositAllocations.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.rewards.test.ts
 	@test -s fixtures/solidity-reference/stakingRouter.status-control.test.ts

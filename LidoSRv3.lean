@@ -101,4 +101,6 @@ import LidoSRv3.Tests.TopupTxMutants
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
 import LidoSRv3.Audit.Model.EthWorld
 import LidoSRv3.Tests.EthWorldMutants
+import LidoSRv3.Audit.Model.EthConfinement
+import LidoSRv3.Tests.EthConfinementMutants
 import LidoSRv3.Tests.PackO2SupplyDomainMutants
