@@ -1,4 +1,5 @@
 import LidoSRv3.Audit.Source.AccountingCorrespondence
+import Mathlib.Tactic.SplitIfs
 
 /-!
 # Oracle-report sanity envelope skeleton
@@ -89,11 +90,23 @@ are extracted as independent named propositions so that:
 2. P-ORACLE-SUPPLY-1 can name the sanity envelope as a parent without
    registering the full checker.
 
-## What this skeleton does NOT claim
+`CommitEnvelope` is the quantitative form and the registered
+P-ORACLE-SANITY-1 conclusion: fifteen `Nat` facts about the report window and
+the configured limits, mentioning no `...Accepts` `Bool`. Each guard that
+Solidity states as an integer-division comparison is carried across as the
+equivalent multiplicative bound, so the parent is not a conjunction
+projection and is not discharged by reduction. The parent itself lives in
+`LidoSRv3.Audit.Guarantees.POracleSanity1`.
 
-This is a **model** checkpoint, not a registration. No `P-ORACLE-SANITY-1`
-is registered: completeness review must confirm that every source-path guard
-is either modeled or explicitly listed as unmodeled.
+## What this module does NOT claim
+
+P-ORACLE-SANITY-1 is registered **bounded**, not complete: its scope is
+exactly the five modeled guards above plus the `uint256` entry bound on
+`timeElapsed`. The residual commit-path checks listed at the end of this file
+are outside the parent and are not claimed by it. Registration is on the Lean
+side only — `audit/guarantees.yaml` is byte-pinned to the certified R1 review
+basis, so a metadata row for this ID would present unreviewed content as R1
+certified and is deliberately not added.
 -/
 
 namespace LidoSRv3.Audit.SolidityAccounting.SanityEnvelope
@@ -505,11 +518,252 @@ theorem checker_implies_simulated (limits : SanityLimits) (s : SanityCheckInput)
     SimulatedShareRateHolds limits s :=
   (and6 h).2.2.2.2.2
 
-/-! ### Guard-drop mutant: annual balance increase
+/-! ### Derived report quantities
 
-The mutant checker drops `annualBalanceIncreaseAccepts`. If this guard is
-load-bearing, there exists an input that the mutant accepts but the real
-checker rejects. -/
+The guard bodies compute these with `let`; naming them at the top level lets
+the envelope below state its conclusions as arithmetic facts about the report
+fields rather than as restatements of the guard `Bool`s. Each definition is
+the guard's own `let` body, so it is definitionally the quantity the pinned
+Solidity line computes. -/
+
+abbrev WEI_PER_ETH : Nat := 1000000000000000000
+
+/-- `postCLBalance` at OracleReportSanityChecker.sol L1301. -/
+def postCLTotal (s : SanityCheckInput) : Nat :=
+  s.postCLValidatorsBalance + s.postCLPendingBalance + s.clWithdrawals
+
+/-- `preCLBalance` after the L1294 zero-substitution. -/
+def effectivePreCLBalance (s : SanityCheckInput) : Nat :=
+  if preCLBalance s == 0 then DEFAULT_CL_BALANCE else preCLBalance s
+
+/-- `fundedPendingBalance` at L920. -/
+def fundedPendingBalance (s : SanityCheckInput) : Nat :=
+  s.preCLPendingBalance + s.deposits
+
+/-- `activatedBalance` at L924–941. -/
+def activatedBalanceOf (s : SanityCheckInput) : Nat :=
+  if fundedPendingBalance s > s.postCLPendingBalance
+  then fundedPendingBalance s - s.postCLPendingBalance else 0
+
+/-- The withdrawal-adjusted pre-report validators balance at L964. -/
+def preCLValidatorsAfterWithdrawals (s : SanityCheckInput) : Nat :=
+  if s.clWithdrawals ≥ s.preCLValidatorsBalance then 0
+  else s.preCLValidatorsBalance - s.clWithdrawals
+
+/-- `actualShareRate` at L1340. -/
+def actualShareRateOf (s : SanityCheckInput) : Nat :=
+  s.postInternalEther * SHARE_RATE_PRECISION_E27 / s.postInternalShares
+
+/-! ### Division-to-multiplication transfer
+
+Every accepted guard states a Solidity integer-division comparison. The
+envelope reports the equivalent multiplicative bound, which is the form that
+carries information about the report fields themselves. -/
+
+theorem lt_mul_of_div_le {a b l : Nat} (hb : 0 < b) (h : a / b ≤ l) :
+    a < (l + 1) * b :=
+  (Nat.div_lt_iff_lt_mul hb).mp (Nat.lt_succ_of_le h)
+
+theorem lt_mul_of_div_div_le {a b c l : Nat} (hb : 0 < b) (hc : 0 < c)
+    (h : a / b / c ≤ l) : a < (l + 1) * c * b := by
+  have hpos : 0 < (l + 1) * c := Nat.mul_pos (Nat.succ_pos l) hc
+  have h1 : a / b < (l + 1) * c := lt_mul_of_div_le hc h
+  obtain ⟨m, hm⟩ : ∃ m, (l + 1) * c = m + 1 := ⟨(l + 1) * c - 1, by omega⟩
+  rw [hm] at h1 ⊢
+  exact lt_mul_of_div_le hb (Nat.le_of_lt_succ h1)
+
+theorem effectiveTimeElapsed_pos (t : Nat) : 0 < effectiveTimeElapsed t := by
+  unfold effectiveTimeElapsed
+  split_ifs with h
+  · decide
+  · simp only [beq_iff_eq] at h
+    omega
+
+theorem effectivePreCLBalance_pos (s : SanityCheckInput) :
+    0 < effectivePreCLBalance s := by
+  unfold effectivePreCLBalance
+  split_ifs with h
+  · decide
+  · simp only [beq_iff_eq] at h
+    omega
+
+/-! ### Guard bodies restated over the named derived quantities
+
+Each of these is `rfl`: the guard's `let` bindings are exactly the definitions
+above, so naming them changes nothing about what the guard computes. Rewriting
+with them keeps the derived quantities opaque during case analysis. -/
+
+theorem annualBalanceIncreaseAccepts_eq (limits : SanityLimits) (s : SanityCheckInput) :
+    annualBalanceIncreaseAccepts limits s =
+      (if preCLBalance s > UINT256_MAX then false
+       else if postCLTotal s > UINT256_MAX then false
+       else if effectivePreCLBalance s ≥ postCLTotal s then true
+       else if ANNUAL_BALANCE_INCREASE_DENOMINATOR
+                 * (postCLTotal s - effectivePreCLBalance s) > UINT256_MAX then false
+       else decide (ANNUAL_BALANCE_INCREASE_DENOMINATOR
+                      * (postCLTotal s - effectivePreCLBalance s)
+                    / effectivePreCLBalance s / effectiveTimeElapsed s.timeElapsed
+                      ≤ limits.annualBalanceIncreaseBPLimit)) := rfl
+
+theorem pendingBalanceCapAccepts_eq (limits : SanityLimits) (s : SanityCheckInput) :
+    pendingBalanceCapAccepts limits s =
+      (if fundedPendingBalance s > UINT256_MAX then false
+       else if fundedPendingBalance s
+                 + limits.externalPendingBalanceCapEth * WEI_PER_ETH > UINT256_MAX then false
+       else decide (s.postCLPendingBalance
+                      ≤ fundedPendingBalance s
+                        + limits.externalPendingBalanceCapEth * WEI_PER_ETH)) := rfl
+
+theorem activatedBalanceAccepts_eq (limits : SanityLimits) (s : SanityCheckInput) :
+    activatedBalanceAccepts limits s =
+      (if limits.appearedEthAmountPerDayLimit * WEI_PER_ETH > UINT256_MAX then false
+       else if limits.appearedEthAmountPerDayLimit * WEI_PER_ETH
+                 * effectiveTimeElapsed s.timeElapsed > UINT256_MAX then false
+       else decide (activatedBalanceOf s
+                      ≤ calculateAmountForPeriod
+                          (limits.appearedEthAmountPerDayLimit * WEI_PER_ETH)
+                          (effectiveTimeElapsed s.timeElapsed)
+                        + MAX_VALIDATOR_EFFECTIVE_BALANCE)) := rfl
+
+theorem validatorsBalanceIncreaseAccepts_eq (limits : SanityLimits) (s : SanityCheckInput) :
+    validatorsBalanceIncreaseAccepts limits s =
+      (if s.postCLValidatorsBalance > preCLValidatorsAfterWithdrawals s then
+         if (s.preCLValidatorsBalance + activatedBalanceOf s)
+              * (limits.annualBalanceIncreaseBPLimit * effectiveTimeElapsed s.timeElapsed)
+              > UINT256_MAX then false
+         else decide (s.postCLValidatorsBalance - preCLValidatorsAfterWithdrawals s
+                        ≤ maxPossibleActivatedBalance limits s)
+       else true) := rfl
+
+theorem simulatedShareRateAccepts_eq (limits : SanityLimits) (s : SanityCheckInput) :
+    simulatedShareRateAccepts limits s =
+      (if !simulatedShareRateSourceDomain s then false
+       else if MAX_BASIS_POINTS * absDiff (actualShareRateOf s) s.simulatedShareRate
+                 > UINT256_MAX then false
+       else decide (MAX_BASIS_POINTS * absDiff (actualShareRateOf s) s.simulatedShareRate
+                      / actualShareRateOf s
+                      ≤ limits.simulatedShareRateDeviationBPLimit)) := rfl
+
+/-! ### Per-guard arithmetic extraction
+
+Each lemma turns an accepted guard into the quantitative fact it enforces on
+the report. None of the conclusions mention a `...Accepts` `Bool`, so none is
+discharged by reduction. -/
+
+theorem annual_bounds (limits : SanityLimits) (s : SanityCheckInput)
+    (h : annualBalanceIncreaseAccepts limits s = true) :
+    preCLBalance s ≤ UINT256_MAX ∧
+    postCLTotal s ≤ UINT256_MAX ∧
+    ANNUAL_BALANCE_INCREASE_DENOMINATOR * (postCLTotal s - effectivePreCLBalance s)
+      < (limits.annualBalanceIncreaseBPLimit + 1)
+        * effectiveTimeElapsed s.timeElapsed * effectivePreCLBalance s := by
+  have hpre := effectivePreCLBalance_pos s
+  have ht := effectiveTimeElapsed_pos s.timeElapsed
+  rw [annualBalanceIncreaseAccepts_eq] at h
+  split_ifs at h with h1 h2 h3 h4
+  · refine ⟨Nat.le_of_not_lt h1, Nat.le_of_not_lt h2, ?_⟩
+    rw [Nat.sub_eq_zero_of_le h3, Nat.mul_zero]
+    exact Nat.mul_pos (Nat.mul_pos (Nat.succ_pos _) ht) hpre
+  · refine ⟨Nat.le_of_not_lt h1, Nat.le_of_not_lt h2, ?_⟩
+    simp only [decide_eq_true_eq] at h
+    exact lt_mul_of_div_div_le hpre ht h
+
+theorem pending_bounds (limits : SanityLimits) (s : SanityCheckInput)
+    (h : pendingBalanceCapAccepts limits s = true) :
+    fundedPendingBalance s ≤ UINT256_MAX ∧
+    fundedPendingBalance s + limits.externalPendingBalanceCapEth * WEI_PER_ETH
+      ≤ UINT256_MAX ∧
+    s.postCLPendingBalance
+      ≤ fundedPendingBalance s + limits.externalPendingBalanceCapEth * WEI_PER_ETH := by
+  rw [pendingBalanceCapAccepts_eq] at h
+  split_ifs at h with h1 h2
+  simp only [decide_eq_true_eq] at h
+  exact ⟨Nat.le_of_not_lt h1, Nat.le_of_not_lt h2, h⟩
+
+theorem activated_bounds (limits : SanityLimits) (s : SanityCheckInput)
+    (h : activatedBalanceAccepts limits s = true) :
+    limits.appearedEthAmountPerDayLimit * WEI_PER_ETH ≤ UINT256_MAX ∧
+    limits.appearedEthAmountPerDayLimit * WEI_PER_ETH
+        * effectiveTimeElapsed s.timeElapsed ≤ UINT256_MAX ∧
+    activatedBalanceOf s
+      ≤ calculateAmountForPeriod (limits.appearedEthAmountPerDayLimit * WEI_PER_ETH)
+          (effectiveTimeElapsed s.timeElapsed) + MAX_VALIDATOR_EFFECTIVE_BALANCE := by
+  rw [activatedBalanceAccepts_eq] at h
+  split_ifs at h with h1 h2
+  simp only [decide_eq_true_eq] at h
+  exact ⟨Nat.le_of_not_lt h1, Nat.le_of_not_lt h2, h⟩
+
+theorem validators_bound (limits : SanityLimits) (s : SanityCheckInput)
+    (h : validatorsBalanceIncreaseAccepts limits s = true) :
+    s.postCLValidatorsBalance
+      ≤ preCLValidatorsAfterWithdrawals s + maxPossibleActivatedBalance limits s := by
+  rw [validatorsBalanceIncreaseAccepts_eq] at h
+  split_ifs at h with h1 h2
+  · simp only [decide_eq_true_eq] at h
+    omega
+  · exact Nat.le_trans (Nat.le_of_not_lt h1) (Nat.le_add_right _ _)
+
+theorem simulated_bounds (limits : SanityLimits) (s : SanityCheckInput)
+    (h : simulatedShareRateAccepts limits s = true) :
+    s.postInternalEther ≠ 0 ∧ s.postInternalShares ≠ 0 ∧
+    s.postInternalEther * SHARE_RATE_PRECISION_E27 ≤ UINT256_MAX ∧
+    actualShareRateOf s ≠ 0 ∧
+    MAX_BASIS_POINTS * absDiff (actualShareRateOf s) s.simulatedShareRate
+      ≤ UINT256_MAX ∧
+    MAX_BASIS_POINTS * absDiff (actualShareRateOf s) s.simulatedShareRate
+      < (limits.simulatedShareRateDeviationBPLimit + 1) * actualShareRateOf s := by
+  rw [simulatedShareRateAccepts_eq] at h
+  split_ifs at h with h1 h2
+  have hdom : simulatedShareRateSourceDomain s = true := by
+    revert h1; cases simulatedShareRateSourceDomain s <;> simp
+  unfold simulatedShareRateSourceDomain at hdom
+  simp only [Bool.and_eq_true, bne_iff_ne, ne_eq, decide_eq_true_eq] at hdom
+  obtain ⟨⟨⟨hEther, hShares⟩, hProd⟩, hRate⟩ := hdom
+  have hRate' : actualShareRateOf s ≠ 0 := hRate
+  simp only [decide_eq_true_eq] at h
+  exact ⟨hEther, hShares, hProd, hRate', Nat.le_of_not_lt h2,
+    lt_mul_of_div_le (Nat.pos_of_ne_zero hRate') h⟩
+
+/-! ### The registered commit envelope
+
+`CommitEnvelope` is the P-ORACLE-SANITY-1 conclusion: the quantitative
+report-window facts the modeled commit-path guards enforce. It is stated
+entirely in `Nat` arithmetic over the report fields and the configured limits,
+so `checkerAccepts → CommitEnvelope` is not a conjunction projection and is
+not discharged by reduction. -/
+
+def CommitEnvelope (limits : SanityLimits) (s : SanityCheckInput) : Prop :=
+  s.timeElapsed ≤ UINT256_MAX ∧
+  preCLBalance s ≤ UINT256_MAX ∧
+  postCLTotal s ≤ UINT256_MAX ∧
+  ANNUAL_BALANCE_INCREASE_DENOMINATOR * (postCLTotal s - effectivePreCLBalance s)
+    < (limits.annualBalanceIncreaseBPLimit + 1)
+      * effectiveTimeElapsed s.timeElapsed * effectivePreCLBalance s ∧
+  fundedPendingBalance s + limits.externalPendingBalanceCapEth * WEI_PER_ETH
+    ≤ UINT256_MAX ∧
+  s.postCLPendingBalance
+    ≤ fundedPendingBalance s + limits.externalPendingBalanceCapEth * WEI_PER_ETH ∧
+  limits.appearedEthAmountPerDayLimit * WEI_PER_ETH
+      * effectiveTimeElapsed s.timeElapsed ≤ UINT256_MAX ∧
+  activatedBalanceOf s
+    ≤ calculateAmountForPeriod (limits.appearedEthAmountPerDayLimit * WEI_PER_ETH)
+        (effectiveTimeElapsed s.timeElapsed) + MAX_VALIDATOR_EFFECTIVE_BALANCE ∧
+  s.postCLValidatorsBalance
+    ≤ preCLValidatorsAfterWithdrawals s + maxPossibleActivatedBalance limits s ∧
+  s.postInternalEther ≠ 0 ∧ s.postInternalShares ≠ 0 ∧
+  s.postInternalEther * SHARE_RATE_PRECISION_E27 ≤ UINT256_MAX ∧
+  actualShareRateOf s ≠ 0 ∧
+  MAX_BASIS_POINTS * absDiff (actualShareRateOf s) s.simulatedShareRate
+    ≤ UINT256_MAX ∧
+  MAX_BASIS_POINTS * absDiff (actualShareRateOf s) s.simulatedShareRate
+    < (limits.simulatedShareRateDeviationBPLimit + 1) * actualShareRateOf s
+
+/-! ### Guard-drop mutants
+
+Each mutant checker drops exactly one modeled guard. If a guard is
+load-bearing for the envelope, there exists an input the mutant accepts on
+which `CommitEnvelope` is false — that is the exact-parent kill-line shape
+used in `LidoSRv3.Tests.SanityEnvelopeParentMutants`. -/
 
 def checkerNoAnnual (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
   timeElapsedFitsUint256 s &&
@@ -517,6 +771,34 @@ def checkerNoAnnual (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
   activatedBalanceAccepts limits s &&
   validatorsBalanceIncreaseAccepts limits s &&
   simulatedShareRateAccepts limits s
+
+def checkerNoPending (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  timeElapsedFitsUint256 s &&
+  annualBalanceIncreaseAccepts limits s &&
+  activatedBalanceAccepts limits s &&
+  validatorsBalanceIncreaseAccepts limits s &&
+  simulatedShareRateAccepts limits s
+
+def checkerNoActivated (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  timeElapsedFitsUint256 s &&
+  annualBalanceIncreaseAccepts limits s &&
+  pendingBalanceCapAccepts limits s &&
+  validatorsBalanceIncreaseAccepts limits s &&
+  simulatedShareRateAccepts limits s
+
+def checkerNoValidators (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  timeElapsedFitsUint256 s &&
+  annualBalanceIncreaseAccepts limits s &&
+  pendingBalanceCapAccepts limits s &&
+  activatedBalanceAccepts limits s &&
+  simulatedShareRateAccepts limits s
+
+def checkerNoSimulated (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
+  timeElapsedFitsUint256 s &&
+  annualBalanceIncreaseAccepts limits s &&
+  pendingBalanceCapAccepts limits s &&
+  activatedBalanceAccepts limits s &&
+  validatorsBalanceIncreaseAccepts limits s
 
 /-! ### Candidate theorem list for completeness review
 
@@ -530,7 +812,8 @@ def checkerNoAnnual (limits : SanityLimits) (s : SanityCheckInput) : Bool :=
    accepts ∧ checker rejects
 8. `annualGuardIsLoadBearing` (Tests): ∃ input, mutant accepts ∧ checker rejects
 
-Residual blockers before P-ORACLE-SANITY-1 registration:
+Residuals outside the registered bounded P-ORACLE-SANITY-1 parent. None of
+these is claimed by `CommitEnvelope`; each remains a named gap:
 - smoothenTokenRebase limiter model
 - sliding-window CL balance decrease check
 - vault/burn attestation guards (require on-chain state reads)
