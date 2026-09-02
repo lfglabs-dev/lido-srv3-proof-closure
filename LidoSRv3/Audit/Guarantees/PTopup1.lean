@@ -176,7 +176,109 @@ theorem source_over_target_guard_required
     if_neg hGwei, if_neg hPaused, hLoop]
   exact if_pos hOver
 
+/-! ## Vocabulary for the registered abstract statement
+
+Each `abbrev` below names one clause of the English guarantee ("pulled =
+pushed on the source-shaped run, and a reverting outcome maps to the abstract
+`TxObservation` rollback.  An unregistered module or a non-type-2 module
+reverts.  If the unchecked sum wraps mod 2^256, the run moves no wei.").  They
+are `abbrev`s, never `def`s, so unfolding them gives back the very same `Prop`
+and every projection (`.1`, `.2.1`, ...) and every kill-line in
+`LidoSRv3.Tests.TopupTxMutants` keeps working unchanged. -/
+
+/-- The wei pulled from Lido by the source-shaped run (source line 744). -/
+abbrev pulled (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Nat :=
+  (run cfg inp).pulled
+
+/-- The wei pushed to the beacon deposit contract by the source-shaped run
+(`BeaconChainDepositor.sol` lines 79--107). -/
+abbrev pushed (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Nat :=
+  (run cfg inp).pushed
+
+/-- "pulled = pushed on the source-shaped run." -/
+abbrev Conserves (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Prop :=
+  pulled cfg inp = pushed cfg inp
+
+/-- "A reverting outcome maps to the abstract `TxObservation` rollback
+(A-ABSTRACT-TX)": the committed state is `before`, and the committed trace has
+no ETH move and no log. -/
+abbrev RevertRestoresSnapshot {State : Type}
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) : Prop :=
+  (run cfg inp).reverts = true →
+    (observation before after attempts trace (run cfg inp)).committedState = before ∧
+      (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
+      (observation before after attempts trace (run cfg inp)).committedTrace.logs = []
+
+/-- Conjunct 1: "pulled = pushed on the source-shaped run, and a reverting
+outcome maps to the abstract `TxObservation` rollback." -/
+abbrev ConservesAndRollsBack {State : Type}
+    (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) : Prop :=
+  Conserves cfg inp ∧ RevertRestoresSnapshot cfg inp before after attempts trace
+
+/-- "Given well-formed inputs, `P`": the four `_validateTopUpInputs` guards of
+source lines 761--782 (caller is the top-up gateway, nonzero key count, the
+three arrays have the key count as length, every pubkey has the pinned length)
+are assumed, curried exactly as the registered statement takes them, and then
+`P` follows. -/
+abbrev GivenWellFormedInputs (cfg : SourceTopupConfig) (inp : SourceTopupInput)
+    (P : Prop) : Prop :=
+  inp.callerIsTopUpGateway = true →
+  inp.keyIndicesLength ≠ 0 →
+  ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
+      ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
+      ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →
+  inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
+  P
+
+/-- "Given a registered, active module, `P`": the `moduleExists` and
+`moduleActive` guards of source lines 689--692 pass, and then `P` follows. -/
+abbrev GivenActiveModule (inp : SourceTopupInput) (P : Prop) : Prop :=
+  inp.moduleExists = true → inp.moduleActive = true → P
+
+/-- Conjunct 2: "An unregistered module reverts" -- given well-formed inputs,
+`moduleExists = false` makes `run` revert `revertStakingModuleUnregistered`. -/
+abbrev UnregisteredModuleReverts (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Prop :=
+  inp.moduleExists = false →
+    GivenWellFormedInputs cfg inp (run cfg inp = .revertStakingModuleUnregistered)
+
+/-- Conjunct 3: "If the unchecked sum wraps mod 2^256, the run moves no wei"
+(`pulled = pushed = 0`; A-TOPUP-NOWRAP discharge). -/
+abbrev WrapMovesNoValue (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Prop :=
+  ¬ NoUncheckedWrap inp → pulled cfg inp = 0 ∧ pushed cfg inp = 0
+
+/-- Conjunct 4: "A non-type-2 module reverts" -- given well-formed inputs and
+an active module, `wcTypeIsType2 = false` makes `run` revert
+`revertWrongWithdrawalCredentialsType`. -/
+abbrev WrongWcTypeReverts (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Prop :=
+  inp.wcTypeIsType2 = false →
+    GivenWellFormedInputs cfg inp
+      (GivenActiveModule inp (run cfg inp = .revertWrongWithdrawalCredentialsType))
+
+/-- Conjunct 5: "Under every earlier guard, `run` follows the allocation
+loop": an allocation-loop failure is `run`'s outcome, and when the loop
+passes but the unchecked total exceeds the rounded target, `run` reverts
+`revertModuleReturnExceedTarget`. -/
+abbrev RunFollowsAllocationLoop (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Prop :=
+  GivenWellFormedInputs cfg inp
+    (GivenActiveModule inp
+      (inp.wcTypeIsType2 = true →
+        cfg.gwei ≠ 0 →
+        ¬(smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false) →
+        (∀ o : SolidityTopup.Outcome,
+            allocationLoop cfg inp.allocations inp.topUpLimits = some o → run cfg inp = o) ∧
+          (allocationLoop cfg inp.allocations inp.topUpLimits = none →
+            smDepositableEthAmountRounded cfg inp < accumulated inp →
+            run cfg inp = .revertModuleReturnExceedTarget)))
+
 /--
+**P-TOPUP-1, abstract plane.**  pulled = pushed on the source-shaped run, and a
+reverting outcome maps to the abstract `TxObservation` rollback
+(A-ABSTRACT-TX).  An unregistered module or a non-type-2 module reverts.  If
+the unchecked sum wraps mod 2^256, the run moves no wei.  Under every earlier
+guard, `run` follows the allocation loop and its over-target check.
+
 `run cfg inp` conserves `pulled = pushed`. If that run reverts, the abstract
 `TxObservation` (`A-ABSTRACT-TX`) restores `before` and erases ETH moves and
 logs.  The registered claim additionally folds in the wrap-plane discharge
@@ -292,47 +394,11 @@ Caveats, stated rather than hidden:
 theorem source_topup_conserves_and_rolls_back {State : Type}
     (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :
-    ((run cfg inp).pulled = (run cfg inp).pushed ∧
-      ((run cfg inp).reverts = true →
-        (observation before after attempts trace (run cfg inp)).committedState = before ∧
-          (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧
-          (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧
-    (inp.moduleExists = false →
-      inp.callerIsTopUpGateway = true →
-      inp.keyIndicesLength ≠ 0 →
-      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
-          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
-          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →
-      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
-      run cfg inp = .revertStakingModuleUnregistered) ∧
-    (¬ NoUncheckedWrap inp →
-      (run cfg inp).pulled = 0 ∧ (run cfg inp).pushed = 0) ∧
-    (inp.wcTypeIsType2 = false →
-      inp.callerIsTopUpGateway = true →
-      inp.keyIndicesLength ≠ 0 →
-      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
-          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
-          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →
-      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
-      inp.moduleExists = true →
-      inp.moduleActive = true →
-      run cfg inp = .revertWrongWithdrawalCredentialsType) ∧
-    (inp.callerIsTopUpGateway = true →
-      inp.keyIndicesLength ≠ 0 →
-      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength
-          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
-          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →
-      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →
-      inp.moduleExists = true →
-      inp.moduleActive = true →
-      inp.wcTypeIsType2 = true →
-      cfg.gwei ≠ 0 →
-      ¬(smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false) →
-      (∀ o : SolidityTopup.Outcome,
-          allocationLoop cfg inp.allocations inp.topUpLimits = some o → run cfg inp = o) ∧
-        (allocationLoop cfg inp.allocations inp.topUpLimits = none →
-          smDepositableEthAmountRounded cfg inp < accumulated inp →
-          run cfg inp = .revertModuleReturnExceedTarget)) :=
+    ConservesAndRollsBack cfg inp before after attempts trace ∧
+    UnregisteredModuleReverts cfg inp ∧
+    WrapMovesNoValue cfg inp ∧
+    WrongWcTypeReverts cfg inp ∧
+    RunFollowsAllocationLoop cfg inp :=
   ⟨⟨run_conserves cfg inp, fun h => reverting_outcome_rolls_back before after attempts trace h⟩,
    fun hMod hAuth hKeys hLens hPub => source_module_guard_required cfg inp hMod hAuth hKeys hLens hPub,
    fun hWrap => source_wrap_precludes_value_moving_commit cfg inp hWrap,
@@ -633,7 +699,37 @@ def VerityGuardedReturndataSimulation (cfg : SourceTopupConfig)
           ((Verity.TopupTx.executeGuarded cfg call .none).run before) =
         Verity.TopupTx.guardedObservables call)
 
-/-- Registered Verity parent: the full committing-source correspondence,
+/-! ## Vocabulary for the registered Verity statement -/
+
+/-- "Any nonzero wrapping batch reverts without moving value and restores the
+snapshot": for every list of uint256 words whose exact sum reaches the modulus
+while its unchecked total is nonzero, `execute` reverts, `Contract.run` hands
+back the entry frame, and the observation is non-committing. -/
+abbrev NonzeroWrapRevertsAndRestores (state : Verity.ContractState) : Prop :=
+  ∀ allocations : List Nat,
+    uint256Modulus ≤ allocSum allocations →
+    allocSumUnchecked allocations ≠ 0 →
+    (∀ a ∈ allocations, a < uint256Modulus) →
+    (let before := Verity.TopupTx.entryFrame state
+      ∃ reason,
+        (Verity.TopupTx.execute allocations .none).run before =
+            Verity.ContractResult.revert reason before ∧
+          (Verity.TopupTx.observe before allocations.length
+            ((Verity.TopupTx.execute allocations .none).run before)).committed = false)
+
+/-- "Every `allocateDeposits` return is guarded": the returndata-conditioned
+module-call plane holds for every possible top-up call. -/
+abbrev EveryReturndataIsGuarded (cfg : SourceTopupConfig)
+    (state : Verity.ContractState) : Prop :=
+  ∀ call : Verity.TopupTx.TopupCall, VerityGuardedReturndataSimulation cfg call state
+
+/-- **P-TOPUP-1, Verity plane.**  If the source run commits and each allocation
+is a uint256 word, `observe` of `execute` equals the source observables (with
+`pulled`/`pushed` matching and every injected failure rolling back to the entry
+snapshot); any nonzero wrapping batch reverts without moving value and restores
+the snapshot; and every `allocateDeposits` return is guarded.
+
+Registered Verity parent: the full committing-source correspondence,
 including universal injected-failure rollback, conjoined with the universal
 nonzero-wrap revert/non-commit/snapshot-restore close above and with the
 returndata-conditioned module-call plane, quantified over every possible
@@ -645,18 +741,8 @@ theorem verity_tx_simulates_source_with_nonzero_wrap_close
     (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)
     (hCommit : (run cfg inp).reverts = false) :
     VerityCommittingSimulation cfg inp state ∧
-      (∀ allocations : List Nat,
-        uint256Modulus ≤ allocSum allocations →
-        allocSumUnchecked allocations ≠ 0 →
-        (∀ a ∈ allocations, a < uint256Modulus) →
-        (let before := Verity.TopupTx.entryFrame state
-          ∃ reason,
-            (Verity.TopupTx.execute allocations .none).run before =
-                Verity.ContractResult.revert reason before ∧
-              (Verity.TopupTx.observe before allocations.length
-                ((Verity.TopupTx.execute allocations .none).run before)).committed = false)) ∧
-      ∀ call : Verity.TopupTx.TopupCall,
-        VerityGuardedReturndataSimulation cfg call state :=
+      NonzeroWrapRevertsAndRestores state ∧
+      EveryReturndataIsGuarded cfg state :=
   ⟨verity_tx_simulates_source cfg inp state hLen hAmt hCommit,
     (fun allocations hWrap hNz hWords =>
       verity_nonzero_wrap_reverts_and_restores allocations state hWrap hNz hWords),

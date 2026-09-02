@@ -159,7 +159,70 @@ theorem universal_post_state_equivariance
     run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) :=
   source_success_post_state_equivariant a₁ a₂ h₁ h₂ inp post h
 
-/-- Registered P-ADDRESS-1 parent. For two nonzero callers, the source-shaped
+/-! ## Vocabulary
+
+English names for the two conjuncts of the registered parent and for the
+Verity composition, so the registered statements read like the guarantee:
+"two nonzero callers have the same source-shaped admission bit, and a
+successful post-state renames under the swap". Every name is an `abbrev`,
+so unfolding recovers exactly the former statement. -/
+
+/-- "Two nonzero callers have the same source-shaped admission bit": the
+source-shaped `run` admits the caller-swapped input exactly when it admits
+the original input. -/
+abbrev AdmissionIsCallerBlind (a₁ a₂ : Verity.Address)
+    (inp : LidoSRv3.Audit.SolidityAddress.Input) : Prop :=
+  succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp)
+
+/-- "A successful post-state renames under the swap": whenever `run` commits
+`post`, the caller-swapped input commits the caller-swapped `post`. -/
+abbrev PostStateRenamesWithCaller (a₁ a₂ : Verity.Address)
+    (inp : LidoSRv3.Audit.SolidityAddress.Input) : Prop :=
+  ∀ post, run inp = .committed post →
+    run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post)
+
+/-- "amount < 2^256": the amount fits one EVM word. -/
+abbrev AmountFitsWord (inp : LidoSRv3.Audit.SolidityAddress.Input) : Prop :=
+  inp.amount < 2 ^ 256
+
+/-- "The balance flag is coherent": an insufficient caller balance can only be
+reported for a nonzero amount. -/
+abbrev BalanceFlagCoherent (inp : LidoSRv3.Audit.SolidityAddress.Input) : Prop :=
+  !inp.callerBalanceSufficient = true → inp.amount ≠ 0
+
+/-- "The allowance flag is coherent": an insufficient caller allowance can only
+be reported for a nonzero amount. -/
+abbrev AllowanceFlagCoherent (inp : LidoSRv3.Audit.SolidityAddress.Input) : Prop :=
+  !inp.callerAllowanceSufficient = true → inp.amount ≠ 0
+
+open LidoSRv3.Audit.Verity.AddressTx in
+/-- "Contract.run observe = sourceAddressView": the pinned Verity transaction's
+address-write observation equals the source address view of the input. -/
+abbrev ObservesSourceView (inp : LidoSRv3.Audit.SolidityAddress.Input) : Prop :=
+  observeAddress inp ((executePinnedSource inp).run (stateFor inp)) = sourceAddressView inp
+
+/-- "A revert restores the snapshot": any reverting `Contract.run` hands back
+the entry state unchanged. -/
+abbrev RevertRestoresSnapshot : Prop :=
+  ∀ (program : Verity.Contract Unit) (state rollback : Verity.ContractState)
+    (reason : String),
+    program.run state = Verity.ContractResult.revert reason rollback → rollback = state
+
+open LidoSRv3.Audit.Verity.AddressTx in
+/-- "The renamed run observes the renamed view": on the caller-swapped input,
+the pinned Verity transaction observes the post-address view of the
+caller-swapped post-state. -/
+abbrev RenamedRunObservesRenamedView (a₁ a₂ : Verity.Address)
+    (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState) : Prop :=
+  observeAddress (renameInput a₁ a₂ inp)
+      ((executePinnedSource (renameInput a₁ a₂ inp)).run
+        (stateFor (renameInput a₁ a₂ inp))) =
+    postAddressView inp.entryPoint (renamePost a₁ a₂ post)
+
+/-- Two nonzero callers have the same source-shaped admission bit, and a
+successful post-state renames under the swap.
+
+Registered P-ADDRESS-1 parent. For two nonzero callers, the source-shaped
 `run` admits `a₁` iff it admits `a₂` on the caller-swapped input, and a
 successful post-state renames under the same swap. The claim is unconditional
 over four modeled address-bearing writer projections: since wave 5,
@@ -190,13 +253,17 @@ more honest. -/
 theorem universal_address_writer_equivariance
     (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)
     (inp : LidoSRv3.Audit.SolidityAddress.Input) :
-    succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp) ∧
-      ∀ post, run inp = .committed post →
-        run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post) := by
+    AdmissionIsCallerBlind a₁ a₂ inp ∧ PostStateRenamesWithCaller a₁ a₂ inp := by
   exact ⟨source_admission_nondiscriminatory a₁ a₂ h₁ h₂ inp,
     fun post h => universal_post_state_equivariance a₁ a₂ h₁ h₂ inp post h⟩
 
-/-- Composition of (i) the universal source-shaped swap, (ii) each
+/-- Two nonzero callers have the same source-shaped admission bit, and a
+successful post-state renames under the swap. Verity composition adds
+`Contract.run` observe = `sourceAddressView` when the amount fits one word
+and the balance/allowance flags are coherent, snapshot rollback on revert, and
+the renamed run observing the renamed view.
+
+Composition of (i) the universal source-shaped swap, (ii) each
 `Contract.run` entrypoint's address-write `observe` matching
 `sourceAddressView` when `amount < 2^256` and the balance/allowance
 flags are coherent, (iii) any `Contract.run` revert restoring the
@@ -205,35 +272,19 @@ of the renamed post-state. Not a WQ claim. -/
 theorem abstract_source_verity_tx_address_equivariance :
     (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
       ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),
-      succeeds (LidoSRv3.Audit.SolidityAddress.run (renameInput a₁ a₂ inp)) =
-        succeeds (LidoSRv3.Audit.SolidityAddress.run inp)) ∧
+      AdmissionIsCallerBlind a₁ a₂ inp) ∧
+    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
+      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),
+      PostStateRenamesWithCaller a₁ a₂ inp) ∧
+    (∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),
+      AmountFitsWord inp → BalanceFlagCoherent inp → AllowanceFlagCoherent inp →
+      ObservesSourceView inp) ∧
+    RevertRestoresSnapshot ∧
     (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
       ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState),
       LidoSRv3.Audit.SolidityAddress.run inp = .committed post →
-      LidoSRv3.Audit.SolidityAddress.run (renameInput a₁ a₂ inp) =
-        .committed (renamePost a₁ a₂ post)) ∧
-    (∀ (inp : LidoSRv3.Audit.SolidityAddress.Input), inp.amount < 2 ^ 256 →
-      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →
-      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →
-      LidoSRv3.Audit.Verity.AddressTx.observeAddress inp
-          ((LidoSRv3.Audit.Verity.AddressTx.executePinnedSource inp).run
-            (LidoSRv3.Audit.Verity.AddressTx.stateFor inp)) =
-        LidoSRv3.Audit.Verity.AddressTx.sourceAddressView inp) ∧
-    (∀ (program : Verity.Contract Unit) (state rollback : Verity.ContractState)
-      (reason : String),
-      program.run state = Verity.ContractResult.revert reason rollback → rollback = state) ∧
-    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →
-      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState),
-      LidoSRv3.Audit.SolidityAddress.run inp = .committed post →
-      inp.amount < 2 ^ 256 →
-      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →
-      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →
-      LidoSRv3.Audit.Verity.AddressTx.observeAddress (renameInput a₁ a₂ inp)
-          ((LidoSRv3.Audit.Verity.AddressTx.executePinnedSource
-              (renameInput a₁ a₂ inp)).run
-            (LidoSRv3.Audit.Verity.AddressTx.stateFor (renameInput a₁ a₂ inp))) =
-        LidoSRv3.Audit.Verity.AddressTx.postAddressView inp.entryPoint
-          (renamePost a₁ a₂ post)) := by
+      AmountFitsWord inp → BalanceFlagCoherent inp → AllowanceFlagCoherent inp →
+      RenamedRunObservesRenamedView a₁ a₂ inp post) := by
   exact ⟨LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.1,
     LidoSRv3.Audit.Verity.AddressTx.composed_verity_tx_address_equivariance.2.2.2.1,
