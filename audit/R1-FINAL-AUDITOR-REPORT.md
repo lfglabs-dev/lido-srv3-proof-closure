@@ -4,7 +4,7 @@
 
 ## Decision
 
-Review basis: certified R1 input set `e2fd6d615e1b7b9eff670df153dedf1950a53d85`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence. The review basis binds the exact generator inputs to a Git object; it is an input-identity binding, not evidence that those bytes received an external audit. Registering a new evidence row advances this pin, so a row added after a given external review is covered by the binding but not by that review.
+Review basis: certified R1 input set `0fc867057b539e5310ddbb3de3ea638f9b11125e`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence. The review basis binds the exact generator inputs to a Git object; it is an input-identity binding, not evidence that those bytes received an external audit. Registering a new evidence row advances this pin, so a row added after a given external review is covered by the binding but not by that review.
 
 ## Architecture and evidence boundary
 
@@ -47,7 +47,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 | [`P-ADDRESS-BATCH-1`](#p-address-batch-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
 | [`P-SSZ-LIVE-1`](#p-ssz-live-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
 | [`P-CONSOLIDATION-VALUE-1`](#p-consolidation-value-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
-| [`P-TOKEN-1`](#p-token-1) | CHECKED | PARTIAL | 12 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOKEN-1`](#p-token-1) | CHECKED | PARTIAL | 13 open | **IMPLEMENTATION_PENDING** |
 
 ## Per-claim acceptance — assumptions, limitations, and source
 
@@ -662,7 +662,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 
 **Assumptions.** `A-SOURCE-SHAPED`
 
-**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+**Limitations — 13 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
 
 - approve and ERC-20 allowance state are entirely unrepresented, so no approval-path claim follows
 - the STETH.transferFrom external call at WithdrawalQueue.sol:134 and all token balances are unmodeled, so no ERC-20 movement is established
@@ -676,6 +676,7 @@ One row per registered claim, with the number of fidelity gaps the registry stil
 - only one request list item is modeled; multi-item requestWithdrawals batches are not composed
 - no Verity Executable Contract exists for the WithdrawalQueue surface, so the verity plane stays PARTIAL
 - P-TOKEN-1 is registered as a subordinate bounded row only; broad ERC-20 token behaviour remains NOT YET and is neither claimed nor implied
+- Address is an unbounded Nat: the 160-bit Solidity address domain is not enforced, so a modeled hop may name a recipient (for example 2^160) that no Solidity address can, and final.owner ≠ 0 is stated on that wider domain; a width-bounded admission or address correspondence proof remains open
 
 **Classification.** **IMPLEMENTATION_PENDING** — Model the STETH.transferFrom call, share conversion, and _enqueue storage writes as an executable Verity WithdrawalQueue contract, then compose approve/transfer/redeem before any broad token parent is proposed.
 
