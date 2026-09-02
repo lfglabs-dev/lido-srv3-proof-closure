@@ -376,13 +376,23 @@ def lean_source_tree(root: Path) -> str:
     """Git tree id of the checked Lean inputs, the same virtual tree
     `scripts/verified_source_tree.sh` hashes and `make prove` records in the
     proof receipt, so a consumer can bind a copy of the records to the exact
-    proof revision it displays through that receipt."""
+    proof revision it displays through that receipt.
+
+    The `LidoSRv3` entry itself must be a real directory: Git records a
+    symlinked root as a `120000` blob holding the link text, never as the
+    `040000` tree of its target, so hashing through the link would attest a
+    tree the receipt cannot contain."""
     for name in LEAN_INPUTS:
         if (root / name).is_symlink():
             fail(f"{name} is a symlink; the checked Lean inputs must be regular files")
         if not (root / name).is_file():
             fail(f"missing Lean input {name}")
-    subtree = git_tree(root / "LidoSRv3")
+    lean_dir = root / "LidoSRv3"
+    if lean_dir.is_symlink():
+        fail("LidoSRv3 is a symlink; the checked Lean inputs must be a regular directory")
+    if not lean_dir.is_dir():
+        fail("missing Lean input LidoSRv3/")
+    subtree = git_tree(lean_dir)
     if subtree is None:
         fail("LidoSRv3/ holds no Lean input")
     entries = [("LidoSRv3/", b"40000", "LidoSRv3", subtree)]

@@ -279,8 +279,9 @@ def check_scanner_edges(fixture: Path) -> None:
 
 
 def check_symlink_tree(fixture: Path) -> None:
-    """A symlink below LidoSRv3/ or among the top-level inputs is refused: the
-    tree id would bind its link text while Lean reads its target."""
+    """A symlink below LidoSRv3/, among the top-level inputs, or standing in for
+    the LidoSRv3/ root is refused: the tree id would bind its link text while
+    Lean reads its target."""
     linked = fixture / "linked"
     for name in generate_ux2.LEAN_INPUTS:
         (linked / name).parent.mkdir(parents=True, exist_ok=True)
@@ -308,7 +309,41 @@ def check_symlink_tree(fixture: Path) -> None:
             raise SystemExit(f"unexpected diagnostic for a top-level symlink: {stop}")
     else:
         raise SystemExit("a symlinked top-level Lean input was hashed")
+    (linked / "lakefile.lean").unlink()
+    (linked / "lakefile.lean").write_text("lakefile.lean", encoding="utf-8")
+    check_symlinked_root(linked)
     shutil.rmtree(linked)
+
+
+def check_symlinked_root(linked: Path) -> None:
+    """`LidoSRv3` itself replaced by a symlink is refused, whatever it points at:
+    Git stores that entry as a `120000` blob of the link text, never as the
+    `040000` tree of the target, so following it would hash a tree the proof
+    receipt cannot contain."""
+    real = linked / "LidoSRv3"
+    moved = linked / "Elsewhere"
+    real.rename(moved)
+    outside = linked.parent / "outside"
+    shutil.copytree(moved, outside / "LidoSRv3")
+    for target in ("Elsewhere", str(outside / "LidoSRv3"), "Missing"):
+        real.symlink_to(target)
+        try:
+            generate_ux2.lean_source_tree(linked)
+        except SystemExit as stop:
+            if "LidoSRv3 is a symlink" not in f"{stop}":
+                raise SystemExit(f"unexpected diagnostic for a symlinked root -> {target}: {stop}")
+        else:
+            raise SystemExit(f"a symlinked LidoSRv3 root -> {target} was hashed as a tree")
+        real.unlink()
+    shutil.rmtree(outside)
+    try:
+        generate_ux2.lean_source_tree(linked)
+    except SystemExit as stop:
+        if "missing Lean input LidoSRv3/" not in f"{stop}":
+            raise SystemExit(f"unexpected diagnostic for a missing root: {stop}")
+    else:
+        raise SystemExit("a missing LidoSRv3 root produced a tree id")
+    moved.rename(real)
 
 
 def check_boundary_and_kill_lines(fixture: Path) -> None:
@@ -337,4 +372,5 @@ with tempfile.TemporaryDirectory() as tmp:
 
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
       "canonical order, unregistered assumption, missing source target, missing headline "
-      "boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, and the Lean source tree id")
+      "boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, "
+      "symlinked inputs and root, and the Lean source tree id")
