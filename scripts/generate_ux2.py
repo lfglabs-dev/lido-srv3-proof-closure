@@ -183,13 +183,13 @@ def mask_command_quotations(text: str) -> str:
     structural = mask_escaped_identifiers(text)
     index = 0
     while index < len(text):
-        opener = COMMAND_QUOTATION_OPENER.match(text, index)
+        opener = COMMAND_QUOTATION_OPENER.match(structural, index)
         if opener is None:
             index += 1
             continue
         # The opening parenthesis is the first structural delimiter after the
         # backtick token, regardless of whitespace around the category tokens.
-        end = text.index("(", index, opener.end()) + 1
+        end = structural.index("(", index, opener.end()) + 1
         depth = 1
         while end < len(text) and depth:
             depth += (structural[end] == "(") - (structural[end] == ")")

@@ -268,6 +268,17 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"Outer.one"}:
         raise SystemExit("scanner balanced a command quotation on a parenthesis in an escaped identifier")
 
+    # Tokens that resemble a command quotation inside a guillemet name are
+    # identifier data, so they must not initiate quotation balancing.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem «foo `(command | bar» : True := trivial\n"
+        "theorem active : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.«foo `(command | bar»", "Outer.active"}:
+        raise SystemExit("scanner treated command-quotation text in an escaped identifier as syntax")
+
     module.write_text(
         "namespace\n"
         "Outer\n"
