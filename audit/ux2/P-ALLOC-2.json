@@ -1,0 +1,134 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-ALLOC-2",
+  "position": 2,
+  "summary": "step_correspondence_and_full_loop_conservation is the registered parent. Its first conjunct retains the explicit-∀ independent Model/Source candidate correspondence, Model.amount equality, positivity, demand bound, and capacity bound. Its second conjunct proves exact request conservation for every successful fuel-bounded sourceAllocateLoop run. Its third conjunct proves that the independently defined proportional Nat modelAllocateLoop has a matching successful run with equal mathematical totals and RowsCorrespond final rows; the proof lifts the relation across every successful mutation. The sourceAllocateLoop_eq_allocateLoop bridge still connects conservation to the Verity executor. The distinct +1 Nat model remains a separate child, and no Solidity equivalence is claimed.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Keep the checked proportional model/source multi-step correspondence and conservation in the parent, with the +1 model as a separate child. The direct-memory/keccak boundary is discharged only for memoryArrayElement reads; cross-call mutation and upstream active filtering remain open. Do not merge the algorithms or claim Solidity equivalence."
+  },
+  "next_gate": "CHECKED: independent proportional modelAllocateLoop and sourceAllocateLoop now match across every successful fuel-bounded mutation with final RowsCorrespond and equal totals; conservation remains bridged to allocateLoop, and direct memory-array reads are oracle-independent (no keccak expression is evaluated). OPEN: upstream active filtering and cross-call mutation of decoded arrays. Keep the distinct +1 model as a separate child and do not claim Solidity equivalence.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation",
+      "module": "LidoSRv3.Audit.Guarantees.PAlloc2",
+      "file": "LidoSRv3/Audit/Guarantees/PAlloc2.lean",
+      "start_line": 236,
+      "end_line": 275,
+      "doc": "/-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source\ncandidate and proportional-amount equality from the step theorem load-bearing,\nand adds fuel-bounded conservation for every successful run of the full\nindependently stated source allocation loop, plus multi-step row correspondence\nwith an independently stated proportional model loop.  It does not identify\nthat proportional loop with the separate +1 `MinFirst` child model. -/",
+      "statement": "theorem step_correspondence_and_full_loop_conservation :\n    (∀ (model : List MinFirstAllocation.Model.Bucket)\n      (source : List MinFirstAllocation.Source.Row)\n      (best : MinFirstAllocation.Source.Row)\n      (allocationSize w : MinFirstAllocation.Source.Word),\n      MinFirstAllocation.RowsCorrespond model source →\n      MinFirstAllocation.Source.candidate? source = some best →\n      MinFirstAllocation.Source.hasFreeSpace best = true →\n      source.length < Verity.Core.Uint256.modulus →\n      allocationSize.val ≠ 0 →\n      MinFirstAllocation.Source.checkedAmount source allocationSize best = some w →\n      (Option.map (fun b => (b.allocation, b.capacity))\n          (MinFirstAllocation.Model.candidate? model) =\n        some (best.allocation.val, best.capacity.val)) ∧\n      MinFirstAllocation.Model.amount model allocationSize.val\n        ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧\n      0 < w.val ∧ w.val ≤ allocationSize.val ∧\n        best.allocation.val + w.val ≤ best.capacity.val) ∧\n    (∀ (fuel : Nat) (rows : List MinFirstAllocation.Source.Row)\n      (allocationSize : MinFirstAllocation.Source.Word)\n      (after : List MinFirstAllocation.Source.Row)\n      (allocated remaining : MinFirstAllocation.Source.Word),\n      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =\n        some (after, allocated, remaining) →\n      allocated.val + remaining.val = allocationSize.val) ∧\n    (∀ (fuel : Nat)\n      (model : List MinFirstAllocation.Model.Bucket)\n      (source : List MinFirstAllocation.Source.Row)\n      (allocationSize : MinFirstAllocation.Source.Word)\n      (after : List MinFirstAllocation.Source.Row)\n      (allocated remaining : MinFirstAllocation.Source.Word),\n      MinFirstAllocation.RowsCorrespond model source →\n      source.length < Verity.Core.Uint256.modulus →\n      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source allocationSize 0 =\n        some (after, allocated, remaining) →\n      ∃ modelAfter,\n        Verity.MinFirstDistributionTx.modelAllocateLoop fuel model\n            allocationSize.val 0 =\n          some (modelAfter, allocated.val, remaining.val) ∧\n        MinFirstAllocation.RowsCorrespond modelAfter after)"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution",
+      "module": "LidoSRv3.Audit.Guarantees.PAlloc2",
+      "file": "LidoSRv3/Audit/Guarantees/PAlloc2.lean",
+      "start_line": 17,
+      "end_line": 28,
+      "doc": "/-- If the two memory arrays decode to `buckets`/`capacities`, then\n`observe` of `allocate` (persisted bucket array plus totals) equals\n`sourceView` of the separately defined `sourceAllocateLoop`; the copied loop\nequations are connected to the executor by a proved equality theorem.\nNot the +1 `selects_least_open_bucket` model. -/",
+      "statement": "theorem verity_tx_simulates_min_first_distribution\n    (buckets capacities : List MinFirstAllocation.Source.Word)\n    (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState)\n    (hBuckets : Verity.MinFirstDistributionTx.readArray state \"buckets\"\n      Verity.MinFirstDistributionTx.bucketsBase buckets.length = some buckets)\n    (hCapacities : Verity.MinFirstDistributionTx.readArray state \"capacities\"\n      Verity.MinFirstDistributionTx.capacitiesBase capacities.length = some capacities) :\n    Verity.MinFirstDistributionTx.observe buckets\n        ((Verity.MinFirstDistributionTx.allocate buckets.length capacities.length\n          allocationSize).run\n        state) =\n      Verity.MinFirstDistributionTx.sourceView buckets capacities allocationSize"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.MinFirstDistributionTxMutants"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
+      "expected": "registered parent combining explicit-∀ proportional-step pinned-selection/model-amount correspondence and bounds, fuel-bounded full sourceAllocateLoop conservation (allocated + remaining = allocationSize), and multi-step RowsCorrespond against the independent proportional modelAllocateLoop; +1 MinFirst selection remains a separate child; lockstep proportional memory-array Verity transaction build with amount, bound, floor, step-conjunct kill-lines, TX-observe computational evidence, rollback, and two-batch mutants"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-HANDWRITTEN-MINFIRST",
+      "severity": "MEDIUM",
+      "risk": "The handwritten MinFirst model lacks established Solidity and EVM equivalence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "severity": "MEDIUM",
+      "risk": "The Verity 4.31 scaffold is non-certified.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "explicit-∀ proportional-step pinned-selection correspondence, equality of the checked source word with independent Model.amount, and positive/bounded/capacity-safe checked amount (∀ over valid model/source rows + allocationSize)",
+      "fuel-bounded full-loop conservation for every successful sourceAllocateLoop run: final allocated + remaining = initial allocationSize; sourceAllocateLoop_eq_allocateLoop transfers the result to the executor loop",
+      "independently defined proportional modelAllocateToBestCandidate/modelAllocateLoop equations and fuel-bounded multi-step simulation preserving RowsCorrespond across every successful source mutation, with equal final allocated/remainder values",
+      "named kill-lines refuting the registered parent's proportional-step conjunct: Tests.MinFirstDistributionTxMutants.selection_kill_line_refutes_parent (first-open mutant scan substituted for Model.candidate?) and Tests.MinFirstDistributionTxMutants.headroom_clamp_kill_line_refutes_parent (checkedAmountNoCapacityCap substituted at the checkedAmount premise only); TX-level mutantSourceView vs runView retained as TX-observe computational evidence",
+      "handwritten +1 Strategy selection (demoted child)",
+      "executor allocateLoop plus a separately defined sourceAllocateLoop with copied equations and a proved equality bridge; observe reads writeArray buckets",
+      "Contract.run rollback after intermediate writes"
+    ],
+    "missing": [
+      "Solidity allocate does not test active (filtered upstream)",
+      "+1 Strategy and proportional Source are different algorithms",
+      "memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression",
+      "cross-call mutation of the decoded arrays"
+    ],
+    "open_gap_count": 4
+  },
+  "source_spans": [
+    {
+      "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+      "function": "allocate outer loop",
+      "start_line": 30,
+      "end_line": 44,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"
+    },
+    {
+      "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+      "function": "allocateToBestCandidate candidate search",
+      "start_line": 76,
+      "end_line": 86,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"
+    },
+    {
+      "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+      "function": "allocateToBestCandidate allocation-size upper bound",
+      "start_line": 93,
+      "end_line": 100,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L93-L100"
+    },
+    {
+      "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
+      "function": "allocateToBestCandidate proportional amount and bucket mutation",
+      "start_line": 102,
+      "end_line": 106,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "Solidity allocate does not test active (filtered upstream)",
+      "+1 Strategy and proportional Source are different algorithms",
+      "memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression",
+      "cross-call mutation of the decoded arrays"
+    ]
+  }
+}

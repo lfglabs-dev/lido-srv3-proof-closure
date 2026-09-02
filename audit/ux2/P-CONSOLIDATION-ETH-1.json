@@ -1,0 +1,192 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-CONSOLIDATION-ETH-1",
+  "position": 7,
+  "summary": "Renamed from P-ETH-1: consolidation fee/refund ETH plane only (orthogonal to P-CONSOLIDATION-1 vault request atomicity). eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent verity_tx_universal_success_shape now matches that quantifier strength on the success arm: for all (msgValue, batchSize, feePerRequest) that are nonzero-valued, word-sized, non-wrapping in the product fee, funded (batchSize*feePerRequest ≤ msgValue), and fuel-fit (batchSize+4 ≤ fuelBudget=32), the honest wiring commits with the whole product fee at the consolidation-request predeploy, the remainder at the refund recipient, and zero retained by every protocol contract on the route; proved by frame-by-frame chaining through the recursive dispatcher. The premises are exactly the abstract parent's non-revert conditions plus the model's fuel bound, and each is load-bearing: premise-necessity kill-lines refute the premise-dropped projections on the honest wiring (zero-value (0,2,0), underfunded (10,4,3), fuel (30,29,1) witnesses), and four wiring mutants (dropped refund leg, misrouted vault leg, corrupted refund amount, single request per batch) refute the same universal predicate at the premise-satisfying witness (10,2,3). The five numeral witnesses, rejecting-predeploy rollback, underfunded revert, ETH conservation, and dispatch/multicall replay agreement are retained as auxiliary regression evidence (verity_tx_composes_value_flow_and_rollback). Wave 6 closes the quantifier gap on the other side of the guard: verity_tx_universal_revert_partition proves UniversalRevertPartition, four ∀-quantified rollback arms read through observe (hence through finalWorld, so each arm asserts transaction-entry rollback of the whole balance sheet, not merely a control tag) — msgValue=0 reverts at the gateway after 2 hops for all word-sized (batchSize, feePerRequest); 2^256 ≤ batchSize*feePerRequest reverts at the gateway for all nonzero-valued word-sized inputs with 0 < batchSize; msgValue < batchSize*feePerRequest (non-wrapping) reverts at the gateway; and a funded non-wrapping batch with 29 ≤ batchSize needing more than fuelBudget frames exhausts dispatch at fuelBudget hops with the sender's whole msgValue restored. That partition is conjoined into the registered verity_tx_success_and_revert_partition alongside the four numeral witnesses it subsumes, so the registered claim is strictly strengthened and no prior witness is dropped. verity_tx_universal_zero_remainder_boundary covers the batchSize+3 = fuelBudget zero-remainder corner excluded by the success parent's conservative batchSize+4 ≤ fuelBudget premise, so together the success arm, the boundary corner, and the four revert arms classify every word-sized input. Wave 4 parent kill-lines refute eth_flow_parent's own success conjunct on mutants of gatewayExecute itself: misrouted_journal_kill_line_refutes_parent (fee legs journaled to an off-ApprovedSet address, classified .other) and zero_value_success_kill_line_refutes_parent (guard-free gateway succeeds at msg.value=0 paying 2*3=6 wei of fees, breaking totalAmount=msgValue). Former P-CONSOLIDATION-ETH-1b fee-leg theorems are demoted to parent evidence under A-CANONICAL-REQUEST-ADDRESS rather than a sibling guarantee. Former P-CONSOLIDATION-ETH-1a (vault→Lido/WQ return confinement) is retired from this parent: it matches neither the consolidation fee/refund happy path nor P-RESERVE-1 spend accounting.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, and the wiring/premise kill-lines. Keep A-CANONICAL-REQUEST-ADDRESS open. Do not restore vault→Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists."
+  },
+  "next_gate": "Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. OPEN: discharge deployed target provenance under A-CANONICAL-REQUEST-ADDRESS, and fold the canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical",
+      "module": "LidoSRv3.Audit.Guarantees.PConsolidationEth1",
+      "file": "LidoSRv3/Audit/Guarantees/PConsolidationEth1.lean",
+      "start_line": 283,
+      "end_line": 294,
+      "doc": "/-- **Registry-facing abstract parent at the canonical request predeploy.**\nThis folds the fee destination into the parent conclusion instead of leaving\nthe canonical target only in sibling evidence.  The literal is model content;\nits equality with the deployed configured target remains\n`A-CANONICAL-REQUEST-ADDRESS`. -/",
+      "statement": "theorem eth_flow_parent_at_canonical (refundRecipient : Address)\n    (hDistinct : refundRecipient ≠ canonicalRequestAddress) :\n    (canonicalApprovedSet refundRecipient).consolidationContract =\n        canonicalRequestAddress ∧\n      ∀ (msgValue n fee : Nat),\n        match gatewayExecute (canonicalApprovedSet refundRecipient) msgValue n fee with\n        | .reverted .zeroArgument => msgValue = 0\n        | .reverted .overflowPanic => n * fee ≥ 2^256\n        | .reverted .insufficientValue => n * fee > msgValue\n        | .success moves =>\n            (∀ m, m ∈ moves → parentApproved m.destination) ∧\n            totalAmount moves = msgValue"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition",
+      "module": "LidoSRv3.Audit.Guarantees.PConsolidationEth1",
+      "file": "LidoSRv3/Audit/Guarantees/PConsolidationEth1.lean",
+      "start_line": 443,
+      "end_line": 480,
+      "doc": "/-- Registry-facing Verity close: the universal funded success shape conjoined\nwith executable rollback shapes at all four modeled non-success boundaries\n(zero value, wrapped product, underfunding, and dispatch-fuel exhaustion), both\nas the four exact numeral witnesses and — since Wave 6 — at full\n`∀`-quantifier strength via `UniversalRevertPartition`. -/",
+      "statement": "theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest : Nat)\n    (hpos : 0 < msgValue)\n    (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)\n    (hnM : batchSize < _root_.Verity.Core.Uint256.modulus)\n    (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)\n    (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)\n    (hle : batchSize * feePerRequest ≤ msgValue)\n    (hfuel : batchSize + 4 ≤\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget) :\n    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest\n          msgValue batchSize feePerRequest) =\n      ⟨.success, batchSize + 3 + (if msgValue - batchSize * feePerRequest = 0 then 0 else 1),\n        ⟨0, 0, 0, 0, 0, batchSize * feePerRequest, msgValue - batchSize * feePerRequest⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 0 2 0) =\n        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,\n          ⟨0, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest\n            10 2 (2 ^ 255)) =\n        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,\n          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 4 3) =\n        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,\n          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 30 29 1) =\n        ⟨.exhausted,\n          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget,\n          ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      UniversalRevertPartition"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants",
+      "LidoSRv3.Tests.PConsolidationEth1RequestTxMutants"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationEth1 LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx LidoSRv3.Tests.PConsolidationEth1RequestTxMutants",
+      "expected": "Wave 1 call-journal classified ETH-flow parent with overflow/zero/insufficient reverts, numeric Bus/Gateway/Vault ensemble, and honest-model confirmations (lateral journal classification, zero msg.value revert) build with drop, misroute, corrupt, rollback, and two-batch mutants; the universal Verity parent verity_tx_universal_success_shape (every nonzero-valued, word-sized, non-wrapping, funded batch within the dispatch fuel budget commits with the whole product fee at the consolidation-request predeploy, the remainder at the refund recipient, and zero retained on the route) builds by frame-by-frame dispatcher induction; Wave 6 lifts the non-success arms to the same quantifier strength: UniversalRevertPartition (proved by verity_tx_universal_revert_partition and conjoined into the registered verity_tx_success_and_revert_partition) gives, for all word-sized inputs, an exact transaction-entry rollback observable on each of the four modeled non-success arms (zero msg.value, wrapped product fee, underfunded batch, dispatch-fuel exhaustion), and verity_tx_universal_zero_remainder_boundary closes the batchSize+3 = fuelBudget zero-remainder corner so no word-sized input is left unclassified; Wave 5 kill-lines build: four wiring mutants refute the same universal predicate at the premise-satisfying witness (10, 2, 3), and three premise-necessity kill-lines refute the premise-dropped projections on the honest wiring (zero-value, underfunded, and fuel-exhaustion witnesses); Wave 2 scope kill-lines (underfunded_batch_is_not_a_repartition, large_funded_batch_exhausts_fuel_budget) remain as executable premise witnesses; Wave 4 parent kill-lines (misrouted_journal_kill_line_refutes_parent, zero_value_success_kill_line_refutes_parent) build and refute the abstract parent's own success conjunct on mutants of gatewayExecute; fee-leg evidence (former P-CONSOLIDATION-ETH-1b) builds in-tree: consolidation_fee_path_confined, consolidation_fee_target_success, and request-tx mutants under A-CANONICAL-REQUEST-ADDRESS; not a sibling guarantee row"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-ABSTRACT-TX",
+      "severity": "MEDIUM",
+      "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOURCE-SHAPED",
+      "severity": "MEDIUM",
+      "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "severity": "MEDIUM",
+      "risk": "The Verity 4.31 scaffold is non-certified.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-CANONICAL-REQUEST-ADDRESS",
+      "severity": "HIGH",
+      "risk": "The model-local consolidation-request target is not proved equal to the pinned EIP-7251 predeploy at 0x0000BBdDc7CE488642fb579F8B00f3a590007251.",
+      "justification": "The pinned upstream source names this address, but fee-target proofs establish movement only to a configured immutable slot; deployment provenance is a separate obligation.",
+      "violation_impact": "A correctly accounted fee could still be sent to the wrong deployed address.",
+      "validation": "Compare constructor/deployment artifacts with the pinned upstream predeploy literal; do not treat the source pin as deployed-immutable identity.",
+      "removal_path": "Prove the configured immutable and deployed target both equal the canonical EIP-7251 address."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "call-journal address classification against ApprovedSet",
+      "∀ (msgValue, n, fee) quantification with overflow (n*fee≥2^256) and zero-value reverts",
+      "numeric Bus/Gateway/Vault ensemble and Contract.run rollback",
+      "∀ (msgValue, batchSize, feePerRequest) Verity-plane success shape under the abstract parent's non-revert conditions plus the dispatch fuel bound (nonzero value, word-sized inputs, non-wrapping product fee, funded batch, batchSize+4 ≤ fuelBudget), proved by dispatcher induction rather than numeral witnesses",
+      "registered Verity revert partition with exact rollback observables for zero-value (0,2,0), overflowing product (10,2,2^255), underfunded (10,4,3), and fuel-exhausted (30,29,1) honest executions",
+      "∀-quantified Verity-plane revert partition (UniversalRevertPartition, discharged by verity_tx_universal_revert_partition and conjoined into the registered parent): one universally quantified transaction-entry rollback arm per modeled non-success shape (zero msg.value, 2^256 ≤ batchSize*feePerRequest, underfunded non-wrapping batch, dispatch-fuel exhaustion), each read through observe/finalWorld so the arm pins the restored balance sheet and not only the control tag; the four numeral witnesses are now instances and are retained as regression facts",
+      "success/exhaustion boundary corner verity_tx_universal_zero_remainder_boundary (batchSize+3 ≤ fuelBudget with zero remainder), so the registered success arm, the boundary corner, and the four universal revert arms leave no word-sized input unclassified",
+      "five numeral witnesses, rejecting-predeploy rollback, underfunded revert, ETH conservation, and dispatch/multicall replay agreement retained as auxiliary regression evidence (the witnesses are consequences of the universal parent)",
+      "parent kill-lines on gatewayExecute mutants: misrouted fee journal to a lateral .other address, and zero-value fee-paying success breaking conservation",
+      "kill-lines on the universal Verity parent itself: four wiring mutants refute the same universal predicate at the premise-satisfying witness (10, 2, 3), and three premise-necessity kill-lines (positivity, funding, fuel) refute the premise-dropped projections on the honest wiring",
+      "canonical EIP-7251 request literal folded into the registered abstract parent via canonicalApprovedSet; deployed configured-target identity remains A-CANONICAL-REQUEST-ADDRESS",
+      "parent fee-leg evidence: consolidation_fee_path_confined (configured consolidation-request tag, not a sibling guarantee)",
+      "parent fee-leg Verity witness consolidation_fee_target_success: vault debit / configured consolidation-request credit under A-CANONICAL-REQUEST-ADDRESS",
+      "bus-forward Contract.run numeral retained as auxiliary fee-path evidence, not a separate guarantee"
+    ],
+    "missing": [
+      "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)",
+      "Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI",
+      "reverting refund or Lido sinks",
+      "refinement between abstract parent and the Verity ensemble",
+      "getConsolidationRequestFee versus stored fee slot",
+      "composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests)",
+      "the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness)",
+      "the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning",
+      "vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)",
+      "pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment",
+      "canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address",
+      "renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee"
+    ],
+    "open_gap_count": 12
+  },
+  "source_spans": [
+    {
+      "path": "contracts/0.8.25/vaults/ValidatorConsolidationRequests.sol",
+      "function": "CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS constant",
+      "start_line": 24,
+      "end_line": 25,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/vaults/ValidatorConsolidationRequests.sol#L24-L25"
+    },
+    {
+      "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol",
+      "function": "executeConsolidation",
+      "start_line": 383,
+      "end_line": 406,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
+    },
+    {
+      "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
+      "function": "addConsolidationRequests",
+      "start_line": 185,
+      "end_line": 223,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
+    },
+    {
+      "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
+      "function": "_refundFee",
+      "start_line": 295,
+      "end_line": 307,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L295-L307"
+    },
+    {
+      "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
+      "function": "_callAddConsolidationRequest",
+      "start_line": 113,
+      "end_line": 121,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
+    },
+    {
+      "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
+      "function": "_callAddWithdrawalRequest",
+      "start_line": 103,
+      "end_line": 111,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L103-L111"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)",
+      "Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI",
+      "reverting refund or Lido sinks",
+      "refinement between abstract parent and the Verity ensemble",
+      "getConsolidationRequestFee versus stored fee slot",
+      "composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests)",
+      "the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness)",
+      "the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning",
+      "vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)",
+      "pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment",
+      "canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address",
+      "renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee"
+    ]
+  }
+}

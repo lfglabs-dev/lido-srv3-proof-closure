@@ -46,6 +46,11 @@ check` fails closed if a count here drifts from the registry.
 
 Wording, assumptions, source spans, next gates: `audit/guarantees.yaml`.
 Generated views: `audit/STATUS.md`, `audit/ROADMAP.md`, `audit/REPRODUCE.md`.
+Per-guarantee display records: `audit/ux2/<ID>.json`, one per row above, each
+carrying the registry wording, the two registered theorems with their exact
+Lean statement, file and lines, the assumptions, the open fidelity gaps, the
+pinned source spans, and the model-vs-deployed boundary; `scripts/generate_ux2.py
+check` fails closed if a record says anything the registry or Lean does not.
 The generated R1 acceptance record is `audit/R1-FINAL-AUDITOR-REPORT.md`; it
 covers every registered canonical and supplemental row without promoting it to
 a deployment, bytecode, or audit-certification claim.

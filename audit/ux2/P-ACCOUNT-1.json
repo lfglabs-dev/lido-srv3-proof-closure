@@ -1,0 +1,220 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-ACCOUNT-1",
+  "position": 5,
+  "summary": "mint_after_read_discipline: on every committed modeled handleOracleReport, rewardsReadSlot is stamped before any nonzero rewardsMintedSlot. mint_order_kill_line refutes the same predicate on a pure call-site-reordering mutant. The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Keep the checked mint-after-read discipline theorem and its call-site-reordering kill-line as the registered parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData."
+  },
+  "next_gate": "fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Keep mint-after-read parent; do not widen to submitReportData.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline",
+      "module": "LidoSRv3.Audit.Guarantees.PAccount1",
+      "file": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
+      "start_line": 73,
+      "end_line": 73,
+      "doc": "/-- Registered P-ACCOUNT-1 parent. Independent tx-storage-flag order\ndiscipline: on every committed execution of the real `handleOracleReport`,\nthe `rewardsReadSlot` tick is written strictly before any nonzero\n`rewardsMintedSlot` tick. This reads the two raw ticks directly and does not\ngo through `storedSteps`; exact expected ticks make the same reordering visible\nat the `View` boundary, but this theorem states the order predicate directly\nrather than obtaining it through source-view equality. `Result.steps` (and the\n`View.steps` it feeds) is built from these same tx storage flags and never\ncalls `AccountingCorrespondence.successfulSteps`; the two planes share no\nstep-list bridge. Unlike the demoted `source_report_before_reward` child,\nthis parent is directly refuted by the `mint_order_kill_line` mutant below,\nso the registered claim has an adversarial witness rather than being true by\nconstruction. The ticks are not call-site constants: every step write goes\nthrough `stampStep`, which reads the transaction-local step clock in\n`sequenceSlot` and stores `clock + 1`, so the number a slot ends up holding is\nthe position at which that write actually ran. Moving a `stampStep` call\ntherefore changes the tick it records, which is what makes this an ordering\nclaim rather than a fact about which numeral a line of program text\ncontains. -/",
+      "statement": "theorem mint_after_read_discipline : mintAfterReadDiscipline"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report",
+      "module": "LidoSRv3.Audit.Guarantees.PAccount1",
+      "file": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
+      "start_line": 38,
+      "end_line": 41,
+      "doc": "/-- Verity child. `observe` of `handleOracleReport` (balance array + total/flag\nslots) equals the independently stated `sourceView`. Not `submitReportData`;\n`sharesToMintAsFees` is an argument, not a computed fee. -/",
+      "statement": "theorem verity_tx_simulates_oracle_report\n    (i : ReportInput) (sharesToMintAsFees : Nat) (state : Verity.ContractState) :\n    observe i ((handleOracleReport i sharesToMintAsFees).run state) =\n      sourceView i sharesToMintAsFees"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.HandleOracleReportTxMutants"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
+      "expected": "mint-after-read discipline over clock-stamped balance-write/read/mint ticks, with its pure call-site reordering kill-line on a valid nonempty report, plus the handleOracleReport-shaped Contract.run transaction and mutants"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-SOURCE-SHAPED",
+      "severity": "MEDIUM",
+      "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "severity": "MEDIUM",
+      "risk": "The Verity 4.31 scaffold is non-certified.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "mint-after-read order discipline over the two raw tx-storage ticks, which are stamped from a transaction-local step clock rather than written as call-site constants, refuted on the registered parent itself by a pure call-site reordering kill-line mutant that edits no literal and rebinds no slot",
+      "balance-write, accounting, rewards-read, and rewards-minted steps are clock-stamped; storedSteps requires the balance-write tick instead of hard-coding balancesWritten",
+      "the reordering mutant's flags remain present but their exact ticks expose the reversed mint/read order",
+      "independent tx storage-flag ticks for Result.steps/View.steps with no successfulSteps bridge",
+      "handleOracleReport-shaped validity/overflow guards; observe reads writeArray balances",
+      "Contract.run rollback after intermediate writes",
+      "child source_report_before_reward: constructor ordering of an accepted positive-fee report on the source if-tree"
+    ],
+    "missing": [
+      "SRStorage membership and unique uint24 module ids",
+      "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
+      "submitReportData / _handleConsensusReportData",
+      "fee computation (sharesToMintAsFees is an argument)",
+      "packed uint64 accounting words",
+      "re-read of the written router snapshot for rewards",
+      "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired"
+    ],
+    "open_gap_count": 7
+  },
+  "source_spans": [
+    {
+      "path": "contracts/0.8.9/oracle/AccountingOracle.sol",
+      "function": "submitReportData",
+      "start_line": 360,
+      "end_line": 366,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L360-L366"
+    },
+    {
+      "path": "contracts/0.8.9/oracle/AccountingOracle.sol",
+      "function": "_handleConsensusReportData",
+      "start_line": 477,
+      "end_line": 559,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L477-L559"
+    },
+    {
+      "path": "contracts/0.8.9/oracle/AccountingOracle.sol",
+      "function": "_processStakingRouterValidatorBalancesByModule",
+      "start_line": 609,
+      "end_line": 619,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/oracle/AccountingOracle.sol#L609-L619"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "reportValidatorBalancesByStakingModule",
+      "start_line": 285,
+      "end_line": 290,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L285-L290"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRLib.sol",
+      "function": "_validateReportValidatorBalancesByStakingModule",
+      "start_line": 853,
+      "end_line": 870,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L853-L870"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRLib.sol",
+      "function": "_reportValidatorBalancesByStakingModule",
+      "start_line": 872,
+      "end_line": 892,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L872-L892"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRUtils.sol",
+      "function": "_ensureAmountGwei",
+      "start_line": 75,
+      "end_line": 83,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L75-L83"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRUtils.sol",
+      "function": "MAX_VALUE_GWEI",
+      "start_line": 23,
+      "end_line": 23,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L23-L23"
+    },
+    {
+      "path": "contracts/0.8.9/Accounting.sol",
+      "function": "handleOracleReport",
+      "start_line": 135,
+      "end_line": 144,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/Accounting.sol#L135-L144"
+    },
+    {
+      "path": "contracts/0.8.9/Accounting.sol",
+      "function": "_calculateProtocolFees",
+      "start_line": 263,
+      "end_line": 303,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/Accounting.sol#L263-L303"
+    },
+    {
+      "path": "contracts/0.8.9/Accounting.sol",
+      "function": "_applyOracleReportContext",
+      "start_line": 359,
+      "end_line": 428,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/Accounting.sol#L359-L428"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "getStakingRewardsDistribution",
+      "start_line": 802,
+      "end_line": 874,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L802-L874"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "reportRewardsMinted",
+      "start_line": 263,
+      "end_line": 271,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L263-L271"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRLib.sol",
+      "function": "_reportRewardsMinted",
+      "start_line": 616,
+      "end_line": 639,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L616-L639"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "SRStorage membership and unique uint24 module ids",
+      "accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE",
+      "submitReportData / _handleConsensusReportData",
+      "fee computation (sharesToMintAsFees is an argument)",
+      "packed uint64 accounting words",
+      "re-read of the written router snapshot for rewards",
+      "full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired"
+    ]
+  }
+}

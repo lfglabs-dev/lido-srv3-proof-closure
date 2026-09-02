@@ -1,0 +1,231 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-TOPUP-1",
+  "position": 4,
+  "summary": "source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run -- genuinely assert-backed: run's value-moving tail and residual amount guards read the on-chain unchecked accumulator (the line-732 sum reduced mod 2^256, wrappedTotal = exactTotal % 2^256) for the over-target guard at line 737, the zero-sum test at line 741, the Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert, so reaching a value-moving commit means the assert passed with the wrapped pull equal to the exact push -- and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps mod 2^256, run itself moves no wei (pulled = pushed = 0) -- a nonzero wrap still aborts on the value-moving tail (underfunded push or line-755 assert), while a sum that wraps to exactly zero takes the line-741 empty commit committedNoTopUp, so wrap-implies-revert is false; the honest fact is wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit / source_wrap_precludes_value_moving_commit); A-TOPUP-NOWRAP lives here, in the wrap antecedent, and in the discharged-balance-guard theorems, not in conjunct (1); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants carries real kill-lines on mutants of the parent's own model: dropped_conservation_assert_kill_line_refutes_parent (a surgical mutant run with ONLY the line-755 assert deleted commits the wrapping batch with pulled = 1 ≠ 2^256+1 = pushed; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style), dropped_module_guard_kill_line_refutes_parent and dropped_wc_guard_kill_line_refutes_parent (mutants without the moduleExists / wcTypeIsType2 require commit at witnesses where the parent demands the named revert), and unwrapped_accumulator_kill_line_refutes_parent (the assert-drop mutant's dual: a wrap-ignoring mutant run commits the wrapping batch the honest run reverts via the assert). The wave-1 projections are renamed guard_discharge_at_* and are honest positive controls, not kill-lines; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control. Verity: if allocations.length ≤ 2^256, each allocation is a uint256 word, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match, including the wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis. Not P-TOPUP-2 amount computation.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Pin beacon-address provenance. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition; do not derive a top-up LinksSource from ALLOC."
+  },
+  "next_gate": "Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
+      "module": "LidoSRv3.Audit.Guarantees.PTopup1",
+      "file": "LidoSRv3/Audit/Guarantees/PTopup1.lean",
+      "start_line": 292,
+      "end_line": 335,
+      "doc": "/--\n`run cfg inp` conserves `pulled = pushed`. If that run reverts, the abstract\n`TxObservation` (`A-ABSTRACT-TX`) restores `before` and erases ETH moves and\nlogs.  The registered claim additionally folds in the wrap-plane discharge\n(`A-TOPUP-NOWRAP` lives in its antecedent: wrap precludes a value-moving\ncommit) and the\n`moduleExists`/`wcTypeIsType2` guard liveness facts as further conjuncts, so a\nkill-line mutant that defeats any one of them falsifies *this* theorem -- the\none tracked as P-TOPUP-1's CHECKED abstract claim in `audit/guarantees.yaml`\n-- and not merely a sibling lemma that the registry never cites.\n\nPinned-source conservation and rollback correspondence for the SRv3 beacon-chain\ntop-up push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:\n\n* `contracts/0.8.25/sr/StakingRouter.sol`, `topUp`, lines 679--759;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_validateTopUpInputs`, lines 761--782;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_checkAppAuth`, lines 1177--1179;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_getTopUpGateway`, lines 1169--1171;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_getModuleState`, lines 1099--1107;\n* `contracts/0.8.25/sr/SRUtils.sol`, `_requireWCType2`, lines 41--43;\n* `contracts/0.8.25/sr/SRUtils.sol`, `_requireModuleIdExists`, lines 45--47;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `PUBKEY_LENGTH`, line 57;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `PUBLIC_KEY_LENGTH`, line 21;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `MIN_DEPOSIT`, line 28;\n* `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;\n* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `makeBeaconChainTopUp`,\n  lines 66--108.\n\nTwo claims, one per half of the guarantee wording.\n\n*Conservation.* On every branch of the source-shaped path -- each authorization,\ninput-validation, module-status, allocation-loop, Lido-side and per-key guard, the\nempty-top-up early commit at source line 741, and the full push -- the wei pulled\nfrom Lido at source line 744 equals the wei pushed to the beacon deposit contract\nby the loop at `BeaconChainDepositor.sol` lines 79--107.\n\nThe pull is the on-chain `unchecked` reading of the line 732 accumulation (the\nsum reduced mod 2^256, `SolidityTopup.accumulated`); the push is the exact\nper-key total (`SolidityTopup.pushedValue`, with the\n`if (amount == 0) continue` skip at `BeaconChainDepositor.sol` line 89 losing\nnothing, per `SolidityTopup.loopPushed_eq_allocSum`).  On the commit branch the\ntwo agree *because the line 755 `assert` has passed*: reaching the commit means\nthe wrapped pull equalled the exact push (`SolidityTopup.committed_topup_spec`),\nand under an actual wrap a value-moving commit is unreachable -- the third\nconjunct shows wrap precludes `pulled ≠ 0` (`SolidityTopup.run_wrap_precludes_value_moving_commit`).\nWrap-to-zero is a no-top-up commit, not a revert.  So\nconservation here is genuinely assert-backed, not a same-array `Nat` coincidence,\nand it still needs no deployment-configuration side condition: unlike the 32-ETH\ndeposit path (P-DEPOSIT-1), the pull and the push are two readings of the *same*\n`_amounts` array, not a count multiplied by two separately-configured constants.\n\n*Rollback.* Every guard on that path is a whole-transaction abort -- the pinned\nspan contains no `try`/`catch` and no failure-swallowing low-level call, and a\nfailing `assert` is a Solidity 0.8 `Panic(0x01)` -- so a reverting outcome maps\nonto the abstract-transaction model's `.reverted` result, and\n`revert_restores_state_value_and_logs` restores the pre-state and erases all\ncommitted ETH moves and logs. That includes the\n`_checkAppAuth(_getTopUpGateway())` at source line 686 -- whose helper bodies at\nlines 1169--1171 and 1177--1179 are pinned above rather than assumed -- which is\nmodelled as the\n*first* guard: `SolidityTopup.unauthorized_reverts` shows an unauthorized caller\nreverts before the line 687 input validation, and\n`SolidityTopup.committing_implies_authorized` shows neither committing branch is\nreachable without the gateway. The branch correspondence therefore covers every\nsource execution rather than silently assuming an authorized caller.\n\nCaveats, stated rather than hidden:\n\n* Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`\n  division matches EVM `DIV`, and the one place the pinned path can overflow --\n  the `amount += _amounts[i]` at source line 732, inside the `unchecked` block\n  opened at line 722 -- is modelled faithfully rather than assumed away: the\n  over-target comparison at line 737, the zero-sum test at line 741, the\n  Lido-side amount guards at `Lido.sol` lines 842/873, the line 744 pull, the\n  funded router balance, and the line 755 `assert` all read the sum reduced\n  mod 2^256 (`SolidityTopup.accumulated`, `wrappedTotal = exactTotal % 2^256`).\n  Under a nonzero wrap the wrapped pull is strictly below the exact push, so\n  the transaction aborts.  Under wrap-to-zero line 741 commits\n  `committedNoTopUp`.  This theorem's third conjunct is the honest discharge:\n  wrap precludes a value-moving commit\n  (`SolidityTopup.run_wrap_precludes_value_moving_commit`).  On the no-wrap\n  branch `source_balance_guards_discharged` shows the two value guards are\n  unreachable, taking the no-wrap fact as an explicit hypothesis\n  (`A-TOPUP-NOWRAP`) rather than a bounded-arithmetic proof, because the bound\n  is not derivable from the pinned P-TOPUP-1 spans.\n* The `moduleExists` and `wcTypeIsType2` guards (source lines 689 and 694) are\n  not merely assumed live -- this theorem's second and fourth conjuncts prove\n  each one reverts with its named `Outcome` constructor whenever the earlier\n  guards pass and the named condition fails, so a regression that drops either\n  guard from `run` breaks this registered theorem directly, not only a sibling\n  lemma that the assurance registry never cites.\n* The guards the router applies to the *untrusted* module returndata are\n  covered by the fifth conjunct: the gwei alignment at source line 724, the\n  per-index `_topUpLimits[i]` bound and its out-of-bounds panic at source line\n  728, and the aggregate over-target comparison at source line 737 read on the\n  line 732 `unchecked` accumulator.  Deleting the loop or the over-target\n  branch from `run` refutes this theorem\n  (`LidoSRv3.Tests.TopupTxMutants.dropped_allocation_guards_kill_line_refutes_parent`\n  and `…dropped_over_target_guard_kill_line_refutes_parent`).  What the\n  conjunct does *not* claim is anything about where the returndata came from:\n  `_amounts` enters the model as an input, and the module-side allocation\n  algorithm remains P-ALLOC-1/P-ALLOC-2.\n* The empty-top-up branch at source line 741 is a *commit*, not a revert:\n  `SolidityTopup.committedNoTopUp_is_not_a_rollback` records this, so no reader\n  can mistake the rollback theorem for a claim that a zero-amount top-up aborts.\n* The rollback half is stated against the abstract transaction model\n  (`A-ABSTRACT-TX`), so the EVM plane stays open.\n* Out of scope here and left open: the per-validator top-up *amount computation*\n  and limit accounting (P-TOPUP-2), the allocation algorithm producing\n  `_amounts` (P-ALLOC-1/2), and the SSZ deposit-data-root construction at\n  `BeaconChainDepositor.sol` lines 120--146 (P-SSZ-1).\n-/",
+      "statement": "theorem source_topup_conserves_and_rolls_back {State : Type}\n    (cfg : SourceTopupConfig) (inp : SourceTopupInput)\n    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :\n    ((run cfg inp).pulled = (run cfg inp).pushed ∧\n      ((run cfg inp).reverts = true →\n        (observation before after attempts trace (run cfg inp)).committedState = before ∧\n          (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧\n          (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧\n    (inp.moduleExists = false →\n      inp.callerIsTopUpGateway = true →\n      inp.keyIndicesLength ≠ 0 →\n      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength\n          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength\n          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →\n      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →\n      run cfg inp = .revertStakingModuleUnregistered) ∧\n    (¬ NoUncheckedWrap inp →\n      (run cfg inp).pulled = 0 ∧ (run cfg inp).pushed = 0) ∧\n    (inp.wcTypeIsType2 = false →\n      inp.callerIsTopUpGateway = true →\n      inp.keyIndicesLength ≠ 0 →\n      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength\n          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength\n          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →\n      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →\n      inp.moduleExists = true →\n      inp.moduleActive = true →\n      run cfg inp = .revertWrongWithdrawalCredentialsType) ∧\n    (inp.callerIsTopUpGateway = true →\n      inp.keyIndicesLength ≠ 0 →\n      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength\n          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength\n          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →\n      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →\n      inp.moduleExists = true →\n      inp.moduleActive = true →\n      inp.wcTypeIsType2 = true →\n      cfg.gwei ≠ 0 →\n      ¬(smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false) →\n      (∀ o : SolidityTopup.Outcome,\n          allocationLoop cfg inp.allocations inp.topUpLimits = some o → run cfg inp = o) ∧\n        (allocationLoop cfg inp.allocations inp.topUpLimits = none →\n          smDepositableEthAmountRounded cfg inp < accumulated inp →\n          run cfg inp = .revertModuleReturnExceedTarget))"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close",
+      "module": "LidoSRv3.Audit.Guarantees.PTopup1",
+      "file": "LidoSRv3/Audit/Guarantees/PTopup1.lean",
+      "start_line": 641,
+      "end_line": 659,
+      "doc": "/-- Registered Verity parent: the full committing-source correspondence,\nincluding universal injected-failure rollback, conjoined with the universal\nnonzero-wrap revert/non-commit/snapshot-restore close above and with the\nreturndata-conditioned module-call plane, quantified over every possible\n`allocateDeposits` return. -/",
+      "statement": "theorem verity_tx_simulates_source_with_nonzero_wrap_close\n    (cfg : SourceTopupConfig) (inp : SourceTopupInput)\n    (state : Verity.ContractState)\n    (hLen : inp.allocations.length ≤ uint256Modulus)\n    (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)\n    (hCommit : (run cfg inp).reverts = false) :\n    VerityCommittingSimulation cfg inp state ∧\n      (∀ allocations : List Nat,\n        uint256Modulus ≤ allocSum allocations →\n        allocSumUnchecked allocations ≠ 0 →\n        (∀ a ∈ allocations, a < uint256Modulus) →\n        (let before := Verity.TopupTx.entryFrame state\n          ∃ reason,\n            (Verity.TopupTx.execute allocations .none).run before =\n                Verity.ContractResult.revert reason before ∧\n              (Verity.TopupTx.observe before allocations.length\n                ((Verity.TopupTx.execute allocations .none).run before)).committed = false)) ∧\n      ∀ call : Verity.TopupTx.TopupCall,\n        VerityGuardedReturndataSimulation cfg call state"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.TopupTxMutants"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
+      "expected": "abstract/source conservation, composed Contract.run correspondence over external-call journal destinations/values/arguments/order and per-validator allocation words, universal word-bounded nonzero-wrap revert/non-commit/snapshot restore, wrap-to-zero empty commit, intermediate-effect rollback, executable fail-closed mutants, and the abstract-parent kill-lines dropped_conservation_assert_kill_line_refutes_parent, dropped_module_guard_kill_line_refutes_parent, dropped_wc_guard_kill_line_refutes_parent, and unwrapped_accumulator_kill_line_refutes_parent build"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-ABSTRACT-TX",
+      "severity": "MEDIUM",
+      "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOURCE-SHAPED",
+      "severity": "MEDIUM",
+      "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-TOPUP-NOWRAP",
+      "severity": "HIGH",
+      "risk": "The unbounded-Nat top-up model reads the unchecked uint256 accumulation at StakingRouter.sol line 732 only under the assumption that the allocation sum stays below 2^256; the bound originates outside the pinned P-TOPUP-1 spans.",
+      "justification": "Lean Nat accumulation matches Solidity unchecked uint256 only when the source sum does not wrap.",
+      "violation_impact": "Top-up conservation and guard reachability can be false after a 2^256 wrap.",
+      "validation": "Exercise boundary mutants and retain the explicit NoUncheckedWrap premise in every consuming theorem.",
+      "removal_path": "Prove an upstream bound on key count and per-key amounts that implies the sum is below 2^256."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "severity": "MEDIUM",
+      "risk": "The Verity 4.31 scaffold is non-certified.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-TOPUP-BEACON-ADDRESS",
+      "severity": "HIGH",
+      "risk": "The model-local beacon deposit target is not proved equal to the immutable/deployed production beacon deposit contract.",
+      "justification": "Call-target correctness and deployment provenance are separate obligations.",
+      "violation_impact": "Conserved top-up value could be sent to the wrong address.",
+      "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical beacon deposit contract.",
+      "removal_path": "Prove the deployed immutable equals 0x00000000219ab540356cBB839Cbe05303d7705Fa."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "abstract conservation/rollback",
+      "pinned-source Verity correspondence for committing batches of at most 2^256 validators whose allocations are uint256 words, including wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis",
+      "universal Verity nonzero-wrap close: for every list of uint256-word allocations with exact sum at least 2^256 and nonzero unchecked total, the wrapped pull cannot fund the exact push schedule, execute is observably non-committing, and Contract.run restores the exact entry snapshot; [2^256-1, 2] remains a concrete regression instance",
+      "Lido pull and beacon deposits executed through Verity external-call frames that debit contract balance",
+      "observable call destinations, values, argument words and ordering plus per-validator allocation storage words",
+      "rollback to the caller snapshot after allocation writes, after the journalled pull, and after the first journalled deposit",
+      "fail-closed mutation of the executable transaction: skipped per-validator writes, dropped, misrouted, short-paid, reordered and duplicated deposits",
+      "wrap branch folded into the registered parent's third conjunct: over-target (line 737), zero-sum (line 741), Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert all read wrappedTotal = exactTotal % 2^256, so wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit; wrap-to-zero is committedNoTopUp, not a revert; kill-line unwrapped_accumulator_kill_line_refutes_parent refutes conjunct 3 on the wrap-ignoring dual mutant (commits with pulled = pushed ≠ 0); guard_discharge_at_wrapping_input is the honest-side nonzero-wrap control showing run reverting at wrapInput via the assert; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control)",
+      "moduleExists guard folded into the registered parent's second conjunct -- unregistered module reverts at source line 689 (kill-line dropped_module_guard_kill_line_refutes_parent: the mutant without the require commits at the same witness; guard_discharge_at_unregistered_module_input is the honest-side positive control)",
+      "wcTypeIsType2 guard folded into the registered parent's fourth conjunct -- non-type-2 WC reverts at source line 694 (kill-line dropped_wc_guard_kill_line_refutes_parent: the mutant without the require commits at the same witness; guard_discharge_at_non_type2_wc_input is the honest-side positive control)",
+      "conservation conjunct kill-line, surgical since wave 5: dropped_conservation_assert_kill_line_refutes_parent commits a mutant run with ONLY the line-755 assert deleted at the wrapping witness with pulled ≠ pushed -- the negation of conjunct (1)'s predicate on the mutant; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style"
+    ],
+    "missing": [
+      "beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct"
+    ],
+    "open_gap_count": 1
+  },
+  "source_spans": [
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "topUp",
+      "start_line": 679,
+      "end_line": 759,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L679-L759"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "_validateTopUpInputs",
+      "start_line": 761,
+      "end_line": 782,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L761-L782"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "_checkAppAuth",
+      "start_line": 1177,
+      "end_line": 1179,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L1177-L1179"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "_getTopUpGateway",
+      "start_line": 1169,
+      "end_line": 1171,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L1169-L1171"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "_getModuleState",
+      "start_line": 1099,
+      "end_line": 1107,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L1099-L1107"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRUtils.sol",
+      "function": "_requireWCType2",
+      "start_line": 41,
+      "end_line": 43,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L41-L43"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRUtils.sol",
+      "function": "_requireModuleIdExists",
+      "start_line": 45,
+      "end_line": 47,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L45-L47"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "PUBKEY_LENGTH",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L57-L57"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "PUBLIC_KEY_LENGTH",
+      "start_line": 21,
+      "end_line": 21,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L21-L21"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "MIN_DEPOSIT",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L28-L28"
+    },
+    {
+      "path": "contracts/0.4.24/Lido.sol",
+      "function": "withdrawDepositableEther",
+      "start_line": 869,
+      "end_line": 886,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L869-L886"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "makeBeaconChainTopUp",
+      "start_line": 66,
+      "end_line": 108,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L66-L108"
+    },
+    {
+      "path": "contracts/0.4.24/Lido.sol",
+      "function": "_spendDepositableEther",
+      "start_line": 839,
+      "end_line": 859,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct"
+    ]
+  }
+}

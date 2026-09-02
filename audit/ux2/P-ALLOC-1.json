@@ -1,0 +1,206 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-ALLOC-1",
+  "position": 1,
+  "summary": "checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Keep the checked execute parent and the live-summary/type-2-stake/packed-config transaction correspondence. Reachable-router CheckedBounds and unique moduleAddress remain strengthening obligations; do not widen to getDepositAllocations or P-ALLOC-2, and do not re-fold the min-clamp tautology."
+  },
+  "next_gate": "CHECKED: storage-backed 32-cap, packed ModuleStateConfig decode, live 96-byte getStakingModuleSummary decoding, and WC02-only getTotalModuleStake (0x0c852f5c) 32-byte decoding are threaded into allocation under decoded-row correspondence. OPEN: unique moduleAddress and reachable-router CheckedBounds; do not widen into P-ALLOC-2 or refold the min-clamp child.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute",
+      "module": "LidoSRv3.Audit.Guarantees.PAlloc1",
+      "file": "LidoSRv3/Audit/Guarantees/PAlloc1.lean",
+      "start_line": 103,
+      "end_line": 108,
+      "doc": "/-- **Wave 2 registered parent.**  Under `CheckedBounds`, the source-shaped\nexecutor succeeds and its capacity column equals the independent `MathView`\nmodel.  This restates `source_capacities_match_canonical` above under the\nparent's public name: it is exactly the executable content of the retired\nWave 1 parent `checked_execute_and_active_capacity_bounded`, with the\n`active_capacity_bounded` conjunct dropped. That conjunct is a\n`Nat.min_le_left`/`Nat.min_le_right` tautology on the `MathView.capacity`\n*definition* that holds for any two `Nat`s regardless of whether `execute`\ncomputed the right target or headroom (P-ALLOC-1 audit issue 1). Folding a\ndefinitional tautology into the parent meant no mutant could ever be written\nthat broke only that conjunct, so the registered parent is narrowed here to\nthe one conjunct a kill-line can actually falsify; `active_capacity_bounded`\nremains available above as an explicit, unregistered MathView-definitional\nchild. -/",
+      "statement": "theorem checked_execute\n    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)\n    (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :\n    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧\n      rows.map (fun row => (row.capacity : Nat)) =\n        MathView.capacities cfg modules depositsToAllocate isTopUp"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage",
+      "module": "LidoSRv3.Audit.Guarantees.PAlloc1",
+      "file": "LidoSRv3/Audit/Guarantees/PAlloc1.lean",
+      "start_line": 160,
+      "end_line": 178,
+      "doc": "/-- Storage-backed P-ALLOC-1 live-summary transaction closure. The router\nmodule count is read from storage and capped at 32. `bindLiveAll` reads each\npacked `ModuleStateConfig`, executes the mapped summary staticcall, ABI-decodes\nthe returned `(exited, deposited, depositable)` words, and for type-2 rows\nexecutes the distinct pinned `getTotalModuleStake()` staticcall and ABI-decodes\nits uint256 word before passing rows to the allocation loop. The premise says\nthose adversarial call observations decode to the source-view rows. It does\nnot prove reachable-router `CheckedBounds`. -/",
+      "statement": "theorem verity_tx_simulates_allocation_count_from_storage\n    (adversary :\n      Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)\n    (cfg : Config)\n    (modules : List _root_.LidoSRv3.Audit.Verity.AllocationTx.BoundModule)\n    (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)\n    (state : Verity.ContractState)\n    (hLength : modules.length = min\n      (state.readSlot\n        _root_.LidoSRv3.Audit.Verity.AllocationTx.modulesCountSlot).val 32)\n    (hBind :\n      (_root_.LidoSRv3.Audit.Verity.AllocationTx.bindLiveAll\n        adversary state 0 modules.length) state =\n      .success modules state) :\n    _root_.LidoSRv3.Audit.Verity.AllocationTx.observe modules\n        ((_root_.LidoSRv3.Audit.Verity.AllocationTx.allocateLiveFromStorage\n          adversary cfg depositsToAllocate isTopUp).run state) =\n      _root_.LidoSRv3.Audit.Verity.AllocationTx.sourceView\n        cfg modules depositsToAllocate isTopUp"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.AllocationTxMutants"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
+      "expected": "checked execute + MathView match parent (min-clamp tautology demoted to an unregistered child), storage-backed 32-capped allocation transaction with packed ModuleStateConfig reads and live 96-byte getStakingModuleSummary ABI decoding, the parent capacity kill-line and summary_field_order_kill_line_refutes_decoder, plus off-by-one/wrong-binding/stale-snapshot/rollback/two-batch mutants build"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-SOURCE-SHAPED",
+      "severity": "MEDIUM",
+      "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "severity": "MEDIUM",
+      "risk": "The Verity 4.31 scaffold is non-certified.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "checked execute succeeds and capacity column equals MathView under CheckedBounds",
+      "named parent kill-line capacity_target_kill_line_refutes_parent: the capacity := target mutant commits a capacity column ≠ MathView.capacities with CheckedBounds discharged at the witness",
+      "active_capacity_bounded (Math.min clamp) demoted to an explicit, unregistered MathView-definitional child",
+      "single bind/execute interpreter; observe reads writeArray columns",
+      "module count read from modulesCountSlot and capped by MAX_STAKING_MODULES_COUNT = 32 before binding router indices",
+      "packed ModuleStateConfig decoding for moduleAddress, uint16 stakeShareLimit, status, and withdrawalCredentialsType",
+      "live source-derived getStakingModuleSummary staticcall with 96-byte returndata guard and ABI decode in exited/deposited/depositable order, plus the distinct WC02-only getTotalModuleStake staticcall (0x0c852f5c) with a fail-closed 32-byte uint256 decode, threaded into BoundModule and the allocation loop under an explicit decoded-row correspondence premise",
+      "summary_field_order_kill_line_refutes_decoder rejects an exited/deposited return-word swap",
+      "Contract.run rollback after intermediate writes"
+    ],
+    "missing": [
+      "unique moduleAddress on addModule",
+      "getDepositAllocations / MinFirst fill (see P-ALLOC-2)",
+      "reachable-router CheckedBounds"
+    ],
+    "open_gap_count": 3
+  },
+  "source_spans": [
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "getDepositAllocations",
+      "start_line": 929,
+      "end_line": 936,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L929-L936"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRLib.sol",
+      "function": "_getDepositAllocations",
+      "start_line": 391,
+      "end_line": 431,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L391-L431"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRLib.sol",
+      "function": "_getModulesAllocationAndCapacity",
+      "start_line": 493,
+      "end_line": 559,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L493-L559"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRLib.sol",
+      "function": "_getStakingModuleSummary",
+      "start_line": 372,
+      "end_line": 379,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRLib.sol#L372-L379"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRStorage.sol",
+      "function": "getModuleState",
+      "start_line": 30,
+      "end_line": 32,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRStorage.sol#L30-L32"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRStorage.sol",
+      "function": "getIStakingModule helpers",
+      "start_line": 34,
+      "end_line": 47,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRStorage.sol#L34-L47"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRStorage.sol",
+      "function": "getModulesCount",
+      "start_line": 54,
+      "end_line": 56,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRStorage.sol#L54-L56"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRStorage.sol",
+      "function": "getModuleIdAt",
+      "start_line": 62,
+      "end_line": 64,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRStorage.sol#L62-L64"
+    },
+    {
+      "path": "contracts/common/lib/WithdrawalCredentials.sol",
+      "function": "isType2(uint256)",
+      "start_line": 47,
+      "end_line": 49,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/WithdrawalCredentials.sol#L47-L49"
+    },
+    {
+      "path": "contracts/0.8.25/sr/SRUtils.sol",
+      "function": "TOTAL_BASIS_POINTS",
+      "start_line": 17,
+      "end_line": 17,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L17-L17"
+    },
+    {
+      "path": "contracts/common/interfaces/IStakingModule.sol",
+      "function": "getStakingModuleSummary",
+      "start_line": 71,
+      "end_line": 81,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/interfaces/IStakingModule.sol#L71-L81"
+    },
+    {
+      "path": "contracts/common/interfaces/IStakingModuleV2.sol",
+      "function": "getTotalModuleStake",
+      "start_line": 28,
+      "end_line": 29,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/interfaces/IStakingModuleV2.sol#L28-L29"
+    },
+    {
+      "path": "package.json",
+      "function": "@openzeppelin/contracts-v5.2 dependency pin",
+      "start_line": 143,
+      "end_line": 143,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/package.json#L143-L143"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "unique moduleAddress on addModule",
+      "getDepositAllocations / MinFirst fill (see P-ALLOC-2)",
+      "reachable-router CheckedBounds"
+    ]
+  }
+}

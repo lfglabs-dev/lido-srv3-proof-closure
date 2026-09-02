@@ -1,0 +1,270 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-SSZ-1",
+  "position": 11,
+  "summary": "Bidirectional structural deposit-root equivalence is registered as deposit_root_iff: the named Spec SszWitness.Correspondence on well-formed deposits (pinned 48/32/96-byte widths). Construction binds sourceWitness src to sourceNode src at .clValidatorVerifier; determination recovers witness = sourceWitness src from depositVerified witness root with root = sourceNode src. Deposit uniqueness is the named PerfectDepositEncoding (A-PERFECT-HASH) child deposit_unique_of_perfect, not a parent conjunct. sourceNode_mutant_kill_line_refutes_parent is the parent-shaped kill-line (encode mutated to sourceNode + 1; wellFormedDeposit retained). This complements composed_ssz_encoding, which still registers the single traversal conjunct composedEncodingOk on ComposedSszInput (the mutant-exercised deposit-data-root reconstruction under sourceCombine). swapped_combine_kill_line_refutes_parent remains the traversal-child kill-line; inconsistent_witness_kill_line and inconsistent_operation_index_kill_line remain bindOperation-level negatives. SHA-256 functional correctness stays A-SHA256-FFI; the imported Yul fragment stays OPEN under A-YUL-INTERFACE.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Keep the checked Spec SszWitness.Correspondence parent, its sourceNode-mutant kill-line, and the named PerfectDepositEncoding uniqueness child. Keep the one-object four-child witness/root/concat/digest composition. Do not implement SSZ.verifyProof or a cryptographic SHA-256 proof."
+  },
+  "next_gate": "Registered parent is Spec SszWitness.Correspondence with a parent-shaped sourceNode mutant kill-line. OPEN: hash identification, SSZ.verifyProof / production gindices, and EIP-4788 / gateway. Keep SHA correctness and Yul visibly OPEN.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff",
+      "module": "LidoSRv3.Audit.Guarantees.PSsz1",
+      "file": "LidoSRv3/Audit/Guarantees/PSsz1.lean",
+      "start_line": 36,
+      "end_line": 38,
+      "doc": "/-- Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named\nSpec `SszWitness.Correspondence` (construction binds `sourceWitness src` to\n`sourceNode src`; determination recovers that witness). Deposit uniqueness\nis the named `PerfectDepositEncoding` / `A-PERFECT-HASH` child\n`deposit_unique_of_perfect`, not a parent conjunct. SHA-256 remains opaque\n(`A-SHA256-FFI`). Complements the one-object `composed_ssz_encoding`\ntraversal conjunct. -/",
+      "statement": "theorem deposit_root_iff (src : SourceDepositDataRootInput)\n    (hWellFormed : wellFormedDeposit src) :\n    Spec.SszWitness.Correspondence depositSszWitness src"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding",
+      "module": "LidoSRv3.Audit.Guarantees.PSsz1",
+      "file": "LidoSRv3/Audit/Guarantees/PSsz1.lean",
+      "start_line": 600,
+      "end_line": 628,
+      "doc": "/-- `observe` of the handwritten `encode` transaction equals `sourceView`.\nA commit also re-exports the structural-witness conjunct. This is not\n`SSZ.verifyProof` and does not prove SHA-256. -/",
+      "statement": "theorem verity_tx_simulates_ssz_encoding\n    (input : EncodingInput) (state : Verity.ContractState) :\n    observe ((encode input).run state) = sourceView input ∧\n      ((observe ((encode input).run state)).status = .committed →\n        structuralOk input = true ∧\n          structuralWitnessConjunct input ∧\n          (observe ((encode input).run state)).observables.bound = 1 ∧\n          (observe ((encode input).run state)).observables.operation =\n            operationWord input.operation ∧\n          (observe ((encode input).run state)).observables.index =\n            indexWord input.witness.index ∧\n          (observe ((encode input).run state)).observables.pivotBoundary =\n            nodeWord input.witness.pivotBoundary ∧\n          (observe ((encode input).run state)).observables.traversedRoot =\n            nodeWord (traversedRoot input) ∧\n          (observe ((encode input).run state)).observables.pathLength =\n            input.witness.path.length ∧\n          (observe ((encode input).run state)).observables.branchLength =\n            input.witness.branch.length ∧\n          (observe ((encode input).run state)).observables.path =\n            twoWords (input.witness.path.map siblingWord) ∧\n          (observe ((encode input).run state)).observables.branch =\n            twoWords (input.witness.branch.map nodeWord)) ∧\n      sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs ∧\n      (ExactDigestComposition input.deposit ∧\n        (digestChain input.deposit).length = 7) ∧\n      ∀ reason rollback,\n        (encode input).run state = .revert reason rollback →\n          rollback = state"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.SszEncodingTxMutants",
+      "LidoSRv3.Tests.SszRegression"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants LidoSRv3.Tests.SszRegression",
+      "expected": "deposit_root_iff proves the named Spec SszWitness.Correspondence at .clValidatorVerifier (construction: wellFormedDeposit src implies depositVerified (sourceWitness src) (sourceNode src); determination: depositVerified witness root with root = sourceNode src implies witness = sourceWitness src); deposit uniqueness is the named PerfectDepositEncoding / A-PERFECT-HASH child deposit_unique_of_perfect, not a parent conjunct; sourceNode_mutant_kill_line_refutes_parent negates the parent correspondence after substituting sourceNode + 1 for encode; composed_ssz_encoding proves the named predicate composedEncodingOk (single traversal conjunct complement); swapped_combine_kill_line_refutes_parent; composedEncodingOkFull_not_trivial_crossed_witness; inconsistent-witness and inconsistent-operation-index kill-lines; sourceWitness_binds_sourceNode non-vacuity; verity_tx_simulates_ssz_encoding; SSZ encoding mutants and regression tests build; SHA-256 remains A-SHA256-FFI"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-SHA256-FFI",
+      "severity": "HIGH",
+      "risk": "SHA-256 precompile behavior relies on opaque native FFI and host-library behavior; differential vectors do not close this crypto risk.",
+      "justification": "The project proves SSZ preimage shape but does not re-prove SHA-256/precompile functional correctness.",
+      "violation_impact": "Digest-value and proof-verification claims fail if SHA-256 behavior differs.",
+      "validation": "Pin the FFI/precompile interface and run known-answer vectors; do not promote vectors to a cryptographic proof.",
+      "removal_path": "Prove or import a separately certified SHA-256/precompile refinement theorem."
+    },
+    {
+      "id": "A-PERFECT-HASH",
+      "severity": "HIGH",
+      "risk": "The structural deposit encoding `sourceNode` is assumed injective on pinned-width well-formed deposits; without it, determination yields witness equality but not deposit uniqueness.",
+      "justification": "SHA-256 remains opaque (`A-SHA256-FFI`); injectivity of the structural root encoding on well-formed deposits is an explicit hypothesis (`PerfectDepositEncoding`) rather than a cryptographic consequence.",
+      "violation_impact": "Two distinct well-formed deposits could share the same structural root, breaking the unregistered uniqueness child `deposit_unique_of_perfect`. The registered `deposit_root_iff` parent still yields witness equality.",
+      "validation": "Recorded as `PerfectDepositEncoding` in `LidoSRv3.Audit.SszDepositEquivalence` and used only by the unregistered uniqueness child; removal requires a proved injectivity theorem or a narrower deposit model.",
+      "removal_path": "Prove `sourceNode` injective on well-formed deposits from the structural encoding, or refine the deposit model so injectivity is definitional."
+    },
+    {
+      "id": "A-MULTI-NODE-TRANSPORT",
+      "severity": "MEDIUM",
+      "risk": "Multi-node certification transport is accepted as a trust and reproducibility risk; transported results require independent identity and consistency checks.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-YUL-INTERFACE",
+      "severity": "MEDIUM",
+      "risk": "Handwritten Yul and direct bytecode require explicit interface composition, not a fabricated source projection.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "bidirectional structural deposit-root equivalence deposit_root_iff as Spec SszWitness.Correspondence at .clValidatorVerifier (construction binds sourceWitness src to sourceNode src; determination recovers witness = sourceWitness src); deposit uniqueness is the named PerfectDepositEncoding / A-PERFECT-HASH child deposit_unique_of_perfect",
+      "parent-shaped kill-line sourceNode_mutant_kill_line_refutes_parent: encode mutated to sourceNode + 1, wellFormedDeposit retained, inhabited by a pinned-width deposit",
+      "complement traversal conjunct composed_ssz_encoding / composedEncodingOk on ComposedSszInput.src",
+      "pinned deposit-data-root source layout",
+      "one-object composition of the four SSZ-encoding children on the single ComposedSszInput.src at the type level: ComposedSszInput.rhs/digestInput/txInput are derived from input.src, so a witness bound for one deposit, an index minted for another operation, or digest bytes for a different deposit cannot be paired with src's pinned deposit-data-root (report/P-SSZ-1.md issue #4's four-child counterexample and issues #20/#21's byte-identity/amount-encoding gaps)",
+      "registered parent conclusion predicate composedEncodingOk, stripped in wave 6 to the single mutant-exercised conjunct: the derived witness's traversal to sourceNode src under the source-combine family; the wave-4 conjuncts that unpacked the hBind premise (Ssz.structural_witness_binding_sound), equated the rfl-identical concat artifacts (source_concat_matches_spec), counted the literal seven preimages (digest_preimages_length), unfolded runVerification's definition (accepted_iff_root_matches), and reassembled the width premises (srcInputs_exactWidths) are demoted to unregistered children, still proved and re-bundled on the same one-object input as composedEncodingOkFull (composed_ssz_encoding_full)",
+      "parent kill-line: swapped_combine_kill_line_refutes_parent refutes the mutant-substituted parent (composedEncodingOkWithCombine with the model mutant sourceCombineSwapped in place of the honest sourceCombine — the one model function inside the predicate that hBind never mentions) at the concrete swappedCombineKillInput witness where every premise and hBind hold; after the wave-6 strip the mutant-substituted conclusion is exactly the traversal conjunct, which reduces to a Nat.pair tree equality forcing sourceAnchor = 0, contradicting the nonzero public-key fold",
+      "conclusion-non-triviality witness: composedEncodingOkFull_not_trivial_crossed_witness (renamed from crossed_witness_kill_line_refutes_parent) shows the unregistered full bundle composedEncodingOkFull is not constantly true (its first structural conjunct fails at the crossed .clProofVerifier operation); the stripped registered predicate mentions neither operation nor combine, so no negation of it is provable, and hBind fails at the crossed point, so this does not refute the parent",
+      "bindOperation-level negative results: inconsistent_witness_kill_line (a crossed two-source pair fails binding) and inconsistent_operation_index_kill_line (distinct named-operation slots)",
+      "GIndex.concat source transcription (sourceConcat = specConcat)",
+      "cross-type List Nat / ByteArray byte identity and 8-byte LE amount encoding between the deposit-data-root and digest/tx children, delivered by the srcInputs derivation (the source's own toLittleEndian64) at the type level",
+      "digest-chain storage reread (Observables.digest rereads digestMapSlot, not the pre-write chain list)",
+      "non-vacuity witness that composed_ssz_encoding's one-object hypotheses are jointly satisfiable (sourceWitness_binds_sourceNode, Tests/SszRegression.composedExample)",
+      "composed Contract.run encoding of the structural-bind/deposit-data-root/concat/digest children on the independent EncodingInput fields",
+      "Contract.run rollback after intermediate writes"
+    ],
+    "missing": [
+      "SSZ.verifyProof on production gindices",
+      "SHA-256 functional correctness of the opaque model/precompile symbol",
+      "refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child",
+      "imported-to-deployed helper/wrapper Yul fragment binding",
+      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
+      "the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput"
+    ],
+    "open_gap_count": 6
+  },
+  "source_spans": [
+    {
+      "path": "contracts/common/lib/BeaconTypes.sol",
+      "function": "Validator declaration",
+      "start_line": 8,
+      "end_line": 17,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/BeaconTypes.sol#L8-L17"
+    },
+    {
+      "path": "contracts/common/interfaces/ValidatorWitness.sol",
+      "function": "ValidatorWitness declaration",
+      "start_line": 13,
+      "end_line": 24,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/interfaces/ValidatorWitness.sol#L13-L24"
+    },
+    {
+      "path": "contracts/common/lib/GIndex.sol",
+      "function": "concat",
+      "start_line": 72,
+      "end_line": 89,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/GIndex.sol#L72-L89"
+    },
+    {
+      "path": "contracts/common/lib/SSZ.sol",
+      "function": "hashTreeRoot(BeaconTypes.Validator)",
+      "start_line": 89,
+      "end_line": 175,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/SSZ.sol#L89-L175"
+    },
+    {
+      "path": "contracts/common/lib/SSZ.sol",
+      "function": "verifyProof",
+      "start_line": 179,
+      "end_line": 248,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/SSZ.sol#L179-L248"
+    },
+    {
+      "path": "contracts/0.8.25/CLValidatorVerifier.sol",
+      "function": "_verifyValidator",
+      "start_line": 44,
+      "end_line": 57,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/CLValidatorVerifier.sol#L44-L57"
+    },
+    {
+      "path": "contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol",
+      "function": "_validatePubKeyWCProof",
+      "start_line": 150,
+      "end_line": 175,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol#L150-L175"
+    },
+    {
+      "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
+      "function": "addConsolidationRequests",
+      "start_line": 185,
+      "end_line": 223,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "_computeDepositDataRootWithAmount",
+      "start_line": 120,
+      "end_line": 135,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "_computeDepositDataRootWithAmount raw signature overload",
+      "start_line": 110,
+      "end_line": 118,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L110-L118"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "_computeSignatureRoot",
+      "start_line": 137,
+      "end_line": 146,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L137-L146"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "_toLittleEndian64",
+      "start_line": 148,
+      "end_line": 153,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L148-L153"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "PUBLIC_KEY_LENGTH",
+      "start_line": 21,
+      "end_line": 21,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L21-L21"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "SIGNATURE_LENGTH",
+      "start_line": 22,
+      "end_line": 22,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L22-L22"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "SHA256_DIGEST_LENGTH and zero padding literals",
+      "start_line": 126,
+      "end_line": 133,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L126-L133"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "DEPOSIT_DATA_LENGTH ABI input shape",
+      "start_line": 120,
+      "end_line": 135,
+      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
+      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "SSZ.verifyProof on production gindices",
+      "SHA-256 functional correctness of the opaque model/precompile symbol",
+      "refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child",
+      "imported-to-deployed helper/wrapper Yul fragment binding",
+      "the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values",
+      "the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput"
+    ]
+  }
+}
