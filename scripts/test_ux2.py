@@ -157,8 +157,12 @@ def check_lean_scanner(fixture: Path) -> None:
         "/-- Not for twelve. -/\n"
         "def helper : Nat := 1\n"
         "theorem twelve : helper = 1 := rfl\n"
+        "private theorem one : True := trivial\n"
+        "@[simp] private theorem two : True := trivial\n"
         "end Outer.Inner\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
+    if any(len(records) != 1 for records in found.values()):
+        raise SystemExit("a private theorem was indexed under the public name it shares")
     expected = {
         "Outer.Inner.one": ("theorem one (x : Nat := 3) : x = x", "/-- Doc for one. -/", 6, 6),
         "Outer.Inner.two": ("theorem two : True", "", 9, 9),
