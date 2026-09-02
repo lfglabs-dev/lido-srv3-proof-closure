@@ -1,7 +1,7 @@
-verified_source_tree=31418977de026ae2324ac4fb5be67258aa8e1752
+verified_source_tree=e21a35fc2ce6e9325eba0e20ad3a02da8107462e
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
 proof_targets=LidoSRv3 LidoSRv3Legacy
-⚠ [16/76] Replayed Verity.Core
+⚠ [11/91] Replayed Verity.Core
 warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -11,7 +11,7 @@ Note: This linter can be disabled with `set_option linter.unnecessarySimpa false
 warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [1132/1164] Replayed Conform.Wheels
+⚠ [1159/1244] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -24,7 +24,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1133/1164] Replayed EvmYul.Pretty
+⚠ [1160/1244] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -37,58 +37,47 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1180/1216] Replayed EvmYul.Semantics
+⚠ [1207/1244] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1181/1216] Replayed EvmYul.EVM.Semantics
+⚠ [1208/1244] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1226/1274] Replayed LidoSRv3.Audit.SszDepositEquivalence
-warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
-  Ssz.traverseBranch
-
-Hint: Omit it from the simp argument list.
-  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
-  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:12: This simp argument is unused:
-  sourceWitness
-
-Hint: Omit it from the simp argument list.
-  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:27: This simp argument is unused:
-  structuralWitness
-
-Hint: Omit it from the simp argument list.
-  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1236/1274] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
-warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
+⚠ [1253/1383] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:110:52: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:346:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
-  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
-  exactTxWidths input ∧
-    (digestPreimages input.toInputs).length = 7 ∧
-      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
-        (runVerification input = VerificationOutcome.revertRootMismatch →
-          (transactionObservation input before after attempts trace).committedState = before)
-info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:347:0: LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback (input : Inputs) (adversary : AdversaryModel)
-  (state : CallState) : (DenoteExternalCalls.denote (sha256Calls input) adversary state).snd.world = state.world
-info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationModel.Denote.Sha256.denote_success_compose (oracle : StaticCallOracle)
-  (fipsSha256 : ByteArray → ByteArray) (world : Verity.ContractState) (inputOffset inputSize outputOffset : Nat)
-  (digest : Digest) (sha256_correct : sha256_correct oracle fipsSha256)
-  (hcall : oracle (request world.memory inputOffset inputSize outputOffset) = StaticCallResult.success digest) :
-  Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
-    Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-      (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-⚠ [1242/1274] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:412:22: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:412:53: This simp argument is unused:
+  hzv
+
+Hint: Omit it from the simp argument list.
+  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:419:25: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:419:44: This simp argument is unused:
+  if_neg hzv
+
+Hint: Omit it from the simp argument list.
+  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1258/1383] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
 warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:265:26: This simp argument is unused:
   Nat.add_assoc
 
@@ -181,445 +170,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵l̵e̵f̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1289/1371] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:110:52: try 'simp' instead of 'simpa'
-
-Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:412:22: This simp argument is unused:
-  modelAllocateLoop
-
-Hint: Omit it from the simp argument list.
-  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:412:53: This simp argument is unused:
-  hzv
-
-Hint: Omit it from the simp argument list.
-  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:419:25: This simp argument is unused:
-  modelAllocateLoop
-
-Hint: Omit it from the simp argument list.
-  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:419:44: This simp argument is unused:
-  if_neg hzv
-
-Hint: Omit it from the simp argument list.
-  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1293/1371] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:302:53: This simp argument is unused:
-  setStorage
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵observeVerity, specTx,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther,
-  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵spendDepositableEther, getBufferedEtherAllocation, decode,
-            min, minWord, requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵
-  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require,
-  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵Verity.bind, Bind.bind, Pure.pure, Contract.run,
-            hzero, hdeposits, depositsReserve, hremaining]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:303:34: This simp argument is unused:
-  ContractState.writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity, specTx,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther, spendDepositableEther, getBufferedEtherAllocation, decode,
-            min, minWord, requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, hremaining]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:305:28: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵observeVerity, specTx,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther,
-  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵spendDepositableEther, getBufferedEtherAllocation, decode,
-            min, minWord, requireSomeUint, getStorage, setStorage,
-  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require,
-  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵Verity.bind, Bind.bind, Pure.pure, Contract.run,
-            hzero, hdeposits, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:319:57: This simp argument is unused:
-  setStorage
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot, Verity.require, Verity.bind,
-                Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲withdrawalsReserve, hremaining, hunreserved]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:320:38: This simp argument is unused:
-  ContractState.writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require, Verity.bind, Bind.bind, Pure.pure,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hremaining, hunreserved]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:322:46: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, ContractState.writeSlot, Verity.require,
-                Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:323:14: This simp argument is unused:
-  withdrawalsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, ContractState.writeSlot, Verity.require,
-                Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:333:30: This simp argument is unused:
-  setStorage
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ ̵ContractState.readSlot, ContractState.writeSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-                    hwithdrawals, depositsReserve, withdrawalsReserve, hremaining, hunreserved,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:334:18: This simp argument is unused:
-  ContractState.writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved, hdepositable]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:336:32: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-                    ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵withdrawalsReserve, hremaining,
-                    hunreserved, hdepositable]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:336:49: This simp argument is unused:
-  withdrawalsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-                    ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
-                    hunreserved, hdepositable]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:348:67: This simp argument is unused:
-  setStorage
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot,
-                          ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲withdrawalsReserve, hremaining, hunreserved, hdepositable, henough, hpost]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:349:48: This simp argument is unused:
-  ContractState.writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:351:70: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
-                          Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve,
-                          hremaining, hunreserved, hdepositable, henough, hpost]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:352:24: This simp argument is unused:
-  withdrawalsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
-                          Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:362:71: This simp argument is unused:
-  setStorage
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot, Verity.require,
-                              Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost, hbuffered]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:363:52: This simp argument is unused:
-  ContractState.writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
-                              ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require, Verity.bind, Bind.bind,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough, hpost, hbuffered]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:365:74: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
-                              ContractState.readSlot, ContractState.writeSlot, Verity.require,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved, hdepositable,
-                              henough, hpost, hbuffered]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:366:28: This simp argument is unused:
-  withdrawalsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
-                              ContractState.readSlot, ContractState.writeSlot, Verity.require,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved, hdepositable,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲henough, hpost, hbuffered]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:378:61: This simp argument is unused:
-  setStorage
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-                                  spendDepositableEther, getBufferedEtherAllocation,
-                                  getDepositableEther, decode, min, minWord, requireSomeUint,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run,
-                                  hzero, hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve,
-                                  hremaining, hunreserved, hdepositable, henough, hpost, hbuffered,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hnext]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:379:56: This simp argument is unused:
-  ContractState.writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-                                  spendDepositableEther, getBufferedEtherAllocation,
-                                  getDepositableEther, decode, min, minWord, requireSomeUint,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require,
-                                  Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost, hbuffered, hnext]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:381:78: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-                                  spendDepositableEther, getBufferedEtherAllocation,
-                                  getDepositableEther, decode, min, minWord, requireSomeUint,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved, hdepositable, henough,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hpost, hbuffered, hnext]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:382:32: This simp argument is unused:
-  withdrawalsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
-                                  spendDepositableEther, getBufferedEtherAllocation,
-                                  getDepositableEther, decode, min, minWord, requireSomeUint,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved, hdepositable, henough,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hpost, hbuffered, hnext]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:403:78: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, ReserveContract.buffered,
-                                  ReserveContract.storedDepositsReserve,
-                                  ReserveContract.unfinalizedStETH,
-                                  ReserveContract.depositedPostReport,
-                                  ReserveContract.depositedNextReportAdjusted,
-                                  modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲minWord, requireSomeUint, getStorage, setStorage,
-                                  ContractState.readSlot, ContractState.writeSlot, Verity.require,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough, hpost, hbuffered, hnext]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:404:32: This simp argument is unused:
-  withdrawalsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, ReserveContract.buffered,
-                                  ReserveContract.storedDepositsReserve,
-                                  ReserveContract.unfinalizedStETH,
-                                  ReserveContract.depositedPostReport,
-                                  ReserveContract.depositedNextReportAdjusted,
-                                  modelWithdrawDepositableEther, spendDepositableEther,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲minWord, requireSomeUint, getStorage, setStorage,
-                                  ContractState.readSlot, ContractState.writeSlot, Verity.require,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved,
-                                  hdepositable, henough, hpost, hbuffered, hnext]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:411:63: This simp argument is unused:
-  setStorage
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining, hunreserved,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:412:44: This simp argument is unused:
-  ContractState.writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require,
-                    Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved, hdepositable,
-                    henough]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:414:66: This simp argument is unused:
-  depositsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
-                    Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:415:20: This simp argument is unused:
-  withdrawalsReserve
-
-Hint: Omit it from the simp argument list.
-  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
-                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
-                    Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
-  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1303/1371] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
-warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
-  memory_writeSlot
-
-Hint: Omit it from the simp argument list.
-  simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1309/1371] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
+⚠ [1265/1383] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
 warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
   evalExprList
 
@@ -1094,7 +645,7 @@ Hint: Omit it from the simp argument list.
       hstorageW, mul_ofNat_val, hdiv, hle]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1312/1371] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
+⚠ [1284/1383] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
 warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:677:36: This simp argument is unused:
   requestCall
 
@@ -1116,7 +667,7 @@ Hint: Omit it from the simp argument list.
   simp ̵[̵i̵h̵]̵
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1313/1371] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
+⚠ [1285/1383] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
 warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:201:41: This simp argument is unused:
   List.mem_nil_iff
 
@@ -1124,7 +675,441 @@ Hint: Omit it from the simp argument list.
   simp [List.mem_cons,̵ ̵L̵i̵s̵t̵.̵m̵e̵m̵_̵n̵i̵l̵_̵i̵f̵f̵] at hx
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1329/1371] Replayed LidoSRv3.Audit.Verity.AddressTx
+⚠ [1307/1383] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:302:53: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵observeVerity, specTx,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵spendDepositableEther, getBufferedEtherAllocation, decode,
+            min, minWord, requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵Verity.bind, Bind.bind, Pure.pure, Contract.run,
+            hzero, hdeposits, depositsReserve, hremaining]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:303:34: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity, specTx,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther, spendDepositableEther, getBufferedEtherAllocation, decode,
+            min, minWord, requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, hremaining]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:305:28: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵observeVerity, specTx,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲modelWithdrawDepositableEther,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵spendDepositableEther, getBufferedEtherAllocation, decode,
+            min, minWord, requireSomeUint, getStorage, setStorage,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require,
+  ̵  ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵ ̵Verity.bind, Bind.bind, Pure.pure, Contract.run,
+            hzero, hdeposits, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:319:57: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot, Verity.require, Verity.bind,
+                Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲withdrawalsReserve, hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:320:38: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:322:46: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, ContractState.writeSlot, Verity.require,
+                Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:323:14: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲setStorage, ContractState.readSlot, ContractState.writeSlot, Verity.require,
+                Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:333:30: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ ̵ContractState.readSlot, ContractState.writeSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+                    hwithdrawals, depositsReserve, withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:334:18: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵ ̵Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved, hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:336:32: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+                    ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵withdrawalsReserve, hremaining,
+                    hunreserved, hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:336:49: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw, observeVerity,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲specTx, modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+                    ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
+                    hunreserved, hdepositable]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:348:67: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot,
+                          ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲withdrawalsReserve, hremaining, hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:349:48: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:351:70: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                          Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve,
+                          hremaining, hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:352:24: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                          getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                          Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:362:71: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot, Verity.require,
+                              Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:363:52: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
+                              ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require, Verity.bind, Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:365:74: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
+                              ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved, hdepositable,
+                              henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:366:28: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲spendDepositableEther, getBufferedEtherAllocation, getDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲decode, min, minWord, requireSomeUint, getStorage, setStorage,
+                              ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved, hdepositable,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲henough, hpost, hbuffered]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:378:61: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run,
+                                  hzero, hdeposits, hwithdrawals, depositsReserve, withdrawalsReserve,
+                                  hremaining, hunreserved, hdepositable, henough, hpost, hbuffered,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:379:56: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require,
+                                  Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough, hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:381:78: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved, hdepositable, henough,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:382:32: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther,
+                                  spendDepositableEther, getBufferedEtherAllocation,
+                                  getDepositableEther, decode, min, minWord, requireSomeUint,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved, hdepositable, henough,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:403:78: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, ReserveContract.buffered,
+                                  ReserveContract.storedDepositsReserve,
+                                  ReserveContract.unfinalizedStETH,
+                                  ReserveContract.depositedPostReport,
+                                  ReserveContract.depositedNextReportAdjusted,
+                                  modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲minWord, requireSomeUint, getStorage, setStorage,
+                                  ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough, hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:404:32: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, ReserveContract.buffered,
+                                  ReserveContract.storedDepositsReserve,
+                                  ReserveContract.unfinalizedStETH,
+                                  ReserveContract.depositedPostReport,
+                                  ReserveContract.depositedNextReportAdjusted,
+                                  modelWithdrawDepositableEther, spendDepositableEther,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲getBufferedEtherAllocation, getDepositableEther, decode, min,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲minWord, requireSomeUint, getStorage, setStorage,
+                                  ContractState.readSlot, ContractState.writeSlot, Verity.require,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining, hunreserved,
+                                  hdepositable, henough, hpost, hbuffered, hnext]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:411:63: This simp argument is unused:
+  setStorage
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, s̵e̵t̵S̵t̵o̵r̵a̵g̵e̵,̵ContractState.readSlot, ContractState.writeSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲Verity.require, Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hwithdrawals, depositsReserve, withdrawalsReserve, hremaining, hunreserved,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hdepositable, henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:412:44: This simp argument is unused:
+  ContractState.writeSlot
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot, C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵w̵r̵i̵t̵e̵S̵l̵o̵t̵,̵Verity.require,
+                    Verity.bind, Bind.bind, Pure.pure, Contract.run, hzero, hdeposits, hwithdrawals,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲depositsReserve, withdrawalsReserve, hremaining, hunreserved, hdepositable,
+                    henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:414:66: This simp argument is unused:
+  depositsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                    Contract.run, hzero, hdeposits, hwithdrawals, d̵e̵p̵o̵s̵i̵t̵s̵R̵e̵s̵e̵r̵v̵e̵,̵withdrawalsReserve, hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:415:20: This simp argument is unused:
+  withdrawalsReserve
+
+Hint: Omit it from the simp argument list.
+  simp [ReserveContract.withdrawWithGuards, ReserveContract.withdraw,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲observeVerity, specTx, modelWithdrawDepositableEther, spendDepositableEther,
+                    getBufferedEtherAllocation, getDepositableEther, decode, min, minWord,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲requireSomeUint, getStorage, setStorage, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ContractState.writeSlot, Verity.require, Verity.bind, Bind.bind, Pure.pure,
+                    Contract.run, hzero, hdeposits, hwithdrawals, depositsReserve, w̵i̵t̵h̵d̵r̵a̵w̵a̵l̵s̵R̵e̵s̵e̵r̵v̵e̵,̵ ̵hremaining,
+  ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1318/1383] Replayed LidoSRv3.Audit.Verity.VaultEthTx
+warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:94:23: This simp argument is unused:
+  hRoute
+
+Hint: Omit it from the simp argument list.
+  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:109:25: This simp argument is unused:
+  hRoute
+
+Hint: Omit it from the simp argument list.
+  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:113:21: This simp argument is unused:
+  hRoute
+
+Hint: Omit it from the simp argument list.
+  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:121:23: This simp argument is unused:
+  hRoute
+
+Hint: Omit it from the simp argument list.
+  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:136:25: This simp argument is unused:
+  hRoute
+
+Hint: Omit it from the simp argument list.
+  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1336/1383] Replayed LidoSRv3.Audit.Verity.AddressTx
 warning: LidoSRv3/Audit/Verity/AddressTx.lean:233:34: This simp argument is unused:
   AddressTxContract.paused
 
@@ -2429,43 +2414,75 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1333/1371] Replayed LidoSRv3.Audit.Verity.VaultEthTx
-warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:94:23: This simp argument is unused:
-  hRoute
+⚠ [1340/1383] Replayed LidoSRv3.Audit.SszDepositEquivalence
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
+  Ssz.traverseBranch
 
 Hint: Omit it from the simp argument list.
-  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
+  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:109:25: This simp argument is unused:
-  hRoute
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:12: This simp argument is unused:
+  sourceWitness
 
 Hint: Omit it from the simp argument list.
-  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:113:21: This simp argument is unused:
-  hRoute
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:27: This simp argument is unused:
+  structuralWitness
 
 Hint: Omit it from the simp argument list.
-  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:121:23: This simp argument is unused:
-  hRoute
+⚠ [1343/1383] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:346:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
+  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
+  exactTxWidths input ∧
+    (digestPreimages input.toInputs).length = 7 ∧
+      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
+        (runVerification input = VerificationOutcome.revertRootMismatch →
+          (transactionObservation input before after attempts trace).committedState = before)
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:347:0: LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback (input : Inputs) (adversary : AdversaryModel)
+  (state : CallState) : (DenoteExternalCalls.denote (sha256Calls input) adversary state).snd.world = state.world
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationModel.Denote.Sha256.denote_success_compose (oracle : StaticCallOracle)
+  (fipsSha256 : ByteArray → ByteArray) (world : Verity.ContractState) (inputOffset inputSize outputOffset : Nat)
+  (digest : Digest) (sha256_correct : sha256_correct oracle fipsSha256)
+  (hcall : oracle (request world.memory inputOffset inputSize outputOffset) = StaticCallResult.success digest) :
+  Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
+    Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+      (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+⚠ [1349/1383] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
+warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
+  memory_writeSlot
 
 Hint: Omit it from the simp argument list.
-  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+  simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:136:25: This simp argument is unused:
-  hRoute
+⚠ [1384/1409] Replayed LidoSRv3.Audit.Verity.TopupHybrid
+warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
+  _root_.Verity.pure
 
 Hint: Omit it from the simp argument list.
-  simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
+  simp [executeSource, sourceTx, observeVerity, withCalls, topupCallJournal,
+        TopupTxContract.executeTopup,
+  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executeNoTopup,
+  ̲  ̲ ̲ ̲ ̲ ̲TopupTxContract.executePullRevert,
+  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executePushRevert, _root_.Verity.require,
+        _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+        _root_.Contracts.linkedCallEntry, _root_.Verity.Contract.run,
+  ̵  ̵ ̵ ̵ ̵ ̵_root_.Verity.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵p̵u̵r̵e̵,̵ ̵Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲Pure.pure,
+  ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1369/1371] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1398/1409] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2519,13 +2536,13 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1370/1371] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+⚠ [1399/1409] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
 warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [1397/1408] Replayed LidoSRv3.Audit.Verity.DepositTx
+⚠ [1401/1409] Replayed LidoSRv3.Audit.Verity.DepositTx
 warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
   Pure.pure
 
@@ -2540,25 +2557,8 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1400/1408] Replayed LidoSRv3.Audit.Verity.TopupHybrid
-warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
-  _root_.Verity.pure
-
-Hint: Omit it from the simp argument list.
-  simp [executeSource, sourceTx, observeVerity, withCalls, topupCallJournal,
-        TopupTxContract.executeTopup,
-  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executeNoTopup,
-  ̲  ̲ ̲ ̲ ̲ ̲TopupTxContract.executePullRevert,
-  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executePushRevert, _root_.Verity.require,
-        _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
-        _root_.Contracts.linkedCallEntry, _root_.Verity.Contract.run,
-  ̵  ̵ ̵ ̵ ̵ ̵_root_.Verity.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵p̵u̵r̵e̵,̵ ̵Bind.bind,
-  ̲  ̲ ̲ ̲ ̲ ̲Pure.pure,
-  ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1407/1408] Replayed LidoSRv3.Legacy.SpecProofs
+⚠ [1408/1409] Replayed LidoSRv3.Legacy.SpecProofs
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-Build completed successfully (1408 jobs).
+Build completed successfully (1409 jobs).
