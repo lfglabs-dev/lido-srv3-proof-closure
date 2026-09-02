@@ -35,6 +35,10 @@ open LidoSRv3.Audit.Source.WithdrawalQueueSingleRequestControl
   (Outcome resolvedOwner requestWithdrawalsSingleControl)
 open LidoSRv3.Audit.Source.AddressTransferCorrespondence (State sourceTransfer)
 
+/-- Addresses are unbounded `Nat` here: the 160-bit Solidity address domain is
+not enforced, so a hop may name a recipient (for example `2^160`) that no
+Solidity address can, and `final.owner ≠ 0` below is stated on that wider
+domain. `audit/guarantees.yaml` records this as an open fidelity gap. -/
 abbrev Address := Nat
 
 /-- One later custody hop, i.e. one `transferFrom` call at line 218. -/

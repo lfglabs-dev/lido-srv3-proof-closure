@@ -107,3 +107,12 @@ domains.
 lake build LidoSRv3.Audit.Guarantees.PToken1 \
   LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants
 ```
+
+## Address width
+
+`Address` in `LidoSRv3/Audit/Source/WithdrawalQueueRequestCustody.lean` is an
+unbounded `Nat`. The 160-bit Solidity address domain is not enforced, so a
+modeled hop may name a recipient such as `2^160` that no Solidity address can,
+and the parent's `final.owner ≠ 0` conjunct is stated on that wider domain.
+The registry row records this as an open fidelity gap; a width-bounded
+admission or an address correspondence proof would close it.

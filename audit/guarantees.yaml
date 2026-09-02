@@ -1295,7 +1295,8 @@
           "events at WithdrawalQueue.sol:380 and WithdrawalQueueERC721.sol:253 are not modeled",
           "only one request list item is modeled; multi-item requestWithdrawals batches are not composed",
           "no Verity Executable Contract exists for the WithdrawalQueue surface, so the verity plane stays PARTIAL",
-          "P-TOKEN-1 is registered as a subordinate bounded row only; broad ERC-20 token behaviour remains NOT YET and is neither claimed nor implied"
+          "P-TOKEN-1 is registered as a subordinate bounded row only; broad ERC-20 token behaviour remains NOT YET and is neither claimed nor implied",
+          "Address is an unbounded Nat: the 160-bit Solidity address domain is not enforced, so a modeled hop may name a recipient (for example 2^160) that no Solidity address can, and final.owner ≠ 0 is stated on that wider domain; a width-bounded admission or address correspondence proof remains open"
         ]
       },
       "classification": {
