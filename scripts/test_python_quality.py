@@ -77,6 +77,8 @@ def check_ratchet(fixture: Path) -> None:
     expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f(cb=lambda x: " + DENSE_BODY + "):\n    return cb\n", encoding="utf-8")
     expect(False, "zz_dense.py:f.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("def f():\n    return (lambda x: " + DENSE_BODY + ")\n", encoding="utf-8")
+    expect(False, "zz_dense.py:f.lambda@2 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f[T: (lambda x: " + DENSE_BODY + ")]():\n    return 1\n", encoding="utf-8")
     expect(False, "zz_dense.py:f.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("class K[T: (lambda x: " + DENSE_BODY + ")]:\n    pass\n", encoding="utf-8")
@@ -123,10 +125,10 @@ def check_metric() -> None:
               "    def inner(c):\n        return c if a else b\n"
               "    return (lambda d: d if a else b)(0)\n")
     (function,) = ast.parse(source).body
-    if check_python_quality.complexity(function) != 14:
+    if check_python_quality.complexity(function) != 13:
         raise SystemExit(f"complexity metric drifted: {check_python_quality.complexity(function)}")
     names = [name for name, _ in check_python_quality.functions(ast.parse(source))]
-    if names != ["f", "f.inner"]:
+    if names != ["f", "f.inner", "f.lambda@22"]:
         raise SystemExit(f"scope qualification drifted: {names}")
     outside = ("def deco(f):\n    return f\n"
                "@(deco if True else deco)\n"
@@ -137,12 +139,13 @@ def check_metric() -> None:
                "a, b = (lambda: 1), 2\n"
                "callbacks = [lambda x: x if x else 0, lambda y: y]\n"
                "def g(cb=lambda z: z if z else 0):\n    return cb(lambda w: w if w else 1)\n"
-               "def h[T: (lambda q: q if q else 0)]():\n    return 1\n")
+               "def h[T: (lambda q: q if q else 0)]():\n    return 1\n"
+               "k = lambda: (lambda: 1 if True else 0)\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.functions(ast.parse(outside))}
     if measured != {"deco": 1, "simple": 1, "dense": 2, "K.pick": 2, "lambda@9": 1,
-                    "lambda@10": 2, "lambda@10#2": 1, "g": 2, "g.lambda@11": 2, "h": 1,
-                    "h.lambda@13": 2}:
+                    "lambda@10": 2, "lambda@10#2": 1, "g": 1, "g.lambda@11": 2, "g.lambda@12": 2,
+                    "h": 1, "h.lambda@13": 2, "k": 1, "lambda@15": 2}:
         raise SystemExit(f"decorator/default/annotation or lambda accounting drifted: {measured}")
     nested = ("def outer(flag):\n"
               "    def inner[T: (9 if flag else 10)](x=(1 if flag else 2),\n"

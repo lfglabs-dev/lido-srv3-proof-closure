@@ -40,38 +40,36 @@ def git_blob_id(content: bytes) -> str:
 
 
 def own_nodes(function: ast.AST):
-    """Every node of a function's body except nested function and class bodies.
+    """Every node of a function's body except nested function, lambda and class bodies.
 
     Only the body counts: a function's own decorators, default values and
     annotations run in the enclosing scope, so they are charged there, and a
     nested definition's setup fields are charged here for the same reason
     while its body is measured on its own (see `functions`). A class body
-    nested in a function runs in that function. Lambdas inside a function's
-    body stay with that function, but a lambda in a nested definition's
-    setup or in a nested class body is listed by `functions` and measured on
-    its own, so only its default values are charged here. Type parameters
-    (PEP 695 bounds and defaults) are treated like default values.
+    nested in a function runs in that function. Every lambda is measured on
+    its own wherever it appears, so only its default values are charged
+    here. Type parameters (PEP 695 bounds and defaults) are treated like
+    default values.
     """
     body = function.body if isinstance(function, FUNCTIONS) else [function.body]
-    pending = [(node, False) for node in body]
+    pending = list(body)
     while pending:
-        node, listed = pending.pop()
+        node = pending.pop()
         if isinstance(node, FUNCTIONS):
             # A nested definition's decorators, defaults and annotations are
             # evaluated by the enclosing function; only its body is its own.
-            pending.extend((field, True) for field in setup_fields(node))
+            pending.extend(setup_fields(node))
             continue
         if isinstance(node, ast.ClassDef):
             # A class body runs where the class is defined; its methods do not.
-            pending.extend((field, True) for field in
-                           [*node.decorator_list, *node.type_params, *node.bases, *node.keywords,
+            pending.extend([*node.decorator_list, *node.type_params, *node.bases, *node.keywords,
                             *node.body])
             continue
-        if isinstance(node, ast.Lambda) and listed:
-            pending.append((node.args, True))
+        if isinstance(node, ast.Lambda):
+            pending.append(node.args)
             continue
         yield node
-        pending.extend((child, listed) for child in ast.iter_child_nodes(node))
+        pending.extend(ast.iter_child_nodes(node))
 
 
 def setup_fields(function: ast.AST) -> list[ast.AST]:
@@ -96,14 +94,14 @@ def complexity(function: ast.AST) -> int:
 
 
 def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
-    """Every function in a module with its scope-qualified name, in source order.
+    """Every function and lambda in a module with its scope-qualified name, in source order.
 
-    Methods carry their class, local functions carry their parent, and a
-    lambda outside every measured body (module or class level, a decorator,
-    a type parameter, a default value, an annotation) counts as a function under its bound name
-    or its line; a name defined twice in the same scope carries an ordinal,
-    so no definition can hide behind another that shares its bare name.
-    Lambdas inside a function body stay with that function.
+    Methods carry their class, local functions carry their parent, and every
+    lambda counts as a function under the name it is bound to or its line,
+    wherever it appears (module or class level, a decorator, a type
+    parameter, a default value, an annotation, or a function body); a name
+    defined twice in the same scope carries an ordinal, so no definition can
+    hide behind another that shares its bare name.
     """
     found: list[tuple[str, ast.AST]] = []
     seen: dict[str, int] = {}
@@ -113,29 +111,30 @@ def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
         seen[qualified] = seen.get(qualified, 0) + 1
         found.append((qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}", node))
 
-    def visit(children, scope: list[str], in_body: bool) -> None:
+    def visit(children, scope: list[str]) -> None:
         for child in children:
             if isinstance(child, FUNCTIONS):
                 record(scope, child.name, child)
                 inner = [*scope, child.name]
-                visit(setup_fields(child), inner, False)
-                visit(child.body, inner, True)
+                visit(setup_fields(child), inner)
+                visit(child.body, inner)
             elif isinstance(child, ast.ClassDef):
-                visit(ast.iter_child_nodes(child), [*scope, child.name], False)
-            elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda) \
-                    and not in_body:
+                visit(ast.iter_child_nodes(child), [*scope, child.name])
+            elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)
-            elif isinstance(child, ast.Lambda) and not in_body:
+                visit(ast.iter_child_nodes(child.value), scope)
+            elif isinstance(child, ast.Lambda):
                 record(scope, f"lambda@{child.lineno}", child)
+                visit(ast.iter_child_nodes(child), scope)
             else:
-                visit(ast.iter_child_nodes(child), scope, in_body)
+                visit(ast.iter_child_nodes(child), scope)
 
-    visit(ast.iter_child_nodes(tree), [], False)
+    visit(ast.iter_child_nodes(tree), [])
     return found
 
 
 def assigned_name(statement: ast.AST) -> str:
-    """The name a module- or class-level lambda is bound to, or its line."""
+    """The name a lambda is bound to, or its line."""
     targets = statement.targets if isinstance(statement, ast.Assign) else [statement.target]
     if len(targets) == 1 and isinstance(targets[0], ast.Name):
         return targets[0].id

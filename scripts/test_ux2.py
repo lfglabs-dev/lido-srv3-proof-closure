@@ -157,6 +157,9 @@ def check_lean_scanner(fixture: Path) -> None:
         "/-- Not for twelve. -/\n"
         "def helper : Nat := 1\n"
         "theorem twelve : helper = 1 := rfl\n"
+        "/-- Doc for thirteen. -/\n"
+        "protected\n"
+        "theorem thirteen : True := trivial\n"
         "private theorem one : True := trivial\n"
         "@[simp] private theorem two : True := trivial\n"
         "private\ntheorem one : True := trivial\n"
@@ -178,6 +181,7 @@ def check_lean_scanner(fixture: Path) -> None:
         "Outer.Inner.ten": ("theorem ten : (Id.run do let x ← pure 1; let y := x + 1; return y) = 2", "", 28, 28),
         "Outer.Inner.eleven": ("theorem eleven : True", "/-- Doc for eleven. -/", 32, 32),
         "Outer.Inner.twelve": ("theorem twelve : helper = 1", "", 35, 35),
+        "Outer.Inner.thirteen": ("protected\ntheorem thirteen : True", "/-- Doc for thirteen. -/", 37, 38),
     }
     if set(found) != set(expected):
         raise SystemExit(f"scanner resolved {sorted(found)}")
@@ -274,6 +278,28 @@ def check_scanner_edges(fixture: Path) -> None:
     shutil.rmtree(hollow)
 
 
+def check_symlink_tree(fixture: Path) -> None:
+    """Symlinks below LidoSRv3/ hash as Git stores them, so the tree id still
+    equals the committed tree `verified_source_tree.sh` reads."""
+    linked = fixture / "linked"
+    for name in generate_ux2.LEAN_INPUTS:
+        (linked / name).parent.mkdir(parents=True, exist_ok=True)
+        (linked / name).write_text(name, encoding="utf-8")
+    nested = linked / "LidoSRv3" / "Nested"
+    nested.mkdir(parents=True)
+    (nested / "Real.lean").write_text("theorem t : True := trivial\n", encoding="utf-8")
+    (linked / "LidoSRv3" / "Alias.lean").symlink_to("Nested/Real.lean")
+    (linked / "LidoSRv3" / "Twin").symlink_to("Nested")
+    git = ["git", "-C", str(linked)]
+    subprocess.run([*git, "init", "-q"], check=True)
+    subprocess.run([*git, "add", "-A"], check=True)
+    expected = subprocess.run([*git, "write-tree"], check=True, capture_output=True,
+                              text=True).stdout.strip()
+    if generate_ux2.lean_source_tree(linked) != expected:
+        raise SystemExit("symlinks below LidoSRv3/ do not hash as Git stores them")
+    shutil.rmtree(linked)
+
+
 def check_boundary_and_kill_lines(fixture: Path) -> None:
     readme = fixture / "README.md"
     original = rewrite(
@@ -295,6 +321,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check_lean_scanner(fixture)
     check_lean_inputs_binding(fixture)
     check_scanner_edges(fixture)
+    check_symlink_tree(fixture)
     check_boundary_and_kill_lines(fixture)
 
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
