@@ -1,0 +1,16 @@
+# Retired import-layer debt. These edges must never return.
+# Entries are permanent tombstones; the immutable pin makes retirement monotone.
+
+# rule: spec-verity
+
+# rule: spec-guarantees
+
+# rule: source-guarantees
+
+# rule: model-guarantees
+
+# rule: common-guarantees
+
+# rule: verity-guarantees
+
+# rule: provenance-guarantees

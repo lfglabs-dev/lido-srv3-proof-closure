@@ -5,12 +5,12 @@
     "lean": "4.31.0",
     "verity_commit": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
   },
-  "command": "lake build LidoSRv3",
+  "command": "lake build LidoSRv3 LidoSRv3Legacy",
   "build": {
     "log": "proofs/logs/prove.txt",
-    "log_sha256": "e9620ae2f30b8fd0298fa33784689ae550296f708d03081cc5146bf7127820bf",
-    "verified_at": "2026-08-24T18:55:02Z",
-    "verified_source_tree": "c0bd673734d262163147237d309e729d9896d405",
+    "log_sha256": "6993f42bbab120637dd5d21b7db6add565c72e3ab6d5d25895921ced14aef4f5",
+    "verified_at": "2026-09-02T06:42:08Z",
+    "verified_source_tree": "e21a35fc2ce6e9325eba0e20ad3a02da8107462e",
     "exit_status": 0
   },
   "targets": [

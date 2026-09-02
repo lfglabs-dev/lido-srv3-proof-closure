@@ -55,14 +55,20 @@ a deployment, bytecode, or audit-certification claim.
 Needs [elan](https://github.com/leanprover/elan) and Lean 4.31.0.
 
 ```bash
+lake build         # production library (no Tests, Legacy, or Trust)
+lake build LidoSRv3Test   # mutants, vectors, nested Verity tests
 make audit-check   # registry, pins, source map, generated views
-make test          # mutants, receipt, provenance guards, Lean regressions
-make prove         # full LidoSRv3 build; writes proofs/logs/proof-report.json
+make test          # metadata, trust, import DAG, then LidoSRv3Test
+make prove         # builds LidoSRv3 and LidoSRv3Legacy; writes proofs/logs/proof-report.json
 ```
 
 `proofs/logs/proof-report.json` is a build receipt for the superseded
 SRV3-P1–P15 lane (`target_scope: legacy-srv3-p1-p15-superseded`). It is not
 evidence for the eleven guarantees above. Use `audit/guarantees.yaml` for those.
+Those theorems live in `LidoSRv3Legacy`, so `make prove` builds it alongside the
+production facade: `scripts/write_proof_report.sh` declares the target set, the
+recipe builds exactly that set, and the receipt is refused unless the build log
+records every declared target.
 
 One guarantee:
 
@@ -74,8 +80,10 @@ PDF: `make report` writes `dist/lido-srv3-formal-methods-report.pdf`.
 
 ## Layout
 
-- `LidoSRv3/Audit/` — models, source maps, Verity transactions, facade
-- `LidoSRv3/Tests/` — mutants; not imported by the facade
+- `LidoSRv3/Audit/` — models, source maps, Verity transactions, public guarantees
+- `LidoSRv3/Tests/` — mutants; not imported by the production facade
+- `LidoSRv3/Audit/Trust.lean` — axiom surface; `LidoSRv3Audit` target, not the facade
+- `LidoSRv3/Legacy/` — superseded P1–P15 lane; `LidoSRv3Legacy`, not a default target
 - `audit/` — registry, source map, assumptions, pins, generated views
 - `verity/targets/` — pin manifest
 - `scripts/` — fail-closed checks
