@@ -86,6 +86,104 @@ RENDERED_CASES = (
 )
 
 
+# Thread r3909473219: removing a tag is not removing an element.  A required
+# taxonomy claim written into `<script>…</script>` reached this view intact
+# while a browser drew none of it, so the gate it feeds reported a pairing that
+# was published to nobody.  The body of a non-rendered element is removed with
+# its tags, and the controls beside each case pin the boundary of that rule:
+# over-reading it would delete text a reader is plainly shown, and no edit to
+# the document could then satisfy the gate.
+NON_RENDERED_CASES = (
+    # One entry per element the reducer holds to be non-rendered, so an element
+    # the suite never exercises cannot carry a claim the day it is used.
+    (f"<script>{HIDDEN}</script>", ""),
+    (f"<style>/* {HIDDEN} */</style>", ""),
+    (f"<template>{HIDDEN}</template>", ""),
+    (f"<textarea>{HIDDEN}</textarea>", ""),
+    (f"<title>{HIDDEN}</title>", ""),
+    (f'<iframe src="x">{HIDDEN}</iframe>', ""),
+    (f"<noembed>{HIDDEN}</noembed>", ""),
+    (f"<noframes>{HIDDEN}</noframes>", ""),
+    # The open tag is a tag, not a bare name: attributes, an ignored solidus and
+    # either casing all still open the element.
+    (f'<script type="text/javascript">{HIDDEN}</script>', ""),
+    (f"<SCRIPT>{HIDDEN}</SCRIPT>", ""),
+    (f"<script/>{HIDDEN}</script>", ""),
+    (f'<script data-note="a>b">{HIDDEN}</script>', ""),
+    (f'<script>{HIDDEN}</script foo="bar">', ""),
+    # An element that never closes runs to the end of the text, which is what a
+    # browser shows of it: nothing.
+    (f"<script>{HIDDEN}", ""),
+    (f"<script data-note='unterminated {HIDDEN}", ""),
+    # `template` content is ordinary markup, so an inner opener opens a real
+    # element and the outer body runs past the inner close.  Stopping at the
+    # first `</template>` left the sentence after it standing.
+    (f"<template><template>inner</template>{HIDDEN}</template>", ""),
+    # The body is removed before the link pass, so link syntax inside it cannot
+    # rewrite the boundary that decides what is deleted.
+    (f"<script>[{HIDDEN}](target)</script>", ""),
+    (f'<script>[note]: target "{HIDDEN}"</script>', ""),
+    # The three shapes that put a sentence behind an end tag a scan stops at,
+    # and the reason the span runs to the *last* close instead of the first.
+    # A raw-text child carries the outer end tag as text, not as a tag:
+    # `</template>` here is script content and closes no template.
+    (f"<template><script>x</template>{HIDDEN}</script>", ""),
+    # A comment inside the body does the same.
+    (f"<template><!-- </template> -->{HIDDEN}</template>", ""),
+    # And HTML's own script double-escape runs past an end tag that looks like
+    # the close.
+    (f"<script><!--<script>x</script>-->{HIDDEN}</script>", ""),
+    # Two elements of the same name therefore bind one span, and the prose
+    # between them is read as hidden.  That is the cost of the rule, and it is
+    # the direction that reports a claim missing rather than present.
+    (f"<script>a</script> {HIDDEN} <script>b</script>", ""),
+
+    # --- controls: every case below is text a reader is shown -----------------
+    # The span is bounded: prose before the open tag and after the close is on
+    # the page and must survive.
+    (f"{HIDDEN} <script>note</script>", HIDDEN),
+    (f"<script>note</script> {HIDDEN}", HIDDEN),
+    # Two different names bound their own spans and do not join.
+    (f"<script>a</script> {HIDDEN} <style>b</style>", HIDDEN),
+    # The name may not run on -- `<scriptx>` and `<script-note>` are other
+    # elements entirely, and their bodies render.
+    (f"<scriptx>{HIDDEN}</scriptx>", HIDDEN),
+    (f"<script-note>{HIDDEN}</script-note>", HIDDEN),
+    # `xmp` and `plaintext` are in GFM's tagfilter but a browser paints their
+    # bodies, so they are deliberately not on the list.
+    (f"<xmp>{HIDDEN}</xmp>", HIDDEN),
+    (f"<plaintext>{HIDDEN}", HIDDEN),
+    # A rendered element's body is content; only its tags and attributes are not.
+    (f'<span title="markup">{HIDDEN}</span>', HIDDEN),
+    # And the element names in ordinary prose open nothing.
+    (f"a script or style template for {HIDDEN}",
+     f"a script or style template for {HIDDEN}"),
+)
+
+
+def check_non_rendered():
+    concealed = shown = 0
+    for source, expected in NON_RENDERED_CASES:
+        actual = " ".join(markdown_text.rendered_text(source).split())
+        if actual != " ".join(expected.split()):
+            raise SystemExit(
+                f"markdown text: rendered_text({source!r})\n  = {actual!r}\n"
+                f"  want {expected!r}")
+        if HIDDEN in actual:
+            shown += 1
+        else:
+            concealed += 1
+    if concealed < 22 or shown < 9:
+        raise SystemExit(f"markdown text: implausible non-rendered case split "
+                         f"({concealed} concealed, {shown} shown)")
+    # Every element on the list must be exercised, so one added later arrives
+    # with its adversarial case already demanded.
+    for name in markdown_text.NON_RENDERED_ELEMENTS:
+        if not any(f"<{name}" in source for source, _ in NON_RENDERED_CASES):
+            raise SystemExit(f"markdown text: no case hides a claim in <{name}>")
+    return concealed, shown
+
+
 def check_rendered():
     for source, expected in RENDERED_CASES:
         actual = " ".join(markdown_text.rendered_text(source).split())
@@ -109,10 +207,13 @@ def main():
         raise SystemExit(f"markdown text: implausible case split "
                          f"({concealed} concealed, {shown} shown)")
     check_rendered()
+    buried, drawn = check_non_rendered()
     print(f"markdown text reducer ok: {len(CASES)} pinned cases, {concealed} shapes that "
           f"publish the sentence to no reader and {shown} that do; "
           f"{len(RENDERED_CASES)} inline-HTML cases where an attribute is markup and "
-          "a bare `<` is not a tag")
+          f"a bare `<` is not a tag; {len(NON_RENDERED_CASES)} element-body cases over "
+          f"{len(markdown_text.NON_RENDERED_ELEMENTS)} non-rendered elements, {buried} "
+          f"bodies a reader never meets and {drawn} controls a reader plainly does")
 
 
 if __name__ == "__main__":

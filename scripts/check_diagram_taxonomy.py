@@ -223,6 +223,14 @@ VERIFIER_SURFACE = {
 MENTION = re.compile("|".join(re.escape(name) for name in sorted(
     set(GATEWAY_VERIFIER) | set(GATEWAY_VERIFIER.values()), key=len, reverse=True)))
 
+# Which bodies the *canvas* never draws.  This is deliberately not
+# `markdown_text.NON_RENDERED_ELEMENTS`: that set answers the question for a
+# Markdown page, where `<title>` is document metadata, and here the canvas is
+# SVG, where `<title>` is the hover tooltip a reader is shown — and the tooltip
+# is exactly where every node cites its address.  Only the two elements the page
+# actually carries, and whose bodies no surface draws, are named.
+CANVAS_NON_RENDERED = ("script", "style")
+
 # The README's `proof` entry is where the pairing is stated for the record, so it
 # must carry both pairings and attribute each one explicitly: prose has no box to
 # make an unqualified mention default to.
@@ -367,7 +375,12 @@ def main():
     # Strip HTML comments before all scans: content inside <!-- … --> is not
     # rendered to a reader and must not contribute to any check — whether
     # identifying an entity, enforcing a class, or verifying required text.
-    html = _COMMENT.sub(" ", fold(DIAGRAM.read_text(encoding="utf-8")))
+    # A `<script>` or `<style>` body is the same kind of hiding place: the page
+    # carries both, and moving a REQUIRED phrase into one left this gate
+    # reporting it published while the canvas drew nothing of it.  They go too.
+    html = markdown_text.strip_non_rendered_elements(
+        _COMMENT.sub(" ", fold(DIAGRAM.read_text(encoding="utf-8"))),
+        CANVAS_NON_RENDERED)
 
     nodes = []
     for match in NODE.finditer(html):

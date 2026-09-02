@@ -619,6 +619,33 @@ def main():
         invoke(fixture, False, "no longer states how many classes are pinned")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # Thread r3909473219 on the canvas surface.  The page carries a
+        # `<script>` and a `<style>` block, and a body neither one draws is not
+        # published text, so every required phrase is moved out of the markup a
+        # reader meets and into each of those bodies in turn.
+        first_tooltip = re.compile(r'<g class="node [a-z]+"[^>]*><title>')
+        for phrase, _why in CHECK.REQUIRED:
+            if phrase not in diagram:
+                raise AssertionError(f"required phrase {phrase!r} absent from the canvas")
+            stripped = diagram.replace(phrase, "REDACTED_POWER")
+            for opener in ("<script>", "<style>"):
+                if opener not in stripped:
+                    raise AssertionError(f"the canvas carries no {opener} body to hide in")
+                hidden = stripped.replace(opener, f"{opener}\n/* {phrase} */\n", 1)
+                diagram_path.write_text(hidden, encoding="utf-8")
+                invoke(fixture, False, f"never mentions {phrase!r}")
+            # The control that keeps the rule from reading too widely: on this
+            # canvas a `<title>` is the hover tooltip, not an HTML `<head>`
+            # title, and it is where every node cites its address.  The same
+            # phrase restored there is text a reader is shown and must be read.
+            tooltip = first_tooltip.search(stripped)
+            if not tooltip:
+                raise AssertionError("no node tooltip on the canvas to restore into")
+            restored = f"{stripped[:tooltip.end()]}{phrase}. {stripped[tooltip.end():]}"
+            diagram_path.write_text(restored, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+        diagram_path.write_text(diagram, encoding="utf-8")
+
         # The README is checked as rendered Markdown; text inside an HTML
         # comment is not shown to a reader and must not satisfy any check.
         # Hiding the class-count sentence in a comment must be rejected even
@@ -678,6 +705,48 @@ def main():
                 readme_path.write_text(mutated, encoding="utf-8")
                 invoke(fixture, False, needle)
 
+            # Thread r3909473219: a tag is not an element.  Deleting the two
+            # tags of `<script>…</script>` and keeping the body left the claim
+            # standing in the text this gate reads while a browser drew none of
+            # it, so the body is removed with them.  Every element the reducer
+            # holds to be non-rendered is driven here, so one it never exercises
+            # cannot carry a claim the day it is used.
+            for buried in tuple(
+                f"<{element}>{flat}</{element}>"
+                for element in CHECK.markdown_text.NON_RENDERED_ELEMENTS
+            ) + (
+                # The open tag is a tag: attributes and casing still open it.
+                f'<script type="text/javascript">{flat}</script>',
+                f"<SCRIPT>{flat}</SCRIPT>",
+                # `template` content is ordinary markup, so an inner opener
+                # really does open another element: stopping at the first
+                # `</template>` left the sentence after it standing as prose.
+                f"<template><template>note</template>{flat}</template>",
+                # And the three shapes that put a sentence behind an end tag a
+                # scan stops at: a raw-text child, a comment, and HTML's own
+                # script double-escape each carry an outer end tag as text.
+                f"<template><script>note</template>{flat}</script>",
+                f"<template><!-- </template> -->{flat}</template>",
+                f"<script><!--<script>note</script>-->{flat}</script>",
+            ):
+                mutated = readme.replace(claim, buried, 1)
+                if mutated == readme:
+                    raise AssertionError(
+                        f"element-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
+            # An element that never closes hides everything after it, which is
+            # what a browser shows of it.  That deletes more of the README than
+            # the claim itself, so the rejection is asserted without pinning
+            # which surviving check names it first.
+            unterminated = readme.replace(claim, f"<script>{flat}", 1)
+            if unterminated == readme:
+                raise AssertionError("unterminated-element mutant changed nothing")
+            readme_path.write_text(unterminated, encoding="utf-8")
+            invoke(fixture, False)
+            readme_path.write_text(readme, encoding="utf-8")
+
             definition = readme.replace(claim, f'[details]: target "{flat}"', 1)
             if definition == readme:
                 raise AssertionError("reference-definition mutant changed nothing")
@@ -692,6 +761,28 @@ def main():
             readme_path.write_text(shown, encoding="utf-8")
             invoke(fixture, True, "diagram taxonomy ok")
             readme_path.write_text(readme, encoding="utf-8")
+
+        # The mirror of that family.  A reducer that read one construct too
+        # widely would delete text a reader plainly meets, and no edit to the
+        # README could then satisfy the gate, so each boundary of the rule is
+        # pinned on the claim that sits mid-line: prose on either side of a
+        # non-rendered element, beside one of a different name, inside one
+        # whose name only looks like one, and inside one a browser does paint.
+        for control in (
+            f"{count_sentence} <script>note</script>",
+            f"<script>note</script> {count_sentence}",
+            f"<script>a</script> {count_sentence} <style>b</style>",
+            f"<scriptx>{count_sentence}</scriptx>",
+            f"<script-note>{count_sentence}</script-note>",
+            f"<xmp>{count_sentence}</xmp>",
+            f'<span title="markup">{count_sentence}</span>',
+        ):
+            mutated = readme.replace(count_sentence, control, 1)
+            if mutated == readme:
+                raise AssertionError(f"element control {control!r} changed nothing")
+            readme_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+        readme_path.write_text(readme, encoding="utf-8")
 
         # Similarly, the `proof` entry hidden in a comment must also fail.
         proof_match = CHECK.PROOF_ENTRY.search(readme)
@@ -843,7 +934,22 @@ def main():
           "literal text, and the same claim carried in a visible link label "
           "still read, and each moved into an HTML attribute — a `title=`, a "
           "`data-` note and an `alt=` — rejected, since an attribute is markup "
-          "and never content")
+          "and never content; every required phrase moved off the canvas and "
+          "into its `<script>` and its `<style>` body rejected, with the same "
+          "phrase restored to a node tooltip still read, since on this SVG a "
+          "`<title>` is the hover text a reader is shown and is where every "
+          "address is cited; and each README claim buried in the body of every one of "
+          f"{len(CHECK.markdown_text.NON_RENDERED_ELEMENTS)} non-rendered "
+          "elements — plus an attributed and an upper-case opener, a nested "
+          "`template` whose close the body runs past, an opener that never "
+          "closes, and the three shapes that carry an outer end tag as text — "
+          "a raw-text child, a comment, and HTML's own script double-escape — "
+          "rejected, since a tag is not an element and a body a browser never "
+          "draws is not prose; with 7 controls holding the other edge of that "
+          "rule, where the same sentence sits on either side of such an "
+          "element, beside one of a different name, inside one whose name only "
+          "looks like one, or inside one a browser does paint, and must still "
+          "be read")
 
 
 if __name__ == "__main__":

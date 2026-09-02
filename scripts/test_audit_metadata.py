@@ -451,9 +451,20 @@ def main():
                 f"> <?php echo 'The evidence is {sentence}.'; ?>\n",
                 f"> <![CDATA[The evidence is {sentence}.]]>\n",
                 f"> <!DOCTYPE note SYSTEM {sentence}>\n",
-                f"> <script>var note = '{sentence}';</script>\n",
-                f"> <style>/* {sentence} */</style>\n",
-                f"> <textarea>{sentence}</textarea>\n",
+                # Thread r3909473219: a tag is not an element.  Naming three
+                # of them as `<(script|style|textarea)\b.*?</\1>` removed the
+                # bodies it knew about and stopped at the first end tag, so
+                # `<template>` published a qualification to no reader while
+                # this gate read it as prose, and a `template` nested in
+                # another carried one past the close that pattern stopped at.
+                # Every element the shared reader holds to be non-rendered is
+                # driven here, so one it never exercises cannot carry a
+                # qualification the day it is used.
+                *(f"> <{element}>{sentence}</{element}>\n"
+                  for element in module.markdown_text.NON_RENDERED_ELEMENTS),
+                f"> <script type=\"text/javascript\">var n = '{sentence}';</script>\n",
+                f"> <STYLE>/* {sentence} */</STYLE>\n",
+                f"> <template><template>note</template>{sentence}</template>\n",
                 f'> <span title="{sentence}">See the note.</span>\n',
                 f'> <img alt="{sentence}" src="x.png">\n',
                 # Thread 14: a Markdown link reference definition renders as
@@ -511,6 +522,18 @@ def main():
                 f'> [The evidence is {sentence}.][note]\n\n[note]: http://example.com\n',
                 f'> The evidence is {sentence}. [see](foo(bar) "hidden")\n',
                 f'> The evidence is {sentence}. [unterminated](foo "x\n',
+                # The same edge for element bodies.  Reading that rule one
+                # construct too widely would delete text a reader plainly
+                # meets: prose beside a non-rendered element, an element whose
+                # name only looks like one, one a browser does paint, and the
+                # text after a raw-text element's first end tag are all on the
+                # page and must still qualify the table.
+                f"> <script>note</script> The evidence is {sentence}.\n",
+                f"> The evidence is {sentence}. <script>note</script>\n",
+                f"> <script>a</script> The evidence is {sentence}. <style>b</style>\n",
+                f"> <scriptx>The evidence is {sentence}.</scriptx>\n",
+                f"> <script-note>The evidence is {sentence}.</script-note>\n",
+                f"> <xmp>The evidence is {sentence}.</xmp>\n",
             ):
                 readme_path.write_text(
                     readme.replace(block, muted_block + shown, 1), encoding="utf-8")
@@ -675,9 +698,13 @@ def main():
           "element (`<div>`); and "
           "each headline qualification re-filed into an appendix, into prose above the "
           "table, into a later blockquote and dropped outright, and spelled inside the "
-          "block by each of 12 constructs that publish no visible text (single- and "
+          "block by each of 20 constructs that publish no visible text (single- and "
           "multi-line comments, a processing instruction, CDATA, a declaration, "
-          "`script`, `style` and `textarea` bodies, `title`/`alt` attribute "
+          "the body of every one of the eight elements the shared reader holds "
+          "to be non-rendered — with an attributed and an upper-case opener and "
+          "a nested `template` whose close the body runs past, since naming "
+          "three of them and stopping at the first end tag let `<template>` "
+          "publish a qualification to no reader — `title`/`alt` attribute "
           "values, Markdown link reference definition titles, inline link "
           "destination/title fields, and six inline-link shapes whose destination "
           "carries balanced or angle-bracketed parentheses — the form a `[^)]*` "
@@ -690,8 +717,11 @@ def main():
           "introduction, deleted, unheaded and its title demoted all rejected, while a "
           "renamed title, a longer block, a redundant restatement, and each "
           "qualification restated through inline markup that still renders it, and each "
-          "carried in a link label or beside an unterminated link — text a reader is "
-          "shown — stay accepted; and the delimiter row that makes the headline a table deleted, "
+          "carried in a link label or beside an unterminated link, and each "
+          "printed on either side of a non-rendered element, beside one of a "
+          "different name, inside two whose names only look like one, or inside "
+          "the `xmp` a browser paints — text a reader is shown — stay accepted; "
+          "and the delimiter row that makes the headline a table deleted, "
           "blanked to pipes and spaces, narrowed, widened, and indented into a "
           "four-column chunk all rejected, with alignment colons and up to three "
           "columns of indentation on the delimiter, the header and a row all still "

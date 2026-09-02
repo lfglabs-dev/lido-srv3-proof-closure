@@ -463,21 +463,24 @@ README_HEADLINE_BLOCK = re.compile(r"\A# [^\n]*\n\n(?P<block>(?:>[^\n]*\n)+)")
 # headline CHECKED table published itself unqualified while this gate stayed
 # green.  Every construct whose characters render as no visible text is removed
 # before the block is tested — comments, processing instructions, declarations
-# and CDATA, the raw-text elements whose bodies are never shown as prose, and
-# the tags themselves, so a sentence cannot hide in an attribute value either.
-# Removal only ever deletes text, so a qualification can vanish from this view
-# but can never be invented in it; the failure direction is a real disclosure
-# reported missing, never a missing one reported present.
-_HTML_ATTRIBUTE = (
-    r"""(?:\s+[A-Za-z_:][A-Za-z0-9_.:-]*"""
-    r"""(?:\s*=\s*(?:[^\s"'=<>`]+|'[^']*'|"[^"]*"))?)"""
-)
+# and CDATA, the elements whose bodies are never shown as prose, and the tags
+# themselves, so a sentence cannot hide in an attribute value either.  Removal
+# only ever deletes text, so a qualification can vanish from this view but can
+# never be invented in it; the failure direction is a real disclosure reported
+# missing, never a missing one reported present.
+#
+# The elements are handed to `markdown_text.non_rendered_spans`, which owns that
+# question for every gate that asks it.  Spelling them here as
+# `<(script|style|textarea)\b.*?</\1>` named three of them and stopped at the
+# first end tag, so `<template>67 in total</template>` published a count to no
+# reader while this gate read it as prose, and a `<template>` nested in another
+# one carried a sentence past the close the pattern stopped at.
+_HTML_ATTRIBUTE = markdown_text.HTML_ATTRIBUTE
 README_UNRENDERED = re.compile(
     r"<!--.*?(?:-->|\Z)"
     r"|<\?.*?(?:\?>|\Z)"
     r"|<!\[CDATA\[.*?(?:\]\]>|\Z)"
     r"|<![A-Za-z].*?(?:>|\Z)"
-    r"|<(script|style|textarea)\b.*?(?:</\1\s*>|\Z)"
     rf"|<[A-Za-z][A-Za-z0-9-]*{_HTML_ATTRIBUTE}*\s*/?>"
     r"|</[A-Za-z][A-Za-z0-9-]*\s*>",
     re.DOTALL | re.IGNORECASE,
@@ -513,8 +516,19 @@ def _mask_readme(text):
     def blank(m):
         return "".join(" " if c != "\n" else "\n" for c in m.group(0))
 
-    # Blank inline HTML constructs (types 1–5) first, preserving positions.
-    masked = README_UNRENDERED.sub(blank, text)
+    # Blank whole non-rendered elements first: a table wrapped in `<template>`
+    # keeps every raw pipe character while the page shows no table at all.
+    # Positions are preserved here the same way, by writing spaces over the
+    # span rather than deleting it.
+    held = list(text)
+    for start, stop in markdown_text.non_rendered_spans(text):
+        for i in range(start, stop):
+            if held[i] != "\n":
+                held[i] = " "
+    masked = "".join(held)
+
+    # Blank the remaining inline HTML constructs, preserving positions.
+    masked = README_UNRENDERED.sub(blank, masked)
 
     # Line-by-line pass: blank code fences and CommonMark type-6 HTML blocks.
     # Code fences: a closing sequence repeats the opening character at least as
@@ -658,7 +672,8 @@ def validate_readme_fidelity_disclosure(rows):
     # balanced parentheses, and a pattern that stopped at the first `)` left the
     # title of `[details](foo(bar) "…")` standing as ordinary text, so a
     # headline rendering only the word "details" satisfied this check.
-    block = markdown_text.visible_text(README_UNRENDERED.sub("", opening.group("block")))
+    block = markdown_text.visible_text(README_UNRENDERED.sub(
+        "", markdown_text.strip_non_rendered_elements(opening.group("block"))))
     require(f"{total} in total" in block,
             f"README: the headline blockquote must render the {total} total fidelity "
             "gaps as visible text; a count stated only further down, or only inside a "
