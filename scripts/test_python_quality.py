@@ -77,6 +77,10 @@ def check_ratchet(fixture: Path) -> None:
     expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f(cb=lambda x: " + DENSE_BODY + "):\n    return cb\n", encoding="utf-8")
     expect(False, "zz_dense.py:f.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("def f[T: (lambda x: " + DENSE_BODY + ")]():\n    return 1\n", encoding="utf-8")
+    expect(False, "zz_dense.py:f.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("class K[T: (lambda x: " + DENSE_BODY + ")]:\n    pass\n", encoding="utf-8")
+    expect(False, "zz_dense.py:K.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     long = scripts / "zz_long.py"
     long.write_text("# pad\n" * 501, encoding="utf-8")
     dense.unlink()
@@ -132,21 +136,24 @@ def check_metric() -> None:
                "class K:\n    pick = lambda self, x: x if x else 1\n"
                "a, b = (lambda: 1), 2\n"
                "callbacks = [lambda x: x if x else 0, lambda y: y]\n"
-               "def g(cb=lambda z: z if z else 0):\n    return cb(lambda w: w if w else 1)\n")
+               "def g(cb=lambda z: z if z else 0):\n    return cb(lambda w: w if w else 1)\n"
+               "def h[T: (lambda q: q if q else 0)]():\n    return 1\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.functions(ast.parse(outside))}
     if measured != {"deco": 1, "simple": 1, "dense": 2, "K.pick": 2, "lambda@9": 1,
-                    "lambda@10": 2, "lambda@10#2": 1, "g": 2, "g.lambda@11": 2}:
+                    "lambda@10": 2, "lambda@10#2": 1, "g": 2, "g.lambda@11": 2, "h": 1,
+                    "h.lambda@13": 2}:
         raise SystemExit(f"decorator/default/annotation or lambda accounting drifted: {measured}")
     nested = ("def outer(flag):\n"
-              "    def inner(x=(1 if flag else 2), cb=lambda z=(5 if flag else 6): z if z else 0):\n"
+              "    def inner[T: (9 if flag else 10)](x=(1 if flag else 2),\n"
+              "                                      cb=lambda z=(5 if flag else 6): z if z else 0):\n"
               "        return x if flag else 0\n"
               "    class C:\n        v = 1 if flag else 2\n        w = lambda self: 7 if flag else 8\n"
               "        def m(self, y=(3 if flag else 4)):\n            return y if flag else 0\n"
               "    return inner, C\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.functions(ast.parse(nested))}
-    if measured != {"outer": 5, "outer.inner": 2, "outer.inner.lambda@2": 2, "outer.C.w": 2,
+    if measured != {"outer": 6, "outer.inner": 2, "outer.inner.lambda@3": 2, "outer.C.w": 2,
                     "outer.C.m": 2}:
         raise SystemExit("nested setup fields are not charged to the enclosing function, or a "
                          f"listed lambda's body is charged twice: {measured}")
