@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import json
 import re
 import sys
@@ -45,7 +46,8 @@ DECLARATION = re.compile(
     r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?"
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)[ \t]+)*"
     r"(theorem)[ \t]+([^\s:({\[]+)", re.MULTILINE)
-MODIFIERS = {"private", "protected", "noncomputable", "unsafe", "partial", "nonrec"}
+MODIFIER_RUN = re.compile(
+    r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
 SCOPE = re.compile(r"^[ \t]*(namespace|section|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
@@ -196,8 +198,8 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     lines = text.splitlines()
     events = sorted(
         [(m.start(), "scope", m) for m in SCOPE.finditer(stripped)]
-        + [(m.start(), "theorem", m) for m in DECLARATION.finditer(stripped)
-           if not is_private(stripped, m)])
+        + [(offset, "theorem", m) for m in DECLARATION.finditer(stripped)
+           for offset, private in [modifier_run(stripped, m)] if not private])
     scope = Scope()
     found: dict[str, dict] = {}
     for offset, kind, match in events:
@@ -219,19 +221,18 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     return found
 
 
-def is_private(stripped: str, match: re.Match) -> bool:
-    """Whether `private` is among the modifiers before this `theorem`.
+def modifier_run(stripped: str, match: re.Match) -> tuple[int, bool]:
+    """Where the modifiers before this `theorem` begin, and whether they
+    include `private`.
 
     Lean reads modifiers across newlines, so the run may sit on the lines
-    above the keyword. A private theorem gets an inaccessible name and can
+    above the keyword; the declaration then starts there, and its doc comment
+    sits above the run. A private theorem gets an inaccessible name and can
     never be the registered declaration, so it must not be indexed under the
     public name it may share.
     """
-    words = stripped[:match.start(1)].split()
-    while words and words[-1] in MODIFIERS:
-        if words.pop() == "private":
-            return True
-    return False
+    run = MODIFIER_RUN.search(stripped, 0, match.start(1))
+    return run.start(), "private" in run.group().split()
 
 
 def apply_scope(scope: Scope, match: re.Match) -> None:
@@ -349,11 +350,15 @@ def git_tree(directory: Path) -> bytes | None:
 
     Git records no empty directory, so a directory with no file below it
     yields `None` and is left out of its parent, exactly as `git mktree` on the
-    committed tree leaves it out.
+    committed tree leaves it out. A symlink is stored as Git stores it: mode
+    120000 with the link target as its blob, whatever it points to.
     """
     entries = []
     for child in directory.iterdir():
-        if child.is_dir():
+        if child.is_symlink():
+            target = os.readlink(child).encode("utf-8")
+            entries.append((child.name, b"120000", child.name, git_blob(target)))
+        elif child.is_dir():
             subtree = git_tree(child)
             if subtree is not None:
                 entries.append((child.name + "/", b"40000", child.name, subtree))
