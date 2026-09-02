@@ -159,6 +159,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "theorem twelve : helper = 1 := rfl\n"
         "private theorem one : True := trivial\n"
         "@[simp] private theorem two : True := trivial\n"
+        "private\ntheorem one : True := trivial\n"
+        "@[simp]\nprivate noncomputable\ntheorem two : True := trivial\n"
         "end Outer.Inner\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     if any(len(records) != 1 for records in found.values()):

@@ -41,11 +41,11 @@ ROLES = {
     "abstract": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
     "verity": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
 }
-# A `private` theorem gets an inaccessible name, so it can never be the
-# registered declaration and must not shadow the public one it may be named after.
 DECLARATION = re.compile(
-    r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?(?:(?:protected|nonrec)[ \t]+)*"
-    r"theorem[ \t]+([^\s:({\[]+)", re.MULTILINE)
+    r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?"
+    r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)[ \t]+)*"
+    r"(theorem)[ \t]+([^\s:({\[]+)", re.MULTILINE)
+MODIFIERS = {"private", "protected", "noncomputable", "unsafe", "partial", "nonrec"}
 SCOPE = re.compile(r"^[ \t]*(namespace|section|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
@@ -196,7 +196,8 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     lines = text.splitlines()
     events = sorted(
         [(m.start(), "scope", m) for m in SCOPE.finditer(stripped)]
-        + [(m.start(), "theorem", m) for m in DECLARATION.finditer(stripped)])
+        + [(m.start(), "theorem", m) for m in DECLARATION.finditer(stripped)
+           if not is_private(stripped, m)])
     scope = Scope()
     found: dict[str, dict] = {}
     for offset, kind, match in events:
@@ -206,7 +207,7 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
         start_line = stripped.count("\n", 0, offset)
         end = statement_end(stripped, match.end())
         line_start = stripped.rfind("\n", 0, offset) + 1
-        full = ".".join(part for part in (scope.prefix(), match.group(1)) if part)
+        full = ".".join(part for part in (scope.prefix(), match.group(2)) if part)
         found.setdefault(full, []).append({
             "module": module_name(root, path),
             "file": path.relative_to(root).as_posix(),
@@ -216,6 +217,21 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
             "statement": text[line_start:end].rstrip(),
         })
     return found
+
+
+def is_private(stripped: str, match: re.Match) -> bool:
+    """Whether `private` is among the modifiers before this `theorem`.
+
+    Lean reads modifiers across newlines, so the run may sit on the lines
+    above the keyword. A private theorem gets an inaccessible name and can
+    never be the registered declaration, so it must not be indexed under the
+    public name it may share.
+    """
+    words = stripped[:match.start(1)].split()
+    while words and words[-1] in MODIFIERS:
+        if words.pop() == "private":
+            return True
+    return False
 
 
 def apply_scope(scope: Scope, match: re.Match) -> None:
