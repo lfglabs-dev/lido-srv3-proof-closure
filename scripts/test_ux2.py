@@ -245,6 +245,18 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"Outer.one"} or found["Outer.one"][0]["statement"] != "theorem one : True":
         raise SystemExit("scanner indexed a theorem inside a command quotation")
 
+    # Lean token whitespace is permitted before the command-category separator;
+    # this must still be syntax data rather than a duplicate declaration.
+    module.write_text(
+        "namespace Outer\n"
+        "def quoted : Syntax := `(command |\n"
+        "  theorem one : True := trivial)\n"
+        "theorem one : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.one"}:
+        raise SystemExit("scanner indexed a theorem inside a spaced command quotation")
+
     module.write_text(
         "namespace Outer\n"
         "def quoted : Syntax := `(command|\n"
@@ -322,6 +334,11 @@ def check_escaped_identifier_lexing(fixture: Path) -> None:
     escaped_keyword = strip("theorem «sorry» : True := trivial\n", mask_escaped_identifiers=True)
     if any(pattern.search(escaped_keyword) for _, pattern in check_proof_escapes.ESCAPES):
         raise SystemExit("proof-escape matcher treated a guillemet name as a guarded keyword")
+    character_then_axiom = strip(
+        "def marker : Char := '«'\naxiom injected : False\n",
+        mask_escaped_identifiers=True)
+    if "axiom injected" not in character_then_axiom:
+        raise SystemExit("a guillemet character literal hid a later proof escape")
 
     controls = (
         "theorem helper : True := trivial /- hidden -/\n",

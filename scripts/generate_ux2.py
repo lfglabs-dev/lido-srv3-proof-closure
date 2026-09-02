@@ -57,6 +57,9 @@ OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")
 ESCAPED_IDENTIFIER = re.compile(r"«[^»\n]*»")
+# Syntax quotations are token-based: whitespace is permitted between their
+# punctuation/category tokens, including before the category separator.
+COMMAND_QUOTATION_OPENER = re.compile(r"`\s*\(\s*command\s*\|")
 CLOSERS = ")]}⟩"
 
 
@@ -167,7 +170,7 @@ def mask_escaped_identifiers(text: str) -> str:
 
 
 def mask_command_quotations(text: str) -> str:
-    """Blank `` `(command| ... )`` quotations while retaining source offsets.
+    """Blank `` `(command | ... )`` quotations while retaining source offsets.
 
     A quoted command is syntax data, not a declaration in the surrounding
     module.  Its parentheses are balanced independently, so masking the whole
@@ -180,10 +183,13 @@ def mask_command_quotations(text: str) -> str:
     structural = mask_escaped_identifiers(text)
     index = 0
     while index < len(text):
-        if not text.startswith("`(command|", index):
+        opener = COMMAND_QUOTATION_OPENER.match(text, index)
+        if opener is None:
             index += 1
             continue
-        end = index + len("`(")
+        # The opening parenthesis is the first structural delimiter after the
+        # backtick token, regardless of whitespace around the category tokens.
+        end = text.index("(", index, opener.end()) + 1
         depth = 1
         while end < len(text) and depth:
             depth += (structural[end] == "(") - (structural[end] == ")")
