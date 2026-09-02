@@ -50,4 +50,13 @@ if ! python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdi
   exit 1
 fi
 
+# A guillemet in a character literal is data, not an escaped identifier opener;
+# a forbidden declaration on the following line must remain visible to the gate.
+printf "\ndef marker : Char := '«'\naxiom injected : False\n" >> "$project"
+if python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
+  printf 'proof-escape regression accepted an axiom after a guillemet character literal\n' >&2
+  exit 1
+fi
+rg -q 'forbidden axiom' "$tmpdir/out" || { cat "$tmpdir/out" >&2; exit 1; }
+
 printf '%s\n' 'proof-escape negative regressions rejected imported, library-root, and Trust project Lean mutations'

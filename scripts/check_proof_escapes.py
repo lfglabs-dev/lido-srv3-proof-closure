@@ -31,6 +31,7 @@ ESCAPES = (
     ("unsafe", re.compile(r"\bunsafe\b")),
     ("Lean.ofReduceBool", re.compile(r"\bLean\.ofReduceBool\b")),
 )
+CHAR_LITERAL = re.compile(r"(?<![\w'])'(?:\\.|[^\\'\n])'(?!\w)")
 
 
 def strip_comments_and_strings(source: str, *, mask_escaped_identifiers: bool = False) -> str:
@@ -92,6 +93,11 @@ def strip_comments_and_strings(source: str, *, mask_escaped_identifiers: bool = 
             in_string = True
             out.append(" ")
             i += 1
+        elif match := CHAR_LITERAL.match(source, i):
+            # A guillemet inside `'«'` is character data, not the start of an
+            # escaped identifier.  Consume literals before recognizing names.
+            out.extend(" " * len(match.group()))
+            i = match.end()
         elif ch == "«":
             in_escaped_identifier = True
             out.append(" " if mask_escaped_identifiers else ch)

@@ -47,7 +47,12 @@ DECLARATION = re.compile(
     r"(theorem|lemma)\s+(«[^»\n]*»|[^\s:({\[]+)", re.MULTILINE)
 MODIFIER_RUN = re.compile(
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
-SCOPE = re.compile(r"^[ \t]*(namespace|section|mutual|end)(?:\s+([^\s]+))?[ \t]*$", re.MULTILINE)
+# A scope name may follow Lean whitespace (including comments stripped to blank
+# lines), but an unnamed scope followed by its closing `end` must not consume
+# that command as a split-line name.
+SCOPE = re.compile(
+    r"^[ \t]*(namespace|section|mutual|end)"
+    r"(?:\s+(?!end(?:[ \t]*$|[ \t]+))([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")

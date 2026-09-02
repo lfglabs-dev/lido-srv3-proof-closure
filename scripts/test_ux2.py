@@ -271,6 +271,14 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"Outer.split_scope"}:
         raise SystemExit(f"scanner lost a scope name separated by Lean whitespace: {found}")
 
+    module.write_text(
+        "namespace Outer\n"
+        "section\n"
+        "end\n"
+        "end Outer\n", encoding="utf-8")
+    if generate_ux2.scan_file(fixture, module) != {}:
+        raise SystemExit("scanner treated an unnamed scope's closing `end` as its name")
+
     module.write_text("end Nothing\n", encoding="utf-8")
     expect_scan_failure(fixture, module, "`end` without an open namespace")
     module.write_text("namespace A\nend B\n", encoding="utf-8")
