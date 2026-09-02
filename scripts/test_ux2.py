@@ -279,8 +279,8 @@ def check_scanner_edges(fixture: Path) -> None:
 
 
 def check_symlink_tree(fixture: Path) -> None:
-    """Symlinks below LidoSRv3/ hash as Git stores them, so the tree id still
-    equals the committed tree `verified_source_tree.sh` reads."""
+    """A symlink below LidoSRv3/ is refused: the tree id would bind its link
+    text while Lean reads its target."""
     linked = fixture / "linked"
     for name in generate_ux2.LEAN_INPUTS:
         (linked / name).parent.mkdir(parents=True, exist_ok=True)
@@ -288,15 +288,17 @@ def check_symlink_tree(fixture: Path) -> None:
     nested = linked / "LidoSRv3" / "Nested"
     nested.mkdir(parents=True)
     (nested / "Real.lean").write_text("theorem t : True := trivial\n", encoding="utf-8")
-    (linked / "LidoSRv3" / "Alias.lean").symlink_to("Nested/Real.lean")
-    (linked / "LidoSRv3" / "Twin").symlink_to("Nested")
-    git = ["git", "-C", str(linked)]
-    subprocess.run([*git, "init", "-q"], check=True)
-    subprocess.run([*git, "add", "-A"], check=True)
-    expected = subprocess.run([*git, "write-tree"], check=True, capture_output=True,
-                              text=True).stdout.strip()
-    if generate_ux2.lean_source_tree(linked) != expected:
-        raise SystemExit("symlinks below LidoSRv3/ do not hash as Git stores them")
+    for link, target in (("Alias.lean", "Nested/Real.lean"), ("Twin", "Nested"),
+                         ("Escape.lean", "../../lakefile.lean")):
+        (linked / "LidoSRv3" / link).symlink_to(target)
+        try:
+            generate_ux2.lean_source_tree(linked)
+        except SystemExit as stop:
+            if "is a symlink" not in f"{stop}":
+                raise SystemExit(f"unexpected diagnostic for a symlink: {stop}")
+        else:
+            raise SystemExit(f"a symlink {link} -> {target} below LidoSRv3/ was hashed")
+        (linked / "LidoSRv3" / link).unlink()
     shutil.rmtree(linked)
 
 
