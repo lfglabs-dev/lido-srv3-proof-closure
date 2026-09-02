@@ -72,7 +72,12 @@ def RequestOwnerCustodyInvariant
           step.caller = step.fromAddr ∧ step.to ≠ 0 ∧ step.to ≠ step.fromAddr
 
 /-- Inversion of the pinned owner-operated branch: a hop that returned a state
-passed every guard at lines 231--245 and wrote line 248's new owner. -/
+passed the four modeled guards -- the zero-recipient check at line 231, the
+self-transfer check at line 232, the owner check at line 238, and the
+owner-operated caller authorization at lines 241--245 -- and wrote line 248's
+new owner. The request-validity and claimed checks at lines 233 and 236 are
+outside this slice (`audit/P-TOKEN-1-T2-SCOPE.md`), so nothing here says they
+passed. -/
 theorem sourceTransfer_some
     (caller fromAddr to : Address) (s s' : State)
     (h : sourceTransfer caller fromAddr to s = some s') :
