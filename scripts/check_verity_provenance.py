@@ -12,6 +12,10 @@ from bisect import bisect_left
 from pathlib import Path
 from typing import NoReturn
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import gfm_table  # noqa: E402  (sibling module, located above)
+
 
 VERITY_REPOSITORY = "https://github.com/lfglabs-dev/verity.git"
 FULL_REVISION = re.compile(r"[0-9a-f]{40}")
@@ -103,80 +107,6 @@ def _crosses_block_boundary(text: str, i: int) -> bool:
     )
 
 
-# GFM §4.10 tables.  A delimiter cell is a run of '-' with optional alignment colons.
-_TABLE_DELIMITER_CELL = re.compile(r"^[ \t]*:?-+:?[ \t]*$")
-_LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d{1,9}[.)])(?:[ \t]|$)")
-
-
-def _unescaped_pipes(line: str) -> list[int]:
-    """Offsets within ``line`` of the ``|`` characters that delimit GFM cells."""
-    return [k for k, ch in enumerate(line) if ch == "|" and not _escaped_at(line, k)]
-
-
-def _indent_width(line: str) -> int:
-    """Columns of leading whitespace, expanding tabs to the next four-column stop."""
-    width = 0
-    for ch in line:
-        if ch == " ":
-            width += 1
-        elif ch == "\t":
-            width += 4 - (width % 4)
-        else:
-            break
-    return width
-
-
-def _table_cells(line: str) -> list[str]:
-    """Split a GFM table row into cells; leading and trailing pipes are optional.
-
-    A row indented four or more columns is an indented chunk, not table markup,
-    so it yields no cells.  Stripping the indentation unconditionally let a line
-    such as ``    | --- | --- |`` pass as a delimiter row, conjuring a table that
-    GFM does not render; the phantom cell and row separators then cleared a live
-    link opener, so the link never formed and a Verity row hidden inside its
-    multiline title was exposed as a canonical pin.
-    """
-    if _indent_width(line) >= 4 or not _unescaped_pipes(line):
-        return []
-    body = line.strip(" \t")
-    if body.startswith("|"):
-        body = body[1:]
-    if body.endswith("|") and not _escaped_at(body, len(body) - 1):
-        body = body[:-1]
-    cells: list[str] = []
-    start = 0
-    for k in _unescaped_pipes(body):
-        cells.append(body[start:k])
-        start = k + 1
-    cells.append(body[start:])
-    return cells
-
-
-def _ends_table(line: str) -> bool:
-    """True when ``line`` cannot continue a GFM table body.
-
-    GFM §4.10 breaks a table body at the first blank line or at the start of
-    another block-level structure, and nowhere else.  In particular an ordinary
-    line carrying no pipe does *not* end the table: it renders as a further row
-    whose single cell is padded out.  Requiring a pipe therefore ended the region
-    early while GFM kept parsing rows, and the newlines inside those excluded
-    rows were never recorded as separators, so a label opener on one of them
-    stayed live across a real row boundary and formed a link GFM does not form.
-    Recording only the newline that closed the region could not fix that, because
-    an opener may sit any number of rows past the early end.
-
-    The conditions below are exactly the block starters that do break a table:
-    a blank line, four columns of indentation (an indented chunk), an ATX
-    heading, a thematic break, a block quote and a list item.
-    """
-    return (
-        line.strip(" \t") == ""
-        or _indent_width(line) >= 4
-        or bool(_ATX_HEADING.match(line))
-        or bool(_THEMATIC_BREAK.match(line))
-        or bool(_BLOCK_QUOTE.match(line))
-        or bool(_LIST_ITEM.match(line))
-    )
 
 
 def _table_separators(text: str) -> list[int]:
@@ -184,9 +114,25 @@ def _table_separators(text: str) -> list[int]:
 
     GFM splits a table row into cells before inline parsing, so a link label,
     destination or title may not span a ``|`` cell separator nor the newline
-    between two rows.  Recognition is conservative — a header row plus a
-    delimiter row with the same cell count is required — so a construct that is
-    not certainly a table leaves inline parsing unchanged.
+    between two rows.
+
+    The tables are located by `scripts/gfm_table.py`, the one cmark-gfm-faithful
+    reader the published-surface gates share.  Reading them here as well left
+    this file with its own approximation, and the approximations disagreed with
+    the renderer in two places that matter: a pipe written after a backslash was
+    read by CommonMark's parity rule rather than by the table scanner's, which
+    counts ``\\|`` as an escape and renders one cell where parity counts two;
+    and the body was continued across a code fence and an HTML block start,
+    which do break a table.  Both directions invented separators the renderer
+    does not place, and an invented separator clears a live link opener, so a
+    link GFM does form was read as not forming and content inside its title was
+    exposed as a published pin.
+
+    The shared reader is one-sided by construction: it never reports a table
+    cmark-gfm does not render, and declines the forms it cannot read faithfully.
+    Declining only omits separators, which leaves a link formed that GFM may not
+    form -- the over-suppressing direction, which can hide a row but can never
+    expose one.
 
     The newline that *closes* the region is recorded too, not only the ones
     between rows.  The region ends where GFM breaks the table, so that newline
@@ -196,34 +142,12 @@ def _table_separators(text: str) -> list[int]:
     ``](url "…`` formed a link that GFM never forms and hid a rendered Verity
     row inside its apparent title.
     """
-    lines: list[tuple[int, str, int]] = []
-    offset = 0
-    for raw in text.splitlines(keepends=True):
-        line = raw.rstrip("\n").rstrip("\r")
-        lines.append((offset, line, offset + len(raw) - 1 if raw.endswith("\n") else -1))
-        offset += len(raw)
     separators: list[int] = []
-    row = 0
-    while row + 1 < len(lines):
-        columns = len(_table_cells(lines[row][1]))
-        delimiter = _table_cells(lines[row + 1][1])
-        if (
-            columns == 0
-            or _ends_table(lines[row][1])
-            or len(delimiter) != columns
-            or not all(_TABLE_DELIMITER_CELL.match(cell) for cell in delimiter)
-        ):
-            row += 1
-            continue
-        end = row + 2
-        while end < len(lines) and not _ends_table(lines[end][1]):
-            end += 1
-        for index in range(row, end):
-            start, line, newline = lines[index]
-            separators.extend(start + k for k in _unescaped_pipes(line))
-            if newline >= 0:
-                separators.append(newline)
-        row = end
+    for table in gfm_table.find_tables(text, interrupting=True):
+        for row in (table.header, table.delimiter, *table.rows):
+            separators.extend(row.start + k for k in gfm_table.unescaped_pipes(row.text))
+            if row.end - row.start > len(row.text):
+                separators.append(row.end - 1)
     return separators
 
 
