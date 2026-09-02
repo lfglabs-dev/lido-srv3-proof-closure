@@ -63,6 +63,8 @@ import LidoSRv3.Audit.Verity.TopupRollback
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
 import LidoSRv3.Audit.Model.EthWorld
+import LidoSRv3.Audit.Model.EthConfinement
+import LidoSRv3.Audit.Guarantees.PEthConfinement1
 
 /-!
 # Production facade
