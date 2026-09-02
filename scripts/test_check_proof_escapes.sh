@@ -50,13 +50,16 @@ if ! python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdi
   exit 1
 fi
 
-# A guillemet in a character literal is data, not an escaped identifier opener;
-# a forbidden declaration on the following line must remain visible to the gate.
-printf "\ndef marker : Char := '«'\naxiom injected : False\n" >> "$project"
-if python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
-  printf 'proof-escape regression accepted an axiom after a guillemet character literal\n' >&2
-  exit 1
-fi
-rg -q 'forbidden axiom' "$tmpdir/out" || { cat "$tmpdir/out" >&2; exit 1; }
+# Character literals (including each guillemet) are data, not escaped
+# identifier delimiters; a following forbidden declaration must stay visible.
+for literal in "'«'" "'»'" "'\\\\'"; do
+  cp LidoSRv3/Audit/Trust.lean "$project"
+  printf "\ndef marker : Char := %s\naxiom injected : False\n" "$literal" >> "$project"
+  if python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
+    printf 'proof-escape regression accepted an axiom after character literal %s\n' "$literal" >&2
+    exit 1
+  fi
+  rg -q 'forbidden axiom' "$tmpdir/out" || { cat "$tmpdir/out" >&2; exit 1; }
+done
 
 printf '%s\n' 'proof-escape negative regressions rejected imported, library-root, and Trust project Lean mutations'

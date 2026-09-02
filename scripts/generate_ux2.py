@@ -49,12 +49,14 @@ MODIFIER_RUN = re.compile(
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
 # A scope name may follow Lean whitespace (including comments stripped to blank
 # lines), but an unnamed scope must not consume the next scope command as a
-# split-line name.  Escaped identifiers are one Lean token even when they
+# split-line name.  A qualified scope name is a dotted sequence of Lean
+# identifier components; each component may be guillemet-escaped and therefore
 # contain whitespace.
+SCOPE_COMPONENT = r"(?:«[^»\n]*»|[^\s.«»]+)"
 SCOPE = re.compile(
     r"^[ \t]*(namespace|section|mutual|end)"
     r"(?:\s+(?!(?:namespace|section|mutual|end)(?:[ \t]*$|[ \t]+))"
-    r"(«[^»\n]*»|[^\s]+))?[ \t]*$", re.MULTILINE)
+    rf"({SCOPE_COMPONENT}(?:\.{SCOPE_COMPONENT})*))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")

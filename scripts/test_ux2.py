@@ -318,18 +318,19 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"Outer.after_mutual"}:
         raise SystemExit("scanner consumed `mutual` as an unnamed section's name")
 
-    # Scope names use the same escaped-identifier tokenization as declarations:
-    # whitespace inside guillemets belongs to the name, including at `end`.
+    # Scope names are dotted identifier-component sequences.  Guillemet
+    # components retain their whitespace both at an opener and its matching
+    # `end`, whether they lead or trail an ordinary component.
     module.write_text(
-        "namespace «Outer Space»\n"
-        "section «Local Space»\n"
+        "namespace «Outer Space».Inner\n"
+        "section Local.«Scope Space»\n"
         "theorem within_escaped_scopes : True := trivial\n"
-        "end «Local Space»\n"
-        "end «Outer Space»\n"
+        "end Local.«Scope Space»\n"
+        "end «Outer Space».Inner\n"
         "theorem after_escaped_scopes : True := trivial\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
-    if set(found) != {"«Outer Space».within_escaped_scopes", "after_escaped_scopes"}:
-        raise SystemExit("scanner did not parse escaped scope names containing whitespace")
+    if set(found) != {"«Outer Space».Inner.within_escaped_scopes", "after_escaped_scopes"}:
+        raise SystemExit("scanner did not parse qualified escaped scope names")
 
     module.write_text("end Nothing\n", encoding="utf-8")
     expect_scan_failure(fixture, module, "`end` without an open namespace")
@@ -374,11 +375,12 @@ def check_escaped_identifier_lexing(fixture: Path) -> None:
     escaped_keyword = strip("theorem «sorry» : True := trivial\n", mask_escaped_identifiers=True)
     if any(pattern.search(escaped_keyword) for _, pattern in check_proof_escapes.ESCAPES):
         raise SystemExit("proof-escape matcher treated a guillemet name as a guarded keyword")
-    character_then_axiom = strip(
-        "def marker : Char := '«'\naxiom injected : False\n",
-        mask_escaped_identifiers=True)
-    if "axiom injected" not in character_then_axiom:
-        raise SystemExit("a guillemet character literal hid a later proof escape")
+    for literal in ("'«'", "'»'", "'\\\\'"):
+        character_then_axiom = strip(
+            f"def marker : Char := {literal}\naxiom injected : False\n",
+            mask_escaped_identifiers=True)
+        if "axiom injected" not in character_then_axiom:
+            raise SystemExit(f"character literal {literal} hid a later proof escape")
 
     controls = (
         "theorem helper : True := trivial /- hidden -/\n",
