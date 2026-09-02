@@ -213,6 +213,10 @@ def check_lean_inputs_binding(fixture: Path) -> None:
     (fixture / "lake-manifest.json").unlink()
     expect(fixture, "check", False, "missing Lean input lake-manifest.json")
     shutil.copy2(ROOT / "lake-manifest.json", fixture / "lake-manifest.json")
+    empty = fixture / "LidoSRv3/Audit/Empty/Deeper"
+    empty.mkdir(parents=True)
+    expect(fixture, "check", True, "11 guarantee records match")
+    shutil.rmtree(empty.parent)
     with_git = subprocess.run(["bash", "scripts/verified_source_tree.sh"], cwd=ROOT,
                               capture_output=True, text=True)
     if with_git.returncode != 0:

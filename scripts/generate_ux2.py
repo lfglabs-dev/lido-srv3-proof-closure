@@ -272,15 +272,24 @@ def git_blob(data: bytes) -> bytes:
     return hashlib.sha1(b"blob %d\0" % len(data) + data).digest()
 
 
-def git_tree(directory: Path) -> bytes:
-    """The Git tree object id of a directory, computed without a Git object store."""
+def git_tree(directory: Path) -> bytes | None:
+    """The Git tree object id of a directory, computed without a Git object store.
+
+    Git records no empty directory, so a directory with no file below it
+    yields `None` and is left out of its parent, exactly as `git mktree` on the
+    committed tree leaves it out.
+    """
     entries = []
     for child in directory.iterdir():
         if child.is_dir():
-            entries.append((child.name + "/", b"40000", child.name, git_tree(child)))
+            subtree = git_tree(child)
+            if subtree is not None:
+                entries.append((child.name + "/", b"40000", child.name, subtree))
         else:
             mode = b"100755" if child.stat().st_mode & 0o111 else b"100644"
             entries.append((child.name, mode, child.name, git_blob(child.read_bytes())))
+    if not entries:
+        return None
     entries.sort(key=lambda entry: entry[0])
     body = b"".join(mode + b" " + name.encode("utf-8") + b"\0" + digest
                     for _, mode, name, digest in entries)
@@ -295,7 +304,10 @@ def lean_source_tree(root: Path) -> str:
     for name in LEAN_INPUTS:
         if not (root / name).is_file():
             fail(f"missing Lean input {name}")
-    entries = [("LidoSRv3/", b"40000", "LidoSRv3", git_tree(root / "LidoSRv3"))]
+    subtree = git_tree(root / "LidoSRv3")
+    if subtree is None:
+        fail("LidoSRv3/ holds no Lean input")
+    entries = [("LidoSRv3/", b"40000", "LidoSRv3", subtree)]
     entries += [(name, b"100644", name, git_blob((root / name).read_bytes())) for name in LEAN_INPUTS]
     entries.sort(key=lambda entry: entry[0])
     body = b"".join(mode + b" " + name.encode("utf-8") + b"\0" + digest
