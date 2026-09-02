@@ -1,11 +1,3 @@
-/-!
-# Production facade
-
-Stable definitions and public guarantees. Mutants, Trust, Legacy, and
-`Audit.Verity.Tests` are compiled by `LidoSRv3Test` / `LidoSRv3Audit` /
-`LidoSRv3Legacy`, not by this module.
--/
-
 import LidoSRv3.Audit.Arithmetic
 import LidoSRv3.Audit.Trace
 import LidoSRv3.Audit.Spec
@@ -71,3 +63,11 @@ import LidoSRv3.Audit.Verity.TopupRollback
 import LidoSRv3.Audit.Verity.TopupHybrid
 import LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel
 import LidoSRv3.Audit.Model.EthWorld
+
+/-!
+# Production facade
+
+Stable definitions and public guarantees. Mutants, Trust, Legacy, and
+`Audit.Verity.Tests` are compiled by `LidoSRv3Test` / `LidoSRv3Audit` /
+`LidoSRv3Legacy`, not by this module.
+-/
