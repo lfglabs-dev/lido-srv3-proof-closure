@@ -20,6 +20,7 @@ import LidoSRv3.Audit.Guarantees.POracleSupply1
 import LidoSRv3.Audit.Guarantees.PAddressBatch1
 import LidoSRv3.Audit.Guarantees.PSszLive1
 import LidoSRv3.Audit.Guarantees.PConsolidationValue1
+import LidoSRv3.Audit.Guarantees.POracleSanity1
 
 /-!
 # Canonical minimal-11 public facade
@@ -79,12 +80,22 @@ def supplemental : List Guarantee :=
   , PAddressBatch1.guarantee
   , PSszLive1.guarantee
   , PConsolidationValue1.guarantee
+  , POracleSanity1.guarantee
   ]
 
 /-- Regression guard: Wave 3 leftover-close IDs stay supplemental. -/
 example : supplemental.map (fun guarantee => guarantee.id.text) =
     ["P-RESERVE-RELATIONAL", "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1",
      "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1", "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1",
-     "P-CONSOLIDATION-VALUE-1"] := by decide
+     "P-CONSOLIDATION-VALUE-1", "P-ORACLE-SANITY-1"] := by decide
+
+/-- P-ORACLE-SANITY-1 is a **bounded** parent: it covers the five modeled
+`OracleReportSanityChecker` commit-path guards plus the `uint256` entry bound
+on `timeElapsed`, and nothing else. The residual commit-path checks are named
+in `LidoSRv3/Audit/Source/SanityEnvelope.lean`. Its `audit/guarantees.yaml`
+row is deliberately absent: that file is byte-pinned to the certified R1
+review basis, and adding a row there would present unreviewed content as R1
+certified. -/
+example : POracleSanity1.guarantee.checkedLayers = [.model, .source] := by decide
 
 end LidoSRv3.Audit.Guarantees
