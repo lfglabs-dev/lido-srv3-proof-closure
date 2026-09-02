@@ -29,7 +29,6 @@ MAX_LINES = 500
 BRANCHES = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.ExceptHandler, ast.With,
             ast.AsyncWith, ast.Assert, ast.IfExp)
 FUNCTIONS = (ast.FunctionDef, ast.AsyncFunctionDef)
-SCOPES = (*FUNCTIONS, ast.ClassDef)
 
 
 def fail(message: str) -> None:
@@ -43,16 +42,25 @@ def git_blob_id(content: bytes) -> str:
 def own_nodes(function: ast.AST):
     """Every node of a function's body except nested function and class bodies.
 
-    Only the body counts: decorators, default values and annotations run in
-    the enclosing scope. A nested definition is measured on its own (see
-    `functions`), so its branches are not charged to the parent as well;
-    lambdas inside a function stay with that function.
+    Only the body counts: a function's own decorators, default values and
+    annotations run in the enclosing scope, so they are charged there, and a
+    nested definition's setup fields are charged here for the same reason
+    while its body is measured on its own (see `functions`). A class body
+    nested in a function runs in that function; lambdas inside a function
+    stay with that function.
     """
     body = function.body if isinstance(function, FUNCTIONS) else [function.body]
     pending = list(body)
     while pending:
         node = pending.pop()
-        if isinstance(node, SCOPES):
+        if isinstance(node, FUNCTIONS):
+            # A nested definition's decorators, defaults and annotations are
+            # evaluated by the enclosing function; only its body is its own.
+            pending.extend([*node.decorator_list, node.args, *([node.returns] if node.returns else [])])
+            continue
+        if isinstance(node, ast.ClassDef):
+            # A class body runs where the class is defined; its methods do not.
+            pending.extend([*node.decorator_list, *node.bases, *node.keywords, *node.body])
             continue
         yield node
         pending.extend(ast.iter_child_nodes(node))
