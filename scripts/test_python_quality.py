@@ -73,6 +73,10 @@ def check_ratchet(fixture: Path) -> None:
     expect(False, "zz_dense.py:dense = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("dense = lambda x: " + DENSE_BODY + "\n", encoding="utf-8")
     expect(False, "zz_dense.py:dense = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("callbacks = [lambda x: " + DENSE_BODY + "]\n", encoding="utf-8")
+    expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("def f(cb=lambda x: " + DENSE_BODY + "):\n    return cb\n", encoding="utf-8")
+    expect(False, "zz_dense.py:f.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     long = scripts / "zz_long.py"
     long.write_text("# pad\n" * 501, encoding="utf-8")
     dense.unlink()
@@ -126,10 +130,13 @@ def check_metric() -> None:
                "    return x\n"
                "dense = lambda x: x if x else 0\n"
                "class K:\n    pick = lambda self, x: x if x else 1\n"
-               "a, b = (lambda: 1), 2\n")
+               "a, b = (lambda: 1), 2\n"
+               "callbacks = [lambda x: x if x else 0, lambda y: y]\n"
+               "def g(cb=lambda z: z if z else 0):\n    return cb(lambda w: w if w else 1)\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.functions(ast.parse(outside))}
-    if measured != {"deco": 1, "simple": 1, "dense": 2, "K.pick": 2}:
+    if measured != {"deco": 1, "simple": 1, "dense": 2, "K.pick": 2, "lambda@9": 1,
+                    "lambda@10": 2, "lambda@10#2": 1, "g": 2, "g.lambda@11": 2}:
         raise SystemExit(f"decorator/default/annotation or lambda accounting drifted: {measured}")
     (annotated,) = [node for node in ast.parse("g: int = lambda: 1 if True else 0\n").body]
     if check_python_quality.assigned_name(annotated) != "g":

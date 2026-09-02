@@ -76,10 +76,12 @@ def complexity(function: ast.AST) -> int:
 def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
     """Every function in a module with its scope-qualified name, in source order.
 
-    Methods carry their class, local functions carry their parent, a lambda
-    bound at module or class level counts as a function under its bound name,
-    and a name defined twice in the same scope carries an ordinal, so no
-    definition can hide behind another that shares its bare name.
+    Methods carry their class, local functions carry their parent, and a
+    lambda outside every measured body (module or class level, a decorator,
+    a default value, an annotation) counts as a function under its bound name
+    or its line; a name defined twice in the same scope carries an ordinal,
+    so no definition can hide behind another that shares its bare name.
+    Lambdas inside a function body stay with that function.
     """
     found: list[tuple[str, ast.AST]] = []
     seen: dict[str, int] = {}
@@ -89,19 +91,25 @@ def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
         seen[qualified] = seen.get(qualified, 0) + 1
         found.append((qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}", node))
 
-    def visit(node: ast.AST, scope: list[str]) -> None:
-        for child in ast.iter_child_nodes(node):
+    def visit(children, scope: list[str], in_body: bool) -> None:
+        for child in children:
             if isinstance(child, FUNCTIONS):
                 record(scope, child.name, child)
-                visit(child, [*scope, child.name])
+                inner = [*scope, child.name]
+                visit([*child.decorator_list, child.args, *([child.returns] if child.returns else [])],
+                      inner, False)
+                visit(child.body, inner, True)
             elif isinstance(child, ast.ClassDef):
-                visit(child, [*scope, child.name])
-            elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
+                visit(ast.iter_child_nodes(child), [*scope, child.name], False)
+            elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda) \
+                    and not in_body:
                 record(scope, assigned_name(child), child.value)
+            elif isinstance(child, ast.Lambda) and not in_body:
+                record(scope, f"lambda@{child.lineno}", child)
             else:
-                visit(child, scope)
+                visit(ast.iter_child_nodes(child), scope, in_body)
 
-    visit(tree, [])
+    visit(ast.iter_child_nodes(tree), [], False)
     return found
 
 
