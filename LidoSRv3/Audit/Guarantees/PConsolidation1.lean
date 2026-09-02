@@ -48,9 +48,8 @@ def guarantee : Guarantee := ⟨.pConsolidation1, [.model, .source, .verityTx]�
 
 /-! ## Vocabulary
 
-Readable names for the two arms of the registered source parent and for the
-registered Verity statement. Every name is an `abbrev`, so each unfolds
-definitionally to the exact clause it stands for (same conjuncts, same order,
+Readable names for the two arms of the registered source parent. Every name
+is an `abbrev`, so each unfolds definitionally to the exact clause it stands for (same conjuncts, same order,
 same nesting): the registered theorems below are the very same propositions as
 before, only spelled the way the English guarantee reads. -/
 
@@ -96,12 +95,6 @@ abbrev CommitsOnlyWhenAllGuardsPass (inputs : Inputs) : Prop :=
 abbrev RevertsOnlyWhenSomeGuardFails (inputs : Inputs) : Prop :=
   ∀ reason, sourceRun inputs = .reverted reason →
     ¬ AllGuardsPassForSomeBatch inputs
-
-/-- "What Verity observes of `addRequests` (the fresh CALLs and events plus the
-count/fee slots) is exactly `sourceView` of the same `sourceRun`." -/
-abbrev ObservesSourceView (inputs : Inputs) (state : Verity.ContractState) : Prop :=
-  observe state ((addRequests inputs).run state) =
-    sourceView inputs (state.readSlot countSlot).val
 
 /-- **P-CONSOLIDATION-1, source plane.** A consolidation batch commits only if
 every vault guard passes (caller = gateway, nonempty aligned 48-byte keys, the
@@ -222,7 +215,8 @@ theorem verity_tx_simulates_consolidation (inputs : Inputs)
       inputs.sourceLens.length = some inputs.sourceLens)
     (hTargetLens : readArray state "targetLens" targetLensBase
       inputs.targetLens.length = some inputs.targetLens) :
-    ObservesSourceView inputs state :=
+    observe state ((addRequests inputs).run state) =
+      sourceView inputs (state.readSlot countSlot).val :=
   verity_tx_simulates_pinned_source inputs state hCountBound hEntry
     hSources hTargets hSourceLens hTargetLens
 

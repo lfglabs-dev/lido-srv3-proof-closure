@@ -275,12 +275,6 @@ theorem eth_flow_parent (approved : ApprovedSet)
         show n * fee + (msgValue - n * fee) = msgValue
         omega
 
-/-- "The fee destination is the canonical EIP-7251 request predeploy": the
-approved set built for `refundRecipient` points its consolidation contract at
-`canonicalRequestAddress`. -/
-abbrev FeeDestinationIsCanonicalPredeploy (refundRecipient : Address) : Prop :=
-  (canonicalApprovedSet refundRecipient).consolidationContract = canonicalRequestAddress
-
 /-- "One gateway execution is classified": `msgValue = 0` reverts
 `ZeroArgument`, `n * fee ≥ 2^256` reverts overflow, `n * fee > msgValue`
 reverts `InsufficientValue`, and otherwise every move is parent-approved (no
@@ -306,7 +300,7 @@ its equality with the deployed configured target remains
 `A-CANONICAL-REQUEST-ADDRESS`. -/
 theorem eth_flow_parent_at_canonical (refundRecipient : Address)
     (hDistinct : refundRecipient ≠ canonicalRequestAddress) :
-    FeeDestinationIsCanonicalPredeploy refundRecipient ∧
+    (canonicalApprovedSet refundRecipient).consolidationContract = canonicalRequestAddress ∧
       ∀ (msgValue n fee : Nat),
         GatewayOutcomeClassified (canonicalApprovedSet refundRecipient) msgValue n fee := by
   refine ⟨rfl, eth_flow_parent (canonicalApprovedSet refundRecipient) ?_⟩

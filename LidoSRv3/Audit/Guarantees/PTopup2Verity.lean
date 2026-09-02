@@ -3,15 +3,6 @@ import LidoSRv3.Audit.Verity.Topup2DistributionTx
 
 namespace LidoSRv3.Audit.Guarantees.PTopup2
 
-/-! ## Vocabulary for the registered Verity statement -/
-
-open LidoSRv3.Audit.Verity.Topup2DistributionTx in
-/-- "The memory array `name` at `base` decodes to `xs`": `readArray` over
-`xs.length` words returns exactly `xs`. -/
-abbrev MemoryArrayDecodes (state : Verity.ContractState) (name : String) (base : Nat)
-    (xs : List Word) : Prop :=
-  readArray state name base xs.length = some xs
-
 open LidoSRv3.Audit.Verity.Topup2DistributionTx in
 /-- **P-TOPUP-2, Verity plane.**  If the memory arrays decode, `observe` of
 `allocate` equals `sourceView` of the same source run.
@@ -26,10 +17,10 @@ theorem verity_tx_simulates_topup2_spec
     (effective pending requested topUpLimits : List Word)
     (target minTopUp remainingCap moduleLimit valueGwei : Word)
     (state : Verity.ContractState)
-    (hEff : MemoryArrayDecodes state "effective" effectiveBase effective)
-    (hPend : MemoryArrayDecodes state "pending" pendingBase pending)
-    (hReq : MemoryArrayDecodes state "requested" requestedBase requested)
-    (hLimits : MemoryArrayDecodes state "topUpLimits" limitsBase topUpLimits)
+    (hEff : readArray state "effective" effectiveBase effective.length = some effective)
+    (hPend : readArray state "pending" pendingBase pending.length = some pending)
+    (hReq : readArray state "requested" requestedBase requested.length = some requested)
+    (hLimits : readArray state "topUpLimits" limitsBase topUpLimits.length = some topUpLimits)
     (hLen : effective.length = pending.length ∧ pending.length = requested.length ∧
       requested.length = topUpLimits.length)
     (hMax : requested.length ≤ maxValidatorsPerTopUp) :

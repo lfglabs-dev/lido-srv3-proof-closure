@@ -9,36 +9,6 @@ namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
 def guarantee : Guarantee := ⟨.pAlloc2, [.algorithm, .source, .verityTx]⟩
 
-/-! ## Vocabulary (registered statements)
-
-The two registered P-ALLOC-2 statements are written with the predicates below
-so that they read like the plain guarantee. Every predicate is an `abbrev`:
-unfolding it gives back exactly the former statement text, and the conjunct
-order of the registered parent is unchanged (`.1`, `.2.1`, `.2.2`). -/
-
-/-- "The `buckets` memory array decodes to `buckets`." -/
-abbrev BucketsArrayDecodesTo (state : Verity.ContractState)
-    (buckets : List MinFirstAllocation.Source.Word) : Prop :=
-  Verity.MinFirstDistributionTx.readArray state "buckets"
-    Verity.MinFirstDistributionTx.bucketsBase buckets.length = some buckets
-
-/-- "The `capacities` memory array decodes to `capacities`." -/
-abbrev CapacitiesArrayDecodesTo (state : Verity.ContractState)
-    (capacities : List MinFirstAllocation.Source.Word) : Prop :=
-  Verity.MinFirstDistributionTx.readArray state "capacities"
-    Verity.MinFirstDistributionTx.capacitiesBase capacities.length = some capacities
-
-/-- "`observe` of the `allocate` transaction (persisted bucket array plus
-totals) equals `sourceView` of the pinned source loop." -/
-abbrev ObservesSourceView
-    (buckets capacities : List MinFirstAllocation.Source.Word)
-    (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState) : Prop :=
-  Verity.MinFirstDistributionTx.observe buckets
-      ((Verity.MinFirstDistributionTx.allocate buckets.length capacities.length
-        allocationSize).run
-      state) =
-    Verity.MinFirstDistributionTx.sourceView buckets capacities allocationSize
-
 /-- If the two memory arrays decode to `buckets`/`capacities`, then
 `observe` of `allocate` (persisted bucket array plus totals) equals
 `sourceView` of the separately defined `sourceAllocateLoop`; the copied loop
@@ -47,9 +17,15 @@ Not the +1 `selects_least_open_bucket` model. -/
 theorem verity_tx_simulates_min_first_distribution
     (buckets capacities : List MinFirstAllocation.Source.Word)
     (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState)
-    (hBuckets : BucketsArrayDecodesTo state buckets)
-    (hCapacities : CapacitiesArrayDecodesTo state capacities) :
-    ObservesSourceView buckets capacities allocationSize state :=
+    (hBuckets : Verity.MinFirstDistributionTx.readArray state "buckets"
+      Verity.MinFirstDistributionTx.bucketsBase buckets.length = some buckets)
+    (hCapacities : Verity.MinFirstDistributionTx.readArray state "capacities"
+      Verity.MinFirstDistributionTx.capacitiesBase capacities.length = some capacities) :
+    Verity.MinFirstDistributionTx.observe buckets
+        ((Verity.MinFirstDistributionTx.allocate buckets.length capacities.length
+          allocationSize).run
+        state) =
+      Verity.MinFirstDistributionTx.sourceView buckets capacities allocationSize :=
   Verity.MinFirstDistributionTx.verity_tx_simulates_pinned_source
     buckets capacities allocationSize state hBuckets hCapacities
 

@@ -108,17 +108,6 @@ def transitionBudget (b : TopupBatch) (cfg : TopupConfig) : Nat :=
 def transition (b : TopupBatch) (cfg : TopupConfig) : List Nat :=
   consumeBudget (transitionBudget b cfg) (candidates b cfg)
 
-/-! ## Vocabulary for the registered statement -/
-
-/-- "The top-up amounts allocated in a batch": the leftover-budget walk
-`transition`, in gwei. -/
-abbrev allocatedTopups (b : TopupBatch) (cfg : TopupConfig) : List Nat :=
-  transition b cfg
-
-/-- "The protocol's per-block cap", `maxTopUpPerBlockGwei`, in gwei. -/
-abbrev blockCap (cfg : TopupConfig) : Nat :=
-  cfg.maxTopUpPerBlockGwei
-
 /-- Public per-key bound for P-TOPUP-2. Each produced allocation is paired
 with, and bounded by, the corresponding requested/evaluated candidate. -/
 theorem per_key_bounded_by_candidate (b : TopupBatch) (cfg : TopupConfig) :
@@ -193,7 +182,7 @@ shows the bound is not vacuous: a mutant budget that drops the
 `maxTopUpPerBlockGwei` term from that `min` lets the identical leftover walk
 allocate above the cap (`block_cap_kill_line_refutes_parent`). -/
 theorem aggregate_bounded_by_block_cap (b : TopupBatch) (cfg : TopupConfig) :
-    (allocatedTopups b cfg).sum ≤ blockCap cfg :=
+    (transition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei :=
   Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_right _ _))
 

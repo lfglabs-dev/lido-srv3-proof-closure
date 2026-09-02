@@ -8,45 +8,6 @@ open LidoSRv3.Audit.SolidityReserve
 
 def guarantee : Guarantee := ⟨.pReserve1, [.model, .source, .verityTx]⟩
 
-/-! ## Vocabulary
-
-Readable names for the conjuncts of the two registered statements. Every name
-is an `abbrev`, so each unfolds definitionally to the exact clause it stands
-for: the registered theorems below are the very same propositions as before,
-only spelled the way the English guarantee reads. -/
-
-/-- "The spend went through the guard-checking wrapper": `canDeposit` and
-`authorizedRouter` both held on this committed call. -/
-abbrev GuardsInScope (inputs : WithdrawInputs) : Prop :=
-  scopedWithdrawGuards inputs
-
-/-- "A committed spend is never the zero amount" (`ZERO_AMOUNT` guard). -/
-abbrev SpendsNonzero (amount : Word) : Prop :=
-  amount ≠ 0
-
-/-- "The amount comes out of the depositable partitions only, `buffered` is a
-checked subtraction, and the stored withdrawal reserve is untouched." -/
-abbrev WithdrawalPartitionPreserved (before after : ReserveState) (amount : Word) : Prop :=
-  withdrawalPartitionSpendInvariant before after amount
-
-/-- "The effective, min-capped, queue-facing withdrawals reserve, read against
-the live `unfinalizedStETH` value, is the same before and after the spend." -/
-abbrev WithdrawalsReserveUnchanged (before after : ReserveState) (live : Word) : Prop :=
-  liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live
-
-/-- "What Verity observes of `withdrawWithGuards` is exactly the abstract
-reserve transaction `specTx`." -/
-abbrev ObservesSpec (inputs : WithdrawInputs) (state : ContractState) (amount : Word) : Prop :=
-  observeVerity state ((ReserveContract.withdrawWithGuards inputs amount).run state) =
-    specTx inputs (decode state) amount
-
-/-- "Every revert of `withdrawWithGuards` hands back the pre-call state." -/
-abbrev RevertRestoresSnapshot (inputs : WithdrawInputs) (state : ContractState)
-    (amount : Word) : Prop :=
-  ∀ reason rollback,
-    (ReserveContract.withdrawWithGuards inputs amount).run state = .revert reason rollback →
-    rollback = state
-
 /-- **P-RESERVE-1, source plane.** Under a fresh withdrawal-queue cache, any
 committed `withdrawDepositableEther` spend passed the scoped guards, spent a
 nonzero amount, took it from the depositable partitions only, and left the live
@@ -102,10 +63,10 @@ theorem source_spend_preserves_withdrawal_reserve
     (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)
     (hfresh : freshQueueCache before live)
     (h : modelWithdrawDepositableEther inputs before amount = .committed after) :
-    GuardsInScope inputs ∧
-      SpendsNonzero amount ∧
-      WithdrawalPartitionPreserved before after amount ∧
-      WithdrawalsReserveUnchanged before after live := by
+    scopedWithdrawGuards inputs ∧
+      amount ≠ 0 ∧
+      withdrawalPartitionSpendInvariant before after amount ∧
+      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live := by
   unfold modelWithdrawDepositableEther at h
   split at h
   · contradiction
@@ -139,8 +100,11 @@ or external-call semantics is claimed.
 -/
 theorem verity_tx_simulates_reserve_spec (inputs : WithdrawInputs)
     (state : ContractState) (amount : Word) :
-    ObservesSpec inputs state amount ∧
-    RevertRestoresSnapshot inputs state amount :=
+    observeVerity state ((ReserveContract.withdrawWithGuards inputs amount).run state) =
+      specTx inputs (decode state) amount ∧
+    ∀ reason rollback,
+      (ReserveContract.withdrawWithGuards inputs amount).run state = .revert reason rollback →
+      rollback = state :=
   ⟨verity_execution_simulates_spec state amount inputs,
     fun reason rollback h =>
       verity_revert_rolls_back inputs state amount reason rollback h⟩

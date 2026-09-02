@@ -86,25 +86,6 @@ theorem source_capacities_match_canonical
   SolidityAllocCapacity.source_execute_refines_audit_model
     cfg modules depositsToAllocate isTopUp hBounds
 
-/-! ## Vocabulary (registered statements)
-
-The registered P-ALLOC-1 statements are written with the predicates below so
-that they read like the plain guarantee: "under the checked `uint256` bounds,
-the source-shaped capacity executor succeeds and its capacity column equals
-the independent MathView model; the storage-backed Verity transaction, once
-the stored module count and the live summaries bind to the rows, observes the
-same rows as the source view". Every predicate is an `abbrev`, so unfolding it
-gives back exactly the former statement text. -/
-
-/-- "`SolidityAllocCapacity.execute` returns rows whose capacity column equals
-`MathView.capacities`." -/
-abbrev CapacityColumnMatchesMathView
-    (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
-    (isTopUp : Bool) : Prop :=
-  ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
-    rows.map (fun row => (row.capacity : Nat)) =
-      MathView.capacities cfg modules depositsToAllocate isTopUp
-
 /-- **Wave 2 registered parent.**  Under `CheckedBounds`, the source-shaped
 executor succeeds and its capacity column equals the independent `MathView`
 model.  This restates `source_capacities_match_canonical` above under the
@@ -122,7 +103,9 @@ child. -/
 theorem checked_execute
     (cfg : Config) (modules : List Module) (depositsToAllocate : Verity.Uint256)
     (isTopUp : Bool) (hBounds : CheckedBounds cfg modules depositsToAllocate isTopUp) :
-    CapacityColumnMatchesMathView cfg modules depositsToAllocate isTopUp :=
+    ∃ rows, SolidityAllocCapacity.execute cfg modules depositsToAllocate isTopUp = some rows ∧
+      rows.map (fun row => (row.capacity : Nat)) =
+        MathView.capacities cfg modules depositsToAllocate isTopUp :=
   source_capacities_match_canonical cfg modules depositsToAllocate isTopUp hBounds
 
 /-- Successful execution retains router index order. -/
@@ -167,33 +150,6 @@ theorem verity_tx_simulates_allocation
     cfg modules depositsToAllocate isTopUp state hBind
 
 open LidoSRv3.Audit.Verity.AllocationTx in
-/-- "The stored router module count, capped at 32, is the number of bound
-rows." -/
-abbrev StoredModuleCountBinds (modules : List BoundModule) (state : Verity.ContractState) :
-    Prop :=
-  modules.length = min (state.readSlot modulesCountSlot).val 32
-
-open LidoSRv3.Audit.Verity.AllocationTx in
-/-- "The live `getStakingModuleSummary` / `getTotalModuleStake` staticcalls
-decode, under the adversary, to exactly those rows." -/
-abbrev LiveSummariesDecodeTo
-    (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
-    (modules : List BoundModule) (state : Verity.ContractState) : Prop :=
-  (bindLiveAll adversary state 0 modules.length) state = .success modules state
-
-open LidoSRv3.Audit.Verity.AllocationTx in
-/-- "`observe` of `allocateLiveFromStorage` equals `sourceView` on the same
-rows." -/
-abbrev ObservesSourceView
-    (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
-    (cfg : Config) (modules : List BoundModule)
-    (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)
-    (state : Verity.ContractState) : Prop :=
-  observe modules
-      ((allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp).run state) =
-    sourceView cfg modules depositsToAllocate isTopUp
-
-open LidoSRv3.Audit.Verity.AllocationTx in
 /-- Storage-backed P-ALLOC-1 live-summary transaction closure. The router
 module count is read from storage and capped at 32. `bindLiveAll` reads each
 packed `ModuleStateConfig`, executes the mapped summary staticcall, ABI-decodes
@@ -209,9 +165,11 @@ theorem verity_tx_simulates_allocation_count_from_storage
     (modules : List BoundModule)
     (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)
     (state : Verity.ContractState)
-    (hLength : StoredModuleCountBinds modules state)
-    (hBind : LiveSummariesDecodeTo adversary modules state) :
-    ObservesSourceView adversary cfg modules depositsToAllocate isTopUp state :=
+    (hLength : modules.length = min (state.readSlot modulesCountSlot).val 32)
+    (hBind : (bindLiveAll adversary state 0 modules.length) state = .success modules state) :
+    observe modules
+        ((allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp).run state) =
+      sourceView cfg modules depositsToAllocate isTopUp :=
   verity_tx_simulates_live_summary_from_storage
     adversary cfg modules depositsToAllocate isTopUp state hLength hBind
 
