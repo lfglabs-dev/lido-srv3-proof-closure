@@ -229,6 +229,14 @@ def check_lean_scanner(fixture: Path) -> None:
 
     module.write_text(
         "namespace Outer\n"
+        "theorem foo'a' : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.foo'a'"}:
+        raise SystemExit("scanner treated character-shaped identifier text as a character literal")
+
+    module.write_text(
+        "namespace Outer\n"
         "def quoted : Syntax := `(command|\n"
         "  theorem one : True := trivial)\n"
         "theorem one : True := trivial\n"
@@ -236,6 +244,17 @@ def check_lean_scanner(fixture: Path) -> None:
     found = generate_ux2.scan_file(fixture, module)
     if set(found) != {"Outer.one"} or found["Outer.one"][0]["statement"] != "theorem one : True":
         raise SystemExit("scanner indexed a theorem inside a command quotation")
+
+    module.write_text(
+        "namespace Outer\n"
+        "def quoted : Syntax := `(command|\n"
+        "  theorem «)» : True := trivial\n"
+        "  theorem one : True := trivial)\n"
+        "theorem one : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.one"}:
+        raise SystemExit("scanner balanced a command quotation on a parenthesis in an escaped identifier")
 
     module.write_text(
         "namespace\n"

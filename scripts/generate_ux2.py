@@ -146,7 +146,9 @@ def word_at(text: str, index: int, word: re.Pattern) -> bool:
     return not before.isalnum() and before not in "_.'«" and after != "»"
 
 
-CHAR_LITERAL = re.compile(r"'(?:\\.|[^\\'\n])'")
+# An apostrophe is legal inside an ordinary Lean identifier (`foo'a'`), so a
+# character-shaped suffix must not be mistaken for a character literal there.
+CHAR_LITERAL = re.compile(r"(?<![\w'])'(?:\\.|[^\\'\n])'")
 
 
 def mask_character_literals(text: str) -> str:
@@ -168,6 +170,9 @@ def mask_command_quotations(text: str) -> str:
     contents as active Lean commands.
     """
     masked = list(text)
+    # Parentheses in escaped identifiers are identifier content, not quotation
+    # delimiters.  Keep offsets by scanning an equally sized masked view.
+    structural = mask_escaped_identifiers(text)
     index = 0
     while index < len(text):
         if not text.startswith("`(command|", index):
@@ -176,7 +181,7 @@ def mask_command_quotations(text: str) -> str:
         end = index + len("`(")
         depth = 1
         while end < len(text) and depth:
-            depth += (text[end] == "(") - (text[end] == ")")
+            depth += (structural[end] == "(") - (structural[end] == ")")
             end += 1
         if depth:
             fail("unterminated command quotation")
