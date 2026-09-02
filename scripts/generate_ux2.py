@@ -47,6 +47,7 @@ DECLARATION = re.compile(
 SCOPE = re.compile(r"^[ \t]*(namespace|section|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
+WHERE = re.compile(r"where\b")
 CLOSERS = ")]}⟩"
 
 
@@ -83,8 +84,9 @@ def statement_end(text: str, start: int) -> int:
     """Offset of the `:=` that ends the signature after `start`.
 
     That is the first `:=` at bracket depth zero which does not belong to a
-    `let` or `have` binding written inside the statement itself: each such
-    binder at depth zero consumes the next depth-zero `:=`.
+    `let` or `have` binding written inside the statement itself (each such
+    binder at depth zero consumes the next depth-zero `:=`), or a depth-zero
+    `where` opening a structure-instance proof.
     """
     depth = 0
     pending = 0
@@ -99,12 +101,19 @@ def statement_end(text: str, start: int) -> int:
             if pending == 0:
                 return index
             pending -= 1
-        elif depth == 0 and BINDER.match(text, index) and not text[index - 1].isalnum() \
-                and text[index - 1] not in "_.'":
+        elif depth == 0 and word_at(text, index, WHERE):
+            return index
+        elif depth == 0 and word_at(text, index, BINDER):
             pending += 1
             index += 3
         index += 1
-    fail("theorem statement never reaches `:=`")
+    fail("theorem statement never reaches `:=` or `where`")
+
+
+def word_at(text: str, index: int, word: re.Pattern) -> bool:
+    """True when `word` starts at `index` as a whole word, not inside an identifier."""
+    return bool(word.match(text, index)) and not text[index - 1].isalnum() \
+        and text[index - 1] not in "_.'"
 
 
 def doc_comment(lines: list[str], declaration_line: int) -> str:
@@ -259,19 +268,39 @@ def render(record: dict) -> str:
     return json.dumps(record, indent=2, ensure_ascii=False) + "\n"
 
 
-def lean_inputs_digest(root: Path) -> str:
-    """SHA-256 over every Lean input the records depend on, so a consumer can
-    bind a copy of the records to the exact proof revision it displays."""
-    digest = hashlib.sha256()
-    paths = sorted((root / "LidoSRv3").rglob("*.lean")) + [root / name for name in LEAN_INPUTS]
-    for path in paths:
-        if not path.is_file():
-            fail(f"missing Lean input {path.relative_to(root).as_posix()}")
-        digest.update(path.relative_to(root).as_posix().encode("utf-8"))
-        digest.update(b"\0")
-        digest.update(path.read_bytes())
-        digest.update(b"\0")
-    return digest.hexdigest()
+def git_blob(data: bytes) -> bytes:
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).digest()
+
+
+def git_tree(directory: Path) -> bytes:
+    """The Git tree object id of a directory, computed without a Git object store."""
+    entries = []
+    for child in directory.iterdir():
+        if child.is_dir():
+            entries.append((child.name + "/", b"40000", child.name, git_tree(child)))
+        else:
+            mode = b"100755" if child.stat().st_mode & 0o111 else b"100644"
+            entries.append((child.name, mode, child.name, git_blob(child.read_bytes())))
+    entries.sort(key=lambda entry: entry[0])
+    body = b"".join(mode + b" " + name.encode("utf-8") + b"\0" + digest
+                    for _, mode, name, digest in entries)
+    return hashlib.sha1(b"tree %d\0" % len(body) + body).digest()
+
+
+def lean_source_tree(root: Path) -> str:
+    """Git tree id of the checked Lean inputs, the same virtual tree
+    `scripts/verified_source_tree.sh` hashes and `make prove` records in the
+    proof receipt, so a consumer can bind a copy of the records to the exact
+    proof revision it displays through that receipt."""
+    for name in LEAN_INPUTS:
+        if not (root / name).is_file():
+            fail(f"missing Lean input {name}")
+    entries = [("LidoSRv3/", b"40000", "LidoSRv3", git_tree(root / "LidoSRv3"))]
+    entries += [(name, b"100644", name, git_blob((root / name).read_bytes())) for name in LEAN_INPUTS]
+    entries.sort(key=lambda entry: entry[0])
+    body = b"".join(mode + b" " + name.encode("utf-8") + b"\0" + digest
+                    for _, mode, name, digest in entries)
+    return hashlib.sha1(b"tree %d\0" % len(body) + body).hexdigest()
 
 
 def generate(root: Path) -> dict[str, str]:
@@ -292,7 +321,7 @@ def generate(root: Path) -> dict[str, str]:
         "pinned_source": source_map["pinned_source"],
         "verity_commit": audit_metadata.PINNED["verity"][1],
         "lean_toolchain": (root / "lean-toolchain").read_text(encoding="utf-8").strip(),
-        "lean_inputs_sha256": lean_inputs_digest(root),
+        "lean_source_tree": lean_source_tree(root),
         "boundary": context["boundary"],
         "guarantees": [{"id": row["id"], "file": f"{row['id']}.json"} for row in rows],
     })
