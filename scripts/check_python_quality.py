@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = Path("scripts")
 BASELINE = Path("audit/python-quality-baseline.txt")
-BASELINE_BLOB = "0de6d422f533265d54f3bbe1e1df6fa77b5ab7b9"
+BASELINE_BLOB = "cdf7a17557ba73ee0bdff6c26471e155745fdb0b"
 MAX_COMPLEXITY = 22
 MAX_LINES = 500
 BRANCHES = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.ExceptHandler, ast.With,
@@ -86,6 +86,9 @@ def complexity(function: ast.AST) -> int:
             count += 1
         elif isinstance(node, ast.BoolOp):
             count += len(node.values) - 1
+        elif isinstance(node, ast.Compare):
+            # `a < b < c` short-circuits like `a < b and b < c`.
+            count += len(node.comparators) - 1
         elif isinstance(node, ast.comprehension):
             count += 1 + len(node.ifs)
         elif isinstance(node, ast.Match):

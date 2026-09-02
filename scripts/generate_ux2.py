@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import os
 import json
 import re
 import sys
@@ -350,15 +349,15 @@ def git_tree(directory: Path) -> bytes | None:
 
     Git records no empty directory, so a directory with no file below it
     yields `None` and is left out of its parent, exactly as `git mktree` on the
-    committed tree leaves it out. A symlink is stored as Git stores it: mode
-    120000 with the link target as its blob, whatever it points to.
+    committed tree leaves it out. A symlink is refused: Git and the receipt
+    would bind only its link text while Lean reads its target, so the tree id
+    could no longer attest what the scanner and the proof read.
     """
     entries = []
     for child in directory.iterdir():
         if child.is_symlink():
-            target = os.readlink(child).encode("utf-8")
-            entries.append((child.name, b"120000", child.name, git_blob(target)))
-        elif child.is_dir():
+            fail(f"{child} is a symlink; the checked Lean inputs must be regular files")
+        if child.is_dir():
             subtree = git_tree(child)
             if subtree is not None:
                 entries.append((child.name + "/", b"40000", child.name, subtree))

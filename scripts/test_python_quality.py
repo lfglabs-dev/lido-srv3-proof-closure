@@ -77,6 +77,9 @@ def check_ratchet(fixture: Path) -> None:
     expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f(cb=lambda x: " + DENSE_BODY + "):\n    return cb\n", encoding="utf-8")
     expect(False, "zz_dense.py:f.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("chain = lambda x: x" + "".join(f" < {i}" for i in range(24)) + "\n",
+                     encoding="utf-8")
+    expect(False, "zz_dense.py:chain = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f():\n    return (lambda x: " + DENSE_BODY + ")\n", encoding="utf-8")
     expect(False, "zz_dense.py:f.lambda@2 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f[T: (lambda x: " + DENSE_BODY + ")]():\n    return 1\n", encoding="utf-8")
@@ -123,12 +126,13 @@ def check_metric() -> None:
               "    match a:\n        case 1:\n            pass\n        case _:\n            pass\n"
               "    with open(b):\n        pass\n    assert a\n"
               "    def inner(c):\n        return c if a else b\n"
+              "    assert 0 <= a < b <= 9\n"
               "    return (lambda d: d if a else b)(0)\n")
     (function,) = ast.parse(source).body
-    if check_python_quality.complexity(function) != 13:
+    if check_python_quality.complexity(function) != 16:
         raise SystemExit(f"complexity metric drifted: {check_python_quality.complexity(function)}")
     names = [name for name, _ in check_python_quality.functions(ast.parse(source))]
-    if names != ["f", "f.inner", "f.lambda@22"]:
+    if names != ["f", "f.inner", "f.lambda@23"]:
         raise SystemExit(f"scope qualification drifted: {names}")
     outside = ("def deco(f):\n    return f\n"
                "@(deco if True else deco)\n"
