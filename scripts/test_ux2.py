@@ -211,6 +211,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "theorem char_open : '(' = '(' := rfl\n"
         "variable («where» : Prop)\n"
         "theorem escaped_where : «where» → «where» := id\n"
+        "variable («(» : Prop)\n"
+        "theorem escaped_bracket : «(» := by assumption\n"
         "end\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     expected_edges = {
@@ -218,11 +220,27 @@ def check_lean_scanner(fixture: Path) -> None:
         "Outer.plain": ("theorem plain : True", ""),
         "Outer.char_open": ("theorem char_open : '(' = '('", ""),
         "Outer.escaped_where": ("theorem escaped_where : «where» → «where»", ""),
+        "Outer.escaped_bracket": ("theorem escaped_bracket : «(»", ""),
     }
     for name, (statement, doc) in expected_edges.items():
         (record,) = found[name]
         if (record["statement"], record["doc"]) != (statement, doc):
             raise SystemExit(f"{name}: scanner lost a valid Lean construct: {record}")
+
+    module.write_text(
+        "namespace\n"
+        "Outer\n"
+        "section\n"
+        "-- an ordinary comment between the scope keyword and name\n"
+        "Inner\n"
+        "theorem split_scope : True := trivial\n"
+        "end\n"
+        "Inner\n"
+        "end\n"
+        "Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.split_scope"}:
+        raise SystemExit(f"scanner lost a scope name separated by Lean whitespace: {found}")
 
     module.write_text("end Nothing\n", encoding="utf-8")
     expect_scan_failure(fixture, module, "`end` without an open namespace")

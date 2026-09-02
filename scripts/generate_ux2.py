@@ -47,10 +47,11 @@ DECLARATION = re.compile(
     r"(theorem|lemma)\s+(«[^»\n]*»|[^\s:({\[]+)", re.MULTILINE)
 MODIFIER_RUN = re.compile(
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
-SCOPE = re.compile(r"^[ \t]*(namespace|section|mutual|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
+SCOPE = re.compile(r"^[ \t]*(namespace|section|mutual|end)(?:\s+([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")
+ESCAPED_IDENTIFIER = re.compile(r"«[^»\n]*»")
 CLOSERS = ")]}⟩"
 
 
@@ -153,6 +154,11 @@ def mask_character_literals(text: str) -> str:
     return CHAR_LITERAL.sub(lambda match: " " * len(match.group()), text)
 
 
+def mask_escaped_identifiers(text: str) -> str:
+    """Blank guillemet identifiers for structural scans while retaining offsets."""
+    return ESCAPED_IDENTIFIER.sub(lambda match: " " * len(match.group()), text)
+
+
 def is_attribute_block(text: str) -> bool:
     """Whether `text` is nothing but attribute groups such as `@[simp, reducible]`."""
     rest = text.strip()
@@ -206,6 +212,7 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     stripped = mask_character_literals(check_proof_escapes.strip_comments_and_strings(text))
     if stripped.count("\n") != text.count("\n"):
         fail(f"{path}: comment stripping changed the line structure")
+    structural = mask_escaped_identifiers(stripped)
     lines = text.splitlines()
     events = sorted(
         [(m.start(), "scope", m) for m in SCOPE.finditer(stripped)]
@@ -218,7 +225,7 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
             apply_scope(scope, match)
             continue
         start_line = stripped.count("\n", 0, offset)
-        end = statement_end(stripped, match.end())
+        end = statement_end(structural, match.end())
         line_start = stripped.rfind("\n", 0, offset) + 1
         full = ".".join(part for part in (scope.prefix(), match.group(2)) if part)
         found.setdefault(full, []).append({
