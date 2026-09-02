@@ -150,6 +150,13 @@ def check_lean_scanner(fixture: Path) -> None:
         "theorem eight (nowhere : Nat) : nowhere = nowhere := rfl\n"
         "theorem nine : Id.run do let x ← pure True; return x := by decide\n"
         "theorem ten : (Id.run do let x ← pure 1; let y := x + 1; return y) = 2 := rfl\n"
+        "/-- Doc for eleven. -/\n"
+        "@[simp,\n"
+        "  reducible]\n"
+        "theorem eleven : True := trivial\n"
+        "/-- Not for twelve. -/\n"
+        "def helper : Nat := 1\n"
+        "theorem twelve : helper = 1 := rfl\n"
         "end Outer.Inner\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     expected = {
@@ -163,6 +170,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "Outer.Inner.eight": ("theorem eight (nowhere : Nat) : nowhere = nowhere", "", 26, 26),
         "Outer.Inner.nine": ("theorem nine : Id.run do let x ← pure True; return x", "", 27, 27),
         "Outer.Inner.ten": ("theorem ten : (Id.run do let x ← pure 1; let y := x + 1; return y) = 2", "", 28, 28),
+        "Outer.Inner.eleven": ("theorem eleven : True", "/-- Doc for eleven. -/", 32, 32),
+        "Outer.Inner.twelve": ("theorem twelve : helper = 1", "", 35, 35),
     }
     if set(found) != set(expected):
         raise SystemExit(f"scanner resolved {sorted(found)}")

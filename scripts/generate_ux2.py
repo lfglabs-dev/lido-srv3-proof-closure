@@ -138,11 +138,43 @@ def word_at(text: str, index: int, word: re.Pattern) -> bool:
         and text[index - 1] not in "_.'"
 
 
+def is_attribute_block(text: str) -> bool:
+    """Whether `text` is nothing but attribute groups such as `@[simp, reducible]`."""
+    rest = text.strip()
+    while rest:
+        if not rest.startswith("@["):
+            return False
+        depth = 0
+        for offset, char in enumerate(rest[1:], start=1):
+            depth += (char == "[") - (char == "]")
+            if depth == 0:
+                rest = rest[offset + 1:].strip()
+                break
+        else:
+            return False
+    return True
+
+
+def attribute_start(lines: list[str], declaration_line: int) -> int:
+    """First line of the attribute block directly above a declaration.
+
+    An attribute may span lines (`@[simp,` then `  reducible]`), so the block
+    is the longest run of lines above the declaration that is nothing but
+    attribute text; without one, the declaration line.
+    """
+    start = declaration_line
+    for index in range(declaration_line - 1, -1, -1):
+        line = lines[index].rstrip()
+        if not line.strip() or line.endswith("-/"):
+            break
+        if is_attribute_block("\n".join(lines[index:declaration_line])):
+            start = index
+    return start
+
+
 def doc_comment(lines: list[str], declaration_line: int) -> str:
     """The `/-- ... -/` block directly above a declaration, or an empty string."""
-    index = declaration_line - 1
-    while index >= 0 and lines[index].strip().startswith("@["):
-        index -= 1
+    index = attribute_start(lines, declaration_line) - 1
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
     stop = index
