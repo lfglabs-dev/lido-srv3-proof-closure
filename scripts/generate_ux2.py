@@ -47,7 +47,7 @@ DECLARATION = re.compile(
     r"(theorem)[ \t]+([^\s:({\[]+)", re.MULTILINE)
 MODIFIER_RUN = re.compile(
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
-SCOPE = re.compile(r"^[ \t]*(namespace|section|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
+SCOPE = re.compile(r"^[ \t]*(namespace|section|mutual|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")
@@ -75,7 +75,7 @@ class Scope:
         if not self.stack:
             fail("`end` without an open namespace or section")
         kind, opened = self.stack.pop()
-        if (name or "") != opened:
+        if name is not None and name != opened:
             fail(f"`end {name or ''}` closes `{kind} {opened}`")
 
     def prefix(self) -> str:
@@ -137,8 +137,20 @@ def binds_with_walrus(text: str, start: int) -> bool:
 
 def word_at(text: str, index: int, word: re.Pattern) -> bool:
     """True when `word` starts at `index` as a whole word, not inside an identifier."""
-    return bool(word.match(text, index)) and not text[index - 1].isalnum() \
-        and text[index - 1] not in "_.'"
+    match = word.match(text, index)
+    if match is None:
+        return False
+    before = text[index - 1] if index else ""
+    after = text[match.end()] if match.end() < len(text) else ""
+    return not before.isalnum() and before not in "_.'«" and after != "»"
+
+
+CHAR_LITERAL = re.compile(r"'(?:\\.|[^\\'\n])'")
+
+
+def mask_character_literals(text: str) -> str:
+    """Blank Lean character literals while retaining their source offsets."""
+    return CHAR_LITERAL.sub(lambda match: " " * len(match.group()), text)
 
 
 def is_attribute_block(text: str) -> bool:
@@ -181,9 +193,9 @@ def doc_comment(lines: list[str], declaration_line: int) -> str:
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
     stop = index
-    while index >= 0 and not lines[index].lstrip().startswith("/--"):
+    while index >= 0 and not lines[index].lstrip().startswith("/-"):
         index -= 1
-    if index < 0:
+    if index < 0 or not lines[index].lstrip().startswith("/--"):
         return ""
     return "\n".join(lines[index:stop + 1])
 
@@ -191,7 +203,7 @@ def doc_comment(lines: list[str], declaration_line: int) -> str:
 def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     """Map every fully qualified theorem in one file to its exact declaration."""
     text = path.read_text(encoding="utf-8")
-    stripped = check_proof_escapes.strip_comments_and_strings(text)
+    stripped = mask_character_literals(check_proof_escapes.strip_comments_and_strings(text))
     if stripped.count("\n") != text.count("\n"):
         fail(f"{path}: comment stripping changed the line structure")
     lines = text.splitlines()
@@ -456,6 +468,9 @@ def main() -> None:
               "and the Lean declarations")
         return
     (root / OUTPUT).mkdir(parents=True, exist_ok=True)
+    for path in (root / OUTPUT).glob("*.json"):
+        if path.name not in files:
+            path.unlink()
     for name, text in files.items():
         (root / OUTPUT / name).write_text(text, encoding="utf-8")
     print(f"generated {len(files)} files under {OUTPUT}")

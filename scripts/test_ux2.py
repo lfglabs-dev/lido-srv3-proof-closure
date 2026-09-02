@@ -79,7 +79,9 @@ def check_artifact_drift(fixture: Path) -> None:
     bogus = fixture / "audit/ux2/P-BOGUS.json"
     bogus.write_text("{}\n", encoding="utf-8")
     expect(fixture, "check", False, "artifacts no registry row derives")
-    bogus.unlink()
+    expect(fixture, "generate", True, "generated 12 files")
+    if bogus.exists():
+        raise SystemExit("generation left a stale UX2 JSON artifact behind")
 
     record.unlink()
     expect(fixture, "check", False, "P-ALLOC-1.json is missing")
@@ -190,6 +192,32 @@ def check_lean_scanner(fixture: Path) -> None:
         got = (record["statement"], record["doc"], record["start_line"], record["end_line"])
         if got != (statement, doc, start, end):
             raise SystemExit(f"{name}: scanner produced {got}")
+
+    module.write_text(
+        "namespace Outer\n"
+        "mutual\n"
+        "def mutual_helper : Nat := 1\n"
+        "end\n"
+        "theorem mutual_one : True := trivial\n"
+        "/-- helper documentation that must not attach below. -/\n"
+        "def helper : Nat := 1\n"
+        "/- implementation note -/\n"
+        "theorem plain : True := trivial\n"
+        "theorem char_open : '(' = '(' := rfl\n"
+        "variable («where» : Prop)\n"
+        "theorem escaped_where : «where» → «where» := id\n"
+        "end\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_edges = {
+        "Outer.mutual_one": ("theorem mutual_one : True", ""),
+        "Outer.plain": ("theorem plain : True", ""),
+        "Outer.char_open": ("theorem char_open : '(' = '('", ""),
+        "Outer.escaped_where": ("theorem escaped_where : «where» → «where»", ""),
+    }
+    for name, (statement, doc) in expected_edges.items():
+        (record,) = found[name]
+        if (record["statement"], record["doc"]) != (statement, doc):
+            raise SystemExit(f"{name}: scanner lost a valid Lean construct: {record}")
 
     module.write_text("end Nothing\n", encoding="utf-8")
     expect_scan_failure(fixture, module, "`end` without an open namespace")
