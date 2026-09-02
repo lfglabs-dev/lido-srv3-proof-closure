@@ -13,7 +13,9 @@ nonzero caller, every supplied owner, every amount, and **every chain of later
 1. the two-sided `_checkWithdrawalRequestAmount` bound (lines 395--402);
 2. the line-130 `msg.sender` fallback as the exact created owner;
 3. an owner that is never the zero address after any number of hops; and
-4. an owner-operated authorization obligation on every executed hop.
+4. `OwnerOperated`: every executed hop was operated by the owner of the state
+   it started from (its `fromAddr` is that pre-state owner and its caller is
+   that address) and moved the request to a distinct nonzero recipient.
 
 **This is not a broad ERC-20 or token guarantee.**  `approve`, allowance
 state, `STETH.transferFrom` at line 134, `getSharesByPooledEth` at line 376,

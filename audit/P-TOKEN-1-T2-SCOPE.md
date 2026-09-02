@@ -66,6 +66,7 @@ Each mutant deletes exactly one source guard and refutes the **same**
 | `zero_recipient_drop_kill_line_refutes_exact_parent` | `WithdrawalQueueERC721.sol:231` | conjunct 3 — a live request is burned to `address(0)` |
 | `caller_authorization_drop_kill_line_refutes_exact_parent` | `WithdrawalQueueERC721.sol:241-245` | conjunct 4 — account 9 moves account 7's request |
 | `owner_fallback_drop_kill_line_refutes_exact_parent` | `WithdrawalQueue.sol:130` | conjunct 3 — the request is created ownerless |
+| `owner_guard_drop_kill_line_refutes_exact_parent` | `WithdrawalQueueERC721.sol:238` | conjunct 4 — account 5 moves account 7's request from a state it does not own; `OwnerOperated` ties each hop's `fromAddr` to its pre-state owner |
 
 Non-vacuity is separate and explicit:
 `custody_premises_inhabited` and `supplied_owner_premises_inhabited` exhibit

@@ -251,6 +251,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.zero_recipient_drop_kill_line_refutes_exact_parent
 #print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.caller_authorization_drop_kill_line_refutes_exact_parent
 #print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.owner_fallback_drop_kill_line_refutes_exact_parent
+#print axioms LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants.owner_guard_drop_kill_line_refutes_exact_parent
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_mint_and_cap
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_entry_source_domain
 #print axioms LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_live_computed_mint

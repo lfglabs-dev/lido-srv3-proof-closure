@@ -9,7 +9,7 @@ Each mutant below deletes exactly one guard of the pinned source at
 composition, so the parent is not tautological on either leg.
 
 These regressions say nothing about approve, ERC-20 movement, redemption, or
-any other token surface; they are confined to the two modeled guards.
+any other token surface; they are confined to the modeled guards.
 -/
 
 namespace LidoSRv3.Tests.WithdrawalQueueRequestCustodyMutants
@@ -64,7 +64,33 @@ theorem caller_authorization_drop_kill_line_refutes_exact_parent :
   intro h
   have hStep := h witnessMint witnessMint_binds_owner 7 0 minStethWithdrawalAmount 7
     [⟨9, 7, 3⟩] { owner := 3, approved := 0 } (by decide) (by decide) (by decide)
-  exact absurd (hStep.2.2.2.2 ⟨9, 7, 3⟩ (by simp)).1 (by decide)
+  have hOp := hStep.2.2.2.2
+  unfold OwnerOperated at hOp
+  exact absurd hOp.2.1 (by decide)
+
+/-- Mutant D: `WithdrawalQueueERC721.sol:238`'s owner check
+(`_getRequestOwner(_requestId) == _from`) is deleted; the zero-recipient,
+self-transfer, and caller-authorization guards are retained verbatim. -/
+def sourceTransferOwnerGuardDropped
+    (caller fromAddr to : Nat) (s : State) : Option State :=
+  if to = 0 then none
+  else if to = fromAddr then none
+  else if caller != fromAddr then none
+  else some { owner := to, approved := 0 }
+
+/-- Exact-parent kill-line D. Account 5 moves account 7's request from a state
+it does not own; the hop's `fromAddr` differs from the pre-state owner, which
+refutes the parent's `OwnerOperated` conjunct. A per-step conjunct that did
+not look at the pre-state owner could not be refuted by this mutant. -/
+theorem owner_guard_drop_kill_line_refutes_exact_parent :
+    ¬ RequestOwnerCustodyInvariant
+        requestWithdrawalsSingleControl sourceTransferOwnerGuardDropped := by
+  intro h
+  have hStep := h witnessMint witnessMint_binds_owner 7 0 minStethWithdrawalAmount 7
+    [⟨5, 5, 9⟩] { owner := 9, approved := 0 } (by decide) (by decide) (by decide)
+  have hOp := hStep.2.2.2.2
+  unfold OwnerOperated at hOp
+  exact absurd hOp.1 (by decide)
 
 /-- Mutant C: `WithdrawalQueue.sol:130`'s `msg.sender` owner fallback is
 deleted; the two-sided amount check at lines 395-402 is retained. -/

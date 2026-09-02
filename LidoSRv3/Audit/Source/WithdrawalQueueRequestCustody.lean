@@ -16,8 +16,11 @@ withdrawal-request surface at
 The composed parent is a multi-step reachability statement, not the
 conjunction of the two slices: for **any** number of subsequent custody hops
 it fixes the created owner, keeps the two-sided amount bound, and shows that
-every hop that executed was owner-operated to a fresh nonzero recipient, so
-the request never becomes ownerless.
+every hop that executed was operated by the owner of the state it started
+from, to a fresh nonzero recipient, so the request never becomes ownerless.
+The per-hop obligation is `OwnerOperated`, a recursive predicate over the
+intermediate states, so the line-238 owner guard is load-bearing for the
+parent (`owner_guard_drop_kill_line_refutes_exact_parent`).
 
 The unmodeled owner binding performed by `_enqueue` and `_emitTransfer`
 (lines 378 and 380) is an explicit universally quantified `mint` argument with
@@ -58,6 +61,23 @@ def applySteps (transfer : Address → Address → Address → State → Option 
       | none => none
       | some s' => applySteps transfer s' rest
 
+/-- Every hop was operated by the owner of the state it started from.  Stated
+by recursion over the chain so the intermediate states are part of the claim:
+a hop's `fromAddr` is the owner of its pre-state (line 238), its caller is that
+same address (lines 241--245), it moves the request to a distinct nonzero
+recipient (lines 231--232), and whatever state the transfer returns, the rest
+of the chain is owner-operated from there.  A per-step conjunct that never
+looked at the pre-state owner would let a transfer without the line-238 guard
+satisfy the parent, which is exactly what this definition forbids. -/
+def OwnerOperated (transfer : Address → Address → Address → State → Option State) :
+    State → List Step → Prop
+  | _, [] => True
+  | s, step :: rest =>
+      step.fromAddr = s.owner ∧ step.caller = step.fromAddr ∧
+        step.to ≠ 0 ∧ step.to ≠ step.fromAddr ∧
+        ∀ s', transfer step.caller step.fromAddr step.to s = some s' →
+          OwnerOperated transfer s' rest
+
 /-- **The P-TOKEN-1 parent predicate.**  Universal over the unmodeled minting
 function, the request inputs, and an arbitrary chain of later custody hops. -/
 def RequestOwnerCustodyInvariant
@@ -72,8 +92,7 @@ def RequestOwnerCustodyInvariant
         amount ≤ maxStethWithdrawalAmount ∧
         owner = resolvedOwner caller suppliedOwner ∧
         final.owner ≠ 0 ∧
-        ∀ step ∈ steps,
-          step.caller = step.fromAddr ∧ step.to ≠ 0 ∧ step.to ≠ step.fromAddr
+        OwnerOperated transfer (mint owner) steps
 
 /-- Inversion of the pinned owner-operated branch: a hop that returned a state
 passed the four modeled guards -- the zero-recipient check at line 231, the
@@ -99,30 +118,32 @@ theorem sourceTransfer_some
   · simp [sourceTransfer, h1, h2, h3] at h
 
 /-- Custody preservation over an arbitrary hop chain: ownership never reaches
-the zero address and every executed hop was operated by the current owner. -/
+the zero address and every executed hop was operated by the owner of the
+state it started from. -/
 theorem custody_chain_preserved :
     ∀ (steps : List Step) (s final : State), s.owner ≠ 0 →
       applySteps sourceTransfer s steps = some final →
-        final.owner ≠ 0 ∧ ∀ step ∈ steps,
-          step.caller = step.fromAddr ∧ step.to ≠ 0 ∧ step.to ≠ step.fromAddr
+        final.owner ≠ 0 ∧ OwnerOperated sourceTransfer s steps
   | [], s, final, hOwner, h => by
       simp only [applySteps, Option.some.injEq] at h
-      exact ⟨h ▸ hOwner, by simp⟩
+      exact ⟨h ▸ hOwner, by unfold OwnerOperated; trivial⟩
   | step :: rest, s, final, hOwner, h => by
       simp only [applySteps] at h
       cases hStep : sourceTransfer step.caller step.fromAddr step.to s with
       | none => rw [hStep] at h; exact absurd h (by simp)
       | some s' =>
           rw [hStep] at h
-          obtain ⟨hTo, hSelf, _, hCaller, hState⟩ :=
+          obtain ⟨hTo, hSelf, hFrom, hCaller, hState⟩ :=
             sourceTransfer_some step.caller step.fromAddr step.to s s' hStep
           have hOwner' : s'.owner ≠ 0 := by rw [hState]; exact hTo
           obtain ⟨hFinal, hRest⟩ := custody_chain_preserved rest s' final hOwner' h
           refine ⟨hFinal, ?_⟩
-          intro other hOther
-          rcases List.mem_cons.mp hOther with hEq | hIn
-          · exact hEq ▸ ⟨hCaller, hTo, hSelf⟩
-          · exact hRest other hIn
+          unfold OwnerOperated
+          refine ⟨hFrom.symm, hCaller, hTo, hSelf, ?_⟩
+          intro s'' hs
+          rw [hStep] at hs
+          injection hs with hs
+          exact hs ▸ hRest
 
 /-- The created owner is never the zero address: the line-130 fallback selects
 a nonzero caller, and an explicitly supplied owner is nonzero by definition of
