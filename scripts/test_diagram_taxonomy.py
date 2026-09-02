@@ -1,0 +1,956 @@
+#!/usr/bin/env python3
+"""Fail-closed mutants for the architecture-map taxonomy checker."""
+
+import importlib.util
+import re
+import shutil
+import subprocess
+import tempfile
+from itertools import combinations
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+CHECKER = "scripts/check_diagram_taxonomy.py"
+DIAGRAM = "diagram/index.html"
+DIAGRAM_README = "diagram/README.md"
+# The checker reduces the README to the text a reader is shown through the
+# shared link-metadata reducer, so the fixture tree must carry it.
+READER = "scripts/markdown_text.py"
+
+
+def _load_checker():
+    """Drive the family loops from the checker's own tables.
+
+    Naming the mutated entities by hand let a table entry added later inherit
+    coverage it never had: the suite kept asserting the same three samples while
+    the gate had grown to eight.  Reading the tables here means a new entry
+    arrives with its adversarial cases already demanded.
+    """
+    spec = importlib.util.spec_from_file_location("_diagram_checker", ROOT / CHECKER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+CHECK = _load_checker()
+
+NODE = re.compile(r'<g class="node ([a-z]+)"(.*?)</g>', re.DOTALL)
+CARD = re.compile(r'<div class="c ([a-z]+)"><div class="n">(.*?)</div>(.*?</div>)</div>')
+NODE_LABEL = re.compile(r'(<text class="nm"[^>]*>)(.*?)(</text>)', re.DOTALL)
+
+REWORDED = "Reworded box"
+
+
+def excise(diagram, pattern, needle, surface):
+    """Delete the single node or card that carries `needle`, leaving the rest."""
+    matches = [m for m in pattern.finditer(diagram) if needle in m.group(0)]
+    if len(matches) != 1:
+        raise AssertionError(f"expected one {surface} carrying {needle!r}, got {len(matches)}")
+    return diagram[:matches[0].start()] + diagram[matches[0].end():]
+
+
+def drop_node(diagram, needle):
+    return excise(diagram, NODE, needle, "node")
+
+
+def drop_card(diagram, needle):
+    return excise(diagram, CARD, needle, "card")
+
+
+def sole(diagram, pattern, forms, surface):
+    """The one box on `surface` carrying any spelling in `forms`."""
+    matches = [m for m in pattern.finditer(diagram)
+               if any(form in m.group(0).lower() for form in forms)]
+    if len(matches) != 1:
+        raise AssertionError(f"expected one {surface} carrying {forms!r}, got {len(matches)}")
+    return matches[0]
+
+
+def address_forms(address):
+    return (address.lower(), CHECK.abbreviated(address).lower())
+
+
+def rewrite_address(text, one, other):
+    """Rewrite `one`'s address as `other`'s, in both the full and short spelling."""
+    swapped = text.replace(one, other).replace(CHECK.abbreviated(one),
+                                               CHECK.abbreviated(other))
+    if swapped == text:
+        raise AssertionError(f"rewriting {one} as {other} changed nothing")
+    return swapped
+
+
+def exchange(diagram, one, other):
+    """Swap two entities' addresses wherever the map draws them, both spellings."""
+    hold = "0x" + "f" * 40
+    swapped = diagram
+    for source, target in ((one, hold), (other, one), (hold, other)):
+        swapped = rewrite_address(swapped, source, target)
+    return swapped
+
+
+def wrong_class(expected):
+    # Never `cl` (that trips the consensus-layer rule first) and never the
+    # expected class, so the repaint is the only thing the gate can object to.
+    return "com" if expected != "com" else "el"
+
+
+def reword_node(match, kind):
+    body = NODE_LABEL.sub(lambda m: m.group(1) + REWORDED + m.group(3), match.group(0), count=1)
+    return body.replace(f'<g class="node {match.group(1)}"', f'<g class="node {kind}"', 1)
+
+
+def reword_card(match, kind):
+    return match.group(0).replace(
+        f'<div class="c {match.group(1)}"><div class="n">{match.group(2)}</div>',
+        f'<div class="c {kind}"><div class="n">{REWORDED}</div>', 1)
+
+
+def splice(diagram, match, replacement):
+    return diagram[:match.start()] + replacement + diagram[match.end():]
+
+
+def invoke(root, ok, needle=None):
+    result = subprocess.run(
+        ["python3", CHECKER], cwd=root,
+        text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    if (result.returncode == 0) != ok:
+        raise AssertionError(f"unexpected rc={result.returncode}:\n{result.stdout}")
+    if needle and needle not in result.stdout:
+        raise AssertionError(f"missing {needle!r}:\n{result.stdout}")
+
+
+def main():
+    with tempfile.TemporaryDirectory(prefix="diagram-taxonomy-mutants-") as tmp:
+        fixture = Path(tmp)
+        for relative in (CHECKER, READER, DIAGRAM, DIAGRAM_README):
+            target = fixture / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, target)
+
+        diagram_path = fixture / DIAGRAM
+        readme_path = fixture / DIAGRAM_README
+        checker_path = fixture / CHECKER
+        diagram = diagram_path.read_text(encoding="utf-8")
+        readme = readme_path.read_text(encoding="utf-8")
+        checker = checker_path.read_text(encoding="utf-8")
+
+        invoke(fixture, True, "diagram taxonomy ok")
+
+        # Each mutant is a way the map could quietly go back to the reading the
+        # UX1 correction removed.
+        for mutated, needle in (
+            # A system predeploy repainted as consensus layer: it would read as
+            # sitting outside the EL trust boundary.
+            (diagram.replace('<div class="c sys"><div class="n">EIP-4788 / 7002 / 7251</div>',
+                             '<div class="c cl"><div class="n">EIP-4788 / 7002 / 7251</div>'),
+             "is drawn as 'cl', must be 'sys'"),
+            (diagram.replace('<g class="node sys" data-flows="f3 f6">',
+                             '<g class="node cl" data-flows="f3 f6">'),
+             "is drawn as 'cl', must be 'sys'"),
+            # An oracle repainted as quorum-held: the committee would appear to
+            # live somewhere other than HashConsensus.
+            (diagram.replace('<div class="c el"><div class="n">AccountingOracle</div>',
+                             '<div class="c com"><div class="n">AccountingOracle</div>'),
+             "is drawn as 'com', must be 'el'"),
+            # HashConsensus demoted to a plain contract.
+            (diagram.replace('<div class="c com"><div class="n">HashConsensus</div>',
+                             '<div class="c el"><div class="n">HashConsensus</div>'),
+             "is drawn as 'el', must be 'com'"),
+            # The consolidation veto handed back to the DSM guardians.
+            (diagram.replace("the committee's veto window", "the guardians' veto window"),
+             "the consolidation veto is the committee's REMOVE_ROLE"),
+            # The same reattribution, retypeset.  A curly apostrophe reads
+            # identically and used to slip the banned ASCII spelling on every
+            # surface at once, so the wording rule has to fold typography first.
+            (diagram.replace("committee's veto window", "guardians’ veto window"),
+             "the consolidation veto is the committee's REMOVE_ROLE"),
+            # The window handed to a holder the banned list never names.  Banning
+            # spellings only removes the ones enumerated, so each surface has to
+            # name the committee affirmatively instead.
+            (diagram.replace("committee's veto window", "DSM's veto window"),
+             "names the committee as its owner only 0 time(s)"),
+            # Only the notes card reattributed.  The canvas spells the owner
+            # `consolidation committee's`, so this leaves that surface intact and
+            # fails only if the notes are read as their own surface.
+            (diagram.replace("the committee's veto window", "the DSM's veto window"),
+             "the notes cards raises the veto window"),
+            # The quorum restated as a constant.
+            (diagram.replace("handleOracleReport", "handleOracleReport · 5/9 quorum"),
+             "quorum lives in HashConsensus"),
+            # EasyTrack's allow-only power restated as a veto.
+            (diagram.replace("the executor is the sole grantee",
+                             "vetoable motions; the executor is the sole grantee"),
+             "EasyTrack holds ALLOW_PAIR_ROLE only"),
+            # The two beacon-proof verifiers conflated again.  Both spellings
+            # survive a document-wide substring check when one is rewritten to
+            # the other, so this has to be caught where the claim is made.
+            (diagram.replace("CLValidatorVerifier", "CLProofVerifier"),
+             "attributes 'CLProofVerifier' to TopUpGateway"),
+            # An on-chain box that no longer says where it comes from.
+            (diagram.replace(
+                '<g class="node com" data-flows="f4 f5 f7"><title>',
+                '<g class="node com" data-flows="f4 f5 f7"><notitle>', 1),
+             "carries no hover tooltip"),
+            # The relabelling bypass.  Reformatting a label used to drop that
+            # box's taxonomy entry and its rule with it, so a repaint rode
+            # through unnoticed.  The address does not move when the wording
+            # does, so the class must still be enforced against it.
+            (diagram.replace('<g class="node el" data-flows="f4 f5 f7"><title>0x852deD',
+                             '<g class="node com" data-flows="f4 f5 f7"><title>0x852deD', 1)
+                    .replace('<text class="nm" x="850" y="160">AccountingOracle</text>',
+                             '<text class="nm" x="850" y="160">Accounting Oracle</text>', 1),
+             "AccountingOracle (0x852deD011285fe67063a08005c71a85690503Cee) "
+             "is drawn as 'com' under the label 'Accounting Oracle', must be 'el'"),
+            # The same bypass on the notes card, which carries the abbreviated
+            # address rather than the full one.
+            (diagram.replace('<div class="c el"><div class="n">AccountingOracle</div>',
+                             '<div class="c com"><div class="n">Accounting Oracle</div>', 1),
+             "AccountingOracle (0x852deD011285fe67063a08005c71a85690503Cee) is drawn as 'com'"),
+            # A renamed predeploy repainted as quorum-held.
+            (diagram.replace('<div class="c sys"><div class="n">EIP-4788 / 7002 / 7251</div>',
+                             '<div class="c com"><div class="n">Beacon roots and requests</div>', 1),
+             "EIP-4788 beacon roots (0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02) "
+             "is drawn as 'com'"),
+            # A renamed committee demoted to a plain contract.
+            (diagram.replace('<div class="c com"><div class="n">HashConsensus</div>',
+                             '<div class="c el"><div class="n">Hash Consensus</div>', 1),
+             "HashConsensus (0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288) is drawn as 'el'"),
+            # The rendered legend restating one compromise consequence for the
+            # whole `bot` class.  This is the surface the reader looks at, so a
+            # corrected README does not excuse it.
+            (diagram.replace("off-chain · cannot redirect principal",
+                             "off-chain · liveness only", 1),
+             "the `bot` legend pill reads 'liveness only'"),
+            (diagram.replace("off-chain · cannot redirect principal",
+                             "off-chain · liveness, not funds", 1),
+             "the `bot` legend pill reads 'liveness, not funds'"),
+            # The pill stripped back to a bare colour swatch: the class-wide
+            # reading would return by omission rather than by wording.
+            (re.sub(r'<span class="bot"[^>]*>', '<span class="bot">', diagram, count=1),
+             "the `bot` legend pill never mentions 'Node operators'"),
+            # The qualification must survive on the map as a claim and not just
+            # as a name: the slashable consequence is the part that breaks the
+            # liveness-only reading of the node operators' signing keys.
+            (diagram.replace("can sign slashable messages", "can be rotated"),
+             "the `bot` legend pill never mentions 'slashable'"),
+            # A taxonomy-critical entity that leaves the map entirely: its rule
+            # must not retire quietly along with it.
+            (diagram.replace("0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288", f"0x{'0' * 40}")
+                    .replace("0xD624…B288", "0x0000…0000"),
+             "the map no longer identifies HashConsensus"),
+            # The same entity dropped from one surface only.  Searching the
+            # canvas and the notes cards together let whichever surface survived
+            # vouch for the one that did not, so the primary drawing could lose
+            # a box while its card kept the gate green.  Each surface is
+            # asserted separately, in both directions.
+            (drop_node(diagram, "0x852deD"),
+             "the map no longer identifies AccountingOracle "
+             "(0x852deD011285fe67063a08005c71a85690503Cee) on the canvas"),
+            (drop_card(diagram, "0x852d"),
+             "the map no longer identifies AccountingOracle "
+             "(0x852deD011285fe67063a08005c71a85690503Cee) on the notes cards"),
+            # A predeploy is drawn as one node but named by three addresses;
+            # dropping that node must strand every identity bound to it rather
+            # than only the one that happens to be checked first.
+            (drop_node(diagram, "0x00000961Ef480Eb55e80D19ad83579A64c007002"),
+             "on the canvas"),
+            # The two oracles exchange deployed addresses on both surfaces at
+            # once.  Both are `el`, so every class rule stays satisfied and the
+            # entity set is unchanged; what moves is which contract each box
+            # tells a reader to look up, and both boxes now publish against the
+            # wrong one.  Reading only the class of the box an address turned up
+            # in could not see this at all.
+            (exchange(diagram,
+                      "0x852deD011285fe67063a08005c71a85690503Cee",
+                      "0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e"),
+             "AccountingOracle (0x852deD011285fe67063a08005c71a85690503Cee) is published "
+             "on the canvas under the label 'ValidatorsExitBus'"),
+        ):
+            if mutated == diagram:
+                raise AssertionError(f"diagram mutant for {needle!r} changed nothing")
+            diagram_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, False, needle)
+            diagram_path.write_text(diagram, encoding="utf-8")
+
+        # Every address-bound entity, not just the three sampled above, must
+        # survive a relabelling repaint and a deletion on each surface
+        # independently.  The label is rewritten in each repaint so that only
+        # the address can be what catches it.
+        family = []
+        for address, (entity, expected, _labels) in CHECK.IDENTITY.items():
+            forms = address_forms(address)
+            kind = wrong_class(expected)
+            for surface, pattern, reword in (
+                ("canvas", NODE, reword_node),
+                ("notes cards", CARD, reword_card),
+            ):
+                box = sole(diagram, pattern, forms, surface)
+                family.append((
+                    splice(diagram, box, reword(box, kind)),
+                    f"is drawn as {kind!r} under the label {REWORDED!r}",
+                ))
+                family.append((
+                    splice(diagram, box, ""),
+                    f"{entity} ({address})",
+                ))
+                # An entity wrapped in an HTML comment is invisible to a
+                # reader; the checker must not count it as present.
+                family.append((
+                    splice(diagram, box, f"<!-- {box.group(0)} -->"),
+                    f"{entity} ({address})",
+                ))
+                # Adversarial (certified defect 5 family): each surface owes one
+                # form of the address.  Accepting either form on either surface
+                # made them interchangeable, so a canvas tooltip rewritten to the
+                # card's elision left this gate reporting the entity bound while
+                # the canvas published no address a reader could look up — and a
+                # card rewritten to the full form loses the spelling the card is
+                # laid out for.  Both directions are driven, per entity and per
+                # surface, from the checker's own form table.
+                other = (CHECK.ABBREVIATED if CHECK.SURFACE_FORM[surface] == CHECK.FULL
+                         else CHECK.FULL)
+                elided_box = (box.group(0).replace(address, CHECK.abbreviated(address))
+                              if other == CHECK.ABBREVIATED
+                              else box.group(0).replace(CHECK.abbreviated(address), address))
+                if elided_box == box.group(0):
+                    raise AssertionError(
+                        f"address-form mutant for {entity} on the {surface} changed nothing")
+                family.append((
+                    splice(diagram, box, elided_box),
+                    f"on the {surface}, only the {other} address of {entity} "
+                    f"({address}) is printed",
+                ))
+                # An address extended by an adjacent character is a different,
+                # invalid address; substring containment accepts it while
+                # token-boundary matching does not.  The extension is not
+                # always a hex digit: a boundary class of hex alone let `g`,
+                # `z`, `Z`, `_` and `X` through, so the published token read
+                # `0x852d…3Ceeg` while this gate still reported success.  Both
+                # forms are extended together and then each one alone, because
+                # locating an entity accepts either form: with only the pair
+                # corrupted, an intact tooltip could vouch for a corrupted
+                # visible row and the reader-facing surface would go unchecked.
+                abbr = CHECK.abbreviated(address)
+                for suffix in ("0", "a", "f", "g", "z", "Z", "_", "X"):
+                    for what, extended_box in (
+                        ("both forms", box.group(0)
+                            .replace(address, address + suffix)
+                            .replace(abbr, abbr + suffix)),
+                        ("full form", box.group(0)
+                            .replace(address, address + suffix)),
+                        ("abbreviated form", box.group(0)
+                            .replace(abbr, abbr + suffix)),
+                    ):
+                        if extended_box == box.group(0):
+                            continue
+                        family.append((
+                            splice(diagram, box, extended_box),
+                            f"{entity}",
+                        ))
+                # A character prepended to the token corrupts it just as a
+                # trailing one does, and the boundary must hold on both sides.
+                for prefixed_box in (box.group(0).replace(address, "X" + address),
+                                     box.group(0).replace(abbr, "X" + abbr)):
+                    if prefixed_box != box.group(0):
+                        family.append((
+                            splice(diagram, box, prefixed_box),
+                            f"{entity}",
+                        ))
+                # The continuation need not be written as a literal character.
+                # A character reference is punctuation to a regex and a letter
+                # on the page, so `…3Cee&#103;` shows a clean boundary in the
+                # source while the map publishes `0x852d…3Ceeg`; the boundary
+                # has to be judged on what is rendered, in decimal and hex
+                # spellings alike, and on each form alone as well as together.
+                for reference in ("&#103;", "&#x67;", "&#48;"):
+                    for referenced_box in (
+                        box.group(0).replace(address, address + reference)
+                                    .replace(abbr, abbr + reference),
+                        box.group(0).replace(address, address + reference),
+                        box.group(0).replace(abbr, abbr + reference),
+                    ):
+                        if referenced_box == box.group(0):
+                            continue
+                        family.append((
+                            splice(diagram, box, referenced_box),
+                            f"{entity}",
+                        ))
+                # A corrupted publication printed beside an intact one.  Asking
+                # whether *some* standalone occurrence exists let the good form
+                # answer for the bad, so a box could draw
+                # `0x852d…3Cee · 0x852d…3Ceeg` — an address a reader copies and
+                # fails to look up — with this gate still reporting success.
+                # Each occurrence has to be judged on its own boundaries.
+                for form in (address, abbr):
+                    beside = box.group(0).replace(form, f"{form} · {form}g", 1)
+                    if beside == box.group(0):
+                        continue
+                    family.append((
+                        splice(diagram, box, beside),
+                        f"{entity}",
+                    ))
+
+        # The same exchange read as a family, one surface at a time.  Every
+        # same-class pair the checker's own table carries is swapped, so a pair
+        # added later arrives with its adversarial case already demanded, and
+        # each surface is asserted alone: a swap confined to the notes cards
+        # leaves the canvas correct, and a check that read the two surfaces
+        # together would let the intact one vouch for the corrupted one.  A pair
+        # drawn inside one box on a surface is skipped there — the combined
+        # predeploy node names three addresses under a single label, so
+        # exchanging two of them inside it changes nothing a reader could read.
+        exchanges = 0
+        for surface, pattern in (("canvas", NODE), ("notes cards", CARD)):
+            for left, right in combinations(CHECK.IDENTITY, 2):
+                left_entity, left_class, left_labels = CHECK.IDENTITY[left]
+                _, right_class, right_labels = CHECK.IDENTITY[right]
+                if left_class != right_class:
+                    continue
+                if left_labels[surface] == right_labels[surface]:
+                    continue
+                left_box = sole(diagram, pattern, address_forms(left), surface)
+                right_box = sole(diagram, pattern, address_forms(right), surface)
+                mutated = diagram.replace(
+                    left_box.group(0), rewrite_address(left_box.group(0), left, right), 1)
+                mutated = mutated.replace(
+                    right_box.group(0), rewrite_address(right_box.group(0), right, left), 1)
+                # IDENTITY is walked in table order within a surface, so the
+                # earlier entry of the pair is the one that answers.
+                family.append((mutated,
+                               f"{left_entity} ({left}) is published on the {surface} "
+                               f"under the label {right_labels[surface]!r}"))
+                exchanges += 1
+        if not exchanges:
+            raise AssertionError("no same-class address exchange was constructed, so the "
+                                 "family asserts nothing")
+
+        # The proof-gated boxes carry no address, so the label each surface
+        # wears is the only handle their class rule has.  Repainting one,
+        # deleting it, or merely rewording it must each fail closed on that
+        # surface alone — the combined `Consolidation pipeline` canvas node and
+        # the `ConsolidationGateway` card are the same entity spelled two ways,
+        # and neither spelling may vouch for the other.
+        for surface, pattern, reword, label_of, prefix in (
+            ("canvas", NODE, reword_node,
+             lambda m: NODE_LABEL.search(m.group(2)).group(2).strip(), "node "),
+            ("notes cards", CARD, reword_card, lambda m: m.group(2).strip(), "c "),
+        ):
+            for label, expected in CHECK.SURFACE_REQUIRED[surface].items():
+                # Match the box's own label field: the same name also occurs in
+                # neighbouring prose, which is not what carries the class.
+                boxes = [m for m in pattern.finditer(diagram) if label_of(m) == label]
+                if len(boxes) != 1:
+                    raise AssertionError(
+                        f"expected one {surface} box labelled {label!r}, got {len(boxes)}")
+                box = boxes[0]
+                repainted = wrong_class(expected)
+                family.append((
+                    splice(diagram, box, box.group(0).replace(
+                        f'"{prefix}{expected}"', f'"{prefix}{repainted}"', 1)),
+                    f"{label!r} is drawn as {repainted!r}, must be {expected!r}",
+                ))
+                family.append((
+                    splice(diagram, box, ""),
+                    f"{label!r} is no longer drawn on the {surface}",
+                ))
+                family.append((
+                    splice(diagram, box, reword(box, expected)),
+                    f"{label!r} is no longer drawn on the {surface}",
+                ))
+
+        # Which verifier a gateway inherits is a per-box claim, and requiring
+        # both names as document-wide substrings could not read it: exchanging
+        # the pair leaves both spellings in place, and dropping one from a
+        # gateway box leaves it cited on the unrelated EIP-4788 box.  Every
+        # gateway box is driven from the checker's own tables and put through
+        # all three families — the verifier relocated off the box, the sibling's
+        # verifier claimed in its place, and both claimed at once.
+        for surface, pattern, label_of in (
+            ("canvas", NODE, lambda m: NODE_LABEL.search(m.group(2)).group(2).strip()),
+            ("notes cards", CARD, lambda m: m.group(2).strip()),
+        ):
+            for label, gateway in CHECK.VERIFIER_SURFACE[surface].items():
+                verifier = CHECK.GATEWAY_VERIFIER[gateway]
+                sibling = next(v for g, v in CHECK.GATEWAY_VERIFIER.items() if g != gateway)
+                boxes = [m for m in pattern.finditer(diagram) if label_of(m) == label]
+                if len(boxes) != 1:
+                    raise AssertionError(
+                        f"expected one {surface} box labelled {label!r}, got {len(boxes)}")
+                box = boxes[0]
+                body = box.group(0)
+                misattributed = (f"the {label!r} box on the {surface} attributes "
+                                 f"{sibling!r} to {gateway}")
+                family.append((
+                    splice(diagram, box, body.replace(verifier, "its own verifier")),
+                    f"the {label!r} box on the {surface} never names {verifier!r}",
+                ))
+                family.append((
+                    splice(diagram, box, body.replace(verifier, sibling)),
+                    misattributed,
+                ))
+                family.append((
+                    splice(diagram, box, body.replace(verifier, f"{verifier} and {sibling}", 1)),
+                    misattributed,
+                ))
+                # A verifier name hidden in an HTML comment is not visible to a
+                # reader and must not count as a published claim: the box must
+                # spell it in rendered text, not in a comment the reader never sees.
+                family.append((
+                    splice(diagram, box, body.replace(verifier, f"<!-- {verifier} -->")),
+                    f"the {label!r} box on the {surface} never names {verifier!r}",
+                ))
+
+        # The consensus-layer rule is one claim with two halves: nothing else may
+        # be painted `cl`, and the validator set must keep it.  Only the first
+        # was enforced, so repainting the sole genuine `cl` entity — or deleting
+        # it outright — left the legend and the documentation intact with this
+        # gate still reporting success.  The validator set carries no address, so
+        # no IDENTITY rule can catch the repaint on its behalf.  Every class it
+        # could be repainted to is driven from the checker's own table, so a
+        # class added later arrives with its adversarial case already demanded.
+        for label in CHECK.CONSENSUS_LAYER:
+            boxes = [m for m in NODE.finditer(diagram)
+                     if NODE_LABEL.search(m.group(2)).group(2).strip() == label]
+            if len(boxes) != 1:
+                raise AssertionError(
+                    f"expected one canvas box labelled {label!r}, got {len(boxes)}")
+            box = boxes[0]
+            needle = f"[{label!r}] is not drawn as consensus layer"
+            for kind in CHECK.CLASSES:
+                if kind == "cl":
+                    continue
+                family.append((
+                    splice(diagram, box,
+                           box.group(0).replace('"node cl"', f'"node {kind}"', 1)),
+                    needle,
+                ))
+            family.append((splice(diagram, box, ""), needle))
+            # Merely rewording it keeps the colour but retires the name the rule
+            # is keyed to, so the other half of the same claim has to catch it.
+            family.append((
+                splice(diagram, box, reword_node(box, "cl")),
+                f"{REWORDED!r} is drawn as consensus layer; only",
+            ))
+
+        # A reworded label must not retire its class rule.  Renaming a box while
+        # leaving its address and its colour untouched is now caught by the
+        # address-to-label binding, which is the stronger reading: the address
+        # is published under a name that is not its entity's.
+        renamed = next(m for m in NODE.finditer(diagram)
+                       if NODE_LABEL.search(m.group(2)).group(2).strip() == "EIP-4788")
+        family.append((
+            splice(diagram, renamed, reword_node(renamed, "sys")),
+            f"is published on the canvas under the label {REWORDED!r}",
+        ))
+
+        for mutated, needle in family:
+            if mutated == diagram:
+                raise AssertionError(f"family mutant for {needle!r} changed nothing")
+            diagram_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, False, needle)
+            diagram_path.write_text(diagram, encoding="utf-8")
+
+        # The taxonomy-coverage rule is a separate claim from the address
+        # binding, and every name it guards happens to sit on an address-bound
+        # box, so the binding answers first for all of them and would leave the
+        # coverage rule unasserted.  Following the rename through the checker's
+        # own table satisfies the binding and isolates it: the entity is then
+        # correctly identified under its new name, and only the coverage rule is
+        # left to object that a TAXONOMY name has stopped being drawn.
+        followed = checker.replace('{"canvas": "EIP-4788",',
+                                   f'{{"canvas": "{REWORDED}",', 1)
+        if followed == checker:
+            raise AssertionError("checker IDENTITY label mutant changed nothing")
+        checker_path.write_text(followed, encoding="utf-8")
+        diagram_path.write_text(splice(diagram, renamed, reword_node(renamed, "sys")),
+                                encoding="utf-8")
+        invoke(fixture, False,
+               "taxonomy name(s) ['EIP-4788'] are no longer drawn on either surface")
+        checker_path.write_text(checker, encoding="utf-8")
+        diagram_path.write_text(diagram, encoding="utf-8")
+
+        # An IDENTITY entry that names only one surface would skip the binding
+        # on the other rather than enforce it, so an entry added later must be
+        # refused at load rather than silently half-bound.
+        halved = checker.replace(', "notes cards": "EIP-4788 / 7002 / 7251"}),\n'
+                                 '    "0x00000961', '}),\n    "0x00000961', 1)
+        if halved == checker:
+            raise AssertionError("checker IDENTITY surface mutant changed nothing")
+        checker_path.write_text(halved, encoding="utf-8")
+        invoke(fixture, False, "must bind one for each of")
+        checker_path.write_text(checker, encoding="utf-8")
+
+        # The README carries the citations; a class it stops documenting is a
+        # colour the reader can no longer resolve to a source claim.
+        stripped = readme.replace("- `sys` —", "- sys:")
+        if stripped == readme:
+            raise AssertionError("README class mutant changed nothing")
+        readme_path.write_text(stripped, encoding="utf-8")
+        invoke(fixture, False, "does not document class 'sys'")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # Documenting every class is not the same claim as the intro's count.
+        # The intro promises the list is exhaustive, so a stale number tells a
+        # reader to stop looking one class early while every class still has an
+        # entry — the per-class loop above passes throughout.  Every wrong
+        # spelling of the count is driven from the checker's own word table so a
+        # class added later arrives with this case already demanded.
+        correct = CHECK.NUMBER_WORDS[len(CHECK.CLASSES)]
+        for word in CHECK.NUMBER_WORDS:
+            if word == correct:
+                continue
+            miscounted = readme.replace(f"the {correct} classes are pinned here",
+                                        f"the {word} classes are pinned here", 1)
+            if miscounted == readme:
+                raise AssertionError("README class-count mutant changed nothing")
+            readme_path.write_text(miscounted, encoding="utf-8")
+            invoke(fixture, False, f"says {word!r} classes are pinned but "
+                                   f"{len(CHECK.CLASSES)} are enforced")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Dropping the sentence rather than misnumbering it retires the claim
+        # instead of contradicting it, so it must fail closed too.
+        uncounted = readme.replace(f"the {correct} classes are pinned here",
+                                   "the classes below are pinned", 1)
+        if uncounted == readme:
+            raise AssertionError("README uncounted mutant changed nothing")
+        readme_path.write_text(uncounted, encoding="utf-8")
+        invoke(fixture, False, "no longer states how many classes are pinned")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # Thread r3909473219 on the canvas surface.  The page carries a
+        # `<script>` and a `<style>` block, and a body neither one draws is not
+        # published text, so every required phrase is moved out of the markup a
+        # reader meets and into each of those bodies in turn.
+        first_tooltip = re.compile(r'<g class="node [a-z]+"[^>]*><title>')
+        for phrase, _why in CHECK.REQUIRED:
+            if phrase not in diagram:
+                raise AssertionError(f"required phrase {phrase!r} absent from the canvas")
+            stripped = diagram.replace(phrase, "REDACTED_POWER")
+            for opener in ("<script>", "<style>"):
+                if opener not in stripped:
+                    raise AssertionError(f"the canvas carries no {opener} body to hide in")
+                hidden = stripped.replace(opener, f"{opener}\n/* {phrase} */\n", 1)
+                diagram_path.write_text(hidden, encoding="utf-8")
+                invoke(fixture, False, f"never mentions {phrase!r}")
+            # The control that keeps the rule from reading too widely: on this
+            # canvas a `<title>` is the hover tooltip, not an HTML `<head>`
+            # title, and it is where every node cites its address.  The same
+            # phrase restored there is text a reader is shown and must be read.
+            tooltip = first_tooltip.search(stripped)
+            if not tooltip:
+                raise AssertionError("no node tooltip on the canvas to restore into")
+            restored = f"{stripped[:tooltip.end()]}{phrase}. {stripped[tooltip.end():]}"
+            diagram_path.write_text(restored, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+        diagram_path.write_text(diagram, encoding="utf-8")
+
+        # The README is checked as rendered Markdown; text inside an HTML
+        # comment is not shown to a reader and must not satisfy any check.
+        # Hiding the class-count sentence in a comment must be rejected even
+        # though the raw text still contains the right words.
+        count_sentence = f"the {correct} classes are pinned here"
+        if count_sentence not in readme:
+            raise AssertionError("README class-count sentence not found")
+        commented_count = readme.replace(count_sentence,
+                                         f"<!-- {count_sentence} -->", 1)
+        if commented_count == readme:
+            raise AssertionError("README comment-hiding mutant changed nothing")
+        readme_path.write_text(commented_count, encoding="utf-8")
+        invoke(fixture, False, "no longer states how many classes are pinned")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # Thread r3909071242: a link's destination and title render as nothing,
+        # so moving a claim into one hides it exactly as a comment does while
+        # leaving its characters in the raw source.  Each README claim the gate
+        # reads is driven through both title delimiters and through a
+        # balanced-parenthesis destination, and the same claim carried in the
+        # visible *label* must still be read or the gate would reject a README a
+        # reader plainly meets.
+        proof_match_for_links = CHECK.PROOF_ENTRY.search(readme)
+        if not proof_match_for_links:
+            raise AssertionError("proof entry not found in README")
+        # A reference definition renders as nothing only at the start of its own
+        # line, so whether that form hides a claim depends on where the claim
+        # sits.  Each entry records that, and both answers are asserted.
+        hideable = (
+            (count_sentence, "no longer states how many classes are pinned", False),
+            (proof_match_for_links.group(0), "does not document class 'proof'", True),
+        )
+        for claim, needle, at_line_start in hideable:
+            flat = " ".join(claim.split()).replace('"', "'")
+            for hidden in (
+                f'[details](target "{flat}")',
+                f"[details](target '{flat}')",
+                f'[details](foo(bar) "{flat}")',
+                f'[details](<foo(bar> "{flat}")',
+            ):
+                mutated = readme.replace(claim, hidden, 1)
+                if mutated == readme:
+                    raise AssertionError(f"link-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+            # Thread r3909320740: an attribute is markup, never content.  The
+            # claim moved into a `title=` leaves the rendered entry showing the
+            # element's text and nothing of the claim.
+            for attributed in (
+                f'<span title="{flat}">an EL contract that gates on a proof</span>',
+                f"<a href='u' data-note='{flat}'>an EL contract</a>",
+                f'<img alt="{flat}" src="x.png">',
+            ):
+                mutated = readme.replace(claim, attributed, 1)
+                if mutated == readme:
+                    raise AssertionError(f"attribute-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
+            # Thread r3909473219: a tag is not an element.  Deleting the two
+            # tags of `<script>…</script>` and keeping the body left the claim
+            # standing in the text this gate reads while a browser drew none of
+            # it, so the body is removed with them.  Every element the reducer
+            # holds to be non-rendered is driven here, so one it never exercises
+            # cannot carry a claim the day it is used.
+            for buried in tuple(
+                f"<{element}>{flat}</{element}>"
+                for element in CHECK.markdown_text.NON_RENDERED_ELEMENTS
+            ) + (
+                # The open tag is a tag: attributes and casing still open it.
+                f'<script type="text/javascript">{flat}</script>',
+                f"<SCRIPT>{flat}</SCRIPT>",
+                # `template` content is ordinary markup, so an inner opener
+                # really does open another element: stopping at the first
+                # `</template>` left the sentence after it standing as prose.
+                f"<template><template>note</template>{flat}</template>",
+                # And the three shapes that put a sentence behind an end tag a
+                # scan stops at: a raw-text child, a comment, and HTML's own
+                # script double-escape each carry an outer end tag as text.
+                f"<template><script>note</template>{flat}</script>",
+                f"<template><!-- </template> -->{flat}</template>",
+                f"<script><!--<script>note</script>-->{flat}</script>",
+            ):
+                mutated = readme.replace(claim, buried, 1)
+                if mutated == readme:
+                    raise AssertionError(
+                        f"element-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
+            # An element that never closes hides everything after it, which is
+            # what a browser shows of it.  That deletes more of the README than
+            # the claim itself, so the rejection is asserted without pinning
+            # which surviving check names it first.
+            unterminated = readme.replace(claim, f"<script>{flat}", 1)
+            if unterminated == readme:
+                raise AssertionError("unterminated-element mutant changed nothing")
+            readme_path.write_text(unterminated, encoding="utf-8")
+            invoke(fixture, False)
+            readme_path.write_text(readme, encoding="utf-8")
+
+            definition = readme.replace(claim, f'[details]: target "{flat}"', 1)
+            if definition == readme:
+                raise AssertionError("reference-definition mutant changed nothing")
+            readme_path.write_text(definition, encoding="utf-8")
+            invoke(fixture, not at_line_start,
+                   needle if at_line_start else "diagram taxonomy ok")
+
+            # The label is visible text, so the same claim there must pass.
+            shown = readme.replace(claim, f'[{claim}](target "hidden")', 1)
+            if shown == readme:
+                raise AssertionError(f"link-label control for {needle!r} changed nothing")
+            readme_path.write_text(shown, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # The mirror of that family.  A reducer that read one construct too
+        # widely would delete text a reader plainly meets, and no edit to the
+        # README could then satisfy the gate, so each boundary of the rule is
+        # pinned on the claim that sits mid-line: prose on either side of a
+        # non-rendered element, beside one of a different name, inside one
+        # whose name only looks like one, and inside one a browser does paint.
+        for control in (
+            f"{count_sentence} <script>note</script>",
+            f"<script>note</script> {count_sentence}",
+            f"<script>a</script> {count_sentence} <style>b</style>",
+            f"<scriptx>{count_sentence}</scriptx>",
+            f"<script-note>{count_sentence}</script-note>",
+            f"<xmp>{count_sentence}</xmp>",
+            f'<span title="markup">{count_sentence}</span>',
+        ):
+            mutated = readme.replace(count_sentence, control, 1)
+            if mutated == readme:
+                raise AssertionError(f"element control {control!r} changed nothing")
+            readme_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # Similarly, the `proof` entry hidden in a comment must also fail.
+        proof_match = CHECK.PROOF_ENTRY.search(readme)
+        if not proof_match:
+            raise AssertionError("proof entry not found in README")
+        proof_text = proof_match.group(0)
+        commented_proof = readme.replace(proof_text, f"<!-- {proof_text} -->", 1)
+        if commented_proof == readme:
+            raise AssertionError("README proof-entry comment mutant changed nothing")
+        readme_path.write_text(commented_proof, encoding="utf-8")
+        invoke(fixture, False, "does not document class 'proof'")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # The count is bound to the enforced set, not to the literal `six`:
+        # growing CLASSES and documenting the new class leaves the intro stale,
+        # which is the direction a future taxonomy edit actually takes.
+        grown, substitutions = re.subn(
+            r"^CLASSES = .*$",
+            f"CLASSES = {CHECK.CLASSES + ('mpc',)!r}",
+            checker, count=1, flags=re.MULTILINE)
+        if substitutions != 1:
+            raise AssertionError("checker CLASSES mutant changed nothing")
+        checker_path.write_text(grown, encoding="utf-8")
+        readme_path.write_text(readme + "\n- `mpc` — a newly pinned class.\n",
+                               encoding="utf-8")
+        invoke(fixture, False, f"but {len(CHECK.CLASSES) + 1} are enforced")
+        checker_path.write_text(checker, encoding="utf-8")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # The README's `proof` entry is where the two verifiers are told apart
+        # for the record, and prose has no box to make a bare mention default
+        # to, so every mention there has to name its gateway.  Exchanging the
+        # pairing, dropping either half of it, and naming a verifier with no
+        # gateway at all must each fail closed.
+        entry = CHECK.PROOF_ENTRY.search(readme).group(0)
+        verifiers = list(CHECK.GATEWAY_VERIFIER.values())
+        swap = {v: verifiers[(i + 1) % len(verifiers)] for i, v in enumerate(verifiers)}
+        readme_family = [(
+            readme.replace(entry, re.sub("|".join(map(re.escape, verifiers)),
+                                         lambda m: swap[m.group(0)], entry)),
+            f"attributes {swap[CHECK.GATEWAY_VERIFIER['TopUpGateway']]!r} to TopUpGateway",
+        )]
+        for gateway, verifier in CHECK.GATEWAY_VERIFIER.items():
+            readme_family.append((
+                readme.replace(entry, entry.replace(verifier, "its own verifier")),
+                f"never states that {gateway} gates through {verifier!r}",
+            ))
+        readme_family.append((
+            readme.replace("- `proof` — an EL contract",
+                           f"- `proof` — a {verifiers[0]} contract", 1),
+            f"names {verifiers[0]!r} without saying whose verifier it is",
+        ))
+        for mutated, needle in readme_family:
+            if mutated == readme:
+                raise AssertionError(f"README proof-entry mutant for {needle!r} changed nothing")
+            readme_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, False, needle)
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # The `bot` class covers node operators, who hold validator signing
+        # keys.  Collapsing it back to one consequence for the whole class reads
+        # a signing-key compromise as liveness-only, when it can sign slashable
+        # messages and so reduce validator balances.
+        collapsed = re.sub(
+            r"^- `bot` —.*?(?=^- `)",
+            "- `bot` — off-chain: picks when and what, never how much. Compromise is a\n"
+            "  liveness problem, not a funds problem.\n",
+            readme, flags=re.MULTILINE | re.DOTALL)
+        if collapsed == readme:
+            raise AssertionError("README bot-class mutant changed nothing")
+        readme_path.write_text(collapsed, encoding="utf-8")
+        invoke(fixture, False, "never mentions 'Node operators'")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # The qualification must survive as a claim, not merely as a name: the
+        # slashable consequence is the part that breaks the liveness-only
+        # reading, so dropping it alone must still fail closed.
+        unslashable = readme.replace("can sign slashable messages", "can be rotated")
+        if unslashable == readme:
+            raise AssertionError("README slashable mutant changed nothing")
+        readme_path.write_text(unslashable, encoding="utf-8")
+        invoke(fixture, False, "never mentions 'slashable'")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        invoke(fixture, True)
+
+    print("diagram taxonomy mutants rejected: predeploy as consensus layer (card and node), "
+          "oracle as quorum-held, HashConsensus demoted, guardian veto (the banned "
+          "spelling, the same claim retypeset with a curly apostrophe, and a "
+          "reattribution no banned list names, rejected per surface), 5/9 constant, "
+          "EasyTrack veto, conflated verifiers, untooltipped node, undocumented class; "
+          f"a taxonomy intro miscounted to each of the other "
+          f"{len(CHECK.NUMBER_WORDS) - 1} words the checker knows, and one that drops the "
+          "count instead of misstating it, rejected while every class stays documented, "
+          "and the count shown bound to the enforced set by growing CLASSES; "
+          "relabelled node and card repaints and a dropped entity still caught by "
+          "address; an entity dropped from one surface only (canvas node deleted with "
+          "its card kept, card deleted with its node kept, and a multi-address "
+          "predeploy node deleted) rejected per surface; `bot` compromise collapsed "
+          "to a class-wide invariant rejected on "
+          "the README entry and on the rendered legend pill (restated, stripped, and "
+          "with the slashable consequence dropped); "
+          f"every one of {len(CHECK.IDENTITY)} address-bound entities relabel-repainted "
+          "and deleted per surface, every one comment-wrapped per surface "
+          "(entity inside <!-- … --> is invisible to a reader and must not be counted "
+          "as present), every one rewritten on each surface into the form the other "
+          "surface publishes — a canvas tooltip elided to the card's `0x852d…3Cee`, a "
+          "card expanded to the full forty digits — rejected, since a surface that owes "
+          "one form and prints the other leaves a reader who goes to it for an address "
+          "holding a spelling that looks up no contract, and every one with its address "
+          "extended per surface by each of "
+          "8 trailing characters — hex and non-hex alike — applied to both forms "
+          "together and to the full and abbreviated form alone, plus a leading "
+          "character on each form (a malformed address must not satisfy a "
+          "token-boundary check via substring containment, and the extension is not "
+          "always a hex digit); every one extended per surface by each of 3 character "
+          "references — decimal and hex — again on both forms together and on each "
+          "alone (a reference is punctuation in the source and a letter on the page, "
+          "so `…3Cee&#103;` publishes `0x852d…3Ceeg` while the raw boundary reads "
+          "clean); and every one published per surface in both forms as an intact "
+          "token beside a corrupted copy of itself (`0x852d…3Cee · 0x852d…3Ceeg`), "
+          "which a check asking only whether some standalone occurrence exists "
+          "excuses — an intact form must not vouch for a corrupted one beside it; "
+          f"{exchanges} same-class address exchanges — every pair the table carries whose "
+          "entities are drawn under different labels on that surface — rejected on each "
+          "surface alone (both boxes keep their class, so only binding the address to the "
+          "entity it names can see the swap), with the two oracles also exchanged on both "
+          "surfaces at once; a taxonomy name whose rename is followed through IDENTITY "
+          "still rejected for no longer being drawn, and an IDENTITY entry that binds "
+          "only one surface refused at load; "
+          "every proof-gated box repainted, deleted and merely "
+          "reworded per surface (the combined `Consolidation pipeline` canvas node and "
+          "the `ConsolidationGateway` card bound independently), and a rename that keeps "
+          "its address and colour still rejected for retiring its taxonomy rule; "
+          f"the addressless consensus-layer box repainted to each of the "
+          f"{len(CHECK.CLASSES) - 1} other classes, deleted, and merely reworded, "
+          "rejected in both directions of the one-genuine-`cl`-entity rule; "
+          f"each of the {sum(len(s) for s in CHECK.VERIFIER_SURFACE.values())} gateway "
+          "boxes had the verifier it inherits relocated off the box, exchanged for its "
+          "sibling's, claimed alongside its sibling's, and hidden in an HTML comment "
+          "(each rejected separately per surface), and the README `proof` entry "
+          "had the pairing swapped, either half of it dropped, and a verifier named with "
+          "no gateway to attribute it to; the README class-count sentence and the "
+          "README `proof` entry hidden in HTML comments each rejected, and each "
+          "also hidden in an inline link's title through both quote delimiters "
+          "and through balanced and angle-bracketed destinations — the shapes a "
+          "`[^)]*` pattern stops short of — with a reference definition rejected "
+          "where it starts its own line and accepted mid-sentence, where it is "
+          "literal text, and the same claim carried in a visible link label "
+          "still read, and each moved into an HTML attribute — a `title=`, a "
+          "`data-` note and an `alt=` — rejected, since an attribute is markup "
+          "and never content; every required phrase moved off the canvas and "
+          "into its `<script>` and its `<style>` body rejected, with the same "
+          "phrase restored to a node tooltip still read, since on this SVG a "
+          "`<title>` is the hover text a reader is shown and is where every "
+          "address is cited; and each README claim buried in the body of every one of "
+          f"{len(CHECK.markdown_text.NON_RENDERED_ELEMENTS)} non-rendered "
+          "elements — plus an attributed and an upper-case opener, a nested "
+          "`template` whose close the body runs past, an opener that never "
+          "closes, and the three shapes that carry an outer end tag as text — "
+          "a raw-text child, a comment, and HTML's own script double-escape — "
+          "rejected, since a tag is not an element and a body a browser never "
+          "draws is not prose; with 7 controls holding the other edge of that "
+          "rule, where the same sentence sits on either side of such an "
+          "element, beside one of a different name, inside one whose name only "
+          "looks like one, or inside one a browser does paint, and must still "
+          "be read")
+
+
+if __name__ == "__main__":
+    main()

@@ -12,40 +12,675 @@ The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean 
 
 Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.
 
-## Acceptance table — every registered claim
+## Acceptance index — every registered claim
 
-| Claim | Accepted theorem plane | Proof shape / exact domain statement | Source/artifact provenance | Acceptance and exact limitation |
+One row per registered claim, with the number of fidelity gaps the registry still records against it. Every one of the 11 canonical claims still records at least one open gap. The rows `P-DEPOSIT-1.verity-tx-rollback.tx` and `P-RESERVE-RELATIONAL` print `0 open` because they are supplemental: the count covers only the narrow slice each such row closes, and the residual gaps stay recorded against its parent canonical claim. The full assumptions, limitations, and source provenance for each claim are expanded in the per-claim sections below; nothing that qualifies a claim is left folded into a table cell.
+
+| Claim | Abstract | Verity | Fidelity gaps | Classification |
 | --- | --- | --- | --- | --- |
-| `P-ALLOC-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage` | checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open. | MAPPED; 13 immutable pinned source span(s). Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. unique moduleAddress on addModule; getDepositAllocations / MinFirst fill (see P-ALLOC-2); reachable-router CheckedBounds Next gate: CHECKED: storage-backed 32-cap, packed ModuleStateConfig decode, live 96-byte getStakingModuleSummary decoding, and WC02-only getTotalModuleStake (0x0c852f5c) 32-byte decoding are threaded into allocation under decoded-row correspondence. OPEN: unique moduleAddress and reachable-router CheckedBounds; do not widen into P-ALLOC-2 or refold the min-clamp child. |
-| `P-ALLOC-2` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution` | step_correspondence_and_full_loop_conservation is the registered parent. Its first conjunct retains the explicit-∀ independent Model/Source candidate correspondence, Model.amount equality, positivity, demand bound, and capacity bound. Its second conjunct proves exact request conservation for every successful fuel-bounded sourceAllocateLoop run. Its third conjunct proves that the independently defined proportional Nat modelAllocateLoop has a matching successful run with equal mathematical totals and RowsCorrespond final rows; the proof lifts the relation across every successful mutation. The sourceAllocateLoop_eq_allocateLoop bridge still connects conservation to the Verity executor. The distinct +1 Nat model remains a separate child, and no Solidity equivalence is claimed. | MAPPED; 4 immutable pinned source span(s). Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. Solidity allocate does not test active (filtered upstream); +1 Strategy and proportional Source are different algorithms; memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression; cross-call mutation of the decoded arrays Next gate: CHECKED: independent proportional modelAllocateLoop and sourceAllocateLoop now match across every successful fuel-bounded mutation with final RowsCorrespond and equal totals; conservation remains bridged to allocateLoop, and direct memory-array reads are oracle-independent (no keccak expression is evaluated). OPEN: upstream active filtering and cross-call mutation of decoded arrays. Keep the distinct +1 model as a separate child and do not claim Solidity equivalence. |
-| `P-DEPOSIT-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit` | source_deposit_conserves_and_rolls_back remains the universal source-plane conservation and non-conserving-deployment rollback theorem. NFrame.verity_tx_composes_nframe_deposit now quantifies over every finite DepositNFrameTx.Inputs.batches list. Under NFrame.LinksSource (still a caller hypothesis) and executable Preconditions, execute runs batches.mapM processBatch, one folded Lido pull, and batches.mapM pushBatch; its observed journal is the two mapped journals around that pull. FoldStable proves every exact prefix stays below 2^256 and wordTotal equals exactTotal, while an executable pre-pass guard makes every wrapping fold revert before any journal. ModuleEntry and depositToBeacon counts are each exactly batches.length (map-length arity, not DepositParentTx probes), independent of key counts. DepositNFrameCorrespondence.routerDepositInputs maps List Spec.Allocation to this link with the validator-count-to-wei multiply explicit, without deriving the link from ALLOC parents. two_batch_conjunct_d_is_n_eq_two recovers the former fixed conjunct (d). The fixed-two executeTwoOnly mutant is rejected at the same ParentConclusion by a healthy three-batch witness. A-DEPOSIT-32-ETHER remains an OPEN artifact-identity assumption; no 32-ether pin or ALLOC-to-DEPOSIT merge is claimed. This is a Verity EDSL theorem, not a compiled-artifact theorem. | MAPPED; 7 immutable pinned source span(s). Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`. | **IMPLEMENTATION_PENDING**. LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength; DEPOSIT_CONTRACT address provenance is assumed rather than pinned to the deployed beacon deposit contract; MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = literal 32 ether is a deployment/constructor fact, not derived by the parent; the two-batch executable limitation is closed by DepositNFrameTx; the remaining word-domain gap is the abstract parent quantifying over unbounded Nat inputs whose committed aggregates exceed one word while the executable noWrap premise bounds the aggregate -- witnessed by abstract_parent_covers_inputs_the_verity_plane_omits at an out-of-domain exhibit that has no in-range substitute (in_range_commit_is_word_bounded); the source pull is not bounded by this row outside ConservingConfig: LinksSource pins only DEPOSIT_SIZE and neither it nor Preconditions relates MAX_EFFECTIVE_BALANCE_WC_TYPE_01 to it, so for the non-conserving deployments the registered parent still admits, the line-972 pull quantity actualDepositsCount * maxEBType1 exceeds any word bound this row proves (linked_hypotheses_do_not_bound_the_line_972_product, with a uint256-encodable immutable); this is a statement about the computed quantity, not a settled transfer and not a reached multiplication -- the skewed deployment turns away at the earlier line-959 ZeroDeposits guard (skewed_pull_witness_turned_away_before_line_972), and an encodable module allocation bounds the product inside one word (line_972_product_le_module_allocation, encodable_allocation_bounds_line_972_product) -- and no in-range input commits a word-exceeding push at all (in_range_commit_is_word_bounded), so it is a separate theorem and not a bound; the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked Next gate: Keep NFrame.LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER only from artifacts; do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named. |
-| `P-TOPUP-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close` | source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run -- genuinely assert-backed: run's value-moving tail and residual amount guards read the on-chain unchecked accumulator (the line-732 sum reduced mod 2^256, wrappedTotal = exactTotal % 2^256) for the over-target guard at line 737, the zero-sum test at line 741, the Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert, so reaching a value-moving commit means the assert passed with the wrapped pull equal to the exact push -- and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps mod 2^256, run itself moves no wei (pulled = pushed = 0) -- a nonzero wrap still aborts on the value-moving tail (underfunded push or line-755 assert), while a sum that wraps to exactly zero takes the line-741 empty commit committedNoTopUp, so wrap-implies-revert is false; the honest fact is wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit / source_wrap_precludes_value_moving_commit); A-TOPUP-NOWRAP lives here, in the wrap antecedent, and in the discharged-balance-guard theorems, not in conjunct (1); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants carries real kill-lines on mutants of the parent's own model: dropped_conservation_assert_kill_line_refutes_parent (a surgical mutant run with ONLY the line-755 assert deleted commits the wrapping batch with pulled = 1 ≠ 2^256+1 = pushed; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style), dropped_module_guard_kill_line_refutes_parent and dropped_wc_guard_kill_line_refutes_parent (mutants without the moduleExists / wcTypeIsType2 require commit at witnesses where the parent demands the named revert), and unwrapped_accumulator_kill_line_refutes_parent (the assert-drop mutant's dual: a wrap-ignoring mutant run commits the wrapping batch the honest run reverts via the assert). The wave-1 projections are renamed guard_discharge_at_* and are honest positive controls, not kill-lines; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control. Verity: if allocations.length ≤ 2^256, each allocation is a uint256 word, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match, including the wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis. Not P-TOPUP-2 amount computation. | MAPPED; 13 immutable pinned source span(s). Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`, `A-TOPUP-BEACON-ADDRESS`. | **IMPLEMENTATION_PENDING**. beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct Next gate: Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC. |
-| `P-ACCOUNT-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report` | mint_after_read_discipline: on every committed modeled handleOracleReport, rewardsReadSlot is stamped before any nonzero rewardsMintedSlot. mint_order_kill_line refutes the same predicate on a pure call-site-reordering mutant. The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument. | MAPPED; 14 immutable pinned source span(s). Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. SRStorage membership and unique uint24 module ids; accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE; submitReportData / _handleConsensusReportData; fee computation (sharesToMintAsFees is an argument); packed uint64 accounting words; re-read of the written router snapshot for rewards; full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired Next gate: fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Keep mint-after-read parent; do not widen to submitReportData. |
-| `P-RESERVE-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec` | source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. Parent kill-lines, each refuting the parent's full predicate shape with the freshQueueCache hypothesis retained: LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent kills the scopedWithdrawGuards conjunct on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped that commits a canDeposit = false call the honest model reverts; LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent kills the partition-invariant and live-reserve conjuncts on mutantWithdraw, a mutation of the spend transition that commits under a fresh cache while the live queue-facing reserve drops 50 to 0. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness are hypothesis-necessity evidence only: they show the freshQueueCache premise cannot be dropped, not that the parent is false. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call. | MAPPED; 5 immutable pinned source span(s). Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption); canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks); packed uint128 buffered ether and ETH transfer; frame-nonce reset and report-time rebalance; _seedDepositsCount; buffer is a declared oracle word, not the contract balance; reserve-target writer surface setDepositsReserveTarget and its report-time rebalance interaction Next gate: The registered parent already proves the live ZERO_AMOUNT guard on every commit. OPEN: keep freshQueueCache explicit until a live WQ CALL exists, and model setDepositsReserveTarget/report-rebalance; do not treat P-RESERVE-RELATIONAL as this parent. |
-| `P-CONSOLIDATION-ETH-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition` | Renamed from P-ETH-1: consolidation fee/refund ETH plane only (orthogonal to P-CONSOLIDATION-1 vault request atomicity). eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent verity_tx_universal_success_shape now matches that quantifier strength on the success arm: for all (msgValue, batchSize, feePerRequest) that are nonzero-valued, word-sized, non-wrapping in the product fee, funded (batchSize*feePerRequest ≤ msgValue), and fuel-fit (batchSize+4 ≤ fuelBudget=32), the honest wiring commits with the whole product fee at the consolidation-request predeploy, the remainder at the refund recipient, and zero retained by every protocol contract on the route; proved by frame-by-frame chaining through the recursive dispatcher. The premises are exactly the abstract parent's non-revert conditions plus the model's fuel bound, and each is load-bearing: premise-necessity kill-lines refute the premise-dropped projections on the honest wiring (zero-value (0,2,0), underfunded (10,4,3), fuel (30,29,1) witnesses), and four wiring mutants (dropped refund leg, misrouted vault leg, corrupted refund amount, single request per batch) refute the same universal predicate at the premise-satisfying witness (10,2,3). The five numeral witnesses, rejecting-predeploy rollback, underfunded revert, ETH conservation, and dispatch/multicall replay agreement are retained as auxiliary regression evidence (verity_tx_composes_value_flow_and_rollback). Wave 6 closes the quantifier gap on the other side of the guard: verity_tx_universal_revert_partition proves UniversalRevertPartition, four ∀-quantified rollback arms read through observe (hence through finalWorld, so each arm asserts transaction-entry rollback of the whole balance sheet, not merely a control tag) — msgValue=0 reverts at the gateway after 2 hops for all word-sized (batchSize, feePerRequest); 2^256 ≤ batchSize*feePerRequest reverts at the gateway for all nonzero-valued word-sized inputs with 0 < batchSize; msgValue < batchSize*feePerRequest (non-wrapping) reverts at the gateway; and a funded non-wrapping batch with 29 ≤ batchSize needing more than fuelBudget frames exhausts dispatch at fuelBudget hops with the sender's whole msgValue restored. That partition is conjoined into the registered verity_tx_success_and_revert_partition alongside the four numeral witnesses it subsumes, so the registered claim is strictly strengthened and no prior witness is dropped. verity_tx_universal_zero_remainder_boundary covers the batchSize+3 = fuelBudget zero-remainder corner excluded by the success parent's conservative batchSize+4 ≤ fuelBudget premise, so together the success arm, the boundary corner, and the four revert arms classify every word-sized input. Wave 4 parent kill-lines refute eth_flow_parent's own success conjunct on mutants of gatewayExecute itself: misrouted_journal_kill_line_refutes_parent (fee legs journaled to an off-ApprovedSet address, classified .other) and zero_value_success_kill_line_refutes_parent (guard-free gateway succeeds at msg.value=0 paying 2*3=6 wei of fees, breaking totalAmount=msgValue). Former P-CONSOLIDATION-ETH-1b fee-leg theorems are demoted to parent evidence under A-CANONICAL-REQUEST-ADDRESS rather than a sibling guarantee. Former P-CONSOLIDATION-ETH-1a (vault→Lido/WQ return confinement) is retired from this parent: it matches neither the consolidation fee/refund happy path nor P-RESERVE-1 spend accounting. | MAPPED; 6 immutable pinned source span(s). Assumptions: `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CANONICAL-REQUEST-ADDRESS`. | **IMPLEMENTATION_PENDING**. VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope); Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI; reverting refund or Lido sinks; refinement between abstract parent and the Verity ensemble; getConsolidationRequestFee versus stored fee slot; composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests); the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness); the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning; vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting); pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment; canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address; renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee Next gate: Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. OPEN: discharge deployed target provenance under A-CANONICAL-REQUEST-ADDRESS, and fold the canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge. |
-| `P-ADDRESS-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance` | universal_address_writer_equivariance covers four modeled address-bearing entrypoint projections. Only requestWithdrawals and unwrap have the proved pause/balance/allowance permissionless-admission lemma; transferFrom and claimWithdrawalsTo retain caller-relative owner/approval gates. The separate AddressClaimBatchTx executes arbitrary-length parallel request/hint iteration and has a bounded two-item observe receipt for packed request/checkpoint reads, claimed-bit writes, locked-ETH decrements, and ordered value-bearing payout CALLs. It is incremental transaction evidence, not a widening of the universal parent. | MAPPED; 4 immutable pinned source span(s). Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. singleton-actor exclusion is by omission: singletonActorEntryPoint is False for every modeled tag, so the parent carries no live exclusion proof; unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item; keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words; EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics; packed WithdrawalQueue ERC-721 transfer and WstETH/ERC-20 storage, approvals, balances, and allowances outside the bounded claim request words; transferFrom is a wrapper-level single-item projection rather than a proved implementation-body correspondence; external-call success and most environment checks are caller-supplied Booleans; pinned implementation-body extraction and machine-level storage/execution correspondence Next gate: OPEN: the checked parent remains a four-projection model. The separate claim batch now iterates arbitrary request/hint lists and materially reads packed request/checkpoint channels, updates locked ETH, and journals payout CALLs, with a checked two-item observe receipt. Still open: unbounded source/equivariance correspondence for that live batch, keccak physical mapping derivation, EnumerableSet/events/adversarial callee semantics, and unrelated packed ERC-721/WstETH storage. Do not add singleton-actor functions or call all four writers permissionless. |
-| `P-TOPUP-2` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec` | aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open. | MAPPED; 3 immutable pinned source span(s). Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. _verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp; live wei conversion and the module-selected allocateDeposits return/policy; Lido withdrawDepositableEther and beacon makeBeaconChainTopUp; gwei versus wei units and 48-byte pubkeys; keccak memory-array oracle; pendingBalanceGwei is trusted operator calldata Next gate: Explicit gwei-normalized per-key topUpLimits input and independent Verity sourceView correspondence are CHECKED. OPEN: model the live wei conversion and module-selected allocateDeposits return before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1. |
-| `P-CONSOLIDATION-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation` | source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). The caller-supplied gateway-admitted-nonzero-value premise (caller=gateway -> msg.value != 0) is threaded into the proof and used: on any run satisfying it, the committed branch's own msg.value = count*fee equality forces fee != 0, so the theorem derives that conjunct instead of leaving the premise unused. Parent-refuting kill-line: fee_blind_commit_kill_line_refutes_parent evaluates the parent's hypothesis-conditioned committed-arm conjunction on the model mutant sourceRunFeeBlind (sourceRun with the exact-fee guard dropped) and falsifies it on a concrete committed batch that SATISFIES the premise (caller=gateway, msg.value=1, fee=0, one valid 48-byte pair): every fee-independent conjunct holds of that commit while fee != 0 fails. Premise-necessity evidence, separately: gateway_admitted_nonzero_kill_line shows that with the premise dropped a free batch (fee=0, msg.value=0) still commits sourceRun; that witness violates the premise, so it refutes only the hypothesis-free projection, not the hypothesis-conditioned parent. Packing-order kill-line: swapped source\|\|target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Value-bearing CALL lift: the executed transaction credits msg.value at frame entry (credited), debits each journaled CALL (forwardCalls), and proves committed_preserves_eth_balance (post-run vault selfBalance equals the pre-call balance, the pinned preservesEthBalance modifier's assert, vault side) and committed_journal_forwards_msg_value (journal suffix frames are .success CALLs to the request target each carrying the per-request fee, summing to msg.value). Not beacon eligibility and not the Bus. Do not compose with P-CONSOLIDATION-ETH-1. The frame-entry credit is admissibility-guarded: a selfBalance + msg.value that would wrap Uint256 is rejected at entry (ENTRY_CREDIT_OVERFLOW via entry_credit_overflow_reverts) before decode, so committed runs certify a non-wrapping entry credit and fundable per-CALL debits. | MAPPED; 10 immutable pinned source span(s). Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`. | **IMPLEMENTATION_PENDING**. beacon eligibility, quota, witness, and gateway grouping; 96-byte packed pubkey calldata and real request-contract calls; Bus publisher/executor path; keccak memory-array oracle; A-CONSOLIDATION-GATEWAY-NONZERO is caller-supplied at the outer P-CONSOLIDATION-ETH-1 gateway msg.value boundary, not a vault-local forwarded-totalFee fact; composition with P-CONSOLIDATION-ETH-1 requires ABI/interpreter bridge (groups, fee fetch, failing refund, value-bearing CALLs); fence remains until then; preservesEthBalance counterparty credit: the vault-side forwarding invariant is CHECKED on the executed plane, but the request predeploy's own balance credit is another contract's state; the multi-contract side stays with P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1 Next gate: Outer-gateway nonzero admission is explicitly relocated to A-CONSOLIDATION-GATEWAY-NONZERO; discharge it only via the ABI/interpreter bridge. preservesEthBalance is CHECKED on the vault side (single-contract executed plane); the predeploy counterparty credit and 96-byte packed pubkey calldata remain OPEN until the ABI/interpreter bridge lands. |
-| `P-SSZ-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding` | Bidirectional structural deposit-root equivalence is registered as deposit_root_iff: the named Spec SszWitness.Correspondence on well-formed deposits (pinned 48/32/96-byte widths). Construction binds sourceWitness src to sourceNode src at .clValidatorVerifier; determination recovers witness = sourceWitness src from depositVerified witness root with root = sourceNode src. Deposit uniqueness is the named PerfectDepositEncoding (A-PERFECT-HASH) child deposit_unique_of_perfect, not a parent conjunct. sourceNode_mutant_kill_line_refutes_parent is the parent-shaped kill-line (encode mutated to sourceNode + 1; wellFormedDeposit retained). This complements composed_ssz_encoding, which still registers the single traversal conjunct composedEncodingOk on ComposedSszInput (the mutant-exercised deposit-data-root reconstruction under sourceCombine). swapped_combine_kill_line_refutes_parent remains the traversal-child kill-line; inconsistent_witness_kill_line and inconsistent_operation_index_kill_line remain bindOperation-level negatives. SHA-256 functional correctness stays A-SHA256-FFI; the imported Yul fragment stays OPEN under A-YUL-INTERFACE. | MAPPED; 16 immutable pinned source span(s). Assumptions: `A-SHA256-FFI`, `A-PERFECT-HASH`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`. | **IMPLEMENTATION_PENDING**. SSZ.verifyProof on production gindices; SHA-256 functional correctness of the opaque model/precompile symbol; refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child; imported-to-deployed helper/wrapper Yul fragment binding; the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values; the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput Next gate: Registered parent is Spec SszWitness.Correspondence with a parent-shaped sourceNode mutant kill-line. OPEN: hash identification, SSZ.verifyProof / production gindices, and EIP-4788 / gateway. Keep SHA correctness and Yul visibly OPEN. |
-| `P-SSZ-1.deposit-data-root` | abstract `CHECKED`: `LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`; Verity `PARTIAL`: `—` | Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED. | No independent source-map target; supplemental evidence only. Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Preserve this child; it is composed into P-SSZ-1. |
-| `P-SSZ-1.gindex-concat` | abstract `CHECKED`: `LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec`; Verity `PARTIAL`: `—` | Narrow pinned-source correspondence for GIndex.concat only: the decoded 248-bit indices follow the exact fls-zero sentinel, depth guard, left-shift/XOR/OR ordering, pack bound, and rhs power propagation at lidofinance/core af095e48 lines 72-89. P-SSZ-1 canonical SOURCE remains OPEN and TX remains BLOCKED; SSZ.verifyProof, wrappers, SHA-256, Yul/EVM, and deployment provenance are not claimed. | No independent source-map target; supplemental evidence only. Assumptions: —. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Preserve this child; it is composed into P-SSZ-1. |
-| `P-SSZ-1.abstract-digest` | abstract `CHECKED`: `LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement`; Verity `PARTIAL`: `—` | Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed. | No independent source-map target; supplemental evidence only. Assumptions: `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Preserve this child; it is composed into P-SSZ-1. |
-| `P-CONSOLIDATION-1.abstract-flow-model` | abstract `CHECKED`: `LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement`; Verity `PARTIAL`: `—` | Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed. | No independent source-map target; supplemental evidence only. Assumptions: `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim. |
-| `P-ALLOC-1.eugene-bound` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond`; Verity `PARTIAL`: `—` | Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence. | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-HANDWRITTEN-MINFIRST`. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim. |
-| `P-ADDRESS-1.yul-interface-harness` | abstract `OPEN`: `—`; Verity `PARTIAL`: `—` | Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; an address-stomp observation is rejected by that abstract relation (it is not a claim that a changed Yul program fails to build), and no EVM execution refinement is claimed. | No independent source-map target; supplemental evidence only. Assumptions: —. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim. |
-| `P-DEPOSIT-1.verity-tx-rollback.tx` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`; Verity `CHECKED`: `LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot` | Checked bounded Verity transaction slice composes authorization, allocation, dynamic deposit data and roots with address/value-keyed Lido, module, and beacon calls. Contract.run restores the exact snapshot after intermediate writes, and two-batch alias/omission mutants are rejected. | No independent source-map target; supplemental evidence only. Assumptions: `A-VERITY-SCAFFOLD`. | **NONE**.  Next gate: Preserve this checked bounded transaction and its parent composition. |
-| `P-CONSOLIDATION-1.fee-refinement.tx` | abstract `OPEN`: `—`; Verity `OPEN`: `—` | Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces. | No independent source-map target; supplemental evidence only. Assumptions: `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim. |
-| `P-SSZ-1.tx-execution-simulation` | abstract `CHECKED`: `LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length`; Verity `PARTIAL`: `—` | Concrete MODEL evidence stages the exact DepositData calldata layout and pure-Lean seven-preimage digest composition. The former TX claim is retracted: the registry theorem does not consume sha256Calls, denote/ObservedCalls, or sha256_call_world_rollback, so removing or mutating the external-call program leaves it provable. TX remains BLOCKED; SHA-256 functional correctness remains assumed under A-SHA256-FFI. | No independent source-map target; supplemental evidence only. Assumptions: `A-VERITY-SCAFFOLD`, `A-SHA256-FFI`. | **IMPLEMENTATION_PENDING**. parent guarantee composition Next gate: Preserve this child; it is composed into P-SSZ-1. |
-| `P-ADDRESS-1.denote-admission` | abstract `OPEN`: `—`; Verity `CHECKED`: `LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant` | Audit-authored claim() admission under official denoteFunction. PauseDisjoint is required: aliased pause/balance slots break the property. This is not WithdrawalQueue.claimWithdrawalsTo, not the facade admission_nondiscriminatory property, and not post-state equivariance. The parent transaction plane remains OPEN. | No independent source-map target; supplemental evidence only. Assumptions: `A-VERITY-SCAFFOLD`. | **IMPLEMENTATION_PENDING**. parent guarantee composition; pinned WithdrawalQueue claim/request/transfer entrypoints; post-state equivariance Next gate: Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim. |
-| `P-RESERVE-RELATIONAL` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_simulates_reserve_relational_spec` | Supplemental parent-closure row promoted only after composition: two states differing solely in depositsReserve produce the same prefinalized ranges, prefinalized ETH, shares to burn, finalized range, and locked ETH. The abstract model, an independently defined pinned-source interpreter for Accounting._calculateWithdrawals, WithdrawalQueue.prefinalize, and WithdrawalQueue._finalize, and an executable Verity Contract.run transaction that decodes a denoted uint256[] batch-ends memory array together with mapUint queue economics are tied together by composition theorems rather than shared names. depositsReserve is proved to lie outside the transaction read frame. The executable plane implements the Solidity 0.8 checked lockedEtherAmount accumulator, which the unbounded Nat planes cannot express, so the correspondence theorem carries an explicit no-overflow side condition and the complementary regime is closed by a separate theorem proving the transaction reverts on the exact pre-call snapshot; the relational non-interference theorem itself is unconditional. | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`. | **NONE**.  Next gate: Replace the source-shaped decoding premise with a machine-checked correspondence to the pinned Solidity spans. |
-| `P-ALLOC-EXEC-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAllocExec1.router_produces_executes_allocation`; Verity `PARTIAL`: `—` | Supplemental parent: the pinned two-batch deposit path routerDepositInputs yields the two legs whose keys are the allocation amounts and whose wei equal Allocation.amount * depositSize, so ExecutesAllocation and LinksSource are theorems of the router, not caller hypotheses. Alloc-exec multiply-only remains a lemma. depositSize is the configuration field; A-DEPOSIT-32-ETHER stays OPEN. This is not an n-frame lift. | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`, `A-CLASSICAL-CHOICE`. | **IMPLEMENTATION_PENDING**. A-DEPOSIT-32-ETHER remains OPEN: depositSize is the configuration field, not a claimed 32-ether artifact identity; the executable transaction stays exactly two batches; this parent is not an n-frame lift; ALLOC parents still do not imply LinksSource without the unit multiply Next gate: Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply. |
-| `P-ETH-JOURNAL-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PEthJournal1.journal_approved_excludes_protocol_return_paths`; Verity `PARTIAL`: `—` | Supplemental legacy-projection parent: JournalApproved of the source-preserving consolidation candidate implies ProtocolReturnPathsExcluded because EthJournalCorrespondence.specDest still maps Vault→Lido and WithdrawalQueue to none. The widened Spec interface handles those routes separately in P-VAULT-ETH-1. This theorem does not claim Lido never drains ETH, and address pins do not close provenance. | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`. | **IMPLEMENTATION_PENDING**. this parent does not model protocol-return value hops; those are the separate P-VAULT-ETH-1 parent; not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened; address pins do not close deposit, top-up, or request artifact identity Next gate: Keep this legacy exclusion projection separate from P-VAULT-ETH-1; do not claim Lido never drains ETH. |
-| `P-VAULT-ETH-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops` | P-VAULT-ETH-1: every successful modeled Vault-to-Lido or WithdrawalQueue protocol-return run has a lossless Spec.EthJournal projection and one externalCallBindTo frame whose value equals the Spec leg wei. Only the pinned Vault-to-Lido route binds the executable entry.sender to the runtime Lido endpoint; inputs.caller is auxiliary and cannot authorize that route. WithdrawalQueue intentionally remains source-shaped and may have a distinct caller. Owner-controlled arbitrary recipients remain excluded. Route constructors, not endpoint address pins, carry provenance. This is not a claim that Lido never drains ETH or a claim about all SRv3 ETH. | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`. | **IMPLEMENTATION_PENDING**. endpoint addresses are explicit runtime inputs and are not configuration identity evidence; no extracted implementation-body binding exists; the executable-sender/runtime-endpoint conjunct does not establish deployment identity; the WithdrawalQueue protocol-return route is source-shaped rather than an extracted implementation body; no all-SRv3-ETH claim; callee execution and Lido buffered-ether accounting remain outside the caller-side frame model Next gate: Add extracted implementation-body and configured-endpoint linkage while preserving the executable-sender/runtime-endpoint guard, value-bearing frame, and owner-recipient exclusion. |
-| `P-ORACLE-SUPPLY-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_entry_source_domain`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_entry_source_domain` | Supplemental parent: the modeled submitReportData entry (pinned AccountingOracle.submitReportData -> _handleConsensusReportData -> Accounting.handleOracleReport / _simulateOracleReport / _calculateProtocolFees) computes entryFeeWei and entryShareRate from report data and entry state and feeds the pair into handleOracleReportComputed, so the entry run is the computed-wrapper run, observe equals sourceView at mintedShares entryFeeWei entryShareRate, the mint never exceeds the pinned feeEther * internalShares / (postInternalEther - feeEther) division, and the named maxShareRate cap holds at the computed pair. Under EntryDomainValid (profitable-branch precisionPoints > 0, totalFee ≤ precisionPoints, feeShareRateDenominator > 0, checked-arithmetic non-underflow) and divisibility, the mint exactly equals the pinned formula (oracle_supply_entry_source_domain). No free sharesToMintAsFees at the entry. Pack E sharesMinted-as-argument is not this conclusion. P-ACCOUNT-1 stays order-only. | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`. | **IMPLEMENTATION_PENDING**. entry consensus hash is an opaque word equality, not keccak256 of ABI-encoded calldata; contract-version, consensus-version, ref-slot, deadline, and extra-data checks are not modeled; smoothenTokenRebase, withdrawal-queue prefinalize, and bad-debt terms enter as report-data fields, not modeled sanity-checker or withdrawal-queue executions; entryShareRate is the E27-quantized internalShares * E27 / (postInternalEther - feeEther); the wrapper mint under-approximates the pinned division by at most the quantization remainder and is exact only under EntryDomainValid + divisibility; uint256 overflow on intermediate products (feeEther * internalSharesBeforeFees, internalSharesBeforeFees * E27) remains unmodeled; Pack E leftover sharesMinted-as-argument is not this parent and stays a child; P-ACCOUNT-1 remains order-only; this row does not fold ACCOUNT into supply Next gate: Keep P-ACCOUNT-1 order-only; do not treat Pack E argument-as-mint as this parent; keep the E27 quantization and unmodeled entry checks disclosed. |
-| `P-ADDRESS-BATCH-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename` | Supplemental unbounded parent for live executeClaimWithdrawalsTo: on well-formed request/hint lists with no fuel bound, ρ · executeClaimWithdrawalsTo = execute · ρ on the journal dests (payouts stay the pre-state reads). Fuel-bounded rename stays a lemma. The keccak slot *formula* is identified; PhysicalClaimSlots is a caller hyp and the live loop still reads mapUint. Does not weaken universal_address_writer_equivariance. | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`. | **IMPLEMENTATION_PENDING**. keccak physical slot maps remain OPEN: PhysicalClaimSlots is a caller hypothesis (mapUint = readSlot of mappingSlotLocation); the slot formula is identified, but the live loop still reads mapUint and does not SLOAD keccak cells; EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, and adversarial recipient code remain out; PAddress1.universal_address_writer_equivariance is not weakened Next gate: Keccak physical slot maps remain OPEN. Keep universal_address_writer_equivariance unweakened. |
-| `P-SSZ-LIVE-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume` | Modeled live-SSZ consume parent: eip4788ParentRoot is identified with a caller-supplied EIP-4788 BEACON_ROOTS 8191-slot timestamp-indexed history read (zero, missing, and overwritten-timestamp reads fail closed). Top-up / consolidation WC admission consumes ageCheck plus production-GI verifyAtParent against that identified root; none admits nothing. ProductionGindexBinding remains the in-repo constructor pin, not a deployed identity. A-SHA256-FFI stays. The Verity plane is the same list lookup, not Contract.run at the EIP-4788 precompile address. | No independent source-map target; supplemental evidence only. Assumptions: `A-SHA256-FFI`, `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`. | **IMPLEMENTATION_PENDING**. A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed; the constructor pin is an in-repo literal, not a live-deployment identity; the BEACON_ROOTS model is not a deployed-address or codehash identity; .verityTx CHECKED is the modeled list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied; not a deployed Solidity gateway, not official consolidation denote success, and not a bus Next gate: Keep A-SHA256-FFI named. Do not read .verityTx CHECKED as Contract.run at the EIP-4788 address. Pin deployed BEACON_ROOTS and gateway identities separately. |
-| `P-CONSOLIDATION-VALUE-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value`; Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value` | Supplemental parent: the official upstream widened-call denotation (DenoteFunctionCalls.denoteFunctionWithCalls at the pinned Verity head) succeeds on the registered bind entrypoint for every oracle, accepting predeploy model, transaction, and world satisfying the source guards, journaling one fresh value-bearing CALL frame, forwarding exactly msg.value, re-establishing preservesEthBalance, and producing only request frames; independently the justified interpreter forwards exactly msg.value with noConsensusLayerVerify. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus. The base denoteFunction fragment still reverts on the bind entrypoint (kept named in ConsolidationBridgeGap). | No independent source-map target; supplemental evidence only. Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`, `A-CLASSICAL-CHOICE`. | **IMPLEMENTATION_PENDING**. A-CONSOLIDATION-GATEWAY-NONZERO remains a caller premise, not discharged; AcceptingPredeploy is a callee-model hypothesis (identity state transition and always-success returndata); official success is the single-request bind (msg.value = 1 * fee), not an n-request batch; link target and fee are CallEnv parameters, not a deployed-address identity; no bus, no delay, no quota, no consensus-layer verify, no ETH-1 composed with CONSOLIDATION-1 ABI bridge; official success holds on the widened-call denotation fragment; the base denoteFunction fragment still maps raw calls outside its arms, and no compiled-artifact behaviour is claimed Next gate: Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota only on top of official success. |
-| `P-TOKEN-1` | abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PToken1.request_owner_custody_invariant`; Verity `PARTIAL`: `—` | P-TOKEN-1 (bounded, subordinate): over the pinned WithdrawalQueue request-creation control prefix composed with an arbitrary-length chain of owner-operated WithdrawalQueueERC721 transferFrom hops, every reachable state satisfies one named conclusion: the amount is inside the two-sided _checkWithdrawalRequestAmount range, the created owner is exactly the line-130 msg.sender fallback, the request owner is never address(0) after any number of hops, and every hop that executed was operated by the then-current owner to a distinct nonzero recipient. The unmodeled _enqueue/_emitTransfer owner binding is an explicit universally quantified mint argument with the single named hypothesis that minting binds a request to its created owner. This is NOT a broad ERC-20 or token guarantee: approve, allowance state, STETH.transferFrom, share conversion, queue storage, finalization, claim/redeem, WstETH paths, pause, and whole-transaction rollback are unmodeled, so no transferability, redeemability, or balance claim follows. | MAPPED; 3 immutable pinned source span(s). Assumptions: `A-SOURCE-SHAPED`. | **IMPLEMENTATION_PENDING**. approve and ERC-20 allowance state are entirely unrepresented, so no approval-path claim follows; the STETH.transferFrom external call at WithdrawalQueue.sol:134 and all token balances are unmodeled, so no ERC-20 movement is established; getSharesByPooledEth share conversion at WithdrawalQueue.sol:376 and _enqueue request-id storage at line 378 are outside the slice; claimWithdrawals, finalization, and every redeem path are unmodeled, so redeemability is not claimed; requestWithdrawalsWstETH, WstETH unwrap, and permit entrypoints are excluded; _checkResumed pause at WithdrawalQueue.sol:129 and whole-transaction rollback are not represented; the approved-operator and isApprovedForAll branches at WithdrawalQueueERC721.sol:242 are excluded; only the owner-operated branch is modeled; request-id validity and claimed checks at WithdrawalQueueERC721.sol:233 and 236, and the owner-indexed EnumerableSet updates at lines 250-251, are outside the slice; events at WithdrawalQueue.sol:380 and WithdrawalQueueERC721.sol:253 are not modeled; only one request list item is modeled; multi-item requestWithdrawals batches are not composed; no Verity Executable Contract exists for the WithdrawalQueue surface, so the verity plane stays PARTIAL; P-TOKEN-1 is registered as a subordinate bounded row only; broad ERC-20 token behaviour remains NOT YET and is neither claimed nor implied Next gate: Add an executable WithdrawalQueue request transaction that discharges the mint hypothesis from real _enqueue storage writes and composes the STETH.transferFrom call, before widening beyond the bounded custody parent. |
+| [`P-ALLOC-1`](#p-alloc-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
+| [`P-ALLOC-2`](#p-alloc-2) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
+| [`P-DEPOSIT-1`](#p-deposit-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOPUP-1`](#p-topup-1) | CHECKED | CHECKED | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-ACCOUNT-1`](#p-account-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
+| [`P-RESERVE-1`](#p-reserve-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-ETH-1`](#p-consolidation-eth-1) | CHECKED | CHECKED | 12 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-1`](#p-address-1) | CHECKED | CHECKED | 8 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOPUP-2`](#p-topup-2) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-1`](#p-consolidation-1) | CHECKED | CHECKED | 7 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1`](#p-ssz-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1.deposit-data-root`](#p-ssz-1deposit-data-root) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1.gindex-concat`](#p-ssz-1gindex-concat) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1.abstract-digest`](#p-ssz-1abstract-digest) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-1.abstract-flow-model`](#p-consolidation-1abstract-flow-model) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-ALLOC-1.eugene-bound`](#p-alloc-1eugene-bound) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-1.yul-interface-harness`](#p-address-1yul-interface-harness) | OPEN | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-DEPOSIT-1.verity-tx-rollback.tx`](#p-deposit-1verity-tx-rollbacktx) | CHECKED | CHECKED | 0 open | **NONE** |
+| [`P-CONSOLIDATION-1.fee-refinement.tx`](#p-consolidation-1fee-refinementtx) | OPEN | OPEN | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-1.tx-execution-simulation`](#p-ssz-1tx-execution-simulation) | CHECKED | PARTIAL | 1 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-1.denote-admission`](#p-address-1denote-admission) | OPEN | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
+| [`P-RESERVE-RELATIONAL`](#p-reserve-relational) | CHECKED | CHECKED | 0 open | **NONE** |
+| [`P-ALLOC-EXEC-1`](#p-alloc-exec-1) | CHECKED | PARTIAL | 3 open | **IMPLEMENTATION_PENDING** |
+| [`P-ETH-JOURNAL-1`](#p-eth-journal-1) | CHECKED | PARTIAL | 3 open | **IMPLEMENTATION_PENDING** |
+| [`P-VAULT-ETH-1`](#p-vault-eth-1) | CHECKED | CHECKED | 4 open | **IMPLEMENTATION_PENDING** |
+| [`P-ORACLE-SUPPLY-1`](#p-oracle-supply-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-ADDRESS-BATCH-1`](#p-address-batch-1) | CHECKED | CHECKED | 3 open | **IMPLEMENTATION_PENDING** |
+| [`P-SSZ-LIVE-1`](#p-ssz-live-1) | CHECKED | CHECKED | 5 open | **IMPLEMENTATION_PENDING** |
+| [`P-CONSOLIDATION-VALUE-1`](#p-consolidation-value-1) | CHECKED | CHECKED | 6 open | **IMPLEMENTATION_PENDING** |
+| [`P-TOKEN-1`](#p-token-1) | CHECKED | PARTIAL | 12 open | **IMPLEMENTATION_PENDING** |
+
+## Per-claim acceptance — assumptions, limitations, and source
+
+### `P-ALLOC-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.checked_execute`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1.verity_tx_simulates_allocation_count_from_storage`.
+
+**Proof shape / exact domain statement.** checked_execute: under CheckedBounds the source executor succeeds and its capacity column equals MathView. The named capacity kill-line remains parent-shaped; active_capacity_bounded remains an unregistered Nat.min child. Verity: allocateLiveFromStorage reads and 32-caps the router count, decodes packed ModuleStateConfig fields, executes the source-derived mapped getStakingModuleSummary staticcall for each row, decodes the 96-byte (exited, deposited, depositable) ABI tuple, and for type-2 rows executes the distinct pinned getTotalModuleStake staticcall (selector 0x0c852f5c) and fail-closed 32-byte uint256 decode before allocation. It persists the computed arrays, and observe equals sourceView when those adversarial call observations decode to the expected source rows. Reachable-router CheckedBounds remains explicitly open.
+
+**Source/artifact provenance.** `MAPPED`; 13 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+
+**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- unique moduleAddress on addModule
+- getDepositAllocations / MinFirst fill (see P-ALLOC-2)
+- reachable-router CheckedBounds
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked execute parent and the live-summary/type-2-stake/packed-config transaction correspondence. Reachable-router CheckedBounds and unique moduleAddress remain strengthening obligations; do not widen to getDepositAllocations or P-ALLOC-2, and do not re-fold the min-clamp tautology.
+
+**Next gate.** CHECKED: storage-backed 32-cap, packed ModuleStateConfig decode, live 96-byte getStakingModuleSummary decoding, and WC02-only getTotalModuleStake (0x0c852f5c) 32-byte decoding are threaded into allocation under decoded-row correspondence. OPEN: unique moduleAddress and reachable-router CheckedBounds; do not widen into P-ALLOC-2 or refold the min-clamp child.
+
+### `P-ALLOC-2`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc2.verity_tx_simulates_min_first_distribution`.
+
+**Proof shape / exact domain statement.** step_correspondence_and_full_loop_conservation is the registered parent. Its first conjunct retains the explicit-∀ independent Model/Source candidate correspondence, Model.amount equality, positivity, demand bound, and capacity bound. Its second conjunct proves exact request conservation for every successful fuel-bounded sourceAllocateLoop run. Its third conjunct proves that the independently defined proportional Nat modelAllocateLoop has a matching successful run with equal mathematical totals and RowsCorrespond final rows; the proof lifts the relation across every successful mutation. The sourceAllocateLoop_eq_allocateLoop bridge still connects conservation to the Verity executor. The distinct +1 Nat model remains a separate child, and no Solidity equivalence is claimed.
+
+**Source/artifact provenance.** `MAPPED`; 4 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`
+
+**Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- Solidity allocate does not test active (filtered upstream)
+- +1 Strategy and proportional Source are different algorithms
+- memoryArrayElement reads are proved oracle-independent: this array path reads word-addressed memory directly and does not evaluate a keccak expression
+- cross-call mutation of the decoded arrays
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked proportional model/source multi-step correspondence and conservation in the parent, with the +1 model as a separate child. The direct-memory/keccak boundary is discharged only for memoryArrayElement reads; cross-call mutation and upstream active filtering remain open. Do not merge the algorithms or claim Solidity equivalence.
+
+**Next gate.** CHECKED: independent proportional modelAllocateLoop and sourceAllocateLoop now match across every successful fuel-bounded mutation with final RowsCorrespond and equal totals; conservation remains bridged to allocateLoop, and direct memory-array reads are oracle-independent (no keccak expression is evaluated). OPEN: upstream active filtering and cross-call mutation of decoded arrays. Keep the distinct +1 model as a separate child and do not claim Solidity equivalence.
+
+### `P-DEPOSIT-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit`.
+
+**Proof shape / exact domain statement.** source_deposit_conserves_and_rolls_back remains the universal source-plane conservation and non-conserving-deployment rollback theorem. NFrame.verity_tx_composes_nframe_deposit now quantifies over every finite DepositNFrameTx.Inputs.batches list. Under NFrame.LinksSource (still a caller hypothesis) and executable Preconditions, execute runs batches.mapM processBatch, one folded Lido pull, and batches.mapM pushBatch; its observed journal is the two mapped journals around that pull. FoldStable proves every exact prefix stays below 2^256 and wordTotal equals exactTotal, while an executable pre-pass guard makes every wrapping fold revert before any journal. ModuleEntry and depositToBeacon counts are each exactly batches.length (map-length arity, not DepositParentTx probes), independent of key counts. DepositNFrameCorrespondence.routerDepositInputs maps List Spec.Allocation to this link with the validator-count-to-wei multiply explicit, without deriving the link from ALLOC parents. two_batch_conjunct_d_is_n_eq_two recovers the former fixed conjunct (d). The fixed-two executeTwoOnly mutant is rejected at the same ParentConclusion by a healthy three-batch witness. A-DEPOSIT-32-ETHER remains an OPEN artifact-identity assumption; no 32-ether pin or ALLOC-to-DEPOSIT merge is claimed. This is a Verity EDSL theorem, not a compiled-artifact theorem.
+
+**Source/artifact provenance.** `MAPPED`; 7 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`
+
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength
+- DEPOSIT_CONTRACT address provenance is assumed rather than pinned to the deployed beacon deposit contract
+- MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = literal 32 ether is a deployment/constructor fact, not derived by the parent
+- the two-batch executable limitation is closed by DepositNFrameTx; the remaining word-domain gap is the abstract parent quantifying over unbounded Nat inputs whose committed aggregates exceed one word while the executable noWrap premise bounds the aggregate -- witnessed by abstract_parent_covers_inputs_the_verity_plane_omits at an out-of-domain exhibit that has no in-range substitute (in_range_commit_is_word_bounded)
+- the source pull is not bounded by this row outside ConservingConfig: LinksSource pins only DEPOSIT_SIZE and neither it nor Preconditions relates MAX_EFFECTIVE_BALANCE_WC_TYPE_01 to it, so for the non-conserving deployments the registered parent still admits, the line-972 pull quantity actualDepositsCount * maxEBType1 exceeds any word bound this row proves (linked_hypotheses_do_not_bound_the_line_972_product, with a uint256-encodable immutable); this is a statement about the computed quantity, not a settled transfer and not a reached multiplication -- the skewed deployment turns away at the earlier line-959 ZeroDeposits guard (skewed_pull_witness_turned_away_before_line_972), and an encodable module allocation bounds the product inside one word (line_972_product_le_module_allocation, encodable_allocation_bounds_line_972_product) -- and no in-range input commits a word-exceeding push at all (in_range_commit_is_word_bounded), so it is a separate theorem and not a bound
+- the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep NFrame.LinksSource explicit and keep the Spec router's per-allocation unit multiply; do not derive it from ALLOC parents. Derive the beacon address and 32-ether constructor/literal identity only from artifacts. The n-frame executable theorem remains a Verity EDSL claim, not compiled-artifact correspondence. The remaining word-domain gap is still named.
+
+**Next gate.** Keep NFrame.LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER only from artifacts; do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.
+
+### `P-TOPUP-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close`.
+
+**Proof shape / exact domain statement.** source_topup_conserves_and_rolls_back is a single registered four-conjunct claim: (1) pulled = pushed on the source-shaped run -- genuinely assert-backed: run's value-moving tail and residual amount guards read the on-chain unchecked accumulator (the line-732 sum reduced mod 2^256, wrappedTotal = exactTotal % 2^256) for the over-target guard at line 737, the zero-sum test at line 741, the Lido-side amount guards (Lido.sol 842/873), the line-744 pull, the funded router balance, and the line-755 assert, so reaching a value-moving commit means the assert passed with the wrapped pull equal to the exact push -- and a reverting outcome maps to the abstract TxObservation rollback (A-ABSTRACT-TX); (2) the moduleExists guard is live -- an unregistered module reverts revertStakingModuleUnregistered; (3) if the unchecked sum wraps mod 2^256, run itself moves no wei (pulled = pushed = 0) -- a nonzero wrap still aborts on the value-moving tail (underfunded push or line-755 assert), while a sum that wraps to exactly zero takes the line-741 empty commit committedNoTopUp, so wrap-implies-revert is false; the honest fact is wrap precludes a value-moving commit (run_wrap_precludes_value_moving_commit / source_wrap_precludes_value_moving_commit); A-TOPUP-NOWRAP lives here, in the wrap antecedent, and in the discharged-balance-guard theorems, not in conjunct (1); (4) the wcTypeIsType2 guard is live -- a non-type-2 module reverts revertWrongWithdrawalCredentialsType. TopupTxMutants carries real kill-lines on mutants of the parent's own model: dropped_conservation_assert_kill_line_refutes_parent (a surgical mutant run with ONLY the line-755 assert deleted commits the wrapping batch with pulled = 1 ≠ 2^256+1 = pushed; mutantRunNoAssert_eq_run_of_assert_passing / mutantRunNoAssert_commits_where_assert_fires pin the single edit down in the P-DEPOSIT-1 style), dropped_module_guard_kill_line_refutes_parent and dropped_wc_guard_kill_line_refutes_parent (mutants without the moduleExists / wcTypeIsType2 require commit at witnesses where the parent demands the named revert), and unwrapped_accumulator_kill_line_refutes_parent (the assert-drop mutant's dual: a wrap-ignoring mutant run commits the wrapping batch the honest run reverts via the assert). The wave-1 projections are renamed guard_discharge_at_* and are honest positive controls, not kill-lines; wrap_to_zero_commits_no_topup is the honest wrap-to-zero empty-commit control. Verity: if allocations.length ≤ 2^256, each allocation is a uint256 word, and the source run does not revert, observe of execute equals sourceObservables and pulled/pushed match, including the wrap-to-zero empty success; NoUncheckedWrap is not a Verity parent hypothesis. Not P-TOPUP-2 amount computation.
+
+**Source/artifact provenance.** `MAPPED`; 13 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-TOPUP-NOWRAP`, `A-VERITY-SCAFFOLD`, `A-TOPUP-BEACON-ADDRESS`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- beacon-address provenance remains OPEN as A-TOPUP-BEACON-ADDRESS, not a parent conjunct
+
+**Classification.** **IMPLEMENTATION_PENDING** — Pin beacon-address provenance. Keep the checked universal nonzero-wrap revert and wrap-to-zero empty-commit partition; do not derive a top-up LinksSource from ALLOC.
+
+**Next gate.** Universal word-bounded nonzero-wrap Verity revert/non-commit/rollback is CHECKED; wrap-to-zero remains an empty commit. OPEN: discharge A-TOPUP-BEACON-ADDRESS from deployment artifacts; do not derive a top-up LinksSource from ALLOC.
+
+### `P-ACCOUNT-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report`.
+
+**Proof shape / exact domain statement.** mint_after_read_discipline: on every committed modeled handleOracleReport, rewardsReadSlot is stamped before any nonzero rewardsMintedSlot. mint_order_kill_line refutes the same predicate on a pure call-site-reordering mutant. The demoted source_report_before_reward child now uses premise-free sourceTraceRetired; legacy fullReportSucceeds APIs remain compatibility adapters and carry no registered load-bearing premise. Not submitReportData; sharesToMintAsFees is an argument.
+
+**Source/artifact provenance.** `MAPPED`; 14 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+
+**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- SRStorage membership and unique uint24 module ids
+- accountingOracle caller and REPORT_EXITED_VALIDATORS_ROLE
+- submitReportData / _handleConsensusReportData
+- fee computation (sharesToMintAsFees is an argument)
+- packed uint64 accounting words
+- re-read of the written router snapshot for rewards
+- full live-report success is still not modeled; the demoted child now states only local accepted constructor order through sourceTraceRetired
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked mint-after-read discipline theorem and its call-site-reordering kill-line as the registered parent, and keep the step ticks sourced from the sequenceSlot clock rather than from call-site constants; keep source_report_before_reward as the demoted source-plane child. Do not widen to submitReportData.
+
+**Next gate.** fullReportSucceeds is retired from the demoted child; OPEN: model later full-report failure surfaces only if widening is explicitly authorized. Keep mint-after-read parent; do not widen to submitReportData.
+
+### `P-RESERVE-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec`.
+
+**Proof shape / exact domain statement.** source_spend_preserves_withdrawal_reserve: any committed modelWithdrawDepositableEther call proves scopedWithdrawGuards (canDeposit/authorizedRouter necessarily held) and withdrawalPartitionSpendInvariant, plus liveEffectiveWithdrawalsReserve invariance under an explicit freshQueueCache hypothesis standing in for a WithdrawalQueue.unfinalizedStETH() CALL. Parent kill-lines, each refuting the parent's full predicate shape with the freshQueueCache hypothesis retained: LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent kills the scopedWithdrawGuards conjunct on mutantWithdrawNoCanDeposit, a guard-for-guard copy with only the canDeposit check dropped that commits a canDeposit = false call the honest model reverts; LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent kills the partition-invariant and live-reserve conjuncts on mutantWithdraw, a mutation of the spend transition that commits under a fresh cache while the live queue-facing reserve drops 50 to 0. staleQueueCacheKillLine_holds and the ReserveMutants stale-cache witness are hypothesis-necessity evidence only: they show the freshQueueCache premise cannot be dropped, not that the parent is false. Verity observe of withdrawWithGuards still equals specTx. unfinalizedStETH remains a cached word, not a live WQ call.
+
+**Source/artifact provenance.** `MAPPED`; 5 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+
+**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- live WithdrawalQueue.unfinalizedStETH call (freshness is now an explicit freshQueueCache hypothesis with a stale-cache kill-line, not an implicit assumption)
+- canDeposit / bunker / router authorization (now proved as scopedWithdrawGuards on any committed call, but the two booleans are still free inputs, not live bunker/pause/msg.sender checks)
+- packed uint128 buffered ether and ETH transfer
+- frame-nonce reset and report-time rebalance
+- _seedDepositsCount
+- buffer is a declared oracle word, not the contract balance
+- reserve-target writer surface setDepositsReserveTarget and its report-time rebalance interaction
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked, guard-and-freshness-scoped spend-formula theorems; the relational independence fact is the P-RESERVE-1.relational child. Do not derive freshQueueCache from ReserveState alone; it stays an explicit per-call hypothesis until a live WithdrawalQueue call is modeled.
+
+**Next gate.** The registered parent already proves the live ZERO_AMOUNT guard on every commit. OPEN: keep freshQueueCache explicit until a live WQ CALL exists, and model setDepositsReserveTarget/report-rebalance; do not treat P-RESERVE-RELATIONAL as this parent.
+
+### `P-CONSOLIDATION-ETH-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition`.
+
+**Proof shape / exact domain statement.** Renamed from P-ETH-1: consolidation fee/refund ETH plane only (orthogonal to P-CONSOLIDATION-1 vault request atomicity). eth_flow_parent (Wave 1): for all (msgValue, n, fee) classified against an ApprovedSet, msg.value=0 reverts ZeroArgument, n*fee≥2^256 reverts overflow, n*fee>msgValue reverts InsufficientValue, otherwise every move is parentApproved and totalAmount=msgValue. VaultHub/StakingVault.withdraw explicitly out of scope. Verity parent verity_tx_universal_success_shape now matches that quantifier strength on the success arm: for all (msgValue, batchSize, feePerRequest) that are nonzero-valued, word-sized, non-wrapping in the product fee, funded (batchSize*feePerRequest ≤ msgValue), and fuel-fit (batchSize+4 ≤ fuelBudget=32), the honest wiring commits with the whole product fee at the consolidation-request predeploy, the remainder at the refund recipient, and zero retained by every protocol contract on the route; proved by frame-by-frame chaining through the recursive dispatcher. The premises are exactly the abstract parent's non-revert conditions plus the model's fuel bound, and each is load-bearing: premise-necessity kill-lines refute the premise-dropped projections on the honest wiring (zero-value (0,2,0), underfunded (10,4,3), fuel (30,29,1) witnesses), and four wiring mutants (dropped refund leg, misrouted vault leg, corrupted refund amount, single request per batch) refute the same universal predicate at the premise-satisfying witness (10,2,3). The five numeral witnesses, rejecting-predeploy rollback, underfunded revert, ETH conservation, and dispatch/multicall replay agreement are retained as auxiliary regression evidence (verity_tx_composes_value_flow_and_rollback). Wave 6 closes the quantifier gap on the other side of the guard: verity_tx_universal_revert_partition proves UniversalRevertPartition, four ∀-quantified rollback arms read through observe (hence through finalWorld, so each arm asserts transaction-entry rollback of the whole balance sheet, not merely a control tag) — msgValue=0 reverts at the gateway after 2 hops for all word-sized (batchSize, feePerRequest); 2^256 ≤ batchSize*feePerRequest reverts at the gateway for all nonzero-valued word-sized inputs with 0 < batchSize; msgValue < batchSize*feePerRequest (non-wrapping) reverts at the gateway; and a funded non-wrapping batch with 29 ≤ batchSize needing more than fuelBudget frames exhausts dispatch at fuelBudget hops with the sender's whole msgValue restored. That partition is conjoined into the registered verity_tx_success_and_revert_partition alongside the four numeral witnesses it subsumes, so the registered claim is strictly strengthened and no prior witness is dropped. verity_tx_universal_zero_remainder_boundary covers the batchSize+3 = fuelBudget zero-remainder corner excluded by the success parent's conservative batchSize+4 ≤ fuelBudget premise, so together the success arm, the boundary corner, and the four revert arms classify every word-sized input. Wave 4 parent kill-lines refute eth_flow_parent's own success conjunct on mutants of gatewayExecute itself: misrouted_journal_kill_line_refutes_parent (fee legs journaled to an off-ApprovedSet address, classified .other) and zero_value_success_kill_line_refutes_parent (guard-free gateway succeeds at msg.value=0 paying 2*3=6 wei of fees, breaking totalAmount=msgValue). Former P-CONSOLIDATION-ETH-1b fee-leg theorems are demoted to parent evidence under A-CANONICAL-REQUEST-ADDRESS rather than a sibling guarantee. Former P-CONSOLIDATION-ETH-1a (vault→Lido/WQ return confinement) is retired from this parent: it matches neither the consolidation fee/refund happy path nor P-RESERVE-1 spend accounting.
+
+**Source/artifact provenance.** `MAPPED`; 6 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-ABSTRACT-TX`, `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CANONICAL-REQUEST-ADDRESS`
+
+**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- VaultHub / Dashboard / TriggerableWithdrawalsGateway / StakingVault withdraw sites (named out of scope)
+- Bus/Gateway/Vault intermediate hops and live executeConsolidation ABI
+- reverting refund or Lido sinks
+- refinement between abstract parent and the Verity ensemble
+- getConsolidationRequestFee versus stored fee slot
+- composition into P-CONSOLIDATION-1 (FunctionSpec is not yet ConsolidationGateway.addConsolidationRequests)
+- the universal revert arms are stated for the modeled non-success shapes only; a reverting refund/Lido sink or a reverting request predeploy is not one of them (the rejecting-predeploy rollback stays a numeral witness)
+- the dispatch-fuel arm quantifies over the model's own dispatcher bound (fuelBudget=32 under A-ABSTRACT-TX); it is a frame-count artifact of the abstract transaction model and carries no deployed gas-metering meaning
+- vault→Lido/WithdrawalQueue protocol-return confinement is out of this parent (former P-CONSOLIDATION-ETH-1a retired; not the consolidation fee/refund happy path and not P-RESERVE-1 buffer accounting)
+- pinned canonical consolidation-request source literal (0x0000BBdDc7CE488642fb579F8B00f3a590007251), named A-CANONICAL-REQUEST-ADDRESS; fee-leg evidence uses the configured immutable/slot only and does not identify it with a deployment
+- canonical-address identity is not yet folded into the registered Verity parent; requestAddr remains a model-local ensemble address
+- renamed public id P-CONSOLIDATION-ETH-1 (was P-ETH-1): not a general SRv3 ETH guarantee
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the universal success-arm parent, the now-universal four-arm revert partition with its numeral witnesses, the zero-remainder boundary corner, and the wiring/premise kill-lines. Keep A-CANONICAL-REQUEST-ADDRESS open. Do not restore vault→Lido/WQ as a child or compose with P-CONSOLIDATION-1 until an ABI/interpreter bridge exists.
+
+**Next gate.** Both sides of the gateway guard are now quantified alike: the Verity plane proves the success arm and all four modeled non-success arms for all word-sized inputs, with the zero-remainder corner closed, so no word-sized input is unclassified. OPEN: discharge deployed target provenance under A-CANONICAL-REQUEST-ADDRESS, and fold the canonical request literal into the registered Verity parent (requestAddr is still a model-local ensemble address). Do not compose with P-CONSOLIDATION-1 before an ABI/interpreter bridge.
+
+### `P-ADDRESS-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance`.
+
+**Proof shape / exact domain statement.** universal_address_writer_equivariance covers four modeled address-bearing entrypoint projections. Only requestWithdrawals and unwrap have the proved pause/balance/allowance permissionless-admission lemma; transferFrom and claimWithdrawalsTo retain caller-relative owner/approval gates. The separate AddressClaimBatchTx executes arbitrary-length parallel request/hint iteration and has a bounded two-item observe receipt for packed request/checkpoint reads, claimed-bit writes, locked-ETH decrements, and ordered value-bearing payout CALLs. It is incremental transaction evidence, not a widening of the universal parent.
+
+**Source/artifact provenance.** `MAPPED`; 4 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+
+**Limitations — 8 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- singleton-actor exclusion is by omission: singletonActorEntryPoint is False for every modeled tag, so the parent carries no live exclusion proof
+- unbounded source-to-Verity correspondence and caller-swap equivariance theorem for the live claimWithdrawalsTo batch; the checked observe receipt is two-item
+- keccak-level physical mapping-slot derivation for queue/checkpoint struct words; ContractState mapUint channels model keyed POSITION/POSITION+1 words
+- EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, adversarial recipient code, and machine-level CALL semantics
+- packed WithdrawalQueue ERC-721 transfer and WstETH/ERC-20 storage, approvals, balances, and allowances outside the bounded claim request words
+- transferFrom is a wrapper-level single-item projection rather than a proved implementation-body correspondence
+- external-call success and most environment checks are caller-supplied Booleans
+- pinned implementation-body extraction and machine-level storage/execution correspondence
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked four-projection parent, its admission-side and write-side kill-lines, and the Verity composition. Do not call all four writers permissionless or widen to singleton-actor entrypoints.
+
+**Next gate.** OPEN: the checked parent remains a four-projection model. The separate claim batch now iterates arbitrary request/hint lists and materially reads packed request/checkpoint channels, updates locked ETH, and journals payout CALLs, with a checked two-item observe receipt. Still open: unbounded source/equivariance correspondence for that live batch, keccak physical mapping derivation, EnumerableSet/events/adversarial callee semantics, and unrelated packed ERC-721/WstETH storage. Do not add singleton-actor functions or call all four writers permissionless.
+
+### `P-TOPUP-2`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec`.
+
+**Proof shape / exact domain statement.** aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open.
+
+**Source/artifact provenance.** `MAPPED`; 3 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`
+
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- _verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp
+- live wei conversion and the module-selected allocateDeposits return/policy
+- Lido withdrawDepositableEther and beacon makeBeaconChainTopUp
+- gwei versus wei units and 48-byte pubkeys
+- keccak memory-array oracle
+- pendingBalanceGwei is trusted operator calldata
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked block-cap parent, its pointwise per-key child, explicit gwei-normalized per-key limit input, and the mutant-budget kill-line. Next model the wei conversion and module-selected allocateDeposits result. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1.
+
+**Next gate.** Explicit gwei-normalized per-key topUpLimits input and independent Verity sourceView correspondence are CHECKED. OPEN: model the live wei conversion and module-selected allocateDeposits return before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.
+
+### `P-CONSOLIDATION-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation`.
+
+**Proof shape / exact domain statement.** source_consolidation_preserves_eligibility_value_atomicity: sourceRun commits iff caller=gateway, nonempty aligned 48-byte keys, product fits, msg.value = count*fee (_requireExactFee). The caller-supplied gateway-admitted-nonzero-value premise (caller=gateway -> msg.value != 0) is threaded into the proof and used: on any run satisfying it, the committed branch's own msg.value = count*fee equality forces fee != 0, so the theorem derives that conjunct instead of leaving the premise unused. Parent-refuting kill-line: fee_blind_commit_kill_line_refutes_parent evaluates the parent's hypothesis-conditioned committed-arm conjunction on the model mutant sourceRunFeeBlind (sourceRun with the exact-fee guard dropped) and falsifies it on a concrete committed batch that SATISFIES the premise (caller=gateway, msg.value=1, fee=0, one valid 48-byte pair): every fee-independent conjunct holds of that commit while fee != 0 fails. Premise-necessity evidence, separately: gateway_admitted_nonzero_kill_line shows that with the premise dropped a free batch (fee=0, msg.value=0) still commits sourceRun; that witness violates the premise, so it refutes only the hypothesis-free projection, not the hypothesis-conditioned parent. Packing-order kill-line: swapped source||target concat fails observe. Verity: if the four memory arrays decode, observe (state.calls/events) equals sourceView of the same sourceRun. Value-bearing CALL lift: the executed transaction credits msg.value at frame entry (credited), debits each journaled CALL (forwardCalls), and proves committed_preserves_eth_balance (post-run vault selfBalance equals the pre-call balance, the pinned preservesEthBalance modifier's assert, vault side) and committed_journal_forwards_msg_value (journal suffix frames are .success CALLs to the request target each carrying the per-request fee, summing to msg.value). Not beacon eligibility and not the Bus. Do not compose with P-CONSOLIDATION-ETH-1. The frame-entry credit is admissibility-guarded: a selfBalance + msg.value that would wrap Uint256 is rejected at entry (ENTRY_CREDIT_OVERFLOW via entry_credit_overflow_reverts) before decode, so committed runs certify a non-wrapping entry credit and fundable per-CALL debits.
+
+**Source/artifact provenance.** `MAPPED`; 10 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`
+
+**Limitations — 7 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- beacon eligibility, quota, witness, and gateway grouping
+- 96-byte packed pubkey calldata and real request-contract calls
+- Bus publisher/executor path
+- keccak memory-array oracle
+- A-CONSOLIDATION-GATEWAY-NONZERO is caller-supplied at the outer P-CONSOLIDATION-ETH-1 gateway msg.value boundary, not a vault-local forwarded-totalFee fact
+- composition with P-CONSOLIDATION-ETH-1 requires ABI/interpreter bridge (groups, fee fetch, failing refund, value-bearing CALLs); fence remains until then
+- preservesEthBalance counterparty credit: the vault-side forwarding invariant is CHECKED on the executed plane, but the request predeploy's own balance credit is another contract's state; the multi-contract side stays with P-CONSOLIDATION-VALUE-1 / P-CONSOLIDATION-ETH-1
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked vault-loop theorems and the value-bearing CALL lift (credited/forwardCalls with preservesEthBalance and exact-forwarding theorems plus their three kill-lines). Relocate or remove hGatewayAdmittedNonzero (outer gateway msg.value surface / P-CONSOLIDATION-ETH-1 boundary, not vault totalFee). Do not compose with P-CONSOLIDATION-ETH-1 until an ABI/interpreter bridge exists. Keep the entry-credit overflow guard (rejects a Uint256-wrapping frame-entry credit, entry_credit_overflow_reverts) and its boundary regressions.
+
+**Next gate.** Outer-gateway nonzero admission is explicitly relocated to A-CONSOLIDATION-GATEWAY-NONZERO; discharge it only via the ABI/interpreter bridge. preservesEthBalance is CHECKED on the vault side (single-contract executed plane); the predeploy counterparty credit and 96-byte packed pubkey calldata remain OPEN until the ABI/interpreter bridge lands.
+
+### `P-SSZ-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding`.
+
+**Proof shape / exact domain statement.** Bidirectional structural deposit-root equivalence is registered as deposit_root_iff: the named Spec SszWitness.Correspondence on well-formed deposits (pinned 48/32/96-byte widths). Construction binds sourceWitness src to sourceNode src at .clValidatorVerifier; determination recovers witness = sourceWitness src from depositVerified witness root with root = sourceNode src. Deposit uniqueness is the named PerfectDepositEncoding (A-PERFECT-HASH) child deposit_unique_of_perfect, not a parent conjunct. sourceNode_mutant_kill_line_refutes_parent is the parent-shaped kill-line (encode mutated to sourceNode + 1; wellFormedDeposit retained). This complements composed_ssz_encoding, which still registers the single traversal conjunct composedEncodingOk on ComposedSszInput (the mutant-exercised deposit-data-root reconstruction under sourceCombine). swapped_combine_kill_line_refutes_parent remains the traversal-child kill-line; inconsistent_witness_kill_line and inconsistent_operation_index_kill_line remain bindOperation-level negatives. SHA-256 functional correctness stays A-SHA256-FFI; the imported Yul fragment stays OPEN under A-YUL-INTERFACE.
+
+**Source/artifact provenance.** `MAPPED`; 16 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SHA256-FFI`, `A-PERFECT-HASH`, `A-MULTI-NODE-TRANSPORT`, `A-SOLC-TRUSTED`, `A-YUL-INTERFACE`
+
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- SSZ.verifyProof on production gindices
+- SHA-256 functional correctness of the opaque model/precompile symbol
+- refinement equating the opaque sha256 symbol with Sha256Engine.sha256 used by the abstract digest child
+- imported-to-deployed helper/wrapper Yul fragment binding
+- the state-root anchor (lhs), the concat operand's pow byte (rhsPow), and the tx child's fork version / claimed root remain independently supplied, non-deposit chain-level values
+- the general Verity EncodingInput API still permits independent fields, but verity_tx_one_object_matches_sourceView provides a TX-level derived-input theorem from one ComposedSszInput
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked Spec SszWitness.Correspondence parent, its sourceNode-mutant kill-line, and the named PerfectDepositEncoding uniqueness child. Keep the one-object four-child witness/root/concat/digest composition. Do not implement SSZ.verifyProof or a cryptographic SHA-256 proof.
+
+**Next gate.** Registered parent is Spec SszWitness.Correspondence with a parent-shaped sourceNode mutant kill-line. OPEN: hash identification, SSZ.verifyProof / production gindices, and EIP-4788 / gateway. Keep SHA correctness and Yul visibly OPEN.
+
+### `P-SSZ-1.deposit-data-root`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Source.DepositDataRootCorrespondence.source_pinned_config_discharges_deposit_data_root`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Source-shaped MODEL-plane evidence derives the signature root from raw signature bytes and proves only the deposit-data-root control-flow shape with a public-key-anchored, nonconstant structural witness binding; the SOURCE plane remains OPEN, SHA-256/precompile semantics remain STRETCH_OPAQUE_FFI, and EVM and production provenance remain BLOCKED.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Preserve this child; it is composed into P-SSZ-1.
+
+### `P-SSZ-1.gindex-concat`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Narrow pinned-source correspondence for GIndex.concat only: the decoded 248-bit indices follow the exact fls-zero sentinel, depth guard, left-shift/XOR/OR ordering, pack bound, and rhs power propagation at lidofinance/core af095e48 lines 72-89. P-SSZ-1 canonical SOURCE remains OPEN and TX remains BLOCKED; SSZ.verifyProof, wrappers, SHA-256, Yul/EVM, and deployment provenance are not claimed.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** None recorded.
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Preserve this child; it is composed into P-SSZ-1.
+
+### `P-SSZ-1.abstract-digest`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Verity.SszAbstractDigest.abstract_digest_refinement`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Typed low-level Verity statements bind the exact seven SHA-256 calls, 64-byte preimages, 32-byte digests, and nested deposit-data-root composition to the pinned pure-Lean SHA-256 engine; functional SHA-256 correctness remains assumed, and no Verity execution simulation is claimed.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SHA256-FFI`, `A-MULTI-NODE-TRANSPORT`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Preserve this child; it is composed into P-SSZ-1.
+
+### `P-CONSOLIDATION-1.abstract-flow-model`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel.abstract_flow_refinement`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Typed low-level Verity statements bind the exact 48-byte source key followed by the exact 48-byte target key, with no padding, to one CALL carrying the resulting 96-byte payload; no amount, SHA-256 call, loop, or rollback composition is present, and no Yul or EVM execution refinement is claimed.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-VERITY-SCAFFOLD`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim.
+
+### `P-ALLOC-1.eugene-bound`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound.checked_amount_le_bond`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Canonical checked SRLib rows composed with the MinFirst mutation prove that one operator reward share is bounded by the configured bond headroom; this is subordinate MODEL/ALGORITHM evidence only and does not establish EVM equivalence.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-HANDWRITTEN-MINFIRST`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim.
+
+### `P-ADDRESS-1.yul-interface-harness`
+
+**Accepted theorem planes.** Abstract `OPEN`: `—`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Typed Yul builtin abstractions at the exact EVMYulLean pin (`f7e4ee0d`) bind a small abstract Yul program with `mstore-address`, `calldataload-address`, `sload-address`, and `calldatacopy-source-target` to the abstract address-renaming relation from `LidoSRv3.Audit.Guarantees.PAddress1`; an address-stomp observation is rejected by that abstract relation (it is not a claim that a changed Yul program fails to build), and no EVM execution refinement is claimed.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** None recorded.
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim.
+
+### `P-DEPOSIT-1.verity-tx-rollback.tx`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back`. Verity `CHECKED`: `LidoSRv3.Audit.Verity.DepositParentTx.revert_after_intermediate_writes_restores_snapshot`.
+
+**Proof shape / exact domain statement.** Checked bounded Verity transaction slice composes authorization, allocation, dynamic deposit data and roots with address/value-keyed Lido, module, and beacon calls. Contract.run restores the exact snapshot after intermediate writes, and two-batch alias/omission mutants are rejected.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-VERITY-SCAFFOLD`
+
+**Limitations — 0 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+
+**Classification.** **NONE**
+
+**Next gate.** Preserve this checked bounded transaction and its parent composition.
+
+### `P-CONSOLIDATION-1.fee-refinement.tx`
+
+**Accepted theorem planes.** Abstract `OPEN`: `—`. Verity `OPEN`: `—`.
+
+**Proof shape / exact domain statement.** Source-shaped bounded FunctionSpec scaffold for the pinned WithdrawalVault consolidation entrypoint. Constructor nonzero guards and the preservesEthBalance assertion are represented syntactically, but dynamic ABI decoding, calls, events, balance rollback, and source/transaction correspondence remain OPEN because Verity does not connect FunctionSpec execution to CallProgram and DenoteMemory traces.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-VERITY-SCAFFOLD`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim.
+
+### `P-SSZ-1.tx-execution-simulation`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Verity.SszTxSimulation.digest_preimages_length`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Concrete MODEL evidence stages the exact DepositData calldata layout and pure-Lean seven-preimage digest composition. The former TX claim is retracted: the registry theorem does not consume sha256Calls, denote/ObservedCalls, or sha256_call_world_rollback, so removing or mutating the external-call program leaves it provable. TX remains BLOCKED; SHA-256 functional correctness remains assumed under A-SHA256-FFI.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-VERITY-SCAFFOLD`, `A-SHA256-FFI`
+
+**Limitations — 1 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+
+**Classification.** **IMPLEMENTATION_PENDING** — Implement and compose the listed missing fidelity without widening the guarantee.
+
+**Next gate.** Preserve this child; it is composed into P-SSZ-1.
+
+### `P-ADDRESS-1.denote-admission`
+
+**Accepted theorem planes.** Abstract `OPEN`: `—`. Verity `CHECKED`: `LidoSRv3.Audit.Verity.AddressAdmission.admission_address_equivariant`.
+
+**Proof shape / exact domain statement.** Audit-authored claim() admission under official denoteFunction. PauseDisjoint is required: aliased pause/balance slots break the property. This is not WithdrawalQueue.claimWithdrawalsTo, not the facade admission_nondiscriminatory property, and not post-state equivariance. The parent transaction plane remains OPEN.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-VERITY-SCAFFOLD`
+
+**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- parent guarantee composition
+- pinned WithdrawalQueue claim/request/transfer entrypoints
+- post-state equivariance
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep the checked audit-authored admission theorem; do not implement WithdrawalQueue claim as this child.
+
+**Next gate.** Complete this bounded evidence and compose it into the parent abstract/Verity guarantee without widening its claim.
+
+### `P-RESERVE-RELATIONAL`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserveRelational.abstract_reserve_does_not_change_finalization`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PReserveRelational.verity_tx_simulates_reserve_relational_spec`.
+
+**Proof shape / exact domain statement.** Supplemental parent-closure row promoted only after composition: two states differing solely in depositsReserve produce the same prefinalized ranges, prefinalized ETH, shares to burn, finalized range, and locked ETH. The abstract model, an independently defined pinned-source interpreter for Accounting._calculateWithdrawals, WithdrawalQueue.prefinalize, and WithdrawalQueue._finalize, and an executable Verity Contract.run transaction that decodes a denoted uint256[] batch-ends memory array together with mapUint queue economics are tied together by composition theorems rather than shared names. depositsReserve is proved to lie outside the transaction read frame. The executable plane implements the Solidity 0.8 checked lockedEtherAmount accumulator, which the unbounded Nat planes cannot express, so the correspondence theorem carries an explicit no-overflow side condition and the complementary regime is closed by a separate theorem proving the transaction reverts on the exact pre-call snapshot; the relational non-interference theorem itself is unconditional.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 0 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+
+**Classification.** **NONE**
+
+**Next gate.** Replace the source-shaped decoding premise with a machine-checked correspondence to the pinned Solidity spans.
+
+### `P-ALLOC-EXEC-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAllocExec1.router_produces_executes_allocation`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Supplemental parent: the pinned two-batch deposit path routerDepositInputs yields the two legs whose keys are the allocation amounts and whose wei equal Allocation.amount * depositSize, so ExecutesAllocation and LinksSource are theorems of the router, not caller hypotheses. Alloc-exec multiply-only remains a lemma. depositSize is the configuration field; A-DEPOSIT-32-ETHER stays OPEN. This is not an n-frame lift.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-DEPOSIT-CONTRACT`, `A-DEPOSIT-32-ETHER`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- A-DEPOSIT-32-ETHER remains OPEN: depositSize is the configuration field, not a claimed 32-ether artifact identity
+- the executable transaction stays exactly two batches; this parent is not an n-frame lift
+- ALLOC parents still do not imply LinksSource without the unit multiply
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep A-DEPOSIT-32-ETHER named; do not invent a pin that discharges the 32-ether assumption or merge ALLOC into DEPOSIT.
+
+**Next gate.** Keep A-DEPOSIT-32-ETHER named; do not treat ALLOC parents as LinksSource without the unit multiply.
+
+### `P-ETH-JOURNAL-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PEthJournal1.journal_approved_excludes_protocol_return_paths`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** Supplemental legacy-projection parent: JournalApproved of the source-preserving consolidation candidate implies ProtocolReturnPathsExcluded because EthJournalCorrespondence.specDest still maps Vault→Lido and WithdrawalQueue to none. The widened Spec interface handles those routes separately in P-VAULT-ETH-1. This theorem does not claim Lido never drains ETH, and address pins do not close provenance.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- this parent does not model protocol-return value hops; those are the separate P-VAULT-ETH-1 parent
+- not a claim about all SRv3 ETH; P-CONSOLIDATION-ETH-1 is not widened
+- address pins do not close deposit, top-up, or request artifact identity
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep this legacy exclusion projection separate from the value-bearing P-VAULT-ETH-1 protocol-return projection.
+
+**Next gate.** Keep this legacy exclusion projection separate from P-VAULT-ETH-1; do not claim Lido never drains ETH.
+
+### `P-VAULT-ETH-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PVaultEth1.protocol_return_value_hops`.
+
+**Proof shape / exact domain statement.** P-VAULT-ETH-1: every successful modeled Vault-to-Lido or WithdrawalQueue protocol-return run has a lossless Spec.EthJournal projection and one externalCallBindTo frame whose value equals the Spec leg wei. Only the pinned Vault-to-Lido route binds the executable entry.sender to the runtime Lido endpoint; inputs.caller is auxiliary and cannot authorize that route. WithdrawalQueue intentionally remains source-shaped and may have a distinct caller. Owner-controlled arbitrary recipients remain excluded. Route constructors, not endpoint address pins, carry provenance. This is not a claim that Lido never drains ETH or a claim about all SRv3 ETH.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 4 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- endpoint addresses are explicit runtime inputs and are not configuration identity evidence
+- no extracted implementation-body binding exists; the executable-sender/runtime-endpoint conjunct does not establish deployment identity
+- the WithdrawalQueue protocol-return route is source-shaped rather than an extracted implementation body; no all-SRv3-ETH claim
+- callee execution and Lido buffered-ether accounting remain outside the caller-side frame model
+
+**Classification.** **IMPLEMENTATION_PENDING** — Bind the modeled route tags to extracted implementation bodies and configured endpoints without treating executable sender equality as provenance.
+
+**Next gate.** Add extracted implementation-body and configured-endpoint linkage while preserving the executable-sender/runtime-endpoint guard, value-bearing frame, and owner-recipient exclusion.
+
+### `P-ORACLE-SUPPLY-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_entry_source_domain`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.POracleSupply1.oracle_supply_entry_source_domain`.
+
+**Proof shape / exact domain statement.** Supplemental parent: the modeled submitReportData entry (pinned AccountingOracle.submitReportData -> _handleConsensusReportData -> Accounting.handleOracleReport / _simulateOracleReport / _calculateProtocolFees) computes entryFeeWei and entryShareRate from report data and entry state and feeds the pair into handleOracleReportComputed, so the entry run is the computed-wrapper run, observe equals sourceView at mintedShares entryFeeWei entryShareRate, the mint never exceeds the pinned feeEther * internalShares / (postInternalEther - feeEther) division, and the named maxShareRate cap holds at the computed pair. Under EntryDomainValid (profitable-branch precisionPoints > 0, totalFee ≤ precisionPoints, feeShareRateDenominator > 0, checked-arithmetic non-underflow) and divisibility, the mint exactly equals the pinned formula (oracle_supply_entry_source_domain). No free sharesToMintAsFees at the entry. Pack E sharesMinted-as-argument is not this conclusion. P-ACCOUNT-1 stays order-only.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- entry consensus hash is an opaque word equality, not keccak256 of ABI-encoded calldata; contract-version, consensus-version, ref-slot, deadline, and extra-data checks are not modeled
+- smoothenTokenRebase, withdrawal-queue prefinalize, and bad-debt terms enter as report-data fields, not modeled sanity-checker or withdrawal-queue executions
+- entryShareRate is the E27-quantized internalShares * E27 / (postInternalEther - feeEther); the wrapper mint under-approximates the pinned division by at most the quantization remainder and is exact only under EntryDomainValid + divisibility
+- uint256 overflow on intermediate products (feeEther * internalSharesBeforeFees, internalSharesBeforeFees * E27) remains unmodeled
+- Pack E leftover sharesMinted-as-argument is not this parent and stays a child
+- P-ACCOUNT-1 remains order-only; this row does not fold ACCOUNT into supply
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep P-ACCOUNT-1 order-only; do not treat the Pack E argument-as-mint child as this parent; keep the entry guards the checked hash/sender premises and the E27 quantization disclosed.
+
+**Next gate.** Keep P-ACCOUNT-1 order-only; do not treat Pack E argument-as-mint as this parent; keep the E27 quantization and unmodeled entry checks disclosed.
+
+### `P-ADDRESS-BATCH-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PAddressBatch1.p_address_batch_1_unbounded_recipient_rename`.
+
+**Proof shape / exact domain statement.** Supplemental unbounded parent for live executeClaimWithdrawalsTo: on well-formed request/hint lists with no fuel bound, ρ · executeClaimWithdrawalsTo = execute · ρ on the journal dests (payouts stay the pre-state reads). Fuel-bounded rename stays a lemma. The keccak slot *formula* is identified; PhysicalClaimSlots is a caller hyp and the live loop still reads mapUint. Does not weaken universal_address_writer_equivariance.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 3 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- keccak physical slot maps remain OPEN: PhysicalClaimSlots is a caller hypothesis (mapUint = readSlot of mappingSlotLocation); the slot formula is identified, but the live loop still reads mapUint and does not SLOAD keccak cells
+- EnumerableSet owner-request removal, Transfer/WithdrawalClaimed events, and adversarial recipient code remain out
+- PAddress1.universal_address_writer_equivariance is not weakened
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep keccak physical slot maps OPEN until the live path SLOADs keccak cells; keep universal_address_writer_equivariance unweakened.
+
+**Next gate.** Keccak physical slot maps remain OPEN. Keep universal_address_writer_equivariance unweakened.
+
+### `P-SSZ-LIVE-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PSszLive1.modeled_beacon_roots_live_ssz_consume`.
+
+**Proof shape / exact domain statement.** Modeled live-SSZ consume parent: eip4788ParentRoot is identified with a caller-supplied EIP-4788 BEACON_ROOTS 8191-slot timestamp-indexed history read (zero, missing, and overwritten-timestamp reads fail closed). Top-up / consolidation WC admission consumes ageCheck plus production-GI verifyAtParent against that identified root; none admits nothing. ProductionGindexBinding remains the in-repo constructor pin, not a deployed identity. A-SHA256-FFI stays. The Verity plane is the same list lookup, not Contract.run at the EIP-4788 precompile address.
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SHA256-FFI`, `A-SOURCE-SHAPED`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 5 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- A-SHA256-FFI remains: combine is abstract; SHA-256 functional correctness is not claimed
+- the constructor pin is an in-repo literal, not a live-deployment identity
+- the BEACON_ROOTS model is not a deployed-address or codehash identity
+- .verityTx CHECKED is the modeled list lookup (executeRead = rfl), not Contract.run at the EIP-4788 precompile address; history cells are caller-supplied
+- not a deployed Solidity gateway, not official consolidation denote success, and not a bus
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep A-SHA256-FFI named and the modeled BEACON_ROOTS result distinct from deployed address/codehash identity; do not promote the constructor pin to deployed identity.
+
+**Next gate.** Keep A-SHA256-FFI named. Do not read .verityTx CHECKED as Contract.run at the EIP-4788 address. Pin deployed BEACON_ROOTS and gateway identities separately.
+
+### `P-CONSOLIDATION-VALUE-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value`. Verity `CHECKED`: `LidoSRv3.Audit.Guarantees.PConsolidationValue1.official_denote_succeeds_and_justified_forwards_msg_value`.
+
+**Proof shape / exact domain statement.** Supplemental parent: the official upstream widened-call denotation (DenoteFunctionCalls.denoteFunctionWithCalls at the pinned Verity head) succeeds on the registered bind entrypoint for every oracle, accepting predeploy model, transaction, and world satisfying the source guards, journaling one fresh value-bearing CALL frame, forwarding exactly msg.value, re-establishing preservesEthBalance, and producing only request frames; independently the justified interpreter forwards exactly msg.value with noConsensusLayerVerify. A-CONSOLIDATION-GATEWAY-NONZERO stays a premise. No bus. The base denoteFunction fragment still reverts on the bind entrypoint (kept named in ConsolidationBridgeGap).
+
+**Source/artifact provenance.** No independent source-map target; supplemental evidence only. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`, `A-CONSOLIDATION-GATEWAY-NONZERO`, `A-CLASSICAL-CHOICE`
+
+**Limitations — 6 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- A-CONSOLIDATION-GATEWAY-NONZERO remains a caller premise, not discharged
+- AcceptingPredeploy is a callee-model hypothesis (identity state transition and always-success returndata)
+- official success is the single-request bind (msg.value = 1 * fee), not an n-request batch
+- link target and fee are CallEnv parameters, not a deployed-address identity
+- no bus, no delay, no quota, no consensus-layer verify, no ETH-1 composed with CONSOLIDATION-1 ABI bridge
+- official success holds on the widened-call denotation fragment; the base denoteFunction fragment still maps raw calls outside its arms, and no compiled-artifact behaviour is claimed
+
+**Classification.** **IMPLEMENTATION_PENDING** — Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota may start only on top of this official-success parent.
+
+**Next gate.** Keep A-CONSOLIDATION-GATEWAY-NONZERO named; bus/delay/quota only on top of official success.
+
+### `P-TOKEN-1`
+
+**Accepted theorem planes.** Abstract `CHECKED`: `LidoSRv3.Audit.Guarantees.PToken1.request_owner_custody_invariant`. Verity `PARTIAL`: `—`.
+
+**Proof shape / exact domain statement.** P-TOKEN-1 (bounded, subordinate): over the pinned WithdrawalQueue request-creation control prefix composed with an arbitrary-length chain of owner-operated WithdrawalQueueERC721 transferFrom hops, every reachable state satisfies one named conclusion: the amount is inside the two-sided _checkWithdrawalRequestAmount range, the created owner is exactly the line-130 msg.sender fallback, the request owner is never address(0) after any number of hops, and every hop that executed was operated by the then-current owner to a distinct nonzero recipient. The unmodeled _enqueue/_emitTransfer owner binding is an explicit universally quantified mint argument with the single named hypothesis that minting binds a request to its created owner. This is NOT a broad ERC-20 or token guarantee: approve, allowance state, STETH.transferFrom, share conversion, queue storage, finalization, claim/redeem, WstETH paths, pause, and whole-transaction rollback are unmodeled, so no transferability, redeemability, or balance claim follows.
+
+**Source/artifact provenance.** `MAPPED`; 3 immutable pinned source span(s) in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance.
+
+**Assumptions.** `A-SOURCE-SHAPED`
+
+**Limitations — 12 open fidelity gap(s).** Surfaces the accepted theorems above do *not* cover:
+
+- approve and ERC-20 allowance state are entirely unrepresented, so no approval-path claim follows
+- the STETH.transferFrom external call at WithdrawalQueue.sol:134 and all token balances are unmodeled, so no ERC-20 movement is established
+- getSharesByPooledEth share conversion at WithdrawalQueue.sol:376 and _enqueue request-id storage at line 378 are outside the slice
+- claimWithdrawals, finalization, and every redeem path are unmodeled, so redeemability is not claimed
+- requestWithdrawalsWstETH, WstETH unwrap, and permit entrypoints are excluded
+- _checkResumed pause at WithdrawalQueue.sol:129 and whole-transaction rollback are not represented
+- the approved-operator and isApprovedForAll branches at WithdrawalQueueERC721.sol:242 are excluded; only the owner-operated branch is modeled
+- request-id validity and claimed checks at WithdrawalQueueERC721.sol:233 and 236, and the owner-indexed EnumerableSet updates at lines 250-251, are outside the slice
+- events at WithdrawalQueue.sol:380 and WithdrawalQueueERC721.sol:253 are not modeled
+- only one request list item is modeled; multi-item requestWithdrawals batches are not composed
+- no Verity Executable Contract exists for the WithdrawalQueue surface, so the verity plane stays PARTIAL
+- P-TOKEN-1 is registered as a subordinate bounded row only; broad ERC-20 token behaviour remains NOT YET and is neither claimed nor implied
+
+**Classification.** **IMPLEMENTATION_PENDING** — Model the STETH.transferFrom call, share conversion, and _enqueue storage writes as an executable Verity WithdrawalQueue contract, then compose approve/transfer/redeem before any broad token parent is proposed.
+
+**Next gate.** Add an executable WithdrawalQueue request transaction that discharges the mint hypothesis from real _enqueue storage writes and composes the STETH.transferFrom call, before widening beyond the bounded custody parent.
+
 
 ## Explicit NOT YET boundaries
 

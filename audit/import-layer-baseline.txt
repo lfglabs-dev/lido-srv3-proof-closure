@@ -1,0 +1,56 @@
+# Shrinking import-layer debt. Delete a row only when the import is gone.
+# Adding a row is forbidden; new inversions fail the check.
+
+# rule: spec-verity
+LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence LidoSRv3.Audit.Verity.AddressClaimBatchTx
+LidoSRv3.Audit.Spec.AddressClaimCorrespondence LidoSRv3.Audit.Verity.AddressClaimBatchTx
+LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence LidoSRv3.Audit.Verity.AddressClaimBatchTx
+LidoSRv3.Audit.Spec.AddressClaimKeccakSlots LidoSRv3.Audit.Verity.AddressClaimBatchTx
+LidoSRv3.Audit.Spec.AllocExecCorrespondence LidoSRv3.Audit.Verity.DepositParentTx
+LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Verity.DepositParentTx
+LidoSRv3.Audit.Spec.ConsolidationBridgeGap LidoSRv3.Audit.Verity.ConsolidationCallFragment
+LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild LidoSRv3.Audit.Verity.ConsolidationCallFragment
+LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild LidoSRv3.Audit.Verity.ConsolidationTx
+LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence LidoSRv3.Audit.Verity.ConsolidationTx
+LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence LidoSRv3.Audit.Verity.ConsolidationValueTx
+LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence LidoSRv3.Audit.Verity.DepositParentTx
+LidoSRv3.Audit.Spec.OracleFrameCorrespondence LidoSRv3.Audit.Verity.HandleOracleReportTx
+LidoSRv3.Audit.Spec.OracleMintCorrespondence LidoSRv3.Audit.Verity.AddressClaimBatchTx
+LidoSRv3.Audit.Spec.OracleMintCorrespondence LidoSRv3.Audit.Verity.HandleOracleReportTx
+LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence LidoSRv3.Audit.Verity.TopupTx
+
+# rule: spec-guarantees
+LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Guarantees.PAlloc1
+LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Guarantees.PAlloc2
+LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Guarantees.PDeposit1
+LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Guarantees.PTopup2
+LidoSRv3.Audit.Spec.ConsolidationBridgeGap LidoSRv3.Audit.Guarantees.PConsolidation1
+LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild LidoSRv3.Audit.Guarantees.PConsolidation1
+LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence LidoSRv3.Audit.Guarantees.PConsolidation1
+LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence LidoSRv3.Audit.Guarantees.PDeposit1
+LidoSRv3.Audit.Spec.DepositNFrameCorrespondence LidoSRv3.Audit.Guarantees.PDeposit1
+LidoSRv3.Audit.Spec.EthJournalCorrespondence LidoSRv3.Audit.Guarantees.PConsolidationEth1
+LidoSRv3.Audit.Spec.OracleFrameCorrespondence LidoSRv3.Audit.Guarantees.PAccount1
+LidoSRv3.Audit.Spec.OracleFrameCorrespondence LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound
+LidoSRv3.Audit.Spec.ReserveQueueCacheChild LidoSRv3.Audit.Guarantees.PReserve1
+LidoSRv3.Audit.Spec.Topup2WeiConversionChild LidoSRv3.Audit.Guarantees.PTopup2
+LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence LidoSRv3.Audit.Guarantees.PTopup1
+
+# rule: source-guarantees
+LidoSRv3.Audit.Source.Topup2Correspondence LidoSRv3.Audit.Guarantees.PTopup2
+
+# rule: model-guarantees
+
+# rule: common-guarantees
+
+# rule: verity-guarantees
+LidoSRv3.Audit.Verity.AddressYulInterface LidoSRv3.Audit.Guarantees.PAddress1
+LidoSRv3.Audit.Verity.ConsolidationCallFragment LidoSRv3.Audit.Guarantees.PConsolidation1
+LidoSRv3.Audit.Verity.TopupPackedStorage LidoSRv3.Audit.Guarantees.PTopup2
+LidoSRv3.Audit.Verity.TopupRollback LidoSRv3.Audit.Guarantees.PTopup1
+
+# rule: provenance-guarantees
+LidoSRv3.Audit.Provenance.ConsolidationRequest LidoSRv3.Audit.Guarantees.PConsolidationEth1
+LidoSRv3.Audit.Provenance.Deposit LidoSRv3.Audit.Guarantees.PDeposit1
+LidoSRv3.Audit.Provenance.TopupBeacon LidoSRv3.Audit.Guarantees.PDeposit1
+LidoSRv3.Audit.Provenance.TopupBeacon LidoSRv3.Audit.Guarantees.PTopup1

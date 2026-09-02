@@ -15,10 +15,10 @@
     --paper:#ffffff; --card:#f5f7fa; --ink:#404040; --heading:#000000; --soft:#949494;
     --line:#e3e8ef; --line2:#eef1f6; --edge:#c3ccd7;
     --accent:#2dd4bf; --accent-ink:#0d9488;
-    --el:#1a6fb5; --cl:#7c5ce0; --com:#b17a1e; --bot:#8b93a1; --proof:#0f9e77;
+    --el:#1a6fb5; --cl:#7c5ce0; --com:#b17a1e; --bot:#8b93a1; --proof:#0f9e77; --sys:#4a5568;
     --el-bg:#edf4fa; --el-bd:#c2d8ea; --cl-bg:#f1edfc; --cl-bd:#d6cbf2;
     --com-bg:#faf3e6; --com-bd:#e6d3ae; --bot-bg:#f1f3f6; --bot-bd:#d5dae1;
-    --proof-bg:#e9f7f2; --proof-bd:#b8e0d2;
+    --proof-bg:#e9f7f2; --proof-bd:#b8e0d2; --sys-bg:#eceef1; --sys-bd:#c6ccd4;
     --cf1:#1a75c0; --cf2:#0d9488; --cf3:#67921a; --cf4:#bd7c17; --cf5:#d0523a; --cf6:#8a5cf6; --cf7:#b44487;
     --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
     --sans:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
@@ -53,6 +53,7 @@
   .legend .com{background:var(--com-bg);border-color:var(--com-bd);color:var(--com)}
   .legend .bot{background:var(--bot-bg);border-color:var(--bot-bd);color:var(--bot)}
   .legend .cl{background:var(--cl-bg);border-color:var(--cl-bd);color:var(--cl)}
+  .legend .sys{background:var(--sys-bg);border-color:var(--sys-bd);color:var(--sys)}
 
   /* flow pills */
   .fbar{display:flex;flex-wrap:wrap;gap:7px 6px;margin:22px 0 8px}
@@ -103,12 +104,13 @@
   .node.proof rect.box{fill:var(--proof-bg);stroke:var(--proof-bd)}
   .node.bot rect.box{fill:var(--bot-bg);stroke:var(--bot-bd)}
   .node.cl rect.box{fill:var(--cl-bg);stroke:var(--cl-bd)}
+  .node.sys rect.box{fill:var(--sys-bg);stroke:var(--sys-bd)}
   .node text{transition:opacity .15s}
   .node .nm{font:700 12.5px var(--sans);fill:var(--heading)}
   .node .fl{font:600 8.6px var(--mono)}
   .node .ad{font:500 8.6px var(--mono);fill:var(--soft)}
   .node.el .fl{fill:var(--el)} .node.com .fl{fill:var(--com)} .node.proof .fl{fill:var(--proof)}
-  .node.bot .fl{fill:var(--bot)} .node.cl .fl{fill:var(--cl)}
+  .node.bot .fl{fill:var(--bot)} .node.cl .fl{fill:var(--cl)} .node.sys .fl{fill:var(--sys)}
   .node.dim{opacity:.12}
   .node.on rect.box{stroke:var(--hl,var(--line));stroke-width:1.8}
 
@@ -131,6 +133,7 @@
   .c.com{--tc:var(--com);background:var(--com-bg);border-color:var(--com-bd)}
   .c.bot{--tc:var(--bot);background:var(--bot-bg);border-color:var(--bot-bd)}
   .c.proof{--tc:var(--proof);background:var(--proof-bg);border-color:var(--proof-bd)}
+  .c.sys{--tc:var(--sys);background:var(--sys-bg);border-color:var(--sys-bd)}
   .c .n{font-weight:700;font-size:.83rem;color:var(--heading);letter-spacing:-.01em}
   .c .f{font-family:var(--mono);font-size:.63rem;color:var(--tc,var(--soft));word-break:break-all;letter-spacing:0}
   .c .a{font-family:var(--mono);font-size:.63rem;color:var(--soft);letter-spacing:0}
@@ -153,13 +156,18 @@
   <div class="kicker">Lido protocol · SRv3 · af095e48</div>
   <h1>How Lido fits together</h1>
   <p>Every box is a contract (source file plus mainnet address, hover for the full story) or an off-chain actor,
-  colored by <b>what makes it trustworthy</b>. Edge labels are the real function calls at
+  colored by <b>what makes it trustworthy</b>. Only the purple boxes are consensus-layer; every other
+  <b>on-chain</b> box, <b>including EIP-4788 / 7002 / 7251</b>, executes on the EL and is reached by ordinary
+  <code>call</code>&nbsp;/&nbsp;<code>staticcall</code>. The gray boxes are the off-chain actors of the
+  <code>bot</code> class: they run no EL code and reach these contracts only by sending transactions to them.
+  Edge labels are the real function calls at
   <b>lidofinance/core@af095e48</b> (SRv3, PR&nbsp;#1811; those contracts are not deployed yet).</p>
   <div class="legend">
     <span class="el">EL contract · held by code</span>
-    <span class="proof">proof-gated · EIP-4788</span>
-    <span class="com">committee · quorum</span>
-    <span class="bot">off-chain · liveness only</span>
+    <span class="proof">EL contract · EIP-4788 proof-gated</span>
+    <span class="com">EL contract · quorum / committee-held</span>
+    <span class="bot" title="No bot-class actor can redirect principal: withdrawal credentials are write-once and point at the WithdrawalVault. What a compromise costs is per actor, not class-wide. Staker and depositor bot: liveness only. Node operators: they hold validator signing keys, and a compromised key can sign slashable messages, so validator balances can still be reduced.">off-chain · cannot redirect principal</span>
+    <span class="sys">EL system predeploy</span>
     <span class="cl">consensus layer</span>
   </div>
 </header>
@@ -176,7 +184,7 @@
   <button class="pill" data-flow="f5" style="--fc:var(--cf5)" aria-pressed="false"
     data-desc="New exit-bus format with ETH-denominated limits; unfulfilled requests forced via triggerExits → WithdrawalVault → EIP-7002. Returned ETH lands in the WithdrawalVault and re-enters the buffer at the next report."><i></i>F5 Validator exit<b class="new">changed</b></button>
   <button class="pill" data-flow="f6" style="--fc:var(--cf6)" aria-pressed="false"
-    data-desc="Migrator → Bus → Gateway pipeline over EIP-7251: balance moves CMv1 → CMv2 without an exit/re-deposit cycle. The Bus delay is the guardians' veto window; targets proven against EIP-4788."><i></i>F6 Consolidation<b class="new">new</b></button>
+    data-desc="Migrator → Bus → Gateway pipeline over EIP-7251: balance moves CMv1 → CMv2 without an exit/re-deposit cycle. The Bus delay is the consolidation committee's veto window (removeBatches is REMOVE_ROLE); targets proven against EIP-4788."><i></i>F6 Consolidation<b class="new">new</b></button>
   <button class="pill" data-flow="f7" style="--fc:var(--cf7)" aria-pressed="false"
     data-desc="Daily report: AccountingOracle writes per-module CL balances straight to the router (new SRv3 surface); Accounting rebases and mints stETH fees to modules, operators, treasury."><i></i>F7 Report &amp; fees<b class="new">changed</b></button>
   <button class="reset" id="reset">show everything</button>
@@ -213,7 +221,7 @@
   <line class="sep" x1="0" y1="630" x2="1280" y2="630"/>
   <text class="bandlbl" x="14" y="14">OFF-CHAIN</text>
   <text class="bandlbl" x="14" y="112">EXECUTION LAYER</text>
-  <text class="bandlbl" x="14" y="650">CONSENSUS LAYER</text>
+  <text class="bandlbl" x="14" y="650">CONSENSUS LAYER · EL SYSTEM PREDEPLOYS</text>
 
   <!-- ================= edges ================= -->
   <g id="edges">
@@ -231,7 +239,9 @@
   <g class="edge" data-flows="f3"><path d="M520,68 C600,90 660,108 702,136"/><text class="lbl" x="574" y="98">Merkle proofs</text></g>
   <g class="edge da" data-flows="f3"><path d="M655,648 L655,268 C655,235 708,232 708,200"/><text class="lbl" transform="rotate(-90 644 430)" x="644" y="430" text-anchor="middle">prove target: Lido WC · active · not slashed</text></g>
   <g class="edge" data-flows="f3"><path d="M690,196 C660,225 620,240 588,260"/><text class="lbl" x="600" y="222">topUp()</text></g>
-  <g class="edge" data-flows="f4 f5 f7"><path d="M855,202 C650,245 480,245 256,286"/><text class="lbl" x="452" y="236">handleOracleReport · 5/9 quorum</text></g>
+  <g class="edge" data-flows="f4 f5 f7"><path d="M855,202 C650,245 480,245 256,286"/><text class="lbl" x="452" y="236">handleOracleReport</text></g>
+  <g class="edge" data-flows="f4 f7"><path d="M1075,171 L1034,171"/><text class="lbl" x="1070" y="163" text-anchor="end">quorum on report hash</text></g>
+  <g class="edge" data-flows="f5"><path d="M1110,204 C1092,238 1068,264 1034,282"/><text class="lbl" x="1064" y="250" text-anchor="end">quorum on report hash</text></g>
   <g class="edge" data-flows="f7"><path d="M880,204 C790,244 700,256 614,272"/><text class="lbl" x="640" y="290">per-module CL balances</text></g>
   <g class="edge" data-flows="f4 f5 f7"><path d="M150,262 L150,206"/><text class="lbl" x="158" y="240">rebase</text></g>
   <g class="edge" data-flows="f7"><path d="M250,304 C310,314 350,320 396,324"/><text class="lbl" x="266" y="340">reportRewardsMinted</text></g>
@@ -242,7 +252,7 @@
   <g class="edge" data-flows="f5 f6"><path d="M860,602 L872,648"/><text class="lbl" data-lf="f5" x="880" y="634">trigger exit</text><text class="lbl" data-lf="f6" x="878" y="620">source→target + fee</text></g>
   <g class="edge" data-flows="f5 f6"><path d="M830,706 C760,726 660,722 614,698"/><text class="lbl" data-lf="f5" x="680" y="738">exit processed</text><text class="lbl" data-lf="f6" x="666" y="754">balance merged into target</text></g>
   <g class="edge" data-flows="f5"><path d="M610,656 C640,615 680,608 712,602"/><text class="lbl" x="622" y="612">exited + skimmed ETH</text></g>
-  <g class="edge" data-flows="f6"><path d="M1157,68 L1157,260"/><text class="lbl" transform="rotate(-90 1147 164)" x="1147" y="164" text-anchor="middle">operator pairs (vetoable)</text></g>
+  <g class="edge" data-flows="f6"><path d="M1235,68 C1252,96 1252,120 1252,164 C1252,208 1252,236 1235,262"/><text class="lbl" transform="rotate(-90 1244 164)" x="1244" y="164" text-anchor="middle">EVMScriptExecutor → Migrator.allowPair</text></g>
   <g class="edge da" data-flows="f6"><path d="M782,662 C950,648 1080,480 1126,344"/><text class="lbl" x="1008" y="560">WC proofs</text></g>
   <g class="edge" data-flows="f6"><path d="M1088,338 C1010,440 930,510 884,538"/><text class="lbl" x="912" y="480">addConsolidationRequests</text></g>
   </g>
@@ -253,8 +263,8 @@
     <text class="nm" x="70" y="41">Staker / stETH holder</text><text class="ad" x="70" y="57">off-chain</text></g>
   <g class="node bot" data-flows="f2 f3"><rect class="box" x="400" y="20" width="150" height="48" rx="9"/>
     <text class="nm" x="410" y="41">Depositor Bot</text><text class="ad" x="410" y="57">off-chain</text></g>
-  <g class="node com" data-flows="f6"><title>0xF0211b7660680B49De1A7E9f25C65660F0a13Fea: vetoable DAO motions</title><rect class="box" x="1075" y="20" width="165" height="48" rx="9"/>
-    <text class="nm" x="1085" y="41">EasyTrack</text><text class="ad" x="1085" y="57">0xF021…3Fea</text></g>
+  <g class="node com" data-flows="f6"><title>0xF0211b7660680B49De1A7E9f25C65660F0a13Fea: DAO motions that pass through EasyTrack are executed by its EVMScriptExecutor, and it is that executor — not EasyTrack itself — that holds ALLOW_PAIR_ROLE on ConsolidationMigrator (UpgradeTemporaryAdmin.sol:68,91; asserted single holder at UpgradeTemplate.sol:339). It can only ALLOW pairs. The veto is elsewhere: DISALLOW_PAIR_ROLE and the Bus REMOVE_ROLE both sit with the consolidation committee (UpgradeTemporaryAdmin.sol:92,99; UpgradeTemplate.sol:330,340).</title><rect class="box" x="1075" y="20" width="165" height="48" rx="9"/>
+    <text class="nm" x="1085" y="38">EasyTrack</text><text class="fl" x="1085" y="52">EVMScriptExecutor</text><text class="ad" x="1085" y="63">0xF021…3Fea · allow-only</text></g>
 
   <g class="node el" data-flows="f1 f2 f3 f4 f7"><title>0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84: stETH token + ETH buffer</title><rect class="box" x="60" y="140" width="190" height="62" rx="9"/>
     <text class="nm" x="70" y="160">Lido · stETH</text><text class="fl" x="70" y="176">0.4.24/Lido.sol</text><text class="ad" x="70" y="190">0xae7a…fE84</text></g>
@@ -263,17 +273,17 @@
   <g class="node el" data-flows="f4"><title>0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1: FIFO queue + escrow, unstETH NFT</title><rect class="box" x="60" y="384" width="190" height="62" rx="9"/>
     <text class="nm" x="70" y="404">WithdrawalQueue</text><text class="fl" x="70" y="420">WithdrawalQueueERC721.sol</text><text class="ad" x="70" y="434">0x889e…F9B1 · unstETH</text></g>
 
-  <g class="node com" data-flows="f2"><title>0xF573E9E3de1f86B085417ab294f56E7920B4e9Be: guardian committee, anti front-run</title><rect class="box" x="400" y="140" width="200" height="56" rx="9"/>
+  <g class="node com" data-flows="f2"><title>0xF573E9E3de1f86B085417ab294f56E7920B4e9Be: an EL contract whose power is committee-held. It stores its own guardian set and quorum (DepositSecurityModule.sol:97-98, getGuardianQuorum :227-231), and guardians attest before StakingRouter.deposit(). Anti front-run. Its only reach into consolidation is the isDepositsPaused() flag (:88) that ConsolidationGateway reads (:276-277); it cannot remove consolidation batches.</title><rect class="box" x="400" y="140" width="200" height="56" rx="9"/>
     <text class="nm" x="410" y="160">DepositSecurityModule</text><text class="fl" x="410" y="176">0.8.9/DepositSecurityModule.sol</text><text class="ad" x="410" y="189">0xF573…e9Be · guardians</text></g>
-  <g class="node proof" data-flows="f3"><title>SRv3, not deployed: verifies 0x02 top-up targets against EIP-4788</title><rect class="box" x="640" y="140" width="170" height="56" rx="9"/>
+  <g class="node proof" data-flows="f3"><title>SRv3, not deployed. Inherits CLValidatorVerifier (TopUpGateway.sol:8,36,70), which is a different verifier from the ConsolidationGateway's CLProofVerifier: it proves each 0x02 top-up target against the EIP-4788 beacon root (Lido withdrawal credentials, active, not slashed) before calling StakingRouter.topUp() (:232).</title><rect class="box" x="640" y="140" width="170" height="56" rx="9"/>
     <text class="nm" x="650" y="160">TopUpGateway</text><text class="fl" x="650" y="176">0.8.25/TopUpGateway.sol</text><text class="ad" x="650" y="189">SRv3 · not deployed</text></g>
   <g class="node el" data-flows="f2 f3 f7"><title>proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999: allocates stake, pulls ETH, distributes fees</title><rect class="box" x="400" y="262" width="210" height="68" rx="9"/>
     <text class="nm" x="410" y="283">StakingRouter · v3</text><text class="fl" x="410" y="299">0.8.25/sr/StakingRouter.sol</text><text class="ad" x="410" y="313">proxy 0xFdDf…2999</text></g>
 
   <g class="node el" data-flows="f2 f6 f7"><title>0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5: 0x01 keys, consolidation source</title><rect class="box" x="300" y="420" width="160" height="56" rx="9"/>
     <text class="nm" x="310" y="440">CMv1 · Curated</text><text class="fl" x="310" y="456">nos/NodeOperatorsRegistry.sol</text><text class="ad" x="310" y="469">0x5503…28d5</text></g>
-  <g class="node el" data-flows="f3 f6 f7"><title>IStakingModuleV2 implementation lives outside the core repo; consolidation target</title><rect class="box" x="480" y="420" width="160" height="56" rx="9"/>
-    <text class="nm" x="490" y="440">CMv2 · Curated</text><text class="fl" x="490" y="456">IStakingModuleV2 (ext. repo)</text><text class="ad" x="490" y="469">SRv3 · 0x02 · new</text></g>
+  <g class="node el" data-flows="f3 f6 f7"><title>Consolidation target. The IStakingModuleV2 interface the router calls through is in this repo (contracts/common/interfaces/IStakingModuleV2.sol); only the CMv2 implementation lives outside it, so no CMv2 bytecode is in scope here.</title><rect class="box" x="480" y="420" width="160" height="56" rx="9"/>
+    <text class="nm" x="490" y="440">CMv2 · Curated</text><text class="fl" x="490" y="456">IStakingModuleV2 · impl ext.</text><text class="ad" x="490" y="469">SRv3 · 0x02 · new</text></g>
   <g class="node el" data-flows="f2 f7"><title>SDVT 0xaE7B191A31f627b4eB1d4DaC64eaB9976995b433 (Obol/SSV clusters) · CSM 0xdA7dE2ECdDfccC6c3AF10108Db212ACBBf9EA83F (bonded permissionless)</title><rect class="box" x="660" y="420" width="190" height="56" rx="9"/>
     <text class="nm" x="670" y="440">SDVT · CSM</text><text class="fl" x="670" y="456">other staking modules</text><text class="ad" x="670" y="469">0xaE7B…b433 · 0xdA7d…A83F</text></g>
 
@@ -282,22 +292,24 @@
   <g class="node el" data-flows="f5 f6"><title>0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f: all Lido validator WC point here</title><rect class="box" x="700" y="540" width="200" height="62" rx="9"/>
     <text class="nm" x="710" y="560">WithdrawalVault</text><text class="fl" x="710" y="576">0.8.9/WithdrawalVault.sol</text><text class="ad" x="710" y="590">0xB9D7…293f</text></g>
 
-  <g class="node com" data-flows="f4 f5 f7"><title>0x852deD011285fe67063a08005c71a85690503Cee: daily report; SRv3 adds per-module CL balances</title><rect class="box" x="840" y="140" width="190" height="62" rx="9"/>
-    <text class="nm" x="850" y="160">AccountingOracle</text><text class="fl" x="850" y="176">oracle/AccountingOracle.sol</text><text class="ad" x="850" y="190">0x852d…3Cee · committee ×9</text></g>
-  <g class="node com" data-flows="f5"><title>0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e: exit requests, ETH-denominated bounds</title><rect class="box" x="840" y="262" width="190" height="62" rx="9"/>
-    <text class="nm" x="850" y="282">ValidatorsExitBus</text><text class="fl" x="850" y="298">oracle/ValidatorsExitBusOracle.sol</text><text class="ad" x="850" y="312">0x0De4…5c6e · committee ×9</text></g>
-  <g class="node bot" data-flows="f5"><title>Hold signing keys only; principal is out of reach</title><rect class="box" x="840" y="735" width="190" height="48" rx="9"/>
+  <g class="node el" data-flows="f4 f5 f7"><title>0x852deD011285fe67063a08005c71a85690503Cee: an EL contract (AccountingOracle.sol:69 — contract AccountingOracle is BaseOracle; BaseOracle.sol:38). It holds no quorum of its own: the quorum lives in the HashConsensus it points at via BaseOracle.getConsensusContract() (BaseOracle.sol:115-116). Daily report; SRv3 adds per-module CL balances.</title><rect class="box" x="840" y="140" width="190" height="62" rx="9"/>
+    <text class="nm" x="850" y="160">AccountingOracle</text><text class="fl" x="850" y="176">oracle/AccountingOracle.sol</text><text class="ad" x="850" y="190">0x852d…3Cee · quorum: HashConsensus</text></g>
+  <g class="node el" data-flows="f5"><title>0x0De4Ea0184c2ad0BacA7183356Aea5B8d5Bf5c6e: an EL contract (ValidatorsExitBusOracle.sol:16 — is BaseOracle, ValidatorsExitBus). Like AccountingOracle it defers its quorum to HashConsensus (BaseOracle.sol:115-116). Exit requests, ETH-denominated bounds.</title><rect class="box" x="840" y="262" width="190" height="62" rx="9"/>
+    <text class="nm" x="850" y="282">ValidatorsExitBus</text><text class="fl" x="850" y="298">oracle/ValidatorsExitBusOracle.sol</text><text class="ad" x="850" y="312">0x0De4…5c6e · quorum: HashConsensus</text></g>
+  <g class="node com" data-flows="f4 f5 f7"><title>0xD624B08C83bAECF0807Dd2c6880C3154a5F0B288: this is where the quorum lives, not in the oracles. HashConsensus.sol:225 stores _quorum; :455-461 read and set it under MANAGE_MEMBERS_AND_QUORUM_ROLE (:172-173). A report is processable only when the 9 members reach quorum on an identical hash. Both BaseOracle contracts reach this address through getConsensusContract() (BaseOracle.sol:115-116).</title><rect class="box" x="1075" y="140" width="155" height="62" rx="9"/>
+    <text class="nm" x="1085" y="160">HashConsensus</text><text class="fl" x="1085" y="176">oracle/HashConsensus.sol</text><text class="ad" x="1085" y="190">0xD624…B288 · ×9 · quorum</text></g>
+  <g class="node bot" data-flows="f5"><title>Hold validator signing keys only; principal is out of reach, but a compromised signing key can sign slashable messages, so validator balances can be reduced</title><rect class="box" x="840" y="735" width="190" height="48" rx="9"/>
     <text class="nm" x="850" y="755">Node operators</text><text class="ad" x="850" y="771">off-chain · signing keys only</text></g>
 
-  <g class="node proof" data-flows="f6"><title>SRv3, not deployed. Migrator validates EasyTrack pairs; Bus enforces the delay (removeBatches = guardian veto); Gateway verifies target WC proofs against EIP-4788</title><rect class="box" x="1075" y="262" width="165" height="76" rx="9"/>
-    <text class="nm" x="1085" y="282">Consolidation pipeline</text><text class="fl" x="1085" y="298">Migrator → Bus → Gateway</text><text class="ad" x="1085" y="311">commit · delay (veto) · execute</text><text class="ad" x="1085" y="327">SRv3 · not deployed</text></g>
+  <g class="node proof" data-flows="f6"><title>SRv3, not deployed. Migrator validates operator pairs allowed through ALLOW_PAIR_ROLE (ConsolidationMigrator.sol:118,181-185). Bus enforces commit-delay-execute; the delay is the consolidation committee's veto window, since removeBatches is REMOVE_ROLE (ConsolidationBus.sol:168,250) and that role is held by the consolidation committee, not by the DSM guardians (UpgradeTemporaryAdmin.sol:99; UpgradeTemplate.sol:330). Gateway is a CLProofVerifier (ConsolidationGateway.sol:12,34,133): it verifies target WC proofs against the EIP-4788 beacon root and additionally reverts if DSM deposits are paused (:276-277).</title><rect class="box" x="1075" y="262" width="165" height="76" rx="9"/>
+    <text class="nm" x="1085" y="282">Consolidation pipeline</text><text class="fl" x="1085" y="298">Migrator → Bus → Gateway</text><text class="ad" x="1085" y="311">commit · delay · execute</text><text class="ad" x="1085" y="327">SRv3 · not deployed</text></g>
 
   <g class="node cl" data-flows="f2 f3 f5 f6"><title>0x01 capped at 32 ETH (excess skimmed); 0x02 compounds to 2048; WC write-once</title><rect class="box" x="400" y="650" width="210" height="56" rx="9"/>
     <text class="nm" x="410" y="670">Validators 0x01 / 0x02</text><text class="fl" x="410" y="686">consensus layer</text><text class="ad" x="410" y="699">0x01 → 32 · 0x02 → 2048</text></g>
-  <g class="node cl" data-flows="f3 f6"><title>0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02: beacon root readable from EL, ~27 h ring</title><rect class="box" x="620" y="650" width="160" height="56" rx="9"/>
-    <text class="nm" x="630" y="670">EIP-4788</text><text class="fl" x="630" y="686">beacon roots</text><text class="ad" x="630" y="699">0x000F…ac02</text></g>
-  <g class="node cl" data-flows="f5 f6"><title>EIP-7002 0x00000961Ef480Eb55e80D19ad83579A64c007002 (exits &amp; partial withdrawals) · EIP-7251 0x0000BBdDc7CE488642fb579F8B00f3a590007251 (source→target merge); both triggered from the withdrawal address</title><rect class="box" x="800" y="650" width="200" height="56" rx="9"/>
-    <text class="nm" x="810" y="670">EIP-7002 · 7251</text><text class="fl" x="810" y="686">withdrawal &amp; consolidation reqs</text><text class="ad" x="810" y="699">0x0000…7002 · 0x0000…7251</text></g>
+  <g class="node sys" data-flows="f3 f6"><title>0x000F3df6D732807Ef1319fB7B8bB8522d0Beac02: EL system predeploy, not a consensus-layer component. CLProofVerifier.sol:123-124 and CLValidatorVerifier.sol:26-27 hold the address; the read is BEACON_ROOTS.staticcall(timestamp) (CLValidatorVerifier.sol:104). It exposes a ~27 h ring of beacon block roots to EL code.</title><rect class="box" x="620" y="650" width="160" height="56" rx="9"/>
+    <text class="nm" x="630" y="670">EIP-4788</text><text class="fl" x="630" y="686">EL predeploy · beacon roots</text><text class="ad" x="630" y="699">0x000F…ac02 · staticcall</text></g>
+  <g class="node sys" data-flows="f5 f6"><title>EL system predeploys, not consensus-layer components. EIP-7002 0x00000961Ef480Eb55e80D19ad83579A64c007002 (TriggerableWithdrawals.sol:9,13; the request is WITHDRAWAL_REQUEST.call{value: fee} at :51/:131 and the fee read is a staticcall at :144) · EIP-7251 0x0000BBdDc7CE488642fb579F8B00f3a590007251 (source→target merge). WithdrawalVault.sol:58-59 names both as predeploy addresses; both are called from the withdrawal address on the EL.</title><rect class="box" x="800" y="650" width="200" height="56" rx="9"/>
+    <text class="nm" x="810" y="670">EIP-7002 · 7251</text><text class="fl" x="810" y="686">EL predeploys · exit / consolidation</text><text class="ad" x="810" y="699">0x0000…7002 · 0x0000…7251</text></g>
   </g>
 </svg>
 </div>
@@ -308,14 +320,14 @@
   <div class="band">
     <div class="c bot"><div class="n">Depositor Bot</div><div class="r">collects guardian signatures, picks module &amp; timing, builds top-up Merkle proofs. Compromise = liveness problem, not funds.</div></div>
     <div class="c bot"><div class="n">Oracle daemons ×9</div><div class="r">compute reports on a shared reference slot: deterministic and replayable by anyone.</div></div>
-    <div class="c bot"><div class="n">Node operators</div><div class="r">hold signing keys only; withdrawal credentials of every Lido validator point to the WithdrawalVault, so principal is out of reach.</div></div>
+    <div class="c bot"><div class="n">Node operators</div><div class="r">hold validator signing keys only; withdrawal credentials of every Lido validator point to the WithdrawalVault, so principal is out of reach. A compromised signing key can still sign slashable messages, reducing validator balances — so this is not liveness only.</div></div>
   </div>
 
   <h2>Governance &amp; committees</h2>
   <div class="band">
-    <div class="c com"><div class="n">DepositSecurityModule + guardians</div><div class="f">contracts/0.8.9/DepositSecurityModule.sol</div><div class="a">0xF573…e9Be</div><div class="r">attest "deposit root unchanged, keys safe", then call StakingRouter.deposit(); can pause and veto consolidation batches: strictly negative power.</div></div>
-    <div class="c com"><div class="n">EasyTrack</div><div class="a">0xF021…3Fea</div><div class="r">vetoable motions; authorizes the CMv1→CMv2 operator pairs (new SRv3 role).</div></div>
-    <div class="c com"><div class="n">HashConsensus</div><div class="f">contracts/0.8.9/oracle/HashConsensus.sol</div><div class="a">0xD624…B288</div><div class="r">a report is processable only at 5/9 quorum on an identical hash: the protocol's central trust assumption.</div></div>
+    <div class="c com"><div class="n">DepositSecurityModule + guardians</div><div class="f">contracts/0.8.9/DepositSecurityModule.sol</div><div class="a">0xF573…e9Be</div><div class="r">an EL contract with a committee-held key: it stores its own guardian set and quorum (:97-98, getGuardianQuorum :227-231). Guardians attest "deposit root unchanged, keys safe", then call StakingRouter.deposit(). Its only reach into consolidation is the isDepositsPaused() flag (:88) that ConsolidationGateway reads (:276-277): it cannot remove consolidation batches.</div></div>
+    <div class="c com"><div class="n">EasyTrack · EVMScriptExecutor</div><div class="a">0xF021…3Fea</div><div class="r">the executor is the sole grantee of ConsolidationMigrator.ALLOW_PAIR_ROLE (UpgradeTemporaryAdmin.sol:68,91-92; UpgradeTemplate.sol:339-340). That role only adds CMv1→CMv2 operator pairs. Removing a pair (DISALLOW_PAIR_ROLE) and removing a committed batch (Bus REMOVE_ROLE) go to the consolidation committee, not to EasyTrack.</div></div>
+    <div class="c com"><div class="n">HashConsensus</div><div class="f">contracts/0.8.9/oracle/HashConsensus.sol</div><div class="a">0xD624…B288</div><div class="r">holds the oracle committee and the quorum: a report is processable only once support reaches the stored _quorum on an identical hash (:225, :455-461, :945). The oracle contracts themselves hold no quorum. This is the protocol's central trust assumption; the quorum is a governance-set number, not a constant.</div></div>
     <div class="c com"><div class="n">Lido DAO (Aragon)</div><div class="a">Voting 0x2e59…618e · Agent 0x3e40…9C8c</div><div class="r">votes modules, roles, parameters; treasury receives its fee share.</div></div>
   </div>
 
@@ -330,25 +342,25 @@
   <h2>Deposit path &amp; modules · <b>ETH never sits in a module</b></h2>
   <div class="band">
     <div class="c el"><div class="n">StakingRouter v3</div><div class="f">contracts/0.8.25/sr/StakingRouter.sol</div><div class="a">proxy 0xFdDf…2999</div><div class="r">pull model: allocates across modules (min-first, target shares), pulls ETH via LIDO.withdrawDepositableEther, deposits, distributes fees.</div></div>
-    <div class="c proof"><div class="n">TopUpGateway</div><div class="f">contracts/0.8.25/TopUpGateway.sol</div><div class="a">SRv3 · not deployed</div><div class="r">verifies each 0x02 target against the beacon root (Lido WC, active, not slashed), then calls StakingRouter.topUp(). Cap = MaxEB − 1.25 − proven balance.</div></div>
-    <div class="c el"><div class="n">CMv1 / SDVT / CSM / CMv2</div><div class="f">nos/NodeOperatorsRegistry.sol · IStakingModuleV2</div><div class="a">0x5503…28d5 · 0xaE7B…b433 · 0xdA7d…A83F</div><div class="r">key registries and operator accounting; CMv2 (0x02, external repo) is the consolidation target, CSM is bonded-permissionless.</div></div>
+    <div class="c proof"><div class="n">TopUpGateway</div><div class="f">contracts/0.8.25/TopUpGateway.sol · CLValidatorVerifier.sol</div><div class="a">SRv3 · not deployed</div><div class="r">inherits CLValidatorVerifier (:8, :36), a different verifier from the ConsolidationGateway's CLProofVerifier. Verifies each 0x02 target against the beacon root (Lido WC, active, not slashed), then calls StakingRouter.topUp(). Cap = MaxEB − 1.25 − proven balance.</div></div>
+    <div class="c el"><div class="n">CMv1 / SDVT / CSM / CMv2</div><div class="f">nos/NodeOperatorsRegistry.sol · common/interfaces/IStakingModuleV2.sol</div><div class="a">0x5503…28d5 · 0xaE7B…b433 · 0xdA7d…A83F</div><div class="r">key registries and operator accounting. Every module the router talks to is reached through IStakingModuleV2, which is in this repo; only the CMv2 (0x02) implementation lives in an external repo, so no CMv2 bytecode is in scope here. CSM is bonded-permissionless.</div></div>
     <div class="c el"><div class="n">Beacon DepositContract</div><div class="f">contracts/0.6.11/deposit_contract.sol (ref)</div><div class="a">0x0000…05Fa</div><div class="r">one-way: nothing ever comes back out; only the first deposit sets withdrawal credentials.</div></div>
   </div>
 
   <h2>Withdrawal side &amp; oracles</h2>
   <div class="band">
     <div class="c el"><div class="n">WithdrawalVault</div><div class="f">contracts/0.8.9/WithdrawalVault.sol</div><div class="a">0xB9D7…293f</div><div class="r">receives CL withdrawals (exits, skimming); relays EIP-7002 forced exits and EIP-7251 consolidations (new in SRv3).</div></div>
-    <div class="c com"><div class="n">AccountingOracle</div><div class="f">contracts/0.8.9/oracle/AccountingOracle.sol</div><div class="a">0x852d…3Cee</div><div class="r">daily report: handleOracleReport to Accounting, plus the new SRv3 surface, reportValidatorBalancesByStakingModule, straight to the router.</div></div>
-    <div class="c com"><div class="n">ValidatorsExitBus(Oracle)</div><div class="f">contracts/0.8.9/oracle/ValidatorsExitBusOracle.sol</div><div class="a">0x0De4…5c6e</div><div class="r">publishes exit requests with ETH-denominated bounds (SRv3 format); unfulfilled requests go through triggerExits.</div></div>
+    <div class="c el"><div class="n">AccountingOracle</div><div class="f">contracts/0.8.9/oracle/AccountingOracle.sol</div><div class="a">0x852d…3Cee</div><div class="r">a plain EL contract, not itself a committee: it is a BaseOracle (:69) that defers the quorum to its HashConsensus (BaseOracle.sol:38, :115-116). Daily report: handleOracleReport to Accounting, plus the new SRv3 surface, reportValidatorBalancesByStakingModule, straight to the router.</div></div>
+    <div class="c el"><div class="n">ValidatorsExitBus(Oracle)</div><div class="f">contracts/0.8.9/oracle/ValidatorsExitBusOracle.sol</div><div class="a">0x0De4…5c6e</div><div class="r">also a BaseOracle (:16) with its quorum in HashConsensus, not in itself. Publishes exit requests with ETH-denominated bounds (SRv3 format); unfulfilled requests go through triggerExits.</div></div>
     <div class="c el"><div class="n">ELRewardsVault · Burner · LidoLocator</div><div class="a">0x388C…9297 · 0xE76c…573a · 0xC1d0…d2Eb</div><div class="r">MEV/priority fees vault (drained at report), stETH burner, and the on-chain address book (not drawn).</div></div>
   </div>
 
   <h2>Consolidation pipeline · <b>all new in SRv3</b></h2>
   <div class="band">
-    <div class="c el"><div class="n">ConsolidationMigrator</div><div class="f">contracts/0.8.25/consolidation/ConsolidationMigrator.sol</div><div class="r">validates requests against EasyTrack pairs, resolves indices → pubkeys, sends the batch to the Bus.</div></div>
-    <div class="c el"><div class="n">ConsolidationBus</div><div class="f">contracts/0.8.25/consolidation/ConsolidationBus.sol</div><div class="r">commit-delay-execute: hash binding, non-replay, and removeBatches: the delay is the guardians' veto window; an executor bot pays the EIP-7251 fee.</div></div>
-    <div class="c proof"><div class="n">ConsolidationGateway</div><div class="f">contracts/0.8.25/consolidation/ConsolidationGateway.sol</div><div class="r">pausable; verifies target WC proofs and limits, checks DSM is not paused, then WithdrawalVault.addConsolidationRequests{value: fee}.</div></div>
-    <div class="c cl"><div class="n">EIP-4788 / 7002 / 7251</div><div class="a">0x000F…ac02 · 0x0000…7002 · 0x0000…7251</div><div class="r">system contracts: beacon-root anchor for every proof; exits and consolidations triggered from the withdrawal address.</div></div>
+    <div class="c el"><div class="n">ConsolidationMigrator</div><div class="f">contracts/0.8.25/consolidation/ConsolidationMigrator.sol</div><div class="r">holds its own allow-list of (source, target) operator pairs and the submitter designated for each (allowPair :181-185, isPairAllowed :239). Only the EasyTrack EVMScriptExecutor can add a pair; the committee can remove one (:200). Resolves key indices → pubkeys and sends the batch to the Bus (:306-324).</div></div>
+    <div class="c el"><div class="n">ConsolidationBus</div><div class="f">contracts/0.8.25/consolidation/ConsolidationBus.sol</div><div class="r">commit-delay-execute: hash binding, non-replay, and removeBatches (:250), gated on REMOVE_ROLE (:168). That role is the consolidation committee's, not the DSM guardians': the delay is the committee's veto window. An executor bot pays the EIP-7251 fee.</div></div>
+    <div class="c proof"><div class="n">ConsolidationGateway</div><div class="f">contracts/0.8.25/consolidation/ConsolidationGateway.sol · CLProofVerifier.sol</div><div class="r">pausable; inherits CLProofVerifier (:12, :34), not the TopUpGateway's CLValidatorVerifier. Verifies target WC proofs and limits, reads the DSM isDepositsPaused() flag (:276-277), then WithdrawalVault.addConsolidationRequests{value: fee}.</div></div>
+    <div class="c sys"><div class="n">EIP-4788 / 7002 / 7251</div><div class="a">0x000F…ac02 · 0x0000…7002 · 0x0000…7251</div><div class="r">execution-layer system predeploys, not consensus-layer components: Lido reaches all three with an ordinary staticcall / call from an EL contract. 4788 is the beacon-root anchor every proof is checked against; 7002 and 7251 accept exit and consolidation requests from the withdrawal address.</div></div>
   </div>
 </div>
 
@@ -453,12 +465,12 @@
     '.node rect.box{fill:var(--card);stroke:var(--line)}',
     '.node.el rect.box{fill:var(--el-bg);stroke:var(--el-bd)}.node.com rect.box{fill:var(--com-bg);stroke:var(--com-bd)}',
     '.node.proof rect.box{fill:var(--proof-bg);stroke:var(--proof-bd)}.node.bot rect.box{fill:var(--bot-bg);stroke:var(--bot-bd)}',
-    '.node.cl rect.box{fill:var(--cl-bg);stroke:var(--cl-bd)}',
+    '.node.cl rect.box{fill:var(--cl-bg);stroke:var(--cl-bd)}.node.sys rect.box{fill:var(--sys-bg);stroke:var(--sys-bd)}',
     '.node .nm{font:700 12.5px "Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;fill:var(--heading)}',
     '.node .fl{font:600 8.6px var(--mono)}',
     '.node .ad{font:500 8.6px var(--mono);fill:var(--soft)}',
     '.node.el .fl{fill:var(--el)}.node.com .fl{fill:var(--com)}.node.proof .fl{fill:var(--proof)}',
-    '.node.bot .fl{fill:var(--bot)}.node.cl .fl{fill:var(--cl)}',
+    '.node.bot .fl{fill:var(--bot)}.node.cl .fl{fill:var(--cl)}.node.sys .fl{fill:var(--sys)}',
     '.node.dim{opacity:.12}',
     '.node.on rect.box{stroke:var(--hl,var(--line));stroke-width:1.8}',
     '.edge path{fill:none;stroke:var(--edge);stroke-width:1.2}',
@@ -473,7 +485,7 @@
     var src = document.querySelector('.canvas svg');
     var clone = src.cloneNode(true);
     var cs = getComputedStyle(document.documentElement);
-    var names = ['--card','--ink','--heading','--soft','--line','--line2','--edge','--el','--cl','--com','--bot','--proof','--el-bg','--el-bd','--cl-bg','--cl-bd','--com-bg','--com-bd','--bot-bg','--bot-bd','--proof-bg','--proof-bd',
+    var names = ['--card','--ink','--heading','--soft','--line','--line2','--edge','--el','--cl','--com','--bot','--proof','--sys','--el-bg','--el-bd','--cl-bg','--cl-bd','--com-bg','--com-bd','--bot-bg','--bot-bd','--proof-bg','--proof-bd','--sys-bg','--sys-bd',
                  '--cf1','--cf2','--cf3','--cf4','--cf5','--cf6','--cf7','--mono'];
     var vars = names.map(function(n){ return n+':'+cs.getPropertyValue(n).trim(); }).join(';');
     var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
