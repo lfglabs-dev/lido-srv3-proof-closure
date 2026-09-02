@@ -7,6 +7,7 @@ import contextlib
 import io
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -144,6 +145,9 @@ def check_lean_scanner(fixture: Path) -> None:
         "  intro y; rfl\n"
         "theorem five (x : Nat) : have h : x = x := rfl; x = x := fun _ => rfl\n"
         "theorem six (outlet : Nat) (h : outlet.let = 1) : outlet = 1 := h\n"
+        "structure Pair where\n  a : Nat\n  h : a = 1\n"
+        "theorem seven : Pair where\n  a := 1\n  h := rfl\n"
+        "theorem eight (nowhere : Nat) : nowhere = nowhere := rfl\n"
         "end Outer.Inner\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     expected = {
@@ -153,6 +157,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "Outer.Inner.four": ("theorem four (x : Nat) : let y := x + 1; y = x + 1", "", 16, 16),
         "Outer.Inner.five": ("theorem five (x : Nat) : have h : x = x := rfl; x = x", "", 18, 18),
         "Outer.Inner.six": ("theorem six (outlet : Nat) (h : outlet.let = 1) : outlet = 1", "", 19, 19),
+        "Outer.Inner.seven": ("theorem seven : Pair", "", 23, 23),
+        "Outer.Inner.eight": ("theorem eight (nowhere : Nat) : nowhere = nowhere", "", 26, 26),
     }
     if set(found) != set(expected):
         raise SystemExit(f"scanner resolved {sorted(found)}")
@@ -167,7 +173,7 @@ def check_lean_scanner(fixture: Path) -> None:
     module.write_text("namespace A\nend B\n", encoding="utf-8")
     expect_scan_failure(fixture, module, "`end B` closes `namespace A`")
     module.write_text("theorem open_ended (x : Nat) : x = x\n", encoding="utf-8")
-    expect_scan_failure(fixture, module, "never reaches `:=`")
+    expect_scan_failure(fixture, module, "never reaches `:=` or `where`")
     module.write_text("/-- orphan -/\n\ntheorem gap : True := trivial\n", encoding="utf-8")
     (record,) = generate_ux2.scan_file(fixture, module)["gap"]
     if record["doc"] != "":
@@ -197,7 +203,8 @@ def expect_scan_failure(fixture: Path, module: Path, diagnostic: str) -> None:
 
 
 def check_lean_inputs_binding(fixture: Path) -> None:
-    """Any Lean input change, even outside the scanned modules, moves the index digest."""
+    """Any Lean input change, even outside the scanned modules, moves the index tree id,
+    and the id is the one scripts/verified_source_tree.sh computes with Git."""
     mutant = fixture / "LidoSRv3/Tests/ZzInputMutant.lean"
     mutant.write_text("-- not a theorem\n", encoding="utf-8")
     expect(fixture, "check", False, "index.json differs from the registry and Lean sources")
@@ -206,6 +213,18 @@ def check_lean_inputs_binding(fixture: Path) -> None:
     (fixture / "lake-manifest.json").unlink()
     expect(fixture, "check", False, "missing Lean input lake-manifest.json")
     shutil.copy2(ROOT / "lake-manifest.json", fixture / "lake-manifest.json")
+    with_git = subprocess.run(["bash", "scripts/verified_source_tree.sh"], cwd=ROOT,
+                              capture_output=True, text=True)
+    if with_git.returncode != 0:
+        raise SystemExit("commit the Lean inputs before running test_ux2.py: "
+                         + with_git.stderr.strip())
+    if generate_ux2.lean_source_tree(ROOT) != with_git.stdout.strip():
+        raise SystemExit("lean_source_tree differs from scripts/verified_source_tree.sh")
+    canonical = generate_ux2.scan_file(
+        ROOT, ROOT / "LidoSRv3/Audit/Verity/DepositParentTx.lean")
+    (record,) = canonical["LidoSRv3.Audit.Verity.DepositParentTx.canonical_preconditions"]
+    if "where" in record["statement"] or not record["statement"].endswith("canonicalState"):
+        raise SystemExit(f"a where-proof statement was not sliced at `where`: {record['statement'][-80:]}")
 
 
 def check_boundary_and_kill_lines(fixture: Path) -> None:
@@ -232,4 +251,4 @@ with tempfile.TemporaryDirectory() as tmp:
 
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
       "canonical order, unregistered assumption, missing source target, missing headline "
-      "boundary, scope tracking, doc-comment and statement slicing, let/have binders, and the Lean input digest")
+      "boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, and the Lean source tree id")
