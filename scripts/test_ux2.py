@@ -228,6 +228,16 @@ def check_lean_scanner(fixture: Path) -> None:
             raise SystemExit(f"{name}: scanner lost a valid Lean construct: {record}")
 
     module.write_text(
+        "namespace Outer\n"
+        "def quoted : Syntax := `(command|\n"
+        "  theorem one : True := trivial)\n"
+        "theorem one : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.one"} or found["Outer.one"][0]["statement"] != "theorem one : True":
+        raise SystemExit("scanner indexed a theorem inside a command quotation")
+
+    module.write_text(
         "namespace\n"
         "Outer\n"
         "section\n"
@@ -282,6 +292,9 @@ def check_escaped_identifier_lexing(fixture: Path) -> None:
     escaped = 'theorem «helper /- -- -/ " name» : True := trivial\n'
     if strip(escaped) != escaped:
         raise SystemExit("comment/string masker altered a guillemet-escaped identifier")
+    escaped_keyword = strip("theorem «sorry» : True := trivial\n", mask_escaped_identifiers=True)
+    if any(pattern.search(escaped_keyword) for _, pattern in check_proof_escapes.ESCAPES):
+        raise SystemExit("proof-escape matcher treated a guillemet name as a guarded keyword")
 
     controls = (
         "theorem helper : True := trivial /- hidden -/\n",

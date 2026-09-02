@@ -159,6 +159,34 @@ def mask_escaped_identifiers(text: str) -> str:
     return ESCAPED_IDENTIFIER.sub(lambda match: " " * len(match.group()), text)
 
 
+def mask_command_quotations(text: str) -> str:
+    """Blank `` `(command| ... )`` quotations while retaining source offsets.
+
+    A quoted command is syntax data, not a declaration in the surrounding
+    module.  Its parentheses are balanced independently, so masking the whole
+    quotation prevents declaration and scope regexes from interpreting its
+    contents as active Lean commands.
+    """
+    masked = list(text)
+    index = 0
+    while index < len(text):
+        if not text.startswith("`(command|", index):
+            index += 1
+            continue
+        end = index + len("`(")
+        depth = 1
+        while end < len(text) and depth:
+            depth += (text[end] == "(") - (text[end] == ")")
+            end += 1
+        if depth:
+            fail("unterminated command quotation")
+        for offset in range(index, end):
+            if masked[offset] != "\n":
+                masked[offset] = " "
+        index = end
+    return "".join(masked)
+
+
 def is_attribute_block(text: str) -> bool:
     """Whether `text` is nothing but attribute groups such as `@[simp, reducible]`."""
     rest = text.strip()
@@ -212,12 +240,13 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     stripped = mask_character_literals(check_proof_escapes.strip_comments_and_strings(text))
     if stripped.count("\n") != text.count("\n"):
         fail(f"{path}: comment stripping changed the line structure")
-    structural = mask_escaped_identifiers(stripped)
+    active = mask_command_quotations(stripped)
+    structural = mask_escaped_identifiers(active)
     lines = text.splitlines()
     events = sorted(
-        [(m.start(), "scope", m) for m in SCOPE.finditer(stripped)]
-        + [(offset, "theorem", m) for m in DECLARATION.finditer(stripped)
-           for offset, private in [modifier_run(stripped, m)] if not private])
+        [(m.start(), "scope", m) for m in SCOPE.finditer(active)]
+        + [(offset, "theorem", m) for m in DECLARATION.finditer(active)
+           for offset, private in [modifier_run(active, m)] if not private])
     scope = Scope()
     found: dict[str, dict] = {}
     for offset, kind, match in events:
