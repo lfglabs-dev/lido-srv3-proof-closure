@@ -148,7 +148,7 @@ def word_at(text: str, index: int, word: re.Pattern) -> bool:
 
 # An apostrophe is legal inside an ordinary Lean identifier (`foo'a'`), so a
 # character-shaped suffix must not be mistaken for a character literal there.
-CHAR_LITERAL = re.compile(r"(?<![\w'])'(?:\\.|[^\\'\n])'")
+CHAR_LITERAL = re.compile(r"(?<![\w'])'(?:\\.|[^\\'\n])'(?!\w)")
 
 
 def mask_character_literals(text: str) -> str:

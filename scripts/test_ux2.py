@@ -327,10 +327,13 @@ def check_escaped_identifier_lexing(fixture: Path) -> None:
     module = fixture / "LidoSRv3/Audit/Guarantees/Synthetic.lean"
     module.write_text(
         "namespace Outer\n"
+        "theorem foo'a' : True := trivial\n"
         "theorem «helper /- name» : True := trivial\n"
         "theorem after_escaped_identifier : True := trivial\n"
         "end Outer\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
+    if "Outer.foo'a'" not in found:
+        raise SystemExit("character-literal masking altered an ordinary theorem identifier")
     if "Outer.«helper /- name»" not in found:
         raise SystemExit("scanner did not retain the full guillemet-escaped theorem name")
     if "Outer.after_escaped_identifier" not in found:
