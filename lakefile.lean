@@ -12,6 +12,7 @@ require verity from git
 @[default_target]
 lean_lib «LidoSRv3» where
   globs := #[
+    .one `LidoSRv3,
     .submodules `LidoSRv3.Audit.Common,
     .submodules `LidoSRv3.Audit.Guarantees,
     .submodules `LidoSRv3.Audit.Model,

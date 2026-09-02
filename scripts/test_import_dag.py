@@ -27,10 +27,14 @@ FILES = (
 )
 
 
-def run(root: Path, succeeds: bool, diagnostic: str = "") -> None:
+def run(root: Path, succeeds: bool, diagnostic: str = "", *extra: str) -> None:
     result = subprocess.run(
         ["python3", str(CHECKER), "--root", str(root),
-         "--allowlist", str(root / "audit/import-layer-allowlist.txt")],
+         "--allowlist", str(root / "audit/import-layer-allowlist.txt"),
+        # The fixture is not a Git worktree; its copied baseline is the same
+        # immutable input used by the production checker's pinned Git blob.
+        # Mutants may change the allowlist but never this baseline.
+         "--baseline", str(root / "audit/import-layer-baseline.txt"), *extra],
         text=True,
         capture_output=True,
         check=False,
@@ -54,9 +58,12 @@ def copy_tree(destination: Path) -> None:
     subprocess.run(
         ["python3", str(CHECKER), "--root", str(destination),
          "--allowlist", str(destination / "audit/import-layer-allowlist.txt"),
+         "--baseline", str(ROOT / "audit/import-layer-allowlist.txt"),
          "--write-allowlist"],
         check=True, capture_output=True, text=True,
     )
+    shutil.copy2(destination / "audit/import-layer-allowlist.txt",
+                 destination / "audit/import-layer-baseline.txt")
 
 
 with tempfile.TemporaryDirectory() as tmp:
@@ -84,7 +91,30 @@ with tempfile.TemporaryDirectory() as tmp:
     spec.write_text(spec_original + "\nimport LidoSRv3.Audit.Verity.AllocationTx\n",
                     encoding="utf-8")
     run(fixture, False, "new spec-verity edge")
+    allowlist = fixture / "audit/import-layer-allowlist.txt"
+    allowlist_original = allowlist.read_text(encoding="utf-8")
+    allowlist.write_text(
+        allowlist_original.replace(
+            "# rule: spec-guarantees",
+            "LidoSRv3.Audit.Spec LidoSRv3.Audit.Verity.AllocationTx\n\n"
+            "# rule: spec-guarantees"),
+        encoding="utf-8")
+    run(fixture, False, "new spec-verity edge")
+    run(fixture, False, "new spec-verity edge", "--write-allowlist")
+    if allowlist.read_text(encoding="utf-8") != allowlist_original.replace(
+            "# rule: spec-guarantees",
+            "LidoSRv3.Audit.Spec LidoSRv3.Audit.Verity.AllocationTx\n\n"
+            "# rule: spec-guarantees"):
+        raise SystemExit("forbidden edge rewrote the mutable allowlist")
+    allowlist.write_text(allowlist_original, encoding="utf-8")
     spec.write_text(spec_original, encoding="utf-8")
+
+    lakefile = fixture / "lakefile.lean"
+    lakefile_original = lakefile.read_text(encoding="utf-8")
+    lakefile.write_text(lakefile_original.replace("    .one `LidoSRv3,\n", ""),
+                        encoding="utf-8")
+    run(fixture, False, "production modules missing from lakefile globs")
+    lakefile.write_text(lakefile_original, encoding="utf-8")
 
     unlisted = fixture / "LidoSRv3/Audit/Verity/Unlisted.lean"
     unlisted.parent.mkdir(parents=True, exist_ok=True)

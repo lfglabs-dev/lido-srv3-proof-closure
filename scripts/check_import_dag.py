@@ -11,12 +11,14 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWLIST = Path("audit/import-layer-allowlist.txt")
+BASELINE_REV = "4fb659e8f8689346f155e633aabc068b6d75c1a5"
 LAKEFILE = Path("lakefile.lean")
 IMPORT = re.compile(r"^\s*import\s+(\S+)\s*$", re.MULTILINE)
 GLOB_ONE = re.compile(r"\.one\s+`([A-Za-z0-9.]+)")
@@ -113,7 +115,7 @@ def glob_covers(module: str, ones: set[str], subs: set[str], ands: set[str]) -> 
 
 
 def production_glob_gaps(root: Path) -> list[str]:
-    """Every production .lean file must be a Lake glob or the facade root."""
+    """Every production .lean file must be explicitly covered by a Lake glob."""
     lakefile = root / LAKEFILE
     if not lakefile.is_file():
         fail(f"missing {LAKEFILE}")
@@ -124,9 +126,12 @@ def production_glob_gaps(root: Path) -> list[str]:
     ones = set(GLOB_ONE.findall(text))
     subs = set(GLOB_SUB.findall(text))
     ands = set(GLOB_AND.findall(text))
-    ones.add("LidoSRv3")
     gaps: list[str] = []
-    for path in sorted((root / "LidoSRv3").rglob("*.lean")):
+    paths = sorted((root / "LidoSRv3").rglob("*.lean"))
+    facade = root / "LidoSRv3.lean"
+    if facade.is_file():
+        paths.append(facade)
+    for path in paths:
         rel = path.relative_to(root).as_posix()
         if is_excluded_from_production(rel):
             continue
@@ -219,10 +224,46 @@ def render_allowlist(grouped: dict[str, set[tuple[str, str]]]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def load_pinned_baseline(root: Path, path: Path | None) -> dict[str, set[tuple[str, str]]]:
+    """Load the debt ceiling from an immutable Git object, never this PR's file."""
+    if path is not None:
+        return load_allowlist(path)
+    source = f"{BASELINE_REV}:{ALLOWLIST.as_posix()}"
+    result = subprocess.run(
+        ["git", "-C", str(root), "show", source],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode:
+        detail = result.stderr.strip() or result.stdout.strip()
+        fail(f"cannot read immutable layer-debt baseline {source}: {detail}")
+    # Parse the pinned Git blob without materializing it in the worktree.
+    grouped: dict[str, set[tuple[str, str]]] = {rule: set() for rule in LAYER_DEBT}
+    current: str | None = None
+    for number, raw in enumerate(result.stdout.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            if line.startswith("# rule:"):
+                current = line.split(":", 1)[1].strip()
+                if current not in LAYER_DEBT:
+                    fail(f"{source}:{number}: unknown rule {current}")
+            continue
+        if current is None:
+            fail(f"{source}:{number}: edge before a `# rule:` header")
+        parts = line.split()
+        if len(parts) != 2:
+            fail(f"{source}:{number}: expected `src imported`, got {line!r}")
+        grouped[current].add((parts[0], parts[1]))
+    return grouped
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--allowlist", type=Path, default=None)
+    parser.add_argument("--baseline", type=Path, default=None,
+                        help="test-only override for the immutable baseline")
     parser.add_argument("--write-allowlist", action="store_true",
                         help="rewrite the allowlist from the current tree and exit")
     args = parser.parse_args()
@@ -232,32 +273,33 @@ def main() -> None:
     found = edges(root)
     hard = hard_violations(found)
     debt = debt_edges(found)
-    if args.write_allowlist:
-        allowlist_path.parent.mkdir(parents=True, exist_ok=True)
-        allowlist_path.write_text(render_allowlist(debt), encoding="utf-8")
-        count = sum(len(rows) for rows in debt.values())
-        print(f"wrote {count} layer-debt edges to {allowlist_path}")
-        if hard:
-            fail("hard production-boundary violations still present: " + "; ".join(hard))
-        return
     if hard:
         fail("production must not import Tests, Legacy, or Trust: " + "; ".join(hard))
     gaps = production_glob_gaps(root)
     if gaps:
         fail("production modules missing from lakefile globs: " + ", ".join(gaps))
-    recorded = load_allowlist(allowlist_path)
+    baseline = load_pinned_baseline(root, args.baseline)
     for rule in LAYER_DEBT:
-        extra = debt[rule] - recorded[rule]
-        missing = recorded[rule] - debt[rule]
+        extra = debt[rule] - baseline[rule]
         if extra:
             rendered = ", ".join(f"{s} → {i}" for s, i in sorted(extra))
-            fail(f"new {rule} edge(s) {rendered}; do not grow layer debt")
+            fail(f"new {rule} edge(s) {rendered}; exceeds immutable baseline "
+                 f"{BASELINE_REV}")
+    if args.write_allowlist:
+        allowlist_path.parent.mkdir(parents=True, exist_ok=True)
+        allowlist_path.write_text(render_allowlist(debt), encoding="utf-8")
+        count = sum(len(rows) for rows in debt.values())
+        print(f"wrote {count} layer-debt edges to {allowlist_path}")
+        return
+    recorded = load_allowlist(allowlist_path)
+    for rule in LAYER_DEBT:
+        missing = recorded[rule] - debt[rule]
         if missing:
             rendered = ", ".join(f"{s} → {i}" for s, i in sorted(missing))
             fail(f"allowlisted {rule} edge(s) are gone: {rendered}; delete them from "
                  f"{allowlist_path.relative_to(root)}")
     print("import-dag ok: production ↛ test/legacy/Trust; globs cover production; "
-          "layer debt did not grow")
+          f"layer debt did not grow past immutable baseline {BASELINE_REV}")
 
 
 if __name__ == "__main__":
