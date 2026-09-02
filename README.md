@@ -1,8 +1,18 @@
 # Lido SRv3 Proof Closure
 
-This repo holds Lean evidence for eleven Staking Router v3 guarantees on
-pinned `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
-The table below is the status. Not every row is closed.
+> ### These are proofs about a model, not about a deployed contract.
+>
+> - The subject is a **Lean model** of Staking Router v3, written against pinned
+>   source `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+> - **No theorem here binds to deployed bytecode, a runtime codehash, a
+>   constructor, or a chain address.** The SRv3 contracts are not deployed.
+> - `CHECKED` means *the named Lean theorem builds*. It does not mean audited,
+>   verified on chain, or closed.
+> - **Every row below still has open fidelity gaps — 67 in total.** The last
+>   column counts them per row; `audit/guarantees.yaml` names each one.
+
+This repo holds Lean evidence for eleven Staking Router v3 guarantees on that
+pinned source. The table below is the status. Not every row is closed.
 
 Lean theorems decide what is proved. `audit/guarantees.yaml` only classifies
 them.
@@ -15,19 +25,24 @@ Each guarantee is proved in three layers, except where a guarantee notes otherwi
 
 We do not claim to have verified the bytecode. `CHECKED` means the named Lean theorem builds; `audit/guarantees.yaml` `fidelity.missing` lists the live Lido surfaces that theorem does not cover. If the Verity Executable Contract cannot close, the registry names one gap. Yul, EVM, runtime bytecode, and deployment provenance are out of scope.
 
-| # | ID | Abstract Lean | Verity Executable Contract |
-| --- | --- | --- | --- |
-| 1 | `P-ALLOC-1` | CHECKED | CHECKED |
-| 2 | `P-ALLOC-2` | CHECKED | CHECKED |
-| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed finite list-batch executable transaction |
-| 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | CHECKED |
-| 5 | `P-ACCOUNT-1` | CHECKED | CHECKED |
-| 6 | `P-RESERVE-1` | CHECKED | CHECKED |
-| 7 | `P-CONSOLIDATION-ETH-1` | CHECKED | CHECKED |
-| 8 | `P-ADDRESS-1` | CHECKED | CHECKED |
-| 9 | `P-TOPUP-2` | CHECKED | CHECKED |
-| 10 | `P-CONSOLIDATION-1` | CHECKED | CHECKED |
-| 11 | `P-SSZ-1` | CHECKED | CHECKED |
+The **Fidelity gaps** column is the count of `fidelity.missing` entries the
+registry records for that row: live Lido surfaces the CHECKED theorem does
+*not* cover. It is never zero, so no row is finished. `scripts/audit_metadata.py
+check` fails closed if a count here drifts from the registry.
+
+| # | ID | Abstract Lean | Verity Executable Contract | Fidelity gaps |
+| --- | --- | --- | --- | --- |
+| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 3 open |
+| 2 | `P-ALLOC-2` | CHECKED | CHECKED | 4 open |
+| 3 | `P-DEPOSIT-1` | CHECKED | CHECKED — composed finite list-batch executable transaction | 6 open |
+| 4 | `P-TOPUP-1` | CHECKED under `A-TOPUP-NOWRAP` | CHECKED | 1 open |
+| 5 | `P-ACCOUNT-1` | CHECKED | CHECKED | 7 open |
+| 6 | `P-RESERVE-1` | CHECKED | CHECKED | 7 open |
+| 7 | `P-CONSOLIDATION-ETH-1` | CHECKED | CHECKED | 12 open |
+| 8 | `P-ADDRESS-1` | CHECKED | CHECKED | 8 open |
+| 9 | `P-TOPUP-2` | CHECKED | CHECKED | 6 open |
+| 10 | `P-CONSOLIDATION-1` | CHECKED | CHECKED | 7 open |
+| 11 | `P-SSZ-1` | CHECKED | CHECKED | 6 open |
 
 Wording, assumptions, source spans, next gates: `audit/guarantees.yaml`.
 Generated views: `audit/STATUS.md`, `audit/ROADMAP.md`, `audit/REPRODUCE.md`.

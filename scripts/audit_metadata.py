@@ -11,9 +11,15 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import gfm_table  # noqa: E402  (sibling module, located above)
+import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
@@ -391,6 +397,293 @@ def validate_guarantees(data, assumption_ids):
     return rows
 
 
+# Every headline-table row that discloses a gap count, whatever index it claims.
+# The per-ID pattern below binds an ID to the position it must carry, so a
+# duplicate published under a *different* index does not match that pattern at
+# all and would go on asserting a contradictory count unchecked.
+README_FIDELITY_ROW = re.compile(
+    r"^\|\s*\d+\s*\|\s*`([^`]+)`\s*\|[^\n|]*\|[^\n|]*\|\s*\d+ open\s*\|$",
+    re.MULTILINE,
+)
+
+# The disclosure is a claim about one table: the headline status table, whose
+# CHECKED cells the gap counts are there to qualify.  Matching those rows
+# anywhere in the README bound them to nothing in particular, so a row moved out
+# of the headline table into any later table went on satisfying this gate while
+# the table a reader actually meets had silently dropped it — the headline could
+# skip from 6 to 8 with `P-CONSOLIDATION-ETH-1` re-filed in an appendix and every
+# check below still passed.  The table is located by its own header, so its rows
+# are read from it and from nowhere else.
+# A header line alone does not make a table.  Markdown renders one only when the
+# next line is a delimiter row whose every cell is one or more hyphens, with
+# optional alignment colons; `|     |     |     |` is pipes and spaces and
+# delimits nothing, so accepting `[ \t\-|]+` let the headline and its gap counts
+# collapse into paragraph text while this gate still read them as a table.  The
+# cell counts must agree too: Markdown drops the table entirely when the
+# delimiter row is not as wide as the header it underlines.
+# Locating the table with a pattern of its own repeated the same mistake one
+# level down.  The pattern compared the header's and the delimiter's `|` counts,
+# and an escaped pipe is a `|` character that delimits no cell: a header reading
+# `| # | ID | Abstract \| Lean | … | Fidelity gaps |` under a delimiter row
+# widened by one column balanced those counts exactly while cmark-gfm, finding a
+# five-cell header under a six-cell delimiter, rendered no table on the page at
+# all.  Every gap count in this gate was checked against a block a reader meets
+# as a paragraph of literal text.  The table is located through
+# `scripts/gfm_table.py`, which splits cells the way the renderer does.
+#
+# The header is identified by the three columns that make it this table: the
+# index, the claim ID, and the gap-count column the disclosure lives in.
+README_HEADLINE_COLUMNS = ("#", "ID", "Fidelity gaps")
+# Inside the rendered table the cells come from the renderer's own split, so
+# only the two that carry a checked value need a pattern of their own.
+README_ID_CELL = re.compile(r"^`([^`]+)`$")
+README_GAP_CELL = re.compile(r"^(\d+) open$")
+# A heading opens a section, and the headline is what comes before the first
+# one.  Requiring only that the table exist *somewhere* bound it to no position,
+# so moving it under a trailing `## Appendix` left this gate green while the
+# headline a reader meets before the CHECKED cells no longer carried a single
+# gap count.
+README_SECTION_HEADING = re.compile(r"^ {0,3}#{2,6}[ \t]", re.MULTILINE)
+
+# The model-vs-deployed boundary and the total gap count are headline claims:
+# they qualify the CHECKED table before a reader reaches it, which is the whole
+# reason they are stated up front.  Searching the README for those sentences
+# bound them to nothing in particular, so relocating either one into an appendix
+# below the table — or into any prose paragraph a reader scrolls past — left
+# this gate green while the headline no longer carried the qualification at all.
+# The opening blockquote is located by its position instead: the leading `>`
+# block immediately under the title, and nowhere else.
+README_HEADLINE_BLOCK = re.compile(r"\A# [^\n]*\n\n(?P<block>(?:>[^\n]*\n)+)")
+
+# Locating the block is only half of it: its contents were then searched as raw
+# Markdown, and text a reader never meets satisfied that search.  Dropping the
+# visible count and boundary and adding a line such as
+# `> <!-- not about a deployed contract; 67 in total -->` left both
+# qualifications present in the source and absent from the rendered page, so the
+# headline CHECKED table published itself unqualified while this gate stayed
+# green.  Every construct whose characters render as no visible text is removed
+# before the block is tested — comments, processing instructions, declarations
+# and CDATA, the elements whose bodies are never shown as prose, and the tags
+# themselves, so a sentence cannot hide in an attribute value either.  Removal
+# only ever deletes text, so a qualification can vanish from this view but can
+# never be invented in it; the failure direction is a real disclosure reported
+# missing, never a missing one reported present.
+#
+# The elements are handed to `markdown_text.non_rendered_spans`, which owns that
+# question for every gate that asks it.  Spelling them here as
+# `<(script|style|textarea)\b.*?</\1>` named three of them and stopped at the
+# first end tag, so `<template>67 in total</template>` published a count to no
+# reader while this gate read it as prose, and a `<template>` nested in another
+# one carried a sentence past the close the pattern stopped at.
+_HTML_ATTRIBUTE = markdown_text.HTML_ATTRIBUTE
+README_UNRENDERED = re.compile(
+    r"<!--.*?(?:-->|\Z)"
+    r"|<\?.*?(?:\?>|\Z)"
+    r"|<!\[CDATA\[.*?(?:\]\]>|\Z)"
+    r"|<![A-Za-z].*?(?:>|\Z)"
+    rf"|<[A-Za-z][A-Za-z0-9-]*{_HTML_ATTRIBUTE}*\s*/?>"
+    r"|</[A-Za-z][A-Za-z0-9-]*\s*>",
+    re.DOTALL | re.IGNORECASE,
+)
+
+# CommonMark type-6 HTML block openers: a line that starts with one of these
+# block-level element names causes everything until the next blank line to be
+# emitted as raw HTML, not parsed as Markdown.  Pipe characters on those
+# interior lines never render as table rows.
+_HTML_BLOCK_TAG = re.compile(
+    r"^ {0,3}</?(?:address|article|aside|base|basefont|blockquote|body|"
+    r"caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|"
+    r"fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|"
+    r"head|header|hr|html|iframe|legend|li|link|main|menu(?:item)?|"
+    r"meta|nav|noframes|ol|optgroup|option|p|param|section|source|"
+    r"summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)"
+    r"(?:[ \t>]|/>|$)",
+    re.IGNORECASE,
+)
+
+
+def _mask_readme(text):
+    """Position-preserving blank of non-rendered regions in the README.
+
+    A pipe line inside a code fence or HTML block is printed as raw text,
+    not as a table row.  Searching the raw README let a table wrapped in
+    `<!--` … `-->` or a code fence satisfy the headline-table gate while the
+    rendered page showed nothing.  Each masked character is replaced with a
+    space so every position in the result corresponds to the same position in
+    the original; this keeps the body-position range the stray-row detection
+    compares against consistent with `README_FIDELITY_ROW.finditer(readme)`.
+    """
+    def blank(m):
+        return "".join(" " if c != "\n" else "\n" for c in m.group(0))
+
+    # Blank whole non-rendered elements first: a table wrapped in `<template>`
+    # keeps every raw pipe character while the page shows no table at all.
+    # Positions are preserved here the same way, by writing spaces over the
+    # span rather than deleting it.
+    held = list(text)
+    for start, stop in markdown_text.non_rendered_spans(text):
+        for i in range(start, stop):
+            if held[i] != "\n":
+                held[i] = " "
+    masked = "".join(held)
+
+    # Blank the remaining inline HTML constructs, preserving positions.
+    masked = README_UNRENDERED.sub(blank, masked)
+
+    # Line-by-line pass: blank code fences and CommonMark type-6 HTML blocks.
+    # Code fences: a closing sequence repeats the opening character at least as
+    # many times; a backtick fence carries no backtick in its info string.
+    # Type-6 HTML blocks: a line whose first non-space token is a block-level
+    # element open/close tag causes everything until the next blank line to be
+    # raw HTML.  The detection uses the original line (before step 1 blanked
+    # the opening tag) so the block-tag pattern fires on the actual characters.
+    lines_m = masked.splitlines(True)   # output lines (positions preserved)
+    lines_o = text.splitlines(True)     # original lines (for HTML-block detection)
+    fence = None
+    html_block = False
+    for i, (ml, ol) in enumerate(zip(lines_m, lines_o)):
+        msk = ml.rstrip("\r\n")
+        orig = ol.rstrip("\r\n")
+        if fence is not None:
+            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$", msk)
+            if m and m.group("seq")[0] == fence[0] and len(m.group("seq")) >= fence[1]:
+                fence = None
+            lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
+        elif html_block:
+            if orig == "":  # blank line ends the HTML block
+                html_block = False
+            else:
+                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
+        else:
+            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$", msk)
+            if m and not (m.group("seq")[0] == "`" and "`" in m.group("info")):
+                fence = (m.group("seq")[0], len(m.group("seq")))
+                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
+            elif _HTML_BLOCK_TAG.match(orig):
+                html_block = True
+                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
+    return "".join(lines_m)
+
+
+def validate_readme_fidelity_disclosure(rows):
+    """Bind the README headline table to the registry's own fidelity counts.
+
+    The headline table is the first thing a reader sees, and every canonical row
+    reads CHECKED/CHECKED.  Without a per-row gap count next to those cells the
+    surface reads as "finished" while the registry still records open gaps, so
+    the count is part of the published claim and may not drift from
+    `fidelity.missing`.
+    """
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    # A pipe line inside a code fence or HTML block renders as literal text, not
+    # as a table row, so wrapping the headline table in `<!--` … `-->` or a code
+    # fence left the raw-text search finding it while the rendered page showed
+    # nothing.  The masked version blanks every non-rendered region character-
+    # for-character (preserving newlines), so positions in `masked_readme` are
+    # identical to positions in `readme` and stray-row detection remains sound.
+    masked_readme = _mask_readme(readme)
+    tables = [t for t in gfm_table.find_tables(masked_readme)
+              if (t.header.cells[0].strip(), t.header.cells[1].strip(),
+                  t.header.cells[-1].strip()) == README_HEADLINE_COLUMNS]
+    require(len(tables) == 1,
+            f"README: found {len(tables)} headline fidelity tables, expected exactly one; "
+            "the gap counts qualify the CHECKED cells a reader meets first, and a second "
+            "table claiming those columns would compete with that disclosure. A header "
+            "whose delimiter row is not exactly as wide renders no table at all, and an "
+            "escaped pipe narrows the header without removing the character")
+    headline = tables[0]
+    canonical = rows[:len(CANONICAL_IDS)]
+    # Read the rows through the cells the renderer lays out, padded to the width
+    # the header declares — GFM pads a short row out rather than dropping it, so
+    # a row that stops before its gap-count cell still prints as a row of the
+    # table with that cell empty.
+    body = []
+    for line in headline.rows:
+        cells = [cell.strip() for cell in line.cells][:headline.columns]
+        body.append(cells + [""] * (headline.columns - len(cells)))
+    printed = [m.group(1) for row in body if (m := README_ID_CELL.match(row[1]))
+               and README_GAP_CELL.match(row[-1])]
+    strays = sorted({m.group(1) for m in README_FIDELITY_ROW.finditer(readme)
+                     if not headline.body_start <= m.start() < headline.body_end})
+    require(not strays,
+            f"README: {', '.join(strays)} print(s) a fidelity-gap row outside the headline "
+            "table; a row filed elsewhere is still a published gap count and is not the "
+            "disclosure the headline table makes")
+    total = 0
+    for position, row in enumerate(canonical, start=1):
+        expected = len(row["fidelity"]["missing"])
+        require(expected > 0, f"{row['id']}: registry records no fidelity gap to disclose")
+        total += expected
+        # A reader meets every row the table prints, but `search` read only the
+        # first: a duplicated row published a second, contradictory gap count
+        # while the first copy kept this gate green.  No canonical ID may name a
+        # repeat, so a second copy is rejected rather than shadowed by whichever
+        # one happens to come first.  Absence is left to the position-bound
+        # `found` check below, which names the missing cell precisely.
+        appearances = printed.count(row["id"])
+        require(appearances <= 1,
+                f"README: {row['id']} names {appearances} headline fidelity rows; "
+                "every printed row is a published claim and exactly one must carry it")
+        found = [gap.group(1) for cells in body
+                 if cells[0] == str(position) and cells[1] == f"`{row['id']}`"
+                 and (gap := README_GAP_CELL.match(cells[-1]))]
+        require(len(found) == 1,
+                f"README: {row['id']} row is missing its `N open` fidelity-gap cell "
+                f"at headline position {position}")
+        require(int(found[0]) == expected,
+                f"README: {row['id']} discloses {found[0]} fidelity gaps, "
+                f"registry records {expected}")
+    # Every canonical claim now has exactly one row, so anything else the table
+    # prints is a gap count standing behind no registry row at all.  Checked
+    # last so the per-row rules above keep naming their own failures precisely.
+    extra = sorted(set(printed) - {row["id"] for row in canonical})
+    require(not extra,
+            f"README: the headline table prints a fidelity-gap row for {', '.join(extra)}, "
+            "which the registry does not record as a canonical claim; a published gap "
+            "count qualifies a published CHECKED cell and must have one to qualify")
+    opening = README_HEADLINE_BLOCK.match(readme)
+    require(opening is not None,
+            "README: no headline blockquote under the title, so the qualifications a "
+            "reader meets before the CHECKED table cannot be located")
+    # The headline is a position, not just a shape.  Requiring only that the
+    # table exist *somewhere* bound it to no position, so moving it under a
+    # trailing `## Appendix` left this gate green while the headline a reader
+    # meets before the CHECKED cells carried no gap count at all.  The table has
+    # to sit between the headline blockquote and the first section heading:
+    # after the qualifications that bound it, and before the document breaks
+    # into sections a reader may never scroll to.  Checked once the blockquote
+    # is known to be in place, so displacing the blockquote is reported by the
+    # rule above, which names that failure exactly.
+    section = README_SECTION_HEADING.search(masked_readme, opening.end("block"))
+    heading = readme[section.start():readme.index("\n", section.start())] if section else ""
+    require(headline.start >= opening.end("block"),
+            "README: the fidelity table is printed above the headline blockquote, so the "
+            "gap counts are published before the boundary and the total that qualify them")
+    require(section is None or headline.start < section.start(),
+            f"README: the fidelity table is printed below `{heading.strip()}`, not in the "
+            "headline above the first section; the gap counts qualify the CHECKED cells a "
+            "reader meets first and cannot do that from an appendix")
+    # Strip HTML constructs, then the link metadata a reader never meets — the
+    # reference definition lines and the inline destinations and titles.  Each
+    # pass only deletes characters, so a qualification that survives is one a
+    # reader actually sees, and the display text is kept (`[text](url "title")`
+    # → `text`) so a qualification carried in the clickable label still counts.
+    # `scripts/markdown_text.py` does the second half: a destination may carry
+    # balanced parentheses, and a pattern that stopped at the first `)` left the
+    # title of `[details](foo(bar) "…")` standing as ordinary text, so a
+    # headline rendering only the word "details" satisfied this check.
+    block = markdown_text.visible_text(README_UNRENDERED.sub(
+        "", markdown_text.strip_non_rendered_elements(opening.group("block"))))
+    require(f"{total} in total" in block,
+            f"README: the headline blockquote must render the {total} total fidelity "
+            "gaps as visible text; a count stated only further down, or only inside a "
+            "comment or other unrendered markup, does not qualify the table above it")
+    require("not about a deployed contract" in block,
+            "README: the headline blockquote must render the model-vs-deployed boundary "
+            "as visible text; a boundary stated only further down, or only inside a "
+            "comment or other unrendered markup, does not qualify the table above it")
+
+
 def validate():
     validate_deposit_constructor_fixture()
     registry = load(AUDIT / "guarantees.yaml")
@@ -402,6 +695,7 @@ def validate():
     validate_pins(lock, manifest, source_map)
     rows = validate_guarantees(registry, assumption_ids)
     validate_r1_review_basis()
+    validate_readme_fidelity_disclosure(rows)
     return rows
 
 
@@ -451,33 +745,79 @@ def rendered(rows, source_map):
     spans_by_id = {target["id"]: target for target in source_map["targets"]}
     trust_names = [line.strip() for line in TRUST_NATIVE_DECIDE_ALLOWLIST.read_text(encoding="utf-8").splitlines()
                    if line.strip() and not line.lstrip().startswith("#")]
+    # Every canonical row is held gap-bearing by validate_readme_fidelity_disclosure,
+    # but a supplemental row may legitimately record none: it closes one narrow
+    # slice and its parent carries the residue.  Naming those rows keeps this
+    # sentence from contradicting the `0 open` cells the table prints for them.
+    gap_free = [r["id"] for r in rows if not r["fidelity"]["missing"]]
+    if gap_free:
+        quoted = [f"`{markdown_table_cell(i)}`" for i in gap_free]
+        listed = quoted[0] if len(quoted) == 1 else \
+            ", ".join(quoted[:-1]) + (" and " if len(quoted) == 2 else ", and ") + quoted[-1]
+        gap_note = (
+            f"Every one of the {len(canonical)} canonical claims still records at "
+            f"least one open gap. The {'row' if len(quoted) == 1 else 'rows'} "
+            f"{listed} print `0 open` because {'it is' if len(quoted) == 1 else 'they are'} "
+            "supplemental: the count covers only the narrow slice each such row "
+            "closes, and the residual gaps stay recorded against its parent "
+            "canonical claim."
+        )
+    else:
+        gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
         f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
-        "## Acceptance table — every registered claim\n\n",
-        "| Claim | Accepted theorem plane | Proof shape / exact domain statement | Source/artifact provenance | Acceptance and exact limitation |\n",
+        "## Acceptance index — every registered claim\n\n",
+        "One row per registered claim, with the number of fidelity gaps the "
+        f"registry still records against it. {gap_note} The full "
+        "assumptions, limitations, and source provenance for each claim are "
+        "expanded in the per-claim sections below; nothing that qualifies a "
+        "claim is left folded into a table cell.\n\n",
+        "| Claim | Abstract | Verity | Fidelity gaps | Classification |\n",
         "| --- | --- | --- | --- | --- |\n"]
+    for row in rows:
+        # Registry IDs are untrusted table content; keep only the characters a
+        # GitHub heading anchor can contain so a link target cannot add columns.
+        anchor = re.sub(r"[^a-z0-9-]", "", row["id"].lower())
+        report.append(
+            f"| [`{markdown_table_cell(row['id'])}`](#{anchor}) | "
+            f"{markdown_table_cell(row['abstract']['status'])} | "
+            f"{markdown_table_cell(row['verity']['status'])} | "
+            f"{len(row['fidelity']['missing'])} open | "
+            f"**{markdown_table_cell(row['classification']['kind'])}** |\n"
+        )
+    report.append("\n## Per-claim acceptance — assumptions, limitations, and source\n\n")
     for row in rows:
         source = spans_by_id.get(row["id"])
         if source:
-            provenance = f"{source['status']}; {len(source['spans'])} immutable pinned source span(s)"
+            provenance = (f"`{source['status']}`; {len(source['spans'])} immutable pinned "
+                          f"source span(s) in `audit/source-map.yaml`")
         else:
             provenance = "No independent source-map target; supplemental evidence only"
         abstract = row["abstract"]
         verity = row["verity"]
-        plane = (f"abstract `{abstract['status']}`: `{abstract['theorem'] or '—'}`; "
-                 f"Verity `{verity['status']}`: `{verity['theorem'] or '—'}`")
-        limitations = "; ".join(row["fidelity"]["missing"])
+        missing = row["fidelity"]["missing"]
+        report.append(f"### `{row['id']}`\n\n")
         report.append(
-            f"| `{markdown_table_cell(row['id'])}` | {markdown_table_cell(plane)} | "
-            f"{markdown_table_cell(row['summary'])} | {markdown_table_cell(provenance)}. "
-            f"Assumptions: {markdown_table_cell(', '.join('`' + a + '`' for a in row['assumptions']) or '—')}. | "
-            f"**{markdown_table_cell(row['classification']['kind'])}**. "
-            f"{markdown_table_cell(limitations)} Next gate: {markdown_table_cell(row['next_gate'])} |\n"
-        )
+            f"**Accepted theorem planes.** Abstract `{abstract['status']}`: "
+            f"`{abstract['theorem'] or '—'}`. Verity `{verity['status']}`: "
+            f"`{verity['theorem'] or '—'}`.\n\n")
+        report.append(f"**Proof shape / exact domain statement.** {row['summary']}\n\n")
+        report.append(f"**Source/artifact provenance.** {provenance}. A source-map entry is "
+                      f"source provenance, not deployed-artifact provenance.\n\n")
+        report.append("**Assumptions.** " + (", ".join(
+            f"`{a}`" for a in row["assumptions"]) or "None recorded.") + "\n\n")
+        report.append(f"**Limitations — {len(missing)} open fidelity gap(s).** "
+                      f"Surfaces the accepted theorems above do *not* cover:\n\n")
+        report.extend(f"- {item}\n" for item in missing)
+        classification = row["classification"]
+        remaining = classification.get("work")
+        report.append(f"\n**Classification.** **{classification['kind']}**"
+                      + (f" — {remaining}" if remaining else "") + "\n\n")
+        report.append(f"**Next gate.** {row['next_gate']}\n\n")
     report.extend([
         "\n## Explicit NOT YET boundaries\n\n",
         "- **ETH confinement:** `P-ETH-JOURNAL-1` is a modeled journal exclusion result, not global ETH confinement across live contracts, arbitrary calls, or deployment state.\n",
