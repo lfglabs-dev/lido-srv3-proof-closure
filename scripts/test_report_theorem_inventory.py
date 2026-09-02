@@ -11,6 +11,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKER = "scripts/check_report_theorem_inventory.py"
+# The checker reads the published table through the shared cmark-gfm table
+# reader, so the fixture tree must carry it or every mutant would fail on an
+# import error rather than on the claim it is testing.
+READER = "scripts/gfm_table.py"
 LEAN = "LidoSRv3/Audit/Guarantees/PAlloc1.lean"
 REPORT = "report/P-ALLOC-1.md"
 REGISTRY = "audit/guarantees.yaml"
@@ -47,7 +51,7 @@ def invoke(root, ok, needle=None):
 def main():
     with tempfile.TemporaryDirectory(prefix="report-inventory-mutants-") as tmp:
         fixture = Path(tmp)
-        for relative in (CHECKER, LEAN, REPORT, REGISTRY):
+        for relative in (CHECKER, READER, LEAN, REPORT, REGISTRY):
             target = fixture / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / relative, target)
@@ -817,7 +821,7 @@ def main():
             raise AssertionError(f"expected 8 inventory rows, read {len(inventory_rows)}")
         for line in inventory_rows:
             name = CHECK.ROW.match(line).group("name")
-            needle = ("prints inventory row(s) outside the `## Theorems` section: "
+            needle = ("prints inventory row(s) outside the rendered theorem table: "
                       f"{name}")
 
             relocated = report.replace(f"{line}\n", "", 1).replace(
@@ -839,7 +843,7 @@ def main():
         report_path.write_text(report.replace(
             elsewhere, f"## Theorems\n\n{section.group('body').strip()}\n\n{elsewhere}", 1),
             encoding="utf-8")
-        invoke(fixture, False, "prints inventory row(s) outside the `## Theorems` section")
+        invoke(fixture, False, "prints inventory row(s) outside the rendered theorem table")
         report_path.write_text(report, encoding="utf-8")
 
         # And the section has to be locatable at all: renaming or demoting the
@@ -887,21 +891,55 @@ def main():
             lambda line: f"    {line}",
             lambda line: f"\t{line}",
         )
+        # Each row is driven from the last position in the table.  A construct
+        # that hides a row also ends the rendered table on the line it opens, so
+        # hiding a row in the middle takes every row below it out of the table
+        # too and the gate names those instead — a true report, but not the one
+        # this family is asserting.  Row order carries no claim (the inventory
+        # is read by name), so moving the row under test to the end isolates
+        # "this construct hid this row" exactly.  The reordering itself is
+        # asserted to pass, so the isolation cannot be hiding a failure.
+        last = inventory_rows[-1]
         for line in inventory_rows:
             name = CHECK.ROW.match(line).group("name")
+            reordered = (report if line == last
+                         else report.replace(f"{line}\n", "", 1)
+                                    .replace(f"{last}\n", f"{last}\n{line}\n", 1))
+            if line != last:
+                if reordered == report or f"{last}\n{line}\n" not in reordered:
+                    raise AssertionError(f"reorder mutant for {name} changed nothing")
+                report_path.write_text(reordered, encoding="utf-8")
+                invoke(fixture, True, "8 P-ALLOC-1 theorems")
             for hide in non_rendered:
-                hidden = report.replace(line, hide(line), 1)
-                if hidden == report:
+                hidden = reordered.replace(line, hide(line), 1)
+                if hidden == reordered:
                     raise AssertionError(f"non-rendered mutant for {name} changed nothing")
                 report_path.write_text(hidden, encoding="utf-8")
                 invoke(fixture, False, f"omits declared theorem(s): {name}")
                 report_path.write_text(report, encoding="utf-8")
 
+        # Adversarial (certified defect 3 family): the table stops where GFM
+        # stops it.  A row hidden in the middle of the body ends the rendered
+        # table there, so every row printed below it is outside the inventory a
+        # reader meets even though the section still spells it.  Reading rows to
+        # the end of the section counted all eight while the page showed one.
+        for position, line in enumerate(inventory_rows[:-1]):
+            following = sorted(CHECK.ROW.match(row).group("name")
+                               for row in inventory_rows[position + 1:])
+            report_path.write_text(report.replace(line, f"```\n{line}\n```", 1),
+                                   encoding="utf-8")
+            invoke(fixture, False, "prints inventory row(s) outside the rendered theorem "
+                                   f"table: {', '.join(following)}")
+            report_path.write_text(report, encoding="utf-8")
+
         # Condition 6 is a list of tag names, and a name the suite never
         # exercises is a name that can hide a row the day it is used.  Each is
         # driven once, from the checker's own list, so a name a later CommonMark
         # revision adds arrives with its case already demanded.
-        first = inventory_rows[0]
+        # Driven from the last row for the same reason as the family above: a
+        # block opened mid-table ends the table there, so hiding the first row
+        # would be reported as the seven rows that leave the inventory with it.
+        first = inventory_rows[-1]
         first_name = CHECK.ROW.match(first).group("name")
         block_names = CHECK.HTML_BLOCK_NAMES.split("|")
         if "div" not in block_names or len(block_names) < 60:
@@ -917,8 +955,8 @@ def main():
         # same holds for a raw-text element, which ends on its own closing tag
         # and so is not stopped by the blank line that ends a `<div>`.
         for runaway in ("<!--", "<script>"):
-            report_path.write_text(report.replace(inventory_rows[0],
-                                                  f"{runaway}\n{inventory_rows[0]}", 1),
+            report_path.write_text(report.replace(inventory_rows[-1],
+                                                  f"{runaway}\n{inventory_rows[-1]}", 1),
                                    encoding="utf-8")
             invoke(fixture, False, "omits declared theorem(s)")
             report_path.write_text(report, encoding="utf-8")
@@ -975,13 +1013,28 @@ def main():
             "prose that mentions <div> in the middle of a line",
             '<span class="x">an inline tag with text after it</span> is not a block',
             "<3 is not a tag",
-            "a paragraph line\n<span>",
         ):
             report_path.write_text(
                 report.replace(inventory_rows[0], f"{inert}\n{inventory_rows[0]}", 1),
                 encoding="utf-8")
             invoke(fixture, True, "8 P-ALLOC-1 theorems")
             report_path.write_text(report, encoding="utf-8")
+
+        # The mirror of that family.  A complete tag alone on its line is HTML
+        # block condition 7, and a table row is not a paragraph, so cmark-gfm
+        # opens the block and ends the table there even though the same tag
+        # under a paragraph line opens nothing.  Every row below it is then
+        # printed as raw HTML, and the inventory a reader meets is the one row
+        # above.  Asserting this as a must-pass claimed eight rendered rows for a
+        # page that renders one.
+        every_row = sorted(CHECK.ROW.match(row).group("name") for row in inventory_rows)
+        report_path.write_text(
+            report.replace(inventory_rows[0],
+                           f"a paragraph line\n<span>\n{inventory_rows[0]}", 1),
+            encoding="utf-8")
+        invoke(fixture, False, "prints inventory row(s) outside the rendered theorem "
+                               f"table: {', '.join(every_row)}")
+        report_path.write_text(report, encoding="utf-8")
 
         # A mis-nested scope would qualify the declarations that follow under the
         # wrong name, and an unbalanced one leaves the qualification undefined;
@@ -1000,6 +1053,111 @@ def main():
                 encoding="utf-8")
             invoke(fixture, False, needle)
             lean_path.write_text(lean, encoding="utf-8")
+
+        # The header and its rows are only a table because one delimiter line
+        # underlines them.  Delete it, blank its cells, or make it disagree with
+        # the header's width and Markdown renders the whole inventory as a
+        # paragraph of literal text, so the rows a reader meets are not rows.
+        delimiter = "| --- | --- | --- | --- | --- |"
+        for mutant in (
+            "",
+            "|     |     |     |     |     |",
+            "| --- | --- |",
+            "| --- | --- | --- | --- | --- | --- |",
+            "    | --- | --- | --- | --- | --- |",
+        ):
+            body = report.replace(f"{delimiter}\n", f"{mutant}\n" if mutant else "", 1)
+            report_path.write_text(body, encoding="utf-8")
+            invoke(fixture, False, "0 rendered theorem tables")
+            report_path.write_text(report, encoding="utf-8")
+
+        # Up to three columns of indentation is ordinary block markup, and the
+        # fourth is what makes an indented chunk: the delimiter, the header and a
+        # row are each indented in turn and the inventory must still be read, or
+        # the gate would reject a table cmark-gfm plainly renders.
+        header_line = next(line for line in section.group("body").splitlines()
+                           if line.endswith("| Line | Plane | Registered | Role |"))
+        for indented in (report.replace(delimiter, f"  {delimiter}", 1),
+                         report.replace(header_line, f"   {header_line}", 1),
+                         report.replace(inventory_rows[0], f" {inventory_rows[0]}", 1)):
+            if indented == report:
+                raise AssertionError("short-indent control changed nothing")
+            report_path.write_text(indented, encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            report_path.write_text(report, encoding="utf-8")
+
+        # Adversarial (certified defect 1 family): an escaped pipe is a `|`
+        # character that delimits no cell.  Writing one into the header narrows
+        # the header by a column while leaving the character count unchanged, so
+        # a delimiter row widened to match the *characters* balanced the old
+        # count-the-pipes check exactly — and cmark-gfm, reading a five-cell
+        # header under a six-cell delimiter, rendered no table at all while this
+        # gate reported eight theorems and two registrations.  Each cell of the
+        # header is driven, and each is also driven with the delimiter left at
+        # its true width, where the table does render and must still be read.
+        header = header_line
+        wide = "| --- | --- | --- | --- | --- | --- |"
+        escapes = ("\\|", "\\\\|", "\\\\\\|")
+        cells = [cell for cell in header.strip("|").split("|")]
+        if len(cells) != 5:
+            raise AssertionError(f"expected a 5-cell inventory header, read {cells}")
+        for position in range(len(cells)):
+            for escape in escapes:
+                mutated = list(cells)
+                mutated[position] = f"{mutated[position].rstrip()} {escape} alias "
+                spoiled = "|" + "|".join(mutated) + "|"
+                report_path.write_text(
+                    report.replace(header, spoiled, 1).replace(delimiter, wide, 1),
+                    encoding="utf-8")
+                invoke(fixture, False, "0 rendered theorem tables")
+                # Under its own true width the same header renders as a table,
+                # so the escape is not a defect in itself: only its disagreement
+                # with the delimiter is.  The first column names the module and
+                # is free to be reworded, so that one must still be read; the
+                # other four are the column labels the inventory is identified
+                # by, and rewording one retires the table this gate checks.
+                report_path.write_text(report.replace(header, spoiled, 1), encoding="utf-8")
+                invoke(fixture, position == 0, None if position == 0
+                       else "0 rendered theorem tables")
+                report_path.write_text(report, encoding="utf-8")
+
+        # A role cell may legitimately print a pipe, and the escape is how it is
+        # written: the row still renders five cells and must still be read.  A
+        # pattern that spelled a cell as `[^|]*` could not cross the escape and
+        # dropped the row instead, so the rows are read through the renderer's
+        # own cell split and this case is a must-pass.
+        for escape in escapes:
+            spoiled_row = inventory_rows[0].replace("| Wave 2 parent.",
+                                                    f"| Wave 2 {escape} parent.", 1)
+            if spoiled_row == inventory_rows[0]:
+                raise AssertionError("escaped-pipe row mutant changed nothing")
+            report_path.write_text(report.replace(inventory_rows[0], spoiled_row, 1),
+                                   encoding="utf-8")
+            invoke(fixture, True, "8 P-ALLOC-1 theorems")
+            report_path.write_text(report, encoding="utf-8")
+
+        # The rejecting half of the same family: escaping a pipe that separates
+        # two real cells removes the boundary, so the row renders four cells
+        # where the table declares five and the columns after it shift left.
+        # The row still reads as an inventory row to the eye and is not one.
+        for escape in escapes[1:]:
+            narrowed = inventory_rows[0].replace("| 103 | Abstract |",
+                                                 f"| 103 {escape} Abstract |", 1)
+            if narrowed == inventory_rows[0]:
+                raise AssertionError("narrowing escape mutant changed nothing")
+            report_path.write_text(report.replace(inventory_rows[0], narrowed, 1),
+                                   encoding="utf-8")
+            invoke(fixture, False, "is not an inventory row")
+            report_path.write_text(report, encoding="utf-8")
+
+        # Alignment colons are part of a valid delimiter, so a table that carries
+        # them must still be read: rejecting it would leave no way to publish a
+        # left-, right- or centre-aligned inventory.
+        report_path.write_text(
+            report.replace(delimiter, "| :--- | ---: | :-: | --- | --- |", 1),
+            encoding="utf-8")
+        invoke(fixture, True, "8 P-ALLOC-1 theorems")
+        report_path.write_text(report, encoding="utf-8")
 
         invoke(fixture, True)
 
@@ -1065,10 +1223,26 @@ def main():
           "and an unclosed raw-text "
           "element each hiding the rows below them, a heading quoted in a fence "
           "or an HTML block not allowed to relocate the section, a row quoted in "
-          "either outside it not counted as a stray claim, and 17 look-alike "
-          "openers — 13 above the section and 4 directly above the first row, "
+          "either outside it not counted as a stray claim, and 16 look-alike "
+          "openers — 13 above the section and 3 directly above the first row, "
           "where a block would blank the whole inventory — asserted to leave the "
-          "real table rendered")
+          "real table rendered while a complete tag alone on its line, which is "
+          "HTML block condition 7 and does end a table body, is rejected as the "
+          "eight rows it takes out of the inventory; every row hidden mid-table "
+          "asserted to take the rows below it out of the rendered table too; and "
+          "the one delimiter row that makes the header and its rows a table "
+          "deleted, blanked to pipes and spaces, narrowed, widened, and indented "
+          "into a four-column chunk all rejected, with alignment colons and up to "
+          "three columns of indentation on the delimiter, the header and a row all "
+          "still read as the table they render; and the escaped pipe that delimits no "
+          "cell driven through every header cell in three spellings under a "
+          "delimiter widened to match its characters — the shape that rendered "
+          "no table at all while the gate reported eight theorems — rejected, "
+          "with the same header at its own true width still read when the escape "
+          "is in the free-text column and rejected when it rewords a bound column "
+          "label, a legitimate escaped pipe inside a role cell still read as the "
+          "five-cell row it renders, and an escape that removes a real cell "
+          "boundary rejected as the four-cell row it renders")
 
 
 if __name__ == "__main__":

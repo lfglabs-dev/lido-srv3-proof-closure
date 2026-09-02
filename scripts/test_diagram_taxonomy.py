@@ -13,6 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CHECKER = "scripts/check_diagram_taxonomy.py"
 DIAGRAM = "diagram/index.html"
 DIAGRAM_README = "diagram/README.md"
+# The checker reduces the README to the text a reader is shown through the
+# shared link-metadata reducer, so the fixture tree must carry it.
+READER = "scripts/markdown_text.py"
 
 
 def _load_checker():
@@ -120,7 +123,7 @@ def invoke(root, ok, needle=None):
 def main():
     with tempfile.TemporaryDirectory(prefix="diagram-taxonomy-mutants-") as tmp:
         fixture = Path(tmp)
-        for relative in (CHECKER, DIAGRAM, DIAGRAM_README):
+        for relative in (CHECKER, READER, DIAGRAM, DIAGRAM_README):
             target = fixture / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / relative, target)
@@ -297,6 +300,27 @@ def main():
                     splice(diagram, box, f"<!-- {box.group(0)} -->"),
                     f"{entity} ({address})",
                 ))
+                # Adversarial (certified defect 5 family): each surface owes one
+                # form of the address.  Accepting either form on either surface
+                # made them interchangeable, so a canvas tooltip rewritten to the
+                # card's elision left this gate reporting the entity bound while
+                # the canvas published no address a reader could look up — and a
+                # card rewritten to the full form loses the spelling the card is
+                # laid out for.  Both directions are driven, per entity and per
+                # surface, from the checker's own form table.
+                other = (CHECK.ABBREVIATED if CHECK.SURFACE_FORM[surface] == CHECK.FULL
+                         else CHECK.FULL)
+                elided_box = (box.group(0).replace(address, CHECK.abbreviated(address))
+                              if other == CHECK.ABBREVIATED
+                              else box.group(0).replace(CHECK.abbreviated(address), address))
+                if elided_box == box.group(0):
+                    raise AssertionError(
+                        f"address-form mutant for {entity} on the {surface} changed nothing")
+                family.append((
+                    splice(diagram, box, elided_box),
+                    f"on the {surface}, only the {other} address of {entity} "
+                    f"({address}) is printed",
+                ))
                 # An address extended by an adjacent character is a different,
                 # invalid address; substring containment accepts it while
                 # token-boundary matching does not.  The extension is not
@@ -333,6 +357,39 @@ def main():
                             splice(diagram, box, prefixed_box),
                             f"{entity}",
                         ))
+                # The continuation need not be written as a literal character.
+                # A character reference is punctuation to a regex and a letter
+                # on the page, so `…3Cee&#103;` shows a clean boundary in the
+                # source while the map publishes `0x852d…3Ceeg`; the boundary
+                # has to be judged on what is rendered, in decimal and hex
+                # spellings alike, and on each form alone as well as together.
+                for reference in ("&#103;", "&#x67;", "&#48;"):
+                    for referenced_box in (
+                        box.group(0).replace(address, address + reference)
+                                    .replace(abbr, abbr + reference),
+                        box.group(0).replace(address, address + reference),
+                        box.group(0).replace(abbr, abbr + reference),
+                    ):
+                        if referenced_box == box.group(0):
+                            continue
+                        family.append((
+                            splice(diagram, box, referenced_box),
+                            f"{entity}",
+                        ))
+                # A corrupted publication printed beside an intact one.  Asking
+                # whether *some* standalone occurrence exists let the good form
+                # answer for the bad, so a box could draw
+                # `0x852d…3Cee · 0x852d…3Ceeg` — an address a reader copies and
+                # fails to look up — with this gate still reporting success.
+                # Each occurrence has to be judged on its own boundaries.
+                for form in (address, abbr):
+                    beside = box.group(0).replace(form, f"{form} · {form}g", 1)
+                    if beside == box.group(0):
+                        continue
+                    family.append((
+                        splice(diagram, box, beside),
+                        f"{entity}",
+                    ))
 
         # The same exchange read as a family, one surface at a time.  Every
         # same-class pair the checker's own table carries is swapped, so a pair
@@ -562,6 +619,33 @@ def main():
         invoke(fixture, False, "no longer states how many classes are pinned")
         readme_path.write_text(readme, encoding="utf-8")
 
+        # Thread r3909473219 on the canvas surface.  The page carries a
+        # `<script>` and a `<style>` block, and a body neither one draws is not
+        # published text, so every required phrase is moved out of the markup a
+        # reader meets and into each of those bodies in turn.
+        first_tooltip = re.compile(r'<g class="node [a-z]+"[^>]*><title>')
+        for phrase, _why in CHECK.REQUIRED:
+            if phrase not in diagram:
+                raise AssertionError(f"required phrase {phrase!r} absent from the canvas")
+            stripped = diagram.replace(phrase, "REDACTED_POWER")
+            for opener in ("<script>", "<style>"):
+                if opener not in stripped:
+                    raise AssertionError(f"the canvas carries no {opener} body to hide in")
+                hidden = stripped.replace(opener, f"{opener}\n/* {phrase} */\n", 1)
+                diagram_path.write_text(hidden, encoding="utf-8")
+                invoke(fixture, False, f"never mentions {phrase!r}")
+            # The control that keeps the rule from reading too widely: on this
+            # canvas a `<title>` is the hover tooltip, not an HTML `<head>`
+            # title, and it is where every node cites its address.  The same
+            # phrase restored there is text a reader is shown and must be read.
+            tooltip = first_tooltip.search(stripped)
+            if not tooltip:
+                raise AssertionError("no node tooltip on the canvas to restore into")
+            restored = f"{stripped[:tooltip.end()]}{phrase}. {stripped[tooltip.end():]}"
+            diagram_path.write_text(restored, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+        diagram_path.write_text(diagram, encoding="utf-8")
+
         # The README is checked as rendered Markdown; text inside an HTML
         # comment is not shown to a reader and must not satisfy any check.
         # Hiding the class-count sentence in a comment must be rejected even
@@ -575,6 +659,129 @@ def main():
             raise AssertionError("README comment-hiding mutant changed nothing")
         readme_path.write_text(commented_count, encoding="utf-8")
         invoke(fixture, False, "no longer states how many classes are pinned")
+        readme_path.write_text(readme, encoding="utf-8")
+
+        # Thread r3909071242: a link's destination and title render as nothing,
+        # so moving a claim into one hides it exactly as a comment does while
+        # leaving its characters in the raw source.  Each README claim the gate
+        # reads is driven through both title delimiters and through a
+        # balanced-parenthesis destination, and the same claim carried in the
+        # visible *label* must still be read or the gate would reject a README a
+        # reader plainly meets.
+        proof_match_for_links = CHECK.PROOF_ENTRY.search(readme)
+        if not proof_match_for_links:
+            raise AssertionError("proof entry not found in README")
+        # A reference definition renders as nothing only at the start of its own
+        # line, so whether that form hides a claim depends on where the claim
+        # sits.  Each entry records that, and both answers are asserted.
+        hideable = (
+            (count_sentence, "no longer states how many classes are pinned", False),
+            (proof_match_for_links.group(0), "does not document class 'proof'", True),
+        )
+        for claim, needle, at_line_start in hideable:
+            flat = " ".join(claim.split()).replace('"', "'")
+            for hidden in (
+                f'[details](target "{flat}")',
+                f"[details](target '{flat}')",
+                f'[details](foo(bar) "{flat}")',
+                f'[details](<foo(bar> "{flat}")',
+            ):
+                mutated = readme.replace(claim, hidden, 1)
+                if mutated == readme:
+                    raise AssertionError(f"link-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+            # Thread r3909320740: an attribute is markup, never content.  The
+            # claim moved into a `title=` leaves the rendered entry showing the
+            # element's text and nothing of the claim.
+            for attributed in (
+                f'<span title="{flat}">an EL contract that gates on a proof</span>',
+                f"<a href='u' data-note='{flat}'>an EL contract</a>",
+                f'<img alt="{flat}" src="x.png">',
+            ):
+                mutated = readme.replace(claim, attributed, 1)
+                if mutated == readme:
+                    raise AssertionError(f"attribute-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
+            # Thread r3909473219: a tag is not an element.  Deleting the two
+            # tags of `<script>…</script>` and keeping the body left the claim
+            # standing in the text this gate reads while a browser drew none of
+            # it, so the body is removed with them.  Every element the reducer
+            # holds to be non-rendered is driven here, so one it never exercises
+            # cannot carry a claim the day it is used.
+            for buried in tuple(
+                f"<{element}>{flat}</{element}>"
+                for element in CHECK.markdown_text.NON_RENDERED_ELEMENTS
+            ) + (
+                # The open tag is a tag: attributes and casing still open it.
+                f'<script type="text/javascript">{flat}</script>',
+                f"<SCRIPT>{flat}</SCRIPT>",
+                # `template` content is ordinary markup, so an inner opener
+                # really does open another element: stopping at the first
+                # `</template>` left the sentence after it standing as prose.
+                f"<template><template>note</template>{flat}</template>",
+                # And the three shapes that put a sentence behind an end tag a
+                # scan stops at: a raw-text child, a comment, and HTML's own
+                # script double-escape each carry an outer end tag as text.
+                f"<template><script>note</template>{flat}</script>",
+                f"<template><!-- </template> -->{flat}</template>",
+                f"<script><!--<script>note</script>-->{flat}</script>",
+            ):
+                mutated = readme.replace(claim, buried, 1)
+                if mutated == readme:
+                    raise AssertionError(
+                        f"element-hiding mutant for {needle!r} changed nothing")
+                readme_path.write_text(mutated, encoding="utf-8")
+                invoke(fixture, False, needle)
+
+            # An element that never closes hides everything after it, which is
+            # what a browser shows of it.  That deletes more of the README than
+            # the claim itself, so the rejection is asserted without pinning
+            # which surviving check names it first.
+            unterminated = readme.replace(claim, f"<script>{flat}", 1)
+            if unterminated == readme:
+                raise AssertionError("unterminated-element mutant changed nothing")
+            readme_path.write_text(unterminated, encoding="utf-8")
+            invoke(fixture, False)
+            readme_path.write_text(readme, encoding="utf-8")
+
+            definition = readme.replace(claim, f'[details]: target "{flat}"', 1)
+            if definition == readme:
+                raise AssertionError("reference-definition mutant changed nothing")
+            readme_path.write_text(definition, encoding="utf-8")
+            invoke(fixture, not at_line_start,
+                   needle if at_line_start else "diagram taxonomy ok")
+
+            # The label is visible text, so the same claim there must pass.
+            shown = readme.replace(claim, f'[{claim}](target "hidden")', 1)
+            if shown == readme:
+                raise AssertionError(f"link-label control for {needle!r} changed nothing")
+            readme_path.write_text(shown, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # The mirror of that family.  A reducer that read one construct too
+        # widely would delete text a reader plainly meets, and no edit to the
+        # README could then satisfy the gate, so each boundary of the rule is
+        # pinned on the claim that sits mid-line: prose on either side of a
+        # non-rendered element, beside one of a different name, inside one
+        # whose name only looks like one, and inside one a browser does paint.
+        for control in (
+            f"{count_sentence} <script>note</script>",
+            f"<script>note</script> {count_sentence}",
+            f"<script>a</script> {count_sentence} <style>b</style>",
+            f"<scriptx>{count_sentence}</scriptx>",
+            f"<script-note>{count_sentence}</script-note>",
+            f"<xmp>{count_sentence}</xmp>",
+            f'<span title="markup">{count_sentence}</span>',
+        ):
+            mutated = readme.replace(count_sentence, control, 1)
+            if mutated == readme:
+                raise AssertionError(f"element control {control!r} changed nothing")
+            readme_path.write_text(mutated, encoding="utf-8")
+            invoke(fixture, True, "diagram taxonomy ok")
         readme_path.write_text(readme, encoding="utf-8")
 
         # Similarly, the `proof` entry hidden in a comment must also fail.
@@ -681,13 +888,24 @@ def main():
           f"every one of {len(CHECK.IDENTITY)} address-bound entities relabel-repainted "
           "and deleted per surface, every one comment-wrapped per surface "
           "(entity inside <!-- … --> is invisible to a reader and must not be counted "
-          "as present), and every one with its address extended per surface by each of "
+          "as present), every one rewritten on each surface into the form the other "
+          "surface publishes — a canvas tooltip elided to the card's `0x852d…3Cee`, a "
+          "card expanded to the full forty digits — rejected, since a surface that owes "
+          "one form and prints the other leaves a reader who goes to it for an address "
+          "holding a spelling that looks up no contract, and every one with its address "
+          "extended per surface by each of "
           "8 trailing characters — hex and non-hex alike — applied to both forms "
           "together and to the full and abbreviated form alone, plus a leading "
           "character on each form (a malformed address must not satisfy a "
-          "token-boundary check via substring containment, the extension is not always "
-          "a hex digit, and an intact form must not vouch for a corrupted one beside "
-          "it); "
+          "token-boundary check via substring containment, and the extension is not "
+          "always a hex digit); every one extended per surface by each of 3 character "
+          "references — decimal and hex — again on both forms together and on each "
+          "alone (a reference is punctuation in the source and a letter on the page, "
+          "so `…3Cee&#103;` publishes `0x852d…3Ceeg` while the raw boundary reads "
+          "clean); and every one published per surface in both forms as an intact "
+          "token beside a corrupted copy of itself (`0x852d…3Cee · 0x852d…3Ceeg`), "
+          "which a check asking only whether some standalone occurrence exists "
+          "excuses — an intact form must not vouch for a corrupted one beside it; "
           f"{exchanges} same-class address exchanges — every pair the table carries whose "
           "entities are drawn under different labels on that surface — rejected on each "
           "surface alone (both boxes keep their class, so only binding the address to the "
@@ -708,7 +926,30 @@ def main():
           "(each rejected separately per surface), and the README `proof` entry "
           "had the pairing swapped, either half of it dropped, and a verifier named with "
           "no gateway to attribute it to; the README class-count sentence and the "
-          "README `proof` entry hidden in HTML comments each rejected")
+          "README `proof` entry hidden in HTML comments each rejected, and each "
+          "also hidden in an inline link's title through both quote delimiters "
+          "and through balanced and angle-bracketed destinations — the shapes a "
+          "`[^)]*` pattern stops short of — with a reference definition rejected "
+          "where it starts its own line and accepted mid-sentence, where it is "
+          "literal text, and the same claim carried in a visible link label "
+          "still read, and each moved into an HTML attribute — a `title=`, a "
+          "`data-` note and an `alt=` — rejected, since an attribute is markup "
+          "and never content; every required phrase moved off the canvas and "
+          "into its `<script>` and its `<style>` body rejected, with the same "
+          "phrase restored to a node tooltip still read, since on this SVG a "
+          "`<title>` is the hover text a reader is shown and is where every "
+          "address is cited; and each README claim buried in the body of every one of "
+          f"{len(CHECK.markdown_text.NON_RENDERED_ELEMENTS)} non-rendered "
+          "elements — plus an attributed and an upper-case opener, a nested "
+          "`template` whose close the body runs past, an opener that never "
+          "closes, and the three shapes that carry an outer end tag as text — "
+          "a raw-text child, a comment, and HTML's own script double-escape — "
+          "rejected, since a tag is not an element and a body a browser never "
+          "draws is not prose; with 7 controls holding the other edge of that "
+          "rule, where the same sentence sits on either side of such an "
+          "element, beside one of a different name, inside one whose name only "
+          "looks like one, or inside one a browser does paint, and must still "
+          "be read")
 
 
 if __name__ == "__main__":

@@ -11,6 +11,10 @@ import unicodedata
 from pathlib import Path
 from typing import NoReturn
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import gfm_table  # noqa: E402  (sibling module, located above)
+
 
 CLAIMS = {
     "P-DEPOSIT-1": {
@@ -198,6 +202,53 @@ CLAIMS = {
 }
 
 
+# The README status table is where a reader meets each claim's Verity cell, and
+# a claim is published only where GFM renders it.  Searching the whole README
+# for a row-shaped line read the raw characters instead, so a row inside a
+# comment, a fence or an HTML block satisfied this gate while the rendered page
+# showed nothing -- and an escaped pipe in the header, which delimits no cell,
+# could drop the table to paragraph text without changing a single row.  The
+# table is located through `scripts/gfm_table.py`, the same cmark-gfm-faithful
+# reader `scripts/audit_metadata.py` binds the gap counts with, and each row is
+# read through the cells that reader lays out.
+README_STATUS_COLUMNS = ("#", "ID", "Fidelity gaps")
+README_ID_CELL = re.compile(r"^`([^`]+)`$")
+# The Verity status is read from the column the header names, not from a fixed
+# index.  Pinning the fourth cell bound the status to a position rather than to
+# a column: inserting a `Published status` column after `Abstract Lean` shifted
+# the real Verity cells one to the right while this gate went on reading the
+# fourth, so the table could print `OPEN` where the registry records `CHECKED`
+# and still pass.  The header must name this column exactly once.
+VERITY_HEADING = "Verity Executable Contract"
+
+
+def readme_status_rows(readme: str) -> dict[str, list[tuple[int, list[str]]]]:
+    """The rendered status rows, indexed by claim ID, with the Verity column."""
+    tables = [t for t in gfm_table.find_tables(readme)
+              if (t.header.cells[0].strip(), t.header.cells[1].strip(),
+                  t.header.cells[-1].strip()) == README_STATUS_COLUMNS]
+    if len(tables) != 1:
+        fail(f"README: found {len(tables)} rendered status tables, expected exactly one; "
+             "a claim is published where the table renders it, and a header whose "
+             "delimiter row is not exactly as wide renders no table at all")
+    table = tables[0]
+    headings = [cell.strip() for cell in table.header.cells]
+    if headings.count(VERITY_HEADING) != 1:
+        fail(f"README: the rendered status table names {VERITY_HEADING!r} "
+             f"{headings.count(VERITY_HEADING)} time(s) in its header {headings}; the "
+             "faithful Verity status is read from the column a reader meets it under, "
+             "so exactly one column must carry that name")
+    verity = headings.index(VERITY_HEADING)
+    printed: dict[str, list[list[str]]] = {}
+    for line in table.rows:
+        cells = [cell.strip() for cell in line.cells][:table.columns]
+        cells += [""] * (table.columns - len(cells))
+        named = README_ID_CELL.match(cells[1])
+        if named:
+            printed.setdefault(named.group(1), []).append((verity, cells))
+    return printed
+
+
 def fail(message: str) -> NoReturn:
     raise ValueError(message)
 
@@ -323,6 +374,7 @@ def check(root: Path) -> None:
         fail(f"cannot parse canonical registry: {exc}")
     rows = {row.get("id"): row for row in registry.get("guarantees", [])}
     readme = read(root / "README.md")
+    status_rows = readme_status_rows(readme)
     facade = read(root / "LidoSRv3/Audit/AllGuarantees.lean")
 
     for claim_id, expected in CLAIMS.items():
@@ -343,11 +395,12 @@ def check(root: Path) -> None:
         ):
             fail(f"{claim_id}: faithful Verity status/theorem differs from the canonical view")
 
-        table_pattern = re.compile(
-            rf"^\|\s*\d+\s*\|\s*`{re.escape(claim_id)}`\s*\|[^\n]*\|\s*{expected_verity_status}[^\n]*\|$",
-            re.MULTILINE,
-        )
-        if not table_pattern.search(readme):
+        printed = status_rows.get(claim_id, [])
+        if len(printed) != 1:
+            fail(f"README: the rendered status table prints {len(printed)} row(s) for "
+                 f"{claim_id}, expected exactly one")
+        verity_column, cells = printed[0]
+        if not cells[verity_column].startswith(expected_verity_status):
             fail(f"README: {claim_id} faithful Verity status differs")
 
         module = expected["module"]

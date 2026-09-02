@@ -38,6 +38,13 @@ def main():
         (fixture / "LidoSRv3/Audit/Provenance").mkdir(parents=True)
         (fixture / "fixtures/solidity-reference").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
+        # The generator reads the published table through the shared cmark-gfm
+        # table reader, so the fixture tree must carry it or every mutant would
+        # fail on an import error rather than on the claim it is testing.
+        shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
+        # And it reduces the headline blockquote to the text a reader is shown
+        # through the shared link-metadata reducer, for the same reason.
+        shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
@@ -444,9 +451,20 @@ def main():
                 f"> <?php echo 'The evidence is {sentence}.'; ?>\n",
                 f"> <![CDATA[The evidence is {sentence}.]]>\n",
                 f"> <!DOCTYPE note SYSTEM {sentence}>\n",
-                f"> <script>var note = '{sentence}';</script>\n",
-                f"> <style>/* {sentence} */</style>\n",
-                f"> <textarea>{sentence}</textarea>\n",
+                # Thread r3909473219: a tag is not an element.  Naming three
+                # of them as `<(script|style|textarea)\b.*?</\1>` removed the
+                # bodies it knew about and stopped at the first end tag, so
+                # `<template>` published a qualification to no reader while
+                # this gate read it as prose, and a `template` nested in
+                # another carried one past the close that pattern stopped at.
+                # Every element the shared reader holds to be non-rendered is
+                # driven here, so one it never exercises cannot carry a
+                # qualification the day it is used.
+                *(f"> <{element}>{sentence}</{element}>\n"
+                  for element in module.markdown_text.NON_RENDERED_ELEMENTS),
+                f"> <script type=\"text/javascript\">var n = '{sentence}';</script>\n",
+                f"> <STYLE>/* {sentence} */</STYLE>\n",
+                f"> <template><template>note</template>{sentence}</template>\n",
                 f'> <span title="{sentence}">See the note.</span>\n',
                 f'> <img alt="{sentence}" src="x.png">\n',
                 # Thread 14: a Markdown link reference definition renders as
@@ -457,10 +475,69 @@ def main():
                 # are invisible; only the display text renders, so a
                 # qualification hidden in the title must not satisfy the check.
                 f'> [see here](http://example.com "{sentence}")\n',
+                # Thread r3909071230: a CommonMark destination may carry
+                # balanced parentheses.  A pattern that stopped at the first
+                # `)` consumed `foo(bar` and left the title standing as
+                # ordinary text, so a headline rendering only the word
+                # "details" satisfied the check for both qualifications.
+                f'> [details](foo(bar) "{sentence}")\n',
+                f'> [details](foo(bar(baz)) "{sentence}")\n',
+                f"> [details](foo(bar) '{sentence}')\n",
+                f'> [details](foo(bar) ({sentence}))\n',
+                f'> [details](<foo(bar> "{sentence}")\n',
+                f'> [outer [inner](u "{sentence}") label](v)\n',
             ):
                 readme_path.write_text(
                     readme.replace(block, muted_block + concealed, 1), encoding="utf-8")
                 invoke(fixture, False, needle)
+
+            # Thread r3909320734: a full or collapsed reference link names its
+            # definition in a second bracket group, which renders as nothing.
+            # Recognising only the `(` form left the whole sentence standing in
+            # `[details][not about a deployed contract; 67 in total]` as if a
+            # reader met it.  The definition is appended so the link really does
+            # form and CommonMark really does render only "details".
+            readme_path.write_text(
+                readme.replace(block, muted_block + f"> [details][{sentence}]\n", 1)
+                .rstrip("\n") + f'\n\n[{sentence}]: http://example.com\n',
+                encoding="utf-8")
+            invoke(fixture, False, needle)
+
+            # A collapsed reference link renders its own label, so the same
+            # sentence written as `[sentence][]` is text a reader is shown and
+            # must still be accepted.
+            readme_path.write_text(
+                readme.replace(block, muted_block + f"> [{sentence}][]\n", 1)
+                .rstrip("\n") + f'\n\n[{sentence}]: http://example.com\n',
+                encoding="utf-8")
+            invoke(fixture, True, command="check")
+
+            # The mirror of that family: a qualification carried in the link
+            # *label* is text a reader is shown, so removing the metadata must
+            # not remove it too.  Otherwise the gate would reject a headline a
+            # reader plainly meets and no edit to the README could satisfy it.
+            for shown in (
+                f'> [The evidence is {sentence}.](http://example.com)\n',
+                f'> [The evidence is {sentence}.](foo(bar) "hidden")\n',
+                f'> [The evidence is {sentence}.][note]\n\n[note]: http://example.com\n',
+                f'> The evidence is {sentence}. [see](foo(bar) "hidden")\n',
+                f'> The evidence is {sentence}. [unterminated](foo "x\n',
+                # The same edge for element bodies.  Reading that rule one
+                # construct too widely would delete text a reader plainly
+                # meets: prose beside a non-rendered element, an element whose
+                # name only looks like one, one a browser does paint, and the
+                # text after a raw-text element's first end tag are all on the
+                # page and must still qualify the table.
+                f"> <script>note</script> The evidence is {sentence}.\n",
+                f"> The evidence is {sentence}. <script>note</script>\n",
+                f"> <script>a</script> The evidence is {sentence}. <style>b</style>\n",
+                f"> <scriptx>The evidence is {sentence}.</scriptx>\n",
+                f"> <script-note>The evidence is {sentence}.</script-note>\n",
+                f"> <xmp>The evidence is {sentence}.</xmp>\n",
+            ):
+                readme_path.write_text(
+                    readme.replace(block, muted_block + shown, 1), encoding="utf-8")
+                invoke(fixture, True, command="check")
 
             # And dropped from the README outright.
             readme_path.write_text(quieted, encoding="utf-8")
@@ -518,6 +595,94 @@ def main():
                 invoke(fixture, True)
                 readme_path.write_text(readme, encoding="utf-8")
 
+        # The headline is a table only because one delimiter row underlines it.
+        # Blank its cells or make it disagree with the header's width and
+        # Markdown renders the CHECKED cells and the gap counts that qualify
+        # them as a run of paragraph text instead.
+        delimiter = "| --- | --- | --- | --- | --- |"
+        for mutant in (
+            "",
+            "|     |     |     |     |     |",
+            "| --- | --- |",
+            "| --- | --- | --- | --- | --- | --- |",
+            "    | --- | --- | --- | --- | --- |",
+        ):
+            body = readme.replace(f"{delimiter}\n", f"{mutant}\n" if mutant else "", 1)
+            readme_path.write_text(body, encoding="utf-8")
+            invoke(fixture, False, "found 0 headline fidelity tables", command="check")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Up to three columns of indentation is ordinary block markup, and the
+        # fourth is what makes an indented chunk: the delimiter, the header and a
+        # row are each indented in turn and the headline must still be located,
+        # or the gate would reject a table cmark-gfm plainly renders.
+        for indented in (readme.replace(delimiter, f"  {delimiter}", 1),
+                         readme.replace(header, f"   {header}", 1),
+                         readme.replace(rows[0], f" {rows[0]}", 1)):
+            if indented == readme:
+                raise AssertionError("short-indent control changed nothing")
+            readme_path.write_text(indented, encoding="utf-8")
+            invoke(fixture, True, command="check")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Adversarial (certified defect 2 family): an escaped pipe is a `|`
+        # character that delimits no cell.  Writing one into the header narrows
+        # the header by a column while leaving the character count unchanged, so
+        # a delimiter row widened to match the *characters* balanced the old
+        # count-the-pipes check exactly — and cmark-gfm, reading a five-cell
+        # header under a six-cell delimiter, rendered no table on the page while
+        # every gap count below was checked against it.  Each cell of the header
+        # is driven, and each is also driven at the header's true width, where
+        # the table does render and must still be read.
+        wide = "| --- | --- | --- | --- | --- | --- |"
+        cells = header.strip("|").split("|")
+        if len(cells) != 5:
+            raise AssertionError(f"expected a 5-cell headline header, read {cells}")
+        for position in range(len(cells)):
+            for escape in ("\\|", "\\\\|", "\\\\\\|"):
+                mutated = list(cells)
+                mutated[position] = f"{mutated[position].rstrip()} {escape} alias "
+                spoiled = "|" + "|".join(mutated) + "|"
+                readme_path.write_text(
+                    readme.replace(header, spoiled, 1).replace(delimiter, wide, 1),
+                    encoding="utf-8")
+                invoke(fixture, False, "found 0 headline fidelity tables", command="check")
+                # The middle two columns are free text; the index, the ID and
+                # the gap-count column are what the disclosure is bound to, so
+                # rewording one of those retires the table this gate checks.
+                readme_path.write_text(readme.replace(header, spoiled, 1), encoding="utf-8")
+                free = position in (2, 3)
+                invoke(fixture, free, None if free else "found 0 headline fidelity tables",
+                       command="check")
+                readme_path.write_text(readme, encoding="utf-8")
+
+        # Adversarial (certified defect 4 family): the headline is a position,
+        # not just a shape.  A table that renders perfectly but sits under a
+        # trailing heading publishes its gap counts after the CHECKED cells they
+        # qualify, and the headline a reader meets first carries none of them.
+        table_start = readme.index(header)
+        table_end = readme.index("\n\n", table_start)
+        whole_table = readme[table_start:table_end + 1]
+        for relocated in (
+            readme.replace(whole_table, "", 1).rstrip("\n") + f"\n\n## Appendix\n\n{whole_table}",
+            readme.replace(whole_table, "", 1).replace(
+                "## Reproduce", f"## Status\n\n{whole_table}\n## Reproduce", 1),
+        ):
+            if whole_table in relocated.split("## ")[0]:
+                raise AssertionError("headline-table relocation mutant changed nothing")
+            readme_path.write_text(relocated, encoding="utf-8")
+            invoke(fixture, False, "not in the headline above the first section",
+                   command="check")
+            readme_path.write_text(readme, encoding="utf-8")
+
+        # Alignment colons belong to a valid delimiter, so the table must still
+        # be located through them; otherwise no aligned headline could pass.
+        readme_path.write_text(
+            readme.replace(delimiter, "| :--- | ---: | :-: | --- | --- |", 1),
+            encoding="utf-8")
+        invoke(fixture, True, command="check")
+        readme_path.write_text(readme, encoding="utf-8")
+
         invoke(fixture, True, command="generate")
         (fixture / "audit/STATUS.md").write_text("stale\n", encoding="utf-8")
         invoke(fixture, False, "STATUS.md is stale", command="check")
@@ -533,15 +698,42 @@ def main():
           "element (`<div>`); and "
           "each headline qualification re-filed into an appendix, into prose above the "
           "table, into a later blockquote and dropped outright, and spelled inside the "
-          "block by each of 12 constructs that publish no visible text (single- and "
+          "block by each of 20 constructs that publish no visible text (single- and "
           "multi-line comments, a processing instruction, CDATA, a declaration, "
-          "`script`, `style` and `textarea` bodies, `title`/`alt` attribute "
-          "values, Markdown link reference definition titles, and inline link "
-          "destination/title fields), with the opening blockquote demoted to prose, pushed below an "
+          "the body of every one of the eight elements the shared reader holds "
+          "to be non-rendered — with an attributed and an upper-case opener and "
+          "a nested `template` whose close the body runs past, since naming "
+          "three of them and stopping at the first end tag let `<template>` "
+          "publish a qualification to no reader — `title`/`alt` attribute "
+          "values, Markdown link reference definition titles, inline link "
+          "destination/title fields, and six inline-link shapes whose destination "
+          "carries balanced or angle-bracketed parentheses — the form a `[^)]*` "
+          "pattern stopped short of, leaving the title standing as ordinary text, "
+          "including one hidden in a nested label, and a full reference link whose "
+          "second bracket group names a definition that renders as nothing), with a "
+          "collapsed reference link still read because it renders its own label, "
+          "with the opening blockquote "
+          "demoted to prose, pushed below an "
           "introduction, deleted, unheaded and its title demoted all rejected, while a "
           "renamed title, a longer block, a redundant restatement, and each "
-          "qualification restated through inline markup that still renders it stay "
-          "accepted")
+          "qualification restated through inline markup that still renders it, and each "
+          "carried in a link label or beside an unterminated link, and each "
+          "printed on either side of a non-rendered element, beside one of a "
+          "different name, inside two whose names only look like one, or inside "
+          "the `xmp` a browser paints — text a reader is shown — stay accepted; "
+          "and the delimiter row that makes the headline a table deleted, "
+          "blanked to pipes and spaces, narrowed, widened, and indented into a "
+          "four-column chunk all rejected, with alignment colons and up to three "
+          "columns of indentation on the delimiter, the header and a row all still "
+          "located as the table they render; the escaped pipe that delimits no cell driven through every "
+          "header cell in three spellings under a delimiter widened to match its "
+          "characters — the shape that rendered no table on the page while every gap "
+          "count below was checked against it — rejected, with the same header at its "
+          "own true width still located when the escape is in a free-text column and "
+          "rejected when it rewords the index, the ID or the gap-count column; and the "
+          "whole table relocated under a trailing appendix and under a later section "
+          "rejected, since a gap count a reader reaches only after the CHECKED cells "
+          "it was written to qualify no longer qualifies them")
 
 
 if __name__ == "__main__":

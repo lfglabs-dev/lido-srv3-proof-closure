@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 """Bind the architecture map's colour taxonomy to what the pinned source says.
 
-Temporary: this file reverse-parses rendered HTML. Do not extend the HTML /
-CommonMark grammar. It will be replaced by a check against generated diagram
-JSON once the environment inventory exists.
-
 The map colours a box by what makes it trustworthy.  Two mistakes are cheap to
 make and expensive for a reader: drawing an EL system predeploy (EIP-4788,
 EIP-7002, EIP-7251) as consensus layer, which puts it outside the EL trust
@@ -22,7 +18,12 @@ Each is pinned here against `diagram/README.md`, which carries the citations.
 
 import re
 import sys
+from html import unescape
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 DIAGRAM = ROOT / "diagram/index.html"
@@ -31,6 +32,20 @@ DIAGRAM_README = ROOT / "diagram/README.md"
 CLASSES = ("el", "proof", "com", "bot", "sys", "cl")
 
 SURFACES = ("canvas", "notes cards")
+
+# Each surface publishes one form of an address, and the form is the point.  A
+# canvas node carries its address in the hover tooltip, where there is room for
+# all forty hex digits and where a reader goes precisely to copy them; a notes
+# card prints the elided `0x852d…3Cee` that fits the card.  Accepting either
+# form on either surface made the two interchangeable, so shortening a tooltip
+# to the card's spelling left this gate reporting eight entities bound while the
+# canvas published no full address at all and a reader hovering for one found an
+# elision they cannot look up.  The form each surface owes is pinned here.
+FULL, ABBREVIATED = "full", "abbreviated"
+SURFACE_FORM = {"canvas": FULL, "notes cards": ABBREVIATED}
+if set(SURFACE_FORM) != set(SURFACES):
+    raise SystemExit("diagram taxonomy: every surface must pin the address form it "
+                     f"publishes; {sorted(SURFACE_FORM)} does not cover {list(SURFACES)}")
 
 # address -> (entity, required class, {surface: the label that address belongs
 # under}).  A label is how a box reads, not what it is: rewording one drops its
@@ -208,6 +223,14 @@ VERIFIER_SURFACE = {
 MENTION = re.compile("|".join(re.escape(name) for name in sorted(
     set(GATEWAY_VERIFIER) | set(GATEWAY_VERIFIER.values()), key=len, reverse=True)))
 
+# Which bodies the *canvas* never draws.  This is deliberately not
+# `markdown_text.NON_RENDERED_ELEMENTS`: that set answers the question for a
+# Markdown page, where `<title>` is document metadata, and here the canvas is
+# SVG, where `<title>` is the hover tooltip a reader is shown — and the tooltip
+# is exactly where every node cites its address.  Only the two elements the page
+# actually carries, and whose bodies no surface draws, are named.
+CANVAS_NON_RENDERED = ("script", "style")
+
 # The README's `proof` entry is where the pairing is stated for the record, so it
 # must carry both pairings and attribute each one explicitly: prose has no box to
 # make an unqualified mention default to.
@@ -262,30 +285,44 @@ _COMMENT = re.compile(r'<!--.*?-->', re.DOTALL)
 _TOKEN_CHAR = r'[0-9A-Za-z_…]'
 
 
-def _address_in(text, addr):
-    """True iff addr appears in text as a standalone address token.
+_CONTINUES = re.compile(_TOKEN_CHAR)
 
-    Substring containment lets a malformed address that merely extends a
-    valid one (e.g. the full address with a trailing `0`) satisfy the
-    check, because the valid prefix is still present inside the longer
-    string.  Requiring no adjacent token character on either side enforces
-    token boundaries without depending on surrounding punctuation, and
-    without assuming the extra character is itself a hex digit.
+# Markup and character references are not what a reader copies.  `&#103;` is
+# three punctuation-looking characters to a regex and a `g` to a browser, so a
+# boundary check run over raw HTML reads the reference as the gap it needs and
+# accepts `0x852d…3Cee&#103;` — which the map then publishes as `0x852d…3Ceeg`.
+# Tags collapse to a space rather than to nothing: two separately positioned
+# text elements sit side by side in the source without being one token on the
+# page, and joining them would invent corruption that no reader can see.
+_TAG = re.compile(r'<[^>]*>')
+
+
+def rendered(fragment):
+    """The text a reader is actually shown: markup removed, references decoded."""
+    return unescape(_TAG.sub(" ", _COMMENT.sub(" ", fragment)))
+
+
+def _address_occurrences(text, addr):
+    """Count the standalone and the extended publications of addr in text.
+
+    Asking only whether *some* standalone occurrence exists lets an intact form
+    vouch for a corrupted one printed beside it: `0x852d…3Cee · 0x852d…3Ceeg`
+    answers yes on the first form while the second is an address a reader would
+    copy and fail to look up.  Every occurrence is therefore judged on its own
+    boundaries, so locating an entity and rejecting a corrupted publication stay
+    independent questions.  Any letter, digit or underscore continues the token,
+    as does the ellipsis the abbreviated form elides its middle with, so the
+    extension does not have to be a hex digit to be caught.
     """
-    return bool(re.search(f'(?<!{_TOKEN_CHAR})' + re.escape(addr) + f'(?!{_TOKEN_CHAR})', text))
-
-
-def _address_corrupted_in(text, addr):
-    """True iff text carries addr only as part of a longer address token.
-
-    Locating an entity accepts either the full or the abbreviated form, so a
-    box that publishes both can have one of them corrupted and still be found
-    by the other: the intact tooltip vouches for a visible row that reads
-    `0x852d…3Ceeg`.  A form present as a substring but not as a standalone
-    token is a corrupted publication of that form, which is judged on its own
-    rather than excused by the form beside it.
-    """
-    return addr in text and not _address_in(text, addr)
+    standalone = extended = 0
+    for match in re.finditer(re.escape(addr), text):
+        before = text[match.start() - 1:match.start()]
+        after = text[match.end():match.end() + 1]
+        if _CONTINUES.match(before) or _CONTINUES.match(after):
+            extended += 1
+        else:
+            standalone += 1
+    return standalone, extended
 
 
 def fail(message):
@@ -338,7 +375,12 @@ def main():
     # Strip HTML comments before all scans: content inside <!-- … --> is not
     # rendered to a reader and must not contribute to any check — whether
     # identifying an entity, enforcing a class, or verifying required text.
-    html = _COMMENT.sub(" ", fold(DIAGRAM.read_text(encoding="utf-8")))
+    # A `<script>` or `<style>` body is the same kind of hiding place: the page
+    # carries both, and moving a REQUIRED phrase into one left this gate
+    # reporting it published while the canvas drew nothing of it.  They go too.
+    html = markdown_text.strip_non_rendered_elements(
+        _COMMENT.sub(" ", fold(DIAGRAM.read_text(encoding="utf-8"))),
+        CANVAS_NON_RENDERED)
 
     nodes = []
     for match in NODE.finditer(html):
@@ -382,23 +424,32 @@ def main():
 
     for surface, boxes in (("canvas", nodes), ("notes cards", cards)):
         absent = []
+        elided = []
+        required = SURFACE_FORM[surface]
         for address, (entity, expected, labels) in IDENTITY.items():
-            forms = (address.lower(), abbreviated(address).lower())
+            forms = {FULL: address.lower(), ABBREVIATED: abbreviated(address).lower()}
             belongs = labels[surface]
-            located = False
+            located = wrong_form = False
             for name, kind, identity in boxes:
-                identity = identity.lower()
+                # Read the box the way it is published: a reference that renders
+                # to a letter continues the token a reader copies, even though
+                # the raw source shows punctuation at that boundary.
+                identity = rendered(identity).lower()
+                intact = {}
                 # Judged before the box is located, and on every box rather
                 # than only this entity's: a corrupted token is what a reader
                 # copies, so it must fail wherever it is published and whether
                 # or not an intact form sits beside it.
-                for form in forms:
-                    if _address_corrupted_in(identity, form):
+                for spelling, form in forms.items():
+                    standalone, extended = _address_occurrences(identity, form)
+                    if extended:
                         fail(f"the {name!r} box on the {surface} publishes {entity}'s "
                              f"address as part of a longer token; {form!r} is extended "
-                             "there rather than printed as itself, and a reader copying "
+                             f"there rather than printed as itself in {extended} of its "
+                             f"{standalone + extended} occurrence(s), and a reader copying "
                              "what is drawn would look up an address that does not exist")
-                if not any(_address_in(identity, form) for form in forms):
+                    intact[spelling] = standalone
+                if not any(intact.values()):
                     continue
                 if kind != expected:
                     fail(f"{entity} ({address}) is drawn as {kind!r} under the label "
@@ -412,9 +463,23 @@ def main():
                          f"label {name!r}, which names a different entity; the address "
                          f"belongs to {belongs!r}, and an address printed against "
                          "another box misidentifies the contract a reader would look up")
-                located = True
-            if not located:
-                absent.append(f"{entity} ({address})")
+                # Being findable is not the same as being published.  Only the
+                # form this surface owes counts as the entity's identity here;
+                # the other form locates the box for the rules above and leaves
+                # the surface still owing its own.
+                if intact[required]:
+                    located = True
+                else:
+                    wrong_form = True
+            if located:
+                continue
+            (elided if wrong_form else absent).append(f"{entity} ({address})")
+        if elided:
+            other = ABBREVIATED if required == FULL else FULL
+            fail(f"on the {surface}, only the {other} address of {', '.join(elided)} is "
+                 f"printed; that surface publishes the {required} form, and a reader who "
+                 "goes to it for an address a contract can be looked up by finds a "
+                 "spelling that identifies no contract")
         if absent:
             fail(f"the map no longer identifies {', '.join(absent)} on the {surface}; "
                  "a taxonomy-critical entity must stay addressable on the canvas and "
@@ -483,7 +548,19 @@ def main():
 
     # Strip HTML comments before all README checks: text inside <!-- … --> is
     # not rendered to a reader and must not satisfy any documentation claim.
-    readme = _COMMENT.sub(" ", fold(DIAGRAM_README.read_text(encoding="utf-8")))
+    # Link metadata is the same kind of hiding place one construct along: a
+    # destination and a title render as nothing, so moving the gateway/verifier
+    # pairing into `[verifier details](target "TopUpGateway CLValidatorVerifier,
+    # …")` left the rendered entry showing two words and no pairing while this
+    # gate still found one.  Both are removed before any claim is read.
+    # Inline HTML is the same hiding place one construct further along: an
+    # attribute is markup, not content, so moving the pairing into
+    # `<span title="…">an EL contract…</span>` left the rendered entry showing
+    # prose and no pairing while this gate still found one.  `rendered_text`
+    # removes the tags and decodes the character references too, so what is read
+    # here is what the page shows.
+    readme = markdown_text.rendered_text(
+        _COMMENT.sub(" ", fold(DIAGRAM_README.read_text(encoding="utf-8"))))
     for phrase, why in REQUIRED:
         if phrase not in html:
             fail(f"{DIAGRAM.relative_to(ROOT)} never mentions {phrase!r}: {why}")
@@ -534,8 +611,8 @@ def main():
 
     print(f"diagram taxonomy ok: {len(nodes)} nodes, {len(cards)} cards, "
           f"{len(legend)} legend classes, {len(IDENTITY)} entities bound to their "
-          "class and to the label they are published under, on the canvas and on "
-          "the notes cards, "
+          "class and to the label they are published under, in the full address form "
+          "on the canvas and the abbreviated form on the notes cards, "
           f"{len(SURFACE_REQUIRED['canvas'])} proof-gated boxes bound per surface, "
           f"{bound} gateway boxes bound to the verifier they inherit, "
           f"{len(TAXONOMY)} taxonomy names still drawn")

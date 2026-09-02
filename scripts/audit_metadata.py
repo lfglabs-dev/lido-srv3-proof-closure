@@ -11,9 +11,15 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import gfm_table  # noqa: E402  (sibling module, located above)
+import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
@@ -408,12 +414,36 @@ README_FIDELITY_ROW = re.compile(
 # skip from 6 to 8 with `P-CONSOLIDATION-ETH-1` re-filed in an appendix and every
 # check below still passed.  The table is located by its own header, so its rows
 # are read from it and from nowhere else.
-README_HEADLINE_TABLE = re.compile(
-    r"^\|\s*#\s*\|\s*ID\s*\|[^\n]*\|\s*Fidelity gaps\s*\|[ \t]*\n"
-    r"\|[ \t\-|]+\|[ \t]*\n"
-    r"(?P<body>(?:\|[^\n]*\|[ \t]*\n)+)",
-    re.MULTILINE,
-)
+# A header line alone does not make a table.  Markdown renders one only when the
+# next line is a delimiter row whose every cell is one or more hyphens, with
+# optional alignment colons; `|     |     |     |` is pipes and spaces and
+# delimits nothing, so accepting `[ \t\-|]+` let the headline and its gap counts
+# collapse into paragraph text while this gate still read them as a table.  The
+# cell counts must agree too: Markdown drops the table entirely when the
+# delimiter row is not as wide as the header it underlines.
+# Locating the table with a pattern of its own repeated the same mistake one
+# level down.  The pattern compared the header's and the delimiter's `|` counts,
+# and an escaped pipe is a `|` character that delimits no cell: a header reading
+# `| # | ID | Abstract \| Lean | … | Fidelity gaps |` under a delimiter row
+# widened by one column balanced those counts exactly while cmark-gfm, finding a
+# five-cell header under a six-cell delimiter, rendered no table on the page at
+# all.  Every gap count in this gate was checked against a block a reader meets
+# as a paragraph of literal text.  The table is located through
+# `scripts/gfm_table.py`, which splits cells the way the renderer does.
+#
+# The header is identified by the three columns that make it this table: the
+# index, the claim ID, and the gap-count column the disclosure lives in.
+README_HEADLINE_COLUMNS = ("#", "ID", "Fidelity gaps")
+# Inside the rendered table the cells come from the renderer's own split, so
+# only the two that carry a checked value need a pattern of their own.
+README_ID_CELL = re.compile(r"^`([^`]+)`$")
+README_GAP_CELL = re.compile(r"^(\d+) open$")
+# A heading opens a section, and the headline is what comes before the first
+# one.  Requiring only that the table exist *somewhere* bound it to no position,
+# so moving it under a trailing `## Appendix` left this gate green while the
+# headline a reader meets before the CHECKED cells no longer carried a single
+# gap count.
+README_SECTION_HEADING = re.compile(r"^ {0,3}#{2,6}[ \t]", re.MULTILINE)
 
 # The model-vs-deployed boundary and the total gap count are headline claims:
 # they qualify the CHECKED table before a reader reaches it, which is the whole
@@ -433,42 +463,28 @@ README_HEADLINE_BLOCK = re.compile(r"\A# [^\n]*\n\n(?P<block>(?:>[^\n]*\n)+)")
 # headline CHECKED table published itself unqualified while this gate stayed
 # green.  Every construct whose characters render as no visible text is removed
 # before the block is tested — comments, processing instructions, declarations
-# and CDATA, the raw-text elements whose bodies are never shown as prose, and
-# the tags themselves, so a sentence cannot hide in an attribute value either.
-# Removal only ever deletes text, so a qualification can vanish from this view
-# but can never be invented in it; the failure direction is a real disclosure
-# reported missing, never a missing one reported present.
-_HTML_ATTRIBUTE = (
-    r"""(?:\s+[A-Za-z_:][A-Za-z0-9_.:-]*"""
-    r"""(?:\s*=\s*(?:[^\s"'=<>`]+|'[^']*'|"[^"]*"))?)"""
-)
+# and CDATA, the elements whose bodies are never shown as prose, and the tags
+# themselves, so a sentence cannot hide in an attribute value either.  Removal
+# only ever deletes text, so a qualification can vanish from this view but can
+# never be invented in it; the failure direction is a real disclosure reported
+# missing, never a missing one reported present.
+#
+# The elements are handed to `markdown_text.non_rendered_spans`, which owns that
+# question for every gate that asks it.  Spelling them here as
+# `<(script|style|textarea)\b.*?</\1>` named three of them and stopped at the
+# first end tag, so `<template>67 in total</template>` published a count to no
+# reader while this gate read it as prose, and a `<template>` nested in another
+# one carried a sentence past the close the pattern stopped at.
+_HTML_ATTRIBUTE = markdown_text.HTML_ATTRIBUTE
 README_UNRENDERED = re.compile(
     r"<!--.*?(?:-->|\Z)"
     r"|<\?.*?(?:\?>|\Z)"
     r"|<!\[CDATA\[.*?(?:\]\]>|\Z)"
     r"|<![A-Za-z].*?(?:>|\Z)"
-    r"|<(script|style|textarea)\b.*?(?:</\1\s*>|\Z)"
     rf"|<[A-Za-z][A-Za-z0-9-]*{_HTML_ATTRIBUTE}*\s*/?>"
     r"|</[A-Za-z][A-Za-z0-9-]*\s*>",
     re.DOTALL | re.IGNORECASE,
 )
-
-# A Markdown link reference definition (`[label]: url "title"`) is metadata;
-# it renders as nothing.  Hiding a required qualification inside a link title
-# left `README_UNRENDERED` (which only strips HTML) unable to remove it, so
-# the blockquote check found the text in a position a reader never sees.
-# This pattern matches a definition line inside a blockquote (the `> ` prefix
-# is preserved from `README_HEADLINE_BLOCK`'s capture group).
-_BLOCKQUOTE_LINK_DEF = re.compile(
-    r"^>[^\S\n]* {0,3}\[(?:[^\[\]\n]|\\.)*\][^\S\n]*:[^\n]*\n",
-    re.MULTILINE,
-)
-
-# An inline link `[text](destination "title")` renders only the link text;
-# the destination and title are invisible to a reader.  Replacing each
-# occurrence with the bare display text removes hidden metadata while
-# preserving every character a reader actually sees.
-_INLINE_LINK_META = re.compile(r"\[([^\[\]]*)\]\([^)]*\)")
 
 # CommonMark type-6 HTML block openers: a line that starts with one of these
 # block-level element names causes everything until the next blank line to be
@@ -500,8 +516,19 @@ def _mask_readme(text):
     def blank(m):
         return "".join(" " if c != "\n" else "\n" for c in m.group(0))
 
-    # Blank inline HTML constructs (types 1–5) first, preserving positions.
-    masked = README_UNRENDERED.sub(blank, text)
+    # Blank whole non-rendered elements first: a table wrapped in `<template>`
+    # keeps every raw pipe character while the page shows no table at all.
+    # Positions are preserved here the same way, by writing spaces over the
+    # span rather than deleting it.
+    held = list(text)
+    for start, stop in markdown_text.non_rendered_spans(text):
+        for i in range(start, stop):
+            if held[i] != "\n":
+                held[i] = " "
+    masked = "".join(held)
+
+    # Blank the remaining inline HTML constructs, preserving positions.
+    masked = README_UNRENDERED.sub(blank, masked)
 
     # Line-by-line pass: blank code fences and CommonMark type-6 HTML blocks.
     # Code fences: a closing sequence repeats the opening character at least as
@@ -555,17 +582,29 @@ def validate_readme_fidelity_disclosure(rows):
     # for-character (preserving newlines), so positions in `masked_readme` are
     # identical to positions in `readme` and stray-row detection remains sound.
     masked_readme = _mask_readme(readme)
-    tables = list(README_HEADLINE_TABLE.finditer(masked_readme))
+    tables = [t for t in gfm_table.find_tables(masked_readme)
+              if (t.header.cells[0].strip(), t.header.cells[1].strip(),
+                  t.header.cells[-1].strip()) == README_HEADLINE_COLUMNS]
     require(len(tables) == 1,
             f"README: found {len(tables)} headline fidelity tables, expected exactly one; "
             "the gap counts qualify the CHECKED cells a reader meets first, and a second "
-            "table claiming those columns would compete with that disclosure")
+            "table claiming those columns would compete with that disclosure. A header "
+            "whose delimiter row is not exactly as wide renders no table at all, and an "
+            "escaped pipe narrows the header without removing the character")
     headline = tables[0]
-    table = headline.group("body")
     canonical = rows[:len(CANONICAL_IDS)]
-    printed = [m.group(1) for m in README_FIDELITY_ROW.finditer(table)]
+    # Read the rows through the cells the renderer lays out, padded to the width
+    # the header declares — GFM pads a short row out rather than dropping it, so
+    # a row that stops before its gap-count cell still prints as a row of the
+    # table with that cell empty.
+    body = []
+    for line in headline.rows:
+        cells = [cell.strip() for cell in line.cells][:headline.columns]
+        body.append(cells + [""] * (headline.columns - len(cells)))
+    printed = [m.group(1) for row in body if (m := README_ID_CELL.match(row[1]))
+               and README_GAP_CELL.match(row[-1])]
     strays = sorted({m.group(1) for m in README_FIDELITY_ROW.finditer(readme)
-                     if not headline.start("body") <= m.start() < headline.end("body")})
+                     if not headline.body_start <= m.start() < headline.body_end})
     require(not strays,
             f"README: {', '.join(strays)} print(s) a fidelity-gap row outside the headline "
             "table; a row filed elsewhere is still a published gap count and is not the "
@@ -575,22 +614,19 @@ def validate_readme_fidelity_disclosure(rows):
         expected = len(row["fidelity"]["missing"])
         require(expected > 0, f"{row['id']}: registry records no fidelity gap to disclose")
         total += expected
-        cell = re.compile(
-            rf"^\|\s*{position}\s*\|\s*`{re.escape(row['id'])}`\s*\|[^\n|]*\|[^\n|]*\|"
-            rf"\s*(\d+) open\s*\|$",
-            re.MULTILINE,
-        )
         # A reader meets every row the table prints, but `search` read only the
         # first: a duplicated row published a second, contradictory gap count
         # while the first copy kept this gate green.  No canonical ID may name a
         # repeat, so a second copy is rejected rather than shadowed by whichever
         # one happens to come first.  Absence is left to the position-bound
-        # `cell` check below, which names the missing cell precisely.
+        # `found` check below, which names the missing cell precisely.
         appearances = printed.count(row["id"])
         require(appearances <= 1,
                 f"README: {row['id']} names {appearances} headline fidelity rows; "
                 "every printed row is a published claim and exactly one must carry it")
-        found = cell.findall(table)
+        found = [gap.group(1) for cells in body
+                 if cells[0] == str(position) and cells[1] == f"`{row['id']}`"
+                 and (gap := README_GAP_CELL.match(cells[-1]))]
         require(len(found) == 1,
                 f"README: {row['id']} row is missing its `N open` fidelity-gap cell "
                 f"at headline position {position}")
@@ -609,15 +645,35 @@ def validate_readme_fidelity_disclosure(rows):
     require(opening is not None,
             "README: no headline blockquote under the title, so the qualifications a "
             "reader meets before the CHECKED table cannot be located")
-    # Strip HTML constructs, link reference definition lines, and inline link
-    # destinations/titles — all three classes render as no visible text.  Each
+    # The headline is a position, not just a shape.  Requiring only that the
+    # table exist *somewhere* bound it to no position, so moving it under a
+    # trailing `## Appendix` left this gate green while the headline a reader
+    # meets before the CHECKED cells carried no gap count at all.  The table has
+    # to sit between the headline blockquote and the first section heading:
+    # after the qualifications that bound it, and before the document breaks
+    # into sections a reader may never scroll to.  Checked once the blockquote
+    # is known to be in place, so displacing the blockquote is reported by the
+    # rule above, which names that failure exactly.
+    section = README_SECTION_HEADING.search(masked_readme, opening.end("block"))
+    heading = readme[section.start():readme.index("\n", section.start())] if section else ""
+    require(headline.start >= opening.end("block"),
+            "README: the fidelity table is printed above the headline blockquote, so the "
+            "gap counts are published before the boundary and the total that qualify them")
+    require(section is None or headline.start < section.start(),
+            f"README: the fidelity table is printed below `{heading.strip()}`, not in the "
+            "headline above the first section; the gap counts qualify the CHECKED cells a "
+            "reader meets first and cannot do that from an appendix")
+    # Strip HTML constructs, then the link metadata a reader never meets — the
+    # reference definition lines and the inline destinations and titles.  Each
     # pass only deletes characters, so a qualification that survives is one a
-    # reader actually sees.  Inline link replacement keeps the display text
-    # (`[text](url "title")` → `text`) so a qualification carried in the
-    # clickable label is still accepted.
-    block = README_UNRENDERED.sub("", opening.group("block"))
-    block = _BLOCKQUOTE_LINK_DEF.sub("", block)
-    block = _INLINE_LINK_META.sub(r"\1", block)
+    # reader actually sees, and the display text is kept (`[text](url "title")`
+    # → `text`) so a qualification carried in the clickable label still counts.
+    # `scripts/markdown_text.py` does the second half: a destination may carry
+    # balanced parentheses, and a pattern that stopped at the first `)` left the
+    # title of `[details](foo(bar) "…")` standing as ordinary text, so a
+    # headline rendering only the word "details" satisfied this check.
+    block = markdown_text.visible_text(README_UNRENDERED.sub(
+        "", markdown_text.strip_non_rendered_elements(opening.group("block"))))
     require(f"{total} in total" in block,
             f"README: the headline blockquote must render the {total} total fidelity "
             "gaps as visible text; a count stated only further down, or only inside a "
