@@ -23,7 +23,7 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "0fc867057b539e5310ddbb3de3ea638f9b11125e"
+R1_REVIEW_BASE = "81e67d78ef39bc6b2db52fa7c501ce3a46d3da88"
 # The report calls this commit its certified review basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
@@ -34,7 +34,7 @@ R1_REVIEW_BASE = "0fc867057b539e5310ddbb3de3ea638f9b11125e"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "8ff5516f70c051f6e99388637e8412487b106185107d326c4034ff3ff8cd334a",
+    "audit/guarantees.yaml": "cae72d28c9cddb9df5f6a5f49a6fdd19d8995e1e4a1ffa49618ed56d1a140b26",
     "audit/source-map.yaml": "4aadab7fec32840c7ba6bf155372210c577f54b9da65cf5b99a65a331e5efbbd",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
