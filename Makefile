@@ -23,6 +23,7 @@ audit-generate:
 
 audit-check:
 	@python3 scripts/audit_metadata.py check
+	@python3 scripts/generate_ux2.py check
 
 audit_metadata: audit-check
 	@printf '%s\n' 'audit_metadata alias: see audit-check'
