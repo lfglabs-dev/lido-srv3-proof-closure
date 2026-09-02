@@ -41,4 +41,13 @@ reject "$project" "unsafe def injected := 0" "forbidden unsafe"
 reject "$project" "#check Lean.ofReduceBool" "forbidden Lean.ofReduceBool"
 reject "$project" "native_decide" "forbidden native_decide"
 
+# Escaped identifiers are code, but their contents are names rather than proof
+# commands or declarations.  Every guarded spelling must therefore be ignored
+# inside guillemets while the mutations above remain rejected outside them.
+printf '\ntheorem «sorry» : True := trivial\ntheorem «axiom» : True := trivial\ntheorem «native_decide» : True := trivial\n' >> "$project"
+if ! python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
+  cat "$tmpdir/out" >&2
+  exit 1
+fi
+
 printf '%s\n' 'proof-escape negative regressions rejected imported, library-root, and Trust project Lean mutations'

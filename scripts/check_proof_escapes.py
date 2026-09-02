@@ -33,11 +33,14 @@ ESCAPES = (
 )
 
 
-def strip_comments_and_strings(source: str) -> str:
+def strip_comments_and_strings(source: str, *, mask_escaped_identifiers: bool = False) -> str:
     """Blank comments/strings while preserving positions and newlines.
 
     Lean guillemet-escaped identifiers are code, even when their contents
     resemble comment or string delimiters (for example, ``«helper /- name»``).
+    Callers that scan for reserved proof-escape words may additionally blank
+    those identifier spans: a word merely spelled inside an escaped name is
+    not a Lean keyword occurrence.
     """
     out: list[str] = []
     i = 0
@@ -60,7 +63,7 @@ def strip_comments_and_strings(source: str) -> str:
                 out.append("\n" if ch == "\n" else " ")
                 i += 1
         elif in_escaped_identifier:
-            out.append(ch)
+            out.append("\n" if ch == "\n" else (" " if mask_escaped_identifiers else ch))
             if ch == "»":
                 in_escaped_identifier = False
             i += 1
@@ -91,7 +94,7 @@ def strip_comments_and_strings(source: str) -> str:
             i += 1
         elif ch == "«":
             in_escaped_identifier = True
-            out.append(ch)
+            out.append(" " if mask_escaped_identifiers else ch)
             i += 1
         else:
             out.append(ch)
@@ -126,7 +129,7 @@ def native_decide_sites(root: Path, files: list[Path] | None = None) -> list[tup
         source = path.read_text(encoding="utf-8")
         if "native_decide" not in source:
             continue
-        clean = strip_comments_and_strings(source)
+        clean = strip_comments_and_strings(source, mask_escaped_identifiers=True)
         lines = source.splitlines()
         newlines = [index for index, char in enumerate(clean) if char == "\n"]
         relative = path.relative_to(root).as_posix()
@@ -153,7 +156,7 @@ def main() -> None:
         source = path.read_text(encoding="utf-8")
         if not any(token in source for token in ("sorry", "admit", "axiom", "constant", "unsafe", "Lean.ofReduceBool")):
             continue
-        clean = strip_comments_and_strings(source)
+        clean = strip_comments_and_strings(source, mask_escaped_identifiers=True)
         newlines = [index for index, char in enumerate(clean) if char == "\n"]
         relative = path.relative_to(root).as_posix()
         for name, pattern in ESCAPES:

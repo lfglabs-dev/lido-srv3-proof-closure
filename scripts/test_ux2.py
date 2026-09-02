@@ -162,6 +162,9 @@ def check_lean_scanner(fixture: Path) -> None:
         "/-- Doc for thirteen. -/\n"
         "protected\n"
         "theorem thirteen : True := trivial\n"
+        "lemma fourteen : True := trivial\n"
+        "theorem\n"
+        "fifteen : True := trivial\n"
         "private theorem one : True := trivial\n"
         "@[simp] private theorem two : True := trivial\n"
         "private\ntheorem one : True := trivial\n"
@@ -184,6 +187,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "Outer.Inner.eleven": ("theorem eleven : True", "/-- Doc for eleven. -/", 32, 32),
         "Outer.Inner.twelve": ("theorem twelve : helper = 1", "", 35, 35),
         "Outer.Inner.thirteen": ("protected\ntheorem thirteen : True", "/-- Doc for thirteen. -/", 37, 38),
+        "Outer.Inner.fourteen": ("lemma fourteen : True", "", 39, 39),
+        "Outer.Inner.fifteen": ("theorem\nfifteen : True", "", 40, 41),
     }
     if set(found) != set(expected):
         raise SystemExit(f"scanner resolved {sorted(found)}")
