@@ -148,6 +148,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "structure Pair where\n  a : Nat\n  h : a = 1\n"
         "theorem seven : Pair where\n  a := 1\n  h := rfl\n"
         "theorem eight (nowhere : Nat) : nowhere = nowhere := rfl\n"
+        "theorem nine : Id.run do let x ← pure True; return x := by decide\n"
+        "theorem ten : (Id.run do let x ← pure 1; let y := x + 1; return y) = 2 := rfl\n"
         "end Outer.Inner\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     expected = {
@@ -159,6 +161,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "Outer.Inner.six": ("theorem six (outlet : Nat) (h : outlet.let = 1) : outlet = 1", "", 19, 19),
         "Outer.Inner.seven": ("theorem seven : Pair", "", 23, 23),
         "Outer.Inner.eight": ("theorem eight (nowhere : Nat) : nowhere = nowhere", "", 26, 26),
+        "Outer.Inner.nine": ("theorem nine : Id.run do let x ← pure True; return x", "", 27, 27),
+        "Outer.Inner.ten": ("theorem ten : (Id.run do let x ← pure 1; let y := x + 1; return y) = 2", "", 28, 28),
     }
     if set(found) != set(expected):
         raise SystemExit(f"scanner resolved {sorted(found)}")
