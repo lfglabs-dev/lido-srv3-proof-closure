@@ -1,11 +1,19 @@
 import LidoSRv3.Audit.Model.EthWorld
-import LidoSRv3.Audit.Guarantees.Registry
 
 /-!
-# P-ETH-CONFINEMENT-1 candidate parent (NOT a registered guarantee)
+# P-ETH-CONFINEMENT-1 candidate parent: model-layer conjuncts (NOT a registered guarantee)
 
-This module states, and proves, the confinement conclusion that the E1
-ETH-world inventory (`LidoSRv3.Audit.Model.EthWorld`) was built to support.
+This module states, and proves, the model-layer part of the confinement
+conclusion that the E1 ETH-world inventory (`LidoSRv3.Audit.Model.EthWorld`)
+was built to support: the agreement of the coverage table with the frozen
+Spec approval table, the exactness of the residual list, and route-level
+confinement.  The candidate parent theorem itself, together with the one
+conjunct that binds the inventory's covering parents to the public guarantee
+registry, lives in `LidoSRv3.Audit.Guarantees.PEthConfinement1`.  The model
+layer may not import `LidoSRv3.Audit.Guarantees.Registry`
+(`scripts/check_import_dag.py` rejects a model → guarantees edge), so the
+registry binding sits with the guarantee modules and this module stays a
+function of the inventory and the frozen Spec alone.
 
 ## Registration status
 
@@ -19,8 +27,9 @@ it carried the R1 review, which is exactly what that pin exists to prevent.
 `audit/P-ETH-CONFINEMENT-1-BRIEF.md` records the blocker and the exact row
 that becomes registerable once the registry reopens.
 
-So the conclusion below is a *candidate* parent: the theorem content is
-complete and kernel-checked, but no public claim surface asserts it.
+So the conclusion is a *candidate* parent: the theorem content is complete
+and kernel-checked (`PEthConfinement1.modeled_positive_value_is_confined_or_residual`),
+but no public claim surface asserts it.
 
 ## What the conclusion says
 
@@ -40,8 +49,11 @@ of each other:
 
 Agreement between (1) and (2) is what makes the conclusion refutable rather
 than a restatement of one table, and (3) forbids naming a covering parent
-that is not actually a registered guarantee.  `EthConfinementMutants` edits
-one line of each table and refutes the corresponding conjunct.
+that is not actually a registered guarantee.  Conjuncts over (1) and (2) are
+proved here; the conjunct over (3) is proved in
+`LidoSRv3.Audit.Guarantees.PEthConfinement1`, which imports the registry.
+`EthConfinementMutants` edits one line of each table and refutes the
+corresponding conjunct.
 
 ## What it does not say
 
@@ -89,9 +101,6 @@ namespace LidoSRv3.Audit.Model.EthConfinement
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Model.EthWorld
 
-/-- The public guarantee registry's identifier type. -/
-abbrev RegistryId := LidoSRv3.Audit.Guarantees.Id
-
 /-! ## Residual hops -/
 
 /-- The value routes this inventory places under **no** registered covering
@@ -101,26 +110,11 @@ Keeping the list independent of the coverage table is what lets
 def residualRoutes : List ValueRoute :=
   [ .busToGateway, .gatewayToVault, .vaultWithdrawalCall ]
 
-/-! ## Registry binding -/
+/-! ## Conclusion conjuncts
 
-/-- Every covering parent the E1 model names, as an entry of the public
-guarantee registry.  `CoveringParent.id` is a free-standing string table; this
-is the function that forces those strings to denote real registered rows. -/
-def registryId : CoveringParent → RegistryId
-  | .pDepositOne            => .pDeposit1
-  | .pTopupOne              => .pTopup1
-  | .pConsolidationEthOne   => .pConsolidationEth1
-  | .pConsolidationOne      => .pConsolidation1
-  | .pConsolidationValueOne => .pConsolidationValue1
-  | .pVaultEthOne           => .pVaultEth1
-  | .pEthJournalOne         => .pEthJournal1
-
-/-! ## Conclusion conjuncts -/
-
-/-- Conjunct 1: no covering parent is fabricated.  Each parent string in the
-E1 model is the registry text of an actual `Guarantees.Id`. -/
-def CoveringParentsAreRegistered : Prop :=
-  ∀ p : CoveringParent, p.id = (registryId p).text
+Conjunct 1 (`CoveringParentsAreRegistered`: no covering parent is fabricated)
+needs the public guarantee registry and is stated in
+`LidoSRv3.Audit.Guarantees.PEthConfinement1`. -/
 
 /-- Conjunct 2: the coverage table and the frozen Spec approval table agree
 route by route.  No route may be covered by a registered parent while landing
@@ -150,17 +144,7 @@ def RouteConfined (r : ValueRoute) : Prop :=
 def Confined (flows : List GeneralFlow) : Prop :=
   ∀ f ∈ authorizedFrames flows, f.isPositive → RouteConfined f.route
 
-/-- The four table-agreement conjuncts of the candidate parent. -/
-def ConfinementConclusion : Prop :=
-  CoveringParentsAreRegistered ∧
-    CoverageAgreesWithSpecApproval ∧
-      ResidualIsExactlyTheUncoveredInventory ∧
-        ResidualHopsAreUnclassified
-
 /-! ## Proofs -/
-
-theorem coveringParentsAreRegistered : CoveringParentsAreRegistered := by
-  intro p; cases p <;> rfl
 
 theorem coverageAgreesWithSpecApproval : CoverageAgreesWithSpecApproval := by
   intro r; cases r <;> rfl
@@ -199,20 +183,11 @@ theorem route_confined (r : ValueRoute) : RouteConfined r := by
   case vaultToWithdrawalQueue =>
     exact Or.inr ⟨.pVaultEthOne, .vaultToWithdrawalQueue, rfl, rfl⟩
 
-/-- **P-ETH-CONFINEMENT-1 candidate parent.** Universal over ETH-world
-traces: the three independently written tables agree, the residual list is
-exactly the uncovered inventory, and every positive-value authorized frame is
-either a named residual hop or is both parent-covered and Spec-approved.
-
-Scope: `ValueRoute`, not the pinned Solidity.  One ETH exit in the source
-(`WithdrawalQueueBase.sol:529`) is outside this enumeration entirely; see the
-scope-boundary section of the module header. -/
-theorem modeled_positive_value_is_confined_or_residual
-    (flows : List GeneralFlow) :
-    ConfinementConclusion ∧ Confined flows :=
-  ⟨⟨coveringParentsAreRegistered, coverageAgreesWithSpecApproval,
-      residualIsExactlyTheUncoveredInventory, residualHopsAreUnclassified⟩,
-    fun f _ _ => route_confined f.route⟩
+/-- Trace-level confinement, universally quantified over ETH-world traces.
+The candidate parent in `LidoSRv3.Audit.Guarantees.PEthConfinement1` conjoins
+this with the four table-agreement conjuncts. -/
+theorem confined (flows : List GeneralFlow) : Confined flows :=
+  fun f _ _ => route_confined f.route
 
 /-! ## Stated limits -/
 

@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Model.EthConfinement
+import LidoSRv3.Audit.Guarantees.PEthConfinement1
 
 /-!
 # Kill-lines for the P-ETH-CONFINEMENT-1 candidate parent
@@ -6,7 +6,8 @@ import LidoSRv3.Audit.Model.EthConfinement
 Each section below copies one production table from
 `LidoSRv3.Audit.Model.EthWorld` or `LidoSRv3.Audit.Model.EthConfinement`,
 changes **exactly one line**, and proves that the corresponding conjunct of
-`ConfinementConclusion` becomes false.
+`ConfinementConclusion` (stated in `LidoSRv3.Audit.Guarantees.PEthConfinement1`,
+which also holds the registry binding `registryId`) becomes false.
 
 Every mutant is paired with a *positive control* proving the copy agrees with
 the production table on every input except the one edited case.  Without the
@@ -27,6 +28,7 @@ namespace LidoSRv3.Tests.EthConfinementMutants
 open LidoSRv3.Audit.Spec
 open LidoSRv3.Audit.Model.EthWorld
 open LidoSRv3.Audit.Model.EthConfinement
+open LidoSRv3.Audit.Guarantees.PEthConfinement1
 
 /-! ## Test-local enumerations
 

@@ -10,8 +10,9 @@ deployment-provenance assumption.
 
 ## What is proved
 
-`LidoSRv3/Audit/Model/EthConfinement.lean` proves
-`modeled_positive_value_is_confined_or_residual`: for every modeled ETH-world
+`LidoSRv3/Audit/Guarantees/PEthConfinement1.lean` proves
+`modeled_positive_value_is_confined_or_residual` over the model-layer conjuncts of
+`LidoSRv3/Audit/Model/EthConfinement.lean`: for every modeled ETH-world
 trace, every positive-value authorized frame is either one of three named
 residual hops, or is both covered by a registered parent guarantee and landing
 on a frozen `Spec.ApprovedDestination`.
@@ -25,7 +26,7 @@ another:
 
 Agreement between (1) and (2) is what makes the statement refutable rather
 than a restatement of one table; (3) forbids naming a covering parent that is
-not an actual registered row. `EthConfinement.registryId` is the function that
+not an actual registered row. `PEthConfinement1.registryId` is the function that
 forces `CoveringParent.id`'s free-standing strings to denote real registry
 entries.
 
@@ -40,6 +41,18 @@ that is, no `native_decide` anywhere in the parent or its mutants.
 `audit/trust-native-decide-allowlist.txt` is pinned to the R1 review basis, so
 a new native-compiled proof term could not be added to it without presenting a
 changed allowlist as R1-reviewed.
+
+## Layering
+
+`scripts/check_import_dag.py` (introduced by the Lake target split, #233)
+rejects any model → guarantees import as a new layer inversion, and the
+registry binding `CoveringParentsAreRegistered` needs `Guarantees.Id`. The
+candidate parent, the four-conjunct `ConfinementConclusion`, and `registryId`
+therefore live in `LidoSRv3/Audit/Guarantees/PEthConfinement1.lean`, next to
+the registered guarantee modules but imported by none of them.
+`LidoSRv3/Audit/Model/EthConfinement.lean` keeps the coverage/Spec agreement,
+the exact residual list, route confinement, and the two stated-limit theorems,
+and imports no registry. Statements are unchanged; only namespaces moved.
 
 ## Kill-lines
 
@@ -195,7 +208,7 @@ with `non-checked verity may not expose a closure theorem`.
   "summary": "Supplemental parent over the E1 ETH-world inventory: every positive-value authorized frame is a named residual hop, or is both covered by a registered parent guarantee and landing on a frozen Spec.ApprovedDestination. Content is the agreement of three independently written tables (ValueRoute.primaryParent, Destination.toSpec, Guarantees.Id.text). Scoped to ValueRoute, not to the pinned Solidity: the WithdrawalQueue claim payout is outside the inventory.",
   "abstract": {
     "status": "CHECKED",
-    "theorem": "LidoSRv3.Audit.Model.EthConfinement.modeled_positive_value_is_confined_or_residual"
+    "theorem": "LidoSRv3.Audit.Guarantees.PEthConfinement1.modeled_positive_value_is_confined_or_residual"
   },
   "verity": {
     "status": "OPEN",
@@ -228,7 +241,7 @@ with `non-checked verity may not expose a closure theorem`.
   ],
   "next_gate": "Resolve the out-of-inventory WithdrawalQueue claim payout before any statement quantifying over all ETH exits from in-scope contracts.",
   "reproduction": {
-    "command": "lake build LidoSRv3.Audit.Model.EthConfinement LidoSRv3.Tests.EthConfinementMutants",
+    "command": "lake build LidoSRv3.Audit.Guarantees.PEthConfinement1 LidoSRv3.Tests.EthConfinementMutants",
     "expected": "modeled_positive_value_is_confined_or_residual, confinement_does_not_bound_unmodeled_value, and residual_hops_carry_unclassified_value build; the four kill-lines refute their conjuncts and the four positive controls keep the one-line-edit premise"
   }
 }
