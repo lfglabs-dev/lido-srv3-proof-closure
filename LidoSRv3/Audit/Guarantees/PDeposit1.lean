@@ -40,6 +40,29 @@ theorem revert_restores_state_value_and_logs {State : Type} :
           tx.committedTrace.logs = [] :=
   @LidoSRv3.Audit.revert_restores_state_value_and_logs State
 
+
+/-! ## Vocabulary (registered statements)
+
+The registered P-DEPOSIT-1 statements are written with the predicates below so
+that they read like the plain guarantee: "the router pulls the right amount of
+ETH from Lido and pushes that same amount to the beacon deposit contract; a
+non-conserving deployment reverts on any nonempty batch". Every predicate is an
+`abbrev`, so unfolding it gives back exactly the former statement text, and the
+conjunct order is unchanged. -/
+
+/-- "On every committed push, pulled = pushed, and the two source formulas for
+the deposit value agree." -/
+abbrev CommittedPushConserves (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Prop :=
+  ∀ keys pulled pushed balanceAfter,
+    run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
+      pulled = pushed ∧ depositsValue cfg inp = pushedValue cfg inp
+
+/-- "A deployment whose per-validator constant differs from the deposit size
+reverts on nonempty batches." -/
+abbrev NonConservingDeploymentReverts (cfg : SourceDepositConfig) (inp : SourceDepositInput) :
+    Prop :=
+  ¬ ConservingConfig cfg → 0 < actualDepositsCount cfg inp → (run cfg inp).reverts = true
+
 /--
 Commit-branch-explicit conservation, and rollback of the deployments that
 would break it, for the SRv3 deposit push at
@@ -101,11 +124,7 @@ Caveats, stated rather than hidden:
 -/
 theorem source_deposit_conserves_and_rolls_back
     (cfg : SourceDepositConfig) (inp : SourceDepositInput) :
-    (∀ keys pulled pushed balanceAfter,
-        run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
-          pulled = pushed ∧ depositsValue cfg inp = pushedValue cfg inp) ∧
-      (¬ ConservingConfig cfg → 0 < actualDepositsCount cfg inp →
-        (run cfg inp).reverts = true) := by
+    CommittedPushConserves cfg inp ∧ NonConservingDeploymentReverts cfg inp := by
   constructor
   · intro keys pulled pushed balanceAfter hRun
     obtain ⟨-, -, hPulled, hPushed, hMoved, -⟩ := committed_deposits_spec hRun
@@ -1073,6 +1092,23 @@ theorem linked_exactTotal_eq_depositsValue
   rw [linked_exactTotal_eq_pushedValue cfg inp inputs h, pushedValue, loopPushed_eq,
     depositsValue, hCons]
 
+/-- "Over any finite batch list, `execute` runs one module leg and one beacon
+leg per batch around a single Lido pull, with a wrap-guarded exact total
+below `2^256`." -/
+abbrev ExecutesNFrameJournal (inputs : DepositNFrameTx.Inputs)
+    (entry : _root_.Verity.ContractState) : Prop :=
+  DepositNFrameTx.ParentConclusion DepositNFrameTx.execute inputs entry
+
+/-- "The exact total of the batches is the source push." -/
+abbrev ExactTotalIsSourcePush (cfg : SourceDepositConfig) (inp : SourceDepositInput)
+    (inputs : DepositNFrameTx.Inputs) : Prop :=
+  exactTotal inputs.batches = pushedValue cfg inp
+
+/-- "On a conserving deployment, the exact total is also the source pull." -/
+abbrev ConservingDeploymentPullsExactTotal (cfg : SourceDepositConfig)
+    (inp : SourceDepositInput) (inputs : DepositNFrameTx.Inputs) : Prop :=
+  ConservingConfig cfg → exactTotal inputs.batches = depositsValue cfg inp
+
 /--
 P-DEPOSIT-1 list-batch product parent.  Universally quantified finite batches
 produce the inductive module/pull/beacon journal, a fold equal to its exact
@@ -1085,14 +1121,10 @@ theorem verity_tx_composes_nframe_deposit
     (inputs : DepositNFrameTx.Inputs) (entry : _root_.Verity.ContractState)
     (hLink : LinksSource cfg inp inputs)
     (hPre : DepositNFrameTx.Preconditions inputs entry) :
-    ((∀ keys pulled pushed balanceAfter,
-        run cfg inp = .committedDeposits keys pulled pushed balanceAfter →
-          pulled = pushed ∧ depositsValue cfg inp = pushedValue cfg inp) ∧
-        (¬ ConservingConfig cfg → 0 < actualDepositsCount cfg inp →
-          (run cfg inp).reverts = true)) ∧
-      DepositNFrameTx.ParentConclusion DepositNFrameTx.execute inputs entry ∧
-      exactTotal inputs.batches = pushedValue cfg inp ∧
-      (ConservingConfig cfg → exactTotal inputs.batches = depositsValue cfg inp) := by
+    (CommittedPushConserves cfg inp ∧ NonConservingDeploymentReverts cfg inp) ∧
+      ExecutesNFrameJournal inputs entry ∧
+      ExactTotalIsSourcePush cfg inp inputs ∧
+      ConservingDeploymentPullsExactTotal cfg inp inputs := by
   exact ⟨source_deposit_conserves_and_rolls_back cfg inp,
     DepositNFrameTx.nframe_deposit_parent inputs entry hPre,
     linked_exactTotal_eq_pushedValue cfg inp inputs hLink,

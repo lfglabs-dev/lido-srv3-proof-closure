@@ -46,7 +46,62 @@ def consolidation_reverted (post snapshot : ValidatorRegistry) : Prop :=
 
 def guarantee : Guarantee := ⟨.pConsolidation1, [.model, .source, .verityTx]⟩
 
-/-- `sourceRun` commits only when caller = gateway, arrays are nonempty and
+/-! ## Vocabulary
+
+Readable names for the two arms of the registered source parent. Every name
+is an `abbrev`, so each unfolds definitionally to the exact clause it stands for (same conjuncts, same order,
+same nesting): the registered theorems below are the very same propositions as
+before, only spelled the way the English guarantee reads. -/
+
+/-- "All the vault guards pass for this batch, and then `rest`": the caller is
+the gateway, the arrays are nonempty and zipped by index, every key is 48
+bytes, `count * fee` fits `uint256`, and `msg.value = count * fee`
+(`_requireExactFee`). The continuation `rest` keeps the original right-nested
+conjunction shape so projections and kill-lines are unchanged. -/
+abbrev AllGuardsPassAnd (inputs : Inputs) (requests : List Request) (rest : Prop) : Prop :=
+  zipRequests inputs.sources inputs.targets
+      inputs.sourceLens inputs.targetLens = some requests ∧
+    inputs.caller = inputs.gateway ∧
+    inputs.sources.length ≠ 0 ∧
+    requests.all validRequest = true ∧
+    requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
+    inputs.msgValue.val = requests.length * inputs.fee.val ∧
+    rest
+
+/-- "Some batch passes every vault guard": the shape the reverted arm negates
+(caller = gateway, nonempty sources, and a zipped, 48-byte-valid, non-wrapping,
+exactly-paid request list). -/
+abbrev AllGuardsPassForSomeBatch (inputs : Inputs) : Prop :=
+  inputs.caller = inputs.gateway ∧
+    inputs.sources.length ≠ 0 ∧
+    ∃ requests,
+      zipRequests inputs.sources inputs.targets
+          inputs.sourceLens inputs.targetLens = some requests ∧
+        requests.all validRequest = true ∧
+        requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
+        inputs.msgValue.val = requests.length * inputs.fee.val
+
+/-- "A batch commits only if every guard passes, the fee is nonzero, and the
+observables are exactly one CALL and one event per pair, source then target." -/
+abbrev CommitsOnlyWhenAllGuardsPass (inputs : Inputs) : Prop :=
+  ∀ obs, sourceRun inputs = .committed obs →
+    ∃ requests,
+      AllGuardsPassAnd inputs requests
+        (inputs.fee.val ≠ 0 ∧
+          obs = commitObservables inputs.requestTarget inputs.fee
+            inputs.msgValue requests)
+
+/-- "A batch reverts only if some guard fails." -/
+abbrev RevertsOnlyWhenSomeGuardFails (inputs : Inputs) : Prop :=
+  ∀ reason, sourceRun inputs = .reverted reason →
+    ¬ AllGuardsPassForSomeBatch inputs
+
+/-- **P-CONSOLIDATION-1, source plane.** A consolidation batch commits only if
+every vault guard passes (caller = gateway, nonempty aligned 48-byte keys, the
+product fits, `msg.value = count * fee`) with a nonzero fee, and then produces
+exactly one CALL and one event per pair; it reverts only if some guard fails.
+
+`sourceRun` commits only when caller = gateway, arrays are nonempty and
 aligned, every key is 48 bytes, the product fits `uint256`, and
 `msg.value` equals `count * fee` (`_requireExactFee`). In isolation `fee = 0`
 with `msg.value = 0` commits `sourceRun`; under the caller-supplied
@@ -75,27 +130,8 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
     (inputs : Inputs)
     (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →
       inputs.msgValue.val ≠ 0) :
-    (∀ obs, sourceRun inputs = .committed obs →
-      ∃ requests,
-        zipRequests inputs.sources inputs.targets
-          inputs.sourceLens inputs.targetLens = some requests ∧
-        inputs.caller = inputs.gateway ∧
-        inputs.sources.length ≠ 0 ∧
-        requests.all validRequest = true ∧
-        requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
-        inputs.msgValue.val = requests.length * inputs.fee.val ∧
-        inputs.fee.val ≠ 0 ∧
-        obs = commitObservables inputs.requestTarget inputs.fee
-          inputs.msgValue requests) ∧
-    (∀ reason, sourceRun inputs = .reverted reason →
-      ¬ (inputs.caller = inputs.gateway ∧
-          inputs.sources.length ≠ 0 ∧
-          ∃ requests,
-            zipRequests inputs.sources inputs.targets
-              inputs.sourceLens inputs.targetLens = some requests ∧
-            requests.all validRequest = true ∧
-            requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧
-            inputs.msgValue.val = requests.length * inputs.fee.val)) :=
+    CommitsOnlyWhenAllGuardsPass inputs ∧
+    RevertsOnlyWhenSomeGuardFails inputs :=
   SolidityConsolidation.source_consolidation_preserves_eligibility_value_atomicity
     inputs hGatewayAdmittedNonzero
 
@@ -154,7 +190,11 @@ theorem fee_blind_commit_kill_line_refutes_parent :
             inputs.msgValue requests) :=
   SolidityConsolidation.fee_blind_commit_kill_line_refutes_parent
 
-/-- If the four memory arrays decode to the `Inputs` fields and the
+/-- **P-CONSOLIDATION-1, Verity plane.** If the four memory arrays decode and
+the entry credit does not wrap, what Verity observes of `addRequests` equals
+`sourceView` of the same `sourceRun`.
+
+If the four memory arrays decode to the `Inputs` fields and the
 frame-entry payable credit does not wrap the `Uint256` balance, `observe`
 (suffix of `state.calls` / `state.events` plus count/fee slots) equals
 `sourceView` of the same `sourceRun`. The entry no-wrap premise is the

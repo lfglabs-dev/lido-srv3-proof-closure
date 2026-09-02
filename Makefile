@@ -39,6 +39,7 @@ test:
 	@python3 scripts/test_markdown_text.py
 	@PYTHONOPTIMIZE=1 python3 scripts/test_audit_metadata.py
 	@python3 scripts/check_validation_receipt.py
+	@python3 scripts/test_check_validation_receipt.py
 	@python3 scripts/check_proof_escapes.py
 	@bash scripts/test_check_proof_escapes.sh
 	@bash scripts/test_check_trust_axioms.sh

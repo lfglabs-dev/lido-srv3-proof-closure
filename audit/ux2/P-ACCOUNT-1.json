@@ -17,9 +17,9 @@
       "name": "LidoSRv3.Audit.Guarantees.PAccount1.mint_after_read_discipline",
       "module": "LidoSRv3.Audit.Guarantees.PAccount1",
       "file": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
-      "start_line": 73,
-      "end_line": 73,
-      "doc": "/-- Registered P-ACCOUNT-1 parent. Independent tx-storage-flag order\ndiscipline: on every committed execution of the real `handleOracleReport`,\nthe `rewardsReadSlot` tick is written strictly before any nonzero\n`rewardsMintedSlot` tick. This reads the two raw ticks directly and does not\ngo through `storedSteps`; exact expected ticks make the same reordering visible\nat the `View` boundary, but this theorem states the order predicate directly\nrather than obtaining it through source-view equality. `Result.steps` (and the\n`View.steps` it feeds) is built from these same tx storage flags and never\ncalls `AccountingCorrespondence.successfulSteps`; the two planes share no\nstep-list bridge. Unlike the demoted `source_report_before_reward` child,\nthis parent is directly refuted by the `mint_order_kill_line` mutant below,\nso the registered claim has an adversarial witness rather than being true by\nconstruction. The ticks are not call-site constants: every step write goes\nthrough `stampStep`, which reads the transaction-local step clock in\n`sequenceSlot` and stores `clock + 1`, so the number a slot ends up holding is\nthe position at which that write actually ran. Moving a `stampStep` call\ntherefore changes the tick it records, which is what makes this an ordering\nclaim rather than a fact about which numeral a line of program text\ncontains. -/",
+      "start_line": 105,
+      "end_line": 105,
+      "doc": "/-- **P-ACCOUNT-1, abstract plane.**  On every committed execution of the\nmodeled `handleOracleReport`, the `rewardsRead` step is written strictly before\nany nonzero `rewardsMinted` step, read directly from the transaction step\nclock: whenever `0 < tick(mint)`, then `tick(read) < tick(mint)`.\n\nRegistered P-ACCOUNT-1 parent. Independent tx-storage-flag order\ndiscipline: on every committed execution of the real `handleOracleReport`,\nthe `rewardsReadSlot` tick is written strictly before any nonzero\n`rewardsMintedSlot` tick. This reads the two raw ticks directly and does not\ngo through `storedSteps`; exact expected ticks make the same reordering visible\nat the `View` boundary, but this theorem states the order predicate directly\nrather than obtaining it through source-view equality. `Result.steps` (and the\n`View.steps` it feeds) is built from these same tx storage flags and never\ncalls `AccountingCorrespondence.successfulSteps`; the two planes share no\nstep-list bridge. Unlike the demoted `source_report_before_reward` child,\nthis parent is directly refuted by the `mint_order_kill_line` mutant below,\nso the registered claim has an adversarial witness rather than being true by\nconstruction. The ticks are not call-site constants: every step write goes\nthrough `stampStep`, which reads the transaction-local step clock in\n`sequenceSlot` and stores `clock + 1`, so the number a slot ends up holding is\nthe position at which that write actually ran. Moving a `stampStep` call\ntherefore changes the tick it records, which is what makes this an ordering\nclaim rather than a fact about which numeral a line of program text\ncontains. -/",
       "statement": "theorem mint_after_read_discipline : mintAfterReadDiscipline"
     },
     {
@@ -29,9 +29,9 @@
       "name": "LidoSRv3.Audit.Guarantees.PAccount1.verity_tx_simulates_oracle_report",
       "module": "LidoSRv3.Audit.Guarantees.PAccount1",
       "file": "LidoSRv3/Audit/Guarantees/PAccount1.lean",
-      "start_line": 38,
-      "end_line": 41,
-      "doc": "/-- Verity child. `observe` of `handleOracleReport` (balance array + total/flag\nslots) equals the independently stated `sourceView`. Not `submitReportData`;\n`sharesToMintAsFees` is an argument, not a computed fee. -/",
+      "start_line": 65,
+      "end_line": 68,
+      "doc": "/-- **P-ACCOUNT-1, Verity plane.**  `observe` of `handleOracleReport` equals\n`sourceView`.\n\nVerity child. `observe` of `handleOracleReport` (balance array + total/flag\nslots) equals the independently stated `sourceView`. Not `submitReportData`;\n`sharesToMintAsFees` is an argument, not a computed fee. -/",
       "statement": "theorem verity_tx_simulates_oracle_report\n    (i : ReportInput) (sharesToMintAsFees : Nat) (state : Verity.ContractState) :\n    observe i ((handleOracleReport i sharesToMintAsFees).run state) =\n      sourceView i sharesToMintAsFees"
     }
   ],

@@ -17,9 +17,9 @@
       "name": "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff",
       "module": "LidoSRv3.Audit.Guarantees.PSsz1",
       "file": "LidoSRv3/Audit/Guarantees/PSsz1.lean",
-      "start_line": 36,
-      "end_line": 38,
-      "doc": "/-- Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named\nSpec `SszWitness.Correspondence` (construction binds `sourceWitness src` to\n`sourceNode src`; determination recovers that witness). Deposit uniqueness\nis the named `PerfectDepositEncoding` / `A-PERFECT-HASH` child\n`deposit_unique_of_perfect`, not a parent conjunct. SHA-256 remains opaque\n(`A-SHA256-FFI`). Complements the one-object `composed_ssz_encoding`\ntraversal conjunct. -/",
+      "start_line": 105,
+      "end_line": 107,
+      "doc": "/-- For every well-formed deposit (48/32/96-byte widths), construction binds\n`sourceWitness` to `sourceNode` at the CLValidatorVerifier, and determination\nrecovers that witness from a verified root: the conclusion\n`Spec.SszWitness.Correspondence depositSszWitness src` unfolds to\n`Construction src ∧ Determination src`.\n\nBidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named\nSpec `SszWitness.Correspondence` (construction binds `sourceWitness src` to\n`sourceNode src`; determination recovers that witness). Deposit uniqueness\nis the named `PerfectDepositEncoding` / `A-PERFECT-HASH` child\n`deposit_unique_of_perfect`, not a parent conjunct. SHA-256 remains opaque\n(`A-SHA256-FFI`). Complements the one-object `composed_ssz_encoding`\ntraversal conjunct. -/",
       "statement": "theorem deposit_root_iff (src : SourceDepositDataRootInput)\n    (hWellFormed : wellFormedDeposit src) :\n    Spec.SszWitness.Correspondence depositSszWitness src"
     },
     {
@@ -29,10 +29,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding",
       "module": "LidoSRv3.Audit.Guarantees.PSsz1",
       "file": "LidoSRv3/Audit/Guarantees/PSsz1.lean",
-      "start_line": 600,
-      "end_line": 628,
-      "doc": "/-- `observe` of the handwritten `encode` transaction equals `sourceView`.\nA commit also re-exports the structural-witness conjunct. This is not\n`SSZ.verifyProof` and does not prove SHA-256. -/",
-      "statement": "theorem verity_tx_simulates_ssz_encoding\n    (input : EncodingInput) (state : Verity.ContractState) :\n    observe ((encode input).run state) = sourceView input ∧\n      ((observe ((encode input).run state)).status = .committed →\n        structuralOk input = true ∧\n          structuralWitnessConjunct input ∧\n          (observe ((encode input).run state)).observables.bound = 1 ∧\n          (observe ((encode input).run state)).observables.operation =\n            operationWord input.operation ∧\n          (observe ((encode input).run state)).observables.index =\n            indexWord input.witness.index ∧\n          (observe ((encode input).run state)).observables.pivotBoundary =\n            nodeWord input.witness.pivotBoundary ∧\n          (observe ((encode input).run state)).observables.traversedRoot =\n            nodeWord (traversedRoot input) ∧\n          (observe ((encode input).run state)).observables.pathLength =\n            input.witness.path.length ∧\n          (observe ((encode input).run state)).observables.branchLength =\n            input.witness.branch.length ∧\n          (observe ((encode input).run state)).observables.path =\n            twoWords (input.witness.path.map siblingWord) ∧\n          (observe ((encode input).run state)).observables.branch =\n            twoWords (input.witness.branch.map nodeWord)) ∧\n      sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs ∧\n      (ExactDigestComposition input.deposit ∧\n        (digestChain input.deposit).length = 7) ∧\n      ∀ reason rollback,\n        (encode input).run state = .revert reason rollback →\n          rollback = state"
+      "start_line": 670,
+      "end_line": 676,
+      "doc": "/-- `observe` of the encode transaction equals `sourceView`, and a commit\nre-exports the structural witness, `GIndex.concat`, and seven-call digest\nconjuncts; a revert restores the snapshot. This is not `SSZ.verifyProof` and\ndoes not prove SHA-256. -/",
+      "statement": "theorem verity_tx_simulates_ssz_encoding\n    (input : EncodingInput) (state : Verity.ContractState) :\n    ObservesSourceView input state ∧\n      CommitPersistsWitnessObservables input state ∧\n      ConcatMatchesSpec input ∧\n      DigestChainIsExact input ∧\n      RevertRestoresSnapshot input state"
     }
   ],
   "kill_lines": {
