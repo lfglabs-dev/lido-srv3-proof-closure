@@ -378,6 +378,8 @@ def lean_source_tree(root: Path) -> str:
     proof receipt, so a consumer can bind a copy of the records to the exact
     proof revision it displays through that receipt."""
     for name in LEAN_INPUTS:
+        if (root / name).is_symlink():
+            fail(f"{name} is a symlink; the checked Lean inputs must be regular files")
         if not (root / name).is_file():
             fail(f"missing Lean input {name}")
     subtree = git_tree(root / "LidoSRv3")

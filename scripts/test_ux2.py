@@ -279,8 +279,8 @@ def check_scanner_edges(fixture: Path) -> None:
 
 
 def check_symlink_tree(fixture: Path) -> None:
-    """A symlink below LidoSRv3/ is refused: the tree id would bind its link
-    text while Lean reads its target."""
+    """A symlink below LidoSRv3/ or among the top-level inputs is refused: the
+    tree id would bind its link text while Lean reads its target."""
     linked = fixture / "linked"
     for name in generate_ux2.LEAN_INPUTS:
         (linked / name).parent.mkdir(parents=True, exist_ok=True)
@@ -299,6 +299,15 @@ def check_symlink_tree(fixture: Path) -> None:
         else:
             raise SystemExit(f"a symlink {link} -> {target} below LidoSRv3/ was hashed")
         (linked / "LidoSRv3" / link).unlink()
+    (linked / "lakefile.lean").unlink()
+    (linked / "lakefile.lean").symlink_to("LidoSRv3/Nested/Real.lean")
+    try:
+        generate_ux2.lean_source_tree(linked)
+    except SystemExit as stop:
+        if "lakefile.lean is a symlink" not in f"{stop}":
+            raise SystemExit(f"unexpected diagnostic for a top-level symlink: {stop}")
+    else:
+        raise SystemExit("a symlinked top-level Lean input was hashed")
     shutil.rmtree(linked)
 
 
