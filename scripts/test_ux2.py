@@ -244,6 +244,30 @@ def check_lean_inputs_binding(fixture: Path) -> None:
         raise SystemExit(f"a where-proof statement was not sliced at `where`: {record['statement'][-80:]}")
 
 
+def check_scanner_edges(fixture: Path) -> None:
+    """Branches no synthetic module reaches: unbalanced attributes, a binder with
+    no `:=` or `←` after it, and a Lean input directory with no file."""
+    if generate_ux2.is_attribute_block("@[simp"):
+        raise SystemExit("an unbalanced attribute was accepted as an attribute block")
+    if generate_ux2.is_attribute_block("@[simp] theorem"):
+        raise SystemExit("trailing declaration text was accepted as attribute text")
+    if generate_ux2.binds_with_walrus("let y", 0):
+        raise SystemExit("a binder with no `:=` or `←` after it counted as a walrus binder")
+    hollow = fixture / "hollow"
+    for name in generate_ux2.LEAN_INPUTS:
+        (hollow / name).parent.mkdir(parents=True, exist_ok=True)
+        (hollow / name).write_text("", encoding="utf-8")
+    (hollow / "LidoSRv3" / "Empty").mkdir(parents=True)
+    try:
+        generate_ux2.lean_source_tree(hollow)
+    except SystemExit as stop:
+        if "holds no Lean input" not in f"{stop}":
+            raise SystemExit(f"unexpected diagnostic for an empty Lean tree: {stop}")
+    else:
+        raise SystemExit("an empty Lean input directory produced a tree id")
+    shutil.rmtree(hollow)
+
+
 def check_boundary_and_kill_lines(fixture: Path) -> None:
     readme = fixture / "README.md"
     original = rewrite(
@@ -264,6 +288,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check_registry_binding(fixture)
     check_lean_scanner(fixture)
     check_lean_inputs_binding(fixture)
+    check_scanner_edges(fixture)
     check_boundary_and_kill_lines(fixture)
 
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
