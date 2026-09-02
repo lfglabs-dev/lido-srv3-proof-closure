@@ -85,8 +85,9 @@ def statement_end(text: str, start: int) -> int:
 
     That is the first `:=` at bracket depth zero which does not belong to a
     `let` or `have` binding written inside the statement itself (each such
-    binder at depth zero consumes the next depth-zero `:=`), or a depth-zero
-    `where` opening a structure-instance proof.
+    binder at depth zero that itself binds with `:=` consumes the next
+    depth-zero `:=`; a do-notation `let x ← …` consumes nothing), or a
+    depth-zero `where` opening a structure-instance proof.
     """
     depth = 0
     pending = 0
@@ -103,11 +104,32 @@ def statement_end(text: str, start: int) -> int:
             pending -= 1
         elif depth == 0 and word_at(text, index, WHERE):
             return index
-        elif depth == 0 and word_at(text, index, BINDER):
+        elif depth == 0 and word_at(text, index, BINDER) and binds_with_walrus(text, index):
             pending += 1
             index += 3
         index += 1
     fail("theorem statement never reaches `:=` or `where`")
+
+
+def binds_with_walrus(text: str, start: int) -> bool:
+    """Whether the `let`/`have` at `start` binds with `:=` rather than `←`.
+
+    A do-notation bind such as `let x ← act` carries no `:=`, so it must not
+    consume the signature's own `:=`; the first depth-zero `:=` or `←` after
+    the binder decides.
+    """
+    depth = 0
+    for index in range(start, len(text) - 1):
+        char = text[index]
+        if char in OPENERS:
+            depth += 1
+        elif char in CLOSERS:
+            depth -= 1
+        elif depth == 0 and text.startswith(":=", index):
+            return True
+        elif depth == 0 and char == "←":
+            return False
+    return False
 
 
 def word_at(text: str, index: int, word: re.Pattern) -> bool:
