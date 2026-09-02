@@ -15,7 +15,15 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import check_python_quality  # noqa: E402  (sibling module, located above)
 
-DENSE = "def dense(x):\n    return " + " or ".join(f"x == {n}" for n in range(24)) + "\n"
+DENSE_BODY = " or ".join(f"x == {n}" for n in range(24))
+DENSE = "def dense(x):\n    return " + DENSE_BODY + "\n"
+SCOPED = (
+    "class A:\n    def dense(self, x):\n        return " + DENSE_BODY + "\n"
+    "class B:\n    def dense(self, x):\n        return x\n"
+    "def outer(x):\n    def dense(y):\n        return " + DENSE_BODY + "\n    return dense(x)\n"
+    "def dense(x):\n    return " + DENSE_BODY + "\n"
+    "def dense(x):\n    return x\n"
+)
 
 
 def invoke(*argv: str) -> tuple[bool, str]:
@@ -77,7 +85,7 @@ def check_ratchet(fixture: Path) -> None:
     override.write_text(rows + "check_import_dag.py:layer_of 30\n", encoding="utf-8")
     expect(False, "check_import_dag.py:layer_of = 18 is under the limit; delete its baseline row and re-pin", *args)
     override.write_text(rows + "malformed row here\n", encoding="utf-8")
-    expect(False, "expected `<file>[:<function>] <value>`", *args)
+    expect(False, "expected `<file>[:<qualified.function>] <value>`", *args)
     override.unlink()
     expect(False, "missing baseline", *args)
 
@@ -93,17 +101,44 @@ def check_metric() -> None:
               "    for _ in b:\n        pass\n    while a:\n        a = a if b else 0\n"
               "    try:\n        pass\n    except ValueError:\n        pass\n"
               "    match a:\n        case 1:\n            pass\n        case _:\n            pass\n"
-              "    with open(b):\n        pass\n    assert a\n    return 0\n")
+              "    with open(b):\n        pass\n    assert a\n"
+              "    def inner(c):\n        return c if a else b\n"
+              "    return (lambda d: d if a else b)(0)\n")
     (function,) = ast.parse(source).body
-    if check_python_quality.complexity(function) != 13:
+    if check_python_quality.complexity(function) != 14:
         raise SystemExit(f"complexity metric drifted: {check_python_quality.complexity(function)}")
+    names = [name for name, _ in check_python_quality.functions(ast.parse(source))]
+    if names != ["f", "f.inner"]:
+        raise SystemExit(f"scope qualification drifted: {names}")
+
+
+def check_scoping(fixture: Path) -> None:
+    """Same-named and nested definitions are measured on their own."""
+    scripts = fixture / "scripts"
+    override = fixture / "override.txt"
+    shutil.copy2(fixture / "audit/python-quality-baseline.txt", override)
+    args = ("--root", str(fixture), "--baseline", str(override))
+    scoped = scripts / "zz_scoped.py"
+    scoped.write_text(SCOPED, encoding="utf-8")
+    ok, text = invoke(*args)
+    if ok:
+        raise SystemExit("same-named and nested dense functions passed the gate")
+    for expected in ("zz_scoped.py:A.dense = 24", "zz_scoped.py:outer.dense = 24", "zz_scoped.py:dense = 24"):
+        if expected not in text:
+            raise SystemExit(f"missing {expected!r}: {text}")
+    for hidden in ("zz_scoped.py:outer =", "zz_scoped.py:B.dense", "zz_scoped.py:dense#2"):
+        if hidden in text:
+            raise SystemExit(f"a simple definition was charged with its neighbour's branches: {hidden}")
+    scoped.unlink()
+    override.unlink()
 
 
 with tempfile.TemporaryDirectory() as tmp:
     fixture = Path(tmp)
     check_pinned_tree(fixture)
     check_ratchet(fixture)
+    check_scoping(fixture)
 check_metric()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "
       "past baseline, stale row, retired-but-listed row, malformed row, missing baseline, "
-      "baseline rewrite, and the branch metric")
+      "baseline rewrite, scope-qualified and nested definitions, and the branch metric")

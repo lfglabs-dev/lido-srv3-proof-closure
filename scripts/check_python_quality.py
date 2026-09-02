@@ -22,12 +22,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = Path("scripts")
 BASELINE = Path("audit/python-quality-baseline.txt")
-BASELINE_BLOB = "a87d38377eee54feef9e94a862ab324153976bca"
+BASELINE_BLOB = "0de6d422f533265d54f3bbe1e1df6fa77b5ab7b9"
 MAX_COMPLEXITY = 22
 MAX_LINES = 500
 BRANCHES = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.ExceptHandler, ast.With,
             ast.AsyncWith, ast.Assert, ast.IfExp)
 FUNCTIONS = (ast.FunctionDef, ast.AsyncFunctionDef)
+SCOPES = (*FUNCTIONS, ast.ClassDef)
 
 
 def fail(message: str) -> None:
@@ -38,10 +39,26 @@ def git_blob_id(content: bytes) -> str:
     return hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest()
 
 
+def own_nodes(function: ast.AST):
+    """Every node of a function body except nested function and class bodies.
+
+    A nested definition is measured on its own (see `functions`), so its
+    branches must not be charged to the parent as well; lambdas stay with
+    the function that contains them.
+    """
+    pending = list(ast.iter_child_nodes(function))
+    while pending:
+        node = pending.pop()
+        if isinstance(node, SCOPES):
+            continue
+        yield node
+        pending.extend(ast.iter_child_nodes(node))
+
+
 def complexity(function: ast.AST) -> int:
     """McCabe cyclomatic complexity of one function body."""
     count = 1
-    for node in ast.walk(function):
+    for node in own_nodes(function):
         if isinstance(node, BRANCHES):
             count += 1
         elif isinstance(node, ast.BoolOp):
@@ -53,15 +70,41 @@ def complexity(function: ast.AST) -> int:
     return count
 
 
+def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
+    """Every function in a module with its scope-qualified name, in source order.
+
+    Methods carry their class, local functions carry their parent, and a name
+    defined twice in the same scope carries an ordinal, so no definition can
+    hide behind another that shares its bare name.
+    """
+    found: list[tuple[str, ast.AST]] = []
+    seen: dict[str, int] = {}
+
+    def visit(node: ast.AST, scope: list[str]) -> None:
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, FUNCTIONS):
+                qualified = ".".join([*scope, child.name])
+                seen[qualified] = seen.get(qualified, 0) + 1
+                key = qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}"
+                found.append((key, child))
+                visit(child, [*scope, child.name])
+            elif isinstance(child, ast.ClassDef):
+                visit(child, [*scope, child.name])
+            else:
+                visit(child, scope)
+
+    visit(tree, [])
+    return found
+
+
 def measure(root: Path) -> dict[str, int]:
-    """Map `file:function` to complexity and `file` to line count."""
+    """Map `file:qualified.function` to complexity and `file` to line count."""
     found: dict[str, int] = {}
     for path in sorted((root / SCRIPTS).glob("*.py")):
         source = path.read_text(encoding="utf-8")
         found[path.name] = len(source.splitlines())
-        for node in ast.walk(ast.parse(source)):
-            if isinstance(node, FUNCTIONS):
-                found[f"{path.name}:{node.name}"] = complexity(node)
+        for name, node in functions(ast.parse(source)):
+            found[f"{path.name}:{name}"] = complexity(node)
     return found
 
 
@@ -84,7 +127,7 @@ def load_baseline(root: Path, override: Path | None) -> dict[str, int]:
             continue
         parts = line.split()
         if len(parts) != 2 or not parts[1].isdigit():
-            fail(f"{source}:{number}: expected `<file>[:<function>] <value>`, got {line!r}")
+            fail(f"{source}:{number}: expected `<file>[:<qualified.function>] <value>`, got {line!r}")
         rows[parts[0]] = int(parts[1])
     return rows
 
