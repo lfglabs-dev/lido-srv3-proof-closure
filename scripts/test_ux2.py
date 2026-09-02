@@ -302,6 +302,35 @@ def check_lean_scanner(fixture: Path) -> None:
     if generate_ux2.scan_file(fixture, module) != {}:
         raise SystemExit("scanner treated an unnamed scope's closing `end` as its name")
 
+    # No scope-command keyword may be consumed as the optional split-line name
+    # of an unnamed scope.  In particular, an unnamed section may contain a
+    # mutual block whose own `end` must close that block rather than underflow.
+    module.write_text(
+        "namespace Outer\n"
+        "section\n"
+        "mutual\n"
+        "def mutual_helper : Nat := 1\n"
+        "end\n"
+        "theorem after_mutual : True := trivial\n"
+        "end\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.after_mutual"}:
+        raise SystemExit("scanner consumed `mutual` as an unnamed section's name")
+
+    # Scope names use the same escaped-identifier tokenization as declarations:
+    # whitespace inside guillemets belongs to the name, including at `end`.
+    module.write_text(
+        "namespace «Outer Space»\n"
+        "section «Local Space»\n"
+        "theorem within_escaped_scopes : True := trivial\n"
+        "end «Local Space»\n"
+        "end «Outer Space»\n"
+        "theorem after_escaped_scopes : True := trivial\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"«Outer Space».within_escaped_scopes", "after_escaped_scopes"}:
+        raise SystemExit("scanner did not parse escaped scope names containing whitespace")
+
     module.write_text("end Nothing\n", encoding="utf-8")
     expect_scan_failure(fixture, module, "`end` without an open namespace")
     module.write_text("namespace A\nend B\n", encoding="utf-8")
