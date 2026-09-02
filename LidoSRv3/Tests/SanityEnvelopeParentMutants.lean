@@ -24,6 +24,14 @@ namespace LidoSRv3.Tests.SanityEnvelopeParentMutants
 open LidoSRv3.Audit.SolidityAccounting.SanityEnvelope
 open LidoSRv3.Audit.Guarantees.POracleSanity1
 
+/-! ### Coverage regression
+
+P-ORACLE-SANITY-1 has model evidence only.  In particular, this parent has no
+Verity-word source program or source-correspondence theorem that could justify
+the registry's `.source` layer. -/
+
+theorem oracleSanityCoverageIsModelOnly : guarantee.checkedLayers = [.model] := rfl
+
 /-! ### Positive control
 
 The parent is not vacuous: a well-behaved report is accepted, so the premise

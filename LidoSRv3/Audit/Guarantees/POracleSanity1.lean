@@ -30,7 +30,7 @@ open LidoSRv3.Audit.SolidityAccounting.SanityEnvelope
 
 /-- Supplemental bounded parent over the modeled sanity-checker commit path.
 Model layer only: there is no Verity executable transaction for the checker. -/
-def guarantee : Guarantee := ⟨.pOracleSanity1, [.model, .source]⟩
+def guarantee : Guarantee := ⟨.pOracleSanity1, [.model]⟩
 
 /-- P-ORACLE-SANITY-1 parent: an accepted report satisfies the quantitative
 commit envelope.
