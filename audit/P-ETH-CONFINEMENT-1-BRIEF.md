@@ -54,6 +54,17 @@ the registered guarantee modules but imported by none of them.
 the exact residual list, route confinement, and the two stated-limit theorems,
 and imports no registry. Statements are unchanged; only namespaces moved.
 
+## Integration
+
+This branch is stacked in dependency order behind #232 (Oracle), which carries
+#233 (the Lake target split) and `main` at UX1. Under #233 the facade may not
+import tests, so `LidoSRv3.lean` imports `LidoSRv3.Audit.Model.EthConfinement`
+and `LidoSRv3.Audit.Guarantees.PEthConfinement1` only, and `make test`
+compiles `LidoSRv3.Tests.EthConfinementMutants` through `lake build
+LidoSRv3Test` rather than through a branch-specific recipe line. Exact-head
+build evidence for the integrated head is posted on the PR as a runner
+receipt (`lake build LidoSRv3 LidoSRv3Test`).
+
 ## Kill-lines
 
 `LidoSRv3/Tests/EthConfinementMutants.lean` edits **one line of each of four
