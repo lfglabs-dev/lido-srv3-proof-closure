@@ -44,7 +44,7 @@ ROLES = {
 DECLARATION = re.compile(
     r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?"
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)[ \t]+)*"
-    r"(theorem)[ \t]+([^\s:({\[]+)", re.MULTILINE)
+    r"(theorem)[ \t]+(«[^»\n]*»|[^\s:({\[]+)", re.MULTILINE)
 MODIFIER_RUN = re.compile(
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
 SCOPE = re.compile(r"^[ \t]*(namespace|section|mutual|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
