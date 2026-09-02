@@ -41,13 +41,15 @@ def git_blob_id(content: bytes) -> str:
 
 
 def own_nodes(function: ast.AST):
-    """Every node of a function body except nested function and class bodies.
+    """Every node of a function's body except nested function and class bodies.
 
-    A nested definition is measured on its own (see `functions`), so its
-    branches must not be charged to the parent as well; lambdas stay with
-    the function that contains them.
+    Only the body counts: decorators, default values and annotations run in
+    the enclosing scope. A nested definition is measured on its own (see
+    `functions`), so its branches are not charged to the parent as well;
+    lambdas inside a function stay with that function.
     """
-    pending = list(ast.iter_child_nodes(function))
+    body = function.body if isinstance(function, FUNCTIONS) else [function.body]
+    pending = list(body)
     while pending:
         node = pending.pop()
         if isinstance(node, SCOPES):
@@ -74,28 +76,41 @@ def complexity(function: ast.AST) -> int:
 def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
     """Every function in a module with its scope-qualified name, in source order.
 
-    Methods carry their class, local functions carry their parent, and a name
-    defined twice in the same scope carries an ordinal, so no definition can
-    hide behind another that shares its bare name.
+    Methods carry their class, local functions carry their parent, a lambda
+    bound at module or class level counts as a function under its bound name,
+    and a name defined twice in the same scope carries an ordinal, so no
+    definition can hide behind another that shares its bare name.
     """
     found: list[tuple[str, ast.AST]] = []
     seen: dict[str, int] = {}
 
+    def record(scope: list[str], name: str, node: ast.AST) -> None:
+        qualified = ".".join([*scope, name])
+        seen[qualified] = seen.get(qualified, 0) + 1
+        found.append((qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}", node))
+
     def visit(node: ast.AST, scope: list[str]) -> None:
         for child in ast.iter_child_nodes(node):
             if isinstance(child, FUNCTIONS):
-                qualified = ".".join([*scope, child.name])
-                seen[qualified] = seen.get(qualified, 0) + 1
-                key = qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}"
-                found.append((key, child))
+                record(scope, child.name, child)
                 visit(child, [*scope, child.name])
             elif isinstance(child, ast.ClassDef):
                 visit(child, [*scope, child.name])
+            elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
+                record(scope, assigned_name(child), child.value)
             else:
                 visit(child, scope)
 
     visit(tree, [])
     return found
+
+
+def assigned_name(statement: ast.AST) -> str:
+    """The name a module- or class-level lambda is bound to, or its line."""
+    targets = statement.targets if isinstance(statement, ast.Assign) else [statement.target]
+    if len(targets) == 1 and isinstance(targets[0], ast.Name):
+        return targets[0].id
+    return f"lambda@{statement.lineno}"
 
 
 def measure(root: Path) -> dict[str, int]:

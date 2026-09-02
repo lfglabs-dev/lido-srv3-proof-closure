@@ -71,6 +71,8 @@ def check_ratchet(fixture: Path) -> None:
     dense = scripts / "zz_dense.py"
     dense.write_text(DENSE, encoding="utf-8")
     expect(False, "zz_dense.py:dense = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("dense = lambda x: " + DENSE_BODY + "\n", encoding="utf-8")
+    expect(False, "zz_dense.py:dense = 24, limit 22, and it is not baseline debt", *args)
     long = scripts / "zz_long.py"
     long.write_text("# pad\n" * 501, encoding="utf-8")
     dense.unlink()
@@ -118,6 +120,23 @@ def check_metric() -> None:
     names = [name for name, _ in check_python_quality.functions(ast.parse(source))]
     if names != ["f", "f.inner"]:
         raise SystemExit(f"scope qualification drifted: {names}")
+    outside = ("def deco(f):\n    return f\n"
+               "@(deco if True else deco)\n"
+               "def simple(x=(1 if True else 2), *, y: (int if True else str) = 3) -> (int if True else str):\n"
+               "    return x\n"
+               "dense = lambda x: x if x else 0\n"
+               "class K:\n    pick = lambda self, x: x if x else 1\n"
+               "a, b = (lambda: 1), 2\n")
+    measured = {name: check_python_quality.complexity(node)
+                for name, node in check_python_quality.functions(ast.parse(outside))}
+    if measured != {"deco": 1, "simple": 1, "dense": 2, "K.pick": 2}:
+        raise SystemExit(f"decorator/default/annotation or lambda accounting drifted: {measured}")
+    (annotated,) = [node for node in ast.parse("g: int = lambda: 1 if True else 0\n").body]
+    if check_python_quality.assigned_name(annotated) != "g":
+        raise SystemExit("an annotated lambda assignment lost its name")
+    (tupled,) = ast.parse("(a, b) = lambda: 1, 2\n").body if False else [ast.parse("(a, b) = lambda: 1\n").body[0]]
+    if check_python_quality.assigned_name(tupled) != "lambda@1":
+        raise SystemExit("a lambda without a single-name target should be keyed by its line")
 
 
 def check_scoping(fixture: Path) -> None:
@@ -149,4 +168,4 @@ with tempfile.TemporaryDirectory() as tmp:
 check_metric()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "
       "past baseline, stale row, retired-but-listed row, malformed row, missing baseline, "
-      "baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, and the branch metric")
+      "baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, module-level lambdas, body-only traversal, and the branch metric")
