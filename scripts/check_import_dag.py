@@ -18,11 +18,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWLIST = Path("audit/import-layer-allowlist.txt")
 BASELINE = Path("audit/import-layer-baseline.txt")
+RETIRED = Path("audit/import-layer-retired.txt")
 # Git blob id of the pre-existing debt ceiling.  Keeping the blob in the
 # checkout makes the check work from a depth-one reviewed ref; pinning its
 # content here means changing the mutable allowlist (or the checked-in copy of
 # this baseline) cannot enlarge that ceiling.
 BASELINE_BLOB = "62ce9c6132d4902cc5e4f1150ffde6fc286d81b7"
+# Retirement is monotone too.  This is deliberately a separate, pinned ledger:
+# a removed debt row becomes a permanent tombstone and cannot be restored by
+# adding it back to the mutable allowlist or by using --write-allowlist.
+RETIRED_BLOB = "f10e32c7b942d3f896911d814ae430234291e098"
 LAKEFILE = Path("lakefile.lean")
 IMPORT = re.compile(r"^\s*import\s+(\S+)\s*$", re.MULTILINE)
 GLOB_ONE = re.compile(r"\.one\s+`([A-Za-z0-9.]+)")
@@ -124,12 +129,17 @@ def production_glob_gaps(root: Path) -> list[str]:
     if not lakefile.is_file():
         fail(f"missing {LAKEFILE}")
     text = lakefile.read_text(encoding="utf-8")
-    # Only the production library lists Verity as `.one` rows. Parsing the
-    # whole file is safe: test/legacy globs are directory prefixes, not `.one`
-    # names of production Verity modules.
-    ones = set(GLOB_ONE.findall(text))
-    subs = set(GLOB_SUB.findall(text))
-    ands = set(GLOB_AND.findall(text))
+    match = re.search(
+        r"^lean_lib «LidoSRv3» where\n(?P<body>.*?)(?=^lean_lib |\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if match is None:
+        fail("missing LidoSRv3 production library")
+    production_library = match.group("body")
+    ones = set(GLOB_ONE.findall(production_library))
+    subs = set(GLOB_SUB.findall(production_library))
+    ands = set(GLOB_AND.findall(production_library))
     gaps: list[str] = []
     paths = sorted((root / "LidoSRv3").rglob("*.lean"))
     facade = root / "LidoSRv3.lean"
@@ -248,12 +258,28 @@ def load_pinned_baseline(root: Path, path: Path | None) -> dict[str, set[tuple[s
     return load_allowlist(source)
 
 
+def load_pinned_retirements(root: Path, path: Path | None) -> dict[str, set[tuple[str, str]]]:
+    """Load immutable tombstones, with a test-only override."""
+    if path is not None:
+        return load_allowlist(path)
+    source = root / RETIRED
+    if not source.is_file():
+        fail(f"missing immutable layer-debt retirement ledger {RETIRED}")
+    content = source.read_bytes()
+    if git_blob_id(content) != RETIRED_BLOB:
+        fail(f"immutable layer-debt retirement ledger {RETIRED} does not match pinned blob "
+             f"{RETIRED_BLOB}")
+    return load_allowlist(source)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--allowlist", type=Path, default=None)
     parser.add_argument("--baseline", type=Path, default=None,
                         help="test-only override for the immutable baseline")
+    parser.add_argument("--retired", type=Path, default=None,
+                        help="test-only override for immutable retirement tombstones")
     parser.add_argument("--write-allowlist", action="store_true",
                         help="rewrite the allowlist from the current tree and exit")
     args = parser.parse_args()
@@ -269,12 +295,17 @@ def main() -> None:
     if gaps:
         fail("production modules missing from lakefile globs: " + ", ".join(gaps))
     baseline = load_pinned_baseline(root, args.baseline)
+    retired = load_pinned_retirements(root, args.retired)
     for rule in LAYER_DEBT:
         extra = debt[rule] - baseline[rule]
         if extra:
             rendered = ", ".join(f"{s} → {i}" for s, i in sorted(extra))
             fail(f"new {rule} edge(s) {rendered}; exceeds immutable baseline "
                  f"blob {BASELINE_BLOB}")
+        restored = debt[rule] & retired[rule]
+        if restored:
+            rendered = ", ".join(f"{s} → {i}" for s, i in sorted(restored))
+            fail(f"retired {rule} edge(s) restored: {rendered}; retirement is permanent")
     if args.write_allowlist:
         allowlist_path.parent.mkdir(parents=True, exist_ok=True)
         allowlist_path.write_text(render_allowlist(debt), encoding="utf-8")
@@ -295,7 +326,7 @@ def main() -> None:
                  f"{allowlist_path.relative_to(root)}")
     print("import-dag ok: production ↛ test/legacy/Trust; globs cover production; "
           f"layer debt did not grow past immutable baseline blob {BASELINE_BLOB} "
-          "or return after allowlist retirement")
+          f"or return after retirement tombstone blob {RETIRED_BLOB}")
 
 
 if __name__ == "__main__":

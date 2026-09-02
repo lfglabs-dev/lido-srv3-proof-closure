@@ -16,6 +16,7 @@ FILES = (
     "lakefile.lean",
     "audit/import-layer-allowlist.txt",
     "audit/import-layer-baseline.txt",
+    "audit/import-layer-retired.txt",
     "scripts/check_import_dag.py",
     "scripts/check_proof_escapes.py",
     "LidoSRv3/Audit/Spec.lean",
@@ -29,11 +30,13 @@ FILES = (
 
 
 def run(root: Path, succeeds: bool, diagnostic: str = "", *extra: str,
-        baseline_override: bool = False) -> None:
+        baseline_override: bool = False, retired_override: Path | None = None) -> None:
     command = ["python3", str(CHECKER), "--root", str(root),
                "--allowlist", str(root / "audit/import-layer-allowlist.txt")]
     if baseline_override:
         command.extend(["--baseline", str(root / "audit/import-layer-baseline.txt")])
+    if retired_override is not None:
+        command.extend(["--retired", str(retired_override)])
     result = subprocess.run(
         [*command, *extra],
         text=True,
@@ -52,17 +55,29 @@ def copy_tree(destination: Path) -> None:
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, target)
+    # Stage every source that owns baseline debt, so the retirement mutants
+    # below cover each populated layer-debt family.
+    for raw in (ROOT / "audit/import-layer-baseline.txt").read_text(encoding="utf-8").splitlines():
+        if not raw or raw.startswith("#"):
+            continue
+        source, _ = raw.split()
+        relative = Path(*source.split(".")).with_suffix(".lean")
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, target)
     # The checker walks every Lean file under LidoSRv3/, so the copied
     # production/test/legacy samples are enough if they import only what we
     # stage. Rebuild the allowlist from this fixture so unused rows do not
     # fail the positive control.
-    subprocess.run(
+    result = subprocess.run(
         ["python3", str(CHECKER), "--root", str(destination),
          "--allowlist", str(destination / "audit/import-layer-allowlist.txt"),
          "--baseline", str(ROOT / "audit/import-layer-baseline.txt"),
          "--write-allowlist"],
-        check=True, capture_output=True, text=True,
+        check=False, capture_output=True, text=True,
     )
+    if result.returncode:
+        raise SystemExit(result.stdout + result.stderr)
 
 
 with tempfile.TemporaryDirectory() as tmp:
@@ -114,9 +129,23 @@ with tempfile.TemporaryDirectory() as tmp:
     allowlist.write_text(allowlist_original, encoding="utf-8")
     spec.write_text(spec_original, encoding="utf-8")
 
-    # Retire a debt row along with its import, then restore just the import.
-    # The immutable ceiling still permits the old edge, so only the mutable
-    # allowlist ratchet can reject this return.
+    # Moving a production glob to a different Lake library must not count as
+    # production coverage.
+    lakefile = fixture / "lakefile.lean"
+    lakefile_original = lakefile.read_text(encoding="utf-8")
+    moved_facade = lakefile_original.replace("    .one `LidoSRv3,\n", "", 1)
+    moved_facade = moved_facade.replace(
+        "  globs := #[\n    .submodules `LidoSRv3.Tests,",
+        "  globs := #[\n    .one `LidoSRv3,\n    .submodules `LidoSRv3.Tests,",
+        1,
+    )
+    lakefile.write_text(moved_facade, encoding="utf-8")
+    run(fixture, False, "production modules missing from lakefile globs")
+    lakefile.write_text(lakefile_original, encoding="utf-8")
+
+    # A tombstone must reject restoration of both the import and its mutable
+    # allowlist row, including the --write-allowlist path.  Exercise every
+    # populated debt family rather than only spec-verity.
     retired = "LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Verity.DepositParentTx"
     allocation = fixture / "LidoSRv3/Audit/Spec/AllocationCorrespondence.lean"
     allocation_original = allocation.read_text(encoding="utf-8")
@@ -127,6 +156,30 @@ with tempfile.TemporaryDirectory() as tmp:
     allocation.write_text(allocation_original, encoding="utf-8")
     run(fixture, False, "unallowlisted spec-verity edge(s) returned")
     allowlist.write_text(allowlist_original, encoding="utf-8")
+
+    baseline_groups = {}
+    active_rule = None
+    for raw in allowlist_original.splitlines():
+        if raw.startswith("# rule:"):
+            active_rule = raw.split(":", 1)[1].strip()
+        elif raw and not raw.startswith("#") and active_rule is not None:
+            baseline_groups.setdefault(active_rule, []).append(raw)
+    expected_families = set()
+    active_rule = None
+    for raw in (ROOT / "audit/import-layer-baseline.txt").read_text(encoding="utf-8").splitlines():
+        if raw.startswith("# rule:"):
+            active_rule = raw.split(":", 1)[1].strip()
+        elif raw and not raw.startswith("#") and active_rule is not None:
+            expected_families.add(active_rule)
+    if set(baseline_groups) != expected_families:
+        raise SystemExit("retirement fixture did not stage every debt family")
+    for rule, rows in baseline_groups.items():
+        row = rows[0]
+        tombstones = fixture / f"audit/{rule}-retired.txt"
+        tombstones.write_text(
+            "# rule: " + rule + "\n" + row + "\n", encoding="utf-8")
+        run(fixture, False, f"retired {rule} edge(s) restored",
+            "--write-allowlist", retired_override=tombstones)
 
     lakefile = fixture / "lakefile.lean"
     lakefile_original = lakefile.read_text(encoding="utf-8")
