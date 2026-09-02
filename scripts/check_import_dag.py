@@ -11,14 +11,18 @@ from __future__ import annotations
 
 import argparse
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWLIST = Path("audit/import-layer-allowlist.txt")
-BASELINE_REV = "4fb659e8f8689346f155e633aabc068b6d75c1a5"
+BASELINE = Path("audit/import-layer-baseline.txt")
+# Git blob id of the pre-existing debt ceiling.  Keeping the blob in the
+# checkout makes the check work from a depth-one reviewed ref; pinning its
+# content here means changing the mutable allowlist (or the checked-in copy of
+# this baseline) cannot enlarge that ceiling.
+BASELINE_BLOB = "62ce9c6132d4902cc5e4f1150ffde6fc286d81b7"
 LAKEFILE = Path("lakefile.lean")
 IMPORT = re.compile(r"^\s*import\s+(\S+)\s*$", re.MULTILINE)
 GLOB_ONE = re.compile(r"\.one\s+`([A-Za-z0-9.]+)")
@@ -224,38 +228,24 @@ def render_allowlist(grouped: dict[str, set[tuple[str, str]]]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def git_blob_id(content: bytes) -> str:
+    """Return Git's SHA-1 blob id without requiring historical Git objects."""
+    import hashlib
+    return hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest()
+
+
 def load_pinned_baseline(root: Path, path: Path | None) -> dict[str, set[tuple[str, str]]]:
-    """Load the debt ceiling from an immutable Git object, never this PR's file."""
+    """Load the immutable debt ceiling, with a test-only override."""
     if path is not None:
         return load_allowlist(path)
-    source = f"{BASELINE_REV}:{ALLOWLIST.as_posix()}"
-    result = subprocess.run(
-        ["git", "-C", str(root), "show", source],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode:
-        detail = result.stderr.strip() or result.stdout.strip()
-        fail(f"cannot read immutable layer-debt baseline {source}: {detail}")
-    # Parse the pinned Git blob without materializing it in the worktree.
-    grouped: dict[str, set[tuple[str, str]]] = {rule: set() for rule in LAYER_DEBT}
-    current: str | None = None
-    for number, raw in enumerate(result.stdout.splitlines(), 1):
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            if line.startswith("# rule:"):
-                current = line.split(":", 1)[1].strip()
-                if current not in LAYER_DEBT:
-                    fail(f"{source}:{number}: unknown rule {current}")
-            continue
-        if current is None:
-            fail(f"{source}:{number}: edge before a `# rule:` header")
-        parts = line.split()
-        if len(parts) != 2:
-            fail(f"{source}:{number}: expected `src imported`, got {line!r}")
-        grouped[current].add((parts[0], parts[1]))
-    return grouped
+    source = root / BASELINE
+    if not source.is_file():
+        fail(f"missing immutable layer-debt baseline {BASELINE}")
+    content = source.read_bytes()
+    if git_blob_id(content) != BASELINE_BLOB:
+        fail(f"immutable layer-debt baseline {BASELINE} does not match pinned blob "
+             f"{BASELINE_BLOB}")
+    return load_allowlist(source)
 
 
 def main() -> None:
@@ -284,7 +274,7 @@ def main() -> None:
         if extra:
             rendered = ", ".join(f"{s} → {i}" for s, i in sorted(extra))
             fail(f"new {rule} edge(s) {rendered}; exceeds immutable baseline "
-                 f"{BASELINE_REV}")
+                 f"blob {BASELINE_BLOB}")
     if args.write_allowlist:
         allowlist_path.parent.mkdir(parents=True, exist_ok=True)
         allowlist_path.write_text(render_allowlist(debt), encoding="utf-8")
@@ -293,13 +283,19 @@ def main() -> None:
         return
     recorded = load_allowlist(allowlist_path)
     for rule in LAYER_DEBT:
+        returned = debt[rule] - recorded[rule]
+        if returned:
+            rendered = ", ".join(f"{s} → {i}" for s, i in sorted(returned))
+            fail(f"unallowlisted {rule} edge(s) returned: {rendered}; add no new debt "
+                 f"and retain rows until their imports are removed")
         missing = recorded[rule] - debt[rule]
         if missing:
             rendered = ", ".join(f"{s} → {i}" for s, i in sorted(missing))
             fail(f"allowlisted {rule} edge(s) are gone: {rendered}; delete them from "
                  f"{allowlist_path.relative_to(root)}")
     print("import-dag ok: production ↛ test/legacy/Trust; globs cover production; "
-          f"layer debt did not grow past immutable baseline {BASELINE_REV}")
+          f"layer debt did not grow past immutable baseline blob {BASELINE_BLOB} "
+          "or return after allowlist retirement")
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ FILES = (
     "LidoSRv3.lean",
     "lakefile.lean",
     "audit/import-layer-allowlist.txt",
+    "audit/import-layer-baseline.txt",
     "scripts/check_import_dag.py",
     "scripts/check_proof_escapes.py",
     "LidoSRv3/Audit/Spec.lean",
@@ -27,14 +28,14 @@ FILES = (
 )
 
 
-def run(root: Path, succeeds: bool, diagnostic: str = "", *extra: str) -> None:
+def run(root: Path, succeeds: bool, diagnostic: str = "", *extra: str,
+        baseline_override: bool = False) -> None:
+    command = ["python3", str(CHECKER), "--root", str(root),
+               "--allowlist", str(root / "audit/import-layer-allowlist.txt")]
+    if baseline_override:
+        command.extend(["--baseline", str(root / "audit/import-layer-baseline.txt")])
     result = subprocess.run(
-        ["python3", str(CHECKER), "--root", str(root),
-         "--allowlist", str(root / "audit/import-layer-allowlist.txt"),
-        # The fixture is not a Git worktree; its copied baseline is the same
-        # immutable input used by the production checker's pinned Git blob.
-        # Mutants may change the allowlist but never this baseline.
-         "--baseline", str(root / "audit/import-layer-baseline.txt"), *extra],
+        [*command, *extra],
         text=True,
         capture_output=True,
         check=False,
@@ -58,18 +59,22 @@ def copy_tree(destination: Path) -> None:
     subprocess.run(
         ["python3", str(CHECKER), "--root", str(destination),
          "--allowlist", str(destination / "audit/import-layer-allowlist.txt"),
-         "--baseline", str(ROOT / "audit/import-layer-allowlist.txt"),
+         "--baseline", str(ROOT / "audit/import-layer-baseline.txt"),
          "--write-allowlist"],
         check=True, capture_output=True, text=True,
     )
-    shutil.copy2(destination / "audit/import-layer-allowlist.txt",
-                 destination / "audit/import-layer-baseline.txt")
 
 
 with tempfile.TemporaryDirectory() as tmp:
     fixture = Path(tmp)
     copy_tree(fixture)
     run(fixture, True)
+
+    baseline = fixture / "audit/import-layer-baseline.txt"
+    baseline_original = baseline.read_text(encoding="utf-8")
+    baseline.write_text(baseline_original + "# mutable baseline bypass\n", encoding="utf-8")
+    run(fixture, False, "does not match pinned blob")
+    baseline.write_text(baseline_original, encoding="utf-8")
 
     facade = fixture / "LidoSRv3.lean"
     original = facade.read_text(encoding="utf-8")
@@ -108,6 +113,20 @@ with tempfile.TemporaryDirectory() as tmp:
         raise SystemExit("forbidden edge rewrote the mutable allowlist")
     allowlist.write_text(allowlist_original, encoding="utf-8")
     spec.write_text(spec_original, encoding="utf-8")
+
+    # Retire a debt row along with its import, then restore just the import.
+    # The immutable ceiling still permits the old edge, so only the mutable
+    # allowlist ratchet can reject this return.
+    retired = "LidoSRv3.Audit.Spec.AllocationCorrespondence LidoSRv3.Audit.Verity.DepositParentTx"
+    allocation = fixture / "LidoSRv3/Audit/Spec/AllocationCorrespondence.lean"
+    allocation_original = allocation.read_text(encoding="utf-8")
+    allocation.write_text(allocation_original.replace(
+        "import LidoSRv3.Audit.Verity.DepositParentTx\n", ""), encoding="utf-8")
+    allowlist.write_text(allowlist_original.replace(retired + "\n", ""), encoding="utf-8")
+    run(fixture, True)
+    allocation.write_text(allocation_original, encoding="utf-8")
+    run(fixture, False, "unallowlisted spec-verity edge(s) returned")
+    allowlist.write_text(allowlist_original, encoding="utf-8")
 
     lakefile = fixture / "lakefile.lean"
     lakefile_original = lakefile.read_text(encoding="utf-8")
