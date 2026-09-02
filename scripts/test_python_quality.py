@@ -138,13 +138,18 @@ def check_metric() -> None:
     if measured != {"deco": 1, "simple": 1, "dense": 2, "K.pick": 2, "lambda@9": 1,
                     "lambda@10": 2, "lambda@10#2": 1, "g": 2, "g.lambda@11": 2}:
         raise SystemExit(f"decorator/default/annotation or lambda accounting drifted: {measured}")
-    nested = ("def outer(flag):\n    def inner(x=(1 if flag else 2)):\n        return x if flag else 0\n"
-              "    class C:\n        v = 1 if flag else 2\n        def m(self, y=(3 if flag else 4)):\n"
-              "            return y if flag else 0\n    return inner, C\n")
+    nested = ("def outer(flag):\n"
+              "    def inner(x=(1 if flag else 2), cb=lambda z=(5 if flag else 6): z if z else 0):\n"
+              "        return x if flag else 0\n"
+              "    class C:\n        v = 1 if flag else 2\n        w = lambda self: 7 if flag else 8\n"
+              "        def m(self, y=(3 if flag else 4)):\n            return y if flag else 0\n"
+              "    return inner, C\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.functions(ast.parse(nested))}
-    if measured != {"outer": 4, "outer.inner": 2, "outer.C.m": 2}:
-        raise SystemExit(f"nested setup fields are not charged to the enclosing function: {measured}")
+    if measured != {"outer": 5, "outer.inner": 2, "outer.inner.lambda@2": 2, "outer.C.w": 2,
+                    "outer.C.m": 2}:
+        raise SystemExit("nested setup fields are not charged to the enclosing function, or a "
+                         f"listed lambda's body is charged twice: {measured}")
     (annotated,) = [node for node in ast.parse("g: int = lambda: 1 if True else 0\n").body]
     if check_python_quality.assigned_name(annotated) != "g":
         raise SystemExit("an annotated lambda assignment lost its name")

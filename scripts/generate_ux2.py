@@ -41,8 +41,10 @@ ROLES = {
     "abstract": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
     "verity": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
 }
+# A `private` theorem gets an inaccessible name, so it can never be the
+# registered declaration and must not shadow the public one it may be named after.
 DECLARATION = re.compile(
-    r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?(?:(?:private|protected|nonrec)[ \t]+)*"
+    r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?(?:(?:protected|nonrec)[ \t]+)*"
     r"theorem[ \t]+([^\s:({\[]+)", re.MULTILINE)
 SCOPE = re.compile(r"^[ \t]*(namespace|section|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"

@@ -46,24 +46,31 @@ def own_nodes(function: ast.AST):
     annotations run in the enclosing scope, so they are charged there, and a
     nested definition's setup fields are charged here for the same reason
     while its body is measured on its own (see `functions`). A class body
-    nested in a function runs in that function; lambdas inside a function
-    stay with that function.
+    nested in a function runs in that function. Lambdas inside a function's
+    body stay with that function, but a lambda in a nested definition's
+    setup or in a nested class body is listed by `functions` and measured on
+    its own, so only its default values are charged here.
     """
     body = function.body if isinstance(function, FUNCTIONS) else [function.body]
-    pending = list(body)
+    pending = [(node, False) for node in body]
     while pending:
-        node = pending.pop()
+        node, listed = pending.pop()
         if isinstance(node, FUNCTIONS):
             # A nested definition's decorators, defaults and annotations are
             # evaluated by the enclosing function; only its body is its own.
-            pending.extend([*node.decorator_list, node.args, *([node.returns] if node.returns else [])])
+            setup = [*node.decorator_list, node.args, *([node.returns] if node.returns else [])]
+            pending.extend((field, True) for field in setup)
             continue
         if isinstance(node, ast.ClassDef):
             # A class body runs where the class is defined; its methods do not.
-            pending.extend([*node.decorator_list, *node.bases, *node.keywords, *node.body])
+            pending.extend((field, True) for field in
+                           [*node.decorator_list, *node.bases, *node.keywords, *node.body])
+            continue
+        if isinstance(node, ast.Lambda) and listed:
+            pending.append((node.args, True))
             continue
         yield node
-        pending.extend(ast.iter_child_nodes(node))
+        pending.extend((child, listed) for child in ast.iter_child_nodes(node))
 
 
 def complexity(function: ast.AST) -> int:
