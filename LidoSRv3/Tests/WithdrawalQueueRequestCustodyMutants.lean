@@ -29,7 +29,9 @@ theorem witnessMint_binds_owner : ∀ owner, (witnessMint owner).owner = owner :
   fun _ => rfl
 
 /-- Mutant A: `WithdrawalQueueERC721.sol:231`'s `TransferToZeroAddress` guard
-is deleted; every other guard of `_transfer` is retained verbatim. -/
+is deleted; every other modeled guard of `_transfer` is retained verbatim
+(the request-validity and claimed checks at lines 233 and 236 are not
+modeled). -/
 def sourceTransferZeroRecipientDropped
     (caller fromAddr to : Nat) (s : State) : Option State :=
   if to = fromAddr then none
