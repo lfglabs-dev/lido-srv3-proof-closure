@@ -23,17 +23,19 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"
+R1_REVIEW_BASE = "81e67d78ef39bc6b2db52fa7c501ce3a46d3da88"
 # The report calls this commit its certified review basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
-# if it had that review.
+# if it had that review.  Advancing this pin is a re-binding of the generator
+# inputs, not a claim that the new bytes were externally reviewed; the report
+# states that distinction in its own header.
 # This exact family is every structured input used to render the R1 review
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "39fb757cbc896a2cbae21830a633e1cb6831fbcc993b832bce4ea1f5f4215948",
-    "audit/source-map.yaml": "ee8847bdf481fad77e8d99bad5be050d723eaa9e3287ec6930417b334d715857",
+    "audit/guarantees.yaml": "cae72d28c9cddb9df5f6a5f49a6fdd19d8995e1e4a1ffa49618ed56d1a140b26",
+    "audit/source-map.yaml": "4aadab7fec32840c7ba6bf155372210c577f54b9da65cf5b99a65a331e5efbbd",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
 CANONICAL_IDS = [
@@ -52,6 +54,7 @@ SUBORDINATE_IDS = [
     "P-RESERVE-RELATIONAL",
     "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1", "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1",
     "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1", "P-CONSOLIDATION-VALUE-1",
+    "P-TOKEN-1",
 ]
 EXPECTED_IDS = CANONICAL_IDS + SUBORDINATE_IDS
 ASSURANCE_STATUSES = {"OPEN", "PARTIAL", "CHECKED"}
@@ -766,7 +769,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence. The review basis binds the exact generator inputs to a Git object; it is an input-identity binding, not evidence that those bytes received an external audit. Registering a new evidence row advances this pin, so a row added after a given external review is covered by the binding but not by that review.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
@@ -822,7 +825,7 @@ def rendered(rows, source_map):
         "\n## Explicit NOT YET boundaries\n\n",
         "- **ETH confinement:** `P-ETH-JOURNAL-1` is a modeled journal exclusion result, not global ETH confinement across live contracts, arbitrary calls, or deployment state.\n",
         "- **Oracle sanity:** `P-ORACLE-SUPPLY-1` covers the registered source-domain/computed-mint model; it does not prove oracle-report truth, committee/oracle authorization, all report sanity, or live storage/execution correspondence.\n",
-        "- **Broad token semantics:** `P-TOKEN-1` remains NOT YET and is not registered. The scoped address and claim rows do not establish general ERC-20/ERC-721/WstETH approvals, balances, transfers, events, or adversarial recipient semantics.\n",
+        "- **Broad token semantics:** NOT YET. `P-TOKEN-1` is registered only as a bounded subordinate row: the pinned WithdrawalQueue request-creation control prefix composed with owner-operated `transferFrom` custody hops. It establishes the two-sided amount bound, the line-130 owner fallback, non-ownerless custody over arbitrary hop chains, and owner-operated authorization per hop. It does **not** establish general ERC-20/ERC-721/WstETH approvals, allowances, balances, `STETH.transferFrom` movement, share conversion, queue storage, finalization, claim/redeem, events, or adversarial recipient semantics, and it is not a canonical guarantee.\n",
         "- **Deployment identity:** NOT YET. Neither a pinned source span, a constructor literal, a configured endpoint, a runtime receipt, nor a model address proves deployed bytecode/codehash/chain identity. General Yul/EVM/deployment provenance is out of scope; the SSZ targeted binding remains OPEN.\n\n",
         "## Proof-escape and receipt acceptance\n\n",
         "`LidoSRv3.Audit.Trust` is the public axiom surface. It permits only Lean foundations (`propext`, `Classical.choice`, `Quot.sound`) plus the three explicitly recorded production exceptions (P-ALLOC-1 Phase-3 capacity, SSZ digest, consolidation flow) and the exact test/mutant-only native-decision names below; the run summary reports each production exception by name rather than folding it into the test-only count. `scripts/check_trust_axioms.py` rebuilds and reruns Trust, parses every emitted named axiom report (including Lean's empty-set spelling), and fails closed on any missing or unexpected dependency, including a production-parent or opaque project axiom. Neither Trust's source text nor its log is taken as evidence: a `#print axioms` line reads the same inside a `/- -/` block, and an `#eval IO.println` can emit a report Lean never computed, so disclosure is read from active commands only, with comments and strings blanked first, and every printed theorem's dependencies are recomputed by the checker itself through the same `Lean.collectAxioms` call `#print axioms` makes, in a probe it spawns that imports only `Lean` and loads the audited module as data, so audited code contributes declarations but never elaborates the probe measuring it — a macro bound to the collector's token sequence would otherwise intercept that call in every spelling, fully qualified ones included. The published log is then confirmed against that recomputation, and a report that hides, invents, or misstates a dependency fails closed. A disclosed native-decision name is bound to provenance rather than spelling: no project Lean source may declare a name in Lean's compiler-generated `_native.native_decide` namespace, so an `opaque` merely spelled like a generated axiom cannot be laundered into the allowed set. That lexical guard only rules out spellings a source can be scanned for, and nothing the environment records about a declaration is evidence of who created it: an elaborator can assemble the name from fragments, give it the reflection type, and register it at a line that genuinely contains `native_decide`. Each disclosed name is therefore vouched for by re-establishing its own claim rather than its origin — the checker recompiles and runs the `Bool` expression the axiom asserts is `true`, which is the same evidence `native_decide` itself relies on — while the recorded kind, type, module, and site conditions are retained only to keep the disclosed set inside the pinned tactic inventory. `scripts/check_proof_escapes.py` mechanically scans every production project Lean source, including top-level library roots, after removing comments and strings: project `sorry`, `admit`, `axiom`, equivalent `constant` declarations, `unsafe`, and `Lean.ofReduceBool` fail closed, and the complete `native_decide` inventory is pinned so additions also fail closed; its negative regression mutates an imported module, the top-level library root, and the Trust entrypoint. `audit/validation-receipt.txt` binds the current tracked tree excluding itself. A green receipt and metadata/public-surface checks establish synchronization, not semantic closure.\n\n",

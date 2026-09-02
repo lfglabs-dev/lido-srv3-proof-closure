@@ -21,6 +21,7 @@ import LidoSRv3.Audit.Guarantees.PAddressBatch1
 import LidoSRv3.Audit.Guarantees.PSszLive1
 import LidoSRv3.Audit.Guarantees.PConsolidationValue1
 import LidoSRv3.Audit.Guarantees.POracleSanity1
+import LidoSRv3.Audit.Guarantees.PToken1
 
 /-!
 # Canonical minimal-11 public facade
@@ -81,13 +82,14 @@ def supplemental : List Guarantee :=
   , PSszLive1.guarantee
   , PConsolidationValue1.guarantee
   , POracleSanity1.guarantee
+  , PToken1.guarantee
   ]
 
-/-- Regression guard: Wave 3 leftover-close IDs stay supplemental. -/
+/-- Regression guard: supplemental IDs stay out of the public facade. -/
 example : supplemental.map (fun guarantee => guarantee.id.text) =
     ["P-RESERVE-RELATIONAL", "P-ALLOC-EXEC-1", "P-ETH-JOURNAL-1",
      "P-VAULT-ETH-1", "P-ORACLE-SUPPLY-1", "P-ADDRESS-BATCH-1", "P-SSZ-LIVE-1",
-     "P-CONSOLIDATION-VALUE-1", "P-ORACLE-SANITY-1"] := by decide
+     "P-CONSOLIDATION-VALUE-1", "P-ORACLE-SANITY-1", "P-TOKEN-1"] := by decide
 
 /-- P-ORACLE-SANITY-1 is a **bounded** parent: it covers the five modeled
 `OracleReportSanityChecker` commit-path guards plus the `uint256` entry bound
