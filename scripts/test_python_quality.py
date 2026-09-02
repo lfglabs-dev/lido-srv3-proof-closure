@@ -77,9 +77,17 @@ def check_ratchet(fixture: Path) -> None:
     expect(False, "zz_long.py = 501, limit 500, and it is not baseline debt", *args)
     long.unlink()
 
+    nested = scripts / "nested" / "zz_dense.py"
+    nested.parent.mkdir()
+    nested.write_text(DENSE, encoding="utf-8")
+    expect(False, "nested/zz_dense.py:dense = 24, limit 22, and it is not baseline debt", *args)
+    shutil.rmtree(nested.parent)
+
     rows = override.read_text(encoding="utf-8")
     override.write_text(rows.replace("audit_metadata.py:rendered 30", "audit_metadata.py:rendered 29"), encoding="utf-8")
     expect(False, "audit_metadata.py:rendered = 30 grew past its baseline 29", *args)
+    override.write_text(rows.replace("audit_metadata.py:rendered 30", "audit_metadata.py:rendered 31"), encoding="utf-8")
+    expect(False, "audit_metadata.py:rendered = 30 is below its baseline 31; lower the row to 30", *args)
     override.write_text(rows + "zz_gone.py:missing 40\n", encoding="utf-8")
     expect(False, "baseline row zz_gone.py:missing names nothing in scripts/; delete it and re-pin", *args)
     override.write_text(rows + "check_import_dag.py:layer_of 30\n", encoding="utf-8")
@@ -141,4 +149,4 @@ with tempfile.TemporaryDirectory() as tmp:
 check_metric()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "
       "past baseline, stale row, retired-but-listed row, malformed row, missing baseline, "
-      "baseline rewrite, scope-qualified and nested definitions, and the branch metric")
+      "baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, and the branch metric")

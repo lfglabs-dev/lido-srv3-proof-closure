@@ -19,6 +19,7 @@ generated here: it lives with the consumer and must cite these records.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -35,6 +36,7 @@ SCHEMA = "lido-srv3-ux2-guarantee-v1"
 INDEX_SCHEMA = "lido-srv3-ux2-index-v1"
 OUTPUT = Path("audit/ux2")
 LEAN_ROOT = Path("LidoSRv3/Audit")
+LEAN_INPUTS = ("LidoSRv3.lean", "lakefile.lean", "lake-manifest.json", "lean-toolchain")
 ROLES = {
     "abstract": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
     "verity": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
@@ -44,6 +46,7 @@ DECLARATION = re.compile(
     r"theorem[ \t]+([^\s:({\[]+)", re.MULTILINE)
 SCOPE = re.compile(r"^[ \t]*(namespace|section|end)(?:[ \t]+([^\s]+))?[ \t]*$", re.MULTILINE)
 OPENERS = "([{⟨"
+BINDER = re.compile(r"(?:let|have)\b")
 CLOSERS = ")]}⟩"
 
 
@@ -77,16 +80,30 @@ class Scope:
 
 
 def statement_end(text: str, start: int) -> int:
-    """Offset of the first `:=` at bracket depth zero after `start`."""
+    """Offset of the `:=` that ends the signature after `start`.
+
+    That is the first `:=` at bracket depth zero which does not belong to a
+    `let` or `have` binding written inside the statement itself: each such
+    binder at depth zero consumes the next depth-zero `:=`.
+    """
     depth = 0
-    for index in range(start, len(text) - 1):
+    pending = 0
+    index = start
+    while index < len(text) - 1:
         char = text[index]
         if char in OPENERS:
             depth += 1
         elif char in CLOSERS:
             depth -= 1
         elif depth == 0 and text.startswith(":=", index):
-            return index
+            if pending == 0:
+                return index
+            pending -= 1
+        elif depth == 0 and BINDER.match(text, index) and not text[index - 1].isalnum() \
+                and text[index - 1] not in "_.'":
+            pending += 1
+            index += 3
+        index += 1
     fail("theorem statement never reaches `:=`")
 
 
@@ -242,6 +259,21 @@ def render(record: dict) -> str:
     return json.dumps(record, indent=2, ensure_ascii=False) + "\n"
 
 
+def lean_inputs_digest(root: Path) -> str:
+    """SHA-256 over every Lean input the records depend on, so a consumer can
+    bind a copy of the records to the exact proof revision it displays."""
+    digest = hashlib.sha256()
+    paths = sorted((root / "LidoSRv3").rglob("*.lean")) + [root / name for name in LEAN_INPUTS]
+    for path in paths:
+        if not path.is_file():
+            fail(f"missing Lean input {path.relative_to(root).as_posix()}")
+        digest.update(path.relative_to(root).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
 def generate(root: Path) -> dict[str, str]:
     registry = load_json(root, "audit/guarantees.yaml")
     source_map = load_json(root, "audit/source-map.yaml")
@@ -260,6 +292,7 @@ def generate(root: Path) -> dict[str, str]:
         "pinned_source": source_map["pinned_source"],
         "verity_commit": audit_metadata.PINNED["verity"][1],
         "lean_toolchain": (root / "lean-toolchain").read_text(encoding="utf-8").strip(),
+        "lean_inputs_sha256": lean_inputs_digest(root),
         "boundary": context["boundary"],
         "guarantees": [{"id": row["id"], "file": f"{row['id']}.json"} for row in rows],
     })

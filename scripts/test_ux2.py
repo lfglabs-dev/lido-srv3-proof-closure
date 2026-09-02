@@ -20,6 +20,9 @@ import generate_ux2  # noqa: E402  (sibling module, located above)
 FILES = (
     "README.md",
     "lean-toolchain",
+    "lakefile.lean",
+    "lake-manifest.json",
+    "LidoSRv3.lean",
     "audit/guarantees.yaml",
     "audit/source-map.yaml",
     "audit/assumptions.yaml",
@@ -54,7 +57,7 @@ def copy_tree(destination: Path) -> None:
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, target)
-    shutil.copytree(ROOT / "LidoSRv3/Audit/Guarantees", destination / "LidoSRv3/Audit/Guarantees")
+    shutil.copytree(ROOT / "LidoSRv3", destination / "LidoSRv3")
     shutil.copytree(ROOT / "audit/ux2", destination / "audit/ux2")
 
 
@@ -137,12 +140,19 @@ def check_lean_scanner(fixture: Path) -> None:
         "protected theorem three : True :=\n"
         "  trivial\n"
         "end Deep\n"
+        "theorem four (x : Nat) : let y := x + 1; y = x + 1 := by\n"
+        "  intro y; rfl\n"
+        "theorem five (x : Nat) : have h : x = x := rfl; x = x := fun _ => rfl\n"
+        "theorem six (outlet : Nat) (h : outlet.let = 1) : outlet = 1 := h\n"
         "end Outer.Inner\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     expected = {
         "Outer.Inner.one": ("theorem one (x : Nat := 3) : x = x", "/-- Doc for one. -/", 6, 6),
         "Outer.Inner.two": ("theorem two : True", "", 9, 9),
         "Outer.Inner.Deep.three": ("protected theorem three : True", "", 13, 13),
+        "Outer.Inner.four": ("theorem four (x : Nat) : let y := x + 1; y = x + 1", "", 16, 16),
+        "Outer.Inner.five": ("theorem five (x : Nat) : have h : x = x := rfl; x = x", "", 18, 18),
+        "Outer.Inner.six": ("theorem six (outlet : Nat) (h : outlet.let = 1) : outlet = 1", "", 19, 19),
     }
     if set(found) != set(expected):
         raise SystemExit(f"scanner resolved {sorted(found)}")
@@ -186,6 +196,18 @@ def expect_scan_failure(fixture: Path, module: Path, diagnostic: str) -> None:
     raise SystemExit(f"scanner accepted a module that should fail: {diagnostic!r}")
 
 
+def check_lean_inputs_binding(fixture: Path) -> None:
+    """Any Lean input change, even outside the scanned modules, moves the index digest."""
+    mutant = fixture / "LidoSRv3/Tests/ZzInputMutant.lean"
+    mutant.write_text("-- not a theorem\n", encoding="utf-8")
+    expect(fixture, "check", False, "index.json differs from the registry and Lean sources")
+    mutant.unlink()
+    expect(fixture, "check", True, "11 guarantee records match")
+    (fixture / "lake-manifest.json").unlink()
+    expect(fixture, "check", False, "missing Lean input lake-manifest.json")
+    shutil.copy2(ROOT / "lake-manifest.json", fixture / "lake-manifest.json")
+
+
 def check_boundary_and_kill_lines(fixture: Path) -> None:
     readme = fixture / "README.md"
     original = rewrite(
@@ -205,8 +227,9 @@ with tempfile.TemporaryDirectory() as tmp:
     check_artifact_drift(fixture)
     check_registry_binding(fixture)
     check_lean_scanner(fixture)
+    check_lean_inputs_binding(fixture)
     check_boundary_and_kill_lines(fixture)
 
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
       "canonical order, unregistered assumption, missing source target, missing headline "
-      "boundary, scope tracking, doc-comment and statement slicing")
+      "boundary, scope tracking, doc-comment and statement slicing, let/have binders, and the Lean input digest")

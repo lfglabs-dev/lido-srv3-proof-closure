@@ -4,9 +4,10 @@
 Every function must keep its cyclomatic complexity below `MAX_COMPLEXITY`
 and every script must stay under `MAX_LINES` lines, except for the debt the
 pinned baseline `audit/python-quality-baseline.txt` records. Baseline debt may
-only shrink: a listed function or file may not grow past its recorded value,
-and a row whose function or file has dropped under the threshold must be
-deleted and `BASELINE_BLOB` re-pinned here, where review sees the ceiling
+only shrink, and every shrink is pinned: a listed function or file must
+measure exactly its recorded value, an improvement must lower the row, a row
+whose subject has dropped under the threshold must be deleted, and each of
+those edits re-pins `BASELINE_BLOB` here, where review sees the ceiling
 move. Cyclomatic complexity is the enforced proxy for the cognitive and
 Halstead targets, which this repository has no tool to measure.
 """
@@ -98,13 +99,18 @@ def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
 
 
 def measure(root: Path) -> dict[str, int]:
-    """Map `file:qualified.function` to complexity and `file` to line count."""
+    """Map `path:qualified.function` to complexity and `path` to line count.
+
+    Paths are relative to `scripts/` and the walk is recursive, so a script in
+    a subdirectory is measured like one at the top.
+    """
     found: dict[str, int] = {}
-    for path in sorted((root / SCRIPTS).glob("*.py")):
+    for path in sorted((root / SCRIPTS).rglob("*.py")):
         source = path.read_text(encoding="utf-8")
-        found[path.name] = len(source.splitlines())
+        relative = path.relative_to(root / SCRIPTS).as_posix()
+        found[relative] = len(source.splitlines())
         for name, node in functions(ast.parse(source)):
-            found[f"{path.name}:{name}"] = complexity(node)
+            found[f"{relative}:{name}"] = complexity(node)
     return found
 
 
@@ -147,10 +153,14 @@ def violations(measured: dict[str, int], baseline: dict[str, int]) -> list[str]:
     for key, value in sorted(measured.items()):
         limit = threshold(key)
         recorded = baseline.get(key)
-        if recorded is None and value >= limit:
-            problems.append(f"{key} = {value}, limit {limit}, and it is not baseline debt")
-        elif recorded is not None and value > recorded:
+        if recorded is None:
+            if value >= limit:
+                problems.append(f"{key} = {value}, limit {limit}, and it is not baseline debt")
+        elif value > recorded:
             problems.append(f"{key} = {value} grew past its baseline {recorded}")
+        elif limit <= value < recorded:
+            problems.append(f"{key} = {value} is below its baseline {recorded}; lower the row to "
+                            f"{value} and re-pin so the improvement cannot be undone")
     for key, recorded in sorted(baseline.items()):
         value = measured.get(key)
         if value is None:
