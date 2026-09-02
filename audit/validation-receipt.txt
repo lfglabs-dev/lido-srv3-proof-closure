@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: ac2ca9737f2b60e04cdf4182c02bbdd558a246fa
+validated-tree: ec640aeb07993e01fc74bcb8ed2f52067884865f
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5570,7 +5570,7 @@ P-ORACLE-SANITY-1: bounded commit-envelope parent and exact-parent kill-lines
 ------------------------------------------------------------------------
 
 - Scope registered. `P-ORACLE-SANITY-1` is registered as a **bounded**
-  supplemental guarantee at `[.model, .source]`. Its scope is exactly the five
+  supplemental guarantee at `[.model]`. Its scope is exactly the five
   modeled `OracleReportSanityChecker` commit-path guards
   (`annualBalanceIncreaseAccepts`, `pendingBalanceCapAccepts`,
   `activatedBalanceAccepts`, `validatorsBalanceIncreaseAccepts`,
