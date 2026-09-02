@@ -34,11 +34,16 @@ ESCAPES = (
 
 
 def strip_comments_and_strings(source: str) -> str:
-    """Blank comments/strings while preserving positions and newlines."""
+    """Blank comments/strings while preserving positions and newlines.
+
+    Lean guillemet-escaped identifiers are code, even when their contents
+    resemble comment or string delimiters (for example, ``«helper /- name»``).
+    """
     out: list[str] = []
     i = 0
     depth = 0
     in_string = False
+    in_escaped_identifier = False
     while i < len(source):
         pair = source[i : i + 2]
         ch = source[i]
@@ -54,6 +59,11 @@ def strip_comments_and_strings(source: str) -> str:
             else:
                 out.append("\n" if ch == "\n" else " ")
                 i += 1
+        elif in_escaped_identifier:
+            out.append(ch)
+            if ch == "»":
+                in_escaped_identifier = False
+            i += 1
         elif in_string:
             out.append("\n" if ch == "\n" else " ")
             if ch == "\\" and i + 1 < len(source):
@@ -78,6 +88,10 @@ def strip_comments_and_strings(source: str) -> str:
         elif ch == '"':
             in_string = True
             out.append(" ")
+            i += 1
+        elif ch == "«":
+            in_escaped_identifier = True
+            out.append(ch)
             i += 1
         else:
             out.append(ch)

@@ -253,6 +253,34 @@ def expect_scan_failure(fixture: Path, module: Path, diagnostic: str) -> None:
     raise SystemExit(f"scanner accepted a module that should fail: {diagnostic!r}")
 
 
+def check_escaped_identifier_lexing(fixture: Path) -> None:
+    """Comment/string delimiters in guillemet names remain Lean code."""
+    strip = check_proof_escapes.strip_comments_and_strings
+    escaped = 'theorem «helper /- -- -/ " name» : True := trivial\n'
+    if strip(escaped) != escaped:
+        raise SystemExit("comment/string masker altered a guillemet-escaped identifier")
+
+    controls = (
+        "theorem helper : True := trivial /- hidden -/\n",
+        'theorem helper : "-- /- hidden -/" = "-- /- hidden -/" := rfl\n',
+    )
+    for source in controls:
+        masked = strip(source)
+        if any(marker in masked for marker in ("/-", "--", "hidden")):
+            raise SystemExit(f"comment/string masker retained ordinary delimiter text: {masked!r}")
+
+    module = fixture / "LidoSRv3/Audit/Guarantees/Synthetic.lean"
+    module.write_text(
+        "namespace Outer\n"
+        "def «helper /- name» : Nat := 1\n"
+        "theorem after_escaped_identifier : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if "Outer.after_escaped_identifier" not in found:
+        raise SystemExit("escaped identifier comment marker hid a later theorem")
+    module.unlink()
+
+
 def check_lean_inputs_binding(fixture: Path) -> None:
     """Any Lean input change, even outside the scanned modules, moves the index tree id,
     and the id is the one scripts/verified_source_tree.sh computes with Git."""
@@ -393,6 +421,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check_artifact_drift(fixture)
     check_registry_binding(fixture)
     check_lean_scanner(fixture)
+    check_escaped_identifier_lexing(fixture)
     check_lean_inputs_binding(fixture)
     check_scanner_edges(fixture)
     check_symlink_tree(fixture)
@@ -401,4 +430,5 @@ with tempfile.TemporaryDirectory() as tmp:
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
       "canonical order, unregistered assumption, missing source target, missing headline "
       "boundary, scope tracking, doc-comment and statement slicing, let/have binders, where-proofs, "
+      "escaped identifier delimiters and ordinary delimiter controls, "
       "symlinked inputs and root, and the Lean source tree id")
