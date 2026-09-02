@@ -9,6 +9,36 @@ namespace LidoSRv3.Audit.Guarantees.PAlloc2
 
 def guarantee : Guarantee := ⟨.pAlloc2, [.algorithm, .source, .verityTx]⟩
 
+/-! ## Vocabulary (registered statements)
+
+The two registered P-ALLOC-2 statements are written with the predicates below
+so that they read like the plain guarantee. Every predicate is an `abbrev`:
+unfolding it gives back exactly the former statement text, and the conjunct
+order of the registered parent is unchanged (`.1`, `.2.1`, `.2.2`). -/
+
+/-- "The `buckets` memory array decodes to `buckets`." -/
+abbrev BucketsArrayDecodesTo (state : Verity.ContractState)
+    (buckets : List MinFirstAllocation.Source.Word) : Prop :=
+  Verity.MinFirstDistributionTx.readArray state "buckets"
+    Verity.MinFirstDistributionTx.bucketsBase buckets.length = some buckets
+
+/-- "The `capacities` memory array decodes to `capacities`." -/
+abbrev CapacitiesArrayDecodesTo (state : Verity.ContractState)
+    (capacities : List MinFirstAllocation.Source.Word) : Prop :=
+  Verity.MinFirstDistributionTx.readArray state "capacities"
+    Verity.MinFirstDistributionTx.capacitiesBase capacities.length = some capacities
+
+/-- "`observe` of the `allocate` transaction (persisted bucket array plus
+totals) equals `sourceView` of the pinned source loop." -/
+abbrev ObservesSourceView
+    (buckets capacities : List MinFirstAllocation.Source.Word)
+    (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState) : Prop :=
+  Verity.MinFirstDistributionTx.observe buckets
+      ((Verity.MinFirstDistributionTx.allocate buckets.length capacities.length
+        allocationSize).run
+      state) =
+    Verity.MinFirstDistributionTx.sourceView buckets capacities allocationSize
+
 /-- If the two memory arrays decode to `buckets`/`capacities`, then
 `observe` of `allocate` (persisted bucket array plus totals) equals
 `sourceView` of the separately defined `sourceAllocateLoop`; the copied loop
@@ -17,15 +47,9 @@ Not the +1 `selects_least_open_bucket` model. -/
 theorem verity_tx_simulates_min_first_distribution
     (buckets capacities : List MinFirstAllocation.Source.Word)
     (allocationSize : MinFirstAllocation.Source.Word) (state : Verity.ContractState)
-    (hBuckets : Verity.MinFirstDistributionTx.readArray state "buckets"
-      Verity.MinFirstDistributionTx.bucketsBase buckets.length = some buckets)
-    (hCapacities : Verity.MinFirstDistributionTx.readArray state "capacities"
-      Verity.MinFirstDistributionTx.capacitiesBase capacities.length = some capacities) :
-    Verity.MinFirstDistributionTx.observe buckets
-        ((Verity.MinFirstDistributionTx.allocate buckets.length capacities.length
-          allocationSize).run
-        state) =
-      Verity.MinFirstDistributionTx.sourceView buckets capacities allocationSize :=
+    (hBuckets : BucketsArrayDecodesTo state buckets)
+    (hCapacities : CapacitiesArrayDecodesTo state capacities) :
+    ObservesSourceView buckets capacities allocationSize state :=
   Verity.MinFirstDistributionTx.verity_tx_simulates_pinned_source
     buckets capacities allocationSize state hBuckets hCapacities
 
@@ -227,6 +251,62 @@ theorem proportional_model_loop_preserves_rows
   Verity.MinFirstDistributionTx.sourceAllocateLoop_model_correspondence
     fuel model source allocationSize 0 after allocated remaining hRows hLen hRun
 
+open LidoSRv3.Audit.MinFirstAllocation in
+/-- "At each step, the module served by the pinned source scan is the one the
+independent model selects (least allocation among the open ones, lowest index
+on ties), and the checked source amount is the model's share of the remaining
+demand: positive, at most the demand, and inside the module's capacity." -/
+abbrev StepMatchesModel : Prop :=
+  ∀ (model : List Model.Bucket)
+    (source : List Source.Row)
+    (best : Source.Row)
+    (allocationSize w : Source.Word),
+    RowsCorrespond model source →
+    Source.candidate? source = some best →
+    Source.hasFreeSpace best = true →
+    source.length < Verity.Core.Uint256.modulus →
+    allocationSize.val ≠ 0 →
+    Source.checkedAmount source allocationSize best = some w →
+    (Option.map (fun b => (b.allocation, b.capacity))
+        (Model.candidate? model) =
+      some (best.allocation.val, best.capacity.val)) ∧
+    Model.amount model allocationSize.val
+      ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
+    0 < w.val ∧ w.val ≤ allocationSize.val ∧
+      best.allocation.val + w.val ≤ best.capacity.val
+
+open LidoSRv3.Audit.MinFirstAllocation in
+/-- "On a full loop, allocated + remaining = the initial demand." -/
+abbrev FullLoopConserves : Prop :=
+  ∀ (fuel : Nat) (rows : List Source.Row)
+    (allocationSize : Source.Word)
+    (after : List Source.Row)
+    (allocated remaining : Source.Word),
+    Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =
+      some (after, allocated, remaining) →
+    allocated.val + remaining.val = allocationSize.val
+
+open LidoSRv3.Audit.MinFirstAllocation in
+/-- "The newly allocated amount is taken into account at the next iteration:
+the independent proportional model loop matches every successful source loop
+run, with equal totals and rows still in correspondence at the end." -/
+abbrev LoopStaysInCorrespondence : Prop :=
+  ∀ (fuel : Nat)
+    (model : List Model.Bucket)
+    (source : List Source.Row)
+    (allocationSize : Source.Word)
+    (after : List Source.Row)
+    (allocated remaining : Source.Word),
+    RowsCorrespond model source →
+    source.length < Verity.Core.Uint256.modulus →
+    Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source allocationSize 0 =
+      some (after, allocated, remaining) →
+    ∃ modelAfter,
+      Verity.MinFirstDistributionTx.modelAllocateLoop fuel model
+          allocationSize.val 0 =
+        some (modelAfter, allocated.val, remaining.val) ∧
+      RowsCorrespond modelAfter after
+
 /-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source
 candidate and proportional-amount equality from the step theorem load-bearing,
 and adds fuel-bounded conservation for every successful run of the full
@@ -234,45 +314,7 @@ independently stated source allocation loop, plus multi-step row correspondence
 with an independently stated proportional model loop.  It does not identify
 that proportional loop with the separate +1 `MinFirst` child model. -/
 theorem step_correspondence_and_full_loop_conservation :
-    (∀ (model : List MinFirstAllocation.Model.Bucket)
-      (source : List MinFirstAllocation.Source.Row)
-      (best : MinFirstAllocation.Source.Row)
-      (allocationSize w : MinFirstAllocation.Source.Word),
-      MinFirstAllocation.RowsCorrespond model source →
-      MinFirstAllocation.Source.candidate? source = some best →
-      MinFirstAllocation.Source.hasFreeSpace best = true →
-      source.length < Verity.Core.Uint256.modulus →
-      allocationSize.val ≠ 0 →
-      MinFirstAllocation.Source.checkedAmount source allocationSize best = some w →
-      (Option.map (fun b => (b.allocation, b.capacity))
-          (MinFirstAllocation.Model.candidate? model) =
-        some (best.allocation.val, best.capacity.val)) ∧
-      MinFirstAllocation.Model.amount model allocationSize.val
-        ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
-      0 < w.val ∧ w.val ≤ allocationSize.val ∧
-        best.allocation.val + w.val ≤ best.capacity.val) ∧
-    (∀ (fuel : Nat) (rows : List MinFirstAllocation.Source.Row)
-      (allocationSize : MinFirstAllocation.Source.Word)
-      (after : List MinFirstAllocation.Source.Row)
-      (allocated remaining : MinFirstAllocation.Source.Word),
-      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =
-        some (after, allocated, remaining) →
-      allocated.val + remaining.val = allocationSize.val) ∧
-    (∀ (fuel : Nat)
-      (model : List MinFirstAllocation.Model.Bucket)
-      (source : List MinFirstAllocation.Source.Row)
-      (allocationSize : MinFirstAllocation.Source.Word)
-      (after : List MinFirstAllocation.Source.Row)
-      (allocated remaining : MinFirstAllocation.Source.Word),
-      MinFirstAllocation.RowsCorrespond model source →
-      source.length < Verity.Core.Uint256.modulus →
-      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source allocationSize 0 =
-        some (after, allocated, remaining) →
-      ∃ modelAfter,
-        Verity.MinFirstDistributionTx.modelAllocateLoop fuel model
-            allocationSize.val 0 =
-          some (modelAfter, allocated.val, remaining.val) ∧
-        MinFirstAllocation.RowsCorrespond modelAfter after) :=
+    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence :=
   ⟨forall_proportional_step_correspondence_and_bounded,
    source_allocate_loop_conserves_requested,
    proportional_model_loop_preserves_rows⟩

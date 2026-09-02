@@ -512,9 +512,9 @@ def main():
             "| `active_capacity_bounded` | 69 | Abstract | unregistered |",
             "| `active_capacity_bounded` | 69 | Abstract | REGISTERED as `abstract.theorem` |", 1)
         promoted = promoted.replace(
-            "| `checked_execute` | 103 | Abstract | REGISTERED as `abstract.theorem` |",
-            "| `checked_execute` | 103 | Abstract | unregistered |", 1)
-        if promoted == report or "`checked_execute` | 103 | Abstract | unregistered" not in promoted:
+            "| `checked_execute` | 122 | Abstract | REGISTERED as `abstract.theorem` |",
+            "| `checked_execute` | 122 | Abstract | unregistered |", 1)
+        if promoted == report or "`checked_execute` | 122 | Abstract | unregistered" not in promoted:
             raise AssertionError("promotion mutant changed nothing")
         report_path.write_text(promoted, encoding="utf-8")
         invoke(fixture, False, "REGISTERED; registry names")
@@ -694,16 +694,16 @@ def main():
                 report_path.write_text(report, encoding="utf-8")
 
         # A stale line number: the citation must point at the real declaration.
-        stale = report.replace("| `checked_execute` | 103 |", "| `checked_execute` | 104 |", 1)
+        stale = report.replace("| `checked_execute` | 122 |", "| `checked_execute` | 104 |", 1)
         if stale == report:
             raise AssertionError("line mutant changed nothing")
         report_path.write_text(stale, encoding="utf-8")
-        invoke(fixture, False, "checked_execute is declared at Lean line 103")
+        invoke(fixture, False, "checked_execute is declared at Lean line 122")
         report_path.write_text(report, encoding="utf-8")
 
         # A row that names no abstract/Verity plane.
-        planeless = report.replace("| `verity_tx_revert_restores_snapshot` | 184 | Verity |",
-                                   "| `verity_tx_revert_restores_snapshot` | 184 | n/a |", 1)
+        planeless = report.replace("| `verity_tx_revert_restores_snapshot` | 220 | Verity |",
+                                   "| `verity_tx_revert_restores_snapshot` | 220 | n/a |", 1)
         if planeless == report:
             raise AssertionError("plane mutant changed nothing")
         report_path.write_text(planeless, encoding="utf-8")
@@ -1141,8 +1141,8 @@ def main():
         # where the table declares five and the columns after it shift left.
         # The row still reads as an inventory row to the eye and is not one.
         for escape in escapes[1:]:
-            narrowed = inventory_rows[0].replace("| 103 | Abstract |",
-                                                 f"| 103 {escape} Abstract |", 1)
+            narrowed = inventory_rows[0].replace("| 122 | Abstract |",
+                                                 f"| 122 {escape} Abstract |", 1)
             if narrowed == inventory_rows[0]:
                 raise AssertionError("narrowing escape mutant changed nothing")
             report_path.write_text(report.replace(inventory_rows[0], narrowed, 1),

@@ -9,6 +9,30 @@ open LidoSRv3.Audit.Verity.HandleOracleReportTx
 
 def guarantee : Guarantee := ⟨.pAccount1, [.model, .source, .verityTx]⟩
 
+/-! ## Vocabulary
+
+The registered abstract statement is the one-liner
+`mint_after_read_discipline : mintAfterReadDiscipline`.  The three names below
+are the definitions it unfolds to; they live in
+`LidoSRv3.Audit.Verity.HandleOracleReportTx` and are only re-exported here
+under their English reading so the statement can be read without leaving this
+file. -/
+
+/-- "The read step is stamped strictly before any nonzero mint step", over the
+two raw ticks: `0 < mintTick → readTick < mintTick`. -/
+abbrev mintAfterRead := LidoSRv3.Audit.Verity.HandleOracleReportTx.mintAfterRead
+
+/-- "On every committed execution of `tx`, the `rewardsReadSlot` tick is
+`mintAfterRead` the `rewardsMintedSlot` tick", for every input, fee and
+starting state; a reverting execution claims nothing. -/
+abbrev mintAfterReadDisciplineOf :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.mintAfterReadDisciplineOf
+
+/-- "The modeled `handleOracleReport` has mint-after-read discipline":
+`mintAfterReadDisciplineOf` applied to the real transaction. -/
+abbrev mintAfterReadDiscipline :=
+  LidoSRv3.Audit.Verity.HandleOracleReportTx.mintAfterReadDiscipline
+
 /-- Child: source-plane constructor order only, not the registered P-ACCOUNT-1
 parent. The retired child has no `fullReportSucceeds` binder: if the locally
 modeled `sourceTraceRetired` accepts and fee shares are strictly positive,
@@ -32,7 +56,10 @@ theorem source_report_before_reward
   LidoSRv3.Audit.SolidityAccounting.source_report_before_reward_retired
     i sharesToMintAsFees hFees trace h
 
-/-- Verity child. `observe` of `handleOracleReport` (balance array + total/flag
+/-- **P-ACCOUNT-1, Verity plane.**  `observe` of `handleOracleReport` equals
+`sourceView`.
+
+Verity child. `observe` of `handleOracleReport` (balance array + total/flag
 slots) equals the independently stated `sourceView`. Not `submitReportData`;
 `sharesToMintAsFees` is an argument, not a computed fee. -/
 theorem verity_tx_simulates_oracle_report
@@ -51,7 +78,12 @@ theorem verity_tx_revert_restores_snapshot
     rollback = state :=
   revert_restores_snapshot i sharesToMintAsFees inject state rollback reason h
 
-/-- Registered P-ACCOUNT-1 parent. Independent tx-storage-flag order
+/-- **P-ACCOUNT-1, abstract plane.**  On every committed execution of the
+modeled `handleOracleReport`, the `rewardsRead` step is written strictly before
+any nonzero `rewardsMinted` step, read directly from the transaction step
+clock: whenever `0 < tick(mint)`, then `tick(read) < tick(mint)`.
+
+Registered P-ACCOUNT-1 parent. Independent tx-storage-flag order
 discipline: on every committed execution of the real `handleOracleReport`,
 the `rewardsReadSlot` tick is written strictly before any nonzero
 `rewardsMintedSlot` tick. This reads the two raw ticks directly and does not

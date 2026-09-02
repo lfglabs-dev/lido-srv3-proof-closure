@@ -108,6 +108,17 @@ def transitionBudget (b : TopupBatch) (cfg : TopupConfig) : Nat :=
 def transition (b : TopupBatch) (cfg : TopupConfig) : List Nat :=
   consumeBudget (transitionBudget b cfg) (candidates b cfg)
 
+/-! ## Vocabulary for the registered statement -/
+
+/-- "The top-up amounts allocated in a batch": the leftover-budget walk
+`transition`, in gwei. -/
+abbrev allocatedTopups (b : TopupBatch) (cfg : TopupConfig) : List Nat :=
+  transition b cfg
+
+/-- "The protocol's per-block cap", `maxTopUpPerBlockGwei`, in gwei. -/
+abbrev blockCap (cfg : TopupConfig) : Nat :=
+  cfg.maxTopUpPerBlockGwei
+
 /-- Public per-key bound for P-TOPUP-2. Each produced allocation is paired
 with, and bounded by, the corresponding requested/evaluated candidate. -/
 theorem per_key_bounded_by_candidate (b : TopupBatch) (cfg : TopupConfig) :
@@ -163,7 +174,11 @@ theorem aggregate_bounded_by_individual (b : TopupBatch) (cfg : TopupConfig) :
   apply Nat.le_trans (consumeBudget_sum_le_sum _ _)
   exact candidates_sum_le b.validators b.requestedGwei cfg hreq
 
-/-- **Registered P-TOPUP-2 parent.** Leftover-budget consumption of
+/-- **P-TOPUP-2, abstract plane.**  The sum of the top-up amounts allocated in
+a batch is at most the protocol's per-block cap, in gwei, with no hypothesis on
+the batch.
+
+**Registered P-TOPUP-2 parent.** Leftover-budget consumption of
 `min(valueGwei, min(moduleLimit, maxTopUpPerBlock))` is ≤ the per-block
 cap. Validator WC, slash, activation, and `allocations = transition` are
 not used. `A-TOPUP-NOWRAP` is not attached to this row: its recorded
@@ -178,7 +193,7 @@ shows the bound is not vacuous: a mutant budget that drops the
 `maxTopUpPerBlockGwei` term from that `min` lets the identical leftover walk
 allocate above the cap (`block_cap_kill_line_refutes_parent`). -/
 theorem aggregate_bounded_by_block_cap (b : TopupBatch) (cfg : TopupConfig) :
-    (transition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei :=
+    (allocatedTopups b cfg).sum ≤ blockCap cfg :=
   Nat.le_trans (consumeBudget_sum_le _ _)
     (Nat.le_trans (Nat.min_le_right _ _) (Nat.min_le_right _ _))
 
