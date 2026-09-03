@@ -52,15 +52,21 @@ DECLARATION = re.compile(
 MODIFIER_RUN = re.compile(
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
 # A scope name may follow Lean whitespace (including comments stripped to blank
-# lines), but an unnamed scope must not consume the next scope command as a
-# split-line name.  A qualified scope name is a dotted sequence of Lean
-# identifier components; each component may be guillemet-escaped and therefore
-# contain whitespace.
+# lines), but an unnamed scope must not consume the next command as a split-line
+# name.  Commands may share a physical line, so scope commands are matched at a
+# Lean whitespace boundary rather than only as a whole line.  A qualified scope
+# name is a dotted sequence of Lean identifier components; each component may
+# be guillemet-escaped and therefore contain whitespace.
 SCOPE_COMPONENT = r"(?:«[^»\n]*»|[^\s.«»]+)"
+COMMAND_KEYWORD = (
+    r"namespace|section|mutual|end|theorem|lemma|def|abbrev|opaque|"
+    r"structure|class|inductive|instance|example|macro|syntax|elab|open|"
+    r"variable|attribute|set_option|deriving"
+)
 SCOPE = re.compile(
-    r"^[ \t]*(namespace|section|mutual|end)"
-    r"(?:\s+(?!(?:namespace|section|mutual|end)(?:[ \t]*$|[ \t]+))"
-    rf"({SCOPE_COMPONENT}(?:\.{SCOPE_COMPONENT})*))?[ \t]*$", re.MULTILINE)
+    r"(?<!\S)(namespace|section|mutual|end)(?![\w'])"
+    rf"(?:\s+(?!(?:{COMMAND_KEYWORD})(?:\s|$))"
+    rf"({SCOPE_COMPONENT}(?:\.{SCOPE_COMPONENT})*))?")
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")
@@ -324,7 +330,9 @@ def apply_scope(scope: Scope, match: re.Match) -> None:
     if keyword == "end":
         scope.leave(name)
     else:
-        scope.enter(keyword, name)
+        # `mutual` has no scope name.  Its following declaration can be on the
+        # next line, and must never become an apparent name for stack matching.
+        scope.enter(keyword, None if keyword == "mutual" else name)
 
 
 def module_name(root: Path, path: Path) -> str:

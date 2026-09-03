@@ -51,15 +51,25 @@ if ! python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdi
 fi
 
 # Character literals (including each guillemet) are data, not escaped
-# identifier delimiters; a following forbidden declaration must stay visible.
+# identifier delimiters; every following guarded spelling must stay visible.
 for literal in "'«'" "'»'" "'\\\\'"; do
-  cp LidoSRv3/Audit/Trust.lean "$project"
-  printf "\ndef marker : Char := %s\naxiom injected : False\n" "$literal" >> "$project"
-  if python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
-    printf 'proof-escape regression accepted an axiom after character literal %s\n' "$literal" >&2
-    exit 1
-  fi
-  rg -q 'forbidden axiom' "$tmpdir/out" || { cat "$tmpdir/out" >&2; exit 1; }
+  while IFS='|' read -r token needle; do
+    cp LidoSRv3/Audit/Trust.lean "$project"
+    printf "\ndef marker : Char := %s\n%s\n" "$literal" "$token" >> "$project"
+    if python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
+      printf 'proof-escape regression accepted %s after character literal %s\n' "$token" "$literal" >&2
+      exit 1
+    fi
+    rg -q "$needle" "$tmpdir/out" || { cat "$tmpdir/out" >&2; exit 1; }
+  done <<'TOKENS'
+sorry|forbidden sorry
+admit|forbidden admit
+axiom injected : False|forbidden axiom
+constant injected : False|forbidden constant
+unsafe def injected := 0|forbidden unsafe
+#check Lean.ofReduceBool|forbidden Lean.ofReduceBool
+native_decide|forbidden native_decide
+TOKENS
 done
 
 printf '%s\n' 'proof-escape negative regressions rejected imported, library-root, and Trust project Lean mutations'

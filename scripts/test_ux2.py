@@ -301,6 +301,16 @@ def check_lean_scanner(fixture: Path) -> None:
     if {name: records[0]["statement"] for name, records in found.items()} != expected_inline:
         raise SystemExit("scanner did not recognize repeated attributes or inline command declarations")
 
+    # Scope commands use the same whitespace command boundary as declarations.
+    # Their events must therefore surround inline theorems before their names
+    # are qualified, including nested named scopes and their corresponding ends.
+    module.write_text(
+        "namespace Outer section Local theorem inner : True := trivial end Local "
+        "theorem outer : True := trivial end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.Local.inner", "Outer.outer"}:
+        raise SystemExit("scanner did not apply inline scope commands before declarations")
+
     module.write_text(
         "namespace Outer\n"
         "def quoted : Syntax := `(command|\n"
