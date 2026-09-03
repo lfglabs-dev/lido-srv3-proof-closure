@@ -382,7 +382,7 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     found: dict[str, dict] = {}
     for offset, kind, match in events:
         if kind == "scope":
-            apply_scope(scope, match)
+            apply_scope(scope, match, active)
             continue
         start_line = stripped.count("\n", 0, offset)
         end = statement_end(structural, match.end())
@@ -417,9 +417,23 @@ def modifier_run(stripped: str, match: re.Match) -> tuple[int, bool]:
     return run.start(), "private" in run.group().split()
 
 
-def apply_scope(scope: Scope, match: re.Match) -> None:
+def apply_scope(scope: Scope, match: re.Match, text: str) -> None:
     keyword, name = match.group(1), match.group(2)
     if keyword == "end":
+        # A close label can only name the scope currently on top of the stack.
+        # If the apparent label differs and more non-whitespace follows on the
+        # same physical line, it is the first word of the next Lean command:
+        #
+        #   namespace Outer; end universe u
+        #
+        # `universe u` (and command forms such as `export …` or `include …`)
+        # must not be made into an `end universe` merely because this scanner
+        # does not enumerate every Lean command keyword.  A lone differing
+        # label still remains an error, preserving fail-closed validation of
+        # malformed closes such as `namespace A; end B`.
+        if (name is not None and scope.stack and name != scope.stack[-1][1]
+                and re.search(r"[^\n\S]*\S", text[match.end(2):])):
+            name = None
         scope.leave(name)
     else:
         # `mutual` has no scope name.  Its following declaration can be on the

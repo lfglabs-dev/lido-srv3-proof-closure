@@ -466,6 +466,29 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"after_unnamed", "after_named"}:
         raise SystemExit("scanner did not distinguish hash commands after unnamed and named `end`")
 
+    # A close has no required label.  Its optional label is only meaningful
+    # when it matches the scope being closed; otherwise a further same-line
+    # token starts the next command.  These commands are deliberately outside
+    # the scanner's historical keyword list, so accepting them cannot depend
+    # on extending that list.  The named-close control keeps explicit labels
+    # on the same line with the following command.
+    module.write_text(
+        "namespace UniverseClose\n"
+        "end universe u\n"
+        "theorem after_universe : True := trivial\n"
+        "namespace ExportClose\n"
+        "end export Nat (add)\n"
+        "theorem after_export : True := trivial\n"
+        "namespace IncludeClose\n"
+        "end include u\n"
+        "theorem after_include : True := trivial\n"
+        "namespace NamedClose\n"
+        "end NamedClose universe v\n"
+        "theorem after_named_universe : True := trivial\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"after_universe", "after_export", "after_include", "after_named_universe"}:
+        raise SystemExit("scanner consumed a same-line command as an omitted `end` label")
+
     # No scope-command keyword may be consumed as the optional split-line name
     # of an unnamed scope.  In particular, an unnamed section may contain a
     # mutual block whose own `end` must close that block rather than underflow.
