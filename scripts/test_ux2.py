@@ -621,6 +621,72 @@ def check_lean_scanner(fixture: Path) -> None:
             "/-- Documentation before a same-line ordinary comment. -/"):
         raise SystemExit("scanner did not retain documentation across a same-line ordinary comment")
 
+    # A line comment trailing an attribute is Lean whitespace and cannot
+    # detach the documentation block above it.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Documentation above a commented attribute. -/\n"
+        "@[simp] -- formatting note\n"
+        "theorem commented_attribute_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.commented_attribute_doc"][0]["doc"] != (
+            "/-- Documentation above a commented attribute. -/"):
+        raise SystemExit("scanner lost documentation above an attribute's trailing line comment")
+
+    # Blank lines between an attribute block and its declaration are Lean
+    # whitespace and cannot detach the documentation block above it.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Documentation across a blank line after an attribute. -/\n"
+        "@[simp]\n"
+        "\n"
+        "theorem blank_after_attribute_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.blank_after_attribute_doc"][0]["doc"] != (
+            "/-- Documentation across a blank line after an attribute. -/"):
+        raise SystemExit("scanner lost documentation across a blank line after an attribute")
+
+    # Family level: trailing line comments and blank lines combine freely with
+    # single and repeated attribute groups without detaching documentation.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Combined whitespace documentation. -/ -- formatting note\n"
+        "@[simp] -- attribute note\n"
+        "\n"
+        "@[protected]\n"
+        "\n"
+        "theorem combined_whitespace_doc : True := trivial\n"
+        "/-- Multiline combined\n"
+        "   documentation. -/ -- formatting note\n"
+        "@[simp,\n"
+        "  grind]\n"
+        "\n"
+        "theorem multiline_combined_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.combined_whitespace_doc"][0]["doc"] != (
+            "/-- Combined whitespace documentation. -/"):
+        raise SystemExit("scanner lost documentation across combined attribute whitespace")
+    if found["Outer.multiline_combined_doc"][0]["doc"] != (
+            "/-- Multiline combined\n   documentation. -/"):
+        raise SystemExit("scanner lost multiline documentation across combined attribute whitespace")
+
+    # Control: documentation never crosses an intervening declaration, however
+    # much Lean whitespace surrounds the attributes.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Detached documentation. -/\n"
+        "@[simp]\n"
+        "\n"
+        "def intervening_helper := 1\n"
+        "theorem detached_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.detached_doc"][0]["doc"]:
+        raise SystemExit("scanner leaked documentation across an intervening declaration")
+
     # A declaration can immediately follow another command and its attached
     # documentation comment on the same line. The next theorem is the control
     # for both declaration and documentation boundaries.
