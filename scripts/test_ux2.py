@@ -302,14 +302,14 @@ def check_lean_scanner(fixture: Path) -> None:
         raise SystemExit("scanner did not recognize repeated attributes or inline command declarations")
 
     # Scope commands use the same whitespace command boundary as declarations.
-    # Their events must therefore surround inline theorems before their names
-    # are qualified, including nested named scopes and their corresponding ends.
+    # Namespaces qualify declarations, while named sections are local binders
+    # and must not become name components.
     module.write_text(
         "namespace Outer section Local theorem inner : True := trivial end Local "
         "theorem outer : True := trivial end Outer\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
-    if set(found) != {"Outer.Local.inner", "Outer.outer"}:
-        raise SystemExit("scanner did not apply inline scope commands before declarations")
+    if set(found) != {"Outer.inner", "Outer.outer"}:
+        raise SystemExit("scanner did not qualify namespaces without qualifying sections")
 
     module.write_text(
         "namespace Outer\n"
