@@ -268,12 +268,16 @@ def attribute_start(lines: list[str], declaration_line: int) -> int:
     attribute text; without one, the declaration line.
     """
     start = declaration_line
+    candidate: list[str] = []
     for index in range(declaration_line - 1, -1, -1):
         line = lines[index].rstrip()
         if not line.strip() or line.endswith("-/"):
             break
-        if is_attribute_block("\n".join(lines[index:declaration_line])):
+        candidate.insert(0, line)
+        if is_attribute_block("\n".join(candidate)):
             start = index
+        elif "@[" in "\n".join(candidate):
+            break
     return start
 
 

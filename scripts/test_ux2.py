@@ -382,6 +382,9 @@ def check_lean_scanner(fixture: Path) -> None:
         "namespace Outer\n"
         "/-- Same-line documentation. -/ theorem documented : True := trivial\n"
         "/-- Attribute documentation. -/ @[simp] theorem attributed : True := trivial\n"
+        "/-- Multiline attribute documentation. -/ @[simp,\n"
+        "  reducible]\n"
+        "theorem multiline_attributed : True := trivial\n"
         "theorem undocumented : True := trivial\n"
         "end Outer\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
@@ -389,6 +392,8 @@ def check_lean_scanner(fixture: Path) -> None:
         raise SystemExit("scanner did not attach a same-line documentation comment")
     if found["Outer.attributed"][0]["doc"] != "/-- Attribute documentation. -/":
         raise SystemExit("scanner did not attach a same-line documentation comment before an attribute")
+    if found["Outer.multiline_attributed"][0]["doc"] != "/-- Multiline attribute documentation. -/":
+        raise SystemExit("scanner did not attach a same-line documentation comment before multiline attributes")
     if found["Outer.undocumented"][0]["doc"]:
         raise SystemExit("scanner leaked a same-line documentation comment to the next declaration")
 
