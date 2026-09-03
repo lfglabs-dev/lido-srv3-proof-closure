@@ -1,7 +1,7 @@
 verified_source_tree=1dd58918b0e1c79f58c950e418ff859ab847c91e
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
 proof_targets=LidoSRv3 LidoSRv3Legacy
-⚠ [11/73] Replayed Verity.Core
+⚠ [11/72] Replayed Verity.Core
 warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -11,7 +11,7 @@ Note: This linter can be disabled with `set_option linter.unnecessarySimpa false
 warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [1159/1161] Replayed Conform.Wheels
+⚠ [1159/1171] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -24,7 +24,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1160/1161] Replayed EvmYul.Pretty
+⚠ [1160/1171] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -37,15 +37,15 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1207/1358] Replayed EvmYul.Semantics
+⚠ [1207/1214] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1208/1358] Replayed EvmYul.EVM.Semantics
+⚠ [1208/1214] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1253/1358] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+⚠ [1253/1269] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
 warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:110:52: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -77,7 +77,7 @@ Hint: Omit it from the simp argument list.
   simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1258/1358] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
+⚠ [1258/1269] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
 warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:265:26: This simp argument is unused:
   Nat.add_assoc
 
@@ -170,7 +170,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵l̵e̵f̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1265/1358] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
+⚠ [1265/1269] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
 warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
   evalExprList
 
@@ -2482,7 +2482,32 @@ Hint: Omit it from the simp argument list.
   ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1399/1410] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1399/1410] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [1401/1410] Replayed LidoSRv3.Audit.Verity.DepositTx
+warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
+  Pure.pure
+
+Hint: Omit it from the simp argument list.
+  simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
+      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+      _root_.Verity.require,
+  ̵  ̵ ̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind,
+  ̵  ̵ ̵ ̵_root_.Verity.pure,
+  ̲  ̲ ̲ ̲Bind.bind, P̵u̵r̵e̵.̵p̵u̵r̵e̵,̵ ̵committedBalances, Nat.sub_add_cancel hFunds,
+  ̵  ̵ ̵ ̵Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1407/1410] Replayed LidoSRv3.Legacy.SpecProofs
+warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [1409/1410] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:376:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2536,29 +2561,4 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1400/1410] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
-warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [1402/1410] Replayed LidoSRv3.Audit.Verity.DepositTx
-warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
-  Pure.pure
-
-Hint: Omit it from the simp argument list.
-  simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
-      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
-      _root_.Verity.require,
-  ̵  ̵ ̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind,
-  ̵  ̵ ̵ ̵_root_.Verity.pure,
-  ̲  ̲ ̲ ̲Bind.bind, P̵u̵r̵e̵.̵p̵u̵r̵e̵,̵ ̵committedBalances, Nat.sub_add_cancel hFunds,
-  ̵  ̵ ̵ ̵Core.Uint256.ofNat,
-  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1409/1410] Replayed LidoSRv3.Legacy.SpecProofs
-warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
-
-Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
 Build completed successfully (1410 jobs).
