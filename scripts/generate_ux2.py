@@ -398,16 +398,32 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
             else:
                 index = attribute_line - 1
     # Lean treats whitespace and ordinary comments alike between a documentation
-    # block and its declaration.  Skip blank lines, complete line comments,
-    # and one-line block comments, leaving the documentation block itself for
-    # the balanced scan below.
+    # block and its declaration.  Skip blank lines and ordinary comments,
+    # leaving the documentation block itself for the balanced scan below.
     while index >= 0:
         line = lines[index].strip()
-        if (not line or line.startswith("--")
-                or (line.startswith("/-") and not line.startswith("/--")
-                    and line.endswith("-/"))):
+        if not line or line.startswith("--"):
             index -= 1
             continue
+        if line.endswith("-/"):
+            comment_end = index
+            depth = 0
+            while index >= 0:
+                for marker in reversed(list(re.finditer(r"/-|-/", lines[index]))):
+                    if marker.group() == "-/":
+                        depth += 1
+                    else:
+                        depth -= 1
+                        if depth == 0:
+                            break
+                if depth == 0:
+                    break
+                index -= 1
+            if (index >= 0 and lines[index].lstrip().startswith("/-")
+                    and not lines[index].lstrip().startswith("/--")):
+                index -= 1
+                continue
+            index = comment_end
         break
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
