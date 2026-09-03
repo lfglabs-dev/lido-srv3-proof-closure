@@ -426,6 +426,11 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
                     and not lines[index].lstrip().startswith("/--")):
                 index -= 1
                 continue
+            # The balanced scan below expects its closing delimiter at the
+            # physical end of the line.  A trailing line comment is separate
+            # Lean whitespace, so remove it from the local scan view.
+            lines = [*lines]
+            lines[comment_end] = re.sub(r"(?<=-/)\s*--.*$", "", lines[comment_end]).rstrip()
             index = comment_end
         break
     if index < 0 or not lines[index].rstrip().endswith("-/"):

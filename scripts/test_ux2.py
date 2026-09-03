@@ -591,6 +591,16 @@ def check_lean_scanner(fixture: Path) -> None:
 
     module.write_text(
         "namespace Outer\n"
+        "/-- Documentation with a trailing line comment. -/ -- formatting note\n"
+        "theorem trailing_commented_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.trailing_commented_doc"][0]["doc"] != (
+            "/-- Documentation with a trailing line comment. -/"):
+        raise SystemExit("scanner did not retain documentation with a trailing line comment")
+
+    module.write_text(
+        "namespace Outer\n"
         "/-- Documentation through a multiline ordinary comment. -/\n"
         "/- formatting\n"
         "   note -/ -- trailing formatting note\n"
