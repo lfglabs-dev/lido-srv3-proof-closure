@@ -147,9 +147,12 @@ def statement_end(text: str, start: int) -> int:
             return index
         elif depth == 0 and word_at(text, index, MATCH):
             awaiting_result_match_arm = True
-        elif depth == 0 and char == "|" and equation_clause_at(text, index):
+        elif depth == 0 and char == "|" and (awaiting_result_match_arm or equation_clause_at(text, index)):
             column = index - text.rfind("\n", 0, index) - 1
             if awaiting_result_match_arm:
+                # The first arm may share the `match ... with` line.  It is
+                # still a result-type arm, even though it cannot be an
+                # equation clause (which must begin a physical line).
                 result_match_arm_column = column
                 awaiting_result_match_arm = False
             elif result_match_arm_column is not None and column >= result_match_arm_column:
@@ -543,6 +546,11 @@ def git_blob(data: bytes) -> bytes:
     return hashlib.sha1(b"blob %d\0" % len(data) + data).digest()
 
 
+def git_file_mode(path: Path) -> bytes:
+    """Git's regular-file mode for `path`, based on its executable bit."""
+    return b"100755" if path.stat().st_mode & 0o111 else b"100644"
+
+
 def git_tree(directory: Path) -> bytes | None:
     """The Git tree object id of a directory, computed without a Git object store.
 
@@ -561,8 +569,7 @@ def git_tree(directory: Path) -> bytes | None:
             if subtree is not None:
                 entries.append((child.name + "/", b"40000", child.name, subtree))
         else:
-            mode = b"100755" if child.stat().st_mode & 0o111 else b"100644"
-            entries.append((child.name, mode, child.name, git_blob(child.read_bytes())))
+            entries.append((child.name, git_file_mode(child), child.name, git_blob(child.read_bytes())))
     if not entries:
         return None
     entries.sort(key=lambda entry: entry[0])
@@ -595,7 +602,8 @@ def lean_source_tree(root: Path) -> str:
     if subtree is None:
         fail("LidoSRv3/ holds no Lean input")
     entries = [("LidoSRv3/", b"40000", "LidoSRv3", subtree)]
-    entries += [(name, b"100644", name, git_blob((root / name).read_bytes())) for name in LEAN_INPUTS]
+    entries += [(name, git_file_mode(root / name), name, git_blob((root / name).read_bytes()))
+                for name in LEAN_INPUTS]
     entries.sort(key=lambda entry: entry[0])
     body = b"".join(mode + b" " + name.encode("utf-8") + b"\0" + digest
                     for _, mode, name, digest in entries)

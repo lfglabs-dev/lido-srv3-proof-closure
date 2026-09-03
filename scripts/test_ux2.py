@@ -249,6 +249,23 @@ def check_lean_scanner(fixture: Path) -> None:
     if found["Outer.after_mixed"][0]["statement"] != "theorem after_mixed : True":
         raise SystemExit("scanner consumed the declaration after result-match equation clauses")
 
+    # The first result-match arm may be inline.  Its column must establish the
+    # result-match layout boundary so following equation clauses do not absorb
+    # the next declaration's `:=` into this theorem's statement.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem inline_mixed : ∀ b : Bool, match b with | true => True | false => False\n"
+        "| true => trivial\n"
+        "| false => trivial\n"
+        "theorem after_inline_mixed : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.inline_mixed"][0]["statement"] != (
+            "theorem inline_mixed : ∀ b : Bool, match b with | true => True | false => False"):
+        raise SystemExit("scanner did not end an inline result match before equation clauses")
+    if found["Outer.after_inline_mixed"][0]["statement"] != "theorem after_inline_mixed : True":
+        raise SystemExit("scanner consumed the declaration after inline result-match equation clauses")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
@@ -716,6 +733,18 @@ def check_symlinked_root(linked: Path) -> None:
     moved.rename(real)
 
 
+def check_top_level_executable_mode(fixture: Path) -> None:
+    """An executable top-level Lean input hashes as Git mode 100755."""
+    input_path = fixture / "lakefile.lean"
+    original_mode = input_path.stat().st_mode
+    regular_tree = generate_ux2.lean_source_tree(fixture)
+    input_path.chmod(original_mode | 0o111)
+    executable_tree = generate_ux2.lean_source_tree(fixture)
+    input_path.chmod(original_mode)
+    if regular_tree == executable_tree:
+        raise SystemExit("an executable top-level Lean input was still hashed as mode 100644")
+
+
 def check_boundary_and_kill_lines(fixture: Path) -> None:
     readme = fixture / "README.md"
     original = rewrite(
@@ -739,6 +768,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check_lean_inputs_binding(fixture)
     check_scanner_edges(fixture)
     check_symlink_tree(fixture)
+    check_top_level_executable_mode(fixture)
     check_boundary_and_kill_lines(fixture)
 
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
