@@ -6,7 +6,7 @@ must expose before the pinned SSZ verifier and deposit-data-root routines can
 be refined.  It is deliberately not an interpreter and does not import or
 alias `Audit.Ssz` or `DepositDataRootCorrespondence`.
 
-Source anchors are `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+Source anchors are `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
 * `SSZ.sol` lines 89--175 (`hashTreeRoot`) and 179--248 (`verifyProof`);
 * `BeaconChainDepositor.sol` lines 110--153 (deposit-data/signature roots);

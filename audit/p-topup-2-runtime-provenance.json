@@ -9,7 +9,7 @@
   ],
   "source_identity": {
     "repository": "https://github.com/lidofinance/core.git",
-    "pinned_commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
+    "pinned_commit": "17005714f151e5502c559932319a3f2f74ac2436",
     "release": {"tag": "v4.0.0", "commit": "17005714f151e5502c559932319a3f2f74ac2436"},
     "files": [
       {"path": "contracts/common/lib/SSZ.sol", "git_blob": "0008c18c4a2ee99e6fbaed59c21cdf0dda41424b", "sha256": "91ef497b972bbee0fe89043034e6bd62fa0c1059f22874d4826bc6164a22009b"},

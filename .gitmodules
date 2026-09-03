@@ -1,0 +1,3 @@
+[submodule "lido-core"]
+	path = lido-core
+	url = https://github.com/lidofinance/core.git

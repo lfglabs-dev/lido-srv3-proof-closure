@@ -425,12 +425,20 @@ def main():
             raise AssertionError("no same-class address exchange was constructed, so the "
                                  "family asserts nothing")
 
-        # The proof-gated boxes carry no address, so the label each surface
-        # wears is the only handle their class rule has.  Repainting one,
+        # The proof-gated boxes are bound by the label each surface wears,
+        # and since v4.0.0 also by their mainnet address.  Repainting one,
         # deleting it, or merely rewording it must each fail closed on that
         # surface alone — the combined `Consolidation pipeline` canvas node and
         # the `ConsolidationGateway` card are the same entity spelled two ways,
-        # and neither spelling may vouch for the other.
+        # and neither spelling may vouch for the other.  Where the box also
+        # carries an IDENTITY address, the address binding is judged first and
+        # is what names the deletion or the rewording; the label rule still
+        # holds the class, which the repaint family below exercises.
+        addressed = {
+            surface: {labels[surface]: (entity, address)
+                      for address, (entity, _, labels) in CHECK.IDENTITY.items()}
+            for surface in CHECK.SURFACES
+        }
         for surface, pattern, reword, label_of, prefix in (
             ("canvas", NODE, reword_node,
              lambda m: NODE_LABEL.search(m.group(2)).group(2).strip(), "node "),
@@ -450,14 +458,15 @@ def main():
                         f'"{prefix}{expected}"', f'"{prefix}{repainted}"', 1)),
                     f"{label!r} is drawn as {repainted!r}, must be {expected!r}",
                 ))
-                family.append((
-                    splice(diagram, box, ""),
-                    f"{label!r} is no longer drawn on the {surface}",
-                ))
-                family.append((
-                    splice(diagram, box, reword(box, expected)),
-                    f"{label!r} is no longer drawn on the {surface}",
-                ))
+                if label in addressed[surface]:
+                    entity, address = addressed[surface][label]
+                    gone = f"{entity} ({address})"
+                    reworded = (f"{entity} ({address}) is published on the {surface} "
+                                f"under the label {REWORDED!r}")
+                else:
+                    gone = reworded = f"{label!r} is no longer drawn on the {surface}"
+                family.append((splice(diagram, box, ""), gone))
+                family.append((splice(diagram, box, reword(box, expected)), reworded))
 
         # Which verifier a gateway inherits is a per-box claim, and requiring
         # both names as document-wide substrings could not read it: exchanging

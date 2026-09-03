@@ -7,7 +7,7 @@ Natural-number source semantics for the fee pipeline of the pinned oracle
 entry `AccountingOracle.submitReportData` → `_handleConsensusReportData` →
 `Accounting.handleOracleReport` → `_simulateOracleReport` →
 `_calculateProtocolFees` → `_calculateTotalProtocolFeeShares` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 The entry *computes* the fee/share-rate pair from report data and entry
 state.  `entryFeeWei` is the pinned LIP-12-guarded
@@ -211,7 +211,7 @@ theorem entry_mint_eq_pinned_of_exact (d : SubmitReportData)
     (feeShareRateDenominator d) hpos hExact hDiv
 
 /-- Checked-arithmetic non-underflow conditions matching the pinned Solidity
-fee pipeline at `af095e48`.  When every field holds, each Nat subtraction
+fee pipeline at `17005714`.  When every field holds, each Nat subtraction
 in `internalEtherBefore`, `internalSharesBeforeFees`, `postInternalEther`,
 and `feeShareRateDenominator` agrees with the Solidity checked arithmetic
 — none silently truncates to a value the source would never reach.
@@ -224,7 +224,7 @@ On the profitable branch (`principalClBalance < unifiedClBalance`):
   with a legitimate non-profitable zero-fee report.
 * `feeBound` guards the `require(totalFee <= FEE_PRECISION_POINTS)` assertion
   in `StakingRouter.getStakingRewardsDistribution` (A-REWARD-09,
-  `af095e48:870`) — Solidity reverts when `totalFee > precisionPoints`,
+  `17005714:870`) — Solidity reverts when `totalFee > precisionPoints`,
   but Lean `Nat.div` silently computes
   `totalRewards * totalFee / precisionPoints > totalRewards` as a valid
   fee amount, conflating a source-reverting over-fee report with a

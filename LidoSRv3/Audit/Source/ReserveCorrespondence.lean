@@ -13,7 +13,7 @@ open Verity.Stdlib.Math
 # Pinned reserve-spend correspondence
 
 This is a source-shaped model of `lidofinance/core` at
-`af095e48bbc1c3841c2c9936219c8461af01056b`, specifically
+`17005714f151e5502c559932319a3f2f74ac2436`, specifically
 `contracts/0.4.24/Lido.sol`:
 
 * `_getBufferedEtherAllocation`, lines 605--616;

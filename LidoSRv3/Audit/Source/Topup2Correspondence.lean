@@ -3,7 +3,7 @@ import Verity.Core
 import Verity.Stdlib.Math
 
 /-! Source-shaped interpreter for `TopUpGateway.topUp` and `_evaluateTopUpLimit`
-at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 The Nat scaffold below remains a regression helper for the historical
 CallProgram plane.  The checked-`uint256` interpreter is the promoted source

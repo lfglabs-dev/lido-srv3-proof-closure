@@ -3,7 +3,7 @@ import LidoSRv3.Audit.Model.AllocCapacity
 /-!
 Pinned checked-`uint256` semantics and independent Audit-model correspondence
 for `SRLib._getModulesAllocationAndCapacity` at Lido core
-`af095e48bbc1c3841c2c9936219c8461af01056b`, `SRLib.sol:493--559`.
+`17005714f151e5502c559932319a3f2f74ac2436`, `SRLib.sol:493--559`.
 
 `AllocCapacity.execute` is the single source-shaped interpreter: its first and
 second loops follow source lines 506--532 and 539--558 and use Verity `safe*`

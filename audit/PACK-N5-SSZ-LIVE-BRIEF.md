@@ -22,7 +22,7 @@ symbol.
 1. Inhabited `ProductionGindex` (`Spec/SszLiveCorrespondence.lean`):
    `giFirstValidatorCurr` with `index = 150 * 2 ^ 40`, `pow = 40`,
    `packed = 0x…0096000000000028`, pinned from the
-   lidofinance/core@af095e48 vector (labeled mainnet values in
+   lidofinance/core@17005714 vector (labeled mainnet values in
    `test/0.8.25/validatorExitDelayVerifier.test.ts`; pack layout
    `(index << 8) | pow` per `contracts/common/lib/GIndex.sol`,
    `giFirstValidatorCurr_packed_decodes`). A model constant from the

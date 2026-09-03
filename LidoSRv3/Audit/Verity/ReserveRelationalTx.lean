@@ -9,7 +9,7 @@ import Verity.Stdlib.Math
 Executable Verity transaction for the guarantee-relevant slice of
 `Accounting._calculateWithdrawals`, `WithdrawalQueue.prefinalize`, and
 `WithdrawalQueue._finalize` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`
 (`Accounting.sol:250-261`, `WithdrawalQueueBase.sol:288-328`, and
 `WithdrawalQueueBase.sol:330-359`).
 

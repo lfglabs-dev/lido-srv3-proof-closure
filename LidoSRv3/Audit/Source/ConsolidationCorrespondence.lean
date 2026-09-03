@@ -4,7 +4,7 @@ import Verity.Core
 # Pinned consolidation-request correspondence
 
 This is a source-shaped model of `lidofinance/core` at
-`af095e48bbc1c3841c2c9936219c8461af01056b`, specifically
+`17005714f151e5502c559932319a3f2f74ac2436`, specifically
 
 * `WithdrawalVault.addConsolidationRequests`, lines 199--208;
 * `WithdrawalVaultEIP7685._addConsolidationRequests`, lines 56--73;

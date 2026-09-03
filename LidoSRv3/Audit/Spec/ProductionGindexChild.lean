@@ -10,7 +10,7 @@ Those remain leftover record, not a deployed GI.
 `ProductionGindexBinding` is now the constructor-pin decode: the packed
 word recorded in `audit/p-topup-2-runtime-provenance.json`
 `build.constructor_args.g_index_first_validator_curr` (TopUpGateway at
-lidofinance/core@af095e48) equals `(index << 8) | pow` for
+lidofinance/core@17005714) equals `(index << 8) | pow` for
 `GI_FIRST_VALIDATOR_CURR` (`150 * 2^40`, pow `40`). That is an in-repo
 constructor literal, not a live-deployment identity discharge and not a
 claim that EIP-4788, SHA, or Yul are modeled.

@@ -5,7 +5,7 @@ import LidoSRv3.Audit.Guarantees.Registry
 # P-ORACLE-SANITY-1 (bounded)
 
 Registered parent for the modeled commit-path guards of
-`OracleReportSanityChecker` at `af095e48`.
+`OracleReportSanityChecker` at `17005714`.
 
 The conclusion is `CommitEnvelope`: fifteen quantitative `Nat` facts about the
 report window and the configured limits. It mentions no `...Accepts` `Bool`,

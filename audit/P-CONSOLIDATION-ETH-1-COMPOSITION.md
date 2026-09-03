@@ -14,7 +14,7 @@ rows under this parent.
   auxiliary builds only. A future standalone claim (“protocol ETH exits only
   to Lido/WQ”) would be a new guarantee, not an ETH-1 child.
 
-Pins: Lido `af095e48bbc1c3841c2c9936219c8461af01056b`, Verity
+Pins: Lido `17005714f151e5502c559932319a3f2f74ac2436`, Verity
 `a063bfc869735045354ebc3862ca08859da0f56e` (merged `main`, contains PR #2362
 external-call frames and PR #2365 atomic compiled multicall).
 

@@ -5,7 +5,7 @@ import Verity.Stdlib.Math
 # P-CONSOLIDATION-ETH-1 fee-leg evidence (former P-CONSOLIDATION-ETH-1b)
 
 Source-shaped `Contract.run` ledger for the inventoried consolidation-fee ETH
-paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. These
+paths at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`. These
 theorems are parent evidence under `A-CANONICAL-REQUEST-ADDRESS`, not a sibling
 guarantee row.
 

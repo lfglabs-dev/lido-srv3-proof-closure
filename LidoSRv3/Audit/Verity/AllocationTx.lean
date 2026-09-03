@@ -6,7 +6,7 @@ import Verity.Core
 # P-ALLOC-1 allocation transaction
 
 Handwritten model of `SRLib._getModulesAllocationAndCapacity` from
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 493--559.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, lines 493--559.
 
 One interpreter (`AllocCapacity.firstLoop` / `secondLoop`). Binding follows
 `getModuleIdAt` then the packed `moduleState.config`. `isActive` is

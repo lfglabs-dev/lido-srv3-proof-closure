@@ -9,7 +9,7 @@ import Verity.Proofs.LoopSimulation
 # P-TOPUP-1 Verity transaction refinement
 
 This is the typed transaction program for the top-up path pinned at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.  In particular,
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.  In particular,
 the allocation loop is the loop at `StakingRouter.sol` lines 722--734, the
 Lido pull is line 744, and the value-bearing deposit calls are the loop in
 `BeaconChainDepositor.sol` lines 79--107.

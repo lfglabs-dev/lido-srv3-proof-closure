@@ -189,7 +189,7 @@ def stateFor (inp : Input) : ContractState :=
   simpa only [addressToWord] using addressToWord_eq_iff a b
 
 /-- Source-to-Verity entrypoint map for the pinned
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b` projection.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436` projection.
 Every address and guard control in `SolidityAddress.Input` is passed to the
 independently executable transaction; storage-dependent booleans are realized
 by the caller's supplied pre-state. -/

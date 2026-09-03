@@ -5,7 +5,7 @@ import Verity.Stdlib.Math
 
 This module supplies the common narrow records, the checked source semantics of
 `SRLib._getModulesAllocationAndCapacity` at Lido core commit
-`af095e48bbc1c3841c2c9936219c8461af01056b`. Economic values are Verity
+`17005714f151e5502c559932319a3f2f74ac2436`. Economic values are Verity
 `Uint256` words. Every Solidity-checked `+`, `-`, and `*`, and every checked
 division, is represented by the corresponding Verity `safe*` operation.
 `Nat` is used only for list recursion and for the independent mathematical

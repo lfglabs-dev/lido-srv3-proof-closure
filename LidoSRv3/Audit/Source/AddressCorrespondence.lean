@@ -5,7 +5,7 @@ import LidoSRv3.Audit.AddressEquivariance
 
 This module is a source-shaped, single-item reading of four address-bearing
 entrypoint projections mapped at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 The single-item restriction removes only batch iteration; it retains every
 caller/address-dependent guard and successful address write in the mapped
 paths.  Non-address arithmetic and external-contract return values are explicit

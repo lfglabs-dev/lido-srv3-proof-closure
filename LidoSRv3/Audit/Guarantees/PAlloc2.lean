@@ -43,7 +43,7 @@ theorem selects_least_open_bucket
 /--
 Pinned-source selection correspondence for
 `MinFirstAllocationStrategy.allocateToBestCandidate` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 76--86.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, lines 76--86.
 Given router-order and free-space-predicate correspondence, the source-shaped
 candidate loop selects the same next bucket as `MinFirst.candidate?`.
 
