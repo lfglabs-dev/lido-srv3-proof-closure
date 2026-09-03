@@ -530,7 +530,11 @@ open Lean in
   let rooted ← _root_.Lean.collectAxioms ``LidoSRv3.Tests.Shadowed.registered
   IO.println s!"SHADOWED\t{bare.size}\t{qualified.size}\t{rooted.size}"
 LEAN
-witness="$(LEAN_PATH="$shadowed${LEAN_PATH:+:$LEAN_PATH}" lake env lean "$shadowed/witness.lean")"
+# `lake env` prepends this project's `.lake/build` to LEAN_PATH.  That tree
+# can contain (or claim) the fixture module before the temporary fixture path,
+# so run Lake's resolved Lean binary directly with the fixture first.
+lean_bin="$(lake env bash -c 'command -v lean')"
+witness="$(LEAN_PATH="$shadowed${LEAN_PATH:+:$LEAN_PATH}" "$lean_bin" "$shadowed/witness.lean")"
 if [[ "$witness" != *"$(printf 'SHADOWED\t0\t0\t0')"* ]]; then
   echo "shadowing witness did not reproduce the bypass: $witness" >&2
   exit 1
