@@ -235,6 +235,33 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"Outer.foo'a'"}:
         raise SystemExit("scanner treated character-shaped identifier text as a character literal")
 
+    # Theorem names use the same dotted escaped-component grammar as scopes;
+    # whitespace inside an escaped component must not truncate a registered name.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem Foo.«bar baz» : True := trivial\n"
+        "theorem «Foo bar».baz : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.Foo.«bar baz»", "Outer.«Foo bar».baz"}:
+        raise SystemExit("scanner did not parse qualified escaped theorem names")
+
+    # Find the opening documentation comment by balancing nested block comments,
+    # rather than stopping at an inner opener.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Outer documentation.\n"
+        "/- nested note\n"
+        "  /- deeper note -/\n"
+        "-/\n"
+        "-/\n"
+        "theorem nested_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    (record,) = found["Outer.nested_doc"]
+    if record["doc"] != "/-- Outer documentation.\n/- nested note\n  /- deeper note -/\n-/\n-/":
+        raise SystemExit("scanner lost documentation around nested block comments")
+
     module.write_text(
         "namespace Outer\n"
         "def quoted : Syntax := `(command|\n"

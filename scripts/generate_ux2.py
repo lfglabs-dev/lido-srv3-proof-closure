@@ -41,10 +41,12 @@ ROLES = {
     "abstract": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
     "verity": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
 }
+THEOREM_COMPONENT = r"(?:«[^»\n]*»|[^\s.«»:({\[\])}⟩]+)"
+THEOREM_NAME = rf"{THEOREM_COMPONENT}(?:\.{THEOREM_COMPONENT})*"
 DECLARATION = re.compile(
     r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?"
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)[ \t]+)*"
-    r"(theorem|lemma)\s+(«[^»\n]*»|[^\s:({\[]+)", re.MULTILINE)
+    rf"(theorem|lemma)\s+({THEOREM_NAME})", re.MULTILINE)
 MODIFIER_RUN = re.compile(
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)\s+)*\Z")
 # A scope name may follow Lean whitespace (including comments stripped to blank
@@ -247,11 +249,22 @@ def doc_comment(lines: list[str], declaration_line: int) -> str:
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
     stop = index
-    while index >= 0 and not lines[index].lstrip().startswith("/-"):
+    depth = 0
+    while index >= 0:
+        line = lines[index]
+        for marker in reversed(list(re.finditer(r"/-|-/", line))):
+            if marker.group() == "-/":
+                depth += 1
+                continue
+            depth -= 1
+            if depth == 0:
+                if line[:marker.start()].strip() or not line[marker.start():].startswith("/--"):
+                    return ""
+                return "\n".join(lines[index:stop + 1])
+            if depth < 0:
+                return ""
         index -= 1
-    if index < 0 or not lines[index].lstrip().startswith("/--"):
-        return ""
-    return "\n".join(lines[index:stop + 1])
+    return ""
 
 
 def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
