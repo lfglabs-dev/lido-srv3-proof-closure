@@ -593,7 +593,7 @@ def check_lean_scanner(fixture: Path) -> None:
         "namespace Outer\n"
         "/-- Documentation through a multiline ordinary comment. -/\n"
         "/- formatting\n"
-        "   note -/\n"
+        "   note -/ -- trailing formatting note\n"
         "theorem multiline_commented_doc : True := trivial\n"
         "end Outer\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)

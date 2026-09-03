@@ -405,7 +405,10 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
         if not line or line.startswith("--"):
             index -= 1
             continue
-        if line.endswith("-/"):
+        # A closing block-comment delimiter may itself be followed by a line
+        # comment.  That trailing comment is whitespace to Lean for purposes
+        # of attaching the documentation block.
+        if re.search(r"-/\s*(?:--.*)?$", line):
             comment_end = index
             depth = 0
             while index >= 0:
