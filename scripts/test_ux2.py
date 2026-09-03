@@ -565,6 +565,7 @@ def check_lean_scanner(fixture: Path) -> None:
         "-- formatting note\n"
         "/- implementation note -/\n"
         "theorem commented_doc : True := trivial\n"
+        "theorem undocumented : True := trivial\n"
         "end Outer\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     if found["Outer.commented_doc"][0]["doc"] != "/-- Documentation through ordinary comments. -/":
