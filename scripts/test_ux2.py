@@ -377,6 +377,65 @@ def check_lean_scanner(fixture: Path) -> None:
             "theorem after_left_applied : True"):
         raise SystemExit("scanner consumed the declaration after a left-application result")
 
+    # Family level: Lean forms multi-character operator tokens from runs of
+    # symbol characters, so any pipe touching another symbol character (`||`,
+    # `|||`, `|=`, like the already-covered `<|` and `|>`) is one operator
+    # token, never an arm delimiter.  A depth-zero lambda arrow after the
+    # operator is the control that truncated the signature at the pipe, and
+    # each following theorem is the boundary control against absorption.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem multi_pipe : id || id = fun x : Nat => x := by rfl\n"
+        "theorem after_multi_pipe : True := trivial\n"
+        "theorem triple_pipe : a ||| b = fun x : Nat => x := by rfl\n"
+        "theorem after_triple_pipe : True := trivial\n"
+        "theorem models_pipe : g |= p = fun x : Nat => x := by rfl\n"
+        "theorem after_models_pipe : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_operators = {
+        "Outer.multi_pipe": "theorem multi_pipe : id || id = fun x : Nat => x",
+        "Outer.after_multi_pipe": "theorem after_multi_pipe : True",
+        "Outer.triple_pipe": "theorem triple_pipe : a ||| b = fun x : Nat => x",
+        "Outer.after_triple_pipe": "theorem after_triple_pipe : True",
+        "Outer.models_pipe": "theorem models_pipe : g |= p = fun x : Nat => x",
+        "Outer.after_models_pipe": "theorem after_models_pipe : True",
+    }
+    if {name: records[0]["statement"] for name, records in found.items()} != expected_operators:
+        raise SystemExit("scanner treated a multi-pipe operator token as an equation clause")
+
+    # The same standalone-token rule applies inside equation-clause patterns:
+    # a pipe glued to another symbol character cannot end the pattern scan.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem operator_pattern : ∀ a b : Nat, a = a\n"
+        "  | a || b => rfl\n"
+        "theorem after_operator_pattern : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.operator_pattern"][0]["statement"] != (
+            "theorem operator_pattern : ∀ a b : Nat, a = a"):
+        raise SystemExit("scanner ended an equation pattern at a multi-pipe operator")
+    if found["Outer.after_operator_pattern"][0]["statement"] != (
+            "theorem after_operator_pattern : True"):
+        raise SystemExit("scanner consumed the declaration after an operator pattern")
+
+    # Real equation arms remain standalone pipes: the arm immediately after an
+    # operator-containing signature line is still the declaration boundary.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem armed_operator : ∀ x y : Nat, x || y = x\n"
+        "  | x, y => rfl\n"
+        "theorem after_armed_operator : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.armed_operator"][0]["statement"] != (
+            "theorem armed_operator : ∀ x y : Nat, x || y = x"):
+        raise SystemExit("scanner lost a real equation arm after an operator signature")
+    if found["Outer.after_armed_operator"][0]["statement"] != (
+            "theorem after_armed_operator : True"):
+        raise SystemExit("scanner consumed the declaration after an operator equation clause")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
@@ -621,6 +680,34 @@ def check_lean_scanner(fixture: Path) -> None:
             "/-- Documentation before a same-line ordinary comment. -/"):
         raise SystemExit("scanner did not retain documentation across a same-line ordinary comment")
 
+    # Family level: dashes inside a documentation block are comment content,
+    # not a trailing line comment.  Whether they share the opener line or the
+    # closer line, or sit inside a nested ordinary comment, stripping them
+    # would cut the block before its closer and silently drop the document.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Documentation with -- dashes inside. -/\n"
+        "theorem dashed_doc : True := trivial\n"
+        "/-- Multiline documentation\n"
+        "   closing with -- dashes -/\n"
+        "theorem multiline_dashed_doc : True := trivial\n"
+        "/-- Documentation /- with a nested -- comment -/ inside. -/\n"
+        "theorem nested_dashed_doc : True := trivial\n"
+        "/-- Dashes inside -- and a trailing comment. -/ -- formatting note\n"
+        "theorem dashed_and_trailing_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_dashed = {
+        "Outer.dashed_doc": "/-- Documentation with -- dashes inside. -/",
+        "Outer.multiline_dashed_doc": "/-- Multiline documentation\n   closing with -- dashes -/",
+        "Outer.nested_dashed_doc": "/-- Documentation /- with a nested -- comment -/ inside. -/",
+        "Outer.dashed_and_trailing_doc": "/-- Dashes inside -- and a trailing comment. -/",
+    }
+    for name, doc in expected_dashed.items():
+        if found[name][0]["doc"] != doc:
+            raise SystemExit(f"scanner stripped comment content as a trailing line comment: "
+                             f"{found[name][0]['doc']!r}")
+
     # A line comment trailing an attribute is Lean whitespace and cannot
     # detach the documentation block above it.
     module.write_text(
@@ -672,6 +759,71 @@ def check_lean_scanner(fixture: Path) -> None:
     if found["Outer.multiline_combined_doc"][0]["doc"] != (
             "/-- Multiline combined\n   documentation. -/"):
         raise SystemExit("scanner lost multiline documentation across combined attribute whitespace")
+
+    # Family level: an ordinary block comment is Lean whitespace wherever it
+    # sits among the declaration's modifiers.  It cannot detach the attribute
+    # block from its declaration nor the documentation above it, whether the
+    # comment is single-line or multiline, trails an attribute line, or sits
+    # between the documentation and the attributes.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Documentation across a comment below the attribute. -/\n"
+        "@[simp]\n"
+        "/- formatting -/\n"
+        "theorem comment_below_attribute : True := trivial\n"
+        "/-- Documentation across a multiline comment below the attribute. -/\n"
+        "@[simp]\n"
+        "/- formatting\n"
+        "   note -/\n"
+        "theorem multiline_comment_below_attribute : True := trivial\n"
+        "/-- Documentation across a comment above the attribute. -/\n"
+        "/- formatting -/\n"
+        "@[simp]\n"
+        "theorem comment_above_attribute : True := trivial\n"
+        "/-- Documentation across a comment trailing the attribute. -/\n"
+        "@[simp] /- formatting -/\n"
+        "theorem comment_trailing_attribute : True := trivial\n"
+        "/-- Documentation across a multiline comment trailing the attribute. -/\n"
+        "@[simp] /- formatting\n"
+        "   note -/\n"
+        "theorem multiline_comment_trailing_attribute : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_commented_attributes = {
+        "Outer.comment_below_attribute":
+            "/-- Documentation across a comment below the attribute. -/",
+        "Outer.multiline_comment_below_attribute":
+            "/-- Documentation across a multiline comment below the attribute. -/",
+        "Outer.comment_above_attribute":
+            "/-- Documentation across a comment above the attribute. -/",
+        "Outer.comment_trailing_attribute":
+            "/-- Documentation across a comment trailing the attribute. -/",
+        "Outer.multiline_comment_trailing_attribute":
+            "/-- Documentation across a multiline comment trailing the attribute. -/",
+    }
+    for name, doc in expected_commented_attributes.items():
+        if found[name][0]["doc"] != doc:
+            raise SystemExit(f"scanner lost documentation across an ordinary block comment: "
+                             f"{found[name][0]['doc']!r}")
+
+    # Controls: ordinary comments alone attach nothing, and documentation
+    # still never crosses an intervening declaration through comments.
+    module.write_text(
+        "namespace Outer\n"
+        "/- ordinary note -/\n"
+        "@[simp]\n"
+        "/- another note -/\n"
+        "theorem uncommented_attribute : True := trivial\n"
+        "/-- Detached documentation. -/\n"
+        "/- formatting -/\n"
+        "def intervening_helper := 1\n"
+        "theorem detached_through_comment : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.uncommented_attribute"][0]["doc"]:
+        raise SystemExit("scanner fabricated documentation from ordinary comments")
+    if found["Outer.detached_through_comment"][0]["doc"]:
+        raise SystemExit("scanner leaked documentation across an intervening declaration")
 
     # Control: documentation never crosses an intervening declaration, however
     # much Lean whitespace surrounds the attributes.

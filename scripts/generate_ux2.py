@@ -84,6 +84,18 @@ ESCAPED_IDENTIFIER = re.compile(r"«[^»\n]*»")
 # form contains active commands for this source scanner to index.
 COMMAND_QUOTATION_OPENER = re.compile(r"`\s*\(")
 CLOSERS = ")]}⟩"
+# Lean builds multi-character operator tokens from runs of symbol characters,
+# so a `|` touching another symbol character belongs to an operator such as
+# `||`, `<|`, `|>`, or `|=`.  Only a pipe standing alone can delimit a match
+# or equation arm.
+SYMBOL_CHARACTERS = frozenset("!#$%&*+-/<=>?@\\^|~:.")
+
+
+def arm_pipe_at(text: str, index: int) -> bool:
+    """Whether the `|` at `index` is a standalone arm-delimiter token."""
+    before = text[index - 1] if index else " "
+    after = text[index + 1] if index + 1 < len(text) else " "
+    return before not in SYMBOL_CHARACTERS and after not in SYMBOL_CHARACTERS
 
 
 def fail(message: str) -> NoReturn:
@@ -150,11 +162,10 @@ def statement_end(text: str, start: int) -> int:
             return index
         elif depth == 0 and word_at(text, index, MATCH):
             result_match_arm_columns.append(None)
-        # `|>` and `<|` are application operators, not match/equation-arm
-        # delimiters.  The latter's pipe is one offset after the operator
-        # begins, so test both spellings at the current pipe position.
-        elif (depth == 0 and char == "|" and not text.startswith("|>", index)
-              and not (index and text[index - 1] == "<")):
+        # An operator containing a pipe (`||`, `<|`, `|>`, `|=`, ...) is one
+        # Lean token, not an arm delimiter.  Only a standalone pipe can open
+        # a match or equation arm.
+        elif depth == 0 and char == "|" and arm_pipe_at(text, index):
             column = index - text.rfind("\n", 0, index) - 1
             # A dedented pipe has left one or more nested result matches. Do
             # this before classifying the pipe so the outer match's layout is
@@ -199,8 +210,7 @@ def equation_clause_at(text: str, index: int) -> bool:
             depth -= 1
         elif depth == 0 and text.startswith("=>", cursor):
             return True
-        elif depth == 0 and ((char == "|" and not text.startswith("|>", cursor)
-                             and not (cursor and text[cursor - 1] == "<"))
+        elif depth == 0 and ((char == "|" and arm_pipe_at(text, cursor))
                              or text.startswith(":=", cursor)
                              or word_at(text, cursor, WHERE)):
             return False
@@ -308,20 +318,113 @@ def strip_trailing_line_comment(line: str) -> str:
     """Remove a line comment trailing a completed block comment or attribute.
 
     Lean treats that trailing comment as whitespace, so it cannot affect
-    documentation or attribute attachment.  A `--` inside an unclosed
+    documentation or attribute attachment.  Only a `--` outside every block
+    comment opened on this line is a line comment: dashes inside a `/- ... -/`
+    or `/-- ... -/` block are comment content.  A `--` inside an unclosed
     attribute bracket is comment text spanning lines, so only strip a
-    bracket-balanced prefix; a `--` that is part of a `/--` opener is
-    documentation, not a trailing comment.
+    bracket-balanced prefix.
     """
-    line = re.sub(r"(?<=-/)\s*--.*$", "", line).rstrip()
-    comment = line.find("--")
-    while comment >= 0:
-        prefix = line[:comment]
-        if (prefix.count("[") == prefix.count("]")
-                and (comment == 0 or line[comment - 1] != "/")):
-            return prefix.rstrip()
-        comment = line.find("--", comment + 2)
+    depth = 0
+    index = 0
+    while index < len(line) - 1:
+        pair = line[index:index + 2]
+        if pair == "/-":
+            depth += 1
+            index += 2
+        elif pair == "-/" and depth:
+            depth -= 1
+            index += 2
+        elif pair == "--" and depth == 0:
+            prefix = line[:index]
+            if prefix.count("[") == prefix.count("]"):
+                return prefix.rstrip()
+            index += 2
+        else:
+            index += 1
     return line
+
+
+def strip_trailing_ordinary_comment(line: str) -> str:
+    """Remove trailing ordinary block comments balanced within one line.
+
+    Lean treats an ordinary `/- ... -/` comment as whitespace, so a comment
+    that opens and closes on this line cannot affect documentation or
+    attribute attachment.  A documentation block is content, and a closer
+    whose opener sits on an earlier line is the balanced scans' boundary
+    cue, so only a trailing run of complete ordinary comments is removed.
+    """
+    while True:
+        line = line.rstrip()
+        if not line.endswith("-/"):
+            return line
+        depth = 0
+        start = None
+        spans = []
+        for marker in re.finditer(r"/-|-/", line):
+            if marker.group() == "/-":
+                if depth == 0:
+                    start = marker.start()
+                depth += 1
+            elif depth:
+                depth -= 1
+                if depth == 0:
+                    spans.append((start, marker.end(),
+                                  line[start:].startswith("/--")))
+        if depth or not spans:
+            return line
+        start, stop, is_doc = spans[-1]
+        if stop != len(line) or is_doc:
+            return line
+        line = line[:start]
+
+
+def strip_trailing_comment(line: str) -> str:
+    """Remove trailing line comments and balanced ordinary block comments.
+
+    Both are Lean whitespace once the text they follow is complete, so
+    neither can detach documentation or an attribute block from its
+    declaration.
+    """
+    while True:
+        stripped = strip_trailing_ordinary_comment(strip_trailing_line_comment(line))
+        if stripped == line:
+            return stripped
+        line = stripped
+
+
+def block_comment_opener(lines: list[str], index: int) -> tuple[int, int] | None:
+    """Location (line, column) of the `/-` opening the block comment whose
+    closer ends `lines[index]`, or None when that closer is unbalanced."""
+    depth = 0
+    while index >= 0:
+        line = strip_trailing_line_comment(lines[index])
+        for marker in reversed(list(re.finditer(r"/-|-/", line))):
+            if marker.group() == "-/":
+                depth += 1
+            else:
+                depth -= 1
+                if depth == 0:
+                    return index, marker.start()
+        index -= 1
+    return None
+
+
+def block_comment_end(lines: list[str], start_line: int,
+                      start_column: int) -> tuple[int, int] | None:
+    """Position (line, column just past `-/`) where the block comment opened at
+    (start_line, start_column) closes, or None when it never balances."""
+    depth = 0
+    for line_index in range(start_line, len(lines)):
+        text = lines[line_index]
+        offset = start_column if line_index == start_line else 0
+        for marker in re.finditer(r"/-|-/", text[offset:]):
+            if marker.group() == "/-":
+                depth += 1
+            else:
+                depth -= 1
+                if depth == 0:
+                    return line_index, offset + marker.end()
+    return None
 
 
 def attribute_start(lines: list[str], declaration_line: int) -> int:
@@ -329,18 +432,33 @@ def attribute_start(lines: list[str], declaration_line: int) -> int:
 
     An attribute may span lines (`@[simp,` then `  reducible]`), so the block
     is the longest run of lines above the declaration that is nothing but
-    attribute text; without one, the declaration line.  Blank lines and
-    trailing line comments are Lean whitespace: they cannot detach an
-    attribute block from its declaration.
+    attribute text; without one, the declaration line.  Blank lines, line
+    comments, and ordinary block comments are Lean whitespace: they cannot
+    detach an attribute block from its declaration.  A documentation block
+    opens the declaration's modifiers, so it remains the boundary nothing
+    above which can belong to the attribute block.
     """
     start = declaration_line
     candidate: list[str] = []
-    for index in range(declaration_line - 1, -1, -1):
-        line = strip_trailing_line_comment(lines[index].rstrip())
+    index = declaration_line - 1
+    while index >= 0:
+        line = strip_trailing_comment(lines[index].rstrip())
         if not line.strip():
+            index -= 1
             continue
+        line_index = index
         if line.endswith("-/"):
-            break
+            opener = block_comment_opener(lines, index)
+            if opener is None or lines[opener[0]][opener[1]:].startswith("/--"):
+                break
+            # An ordinary block comment is Lean whitespace between the
+            # attribute block and its declaration; continue above it.  Text
+            # preceding its opener on the same line is attribute content.
+            line = strip_trailing_comment(lines[opener[0]][:opener[1]].rstrip())
+            index = opener[0] - 1
+            if not line.strip():
+                continue
+            line_index = opener[0]
         candidate.insert(0, line)
         block = "\n".join(candidate)
         doc_end = candidate[0].rfind("-/")
@@ -348,9 +466,10 @@ def attribute_start(lines: list[str], declaration_line: int) -> int:
             block = candidate[0][doc_end + 2:] + ("\n" + "\n".join(candidate[1:])
                                                    if len(candidate) > 1 else "")
         if is_attribute_block(block):
-            start = index
+            start = line_index
         elif "@[" in block:
             break
+        index -= 1
     return start
 
 
@@ -390,19 +509,34 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
         # the documentation line.
         wrapped_attribute_start = None
         candidate = [prefix]
-        for line_index in range(declaration_line - 1, -1, -1):
-            line = strip_trailing_line_comment(lines[line_index].rstrip())
+        line_index = declaration_line - 1
+        while line_index >= 0:
+            line = strip_trailing_comment(lines[line_index].rstrip())
             if not line.strip():
                 break
+            if line.endswith("-/"):
+                # A block comment ends here.  An ordinary comment is Lean
+                # whitespace between the documentation and the attributes, so
+                # skip above it; its closer must not pose as a doc closer.
+                opener = block_comment_opener(lines, line_index)
+                if (opener is not None
+                        and not lines[opener[0]][opener[1]:].startswith("/--")):
+                    prefix_text = strip_trailing_comment(
+                        lines[opener[0]][:opener[1]].rstrip())
+                    line_index = opener[0]
+                    if not prefix_text.strip():
+                        line_index -= 1
+                        continue
+                    line = prefix_text
             candidate.insert(0, line)
             doc_end = line.rfind("-/")
-            if doc_end < 0:
-                continue
-            attribute_text = line[doc_end + 2:] + (
-                "\n" + "\n".join(candidate[1:]) if len(candidate) > 1 else "")
-            if is_attribute_block(attribute_text):
-                wrapped_attribute_start = line_index
-            break
+            if doc_end >= 0:
+                attribute_text = line[doc_end + 2:] + (
+                    "\n" + "\n".join(candidate[1:]) if len(candidate) > 1 else "")
+                if is_attribute_block(attribute_text):
+                    wrapped_attribute_start = line_index
+                break
+            line_index -= 1
         if wrapped_attribute_start is not None:
             lines = [*lines]
             lines[wrapped_attribute_start] = lines[wrapped_attribute_start][:
@@ -410,12 +544,12 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
             index = wrapped_attribute_start
         else:
             attribute_line = attribute_start(lines, declaration_line)
-            attribute_text = strip_trailing_line_comment(
+            attribute_text = strip_trailing_comment(
                 lines[attribute_line].rstrip())
             doc_end = attribute_text.rfind("-/")
             attribute_block = attribute_text[doc_end + 2:] + (
                 "\n" + "\n".join(
-                    strip_trailing_line_comment(trailing.rstrip())
+                    strip_trailing_comment(trailing.rstrip())
                     for trailing in lines[attribute_line + 1:declaration_line])
                 if attribute_line + 1 < declaration_line else "")
             if doc_end >= 0 and is_attribute_block(attribute_block):
@@ -466,10 +600,18 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
                 continue
             # The balanced scan below expects its closing delimiter at the
             # physical end of the line.  A trailing line comment is separate
-            # Lean whitespace, so remove it from the local scan view.
+            # Lean whitespace, so keep the local scan view only through the
+            # closer that balances this block's own opener; dashes inside the
+            # block are comment content, not a trailing comment.
             lines = [*lines]
-            lines[comment_end] = strip_trailing_line_comment(lines[comment_end])
-            index = comment_end
+            end = (block_comment_end(lines, index, comment_start)
+                   if comment_start is not None else None)
+            if end is not None:
+                lines[end[0]] = lines[end[0]][:end[1]]
+                index = end[0]
+            else:
+                lines[comment_end] = strip_trailing_line_comment(lines[comment_end])
+                index = comment_end
         break
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
