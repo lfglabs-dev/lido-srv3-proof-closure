@@ -686,8 +686,8 @@ def check_lean_scanner(fixture: Path) -> None:
     expect_scan_failure(fixture, module, "never reaches `:=` or `where`")
     module.write_text("/-- orphan -/\n\ntheorem gap : True := trivial\n", encoding="utf-8")
     (record,) = generate_ux2.scan_file(fixture, module)["gap"]
-    if record["doc"] != "":
-        raise SystemExit("a doc comment separated by a blank line was attached")
+    if record["doc"] != "/-- orphan -/":
+        raise SystemExit("scanner did not retain documentation across a blank line")
     module.write_text("-- not a doc -/\ntheorem tail : True := trivial\n", encoding="utf-8")
     (record,) = generate_ux2.scan_file(fixture, module)["tail"]
     if record["doc"] != "":
