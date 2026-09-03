@@ -77,7 +77,6 @@ MATCH = re.compile(r"match\b")
 # Equation-style theorem proofs begin their clauses with a depth-zero `|` at
 # the start of a subsequent logical line.  It ends the declaration signature
 # just as `:=` and `where` do.
-EQUATION_CLAUSE = re.compile(r"\n[ \t]*\|[^\n|]*(?:=>|\n[ \t]*=>)")
 ESCAPED_IDENTIFIER = re.compile(r"«[^»\n]*»")
 # Syntax quotations are token-based: whitespace is permitted between their
 # punctuation/category tokens, including before the category separator.
@@ -126,12 +125,14 @@ def statement_end(text: str, start: int) -> int:
     """
     depth = 0
     pending = 0
-    # A result type may itself be a top-level `match ... with`.  Its arms use
-    # the same `|` token as equation-style theorem bodies, but Lean layout
-    # ends those arms when the following pipe dedents below them.  Retain the
-    # first arm's column rather than suppressing equation clauses forever.
-    result_match_arm_column: int | None = None
-    awaiting_result_match_arm = False
+    # A result type may itself contain nested top-level `match ... with`
+    # expressions. Their arms use the same `|` token as equation-style theorem
+    # bodies. Each match has an independent layout boundary, so a stack is
+    # required: a nested match must not replace its enclosing match's column.
+    # `None` means a `match` is awaiting its first arm; an integer is that
+    # match's arm column. Keeping frames rather than one scalar preserves the
+    # enclosing match when a nested result match finishes.
+    result_match_arm_columns: list[int | None] = []
     index = start
     while index < len(text) - 1:
         char = text[index]
@@ -146,27 +147,31 @@ def statement_end(text: str, start: int) -> int:
         elif depth == 0 and word_at(text, index, WHERE):
             return index
         elif depth == 0 and word_at(text, index, MATCH):
-            awaiting_result_match_arm = True
-        elif depth == 0 and char == "|" and (awaiting_result_match_arm or equation_clause_at(text, index)):
+            result_match_arm_columns.append(None)
+        elif depth == 0 and char == "|":
             column = index - text.rfind("\n", 0, index) - 1
-            if awaiting_result_match_arm:
-                # The first arm may share the `match ... with` line.  It is
-                # still a result-type arm, even though it cannot be an
-                # equation clause (which must begin a physical line).
-                result_match_arm_column = column
-                awaiting_result_match_arm = False
-            elif result_match_arm_column is not None and column >= result_match_arm_column:
-                # Another arm of the result-type `match`.
+            # A dedented pipe has left one or more nested result matches. Do
+            # this before classifying the pipe so the outer match's layout is
+            # restored after an inner match ends.
+            while (result_match_arm_columns and result_match_arm_columns[-1] is not None
+                   and column < result_match_arm_columns[-1]):
+                result_match_arm_columns.pop()
+            if result_match_arm_columns and result_match_arm_columns[-1] is None:
+                # The first arm may share the `match ... with` line. It is
+                # still a result-type arm, even though an equation clause may
+                # also start on the theorem signature line when no match is
+                # active.
+                result_match_arm_columns[-1] = column
+            elif result_match_arm_columns:
+                # This is another arm of the innermost surviving result match.
                 pass
-            else:
-                # A pipe that dedents below the result-match arms starts the
-                # equation proof.  The result match is now complete.
-                result_match_arm_column = None
-                awaiting_result_match_arm = False
+            elif equation_clause_at(text, index):
                 # Return the preceding newline so the declaration's source
                 # span ends on its signature line, rather than on the first
-                # body arm.
-                return text.rfind("\n", 0, index)
+                # body arm. A same-line first equation arm instead ends at
+                # the pipe itself, retaining the signature that precedes it.
+                line_start = text.rfind("\n", 0, index)
+                return index if line_start < start else line_start
         elif depth == 0 and word_at(text, index, BINDER) and binds_with_walrus(text, index):
             pending += 1
             index += 3
@@ -177,8 +182,20 @@ def statement_end(text: str, start: int) -> int:
 def equation_clause_at(text: str, index: int) -> bool:
     """Whether `index` is the pipe beginning a top-level equation clause."""
     line_start = text.rfind("\n", 0, index)
-    match = EQUATION_CLAUSE.match(text, line_start)
-    return match is not None and text.find("|", match.start(), match.end()) == index
+    prefix = text[line_start + 1:index]
+    # A normal equation clause starts after indentation on a later line. Lean
+    # also permits its first `| ... =>` to share the theorem signature line;
+    # in both cases the arrow must belong to this pipe before another arm (or
+    # the end of its physical line) begins.
+    if prefix.strip() and "theorem" not in prefix and "lemma" not in prefix:
+        return False
+    arm_end = text.find("|", index + 1)
+    line_end = text.find("\n", index)
+    if arm_end < 0 or (line_end >= 0 and line_end < arm_end):
+        arm_end = len(text) if line_end < 0 else line_end
+    if "=>" in text[index + 1:arm_end]:
+        return True
+    return line_end >= 0 and re.match(r"\n[ \t]*=>", text[line_end:]) is not None
 
 
 def binds_with_walrus(text: str, start: int) -> bool:
@@ -352,7 +369,13 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
                 continue
             depth -= 1
             if depth == 0:
-                if line[:marker.start()].strip() or not line[marker.start():].startswith("/--"):
+                # A documentation comment can follow a completed command on
+                # the same physical line. The declaration scanner has already
+                # established the later theorem boundary; here the only
+                # attachment requirement is that the immediately preceding
+                # block is a documentation comment (with no intervening text
+                # between it and the declaration/attributes).
+                if not line[marker.start():].startswith("/--"):
                     return ""
                 return "\n".join(lines[index:stop + 1])
             if depth < 0:

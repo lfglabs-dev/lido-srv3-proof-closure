@@ -266,6 +266,45 @@ def check_lean_scanner(fixture: Path) -> None:
     if found["Outer.after_inline_mixed"][0]["statement"] != "theorem after_inline_mixed : True":
         raise SystemExit("scanner consumed the declaration after inline result-match equation clauses")
 
+    # Nested result matches each have their own arm column. When the inner
+    # arms dedent, the outer match remains active; only a later dedent below
+    # the outer arms begins the equation proof.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem nested_mixed : ∀ b c : Bool, match b with\n"
+        "  | true => match c with\n"
+        "    | true => True\n"
+        "    | false => False\n"
+        "  | false => False\n"
+        "| true, true => trivial\n"
+        "| _, _ => trivial\n"
+        "theorem after_nested_mixed : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.nested_mixed"][0]["statement"] != (
+            "theorem nested_mixed : ∀ b c : Bool, match b with\n"
+            "  | true => match c with\n"
+            "    | true => True\n"
+            "    | false => False\n"
+            "  | false => False"):
+        raise SystemExit("scanner lost the outer result-match state after a nested match")
+    if found["Outer.after_nested_mixed"][0]["statement"] != "theorem after_nested_mixed : True":
+        raise SystemExit("scanner consumed the declaration after nested result-match equation clauses")
+
+    # Equation clauses may begin on the theorem signature line. A following
+    # theorem is the boundary control: it must not be absorbed into the first
+    # declaration when that first arm has no preceding newline.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem inline_equation : ∀ n : Nat, n = n | n => rfl\n"
+        "theorem after_inline_equation : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.inline_equation"][0]["statement"] != "theorem inline_equation : ∀ n : Nat, n = n":
+        raise SystemExit("scanner did not slice a same-line equation clause")
+    if found["Outer.after_inline_equation"][0]["statement"] != "theorem after_inline_equation : True":
+        raise SystemExit("scanner consumed the declaration after a same-line equation clause")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
@@ -446,6 +485,20 @@ def check_lean_scanner(fixture: Path) -> None:
         raise SystemExit("scanner did not attach a same-line documentation comment before multiline attributes")
     if found["Outer.undocumented"][0]["doc"]:
         raise SystemExit("scanner leaked a same-line documentation comment to the next declaration")
+
+    # A declaration can immediately follow another command and its attached
+    # documentation comment on the same line. The next theorem is the control
+    # for both declaration and documentation boundaries.
+    module.write_text(
+        "namespace Outer\n"
+        "def helper := 1 /-- Helper-backed theorem. -/ theorem registered : helper = 1 := rfl\n"
+        "theorem undocumented_after_helper : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.registered"][0]["doc"] != "/-- Helper-backed theorem. -/":
+        raise SystemExit("scanner did not attach documentation after a same-line preceding command")
+    if found["Outer.undocumented_after_helper"][0]["doc"]:
+        raise SystemExit("scanner leaked same-line command documentation to the next declaration")
 
     module.write_text(
         "namespace\n"
