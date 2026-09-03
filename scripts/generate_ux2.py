@@ -70,10 +70,11 @@ SCOPE = re.compile(
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")
+MATCH = re.compile(r"match\b")
 # Equation-style theorem proofs begin their clauses with a depth-zero `|` at
 # the start of a subsequent logical line.  It ends the declaration signature
 # just as `:=` and `where` do.
-EQUATION_CLAUSE = re.compile(r"\n[ \t]*\|(?=[^\n]*=>)")
+EQUATION_CLAUSE = re.compile(r"\n[ \t]*\|[^\n|]*(?:=>|\n[ \t]*=>)")
 ESCAPED_IDENTIFIER = re.compile(r"«[^»\n]*»")
 # Syntax quotations are token-based: whitespace is permitted between their
 # punctuation/category tokens, including before the category separator.
@@ -122,6 +123,7 @@ def statement_end(text: str, start: int) -> int:
     """
     depth = 0
     pending = 0
+    result_match = False
     index = start
     while index < len(text) - 1:
         char = text[index]
@@ -135,8 +137,15 @@ def statement_end(text: str, start: int) -> int:
             pending -= 1
         elif depth == 0 and word_at(text, index, WHERE):
             return index
-        elif depth == 0 and equation_clause_at(text, index):
-            return index
+        elif depth == 0 and word_at(text, index, MATCH):
+            # A result type may itself be a top-level `match ... with`.
+            # Its arms also begin with `|`, but they are type syntax, not
+            # equation-style theorem bodies.
+            result_match = True
+        elif depth == 0 and char == "|" and not result_match and equation_clause_at(text, index):
+            # Return the preceding newline so the declaration's source span
+            # ends on its signature line, rather than on the first body arm.
+            return text.rfind("\n", 0, index)
         elif depth == 0 and word_at(text, index, BINDER) and binds_with_walrus(text, index):
             pending += 1
             index += 3
@@ -148,7 +157,7 @@ def equation_clause_at(text: str, index: int) -> bool:
     """Whether `index` is the pipe beginning a top-level equation clause."""
     line_start = text.rfind("\n", 0, index)
     match = EQUATION_CLAUSE.match(text, line_start)
-    return match is not None and match.end() - 1 == index
+    return match is not None and text.find("|", match.start(), match.end()) == index
 
 
 def binds_with_walrus(text: str, start: int) -> bool:

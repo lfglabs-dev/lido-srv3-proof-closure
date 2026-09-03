@@ -203,6 +203,31 @@ def check_lean_scanner(fixture: Path) -> None:
         if got != (statement, doc, start, end):
             raise SystemExit(f"{name}: scanner produced {got}")
 
+    # An equation clause may wrap its arrow, but a result-type `match` has
+    # visually similar arms that remain part of the declaration signature.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem result_match : match true with\n"
+        "  | true => True\n"
+        "  | false => False := by\n"
+        "  trivial\n"
+        "theorem wrapped_equation : ∀ n : Nat, n = n\n"
+        "  | n\n"
+        "    => rfl\n"
+        "theorem after_wrapped_equation : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    match_record = found["Outer.result_match"][0]
+    if match_record["statement"] != (
+        "theorem result_match : match true with\n"
+        "  | true => True\n"
+        "  | false => False"):
+        raise SystemExit("scanner treated a result-type match arm as an equation clause")
+    wrapped_record = found["Outer.wrapped_equation"][0]
+    if (wrapped_record["statement"], wrapped_record["end_line"]) != (
+            "theorem wrapped_equation : ∀ n : Nat, n = n", 6):
+        raise SystemExit("scanner did not slice a wrapped equation clause at its signature line")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
