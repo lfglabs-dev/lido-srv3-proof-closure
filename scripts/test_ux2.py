@@ -250,6 +250,19 @@ def check_lean_scanner(fixture: Path) -> None:
             "theorem wrapped_equation : ∀ n : Nat, n = n", 6):
         raise SystemExit("scanner did not slice a wrapped equation clause at its signature line")
 
+    module.write_text(
+        "namespace Outer\n"
+        "theorem multiline_pattern : ∀ n : Nat, n = n\n"
+        "  | (Nat.succ\n"
+        "      n) => rfl\n"
+        "theorem after_multiline_pattern : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.multiline_pattern"][0]["statement"] != "theorem multiline_pattern : ∀ n : Nat, n = n":
+        raise SystemExit("scanner did not scan a multiline equation pattern through its arrow")
+    if found["Outer.after_multiline_pattern"][0]["statement"] != "theorem after_multiline_pattern : True":
+        raise SystemExit("scanner consumed the declaration after a multiline equation pattern")
+
     # Result-type match arms are indented beneath the theorem, while the
     # equation clauses return to the theorem command column.  Seeing the
     # former must not suppress scanning the latter or consume the next theorem.
@@ -545,6 +558,17 @@ def check_lean_scanner(fixture: Path) -> None:
     if found["Outer.wrapped_inline_attributed"][0]["doc"] != (
             "/-- Wrapped-inline attribute documentation. -/"):
         raise SystemExit("scanner lost inline documentation across a wrapped attribute")
+
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Documentation through ordinary comments. -/\n"
+        "-- formatting note\n"
+        "/- implementation note -/\n"
+        "theorem commented_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.commented_doc"][0]["doc"] != "/-- Documentation through ordinary comments. -/":
+        raise SystemExit("scanner did not retain documentation across ordinary comments")
     if found["Outer.undocumented"][0]["doc"]:
         raise SystemExit("scanner leaked a same-line documentation comment to the next declaration")
 

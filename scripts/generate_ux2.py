@@ -183,21 +183,23 @@ def statement_end(text: str, start: int) -> int:
 
 def equation_clause_at(text: str, index: int) -> bool:
     """Whether `index` is the pipe beginning a top-level equation clause."""
-    line_start = text.rfind("\n", 0, index)
-    prefix = text[line_start + 1:index]
-    # A normal equation clause starts after indentation on a later line. Lean
-    # also permits its first `| ... =>` to share the theorem signature line;
-    # in both cases the arrow must belong to this pipe before another arm (or
-    # the end of its physical line) begins.
-    if prefix.strip() and "theorem" not in prefix and "lemma" not in prefix:
-        return False
-    arm_end = text.find("|", index + 1)
-    line_end = text.find("\n", index)
-    if arm_end < 0 or (line_end >= 0 and line_end < arm_end):
-        arm_end = len(text) if line_end < 0 else line_end
-    if "=>" in text[index + 1:arm_end]:
-        return True
-    return line_end >= 0 and re.match(r"\n[ \t]*=>", text[line_end:]) is not None
+    # A pattern may span physical lines before its arrow.  Search its balanced
+    # text, stopping at the next arm or declaration boundary rather than
+    # assuming `=>` is on the pipe line (or immediately after it).
+    depth = 0
+    for cursor in range(index + 1, len(text) - 1):
+        char = text[cursor]
+        if char in OPENERS:
+            depth += 1
+        elif char in CLOSERS:
+            depth -= 1
+        elif depth == 0 and text.startswith("=>", cursor):
+            return True
+        elif depth == 0 and ((char == "|" and not text.startswith("|>", cursor))
+                             or text.startswith(":=", cursor)
+                             or word_at(text, cursor, WHERE)):
+            return False
+    return False
 
 
 def binds_with_walrus(text: str, start: int) -> bool:
@@ -390,6 +392,17 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
                 index = attribute_line
             else:
                 index = attribute_line - 1
+    # Lean treats ordinary comments as whitespace.  Skip complete line and
+    # one-line block comments, while retaining a blank source line as a
+    # deliberate documentation gap and leaving the documentation block itself
+    # for the balanced scan below.
+    while index >= 0:
+        line = lines[index].strip()
+        if line.startswith("--") or (line.startswith("/-") and not line.startswith("/--")
+                                      and line.endswith("-/")):
+            index -= 1
+            continue
+        break
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
     stop = index
