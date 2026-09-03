@@ -63,9 +63,12 @@ COMMAND_KEYWORD = (
     r"structure|class|inductive|instance|example|macro|syntax|elab|open|"
     r"variable|attribute|set_option|deriving"
 )
+# A hash command can follow an unnamed `end` on the same line.  It is a new
+# command, not the optional name of that `end`.
+HASH_COMMAND = r"#[A-Za-z_][A-Za-z0-9_']*"
 SCOPE = re.compile(
     r"(?<!\S)(namespace|section|mutual|end)(?![\w'])"
-    rf"(?:\s+(?!(?:{COMMAND_KEYWORD})(?:\s|$))"
+    rf"(?:\s+(?!(?:{COMMAND_KEYWORD}|{HASH_COMMAND})(?:\s|$))"
     rf"({SCOPE_COMPONENT}(?:\.{SCOPE_COMPONENT})*))?")
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")

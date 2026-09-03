@@ -386,6 +386,19 @@ def check_lean_scanner(fixture: Path) -> None:
     if generate_ux2.scan_file(fixture, module) != {}:
         raise SystemExit("scanner treated an unnamed scope's closing `end` as its name")
 
+    # A hash command following an unnamed close is a distinct command, while
+    # a named close before the same command must keep its scope name.
+    module.write_text(
+        "namespace Unnamed\n"
+        "end #check Nat\n"
+        "theorem after_unnamed : True := trivial\n"
+        "namespace Named\n"
+        "end Named #check Nat\n"
+        "theorem after_named : True := trivial\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"after_unnamed", "after_named"}:
+        raise SystemExit("scanner did not distinguish hash commands after unnamed and named `end`")
+
     # No scope-command keyword may be consumed as the optional split-line name
     # of an unnamed scope.  In particular, an unnamed section may contain a
     # mutual block whose own `end` must close that block rather than underflow.
