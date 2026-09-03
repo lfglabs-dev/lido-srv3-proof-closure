@@ -19,7 +19,7 @@
       "file": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
       "start_line": 125,
       "end_line": 127,
-      "doc": "/--\nCommit-branch-explicit conservation, and rollback of the deployments that\nwould break it, for the SRv3 deposit push at\n`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:\n\n* `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997;\n* `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;\n* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`,\n  `makeBeaconChainDeposits32ETH`, lines 36--64.\n\nTwo conjuncts, one per half of the guarantee wording; neither is definitional.\n\n*Conservation.* On the committed-push branch -- the only branch that moves wei\n-- the wei pulled from Lido at line 983 equals the wei pushed to the beacon\ndeposit contract by the loop at `BeaconChainDepositor.sol` lines 53--63, and\nthe two independently written source formulas agree: line 972's\n`depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and\nthe loop's `pushedValue`.  This is exactly the invariant the `assert` at line\n996 checks, and it is proved from the source-shaped guard structure, not\nassumed: `committedDeposits` carries arbitrary `Nat`s, and only the assert\ngate forces the equality.  The claim is deliberately restricted to the\ncommitted branch because `Outcome.pulled`/`Outcome.pushed` are defined as `0`\non every other branch, so a whole-path accessor equality would be mostly\n`0 = 0`.  The kill-line\n`LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed`\nshows this conjunct is load-bearing: dropping the line 996 assert branch from\n`run` (`SolidityDeposit.mutantRun`) lets a skewed deployment commit with\n`pulled ≠ pushed`.\n\n*Rollback.* A deployment whose `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`\n(`StakingRouter.sol` line 65) differs from `DEPOSIT_SIZE`\n(`BeaconChainDepositor.sol` line 24) never commits a mismatched push: on any\nnonempty key batch the whole transaction reverts -- the failing line 996\n`assert` is a Solidity 0.8 `Panic(0x01)`, and the pinned span contains no\n`try`/`catch` and no failure-swallowing low-level call.  This is the\nsource-plane rollback content, and it is not definitional either: it needs the\nempty-batch early return at line 978 excluded (`committedNoDeposits`) and the\nassert gate to exclude a mismatched commit (`committed_implies_conserving`).\n\nCaveats, stated rather than hidden:\n\n* The abstract-transaction rollback fact used in earlier revisions --\n  `observation` maps a reverting outcome to `.reverted`, whose\n  `committedState`/`committedTrace` are `before`/`⟨[], [], []⟩` by definition\n  (`A-ABSTRACT-TX`) -- is definitional in this model and is therefore *not* a\n  conjunct of this registered parent.  It remains available as the\n  unregistered child `revert_restores_state_value_and_logs` (and\n  `SolidityDeposit.reverting_outcome_rolls_back`).\n* Conservation on the commit branch holds without a `ConservingConfig`\n  hypothesis only because the line 996 `assert` is modelled as the revert it\n  is; `SolidityDeposit.pulled_eq_pushed_iff_conserving` shows the pull and\n  push scales agree *exactly when* the deployment sets them equal.\n* Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`\n  division matches EVM `DIV`, but no overflow reasoning is performed.\n* Locator-derived DSM authentication at lines 943 and 1173--1179 remains an\n  interface fact outside this data-only model, so this is not a claim about\n  every possible caller.\n-/",
+      "doc": "/--\nCommit-branch-explicit conservation, and rollback of the deployments that\nwould break it, for the SRv3 deposit push at\n`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:\n\n* `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997;\n* `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;\n* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`,\n  `makeBeaconChainDeposits32ETH`, lines 36--64.\n\nTwo conjuncts, one per half of the guarantee wording; neither is definitional.\n\n*Conservation.* On the committed-push branch -- the only branch that moves wei\n-- the wei pulled from Lido at line 983 equals the wei pushed to the beacon\ndeposit contract by the loop at `BeaconChainDepositor.sol` lines 53--63, and\nthe two independently written source formulas agree: line 972's\n`depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and\nthe loop's `pushedValue`.  This is exactly the invariant the `assert` at line\n996 checks, and it is proved from the source-shaped guard structure, not\nassumed: `committedDeposits` carries arbitrary `Nat`s, and only the assert\ngate forces the equality.  The claim is deliberately restricted to the\ncommitted branch because `Outcome.pulled`/`Outcome.pushed` are defined as `0`\non every other branch, so a whole-path accessor equality would be mostly\n`0 = 0`.  The kill-line\n`LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed`\nshows this conjunct is load-bearing: dropping the line 996 assert branch from\n`run` (`SolidityDeposit.mutantRun`) lets a skewed deployment commit with\n`pulled ≠ pushed`.\n\n*Rollback.* A deployment whose `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`\n(`StakingRouter.sol` line 65) differs from `DEPOSIT_SIZE`\n(`BeaconChainDepositor.sol` line 24) never commits a mismatched push: on any\nnonempty key batch the whole transaction reverts -- the failing line 996\n`assert` is a Solidity 0.8 `Panic(0x01)`, and the pinned span contains no\n`try`/`catch` and no failure-swallowing low-level call.  This is the\nsource-plane rollback content, and it is not definitional either: it needs the\nempty-batch early return at line 978 excluded (`committedNoDeposits`) and the\nassert gate to exclude a mismatched commit (`committed_implies_conserving`).\n\nCaveats, stated rather than hidden:\n\n* The abstract-transaction rollback fact used in earlier revisions --\n  `observation` maps a reverting outcome to `.reverted`, whose\n  `committedState`/`committedTrace` are `before`/`⟨[], [], []⟩` by definition\n  (`A-ABSTRACT-TX`) -- is definitional in this model and is therefore *not* a\n  conjunct of this registered parent.  It remains available as the\n  unregistered child `revert_restores_state_value_and_logs` (and\n  `SolidityDeposit.reverting_outcome_rolls_back`).\n* Conservation on the commit branch holds without a `ConservingConfig`\n  hypothesis only because the line 996 `assert` is modelled as the revert it\n  is; `SolidityDeposit.pulled_eq_pushed_iff_conserving` shows the pull and\n  push scales agree *exactly when* the deployment sets them equal.\n* Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`\n  division matches EVM `DIV`, but no overflow reasoning is performed.\n* Locator-derived DSM authentication at lines 943 and 1173--1179 remains an\n  interface fact outside this data-only model, so this is not a claim about\n  every possible caller.\n-/",
       "statement": "theorem source_deposit_conserves_and_rolls_back\n    (cfg : SourceDepositConfig) (inp : SourceDepositInput) :\n    CommittedPushConserves cfg inp ∧ NonConservingDeploymentReverts cfg inp"
     },
     {
@@ -127,63 +127,63 @@
       "function": "constructor",
       "start_line": 88,
       "end_line": 106,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L88-L106"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L88-L106"
     },
     {
       "path": "contracts/0.8.25/sr/StakingRouter.sol",
       "function": "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 immutable",
       "start_line": 63,
       "end_line": 66,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L63-L66"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L63-L66"
     },
     {
       "path": "contracts/0.8.25/sr/StakingRouter.sol",
       "function": "deposit",
       "start_line": 942,
       "end_line": 997,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L942-L997"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L942-L997"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "DEPOSIT_SIZE constant",
       "start_line": 24,
       "end_line": 25,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L24-L25"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L24-L25"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "withdrawDepositableEther",
       "start_line": 869,
       "end_line": 886,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L869-L886"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L869-L886"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "_spendDepositableEther",
       "start_line": 839,
       "end_line": 859,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L839-L859"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "makeBeaconChainDeposits32ETH",
       "start_line": 36,
       "end_line": 64,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L36-L64"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L36-L64"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

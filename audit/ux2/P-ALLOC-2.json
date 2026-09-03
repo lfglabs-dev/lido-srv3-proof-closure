@@ -88,39 +88,39 @@
       "function": "allocate outer loop",
       "start_line": 30,
       "end_line": 44,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"
     },
     {
       "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
       "function": "allocateToBestCandidate candidate search",
       "start_line": 76,
       "end_line": 86,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"
     },
     {
       "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
       "function": "allocateToBestCandidate allocation-size upper bound",
       "start_line": 93,
       "end_line": 100,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L93-L100"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L93-L100"
     },
     {
       "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
       "function": "allocateToBestCandidate proportional amount and bucket mutation",
       "start_line": 102,
       "end_line": 106,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

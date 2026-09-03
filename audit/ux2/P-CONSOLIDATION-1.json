@@ -102,87 +102,87 @@
       "function": "addConsolidationRequests",
       "start_line": 325,
       "end_line": 370,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L325-L370"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationBus.sol#L325-L370"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol",
       "function": "executeConsolidation",
       "start_line": 383,
       "end_line": 406,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
       "function": "addConsolidationRequests",
       "start_line": 185,
       "end_line": 223,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
       "function": "_prepareConsolidationPairs",
       "start_line": 348,
       "end_line": 365,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L348-L365"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L348-L365"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",
       "function": "constructor",
       "start_line": 63,
       "end_line": 78,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L63-L78"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L63-L78"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",
       "function": "preservesEthBalance",
       "start_line": 81,
       "end_line": 85,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L81-L85"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L81-L85"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",
       "function": "addConsolidationRequests",
       "start_line": 199,
       "end_line": 208,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L199-L208"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L199-L208"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "constructor",
       "start_line": 34,
       "end_line": 40,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L34-L40"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L34-L40"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "_addConsolidationRequests",
       "start_line": 56,
       "end_line": 73,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L56-L73"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L56-L73"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "_callAddConsolidationRequest",
       "start_line": 113,
       "end_line": 121,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],
