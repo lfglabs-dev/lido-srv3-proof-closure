@@ -23,7 +23,7 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"
+R1_REVIEW_BASE = "3d505676229bb19436d49e023c065d179ca5d5d0"
 # The report calls this commit its certified review basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
