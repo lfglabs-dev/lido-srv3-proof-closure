@@ -829,8 +829,13 @@ def git_blob(data: bytes) -> bytes:
 
 
 def git_file_mode(path: Path) -> bytes:
-    """Git's regular-file mode for `path`, based on its executable bit."""
-    return b"100755" if path.stat().st_mode & 0o111 else b"100644"
+    """Git's regular-file mode for `path`, based on its owner execute bit.
+
+    Git normalizes the worktree mode to `100755` only from the owner execute
+    bit; group/other-only execute bits (such as mode `0650`) still record
+    `100644`.  Testing any execute bit would diverge from the committed mode
+    that `scripts/verified_source_tree.sh` reads through `git ls-tree`."""
+    return b"100755" if path.stat().st_mode & 0o100 else b"100644"
 
 
 def git_tree(directory: Path) -> bytes | None:

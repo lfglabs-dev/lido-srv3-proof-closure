@@ -1142,15 +1142,24 @@ def check_symlinked_root(linked: Path) -> None:
 
 
 def check_top_level_executable_mode(fixture: Path) -> None:
-    """An executable top-level Lean input hashes as Git mode 100755."""
+    """A top-level Lean input hashes as Git mode 100755 only from the owner
+    execute bit; group/other-only execute (mode 0650) still hashes as 100644,
+    exactly as Git normalizes the worktree mode into the committed tree."""
     input_path = fixture / "lakefile.lean"
     original_mode = input_path.stat().st_mode
     regular_tree = generate_ux2.lean_source_tree(fixture)
-    input_path.chmod(original_mode | 0o111)
-    executable_tree = generate_ux2.lean_source_tree(fixture)
-    input_path.chmod(original_mode)
+    try:
+        input_path.chmod(0o755)
+        executable_tree = generate_ux2.lean_source_tree(fixture)
+        input_path.chmod(0o650)
+        group_only_tree = generate_ux2.lean_source_tree(fixture)
+    finally:
+        input_path.chmod(original_mode)
     if regular_tree == executable_tree:
-        raise SystemExit("an executable top-level Lean input was still hashed as mode 100644")
+        raise SystemExit("an owner-executable top-level Lean input was still hashed as mode 100644")
+    if group_only_tree != regular_tree:
+        raise SystemExit("a group/other-only executable top-level Lean input was hashed as "
+                         "mode 100755; Git records such a file as 100644")
 
 
 def check_boundary_and_kill_lines(fixture: Path) -> None:
