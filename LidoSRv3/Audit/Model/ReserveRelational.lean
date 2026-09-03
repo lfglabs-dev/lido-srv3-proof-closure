@@ -2,7 +2,7 @@ namespace LidoSRv3.Audit.ReserveRelational
 
 /-!
 Abstract plane of `P-RESERVE-RELATIONAL` for Lido core
-`af095e48bbc1c3841c2c9936219c8461af01056b`.
+`17005714f151e5502c559932319a3f2f74ac2436`.
 
 The report supplies the already-computed, ascending finalization batch ends
 and the queue supplies the nominal/discounted ETH and burnable shares for each

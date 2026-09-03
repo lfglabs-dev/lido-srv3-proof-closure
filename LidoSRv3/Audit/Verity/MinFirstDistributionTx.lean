@@ -7,7 +7,7 @@ import Compiler.Proofs.IRGeneration.DenoteAgreement
 
 This transaction models `MinFirstAllocationStrategy.allocate` /
 `allocateToBestCandidate` from
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 30--107.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, lines 30--107.
 Unlike the earlier selected-row slice, both input arrays are read through the
 compilation-model denotation of memory-backed `uint256[]` values.  The loop
 is the source `while (allocated < allocationSize)` over

@@ -3,7 +3,7 @@
 
 This is a deliberately narrow, source-shaped reading of
 `WithdrawalQueue.requestWithdrawals` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`,
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`,
 `contracts/0.8.9/WithdrawalQueue.sol:125-135`, together with its internal
 `_checkWithdrawalRequestAmount` predicate at lines 395-402.
 

@@ -2,7 +2,7 @@
 # P-SSZ-1 / `GIndex.concat` pinned-source correspondence
 
 This module transcribes only `GIndex.concat` from `lidofinance/core` commit
-`af095e48bbc1c3841c2c9936219c8461af01056b`,
+`17005714f151e5502c559932319a3f2f74ac2436`,
 `contracts/common/lib/GIndex.sol` lines 72--89 (the authoritative span in
 `audit/source-map.yaml`; the function body is lines 76--89).
 

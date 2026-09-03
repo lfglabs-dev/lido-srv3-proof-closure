@@ -3,7 +3,7 @@
 
 This module models the owner-operated branch of
 `WithdrawalQueueERC721.transferFrom` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 218--253.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, lines 218--253.
 It covers the caller/owner check, approval deletion, and request-owner handoff.
 The owner-indexed enumerable sets and emitted event are outside this bounded
 slice and therefore remain open for the parent guarantee.

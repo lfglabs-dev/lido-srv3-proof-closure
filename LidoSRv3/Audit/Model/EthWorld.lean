@@ -4,7 +4,7 @@ import LidoSRv3.Audit.Spec
 # E1 ETH-world inventory model
 
 Complete inventory of every modeled in-scope positive-value route
-in the Lido SRv3 audit scope at `lidofinance/core@af095e48`.
+in the Lido SRv3 audit scope at `lidofinance/core@17005714`.
 
 This model classifies all value-bearing external calls into modeled routes
 covered by existing ETH parents and explicitly names the routes that remain

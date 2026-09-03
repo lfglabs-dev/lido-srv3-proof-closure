@@ -290,7 +290,7 @@ one tracked as P-TOPUP-1's CHECKED abstract claim in `audit/guarantees.yaml`
 -- and not merely a sibling lemma that the registry never cites.
 
 Pinned-source conservation and rollback correspondence for the SRv3 beacon-chain
-top-up push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+top-up push at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `topUp`, lines 679--759;
 * `contracts/0.8.25/sr/StakingRouter.sol`, `_validateTopUpInputs`, lines 761--782;

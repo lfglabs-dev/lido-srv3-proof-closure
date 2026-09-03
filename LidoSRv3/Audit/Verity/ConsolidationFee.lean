@@ -7,7 +7,7 @@ import Verity.Core.Model.DenoteMemory
 
 Source-shaped bounded scaffold for `WithdrawalVault.addConsolidationRequests` and
 `WithdrawalVaultEIP7685._addConsolidationRequests` at Lido core pin
-`af095e48bbc1c3841c2c9936219c8461af01056b`.  The gateway's grouped witness,
+`17005714f151e5502c559932319a3f2f74ac2436`.  The gateway's grouped witness,
 quota, and refund path is deliberately outside this vault-entrypoint model.
 
 There is no mutable source storage on this path.  In particular, this file does

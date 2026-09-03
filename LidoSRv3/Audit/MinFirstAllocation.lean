@@ -5,7 +5,7 @@ import Mathlib.Data.List.Forall2
 # Minimum-first allocation: abstract model and pinned-source shape
 
 This component covers `MinFirstAllocationStrategy.sol` lines 30--107 at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 `Model` and `Source` intentionally have different state and outcome types and
 independent execution relations.  `Model` is an unbounded mathematical

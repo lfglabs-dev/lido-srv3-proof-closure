@@ -2,7 +2,7 @@ import LidoSRv3.Audit.Arithmetic
 
 /-!
 Pinned source correspondence for the report-before-reward path at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 The real external entry point is `AccountingOracle.submitReportData`. Its
 main-data helper writes the
