@@ -274,9 +274,14 @@ def attribute_start(lines: list[str], declaration_line: int) -> int:
         if not line.strip() or line.endswith("-/"):
             break
         candidate.insert(0, line)
-        if is_attribute_block("\n".join(candidate)):
+        block = "\n".join(candidate)
+        doc_end = candidate[0].rfind("-/")
+        if doc_end >= 0:
+            block = candidate[0][doc_end + 2:] + ("\n" + "\n".join(candidate[1:])
+                                                   if len(candidate) > 1 else "")
+        if is_attribute_block(block):
             start = index
-        elif "@[" in "\n".join(candidate):
+        elif "@[" in block:
             break
     return start
 
@@ -305,7 +310,15 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
             else inline_prefix[:attribute_offset].rstrip())
         index = declaration_line
     else:
-        index = attribute_start(lines, declaration_line) - 1
+        attribute_line = attribute_start(lines, declaration_line)
+        attribute_text = lines[attribute_line].rstrip()
+        doc_end = attribute_text.rfind("-/")
+        if doc_end >= 0 and is_attribute_block(attribute_text[doc_end + 2:]):
+            lines = [*lines]
+            lines[attribute_line] = attribute_text[:doc_end + 2]
+            index = attribute_line
+        else:
+            index = attribute_line - 1
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
     stop = index
