@@ -150,7 +150,7 @@ def statement_end(text: str, start: int) -> int:
             return index
         elif depth == 0 and word_at(text, index, MATCH):
             result_match_arm_columns.append(None)
-        elif depth == 0 and char == "|":
+        elif depth == 0 and char == "|" and not text.startswith("|>", index):
             column = index - text.rfind("\n", 0, index) - 1
             # A dedented pipe has left one or more nested result matches. Do
             # this before classifying the pipe so the outer match's layout is
@@ -347,18 +347,49 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
             else inline_prefix[:attribute_offset].rstrip())
         index = declaration_line
     else:
-        attribute_line = attribute_start(lines, declaration_line)
-        attribute_text = lines[attribute_line].rstrip()
-        doc_end = attribute_text.rfind("-/")
-        attribute_block = attribute_text[doc_end + 2:] + (
-            "\n" + "\n".join(lines[attribute_line + 1:declaration_line])
-            if attribute_line + 1 < declaration_line else "")
-        if doc_end >= 0 and is_attribute_block(attribute_block):
+        # The final line of a wrapped attribute can share the declaration line:
+        #
+        #   /-- docs -/ @[simp,
+        #     grind] theorem declaration ...
+        #
+        # In that form neither the text above the declaration nor its same-line
+        # prefix alone is an attribute block.  Find a documentation line whose
+        # suffix, together with the intervening lines and that prefix, is one
+        # complete attribute block, then leave the normal balanced-doc scan at
+        # the documentation line.
+        wrapped_attribute_start = None
+        candidate = [prefix]
+        for line_index in range(declaration_line - 1, -1, -1):
+            line = lines[line_index].rstrip()
+            if not line.strip():
+                break
+            candidate.insert(0, line)
+            doc_end = line.rfind("-/")
+            if doc_end < 0:
+                continue
+            attribute_text = line[doc_end + 2:] + (
+                "\n" + "\n".join(candidate[1:]) if len(candidate) > 1 else "")
+            if is_attribute_block(attribute_text):
+                wrapped_attribute_start = line_index
+            break
+        if wrapped_attribute_start is not None:
             lines = [*lines]
-            lines[attribute_line] = attribute_text[:doc_end + 2]
-            index = attribute_line
+            lines[wrapped_attribute_start] = lines[wrapped_attribute_start][:
+                lines[wrapped_attribute_start].rfind("-/") + 2]
+            index = wrapped_attribute_start
         else:
-            index = attribute_line - 1
+            attribute_line = attribute_start(lines, declaration_line)
+            attribute_text = lines[attribute_line].rstrip()
+            doc_end = attribute_text.rfind("-/")
+            attribute_block = attribute_text[doc_end + 2:] + (
+                "\n" + "\n".join(lines[attribute_line + 1:declaration_line])
+                if attribute_line + 1 < declaration_line else "")
+            if doc_end >= 0 and is_attribute_block(attribute_block):
+                lines = [*lines]
+                lines[attribute_line] = attribute_text[:doc_end + 2]
+                index = attribute_line
+            else:
+                index = attribute_line - 1
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
     stop = index

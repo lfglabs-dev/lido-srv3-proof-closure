@@ -327,6 +327,27 @@ def check_lean_scanner(fixture: Path) -> None:
     if found["Outer.after_inline_equation"][0]["statement"] != "theorem after_inline_equation : True":
         raise SystemExit("scanner consumed the declaration after a same-line equation clause")
 
+    # `|>` is an operator in a result-match scrutinee, not an arm delimiter.
+    # The following theorem controls that the real match arms remain in the
+    # signature and do not become equation clauses.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem piped_result_match : match true |> id with\n"
+        "  | true => True\n"
+        "  | false => False\n"
+        ":= by trivial\n"
+        "theorem after_piped_result_match : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.piped_result_match"][0]["statement"] != (
+            "theorem piped_result_match : match true |> id with\n"
+            "  | true => True\n"
+            "  | false => False"):
+        raise SystemExit("scanner treated a pipeline operator as a result-match arm")
+    if found["Outer.after_piped_result_match"][0]["statement"] != (
+            "theorem after_piped_result_match : True"):
+        raise SystemExit("scanner consumed the declaration after a piped result match")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
@@ -510,6 +531,8 @@ def check_lean_scanner(fixture: Path) -> None:
         "/-- Multiline attribute documentation. -/ @[simp,\n"
         "  reducible]\n"
         "theorem multiline_attributed : True := trivial\n"
+        "/-- Wrapped-inline attribute documentation. -/ @[simp,\n"
+        "  grind] theorem wrapped_inline_attributed : True := trivial\n"
         "theorem undocumented : True := trivial\n"
         "end Outer\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
@@ -519,6 +542,9 @@ def check_lean_scanner(fixture: Path) -> None:
         raise SystemExit("scanner did not attach a same-line documentation comment before an attribute")
     if found["Outer.multiline_attributed"][0]["doc"] != "/-- Multiline attribute documentation. -/":
         raise SystemExit("scanner did not attach a same-line documentation comment before multiline attributes")
+    if found["Outer.wrapped_inline_attributed"][0]["doc"] != (
+            "/-- Wrapped-inline attribute documentation. -/"):
+        raise SystemExit("scanner lost inline documentation across a wrapped attribute")
     if found["Outer.undocumented"][0]["doc"]:
         raise SystemExit("scanner leaked a same-line documentation comment to the next declaration")
 
