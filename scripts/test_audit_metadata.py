@@ -72,14 +72,15 @@ def main():
         ).stdout.strip()
         audit_script = fixture / "scripts/audit_metadata.py"
         audit_source = audit_script.read_text(encoding="utf-8")
-        audit_script.write_text(
-            audit_source.replace(
-                'R1_REVIEW_BASE = "25fbc6e0493948a866a49cda2962d3e897fa00e3"',
-                f'R1_REVIEW_BASE = "{fixture_review_base}"',
-                1,
-            ),
-            encoding="utf-8",
+        audit_source, substitutions = re.subn(
+            r'R1_REVIEW_BASE = "[0-9a-f]{40}"',
+            f'R1_REVIEW_BASE = "{fixture_review_base}"',
+            audit_source,
+            count=1,
         )
+        if substitutions != 1:
+            raise AssertionError("fixture could not substitute the R1 review basis")
+        audit_script.write_text(audit_source, encoding="utf-8")
 
         gpath = fixture / "audit/guarantees.yaml"
         apath = fixture / "audit/assumptions.yaml"
