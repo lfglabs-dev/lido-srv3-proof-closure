@@ -1198,7 +1198,7 @@ theorem P12_update_module_params_requires_valid_config
     · simp [hValid] at h
 
 /--
-  New at `af095e48`: `_updateModuleParams` rejects a zero `maxDepositsPerBlock`
+  New at `17005714`: `_updateModuleParams` rejects a zero `maxDepositsPerBlock`
   (`InvalidMaxDepositPerBlockValue`), so a successful update implies a positive
   per-block deposit limit.
 -/
@@ -2171,7 +2171,7 @@ theorem P8_topup_transition_allocation_sum_bounded_by_module_allocation
     (topUpTargetWei_le_module_allocation moduleAllocationWei maxTopUpPerBlockGwei)
 
 /--
-  New at `af095e48`: the allocation sum is additionally bounded by the
+  New at `17005714`: the allocation sum is additionally bounded by the
   router-global per-block top-up cap (`maxTopUpPerBlockGwei`, PR #1820).
 -/
 theorem P8_topup_transition_respects_per_block_cap
@@ -2193,7 +2193,7 @@ theorem P8_topup_transition_respects_per_block_cap
     (topUpTargetWei_le_per_block_cap moduleAllocationWei maxTopUpPerBlockGwei)
 
 /--
-  New at `af095e48`: a successful zero-target top-up (queue-advancement no-op)
+  New at `17005714`: a successful zero-target top-up (queue-advancement no-op)
   requires the Lido protocol deposit gate `LIDO.canDeposit()` to be open;
   otherwise the router reverts with `LidoDepositsPaused`.
 -/

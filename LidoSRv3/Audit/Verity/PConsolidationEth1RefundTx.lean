@@ -9,7 +9,7 @@ buildable auxiliary evidence only: vault→Lido/WQ returns are not the
 consolidation fee/refund happy path of `P-CONSOLIDATION-ETH-1` and are not P-RESERVE-1 buffer
 accounting. Not a registry row.
 
-Pins: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+Pins: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 * `ConsolidationGateway.addConsolidationRequests` (lines 185--223) sends
   `requestsCount * fee` to `WithdrawalVault`

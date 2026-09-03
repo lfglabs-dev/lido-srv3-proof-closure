@@ -591,7 +591,7 @@
         "command": "lake build LidoSRv3.Audit.Source.GIndexConcatCorrespondence LidoSRv3.Tests.GIndexConcatMutants",
         "expected": "successful exact GIndex.concat source transcription, accepted/rejected boundary vectors, and wrong-shift, wrong-depth, wrong-order, and wrapping-overflow mutant rejection; no parent SOURCE/TX closure"
       },
-      "summary": "Narrow pinned-source correspondence for GIndex.concat only: the decoded 248-bit indices follow the exact fls-zero sentinel, depth guard, left-shift/XOR/OR ordering, pack bound, and rhs power propagation at lidofinance/core af095e48 lines 72-89. P-SSZ-1 canonical SOURCE remains OPEN and TX remains BLOCKED; SSZ.verifyProof, wrappers, SHA-256, Yul/EVM, and deployment provenance are not claimed.",
+      "summary": "Narrow pinned-source correspondence for GIndex.concat only: the decoded 248-bit indices follow the exact fls-zero sentinel, depth guard, left-shift/XOR/OR ordering, pack bound, and rhs power propagation at lidofinance/core 17005714 lines 72-89. P-SSZ-1 canonical SOURCE remains OPEN and TX remains BLOCKED; SSZ.verifyProof, wrappers, SHA-256, Yul/EVM, and deployment provenance are not claimed.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec"
@@ -1105,7 +1105,7 @@
           "modeled submitReportData entry computes entryFeeWei (LIP-12-guarded totalRewards * totalFee / precisionPoints) and entryShareRate (internalShares * E27 / (postInternalEther - feeEther)) from report data and entry state, and feeds the pair into handleOracleReportComputed with no free sharesToMintAsFees argument",
           "entry checks the consensus-hash and sender-allowed premises; hash mismatch and disallowed sender revert with the pre-state restored, and both premises are shown load-bearing",
           "computed-pair mint never exceeds the pinned _calculateTotalProtocolFeeShares division and equals it exactly under EntryDomainValid + divisibility (entry_mint_eq_pinned_of_domain via oracle_supply_entry_source_domain)",
-          "EntryDomainValid captures Solidity checked-arithmetic non-underflow conditions at af095e48 plus profitable-branch precisionPoints > 0, the pinned totalFee ≤ precisionPoints source guard at getStakingRewardsDistribution af095e48:870, and feeShareRateDenominator > 0; guards are shown load-bearing (zeroPrecisionNotDomainValid, zeroDenomNotDomainValid, feeBoundIsLoadBearing, domain_guard_kill_line_refutes_full_parent)",
+          "EntryDomainValid captures Solidity checked-arithmetic non-underflow conditions at 17005714 plus profitable-branch precisionPoints > 0, the pinned totalFee ≤ precisionPoints source guard at getStakingRewardsDistribution 17005714:870, and feeShareRateDenominator > 0; guards are shown load-bearing (zeroPrecisionNotDomainValid, zeroDenomNotDomainValid, feeBoundIsLoadBearing, domain_guard_kill_line_refutes_full_parent)",
           "live handleOracleReportComputed wrapper computes sharesToMintAsFees from feeWei and shareRate",
           "observe of the computed path equals sourceView at mintedShares feeWei shareRate",
           "computed fee/shareRate mint on Spec.OracleFrame, not a free sharesToMintAsFees argument",

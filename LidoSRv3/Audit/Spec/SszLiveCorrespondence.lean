@@ -6,7 +6,7 @@ import LidoSRv3.Audit.Spec.ProductionGindexChild
 # Node 5: SSZ live-chain correspondence layer
 
 Inhabits a named `ProductionGindex` model constant from the pinned
-lidofinance/core@af095e48 test vector
+lidofinance/core@17005714 test vector
 (`GI_FIRST_VALIDATOR_CURR` packed
 `0x0000000000000000000000000000000000000000000000000096000000000028`,
 labeled mainnet values in `test/0.8.25/validatorExitDelayVerifier.test.ts`;
@@ -39,7 +39,7 @@ structure ProductionGindex where
   deriving DecidableEq, Repr
 
 /-- The inhabited `ProductionGindex`: `GI_FIRST_VALIDATOR_CURR` from the
-pinned lidofinance/core@af095e48 vector. `pow = 0x28 = 40`,
+pinned lidofinance/core@17005714 vector. `pow = 0x28 = 40`,
 `index = 0x960000000000 = 150 * 2 ^ 40`. -/
 def giFirstValidatorCurr : ProductionGindex :=
   { index := 150 * 2 ^ 40

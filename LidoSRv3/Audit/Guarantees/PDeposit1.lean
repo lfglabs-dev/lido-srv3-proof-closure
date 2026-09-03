@@ -66,7 +66,7 @@ abbrev NonConservingDeploymentReverts (cfg : SourceDepositConfig) (inp : SourceD
 /--
 Commit-branch-explicit conservation, and rollback of the deployments that
 would break it, for the SRv3 deposit push at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
 * `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997;
 * `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;

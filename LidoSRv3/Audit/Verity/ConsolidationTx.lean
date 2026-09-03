@@ -7,7 +7,7 @@ import Compiler.CompilationModel
 # P-CONSOLIDATION-1 faithful call/event/memory transaction
 
 This transaction models `WithdrawalVault.addConsolidationRequests` from
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. Source and target
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`. Source and target
 public keys and their lengths are read through the compilation-model
 denotation of memory-backed `uint256[]` values. Successful pairs persist
 `source ‖ target` through `writeMapUint`, the request count and fee through

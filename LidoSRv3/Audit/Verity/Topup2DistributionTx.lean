@@ -6,7 +6,7 @@ import Verity.Core.Model.Denote
 
 This transaction models the guarantee-relevant slice of
 `TopUpGateway.topUp` / `_evaluateTopUpLimit` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`
 (lines 160--237 and 396--415), composed with the StakingRouter share
 budget `min(moduleAllocation, maxTopUpPerBlock)` that
 `StakingRouter.topUp` applies at lines 696--700.
