@@ -70,6 +70,10 @@ SCOPE = re.compile(
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")
+# Equation-style theorem proofs begin their clauses with a depth-zero `|` at
+# the start of a subsequent logical line.  It ends the declaration signature
+# just as `:=` and `where` do.
+EQUATION_CLAUSE = re.compile(r"\n[ \t]*\|(?=[^\n]*=>)")
 ESCAPED_IDENTIFIER = re.compile(r"«[^»\n]*»")
 # Syntax quotations are token-based: whitespace is permitted between their
 # punctuation/category tokens, including before the category separator.
@@ -113,7 +117,8 @@ def statement_end(text: str, start: int) -> int:
     `let` or `have` binding written inside the statement itself (each such
     binder at depth zero that itself binds with `:=` consumes the next
     depth-zero `:=`; a do-notation `let x ← …` consumes nothing), or a
-    depth-zero `where` opening a structure-instance proof.
+    depth-zero `where` opening a structure-instance proof, or a top-level
+    equation clause.
     """
     depth = 0
     pending = 0
@@ -130,11 +135,20 @@ def statement_end(text: str, start: int) -> int:
             pending -= 1
         elif depth == 0 and word_at(text, index, WHERE):
             return index
+        elif depth == 0 and equation_clause_at(text, index):
+            return index
         elif depth == 0 and word_at(text, index, BINDER) and binds_with_walrus(text, index):
             pending += 1
             index += 3
         index += 1
     fail("theorem statement never reaches `:=` or `where`")
+
+
+def equation_clause_at(text: str, index: int) -> bool:
+    """Whether `index` is the pipe beginning a top-level equation clause."""
+    line_start = text.rfind("\n", 0, index)
+    match = EQUATION_CLAUSE.match(text, line_start)
+    return match is not None and match.end() - 1 == index
 
 
 def binds_with_walrus(text: str, start: int) -> bool:
