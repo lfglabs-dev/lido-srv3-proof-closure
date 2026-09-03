@@ -285,9 +285,20 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
     block scan can treat it like a directly preceding documentation line.
     """
     prefix = lines[declaration_line][:declaration_column]
-    if prefix.rstrip().endswith("-/"):
+    inline_prefix = prefix.rstrip()
+    # Attributes may share the declaration line with its documentation block.
+    # Peel only a complete suffix of attribute groups, so ordinary text between
+    # a comment and declaration still prevents accidental attachment.
+    attribute_offset = next(
+        (offset for offset, char in enumerate(inline_prefix)
+         if char == "@" and is_attribute_block(inline_prefix[offset:])
+         and inline_prefix[:offset].rstrip().endswith("-/")),
+        None)
+    if inline_prefix.endswith("-/") or attribute_offset is not None:
         lines = [*lines]
-        lines[declaration_line] = prefix.rstrip()
+        lines[declaration_line] = (
+            inline_prefix if attribute_offset is None
+            else inline_prefix[:attribute_offset].rstrip())
         index = declaration_line
     else:
         index = attribute_start(lines, declaration_line) - 1

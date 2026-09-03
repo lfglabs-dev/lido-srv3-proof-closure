@@ -375,16 +375,20 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"root_level", "Outer.control_level"}:
         raise SystemExit("scanner did not resolve `_root_` declarations from the Lean root namespace")
 
-    # A documentation comment may share the declaration line.  The following
-    # theorem is the control: it must not inherit the previous comment.
+    # A documentation comment may share the declaration line, including when
+    # same-line attributes precede the declaration.  The following theorem is
+    # the control: it must not inherit either previous comment.
     module.write_text(
         "namespace Outer\n"
         "/-- Same-line documentation. -/ theorem documented : True := trivial\n"
+        "/-- Attribute documentation. -/ @[simp] theorem attributed : True := trivial\n"
         "theorem undocumented : True := trivial\n"
         "end Outer\n", encoding="utf-8")
     found = generate_ux2.scan_file(fixture, module)
     if found["Outer.documented"][0]["doc"] != "/-- Same-line documentation. -/":
         raise SystemExit("scanner did not attach a same-line documentation comment")
+    if found["Outer.attributed"][0]["doc"] != "/-- Attribute documentation. -/":
+        raise SystemExit("scanner did not attach a same-line documentation comment before an attribute")
     if found["Outer.undocumented"][0]["doc"]:
         raise SystemExit("scanner leaked a same-line documentation comment to the next declaration")
 
