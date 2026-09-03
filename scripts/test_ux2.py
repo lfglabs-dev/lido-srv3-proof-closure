@@ -611,6 +611,16 @@ def check_lean_scanner(fixture: Path) -> None:
             "/-- Documentation through a multiline ordinary comment. -/"):
         raise SystemExit("scanner did not retain documentation across a multiline ordinary comment")
 
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Documentation before a same-line ordinary comment. -/ /- formatting -/\n"
+        "theorem same_line_commented_doc : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.same_line_commented_doc"][0]["doc"] != (
+            "/-- Documentation before a same-line ordinary comment. -/"):
+        raise SystemExit("scanner did not retain documentation across a same-line ordinary comment")
+
     # A declaration can immediately follow another command and its attached
     # documentation comment on the same line. The next theorem is the control
     # for both declaration and documentation boundaries.

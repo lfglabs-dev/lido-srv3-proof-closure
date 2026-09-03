@@ -410,6 +410,7 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
         # of attaching the documentation block.
         if re.search(r"-/\s*(?:--.*)?$", line):
             comment_end = index
+            comment_start = None
             depth = 0
             while index >= 0:
                 for marker in reversed(list(re.finditer(r"/-|-/", lines[index]))):
@@ -418,12 +419,22 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
                     else:
                         depth -= 1
                         if depth == 0:
+                            comment_start = marker.start()
                             break
                 if depth == 0:
                     break
                 index -= 1
-            if (index >= 0 and lines[index].lstrip().startswith("/-")
-                    and not lines[index].lstrip().startswith("/--")):
+            if (index >= 0 and comment_start is not None
+                    and lines[index][comment_start:].startswith("/-")
+                    and not lines[index][comment_start:].startswith("/--")):
+                before_comment = lines[index][:comment_start].rstrip()
+                if before_comment:
+                    # An ordinary comment can follow a documentation block on
+                    # the same line.  Keep scanning that preceding text rather
+                    # than discarding the whole physical line.
+                    lines = [*lines]
+                    lines[index] = before_comment
+                    continue
                 index -= 1
                 continue
             # The balanced scan below expects its closing delimiter at the
