@@ -391,6 +391,20 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"Outer.one"}:
         raise SystemExit("scanner indexed a theorem inside a spaced command quotation")
 
+    # In a command macro, Lean infers the quotation category from the macro's
+    # result. The quoted theorem is syntax data, while the following theorem
+    # is the active control and must be the only indexed declaration.
+    module.write_text(
+        "namespace Outer\n"
+        "macro \"registered\" : command => `( theorem registered : True := trivial)\n"
+        "theorem registered : True := trivial\n"
+        "theorem inferred_command_control : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if {name: len(records) for name, records in found.items()} != {
+            "Outer.registered": 1, "Outer.inferred_command_control": 1}:
+        raise SystemExit("scanner indexed a theorem inside an inferred command quotation")
+
     # Declaration attributes are a repeatable token sequence, not a single
     # optional prefix.  Commands may also share a physical line, so a theorem
     # must be recognized at its whitespace command boundary and its statement
@@ -497,6 +511,8 @@ def check_lean_scanner(fixture: Path) -> None:
     found = generate_ux2.scan_file(fixture, module)
     if found["Outer.registered"][0]["doc"] != "/-- Helper-backed theorem. -/":
         raise SystemExit("scanner did not attach documentation after a same-line preceding command")
+    if found["Outer.registered"][0]["doc"].startswith("def helper"):
+        raise SystemExit("scanner included preceding same-line code in documentation")
     if found["Outer.undocumented_after_helper"][0]["doc"]:
         raise SystemExit("scanner leaked same-line command documentation to the next declaration")
 

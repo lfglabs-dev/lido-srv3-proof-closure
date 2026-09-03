@@ -78,9 +78,11 @@ MATCH = re.compile(r"match\b")
 # the start of a subsequent logical line.  It ends the declaration signature
 # just as `:=` and `where` do.
 ESCAPED_IDENTIFIER = re.compile(r"«[^»\n]*»")
-# Syntax quotations are token-based: whitespace is permitted between their
-# punctuation/category tokens, including before the category separator.
-COMMAND_QUOTATION_OPENER = re.compile(r"`\s*\(\s*command\s*\|")
+# A quotation can either spell its syntax category (`` `(command | ...)``) or
+# inherit it from a command macro's expected result (`` `(theorem ...)``).
+# Both begin with the same backtick-parenthesis token sequence, and neither
+# form contains active commands for this source scanner to index.
+COMMAND_QUOTATION_OPENER = re.compile(r"`\s*\(")
 CLOSERS = ")]}⟩"
 
 
@@ -245,12 +247,12 @@ def mask_escaped_identifiers(text: str) -> str:
 
 
 def mask_command_quotations(text: str) -> str:
-    """Blank `` `(command | ... )`` quotations while retaining source offsets.
+    """Blank parenthesized syntax quotations while retaining source offsets.
 
-    A quoted command is syntax data, not a declaration in the surrounding
-    module.  Its parentheses are balanced independently, so masking the whole
-    quotation prevents declaration and scope regexes from interpreting its
-    contents as active Lean commands.
+    An explicit or inferred-category quoted command is syntax data, not a
+    declaration in the surrounding module. Its parentheses are balanced
+    independently, so masking the whole quotation prevents declaration and
+    scope regexes from interpreting its contents as active Lean commands.
     """
     masked = list(text)
     # Parentheses in escaped identifiers are identifier content, not quotation
@@ -262,9 +264,9 @@ def mask_command_quotations(text: str) -> str:
         if opener is None:
             index += 1
             continue
-        # The opening parenthesis is the first structural delimiter after the
-        # backtick token, regardless of whitespace around the category tokens.
-        end = structural.index("(", index, opener.end()) + 1
+        # The opening parenthesis ends the opener, regardless of whitespace
+        # after the backtick or whether a category was written explicitly.
+        end = opener.end()
         depth = 1
         while end < len(text) and depth:
             depth += (structural[end] == "(") - (structural[end] == ")")
@@ -377,7 +379,10 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
                 # between it and the declaration/attributes).
                 if not line[marker.start():].startswith("/--"):
                     return ""
-                return "\n".join(lines[index:stop + 1])
+                # A preceding command may share this physical line. Slice
+                # from the documentation opener, so displayed documentation
+                # never includes executable text before `/--`.
+                return "\n".join([line[marker.start():], *lines[index + 1:stop + 1]])
             if depth < 0:
                 return ""
         index -= 1
