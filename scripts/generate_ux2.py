@@ -277,9 +277,20 @@ def attribute_start(lines: list[str], declaration_line: int) -> int:
     return start
 
 
-def doc_comment(lines: list[str], declaration_line: int) -> str:
-    """The `/-- ... -/` block directly above a declaration, or an empty string."""
-    index = attribute_start(lines, declaration_line) - 1
+def doc_comment(lines: list[str], declaration_line: int, declaration_column: int) -> str:
+    """The `/-- ... -/` block attached to a declaration, or an empty string.
+
+    Lean permits a documentation block and its declaration to share a line.
+    Limit that line to the text before the declaration so the existing balanced
+    block scan can treat it like a directly preceding documentation line.
+    """
+    prefix = lines[declaration_line][:declaration_column]
+    if prefix.rstrip().endswith("-/"):
+        lines = [*lines]
+        lines[declaration_line] = prefix.rstrip()
+        index = declaration_line
+    else:
+        index = attribute_start(lines, declaration_line) - 1
     if index < 0 or not lines[index].rstrip().endswith("-/"):
         return ""
     stop = index
@@ -325,13 +336,18 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
             continue
         start_line = stripped.count("\n", 0, offset)
         end = statement_end(structural, match.end())
-        full = ".".join(part for part in (scope.prefix(), match.group(2)) if part)
+        name = match.group(2)
+        # `_root_.name` is an absolute Lean name, not a component beneath the
+        # active namespace.  The display key must therefore match Lean's
+        # resolved root-level declaration name.
+        full = name[len("_root_."):] if name.startswith("_root_.") else \
+            ".".join(part for part in (scope.prefix(), name) if part)
         found.setdefault(full, []).append({
             "module": module_name(root, path),
             "file": path.relative_to(root).as_posix(),
             "start_line": start_line + 1,
             "end_line": stripped.count("\n", 0, end) + 1,
-            "doc": doc_comment(lines, start_line),
+            "doc": doc_comment(lines, start_line, offset - text.rfind("\n", 0, offset) - 1),
             "statement": text[offset:end].rstrip(),
         })
     return found
