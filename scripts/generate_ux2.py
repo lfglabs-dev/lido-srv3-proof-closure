@@ -313,7 +313,10 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
         attribute_line = attribute_start(lines, declaration_line)
         attribute_text = lines[attribute_line].rstrip()
         doc_end = attribute_text.rfind("-/")
-        if doc_end >= 0 and is_attribute_block(attribute_text[doc_end + 2:]):
+        attribute_block = attribute_text[doc_end + 2:] + (
+            "\n" + "\n".join(lines[attribute_line + 1:declaration_line])
+            if attribute_line + 1 < declaration_line else "")
+        if doc_end >= 0 and is_attribute_block(attribute_block):
             lines = [*lines]
             lines[attribute_line] = attribute_text[:doc_end + 2]
             index = attribute_line
