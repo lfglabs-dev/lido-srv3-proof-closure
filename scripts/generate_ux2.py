@@ -126,7 +126,12 @@ def statement_end(text: str, start: int) -> int:
     """
     depth = 0
     pending = 0
-    result_match = False
+    # A result type may itself be a top-level `match ... with`.  Its arms use
+    # the same `|` token as equation-style theorem bodies, but Lean layout
+    # ends those arms when the following pipe dedents below them.  Retain the
+    # first arm's column rather than suppressing equation clauses forever.
+    result_match_arm_column: int | None = None
+    awaiting_result_match_arm = False
     index = start
     while index < len(text) - 1:
         char = text[index]
@@ -141,14 +146,24 @@ def statement_end(text: str, start: int) -> int:
         elif depth == 0 and word_at(text, index, WHERE):
             return index
         elif depth == 0 and word_at(text, index, MATCH):
-            # A result type may itself be a top-level `match ... with`.
-            # Its arms also begin with `|`, but they are type syntax, not
-            # equation-style theorem bodies.
-            result_match = True
-        elif depth == 0 and char == "|" and not result_match and equation_clause_at(text, index):
-            # Return the preceding newline so the declaration's source span
-            # ends on its signature line, rather than on the first body arm.
-            return text.rfind("\n", 0, index)
+            awaiting_result_match_arm = True
+        elif depth == 0 and char == "|" and equation_clause_at(text, index):
+            column = index - text.rfind("\n", 0, index) - 1
+            if awaiting_result_match_arm:
+                result_match_arm_column = column
+                awaiting_result_match_arm = False
+            elif result_match_arm_column is not None and column >= result_match_arm_column:
+                # Another arm of the result-type `match`.
+                pass
+            else:
+                # A pipe that dedents below the result-match arms starts the
+                # equation proof.  The result match is now complete.
+                result_match_arm_column = None
+                awaiting_result_match_arm = False
+                # Return the preceding newline so the declaration's source
+                # span ends on its signature line, rather than on the first
+                # body arm.
+                return text.rfind("\n", 0, index)
         elif depth == 0 and word_at(text, index, BINDER) and binds_with_walrus(text, index):
             pending += 1
             index += 3
@@ -353,7 +368,11 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     structural = mask_escaped_identifiers(active)
     lines = text.splitlines()
     events = sorted(
-        [(m.start(), "scope", m) for m in SCOPE.finditer(active)]
+        [(m.start(), "scope", m) for m in SCOPE.finditer(active)
+         # Scope commands embedded in a guillemet identifier are identifier
+         # text.  Keep matching against `active` to retain escaped scope names,
+         # but require the keyword itself to survive the structural masking.
+         if structural.startswith(m.group(1), m.start(1))]
         + [(offset, "theorem", m) for m in DECLARATION.finditer(active)
            # The identifier spelling is kept in `active`, but its structural
            # token must not have originated inside a guillemet identifier.

@@ -228,6 +228,27 @@ def check_lean_scanner(fixture: Path) -> None:
             "theorem wrapped_equation : ∀ n : Nat, n = n", 6):
         raise SystemExit("scanner did not slice a wrapped equation clause at its signature line")
 
+    # Result-type match arms are indented beneath the theorem, while the
+    # equation clauses return to the theorem command column.  Seeing the
+    # former must not suppress scanning the latter or consume the next theorem.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem mixed : ∀ b : Bool, match b with\n"
+        "  | true => True\n"
+        "  | false => False\n"
+        "| true => trivial\n"
+        "| false => trivial\n"
+        "theorem after_mixed : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.mixed"][0]["statement"] != (
+            "theorem mixed : ∀ b : Bool, match b with\n"
+            "  | true => True\n"
+            "  | false => False"):
+        raise SystemExit("scanner did not end a result match before equation clauses")
+    if found["Outer.after_mixed"][0]["statement"] != "theorem after_mixed : True":
+        raise SystemExit("scanner consumed the declaration after result-match equation clauses")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
@@ -362,6 +383,18 @@ def check_lean_scanner(fixture: Path) -> None:
     found = generate_ux2.scan_file(fixture, module)
     if set(found) != {"Outer.«foo `(command | bar»", "Outer.active"}:
         raise SystemExit("scanner treated command-quotation text in an escaped identifier as syntax")
+
+    # A scope keyword inside a guillemet theorem name is identifier data.  It
+    # must neither pop the active namespace nor underflow at top level.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem «foo end» : True := trivial\n"
+        "theorem still_nested : True := trivial\n"
+        "end Outer\n"
+        "theorem top_level : True := trivial\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if set(found) != {"Outer.«foo end»", "Outer.still_nested", "top_level"}:
+        raise SystemExit("scanner treated `end` in an escaped theorem name as a scope command")
 
     # `_root_.` makes a declaration name absolute, so it must suppress the
     # active namespace rather than becoming a component of it.  The ordinary
