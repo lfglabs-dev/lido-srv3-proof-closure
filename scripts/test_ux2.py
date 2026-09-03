@@ -284,6 +284,23 @@ def check_lean_scanner(fixture: Path) -> None:
     if set(found) != {"Outer.one"}:
         raise SystemExit("scanner indexed a theorem inside a spaced command quotation")
 
+    # Declaration attributes are a repeatable token sequence, not a single
+    # optional prefix.  Commands may also share a physical line, so a theorem
+    # must be recognized at its whitespace command boundary and its statement
+    # must begin at the theorem rather than the preceding helper command.
+    module.write_text(
+        "namespace Outer\n"
+        "@[simp] @[protected] theorem repeated_attributes : True := trivial\n"
+        "def helper := 1 theorem inline_after_helper : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_inline = {
+        "Outer.repeated_attributes": "theorem repeated_attributes : True",
+        "Outer.inline_after_helper": "theorem inline_after_helper : True",
+    }
+    if {name: records[0]["statement"] for name, records in found.items()} != expected_inline:
+        raise SystemExit("scanner did not recognize repeated attributes or inline command declarations")
+
     module.write_text(
         "namespace Outer\n"
         "def quoted : Syntax := `(command|\n"

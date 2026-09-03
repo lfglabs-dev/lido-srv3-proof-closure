@@ -44,7 +44,9 @@ ROLES = {
 THEOREM_COMPONENT = r"(?:«[^»\n]*»|[^\s.«»:({\[\])}⟩]+)"
 THEOREM_NAME = rf"{THEOREM_COMPONENT}(?:\.{THEOREM_COMPONENT})*"
 DECLARATION = re.compile(
-    r"^[ \t]*(?:@\[[^\]]*\][ \t]*)?"
+    # Commands are separated by Lean whitespace, not necessarily newlines.
+    # Attribute groups may repeat before a single declaration.
+    r"(?<!\S)(?:@\[[^\]]*\][ \t]*)*"
     r"(?:(?:private|protected|noncomputable|unsafe|partial|nonrec)[ \t]+)*"
     rf"(theorem|lemma)\s+({THEOREM_NAME})", re.MULTILINE)
 MODIFIER_RUN = re.compile(
@@ -279,6 +281,9 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
     events = sorted(
         [(m.start(), "scope", m) for m in SCOPE.finditer(active)]
         + [(offset, "theorem", m) for m in DECLARATION.finditer(active)
+           # The identifier spelling is kept in `active`, but its structural
+           # token must not have originated inside a guillemet identifier.
+           if structural.startswith(m.group(1), m.start(1))
            for offset, private in [modifier_run(active, m)] if not private])
     scope = Scope()
     found: dict[str, dict] = {}
@@ -288,7 +293,6 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
             continue
         start_line = stripped.count("\n", 0, offset)
         end = statement_end(structural, match.end())
-        line_start = stripped.rfind("\n", 0, offset) + 1
         full = ".".join(part for part in (scope.prefix(), match.group(2)) if part)
         found.setdefault(full, []).append({
             "module": module_name(root, path),
@@ -296,7 +300,7 @@ def scan_file(root: Path, path: Path) -> dict[str, list[dict]]:
             "start_line": start_line + 1,
             "end_line": stripped.count("\n", 0, end) + 1,
             "doc": doc_comment(lines, start_line),
-            "statement": text[line_start:end].rstrip(),
+            "statement": text[offset:end].rstrip(),
         })
     return found
 
