@@ -361,6 +361,22 @@ def check_lean_scanner(fixture: Path) -> None:
             "theorem after_piped_result_match : True"):
         raise SystemExit("scanner consumed the declaration after a piped result match")
 
+    # Both Lean application operators contain a pipe but neither is an
+    # equation arm.  A depth-zero lambda arrow after `<|` is the control that
+    # used to make the scanner truncate the signature at the operator.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem left_applied : id <| (fun x : Nat => x) = fun x => x := by rfl\n"
+        "theorem after_left_applied : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.left_applied"][0]["statement"] != (
+            "theorem left_applied : id <| (fun x : Nat => x) = fun x => x"):
+        raise SystemExit("scanner treated a left-application operator as an equation clause")
+    if found["Outer.after_left_applied"][0]["statement"] != (
+            "theorem after_left_applied : True"):
+        raise SystemExit("scanner consumed the declaration after a left-application result")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"

@@ -150,7 +150,11 @@ def statement_end(text: str, start: int) -> int:
             return index
         elif depth == 0 and word_at(text, index, MATCH):
             result_match_arm_columns.append(None)
-        elif depth == 0 and char == "|" and not text.startswith("|>", index):
+        # `|>` and `<|` are application operators, not match/equation-arm
+        # delimiters.  The latter's pipe is one offset after the operator
+        # begins, so test both spellings at the current pipe position.
+        elif (depth == 0 and char == "|" and not text.startswith("|>", index)
+              and not (index and text[index - 1] == "<")):
             column = index - text.rfind("\n", 0, index) - 1
             # A dedented pipe has left one or more nested result matches. Do
             # this before classifying the pipe so the outer match's layout is
@@ -195,7 +199,8 @@ def equation_clause_at(text: str, index: int) -> bool:
             depth -= 1
         elif depth == 0 and text.startswith("=>", cursor):
             return True
-        elif depth == 0 and ((char == "|" and not text.startswith("|>", cursor))
+        elif depth == 0 and ((char == "|" and not text.startswith("|>", cursor)
+                             and not (cursor and text[cursor - 1] == "<"))
                              or text.startswith(":=", cursor)
                              or word_at(text, cursor, WHERE)):
             return False
