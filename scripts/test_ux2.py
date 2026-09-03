@@ -203,6 +203,28 @@ def check_lean_scanner(fixture: Path) -> None:
         if got != (statement, doc, start, end):
             raise SystemExit(f"{name}: scanner produced {got}")
 
+    # An apostrophe continues an ordinary Lean identifier, even when its
+    # prefix spells a signature keyword. Each spelling exercises a distinct
+    # statement_end branch: `where` ends a signature, while `let` and `have`
+    # can consume a following walrus binding.
+    module.write_text(
+        "namespace Suffix\n"
+        "def where' : Prop := True\n"
+        "def let' : Prop := True\n"
+        "def have' : Prop := True\n"
+        "theorem where_suffix : where' := trivial\n"
+        "theorem let_suffix : let' := trivial\n"
+        "theorem have_suffix : have' := trivial\n"
+        "end Suffix\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_suffixes = {
+        "Suffix.where_suffix": "theorem where_suffix : where'",
+        "Suffix.let_suffix": "theorem let_suffix : let'",
+        "Suffix.have_suffix": "theorem have_suffix : have'",
+    }
+    if {name: records[0]["statement"] for name, records in found.items()} != expected_suffixes:
+        raise SystemExit("scanner treated keyword-prefix identifiers as signature keywords")
+
     # An equation clause may wrap its arrow, but a result-type `match` has
     # visually similar arms that remain part of the declaration signature.
     module.write_text(

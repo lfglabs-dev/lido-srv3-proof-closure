@@ -228,7 +228,7 @@ def word_at(text: str, index: int, word: re.Pattern) -> bool:
         return False
     before = text[index - 1] if index else ""
     after = text[match.end()] if match.end() < len(text) else ""
-    return not before.isalnum() and before not in "_.'«" and after != "»"
+    return not before.isalnum() and before not in "_.'«" and after not in "'»"
 
 
 # An apostrophe is legal inside an ordinary Lean identifier (`foo'a'`), so a
