@@ -33,19 +33,34 @@ returns the first data byte; the preceding word is its byte length. -/
 def elementLength (array : String) (index : Expr) : Expr :=
   .calldataload (.sub (.arrayElementDynamicDataOffset array index) (.literal 32))
 
+/-! ## WithdrawalVaultEIP7685 loop body (WithdrawalVaultEIP7685.sol:68-72) -/
+
+/-- One iteration of `for (uint256 i = 0; i < requestsCount; ++i)`
+(`WithdrawalVaultEIP7685.sol:68-72`), inlining `_validatePublicKey`
+(97-101) twice and `_callAddConsolidationRequest` (113-121).
+
+Added by the model: the `calldatacopy` scratch layout `[0,96)` standing for
+`abi.encodePacked(sourcePubkey, targetPubkey)` (line 114) and the ABI event
+data layout at `[128,288)`. -/
 def consolidationRequestLoopBody : List Stmt :=
   [ .letVar "sourceOffset" (.arrayElementDynamicDataOffset "sourcePubkeys" (.localVar "i"))
   , .letVar "targetOffset" (.arrayElementDynamicDataOffset "targetPubkeys" (.localVar "i"))
+  -- WithdrawalVaultEIP7685.sol:69  _validatePublicKey(sourcePubkeys[i]);  -> 98  if (pubkey.length != PUBLIC_KEY_LENGTH) revert InvalidPublicKeyLength(pubkey);
   , .require (.eq (elementLength "sourcePubkeys" (.localVar "i")) (.literal 48))
       "InvalidPublicKeyLength(sourcePubkey)"
+  -- WithdrawalVaultEIP7685.sol:70  _validatePublicKey(targetPubkeys[i]);  -> 98  [_validatePublicKey]
   , .require (.eq (elementLength "targetPubkeys" (.localVar "i")) (.literal 48))
       "InvalidPublicKeyLength(targetPubkey)"
+  -- WithdrawalVaultEIP7685.sol:114  bytes memory request = abi.encodePacked(sourcePubkey, targetPubkey);  [_callAddConsolidationRequest]
   , .calldatacopy (.literal 0) (.localVar "sourceOffset") (.literal 48)
   , .calldatacopy (.literal 48) (.localVar "targetOffset") (.literal 48)
+  -- WithdrawalVaultEIP7685.sol:115  (bool success,) = CONSOLIDATION_REQUEST.call{value: fee}(request);  [_callAddConsolidationRequest]
   , .letVar "request_ok"
       (.call (.literal Verity.Core.MAX_UINT256) (.immutable "CONSOLIDATION_REQUEST")
         (.localVar "fee") (.literal 0) (.literal 96) (.literal 0) (.literal 0))
+  -- WithdrawalVaultEIP7685.sol:116-118  if (!success) { revert RequestAdditionFailed(request); }  [_callAddConsolidationRequest]
   , .require (.eq (.localVar "request_ok") (.literal 1)) "RequestAdditionFailed(request)"
+  -- WithdrawalVaultEIP7685.sol:120  emit ConsolidationRequestAdded(request);  [_callAddConsolidationRequest]
   -- ABI event data for the single non-indexed `bytes request`: offset, length, payload.
   , .mstore (.literal 128) (.literal 32)
   , .mstore (.literal 160) (.literal 96)
@@ -53,7 +68,28 @@ def consolidationRequestLoopBody : List Stmt :=
   , .calldatacopy (.literal 240) (.localVar "targetOffset") (.literal 48)
   , .rawLog [.literal consolidationRequestAddedTopic] (.literal 128) (.literal 160) ]
 
-/-- Exact vault signature `addConsolidationRequests(bytes[],bytes[])`.
+/-! ## WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208) -/
+
+/-- `WithdrawalVault.sol:199-208 addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys)`,
+`FunctionSpec` form, inlining the `preservesEthBalance` modifier
+(`WithdrawalVault.sol:81-85`), `_addConsolidationRequests`
+(`WithdrawalVaultEIP7685.sol:56-73`), `_getConsolidationRequestFee` /
+`_getFeeFromContract` (79-95) and `_requireExactFee` (123-127); the loop
+body is `consolidationRequestLoopBody`.
+
+Not transcribed: the constructor nonzero-address guards beyond `spec`'s
+two `ZeroAddress` requires; ABI-level `bytes[]` decoding (local obligation
+`bytes_array_offsets_and_lengths`); whole-transaction rollback of earlier
+successful CALLs (local obligation
+`whole_transaction_rollback_after_prior_success`).
+
+Added by the model: the explicit underflow guard on
+`address(this).balance - msg.value` (a Solidity 0.8 checked subtraction),
+the `requiredFee / requestsCount == fee` division check expressing checked
+multiplication, and the `fee_read_ok` / `returndatasize` decomposition of
+`_getFeeFromContract`.
+
+Exact vault signature `addConsolidationRequests(bytes[],bytes[])`.
 The multiplication guard expresses Solidity 0.8 checked-multiplication:
 for nonzero `requestsCount`, a wrapped product cannot divide back to `fee`.
 The fee is obtained by empty-calldata STATICCALL to the immutable target and
@@ -74,33 +110,51 @@ def addConsolidationRequests : FunctionSpec :=
          obligation := "EVM transaction rollback removes successful earlier request calls and logs when any later request fails."
          proofStatus := .unchecked }]
     body :=
+      -- WithdrawalVault.sol:82  uint256 balanceBeforeCall = address(this).balance - msg.value;  [preservesEthBalance]
       [ .letVar "balanceBeforeCall" (.sub .selfBalance .msgValue)
+      -- (same line, checked subtraction: Panic 0x11 on underflow)
       , .require (.ge .selfBalance .msgValue)
           "Panic(0x11): preservesEthBalance pre-call subtraction underflow"
+      -- WithdrawalVault.sol:203-204  if (msg.sender != CONSOLIDATION_GATEWAY) { revert NotConsolidationGateway(); }
       , .require (.eq .caller (.immutable "CONSOLIDATION_GATEWAY"))
           "NotConsolidationGateway"
+      -- WithdrawalVaultEIP7685.sol:60  uint256 requestsCount = sourcePubkeys.length;  [_addConsolidationRequests]
       , .letVar "requestsCount" (.arrayLength "sourcePubkeys")
+      -- WithdrawalVaultEIP7685.sol:61  if (requestsCount == 0) revert ZeroArgument("sourcePubkeys");  [_addConsolidationRequests]
       , .require (.gt (.localVar "requestsCount") (.literal 0)) "ZeroArgument(sourcePubkeys)"
+      -- WithdrawalVaultEIP7685.sol:62-63  if (requestsCount != targetPubkeys.length) revert ArraysLengthMismatch(...)  [_addConsolidationRequests]
       , .require (.eq (.localVar "requestsCount") (.arrayLength "targetPubkeys"))
           "ArraysLengthMismatch"
+      -- WithdrawalVaultEIP7685.sol:65  uint256 fee = _getConsolidationRequestFee();  -> 84  (bool success, bytes memory feeData) = contractAddress.staticcall("");  [_getFeeFromContract]
       , .letVar "fee_read_ok"
           (.staticcall (.literal Verity.Core.MAX_UINT256)
             (.immutable "CONSOLIDATION_REQUEST") (.literal 0) (.literal 0)
             (.literal 96) (.literal 32))
+      -- WithdrawalVaultEIP7685.sol:86-88  if (!success) { revert FeeReadFailed(); }  [_getFeeFromContract]
       , .require (.eq (.localVar "fee_read_ok") (.literal 1)) "FeeReadFailed"
+      -- WithdrawalVaultEIP7685.sol:90-92  if (feeData.length != 32) { revert FeeInvalidData(); }  [_getFeeFromContract]
       , .require (.eq .returndataSize (.literal 32)) "FeeInvalidData"
+      -- WithdrawalVaultEIP7685.sol:94  return abi.decode(feeData, (uint256));  [_getFeeFromContract]
       , .letVar "fee" (.mload (.literal 96))
+      -- WithdrawalVaultEIP7685.sol:66  _requireExactFee(requestsCount * fee);  (checked multiply)
       , .letVar "requiredFee" (.mul (.localVar "requestsCount") (.localVar "fee"))
       , .require
           (.eq (.div (.localVar "requiredFee") (.localVar "requestsCount")) (.localVar "fee"))
           "Panic(0x11): checked multiplication overflow"
+      -- WithdrawalVaultEIP7685.sol:124-125  if (requiredFee != msg.value) { revert IncorrectFee(requiredFee, msg.value); }  [_requireExactFee]
       , .require (.eq .msgValue (.localVar "requiredFee")) "IncorrectFee"
+      -- WithdrawalVaultEIP7685.sol:68  for (uint256 i = 0; i < requestsCount; ++i) {  [_addConsolidationRequests]
       , .forEach "i" (.localVar "requestsCount") consolidationRequestLoopBody
+      -- WithdrawalVault.sol:84  assert(address(this).balance == balanceBeforeCall);  [preservesEthBalance]
       -- Solidity `assert` is Panic(0x01), not a recoverable custom-error guard.
       , .ite (.eq .selfBalance (.localVar "balanceBeforeCall")) []
           [.panicCode (.literal 0x01)]
       , .stop ] }
 
+/-- Contract shell: the two immutables (`WithdrawalVault.sol` constructor
+`CONSOLIDATION_GATEWAY`, `WithdrawalVaultEIP7685.sol` `CONSOLIDATION_REQUEST`)
+with their nonzero-address guards (`_onlyNonZeroAddress`, `ZeroAddress`).
+No mutable storage on this path. -/
 def spec : CompilationModel :=
   { name := "WithdrawalVaultConsolidationRequests"
     fields := []
@@ -279,33 +333,49 @@ def decodeWord (bytes : List Nat) : Nat :=
 inductive BatchStatus where | reverted | succeeded
   deriving DecidableEq
 
-/-- A handwritten guarded fee-staticcall followed by a request-call batch.
+/-- `WithdrawalVault.sol:199-208 addConsolidationRequests` as a `CallProgram`:
+a handwritten guarded fee-staticcall followed by a request-call batch.
 Authorization and both array-shape guards precede the fee site.  After a valid
 fee result and exact `msg.value` check, each request is decoded and length-
-checked immediately before its request call, in the pinned source order. -/
+checked immediately before its request call, in the pinned source order.
+
+Not transcribed: `preservesEthBalance` (81-85), the `abi.decode` of the fee
+(`decodeWord` stands in), the event (line 120). Added by the model:
+`BatchStatus`, `encodeRequest` memory encoding. -/
 def batchCalls (caller gateway consolidationRequest msgValue : Nat)
     (sources targets : List Pubkey) : CallProgram BatchStatus :=
+  -- WithdrawalVaultEIP7685.sol:60  uint256 requestsCount = sourcePubkeys.length;
   let count := sources.length
   let requests := List.zipWith
     (fun source target => encodeRequest ({ source, target } : Request)) sources targets
+  -- WithdrawalVault.sol:203  if (msg.sender != CONSOLIDATION_GATEWAY)  +  EIP7685 61  requestsCount == 0  +  62  requestsCount != targetPubkeys.length
   if caller = gateway ∧ count > 0 ∧ count = targets.length then
+    -- WithdrawalVaultEIP7685.sol:84  (bool success, bytes memory feeData) = contractAddress.staticcall("");  [_getFeeFromContract]
     .bind (feeSite consolidationRequest) fun feeObservation =>
       match feeObservation.result with
       | .success data =>
+          -- WithdrawalVaultEIP7685.sol:90  if (feeData.length != 32) {  [_getFeeFromContract]
           if data.length = 32 then
+            -- WithdrawalVaultEIP7685.sol:94  return abi.decode(feeData, (uint256));
             let fee := decodeWord data
+            -- WithdrawalVaultEIP7685.sol:66  _requireExactFee(requestsCount * fee);  -> 124  if (requiredFee != msg.value)
             if count * fee ≤ Verity.Core.MAX_UINT256 ∧ msgValue = count * fee then
+              -- WithdrawalVaultEIP7685.sol:68-72  for (uint256 i = 0; i < requestsCount; ++i) { ... }
               let rec loop (index : Nat) : List MemoryRequest → CallProgram BatchStatus
                 | [] => .pure .succeeded
                 | request :: rest =>
+                    -- WithdrawalVaultEIP7685.sol:69-70  _validatePublicKey(sourcePubkeys[i]); _validatePublicKey(targetPubkeys[i]);
                     if validRequest request then
+                      -- WithdrawalVaultEIP7685.sol:115  CONSOLIDATION_REQUEST.call{value: fee}(request);  [_callAddConsolidationRequest]
                       .bind (requestSite consolidationRequest fee index request) fun observation =>
+                        -- WithdrawalVaultEIP7685.sol:116  if (!success) { revert RequestAdditionFailed(request); }
                         if observation.result.succeeded then loop (index + 1) rest
                         else .pure .reverted
                     else .pure .reverted
               loop 0 requests
             else .pure .reverted
           else .pure .reverted
+      -- WithdrawalVaultEIP7685.sol:86  if (!success) { revert FeeReadFailed(); }  [_getFeeFromContract]
       | .failure _ | .revert _ => .pure .reverted
   else .pure .reverted
 

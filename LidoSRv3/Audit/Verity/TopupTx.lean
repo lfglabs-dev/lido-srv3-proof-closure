@@ -27,11 +27,18 @@ open _root_.Verity
 open _root_.Contracts
 open LidoSRv3.Audit.SolidityTopup
 
+/-- Observation slots, no Solidity storage counterpart: `allocations[i]`,
+`amount` (`StakingRouter.sol:717-732`, memory and stack) and the pulled total
+are persisted so the transaction boundary can be observed. -/
 def allocationSlot : Nat := 7100
 def allocationTotalSlot : Nat := 7101
 def pulledTotalSlot : Nat := 7102
 
+/-- Placeholder address for `LIDO` (`StakingRouter.sol:744`); a model pin, not
+the deployed Lido address. -/
 def lidoAddress : Address := (0xF00D : Address)
+/-- `DEPOSIT_CONTRACT` (`StakingRouter.sol:750`), the canonical beacon deposit
+contract address. -/
 def beaconAddress : Address := (0x00000000219ab540356cBB839Cbe05303d7705Fa : Address)
 
 inductive FailurePoint where
@@ -64,9 +71,11 @@ def evmWord (n : Nat) : Nat := n % uint256Modulus
 
 /-! ## Executable transaction -/
 
-/-- Source-shaped allocation loop, expressed solely with Verity storage. -/
+/-- Source-shaped allocation loop (`StakingRouter.sol:722-734` without its
+guards, which `guardLoop` below carries), expressed solely with Verity storage. -/
 def allocationPass : List Nat → Nat → Nat → ContractState → ContractState
   | [], _, total, state => state.writeSlot allocationTotalSlot total
+  -- StakingRouter.sol:732  amount += allocations[i];  (materialised per index and as a running slot)
   | amount :: rest, index, total, state =>
       allocationPass rest (index + 1) (total + amount)
         ((state.writeMapUint allocationSlot index amount).writeSlot
@@ -76,9 +85,10 @@ def allocationPass : List Nat → Nat → Nat → ContractState → ContractStat
 def allocationStage (allocations : List Nat) : Contract Unit := fun state =>
   .success () ((allocationPass allocations 0 0 state).writeSlot pulledTotalSlot 0)
 
-/-- Real external-call frame: the zero-value Lido pull at source line 744.
+/-- Real external-call frame: the zero-value Lido pull at `StakingRouter.sol:744`.
 `externalCallBindTo` journals the destination and argument word itself. -/
 def lidoPull (total : Nat) : Contract Unit :=
+  -- StakingRouter.sol:744  LIDO.withdrawDepositableEther(amount, 0);
   externalCallBindTo lidoAddress 0 [] "withdrawDepositableEther"
     ([(total : Uint256)] : List Uint256)
 
@@ -87,6 +97,7 @@ caller-side frame: it debits, journals, and binds, but callee-originated
 inflow is outside its remit (callee state lives in `Verity.MultiContract`), so
 the credit is an explicit step. -/
 def creditPull (total : Nat) : Contract Unit := fun state =>
+  -- Lido.sol:885  stakingRouter.receiveDepositableEther.value(_amount)();
   .success ()
     (({ state with selfBalance := state.selfBalance + (total : Uint256) }).writeSlot
       pulledTotalSlot (total : Uint256))
@@ -94,38 +105,83 @@ def creditPull (total : Nat) : Contract Unit := fun state =>
 /-- Real external-call frame: one value-bearing beacon push.  The frame fails
 closed when the router cannot pay, so a push is gated on funds actually held. -/
 def beaconPush (index amount : Nat) : Contract Unit :=
+  -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot);
   externalCallBindTo beaconAddress (amount : Uint256) [] "makeBeaconChainTopUp"
     ([(index : Uint256), (amount : Uint256)] : List Uint256)
 
-/-- The push loop.  Zero allocations are skipped exactly as
-`BeaconChainDepositor.sol` line 89 does.  `stopAfterFirst` injects a failure
-once the first frame has really debited and journalled. -/
+/-- The *value/journal* push loop of `BeaconChainDepositor.sol:79-107` (reached
+from `StakingRouter.sol:750`): one real `externalCallBindTo` frame per nonzero
+amount. Zero allocations are skipped exactly as `BeaconChainDepositor.sol:89`
+does. `stopAfterFirst` injects a failure once the first frame has really
+debited and journalled.
+
+Not to be confused with `SolidityTopup.pushLoop` (same name, different
+namespace), which is the *guard* loop of the same Solidity lines (pubkey length,
+`MIN_DEPOSIT`, `uint64` bound) and moves no value; the executable guard side
+lives in `guardLoop` and `executeGuarded` below.
+
+Not transcribed: `BeaconChainDepositor.sol:82-84, 92-94, 97-99` guards (see
+`SolidityTopup.pushLoop`), `:103-104` (SSZ root, P-SSZ-1). -/
 def pushLoop (stopAfterFirst : Bool) : List Nat → Nat → Contract Unit
+  -- BeaconChainDepositor.sol:79  for (uint256 i; i < len; ++i) {  (loop exit)
   | [], _ => Verity.pure ()
   | amount :: rest, index =>
+      -- BeaconChainDepositor.sol:89  if (amount == 0) continue;
       if amount = 0 then pushLoop stopAfterFirst rest (index + 1)
       else do
+        -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(...)
         beaconPush index amount
+        -- Added by the model: failure hook after the first real frame.
         require (!stopAfterFirst) "FAIL_AFTER_FIRST_BEACON_PUSH"
         pushLoop stopAfterFirst rest (index + 1)
 
-/-- Pull the aggregate from Lido, then forward every non-zero allocation to
-the deposit contract.  Both legs go through real `externalCallBindTo` frames,
-so the journal is produced by execution rather than asserted. -/
+/-- `StakingRouter.sol:742-756`: pull the aggregate from Lido, then forward
+every non-zero allocation to the deposit contract.  Both legs go through real
+`externalCallBindTo` frames, so the journal is produced by execution rather
+than asserted.
+
+Not transcribed (Lido guards not modelled here): `Lido.sol:870`
+(`require(canDeposit(), "CAN_NOT_DEPOSIT")`), `:872` (`_auth`), `:873`
+(`require(_amount != 0, "ZERO_AMOUNT")`), `:842`
+(`require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER")`) and the
+buffer accounting `:846-858`; the frame's own success is the only Lido-side
+failure (`lidoStub`). Also not transcribed: `StakingRouter.sol:742/752/755`
+(balance snapshots and the assert; `execute_ends_with_zero_balance` is the
+executable reading), `:746-747` (withdrawal credentials).
+
+Added by the model: `creditPull` (callee inflow made explicit) and the
+`require (failure ≠ .afterLidoPull)` hook, a rollback probe placed after the
+journalled pull. -/
 def pushStage (allocations : List Nat) (total : Nat) (failure : FailurePoint) :
     Contract Unit := do
+  -- StakingRouter.sol:744  LIDO.withdrawDepositableEther(amount, 0);
   lidoPull total
+  -- Lido.sol:885  stakingRouter.receiveDepositableEther.value(_amount)();
   creditPull total
+  -- Added by the model: failure hook after the pull.
   require (decide (failure ≠ .afterLidoPull)) "FAIL_AFTER_LIDO_PULL"
+  -- StakingRouter.sol:750  BeaconChainDepositor.makeBeaconChainTopUp(DEPOSIT_CONTRACT, wcBytes, _pubkeys, allocations);
   pushLoop (failure = .afterFirstBeaconPush) allocations 0
 
-/-- Executable Verity transaction.  Every failure point sits *after* real
-storage writes and, past the first, after real journalled call frames;
-`Contract.run` supplies the transaction boundary that restores the snapshot. -/
+/-- `StakingRouter.sol:722-756` (the suffix of `topUp` from the accumulator
+loop on) as an executable Verity transaction over a free `allocations` list.
+Every failure point sits *after* real storage writes and, past the first, after
+real journalled call frames; `Contract.run` supplies the transaction boundary
+that restores the snapshot.
+
+Not transcribed: `StakingRouter.sol:686-718` (authentication, input validation,
+module guards and the module call; `executeGuarded` below adds the call and the
+`:724/728/737` guards), `:758` (event).
+
+Added by the model: `allocationStage` slots and the `failure` schedule. -/
 def execute (allocations : List Nat) (failure : FailurePoint) : Contract Unit := do
+  -- StakingRouter.sol:722-734  unchecked { for (...) { amount += allocations[i]; } }  (guards elsewhere)
   allocationStage allocations
+  -- Added by the model: failure hook after the allocation writes.
   require (decide (failure ≠ .afterAllocationWrite)) "FAIL_AFTER_ALLOCATION_WRITE"
+  -- StakingRouter.sol:732  amount  (wrapped reading, see the TopupCorrespondence name table)
   let total := allocSumUnchecked allocations
+  -- StakingRouter.sol:741  if (amount > 0) {
   if total = 0 then Verity.pure ()
   else pushStage allocations total failure
 
@@ -966,12 +1022,17 @@ step.  Guard order is source order: the alignment test at line 724 precedes the
 `_topUpLimits[i]` read at line 728, so an over-long returndata array trips
 alignment for its extra entry first and the out-of-bounds panic second. -/
 def guardLoop (cfg : SourceTopupConfig) : List Nat → List Nat → Contract Unit
+  -- StakingRouter.sol:723  for (uint256 i; i < allocations.length; ++i) {  (loop exit)
   | [], _ => Verity.pure ()
   | a :: _, [] => do
+      -- StakingRouter.sol:724-726  if (allocations[i] % 1 gwei != 0) { revert AmountNotAlignedToGwei(); }
       require (decide (a % cfg.gwei = 0)) "AmountNotAlignedToGwei"
+      -- StakingRouter.sol:728  _topUpLimits[i]  (out-of-bounds read, Panic(0x32))
       require false "TopUpLimitIndexOutOfBounds"
   | a :: as, l :: ls => do
+      -- StakingRouter.sol:724-726  if (allocations[i] % 1 gwei != 0) { revert AmountNotAlignedToGwei(); }
       require (decide (a % cfg.gwei = 0)) "AmountNotAlignedToGwei"
+      -- StakingRouter.sol:728-730  if (allocations[i] > _topUpLimits[i]) { revert AllocationExceedsLimit(); }
       require (decide (a ≤ l)) "AllocationExceedsLimit"
       guardLoop cfg as ls
 
@@ -1073,14 +1134,18 @@ structure TopupCall where
 spend it. -/
 def guardedStage (cfg : SourceTopupConfig) (limits : List Nat) (roundedTarget : Nat)
     (returned : List Nat) (failure : FailurePoint) : Contract Unit := do
+  -- StakingRouter.sol:722-734  per-index guards of the accumulator loop
   guardLoop cfg returned limits
+  -- StakingRouter.sol:737-739  if (amount > smDepositableEthAmountRounded) { revert ModuleReturnExceedTarget(); }
   require (decide (allocSumUnchecked returned ≤ roundedTarget)) "ModuleReturnExceedTarget"
+  -- StakingRouter.sol:722-756  accumulate, pull, push
   execute returned failure
 
 /-- The corrected executable top-up: call the module, then guard and spend
 exactly what it returned. -/
 def executeGuarded (cfg : SourceTopupConfig) (call : TopupCall) (failure : FailurePoint) :
     Contract Unit := do
+  -- StakingRouter.sol:717-718  uint256[] memory allocations = IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(...);
   let returned ← allocateDeposits call.keyCount call.moduleReturndata
   guardedStage cfg call.topUpLimits call.roundedTarget returned failure
 

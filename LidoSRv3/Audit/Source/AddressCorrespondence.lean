@@ -10,6 +10,24 @@ The single-item restriction removes only batch iteration; it retains every
 caller/address-dependent guard and successful address write in the mapped
 paths.  Non-address arithmetic and external-contract return values are explicit
 inputs.  This is SOURCE evidence, not compiler/Yul/EVM evidence.
+
+## Name correspondence (Solidity -> `Input`)
+
+| Solidity | entrypoint | `Input` field |
+|---|---|---|
+| `msg.sender` | all | `caller` |
+| `_from` (WithdrawalQueueERC721.sol:218) | `transferFrom` | `senderFrom` |
+| `_to` (WithdrawalQueueERC721.sol:218) | `transferFrom` | `recipient` |
+| `_owner` (WithdrawalQueue.sol:125) | `requestWithdrawals` | `recipient` |
+| `_recipient` (`claimWithdrawalsTo`) | `claimWithdrawalsTo` | `recipient` |
+| `request.owner` (WithdrawalQueueERC721.sol:238) | `transferFrom`, `claimWithdrawalsTo` | `requestOwner` |
+| `_amounts[i]` / `_wstETHAmount` | `requestWithdrawals`, `unwrap` | `amount` |
+
+`_owner` of `requestWithdrawals` is stored in `Input.recipient` on purpose:
+one field holds "the address the call hands the asset to" for every
+entrypoint, so `renameInput` and the equivariance lemmas treat the four
+writers uniformly.  `WithdrawalQueue.sol:130 if (_owner == address(0)) _owner = msg.sender;`
+is the `if inp.recipient = 0 then inp.caller` in `successfulPost`.
 -/
 
 namespace LidoSRv3.Audit.SolidityAddress
