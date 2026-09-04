@@ -89,6 +89,24 @@
       "violation_impact": "Conserved top-up value could be sent to the wrong address.",
       "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical beacon deposit contract.",
       "removal_path": "Prove the deployed immutable equals 0x00000000219ab540356cBB839Cbe05303d7705Fa."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
   "fidelity": {
