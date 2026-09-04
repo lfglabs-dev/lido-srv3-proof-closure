@@ -1109,6 +1109,23 @@ def check_lean_scanner(fixture: Path) -> None:
     (record,) = generate_ux2.scan_file(fixture, module)["gap"]
     if record["doc"] != "/-- orphan -/":
         raise SystemExit("scanner did not retain documentation across a blank line")
+    # A leading `--` inside an already-open block comment is comment content,
+    # not a line comment.  Its `-/` must still close both documentation and
+    # ordinary intervening comments while locating an attached doc block.
+    module.write_text(
+        "/-- Docs with a dashed closing line.\n"
+        "-- detail -/\n"
+        "theorem dashed_doc_close : True := trivial\n"
+        "/-- Docs across an ordinary comment. -/\n"
+        "/- formatting\n"
+        "-- detail -/\n"
+        "theorem dashed_ordinary_close : True := trivial\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["dashed_doc_close"][0]["doc"] != (
+            "/-- Docs with a dashed closing line.\n-- detail -/"):
+        raise SystemExit("scanner lost documentation whose closer follows dashes")
+    if found["dashed_ordinary_close"][0]["doc"] != "/-- Docs across an ordinary comment. -/":
+        raise SystemExit("scanner lost documentation across a dashed block-comment closer")
     module.write_text("-- not a doc -/\ntheorem tail : True := trivial\n", encoding="utf-8")
     (record,) = generate_ux2.scan_file(fixture, module)["tail"]
     if record["doc"] != "":

@@ -653,7 +653,11 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
     # leaving the documentation block itself for the balanced scan below.
     while index >= 0:
         line = lines[index].strip()
-        if not line or line.startswith("--"):
+        # A line beginning with `--` is normally a line comment.  It can also
+        # be content in a block comment opened on an earlier line, however; in
+        # particular its closing `-/` remains a structural delimiter.  Leave
+        # such a possible closer for the balanced scan below.
+        if not line or (line.startswith("--") and "-/" not in line):
             index -= 1
             continue
         # A closing block-comment delimiter may itself be followed by a line
@@ -661,7 +665,9 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
         # of attaching the documentation block, and its text is inert:
         # comment markers inside it must not enter the balanced scans below.
         # Normalize the scan view before matching the closer.
-        normalized = strip_inert_line_comment(lines[index]).rstrip()
+        normalized = lines[index].rstrip() if (
+            lines[index].lstrip().startswith("--") and "-/" in lines[index]
+        ) else strip_inert_line_comment(lines[index]).rstrip()
         if normalized.endswith("-/"):
             lines = [*lines]
             lines[index] = normalized
