@@ -1346,6 +1346,35 @@ def check_boundary_and_kill_lines(fixture: Path) -> None:
         raise SystemExit("a reproduction without mutant modules reported kill-lines")
 
 
+def check_equation_arm_examples_elaborate() -> None:
+    """Keep the two equation-arm regressions tied to valid Lean syntax.
+
+    The scanner matrix below deliberately includes many layout variants.  This
+    compact source is the executable anchor for the two reported families:
+    pattern-lambda arms inside a `let`, and equation-style local-function
+    arms.  If either spelling stops being accepted by the pinned Lean parser,
+    the scanner test must not continue claiming to cover a real declaration.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        source = Path(tmp) / "UX2EquationArms.lean"
+        source.write_text(
+            "theorem pattern_lambda : let p : Bool → Prop := "
+            "fun | true => True | false => False; p true := trivial\n"
+            "theorem local_equations : let rec p : Nat → Prop "
+            "| 0 => True | n + 1 => p n; p 0 := by trivial\n",
+            encoding="utf-8",
+        )
+        result = subprocess.run(
+            ["lake", "env", "lean", str(source)], cwd=ROOT,
+            capture_output=True, text=True,
+        )
+    if result.returncode:
+        raise SystemExit(
+            "the UX2 equation-arm regression examples no longer elaborate:\n"
+            f"{result.stdout}{result.stderr}"
+        )
+
+
 with tempfile.TemporaryDirectory() as tmp:
     fixture = Path(tmp)
     copy_tree(fixture)
@@ -1359,6 +1388,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check_symlink_tree(fixture)
     check_top_level_executable_mode(fixture)
     check_boundary_and_kill_lines(fixture)
+    check_equation_arm_examples_elaborate()
 
 print("ux2 artifact mutants ok: drift, stale, missing, unresolved/duplicate theorem, "
       "canonical order, unregistered assumption, missing source target, missing headline "
