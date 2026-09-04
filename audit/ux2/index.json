@@ -1,0 +1,60 @@
+{
+  "schema": "lido-srv3-ux2-index-v1",
+  "pinned_source": "lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436",
+  "verity_commit": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
+  "lean_toolchain": "leanprover/lean4:v4.31.0",
+  "lean_source_tree": "1f2f245878650a816a8b1fab36ce0a67b139ee10",
+  "boundary": [
+    "These are proofs about a model, not about a deployed contract.",
+    "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+    "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
+    "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+    "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+  ],
+  "guarantees": [
+    {
+      "id": "P-ALLOC-1",
+      "file": "P-ALLOC-1.json"
+    },
+    {
+      "id": "P-ALLOC-2",
+      "file": "P-ALLOC-2.json"
+    },
+    {
+      "id": "P-DEPOSIT-1",
+      "file": "P-DEPOSIT-1.json"
+    },
+    {
+      "id": "P-TOPUP-1",
+      "file": "P-TOPUP-1.json"
+    },
+    {
+      "id": "P-ACCOUNT-1",
+      "file": "P-ACCOUNT-1.json"
+    },
+    {
+      "id": "P-RESERVE-1",
+      "file": "P-RESERVE-1.json"
+    },
+    {
+      "id": "P-CONSOLIDATION-ETH-1",
+      "file": "P-CONSOLIDATION-ETH-1.json"
+    },
+    {
+      "id": "P-ADDRESS-1",
+      "file": "P-ADDRESS-1.json"
+    },
+    {
+      "id": "P-TOPUP-2",
+      "file": "P-TOPUP-2.json"
+    },
+    {
+      "id": "P-CONSOLIDATION-1",
+      "file": "P-CONSOLIDATION-1.json"
+    },
+    {
+      "id": "P-SSZ-1",
+      "file": "P-SSZ-1.json"
+    }
+  ]
+}
