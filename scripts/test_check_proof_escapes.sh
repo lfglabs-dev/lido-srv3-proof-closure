@@ -41,4 +41,35 @@ reject "$project" "unsafe def injected := 0" "forbidden unsafe"
 reject "$project" "#check Lean.ofReduceBool" "forbidden Lean.ofReduceBool"
 reject "$project" "native_decide" "forbidden native_decide"
 
+# Escaped identifiers are code, but their contents are names rather than proof
+# commands or declarations.  Every guarded spelling must therefore be ignored
+# inside guillemets while the mutations above remain rejected outside them.
+printf '\ntheorem «sorry» : True := trivial\ntheorem «axiom» : True := trivial\ntheorem «native_decide» : True := trivial\n' >> "$project"
+if ! python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
+  cat "$tmpdir/out" >&2
+  exit 1
+fi
+
+# Character literals (including each guillemet) are data, not escaped
+# identifier delimiters; every following guarded spelling must stay visible.
+for literal in "'«'" "'»'" "'\\\\'"; do
+  while IFS='|' read -r token needle; do
+    cp LidoSRv3/Audit/Trust.lean "$project"
+    printf "\ndef marker : Char := %s\n%s\n" "$literal" "$token" >> "$project"
+    if python3 "$checker" --root "$fixture" --native-decide-policy forbid >"$tmpdir/out" 2>&1; then
+      printf 'proof-escape regression accepted %s after character literal %s\n' "$token" "$literal" >&2
+      exit 1
+    fi
+    rg -q "$needle" "$tmpdir/out" || { cat "$tmpdir/out" >&2; exit 1; }
+  done <<'TOKENS'
+sorry|forbidden sorry
+admit|forbidden admit
+axiom injected : False|forbidden axiom
+constant injected : False|forbidden constant
+unsafe def injected := 0|forbidden unsafe
+#check Lean.ofReduceBool|forbidden Lean.ofReduceBool
+native_decide|forbidden native_decide
+TOKENS
+done
+
 printf '%s\n' 'proof-escape negative regressions rejected imported, library-root, and Trust project Lean mutations'

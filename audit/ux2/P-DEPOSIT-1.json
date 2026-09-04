@@ -1,0 +1,217 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-DEPOSIT-1",
+  "position": 3,
+  "summary": "source_deposit_conserves_and_rolls_back remains the universal source-plane conservation and non-conserving-deployment rollback theorem. NFrame.verity_tx_composes_nframe_deposit now quantifies over every finite DepositNFrameTx.Inputs.batches list. Under NFrame.LinksSource (still a caller hypothesis) and executable Preconditions, execute runs batches.mapM processBatch, one folded Lido pull, and batches.mapM pushBatch; its observed journal is the two mapped journals around that pull. FoldStable proves every exact prefix stays below 2^256 and wordTotal equals exactTotal, while an executable pre-pass guard makes every wrapping fold revert before any journal. ModuleEntry and depositToBeacon counts are each exactly batches.length (map-length arity, not DepositParentTx probes), independent of key counts. DepositNFrameCorrespondence.routerDepositInputs maps List Spec.Allocation to this link with the validator-count-to-wei multiply explicit, without deriving the link from ALLOC parents. two_batch_conjunct_d_is_n_eq_two recovers the former fixed conjunct (d). The fixed-two executeTwoOnly mutant is rejected at the same ParentConclusion by a healthy three-batch witness. A-DEPOSIT-32-ETHER remains an OPEN artifact-identity assumption; no 32-ether pin or ALLOC-to-DEPOSIT merge is claimed. This is a Verity EDSL theorem, not a compiled-artifact theorem.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Keep NFrame.LinksSource explicit and keep the Spec router's per-allocation unit multiply; do not derive it from ALLOC parents. Derive the beacon address and 32-ether constructor/literal identity only from artifacts. The n-frame executable theorem remains a Verity EDSL claim, not compiled-artifact correspondence. The remaining word-domain gap is still named."
+  },
+  "next_gate": "Keep NFrame.LinksSource explicit. Discharge OPEN A-DEPOSIT-CONTRACT and A-DEPOSIT-32-ETHER only from artifacts; do not infer either from the generalized router or merge ALLOC into DEPOSIT. The unbounded-Nat versus word gap stays named.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PDeposit1.source_deposit_conserves_and_rolls_back",
+      "module": "LidoSRv3.Audit.Guarantees.PDeposit1",
+      "file": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
+      "start_line": 125,
+      "end_line": 127,
+      "doc": "/--\nCommit-branch-explicit conservation, and rollback of the deployments that\nwould break it, for the SRv3 deposit push at\n`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:\n\n* `contracts/0.8.25/sr/StakingRouter.sol`, `deposit`, lines 942--997;\n* `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;\n* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`,\n  `makeBeaconChainDeposits32ETH`, lines 36--64.\n\nTwo conjuncts, one per half of the guarantee wording; neither is definitional.\n\n*Conservation.* On the committed-push branch -- the only branch that moves wei\n-- the wei pulled from Lido at line 983 equals the wei pushed to the beacon\ndeposit contract by the loop at `BeaconChainDepositor.sol` lines 53--63, and\nthe two independently written source formulas agree: line 972's\n`depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01` and\nthe loop's `pushedValue`.  This is exactly the invariant the `assert` at line\n996 checks, and it is proved from the source-shaped guard structure, not\nassumed: `committedDeposits` carries arbitrary `Nat`s, and only the assert\ngate forces the equality.  The claim is deliberately restricted to the\ncommitted branch because `Outcome.pulled`/`Outcome.pushed` are defined as `0`\non every other branch, so a whole-path accessor equality would be mostly\n`0 = 0`.  The kill-line\n`LidoSRv3.Tests.DepositVectors.dropped_conservation_assert_breaks_pulled_eq_pushed`\nshows this conjunct is load-bearing: dropping the line 996 assert branch from\n`run` (`SolidityDeposit.mutantRun`) lets a skewed deployment commit with\n`pulled ≠ pushed`.\n\n*Rollback.* A deployment whose `MAX_EFFECTIVE_BALANCE_WC_TYPE_01`\n(`StakingRouter.sol` line 65) differs from `DEPOSIT_SIZE`\n(`BeaconChainDepositor.sol` line 24) never commits a mismatched push: on any\nnonempty key batch the whole transaction reverts -- the failing line 996\n`assert` is a Solidity 0.8 `Panic(0x01)`, and the pinned span contains no\n`try`/`catch` and no failure-swallowing low-level call.  This is the\nsource-plane rollback content, and it is not definitional either: it needs the\nempty-batch early return at line 978 excluded (`committedNoDeposits`) and the\nassert gate to exclude a mismatched commit (`committed_implies_conserving`).\n\nCaveats, stated rather than hidden:\n\n* The abstract-transaction rollback fact used in earlier revisions --\n  `observation` maps a reverting outcome to `.reverted`, whose\n  `committedState`/`committedTrace` are `before`/`⟨[], [], []⟩` by definition\n  (`A-ABSTRACT-TX`) -- is definitional in this model and is therefore *not* a\n  conjunct of this registered parent.  It remains available as the\n  unregistered child `revert_restores_state_value_and_logs` (and\n  `SolidityDeposit.reverting_outcome_rolls_back`).\n* Conservation on the commit branch holds without a `ConservingConfig`\n  hypothesis only because the line 996 `assert` is modelled as the revert it\n  is; `SolidityDeposit.pulled_eq_pushed_iff_conserving` shows the pull and\n  push scales agree *exactly when* the deployment sets them equal.\n* Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`\n  division matches EVM `DIV`, but no overflow reasoning is performed.\n* Locator-derived DSM authentication at lines 943 and 1173--1179 remains an\n  interface fact outside this data-only model, so this is not a claim about\n  every possible caller.\n-/",
+      "statement": "theorem source_deposit_conserves_and_rolls_back\n    (cfg : SourceDepositConfig) (inp : SourceDepositInput) :\n    CommittedPushConserves cfg inp ∧ NonConservingDeploymentReverts cfg inp"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PDeposit1.NFrame.verity_tx_composes_nframe_deposit",
+      "module": "LidoSRv3.Audit.Guarantees.PDeposit1",
+      "file": "LidoSRv3/Audit/Guarantees/PDeposit1.lean",
+      "start_line": 1119,
+      "end_line": 1127,
+      "doc": "/--\nP-DEPOSIT-1 list-batch product parent.  Universally quantified finite batches\nproduce the inductive module/pull/beacon journal, a fold equal to its exact\n`Nat` total below `2^256`, and exactly `batches.length` module and beacon legs.\nThe exact total is linked to the source push (and to its pull only under the\nexplicit conserving-deployment hypothesis).\n-/",
+      "statement": "theorem verity_tx_composes_nframe_deposit\n    (cfg : SourceDepositConfig) (inp : SourceDepositInput)\n    (inputs : DepositNFrameTx.Inputs) (entry : _root_.Verity.ContractState)\n    (hLink : LinksSource cfg inp inputs)\n    (hPre : DepositNFrameTx.Preconditions inputs entry) :\n    (CommittedPushConserves cfg inp ∧ NonConservingDeploymentReverts cfg inp) ∧\n      ExecutesNFrameJournal inputs entry ∧\n      ExactTotalIsSourcePush cfg inp inputs ∧\n      ConservingDeploymentPullsExactTotal cfg inp inputs"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.DepositVectors",
+      "LidoSRv3.Tests.DepositParentTxMutants",
+      "LidoSRv3.Tests.DepositNFrameTxMutants"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Audit.Verity.DepositNFrameTx LidoSRv3.Audit.Spec.DepositNFrameCorrespondence LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants LidoSRv3.Tests.DepositNFrameTxMutants",
+      "expected": "universal finite List Batch execution with inductive process/push journal, fold-stable no-wrap and executable wrapping rejection, exactly batches.length moduleEntry/pushEntry map-length arity, generalized List Spec.Allocation router link, named n=2 recovery of the former conjunct (d), and a parent-shaped fixed-two mutant rejected by a healthy three-batch witness; source conservation, rollback, A-DEPOSIT-32-ETHER, and NFrame.LinksSource as a caller hypothesis remain scoped as stated"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-ABSTRACT-TX",
+      "severity": "MEDIUM",
+      "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOURCE-SHAPED",
+      "severity": "MEDIUM",
+      "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "severity": "MEDIUM",
+      "risk": "The Verity 4.31 scaffold is non-certified.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-DEPOSIT-CONTRACT",
+      "severity": "HIGH",
+      "risk": "The deposit transaction's DEPOSIT_CONTRACT immutable is not derived from deployment artifacts.",
+      "justification": "The executable model uses a configured destination; production address identity is a provenance fact.",
+      "violation_impact": "Correctly accounted deposits could be delivered to a noncanonical contract.",
+      "validation": "Check constructor arguments and deployed immutable extraction.",
+      "removal_path": "Prove DEPOSIT_CONTRACT equals the canonical beacon deposit contract in the deployed artifact."
+    },
+    {
+      "id": "A-DEPOSIT-32-ETHER",
+      "severity": "HIGH",
+      "risk": "The production MAX_EFFECTIVE_BALANCE_WC_TYPE_01 constructor value and BeaconChainDepositor DEPOSIT_SIZE are not jointly proved to equal 32 ether.",
+      "justification": "The source model exposes both scales as configuration fields and proves mismatch reverts rather than inventing deployment equality.",
+      "violation_impact": "The production deposit path can revert or fail its intended per-validator value convention.",
+      "validation": "Pin the constructor argument and source literal in reproducible deployment artifacts.",
+      "removal_path": "Prove both production values equal 32 * 10^18 wei."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "abstract commit-branch conservation (pulled = pushed on every committed push) and non-conserving-deployment revert on nonempty batches",
+      "pinned-source correspondence",
+      "authorization, allocation, dynamic deposit data, and deposit roots",
+      "per-module allocation, dynamic-data, and deposit-data-root storage words",
+      "universal finite list-batch Verity execution with an inductively derived module-map, one-pull, beacon-map journal including names, destinations, wei values, arguments, and order",
+      "fold-stable no-wrap: every exact prefix is below 2^256, the word fold equals the exact Nat fold, and a wrapping fold reverts before producing any journal",
+      "arity-n: exactly batches.length moduleEntry and depositToBeacon map-length legs, independent of per-batch key counts; the old conjunct (d) is proved as n = 2",
+      "generalized routerDepositInputs over List Spec.Allocation yields NFrame.LinksSource with the per-allocation unit multiply explicit",
+      "parent-shaped executeTwoOnly kill-line on a healthy three-batch witness",
+      "linked_conserving_deployment_pull_is_word_bounded: the source pull depositsValue = actualDepositsCount * maxEBType1 is word-bounded only under the extra hypothesis ConservingConfig, which the registered parent does not carry, so conjunct (d) states the pull bound with that hypothesis attached rather than unconditionally",
+      "checked line-972-product kill-line linked_hypotheses_do_not_bound_the_line_972_product: at a skewed deployment whose maxEBType1 is the largest uint256-encodable value 2^256 - 1 (encodability is itself a checked conjunct), LinksSource and Preconditions both still hold and the executable push is still 160 wei, while the standalone unbounded-Nat line-972 depositsValue formula reaches 5 * 2^256 - 5, at or above one word, so neither the theorem nor conjunct (d) may be read as bounding the pull quantity every admitted deployment computes; no deployment settles that pull and none even reaches the line-972 multiplication: the skewed deployment's computed cap maxDepositsCount = min 8 (256 / (2^256 - 1)) is zero, so run returns revertZeroDeposits at the earlier line-959 guard (skewed_pull_witness_turned_away_before_line_972, the executable regression on exactly the witness the kill-line quotes), and the line-969 over-target guard bounds the product by the module allocation (line_972_product_le_module_allocation), so a uint256-encodable allocation keeps it inside one word (encodable_allocation_bounds_line_972_product) and an in-range input cannot commit a word-exceeding push (in_range_commit_is_word_bounded)",
+      "checked quantifier-gap witness abstract_parent_covers_inputs_the_verity_plane_omits, non-vacuous by oversized_run_commits: at a 2^256-key input whose per-block cap, module allocation, signature batch and depositable ether are all scaled so no guard turns the model away, the unbounded Nat model's run commits a 2^256-frame push and the abstract parent's conservation conclusion fires on that model-level committed outcome, while no Inputs satisfies LinksSource together with the noWrap premise, for any entry state -- the finite limitation is a theorem here, not only a fidelity note; the exhibit is scoped as a quantifier gap of the abstract model, not a pinned-source execution: oversized_input_is_outside_the_source_domain checks the input sits outside the uint256 domain, so no realizable deployment encodes the call, for encodable module allocations the source's own guards keep the line-972 product inside one word (encodable_allocation_bounds_line_972_product), and no input with an encodable module allocation can commit a word-exceeding push at all (in_range_commit_is_word_bounded), so this word-domain gap's witness necessarily lives outside the source domain; checked in-range commit bound in_range_commit_is_word_bounded: a committing run passed the line-969 over-target guard and the line-996 assert, so on an encodable module allocation both the line-972 product and the committed loop push are below 2^256 -- closing the word-bound gap by keeping the witness in range is impossible, not merely undone; checked in-range n-frame witness manyKey_run_commits with manyKey_input_is_within_the_source_domain and manyKey_links_source_two_legs: a nine-key input with every field uint256-encodable whose model run commits nine per-key deposit frames of 288 wei in total while LinksSource still splits the keys 4 + 5 across the existing two aggregate legs with the total inside one word, so the executable plane admits the input and still journals exactly two depositToBeacon frames -- the missing n-frame model is exhibited where it lives, in range, not by the oversized out-of-domain exhibit; the witness's admission kernel-checks the composed parent's complete hypothesis set at the concrete entry state canonicalState: manyKey_links_source_two_legs proves the full Preconditions (nLinks canonicalSourceConfig 4) canonicalState -- every guard-health flag, distinctModules, valueMatches 288 = 9 * 32, entryBalance, funded 288 <= 1000, noWrap -- rather than LinksSource with the no-wrap inequality alone, and two regressions pin the entry state down from the other side: manyKey_entry_state_guards_are_load_bearing refutes the whole bundle when Lido's ledger is one wei short (288 <= 287 fails at the funding premise), and manyKey_underfunded_entry_reverts_at_not_enough_ether runs the executable transaction at that underfunded entry and gets exactly revert NOT_ENOUGH_ETHER back to the entry snapshot, so the admission is load-bearing, not inherited by accident",
+      "public hypothesis-free verity_tx_revert_restores_snapshot theorem: any actual execute revert restores the exact entry snapshot and idle observation, including after intermediate writes",
+      "source-plane kill-line at the registered abstract parent's own predicate: dropping the line 996 assert from SolidityDeposit.run (mutantRun) commits the skewed deployment with pulled ≠ pushed, and mutantRun = run wherever the assert passes",
+      "executable-plane conservation sibling evidence: skipping the Lido debit breaks the mutant DepositParentTx's own pulled = pushed Observables equality"
+    ],
+    "missing": [
+      "LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength",
+      "DEPOSIT_CONTRACT address provenance is assumed rather than pinned to the deployed beacon deposit contract",
+      "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = literal 32 ether is a deployment/constructor fact, not derived by the parent",
+      "the two-batch executable limitation is closed by DepositNFrameTx; the remaining word-domain gap is the abstract parent quantifying over unbounded Nat inputs whose committed aggregates exceed one word while the executable noWrap premise bounds the aggregate -- witnessed by abstract_parent_covers_inputs_the_verity_plane_omits at an out-of-domain exhibit that has no in-range substitute (in_range_commit_is_word_bounded)",
+      "the source pull is not bounded by this row outside ConservingConfig: LinksSource pins only DEPOSIT_SIZE and neither it nor Preconditions relates MAX_EFFECTIVE_BALANCE_WC_TYPE_01 to it, so for the non-conserving deployments the registered parent still admits, the line-972 pull quantity actualDepositsCount * maxEBType1 exceeds any word bound this row proves (linked_hypotheses_do_not_bound_the_line_972_product, with a uint256-encodable immutable); this is a statement about the computed quantity, not a settled transfer and not a reached multiplication -- the skewed deployment turns away at the earlier line-959 ZeroDeposits guard (skewed_pull_witness_turned_away_before_line_972), and an encodable module allocation bounds the product inside one word (line_972_product_le_module_allocation, encodable_allocation_bounds_line_972_product) -- and no in-range input commits a word-exceeding push at all (in_range_commit_is_word_bounded), so it is a separate theorem and not a bound",
+      "the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked"
+    ],
+    "open_gap_count": 6
+  },
+  "source_spans": [
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "constructor",
+      "start_line": 88,
+      "end_line": 106,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L88-L106"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 immutable",
+      "start_line": 63,
+      "end_line": 66,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L63-L66"
+    },
+    {
+      "path": "contracts/0.8.25/sr/StakingRouter.sol",
+      "function": "deposit",
+      "start_line": 942,
+      "end_line": 997,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L942-L997"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "DEPOSIT_SIZE constant",
+      "start_line": 24,
+      "end_line": 25,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L24-L25"
+    },
+    {
+      "path": "contracts/0.4.24/Lido.sol",
+      "function": "withdrawDepositableEther",
+      "start_line": 869,
+      "end_line": 886,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L869-L886"
+    },
+    {
+      "path": "contracts/0.4.24/Lido.sol",
+      "function": "_spendDepositableEther",
+      "start_line": 839,
+      "end_line": 859,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L839-L859"
+    },
+    {
+      "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
+      "function": "makeBeaconChainDeposits32ETH",
+      "start_line": 36,
+      "end_line": 64,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L36-L64"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "LinksSource is a caller-supplied hypothesis: Wave 4 kill-line alloc_derived_linkssource_kill_line_refutes_bridge shows P-ALLOC-1 CheckedBounds and P-ALLOC-2 step premises plus key-count composition still do not imply LinksSource, because ALLOC does not constrain per-batch wei (firstAmount) and does not constrain publicKeysBatchLength",
+      "DEPOSIT_CONTRACT address provenance is assumed rather than pinned to the deployed beacon deposit contract",
+      "MAX_EFFECTIVE_BALANCE_WC_TYPE_01 = literal 32 ether is a deployment/constructor fact, not derived by the parent",
+      "the two-batch executable limitation is closed by DepositNFrameTx; the remaining word-domain gap is the abstract parent quantifying over unbounded Nat inputs whose committed aggregates exceed one word while the executable noWrap premise bounds the aggregate -- witnessed by abstract_parent_covers_inputs_the_verity_plane_omits at an out-of-domain exhibit that has no in-range substitute (in_range_commit_is_word_bounded)",
+      "the source pull is not bounded by this row outside ConservingConfig: LinksSource pins only DEPOSIT_SIZE and neither it nor Preconditions relates MAX_EFFECTIVE_BALANCE_WC_TYPE_01 to it, so for the non-conserving deployments the registered parent still admits, the line-972 pull quantity actualDepositsCount * maxEBType1 exceeds any word bound this row proves (linked_hypotheses_do_not_bound_the_line_972_product, with a uint256-encodable immutable); this is a statement about the computed quantity, not a settled transfer and not a reached multiplication -- the skewed deployment turns away at the earlier line-959 ZeroDeposits guard (skewed_pull_witness_turned_away_before_line_972), and an encodable module allocation bounds the product inside one word (line_972_product_le_module_allocation, encodable_allocation_bounds_line_972_product) -- and no in-range input commits a word-exceeding push at all (in_range_commit_is_word_bounded), so it is a separate theorem and not a bound",
+      "the registered composed parent still carries LinksSource and success Preconditions, making its internal revert conjunct vacuous even though the separate public hypothesis-free rollback theorem is checked"
+    ]
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "schema": "lido-srv3-ux2-guarantee-v1",
+  "id": "P-TOPUP-2",
+  "position": 9,
+  "summary": "aggregate_bounded_by_block_cap proves the leftover-budget walk cannot exceed maxTopUpPerBlockGwei. per_key_bounded_by_candidate additionally proves a pointwise Forall2 bound between every produced allocation and its requested/evaluated candidate. block_cap_kill_line_refutes_parent drops the cap term. Verity correspondence now decodes an explicit gwei-normalized topUpLimits array, checks it equals the independently evaluated per-key limits, and uses it to cap requests; it remains conditional on count <= 32. The count>32 no-check mutant is guard-necessity evidence outside that parent's premises, not a parent refutation. A-TOPUP-NOWRAP is removed from this row because its recorded line-732 risk belongs to P-TOPUP-1. Live wei conversion, module allocateDeposits policy, and SSZ remain open.",
+  "classification": {
+    "kind": "IMPLEMENTATION_PENDING",
+    "work": "Keep the checked block-cap parent, its pointwise per-key child, explicit gwei-normalized per-key limit input, and the mutant-budget kill-line. Next model the wei conversion and module-selected allocateDeposits result. Keep the 32-guard witness labeled as premise/guard necessity; do not compose with P-TOPUP-1."
+  },
+  "next_gate": "Explicit gwei-normalized per-key topUpLimits input and independent Verity sourceView correspondence are CHECKED. OPEN: model the live wei conversion and module-selected allocateDeposits return before widening; keep the 32-guard as premise/guard necessity; do not compose with P-TOPUP-1.",
+  "roadmap_priority": "DONE",
+  "theorems": [
+    {
+      "plane": "abstract",
+      "role": "registered abstract Lean parent (audit/guarantees.yaml abstract.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PTopup2.aggregate_bounded_by_block_cap",
+      "module": "LidoSRv3.Audit.Guarantees.PTopup2",
+      "file": "LidoSRv3/Audit/Guarantees/PTopup2.lean",
+      "start_line": 184,
+      "end_line": 185,
+      "doc": "/-- **P-TOPUP-2, abstract plane.**  The sum of the top-up amounts allocated in\na batch is at most the protocol's per-block cap, in gwei, with no hypothesis on\nthe batch.\n\n**Registered P-TOPUP-2 parent.** Leftover-budget consumption of\n`min(valueGwei, min(moduleLimit, maxTopUpPerBlock))` is ≤ the per-block\ncap. Validator WC, slash, activation, and `allocations = transition` are\nnot used. `A-TOPUP-NOWRAP` is not attached to this row: its recorded\nStakingRouter line-732 accumulator belongs to P-TOPUP-1.\n\nThis is unconditional in `b` and `cfg`: unlike a post-condition that takes\nthe sum bound as a hypothesis and hands it back, this theorem's content is\nin the *proof* — induction over `consumeBudget` showing the leftover walk\nnever exceeds the budget it was given, composed with `transitionBudget`'s\n`min _ (min _ maxTopUpPerBlockGwei)`. `Tests.Topup2DistributionTxMutants`\nshows the bound is not vacuous: a mutant budget that drops the\n`maxTopUpPerBlockGwei` term from that `min` lets the identical leftover walk\nallocate above the cap (`block_cap_kill_line_refutes_parent`). -/",
+      "statement": "theorem aggregate_bounded_by_block_cap (b : TopupBatch) (cfg : TopupConfig) :\n    (transition b cfg).sum ≤ cfg.maxTopUpPerBlockGwei"
+    },
+    {
+      "plane": "verity",
+      "role": "registered Verity Executable Contract parent (audit/guarantees.yaml verity.theorem)",
+      "status": "CHECKED",
+      "name": "LidoSRv3.Audit.Guarantees.PTopup2.verity_tx_simulates_topup2_spec",
+      "module": "LidoSRv3.Audit.Guarantees.PTopup2Verity",
+      "file": "LidoSRv3/Audit/Guarantees/PTopup2Verity.lean",
+      "start_line": 16,
+      "end_line": 31,
+      "doc": "/-- **P-TOPUP-2, Verity plane.**  If the memory arrays decode, `observe` of\n`allocate` equals `sourceView` of the same source run.\n\nIf the four memory arrays decode to equal-length `effective` /\n`pending` / `requested` / live per-key `topUpLimits` within\n`maxValidatorsPerTopUp`, then `observe` of\n`allocate` (persisted allocation array plus remaining/used slots) equals\n`sourceView` of the same `sourceRun`. Limits are normalized to gwei here;\nthe live wei conversion and SSZ remain outside this theorem. -/",
+      "statement": "theorem verity_tx_simulates_topup2_spec\n    (effective pending requested topUpLimits : List Word)\n    (target minTopUp remainingCap moduleLimit valueGwei : Word)\n    (state : Verity.ContractState)\n    (hEff : readArray state \"effective\" effectiveBase effective.length = some effective)\n    (hPend : readArray state \"pending\" pendingBase pending.length = some pending)\n    (hReq : readArray state \"requested\" requestedBase requested.length = some requested)\n    (hLimits : readArray state \"topUpLimits\" limitsBase topUpLimits.length = some topUpLimits)\n    (hLen : effective.length = pending.length ∧ pending.length = requested.length ∧\n      requested.length = topUpLimits.length)\n    (hMax : requested.length ≤ maxValidatorsPerTopUp) :\n    observe (List.replicate requested.length 0) remainingCap\n        ((allocate requested.length target minTopUp remainingCap moduleLimit valueGwei).run\n          state) =\n      sourceView effective pending requested topUpLimits\n        target minTopUp remainingCap moduleLimit valueGwei"
+    }
+  ],
+  "kill_lines": {
+    "modules": [
+      "LidoSRv3.Tests.Topup2DistributionTxMutants"
+    ],
+    "reproduction": {
+      "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
+      "expected": "abstract leftover-budget block-cap parent (unconditional; proved by induction over the budget-consuming walk), a mutant-budget kill-line refuting the parent's own statement when the cap term is dropped, and lockstep memory-array Verity transaction build with overflow, off-by-one, rollback, two-batch mutants plus maxValidatorsPerTopUp guard kill-line max_validators_guard_kill_line_refutes_no_check (honest reverts 33-validator batch, mutant without guard commits)"
+    }
+  },
+  "assumptions": [
+    {
+      "id": "A-SOURCE-SHAPED",
+      "severity": "MEDIUM",
+      "risk": "Source-shaped inputs are not extracted from independently verified pinned Solidity spans.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-VERITY-SCAFFOLD",
+      "severity": "MEDIUM",
+      "risk": "The Verity 4.31 scaffold is non-certified.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    }
+  ],
+  "fidelity": {
+    "covered": [
+      "leftover-budget block-cap bound: consumeBudget over transitionBudget sums to at most maxTopUpPerBlockGwei, unconditionally, with a mutant-budget kill-line",
+      "per-key bound per_key_bounded_by_candidate: every transition allocation is paired with and no greater than its requested/evaluated candidate",
+      "executor sourceRun plus separately copied sourceRunIndependent/sourceLimitsIndependent/sourceCandidatesIndependent/sourceConsumeIndependent equations with proved equality bridges; an explicit decoded gwei-normalized topUpLimits array is checked against gateway evaluation and caps each request; observe reads persisted allocations and budget slots",
+      "Contract.run rollback after intermediate writes",
+      "maxValidatorsPerTopUp guard enforced as checked revert on count>32; the no-check mutant is guard-necessity evidence outside the registered Verity parent's count <= 32 premise"
+    ],
+    "missing": [
+      "_verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp",
+      "live wei conversion and the module-selected allocateDeposits return/policy",
+      "Lido withdrawDepositableEther and beacon makeBeaconChainTopUp",
+      "gwei versus wei units and 48-byte pubkeys",
+      "keccak memory-array oracle",
+      "pendingBalanceGwei is trusted operator calldata"
+    ],
+    "open_gap_count": 6
+  },
+  "source_spans": [
+    {
+      "path": "contracts/0.8.25/TopUpGateway.sol",
+      "function": "topUp",
+      "start_line": 160,
+      "end_line": 237,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/TopUpGateway.sol#L160-L237"
+    },
+    {
+      "path": "contracts/0.8.25/TopUpGateway.sol",
+      "function": "_evaluateTopUpLimit",
+      "start_line": 396,
+      "end_line": 415,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/TopUpGateway.sol#L396-L415"
+    },
+    {
+      "path": "contracts/0.8.25/CLValidatorVerifier.sol",
+      "function": "_verifyValidator",
+      "start_line": 44,
+      "end_line": 57,
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/CLValidatorVerifier.sol#L44-L57"
+    }
+  ],
+  "boundary": {
+    "model_not_deployment": [
+      "These are proofs about a model, not about a deployed contract.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
+      "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
+      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+    ],
+    "not_covered": [
+      "_verifyValidator / 0x02 module WC / block-distance / RootPrecedesLastTopUp",
+      "live wei conversion and the module-selected allocateDeposits return/policy",
+      "Lido withdrawDepositableEther and beacon makeBeaconChainTopUp",
+      "gwei versus wei units and 48-byte pubkeys",
+      "keccak memory-array oracle",
+      "pendingBalanceGwei is trusted operator calldata"
+    ]
+  }
+}

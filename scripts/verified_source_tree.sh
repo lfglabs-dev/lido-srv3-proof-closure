@@ -28,8 +28,7 @@ untracked_inputs="$({
 
 {
   printf '040000 tree %s\tLidoSRv3\n' "$(git rev-parse HEAD:LidoSRv3)"
-  printf '100644 blob %s\tLidoSRv3.lean\n' "$(git rev-parse HEAD:LidoSRv3.lean)"
-  printf '100644 blob %s\tlake-manifest.json\n' "$(git rev-parse HEAD:lake-manifest.json)"
-  printf '100644 blob %s\tlakefile.lean\n' "$(git rev-parse HEAD:lakefile.lean)"
-  printf '100644 blob %s\tlean-toolchain\n' "$(git rev-parse HEAD:lean-toolchain)"
+  for input in LidoSRv3.lean lake-manifest.json lakefile.lean lean-toolchain; do
+    git ls-tree HEAD -- "$input"
+  done
 } | git mktree
