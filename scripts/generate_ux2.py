@@ -74,6 +74,7 @@ OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
 WHERE = re.compile(r"where\b")
 MATCH = re.compile(r"match\b")
+FUN = re.compile(r"fun\b")
 # Equation-style theorem proofs begin their clauses with a depth-zero `|` at
 # the start of a subsequent logical line.  It ends the declaration signature
 # just as `:=` and `where` do.
@@ -96,6 +97,21 @@ def arm_pipe_at(text: str, index: int) -> bool:
     before = text[index - 1] if index else " "
     after = text[index + 1] if index + 1 < len(text) else " "
     return before not in SYMBOL_CHARACTERS and after not in SYMBOL_CHARACTERS
+
+
+def pattern_lambda_at(text: str, index: int) -> bool:
+    """Whether the `fun` at `index` opens a pattern-matching lambda.
+
+    `fun | ... => ...` lays its arms out exactly like a result-type
+    `match ... with`, so the pipes that follow belong to the lambda and can
+    never open an equation-style declaration body.  Comments are masked to
+    whitespace in the scanned view, so only whitespace sits between the
+    keyword and its first arm.
+    """
+    cursor = index + 3
+    while cursor < len(text) and text[cursor].isspace():
+        cursor += 1
+    return cursor < len(text) and text[cursor] == "|" and arm_pipe_at(text, cursor)
 
 
 def fail(message: str) -> NoReturn:
@@ -140,12 +156,13 @@ def statement_end(text: str, start: int) -> int:
     depth = 0
     pending = 0
     # A result type may itself contain nested top-level `match ... with`
-    # expressions. Their arms use the same `|` token as equation-style theorem
-    # bodies. Each match has an independent layout boundary, so a stack is
-    # required: a nested match must not replace its enclosing match's column.
-    # `None` means a `match` is awaiting its first arm; an integer is that
-    # match's arm column. Keeping frames rather than one scalar preserves the
-    # enclosing match when a nested result match finishes.
+    # expressions or pattern-matching lambdas (`fun | ... => ...`). Their arms
+    # use the same `|` token as equation-style theorem bodies. Each matcher
+    # has an independent layout boundary, so a stack is required: a nested
+    # matcher must not replace its enclosing matcher's column. `None` means a
+    # matcher is awaiting its first arm; an integer is that matcher's arm
+    # column. Keeping frames rather than one scalar preserves the enclosing
+    # matcher when a nested result matcher finishes.
     result_match_arm_columns: list[int | None] = []
     index = start
     while index < len(text) - 1:
@@ -161,6 +178,8 @@ def statement_end(text: str, start: int) -> int:
         elif depth == 0 and word_at(text, index, WHERE):
             return index
         elif depth == 0 and word_at(text, index, MATCH):
+            result_match_arm_columns.append(None)
+        elif depth == 0 and word_at(text, index, FUN) and pattern_lambda_at(text, index):
             result_match_arm_columns.append(None)
         # An operator containing a pipe (`||`, `<|`, `|>`, `|=`, ...) is one
         # Lean token, not an arm delimiter.  Only a standalone pipe can open
@@ -339,6 +358,33 @@ def strip_trailing_line_comment(line: str) -> str:
             if prefix.count("[") == prefix.count("]"):
                 return prefix.rstrip()
             index += 2
+        else:
+            index += 1
+    return line
+
+
+def strip_inert_line_comment(line: str) -> str:
+    """Remove a trailing `--` comment from a line scanned as comment text.
+
+    Unlike `strip_trailing_line_comment`, bracket balance is irrelevant here:
+    the documentation attachment scan applies this view only to comment
+    whitespace above a declaration, never to attribute text whose unclosed
+    brackets would make `--` comment content spanning lines.  Every `--` at
+    block-comment depth zero therefore starts a line comment, and its inert
+    text must not enter the balanced marker scans.
+    """
+    depth = 0
+    index = 0
+    while index < len(line) - 1:
+        pair = line[index:index + 2]
+        if pair == "/-":
+            depth += 1
+            index += 2
+        elif pair == "-/" and depth:
+            depth -= 1
+            index += 2
+        elif pair == "--" and depth == 0:
+            return line[:index].rstrip()
         else:
             index += 1
     return line
@@ -568,8 +614,13 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
             continue
         # A closing block-comment delimiter may itself be followed by a line
         # comment.  That trailing comment is whitespace to Lean for purposes
-        # of attaching the documentation block.
-        if re.search(r"-/\s*(?:--.*)?$", line):
+        # of attaching the documentation block, and its text is inert:
+        # comment markers inside it must not enter the balanced scans below.
+        # Normalize the scan view before matching the closer.
+        normalized = strip_inert_line_comment(lines[index]).rstrip()
+        if normalized.endswith("-/"):
+            lines = [*lines]
+            lines[index] = normalized
             comment_end = index
             comment_start = None
             depth = 0
@@ -610,7 +661,7 @@ def doc_comment(lines: list[str], declaration_line: int, declaration_column: int
                 lines[end[0]] = lines[end[0]][:end[1]]
                 index = end[0]
             else:
-                lines[comment_end] = strip_trailing_line_comment(lines[comment_end])
+                # The view at `comment_end` is already normalized above.
                 index = comment_end
         break
     if index < 0 or not lines[index].rstrip().endswith("-/"):

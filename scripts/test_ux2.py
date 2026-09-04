@@ -436,6 +436,64 @@ def check_lean_scanner(fixture: Path) -> None:
             "theorem after_armed_operator : True"):
         raise SystemExit("scanner consumed the declaration after an operator equation clause")
 
+    # A depth-zero pattern-matching lambda in the result type owns its pipes:
+    # `fun | ... => ...` arms lay out exactly like a result-type match, so
+    # they are never equation clauses of the declaration, even inside a `let`
+    # binding whose walrus the signature scan still consumes.  The following
+    # theorem is the boundary control against absorption.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem pattern_lambda : let p : Bool → Prop := fun | true => True | false => False; p true := trivial\n"
+        "theorem after_pattern_lambda : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    if found["Outer.pattern_lambda"][0]["statement"] != (
+            "theorem pattern_lambda : let p : Bool → Prop := "
+            "fun | true => True | false => False; p true"):
+        raise SystemExit("scanner treated pattern-lambda arms as equation clauses")
+    if found["Outer.after_pattern_lambda"][0]["statement"] != (
+            "theorem after_pattern_lambda : True"):
+        raise SystemExit("scanner consumed the declaration after a pattern lambda")
+
+    # Family level: the lambda's first arm fixes its own layout column, so a
+    # multiline pattern lambda keeps its arms in the signature, a dedented
+    # pipe after the lambda still opens an equation clause, and a pattern
+    # lambda nested in a result-match arm ends at its own dedent without
+    # losing the enclosing match.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem multiline_lambda : let p := fun\n"
+        "    | true => True\n"
+        "    | false => False; p true := trivial\n"
+        "theorem after_multiline_lambda : True := trivial\n"
+        "theorem lambda_then_equation : let f := fun | a => a; ∀ n : Nat, f n = f n\n"
+        "  | n => rfl\n"
+        "theorem after_lambda_then_equation : True := trivial\n"
+        "theorem lambda_in_match : ∀ b : Bool, match b with\n"
+        "  | true => fun | a => a = a\n"
+        "  | false => True\n"
+        "  := by trivial\n"
+        "theorem after_lambda_in_match : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_lambdas = {
+        "Outer.multiline_lambda":
+            "theorem multiline_lambda : let p := fun\n"
+            "    | true => True\n"
+            "    | false => False; p true",
+        "Outer.after_multiline_lambda": "theorem after_multiline_lambda : True",
+        "Outer.lambda_then_equation":
+            "theorem lambda_then_equation : let f := fun | a => a; ∀ n : Nat, f n = f n",
+        "Outer.after_lambda_then_equation": "theorem after_lambda_then_equation : True",
+        "Outer.lambda_in_match":
+            "theorem lambda_in_match : ∀ b : Bool, match b with\n"
+            "  | true => fun | a => a = a\n"
+            "  | false => True",
+        "Outer.after_lambda_in_match": "theorem after_lambda_in_match : True",
+    }
+    if {name: records[0]["statement"] for name, records in found.items()} != expected_lambdas:
+        raise SystemExit("scanner mishandled a pattern-lambda layout boundary")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
@@ -707,6 +765,42 @@ def check_lean_scanner(fixture: Path) -> None:
         if found[name][0]["doc"] != doc:
             raise SystemExit(f"scanner stripped comment content as a trailing line comment: "
                              f"{found[name][0]['doc']!r}")
+
+    # Family level: a line comment trailing a documentation block is inert
+    # Lean whitespace, so comment markers inside it (`/-`, `-/`) are text and
+    # must not enter the backward scan that balances the block's opener.
+    # However much comment whitespace lies between the block and its
+    # declaration, the document is retained; the undocumented theorem is the
+    # detachment control.
+    module.write_text(
+        "namespace Outer\n"
+        "/-- Documentation /- with a nested comment -/ inside. -/ -- trailing /- marker\n"
+        "\n"
+        "theorem inert_blank : True := trivial\n"
+        "/-- Documentation /- with a nested comment -/ inside. -/ -- trailing /- marker\n"
+        "-- intervening line comment\n"
+        "theorem inert_line_comment : True := trivial\n"
+        "/-- Documentation /- with a nested comment -/ inside. -/ -- trailing /- marker\n"
+        "/- intervening ordinary comment -/\n"
+        "theorem inert_ordinary_comment : True := trivial\n"
+        "/-- Multiline documentation /- with a nested comment -/\n"
+        "-/ -- trailing /- marker\n"
+        "/- intervening ordinary comment -/\n"
+        "theorem inert_multiline : True := trivial\n"
+        "theorem undocumented : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_inert = {
+        "Outer.inert_blank": "/-- Documentation /- with a nested comment -/ inside. -/",
+        "Outer.inert_line_comment": "/-- Documentation /- with a nested comment -/ inside. -/",
+        "Outer.inert_ordinary_comment": "/-- Documentation /- with a nested comment -/ inside. -/",
+        "Outer.inert_multiline": "/-- Multiline documentation /- with a nested comment -/\n-/",
+        "Outer.undocumented": "",
+    }
+    for name, doc in expected_inert.items():
+        if found[name][0]["doc"] != doc:
+            raise SystemExit(f"scanner balanced a comment marker inside a trailing line comment: "
+                             f"{name}: {found[name][0]['doc']!r}")
 
     # A line comment trailing an attribute is Lean whitespace and cannot
     # detach the documentation block above it.
