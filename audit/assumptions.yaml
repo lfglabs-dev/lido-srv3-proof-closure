@@ -132,8 +132,9 @@
       "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
       "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
       "severity": "MEDIUM",
+      "scope": "global",
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
@@ -159,9 +160,10 @@
     {
       "id": "A-SOLC-TRUSTED",
       "accepted": true,
-      "risk": "Pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
       "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
       "severity": "MEDIUM",
+      "scope": "global",
       "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
       "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
       "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
