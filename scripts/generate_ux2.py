@@ -72,6 +72,8 @@ SCOPE = re.compile(
     rf"({SCOPE_COMPONENT}(?:\.{SCOPE_COMPONENT})*))?")
 OPENERS = "([{⟨"
 BINDER = re.compile(r"(?:let|have)\b")
+LET = re.compile(r"let\b")
+REC = re.compile(r"rec\b")
 WHERE = re.compile(r"where\b")
 MATCH = re.compile(r"match\b")
 FUN = re.compile(r"fun\b")
@@ -97,6 +99,44 @@ def arm_pipe_at(text: str, index: int) -> bool:
     before = text[index - 1] if index else " "
     after = text[index + 1] if index + 1 < len(text) else " "
     return before not in SYMBOL_CHARACTERS and after not in SYMBOL_CHARACTERS
+
+
+def equation_local_function_at(text: str, index: int) -> bool:
+    """Whether the `let` at `index` opens an equation-style local function.
+
+    `let [rec] name : type | pat => body | ...` defines its equations where a
+    plain `let name := value` or a pattern lambda body would stand.  Its arms
+    lay out exactly like a result-type `match`, so the pipes that follow
+    belong to the binding and can never open an equation-style declaration
+    body.  A plain typed binding (`let name : type := ...`) instead carries no
+    arms and returns False, leaving the existing walrus accounting untouched.
+    `have` can never take equation arms, so only a `let` is eligible: letting
+    `have` push a matcher frame would swallow the declaration's own equation
+    arms.  The scan stops at the first binding operator (`:=`, which ends a
+    plain binding, or a do-notation `←`, which carries no `:=`) or at a
+    depth-zero `where`, mirroring the existing binder helpers.
+    """
+    cursor = index + 3
+    while cursor < len(text) and text[cursor].isspace():
+        cursor += 1
+    if word_at(text, cursor, REC):
+        cursor += 3
+        while cursor < len(text) and text[cursor].isspace():
+            cursor += 1
+    depth = 0
+    while cursor < len(text) - 1:
+        char = text[cursor]
+        if char in OPENERS:
+            depth += 1
+        elif char in CLOSERS:
+            depth -= 1
+        elif depth == 0 and (text.startswith(":=", cursor) or char == "←"
+                             or word_at(text, cursor, WHERE)):
+            return False
+        elif depth == 0 and char == "|" and arm_pipe_at(text, cursor):
+            return equation_clause_at(text, cursor)
+        cursor += 1
+    return False
 
 
 def pattern_lambda_at(text: str, index: int) -> bool:
@@ -156,13 +196,14 @@ def statement_end(text: str, start: int) -> int:
     depth = 0
     pending = 0
     # A result type may itself contain nested top-level `match ... with`
-    # expressions or pattern-matching lambdas (`fun | ... => ...`). Their arms
-    # use the same `|` token as equation-style theorem bodies. Each matcher
-    # has an independent layout boundary, so a stack is required: a nested
-    # matcher must not replace its enclosing matcher's column. `None` means a
-    # matcher is awaiting its first arm; an integer is that matcher's arm
-    # column. Keeping frames rather than one scalar preserves the enclosing
-    # matcher when a nested result matcher finishes.
+    # expressions, pattern-matching lambdas (`fun | ... => ...`), or
+    # equation-style local functions (`let [rec] f : T | ... => ...`). Their
+    # arms use the same `|` token as equation-style theorem bodies. Each
+    # matcher has an independent layout boundary, so a stack is required: a
+    # nested matcher must not replace its enclosing matcher's column. `None`
+    # means a matcher is awaiting its first arm; an integer is that matcher's
+    # arm column. Keeping frames rather than one scalar preserves the
+    # enclosing matcher when a nested result matcher finishes.
     result_match_arm_columns: list[int | None] = []
     index = start
     while index < len(text) - 1:
@@ -181,25 +222,28 @@ def statement_end(text: str, start: int) -> int:
             result_match_arm_columns.append(None)
         elif depth == 0 and word_at(text, index, FUN) and pattern_lambda_at(text, index):
             result_match_arm_columns.append(None)
+        elif depth == 0 and word_at(text, index, LET) and equation_local_function_at(text, index):
+            result_match_arm_columns.append(None)
         # An operator containing a pipe (`||`, `<|`, `|>`, `|=`, ...) is one
         # Lean token, not an arm delimiter.  Only a standalone pipe can open
         # a match or equation arm.
         elif depth == 0 and char == "|" and arm_pipe_at(text, index):
             column = index - text.rfind("\n", 0, index) - 1
-            # A dedented pipe has left one or more nested result matches. Do
-            # this before classifying the pipe so the outer match's layout is
-            # restored after an inner match ends.
+            # A dedented pipe has left one or more nested result matchers
+            # (matches, pattern lambdas, equation-style local functions). Do
+            # this before classifying the pipe so the outer matcher's layout
+            # is restored after an inner matcher ends.
             while (result_match_arm_columns and result_match_arm_columns[-1] is not None
-                   and column < result_match_arm_columns[-1]):
+                    and column < result_match_arm_columns[-1]):
                 result_match_arm_columns.pop()
             if result_match_arm_columns and result_match_arm_columns[-1] is None:
-                # The first arm may share the `match ... with` line. It is
-                # still a result-type arm, even though an equation clause may
-                # also start on the theorem signature line when no match is
-                # active.
+                # The first arm may share the opener line (`match ... with`,
+                # `fun`, or `let [rec] f : T`). It is still a result-type arm,
+                # even though an equation clause may also start on the theorem
+                # signature line when no matcher is active.
                 result_match_arm_columns[-1] = column
             elif result_match_arm_columns:
-                # This is another arm of the innermost surviving result match.
+                # This is another arm of the innermost surviving result matcher.
                 pass
             elif equation_clause_at(text, index):
                 # Return the preceding newline so the declaration's source

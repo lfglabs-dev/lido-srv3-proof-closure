@@ -494,6 +494,67 @@ def check_lean_scanner(fixture: Path) -> None:
     if {name: records[0]["statement"] for name, records in found.items()} != expected_lambdas:
         raise SystemExit("scanner mishandled a pattern-lambda layout boundary")
 
+    # Family level with equation-style local functions: `let [rec] f : T`
+    # followed by `| ... => ...` arms defines the local function's equations
+    # where a walrus binding would stand.  Those pipes belong to the binding
+    # and can never open an equation-style declaration body, exactly like the
+    # pattern-lambda arms above.  Single-line and multiline spellings, a
+    # dedented equation clause after the local function, and a nested
+    # pattern lambda inside a local-function arm each keep the enclosing
+    # matcher; the following theorems are the boundary controls.
+    module.write_text(
+        "namespace Outer\n"
+        "theorem local_equations : let p : Nat → Prop | 0 => True | n + 1 => p n; p 0 := by trivial\n"
+        "theorem after_local_equations : True := trivial\n"
+        "theorem local_rec_equations : let rec p : Nat → Prop | 0 => True | n + 1 => p n; p 0 := by trivial\n"
+        "theorem after_local_rec_equations : True := trivial\n"
+        "theorem multiline_local : let rec p : Nat → Prop\n"
+        "    | 0 => True\n"
+        "    | n + 1 => p n; p 0 := by trivial\n"
+        "theorem after_multiline_local : True := trivial\n"
+        "theorem local_then_equation : let rec p : Nat → Prop | 0 => True | n + 1 => p n; ∀ n : Nat, p n = p n\n"
+        "  | n => rfl\n"
+        "theorem after_local_then_equation : True := trivial\n"
+        "theorem lambda_in_local : let rec p : Nat → Prop | 0 => let q := fun | true => True | false => False; q true | n + 1 => p n; p 0 := by trivial\n"
+        "theorem after_lambda_in_local : True := trivial\n"
+        "theorem have_then_equation : have h : True := trivial; ∀ n : Nat, n = n\n"
+        "  | n => rfl\n"
+        "theorem after_have_then_equation : True := trivial\n"
+        "theorem do_bind_control : Id.run do let x ← pure True; return x := by decide\n"
+        "theorem after_do_bind_control : True := trivial\n"
+        "end Outer\n", encoding="utf-8")
+    found = generate_ux2.scan_file(fixture, module)
+    expected_locals = {
+        "Outer.local_equations":
+            "theorem local_equations : let p : Nat → Prop | 0 => True | n + 1 => p n; p 0",
+        "Outer.after_local_equations": "theorem after_local_equations : True",
+        "Outer.local_rec_equations":
+            "theorem local_rec_equations : let rec p : Nat → Prop | 0 => True | n + 1 => p n; p 0",
+        "Outer.after_local_rec_equations": "theorem after_local_rec_equations : True",
+        "Outer.multiline_local":
+            "theorem multiline_local : let rec p : Nat → Prop\n"
+            "    | 0 => True\n"
+            "    | n + 1 => p n; p 0",
+        "Outer.after_multiline_local": "theorem after_multiline_local : True",
+        "Outer.local_then_equation":
+            "theorem local_then_equation : let rec p : Nat → Prop | 0 => True | n + 1 => p n; ∀ n : Nat, p n = p n",
+        "Outer.after_local_then_equation": "theorem after_local_then_equation : True",
+        "Outer.lambda_in_local":
+            "theorem lambda_in_local : let rec p : Nat → Prop | 0 => let q := fun | true => True | false => False; q true | n + 1 => p n; p 0",
+        "Outer.after_lambda_in_local": "theorem after_lambda_in_local : True",
+        # Controls: `have` can never take equation arms, so a pipe after a
+        # `have` binding is still the declaration's own equation clause, and
+        # a do-notation `let x ← …` carries no walrus to consume.
+        "Outer.have_then_equation":
+            "theorem have_then_equation : have h : True := trivial; ∀ n : Nat, n = n",
+        "Outer.after_have_then_equation": "theorem after_have_then_equation : True",
+        "Outer.do_bind_control":
+            "theorem do_bind_control : Id.run do let x ← pure True; return x",
+        "Outer.after_do_bind_control": "theorem after_do_bind_control : True",
+    }
+    if {name: records[0]["statement"] for name, records in found.items()} != expected_locals:
+        raise SystemExit("scanner treated local-function arms as equation clauses")
+
     module.write_text(
         "namespace Outer\n"
         "mutual\n"
