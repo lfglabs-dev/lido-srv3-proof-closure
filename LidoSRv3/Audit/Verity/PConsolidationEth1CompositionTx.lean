@@ -102,16 +102,53 @@ def envWith (resolve : String → Option LinkedExternal) : CallEnv :=
 def feeField : Field :=
   { name := "feePerRequest", ty := .uint256, slot := some 0 }
 
+/-! ## Name correspondence (Solidity to Lean)
+
+| Solidity                                             | Lean                          |
+|------------------------------------------------------|-------------------------------|
+| `msg.value` (declared amount, calldata word 0)        | `amountParam` (`"amount"`), alias `msgValueParam` |
+| `requestsCount` (`ConsolidationGateway.sol:194-199`)  | `batchParam` (`"batchSize"`), alias `requestsCountParam` |
+| `fee` per request (`ConsolidationGateway.sol:211`)    | storage `feePerRequest` (`feeField`) |
+| `totalFee = requestsCount * fee` (line 212)           | local `"fee"` in `gatewayFn` / `vaultFn` (name kept, proofs evaluate it) |
+| `refund = msg.value - fee` (`_checkFee`, line 291)    | local `"refund"` |
+-/
+
 def amountParam : Param := { name := "amount", ty := .uint256 }
 def batchParam : Param := { name := "batchSize", ty := .uint256 }
 
-/-- `require(msg.value == amount)` — the receiving half of the declared-amount
-convention. -/
+/-- Solidity-facing name: the ensemble's `batchSize` is
+`ConsolidationGateway.sol:194-199 requestsCount` (the flattened pair count),
+which the vault receives as `sourcePubkeys.length`
+(`WithdrawalVaultEIP7685.sol:60`). -/
+abbrev requestsCountParam := batchParam
+
+/-- Solidity-facing name: the ensemble's declared `amount` is the frame's
+`msg.value` (the declared-amount calling convention lifts calldata word `0`
+into `CallSite.value`). -/
+abbrev msgValueParam := amountParam
+
+/-- Harness calling convention, not Solidity: `require(msg.value == amount)`
+is the receiving half of the declared-amount convention (see the module
+header). Solidity has no such check; `msg.value` is simply the frame value. -/
 def declaredValueCheck : Stmt :=
   .require (.eq .msgValue (.param "amount")) "DeclaredValueMismatch"
 
-/-! ### ConsolidationBus -/
+/-! ### ConsolidationBus.executeConsolidation (ConsolidationBus.sol:383-406) -/
 
+/-- `ConsolidationBus.sol:383-406 executeConsolidation(ConsolidationWitnessGroup[] calldata groups)`.
+Only line 403 is transcribed: the value-forwarding hop to the gateway.
+
+Not transcribed: 385-391 (rebuild `publisherGroups`), 393 (`batchHash`),
+395-396 (`BatchNotFound`), 398-399 (`ExecutionDelayNotPassed`), 401
+(`delete _pendingBatches[batchHash]`), 405 (`emit RequestsExecuted`). The
+batch lifecycle is out of this ensemble.
+
+Added by the model: `declaredValueCheck` (harness convention) and the
+`batchSize` calldata word that stands for the flattened request count.
+
+The single-contract ledger counterpart of this hop is
+`PConsolidationEth1RequestTx.busForward` (storage ledger, not a frame
+dispatch); both transcribe the same line 403. -/
 def busFn : FunctionSpec :=
   { name := "executeConsolidation"
     params := [amountParam, batchParam]
@@ -119,8 +156,12 @@ def busFn : FunctionSpec :=
     isPayable := true
     body :=
       [ declaredValueCheck
+      -- ConsolidationBus.sol:403  CONSOLIDATION_GATEWAY.addConsolidationRequests{value: msg.value}(groups, msg.sender);
       , .externalCallBind [] "gateway" [.param "amount", .param "batchSize"]
       , .stop ] }
+
+/-- Solidity-facing name, `ConsolidationBus.sol:383`. -/
+abbrev executeConsolidation := busFn
 
 def busSpec : CompilationModel :=
   { name := "ConsolidationBus", fields := [], constructor := none, functions := [busFn] }
@@ -128,8 +169,35 @@ def busSpec : CompilationModel :=
 def busEnv : CallEnv :=
   envWith (fun name => if name == "gateway" then some (link gatewayAddr 1) else none)
 
-/-! ### TriggerableWithdrawalsGateway -/
+/-! ### ConsolidationGateway.addConsolidationRequests (ConsolidationGateway.sol:185-223)
 
+(The gateway on this route is `ConsolidationGateway`, not
+`TriggerableWithdrawalsGateway`.) -/
+
+/-- `ConsolidationGateway.sol:185-223 addConsolidationRequests(ConsolidationWitnessGroup[] calldata groups, address refundRecipient)`,
+ETH plane only, inlining `_checkFee` (286-293) and `_refundFee` (295-307).
+
+Transcribed: 189 (`ZeroArgument("msg.value")`), 211-212 (`fee`, `totalFee`),
+213 via `_checkFee` 287-291 (`InsufficientFee`, `refund`), 220 (the vault
+hop with `value: totalFee`), 222 via `_refundFee` 296 and 302 (the refund
+hop).
+
+Not transcribed: the `onlyRole(ADD_CONSOLIDATION_REQUEST_ROLE)`,
+`preservesEthBalance` and `whenResumed` modifiers (188), 190-191
+(`ZeroArgument("groups")`), the group loop and `EmptyGroup` (192-199,
+`requestsCount` arrives as the `batchSize` word),
+`_checkConsolidationPreconditions` (201), `_getWithdrawalVaultData` (203),
+`_validatePubKeyWCProof` (205-207), `_consumeConsolidationRequestLimit`
+(209), `_prepareConsolidationPairs` (216-219, def 348-365), the
+`recipient == address(0)` remap (298-300) and `FeeRefundFailed` (303-305).
+
+Added by the model: `declaredValueCheck`; the `fee / batchSize ==
+feePerRequest` division check expressing the checked multiply of line 212;
+the `Wiring` knobs (`emitRefund`, `refundWholeValue`) that select mutants.
+
+Naming: the Lean local `"fee"` is Solidity's `totalFee` (line 212); the
+per-request `fee` of line 211 is the storage word `feePerRequest`. The
+string is not renamed because the kill-line proofs evaluate this body. -/
 def gatewayFn (w : Wiring) : FunctionSpec :=
   { name := "addConsolidationRequests"
     params := [amountParam, batchParam]
@@ -137,16 +205,24 @@ def gatewayFn (w : Wiring) : FunctionSpec :=
     isPayable := true
     body :=
       [ declaredValueCheck
+      -- ConsolidationGateway.sol:189  if (msg.value == 0) revert ZeroArgument("msg.value");
       , .require (.lt (.literal 0) .msgValue) "ZeroArgument"
+      -- ConsolidationGateway.sol:211-212  uint256 fee = withdrawalVault.getConsolidationRequestFee(); uint256 totalFee = requestsCount * fee;  (Lean "fee" = totalFee)
       , .letVar "fee" (.mul (.param "batchSize") (.storage "feePerRequest"))
+      -- (line 212 is a Solidity 0.8 checked multiply: Panic 0x11 on wrap)
       , .ite (.eq (.param "batchSize") (.literal 0)) []
           [ .require (.eq (.div (.localVar "fee") (.param "batchSize"))
               (.storage "feePerRequest")) "Panic(0x11)" ]
+      -- ConsolidationGateway.sol:287-288  if (msg.value < fee) { revert InsufficientFee(fee, msg.value); }  [_checkFee, called at 213]
       , .require (.le (.localVar "fee") (.param "amount")) "InsufficientValue"
+      -- ConsolidationGateway.sol:291  refund = msg.value - fee;  [_checkFee, unchecked]
       , .letVar "refund" (.sub (.param "amount") (.localVar "fee"))
+      -- ConsolidationGateway.sol:220  withdrawalVault.addConsolidationRequests{value: totalFee}(sourcePubkeys, targetPubkeys);
       , .externalCallBind [] "vault" [.localVar "fee", .param "batchSize"] ]
       ++ (if w.emitRefund then
+            -- ConsolidationGateway.sol:296  if (refund > 0) {  [_refundFee, called at 222]
             [ .ite (.gt (.localVar "refund") (.literal 0))
+                -- ConsolidationGateway.sol:302  (bool success, ) = recipient.call{value: refund}("");  [_refundFee]
                 [ .externalCallBind [] "refund"
                     [if w.refundWholeValue then .param "amount" else .localVar "refund"] ]
                 [] ]
@@ -163,8 +239,26 @@ def gatewayEnv (w : Wiring) : CallEnv :=
     else if name == "refund" then some (link w.refundTarget 3)
     else none)
 
-/-! ### WithdrawalVault -/
+/-! ### WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208) -/
 
+/-- `WithdrawalVault.sol:199-208 addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys)`,
+ETH plane only, inlining `_addConsolidationRequests`
+(`WithdrawalVaultEIP7685.sol:56-73`), `_requireExactFee` (123-127) and the
+CALL of `_callAddConsolidationRequest` (115).
+
+Not transcribed: the `preservesEthBalance` modifier (`WithdrawalVault.sol:81-85`)
+is not stated here; ETH conservation is proved on the ensemble
+(`dispatch_conserves_eth`, `verity_tx_universal_success_shape`) and, vault
+side, by `ConsolidationTx.committed_preserves_eth_balance`. Also not
+transcribed: the gateway check (203), the array guards (60-63), the fee
+STATICCALL (65, `feePerRequest` is storage here), `_validatePublicKey`
+(69-70), the CALL failure arm and the event (116-120).
+
+Added by the model: `declaredValueCheck`; the division check for the checked
+multiply of line 66; the `perRequestCalls` wiring knob (mutant selector).
+
+Naming: the Lean local `"fee"` is `requestsCount * fee` (the
+`_requireExactFee` argument, line 66); each CALL forwards `feePerRequest`. -/
 def vaultFn (w : Wiring) : FunctionSpec :=
   { name := "addConsolidationRequests"
     params := [amountParam, batchParam]
@@ -172,13 +266,17 @@ def vaultFn (w : Wiring) : FunctionSpec :=
     isPayable := true
     body :=
       [ declaredValueCheck
+      -- WithdrawalVaultEIP7685.sol:66  _requireExactFee(requestsCount * fee);  (Lean "fee" = requestsCount * fee, checked multiply)
       , .letVar "fee" (.mul (.param "batchSize") (.storage "feePerRequest"))
       , .ite (.eq (.param "batchSize") (.literal 0)) []
           [ .require (.eq (.div (.localVar "fee") (.param "batchSize"))
               (.storage "feePerRequest")) "Panic(0x11)" ]
+      -- WithdrawalVaultEIP7685.sol:124  if (requiredFee != msg.value) { revert IncorrectFee(requiredFee, msg.value); }  [_requireExactFee]
       , .require (.eq (.param "amount") (.localVar "fee")) "FeeMismatch" ]
       ++ (if w.perRequestCalls then
+            -- WithdrawalVaultEIP7685.sol:68  for (uint256 i = 0; i < requestsCount; ++i) {
             [ .forEach "i" (.param "batchSize")
+                -- WithdrawalVaultEIP7685.sol:115  (bool success,) = CONSOLIDATION_REQUEST.call{value: fee}(request);  [_callAddConsolidationRequest]
                 [ .externalCallBind [] "request" [.storage "feePerRequest"] ] ]
           else
             [ .externalCallBind [] "request" [.storage "feePerRequest"] ])

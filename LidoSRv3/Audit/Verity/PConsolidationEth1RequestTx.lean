@@ -35,6 +35,9 @@ def vaultSlot : StorageSlot Uint256 := ⟨2⟩
 def withdrawalSlot : StorageSlot Uint256 := ⟨3⟩
 def consolidationSlot : StorageSlot Uint256 := ⟨4⟩
 
+/-- `ConsolidationBus.sol:403  CONSOLIDATION_GATEWAY.addConsolidationRequests{value: msg.value}(groups, msg.sender);`
+as a storage ledger; the frame-dispatch counterpart of the same line is
+`PConsolidationEth1CompositionTx.busFn`. -/
 def busForward (msgValue : Uint256) (gatewayOk : Bool) : Contract Unit := do
   let b ← getStorage busSlot
   let g ← getStorage gatewaySlot

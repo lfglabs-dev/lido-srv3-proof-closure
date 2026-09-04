@@ -6,8 +6,8 @@ for `SRLib._getModulesAllocationAndCapacity` at Lido core
 `17005714f151e5502c559932319a3f2f74ac2436`, `SRLib.sol:493--559`.
 
 `AllocCapacity.execute` is the single source-shaped interpreter: its first and
-second loops follow source lines 506--532 and 539--558 and use Verity `safe*`
-operations for Solidity checked arithmetic.  The independent Audit model is
+second loops follow `SRLib.sol:506-533` and `SRLib.sol:539-558` and use Verity
+`safe*` operations for Solidity checked arithmetic.  The independent Audit model is
 `AllocCapacity.MathView.capacities`: a direct `List.map` over unbounded natural
 number equations.  It has no executor, loop state, `Option`, or `safe*`
 operations.
@@ -28,9 +28,14 @@ open LidoSRv3.Audit.AllocCapacity
 abbrev SourceModule := AllocCapacity.Module
 abbrev SourceConfig := AllocCapacity.Config
 
+/-! ## SRLib._getModulesAllocationAndCapacity (SRLib.sol:493-559) -/
+
 /-- The already checked, source-shaped semantics.  This name is an API export,
 not a second implementation. -/
 def execute := AllocCapacity.execute
+
+/-- Solidity-facing name, `SRLib.sol:493`. Proofs use `execute`. -/
+abbrev _getModulesAllocationAndCapacity := execute
 
 /-- Non-definitional correspondence from checked source execution to the
 minimal independent Audit model.  The assumptions are exactly `CheckedBounds`:

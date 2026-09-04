@@ -31,8 +31,10 @@ def requestAddress (call : CallObs) : Address :=
 def requestEntry (call : CallObs) : ExternalCall :=
   linkedCallEntryTo requestCallName (requestAddress call) call.value call.input
 
-/-- One real caller-side request frame.  The nonzero value is taken from the
-committed source observation, where it is the fee for this request. -/
+/-- `WithdrawalVaultEIP7685.sol:115  (bool success,) = CONSOLIDATION_REQUEST.call{value: fee}(request);`
+[_callAddConsolidationRequest]. One real caller-side request frame.  The
+nonzero value is taken from the committed source observation, where it is
+the fee for this request. -/
 def requestFrame (call : CallObs) : Contract Unit :=
   externalCallBindTo (requestAddress call) call.value [] requestCallName call.input
 
@@ -64,8 +66,21 @@ def freshCalls (before after : ContractState) : List ExternalCall :=
 def forwardedValue (before after : ContractState) : Nat :=
   (freshCalls before after |>.map (·.value)).sum
 
-/-- The Solidity modifier's postcondition: after forwarding the incoming
-`msg.value`, the vault is back at its balance from before that value arrived. -/
+/-- `WithdrawalVault.sol:81-85` modifier `preservesEthBalance`:
+
+```
+modifier preservesEthBalance() {
+    uint256 balanceBeforeCall = address(this).balance - msg.value;   // 82
+    _;                                                               // 83
+    assert(address(this).balance == balanceBeforeCall);              // 84
+}
+```
+
+The modifier's postcondition: after forwarding the incoming `msg.value`,
+the vault is back at its balance from before that value arrived. Here
+`before` is the state at the top of the body, i.e. after the payable credit,
+so `before.selfBalance - before.msgValue` is exactly Solidity's
+`balanceBeforeCall` (line 82) and the equality is the `assert` of line 84. -/
 def preservesEthBalance (before after : ContractState) : Prop :=
   after.selfBalance = before.selfBalance - before.msgValue
 
@@ -78,14 +93,29 @@ is performed by the vault interpreter. -/
 def noConsensusLayerVerify (before after : ContractState) : Prop :=
   ∀ call ∈ freshCalls before after, call.name = requestCallName
 
-/-- The guarded justified interpreter.  A source revert is a transaction
+/-! ## WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208), value plane -/
+
+/-- `WithdrawalVault.sol:199-208 addConsolidationRequests`, value plane: the
+guards are `SolidityConsolidation.sourceRun` (see its header for the line
+map) and the loop `WithdrawalVaultEIP7685.sol:68-72` is `forwardCalls`, one
+`externalCallBindTo` per `CONSOLIDATION_REQUEST.call{value: fee}(request)`
+(line 115).
+
+Not transcribed: the `preservesEthBalance` modifier as a statement (it is
+the predicate `preservesEthBalance` above, proved on the executed plane by
+`ConsolidationTx.committed_preserves_eth_balance`); the event (120).
+
+The guarded justified interpreter.  A source revert is a transaction
 revert.  A source commit supplies the value-bearing request schedule. -/
 def execute (inputs : Inputs) : Contract Unit := fun snapshot =>
   match sourceRun inputs with
   | .reverted reason => .revert reason snapshot
   | .committed obs => forwardCalls obs.calls snapshot
 
-/-- Mutant interpreter: it retains the exact same committed guard result and
+/-- Solidity-facing name, `WithdrawalVault.sol:199`. -/
+abbrev addConsolidationRequests := execute
+
+/-- Kill-line mutant (not source). Mutant interpreter: it retains the exact same committed guard result and
 request payloads, but replaces every request value with zero. -/
 def zeroValueCall (call : CallObs) : CallObs :=
   { call with value := 0 }

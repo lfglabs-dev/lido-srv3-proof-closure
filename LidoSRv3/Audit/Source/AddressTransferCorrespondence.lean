@@ -25,14 +25,37 @@ def modelTransfer (caller fromAddr to : Nat) (s : State) : Option State :=
   else if caller != fromAddr then none
   else some { owner := to, approved := 0 }
 
-/-- SOURCE plane: lines 231--248 on the owner-operated branch of `_transfer`.
+/-! ## WithdrawalQueueERC721._transfer, owner-operated branch (WithdrawalQueueERC721.sol:230-254) -/
+
+/-- `WithdrawalQueueERC721.sol:218-220 transferFrom(address _from, address _to, uint256 _requestId)`
+-> `WithdrawalQueueERC721.sol:230-254 _transfer(address _from, address _to, uint256 _requestId)`,
+restricted to the owner-operated branch (`_from == msgSender`).
+
+Not transcribed (out of slice): 233
+`if (_requestId == 0 || _requestId > getLastRequestId()) revert InvalidRequestId(_requestId);`
+(the request is fixed to exist); 235-236
+`if (request.claimed) revert RequestAlreadyClaimed(_requestId);` (fixed unclaimed);
+the two approval alternatives of 242 `isApprovedForAll(_from, msgSender)` and
+`_getTokenApprovals()[_requestId] == msgSender` (this slice keeps only the
+owner disjunct); 250-251 the owner-indexed enumerable sets
+`_getRequestsByOwner()[_from].remove(...)` / `[_to].add(...)`; 253
+`_emitTransfer(_from, _to, _requestId);`.
+Added by the model: nothing (`none` stands for every revert).
+
+SOURCE plane: lines 231--248 on the owner-operated branch of `_transfer`.
 The two definitions are kept separate so the correspondence theorem is the
 reviewable boundary rather than a registry status assertion. -/
 def sourceTransfer (caller fromAddr to : Nat) (s : State) : Option State :=
+  -- WithdrawalQueueERC721.sol:231  if (_to == address(0)) revert TransferToZeroAddress();
   if to = 0 then none
+  -- WithdrawalQueueERC721.sol:232  if (_to == _from) revert TransferToThemselves();
   else if to = fromAddr then none
+  -- WithdrawalQueueERC721.sol:238  if (_from != request.owner) revert TransferFromIncorrectOwner(_from, request.owner);
   else if s.owner != fromAddr then none
+  -- WithdrawalQueueERC721.sol:241-245  if (!(_from == msgSender || isApprovedForAll(...) || ...)) { revert NotOwnerOrApproved(msgSender); }
+  -- (owner-operated branch: only the `_from == msgSender` disjunct is kept)
   else if caller != fromAddr then none
+  -- WithdrawalQueueERC721.sol:247-248  delete _getTokenApprovals()[_requestId]; request.owner = _to;
   else some { owner := to, approved := 0 }
 
 /-- Equality of two audit-authored definitions for the bounded pinned-source-

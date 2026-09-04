@@ -7,7 +7,11 @@ import Verity.Stdlib.Math
 Source-shaped `Contract.run` ledger formerly filed as child `P-CONSOLIDATION-ETH-1a`. Kept as
 buildable auxiliary evidence only: vault→Lido/WQ returns are not the
 consolidation fee/refund happy path of `P-CONSOLIDATION-ETH-1` and are not P-RESERVE-1 buffer
-accounting. Not a registry row.
+accounting. Not a registry row (unregistered), but it remains the published
+counterpart of `ConsolidationGateway._refundFee` (295-307): the ensemble in
+`PConsolidationEth1CompositionTx.gatewayFn` transcribes only the refund hop
+(lines 296 and 302), while `refundFee` below also carries the `success` bool
+and the recipient resolution.
 
 Pins: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
@@ -35,28 +39,58 @@ def vaultSlot : StorageSlot Uint256 := ⟨1⟩
 def refundSlot : StorageSlot Uint256 := ⟨2⟩
 def lidoSlot : StorageSlot Uint256 := ⟨3⟩
 
-/-- Live `_refundFee` remaps `address(0)` (including `2^160` after the 160-bit
-mask) to `msg.sender`. -/
+/-! ## Observation slots
+
+The four slots are a balance ledger added by the model (one word per
+account); neither `ConsolidationGateway` nor `WithdrawalVault` stores these
+balances. Observation slots, no Solidity storage counterpart. -/
+
+/-- `ConsolidationGateway.sol:298-300  if (recipient == address(0)) { recipient = msg.sender; }`
+[_refundFee]. Live `_refundFee` remaps `address(0)` (including `2^160` after
+the 160-bit mask) to `msg.sender`. -/
 def resolvedRefundRecipient (recipient sender : Uint256) : Uint256 :=
   if Core.Address.ofNat recipient.val = 0 then sender else recipient
 
-/-- `_checkFee`: revert if `msg.value < fee`; remainder is `msg.value - fee`. -/
+/-! ## ConsolidationGateway._checkFee (ConsolidationGateway.sol:286-293) -/
+
+/-- `ConsolidationGateway.sol:286-293 _checkFee(uint256 fee) returns (uint256 refund)`,
+preceded by the `msg.value` guard of the caller
+(`ConsolidationGateway.sol:189`). The `fee` argument is the caller's
+`totalFee` (line 212). Revert if `msg.value < fee`; remainder is
+`msg.value - fee`. -/
 def checkFee (msgValue fee : Uint256) : Contract Uint256 := do
+  -- ConsolidationGateway.sol:189  if (msg.value == 0) revert ZeroArgument("msg.value");  [addConsolidationRequests]
   require (msgValue != 0) "ZeroArgument(msg.value)"
+  -- ConsolidationGateway.sol:287-288  if (msg.value < fee) { revert InsufficientFee(fee, msg.value); }
   require (decide (fee ≤ msgValue)) "InsufficientFee"
+  -- ConsolidationGateway.sol:291  refund = msg.value - fee;  (unchecked; cannot underflow after the guard)
   subPanic msgValue fee
 
-/-- `_refundFee`: a zero remainder is a no-op. Otherwise pay the resolved
+/-! ## ConsolidationGateway._refundFee (ConsolidationGateway.sol:295-307) -/
+
+/-- `ConsolidationGateway.sol:295-307 _refundFee(uint256 refund, address recipient)`.
+A zero remainder is a no-op. Otherwise pay the resolved
 recipient (`address(0)` / `2^160` → `msg.sender`). Defaults keep the
 registered numeric ledger: recipient and sender are the same nonzero word,
-so resolution does not change the destination slot. -/
+so resolution does not change the destination slot.
+
+Not transcribed: the CALL itself; `refundOk` is its `success` bool (302).
+Added by the model: the recomputation of `refund` from `msgValue - fee`
+(Solidity receives it as an argument), the unreachable `dest != 0` guard,
+and the ledger slot moves. -/
 def refundFee (msgValue fee recipient sender : Uint256) (refundOk : Bool) :
     Contract Unit := do
+  -- ConsolidationGateway.sol:291  refund = msg.value - fee;  [_checkFee; recomputed here]
   let refund ← subPanic msgValue fee
+  -- ConsolidationGateway.sol:296  if (refund > 0) {
   if refund != 0 then do
+    -- ConsolidationGateway.sol:302-305  (bool success, ) = recipient.call{value: refund}(""); if (!success) { revert FeeRefundFailed(); }
     require refundOk "FeeRefundFailed"
+    -- ConsolidationGateway.sol:298-300  if (recipient == address(0)) { recipient = msg.sender; }
     let dest := resolvedRefundRecipient recipient sender
+    -- Model guard, unreachable when `sender != 0` (no Solidity counterpart: `msg.sender` is never zero).
     require (dest != 0) "ZeroArgument(refundRecipient)"
+    -- Ledger effect of the CALL at line 302 (added by the model).
     let r ← getStorage refundSlot
     let g ← getStorage gatewaySlot
     let rAfter ← addPanic r refund
@@ -64,19 +98,29 @@ def refundFee (msgValue fee recipient sender : Uint256) (refundOk : Bool) :
     setStorage refundSlot rAfter
     setStorage gatewaySlot gAfterRefund
 
-/-- Gateway path: `_checkFee`, vault send, then `_refundFee`. -/
+/-! ## ConsolidationGateway.addConsolidationRequests (ConsolidationGateway.sol:185-223), ETH legs -/
+
+/-- `ConsolidationGateway.sol:185-223 addConsolidationRequests`, ETH legs only:
+`_checkFee` (213), vault send (220), then `_refundFee` (222). `fee` is
+Solidity's `totalFee` (212). Everything between (roles, groups, witnesses,
+quota, `_prepareConsolidationPairs`) is not transcribed; `vaultOk` stands
+for the vault call's success. -/
 def gatewayRefund (msgValue fee : Uint256) (vaultOk refundOk : Bool)
     (recipient : Uint256 := 1) (sender : Uint256 := 1) : Contract Unit := do
+  -- ConsolidationGateway.sol:213  uint256 refund = _checkFee(totalFee);
   let _remainder ← checkFee msgValue fee
+  -- Ledger: the frame's `msg.value` credit at the gateway (added by the model).
   let g ← getStorage gatewaySlot
   let v ← getStorage vaultSlot
   let gReceived ← addPanic g msgValue
   setStorage gatewaySlot gReceived
+  -- ConsolidationGateway.sol:220  withdrawalVault.addConsolidationRequests{value: totalFee}(sourcePubkeys, targetPubkeys);
   require vaultOk "VaultCallFailed"
   let vAfter ← addPanic v fee
   let gAfterFee ← subPanic gReceived fee
   setStorage vaultSlot vAfter
   setStorage gatewaySlot gAfterFee
+  -- ConsolidationGateway.sol:222  _refundFee(refund, refundRecipient);
   refundFee msgValue fee recipient sender refundOk
 
 /-- Gateway path where `msg.value = fee`, so source skips `_refundFee`. -/
