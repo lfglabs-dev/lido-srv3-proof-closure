@@ -21,7 +21,7 @@ LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # by deliberately updating this guard.  The existing uses are separately
 # disclosed by the Trust report's axiom output.
 NATIVE_DECIDE_COUNT = 218
-NATIVE_DECIDE_SHA256 = "187f9bad4a1f96e8919eba8d5feca034ccde6f01b6ce268e26066e57ced14e81"
+NATIVE_DECIDE_SHA256 = "46df09dbc9ae95a3196dc32ed3a6c0a2ea2369b13c3e7e910c78a73b9c701fb7"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),

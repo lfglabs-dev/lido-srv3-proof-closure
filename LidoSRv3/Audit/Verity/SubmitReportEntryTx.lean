@@ -33,14 +33,32 @@ open LidoSRv3.Audit.SolidityAccounting.SubmitReportEntry
 open LidoSRv3.Audit.Spec.OracleMintCorrespondence
 open LidoSRv3.Audit.Verity.HandleOracleReportTx
 
-/-- Modeled oracle entry.  Guard order follows the pinned entry: the sender
+/-! ## AccountingOracle.submitReportData (AccountingOracle.sol:360-366) -/
+
+/-- `AccountingOracle.sol:360-366 submitReportData(ReportData calldata data, uint256 contractVersion)`.
+
+Not transcribed: AccountingOracle.sol:362 `_checkContractVersion(contractVersion);`
+and 364 `uint256 prevRefSlot = _startProcessing();` (contract-version, ref-slot
+and deadline bookkeeping, outside the modeled body); the body of 361 and 363
+(the sender gate and the consensus-hash equality are the boolean inputs
+`senderAllowed` / `consensusHashMatches`, not recomputed).
+Added by the model: the revert strings `"SENDER_NOT_ALLOWED"` /
+`"UNEXPECTED_DATA_HASH"` (Solidity uses custom errors), and the entry-computed
+mint `entryFeeWei d` / `entryShareRate d` handed to
+`handleOracleReportComputed` (P-ORACLE-SUPPLY-1) in place of the opaque
+`sharesToMintAsFees` of `HandleOracleReportTx.handleOracleReport`.
+
+Modeled oracle entry.  Guard order follows the pinned entry: the sender
 gate first, then the consensus-hash check, then the report body — here the
 computed-mint wrapper `handleOracleReportComputed` at the entry-computed
 `entryFeeWei d` / `entryShareRate d`.  No free mint argument exists in this
 signature. -/
 def submitReportDataTx (d : SubmitReportData) : Contract Result := fun snapshot =>
+  -- AccountingOracle.sol:361  _checkMsgSenderIsAllowedToSubmitData();
   if senderAllowed d then
+    -- AccountingOracle.sol:363  _checkConsensusData(data.refSlot, data.consensusVersion, keccak256(abi.encode(data)));
     if consensusHashMatches d then
+      -- AccountingOracle.sol:365  _handleConsensusReportData(data, prevRefSlot);
       handleOracleReportComputed d.report (entryFeeWei d) (entryShareRate d)
         (failAfterWrites := false) snapshot
     else .revert "UNEXPECTED_DATA_HASH" snapshot

@@ -47,26 +47,52 @@ inductive Outcome where
   | value (index pow : Nat)
   deriving DecidableEq, Repr
 
-/-- Independent specification: append the right index below the left pivot. -/
+/-! ## GIndex.concat (GIndex.sol:76-89) -/
+
+/-- `GIndex.sol:76-89 concat(GIndex lhs, GIndex rhs) pure returns (GIndex)`,
+literal transcription followed by the range check of `pack`.
+
+Not transcribed: the `bytes32` packing itself (`pack` writes
+`index << 8 | pow`); only its `IndexOutOfRange` guard on the 248-bit index
+is kept as `packOverflow`. Note that `packOverflow` is the same
+`IndexOutOfRange()` error as `depthOverflow` (line 84), raised from inside
+`pack` instead of from `concat`; the model keeps the two raise sites apart.
+
+Added by the model: the `Outcome` inductive and `fls 0 = 256`. -/
+def sourceConcat (lhs rhs : GIndex) : Outcome :=
+  -- GIndex.sol:77  uint256 lindex = index(lhs);
+  let lindex := lhs.index
+  -- GIndex.sol:78  uint256 rindex = index(rhs);
+  let rindex := rhs.index
+  -- GIndex.sol:80  uint256 lhsMSbIndex = fls(lindex);
+  let lhsMSbIndex := fls lindex
+  -- GIndex.sol:81  uint256 rhsMSbIndex = fls(rindex);
+  let rhsMSbIndex := fls rindex
+  -- GIndex.sol:83-85  if (lhsMSbIndex + 1 + rhsMSbIndex > 248) { revert IndexOutOfRange(); }
+  if lhsMSbIndex + 1 + rhsMSbIndex > 248 then .depthOverflow
+  else
+    -- GIndex.sol:87-88  return pack((lindex << rhsMSbIndex) | (rindex ^ (1 << rhsMSbIndex)), pow(rhs));
+    let packedIndex := (lindex <<< rhsMSbIndex) |||
+      (rindex ^^^ (1 <<< rhsMSbIndex))
+    -- pack: IndexOutOfRange when the index does not fit 248 bits (same error as line 84)
+    if packedIndex > maxUint248 then .packOverflow
+    else .value packedIndex rhs.pow
+
+/-- Solidity-facing name, `GIndex.sol:76`. -/
+abbrev concat := sourceConcat
+
+/-- Independent specification: append the right index below the left pivot.
+It is written from the remerkleable semantics
+(`remerkleable/tree.py#L46`, the reference cited at `GIndex.sol:75`: the
+right index's bits below its top bit are appended under the left index),
+not from the Solidity text, which is why `source_concat_matches_spec` is a
+non-vacuous refinement rather than a restatement. -/
 def specConcat (lhs rhs : GIndex) : Outcome :=
   if fls lhs.index + 1 + fls rhs.index > 248 then .depthOverflow
   else
     let joined := (lhs.index <<< fls rhs.index) |||
       (rhs.index ^^^ (1 <<< fls rhs.index))
     if joined > maxUint248 then .packOverflow else .value joined rhs.pow
-
-/-- Literal transcription of pinned `GIndex.concat` followed by pinned `pack`. -/
-def sourceConcat (lhs rhs : GIndex) : Outcome :=
-  let lindex := lhs.index
-  let rindex := rhs.index
-  let lhsMSbIndex := fls lindex
-  let rhsMSbIndex := fls rindex
-  if lhsMSbIndex + 1 + rhsMSbIndex > 248 then .depthOverflow
-  else
-    let packedIndex := (lindex <<< rhsMSbIndex) |||
-      (rindex ^^^ (1 <<< rhsMSbIndex))
-    if packedIndex > maxUint248 then .packOverflow
-    else .value packedIndex rhs.pow
 
 /-- The narrow SOURCE child: the pinned transcription refines the independent
 generalized-index append specification for every valid packed input. -/

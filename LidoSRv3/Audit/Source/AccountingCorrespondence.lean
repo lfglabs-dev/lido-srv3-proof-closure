@@ -21,6 +21,24 @@ load-bearing full-report success premise.  The legacy `sourceTrace` adapter is
 retained only for API compatibility. External-call authorization and the
 truthfulness of oracle calldata remain interface assumptions. Yul, EVM, runtime
 identity, cryptography, and end-to-end deployment composition are not claimed.
+
+Fee arithmetic (`_calculateProtocolFees`, `Accounting.sol:263-303`, body from 265, and the
+`sharesToMintAsFees` value it feeds to `Accounting.sol:403-413`) is *not*
+modeled here: `sharesToMintAsFees` is an opaque `Nat` argument of
+`successfulSteps`.  The fee computation lives in
+`LidoSRv3/Audit/Source/SubmitReportFeeCorrespondence.lean`
+(`SubmitReportEntry.feeEther`, guarantee P-ORACLE-SUPPLY-1).
+
+Solidity sources transcribed (pinned `lido-core/contracts`):
+
+* `0.8.25/sr/SRLib.sol:854-870
+  _validateReportValidatorBalancesByStakingModule(_stakingModuleIds, _validatorBalancesGwei)`
+  -> `idsAndBalancesValid`;
+* `0.8.25/sr/SRLib.sol:873-892
+  _reportValidatorBalancesByStakingModule(_stakingModuleIds, _validatorBalancesGwei)`
+  -> `checkedTotal64` / `checkedTotal256` / `accept`;
+* `0.8.9/Accounting.sol:403-413` (the `if (_update.sharesToMintAsFees > 0)` block)
+  -> `successfulSteps`.
 -/
 
 namespace LidoSRv3.Audit.SolidityAccounting
@@ -29,7 +47,16 @@ open Verity Verity.Stdlib.Math
 
 abbrev Word := Verity.Core.Uint256
 
+/-! ## SRUtils constants (SRUtils.sol:23) -/
+
+-- SRUtils.sol:23  uint256 internal constant MAX_VALUE_GWEI = 1_000_000_000 ether / 1 gwei; // i.e. 1B ETH
 def maxValueGwei : Nat := 1000000000000000000
+
+/-- Solidity-facing name, SRUtils.sol:23. -/
+abbrev MAX_VALUE_GWEI := maxValueGwei
+
+/-- Destination bound of the `uint64 totalValidatorsBalanceGwei` accumulator
+(SRLib.sol:880) and of `uint64(_validatorBalancesGwei[i])` (SRLib.sol:884). -/
 def uint64Max : Nat := 18446744073709551615
 
 structure ReportInput where
@@ -51,13 +78,43 @@ inductive Step
   | rewardsMinted
   deriving Repr, DecidableEq
 
+/-! ## StakingRouter._validateReportValidatorBalancesByStakingModule (SRLib.sol:854-870) -/
+
+/-- `SRLib.sol:854-870
+_validateReportValidatorBalancesByStakingModule(uint256[] _stakingModuleIds, uint256[] _validatorBalancesGwei)`.
+
+The three Solidity reverts are merged into one `Bool`; a `false` result is the
+model's single `INVALID_REPORT` revert (see `HandleOracleReportTx`):
+
+* SRLib.sol:861 `revert ISRBase.ArraysLengthMismatch()` (guard at 860) is the
+  first two conjuncts, with `registeredModuleIds.length` standing for
+  `SRStorage.getModulesCount()` (858);
+* SRLib.sol:866 `revert ISRBase.UnexpectedModuleId(moduleId, _stakingModuleIds[i])`
+  is the third conjunct, the loop 864-869 collapsed to a list equality
+  (`SRStorage.getModuleIdAt(i)` is `registeredModuleIds[i]`);
+* SRLib.sol:868 `SRUtils._ensureAmountGwei(_validatorBalancesGwei[i])`, i.e.
+  SRUtils.sol:79-80 `if (amountGwei > MAX_VALUE_GWEI) revert ISRBase.InvalidAmountGwei()`
+  with `MAX_VALUE_GWEI` at SRUtils.sol:23, is the fourth conjunct.
+
+Not transcribed: the revert selectors / arguments themselves (the model only
+distinguishes accept from reject).
+Added by the model: nothing. -/
 def idsAndBalancesValid (i : ReportInput) : Bool :=
+  -- SRLib.sol:860  if (_stakingModuleIds.length != n || _validatorBalancesGwei.length != n) {
+  -- SRLib.sol:861      revert ISRBase.ArraysLengthMismatch();
   i.reportedModuleIds.length == i.registeredModuleIds.length &&
   i.balancesGwei.length == i.registeredModuleIds.length &&
+  -- SRLib.sol:865  uint256 moduleId = SRStorage.getModuleIdAt(i);
+  -- SRLib.sol:866  if (moduleId != _stakingModuleIds[i]) revert ISRBase.UnexpectedModuleId(moduleId, _stakingModuleIds[i]);
   i.reportedModuleIds == i.registeredModuleIds &&
+  -- SRLib.sol:868  SRUtils._ensureAmountGwei(_validatorBalancesGwei[i]);
+  -- SRUtils.sol:79  if (amountGwei > MAX_VALUE_GWEI) { revert ISRBase.InvalidAmountGwei(); }
   i.balancesGwei.all (· ≤ maxValueGwei)
 
-/-- Verity-word execution of the checked `+=` at SRLib.sol line 888, followed
+/-! ## StakingRouter._reportValidatorBalancesByStakingModule (SRLib.sol:873-892) -/
+
+/-- Verity-word execution of the checked `+=` at SRLib.sol:888
+`totalValidatorsBalanceGwei += validatorsBalanceGwei;`, followed
 by the uint64 destination bound.  This is deliberately separate from
 `checkedTotal64`, the pinned Solidity source semantics below. -/
 def checkedTotal256 : List Nat → Option Word
@@ -67,23 +124,52 @@ def checkedTotal256 : List Nat → Option Word
       let next ← safeAdd tail (Verity.Core.Uint256.ofNat x)
       if next.val ≤ uint64Max then some next else none
 
-/-- Independent pinned-source semantics for Solidity's checked uint64 `+=`.
+/-- Independent pinned-source semantics for Solidity's checked uint64 `+=`
+(SRLib.sol:880 `uint64 totalValidatorsBalanceGwei;`, loop 881-889).
 It uses only natural-number addition and the uint64 bound: it does not call,
-project, or otherwise depend on the Verity execution. -/
+project, or otherwise depend on the Verity execution.  The list is folded from
+the tail, which is order-independent for `+` and the bound. -/
 def checkedTotal64 : List Nat → Option Nat
   | [] => some 0
   | x :: xs => do
       let tail ← checkedTotal64 xs
+      -- SRLib.sol:888  totalValidatorsBalanceGwei += validatorsBalanceGwei;
+      -- (checked uint64 `+=`: overflow above uint64Max is a panic revert)
       let next := x + tail
       if next ≤ uint64Max then some next else none
 
+/-- `SRLib.sol:873-892
+_reportValidatorBalancesByStakingModule(uint256[] _stakingModuleIds, uint256[] _validatorBalancesGwei)`
+as an acceptance function: `none` is a revert, `some` carries what the router
+persists.
+
+Not transcribed: the per-module storage write SRLib.sol:886
+`moduleAcc.validatorsBalanceGwei = validatorsBalanceGwei;` (the balance vector
+is returned instead), and the router write 890-891
+`routerAcc.validatorsBalanceGwei = totalValidatorsBalanceGwei;` (returned as
+`totalBalanceGwei`).
+Added by the model: nothing. -/
 def accept (i : ReportInput) : Option AcceptedReport := do
+  -- SRLib.sol:877  _validateReportValidatorBalancesByStakingModule(_stakingModuleIds, _validatorBalancesGwei);
   if idsAndBalancesValid i then pure () else none
+  -- SRLib.sol:880-889  uint64 totalValidatorsBalanceGwei; for (uint256 i = 0; i < n; ++i) { ... += validatorsBalanceGwei; }
   let total ← checkedTotal64 i.balancesGwei
   pure ⟨i.reportedModuleIds, i.balancesGwei, total⟩
 
-/-- Successful source steps after the validated balance write.  The pinned
-`Accounting.sol:403-413` call is conditional on strictly positive fee shares. -/
+/-! ## Accounting._applyOracleReportContext, fee-mint block (Accounting.sol:403-413) -/
+
+/-- Successful source steps after the validated balance write.
+
+The `.rewardsMinted` step is the pinned block `Accounting.sol:403-413`
+`if (_update.sharesToMintAsFees > 0) { LIDO.mintShares(...); _distributeFee(...);
+_contracts.stakingRouter.reportRewardsMinted(...); }`.  The value
+`_update.sharesToMintAsFees` it tests is computed earlier by
+`_calculateProtocolFees` (`Accounting.sol:263-303`), whose own
+`if (sharesToMintAsFees > 0)` at 290 only fills `feeDistribution`; the mint and
+the `reportRewardsMinted` callback (409-412) happen exclusively in 403-413.
+Both spans share the same strict-positivity test, which is the single `if`
+below.  `sharesToMintAsFees` is an opaque argument here; its computation is
+`SubmitReportFeeCorrespondence` (P-ORACLE-SUPPLY-1). -/
 def successfulSteps (accepted : AcceptedReport) (sharesToMintAsFees : Nat) : List Step :=
   [.balancesWritten accepted.balancesGwei, .accountingCalled,
     .rewardsRead accepted.balancesGwei] ++

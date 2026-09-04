@@ -6,7 +6,31 @@ import Verity.Core
 # P-ALLOC-1 allocation transaction
 
 Handwritten model of `SRLib._getModulesAllocationAndCapacity` from
-`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, lines 493--559.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, `SRLib.sol:493-559`,
+wrapped as the storage-counted transaction `StakingRouter.getDepositAllocations`
+(`StakingRouter.sol:929-936`, see the `getDepositAllocations` abbrev below).
+
+## Name table (C4)
+
+| Solidity (`SRLib.sol`)                      | Lean                                   |
+|---------------------------------------------|----------------------------------------|
+| `_allocations[i]` (line 531)                | `Row.currentAllocation`, `Result.allocations` |
+| `_capacities[i]` (line 557)                 | `Row.capacity`, `Result.capacities`    |
+| `totalValidators` (lines 506, 532)          | `total` in `sourceExecute`, `Result.totalValidators` |
+| `cache[i].activeCount` (line 525)           | `Row.activeCount`                      |
+| `targetValidators` (line 552)               | `Row.targetValidators`                 |
+| `depositsToAllocate` (line 493)             | `depositsToAllocate`                   |
+
+## Not transcribed: SRLib.sol:403-427
+
+`_getDepositAllocations` (`SRLib.sol:391-431`) is the caller of the transcribed
+function. Its wei-to-validator conversion `depositsToAllocate = _allocateAmount / initialDeposit`
+(line 404), the `modulesCount == 0` early return (lines 397-399), the
+`MinFirstAllocationStrategy.allocate(allocated, capacities, depositsToAllocate)`
+call (line 415, guarantee P-ALLOC-2), and the validator-to-wei conversions of
+lines 417-421 and 424-429 are outside this transaction: the model takes
+`depositsToAllocate` already in validator units and returns the validator-unit
+columns of `_getModulesAllocationAndCapacity`.
 
 One interpreter (`AllocCapacity.firstLoop` / `secondLoop`). Binding follows
 `getModuleIdAt` then the packed `moduleState.config`. `isActive` is
@@ -26,15 +50,18 @@ open LidoSRv3.Audit.AllocCapacity
 
 abbrev Word := Uint256
 
-/-- `SRStorage.getModulesCount()`. The source caps this count by
+/-! ## Router storage read by SRLib.sol:498-522 -/
+
+/-- `SRStorage.getModulesCount()` (`SRLib.sol:498`). The source caps this count by
 `MAX_STAKING_MODULES_COUNT = 32` before walking router indices. -/
 def modulesCountSlot : Nat := 29
-/-- `SRStorage.getModuleIdAt(i)` — map from router index to module id. -/
+/-- `SRStorage.getModuleIdAt(i)` (`SRLib.sol:509`), map from router index to module id. -/
 def moduleIdSlot : Nat := 30
 /-- Packed `ModuleStateConfig` keyed by module id. Solidity packs the address
 in bits 0..159, then four uint16 fields, status in bits 224..231, and
 withdrawal-credentials type in bits 232..239. -/
 def moduleConfigSlot : Nat := 31
+/-- `moduleState.accounting.exitedValidatorsCount` (`SRLib.sol:522`). -/
 def accountingExitedSlot : Nat := 35
 /-- Planted summaries remain only for the legacy/free-count sibling path and
 test seeding. The registered live path does not read these three maps. -/
@@ -42,6 +69,9 @@ def summaryExitedSlot : Nat := 36
 def summaryDepositedSlot : Nat := 37
 def summaryDepositableSlot : Nat := 38
 def summaryStakeSlot : Nat := 39
+/-- Observation slots, no Solidity storage counterpart: `_allocations`,
+`_capacities` and `totalValidators` are memory in `SRLib.sol:499,534,506`;
+the model persists them so `observe` can read the committed columns. -/
 def allocationSlot : Nat := 40
 def capacitySlot : Nat := 41
 def boundAddressSlot : Nat := 42
@@ -136,8 +166,14 @@ def toSourceModule (m : BoundModule) : Module :=
     accountingExitedCount := m.accountingExitedCount
     totalModuleStake := m.totalModuleStake }
 
+/-! ## First-loop bindings (SRLib.sol:509-518, hoisted out of the loop) -/
+
+/-- Planted-summary binding of one router row (`SRLib.sol:509-517` with the
+summary tuple read from seeded maps instead of a call). -/
 def sourceBindOne (state : ContractState) (index : Nat) : BoundModule :=
+  -- SRLib.sol:509  uint256 moduleId = SRStorage.getModuleIdAt(i);
   let moduleId := state.readMapUint moduleIdSlot index
+  -- SRLib.sol:510-511  moduleState = moduleId.getModuleState(); stateConfig = moduleState.config;
   let packed := state.readMapUint moduleConfigSlot moduleId
   let moduleAddress := configModuleAddress packed
   { moduleId := moduleId
@@ -214,6 +250,16 @@ def bindLiveOne
     | .success _ afterCall => .revert "StakingModuleSummaryCallFailed" afterCall
     | .revert reason afterCall => .revert reason afterCall
 
+/-- Live binding of the router prefix `[index, index + count)`.
+
+Split loop: Solidity makes the `_getStakingModuleSummary` call (`SRLib.sol:516-517`)
+and the type-2 `getTotalModuleStake()` call (`SRLib.sol:529`) inside the first
+allocation loop (`SRLib.sol:508-533`), interleaved with the arithmetic of lines
+521-532. The Lean model runs all the calls first, in the same router order, and
+only then executes `sourceExecute` over the bound rows. The two orders are
+observationally equal because the calls are `staticcall`s (no state written
+between iterations) and the loop arithmetic does not feed back into the call
+arguments. -/
 def bindLiveAll
     (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
     (snapshot : ContractState) : Nat → Nat → Contract (List BoundModule)
@@ -248,10 +294,17 @@ theorem bindLiveOne_decodes_summary
     rw [hresult]
   simp [bindLiveOne, hcall, hdecode, withSummary, htype1]
 
-/-- The single `_getModulesAllocationAndCapacity` interpreter. -/
+/-! ## SRLib._getModulesAllocationAndCapacity (SRLib.sol:493-559) -/
+
+/-- The single `_getModulesAllocationAndCapacity` interpreter: transcribes
+`SRLib.sol:493-559` (not the caller `_getDepositAllocations`, `SRLib.sol:391-431`).
+Same shape as `AllocCapacity.execute`, additionally returning the final
+`totalValidators` word. -/
 def sourceExecute (cfg : Config) (modules : List BoundModule)
     (depositsToAllocate : Word) (isTopUp : Bool) : Option (List Row × Word) := do
+  -- SRLib.sol:505-533  uint256 totalValidators = depositsToAllocate;  then the first loop
   let (entries, total) ← AllocCapacity.firstLoop cfg (modules.map toSourceModule) depositsToAllocate
+  -- SRLib.sol:539-558  second loop
   let rows ← AllocCapacity.secondLoop cfg isTopUp total (modules.map toSourceModule) entries
   some (rows, total)
 
@@ -269,14 +322,26 @@ structure Result where
   totalValidators : Word
   deriving DecidableEq, Repr
 
+/-- `SRLib.sol:493-559` as a transaction over `count` planted router rows.
+
+Not transcribed: `SRLib.sol:498` (`modulesCount` is the `count` argument here;
+`allocateFromStorage` reads it), the external calls of lines 516-517 and 529
+(planted maps, see `allocateLiveFromStorage` for the live version).
+
+Added by the model: revert string `"ALLOC_ARITHMETIC"` for any checked
+arithmetic failure (Solidity panics with `Panic(0x11)`/`Panic(0x12)`),
+persisted observation slots, and the `failAfterWrites` rollback hook. -/
 def allocate (count : Nat) (cfg : Config) (depositsToAllocate : Word)
     (isTopUp : Bool) (failAfterWrites : Bool := false) : Contract Result :=
   fun snapshot =>
+    -- SRLib.sol:508-518  per-row storage reads and summary tuple (hoisted, see bindLiveAll)
     let modules := sourceBindAll snapshot count
+    -- SRLib.sol:506-558  both loops
     match sourceExecute cfg modules depositsToAllocate isTopUp with
     | none => .revert "ALLOC_ARITHMETIC" snapshot
     | some (rows, total) =>
         let addresses := modules.map BoundModule.moduleAddress
+        -- SRLib.sol:531, 557  _allocations[i] / _capacities[i] (persisted as observation arrays)
         let dirty := persistRows rows addresses snapshot
         let dirty := dirty.writeSlot totalSlot total
         if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
@@ -285,15 +350,27 @@ def allocate (count : Nat) (cfg : Config) (depositsToAllocate : Word)
             addresses, total⟩ dirty
 
 /-- Allocation entry point whose loop bound comes from router storage, capped
-at the pinned `MAX_STAKING_MODULES_COUNT = 32`. -/
+at the pinned `MAX_STAKING_MODULES_COUNT = 32`. This is the storage-counted
+shape of `StakingRouter.getDepositAllocations` (`StakingRouter.sol:929-936`)
+restricted to the `_getModulesAllocationAndCapacity` step (see the module
+header, "Not transcribed: SRLib.sol:403-427"). -/
 def allocateFromStorage (cfg : Config) (depositsToAllocate : Word)
     (isTopUp : Bool) (failAfterWrites : Bool := false) : Contract Result :=
   fun snapshot =>
+    -- SRLib.sol:498  uint256 modulesCount = SRStorage.getModulesCount();
     allocate (min (snapshot.readSlot modulesCountSlot).val 32)
       cfg depositsToAllocate isTopUp failAfterWrites snapshot
 
+/-- Solidity-facing name, `StakingRouter.sol:929-936`
+`getDepositAllocations(uint256 _depositAmount, bool _isTopUp)`, which forwards to
+`SRLib._getDepositAllocations` (`SRLib.sol:391-431`) and through it to
+`_getModulesAllocationAndCapacity` (`SRLib.sol:493-559`, line 408). Only the
+latter step is modelled; proofs unfold `allocateFromStorage`. -/
+abbrev getDepositAllocations := allocateFromStorage
+
 /-- Storage-counted allocation whose summary fields and type-2 stake word come
-from the live pinned calls. -/
+from the live pinned calls (`SRLib.sol:516-517` and `SRLib.sol:529`, executed up
+front by `bindLiveAll`). -/
 def allocateLiveFromStorage
     (adversary : Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
     (cfg : Config) (depositsToAllocate : Word)
@@ -420,6 +497,8 @@ theorem revert_restores_snapshot
       .revert reason rollback) : rollback = state := by
   unfold Contract.run at h
   split at h <;> simp_all
+
+/-! ## Test seeding (not source) -/
 
 def seedOne (state : ContractState) (index : Nat) (m : BoundModule) : ContractState :=
   let state := state.writeMapUint moduleIdSlot index m.moduleId
