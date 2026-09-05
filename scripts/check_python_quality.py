@@ -145,8 +145,11 @@ def complexity(scope: ast.AST, postponed: bool = False) -> int:
         elif isinstance(node, ast.comprehension):
             count += 1 + len(node.ifs)
         elif isinstance(node, ast.Match):
-            count += sum(not (case.guard is None and irrefutable_pattern(case.pattern))
-                         for case in node.cases)
+            # An irrefutable pattern cannot fall through, whether or not it
+            # has a guard.  Its guard is still one separately evaluated
+            # decision below; charging the case here as well would count it
+            # twice.
+            count += sum(not irrefutable_pattern(case.pattern) for case in node.cases)
             count += sum(pattern_alternatives(case.pattern) + (case.guard is not None)
                          for case in node.cases)
     return count
@@ -201,8 +204,11 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
                 visit([*child.decorator_list, *type_params(child), *child.bases, *child.keywords], inner)
                 visit(child.body, inner)
             elif type_alias(child):
-                # The alias value is evaluated only when its __value__ is read.
-                continue
+                # A PEP 695 alias's value and parameters are lazy, so they
+                # must not add complexity to the containing executable scope.
+                # They can nevertheless contain independently owned lambdas,
+                # which are inventory-worthy callable scopes.
+                visit([*type_params(child), child.value], scope)
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)
                 visit(ast.iter_child_nodes(child.value), scope)

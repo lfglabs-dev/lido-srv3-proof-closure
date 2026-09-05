@@ -99,11 +99,16 @@ def check_ratchet(fixture: Path) -> None:
     expect(False, "zz_dense.py:f = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f(x, enabled):\n    match x:\n" + "".join(f"        case {n} if enabled:\n            pass\n" for n in range(11)) + "        case _:\n            pass\n", encoding="utf-8")
     expect(False, "zz_dense.py:f = 23, limit 22, and it is not baseline debt", *args)
+    dense.write_text("def f(x, enabled):\n" + "".join(
+        "    match x:\n        case _ if enabled:\n            pass\n" for _ in range(22)), encoding="utf-8")
+    expect(False, "zz_dense.py:f = 23, limit 22, and it is not baseline debt", *args)
     dense.write_text("from __future__ import annotations\ncallback: (lambda x: " + DENSE_BODY + ") = None\n", encoding="utf-8")
     expect(True, "python-quality ok", *args)
     if sys.version_info >= (3, 12):
         dense.write_text("def f():\n" + "".join(f"    type A{n} = int if missing else str\n" for n in range(21)), encoding="utf-8")
         expect(True, "python-quality ok", *args)
+        dense.write_text("type Callback = (lambda x: " + DENSE_BODY + ")\n", encoding="utf-8")
+        expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     long = scripts / "zz_long.py"
     long.write_text("# pad\n" * 501, encoding="utf-8")
     dense.unlink()
@@ -243,6 +248,10 @@ def check_deferred_surfaces() -> None:
         for n in range(11))).body[0]
     if check_python_quality.complexity(fallback) != 12:
         raise SystemExit("irrefutable match fallbacks were counted as decisions")
+    guarded = ast.parse("def f(x, enabled):\n" + "".join(
+        "    match x:\n        case _ if enabled:\n            pass\n" for _ in range(11))).body[0]
+    if check_python_quality.complexity(guarded) != 12:
+        raise SystemExit("guarded irrefutable cases counted their guard twice")
     lazy = ast.parse("def outer(flag):\n" + "".join(
         f"    def f{n}(x: int if flag else str):\n        pass\n" for n in range(21)))
     postponed = check_python_quality.postponed_annotations(lazy, (3, 14))
@@ -260,6 +269,17 @@ def check_lazy_type_parameters() -> None:
         raise SystemExit("lazy type-parameter bounds were charged to their enclosing scope")
 
 
+def check_lazy_type_aliases() -> None:
+    """Alias bodies are lazy control flow but still expose callable scopes."""
+    if sys.version_info < (3, 12):
+        return
+    alias = ast.parse("type Callback = (lambda x: x if x else 0)\n")
+    measured = {name: check_python_quality.complexity(node)
+                for name, node in check_python_quality.scopes(alias)}
+    if measured != {"<module>": 1, "lambda@1": 2}:
+        raise SystemExit(f"lazy alias lambda inventory drifted: {measured}")
+
+
 with tempfile.TemporaryDirectory() as tmp:
     fixture = Path(tmp)
     check_pinned_tree(fixture)
@@ -269,6 +289,7 @@ check_metric()
 check_scope_ownership()
 check_deferred_surfaces()
 check_lazy_type_parameters()
+check_lazy_type_aliases()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "
       "past baseline, stale row, retired-but-listed row, malformed row, missing baseline, "
       "baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, module-level lambdas, body-only traversal, and the branch metric")
