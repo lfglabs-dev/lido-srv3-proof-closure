@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Verity.MinFirstSourceEntry
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.StrategyProofs
 import LidoSRv3.Audit.Common.Atomicity
@@ -562,3 +563,12 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Common.BoundedAmount.checkedAdd_sound
 #print axioms LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects
 #print axioms LidoSRv3.Audit.Common.success_exposes_exact_committed_effects
+
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.zero_demand
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.short_capacity
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_preserves_state
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.revert_restores_snapshot
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_refines_proportional_model
+#print axioms LidoSRv3.Audit.Verity.AllocationTx.live_revert_restores_snapshot
+
+#print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.eager_guard_disagrees_on_zero_demand

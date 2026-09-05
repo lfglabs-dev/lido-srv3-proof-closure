@@ -54,6 +54,7 @@ lean_lib «LidoSRv3» where
     .one `LidoSRv3.Audit.Verity.HandleOracleReportTx,
     .one `LidoSRv3.Audit.Verity.MinFirstAmountTx,
     .one `LidoSRv3.Audit.Verity.MinFirstDistributionTx,
+    .one `LidoSRv3.Audit.Verity.MinFirstSourceEntry,
     .one `LidoSRv3.Audit.Verity.OfficialSemantics,
     .one `LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx,
     .one `LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal,

@@ -70,3 +70,7 @@ for each delivery. Added premises cannot count as unconditional strengthening.
 Stage A changes only two disclosures; all eleven statuses and all 67 canonical gap
 entries remain. No assumption is discharged. It adds no executed differential test
 and does not satisfy the source-model completion gates for B–F.
+
+The additive Stage B allocation boundary slice is described in
+`MINFIRST-SOURCE-ENTRY.md`. Its execution review extends `source-map.yaml` for
+ALLOC-1/2. Full Stage B, the reserve path, and all later stages remain open.
