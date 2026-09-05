@@ -51,6 +51,18 @@ def type_alias(node: ast.AST) -> bool:
     return type(node).__name__ == "TypeAlias"
 
 
+def type_parameter_evaluators(node: ast.AST) -> list[tuple[str, ast.AST]]:
+    """Lazy PEP 695 bound/default expressions, named within their parameter."""
+    evaluators: list[tuple[str, ast.AST]] = []
+    for parameter in type_params(node):
+        name = getattr(parameter, "name", f"parameter@{parameter.lineno}")
+        for field, suffix in (("bound", "__bound__"), ("default_value", "__default__")):
+            value = getattr(parameter, field, None)
+            if isinstance(value, ast.AST):
+                evaluators.append((f"{name}.{suffix}", value))
+    return evaluators
+
+
 def argument_fields(arguments: ast.arguments, postponed: bool) -> list[ast.AST]:
     """Expressions evaluated while a callable is created, not its body."""
     fields = [*arguments.defaults, *arguments.kw_defaults]
@@ -153,7 +165,9 @@ def own_nodes(scope: ast.AST, postponed: bool):
             # A PEP 695 alias evaluates its value lazily; neither its value
             # nor its type parameters are executable control flow here.
             continue
-        if postponed and isinstance(node, ast.AnnAssign):
+        if isinstance(node, ast.AnnAssign) and (postponed or isinstance(scope, FUNCTIONS)):
+            # PEP 526 never evaluates annotations local to a function.  They
+            # are not executable control flow on pre-PEP-649 runtimes either.
             pending.extend(part for part in [node.target, node.value] if part is not None)
             continue
         yield node
@@ -254,11 +268,17 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
             if fields:
                 record([bound], "__annotate__", annotation_scope(fields))
 
+    def record_type_parameter_evaluators(scope: list[str], node: ast.AST) -> None:
+        """Give every PEP 695 lazy evaluator an independently ratcheted scope."""
+        for name, expression in type_parameter_evaluators(node):
+            record(scope, name, annotation_scope([expression]))
+
     def visit(children, scope: list[str], annotation_owner: bool) -> None:
         for child in children:
             if isinstance(child, FUNCTIONS):
                 record(scope, child.name, child)
                 inner = [*scope, child.name]
+                record_type_parameter_evaluators(inner, child)
                 visit(argument_fields(child.args, postponed), inner, False)
                 visit([*child.decorator_list, *type_params(child),
                        *([child.returns] if not postponed and child.returns is not None else []),
@@ -268,6 +288,7 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
             elif isinstance(child, ast.ClassDef):
                 record(scope, child.name, child)
                 inner = [*scope, child.name]
+                record_type_parameter_evaluators(inner, child)
                 visit([*child.decorator_list, *type_params(child), *child.bases, *child.keywords], inner, False)
                 visit(child.body, inner, True)
             elif type_alias(child):
@@ -277,6 +298,7 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                 # which are inventory-worthy callable scopes.
                 alias_name = child.name.id if isinstance(child.name, ast.Name) else f"alias@{child.lineno}"
                 record(scope, f"{alias_name}.__value__", annotation_scope([child.value]))
+                record_type_parameter_evaluators([*scope, alias_name], child)
                 visit([*type_params(child), child.value], scope, annotation_owner)
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)

@@ -110,6 +110,12 @@ def check_ratchet(fixture: Path) -> None:
     if sys.version_info >= (3, 12):
         dense.write_text("def f():\n" + "".join(f"    type A{n} = int if missing else str\n" for n in range(21)), encoding="utf-8")
         expect(True, "python-quality ok", *args)
+        dense.write_text("def f[T: " + DENSE_BODY + "]():\n    pass\n", encoding="utf-8")
+        expect(False, "zz_dense.py:f.T.__bound__ = 24, limit 22, and it is not baseline debt", *args)
+        dense.write_text("class K[T: " + DENSE_BODY + "]:\n    pass\n", encoding="utf-8")
+        expect(False, "zz_dense.py:K.T.__bound__ = 24, limit 22, and it is not baseline debt", *args)
+        dense.write_text("type A[T: " + DENSE_BODY + "] = int\n", encoding="utf-8")
+        expect(False, "zz_dense.py:A.T.__bound__ = 24, limit 22, and it is not baseline debt", *args)
         dense.write_text("type Callback = (lambda x: " + DENSE_BODY + ")\n", encoding="utf-8")
         expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     long = scripts / "zz_long.py"
@@ -317,13 +323,38 @@ def check_lazy_annotation_thunks() -> None:
 
 
 def check_lazy_type_parameters() -> None:
-    """PEP 695 bounds are discoverable syntax, not enclosing control flow."""
+    """PEP 695 evaluators own bounds without charging their containing scope."""
     if sys.version_info < (3, 12):
         return
-    lazy_bound = ast.parse("def outer(flag):\n" + "".join(
-        f"    def f{n}[T: int if flag else str]():\n        pass\n" for n in range(21)))
-    if check_python_quality.complexity(lazy_bound.body[0]) != 1:
-        raise SystemExit("lazy type-parameter bounds were charged to their enclosing scope")
+    source = "def f[T: " + DENSE_BODY + "]():\n    pass\n"
+    source += "class K[T: " + DENSE_BODY + "]:\n    pass\n"
+    source += "type A[T: " + DENSE_BODY + "] = int\n"
+    measured = {name: check_python_quality.complexity(node)
+                for name, node in check_python_quality.scopes(ast.parse(source))}
+    expected = {"<module>": 1, "f": 1, "f.T.__bound__": 24, "K": 1,
+                "K.T.__bound__": 24, "A.__value__": 1, "A.T.__bound__": 24}
+    if measured != expected:
+        raise SystemExit(f"lazy type-parameter bound scope drifted: {measured}")
+    if sys.version_info >= (3, 13):
+        defaults = ast.parse("def f[T = " + DENSE_BODY + "]():\n    pass\n"
+                             "class K[T = " + DENSE_BODY + "]:\n    pass\n"
+                             "type A[T = " + DENSE_BODY + "] = int\n")
+        measured = {name: check_python_quality.complexity(node)
+                    for name, node in check_python_quality.scopes(defaults)}
+        expected = {"<module>": 1, "f": 1, "f.T.__default__": 24, "K": 1,
+                    "K.T.__default__": 24, "A.__value__": 1, "A.T.__default__": 24}
+        if measured != expected:
+            raise SystemExit(f"lazy type-parameter default scope drifted: {measured}")
+
+
+def check_function_local_annotations() -> None:
+    """PEP 526 locals are not evaluated on runtimes before PEP 649."""
+    local = ast.parse("def f():\n    value: " + DENSE_BODY + " = None\n")
+    if check_python_quality.complexity(local.body[0]) != 1:
+        raise SystemExit("a function-local annotation was treated as executable control flow")
+    module = ast.parse("value: " + DENSE_BODY + " = None\n")
+    if check_python_quality.complexity(module) != 24:
+        raise SystemExit("a module annotation stopped owning executable control flow")
 
 
 def check_lazy_type_aliases() -> None:
@@ -361,6 +392,7 @@ check_deferred_surfaces()
 check_deferred_callable_inventory()
 check_lazy_annotation_thunks()
 check_lazy_type_parameters()
+check_function_local_annotations()
 check_lazy_type_aliases()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "
       "past baseline, stale row, retired-but-listed row, malformed row, missing baseline, "
