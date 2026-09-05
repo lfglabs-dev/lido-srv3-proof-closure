@@ -273,16 +273,35 @@ def check_deferred_callable_inventory() -> None:
         raise SystemExit("a deferred assignment annotation created a runtime lambda scope")
     lazy_lambda = ast.parse("def f(x: (lambda y: y if y else 0)) -> (lambda z: z):\n    pass\n")
     names = [name for name, _ in check_python_quality.scopes(lazy_lambda, True, True)]
-    if names != ["<module>", "f", "f.lambda@1", "f.lambda@1#2"]:
+    if names != ["<module>", "f", "f.__annotate__", "f.lambda@1", "f.lambda@1#2"]:
         raise SystemExit("Python 3.14 lazy annotation callables were not inventoried")
     annotated = ast.parse("callback: (lambda x: x if x else 0) = None\n")
     names = [name for name, _ in check_python_quality.scopes(annotated, True, True)]
-    if names != ["<module>", "lambda@1"]:
+    if names != ["<module>", "__annotate__", "lambda@1"]:
         raise SystemExit("a Python 3.14 lazy assignment annotation was not inventoried")
     if check_python_quality.lazy_annotations(lazy_lambda, (3, 14)) is not True:
         raise SystemExit("Python 3.14 annotations were not recognized as lazy")
     if check_python_quality.lazy_annotations(deferred_assignment, (3, 14)):
         raise SystemExit("future annotations were treated as PEP 649 callables")
+
+
+def check_lazy_annotation_thunks() -> None:
+    """PEP 649 annotations own complexity in their generated thunk."""
+    source = "def f(x: " + DENSE_BODY + "):\n    pass\n"
+    tree = ast.parse(source)
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(tree, True, True)}
+    if measured != {"<module>": 1, "f": 1, "f.__annotate__": 24}:
+        raise SystemExit(f"PEP 649 function annotation thunk drifted: {measured}")
+    module = ast.parse("callback: " + DENSE_BODY + " = None\n")
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(module, True, True)}
+    if measured != {"<module>": 1, "__annotate__": 24}:
+        raise SystemExit(f"PEP 649 module annotation thunk drifted: {measured}")
+    stringized = ast.parse("from __future__ import annotations\n" + source)
+    names = [name for name, _ in check_python_quality.scopes(stringized, True, False)]
+    if "f.__annotate__" in names:
+        raise SystemExit("stringized annotations created an executable thunk")
 
 
 def check_lazy_type_parameters() -> None:
@@ -323,6 +342,7 @@ check_metric()
 check_scope_ownership()
 check_deferred_surfaces()
 check_deferred_callable_inventory()
+check_lazy_annotation_thunks()
 check_lazy_type_parameters()
 check_lazy_type_aliases()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "

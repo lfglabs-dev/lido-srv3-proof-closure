@@ -78,6 +78,19 @@ def annotation_fields(arguments: ast.arguments) -> list[ast.AST]:
     return fields
 
 
+def annotation_scope(fields: list[ast.AST]) -> ast.Module:
+    """The executable PEP 649 thunk represented by its annotation expressions."""
+    return ast.Module(body=[ast.Expr(value=field) for field in fields], type_ignores=[])
+
+
+def local_annotations(node: ast.AST) -> list[ast.AST]:
+    """Direct annotations evaluated by a module or class annotation thunk."""
+    if not isinstance(node, (ast.Module, ast.ClassDef)):
+        return []
+    return [statement.annotation for statement in node.body
+            if isinstance(statement, ast.AnnAssign)]
+
+
 def setup_fields(node: ast.AST, postponed: bool) -> list[ast.AST]:
     """Expressions a definition evaluates in its enclosing executable scope."""
     if isinstance(node, FUNCTIONS):
@@ -210,7 +223,14 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
     def record(scope: list[str], name: str, node: ast.AST) -> None:
         qualified = ".".join([*scope, name])
         seen[qualified] = seen.get(qualified, 0) + 1
-        found.append((qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}", node))
+        bound = qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}"
+        found.append((bound, node))
+        if lazy and isinstance(node, (*FUNCTIONS, ast.ClassDef)):
+            fields = (annotation_fields(node.args) +
+                      ([node.returns] if node.returns is not None else [])
+                      if isinstance(node, FUNCTIONS) else local_annotations(node))
+            if fields:
+                record([bound], "__annotate__", annotation_scope(fields))
 
     def visit(children, scope: list[str]) -> None:
         for child in children:
@@ -258,6 +278,10 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
             else:
                 visit(ast.iter_child_nodes(child), scope)
 
+    if lazy:
+        fields = local_annotations(tree)
+        if fields:
+            record([], "__annotate__", annotation_scope(fields))
     visit(ast.iter_child_nodes(tree), [])
     return found
 
