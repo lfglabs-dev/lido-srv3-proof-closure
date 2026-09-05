@@ -273,6 +273,14 @@ def check_lazy_type_aliases() -> None:
     """Alias bodies are lazy control flow but still expose callable scopes."""
     if sys.version_info < (3, 12):
         return
+    module_aliases = ast.parse("".join(
+        f"type A{number} = int if flag else str\n" for number in range(21)))
+    if check_python_quality.complexity(module_aliases) != 1:
+        raise SystemExit("lazy type-alias bodies were charged to their containing module")
+    function_aliases = ast.parse("def outer(flag):\n" + "".join(
+        f"    type A{number} = int if flag else str\n" for number in range(21)))
+    if check_python_quality.complexity(function_aliases.body[0]) != 1:
+        raise SystemExit("lazy type-alias bodies were charged to their containing function")
     alias = ast.parse("type Callback = (lambda x: x if x else 0)\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.scopes(alias)}
