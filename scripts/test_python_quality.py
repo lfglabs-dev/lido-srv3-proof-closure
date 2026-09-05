@@ -262,6 +262,21 @@ def check_deferred_surfaces() -> None:
         raise SystemExit("Python 3.14 lazy annotations were charged to their enclosing scope")
 
 
+def check_deferred_callable_inventory() -> None:
+    """Deferred annotation expressions never manufacture callable scopes."""
+    deferred_assignment = ast.parse(
+        "from __future__ import annotations\n"
+        "callback: (lambda x: " + DENSE_BODY + ") = None\n")
+    names = [name for name, _ in check_python_quality.scopes(
+        deferred_assignment, check_python_quality.postponed_annotations(deferred_assignment))]
+    if names != ["<module>"]:
+        raise SystemExit("a deferred assignment annotation created a runtime lambda scope")
+    lazy_lambda = ast.parse("def f(x: (lambda y: y if y else 0)):\n    pass\n")
+    names = [name for name, _ in check_python_quality.scopes(lazy_lambda, True)]
+    if names != ["<module>", "f"]:
+        raise SystemExit("Python 3.14 lazy annotations created a runtime lambda scope")
+
+
 def check_lazy_type_parameters() -> None:
     """PEP 695 bounds are discoverable syntax, not enclosing control flow."""
     if sys.version_info < (3, 12):
@@ -299,6 +314,7 @@ with tempfile.TemporaryDirectory() as tmp:
 check_metric()
 check_scope_ownership()
 check_deferred_surfaces()
+check_deferred_callable_inventory()
 check_lazy_type_parameters()
 check_lazy_type_aliases()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "

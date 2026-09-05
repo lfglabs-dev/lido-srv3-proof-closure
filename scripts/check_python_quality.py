@@ -156,7 +156,7 @@ def complexity(scope: ast.AST, postponed: bool = False) -> int:
 
 
 def postponed_annotations(tree: ast.Module, runtime_version=None) -> bool:
-    """Whether this module's annotations are deferred by its future import."""
+    """Whether this module's annotations are deferred by its runtime or future import."""
     if runtime_version is None:
         runtime_version = sys.version_info
     # PEP 649 makes annotations lazy by default starting with Python 3.14.
