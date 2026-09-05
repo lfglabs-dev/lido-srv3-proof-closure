@@ -1,7 +1,7 @@
 verified_source_tree=1f2f245878650a816a8b1fab36ce0a67b139ee10
-lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
+lean_version=Lean (version 4.31.0, arm64-apple-darwin24.6.0, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
 proof_targets=LidoSRv3 LidoSRv3Legacy
-⚠ [11/29] Replayed Verity.Core
+⚠ [11/251] Replayed Verity.Core
 warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -11,7 +11,7 @@ Note: This linter can be disabled with `set_option linter.unnecessarySimpa false
 warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-⚠ [1159/1198] Replayed Conform.Wheels
+⚠ [1159/1358] Replayed Conform.Wheels
 warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -24,7 +24,7 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1160/1198] Replayed EvmYul.Pretty
+⚠ [1160/1358] Replayed EvmYul.Pretty
 warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
 
 Note: The updated constant has a different type:
@@ -37,47 +37,15 @@ Note: The updated constant has a different type:
   {α : Sort u} → (α → α → Prop) → Prop
 instead of
   (α : Sort u_1) → (α → α → Prop) → Prop
-⚠ [1207/1313] Replayed EvmYul.Semantics
+⚠ [1207/1358] Replayed EvmYul.Semantics
 warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1208/1313] Replayed EvmYul.EVM.Semantics
+⚠ [1208/1358] Replayed EvmYul.EVM.Semantics
 warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
 
 import Mathlib.Init
-⚠ [1253/1313] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
-
-Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:22: This simp argument is unused:
-  modelAllocateLoop
-
-Hint: Omit it from the simp argument list.
-  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:53: This simp argument is unused:
-  hzv
-
-Hint: Omit it from the simp argument list.
-  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:25: This simp argument is unused:
-  modelAllocateLoop
-
-Hint: Omit it from the simp argument list.
-  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:44: This simp argument is unused:
-  if_neg hzv
-
-Hint: Omit it from the simp argument list.
-  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1258/1313] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
+⚠ [1250/1358] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
 warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:299:26: This simp argument is unused:
   Nat.add_assoc
 
@@ -170,482 +138,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵l̵e̵f̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1265/1313] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
-  evalExprList
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, e̵v̵a̵l̵E̵x̵p̵r̵L̵i̵s̵t̵,̵boolWord, lookupValue, bindValue, withPayableCallContext,
-  ̲  ̲ ̲ ̲withTransactionContext, wordNormalize, DynamicAbi.wordNormalize, execExternalCallBind,
-  ̲  ̲ ̲ ̲gatewayEnv, envWith, link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry, debitSelfBalance, bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:76:27: This simp argument is unused:
-  bindValue
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue,
-  ̲  ̲ ̲ ̲b̵i̵n̵d̵V̵a̵l̵u̵e̵,̵ ̵withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry, debitSelfBalance, bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:77:45: This simp argument is unused:
-  execExternalCallBind
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲e̵x̵e̵c̵E̵x̵t̵e̵r̵n̵a̵l̵C̵a̵l̵l̵B̵i̵n̵d̵,̵ ̵gatewayEnv, envWith, link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry, debitSelfBalance, bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:10: This simp argument is unused:
-  denoteCallJournaled
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵J̵o̵u̵r̵n̵a̵l̵e̵d̵,̵ ̵denoteCall, identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry, debitSelfBalance, bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:31: This simp argument is unused:
-  denoteCall
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary,
-  ̲  ̲ ̲ ̲chargedGas, journalEntry, debitSelfBalance, bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:62: This simp argument is unused:
-  chargedGas
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, c̵h̵a̵r̵g̵e̵d̵G̵a̵s̵,̵ ̵journalEntry, debitSelfBalance, bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:74: This simp argument is unused:
-  journalEntry
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, j̵o̵u̵r̵n̵a̵l̵E̵n̵t̵r̵y̵,̵debitSelfBalance, bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:79:4: This simp argument is unused:
-  debitSelfBalance
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry, d̵e̵b̵i̵t̵S̵e̵l̵f̵B̵a̵l̵a̵n̵c̵e̵,̵ ̵bindResultWords, honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:79:22: This simp argument is unused:
-  bindResultWords
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
-  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry, debitSelfBalance, b̵i̵n̵d̵R̵e̵s̵u̵l̵t̵W̵o̵r̵d̵s̵,̵ ̵honest]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:83:38: Variable name `hn` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:135:66: This simp argument is unused:
-  evalExprList
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, e̵v̵a̵l̵E̵x̵p̵r̵L̵i̵s̵t̵,̵
-  ̵ ̵ ̵ ̵ ̵boolWord, lookupValue, bindValue, withPayableCallContext,
-  ̲  ̲ ̲ ̲withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize, execExternalCallBind,
-  ̲  ̲ ̲ ̲gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hfee',
-      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:137:45: This simp argument is unused:
-  execExternalCallBind
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲ e̵x̵e̵c̵E̵x̵t̵e̵r̵n̵a̵l̵C̵a̵l̵l̵B̵i̵n̵d̵,̵  ̲ ̲gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hfee',
-      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:10: This simp argument is unused:
-  denoteCallJournaled
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJ̵o̵u̵r̵n̵a̵l̵e̵d̵, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hfee',
-      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:31: This simp argument is unused:
-  denoteCall
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary,
-  ̲  ̲ ̲ ̲chargedGas, journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn,
-  ̲  ̲ ̲ ̲hfee',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:62: This simp argument is unused:
-  chargedGas
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, c̵h̵a̵r̵g̵e̵d̵G̵a̵s̵,̵ ̵journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM',
-  ̲  ̲ ̲ ̲hn, hfee',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ContractState.storage,
-  ̵  ̵ ̵ ̵hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:74: This simp argument is unused:
-  journalEntry
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, j̵o̵u̵r̵n̵a̵l̵E̵n̵t̵r̵y̵,̵
-  ̵ ̵ ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn,
-  ̲  ̲ ̲ ̲hfee',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:139:4: This simp argument is unused:
-  debitSelfBalance
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
-  ̵  ̵ ̵ ̵d̵e̵bit̵S̵e̵l̵f̵B̵a̵l̵a̵nc̵e̵,̵ ̵b̵i̵n̵dResultWords, honest, hpos, hmv', hnM', hn,
-  ̲  ̲ ̲ ̲hfee',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:139:22: This simp argument is unused:
-  bindResultWords
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, b̵i̵n̵d̵R̵e̵s̵u̵l̵t̵W̵o̵r̵d̵s̵,̵ ̵honest, hpos, hmv', hnM', hn,
-  ̲  ̲ ̲ ̲hfee',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hwrap]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:148:5: Variable name `hfee` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:169:66: This simp argument is unused:
-  evalExprList
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, e̵v̵a̵l̵E̵x̵p̵r̵L̵i̵s̵t̵,̵
-  ̵ ̵ ̵ ̵ ̵boolWord, lookupValue, bindValue, withPayableCallContext,
-  ̲  ̲ ̲ ̲withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize, execExternalCallBind,
-  ̲  ̲ ̲ ̲gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
-      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:171:45: This simp argument is unused:
-  execExternalCallBind
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲ e̵x̵e̵c̵E̵x̵t̵e̵r̵n̵a̵l̵C̵a̵l̵l̵B̵i̵n̵d̵,̵  ̲ ̲gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
-      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:10: This simp argument is unused:
-  denoteCallJournaled
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJ̵o̵u̵r̵n̵a̵l̵e̵d̵, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary, chargedGas,
-  ̲  ̲ ̲ ̲journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
-      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:31: This simp argument is unused:
-  denoteCall
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary,
-  ̲  ̲ ̲ ̲chargedGas, journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
-      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:62: This simp argument is unused:
-  chargedGas
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, c̵h̵a̵r̵g̵e̵d̵G̵a̵s̵,̵ ̵journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM',
-  ̲  ̲ ̲ ̲hn, hnf',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot,
-  ̲  ̲ ̲ ̲ContractState.storage,
-  ̵  ̵ ̵ ̵hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:74: This simp argument is unused:
-  journalEntry
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, j̵o̵u̵r̵n̵a̵l̵E̵n̵t̵r̵y̵,̵
-  ̵ ̵ ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn,
-  ̲  ̲ ̲ ̲hnf',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:173:4: This simp argument is unused:
-  debitSelfBalance
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
-  ̵  ̵ ̵ ̵d̵e̵bit̵S̵e̵l̵f̵B̵a̵l̵a̵nc̵e̵,̵ ̵b̵i̵n̵dResultWords, honest, hpos, hmv', hnM', hn,
-  ̲  ̲ ̲ ̲hnf',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:173:22: This simp argument is unused:
-  bindResultWords
-
-Hint: Omit it from the simp argument list.
-  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
-  ̵  ̵ ̵ ̵effectiveFields,
-  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
-      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
-  ̵  ̵ ̵ ̵execStmtListWithCalls,
-  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
-  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
-  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
-  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
-  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
-  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
-  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
-  ̵  ̵ ̵ ̵debitSelfBalance, b̵i̵n̵d̵R̵e̵s̵u̵l̵t̵W̵o̵r̵d̵s̵,̵ ̵honest, hpos, hmv', hnM', hn,
-  ̲  ̲ ̲ ̲hnf',
-  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
-      hstorageW, mul_ofNat_val, hdiv, hle]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1284/1313] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
+⚠ [1268/1358] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
 warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:726:36: This simp argument is unused:
   requestCall
 
@@ -667,7 +160,7 @@ Hint: Omit it from the simp argument list.
   simp ̵[̵i̵h̵]̵
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1285/1313] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
+⚠ [1269/1358] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
 warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:241:41: This simp argument is unused:
   List.mem_nil_iff
 
@@ -675,7 +168,7 @@ Hint: Omit it from the simp argument list.
   simp [List.mem_cons,̵ ̵L̵i̵s̵t̵.̵m̵e̵m̵_̵n̵i̵l̵_̵i̵f̵f̵] at hx
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1308/1407] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
+⚠ [1279/1358] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:410:53: This simp argument is unused:
   setStorage
 
@@ -1073,7 +566,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1318/1407] Replayed LidoSRv3.Audit.Verity.VaultEthTx
+⚠ [1286/1358] Replayed LidoSRv3.Audit.Verity.VaultEthTx
 warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:94:23: This simp argument is unused:
   hRoute
 
@@ -1109,7 +602,7 @@ Hint: Omit it from the simp argument list.
   simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1336/1407] Replayed LidoSRv3.Audit.Verity.AddressTx
+⚠ [1292/1358] Replayed LidoSRv3.Audit.Verity.AddressTx
 warning: LidoSRv3/Audit/Verity/AddressTx.lean:277:34: This simp argument is unused:
   AddressTxContract.paused
 
@@ -2414,7 +1907,7 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1340/1407] Replayed LidoSRv3.Audit.SszDepositEquivalence
+⚠ [1294/1358] Replayed LidoSRv3.Audit.SszDepositEquivalence
 warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
   Ssz.traverseBranch
 
@@ -2437,7 +1930,514 @@ Hint: Omit it from the simp argument list.
   simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1343/1407] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+⚠ [1308/1410] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:22: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:53: This simp argument is unused:
+  hzv
+
+Hint: Omit it from the simp argument list.
+  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:25: This simp argument is unused:
+  modelAllocateLoop
+
+Hint: Omit it from the simp argument list.
+  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:44: This simp argument is unused:
+  if_neg hzv
+
+Hint: Omit it from the simp argument list.
+  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1312/1410] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
+  evalExprList
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, e̵v̵a̵l̵E̵x̵p̵r̵L̵i̵s̵t̵,̵boolWord, lookupValue, bindValue, withPayableCallContext,
+  ̲  ̲ ̲ ̲withTransactionContext, wordNormalize, DynamicAbi.wordNormalize, execExternalCallBind,
+  ̲  ̲ ̲ ̲gatewayEnv, envWith, link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry, debitSelfBalance, bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:76:27: This simp argument is unused:
+  bindValue
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue,
+  ̲  ̲ ̲ ̲b̵i̵n̵d̵V̵a̵l̵u̵e̵,̵ ̵withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry, debitSelfBalance, bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:77:45: This simp argument is unused:
+  execExternalCallBind
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲e̵x̵e̵c̵E̵x̵t̵e̵r̵n̵a̵l̵C̵a̵l̵l̵B̵i̵n̵d̵,̵ ̵gatewayEnv, envWith, link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry, debitSelfBalance, bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:10: This simp argument is unused:
+  denoteCallJournaled
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵J̵o̵u̵r̵n̵a̵l̵e̵d̵,̵ ̵denoteCall, identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry, debitSelfBalance, bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:31: This simp argument is unused:
+  denoteCall
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary,
+  ̲  ̲ ̲ ̲chargedGas, journalEntry, debitSelfBalance, bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:62: This simp argument is unused:
+  chargedGas
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, c̵h̵a̵r̵g̵e̵d̵G̵a̵s̵,̵ ̵journalEntry, debitSelfBalance, bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:78:74: This simp argument is unused:
+  journalEntry
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, j̵o̵u̵r̵n̵a̵l̵E̵n̵t̵r̵y̵,̵debitSelfBalance, bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:79:4: This simp argument is unused:
+  debitSelfBalance
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry, d̵e̵b̵i̵t̵S̵e̵l̵f̵B̵a̵l̵a̵n̵c̵e̵,̵ ̵bindResultWords, honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:79:22: This simp argument is unused:
+  bindResultWords
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck, effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindExternalParams, DynamicAbi.bindSupportedParams,
+  ̲  ̲ ̲ ̲DynamicAbi.decodeSupportedParamWord, amountParam, batchParam, execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList, boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext, wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith, link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry, debitSelfBalance, b̵i̵n̵d̵R̵e̵s̵u̵l̵t̵W̵o̵r̵d̵s̵,̵ ̵honest]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:83:38: Variable name `hn` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:135:66: This simp argument is unused:
+  evalExprList
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, e̵v̵a̵l̵E̵x̵p̵r̵L̵i̵s̵t̵,̵
+  ̵ ̵ ̵ ̵ ̵boolWord, lookupValue, bindValue, withPayableCallContext,
+  ̲  ̲ ̲ ̲withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize, execExternalCallBind,
+  ̲  ̲ ̲ ̲gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hfee',
+      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:137:45: This simp argument is unused:
+  execExternalCallBind
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲ e̵x̵e̵c̵E̵x̵t̵e̵r̵n̵a̵l̵C̵a̵l̵l̵B̵i̵n̵d̵,̵  ̲ ̲gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hfee',
+      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:10: This simp argument is unused:
+  denoteCallJournaled
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJ̵o̵u̵r̵n̵a̵l̵e̵d̵, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hfee',
+      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:31: This simp argument is unused:
+  denoteCall
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary,
+  ̲  ̲ ̲ ̲chargedGas, journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn,
+  ̲  ̲ ̲ ̲hfee',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:62: This simp argument is unused:
+  chargedGas
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, c̵h̵a̵r̵g̵e̵d̵G̵a̵s̵,̵ ̵journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM',
+  ̲  ̲ ̲ ̲hn, hfee',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ContractState.storage,
+  ̵  ̵ ̵ ̵hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:138:74: This simp argument is unused:
+  journalEntry
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, j̵o̵u̵r̵n̵a̵l̵E̵n̵t̵r̵y̵,̵
+  ̵ ̵ ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn,
+  ̲  ̲ ̲ ̲hfee',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:139:4: This simp argument is unused:
+  debitSelfBalance
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
+  ̵  ̵ ̵ ̵d̵e̵bit̵S̵e̵l̵f̵B̵a̵l̵a̵nc̵e̵,̵ ̵b̵i̵n̵dResultWords, honest, hpos, hmv', hnM', hn,
+  ̲  ̲ ̲ ̲hfee',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:139:22: This simp argument is unused:
+  bindResultWords
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, b̵i̵n̵d̵R̵e̵s̵u̵l̵t̵W̵o̵r̵d̵s̵,̵ ̵honest, hpos, hmv', hnM', hn,
+  ̲  ̲ ̲ ̲hfee',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hwrap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:148:5: Variable name `hfee` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:169:66: This simp argument is unused:
+  evalExprList
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, e̵v̵a̵l̵E̵x̵p̵r̵L̵i̵s̵t̵,̵
+  ̵ ̵ ̵ ̵ ̵boolWord, lookupValue, bindValue, withPayableCallContext,
+  ̲  ̲ ̲ ̲withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize, execExternalCallBind,
+  ̲  ̲ ̲ ̲gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
+      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:171:45: This simp argument is unused:
+  execExternalCallBind
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲ e̵x̵e̵c̵E̵x̵t̵e̵r̵n̵a̵l̵C̵a̵l̵l̵B̵i̵n̵d̵,̵  ̲ ̲gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall, identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
+      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:10: This simp argument is unused:
+  denoteCallJournaled
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJ̵o̵u̵r̵n̵a̵l̵e̵d̵, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary, chargedGas,
+  ̲  ̲ ̲ ̲journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
+      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:31: This simp argument is unused:
+  denoteCall
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, d̵e̵n̵o̵t̵e̵C̵a̵l̵l̵,̵ ̵identityAdversary,
+  ̲  ̲ ̲ ̲chargedGas, journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn, hnf',
+      gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:62: This simp argument is unused:
+  chargedGas
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, c̵h̵a̵r̵g̵e̵d̵G̵a̵s̵,̵ ̵journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM',
+  ̲  ̲ ̲ ̲hn, hnf',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot,
+  ̲  ̲ ̲ ̲ContractState.storage,
+  ̵  ̵ ̵ ̵hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:172:74: This simp argument is unused:
+  journalEntry
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, j̵o̵u̵r̵n̵a̵l̵E̵n̵t̵r̵y̵,̵
+  ̵ ̵ ̵ ̵ ̵debitSelfBalance, bindResultWords, honest, hpos, hmv', hnM', hn,
+  ̲  ̲ ̲ ̲hnf',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:173:4: This simp argument is unused:
+  debitSelfBalance
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
+  ̵  ̵ ̵ ̵d̵e̵bit̵S̵e̵l̵f̵B̵a̵l̵a̵nc̵e̵,̵ ̵b̵i̵n̵dResultWords, honest, hpos, hmv', hnM', hn,
+  ̲  ̲ ̲ ̲hnf',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:173:22: This simp argument is unused:
+  bindResultWords
+
+Hint: Omit it from the simp argument list.
+  simp [executeFunctionWithCalls, gwTx, gatewayFn, gatewaySpec, declaredValueCheck,
+  ̵  ̵ ̵ ̵effectiveFields,
+  ̲  ̲ ̲ ̲bindExternalParams, DynamicAbi.bindE̵x̵E̲x̲ter̵n̵a̵l̵r̲n̲a̲l̲Params, ̲D̲y̲n̲a̲m̲i̲c̲A̲b̲i̲.̲b̲i̲n̲d̲S̲u̲p̲p̲o̲r̲t̲e̲d̲P̲a̲r̲a̲m̲s̲,̲
+      DynamicAbi.b̵i̵n̵dS̵u̵p̵p̵o̵r̵t̵ed̵P̵a̵r̵a̵m̵s̵,̵ ̵D̵y̵n̵a̵m̵i̵cA̵b̵i̵.̵d̵e̵c̵odeSupportedParamWord, amountParam, batchParam,
+  ̵  ̵ ̵ ̵execStmtListWithCalls,
+  ̲  ̲ ̲ ̲execStmtWithCalls, execStmt, evalExpr, evalExprList,
+  ̵  ̵ ̵ ̵boolWord, lookupValue, bindValue,
+  ̲  ̲ ̲ ̲withPayableCallContext, withTransactionContext,
+  ̵  ̵ ̵ ̵wordNormalize, DynamicAbi.wordNormalize,
+  ̲  ̲ ̲ ̲execExternalCallBind, gatewayEnv, envWith,
+  ̵  ̵ ̵ ̵link, denoteCallJournaled, denoteCall,
+  ̲  ̲ ̲ ̲identityAdversary, chargedGas, journalEntry,
+  ̵  ̵ ̵ ̵debitSelfBalance, b̵i̵n̵d̵R̵e̵s̵u̵l̵t̵W̵o̵r̵d̵s̵,̵ ̵honest, hpos, hmv', hnM', hn,
+  ̲  ̲ ̲ ̲hnf',
+  ̵  ̵ ̵ ̵gateway_fee_slot, readFieldWord, feeField, ContractState.readSlot, ContractState.storage,
+      hstorageW, mul_ofNat_val, hdiv, hle]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1349/1410] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
 warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -2457,7 +2457,7 @@ info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationMode
   Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
     Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
       (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-⚠ [1349/1407] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
+⚠ [1354/1410] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
 warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
   memory_writeSlot
 
@@ -2465,7 +2465,7 @@ Hint: Omit it from the simp argument list.
   simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1384/1407] Replayed LidoSRv3.Audit.Verity.TopupHybrid
+⚠ [1385/1410] Replayed LidoSRv3.Audit.Verity.TopupHybrid
 warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
   _root_.Verity.pure
 
@@ -2482,7 +2482,7 @@ Hint: Omit it from the simp argument list.
   ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1398/1407] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+⚠ [1399/1410] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
 warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:5: Variable name `hsize` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
@@ -2536,13 +2536,13 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1399/1407] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+⚠ [1400/1410] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
 warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
 
 The binding can be removed (if unused) or named `_` (if used implicitly).
 
 Note: This linter can be disabled with `set_option linter.unusedVariables false`
-⚠ [1401/1407] Replayed LidoSRv3.Audit.Verity.DepositTx
+⚠ [1402/1410] Replayed LidoSRv3.Audit.Verity.DepositTx
 warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
   Pure.pure
 
@@ -2557,7 +2557,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1409/1410] Replayed LidoSRv3.Legacy.SpecProofs
+⚠ [1409/1410] Built LidoSRv3.Legacy.SpecProofs (6.1s)
 warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`

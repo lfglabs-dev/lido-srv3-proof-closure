@@ -23,8 +23,8 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "cb743834032bfe070c96ec3f299c1e19f5d403bd"
-# The report calls this commit its certified review basis.  Keep the exact
+R1_REVIEW_BASE = "2af887567c3faa074d30123c09c7f6114ca3589b"
+# The report records this commit as its Stage A disclosure input basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
 # if it had that review.
@@ -32,7 +32,7 @@ R1_REVIEW_BASE = "cb743834032bfe070c96ec3f299c1e19f5d403bd"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "8a1d81225d1a8a813e638e0c80e0dba47e590bfd88be656a70e71b640cb190bb",
+    "audit/guarantees.yaml": "19ad54e73791465cb8ebf3321ddb0a5a8338c1a04e9f2587ef3c5d197f0b8495",
     "audit/source-map.yaml": "e592f4e15e9d3ce8ffdcefdc87bb664ac404c6d0b7447e29e35d5c60611eaba6",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
@@ -85,7 +85,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-PERFECT-HASH", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "c184a7c659c8ddbdc2af3461644eccce399496c51e9ab9beff1a0498124eab12",
+    "P-ALLOC-1": "0fd2c95fe2d34b7ca586819530f6e6a57a17e4415af068789cc22019fa6ad705",
     "P-ALLOC-2": "e5955a7a287a477ee8e21da15dabed644676f247d242035be35cf8db5f39f70e",
     "P-DEPOSIT-1": "768e8ca14a82e6185ec6cfaaa87365c708434f9a6281fa265eb332a8a10e8208",
     "P-TOPUP-1": "7097df87332a3b9f4996ae897b5619947c71d4bdc547dad407759174fa62212f",
@@ -93,7 +93,7 @@ EXPECTED_CANONICAL_DETAIL_SHA256 = {
     "P-RESERVE-1": "5b2e39b7d0f6ae09eabea8ee1f4ff5f02337921e576bb6786bb6b9063272b010",
     "P-CONSOLIDATION-ETH-1": "0bbd358a2b0ab770b4a88536e88ce9a32fa6bfdecbc83c70c519673505841017",
     "P-ADDRESS-1": "2aec78330a6f136e109160e4cca2c2da6e159dc2db719d28b260134d69e447aa",
-    "P-TOPUP-2": "ab0afa6dde459f2b29f0102aada3cd2df77e376b2c48a435b4081b32a9307c6e",
+    "P-TOPUP-2": "9fac92874b97a201f80be5b60508d84bedefdeed962c417aaa8b3323044b18dc",
     "P-CONSOLIDATION-1": "2fb9fc984cd8ded5ed7f11e749e5ba0356dc128ee8ea11ad59b30973778a0cdb",
     "P-SSZ-1": "34b6ab0e40f56dd44ffb44c1b37a090ffeb3880339d403022e172534a16cbb8a",
 }
@@ -780,7 +780,7 @@ def rendered(rows, source_map):
         gap_note = "No row is gap-free."
     report = [header + "# R1 final auditor report\n\n",
         "## Decision\n\n",
-        f"Review basis: certified R1 input set `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
+        f"Review basis: recorded input set (Stage A disclosure amendment; no proof-status upgrade) `{R1_REVIEW_BASE}`. **Not an audit certificate or deployment/bytecode verification.** The eleven canonical guarantees are Lean-checked only on the named abstract and Verity executable-contract planes. `CHECKED` means the theorem named below is buildable; it does not establish Solidity-to-bytecode, runtime-codehash, chain-address, constructor, or live-deployment identity. This report is generated from the canonical assurance registry and source map; it is an acceptance record, not proof evidence.\n\n",
         "## Architecture and evidence boundary\n\n",
         "The evidence stack is: pinned Lido source spans → source-shaped/abstract Lean specifications → Verity Lean program and `Contract.run` transaction observables → named theorem and negative-mutant receipts. Revert theorems concern the modeled snapshot and journal. External calls, storage observations, and source correspondences have only the scope stated per row. Lean theorem names are authoritative; metadata records classification and fidelity, never proof progress.\n\n",
         "Pinned upstream source is `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`; Verity is pinned in `audit/artifacts.lock.json`; Lean is `leanprover/lean4:v4.31.0`. Canonical source anchors are immutable permalinks in `audit/source-map.yaml`. A source-map entry is source provenance, not deployed-artifact provenance. Supplemental rows deliberately have no independent source-map target unless their parent mapping says otherwise.\n\n",
