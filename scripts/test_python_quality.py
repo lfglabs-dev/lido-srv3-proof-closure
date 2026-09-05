@@ -279,6 +279,10 @@ def check_deferred_callable_inventory() -> None:
     names = [name for name, _ in check_python_quality.scopes(annotated, True, True)]
     if names != ["<module>", "__annotate__", "lambda@1"]:
         raise SystemExit("a Python 3.14 lazy assignment annotation was not inventoried")
+    local = ast.parse("def f():\n    callback: (lambda x: x if x else 0) = None\n")
+    names = [name for name, _ in check_python_quality.scopes(local, True, True)]
+    if names != ["<module>", "f"]:
+        raise SystemExit("a function-local annotation created a lazy lambda scope")
     if check_python_quality.lazy_annotations(lazy_lambda, (3, 14)) is not True:
         raise SystemExit("Python 3.14 annotations were not recognized as lazy")
     if check_python_quality.lazy_annotations(deferred_assignment, (3, 14)):
@@ -298,6 +302,14 @@ def check_lazy_annotation_thunks() -> None:
                 for name, node in check_python_quality.scopes(module, True, True)}
     if measured != {"<module>": 1, "__annotate__": 24}:
         raise SystemExit(f"PEP 649 module annotation thunk drifted: {measured}")
+    nested = ast.parse("if enabled:\n    callback: " + DENSE_BODY + " = None\n"
+                       "class C:\n    if enabled:\n        callback: " + DENSE_BODY + " = None\n"
+                       "    def f():\n        callback: " + DENSE_BODY + " = None\n")
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(nested, True, True)}
+    if measured != {"<module>": 2, "__annotate__": 24, "C": 2,
+                    "C.__annotate__": 24, "C.f": 1}:
+        raise SystemExit(f"PEP 649 nested annotation thunks drifted: {measured}")
     stringized = ast.parse("from __future__ import annotations\n" + source)
     names = [name for name, _ in check_python_quality.scopes(stringized, True, False)]
     if "f.__annotate__" in names:
@@ -329,8 +341,13 @@ def check_lazy_type_aliases() -> None:
     alias = ast.parse("type Callback = (lambda x: x if x else 0)\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.scopes(alias)}
-    if measured != {"<module>": 1, "lambda@1": 2}:
+    if measured != {"<module>": 1, "Callback.__value__": 1, "lambda@1": 2}:
         raise SystemExit(f"lazy alias lambda inventory drifted: {measured}")
+    alias_value = ast.parse("type Dense = " + DENSE_BODY + "\n")
+    measured = {name: check_python_quality.complexity(node)
+                for name, node in check_python_quality.scopes(alias_value)}
+    if measured != {"<module>": 1, "Dense.__value__": 24}:
+        raise SystemExit(f"lazy alias value complexity drifted: {measured}")
 
 
 with tempfile.TemporaryDirectory() as tmp:

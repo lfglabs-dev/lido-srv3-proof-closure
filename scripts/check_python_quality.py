@@ -83,12 +83,34 @@ def annotation_scope(fields: list[ast.AST]) -> ast.Module:
     return ast.Module(body=[ast.Expr(value=field) for field in fields], type_ignores=[])
 
 
+def assignment_annotation(node: ast.AST, lazy: bool, annotation_owner: bool) -> list[ast.AST]:
+    """The PEP 649 annotation an assignment owner evaluates, if any."""
+    if lazy and annotation_owner and isinstance(node, ast.AnnAssign):
+        return [node.annotation]
+    return []
+
+
 def local_annotations(node: ast.AST) -> list[ast.AST]:
-    """Direct annotations evaluated by a module or class annotation thunk."""
+    """Annotations evaluated by a module or class annotation thunk.
+
+    PEP 649's generated thunk covers annotations reached through the owner's
+    control-flow statements, but not annotations belonging to nested lexical
+    function or class scopes.
+    """
     if not isinstance(node, (ast.Module, ast.ClassDef)):
         return []
-    return [statement.annotation for statement in node.body
-            if isinstance(statement, ast.AnnAssign)]
+    found: list[ast.AST] = []
+
+    def visit(children) -> None:
+        for child in children:
+            if isinstance(child, (FUNCTIONS, ast.ClassDef)):
+                continue
+            if isinstance(child, ast.AnnAssign):
+                found.append(child.annotation)
+            visit(ast.iter_child_nodes(child))
+
+    visit(node.body)
+    return found
 
 
 def setup_fields(node: ast.AST, postponed: bool) -> list[ast.AST]:
@@ -232,28 +254,30 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
             if fields:
                 record([bound], "__annotate__", annotation_scope(fields))
 
-    def visit(children, scope: list[str]) -> None:
+    def visit(children, scope: list[str], annotation_owner: bool) -> None:
         for child in children:
             if isinstance(child, FUNCTIONS):
                 record(scope, child.name, child)
                 inner = [*scope, child.name]
-                visit(argument_fields(child.args, postponed), inner)
+                visit(argument_fields(child.args, postponed), inner, False)
                 visit([*child.decorator_list, *type_params(child),
                        *([child.returns] if not postponed and child.returns is not None else []),
                        *(annotation_fields(child.args) if lazy else []),
-                       *([child.returns] if lazy and child.returns is not None else [])], inner)
-                visit(child.body, inner)
+                       *([child.returns] if lazy and child.returns is not None else [])], inner, False)
+                visit(child.body, inner, False)
             elif isinstance(child, ast.ClassDef):
                 record(scope, child.name, child)
                 inner = [*scope, child.name]
-                visit([*child.decorator_list, *type_params(child), *child.bases, *child.keywords], inner)
-                visit(child.body, inner)
+                visit([*child.decorator_list, *type_params(child), *child.bases, *child.keywords], inner, False)
+                visit(child.body, inner, True)
             elif type_alias(child):
                 # A PEP 695 alias's value and parameters are lazy, so they
                 # must not add complexity to the containing executable scope.
                 # They can nevertheless contain independently owned lambdas,
                 # which are inventory-worthy callable scopes.
-                visit([*type_params(child), child.value], scope)
+                alias_name = child.name.id if isinstance(child.name, ast.Name) else f"alias@{child.lineno}"
+                record(scope, f"{alias_name}.__value__", annotation_scope([child.value]))
+                visit([*type_params(child), child.value], scope, annotation_owner)
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)
                 # The assigned lambda has just been recorded above, but an
@@ -263,26 +287,24 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                 # independently-owned callable remains inventory-visible.
                 targets = child.targets if isinstance(child, ast.Assign) else [child.target]
                 fields = [*targets, *ast.iter_child_nodes(child.value)]
-                if lazy and isinstance(child, ast.AnnAssign):
-                    fields.append(child.annotation)
-                visit(fields, scope)
+                fields.extend(assignment_annotation(child, lazy, annotation_owner))
+                visit(fields, scope, annotation_owner)
             elif isinstance(child, ast.Lambda):
                 record(scope, f"lambda@{child.lineno}", child)
-                visit(ast.iter_child_nodes(child), scope)
+                visit(ast.iter_child_nodes(child), scope, annotation_owner)
             elif postponed and isinstance(child, ast.AnnAssign):
                 # Unlike the assigned value, the annotation is not evaluated.
                 fields = [part for part in (child.target, child.value) if part is not None]
-                if lazy:
-                    fields.append(child.annotation)
-                visit(fields, scope)
+                fields.extend(assignment_annotation(child, lazy, annotation_owner))
+                visit(fields, scope, annotation_owner)
             else:
-                visit(ast.iter_child_nodes(child), scope)
+                visit(ast.iter_child_nodes(child), scope, annotation_owner)
 
     if lazy:
         fields = local_annotations(tree)
         if fields:
             record([], "__annotate__", annotation_scope(fields))
-    visit(ast.iter_child_nodes(tree), [])
+    visit(ast.iter_child_nodes(tree), [], True)
     return found
 
 
