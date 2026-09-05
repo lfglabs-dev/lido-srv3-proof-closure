@@ -44,6 +44,13 @@ def type_params(node: ast.AST) -> list[ast.AST]:
     return list(getattr(node, "type_params", []))
 
 
+def type_alias(node: ast.AST) -> bool:
+    """Whether *node* is the version-dependent PEP 695 type-alias node."""
+    # ast.TypeAlias is absent on 3.10 and 3.11.  Its spelling is stable, and
+    # checking the instance name keeps this checker importable on both.
+    return type(node).__name__ == "TypeAlias"
+
+
 def argument_fields(arguments: ast.arguments, postponed: bool) -> list[ast.AST]:
     """Expressions evaluated while a callable is created, not its body."""
     fields = [*arguments.defaults, *arguments.kw_defaults]
@@ -92,6 +99,10 @@ def own_nodes(scope: ast.AST, postponed: bool):
         if isinstance(node, (FUNCTIONS, ast.ClassDef, ast.Lambda)):
             pending.extend(setup_fields(node, postponed))
             continue
+        if type_alias(node):
+            # A PEP 695 alias evaluates its value lazily; neither its value
+            # nor its type parameters are executable control flow here.
+            continue
         if postponed and isinstance(node, ast.AnnAssign):
             pending.extend(part for part in [node.target, node.value] if part is not None)
             continue
@@ -108,6 +119,15 @@ def pattern_alternatives(pattern: ast.AST) -> int:
     return total
 
 
+def irrefutable_pattern(pattern: ast.AST) -> bool:
+    """Whether an unguarded match pattern cannot fall through."""
+    if isinstance(pattern, ast.MatchAs):
+        return pattern.pattern is None or irrefutable_pattern(pattern.pattern)
+    if isinstance(pattern, ast.MatchOr):
+        return any(irrefutable_pattern(part) for part in pattern.patterns)
+    return False
+
+
 def complexity(scope: ast.AST, postponed: bool = False) -> int:
     """McCabe cyclomatic complexity of one independently-owned scope."""
     count = 1
@@ -122,14 +142,20 @@ def complexity(scope: ast.AST, postponed: bool = False) -> int:
         elif isinstance(node, ast.comprehension):
             count += 1 + len(node.ifs)
         elif isinstance(node, ast.Match):
-            count += len(node.cases)
+            count += sum(not (case.guard is None and irrefutable_pattern(case.pattern))
+                         for case in node.cases)
             count += sum(pattern_alternatives(case.pattern) + (case.guard is not None)
                          for case in node.cases)
     return count
 
 
-def postponed_annotations(tree: ast.Module) -> bool:
+def postponed_annotations(tree: ast.Module, runtime_version=None) -> bool:
     """Whether this module's annotations are deferred by its future import."""
+    if runtime_version is None:
+        runtime_version = sys.version_info
+    # PEP 649 makes annotations lazy by default starting with Python 3.14.
+    if runtime_version >= (3, 14):
+        return True
     for statement in tree.body:
         if isinstance(statement, ast.ImportFrom) and statement.module == "__future__":
             if any(alias.name == "annotations" for alias in statement.names):
@@ -171,12 +197,18 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
                 inner = [*scope, child.name]
                 visit([*child.decorator_list, *type_params(child), *child.bases, *child.keywords], inner)
                 visit(child.body, inner)
+            elif type_alias(child):
+                # The alias value is evaluated only when its __value__ is read.
+                continue
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)
                 visit(ast.iter_child_nodes(child.value), scope)
             elif isinstance(child, ast.Lambda):
                 record(scope, f"lambda@{child.lineno}", child)
                 visit(ast.iter_child_nodes(child), scope)
+            elif postponed and isinstance(child, ast.AnnAssign):
+                # Unlike the assigned value, the annotation is not evaluated.
+                visit([part for part in (child.target, child.value) if part is not None], scope)
             else:
                 visit(ast.iter_child_nodes(child), scope)
 
@@ -225,7 +257,9 @@ def load_baseline(root: Path, override: Path | None) -> dict[str, int]:
     source = override if override is not None else root / BASELINE
     if not source.is_file():
         fail(f"missing baseline {source}")
-    content = source.read_bytes()
+    # Git's blob identity is based on normalized LF bytes.  A checkout using
+    # core.autocrlf must therefore validate the same pinned baseline.
+    content = source.read_bytes().replace(b"\r\n", b"\n")
     if override is None and git_blob_id(content) != BASELINE_BLOB:
         fail(f"baseline {BASELINE} does not match pinned blob {BASELINE_BLOB}; retire debt by "
              "deleting rows and re-pinning BASELINE_BLOB in scripts/check_python_quality.py")

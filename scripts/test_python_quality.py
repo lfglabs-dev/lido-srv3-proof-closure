@@ -60,6 +60,9 @@ def check_pinned_tree(fixture: Path) -> None:
     baseline.write_text(original + "# bypass\n", encoding="utf-8")
     expect(False, "does not match pinned blob", "--root", str(fixture))
     baseline.write_text(original, encoding="utf-8")
+    baseline.write_bytes(original.replace("\n", "\r\n").encode("utf-8"))
+    expect(True, "python-quality ok", "--root", str(fixture))
+    baseline.write_text(original, encoding="utf-8")
 
 
 def check_ratchet(fixture: Path) -> None:
@@ -93,9 +96,14 @@ def check_ratchet(fixture: Path) -> None:
     dense.write_text("class C:\n" + "".join("    if True:\n        pass\n" for _ in range(22)), encoding="utf-8")
     expect(False, "zz_dense.py:C = 23, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f(x):\n    match x:\n        case " + " | ".join(str(n) for n in range(23)) + ":\n            pass\n        case _:\n            pass\n", encoding="utf-8")
-    expect(False, "zz_dense.py:f = 25, limit 22, and it is not baseline debt", *args)
-    dense.write_text("def f(x, enabled):\n    match x:\n" + "".join(f"        case {n} if enabled:\n            pass\n" for n in range(11)) + "        case _:\n            pass\n", encoding="utf-8")
     expect(False, "zz_dense.py:f = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("def f(x, enabled):\n    match x:\n" + "".join(f"        case {n} if enabled:\n            pass\n" for n in range(11)) + "        case _:\n            pass\n", encoding="utf-8")
+    expect(False, "zz_dense.py:f = 23, limit 22, and it is not baseline debt", *args)
+    dense.write_text("from __future__ import annotations\ncallback: (lambda x: " + DENSE_BODY + ") = None\n", encoding="utf-8")
+    expect(True, "python-quality ok", *args)
+    if sys.version_info >= (3, 12):
+        dense.write_text("def f():\n" + "".join(f"    type A{n} = int if missing else str\n" for n in range(21)), encoding="utf-8")
+        expect(True, "python-quality ok", *args)
     long = scripts / "zz_long.py"
     long.write_text("# pad\n" * 501, encoding="utf-8")
     dense.unlink()
@@ -138,7 +146,7 @@ def check_metric() -> None:
               "    assert 0 <= a < b <= 9\n"
               "    return (lambda d: d if a else b)(0)\n")
     (function,) = ast.parse(source).body
-    if check_python_quality.complexity(function) != 16:
+    if check_python_quality.complexity(function) != 15:
         raise SystemExit(f"complexity metric drifted: {check_python_quality.complexity(function)}")
     names = [name for name, _ in check_python_quality.functions(ast.parse(source))]
     if names != ["f", "f.inner", "f.lambda@23"]:
@@ -182,7 +190,7 @@ def check_metric() -> None:
     if [name for name, _ in check_python_quality.functions(deferred_lambda)] != ["f"]:
         raise SystemExit("a postponed annotation created a runtime lambda scope")
     nested_or = ast.parse("def f(x):\n    match x:\n        case [0 | 1] | [2 | 3]:\n            pass\n        case _:\n            pass\n").body[0]
-    if check_python_quality.complexity(nested_or) != 6:
+    if check_python_quality.complexity(nested_or) != 5:
         raise SystemExit("nested MatchOr alternatives were not counted recursively")
     if sys.version_info >= (3, 12):
         generic = ast.parse("def f[T: (lambda q: q if q else 0)]():\n    return 1\n")
@@ -228,6 +236,20 @@ def check_scope_ownership() -> None:
         raise SystemExit(f"module/class/function/lambda ownership drifted: {measured}")
 
 
+def check_deferred_surfaces() -> None:
+    """Lazy annotations and irrefutable fallbacks do not create false debt."""
+    fallback = ast.parse("def f(x):\n" + "".join(
+        f"    match x:\n        case {n}:\n            pass\n        case _:\n            pass\n"
+        for n in range(11))).body[0]
+    if check_python_quality.complexity(fallback) != 12:
+        raise SystemExit("irrefutable match fallbacks were counted as decisions")
+    lazy = ast.parse("def outer(flag):\n" + "".join(
+        f"    def f{n}(x: int if flag else str):\n        pass\n" for n in range(21)))
+    postponed = check_python_quality.postponed_annotations(lazy, (3, 14))
+    if not postponed or check_python_quality.complexity(lazy.body[0], postponed) != 1:
+        raise SystemExit("Python 3.14 lazy annotations were charged to their enclosing scope")
+
+
 with tempfile.TemporaryDirectory() as tmp:
     fixture = Path(tmp)
     check_pinned_tree(fixture)
@@ -235,6 +257,7 @@ with tempfile.TemporaryDirectory() as tmp:
     check_scoping(fixture)
 check_metric()
 check_scope_ownership()
+check_deferred_surfaces()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "
       "past baseline, stale row, retired-but-listed row, malformed row, missing baseline, "
       "baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, module-level lambdas, body-only traversal, and the branch metric")
