@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = Path("scripts")
 BASELINE = Path("audit/python-quality-baseline.txt")
-BASELINE_BLOB = "42a95b26255c49c3f291b925b9f761b8a6b49c7d"
+BASELINE_BLOB = "15b0ca24c348987dcf61dabde5064a29dd31fb4f"
 MAX_COMPLEXITY = 22
 MAX_LINES = 500
 BRANCHES = (ast.If, ast.For, ast.AsyncFor, ast.While, ast.ExceptHandler, ast.With,
@@ -39,49 +39,79 @@ def git_blob_id(content: bytes) -> str:
     return hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest()
 
 
-def own_nodes(function: ast.AST):
-    """Every node of a function's body except nested function, lambda and class bodies.
+def type_params(node: ast.AST) -> list[ast.AST]:
+    """PEP 695 parameters, when the running Python exposes them."""
+    return list(getattr(node, "type_params", []))
 
-    Only the body counts: a function's own decorators, default values and
-    annotations run in the enclosing scope, so they are charged there, and a
-    nested definition's setup fields are charged here for the same reason
-    while its body is measured on its own (see `functions`). A class body
-    nested in a function runs in that function. Every lambda is measured on
-    its own wherever it appears, so only its default values are charged
-    here. Type parameters (PEP 695 bounds and defaults) are treated like
-    default values.
+
+def argument_fields(arguments: ast.arguments, postponed: bool) -> list[ast.AST]:
+    """Expressions evaluated while a callable is created, not its body."""
+    fields = [*arguments.defaults, *arguments.kw_defaults]
+    if postponed:
+        return [field for field in fields if field is not None]
+    fields.extend(argument.annotation for argument in
+                  [*arguments.posonlyargs, *arguments.args, *arguments.kwonlyargs]
+                  if argument.annotation is not None)
+    if arguments.vararg is not None and arguments.vararg.annotation is not None:
+        fields.append(arguments.vararg.annotation)
+    if arguments.kwarg is not None and arguments.kwarg.annotation is not None:
+        fields.append(arguments.kwarg.annotation)
+    return [field for field in fields if field is not None]
+
+
+def setup_fields(node: ast.AST, postponed: bool) -> list[ast.AST]:
+    """Expressions a definition evaluates in its enclosing executable scope."""
+    if isinstance(node, FUNCTIONS):
+        fields = [*node.decorator_list, *type_params(node), *argument_fields(node.args, postponed)]
+        if not postponed and node.returns is not None:
+            fields.append(node.returns)
+        return fields
+    if isinstance(node, ast.ClassDef):
+        return [*node.decorator_list, *type_params(node), *node.bases, *node.keywords]
+    if isinstance(node, ast.Lambda):
+        return argument_fields(node.args, postponed)
+    return []
+
+
+def own_nodes(scope: ast.AST, postponed: bool):
+    """Nodes executed by exactly one lexical executable scope.
+
+    Module, class, function, and lambda bodies are separate owners.  A nested
+    definition contributes only its creation-time setup to the containing
+    scope; its body belongs to its own metric.  With postponed annotations,
+    annotation expressions are intentionally not runtime-owned by any scope.
     """
-    body = function.body if isinstance(function, FUNCTIONS) else [function.body]
-    pending = list(body)
+    if isinstance(scope, ast.Module):
+        pending = list(scope.body)
+    elif isinstance(scope, (FUNCTIONS, ast.ClassDef)):
+        pending = list(scope.body)
+    else:  # Lambda
+        pending = [scope.body]
     while pending:
         node = pending.pop()
-        if isinstance(node, FUNCTIONS):
-            # A nested definition's decorators, defaults and annotations are
-            # evaluated by the enclosing function; only its body is its own.
-            pending.extend(setup_fields(node))
+        if isinstance(node, (FUNCTIONS, ast.ClassDef, ast.Lambda)):
+            pending.extend(setup_fields(node, postponed))
             continue
-        if isinstance(node, ast.ClassDef):
-            # A class body runs where the class is defined; its methods do not.
-            pending.extend([*node.decorator_list, *node.type_params, *node.bases, *node.keywords,
-                            *node.body])
-            continue
-        if isinstance(node, ast.Lambda):
-            pending.append(node.args)
+        if postponed and isinstance(node, ast.AnnAssign):
+            pending.extend(part for part in [node.target, node.value] if part is not None)
             continue
         yield node
         pending.extend(ast.iter_child_nodes(node))
 
 
-def setup_fields(function: ast.AST) -> list[ast.AST]:
-    """A definition's decorators, type parameters, arguments and return annotation."""
-    return [*function.decorator_list, *function.type_params, function.args,
-            *([function.returns] if function.returns else [])]
+def pattern_alternatives(pattern: ast.AST) -> int:
+    """Additional decisions represented by MatchOr, including nested alternatives."""
+    total = 0
+    for node in ast.walk(pattern):
+        if isinstance(node, ast.MatchOr):
+            total += len(node.patterns) - 1
+    return total
 
 
-def complexity(function: ast.AST) -> int:
-    """McCabe cyclomatic complexity of one function body."""
+def complexity(scope: ast.AST, postponed: bool = False) -> int:
+    """McCabe cyclomatic complexity of one independently-owned scope."""
     count = 1
-    for node in own_nodes(function):
+    for node in own_nodes(scope, postponed):
         if isinstance(node, BRANCHES):
             count += 1
         elif isinstance(node, ast.BoolOp):
@@ -93,11 +123,24 @@ def complexity(function: ast.AST) -> int:
             count += 1 + len(node.ifs)
         elif isinstance(node, ast.Match):
             count += len(node.cases)
+            count += sum(pattern_alternatives(case.pattern) + (case.guard is not None)
+                         for case in node.cases)
     return count
 
 
-def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
-    """Every function and lambda in a module with its scope-qualified name, in source order.
+def postponed_annotations(tree: ast.Module) -> bool:
+    """Whether this module's annotations are deferred by its future import."""
+    for statement in tree.body:
+        if isinstance(statement, ast.ImportFrom) and statement.module == "__future__":
+            if any(alias.name == "annotations" for alias in statement.names):
+                return True
+        elif not isinstance(statement, ast.Expr) or not isinstance(statement.value, ast.Constant):
+            break
+    return False
+
+
+def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST]]:
+    """Module, class, function, and lambda scopes with stable qualified keys.
 
     Methods carry their class, local functions carry their parent, and every
     lambda counts as a function under the name it is bound to or its line,
@@ -106,7 +149,7 @@ def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
     defined twice in the same scope carries an ordinal, so no definition can
     hide behind another that shares its bare name.
     """
-    found: list[tuple[str, ast.AST]] = []
+    found: list[tuple[str, ast.AST]] = [("<module>", tree)]
     seen: dict[str, int] = {}
 
     def record(scope: list[str], name: str, node: ast.AST) -> None:
@@ -119,10 +162,15 @@ def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
             if isinstance(child, FUNCTIONS):
                 record(scope, child.name, child)
                 inner = [*scope, child.name]
-                visit(setup_fields(child), inner)
+                visit(argument_fields(child.args, postponed), inner)
+                visit([*child.decorator_list, *type_params(child),
+                       *([child.returns] if not postponed and child.returns is not None else [])], inner)
                 visit(child.body, inner)
             elif isinstance(child, ast.ClassDef):
-                visit(ast.iter_child_nodes(child), [*scope, child.name])
+                record(scope, child.name, child)
+                inner = [*scope, child.name]
+                visit([*child.decorator_list, *type_params(child), *child.bases, *child.keywords], inner)
+                visit(child.body, inner)
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)
                 visit(ast.iter_child_nodes(child.value), scope)
@@ -134,6 +182,13 @@ def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
 
     visit(ast.iter_child_nodes(tree), [])
     return found
+
+
+def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
+    """Backward-compatible callable-only view used by the regression harness."""
+    postponed = postponed_annotations(tree) if isinstance(tree, ast.Module) else False
+    return [(name, node) for name, node in scopes(tree, postponed)
+            if isinstance(node, (*FUNCTIONS, ast.Lambda))]
 
 
 def assigned_name(statement: ast.AST) -> str:
@@ -155,8 +210,10 @@ def measure(root: Path) -> dict[str, int]:
         source = path.read_text(encoding="utf-8")
         relative = path.relative_to(root / SCRIPTS).as_posix()
         found[relative] = len(source.splitlines())
-        for name, node in functions(ast.parse(source)):
-            found[f"{relative}:{name}"] = complexity(node)
+        tree = ast.parse(source)
+        postponed = postponed_annotations(tree)
+        for name, node in scopes(tree, postponed):
+            found[f"{relative}:{name}"] = complexity(node, postponed)
     return found
 
 
@@ -185,7 +242,7 @@ def load_baseline(root: Path, override: Path | None) -> dict[str, int]:
 
 
 def render_baseline(measured: dict[str, int]) -> str:
-    lines = ["# Python quality debt: functions at or above the complexity limit and",
+    lines = ["# Python quality debt: executable scopes at or above the complexity limit and",
              "# scripts at or above the line limit. Rows may only shrink or disappear;",
              "# deleting a row re-pins BASELINE_BLOB in scripts/check_python_quality.py.", ""]
     for key in sorted(measured):
@@ -235,9 +292,9 @@ def main() -> None:
     problems = violations(measured, load_baseline(root, args.baseline))
     if problems:
         fail("; ".join(problems))
-    functions = sum(1 for key in measured if ":" in key)
-    print(f"python-quality ok: {functions} functions under cyclomatic {MAX_COMPLEXITY} and "
-          f"{len(measured) - functions} scripts under {MAX_LINES} lines, except pinned baseline "
+    scope_count = sum(1 for key in measured if ":" in key)
+    print(f"python-quality ok: {scope_count} executable scopes under cyclomatic {MAX_COMPLEXITY} and "
+          f"{len(measured) - scope_count} scripts under {MAX_LINES} lines, except pinned baseline "
           f"debt (blob {BASELINE_BLOB}) which did not grow")
 
 

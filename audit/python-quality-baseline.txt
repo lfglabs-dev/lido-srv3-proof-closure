@@ -1,4 +1,4 @@
-# Python quality debt: functions at or above the complexity limit and
+# Python quality debt: executable scopes at or above the complexity limit and
 # scripts at or above the line limit. Rows may only shrink or disappear;
 # deleting a row re-pins BASELINE_BLOB in scripts/check_python_quality.py.
 
@@ -34,3 +34,4 @@ test_report_theorem_inventory.py:main 116
 test_ux2.py 1397
 test_ux2.py:check_lean_scanner 88
 test_verity_provenance.py 882
+test_verity_provenance.py:<module> 28
