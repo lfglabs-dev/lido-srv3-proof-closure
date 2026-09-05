@@ -176,8 +176,8 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
 
     Methods carry their class, local functions carry their parent, and every
     lambda counts as a function under the name it is bound to or its line,
-    wherever it appears (module or class level, a decorator, a type
-    parameter, a default value, an annotation, or a function body); a name
+    wherever it is evaluated (module or class level, a decorator, a type
+    parameter, a default value, or a function body); a name
     defined twice in the same scope carries an ordinal, so no definition can
     hide behind another that shares its bare name.
     """
@@ -205,10 +205,9 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
                 visit(child.body, inner)
             elif type_alias(child):
                 # A PEP 695 alias's value and parameters are lazy, so they
-                # must not add complexity to the containing executable scope.
-                # They can nevertheless contain independently owned lambdas,
-                # which are inventory-worthy callable scopes.
-                visit([*type_params(child), child.value], scope)
+                # do not execute, and cannot create callable scopes, when
+                # the containing module or function runs.
+                continue
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)
                 # The assigned lambda has just been recorded above, but an

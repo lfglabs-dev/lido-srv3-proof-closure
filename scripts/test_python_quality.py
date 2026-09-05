@@ -111,7 +111,7 @@ def check_ratchet(fixture: Path) -> None:
         dense.write_text("def f():\n" + "".join(f"    type A{n} = int if missing else str\n" for n in range(21)), encoding="utf-8")
         expect(True, "python-quality ok", *args)
         dense.write_text("type Callback = (lambda x: " + DENSE_BODY + ")\n", encoding="utf-8")
-        expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
+        expect(True, "python-quality ok", *args)
     long = scripts / "zz_long.py"
     long.write_text("# pad\n" * 501, encoding="utf-8")
     dense.unlink()
@@ -288,7 +288,7 @@ def check_lazy_type_parameters() -> None:
 
 
 def check_lazy_type_aliases() -> None:
-    """Alias bodies are lazy control flow but still expose callable scopes."""
+    """Alias bodies are wholly lazy, including any callable syntax they contain."""
     if sys.version_info < (3, 12):
         return
     module_aliases = ast.parse("".join(
@@ -302,8 +302,8 @@ def check_lazy_type_aliases() -> None:
     alias = ast.parse("type Callback = (lambda x: x if x else 0)\n")
     measured = {name: check_python_quality.complexity(node)
                 for name, node in check_python_quality.scopes(alias)}
-    if measured != {"<module>": 1, "lambda@1": 2}:
-        raise SystemExit(f"lazy alias lambda inventory drifted: {measured}")
+    if measured != {"<module>": 1}:
+        raise SystemExit(f"lazy alias body created a callable scope: {measured}")
 
 
 with tempfile.TemporaryDirectory() as tmp:
