@@ -66,6 +66,18 @@ def argument_fields(arguments: ast.arguments, postponed: bool) -> list[ast.AST]:
     return [field for field in fields if field is not None]
 
 
+def annotation_fields(arguments: ast.arguments) -> list[ast.AST]:
+    """Annotations that can be evaluated lazily, outside callable creation."""
+    fields = [argument.annotation for argument in
+              [*arguments.posonlyargs, *arguments.args, *arguments.kwonlyargs]
+              if argument.annotation is not None]
+    if arguments.vararg is not None and arguments.vararg.annotation is not None:
+        fields.append(arguments.vararg.annotation)
+    if arguments.kwarg is not None and arguments.kwarg.annotation is not None:
+        fields.append(arguments.kwarg.annotation)
+    return fields
+
+
 def setup_fields(node: ast.AST, postponed: bool) -> list[ast.AST]:
     """Expressions a definition evaluates in its enclosing executable scope."""
     if isinstance(node, FUNCTIONS):
@@ -155,13 +167,8 @@ def complexity(scope: ast.AST, postponed: bool = False) -> int:
     return count
 
 
-def postponed_annotations(tree: ast.Module, runtime_version=None) -> bool:
-    """Whether this module's annotations are deferred by its runtime or future import."""
-    if runtime_version is None:
-        runtime_version = sys.version_info
-    # PEP 649 makes annotations lazy by default starting with Python 3.14.
-    if runtime_version >= (3, 14):
-        return True
+def future_annotations(tree: ast.Module) -> bool:
+    """Whether annotations are stringized by ``__future__.annotations``."""
     for statement in tree.body:
         if isinstance(statement, ast.ImportFrom) and statement.module == "__future__":
             if any(alias.name == "annotations" for alias in statement.names):
@@ -171,13 +178,29 @@ def postponed_annotations(tree: ast.Module, runtime_version=None) -> bool:
     return False
 
 
-def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST]]:
+def postponed_annotations(tree: ast.Module, runtime_version=None) -> bool:
+    """Whether this module's annotations are deferred by its runtime or future import."""
+    if runtime_version is None:
+        runtime_version = sys.version_info
+    # PEP 649 makes annotations lazy by default starting with Python 3.14.
+    return runtime_version >= (3, 14) or future_annotations(tree)
+
+
+def lazy_annotations(tree: ast.Module, runtime_version=None) -> bool:
+    """Whether deferred annotations retain executable objects under PEP 649."""
+    if runtime_version is None:
+        runtime_version = sys.version_info
+    return runtime_version >= (3, 14) and not future_annotations(tree)
+
+
+def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> list[tuple[str, ast.AST]]:
     """Module, class, function, and lambda scopes with stable qualified keys.
 
     Methods carry their class, local functions carry their parent, and every
     lambda counts as a function under the name it is bound to or its line,
-    wherever it appears (module or class level, a decorator, a type
-    parameter, a default value, an annotation, or a function body); a name
+    wherever it appears in an evaluated or PEP-649-lazy expression (module
+    or class level, a decorator, a type parameter, a default value, an
+    annotation, or a function body); a name
     defined twice in the same scope carries an ordinal, so no definition can
     hide behind another that shares its bare name.
     """
@@ -196,7 +219,9 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
                 inner = [*scope, child.name]
                 visit(argument_fields(child.args, postponed), inner)
                 visit([*child.decorator_list, *type_params(child),
-                       *([child.returns] if not postponed and child.returns is not None else [])], inner)
+                       *([child.returns] if not postponed and child.returns is not None else []),
+                       *(annotation_fields(child.args) if lazy else []),
+                       *([child.returns] if lazy and child.returns is not None else [])], inner)
                 visit(child.body, inner)
             elif isinstance(child, ast.ClassDef):
                 record(scope, child.name, child)
@@ -217,13 +242,19 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
                 # Visit it alongside the RHS's nested syntax so each
                 # independently-owned callable remains inventory-visible.
                 targets = child.targets if isinstance(child, ast.Assign) else [child.target]
-                visit([*targets, *ast.iter_child_nodes(child.value)], scope)
+                fields = [*targets, *ast.iter_child_nodes(child.value)]
+                if lazy and isinstance(child, ast.AnnAssign):
+                    fields.append(child.annotation)
+                visit(fields, scope)
             elif isinstance(child, ast.Lambda):
                 record(scope, f"lambda@{child.lineno}", child)
                 visit(ast.iter_child_nodes(child), scope)
             elif postponed and isinstance(child, ast.AnnAssign):
                 # Unlike the assigned value, the annotation is not evaluated.
-                visit([part for part in (child.target, child.value) if part is not None], scope)
+                fields = [part for part in (child.target, child.value) if part is not None]
+                if lazy:
+                    fields.append(child.annotation)
+                visit(fields, scope)
             else:
                 visit(ast.iter_child_nodes(child), scope)
 
@@ -234,7 +265,8 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
 def functions(tree: ast.AST) -> list[tuple[str, ast.AST]]:
     """Backward-compatible callable-only view used by the regression harness."""
     postponed = postponed_annotations(tree) if isinstance(tree, ast.Module) else False
-    return [(name, node) for name, node in scopes(tree, postponed)
+    lazy = lazy_annotations(tree) if isinstance(tree, ast.Module) else False
+    return [(name, node) for name, node in scopes(tree, postponed, lazy)
             if isinstance(node, (*FUNCTIONS, ast.Lambda))]
 
 
@@ -259,7 +291,7 @@ def measure(root: Path) -> dict[str, int]:
         found[relative] = len(source.splitlines())
         tree = ast.parse(source)
         postponed = postponed_annotations(tree)
-        for name, node in scopes(tree, postponed):
+        for name, node in scopes(tree, postponed, lazy_annotations(tree)):
             found[f"{relative}:{name}"] = complexity(node, postponed)
     return found
 

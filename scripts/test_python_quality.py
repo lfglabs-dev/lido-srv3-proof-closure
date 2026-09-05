@@ -263,7 +263,7 @@ def check_deferred_surfaces() -> None:
 
 
 def check_deferred_callable_inventory() -> None:
-    """Deferred annotation expressions never manufacture callable scopes."""
+    """Stringized annotations skip callables; PEP 649 annotations inventory them."""
     deferred_assignment = ast.parse(
         "from __future__ import annotations\n"
         "callback: (lambda x: " + DENSE_BODY + ") = None\n")
@@ -271,10 +271,18 @@ def check_deferred_callable_inventory() -> None:
         deferred_assignment, check_python_quality.postponed_annotations(deferred_assignment))]
     if names != ["<module>"]:
         raise SystemExit("a deferred assignment annotation created a runtime lambda scope")
-    lazy_lambda = ast.parse("def f(x: (lambda y: y if y else 0)):\n    pass\n")
-    names = [name for name, _ in check_python_quality.scopes(lazy_lambda, True)]
-    if names != ["<module>", "f"]:
-        raise SystemExit("Python 3.14 lazy annotations created a runtime lambda scope")
+    lazy_lambda = ast.parse("def f(x: (lambda y: y if y else 0)) -> (lambda z: z):\n    pass\n")
+    names = [name for name, _ in check_python_quality.scopes(lazy_lambda, True, True)]
+    if names != ["<module>", "f", "f.lambda@1", "f.lambda@1#2"]:
+        raise SystemExit("Python 3.14 lazy annotation callables were not inventoried")
+    annotated = ast.parse("callback: (lambda x: x if x else 0) = None\n")
+    names = [name for name, _ in check_python_quality.scopes(annotated, True, True)]
+    if names != ["<module>", "lambda@1"]:
+        raise SystemExit("a Python 3.14 lazy assignment annotation was not inventoried")
+    if check_python_quality.lazy_annotations(lazy_lambda, (3, 14)) is not True:
+        raise SystemExit("Python 3.14 annotations were not recognized as lazy")
+    if check_python_quality.lazy_annotations(deferred_assignment, (3, 14)):
+        raise SystemExit("future annotations were treated as PEP 649 callables")
 
 
 def check_lazy_type_parameters() -> None:
