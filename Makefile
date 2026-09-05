@@ -32,6 +32,8 @@ check: test
 	@printf '%s\n' 'check ok: metadata, mutants, receipt, provenance, and executable regressions passed'
 
 test:
+	@bash scripts/test_minfirst_source_differential.sh
+	@python3 scripts/test_minfirst_guard_mutation.py
 	@python3 scripts/audit_metadata.py check
 	@python3 scripts/generate_ux2.py check
 	@python3 scripts/test_ux2.py
