@@ -69,12 +69,15 @@ def argument_fields(arguments: ast.arguments, postponed: bool) -> list[ast.AST]:
 def setup_fields(node: ast.AST, postponed: bool) -> list[ast.AST]:
     """Expressions a definition evaluates in its enclosing executable scope."""
     if isinstance(node, FUNCTIONS):
-        fields = [*node.decorator_list, *type_params(node), *argument_fields(node.args, postponed)]
+        # PEP 695 bounds and constraints are lazy.  They can contain callable
+        # syntax that `scopes` inventories, but none of their control flow is
+        # executed while this definition is created.
+        fields = [*node.decorator_list, *argument_fields(node.args, postponed)]
         if not postponed and node.returns is not None:
             fields.append(node.returns)
         return fields
     if isinstance(node, ast.ClassDef):
-        return [*node.decorator_list, *type_params(node), *node.bases, *node.keywords]
+        return [*node.decorator_list, *node.bases, *node.keywords]
     if isinstance(node, ast.Lambda):
         return argument_fields(node.args, postponed)
     return []

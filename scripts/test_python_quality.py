@@ -250,6 +250,16 @@ def check_deferred_surfaces() -> None:
         raise SystemExit("Python 3.14 lazy annotations were charged to their enclosing scope")
 
 
+def check_lazy_type_parameters() -> None:
+    """PEP 695 bounds are discoverable syntax, not enclosing control flow."""
+    if sys.version_info < (3, 12):
+        return
+    lazy_bound = ast.parse("def outer(flag):\n" + "".join(
+        f"    def f{n}[T: int if flag else str]():\n        pass\n" for n in range(21)))
+    if check_python_quality.complexity(lazy_bound.body[0]) != 1:
+        raise SystemExit("lazy type-parameter bounds were charged to their enclosing scope")
+
+
 with tempfile.TemporaryDirectory() as tmp:
     fixture = Path(tmp)
     check_pinned_tree(fixture)
@@ -258,6 +268,7 @@ with tempfile.TemporaryDirectory() as tmp:
 check_metric()
 check_scope_ownership()
 check_deferred_surfaces()
+check_lazy_type_parameters()
 print("python-quality mutants ok: pinned baseline, new dense function, new long script, growth "
       "past baseline, stale row, retired-but-listed row, malformed row, missing baseline, "
       "baseline rewrite, nested directories, an un-pinned improvement, scope-qualified and nested definitions, module-level lambdas, body-only traversal, and the branch metric")
