@@ -275,23 +275,34 @@ theorem eth_flow_parent (approved : ApprovedSet)
         show n * fee + (msgValue - n * fee) = msgValue
         omega
 
-/-- **Registry-facing abstract parent at the canonical request predeploy.**
+/-- "One gateway execution is classified": `msgValue = 0` reverts
+`ZeroArgument`, `n * fee ≥ 2^256` reverts overflow, `n * fee > msgValue`
+reverts `InsufficientValue`, and otherwise every move is parent-approved (no
+lateral `.other` destination) and the moved total equals `msgValue`. -/
+abbrev GatewayOutcomeClassified (approved : ApprovedSet) (msgValue n fee : Nat) : Prop :=
+  match gatewayExecute approved msgValue n fee with
+  | .reverted .zeroArgument => msgValue = 0
+  | .reverted .overflowPanic => n * fee ≥ 2^256
+  | .reverted .insufficientValue => n * fee > msgValue
+  | .success moves =>
+      (∀ m, m ∈ moves → parentApproved m.destination) ∧
+      totalAmount moves = msgValue
+
+/-- **P-CONSOLIDATION-ETH-1, abstract plane.** At the canonical request
+predeploy, for every `(msgValue, n, fee)`: zero value, wrapping fee and
+underfunding revert, and otherwise every wei goes to the request contract or
+the refund recipient with the total equal to `msgValue`.
+
+**Registry-facing abstract parent at the canonical request predeploy.**
 This folds the fee destination into the parent conclusion instead of leaving
 the canonical target only in sibling evidence.  The literal is model content;
 its equality with the deployed configured target remains
 `A-CANONICAL-REQUEST-ADDRESS`. -/
 theorem eth_flow_parent_at_canonical (refundRecipient : Address)
     (hDistinct : refundRecipient ≠ canonicalRequestAddress) :
-    (canonicalApprovedSet refundRecipient).consolidationContract =
-        canonicalRequestAddress ∧
+    (canonicalApprovedSet refundRecipient).consolidationContract = canonicalRequestAddress ∧
       ∀ (msgValue n fee : Nat),
-        match gatewayExecute (canonicalApprovedSet refundRecipient) msgValue n fee with
-        | .reverted .zeroArgument => msgValue = 0
-        | .reverted .overflowPanic => n * fee ≥ 2^256
-        | .reverted .insufficientValue => n * fee > msgValue
-        | .success moves =>
-            (∀ m, m ∈ moves → parentApproved m.destination) ∧
-            totalAmount moves = msgValue := by
+        GatewayOutcomeClassified (canonicalApprovedSet refundRecipient) msgValue n fee := by
   refine ⟨rfl, eth_flow_parent (canonicalApprovedSet refundRecipient) ?_⟩
   simpa [canonicalApprovedSet] using hDistinct
 
@@ -435,7 +446,53 @@ theorem verity_tx_universal_zero_remainder_boundary
 
 end VerityUniversalRevert
 
-/-- Registry-facing Verity close: the universal funded success shape conjoined
+section VerityRegisteredParent
+
+open _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx
+  (observe run honest fuelBudget honest_revert_partition)
+
+/-! ## Vocabulary for the registered Verity statement
+
+Each name is an `abbrev` unfolding to the exact clause it stands for, so the
+registered conjunction below is the same proposition as before (same clauses,
+same order, same nesting). -/
+
+/-- "For every funded, word-sized, fuel-fit batch the honest wiring commits: the
+whole product fee lands at the request predeploy, the remainder at the refund
+recipient, and no protocol contract on the route retains ETH." -/
+abbrev UniversalSuccessShape (msgValue batchSize feePerRequest : Nat) : Prop :=
+  observe (run honest msgValue batchSize feePerRequest) =
+    ⟨.success, batchSize + 3 + (if msgValue - batchSize * feePerRequest = 0 then 0 else 1),
+      ⟨0, 0, 0, 0, 0, batchSize * feePerRequest, msgValue - batchSize * feePerRequest⟩⟩
+
+/-- "Zero value rolls back" (concrete witness `msgValue = 0`, `n = 2`, `fee = 0`). -/
+abbrev RevertsOnZeroValue : Prop :=
+  observe (run honest 0 2 0) =
+    ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2, ⟨0, 0, 0, 0, 0, 0, 0⟩⟩
+
+/-- "A wrapping product fee rolls back" (concrete witness `n * fee = 2^256`). -/
+abbrev RevertsOnWrappedFee : Prop :=
+  observe (run honest 10 2 (2 ^ 255)) =
+    ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩
+
+/-- "Underfunding rolls back" (concrete witness `n * fee = 12 > 10 = msgValue`). -/
+abbrev RevertsOnUnderfunding : Prop :=
+  observe (run honest 10 4 3) =
+    ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2, ⟨10, 0, 0, 0, 0, 0, 0⟩⟩
+
+/-- "Dispatch-fuel exhaustion rolls back" (concrete witness of the model's
+frame-count arm; not gas). -/
+abbrev ExhaustsFuelAndRollsBack : Prop :=
+  observe (run honest 30 29 1) = ⟨.exhausted, fuelBudget, ⟨30, 0, 0, 0, 0, 0, 0⟩⟩
+
+/-- **P-CONSOLIDATION-ETH-1, Verity plane.** For every funded, word-sized,
+fuel-fit batch the Bus/Gateway/Vault ensemble commits the whole product fee at
+the request predeploy and the remainder at the refund recipient; it rolls back
+at the four modeled non-success boundaries (zero value, wrapped product,
+underfunding, fuel exhaustion), both on the four concrete witnesses and at full
+`∀`-quantifier strength (`UniversalRevertPartition`).
+
+Registry-facing Verity close: the universal funded success shape conjoined
 with executable rollback shapes at all four modeled non-success boundaries
 (zero value, wrapped product, underfunding, and dispatch-fuel exhaustion), both
 as the four exact numeral witnesses and — since Wave 6 — at full
@@ -447,42 +504,19 @@ theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest
     (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)
     (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)
     (hle : batchSize * feePerRequest ≤ msgValue)
-    (hfuel : batchSize + 4 ≤
-      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget) :
-    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
-        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
-          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest
-          msgValue batchSize feePerRequest) =
-      ⟨.success, batchSize + 3 + (if msgValue - batchSize * feePerRequest = 0 then 0 else 1),
-        ⟨0, 0, 0, 0, 0, batchSize * feePerRequest, msgValue - batchSize * feePerRequest⟩⟩ ∧
-      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
-          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
-            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 0 2 0) =
-        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
-          ⟨0, 0, 0, 0, 0, 0, 0⟩⟩ ∧
-      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
-          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
-            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest
-            10 2 (2 ^ 255)) =
-        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
-          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
-      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
-          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
-            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 4 3) =
-        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,
-          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧
-      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe
-          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run
-            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 30 29 1) =
-        ⟨.exhausted,
-          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget,
-          ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ ∧
+    (hfuel : batchSize + 4 ≤ fuelBudget) :
+    UniversalSuccessShape msgValue batchSize feePerRequest ∧
+      RevertsOnZeroValue ∧
+      RevertsOnWrappedFee ∧
+      RevertsOnUnderfunding ∧
+      ExhaustsFuelAndRollsBack ∧
       UniversalRevertPartition := by
   refine ⟨verity_tx_universal_success_shape msgValue batchSize feePerRequest
     hpos hmv hnM hfee hnf hle hfuel, ?_⟩
-  obtain ⟨h1, h2, h3, h4⟩ :=
-    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest_revert_partition
+  obtain ⟨h1, h2, h3, h4⟩ := honest_revert_partition
   exact ⟨h1, h2, h3, h4, verity_tx_universal_revert_partition⟩
+
+end VerityRegisteredParent
 
 theorem verity_tx_composes_value_flow_and_rollback :
     (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe

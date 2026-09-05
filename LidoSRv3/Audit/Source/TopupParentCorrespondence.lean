@@ -113,20 +113,38 @@ def allCallsSucceeded : List CallObservation -> Bool
 def positiveCount (amounts : List Nat) : Nat :=
   (amounts.filter (fun amount => amount != 0)).length
 
-/-- Guards executed before the allocation-module call at source lines 717--718. -/
+/-! ## StakingRouter.topUp (StakingRouter.sol:679-759), split at the module call -/
+
+/-- Guards executed before the allocation-module call at `StakingRouter.sol:717-718`.
+
+This is NOT `_validateTopUpInputs` alone. Its guards come from five origins, in
+source order: `StakingRouter.sol:686` (`_checkAppAuth`), `:769-781` (the three
+`_validateTopUpInputs` guards, reached from `:687`), `:689/691/694` (module
+existence, status and WC type), `:706` (the gwei modulus totality guard), and
+`:713-715` (paused Lido on the zero-allocation path). It is the prefix of
+`SolidityTopup.run` up to, but excluding, the module call. -/
 def preAllocation (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Option Outcome :=
+  -- StakingRouter.sol:686  _checkAppAuth(_getTopUpGateway());
   if inp.callerIsTopUpGateway = false then some .revertNotAuthorized
+  -- StakingRouter.sol:769-771  if (n == 0) { revert EmptyKeysList(); }  [_validateTopUpInputs]
   else if inp.keyIndicesLength = 0 then some .revertEmptyKeysList
+  -- StakingRouter.sol:773-775  if (_operatorIds.length != n || ...) { revert ArraysLengthMismatch(); }  [_validateTopUpInputs]
   else if inp.operatorIdsLength != inp.keyIndicesLength
       || inp.topUpLimits.length != inp.keyIndicesLength
       || inp.pubkeyLengths.length != inp.keyIndicesLength then
     some .revertArraysLengthMismatch
+  -- StakingRouter.sol:777-781  if (_pubkeys[i].length != PUBKEY_LENGTH) { revert WrongPubkeyLength(); }  [_validateTopUpInputs]
   else if inp.pubkeyLengths.any (fun length => length != cfg.pubkeyLength) then
     some .revertWrongPubkeyLength
+  -- StakingRouter.sol:689  _getModuleState(_stakingModuleId)  (revert StakingModuleUnregistered, SRUtils.sol:46)
   else if inp.moduleExists = false then some .revertStakingModuleUnregistered
+  -- StakingRouter.sol:691  if (stateConfig.status != StakingModuleStatus.Active) revert StakingModuleNotActive();
   else if inp.moduleActive = false then some .revertStakingModuleNotActive
+  -- StakingRouter.sol:694  SRUtils._requireWCType2(stateConfig.withdrawalCredentialsType);
   else if inp.wcTypeIsType2 = false then some .revertWrongWithdrawalCredentialsType
+  -- StakingRouter.sol:706  smDepositableEthAmount % 1 gwei  (totality guard, dead on chain)
   else if cfg.gwei = 0 then some .revertGweiModuloByZero
+  -- StakingRouter.sol:713-715  if (smDepositableEthAmountRounded == 0 && !LIDO.canDeposit()) { revert LidoDepositsPaused(); }
   else if smDepositableEthAmountRounded cfg inp = 0 && inp.lidoCanDeposit = false then
     some .revertLidoDepositsPaused
   else none
@@ -140,50 +158,71 @@ balance the line 755 `assert` observes through `SolidityTopup.routerBalanceAfter
 value-moving tail, so this module no longer keeps a separate copy. -/
 def afterAllocation (cfg : SourceTopupConfig) (inp : SourceTopupInput)
     (iface : CalleeInterface) : ParentExecution :=
+  -- StakingRouter.sol:717-718  allocations = IStakingModuleV2(...).allocateDeposits(...)  (journalled)
   let allocationObs := allocationCall iface
   let allocationCalls := [allocationObs]
+  -- StakingRouter.sol:722-734  allocation guard loop
   match allocationLoop cfg inp.allocations inp.topUpLimits with
   | some outcome => sourceRevert allocationCalls outcome
   | none =>
+    -- StakingRouter.sol:737-739  if (amount > smDepositableEthAmountRounded) { revert ModuleReturnExceedTarget(); }
     if smDepositableEthAmountRounded cfg inp < accumulated inp then
       sourceRevert allocationCalls .revertModuleReturnExceedTarget
+    -- StakingRouter.sol:741  if (amount > 0) {  (else: commit without a pull)
     else if accumulated inp = 0 then
       { calls := allocationCalls, result := .committedNoTopUp }
     else
+      -- StakingRouter.sol:744  LIDO.withdrawDepositableEther(amount, 0);  (journalled)
       let pullObs := lidoCall iface
       let pullCalls := allocationCalls ++ [pullObs]
+      -- Lido.sol:870  require(canDeposit(), "CAN_NOT_DEPOSIT");
       if inp.lidoCanDeposit = false then sourceRevert pullCalls .revertLidoCannotDeposit
+      -- Lido.sol:842  require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER");
       else if inp.lidoDepositableEther < accumulated inp then
         sourceRevert pullCalls .revertLidoNotEnoughEther
+      -- Added by the model: the callee frame itself may fail.
       else if !callSucceeded iface.lidoPull then
         { calls := pullCalls, result := .reverted .lidoPullCallFailed }
       else
+        -- StakingRouter.sol:750  BeaconChainDepositor.makeBeaconChainTopUp(...)  (one journalled call per nonzero amount)
         let depositCalls := beaconCalls inp.allocations iface.beaconPushes
         let pushCalls := pullCalls ++ depositCalls
+        -- BeaconChainDepositor.sol:74  if (len != _amount.length) revert ArrayLengthMismatch();
         if inp.pubkeyLengths.length != inp.allocations.length then
           sourceRevert pushCalls .revertArrayLengthMismatch
+        -- BeaconChainDepositor.sol:79-107  per-key guard loop
         else match pushLoop cfg inp.pubkeyLengths inp.allocations with
           | some outcome => sourceRevert pushCalls outcome
           | none =>
+            -- Added by the model: a deposit-contract frame may fail.
             if iface.beaconPushes.length != positiveCount inp.allocations
                 || !allCallsSucceeded depositCalls then
               { calls := pushCalls, result := .reverted .beaconPushCallFailed }
+            -- BeaconChainDepositor.sol:106  deposit{value: amount}  (unfunded transfer reverts)
             else if inp.routerBalanceBefore + accumulated inp < pushedValue inp then
               sourceRevert pushCalls .revertInsufficientRouterBalance
+            -- StakingRouter.sol:755  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);
             else if accumulated inp != pushedValue inp then
               sourceRevert pushCalls .revertAssertBalanceUnchanged
             else
               { calls := pushCalls,
                 result := .committedTopUp (accumulated inp) }
 
-/-- Pinned-source parent model. Authentication is derived from the public
-caller frame, rather than supplied as an already-decided suffix flag. -/
+/-- `StakingRouter.sol:679-759 topUp(...)` as the parent model: `preAllocation`,
+then the module call, then `afterAllocation`. Authentication is derived from the
+public caller frame, rather than supplied as an already-decided suffix flag.
+
+Added by the model: `CalleeInterface` responses (call success/failure and
+returndata) for the three external calls at `:717-718`, `:744` and `:750`. -/
 def sourceExecute (cfg : SourceTopupConfig) (base : SourceTopupInput)
     (gateway caller : Address) (iface : CalleeInterface) : ParentExecution :=
+  -- StakingRouter.sol:1177-1179  _checkAppAuth: if (_msgSender() != _appAuth) revert NotAuthorized();
   let authenticated := { base with callerIsTopUpGateway := caller == gateway }
+  -- StakingRouter.sol:686-715  guards before the module call
   match preAllocation cfg authenticated with
   | some outcome => sourceRevert [] outcome
   | none =>
+    -- StakingRouter.sol:717-718  allocations = ...allocateDeposits(...)  (returndata bound here)
     let inp := { authenticated with allocations := iface.allocation.allocations }
     if !callSucceeded iface.allocation.response then
       { calls := [allocationCall iface], result := .reverted .allocationCallFailed }

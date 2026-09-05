@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo="${LIDO_CORE_REPO:-../lido-core}"
-expected=af095e48bbc1c3841c2c9936219c8461af01056b
+expected=17005714f151e5502c559932319a3f2f74ac2436
 forge_bin="${FORGE_BIN:-/root/.foundry/bin/forge}"
 test "$(git -C "$repo" rev-parse HEAD)" = "$expected"
 test "$(git -C "$repo" status --porcelain --untracked-files=no)" = ""

@@ -702,8 +702,8 @@ def main():
         report_path.write_text(report, encoding="utf-8")
 
         # A row that names no abstract/Verity plane.
-        planeless = report.replace("| `verity_tx_revert_restores_snapshot` | 184 | Verity |",
-                                   "| `verity_tx_revert_restores_snapshot` | 184 | n/a |", 1)
+        planeless = report.replace("| `verity_tx_revert_restores_snapshot` | 178 | Verity |",
+                                   "| `verity_tx_revert_restores_snapshot` | 178 | n/a |", 1)
         if planeless == report:
             raise AssertionError("plane mutant changed nothing")
         report_path.write_text(planeless, encoding="utf-8")
@@ -1142,7 +1142,7 @@ def main():
         # The row still reads as an inventory row to the eye and is not one.
         for escape in escapes[1:]:
             narrowed = inventory_rows[0].replace("| 103 | Abstract |",
-                                                 f"| 103 {escape} Abstract |", 1)
+                                                 f"| 122 {escape} Abstract |", 1)
             if narrowed == inventory_rows[0]:
                 raise AssertionError("narrowing escape mutant changed nothing")
             report_path.write_text(report.replace(inventory_rows[0], narrowed, 1),

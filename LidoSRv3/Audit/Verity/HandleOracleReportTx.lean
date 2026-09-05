@@ -8,7 +8,7 @@ This transaction models the accounting-relevant path of
 `AccountingOracle._handleConsensusReportData` →
 `StakingRouter.reportValidatorBalancesByStakingModule` →
 `Accounting.handleOracleReport` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 The executable body:
 
@@ -25,6 +25,12 @@ The executable body:
 This is not an EVM theorem: slot numbers are a model-local projection of the
 pinned accounting-relevant path. Sanity checks, CL state, vault transfers,
 and extra-data processing stay outside this guarantee.
+
+The fee value `sharesToMintAsFees` is an opaque argument here; its
+computation (`_calculateProtocolFees`, `Accounting.sol:263-303`) is modeled in
+`LidoSRv3/Audit/Source/SubmitReportFeeCorrespondence.lean`
+(`SubmitReportEntry.feeEther`, guarantee P-ORACLE-SUPPLY-1) and fed in by
+`SubmitReportEntryTx.submitReportDataTx`.
 -/
 
 namespace LidoSRv3.Audit.Verity.HandleOracleReportTx
@@ -35,27 +41,47 @@ open LidoSRv3.Audit.SolidityAccounting
 
 abbrev Word := Verity.Core.Uint256
 
+/-! ## Storage projection (model-local slots)
+
+The two data slots stand for router storage; the three step slots and the
+clock below are observation slots. -/
+
+-- SRLib.sol:886  moduleAcc.validatorsBalanceGwei = validatorsBalanceGwei;   (one entry per module)
 def moduleBalancesSlot : Nat := 10
+-- SRLib.sol:891  routerAcc.validatorsBalanceGwei = totalValidatorsBalanceGwei;
 def totalBalanceSlot : Nat := 11
+-- observation slot, no Solidity storage counterpart: AccountingOracle.sol:529 `handleOracleReport(` was reached
 def accountingCalledSlot : Nat := 12
+-- observation slot, no Solidity storage counterpart: Accounting.sol:277 `getStakingRewardsDistribution()` was read
 def rewardsReadSlot : Nat := 13
+-- observation slot, no Solidity storage counterpart: Accounting.sol:409 `reportRewardsMinted(` was reached
 def rewardsMintedSlot : Nat := 14
 
-/-- Transaction-local step clock.  It is reset at the top of the modeled body
+/-! ## Execution-order clock
+
+`sequenceSlot`, `balancesWrittenSlot`, `nextTick` and `stampStep` form a
+transaction-local clock.  They are observation slots with no Solidity storage
+counterpart: Solidity has no such counter, the model adds it so that the
+*order* in which the step writes ran is a fact recorded in storage. -/
+
+/-- Transaction-local step clock (observation slot, no Solidity storage
+counterpart).  It is reset at the top of the modeled body
 and read back by every subsequent step write, so the tick a step records is
 the position at which that write actually ran. -/
 def sequenceSlot : Nat := 15
 
-/-- Tick proving that the accepted balance vector was actually persisted.
-Unlike the historical hard-coded `.balancesWritten` prefix in `storedSteps`,
+/-- Tick proving that the accepted balance vector was actually persisted
+(observation slot, no Solidity storage counterpart).  Unlike the historical hard-coded `.balancesWritten` prefix in `storedSteps`,
 this slot is absent when the write-side step is skipped. -/
 def balancesWrittenSlot : Nat := 16
 
-/-- The tick the next step write will record: one past the current clock. -/
+/-- The tick the next step write will record: one past the current clock.
+Model-only clock arithmetic, no Solidity counterpart. -/
 def nextTick (state : ContractState) : Word :=
   state.readSlot sequenceSlot + 1
 
-/-- Advance the step clock and stamp `slot` with the new tick.
+/-- Advance the step clock and stamp `slot` with the new tick.  Model-only,
+no Solidity counterpart.
 
 The tick is *read out of the state* rather than written as a call-site
 constant, so moving this call earlier or later in the body changes the value
@@ -125,13 +151,21 @@ resulting `1 + 1` / `1 + 2` comparisons that `storedSteps` performs. -/
 
 @[simp] theorem word_one_add_two : (1 : Word) + 2 = 3 := by decide
 
+/-! ## StakingRouter._reportValidatorBalancesByStakingModule, write side (SRLib.sol:881-889) -/
+
 /-- Persist reported balances in router order as a `uint256[]` storage array.
 This is the `reportValidatorBalancesByStakingModule` write of the modeled
 path; ids are the registered router order already checked by
 `idsAndBalancesValid`. -/
 def persistBalances (bals : List Nat) (state : ContractState) : ContractState :=
+  -- SRLib.sol:886  moduleAcc.validatorsBalanceGwei = validatorsBalanceGwei;   (loop 881-889, one array write)
   state.writeArray moduleBalancesSlot (bals.map Verity.Core.Uint256.ofNat)
 
+/-- Historical wrapper kept for the proofs that unfold it (`simp [writeAll]`).
+The first argument is the module-id vector; it is ignored because
+`idsAndBalancesValid` has already checked it equals the registered order
+(SRLib.sol:864-866), so `moduleId.getModuleState()` at SRLib.sol:883 selects
+position `i`. -/
 def writeAll : List Nat → List Nat → ContractState → ContractState
   | _, bals, state => persistBalances bals state
 
@@ -160,7 +194,36 @@ def storedSteps (state : ContractState) (balances : List Nat) : List Step :=
     if state.readSlot rewardsMintedSlot = 4 then [.rewardsMinted] else []
   written ++ acc ++ rd ++ mint
 
-/-- Executable oracle-report transaction.  Validity and overflow guards run
+/-! ## AccountingOracle._handleConsensusReportData -> StakingRouter -> Accounting.handleOracleReport -/
+
+/-- `AccountingOracle.sol:477-559 _handleConsensusReportData(ReportData data, uint256 prevRefSlot)`,
+collapsed together with its callee
+`AccountingOracle.sol:609-619 _processStakingRouterValidatorBalancesByModule(stakingRouter, ids, balances)`
+(which calls `SRLib.sol:873-892 _reportValidatorBalancesByStakingModule`) and
+`Accounting.sol:135-144 handleOracleReport(ReportValues _report)`, whose
+`_simulateOracleReport` / `_applyOracleReportContext` produce the
+`.rewardsRead` (Accounting.sol:277) and `.rewardsMinted` (Accounting.sol:403-413)
+steps.  The single body below is the accounting-relevant path of that chain.
+
+Not transcribed: AccountingOracle.sol:478-495 (extra-data format / hash /
+items-count checks), 497-498 (`timeElapsed`), 504 `_checkStakingRouterModuleBalances(...)`
+(sanity checker), 505-511 `_processStakingRouterExitedValidatorsByModule(...)`,
+523-527 `withdrawalQueue.onOracleReport(...)`, 530-540 the `ReportValues`
+payload, 543-548 `updateReportData` (lazy oracle), 550-558 the extra-data
+processing state; AccountingOracle.sol:614-616
+`if (stakingModuleIds.length == 0) { return; }` (the source skips the router
+call on an empty id vector; the model has no early return, so an empty
+`reportedModuleIds` is accepted only when `registeredModuleIds` is empty too);
+Accounting.sol:138-139 (`_loadOracleReportContracts`, `NotAuthorized`),
+141 `_snapshotPreReportState`, 142 `_simulateOracleReport` except the
+rewards-distribution read at 277, 143 `_applyOracleReportContext` except the
+fee-mint block 403-413.
+Added by the model: the step clock (`sequenceSlot`, `stampStep`), the
+observation slots 12-14 and 16, the `failAfterWrites` test hook, the revert
+strings `"INVALID_REPORT"` / `"OVERFLOW"` / `"INJECTED_AFTER_WRITES"` (Solidity
+reverts with custom errors or a checked-arithmetic panic).
+
+Executable oracle-report transaction.  Validity and overflow guards run
 in the body.  On overflow the prefix writes are performed and then reverted
 by `Contract.run`.  `failAfterWrites` is a test hook placed after every
 balance, total, and step-flag write.  The step clock is reset and then each
@@ -173,20 +236,31 @@ through `storedSteps`, never through
 trace. -/
 def handleOracleReport (i : ReportInput) (sharesToMintAsFees : Nat)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
+  -- SRLib.sol:877  _validateReportValidatorBalancesByStakingModule(_stakingModuleIds, _validatorBalancesGwei);
   if idsAndBalancesValid i then
+    -- SRLib.sol:888  totalValidatorsBalanceGwei += validatorsBalanceGwei;   (checked uint64, loop 881-889)
     match checkedTotal256 i.balancesGwei with
     | none =>
+        -- the per-module writes of earlier iterations (SRLib.sol:886) precede the panic and are rolled back
         .revert "OVERFLOW" (writeAll i.reportedModuleIds i.balancesGwei snapshot)
     | some total =>
+        -- SRLib.sol:886  moduleAcc.validatorsBalanceGwei = validatorsBalanceGwei;
         let dirty := writeAll i.reportedModuleIds i.balancesGwei snapshot
+        -- SRLib.sol:891  routerAcc.validatorsBalanceGwei = totalValidatorsBalanceGwei;
         let dirty := dirty.writeSlot totalBalanceSlot total
+        -- model-only clock reset, no Solidity counterpart
         let dirty := dirty.writeSlot sequenceSlot 0
         let dirty := stampStep balancesWrittenSlot dirty
+        -- AccountingOracle.sol:529  IReportReceiver(LOCATOR.accounting()).handleOracleReport(
         let dirty := stampStep accountingCalledSlot dirty
+        -- Accounting.sol:277  ) = _stakingRouter.getStakingRewardsDistribution();
         let dirty := stampStep rewardsReadSlot dirty
+        -- Accounting.sol:403  if (_update.sharesToMintAsFees > 0) {
+        -- Accounting.sol:409  _contracts.stakingRouter.reportRewardsMinted(
         let dirty :=
           if 0 < sharesToMintAsFees then stampStep rewardsMintedSlot dirty
           else dirty.writeSlot rewardsMintedSlot 0
+        -- test hook, no Solidity counterpart
         if failAfterWrites then .revert "INJECTED_AFTER_WRITES" dirty
         else .success ⟨i.balancesGwei, total, storedSteps dirty i.balancesGwei⟩ dirty
   else .revert "INVALID_REPORT" snapshot

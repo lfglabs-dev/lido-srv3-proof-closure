@@ -17,10 +17,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PConsolidationEth1.eth_flow_parent_at_canonical",
       "module": "LidoSRv3.Audit.Guarantees.PConsolidationEth1",
       "file": "LidoSRv3/Audit/Guarantees/PConsolidationEth1.lean",
-      "start_line": 283,
-      "end_line": 294,
-      "doc": "/-- **Registry-facing abstract parent at the canonical request predeploy.**\nThis folds the fee destination into the parent conclusion instead of leaving\nthe canonical target only in sibling evidence.  The literal is model content;\nits equality with the deployed configured target remains\n`A-CANONICAL-REQUEST-ADDRESS`. -/",
-      "statement": "theorem eth_flow_parent_at_canonical (refundRecipient : Address)\n    (hDistinct : refundRecipient ≠ canonicalRequestAddress) :\n    (canonicalApprovedSet refundRecipient).consolidationContract =\n        canonicalRequestAddress ∧\n      ∀ (msgValue n fee : Nat),\n        match gatewayExecute (canonicalApprovedSet refundRecipient) msgValue n fee with\n        | .reverted .zeroArgument => msgValue = 0\n        | .reverted .overflowPanic => n * fee ≥ 2^256\n        | .reverted .insufficientValue => n * fee > msgValue\n        | .success moves =>\n            (∀ m, m ∈ moves → parentApproved m.destination) ∧\n            totalAmount moves = msgValue"
+      "start_line": 301,
+      "end_line": 305,
+      "doc": "/-- **P-CONSOLIDATION-ETH-1, abstract plane.** At the canonical request\npredeploy, for every `(msgValue, n, fee)`: zero value, wrapping fee and\nunderfunding revert, and otherwise every wei goes to the request contract or\nthe refund recipient with the total equal to `msgValue`.\n\n**Registry-facing abstract parent at the canonical request predeploy.**\nThis folds the fee destination into the parent conclusion instead of leaving\nthe canonical target only in sibling evidence.  The literal is model content;\nits equality with the deployed configured target remains\n`A-CANONICAL-REQUEST-ADDRESS`. -/",
+      "statement": "theorem eth_flow_parent_at_canonical (refundRecipient : Address)\n    (hDistinct : refundRecipient ≠ canonicalRequestAddress) :\n    (canonicalApprovedSet refundRecipient).consolidationContract = canonicalRequestAddress ∧\n      ∀ (msgValue n fee : Nat),\n        GatewayOutcomeClassified (canonicalApprovedSet refundRecipient) msgValue n fee"
     },
     {
       "plane": "verity",
@@ -29,10 +29,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PConsolidationEth1.verity_tx_success_and_revert_partition",
       "module": "LidoSRv3.Audit.Guarantees.PConsolidationEth1",
       "file": "LidoSRv3/Audit/Guarantees/PConsolidationEth1.lean",
-      "start_line": 443,
-      "end_line": 480,
-      "doc": "/-- Registry-facing Verity close: the universal funded success shape conjoined\nwith executable rollback shapes at all four modeled non-success boundaries\n(zero value, wrapped product, underfunding, and dispatch-fuel exhaustion), both\nas the four exact numeral witnesses and — since Wave 6 — at full\n`∀`-quantifier strength via `UniversalRevertPartition`. -/",
-      "statement": "theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest : Nat)\n    (hpos : 0 < msgValue)\n    (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)\n    (hnM : batchSize < _root_.Verity.Core.Uint256.modulus)\n    (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)\n    (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)\n    (hle : batchSize * feePerRequest ≤ msgValue)\n    (hfuel : batchSize + 4 ≤\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget) :\n    _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n        (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest\n          msgValue batchSize feePerRequest) =\n      ⟨.success, batchSize + 3 + (if msgValue - batchSize * feePerRequest = 0 then 0 else 1),\n        ⟨0, 0, 0, 0, 0, batchSize * feePerRequest, msgValue - batchSize * feePerRequest⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 0 2 0) =\n        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,\n          ⟨0, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest\n            10 2 (2 ^ 255)) =\n        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,\n          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 10 4 3) =\n        ⟨.calleeReverted _root_.Verity.MultiContract.gatewayAddr, 2,\n          ⟨10, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.observe\n          (_root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.run\n            _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.honest 30 29 1) =\n        ⟨.exhausted,\n          _root_.LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx.fuelBudget,\n          ⟨30, 0, 0, 0, 0, 0, 0⟩⟩ ∧\n      UniversalRevertPartition"
+      "start_line": 500,
+      "end_line": 513,
+      "doc": "/-- **P-CONSOLIDATION-ETH-1, Verity plane.** For every funded, word-sized,\nfuel-fit batch the Bus/Gateway/Vault ensemble commits the whole product fee at\nthe request predeploy and the remainder at the refund recipient; it rolls back\nat the four modeled non-success boundaries (zero value, wrapped product,\nunderfunding, fuel exhaustion), both on the four concrete witnesses and at full\n`∀`-quantifier strength (`UniversalRevertPartition`).\n\nRegistry-facing Verity close: the universal funded success shape conjoined\nwith executable rollback shapes at all four modeled non-success boundaries\n(zero value, wrapped product, underfunding, and dispatch-fuel exhaustion), both\nas the four exact numeral witnesses and — since Wave 6 — at full\n`∀`-quantifier strength via `UniversalRevertPartition`. -/",
+      "statement": "theorem verity_tx_success_and_revert_partition (msgValue batchSize feePerRequest : Nat)\n    (hpos : 0 < msgValue)\n    (hmv : msgValue < _root_.Verity.Core.Uint256.modulus)\n    (hnM : batchSize < _root_.Verity.Core.Uint256.modulus)\n    (hfee : feePerRequest < _root_.Verity.Core.Uint256.modulus)\n    (hnf : batchSize * feePerRequest < _root_.Verity.Core.Uint256.modulus)\n    (hle : batchSize * feePerRequest ≤ msgValue)\n    (hfuel : batchSize + 4 ≤ fuelBudget) :\n    UniversalSuccessShape msgValue batchSize feePerRequest ∧\n      RevertsOnZeroValue ∧\n      RevertsOnWrappedFee ∧\n      RevertsOnUnderfunding ∧\n      ExhaustsFuelAndRollsBack ∧\n      UniversalRevertPartition"
     }
   ],
   "kill_lines": {
@@ -81,6 +81,24 @@
       "violation_impact": "A correctly accounted fee could still be sent to the wrong deployed address.",
       "validation": "Compare constructor/deployment artifacts with the pinned upstream predeploy literal; do not treat the source pin as deployed-immutable identity.",
       "removal_path": "Prove the configured immutable and deployed target both equal the canonical EIP-7251 address."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
   "fidelity": {
@@ -122,55 +140,55 @@
       "function": "CONSOLIDATION_REQUEST_PREDEPLOY_ADDRESS constant",
       "start_line": 24,
       "end_line": 25,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/vaults/ValidatorConsolidationRequests.sol#L24-L25"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/vaults/ValidatorConsolidationRequests.sol#L24-L25"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol",
       "function": "executeConsolidation",
       "start_line": 383,
       "end_line": 406,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
       "function": "addConsolidationRequests",
       "start_line": 185,
       "end_line": 223,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
       "function": "_refundFee",
       "start_line": 295,
       "end_line": 307,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L295-L307"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L295-L307"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "_callAddConsolidationRequest",
       "start_line": 113,
       "end_line": 121,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "_callAddWithdrawalRequest",
       "start_line": 103,
       "end_line": 111,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L103-L111"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L103-L111"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

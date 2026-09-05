@@ -17,10 +17,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PConsolidation1.source_consolidation_preserves_eligibility_value_atomicity",
       "module": "LidoSRv3.Audit.Guarantees.PConsolidation1",
       "file": "LidoSRv3/Audit/Guarantees/PConsolidation1.lean",
-      "start_line": 74,
-      "end_line": 98,
-      "doc": "/-- `sourceRun` commits only when caller = gateway, arrays are nonempty and\naligned, every key is 48 bytes, the product fits `uint256`, and\n`msg.value` equals `count * fee` (`_requireExactFee`). In isolation `fee = 0`\nwith `msg.value = 0` commits `sourceRun`; under the caller-supplied\n`hGatewayAdmittedNonzero` premise this parent additionally derives\n`inputs.fee.val ≠ 0` for every committed run (the gateway entrypoint rejects\n`msg.value = 0` before this vault call is ever reached, and the committed\nbranch's own `msg.value = count * fee` equality then forces a nonzero fee).\nA revert implies the un-strengthened conjunction is false. Not beacon\neligibility and not the Bus.\n\n**Outer-gateway premise, recorded as `A-CONSOLIDATION-GATEWAY-NONZERO`.**\n`hGatewayAdmittedNonzero` is forwarded to the source theorem and used to\nderive the `inputs.fee.val ≠ 0` conjunct above, so the premise excludes the\nfree-batch arm from this parent's committed case. The premise nevertheless\nnames the **outer gateway `msg.value` surface** (and the\n`P-CONSOLIDATION-ETH-1` fee/refund plane), not the vault's forwarded\n`totalFee` call. It is therefore classified at that boundary rather than\npresented as a vault-local fact. Two kill-lines pin the present claim:\n`gateway_admitted_nonzero_kill_line` is premise-necessity evidence (dropped,\nthe same conjunct is false of `sourceRun` on a concrete free batch that\nviolates the premise), and `fee_blind_commit_kill_line_refutes_parent` is\nthe parent-refuting kill-line (on the mutant interpreter `sourceRunFeeBlind`\nwith the exact-fee guard dropped, a batch that SATISFIES the premise commits\nwhile this parent's committed-arm conjunction is false of that commit). -/",
-      "statement": "theorem source_consolidation_preserves_eligibility_value_atomicity\n    (inputs : Inputs)\n    (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →\n      inputs.msgValue.val ≠ 0) :\n    (∀ obs, sourceRun inputs = .committed obs →\n      ∃ requests,\n        zipRequests inputs.sources inputs.targets\n          inputs.sourceLens inputs.targetLens = some requests ∧\n        inputs.caller = inputs.gateway ∧\n        inputs.sources.length ≠ 0 ∧\n        requests.all validRequest = true ∧\n        requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧\n        inputs.msgValue.val = requests.length * inputs.fee.val ∧\n        inputs.fee.val ≠ 0 ∧\n        obs = commitObservables inputs.requestTarget inputs.fee\n          inputs.msgValue requests) ∧\n    (∀ reason, sourceRun inputs = .reverted reason →\n      ¬ (inputs.caller = inputs.gateway ∧\n          inputs.sources.length ≠ 0 ∧\n          ∃ requests,\n            zipRequests inputs.sources inputs.targets\n              inputs.sourceLens inputs.targetLens = some requests ∧\n            requests.all validRequest = true ∧\n            requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 ∧\n            inputs.msgValue.val = requests.length * inputs.fee.val))"
+      "start_line": 129,
+      "end_line": 134,
+      "doc": "/-- **P-CONSOLIDATION-1, source plane.** A consolidation batch commits only if\nevery vault guard passes (caller = gateway, nonempty aligned 48-byte keys, the\nproduct fits, `msg.value = count * fee`) with a nonzero fee, and then produces\nexactly one CALL and one event per pair; it reverts only if some guard fails.\n\n`sourceRun` commits only when caller = gateway, arrays are nonempty and\naligned, every key is 48 bytes, the product fits `uint256`, and\n`msg.value` equals `count * fee` (`_requireExactFee`). In isolation `fee = 0`\nwith `msg.value = 0` commits `sourceRun`; under the caller-supplied\n`hGatewayAdmittedNonzero` premise this parent additionally derives\n`inputs.fee.val ≠ 0` for every committed run (the gateway entrypoint rejects\n`msg.value = 0` before this vault call is ever reached, and the committed\nbranch's own `msg.value = count * fee` equality then forces a nonzero fee).\nA revert implies the un-strengthened conjunction is false. Not beacon\neligibility and not the Bus.\n\n**Outer-gateway premise, recorded as `A-CONSOLIDATION-GATEWAY-NONZERO`.**\n`hGatewayAdmittedNonzero` is forwarded to the source theorem and used to\nderive the `inputs.fee.val ≠ 0` conjunct above, so the premise excludes the\nfree-batch arm from this parent's committed case. The premise nevertheless\nnames the **outer gateway `msg.value` surface** (and the\n`P-CONSOLIDATION-ETH-1` fee/refund plane), not the vault's forwarded\n`totalFee` call. It is therefore classified at that boundary rather than\npresented as a vault-local fact. Two kill-lines pin the present claim:\n`gateway_admitted_nonzero_kill_line` is premise-necessity evidence (dropped,\nthe same conjunct is false of `sourceRun` on a concrete free batch that\nviolates the premise), and `fee_blind_commit_kill_line_refutes_parent` is\nthe parent-refuting kill-line (on the mutant interpreter `sourceRunFeeBlind`\nwith the exact-fee guard dropped, a batch that SATISFIES the premise commits\nwhile this parent's committed-arm conjunction is false of that commit). -/",
+      "statement": "theorem source_consolidation_preserves_eligibility_value_atomicity\n    (inputs : Inputs)\n    (hGatewayAdmittedNonzero : inputs.caller = inputs.gateway →\n      inputs.msgValue.val ≠ 0) :\n    CommitsOnlyWhenAllGuardsPass inputs ∧\n    RevertsOnlyWhenSomeGuardFails inputs"
     },
     {
       "plane": "verity",
@@ -29,9 +29,9 @@
       "name": "LidoSRv3.Audit.Guarantees.PConsolidation1.verity_tx_simulates_consolidation",
       "module": "LidoSRv3.Audit.Guarantees.PConsolidation1",
       "file": "LidoSRv3/Audit/Guarantees/PConsolidation1.lean",
-      "start_line": 164,
-      "end_line": 179,
-      "doc": "/-- If the four memory arrays decode to the `Inputs` fields and the\nframe-entry payable credit does not wrap the `Uint256` balance, `observe`\n(suffix of `state.calls` / `state.events` plus count/fee slots) equals\n`sourceView` of the same `sourceRun`. The entry no-wrap premise is the\nexecuted-plane funding condition: a wrapping credit is turned away at\nentry (`entry_credit_overflow_reverts`) rather than committed as wrapping\nCALL debits. Not 96-byte packed calldata. -/",
+      "start_line": 204,
+      "end_line": 219,
+      "doc": "/-- **P-CONSOLIDATION-1, Verity plane.** If the four memory arrays decode and\nthe entry credit does not wrap, what Verity observes of `addRequests` equals\n`sourceView` of the same `sourceRun`.\n\nIf the four memory arrays decode to the `Inputs` fields and the\nframe-entry payable credit does not wrap the `Uint256` balance, `observe`\n(suffix of `state.calls` / `state.events` plus count/fee slots) equals\n`sourceView` of the same `sourceRun`. The entry no-wrap premise is the\nexecuted-plane funding condition: a wrapping credit is turned away at\nentry (`entry_credit_overflow_reverts`) rather than committed as wrapping\nCALL debits. Not 96-byte packed calldata. -/",
       "statement": "theorem verity_tx_simulates_consolidation (inputs : Inputs)\n    (state : Verity.ContractState)\n    (hCountBound : (state.readSlot countSlot).val + inputs.sources.length <\n      Verity.Core.Uint256.modulus)\n    (hEntry : state.selfBalance.val + inputs.msgValue.val <\n      Verity.Core.Uint256.modulus)\n    (hSources : readArray state \"sources\" sourcesBase inputs.sources.length =\n      some inputs.sources)\n    (hTargets : readArray state \"targets\" targetsBase inputs.targets.length =\n      some inputs.targets)\n    (hSourceLens : readArray state \"sourceLens\" sourceLensBase\n      inputs.sourceLens.length = some inputs.sourceLens)\n    (hTargetLens : readArray state \"targetLens\" targetLensBase\n      inputs.targetLens.length = some inputs.targetLens) :\n    observe state ((addRequests inputs).run state) =\n      sourceView inputs (state.readSlot countSlot).val"
     }
   ],
@@ -71,6 +71,24 @@
       "violation_impact": "Without outer admission, a zero-fee zero-value vault batch can commit.",
       "validation": "Compose the gateway entrypoint guard with the vault ABI/interpreter bridge.",
       "removal_path": "Discharge the premise through a checked P-CONSOLIDATION-ETH-1 to P-CONSOLIDATION-1 composition theorem."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
   "fidelity": {
@@ -102,87 +120,87 @@
       "function": "addConsolidationRequests",
       "start_line": 325,
       "end_line": 370,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L325-L370"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationBus.sol#L325-L370"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationBus.sol",
       "function": "executeConsolidation",
       "start_line": 383,
       "end_line": 406,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationBus.sol#L383-L406"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
       "function": "addConsolidationRequests",
       "start_line": 185,
       "end_line": 223,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
       "function": "_prepareConsolidationPairs",
       "start_line": 348,
       "end_line": 365,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L348-L365"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L348-L365"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",
       "function": "constructor",
       "start_line": 63,
       "end_line": 78,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L63-L78"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L63-L78"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",
       "function": "preservesEthBalance",
       "start_line": 81,
       "end_line": 85,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L81-L85"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L81-L85"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVault.sol",
       "function": "addConsolidationRequests",
       "start_line": 199,
       "end_line": 208,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVault.sol#L199-L208"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVault.sol#L199-L208"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "constructor",
       "start_line": 34,
       "end_line": 40,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L34-L40"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L34-L40"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "_addConsolidationRequests",
       "start_line": 56,
       "end_line": 73,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L56-L73"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L56-L73"
     },
     {
       "path": "contracts/0.8.9/WithdrawalVaultEIP7685.sol",
       "function": "_callAddConsolidationRequest",
       "start_line": 113,
       "end_line": 121,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalVaultEIP7685.sol#L113-L121"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

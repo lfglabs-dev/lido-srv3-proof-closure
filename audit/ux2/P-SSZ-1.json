@@ -17,9 +17,9 @@
       "name": "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff",
       "module": "LidoSRv3.Audit.Guarantees.PSsz1",
       "file": "LidoSRv3/Audit/Guarantees/PSsz1.lean",
-      "start_line": 36,
-      "end_line": 38,
-      "doc": "/-- Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named\nSpec `SszWitness.Correspondence` (construction binds `sourceWitness src` to\n`sourceNode src`; determination recovers that witness). Deposit uniqueness\nis the named `PerfectDepositEncoding` / `A-PERFECT-HASH` child\n`deposit_unique_of_perfect`, not a parent conjunct. SHA-256 remains opaque\n(`A-SHA256-FFI`). Complements the one-object `composed_ssz_encoding`\ntraversal conjunct. -/",
+      "start_line": 105,
+      "end_line": 107,
+      "doc": "/-- For every well-formed deposit (48/32/96-byte widths), construction binds\n`sourceWitness` to `sourceNode` at the CLValidatorVerifier, and determination\nrecovers that witness from a verified root: the conclusion\n`Spec.SszWitness.Correspondence depositSszWitness src` unfolds to\n`Construction src ∧ Determination src`.\n\nBidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named\nSpec `SszWitness.Correspondence` (construction binds `sourceWitness src` to\n`sourceNode src`; determination recovers that witness). Deposit uniqueness\nis the named `PerfectDepositEncoding` / `A-PERFECT-HASH` child\n`deposit_unique_of_perfect`, not a parent conjunct. SHA-256 remains opaque\n(`A-SHA256-FFI`). Complements the one-object `composed_ssz_encoding`\ntraversal conjunct. -/",
       "statement": "theorem deposit_root_iff (src : SourceDepositDataRootInput)\n    (hWellFormed : wellFormedDeposit src) :\n    Spec.SszWitness.Correspondence depositSszWitness src"
     },
     {
@@ -29,10 +29,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding",
       "module": "LidoSRv3.Audit.Guarantees.PSsz1",
       "file": "LidoSRv3/Audit/Guarantees/PSsz1.lean",
-      "start_line": 600,
-      "end_line": 628,
-      "doc": "/-- `observe` of the handwritten `encode` transaction equals `sourceView`.\nA commit also re-exports the structural-witness conjunct. This is not\n`SSZ.verifyProof` and does not prove SHA-256. -/",
-      "statement": "theorem verity_tx_simulates_ssz_encoding\n    (input : EncodingInput) (state : Verity.ContractState) :\n    observe ((encode input).run state) = sourceView input ∧\n      ((observe ((encode input).run state)).status = .committed →\n        structuralOk input = true ∧\n          structuralWitnessConjunct input ∧\n          (observe ((encode input).run state)).observables.bound = 1 ∧\n          (observe ((encode input).run state)).observables.operation =\n            operationWord input.operation ∧\n          (observe ((encode input).run state)).observables.index =\n            indexWord input.witness.index ∧\n          (observe ((encode input).run state)).observables.pivotBoundary =\n            nodeWord input.witness.pivotBoundary ∧\n          (observe ((encode input).run state)).observables.traversedRoot =\n            nodeWord (traversedRoot input) ∧\n          (observe ((encode input).run state)).observables.pathLength =\n            input.witness.path.length ∧\n          (observe ((encode input).run state)).observables.branchLength =\n            input.witness.branch.length ∧\n          (observe ((encode input).run state)).observables.path =\n            twoWords (input.witness.path.map siblingWord) ∧\n          (observe ((encode input).run state)).observables.branch =\n            twoWords (input.witness.branch.map nodeWord)) ∧\n      sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs ∧\n      (ExactDigestComposition input.deposit ∧\n        (digestChain input.deposit).length = 7) ∧\n      ∀ reason rollback,\n        (encode input).run state = .revert reason rollback →\n          rollback = state"
+      "start_line": 670,
+      "end_line": 676,
+      "doc": "/-- `observe` of the encode transaction equals `sourceView`, and a commit\nre-exports the structural witness, `GIndex.concat`, and seven-call digest\nconjuncts; a revert restores the snapshot. This is not `SSZ.verifyProof` and\ndoes not prove SHA-256. -/",
+      "statement": "theorem verity_tx_simulates_ssz_encoding\n    (input : EncodingInput) (state : Verity.ContractState) :\n    ObservesSourceView input state ∧\n      CommitPersistsWitnessObservables input state ∧\n      ConcatMatchesSpec input ∧\n      DigestChainIsExact input ∧\n      RevertRestoresSnapshot input state"
     }
   ],
   "kill_lines": {
@@ -76,7 +76,7 @@
     {
       "id": "A-SOLC-TRUSTED",
       "severity": "MEDIUM",
-      "risk": "Pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
       "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
       "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
       "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
@@ -89,6 +89,15 @@
       "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
       "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
@@ -126,135 +135,135 @@
       "function": "Validator declaration",
       "start_line": 8,
       "end_line": 17,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/BeaconTypes.sol#L8-L17"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/BeaconTypes.sol#L8-L17"
     },
     {
       "path": "contracts/common/interfaces/ValidatorWitness.sol",
       "function": "ValidatorWitness declaration",
       "start_line": 13,
       "end_line": 24,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/interfaces/ValidatorWitness.sol#L13-L24"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/interfaces/ValidatorWitness.sol#L13-L24"
     },
     {
       "path": "contracts/common/lib/GIndex.sol",
       "function": "concat",
       "start_line": 72,
       "end_line": 89,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/GIndex.sol#L72-L89"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/GIndex.sol#L72-L89"
     },
     {
       "path": "contracts/common/lib/SSZ.sol",
       "function": "hashTreeRoot(BeaconTypes.Validator)",
       "start_line": 89,
       "end_line": 175,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/SSZ.sol#L89-L175"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/SSZ.sol#L89-L175"
     },
     {
       "path": "contracts/common/lib/SSZ.sol",
       "function": "verifyProof",
       "start_line": 179,
       "end_line": 248,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/SSZ.sol#L179-L248"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/SSZ.sol#L179-L248"
     },
     {
       "path": "contracts/0.8.25/CLValidatorVerifier.sol",
       "function": "_verifyValidator",
       "start_line": 44,
       "end_line": 57,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/CLValidatorVerifier.sol#L44-L57"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/CLValidatorVerifier.sol#L44-L57"
     },
     {
       "path": "contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol",
       "function": "_validatePubKeyWCProof",
       "start_line": 150,
       "end_line": 175,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol#L150-L175"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/vaults/predeposit_guarantee/CLProofVerifier.sol#L150-L175"
     },
     {
       "path": "contracts/0.8.25/consolidation/ConsolidationGateway.sol",
       "function": "addConsolidationRequests",
       "start_line": 185,
       "end_line": 223,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/consolidation/ConsolidationGateway.sol#L185-L223"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "_computeDepositDataRootWithAmount",
       "start_line": 120,
       "end_line": 135,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "_computeDepositDataRootWithAmount raw signature overload",
       "start_line": 110,
       "end_line": 118,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L110-L118"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L110-L118"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "_computeSignatureRoot",
       "start_line": 137,
       "end_line": 146,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L137-L146"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L137-L146"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "_toLittleEndian64",
       "start_line": 148,
       "end_line": 153,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L148-L153"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L148-L153"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "PUBLIC_KEY_LENGTH",
       "start_line": 21,
       "end_line": 21,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L21-L21"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L21-L21"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "SIGNATURE_LENGTH",
       "start_line": 22,
       "end_line": 22,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L22-L22"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L22-L22"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "SHA256_DIGEST_LENGTH and zero padding literals",
       "start_line": 126,
       "end_line": 133,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L126-L133"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L126-L133"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "DEPOSIT_DATA_LENGTH ABI input shape",
       "start_line": 120,
       "end_line": 135,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L120-L135"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

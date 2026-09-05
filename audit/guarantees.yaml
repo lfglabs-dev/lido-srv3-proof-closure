@@ -6,7 +6,9 @@
       "id": "P-ALLOC-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc1 LidoSRv3.Audit.Verity.AllocationTx LidoSRv3.Tests.AllocationTxMutants",
@@ -50,7 +52,9 @@
       "id": "P-ALLOC-2",
       "assumptions": [
         "A-HANDWRITTEN-MINFIRST",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAlloc2 LidoSRv3.Audit.Verity.MinFirstDistributionTx LidoSRv3.Tests.MinFirstDistributionTxMutants",
@@ -96,7 +100,9 @@
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
         "A-DEPOSIT-CONTRACT",
-        "A-DEPOSIT-32-ETHER"
+        "A-DEPOSIT-32-ETHER",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PDeposit1 LidoSRv3.Audit.Verity.DepositParentTx LidoSRv3.Audit.Verity.DepositNFrameTx LidoSRv3.Audit.Spec.DepositNFrameCorrespondence LidoSRv3.Tests.DepositVectors LidoSRv3.Tests.DepositParentTxMutants LidoSRv3.Tests.DepositNFrameTxMutants",
@@ -152,7 +158,9 @@
         "A-SOURCE-SHAPED",
         "A-TOPUP-NOWRAP",
         "A-VERITY-SCAFFOLD",
-        "A-TOPUP-BEACON-ADDRESS"
+        "A-TOPUP-BEACON-ADDRESS",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup1 LidoSRv3.Audit.Verity.TopupTx LidoSRv3.Tests.TopupTxMutants",
@@ -196,7 +204,9 @@
       "id": "P-ACCOUNT-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAccount1 LidoSRv3.Audit.Verity.HandleOracleReportTx LidoSRv3.Tests.HandleOracleReportTxMutants",
@@ -242,7 +252,9 @@
       "id": "P-RESERVE-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserve1 LidoSRv3.Tests.ReserveMutants",
@@ -288,7 +300,9 @@
         "A-ABSTRACT-TX",
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CANONICAL-REQUEST-ADDRESS"
+        "A-CANONICAL-REQUEST-ADDRESS",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationEth1 LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert LidoSRv3.Tests.PConsolidationEth1CompositionTxMutants LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx LidoSRv3.Tests.PConsolidationEth1RequestTxMutants",
@@ -346,7 +360,9 @@
       "id": "P-ADDRESS-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddress1 LidoSRv3.Audit.Verity.AddressTx LidoSRv3.Audit.Verity.AddressClaimBatchTx LidoSRv3.Tests.AddressSourceMutants",
@@ -394,7 +410,9 @@
       "id": "P-TOPUP-2",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-VERITY-SCAFFOLD"
+        "A-VERITY-SCAFFOLD",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PTopup2 LidoSRv3.Audit.Guarantees.PTopup2Verity LidoSRv3.Audit.Verity.Topup2DistributionTx LidoSRv3.Tests.Topup2DistributionTxMutants",
@@ -438,7 +456,9 @@
       "assumptions": [
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CONSOLIDATION-GATEWAY-NONZERO"
+        "A-CONSOLIDATION-GATEWAY-NONZERO",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidation1 LidoSRv3.Audit.Verity.ConsolidationTx LidoSRv3.Tests.ConsolidationTxMutants",
@@ -489,7 +509,8 @@
         "A-PERFECT-HASH",
         "A-MULTI-NODE-TRANSPORT",
         "A-SOLC-TRUSTED",
-        "A-YUL-INTERFACE"
+        "A-YUL-INTERFACE",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PSsz1 LidoSRv3.Audit.Verity.SszEncodingTx LidoSRv3.Tests.SszEncodingTxMutants LidoSRv3.Tests.SszRegression",
@@ -591,7 +612,7 @@
         "command": "lake build LidoSRv3.Audit.Source.GIndexConcatCorrespondence LidoSRv3.Tests.GIndexConcatMutants",
         "expected": "successful exact GIndex.concat source transcription, accepted/rejected boundary vectors, and wrong-shift, wrong-depth, wrong-order, and wrapping-overflow mutant rejection; no parent SOURCE/TX closure"
       },
-      "summary": "Narrow pinned-source correspondence for GIndex.concat only: the decoded 248-bit indices follow the exact fls-zero sentinel, depth guard, left-shift/XOR/OR ordering, pack bound, and rhs power propagation at lidofinance/core af095e48 lines 72-89. P-SSZ-1 canonical SOURCE remains OPEN and TX remains BLOCKED; SSZ.verifyProof, wrappers, SHA-256, Yul/EVM, and deployment provenance are not claimed.",
+      "summary": "Narrow pinned-source correspondence for GIndex.concat only: the decoded 248-bit indices follow the exact fls-zero sentinel, depth guard, left-shift/XOR/OR ordering, pack bound, and rhs power propagation at lidofinance/core 17005714 lines 72-89. P-SSZ-1 canonical SOURCE remains OPEN and TX remains BLOCKED; SSZ.verifyProof, wrappers, SHA-256, Yul/EVM, and deployment provenance are not claimed.",
       "abstract": {
         "status": "CHECKED",
         "theorem": "LidoSRv3.Audit.Source.GIndexConcatCorrespondence.source_concat_matches_spec"
@@ -927,7 +948,9 @@
       "assumptions": [
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PReserveRelationalVerity LidoSRv3.Tests.ReserveRelationalMutants LidoSRv3.Tests.ReserveRelationalTxMutants",
@@ -964,7 +987,9 @@
         "A-SOURCE-SHAPED",
         "A-DEPOSIT-CONTRACT",
         "A-DEPOSIT-32-ETHER",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAllocExec1 LidoSRv3.Tests.PackN1AllocExecMutants",
@@ -1001,7 +1026,9 @@
       "id": "P-ETH-JOURNAL-1",
       "assumptions": [
         "A-SOURCE-SHAPED",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PEthJournal1 LidoSRv3.Tests.PackN2EthJournalMutants",
@@ -1040,7 +1067,9 @@
       "assumptions": [
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PVaultEth1 LidoSRv3.Tests.PackP2VaultEthMutants",
@@ -1085,7 +1114,9 @@
       "assumptions": [
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.POracleSupply1 LidoSRv3.Tests.PackN3OracleMintMutants LidoSRv3.Tests.PackP3SubmitReportEntryMutants LidoSRv3.Tests.PackO2SupplyDomainMutants",
@@ -1105,7 +1136,7 @@
           "modeled submitReportData entry computes entryFeeWei (LIP-12-guarded totalRewards * totalFee / precisionPoints) and entryShareRate (internalShares * E27 / (postInternalEther - feeEther)) from report data and entry state, and feeds the pair into handleOracleReportComputed with no free sharesToMintAsFees argument",
           "entry checks the consensus-hash and sender-allowed premises; hash mismatch and disallowed sender revert with the pre-state restored, and both premises are shown load-bearing",
           "computed-pair mint never exceeds the pinned _calculateTotalProtocolFeeShares division and equals it exactly under EntryDomainValid + divisibility (entry_mint_eq_pinned_of_domain via oracle_supply_entry_source_domain)",
-          "EntryDomainValid captures Solidity checked-arithmetic non-underflow conditions at af095e48 plus profitable-branch precisionPoints > 0, the pinned totalFee ≤ precisionPoints source guard at getStakingRewardsDistribution af095e48:870, and feeShareRateDenominator > 0; guards are shown load-bearing (zeroPrecisionNotDomainValid, zeroDenomNotDomainValid, feeBoundIsLoadBearing, domain_guard_kill_line_refutes_full_parent)",
+          "EntryDomainValid captures Solidity checked-arithmetic non-underflow conditions at 17005714 plus profitable-branch precisionPoints > 0, the pinned totalFee ≤ precisionPoints source guard at getStakingRewardsDistribution 17005714:870, and feeShareRateDenominator > 0; guards are shown load-bearing (zeroPrecisionNotDomainValid, zeroDenomNotDomainValid, feeBoundIsLoadBearing, domain_guard_kill_line_refutes_full_parent)",
           "live handleOracleReportComputed wrapper computes sharesToMintAsFees from feeWei and shareRate",
           "observe of the computed path equals sourceView at mintedShares feeWei shareRate",
           "computed fee/shareRate mint on Spec.OracleFrame, not a free sharesToMintAsFees argument",
@@ -1133,7 +1164,9 @@
       "assumptions": [
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PAddressBatch1 LidoSRv3.Tests.PackN4AddressBatchMutants LidoSRv3.Audit.Spec.AddressClaimKeccakSlots LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence",
@@ -1172,7 +1205,9 @@
       "assumptions": [
         "A-SHA256-FFI",
         "A-SOURCE-SHAPED",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PSszLive1 LidoSRv3.Audit.Source.BeaconRootsCorrespondence LidoSRv3.Audit.Verity.BeaconRootsTx LidoSRv3.Tests.PackN5SszLiveMutants LidoSRv3.Tests.PackS1HashMutants LidoSRv3.Tests.PackW2GindexMutants",
@@ -1215,7 +1250,9 @@
         "A-SOURCE-SHAPED",
         "A-VERITY-SCAFFOLD",
         "A-CONSOLIDATION-GATEWAY-NONZERO",
-        "A-CLASSICAL-CHOICE"
+        "A-CLASSICAL-CHOICE",
+        "A-SOLC-TRUSTED",
+        "A-RUNTIME-PROVENANCE"
       ],
       "reproduction": {
         "command": "lake build LidoSRv3.Audit.Guarantees.PConsolidationValue1 LidoSRv3.Tests.PackN6ConsolValueMutants LidoSRv3.Tests.PackP6OfficialSuccessMutants",

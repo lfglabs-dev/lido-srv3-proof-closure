@@ -1,6 +1,6 @@
 {
   "schema": "p-topup-2-packed-layout-comparison-v1",
-  "lido_commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
+  "lido_commit": "17005714f151e5502c559932319a3f2f74ac2436",
   "compiler": {"solc": "0.8.25", "optimizer": true, "optimizer_runs": 200, "via_ir": true, "evm_version": "cancun"},
   "method": "Pinned TopUpGateway compiles successfully; namespaced assembly storage is absent from standard storageLayout, so struct order/width comes from the solc AST and the ERC-7201 base from the compiled source literal. Verity values are checked by generated_layout_exact over GatewayPackedContract.spec.fields.",
   "erc7201_base": "0x22e512057841e2bc1e6d80030c8bb8b4935377af2e64ba9bf8e6a3e88fb32200",

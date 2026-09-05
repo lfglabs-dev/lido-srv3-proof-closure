@@ -89,6 +89,10 @@ CLAIMS = {
             ("def", "canonicalDepositContractAddress"),
             ("def", "thirtyTwoEtherWei"),
             ("theorem", "revert_restores_state_value_and_logs"),
+            # Readable-statement vocabulary (syntactic sugar only): `abbrev`s
+            # naming the registered parents' conjuncts.
+            ("abbrev", "CommittedPushConserves"),
+            ("abbrev", "NonConservingDeploymentReverts"),
             ("theorem", "source_deposit_conserves_and_rolls_back"),
             ("theorem", "source_router_balance_unchanged"),
             ("theorem", "source_reverting_branch_moves_no_ether"),
@@ -127,6 +131,9 @@ CLAIMS = {
             ("theorem", "exactTotal_eq_exactKeys_mul"),
             ("theorem", "linked_exactTotal_eq_pushedValue"),
             ("theorem", "linked_exactTotal_eq_depositsValue"),
+            ("abbrev", "ExecutesNFrameJournal"),
+            ("abbrev", "ExactTotalIsSourcePush"),
+            ("abbrev", "ConservingDeploymentPullsExactTotal"),
             ("theorem", "verity_tx_composes_nframe_deposit"),
             ("theorem", "two_batch_conjunct_d_is_n_eq_two"),
         ),
@@ -184,6 +191,20 @@ CLAIMS = {
             ("theorem", "source_wc_type2_guard_required"),
             ("theorem", "source_allocation_guards_required"),
             ("theorem", "source_over_target_guard_required"),
+            # Readable-statement vocabulary (syntactic sugar only): `abbrev`s
+            # naming the five conjuncts of the registered abstract parent and
+            # the shared guard prefixes; unfolding them gives the same Prop.
+            ("abbrev", "pulled"),
+            ("abbrev", "pushed"),
+            ("abbrev", "Conserves"),
+            ("abbrev", "RevertRestoresSnapshot"),
+            ("abbrev", "ConservesAndRollsBack"),
+            ("abbrev", "GivenWellFormedInputs"),
+            ("abbrev", "GivenActiveModule"),
+            ("abbrev", "UnregisteredModuleReverts"),
+            ("abbrev", "WrapMovesNoValue"),
+            ("abbrev", "WrongWcTypeReverts"),
+            ("abbrev", "RunFollowsAllocationLoop"),
             ("theorem", "source_topup_conserves_and_rolls_back"),
             ("theorem", "source_router_balance_unchanged"),
             ("theorem", "source_reverting_branch_moves_no_ether"),
@@ -196,6 +217,9 @@ CLAIMS = {
             ("theorem", "verity_nonzero_wrap_reverts_and_restores"),
             ("def", "VerityCommittingSimulation"),
             ("def", "VerityGuardedReturndataSimulation"),
+            # Readable-statement vocabulary for the registered Verity parent.
+            ("abbrev", "NonzeroWrapRevertsAndRestores"),
+            ("abbrev", "EveryReturndataIsGuarded"),
             ("theorem", "verity_tx_simulates_source_with_nonzero_wrap_close"),
         ),
     },

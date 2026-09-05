@@ -17,10 +17,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PAlloc2.step_correspondence_and_full_loop_conservation",
       "module": "LidoSRv3.Audit.Guarantees.PAlloc2",
       "file": "LidoSRv3/Audit/Guarantees/PAlloc2.lean",
-      "start_line": 236,
-      "end_line": 275,
+      "start_line": 292,
+      "end_line": 293,
       "doc": "/-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source\ncandidate and proportional-amount equality from the step theorem load-bearing,\nand adds fuel-bounded conservation for every successful run of the full\nindependently stated source allocation loop, plus multi-step row correspondence\nwith an independently stated proportional model loop.  It does not identify\nthat proportional loop with the separate +1 `MinFirst` child model. -/",
-      "statement": "theorem step_correspondence_and_full_loop_conservation :\n    (∀ (model : List MinFirstAllocation.Model.Bucket)\n      (source : List MinFirstAllocation.Source.Row)\n      (best : MinFirstAllocation.Source.Row)\n      (allocationSize w : MinFirstAllocation.Source.Word),\n      MinFirstAllocation.RowsCorrespond model source →\n      MinFirstAllocation.Source.candidate? source = some best →\n      MinFirstAllocation.Source.hasFreeSpace best = true →\n      source.length < Verity.Core.Uint256.modulus →\n      allocationSize.val ≠ 0 →\n      MinFirstAllocation.Source.checkedAmount source allocationSize best = some w →\n      (Option.map (fun b => (b.allocation, b.capacity))\n          (MinFirstAllocation.Model.candidate? model) =\n        some (best.allocation.val, best.capacity.val)) ∧\n      MinFirstAllocation.Model.amount model allocationSize.val\n        ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧\n      0 < w.val ∧ w.val ≤ allocationSize.val ∧\n        best.allocation.val + w.val ≤ best.capacity.val) ∧\n    (∀ (fuel : Nat) (rows : List MinFirstAllocation.Source.Row)\n      (allocationSize : MinFirstAllocation.Source.Word)\n      (after : List MinFirstAllocation.Source.Row)\n      (allocated remaining : MinFirstAllocation.Source.Word),\n      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =\n        some (after, allocated, remaining) →\n      allocated.val + remaining.val = allocationSize.val) ∧\n    (∀ (fuel : Nat)\n      (model : List MinFirstAllocation.Model.Bucket)\n      (source : List MinFirstAllocation.Source.Row)\n      (allocationSize : MinFirstAllocation.Source.Word)\n      (after : List MinFirstAllocation.Source.Row)\n      (allocated remaining : MinFirstAllocation.Source.Word),\n      MinFirstAllocation.RowsCorrespond model source →\n      source.length < Verity.Core.Uint256.modulus →\n      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source allocationSize 0 =\n        some (after, allocated, remaining) →\n      ∃ modelAfter,\n        Verity.MinFirstDistributionTx.modelAllocateLoop fuel model\n            allocationSize.val 0 =\n          some (modelAfter, allocated.val, remaining.val) ∧\n        MinFirstAllocation.RowsCorrespond modelAfter after)"
+      "statement": "theorem step_correspondence_and_full_loop_conservation :\n    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence"
     },
     {
       "plane": "verity",
@@ -62,6 +62,24 @@
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
       "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
   "fidelity": {
@@ -88,39 +106,39 @@
       "function": "allocate outer loop",
       "start_line": 30,
       "end_line": 44,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L30-L44"
     },
     {
       "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
       "function": "allocateToBestCandidate candidate search",
       "start_line": 76,
       "end_line": 86,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L76-L86"
     },
     {
       "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
       "function": "allocateToBestCandidate allocation-size upper bound",
       "start_line": 93,
       "end_line": 100,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L93-L100"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L93-L100"
     },
     {
       "path": "contracts/common/lib/MinFirstAllocationStrategy.sol",
       "function": "allocateToBestCandidate proportional amount and bucket mutation",
       "start_line": 102,
       "end_line": 106,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/common/lib/MinFirstAllocationStrategy.sol#L102-L106"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

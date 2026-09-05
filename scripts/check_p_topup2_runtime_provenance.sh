@@ -8,7 +8,7 @@ set -euo pipefail
 fail() { printf 'P-TOPUP-2 runtime provenance: FAIL: %s\n' "$1" >&2; exit 1; }
 need() { command -v "$1" >/dev/null || fail "missing tool: $1"; }
 
-PIN=af095e48bbc1c3841c2c9936219c8461af01056b
+PIN=17005714f151e5502c559932319a3f2f74ac2436
 RELEASE_COMMIT=17005714f151e5502c559932319a3f2f74ac2436
 REFERENCE_BLOCK=25730798
 PROXY=0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374

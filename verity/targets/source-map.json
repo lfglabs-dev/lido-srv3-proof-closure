@@ -1,7 +1,7 @@
 {
   "schema": "srv3-source-map-v1",
   "source_revisions": {
-    "lido_pr_1811_commit": "af095e48bbc1c3841c2c9936219c8461af01056b",
+    "lido_pr_1811_commit": "17005714f151e5502c559932319a3f2f74ac2436",
     "verity_commit": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46"
   },
   "correspondence_register": "archive/legacy-p1-p15/verity-targets/solidity-correspondence.md",

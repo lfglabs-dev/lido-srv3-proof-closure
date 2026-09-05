@@ -286,7 +286,7 @@ theorem zeroDenomNotDomainValid :
 
 /-- A-REWARD-09 counterexample: `totalFee = 2 > precisionPoints = 1` on the
 profitable branch.  Solidity reverts at `getStakingRewardsDistribution`
-(`af095e48:870`); the Lean model silently computes `feeEther = 2` from
+(`17005714:870`); the Lean model silently computes `feeEther = 2` from
 `totalRewards = 1`, exceeding total rewards. -/
 private def feeBoundWitness : SubmitReportData :=
   { report := routerReport

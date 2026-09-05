@@ -19,6 +19,15 @@ open _root_.Verity
 open _root_.Verity.EVM.Uint256
 open LidoSRv3.Audit.SolidityAddress
 
+/-! ## Storage projection
+
+`paused`, `balances`, `allowances`, `owners`, `claimed` stand for the pinned
+contracts' state (WithdrawalQueue pause flag, stETH / wstETH balances and
+allowances, `WithdrawalRequest.owner`, `WithdrawalRequest.claimed`).
+`recipients` is an observation slot with no Solidity storage counterpart: it
+records the address that a successful call hands the asset to (the new
+request owner, the claim recipient, or the unwrap caller), so the
+address-equivariance theorems can read it back instead of parsing events. -/
 verity_contract AddressTxContract where
   storage
     paused : Uint256 := slot 0
@@ -26,28 +35,48 @@ verity_contract AddressTxContract where
     allowances : Address → Address → Uint256 := slot 2
     owners : Uint256 → Uint256 := slot 3
     claimed : Uint256 → Uint256 := slot 4
+    -- observation slot, no Solidity storage counterpart
     recipients : Uint256 → Uint256 := slot 5
 
+  -- WithdrawalQueueERC721.sol:218-220 transferFrom(_from, _to, _requestId) -> 230-254 _transfer.
+  -- Not transcribed: 250-251 enumerable sets, 253 `_emitTransfer`.  `requestExists` stands for
+  -- the 233 range check; `callerApproved` for the two approval disjuncts of 242.
   function no_external_calls transferFrom (fromAddr : Address, toAddr : Address,
       requestId : Uint256, requestExists : Bool, callerApproved : Bool) : Unit := do
+    -- WithdrawalQueueERC721.sol:240  address msgSender = msg.sender;
     let sender ← msgSender
+    -- WithdrawalQueueERC721.sol:231  if (_to == address(0)) revert TransferToZeroAddress();
     require (toAddr != zeroAddress) "TransferToZeroAddress"
+    -- WithdrawalQueueERC721.sol:232  if (_to == _from) revert TransferToThemselves();
     require (toAddr != fromAddr) "TransferToThemselves"
+    -- WithdrawalQueueERC721.sol:233  if (_requestId == 0 || _requestId > getLastRequestId()) revert InvalidRequestId(_requestId);
     require requestExists "InvalidRequestId"
+    -- WithdrawalQueueERC721.sol:235-236  WithdrawalRequest storage request = _getQueue()[_requestId]; if (request.claimed) revert RequestAlreadyClaimed(_requestId);
     let wasClaimed ← getMappingUint claimed requestId
     require (wasClaimed == 0) "RequestAlreadyClaimed"
+    -- WithdrawalQueueERC721.sol:238  if (_from != request.owner) revert TransferFromIncorrectOwner(_from, request.owner);
     let ownerWord ← getMappingUint owners requestId
     require (ownerWord == addressToWord fromAddr) "TransferFromIncorrectOwner"
+    -- WithdrawalQueueERC721.sol:241-245  if (!(_from == msgSender || isApprovedForAll(_from, msgSender) || _getTokenApprovals()[_requestId] == msgSender)) { revert NotOwnerOrApproved(msgSender); }
     require ((sender == fromAddr) || callerApproved) "NotOwnerOrApproved"
+    -- observation write, no Solidity counterpart (247 `delete _getTokenApprovals()[_requestId]` is not modeled: approvals are an input flag)
     setMappingUint recipients requestId (addressToWord toAddr)
+    -- WithdrawalQueueERC721.sol:248  request.owner = _to;
     setMappingUint owners requestId (addressToWord toAddr)
 
+  -- WithdrawalQueue.sol:125-135 requestWithdrawals(uint256[] _amounts, address _owner), single-item
+  -- projection of the loop 132-135 (`_amounts.length == 1`), with 373-381 _requestWithdrawal inlined.
+  -- `owner` is Solidity's `_owner`.  Not transcribed: 131 `requestIds = new uint256[](...)` and the
+  -- return value; 376 `getSharesByPooledEth`; 378 `_enqueue` bookkeeping other than the owner; 380 `_emitTransfer`.
   function no_external_calls requestWithdrawal (amount : Uint256, requestId : Uint256,
       owner : Address, amountInRange : Bool, externalCallSucceeds : Bool) : Unit := do
     let sender ← msgSender
+    -- WithdrawalQueue.sol:129  _checkResumed();
     let pauseWord ← getStorage paused
     require (pauseWord == 0) "Paused"
+    -- WithdrawalQueue.sol:133  _checkWithdrawalRequestAmount(_amounts[i]);   (395-402, RequestAmountTooSmall / TooLarge)
     require amountInRange "AmountOutOfRange"
+    -- WithdrawalQueue.sol:374  STETH.transferFrom(msg.sender, address(this), _amountOfStETH);   (ERC20 balance and allowance checks)
     let balance ← getMapping balances sender
     require (balance >= amount) "InsufficientBalance"
     let allowance ← getMapping2 allowances sender owner
@@ -55,6 +84,9 @@ verity_contract AddressTxContract where
     -- Deliberately precedes the external result: failure must roll this back.
     setMapping balances sender (sub balance amount)
     require externalCallSucceeds "ExternalCallFailed"
+    -- WithdrawalQueue.sol:130  if (_owner == address(0)) _owner = msg.sender;
+    -- (the Solidity assignment precedes the loop; here it is applied at the owner write, 378 `_enqueue(..., _owner)`,
+    --  which is the only place `_owner` is used.  Kept in place: the proofs unfold this normal form.)
     if owner == zeroAddress then
       setMappingUint owners requestId (addressToWord sender)
       setMappingUint recipients requestId (addressToWord sender)
@@ -79,14 +111,26 @@ verity_contract AddressTxContract where
     require externalCallSucceeds "ExternalCallFailed"
     setMappingUint recipients requestId (addressToWord recipient)
 
+  -- WstETH.sol:69-75 unwrap(uint256 _wstETHAmount) returns (uint256).
+  -- Not transcribed: 71 `uint256 stETHAmount = stETH.getPooledEthByShares(_wstETHAmount);` and the
+  -- 74 `return stETHAmount;` (the stETH amount is not address-bearing).
   function no_external_calls redeem (amount : Uint256, externalCallSucceeds : Bool) : Unit := do
     let sender ← msgSender
+    -- WstETH.sol:70  require(_wstETHAmount > 0, "wstETH: zero amount unwrap not allowed");
     require (amount != 0) "ZeroAmount"
+    -- WstETH.sol:72  _burn(msg.sender, _wstETHAmount);
+    -- (the `balance >= amount` guard is the implicit ERC20 `_burn` check "ERC20: burn amount exceeds balance")
     let balance ← getMapping balances sender
     require (balance >= amount) "InsufficientBalance"
     setMapping balances sender (sub balance amount)
+    -- WstETH.sol:73  stETH.transfer(msg.sender, stETHAmount);
     require externalCallSucceeds "ExternalCallFailed"
+    -- observation write, no Solidity counterpart: `unwrap` has no request id, so the recipient of the
+    -- line-73 transfer (the caller) is recorded under the key `amount`; `observeAddress` reads it back there.
     setMappingUint recipients amount (addressToWord sender)
+
+/-- Solidity-facing name, WstETH.sol:69. -/
+abbrev AddressTxContract.unwrap := AddressTxContract.redeem
 
 inductive TxStatus where | committed | reverted deriving DecidableEq, Repr
 
@@ -189,7 +233,7 @@ def stateFor (inp : Input) : ContractState :=
   simpa only [addressToWord] using addressToWord_eq_iff a b
 
 /-- Source-to-Verity entrypoint map for the pinned
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b` projection.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436` projection.
 Every address and guard control in `SolidityAddress.Input` is passed to the
 independently executable transaction; storage-dependent booleans are realized
 by the caller's supplied pre-state. -/

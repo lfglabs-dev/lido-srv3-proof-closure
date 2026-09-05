@@ -7,7 +7,7 @@ import Compiler.CompilationModel
 # P-CONSOLIDATION-1 faithful call/event/memory transaction
 
 This transaction models `WithdrawalVault.addConsolidationRequests` from
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. Source and target
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`. Source and target
 public keys and their lengths are read through the compilation-model
 denotation of memory-backed `uint256[]` values. Successful pairs persist
 `source ‖ target` through `writeMapUint`, the request count and fee through
@@ -36,13 +36,31 @@ open LidoSRv3.Audit.SolidityConsolidation
 
 abbrev Word := SolidityConsolidation.Word
 
+/-! ## Memory layout and observation slots
+
+`WithdrawalVault.addConsolidationRequests` (`WithdrawalVault.sol:199-208`)
+has no mutable storage on this path: `CONSOLIDATION_GATEWAY` and
+`CONSOLIDATION_REQUEST` are constructor immutables and the loop of
+`WithdrawalVaultEIP7685.sol:68-72` only CALLs and emits. The four `*Base`
+offsets model the memory-backed `sourcePubkeys` / `targetPubkeys` arrays
+(and their element lengths); the four slots are observation slots, no
+Solidity storage counterpart. -/
+
+/-- Memory base of `sourcePubkeys` (harness layout, not a Solidity offset). -/
 def sourcesBase : Nat := 0x1000
+/-- Memory base of `targetPubkeys` (harness layout, not a Solidity offset). -/
 def targetsBase : Nat := 0x2000
+/-- Memory base of the `sourcePubkeys[i].length` words (harness layout). -/
 def sourceLensBase : Nat := 0x3000
+/-- Memory base of the `targetPubkeys[i].length` words (harness layout). -/
 def targetLensBase : Nat := 0x4000
+/-- Observation slot, no Solidity storage counterpart: running request count. -/
 def countSlot : Nat := 30
+/-- Observation slot, no Solidity storage counterpart: `msg.value` of the last commit. -/
 def feePaidSlot : Nat := 31
+/-- Observation slot, no Solidity storage counterpart: `sourcePubkey` word per request index. -/
 def sourceMapSlot : Nat := 32
+/-- Observation slot, no Solidity storage counterpart: `targetPubkey` word per request index. -/
 def targetMapSlot : Nat := 33
 
 private def oracle : DenoteOracle where
@@ -116,11 +134,15 @@ theorem credited_readSlot (state : ContractState) (inputs : Inputs)
     (slot : Nat) :
     (credited state inputs).readSlot slot = state.readSlot slot := rfl
 
+/-- `WithdrawalVaultEIP7685.sol:120  emit ConsolidationRequestAdded(request);` as a Verity `Event`. -/
 def toEvent (ev : EventObs) : Event :=
   { name := "ConsolidationRequestAdded"
     args := ev.payload
     indexedArgs := [ev.topic] }
 
+/-- `WithdrawalVaultEIP7685.sol:115  (bool success,) = CONSOLIDATION_REQUEST.call{value: fee}(request);`
+as a journaled `.success` CALL frame (the failure arm, line 116-118
+`RequestAdditionFailed`, is not transcribed). -/
 def toJournal (c : CallObs) : ExternalCall :=
   { siteId := c.target.val
     kind := .call
@@ -156,6 +178,9 @@ private theorem map_ofNat_val (ws : List Word) :
   simp [ofJournal, toJournal, ofNat_val]
   exact map_ofNat_val _
 
+/-- Added by the model: records each `source ‖ target` pair in the two
+observation mapping slots (`sourceMapSlot`, `targetMapSlot`). No Solidity
+storage write corresponds to this. -/
 def writePayloads : Nat → List (List Word) → ContractState → ContractState
   | _, [], state => state
   | index, payload :: rest, state =>
@@ -175,6 +200,10 @@ def forwardCalls (state : ContractState) : List CallObs → ContractState
   | [] => state
   | c :: rest => forwardCalls (forwardCall state c) rest
 
+/-- Effects of a committed loop `WithdrawalVaultEIP7685.sol:68-72` on the
+vault state: the per-CALL value debits (`forwardCalls`, line 115), the CALL
+journal (line 115) and the events (line 120). The observation-slot writes
+(`writePayloads`, `countSlot`, `feePaidSlot`) are added by the model. -/
 def persist (start : Nat) (obs : Observables) (state : ContractState) :
     ContractState :=
   let dirty := writePayloads start obs.payloads state
@@ -197,11 +226,28 @@ structure Result where
 def ofObservables (obs : Observables) : Result :=
   ⟨obs.calls, obs.events, obs.payloads, obs.requestCount, obs.feePaid⟩
 
-/-- Executable transaction. The entry state is the payable credit of
-`msg.value` (`credited`); a frame entry whose credit would wrap the vault's
-`Uint256` balance is rejected before decode (`ENTRY_CREDIT_OVERFLOW`); on
-admissible entries, length mismatch, fee failure, or the injected failure
-after intermediate writes reverts to the un-credited pre-call snapshot. -/
+/-! ## WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208), executed plane -/
+
+/-- `WithdrawalVault.sol:199-208 addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys)`,
+executed transaction. Guards and the loop are delegated to the pinned
+`SolidityConsolidation.sourceRun` (see its header for the line map); this
+def adds the frame entry, the memory decode of the two arrays, and the
+state effects.
+
+Not transcribed: `preservesEthBalance` (`WithdrawalVault.sol:81-85`) as a
+statement; it is proved instead (`committed_preserves_eth_balance`). The
+STATICCALL fee read and the CALL failure arm follow `sourceRun`.
+
+Added by the model: the payable frame-entry credit `credited` with its
+`ENTRY_CREDIT_OVERFLOW` admissibility guard, the `MEMORY_ARRAY_DECODE`
+revert, the `failAfterWrites` injection hook (`INJECTED_AFTER_WRITES`), and
+the observation slots written by `persist`.
+
+The entry state is the payable credit of `msg.value` (`credited`); a frame
+entry whose credit would wrap the vault's `Uint256` balance is rejected
+before decode (`ENTRY_CREDIT_OVERFLOW`); on admissible entries, length
+mismatch, fee failure, or the injected failure after intermediate writes
+reverts to the un-credited pre-call snapshot. -/
 def addRequests (inputs : Inputs) (failAfterWrites : Bool := false) :
     Contract Result := fun snapshot =>
   if snapshot.selfBalance.val + inputs.msgValue.val <
@@ -228,6 +274,9 @@ def addRequests (inputs : Inputs) (failAfterWrites : Bool := false) :
             else .success (ofObservables obs) dirty
     | _, _, _, _ => .revert "MEMORY_ARRAY_DECODE" snapshot
   else .revert "ENTRY_CREDIT_OVERFLOW" snapshot
+
+/-- Solidity-facing name, `WithdrawalVault.sol:199`. -/
+abbrev addConsolidationRequests := addRequests
 
 /-- Entry-credit overflow rejects the transaction before any decode, guard,
 or write: when `selfBalance + msg.value` would wrap the `Uint256` balance,
@@ -1039,9 +1088,9 @@ theorem committed_preserves_eth_balance
   exact sub_foldl_replicate state.selfBalance inputs.fee obs.calls.length
     inputs.msgValue hFeeEq
 
-/-! ## Model mutants for the value-plane kill-lines
+/-! ## Kill-line mutants (not source)
 
-`addRequestsValueBlind` keeps the frame-entry payable credit and the
+Model mutants for the value-plane kill-lines. `addRequestsValueBlind` keeps the frame-entry payable credit and the
 journaled CALL frames but drops the per-CALL debit — exactly the pre-lift
 stub behavior ("success stubs move no wei"). `addRequestsDoubleDebit`
 debits twice the journaled value per CALL. `addRequestsJournalValueBlind`
@@ -1126,9 +1175,11 @@ def addRequestsDoubleDebit (inputs : Inputs) : Contract Result :=
 def addRequestsJournalValueBlind (inputs : Inputs) : Contract Result :=
   addRequestsWith persistJournalValueBlind inputs
 
-/-! ## FunctionSpec call/event/memory fragment
+/-! ## FunctionSpec call/event/memory fragment (not a transcription)
 
-The official `denoteFunction` still maps `Expr.call` / `Stmt.externalCallBind`
+`requestOne` is a single-pair bridge spec exercising the three constructors,
+not a transcription of the Solidity loop (its `requests` counter has no
+storage counterpart in `WithdrawalVault`). The official `denoteFunction` still maps `Expr.call` / `Stmt.externalCallBind`
 to `none` / `.revert`. The widened `denoteFunctionWithCalls` fragment from
 Verity #2360 executes `externalCallBind`, `emit`, and `mstore`. The single-pair
 spec below stays inside that fragment so a success hypothesis is not vacuous.

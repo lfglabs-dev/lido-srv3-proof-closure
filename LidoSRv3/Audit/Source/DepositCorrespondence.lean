@@ -2,7 +2,7 @@ import LidoSRv3.Audit.Trace
 
 /-!
 Pinned source correspondence for the SRv3 deposit beacon-chain push at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 Four spans make up the pinned deposit path:
 
@@ -180,34 +180,56 @@ inductive Outcome
   | committedDeposits (keys pulled pushed balanceAfter : Nat)
   deriving Repr, DecidableEq
 
-/-- `maxDepositsCount`, source lines 954--957. -/
+/-! ## StakingRouter.deposit (StakingRouter.sol:942-997) -/
+
+/-- `maxDepositsCount`, `StakingRouter.sol:954-957`. -/
 def maxDepositsCount (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Nat :=
+  -- StakingRouter.sol:954-957  uint256 maxDepositsCount = Math.min(state.deposits.maxDepositsPerBlock, stakingModuleDepositableEthAmount / MAX_EFFECTIVE_BALANCE_WC_TYPE_01);
   min inp.maxDepositsPerBlock (inp.moduleDepositableEth / cfg.maxEBType1)
 
-/-- `actualDepositsCount = publicKeysBatch.length / PUBKEY_LENGTH`, source line 967. -/
+/-- `actualDepositsCount = publicKeysBatch.length / PUBKEY_LENGTH`, `StakingRouter.sol:967`. -/
 def actualDepositsCount (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Nat :=
+  -- StakingRouter.sol:967  uint256 actualDepositsCount = publicKeysBatch.length / PUBKEY_LENGTH;
   inp.publicKeysBatchLength / cfg.pubkeyLength
 
 /-- `depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01`,
-source line 972; the amount pulled from Lido at source line 983. -/
+`StakingRouter.sol:972`; the amount pulled from Lido at `StakingRouter.sol:983`. -/
 def depositsValue (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Nat :=
+  -- StakingRouter.sol:972  uint256 depositsValue = actualDepositsCount * MAX_EFFECTIVE_BALANCE_WC_TYPE_01;
   actualDepositsCount cfg inp * cfg.maxEBType1
 
-/-- The wei the deposit loop at `BeaconChainDepositor.sol` lines 53--63 sends:
-one `DEPOSIT_SIZE` transfer per key, at source line 57.  This is the loop's own
-accumulation shape, not a closed form. -/
+/-! ## BeaconChainDepositor.makeBeaconChainDeposits32ETH (BeaconChainDepositor.sol:36-64), value loop -/
+
+/-- The wei the deposit loop at `BeaconChainDepositor.sol:53-63` sends:
+one `DEPOSIT_SIZE` transfer per key, at `BeaconChainDepositor.sol:57`.  This is
+the loop's own accumulation shape, not a closed form.
+
+Not transcribed: `BeaconChainDepositor.sol:54-55` (`MemUtils.copyBytes` of the
+key and signature slices) and `:61` (`_computeDepositDataRootWithAmount`,
+P-SSZ-1); only the `value:` of the call is modelled. -/
 def loopPushed (cfg : SourceDepositConfig) : Nat → Nat
+  -- BeaconChainDepositor.sol:53  for (uint256 i; i < _keysCount; ++i) {  (loop exit)
   | 0 => 0
+  -- BeaconChainDepositor.sol:57  _depositContract.deposit{value: DEPOSIT_SIZE}(publicKey, _withdrawalCredentials, signature, ...);
   | n + 1 => loopPushed cfg n + cfg.depositSize
 
-/-- The wei pushed to the beacon deposit contract for one `deposit` call. -/
+/-- Solidity-facing name, `BeaconChainDepositor.sol:36`
+`makeBeaconChainDeposits32ETH(IDepositContract, uint256 _keysCount, bytes, bytes, bytes)`,
+restricted to the wei its loop sends for `_keysCount` keys. Proofs unfold
+`loopPushed`. -/
+abbrev makeBeaconChainDeposits32ETH := loopPushed
+
+/-- The wei pushed to the beacon deposit contract for one `deposit` call
+(`StakingRouter.sol:985-991` with `_keysCount = actualDepositsCount`). -/
 def pushedValue (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Nat :=
+  -- StakingRouter.sol:985-991  BeaconChainDepositor.makeBeaconChainDeposits32ETH(DEPOSIT_CONTRACT, actualDepositsCount, ...);
   loopPushed cfg (actualDepositsCount cfg inp)
 
 /-- `etherBalanceAfterDeposits`, the `address(this).balance` read at source line
 993: the line 980 snapshot, plus the pull at line 983, minus what the loop at
 `BeaconChainDepositor.sol` lines 53--63 sent out. -/
 def routerBalanceAfter (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Nat :=
+  -- StakingRouter.sol:993  uint256 etherBalanceAfterDeposits = address(this).balance;
   inp.routerBalanceBefore + depositsValue cfg inp - pushedValue cfg inp
 
 /--
@@ -222,12 +244,31 @@ instance (cfg : SourceDepositConfig) : Decidable (ConservingConfig cfg) :=
   inferInstanceAs (Decidable (cfg.maxEBType1 = cfg.depositSize))
 
 /--
+`StakingRouter.sol:942-997 deposit(uint256 _stakingModuleId, bytes calldata _depositCalldata)`
+with the callees it reaches inlined: `Lido.sol:869-886 withdrawDepositableEther`,
+`Lido.sol:839-859 _spendDepositableEther`, and
+`BeaconChainDepositor.sol:36-64 makeBeaconChainDeposits32ETH`.
+
 The pinned deposit path, as a first-guard-wins function.  The guard order is the
 source order after locator-derived DSM authentication: the body guards at
 lines 946, 959, 966, 969, 978, then the
 `Lido.withdrawDepositableEther` guards reached at line 983, then the
 `BeaconChainDepositor.makeBeaconChainDeposits32ETH` guards reached at line 985,
 and finally the `assert` at line 996.
+
+Not transcribed: `StakingRouter.sol:943-944` (`_checkAppAuth`, `_getModuleState`:
+locator/app facts), `:948-949` (withdrawal credentials and module address),
+`:951-953` (`getDepositableEther` and `_getModuleDepositAllocation`, supplied as
+`inp.moduleDepositableEth`, P-ALLOC-1), `:962-963` (`obtainDepositData` call,
+supplied as the two batch lengths), `:976` (`_updateModuleLastDepositState`,
+a storage write with no value effect), `:980` (balance snapshot is
+`inp.routerBalanceBefore`); `Lido.sol:871-872` (`_auth(stakingRouter)`),
+`:875-885` beyond the `require` at 842 (buffer accounting and events);
+`BeaconChainDepositor.sol:50-51, 54-55, 61` (memory copies and SSZ root).
+
+Added by the model: the two division/modulo-by-zero panics of lines 956 and 966
+as explicit branches, `revertInsufficientRouterBalance` for the value transfer
+at `BeaconChainDepositor.sol:57` failing, and `Nat` (unbounded) arithmetic.
 
 That last guard is written as `depositsValue ≠ pushedValue` rather than as a
 comparison of `routerBalanceAfter` with the line 980 snapshot.  The two readings
@@ -238,32 +279,55 @@ pull/push form is preferred here because truncating `Nat` subtraction, unlike a
 real balance, can silently bottom out at zero.
 -/
 def run (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
+  -- StakingRouter.deposit (StakingRouter.sol:942-997)
+  -- StakingRouter.sol:946  if (stateConfig.status != StakingModuleStatus.Active) revert StakingModuleNotActive();
   if inp.moduleActive = false then
     .revertStakingModuleNotActive
+  -- StakingRouter.sol:956  stakingModuleDepositableEthAmount / MAX_EFFECTIVE_BALANCE_WC_TYPE_01  (Panic(0x12) on zero divisor)
   else if cfg.maxEBType1 = 0 then
     .revertMaxDepositsDivisionByZero
+  -- StakingRouter.sol:959  if (maxDepositsCount == 0) revert ZeroDeposits();
   else if maxDepositsCount cfg inp = 0 then
     .revertZeroDeposits
+  -- StakingRouter.sol:966  publicKeysBatch.length % PUBKEY_LENGTH  (Panic(0x12) on zero modulus)
   else if cfg.pubkeyLength = 0 then
     .revertPubkeyModuloByZero
+  -- StakingRouter.sol:966  if (publicKeysBatch.length % PUBKEY_LENGTH != 0) revert WrongPubkeyLength();
   else if inp.publicKeysBatchLength % cfg.pubkeyLength ≠ 0 then
     .revertWrongPubkeyLength
+  -- StakingRouter.sol:969  if (actualDepositsCount > maxDepositsCount) revert ModuleReturnExceedTarget();
   else if maxDepositsCount cfg inp < actualDepositsCount cfg inp then
     .revertModuleReturnExceedTarget
+  -- StakingRouter.sol:976  _updateModuleLastDepositState(_stakingModuleId, depositsValue);  (committed before the return)
+  -- StakingRouter.sol:978  if (actualDepositsCount == 0) return;
   else if actualDepositsCount cfg inp = 0 then
     .committedNoDeposits
+  -- StakingRouter.sol:983  LIDO.withdrawDepositableEther(depositsValue, actualDepositsCount);
+  -- Lido.withdrawDepositableEther (Lido.sol:869-886)
+  -- Lido.sol:870  require(canDeposit(), "CAN_NOT_DEPOSIT");
   else if inp.lidoCanDeposit = false then
     .revertLidoCannotDeposit
+  -- Lido.sol:872  _auth(address(stakingRouter));  (not modelled, caller is the router)
+  -- Lido.sol:873  require(_amount != 0, "ZERO_AMOUNT");
   else if depositsValue cfg inp = 0 then
     .revertLidoZeroAmount
+  -- Lido._spendDepositableEther (Lido.sol:839-859), reached from Lido.sol:875
+  -- Lido.sol:842  require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER");
   else if inp.lidoDepositableEther < depositsValue cfg inp then
     .revertLidoNotEnoughEther
+  -- Lido.sol:885  stakingRouter.receiveDepositableEther.value(_amount)();  (the pull, `Outcome.pulled`)
+  -- BeaconChainDepositor.makeBeaconChainDeposits32ETH (BeaconChainDepositor.sol:36-64), reached from StakingRouter.sol:985
+  -- BeaconChainDepositor.sol:43-45  if (_publicKeysBatch.length != PUBLIC_KEY_LENGTH * _keysCount) revert InvalidPublicKeysBatchLength(...);
   else if inp.publicKeysBatchLength ≠ cfg.publicKeyLength * actualDepositsCount cfg inp then
     .revertInvalidPublicKeysBatchLength
+  -- BeaconChainDepositor.sol:46-48  if (_signaturesBatch.length != SIGNATURE_LENGTH * _keysCount) revert InvalidSignaturesBatchLength(...);
   else if inp.signaturesBatchLength ≠ cfg.signatureLength * actualDepositsCount cfg inp then
     .revertInvalidSignaturesBatchLength
+  -- BeaconChainDepositor.sol:53-63  the value loop; a transfer the router cannot fund reverts (EVM, not a source guard)
   else if inp.routerBalanceBefore + depositsValue cfg inp < pushedValue cfg inp then
     .revertInsufficientRouterBalance
+  -- StakingRouter.deposit, epilogue
+  -- StakingRouter.sol:996  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);  (as pull = push, see docstring)
   else if depositsValue cfg inp ≠ pushedValue cfg inp then
     .revertAssertBalanceUnchanged
   else
@@ -526,7 +590,7 @@ theorem reverting_moves_no_ether {o : Outcome} (h : o.reverts = true) :
     o.pulled = 0 ∧ o.pushed = 0 := by
   cases o <;> simp_all [Outcome.reverts, Outcome.pulled, Outcome.pushed]
 
-/-! ## The line 996 assert is the conservation load-bearer
+/-! ## Kill-line mutants (not source): the line 996 assert is the conservation load-bearer
 
 `mutantRun` is the pinned `run` with exactly one branch removed: the line 996
 `assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits)` guard
@@ -543,6 +607,7 @@ this mutant lives in `LidoSRv3.Tests.DepositVectors`
 deployment whose pull scale differs from `DEPOSIT_SIZE` commits the mismatched
 push instead of reverting. -/
 def mutantRun (cfg : SourceDepositConfig) (inp : SourceDepositInput) : Outcome :=
+  -- Same branches as `run` (see its annotations) minus the StakingRouter.sol:996 assert.
   if inp.moduleActive = false then
     .revertStakingModuleNotActive
   else if cfg.maxEBType1 = 0 then

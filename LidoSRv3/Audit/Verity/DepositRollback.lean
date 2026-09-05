@@ -6,7 +6,7 @@ import Verity.Core.Model.DenoteExternalCalls
 /-!
 # P-DEPOSIT-1: source-shaped deposit prefix scaffold (OPEN)
 
-Pinned source: `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+Pinned source: `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 This artifact deliberately does **not** claim an end-to-end deposit model.  It
 uses Verity's official contract-separated storage identities for the router,

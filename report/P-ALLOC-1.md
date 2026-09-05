@@ -37,13 +37,13 @@ published status cell depends on them, and no fidelity gap is closed by them.
 | Theorem (`LidoSRv3.Audit.Guarantees.PAlloc1.`) | Line | Plane | Registered | Role |
 | --- | --- | --- | --- | --- |
 | `checked_execute` | 103 | Abstract | REGISTERED as `abstract.theorem` | Wave 2 parent. Under `CheckedBounds` the source-shaped executor succeeds and its capacity column equals `MathView.capacities`. Killed by `AllocationTxMutants.capacity_target_kill_line_refutes_parent`. |
-| `verity_tx_simulates_allocation_count_from_storage` | 160 | Verity | REGISTERED as `verity.theorem` | Storage-backed live-summary transaction closure: 32-capped stored module count, packed `ModuleStateConfig`, mapped `getStakingModuleSummary` staticcall, WC02 `getTotalModuleStake()` staticcall, `observe` equals `sourceView`. |
+| `verity_tx_simulates_allocation_count_from_storage` | 161 | Verity | REGISTERED as `verity.theorem` | Storage-backed live-summary transaction closure: 32-capped stored module count, packed `ModuleStateConfig`, mapped `getStakingModuleSummary` staticcall, WC02 `getTotalModuleStake()` staticcall, `observe` equals `sourceView`. |
 | `active_capacity_bounded` | 69 | Abstract | unregistered | `MathView`-definitional child. `Nat.min_le_left` / `Nat.min_le_right` on a definition that already is a clamp (issue 1). Deliberately demoted out of the parent so a kill-line can exist. |
 | `source_capacities_match_canonical` | 80 | Abstract | unregistered | The statement `checked_execute` restates under the public parent name. Same proof term; kept separately so the SOURCE-refinement name stays citable. |
 | `router_order_preserved` | 112 | Abstract | unregistered | Structural list-map identity: a successful execute retains router index order. Says nothing about capacity values. |
 | `source_capacities_and_mapped_summary_transaction` | 121 | Abstract and Verity (composite) | unregistered | Conjoins `source_capacities_match_canonical` with the bounded Phase-3 `mappedSummaryTransaction` slice. Its Verity conjunct is the stub-adversary Phase-3 call, not the registered live-summary path (issue 4). |
 | `verity_tx_simulates_allocation` | 138 | Verity | unregistered | Legacy free-`count` sibling. `count` is a harness argument and summary fields are planted, which is exactly what the registered theorem closes (issues 13, 15, 19). |
-| `verity_tx_revert_restores_snapshot` | 184 | Verity | unregistered | Every revert of `allocate`, including the injected post-write failure, restores the pre-call snapshot. |
+| `verity_tx_revert_restores_snapshot` | 178 | Verity | unregistered | Every revert of `allocate`, including the injected post-write failure, restores the pre-call snapshot. |
 
 Cited outside this module: `LidoSRv3.Audit.Verity.AllocationTx.bindLiveOne_decodes_summary`
 (one-call ABI bridge, unregistered),
@@ -57,7 +57,7 @@ Assumptions: `A-SOURCE-SHAPED`, `A-VERITY-SCAFFOLD`.
 
 ## Intent
 
-Lido SRv3’s `StakingRouter` decides how many new deposits (or top-ups) each staking module may receive. The live function is `SRLib._getModulesAllocationAndCapacity` (`lidofinance/core@af095e48`, lines 493–559), exposed as `StakingRouter.getDepositAllocations`. For every module it (1) reads `moduleId → moduleAddress` and calls the module’s `getStakingModuleSummary`, (2) computes a current allocation (active-validator count, or `ceil(stake / maxEBType1)` for type-2 / compounding modules), (3) sums those into a new network-wide validator total, then (4) sets each *active* module’s capacity to `min(share-limit target, available headroom)`.
+Lido SRv3’s `StakingRouter` decides how many new deposits (or top-ups) each staking module may receive. The live function is `SRLib._getModulesAllocationAndCapacity` (`lidofinance/core@17005714`, lines 493–559), exposed as `StakingRouter.getDepositAllocations`. For every module it (1) reads `moduleId → moduleAddress` and calls the module’s `getStakingModuleSummary`, (2) computes a current allocation (active-validator count, or `ceil(stake / maxEBType1)` for type-2 / compounding modules), (3) sums those into a new network-wide validator total, then (4) sets each *active* module’s capacity to `min(share-limit target, available headroom)`.
 
 The registered guarantee (`checked_execute`) is an execute↔MathView capacity-column correspondence: under the named checked-arithmetic bounds (`CheckedBounds`), the source-shaped executor succeeds and its capacity column equals the independent `MathView` model’s, row for row. The earlier headline — an active module cannot be given more capacity than its stake-share target *or* its available depositable/top-up headroom, the router’s anti-concentration / anti-over-allocation bound — is now the unregistered child `active_capacity_bounded`, a `Nat.min` tautology on the `MathView.capacity` definition (issue 1), not the registered claim.
 

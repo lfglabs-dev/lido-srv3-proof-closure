@@ -17,9 +17,9 @@
       "name": "LidoSRv3.Audit.Guarantees.PReserve1.source_spend_preserves_withdrawal_reserve",
       "module": "LidoSRv3.Audit.Guarantees.PReserve1",
       "file": "LidoSRv3/Audit/Guarantees/PReserve1.lean",
-      "start_line": 57,
-      "end_line": 64,
-      "doc": "/-- Registered Wave 1 parent for P-RESERVE-1. Strengthened along the three\naxes `report/P-RESERVE-1.md` calls out (issues #1, #2, #5):\n\n* the premise is `modelWithdrawDepositableEther`, the full wrapper\n  transition that enforces `canDeposit`/`authorizedRouter`\n  (`scopedWithdrawGuards`) and the `amount ≠ 0` (`ZERO_AMOUNT`) guard before\n  ever reaching `_spendDepositableEther`, not the bare internal spend helper\n  the original theorem quoted. The conclusion now *proves*\n  `scopedWithdrawGuards inputs` and `amount ≠ 0`, rather than assuming them: a\n  guard failure reverts, so it can never reach the `.committed` branch this\n  theorem is about;\n* the conclusion adds `liveEffectiveWithdrawalsReserve after live =\n  liveEffectiveWithdrawalsReserve before live`, the *effective*, min-capped,\n  queue-facing reserve computed against an explicit `live` value standing in\n  for a `WithdrawalQueue.unfinalizedStETH()` CALL — not merely the restated\n  `storedDepositsReserve` field that `withdrawalPartitionSpendInvariant`\n  quotes;\n* that added conjunct needs `freshQueueCache before live`, naming the\n  cache-freshness the original theorem left implicit. Drop that hypothesis\n  and the identical spend from `depositsReserve + unreserved` can still raid\n  the live reserve — see `staleQueueCacheKillLine_holds` and\n  `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample` for\n  the concrete premise-necessity witness (it refutes the freshness-dropped\n  sibling claim, i.e. shows the hypothesis cannot be removed; it does not\n  refute this parent, which cannot be instantiated on that stale-cache\n  vector).\n\nThe parent kill-lines, one per conjunct group, each the negation of this\ntheorem's full predicate shape — all five binders, `freshQueueCache`\nhypothesis retained, same three-conjunct conclusion — applied to a mutant of\n`modelWithdrawDepositableEther`:\n\n* `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` kills\n  conjunct (1) (`scopedWithdrawGuards` guard liveness): the mutant\n  `mutantWithdrawNoCanDeposit` deletes only the `canDeposit` check, so on the\n  witness (`canDeposit = false`, `authorizedRouter = true`, nonzero amount,\n  fresh cache) the mutated call commits while the first conjunct is false.\n* `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`\n  kills conjuncts (2)-(3): the mutant `mutantWithdraw` keeps every guard and\n  mutates the spend transition (`withdrawalPartitionMutant` commits the\n  spend, then overwrites `buffered` with the post-spend\n  `storedDepositsReserve`). On the witness vector the mutated call commits\n  under a fresh cache while the live queue-facing reserve drops 50 → 0.\n\nThe original `withdrawalPartitionSpendInvariant` conjunct is retained so\nexisting consumers of this theorem name keep their evidence. -/",
+      "start_line": 62,
+      "end_line": 69,
+      "doc": "/-- **P-RESERVE-1, source plane.** Under a fresh withdrawal-queue cache, any\ncommitted `withdrawDepositableEther` spend passed the scoped guards, spent a\nnonzero amount, took it from the depositable partitions only, and left the live\nqueue-facing withdrawals reserve unchanged.\n\nRegistered Wave 1 parent for P-RESERVE-1. Strengthened along the three\naxes `report/P-RESERVE-1.md` calls out (issues #1, #2, #5):\n\n* the premise is `modelWithdrawDepositableEther`, the full wrapper\n  transition that enforces `canDeposit`/`authorizedRouter`\n  (`scopedWithdrawGuards`) and the `amount ≠ 0` (`ZERO_AMOUNT`) guard before\n  ever reaching `_spendDepositableEther`, not the bare internal spend helper\n  the original theorem quoted. The conclusion now *proves*\n  `scopedWithdrawGuards inputs` and `amount ≠ 0`, rather than assuming them: a\n  guard failure reverts, so it can never reach the `.committed` branch this\n  theorem is about;\n* the conclusion adds `liveEffectiveWithdrawalsReserve after live =\n  liveEffectiveWithdrawalsReserve before live`, the *effective*, min-capped,\n  queue-facing reserve computed against an explicit `live` value standing in\n  for a `WithdrawalQueue.unfinalizedStETH()` CALL — not merely the restated\n  `storedDepositsReserve` field that `withdrawalPartitionSpendInvariant`\n  quotes;\n* that added conjunct needs `freshQueueCache before live`, naming the\n  cache-freshness the original theorem left implicit. Drop that hypothesis\n  and the identical spend from `depositsReserve + unreserved` can still raid\n  the live reserve — see `staleQueueCacheKillLine_holds` and\n  `LidoSRv3.Tests.ReserveMutants.stale_queue_cache_mutant_counterexample` for\n  the concrete premise-necessity witness (it refutes the freshness-dropped\n  sibling claim, i.e. shows the hypothesis cannot be removed; it does not\n  refute this parent, which cannot be instantiated on that stale-cache\n  vector).\n\nThe parent kill-lines, one per conjunct group, each the negation of this\ntheorem's full predicate shape — all five binders, `freshQueueCache`\nhypothesis retained, same three-conjunct conclusion — applied to a mutant of\n`modelWithdrawDepositableEther`:\n\n* `LidoSRv3.Tests.ReserveMutants.guard_drop_kill_line_refutes_parent` kills\n  conjunct (1) (`scopedWithdrawGuards` guard liveness): the mutant\n  `mutantWithdrawNoCanDeposit` deletes only the `canDeposit` check, so on the\n  witness (`canDeposit = false`, `authorizedRouter = true`, nonzero amount,\n  fresh cache) the mutated call commits while the first conjunct is false.\n* `LidoSRv3.Tests.ReserveMutants.partition_spend_mutant_kill_line_refutes_parent`\n  kills conjuncts (2)-(3): the mutant `mutantWithdraw` keeps every guard and\n  mutates the spend transition (`withdrawalPartitionMutant` commits the\n  spend, then overwrites `buffered` with the post-spend\n  `storedDepositsReserve`). On the witness vector the mutated call commits\n  under a fresh cache while the live queue-facing reserve drops 50 → 0.\n\nThe original `withdrawalPartitionSpendInvariant` conjunct is retained so\nexisting consumers of this theorem name keep their evidence. -/",
       "statement": "theorem source_spend_preserves_withdrawal_reserve\n    (inputs : WithdrawInputs) (before after : ReserveState) (amount live : Word)\n    (hfresh : freshQueueCache before live)\n    (h : modelWithdrawDepositableEther inputs before amount = .committed after) :\n    scopedWithdrawGuards inputs ∧\n      amount ≠ 0 ∧\n      withdrawalPartitionSpendInvariant before after amount ∧\n      liveEffectiveWithdrawalsReserve after live = liveEffectiveWithdrawalsReserve before live"
     },
     {
@@ -29,9 +29,9 @@
       "name": "LidoSRv3.Audit.Guarantees.PReserve1.verity_tx_simulates_reserve_spec",
       "module": "LidoSRv3.Audit.Guarantees.PReserve1",
       "file": "LidoSRv3/Audit/Guarantees/PReserve1.lean",
-      "start_line": 92,
-      "end_line": 98,
-      "doc": "/--\nFaithful VERITY_TX closure for P-RESERVE-1. This theorem starts with the actual\n`Verity.Contract.run` result of the source-shaped reserve spend and proves that\nits committed/reverted observable transition is the abstract reserve\ntransaction. In particular, every `safeAdd`/`safeSub` failure and\n`NOT_ENOUGH_ETHER` branch observes Verity's pre-call rollback state.\n\nThis is not an EVM theorem: storage-slot numbers are a model-local projection,\nand no Solidity compiler, Yul, runtime bytecode, proxy layout, deployed code,\nor external-call semantics is claimed.\n-/",
+      "start_line": 101,
+      "end_line": 107,
+      "doc": "/--\n**P-RESERVE-1, Verity plane.** The executable `withdrawWithGuards` observes the\nabstract reserve transaction `specTx`, and every revert restores the pre-call\nsnapshot.\n\nFaithful VERITY_TX closure for P-RESERVE-1. This theorem starts with the actual\n`Verity.Contract.run` result of the source-shaped reserve spend and proves that\nits committed/reverted observable transition is the abstract reserve\ntransaction. In particular, every `safeAdd`/`safeSub` failure and\n`NOT_ENOUGH_ETHER` branch observes Verity's pre-call rollback state.\n\nThis is not an EVM theorem: storage-slot numbers are a model-local projection,\nand no Solidity compiler, Yul, runtime bytecode, proxy layout, deployed code,\nor external-call semantics is claimed.\n-/",
       "statement": "theorem verity_tx_simulates_reserve_spec (inputs : WithdrawInputs)\n    (state : ContractState) (amount : Word) :\n    observeVerity state ((ReserveContract.withdrawWithGuards inputs amount).run state) =\n      specTx inputs (decode state) amount ∧\n    ∀ reason rollback,\n      (ReserveContract.withdrawWithGuards inputs amount).run state = .revert reason rollback →\n      rollback = state"
     }
   ],
@@ -62,6 +62,24 @@
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
       "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
   "fidelity": {
@@ -89,47 +107,47 @@
       "function": "_getBufferedEtherAllocation",
       "start_line": 605,
       "end_line": 616,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L605-L616"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L605-L616"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "getDepositableEther",
       "start_line": 823,
       "end_line": 825,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L823-L825"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L823-L825"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "_getDepositableEther",
       "start_line": 831,
       "end_line": 833,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L831-L833"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L831-L833"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "_spendDepositableEther",
       "start_line": 839,
       "end_line": 859,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L839-L859"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "withdrawDepositableEther",
       "start_line": 869,
       "end_line": 886,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L869-L886"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L869-L886"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

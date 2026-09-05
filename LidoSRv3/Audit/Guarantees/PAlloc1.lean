@@ -149,6 +149,7 @@ theorem verity_tx_simulates_allocation
   _root_.LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_pinned_source
     cfg modules depositsToAllocate isTopUp state hBind
 
+open LidoSRv3.Audit.Verity.AllocationTx in
 /-- Storage-backed P-ALLOC-1 live-summary transaction closure. The router
 module count is read from storage and capped at 32. `bindLiveAll` reads each
 packed `ModuleStateConfig`, executes the mapped summary staticcall, ABI-decodes
@@ -161,22 +162,15 @@ theorem verity_tx_simulates_allocation_count_from_storage
     (adversary :
       Compiler.CompilationModel.DenoteExternalCalls.AdversaryModel)
     (cfg : Config)
-    (modules : List _root_.LidoSRv3.Audit.Verity.AllocationTx.BoundModule)
+    (modules : List BoundModule)
     (depositsToAllocate : Verity.Uint256) (isTopUp : Bool)
     (state : Verity.ContractState)
-    (hLength : modules.length = min
-      (state.readSlot
-        _root_.LidoSRv3.Audit.Verity.AllocationTx.modulesCountSlot).val 32)
-    (hBind :
-      (_root_.LidoSRv3.Audit.Verity.AllocationTx.bindLiveAll
-        adversary state 0 modules.length) state =
-      .success modules state) :
-    _root_.LidoSRv3.Audit.Verity.AllocationTx.observe modules
-        ((_root_.LidoSRv3.Audit.Verity.AllocationTx.allocateLiveFromStorage
-          adversary cfg depositsToAllocate isTopUp).run state) =
-      _root_.LidoSRv3.Audit.Verity.AllocationTx.sourceView
-        cfg modules depositsToAllocate isTopUp :=
-  _root_.LidoSRv3.Audit.Verity.AllocationTx.verity_tx_simulates_live_summary_from_storage
+    (hLength : modules.length = min (state.readSlot modulesCountSlot).val 32)
+    (hBind : (bindLiveAll adversary state 0 modules.length) state = .success modules state) :
+    observe modules
+        ((allocateLiveFromStorage adversary cfg depositsToAllocate isTopUp).run state) =
+      sourceView cfg modules depositsToAllocate isTopUp :=
+  verity_tx_simulates_live_summary_from_storage
     adversary cfg modules depositsToAllocate isTopUp state hLength hBind
 
 /-- Every revert of the allocation transaction, including the injected

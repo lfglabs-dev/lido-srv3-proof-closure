@@ -5,7 +5,7 @@ import Verity.Stdlib.Math
 
 This module supplies the common narrow records, the checked source semantics of
 `SRLib._getModulesAllocationAndCapacity` at Lido core commit
-`af095e48bbc1c3841c2c9936219c8461af01056b`. Economic values are Verity
+`17005714f151e5502c559932319a3f2f74ac2436`. Economic values are Verity
 `Uint256` words. Every Solidity-checked `+`, `-`, and `*`, and every checked
 division, is represented by the corresponding Verity `safe*` operation.
 `Nat` is used only for list recursion and for the independent mathematical
@@ -21,7 +21,9 @@ open Verity.Stdlib.Math
 /-- `SRUtils.TOTAL_BASIS_POINTS` (`SRUtils.sol`, line 17). -/
 def totalBasisPoints : Uint256 := 10000
 
-/-- Values cached/read for one router-ordered module in source lines 509--529. -/
+/-- Values cached/read for one router-ordered module in `SRLib.sol:509-529`
+(`ModuleParamsCache` plus the `_getStakingModuleSummary` tuple, the accounting
+`exitedValidatorsCount` and the type-2 `getTotalModuleStake()` word). -/
 structure Module where
   moduleId : Uint256
   shareLimit : Uint256
@@ -34,6 +36,8 @@ structure Module where
   totalModuleStake : Uint256
   deriving DecidableEq, Repr
 
+/-- The two `Config` calldata fields read by `_getModulesAllocationAndCapacity`
+(`SRLib.sol:507` `_cfg.maxEBType1`, `SRLib.sol:537` `_cfg.maxEBType2`). -/
 structure Config where
   maxEBType1 : Uint256
   maxEBType2 : Uint256
@@ -51,8 +55,11 @@ structure Row where
 def wordMax (a b : Uint256) : Uint256 := if a ≤ b then b else a
 def wordMin (a b : Uint256) : Uint256 := if a ≤ b then a else b
 
-/-- Lines 521--522: Solidity checked subtraction after `Math.max`. -/
+/-! ## SRLib._getModulesAllocationAndCapacity (SRLib.sol:493-559), first loop -/
+
+/-- `SRLib.sol:521-522`: Solidity checked subtraction after `Math.max`. -/
 def activeCount? (m : Module) : Option Uint256 :=
+  -- SRLib.sol:521-522  uint256 validatorsCount = depositedValidatorsCount - Math.max(exitedValidatorsCount, moduleState.accounting.exitedValidatorsCount);
   safeSub m.depositedCount (wordMax m.summaryExitedCount m.accountingExitedCount)
 
 /-- OpenZeppelin `Math.ceilDiv`: division-by-zero reverts; its internal
@@ -60,45 +67,74 @@ def activeCount? (m : Module) : Option Uint256 :=
 def ceilDiv? (a b : Uint256) : Option Uint256 :=
   if b = 0 then none else some (ceilDiv a b)
 
-/-- Lines 527--531. -/
+/-- `SRLib.sol:521-531`: one iteration of the first loop after the summary
+call. Returns `(_allocations[i], cache[i].activeCount)`. -/
 def allocationEntry? (cfg : Config) (m : Module) : Option (Uint256 × Uint256) := do
+  -- SRLib.sol:521-525  uint256 validatorsCount = ...; cache[i].activeCount = validatorsCount;
   let active ← activeCount? m
+  -- SRLib.sol:527  if (WithdrawalCredentials.isType2(stateConfig.withdrawalCredentialsType)) {
+  -- SRLib.sol:529  validatorsCount = Math.ceilDiv(moduleId.getIStakingModuleV2().getTotalModuleStake(), maxEBType1);
+  -- SRLib.sol:531  _allocations[i] = validatorsCount;
   let allocation ← if m.isType2 then ceilDiv? m.totalModuleStake cfg.maxEBType1 else some active
   pure (allocation, active)
 
-/-- Lines 506--532, in router order. -/
+/-- `SRLib.sol:506-533`, in router order. The `Uint256` argument is
+`totalValidators`, seeded with `depositsToAllocate` (`SRLib.sol:506`) by the
+caller (`execute`). The `getModuleIdAt` / `getModuleState` / summary-call
+reads of `SRLib.sol:509-518` are the fields of `Module`; see
+`Verity.AllocationTx.bindLiveAll` for the live-call binding. -/
 def firstLoop (cfg : Config) : List Module → Uint256 → Option (List (Uint256 × Uint256) × Uint256)
+  -- SRLib.sol:508  for (uint256 i = 0; i < modulesCount; ++i) {  (loop exit)
   | [], total => some ([], total)
   | m :: ms, total => do
+      -- SRLib.sol:521-531  validatorsCount ... _allocations[i] = validatorsCount;
       let entry ← allocationEntry? cfg m
+      -- SRLib.sol:532  totalValidators += validatorsCount;
       let nextTotal ← safeAdd total entry.1
       let (entries, finalTotal) ← firstLoop cfg ms nextTotal
       pure (entry :: entries, finalTotal)
 
-/-- Lines 543--549. -/
+/-! ## SRLib._getModulesAllocationAndCapacity (SRLib.sol:534-558), second loop -/
+
+/-- `SRLib.sol:543-549`. `allocation` is `_allocations[i]`, `active` is
+`cache[i].activeCount`. -/
 def availableCapacity? (cfg : Config) (isTopUp : Bool) (m : Module)
     (allocation active : Uint256) : Option Uint256 :=
+  -- SRLib.sol:543  if (_isTopUp && WithdrawalCredentials.isType2(cache[i].wcType)) {
   if isTopUp && m.isType2 then do
+    -- SRLib.sol:546  validatorsCapacity = cache[i].activeCount * maxEBType2 / maxEBType1;
     let weiCapacity ← safeMul active cfg.maxEBType2
     safeDiv weiCapacity cfg.maxEBType1
   else
+    -- SRLib.sol:548  validatorsCapacity = _allocations[i] + cache[i].depositableCount;
     safeAdd allocation m.depositableCount
 
-/-- Lines 550--554. Multiplication is Solidity checked before division. -/
+/-- `SRLib.sol:552`. Multiplication is Solidity checked before division. -/
 def targetValidators? (total : Uint256) (m : Module) : Option Uint256 := do
+  -- SRLib.sol:552  uint256 targetValidators = (cache[i].shareLimit * totalValidators) / SRUtils.TOTAL_BASIS_POINTS;
   let numerator ← safeMul m.shareLimit total
   safeDiv numerator totalBasisPoints
 
-/-- Lines 539--558. Inactive modules retain their current allocation. -/
+/-- `SRLib.sol:539-558`. Inactive modules retain their current allocation
+(`SRLib.sol:541` is the only assignment they see). The `List (Uint256 × Uint256)`
+argument is the `(_allocations[i], cache[i].activeCount)` column produced by
+`firstLoop`; a length mismatch (impossible for `execute`) fails closed. -/
 def secondLoop (cfg : Config) (isTopUp : Bool) (total : Uint256) :
     List Module → List (Uint256 × Uint256) → Option (List Row)
+  -- SRLib.sol:539  for (uint256 i = 0; i < modulesCount; ++i) {  (loop exit)
   | [], [] => some []
   | m :: ms, entry :: entries => do
+      -- SRLib.sol:541  uint256 validatorsCapacity = _allocations[i];
       let (allocation, active) := entry
+      -- SRLib.sol:542  if (cache[i].status == StakingModuleStatus.Active) {
       if m.isActive then
+        -- SRLib.sol:543-549  validatorsCapacity = ... (top-up type-2 branch or allocation + depositable)
         let available ← availableCapacity? cfg isTopUp m allocation active
+        -- SRLib.sol:552  uint256 targetValidators = (cache[i].shareLimit * totalValidators) / TOTAL_BASIS_POINTS;
         let target ← targetValidators? total m
         let rows ← secondLoop cfg isTopUp total ms entries
+        -- SRLib.sol:554  validatorsCapacity = Math.min(targetValidators, validatorsCapacity);
+        -- SRLib.sol:557  _capacities[i] = validatorsCapacity;
         pure (({
           moduleId := m.moduleId
           currentAllocation := allocation
@@ -108,6 +144,7 @@ def secondLoop (cfg : Config) (isTopUp : Bool) (total : Uint256) :
         } : Row) :: rows)
       else
         let rows ← secondLoop cfg isTopUp total ms entries
+        -- SRLib.sol:557  _capacities[i] = validatorsCapacity;  (still `_allocations[i]`, line 541)
         pure (({
           moduleId := m.moduleId
           currentAllocation := allocation
@@ -117,12 +154,29 @@ def secondLoop (cfg : Config) (isTopUp : Bool) (total : Uint256) :
         } : Row) :: rows)
   | _, _ => none
 
-/-- Exact checked-`uint256` source semantics of lines 493--559.  This is not the
-independent Audit model; that model is `MathView.capacities` below. -/
+/-- `SRLib.sol:493-559 _getModulesAllocationAndCapacity(Config calldata _cfg, uint256 depositsToAllocate, bool _isTopUp)`
+returning `(_allocations, _capacities)`: exact checked-`uint256` source
+semantics. Each `Row` carries `_allocations[i]` as `currentAllocation` and
+`_capacities[i]` as `capacity`. This is not the independent Audit model; that
+model is `MathView.capacities` below.
+
+Not transcribed: `SRLib.sol:498-503` (`getModulesCount`, array and cache
+allocation: the `modules` list already has router length and order),
+`SRLib.sol:509-518` (storage reads and external summary call, supplied as
+`Module` fields).
+
+Added by the model: `Row.targetValidators` and `Row.activeCount` are kept as
+proof-relevant observations; Solidity only returns the two arrays. -/
 def execute (cfg : Config) (modules : List Module) (depositsToAllocate : Uint256)
     (isTopUp : Bool) : Option (List Row) := do
+  -- SRLib.sol:506  uint256 totalValidators = depositsToAllocate;
+  -- SRLib.sol:508-533  first loop
   let (entries, total) ← firstLoop cfg modules depositsToAllocate
+  -- SRLib.sol:539-558  second loop
   secondLoop cfg isTopUp total modules entries
+
+/-- Solidity-facing name, `SRLib.sol:493`. Proofs unfold `execute`. -/
+abbrev _getModulesAllocationAndCapacity := execute
 
 namespace MathView
 

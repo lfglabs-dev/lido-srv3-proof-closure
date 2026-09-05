@@ -11,6 +11,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = Path("audit/validation-receipt.txt")
 EXPECTED_BASE = "a57accb1e497894b22741bc243f79150eade8aef"
+P_ORACLE_SANITY_SCOPE = (
+    "- Scope registered. `P-ORACLE-SANITY-1` is registered as a **bounded**\n"
+    "  supplemental guarantee at `[.model]`."
+)
 
 
 def git(*args, env=None):
@@ -75,6 +79,14 @@ def main():
         raise SystemExit("validation receipt base is not the canonical predecessor")
     if fields.get("validation-subject") != "current tracked tree excluding this receipt":
         raise SystemExit("validation receipt subject semantics are missing or incompatible")
+    # This supplemental parent has model evidence only. Keep the rendered
+    # receipt tied to that bounded claim so it cannot advertise an unproved
+    # Verity-word source layer independently of the Lean registry.
+    if text.count(P_ORACLE_SANITY_SCOPE) != 1:
+        raise SystemExit(
+            "validation receipt must state P-ORACLE-SANITY-1's model-only "
+            "checked-layer coverage exactly once"
+        )
     actual = tracked_tree_excluding_receipt()
     if fields.get("validated-tree") != actual:
         raise SystemExit(

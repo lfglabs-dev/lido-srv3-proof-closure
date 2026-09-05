@@ -19,7 +19,7 @@ mapped to the record field a reader meets it on.
 
 | Lido input (source) | UX2 surface |
 | --- | --- |
-| The audited core-contract commit is `af095e48bbc1c3841c2c9936219c8461af01056b` (kickoff, 2026-07-13). | `index.json.pinned_source`; every `source_spans[].source_sha` and `permalink` is pinned to it. |
+| The audited core-contract commit is `17005714f151e5502c559932319a3f2f74ac2436` (merged v4.0.0 source pin). | `index.json.pinned_source`; every `source_spans[].source_sha` and `permalink` is pinned to it. |
 | Eleven guarantees were agreed with Lido as the scope (report methodology). | Exactly the eleven canonical rows produce a record, in registry order (`position`); `check` fails on any other set. |
 | Assumption-map questions raised at kickoff: deposits reserve, withdrawal processing, SDVT upgrades, oracle quorum (2026-07-16). | `assumptions[]` carries the registry's accepted-risk text per row; `fidelity.missing` names the surfaces a theorem does not cover (for example the live `unfinalizedStETH` call on P-RESERVE-1 and oracle-report truth on P-ACCOUNT-1). |
 | Proofs are about a model, not a deployment; `CHECKED` means the named theorem builds (UX1, README headline). | `boundary.model_not_deployment` is read from the README headline blockquote, which `scripts/audit_metadata.py` binds to the registry, so the count and the boundary sentences cannot drift. |

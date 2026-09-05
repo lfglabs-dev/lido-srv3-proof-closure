@@ -4,7 +4,7 @@ import Verity.Core
 # Pinned consolidation-request correspondence
 
 This is a source-shaped model of `lidofinance/core` at
-`af095e48bbc1c3841c2c9936219c8461af01056b`, specifically
+`17005714f151e5502c559932319a3f2f74ac2436`, specifically
 
 * `WithdrawalVault.addConsolidationRequests`, lines 199--208;
 * `WithdrawalVaultEIP7685._addConsolidationRequests`, lines 56--73;
@@ -19,6 +19,20 @@ vault entrypoint: gateway authorization, nonempty equal-length arrays, exact
 successful CALL. Gateway grouping, quota, SSZ witnesses, and refunds are
 outside this slice. No Yul, EVM, runtime-bytecode, or cryptographic claim is
 made.
+
+## Name correspondence (Solidity to Lean)
+
+| Solidity                                   | Lean                          |
+|--------------------------------------------|-------------------------------|
+| `sourcePubkeys` / `targetPubkeys`          | `Inputs.sources` / `Inputs.targets` (aliases `sourcePubkeys` / `targetPubkeys`) |
+| `sourcePubkeys[i].length`                  | `Inputs.sourceLens[i]`, `Request.sourceLen` |
+| `msg.sender`                               | `Inputs.caller` (alias `msgSender`) |
+| `CONSOLIDATION_GATEWAY` (immutable)        | `Inputs.gateway` (alias `CONSOLIDATION_GATEWAY`) |
+| `CONSOLIDATION_REQUEST` (immutable)        | `Inputs.requestTarget` (alias `CONSOLIDATION_REQUEST`) |
+| `fee` (per request, `_getConsolidationRequestFee()`) | `Inputs.fee` |
+| `requestsCount * fee` (`_requireExactFee` argument) | `requests.length * inputs.fee.val` |
+| `msg.value`                                | `Inputs.msgValue` |
+| `PUBLIC_KEY_LENGTH` (`WithdrawalVaultEIP7685.sol:20`) | `publicKeyBytes` (alias `PUBLIC_KEY_LENGTH`) |
 -/
 
 namespace LidoSRv3.Audit.SolidityConsolidation
@@ -27,7 +41,11 @@ open Verity
 
 abbrev Word := Verity.Core.Uint256
 
+/-- `WithdrawalVaultEIP7685.sol:20  uint256 internal constant PUBLIC_KEY_LENGTH = 48;` -/
 def publicKeyBytes : Word := Verity.Core.Uint256.ofNat 48
+
+/-- Solidity-facing name, `WithdrawalVaultEIP7685.sol:20`. -/
+abbrev PUBLIC_KEY_LENGTH := publicKeyBytes
 
 def consolidationRequestAddress : Nat :=
   0x0000BBdDc7CE488642fb579F8B00f3a590007251
@@ -42,24 +60,19 @@ structure Request where
   targetLen : Word
   deriving DecidableEq, Repr
 
+/-- `_validatePublicKey` (`WithdrawalVaultEIP7685.sol:97-101`) applied to
+both keys of one pair (`sourcePubkeys[i]`, `targetPubkeys[i]`, lines 69-70).
+-/
 def validRequest (request : Request) : Bool :=
+  -- WithdrawalVaultEIP7685.sol:98  if (pubkey.length != PUBLIC_KEY_LENGTH) {  [_validatePublicKey]
   request.sourceLen == publicKeyBytes && request.targetLen == publicKeyBytes
 
 /-- Word-level `source ‖ target` payload. Each key is identified by a word
-and independently required to be 48 bytes wide. -/
+and independently required to be 48 bytes wide.
+
+`WithdrawalVaultEIP7685.sol:114  bytes memory request = abi.encodePacked(sourcePubkey, targetPubkey);` -/
 def payload (request : Request) : List Word :=
   [request.source, request.target]
-
-/-- Swapped target then source payload; used only to prove packing order matters. -/
-def swappedPayload (request : Request) : List Word :=
-  [request.target, request.source]
-
-theorem payload_ne_swapped (request : Request) (h : request.source ≠ request.target) :
-    payload request ≠ swappedPayload request := by
-  unfold payload swappedPayload
-  intro heq
-  injection heq with h1 _
-  exact h h1
 
 structure CallObs where
   target : Word
@@ -85,18 +98,47 @@ inductive SourceOutcome where
   | committed (obs : Observables)
   deriving DecidableEq, Repr
 
+/-- Frame inputs of `WithdrawalVault.addConsolidationRequests`: the two
+calldata arrays (as words plus their byte lengths), the frame's `msg.sender`
+and `msg.value`, the two constructor immutables, and the per-request fee
+that the (untranscribed) STATICCALL `_getConsolidationRequestFee` returns. -/
 structure Inputs where
+  /-- `msg.sender` -/
   caller : Word
+  /-- `CONSOLIDATION_GATEWAY` immutable -/
   gateway : Word
+  /-- `CONSOLIDATION_REQUEST` immutable -/
   requestTarget : Word
+  /-- `fee` (per request), result of `_getConsolidationRequestFee()` line 65 -/
   fee : Word
+  /-- `msg.value` -/
   msgValue : Word
+  /-- `sourcePubkeys` (one word per key) -/
   sources : List Word
+  /-- `targetPubkeys` (one word per key) -/
   targets : List Word
+  /-- `sourcePubkeys[i].length` -/
   sourceLens : List Word
+  /-- `targetPubkeys[i].length` -/
   targetLens : List Word
   deriving DecidableEq, Repr
 
+/-- Solidity-facing name, `WithdrawalVault.sol:200 bytes[] calldata sourcePubkeys`. -/
+abbrev Inputs.sourcePubkeys (i : Inputs) := i.sources
+/-- Solidity-facing name, `WithdrawalVault.sol:201 bytes[] calldata targetPubkeys`. -/
+abbrev Inputs.targetPubkeys (i : Inputs) := i.targets
+/-- Solidity-facing name, `msg.sender` (`WithdrawalVault.sol:203`). -/
+abbrev Inputs.msgSender (i : Inputs) := i.caller
+/-- Solidity-facing name, immutable `CONSOLIDATION_GATEWAY` (`WithdrawalVault.sol:203`). -/
+abbrev Inputs.CONSOLIDATION_GATEWAY (i : Inputs) := i.gateway
+/-- Solidity-facing name, immutable `CONSOLIDATION_REQUEST` (`WithdrawalVaultEIP7685.sol:115`). -/
+abbrev Inputs.CONSOLIDATION_REQUEST (i : Inputs) := i.requestTarget
+
+/-- Added by the model: turns the four parallel arrays into one `Request` per
+index. Solidity indexes `sourcePubkeys[i]` / `targetPubkeys[i]` directly
+(lines 69-71); the `none` arm is the `ArraysLengthMismatch` condition of
+lines 62-63 (the two length arrays are model bookkeeping and always match
+their key arrays in a decoded frame). -/
 def zipRequests (sources targets sourceLens targetLens : List Word) :
     Option (List Request) :=
   if sources.length = targets.length ∧
@@ -123,24 +165,19 @@ theorem zipRequests_some_length {sources targets sourceLens targetLens : List Wo
       simp [List.length_zip, h1, h2, h3]
   · cases h
 
+/-- `WithdrawalVaultEIP7685.sol:115  (bool success,) = CONSOLIDATION_REQUEST.call{value: fee}(request);`
+(the CALL as a journal observation; its `success` bool is not transcribed). -/
 def requestCall (target fee : Word) (request : Request) : CallObs :=
   { target := target, value := fee, input := payload request }
 
+/-- `WithdrawalVaultEIP7685.sol:120  emit ConsolidationRequestAdded(request);` -/
 def requestEvent (request : Request) : EventObs :=
   { topic := Verity.Core.Uint256.ofNat consolidationRequestAddedTopic
     payload := payload request }
 
-def swappedRequestCall (target fee : Word) (request : Request) : CallObs :=
-  { target := target, value := fee, input := swappedPayload request }
-
-def swappedCommitObservables (target fee msgValue : Word) (requests : List Request) :
-    Observables :=
-  { calls := requests.map (swappedRequestCall target fee)
-    events := requests.map requestEvent
-    payloads := requests.map swappedPayload
-    requestCount := requests.length
-    feePaid := msgValue }
-
+/-- Observables of the loop `WithdrawalVaultEIP7685.sol:68-72` on a committed
+run: one CALL and one event per pair, in source order. `payloads`,
+`requestCount`, `feePaid` are added by the model (observation record). -/
 def commitObservables (target fee msgValue : Word) (requests : List Request) :
     Observables :=
   { calls := requests.map (requestCall target fee)
@@ -148,70 +185,6 @@ def commitObservables (target fee msgValue : Word) (requests : List Request) :
     payloads := requests.map payload
     requestCount := requests.length
     feePaid := msgValue }
-
-theorem commitObservables_ne_swapped (target fee msgValue : Word)
-    (requests : List Request)
-    (hne : requests.length = 1)
-    (hdist : ∀ r ∈ requests, r.source ≠ r.target) :
-    commitObservables target fee msgValue requests ≠
-      swappedCommitObservables target fee msgValue requests := by
-  obtain ⟨r, hr⟩ := List.length_eq_one_iff.mp hne
-  subst hr
-  intro heq
-  have hcalls := congrArg Observables.calls heq
-  simp only [commitObservables, swappedCommitObservables, requestCall, swappedRequestCall,
-    List.map_cons, List.map_nil] at hcalls
-  injection hcalls with hcall _
-  injection hcall with _ _ hinput
-  exact payload_ne_swapped r (hdist r List.mem_cons_self) hinput
-
-/-- Independent pinned-source interpreter. It does not call the Verity
-transaction or any shared execution helper besides the constructors above. -/
-def sourceRun (inputs : Inputs) : SourceOutcome :=
-  if inputs.caller == inputs.gateway then
-    if inputs.sources.length == 0 then
-      .reverted "ZeroArgument(sourcePubkeys)"
-    else
-      match zipRequests inputs.sources inputs.targets
-          inputs.sourceLens inputs.targetLens with
-      | none => .reverted "ArraysLengthMismatch"
-      | some requests =>
-          if requests.all validRequest then
-            if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
-              if inputs.msgValue.val == requests.length * inputs.fee.val then
-                .committed (commitObservables inputs.requestTarget inputs.fee
-                  inputs.msgValue requests)
-              else .reverted "IncorrectFee"
-            else .reverted "Panic(0x11): checked multiplication overflow"
-          else .reverted "InvalidPublicKeyLength"
-  else .reverted "NotConsolidationGateway"
-
-/-- **Model mutant: exact-fee guard dropped.** Identical to `sourceRun`
-except the pinned `_requireExactFee` check (`inputs.msgValue.val ==
-requests.length * inputs.fee.val`, `WithdrawalVaultEIP7685` 123--127) is
-removed, so a gateway-authorized, nonempty, 48-byte-aligned batch commits
-even when `msg.value` does not equal `count * fee` -- in particular a
-`fee = 0` batch with nonzero `msg.value`, which still satisfies the
-registered parent's `hGatewayAdmittedNonzero` premise. This mutant exists
-only so that `fee_blind_commit_kill_line_refutes_parent` can refute the
-registered parent's hypothesis-conditioned committed-arm conjunction on a
-mutant of its own model; it is never the model of record. -/
-def sourceRunFeeBlind (inputs : Inputs) : SourceOutcome :=
-  if inputs.caller == inputs.gateway then
-    if inputs.sources.length == 0 then
-      .reverted "ZeroArgument(sourcePubkeys)"
-    else
-      match zipRequests inputs.sources inputs.targets
-          inputs.sourceLens inputs.targetLens with
-      | none => .reverted "ArraysLengthMismatch"
-      | some requests =>
-          if requests.all validRequest then
-            if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
-              .committed (commitObservables inputs.requestTarget inputs.fee
-                inputs.msgValue requests)
-            else .reverted "Panic(0x11): checked multiplication overflow"
-          else .reverted "InvalidPublicKeyLength"
-  else .reverted "NotConsolidationGateway"
 
 theorem commitObservables_binds (target fee msgValue : Word)
     (requests : List Request) :
@@ -225,6 +198,64 @@ theorem commitObservables_binds (target fee msgValue : Word)
       obs.events.map (·.payload) = requests.map payload := by
   simp [commitObservables, requestCall, requestEvent, payload]
 
+/-! ## WithdrawalVault.addConsolidationRequests (WithdrawalVault.sol:199-208) -/
+
+/-- `WithdrawalVault.sol:199-208 addConsolidationRequests(bytes[] calldata sourcePubkeys, bytes[] calldata targetPubkeys)`,
+inlining `WithdrawalVaultEIP7685._addConsolidationRequests` (56-73),
+`_requireExactFee` (123-127), `_validatePublicKey` (97-101) and
+`_callAddConsolidationRequest` (113-121).
+
+Not transcribed:
+* the `preservesEthBalance` modifier (`WithdrawalVault.sol:81-85`, applied at
+  line 202): proved on the executed plane by
+  `ConsolidationTx.committed_preserves_eth_balance`;
+* the STATICCALL fee read `_getConsolidationRequestFee()` (line 65,
+  `_getFeeFromContract` 83-95): `fee` is an input of the model;
+* CALL success/failure at line 115-118 (`RequestAdditionFailed`): every
+  journaled CALL is a `.success` frame;
+* the constructor nonzero-address guards.
+
+Added by the model: `zipRequests` (parallel arrays to pairs), the
+`SourceOutcome` / `Observables` record, and the revert reason strings.
+
+Ordering note: `_validatePublicKey` runs inside the loop (lines 69-70),
+after `_requireExactFee` (line 66); the model hoists the whole-batch key
+validation before the fee guard. Both guards are pure and the first failing
+one reverts the frame either way, so the committed arm is unchanged; only
+the revert reason of a batch that fails both guards differs
+(`InvalidPublicKeyLength` here, `IncorrectFee` in Solidity).
+
+Independent pinned-source interpreter. It does not call the Verity
+transaction or any shared execution helper besides the constructors above. -/
+def sourceRun (inputs : Inputs) : SourceOutcome :=
+  -- WithdrawalVault.sol:203  if (msg.sender != CONSOLIDATION_GATEWAY) {
+  if inputs.caller == inputs.gateway then
+    -- WithdrawalVaultEIP7685.sol:60-61  uint256 requestsCount = sourcePubkeys.length; if (requestsCount == 0) revert ZeroArgument("sourcePubkeys");  [_addConsolidationRequests]
+    if inputs.sources.length == 0 then
+      .reverted "ZeroArgument(sourcePubkeys)"
+    else
+      -- WithdrawalVaultEIP7685.sol:62-63  if (requestsCount != targetPubkeys.length) revert ArraysLengthMismatch(...)  [_addConsolidationRequests]
+      match zipRequests inputs.sources inputs.targets
+          inputs.sourceLens inputs.targetLens with
+      | none => .reverted "ArraysLengthMismatch"
+      | some requests =>
+          -- WithdrawalVaultEIP7685.sol:98  if (pubkey.length != PUBLIC_KEY_LENGTH) revert InvalidPublicKeyLength(pubkey);  [_validatePublicKey, loop 69-70; hoisted before the fee guard]
+          if requests.all validRequest then
+            -- WithdrawalVaultEIP7685.sol:66  _requireExactFee(requestsCount * fee);  (Solidity 0.8 checked multiply, Panic 0x11)
+            if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
+              -- WithdrawalVaultEIP7685.sol:124  if (requiredFee != msg.value) revert IncorrectFee(requiredFee, msg.value);  [_requireExactFee]
+              if inputs.msgValue.val == requests.length * inputs.fee.val then
+                -- WithdrawalVaultEIP7685.sol:71  _callAddConsolidationRequest(sourcePubkeys[i], targetPubkeys[i], fee);  (loop 68-72; CALL 115 + emit 120 per pair)
+                .committed (commitObservables inputs.requestTarget inputs.fee
+                  inputs.msgValue requests)
+              else .reverted "IncorrectFee"
+            else .reverted "Panic(0x11): checked multiplication overflow"
+          else .reverted "InvalidPublicKeyLength"
+  -- WithdrawalVault.sol:204  revert NotConsolidationGateway();
+  else .reverted "NotConsolidationGateway"
+
+/-- Solidity-facing name, `WithdrawalVault.sol:199`. -/
+abbrev addConsolidationRequests := sourceRun
 /-- A committed source run binds one CALL and one event per pair, pays exactly
 `msg.value`, and records `source ‖ target` as the memory payload. A revert
 exposes no prefix of those effects.
@@ -320,6 +351,96 @@ theorem source_consolidation_preserves_eligibility_value_atomicity
     rcases hok with ⟨hEq, hPos, requests, hZip, hValid, hBound, hFee⟩
     unfold sourceRun at hrev
     simp [hEq, hPos, hZip, hValid, hBound, hFee, beq_iff_eq] at hrev
+
+/-! ## Not transcribed: ConsolidationBus.sol:325-370 and ConsolidationGateway.sol:185-223
+
+The Bus publish path (`ConsolidationBus.addConsolidationRequests`, lines
+325-370: grouping, batch hash, pending-batch lifecycle) and the Gateway
+entrypoint (`ConsolidationGateway.addConsolidationRequests`, lines 185-223:
+role, quota, SSZ witnesses, fee/refund split, `_prepareConsolidationPairs`)
+are not part of this model. They enter only through the caller-supplied
+`hGatewayAdmittedNonzero` premise below: `ConsolidationGateway.sol:189`
+`if (msg.value == 0) revert ZeroArgument("msg.value");` guarantees that any
+frame reaching the vault with `msg.sender == CONSOLIDATION_GATEWAY` carries a
+nonzero `msg.value`. -/
+
+/-! ## Kill-line mutants (not source)
+
+Nothing below is a transcription. `sourceRunFeeBlind` drops one guard of
+`sourceRun`; the `swapped*` definitions reverse the packing order of
+`abi.encodePacked(sourcePubkey, targetPubkey)`; the witnesses are concrete
+batches used by the kill-line theorems. -/
+
+/-- **Model mutant: exact-fee guard dropped.** Identical to `sourceRun`
+except the pinned `_requireExactFee` check (`inputs.msgValue.val ==
+requests.length * inputs.fee.val`, `WithdrawalVaultEIP7685` 123--127) is
+removed, so a gateway-authorized, nonempty, 48-byte-aligned batch commits
+even when `msg.value` does not equal `count * fee` -- in particular a
+`fee = 0` batch with nonzero `msg.value`, which still satisfies the
+registered parent's `hGatewayAdmittedNonzero` premise. This mutant exists
+only so that `fee_blind_commit_kill_line_refutes_parent` can refute the
+registered parent's hypothesis-conditioned committed-arm conjunction on a
+mutant of its own model; it is never the model of record. -/
+def sourceRunFeeBlind (inputs : Inputs) : SourceOutcome :=
+  if inputs.caller == inputs.gateway then
+    if inputs.sources.length == 0 then
+      .reverted "ZeroArgument(sourcePubkeys)"
+    else
+      match zipRequests inputs.sources inputs.targets
+          inputs.sourceLens inputs.targetLens with
+      | none => .reverted "ArraysLengthMismatch"
+      | some requests =>
+          if requests.all validRequest then
+            if (requests.length * inputs.fee.val ≤ Verity.Core.MAX_UINT256 : Bool) then
+              .committed (commitObservables inputs.requestTarget inputs.fee
+                inputs.msgValue requests)
+            else .reverted "Panic(0x11): checked multiplication overflow"
+          else .reverted "InvalidPublicKeyLength"
+  else .reverted "NotConsolidationGateway"
+
+/-- Swapped target then source payload; used only to prove packing order matters.
+Mutant of `payload`, i.e. of `abi.encodePacked(sourcePubkey, targetPubkey)`
+(`WithdrawalVaultEIP7685.sol:114`) with the two operands reversed. -/
+def swappedPayload (request : Request) : List Word :=
+  [request.target, request.source]
+
+/-- Packing order is observable: `abi.encodePacked(sourcePubkey, targetPubkey)`
+(`WithdrawalVaultEIP7685.sol:114`) and its operand-swapped mutant produce
+different request bytes whenever the two keys differ. This is the
+packing-order kill-line's core fact. -/
+theorem payload_ne_swapped (request : Request) (h : request.source ≠ request.target) :
+    payload request ≠ swappedPayload request := by
+  unfold payload swappedPayload
+  intro heq
+  injection heq with h1 _
+  exact h h1
+
+def swappedRequestCall (target fee : Word) (request : Request) : CallObs :=
+  { target := target, value := fee, input := swappedPayload request }
+
+def swappedCommitObservables (target fee msgValue : Word) (requests : List Request) :
+    Observables :=
+  { calls := requests.map (swappedRequestCall target fee)
+    events := requests.map requestEvent
+    payloads := requests.map swappedPayload
+    requestCount := requests.length
+    feePaid := msgValue }
+
+theorem commitObservables_ne_swapped (target fee msgValue : Word)
+    (requests : List Request)
+    (hne : requests.length = 1)
+    (hdist : ∀ r ∈ requests, r.source ≠ r.target) :
+    commitObservables target fee msgValue requests ≠
+      swappedCommitObservables target fee msgValue requests := by
+  obtain ⟨r, hr⟩ := List.length_eq_one_iff.mp hne
+  subst hr
+  intro heq
+  have hcalls := congrArg Observables.calls heq
+  simp only [commitObservables, swappedCommitObservables, requestCall, swappedRequestCall,
+    List.map_cons, List.map_nil] at hcalls
+  injection hcalls with hcall _
+  injection hcall with _ _ hinput
+  exact payload_ne_swapped r (hdist r List.mem_cons_self) hinput
 
 /-- **Premise-necessity evidence for the registered `hGatewayAdmittedNonzero`
 premise** (not the parent-refuting kill-line). Drop the premise and the

@@ -13,7 +13,7 @@ open Verity.Stdlib.Math
 # Pinned reserve-spend correspondence
 
 This is a source-shaped model of `lidofinance/core` at
-`af095e48bbc1c3841c2c9936219c8461af01056b`, specifically
+`17005714f151e5502c559932319a3f2f74ac2436`, specifically
 `contracts/0.4.24/Lido.sol`:
 
 * `_getBufferedEtherAllocation`, lines 605--616;
@@ -31,6 +31,24 @@ Solidity 0.4.24 raw subtraction in the allocation helper is represented by
 bounds. SafeMath additions/subtractions in the spend helper remain executable
 checked-`Uint256` branches. No Yul, EVM, runtime-bytecode, cryptographic, or E2E
 claim is made by this module.
+
+## Revert strings
+
+Only `NOT_ENOUGH_ETHER` (Lido.sol:842), `CAN_NOT_DEPOSIT` (870),
+`APP_AUTH_FAILED` (872, via `_auth`) and `ZERO_AMOUNT` (873) are literal
+Solidity revert reasons.  The five others are invented by the model for
+branches where Solidity 0.4.24 reverts *without* a message:
+
+* `ALLOCATION_ARITHMETIC`: the raw `remaining -= ...` at Lido.sol:610 and 613
+  (unchecked in 0.4.24, here `safeSub`; proved unreachable from the `min`s);
+* `DEPOSITABLE_OVERFLOW`: the raw `+` at Lido.sol:832;
+* `DEPOSITED_POST_REPORT_OVERFLOW`: SafeMath `.add` at Lido.sol:846;
+* `BUFFER_UNDERFLOW`: SafeMath `.sub` at Lido.sol:847;
+* `DEPOSITED_NEXT_REPORT_OVERFLOW`: SafeMath `.add` at Lido.sol:852.
+
+`Allocation` field order (`total, unreserved, depositsReserve,
+withdrawalsReserve`) is *not* the Solidity assignment order (607, 609, 612,
+615); the source-plane constructor is therefore written with named fields.
 -/
 
 abbrev Word := Verity.Core.Uint256
@@ -104,8 +122,19 @@ def effectiveWithdrawalsReserve (s : ReserveState) : Word :=
   let deposits := minWord s.buffered s.storedDepositsReserve
   minWord (s.buffered - deposits) s.unfinalizedStETH
 
-/- Concrete Verity storage projection. These are model-local slots, not a claim
-about the proxy's deployed keccak-derived storage positions. -/
+/-! ## Verity plane: Lido._spendDepositableEther (Lido.sol:839-859) as a `verity_contract`
+
+Concrete Verity storage projection. These are model-local slots, not a claim
+about the proxy's deployed keccak-derived storage positions.
+
+`withdraw` inlines `_getBufferedEtherAllocation` (605-616),
+`_getDepositableEther` (832) and `_spendDepositableEther` (839-859) into one
+body.  Its four `setStorage` writes are issued in a different order than the
+Solidity writes (Lido.sol:847 buffered + depositedPostReport, 853
+depositedNextReport, 857 deposits reserve): here `buffered`,
+`storedDepositsReserve`, `depositedPostReport`, `depositedNextReportAdjusted`.
+The slots are distinct so the post-state is the same; the order is kept as is
+because `verity_execution_simulates_spec` unfolds this exact normal form. -/
 verity_contract ReserveContract where
   storage
     buffered : Uint256 := slot 0
@@ -170,37 +199,86 @@ structure WithdrawInputs where
   authorizedRouter : Bool
   deriving DecidableEq, Repr
 
-def sourceGetBufferedEtherAllocation (s : ReserveState) : Option Allocation := do
-  let depositsReserve := minWord s.buffered s.storedDepositsReserve
-  let remainingAfterDeposits ← safeSub s.buffered depositsReserve
-  let withdrawalsReserve := minWord remainingAfterDeposits s.unfinalizedStETH
-  let unreserved ← safeSub remainingAfterDeposits withdrawalsReserve
-  pure ⟨s.buffered, unreserved, depositsReserve, withdrawalsReserve⟩
+/-! ## Lido._getBufferedEtherAllocation (Lido.sol:605-616) -/
 
+/-- `Lido.sol:605-616 _getBufferedEtherAllocation() returns (BufferedEtherAllocation allocation)`.
+
+Not transcribed: the two external reads `_getBufferedEther()` (606) and
+`_withdrawalQueue().unfinalizedStETH()` (612) are the `ReserveState` fields
+`buffered` / `unfinalizedStETH`; `DEPOSITS_RESERVE_POSITION.getStorageUint256()`
+(609) is `storedDepositsReserve`.
+Added by the model: the `safeSub` failure branches (`none`) for the two raw
+0.4.24 subtractions; both are proved unreachable from the `min` bounds. -/
+def sourceGetBufferedEtherAllocation (s : ReserveState) : Option Allocation := do
+  -- Lido.sol:609  allocation.depositsReserve = Math256.min(remaining, DEPOSITS_RESERVE_POSITION.getStorageUint256());
+  let depositsReserve := minWord s.buffered s.storedDepositsReserve
+  -- Lido.sol:610  remaining -= allocation.depositsReserve;
+  -- (raw 0.4.24 subtraction; `safeSub` cannot fail here since depositsReserve ≤ buffered)
+  let remainingAfterDeposits ← safeSub s.buffered depositsReserve
+  -- Lido.sol:612  allocation.withdrawalsReserve = Math256.min(remaining, _withdrawalQueue().unfinalizedStETH());
+  let withdrawalsReserve := minWord remainingAfterDeposits s.unfinalizedStETH
+  -- Lido.sol:613  remaining -= allocation.withdrawalsReserve;
+  -- (raw 0.4.24 subtraction; `safeSub` cannot fail here since withdrawalsReserve ≤ remaining)
+  let unreserved ← safeSub remainingAfterDeposits withdrawalsReserve
+  pure {
+    -- Lido.sol:606-607  uint256 remaining = _getBufferedEther(); allocation.total = remaining;
+    total := s.buffered
+    depositsReserve := depositsReserve
+    withdrawalsReserve := withdrawalsReserve
+    -- Lido.sol:615  allocation.unreserved = remaining;
+    unreserved := unreserved }
+
+/-! ## Lido._getDepositableEther (Lido.sol:831-833) -/
+
+/-- `Lido.sol:831-833 _getDepositableEther(BufferedEtherAllocation allocation) returns (uint256)`. -/
 def sourceGetDepositableEther (a : Allocation) : Option Word :=
+  -- Lido.sol:832  return allocation.depositsReserve + allocation.unreserved;
   safeAdd a.depositsReserve a.unreserved
 
+/-! ## Lido._spendDepositableEther (Lido.sol:839-859) -/
+
+/-- `Lido.sol:839-859 _spendDepositableEther(uint256 _depositAmount)`.
+
+Not transcribed: the events Lido.sol:848 `emit DepositedPostReportUpdated(...)`
+and 849 `emit Unbuffered(_depositAmount)`; the nonce half of 851
+`(uint256 depositedNextReport, uint256 curNonce) = _getDepositedNextReportAdjusted();`
+and of 853 `_setDepositedNextReportAndLastDepositNonce(depositedNextReport, curNonce);`
+(`curNonce` is written back unchanged; `depositedNextReportAdjusted` is an
+explicit input); the guard 856 `if (storedDepositsReserve > 0)` (absorbed, see
+below).
+Added by the model: the revert strings other than `NOT_ENOUGH_ETHER` (see
+module header). -/
 def sourceSpendDepositableEther (before : ReserveState) (amount : Word) : SourceOutcome :=
+  -- Lido.sol:840  BufferedEtherAllocation memory allocation = _getBufferedEtherAllocation();
   match sourceGetBufferedEtherAllocation before with
   | none => .reverted "ALLOCATION_ARITHMETIC"
   | some allocation =>
+      -- Lido.sol:841  uint256 depositableEther = _getDepositableEther(allocation);
       match sourceGetDepositableEther allocation with
       | none => .reverted "DEPOSITABLE_OVERFLOW"
       | some depositable =>
+          -- Lido.sol:842  require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER");
           if amount ≤ depositable then
+            -- Lido.sol:846  uint256 depositedPostReport = _getDepositedPostReport().add(_depositAmount);
             match safeAdd before.depositedPostReport amount with
             | none => .reverted "DEPOSITED_POST_REPORT_OVERFLOW"
             | some depositedPostReport =>
+                -- Lido.sol:847  _setBufferedEtherAndDepositedPostReport(allocation.total.sub(_depositAmount), depositedPostReport);
                 match safeSub allocation.total amount with
                 | none => .reverted "BUFFER_UNDERFLOW"
                 | some buffered =>
+                    -- Lido.sol:852  depositedNextReport = depositedNextReport.add(_depositAmount);
                     match safeAdd before.depositedNextReportAdjusted amount with
                     | none => .reverted "DEPOSITED_NEXT_REPORT_OVERFLOW"
                     | some depositedNextReportAdjusted =>
+                        -- Lido.sol:857  _setDepositsReserve(storedDepositsReserve > _depositAmount ? storedDepositsReserve - _depositAmount : 0);
+                        -- The guard Lido.sol:856 `if (storedDepositsReserve > 0)` is absorbed: when the
+                        -- stored reserve is 0 the ternary yields 0, so writing it unconditionally is a no-op.
                         let storedDepositsReserve :=
                           if before.storedDepositsReserve > amount then
                             before.storedDepositsReserve - amount
                           else 0
+                        -- Writes: Lido.sol:847 (buffered, depositedPostReport), 853 (depositedNextReport), 857 (deposits reserve)
                         .committed { before with
                           buffered := buffered
                           storedDepositsReserve := storedDepositsReserve
@@ -208,16 +286,32 @@ def sourceSpendDepositableEther (before : ReserveState) (amount : Word) : Source
                           depositedNextReportAdjusted := depositedNextReportAdjusted }
           else .reverted "NOT_ENOUGH_ETHER"
 
-/-- Source-shaped `getDepositableEther` wrapper at lines 823--825. -/
+/-! ## Lido.getDepositableEther (Lido.sol:823-825) -/
+
+/-- Source-shaped `getDepositableEther` wrapper at lines 823--825
+(`Lido.sol:824  return _getDepositableEther(_getBufferedEtherAllocation());`). -/
 def sourceDepositableEtherView (s : ReserveState) : Option Word := do
   sourceGetDepositableEther (← sourceGetBufferedEtherAllocation s)
 
-/-- Reserve projection of `withdrawDepositableEther`, lines 869--886. -/
+/-! ## Lido.withdrawDepositableEther (Lido.sol:869-886) -/
+
+/-- `Lido.sol:869-886 withdrawDepositableEther(uint256 _amount, uint256 _seedDepositsCount)`,
+reserve projection.
+
+Not transcribed: 877-882 the deprecated `_seedDepositsCount` bookkeeping and
+its event; 885 `stakingRouter.receiveDepositableEther.value(_amount)();` (the
+final value transfer).
+Added by the model: `WithdrawInputs` carries the results of `canDeposit()` and
+`_auth(...)`, whose implementations are outside the pinned spans. -/
 def sourceWithdrawDepositableEther (inputs : WithdrawInputs)
     (before : ReserveState) (amount : Word) : SourceOutcome :=
+  -- Lido.sol:870  require(canDeposit(), "CAN_NOT_DEPOSIT");
   if !inputs.canDeposit then .reverted "CAN_NOT_DEPOSIT"
+  -- Lido.sol:871-872  IStakingRouter stakingRouter = _stakingRouter(); _auth(address(stakingRouter));
   else if !inputs.authorizedRouter then .reverted "APP_AUTH_FAILED"
+  -- Lido.sol:873  require(_amount != 0, "ZERO_AMOUNT");
   else if amount = 0 then .reverted "ZERO_AMOUNT"
+  -- Lido.sol:875  _spendDepositableEther(_amount);
   else sourceSpendDepositableEther before amount
 
 /-- Abstract wrapper semantics.  It uses only the MODEL spend transition. -/
@@ -245,13 +339,27 @@ theorem source_withdraw_matches_model (inputs : WithdrawInputs)
 
 namespace ReserveContract
 
-/-- The wrapper guards live outside the pinned reserve-spend spans. Once they
-pass, execution delegates to the typed `verity_contract` entrypoint. -/
+/-- `Lido.sol:869-886 withdrawDepositableEther(uint256 _amount, uint256 _seedDepositsCount)`
+on the Verity plane.  The wrapper guards live outside the pinned reserve-spend
+spans. Once they pass, execution delegates to the typed `verity_contract`
+entrypoint `withdraw` (= `_spendDepositableEther`).  Same omissions as
+`sourceWithdrawDepositableEther`. -/
 def withdrawWithGuards (inputs : WithdrawInputs) (amount : Word) : Contract Unit := do
+  -- Lido.sol:870  require(canDeposit(), "CAN_NOT_DEPOSIT");
   require inputs.canDeposit "CAN_NOT_DEPOSIT"
+  -- Lido.sol:871-872  IStakingRouter stakingRouter = _stakingRouter(); _auth(address(stakingRouter));
   require inputs.authorizedRouter "APP_AUTH_FAILED"
+  -- Lido.sol:873  require(_amount != 0, "ZERO_AMOUNT");
   require (amount != 0) "ZERO_AMOUNT"
+  -- Lido.sol:875  _spendDepositableEther(_amount);
   withdraw amount
+
+/-- Solidity-facing name, Lido.sol:869. -/
+abbrev withdrawDepositableEther := withdrawWithGuards
+
+/-- Solidity-facing name, Lido.sol:839: the `verity_contract` entrypoint
+`withdraw` transcribes `_spendDepositableEther`. -/
+abbrev spendDepositableEther := withdraw
 
 end ReserveContract
 

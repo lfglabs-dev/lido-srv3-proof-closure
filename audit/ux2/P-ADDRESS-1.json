@@ -17,10 +17,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PAddress1.universal_address_writer_equivariance",
       "module": "LidoSRv3.Audit.Guarantees.PAddress1",
       "file": "LidoSRv3/Audit/Guarantees/PAddress1.lean",
-      "start_line": 190,
-      "end_line": 195,
-      "doc": "/-- Registered P-ADDRESS-1 parent. For two nonzero callers, the source-shaped\n`run` admits `a₁` iff it admits `a₂` on the caller-swapped input, and a\nsuccessful post-state renames under the same swap. The claim is unconditional\nover four modeled address-bearing writer projections: since wave 5,\n`addressEquivarianceEntryScope` covers `claimWithdrawalsTo` too -- its\nrequest-owner gate (`caller = requestOwner`) is caller-relative and renames\nwith the caller (`requestOwner` is an address-indexed input field renamed by\n`renameInput`) -- so the scope is total over the modeled writers\n(`addressEquivarianceEntryScope_total`). The wave-4 scope premise thereby\nbecame vacuous: the source lemmas below hold for every `EntryPoint` via\n`run_rename`, so the premise's deletion cannot break the proof, and per the\nwave-4 load-bearing criterion it is no longer carried. On\n`requestWithdrawals` and `unwrap`, admission is pause plus the caller's own\nbalance/allowance flags only (`pause_balance_admitted_is_permissionless`); it\ndoes not test `caller = owner` or `caller = <fixed constant>`. Adding a\nfixed-owner gate to that admission breaks equivariance via\n`LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent`,\nwhich negates this theorem's exact predicate shape on a mutant of this file's\nown `admitted`/`run`/`renameInput` (not an unrelated toy entrypoint).\n\n`wellFormedAddressInput` and `singletonActorEntryPoint` are deliberately not\ncarried as hypotheses here: neither restricts this conclusion (the proof\nbelow needs only `a₁, a₂ ≠ 0`), and `singletonActorEntryPoint` is provably\n`False` for every `EntryPoint` in this model\n(`not_singleton_actor_entry_point`), so requiring its negation would add no\ncontent while reading as a real exclusion. Carrying either as an unused\nbinder would hide that they are premise-free rather than making the claim\nmore honest. -/",
-      "statement": "theorem universal_address_writer_equivariance\n    (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)\n    (inp : LidoSRv3.Audit.SolidityAddress.Input) :\n    succeeds (run (renameInput a₁ a₂ inp)) = succeeds (run inp) ∧\n      ∀ post, run inp = .committed post →\n        run (renameInput a₁ a₂ inp) = .committed (renamePost a₁ a₂ post)"
+      "start_line": 253,
+      "end_line": 256,
+      "doc": "/-- Two nonzero callers have the same source-shaped admission bit, and a\nsuccessful post-state renames under the swap.\n\nRegistered P-ADDRESS-1 parent. For two nonzero callers, the source-shaped\n`run` admits `a₁` iff it admits `a₂` on the caller-swapped input, and a\nsuccessful post-state renames under the same swap. The claim is unconditional\nover four modeled address-bearing writer projections: since wave 5,\n`addressEquivarianceEntryScope` covers `claimWithdrawalsTo` too -- its\nrequest-owner gate (`caller = requestOwner`) is caller-relative and renames\nwith the caller (`requestOwner` is an address-indexed input field renamed by\n`renameInput`) -- so the scope is total over the modeled writers\n(`addressEquivarianceEntryScope_total`). The wave-4 scope premise thereby\nbecame vacuous: the source lemmas below hold for every `EntryPoint` via\n`run_rename`, so the premise's deletion cannot break the proof, and per the\nwave-4 load-bearing criterion it is no longer carried. On\n`requestWithdrawals` and `unwrap`, admission is pause plus the caller's own\nbalance/allowance flags only (`pause_balance_admitted_is_permissionless`); it\ndoes not test `caller = owner` or `caller = <fixed constant>`. Adding a\nfixed-owner gate to that admission breaks equivariance via\n`LidoSRv3.Tests.AddressSourceMutants.fixed_owner_gate_kill_line_refutes_parent`,\nwhich negates this theorem's exact predicate shape on a mutant of this file's\nown `admitted`/`run`/`renameInput` (not an unrelated toy entrypoint).\n\n`wellFormedAddressInput` and `singletonActorEntryPoint` are deliberately not\ncarried as hypotheses here: neither restricts this conclusion (the proof\nbelow needs only `a₁, a₂ ≠ 0`), and `singletonActorEntryPoint` is provably\n`False` for every `EntryPoint` in this model\n(`not_singleton_actor_entry_point`), so requiring its negation would add no\ncontent while reading as a real exclusion. Carrying either as an unused\nbinder would hide that they are premise-free rather than making the claim\nmore honest. -/",
+      "statement": "theorem universal_address_writer_equivariance\n    (a₁ a₂ : Verity.Address) (h₁ : a₁ ≠ 0) (h₂ : a₂ ≠ 0)\n    (inp : LidoSRv3.Audit.SolidityAddress.Input) :\n    AdmissionIsCallerBlind a₁ a₂ inp ∧ PostStateRenamesWithCaller a₁ a₂ inp"
     },
     {
       "plane": "verity",
@@ -29,10 +29,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PAddress1.abstract_source_verity_tx_address_equivariance",
       "module": "LidoSRv3.Audit.Guarantees.PAddress1",
       "file": "LidoSRv3/Audit/Guarantees/PAddress1.lean",
-      "start_line": 205,
-      "end_line": 236,
-      "doc": "/-- Composition of (i) the universal source-shaped swap, (ii) each\n`Contract.run` entrypoint's address-write `observe` matching\n`sourceAddressView` when `amount < 2^256` and the balance/allowance\nflags are coherent, (iii) any `Contract.run` revert restoring the\nsnapshot, (iv) the renamed input's TX view matching `postAddressView`\nof the renamed post-state. Not a WQ claim. -/",
-      "statement": "theorem abstract_source_verity_tx_address_equivariance :\n    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →\n      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),\n      succeeds (LidoSRv3.Audit.SolidityAddress.run (renameInput a₁ a₂ inp)) =\n        succeeds (LidoSRv3.Audit.SolidityAddress.run inp)) ∧\n    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →\n      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState),\n      LidoSRv3.Audit.SolidityAddress.run inp = .committed post →\n      LidoSRv3.Audit.SolidityAddress.run (renameInput a₁ a₂ inp) =\n        .committed (renamePost a₁ a₂ post)) ∧\n    (∀ (inp : LidoSRv3.Audit.SolidityAddress.Input), inp.amount < 2 ^ 256 →\n      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →\n      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →\n      LidoSRv3.Audit.Verity.AddressTx.observeAddress inp\n          ((LidoSRv3.Audit.Verity.AddressTx.executePinnedSource inp).run\n            (LidoSRv3.Audit.Verity.AddressTx.stateFor inp)) =\n        LidoSRv3.Audit.Verity.AddressTx.sourceAddressView inp) ∧\n    (∀ (program : Verity.Contract Unit) (state rollback : Verity.ContractState)\n      (reason : String),\n      program.run state = Verity.ContractResult.revert reason rollback → rollback = state) ∧\n    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →\n      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState),\n      LidoSRv3.Audit.SolidityAddress.run inp = .committed post →\n      inp.amount < 2 ^ 256 →\n      (!inp.callerBalanceSufficient = true → inp.amount ≠ 0) →\n      (!inp.callerAllowanceSufficient = true → inp.amount ≠ 0) →\n      LidoSRv3.Audit.Verity.AddressTx.observeAddress (renameInput a₁ a₂ inp)\n          ((LidoSRv3.Audit.Verity.AddressTx.executePinnedSource\n              (renameInput a₁ a₂ inp)).run\n            (LidoSRv3.Audit.Verity.AddressTx.stateFor (renameInput a₁ a₂ inp))) =\n        LidoSRv3.Audit.Verity.AddressTx.postAddressView inp.entryPoint\n          (renamePost a₁ a₂ post))"
+      "start_line": 272,
+      "end_line": 287,
+      "doc": "/-- Two nonzero callers have the same source-shaped admission bit, and a\nsuccessful post-state renames under the swap. Verity composition adds\n`Contract.run` observe = `sourceAddressView` when the amount fits one word\nand the balance/allowance flags are coherent, snapshot rollback on revert, and\nthe renamed run observing the renamed view.\n\nComposition of (i) the universal source-shaped swap, (ii) each\n`Contract.run` entrypoint's address-write `observe` matching\n`sourceAddressView` when `amount < 2^256` and the balance/allowance\nflags are coherent, (iii) any `Contract.run` revert restoring the\nsnapshot, (iv) the renamed input's TX view matching `postAddressView`\nof the renamed post-state. Not a WQ claim. -/",
+      "statement": "theorem abstract_source_verity_tx_address_equivariance :\n    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →\n      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),\n      AdmissionIsCallerBlind a₁ a₂ inp) ∧\n    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →\n      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),\n      PostStateRenamesWithCaller a₁ a₂ inp) ∧\n    (∀ (inp : LidoSRv3.Audit.SolidityAddress.Input),\n      AmountFitsWord inp → BalanceFlagCoherent inp → AllowanceFlagCoherent inp →\n      ObservesSourceView inp) ∧\n    RevertRestoresSnapshot ∧\n    (∀ (a₁ a₂ : Verity.Address), a₁ ≠ 0 → a₂ ≠ 0 →\n      ∀ (inp : LidoSRv3.Audit.SolidityAddress.Input) (post : PostState),\n      LidoSRv3.Audit.SolidityAddress.run inp = .committed post →\n      AmountFitsWord inp → BalanceFlagCoherent inp → AllowanceFlagCoherent inp →\n      RenamedRunObservesRenamedView a₁ a₂ inp post)"
     }
   ],
   "kill_lines": {
@@ -61,6 +61,24 @@
       "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
       "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
@@ -93,39 +111,39 @@
       "function": "transferFrom",
       "start_line": 218,
       "end_line": 220,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueueERC721.sol#L218-L220"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalQueueERC721.sol#L218-L220"
     },
     {
       "path": "contracts/0.8.9/WithdrawalQueue.sol",
       "function": "requestWithdrawals",
       "start_line": 125,
       "end_line": 142,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueue.sol#L125-L142"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalQueue.sol#L125-L142"
     },
     {
       "path": "contracts/0.8.9/WithdrawalQueue.sol",
       "function": "claimWithdrawalsTo",
       "start_line": 244,
       "end_line": 264,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.9/WithdrawalQueue.sol#L244-L264"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalQueue.sol#L244-L264"
     },
     {
       "path": "contracts/0.6.12/WstETH.sol",
       "function": "unwrap",
       "start_line": 69,
       "end_line": 80,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.6.12/WstETH.sol#L69-L80"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.6.12/WstETH.sol#L69-L80"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],

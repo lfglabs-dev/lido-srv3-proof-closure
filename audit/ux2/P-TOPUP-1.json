@@ -17,10 +17,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PTopup1.source_topup_conserves_and_rolls_back",
       "module": "LidoSRv3.Audit.Guarantees.PTopup1",
       "file": "LidoSRv3/Audit/Guarantees/PTopup1.lean",
-      "start_line": 292,
-      "end_line": 335,
-      "doc": "/--\n`run cfg inp` conserves `pulled = pushed`. If that run reverts, the abstract\n`TxObservation` (`A-ABSTRACT-TX`) restores `before` and erases ETH moves and\nlogs.  The registered claim additionally folds in the wrap-plane discharge\n(`A-TOPUP-NOWRAP` lives in its antecedent: wrap precludes a value-moving\ncommit) and the\n`moduleExists`/`wcTypeIsType2` guard liveness facts as further conjuncts, so a\nkill-line mutant that defeats any one of them falsifies *this* theorem -- the\none tracked as P-TOPUP-1's CHECKED abstract claim in `audit/guarantees.yaml`\n-- and not merely a sibling lemma that the registry never cites.\n\nPinned-source conservation and rollback correspondence for the SRv3 beacon-chain\ntop-up push at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:\n\n* `contracts/0.8.25/sr/StakingRouter.sol`, `topUp`, lines 679--759;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_validateTopUpInputs`, lines 761--782;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_checkAppAuth`, lines 1177--1179;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_getTopUpGateway`, lines 1169--1171;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_getModuleState`, lines 1099--1107;\n* `contracts/0.8.25/sr/SRUtils.sol`, `_requireWCType2`, lines 41--43;\n* `contracts/0.8.25/sr/SRUtils.sol`, `_requireModuleIdExists`, lines 45--47;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `PUBKEY_LENGTH`, line 57;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `PUBLIC_KEY_LENGTH`, line 21;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `MIN_DEPOSIT`, line 28;\n* `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;\n* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `makeBeaconChainTopUp`,\n  lines 66--108.\n\nTwo claims, one per half of the guarantee wording.\n\n*Conservation.* On every branch of the source-shaped path -- each authorization,\ninput-validation, module-status, allocation-loop, Lido-side and per-key guard, the\nempty-top-up early commit at source line 741, and the full push -- the wei pulled\nfrom Lido at source line 744 equals the wei pushed to the beacon deposit contract\nby the loop at `BeaconChainDepositor.sol` lines 79--107.\n\nThe pull is the on-chain `unchecked` reading of the line 732 accumulation (the\nsum reduced mod 2^256, `SolidityTopup.accumulated`); the push is the exact\nper-key total (`SolidityTopup.pushedValue`, with the\n`if (amount == 0) continue` skip at `BeaconChainDepositor.sol` line 89 losing\nnothing, per `SolidityTopup.loopPushed_eq_allocSum`).  On the commit branch the\ntwo agree *because the line 755 `assert` has passed*: reaching the commit means\nthe wrapped pull equalled the exact push (`SolidityTopup.committed_topup_spec`),\nand under an actual wrap a value-moving commit is unreachable -- the third\nconjunct shows wrap precludes `pulled ≠ 0` (`SolidityTopup.run_wrap_precludes_value_moving_commit`).\nWrap-to-zero is a no-top-up commit, not a revert.  So\nconservation here is genuinely assert-backed, not a same-array `Nat` coincidence,\nand it still needs no deployment-configuration side condition: unlike the 32-ETH\ndeposit path (P-DEPOSIT-1), the pull and the push are two readings of the *same*\n`_amounts` array, not a count multiplied by two separately-configured constants.\n\n*Rollback.* Every guard on that path is a whole-transaction abort -- the pinned\nspan contains no `try`/`catch` and no failure-swallowing low-level call, and a\nfailing `assert` is a Solidity 0.8 `Panic(0x01)` -- so a reverting outcome maps\nonto the abstract-transaction model's `.reverted` result, and\n`revert_restores_state_value_and_logs` restores the pre-state and erases all\ncommitted ETH moves and logs. That includes the\n`_checkAppAuth(_getTopUpGateway())` at source line 686 -- whose helper bodies at\nlines 1169--1171 and 1177--1179 are pinned above rather than assumed -- which is\nmodelled as the\n*first* guard: `SolidityTopup.unauthorized_reverts` shows an unauthorized caller\nreverts before the line 687 input validation, and\n`SolidityTopup.committing_implies_authorized` shows neither committing branch is\nreachable without the gateway. The branch correspondence therefore covers every\nsource execution rather than silently assuming an authorized caller.\n\nCaveats, stated rather than hidden:\n\n* Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`\n  division matches EVM `DIV`, and the one place the pinned path can overflow --\n  the `amount += _amounts[i]` at source line 732, inside the `unchecked` block\n  opened at line 722 -- is modelled faithfully rather than assumed away: the\n  over-target comparison at line 737, the zero-sum test at line 741, the\n  Lido-side amount guards at `Lido.sol` lines 842/873, the line 744 pull, the\n  funded router balance, and the line 755 `assert` all read the sum reduced\n  mod 2^256 (`SolidityTopup.accumulated`, `wrappedTotal = exactTotal % 2^256`).\n  Under a nonzero wrap the wrapped pull is strictly below the exact push, so\n  the transaction aborts.  Under wrap-to-zero line 741 commits\n  `committedNoTopUp`.  This theorem's third conjunct is the honest discharge:\n  wrap precludes a value-moving commit\n  (`SolidityTopup.run_wrap_precludes_value_moving_commit`).  On the no-wrap\n  branch `source_balance_guards_discharged` shows the two value guards are\n  unreachable, taking the no-wrap fact as an explicit hypothesis\n  (`A-TOPUP-NOWRAP`) rather than a bounded-arithmetic proof, because the bound\n  is not derivable from the pinned P-TOPUP-1 spans.\n* The `moduleExists` and `wcTypeIsType2` guards (source lines 689 and 694) are\n  not merely assumed live -- this theorem's second and fourth conjuncts prove\n  each one reverts with its named `Outcome` constructor whenever the earlier\n  guards pass and the named condition fails, so a regression that drops either\n  guard from `run` breaks this registered theorem directly, not only a sibling\n  lemma that the assurance registry never cites.\n* The guards the router applies to the *untrusted* module returndata are\n  covered by the fifth conjunct: the gwei alignment at source line 724, the\n  per-index `_topUpLimits[i]` bound and its out-of-bounds panic at source line\n  728, and the aggregate over-target comparison at source line 737 read on the\n  line 732 `unchecked` accumulator.  Deleting the loop or the over-target\n  branch from `run` refutes this theorem\n  (`LidoSRv3.Tests.TopupTxMutants.dropped_allocation_guards_kill_line_refutes_parent`\n  and `…dropped_over_target_guard_kill_line_refutes_parent`).  What the\n  conjunct does *not* claim is anything about where the returndata came from:\n  `_amounts` enters the model as an input, and the module-side allocation\n  algorithm remains P-ALLOC-1/P-ALLOC-2.\n* The empty-top-up branch at source line 741 is a *commit*, not a revert:\n  `SolidityTopup.committedNoTopUp_is_not_a_rollback` records this, so no reader\n  can mistake the rollback theorem for a claim that a zero-amount top-up aborts.\n* The rollback half is stated against the abstract transaction model\n  (`A-ABSTRACT-TX`), so the EVM plane stays open.\n* Out of scope here and left open: the per-validator top-up *amount computation*\n  and limit accounting (P-TOPUP-2), the allocation algorithm producing\n  `_amounts` (P-ALLOC-1/2), and the SSZ deposit-data-root construction at\n  `BeaconChainDepositor.sol` lines 120--146 (P-SSZ-1).\n-/",
-      "statement": "theorem source_topup_conserves_and_rolls_back {State : Type}\n    (cfg : SourceTopupConfig) (inp : SourceTopupInput)\n    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :\n    ((run cfg inp).pulled = (run cfg inp).pushed ∧\n      ((run cfg inp).reverts = true →\n        (observation before after attempts trace (run cfg inp)).committedState = before ∧\n          (observation before after attempts trace (run cfg inp)).committedTrace.ethMoves = [] ∧\n          (observation before after attempts trace (run cfg inp)).committedTrace.logs = [])) ∧\n    (inp.moduleExists = false →\n      inp.callerIsTopUpGateway = true →\n      inp.keyIndicesLength ≠ 0 →\n      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength\n          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength\n          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →\n      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →\n      run cfg inp = .revertStakingModuleUnregistered) ∧\n    (¬ NoUncheckedWrap inp →\n      (run cfg inp).pulled = 0 ∧ (run cfg inp).pushed = 0) ∧\n    (inp.wcTypeIsType2 = false →\n      inp.callerIsTopUpGateway = true →\n      inp.keyIndicesLength ≠ 0 →\n      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength\n          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength\n          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →\n      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →\n      inp.moduleExists = true →\n      inp.moduleActive = true →\n      run cfg inp = .revertWrongWithdrawalCredentialsType) ∧\n    (inp.callerIsTopUpGateway = true →\n      inp.keyIndicesLength ≠ 0 →\n      ¬(inp.operatorIdsLength ≠ inp.keyIndicesLength\n          ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength\n          ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength) →\n      inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) = false →\n      inp.moduleExists = true →\n      inp.moduleActive = true →\n      inp.wcTypeIsType2 = true →\n      cfg.gwei ≠ 0 →\n      ¬(smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false) →\n      (∀ o : SolidityTopup.Outcome,\n          allocationLoop cfg inp.allocations inp.topUpLimits = some o → run cfg inp = o) ∧\n        (allocationLoop cfg inp.allocations inp.topUpLimits = none →\n          smDepositableEthAmountRounded cfg inp < accumulated inp →\n          run cfg inp = .revertModuleReturnExceedTarget))"
+      "start_line": 394,
+      "end_line": 401,
+      "doc": "/--\n**P-TOPUP-1, abstract plane.**  pulled = pushed on the source-shaped run, and a\nreverting outcome maps to the abstract `TxObservation` rollback\n(A-ABSTRACT-TX).  An unregistered module or a non-type-2 module reverts.  If\nthe unchecked sum wraps mod 2^256, the run moves no wei.  Under every earlier\nguard, `run` follows the allocation loop and its over-target check.\n\n`run cfg inp` conserves `pulled = pushed`. If that run reverts, the abstract\n`TxObservation` (`A-ABSTRACT-TX`) restores `before` and erases ETH moves and\nlogs.  The registered claim additionally folds in the wrap-plane discharge\n(`A-TOPUP-NOWRAP` lives in its antecedent: wrap precludes a value-moving\ncommit) and the\n`moduleExists`/`wcTypeIsType2` guard liveness facts as further conjuncts, so a\nkill-line mutant that defeats any one of them falsifies *this* theorem -- the\none tracked as P-TOPUP-1's CHECKED abstract claim in `audit/guarantees.yaml`\n-- and not merely a sibling lemma that the registry never cites.\n\nPinned-source conservation and rollback correspondence for the SRv3 beacon-chain\ntop-up push at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:\n\n* `contracts/0.8.25/sr/StakingRouter.sol`, `topUp`, lines 679--759;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_validateTopUpInputs`, lines 761--782;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_checkAppAuth`, lines 1177--1179;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_getTopUpGateway`, lines 1169--1171;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `_getModuleState`, lines 1099--1107;\n* `contracts/0.8.25/sr/SRUtils.sol`, `_requireWCType2`, lines 41--43;\n* `contracts/0.8.25/sr/SRUtils.sol`, `_requireModuleIdExists`, lines 45--47;\n* `contracts/0.8.25/sr/StakingRouter.sol`, `PUBKEY_LENGTH`, line 57;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `PUBLIC_KEY_LENGTH`, line 21;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `MIN_DEPOSIT`, line 28;\n* `contracts/0.4.24/Lido.sol`, `withdrawDepositableEther`, lines 869--886;\n* `contracts/0.4.24/Lido.sol`, `_spendDepositableEther`, lines 839--859;\n* `contracts/0.8.25/lib/BeaconChainDepositor.sol`, `makeBeaconChainTopUp`,\n  lines 66--108.\n\nTwo claims, one per half of the guarantee wording.\n\n*Conservation.* On every branch of the source-shaped path -- each authorization,\ninput-validation, module-status, allocation-loop, Lido-side and per-key guard, the\nempty-top-up early commit at source line 741, and the full push -- the wei pulled\nfrom Lido at source line 744 equals the wei pushed to the beacon deposit contract\nby the loop at `BeaconChainDepositor.sol` lines 79--107.\n\nThe pull is the on-chain `unchecked` reading of the line 732 accumulation (the\nsum reduced mod 2^256, `SolidityTopup.accumulated`); the push is the exact\nper-key total (`SolidityTopup.pushedValue`, with the\n`if (amount == 0) continue` skip at `BeaconChainDepositor.sol` line 89 losing\nnothing, per `SolidityTopup.loopPushed_eq_allocSum`).  On the commit branch the\ntwo agree *because the line 755 `assert` has passed*: reaching the commit means\nthe wrapped pull equalled the exact push (`SolidityTopup.committed_topup_spec`),\nand under an actual wrap a value-moving commit is unreachable -- the third\nconjunct shows wrap precludes `pulled ≠ 0` (`SolidityTopup.run_wrap_precludes_value_moving_commit`).\nWrap-to-zero is a no-top-up commit, not a revert.  So\nconservation here is genuinely assert-backed, not a same-array `Nat` coincidence,\nand it still needs no deployment-configuration side condition: unlike the 32-ETH\ndeposit path (P-DEPOSIT-1), the pull and the push are two readings of the *same*\n`_amounts` array, not a count multiplied by two separately-configured constants.\n\n*Rollback.* Every guard on that path is a whole-transaction abort -- the pinned\nspan contains no `try`/`catch` and no failure-swallowing low-level call, and a\nfailing `assert` is a Solidity 0.8 `Panic(0x01)` -- so a reverting outcome maps\nonto the abstract-transaction model's `.reverted` result, and\n`revert_restores_state_value_and_logs` restores the pre-state and erases all\ncommitted ETH moves and logs. That includes the\n`_checkAppAuth(_getTopUpGateway())` at source line 686 -- whose helper bodies at\nlines 1169--1171 and 1177--1179 are pinned above rather than assumed -- which is\nmodelled as the\n*first* guard: `SolidityTopup.unauthorized_reverts` shows an unauthorized caller\nreverts before the line 687 input validation, and\n`SolidityTopup.committing_implies_authorized` shows neither committing branch is\nreachable without the gateway. The branch correspondence therefore covers every\nsource execution rather than silently assuming an authorized caller.\n\nCaveats, stated rather than hidden:\n\n* Arithmetic is read as unbounded `Nat` (`A-SOURCE-SHAPED`): truncating `Nat`\n  division matches EVM `DIV`, and the one place the pinned path can overflow --\n  the `amount += _amounts[i]` at source line 732, inside the `unchecked` block\n  opened at line 722 -- is modelled faithfully rather than assumed away: the\n  over-target comparison at line 737, the zero-sum test at line 741, the\n  Lido-side amount guards at `Lido.sol` lines 842/873, the line 744 pull, the\n  funded router balance, and the line 755 `assert` all read the sum reduced\n  mod 2^256 (`SolidityTopup.accumulated`, `wrappedTotal = exactTotal % 2^256`).\n  Under a nonzero wrap the wrapped pull is strictly below the exact push, so\n  the transaction aborts.  Under wrap-to-zero line 741 commits\n  `committedNoTopUp`.  This theorem's third conjunct is the honest discharge:\n  wrap precludes a value-moving commit\n  (`SolidityTopup.run_wrap_precludes_value_moving_commit`).  On the no-wrap\n  branch `source_balance_guards_discharged` shows the two value guards are\n  unreachable, taking the no-wrap fact as an explicit hypothesis\n  (`A-TOPUP-NOWRAP`) rather than a bounded-arithmetic proof, because the bound\n  is not derivable from the pinned P-TOPUP-1 spans.\n* The `moduleExists` and `wcTypeIsType2` guards (source lines 689 and 694) are\n  not merely assumed live -- this theorem's second and fourth conjuncts prove\n  each one reverts with its named `Outcome` constructor whenever the earlier\n  guards pass and the named condition fails, so a regression that drops either\n  guard from `run` breaks this registered theorem directly, not only a sibling\n  lemma that the assurance registry never cites.\n* The guards the router applies to the *untrusted* module returndata are\n  covered by the fifth conjunct: the gwei alignment at source line 724, the\n  per-index `_topUpLimits[i]` bound and its out-of-bounds panic at source line\n  728, and the aggregate over-target comparison at source line 737 read on the\n  line 732 `unchecked` accumulator.  Deleting the loop or the over-target\n  branch from `run` refutes this theorem\n  (`LidoSRv3.Tests.TopupTxMutants.dropped_allocation_guards_kill_line_refutes_parent`\n  and `…dropped_over_target_guard_kill_line_refutes_parent`).  What the\n  conjunct does *not* claim is anything about where the returndata came from:\n  `_amounts` enters the model as an input, and the module-side allocation\n  algorithm remains P-ALLOC-1/P-ALLOC-2.\n* The empty-top-up branch at source line 741 is a *commit*, not a revert:\n  `SolidityTopup.committedNoTopUp_is_not_a_rollback` records this, so no reader\n  can mistake the rollback theorem for a claim that a zero-amount top-up aborts.\n* The rollback half is stated against the abstract transaction model\n  (`A-ABSTRACT-TX`), so the EVM plane stays open.\n* Out of scope here and left open: the per-validator top-up *amount computation*\n  and limit accounting (P-TOPUP-2), the allocation algorithm producing\n  `_amounts` (P-ALLOC-1/2), and the SSZ deposit-data-root construction at\n  `BeaconChainDepositor.sol` lines 120--146 (P-SSZ-1).\n-/",
+      "statement": "theorem source_topup_conserves_and_rolls_back {State : Type}\n    (cfg : SourceTopupConfig) (inp : SourceTopupInput)\n    (before after : State) (attempts : List CallAttempt) (trace : CommitTrace) :\n    ConservesAndRollsBack cfg inp before after attempts trace ∧\n    UnregisteredModuleReverts cfg inp ∧\n    WrapMovesNoValue cfg inp ∧\n    WrongWcTypeReverts cfg inp ∧\n    RunFollowsAllocationLoop cfg inp"
     },
     {
       "plane": "verity",
@@ -29,10 +29,10 @@
       "name": "LidoSRv3.Audit.Guarantees.PTopup1.verity_tx_simulates_source_with_nonzero_wrap_close",
       "module": "LidoSRv3.Audit.Guarantees.PTopup1",
       "file": "LidoSRv3/Audit/Guarantees/PTopup1.lean",
-      "start_line": 641,
-      "end_line": 659,
-      "doc": "/-- Registered Verity parent: the full committing-source correspondence,\nincluding universal injected-failure rollback, conjoined with the universal\nnonzero-wrap revert/non-commit/snapshot-restore close above and with the\nreturndata-conditioned module-call plane, quantified over every possible\n`allocateDeposits` return. -/",
-      "statement": "theorem verity_tx_simulates_source_with_nonzero_wrap_close\n    (cfg : SourceTopupConfig) (inp : SourceTopupInput)\n    (state : Verity.ContractState)\n    (hLen : inp.allocations.length ≤ uint256Modulus)\n    (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)\n    (hCommit : (run cfg inp).reverts = false) :\n    VerityCommittingSimulation cfg inp state ∧\n      (∀ allocations : List Nat,\n        uint256Modulus ≤ allocSum allocations →\n        allocSumUnchecked allocations ≠ 0 →\n        (∀ a ∈ allocations, a < uint256Modulus) →\n        (let before := Verity.TopupTx.entryFrame state\n          ∃ reason,\n            (Verity.TopupTx.execute allocations .none).run before =\n                Verity.ContractResult.revert reason before ∧\n              (Verity.TopupTx.observe before allocations.length\n                ((Verity.TopupTx.execute allocations .none).run before)).committed = false)) ∧\n      ∀ call : Verity.TopupTx.TopupCall,\n        VerityGuardedReturndataSimulation cfg call state"
+      "start_line": 737,
+      "end_line": 745,
+      "doc": "/-- **P-TOPUP-1, Verity plane.**  If the source run commits and each allocation\nis a uint256 word, `observe` of `execute` equals the source observables (with\n`pulled`/`pushed` matching and every injected failure rolling back to the entry\nsnapshot); any nonzero wrapping batch reverts without moving value and restores\nthe snapshot; and every `allocateDeposits` return is guarded.\n\nRegistered Verity parent: the full committing-source correspondence,\nincluding universal injected-failure rollback, conjoined with the universal\nnonzero-wrap revert/non-commit/snapshot-restore close above and with the\nreturndata-conditioned module-call plane, quantified over every possible\n`allocateDeposits` return. -/",
+      "statement": "theorem verity_tx_simulates_source_with_nonzero_wrap_close\n    (cfg : SourceTopupConfig) (inp : SourceTopupInput)\n    (state : Verity.ContractState)\n    (hLen : inp.allocations.length ≤ uint256Modulus)\n    (hAmt : ∀ a ∈ inp.allocations, a < uint256Modulus)\n    (hCommit : (run cfg inp).reverts = false) :\n    VerityCommittingSimulation cfg inp state ∧\n      NonzeroWrapRevertsAndRestores state ∧\n      EveryReturndataIsGuarded cfg state"
     }
   ],
   "kill_lines": {
@@ -89,6 +89,24 @@
       "violation_impact": "Conserved top-up value could be sent to the wrong address.",
       "validation": "Pin constructor/deployment artifacts and compare the immutable target with the canonical beacon deposit contract.",
       "removal_path": "Prove the deployed immutable equals 0x00000000219ab540356cBB839Cbe05303d7705Fa."
+    },
+    {
+      "id": "A-SOLC-TRUSTED",
+      "severity": "MEDIUM",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
+      "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
+      "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
+      "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."
+    },
+    {
+      "id": "A-RUNTIME-PROVENANCE",
+      "severity": "MEDIUM",
+      "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
+      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
+      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
+      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     }
   ],
   "fidelity": {
@@ -116,111 +134,111 @@
       "function": "topUp",
       "start_line": 679,
       "end_line": 759,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L679-L759"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L679-L759"
     },
     {
       "path": "contracts/0.8.25/sr/StakingRouter.sol",
       "function": "_validateTopUpInputs",
       "start_line": 761,
       "end_line": 782,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L761-L782"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L761-L782"
     },
     {
       "path": "contracts/0.8.25/sr/StakingRouter.sol",
       "function": "_checkAppAuth",
       "start_line": 1177,
       "end_line": 1179,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L1177-L1179"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L1177-L1179"
     },
     {
       "path": "contracts/0.8.25/sr/StakingRouter.sol",
       "function": "_getTopUpGateway",
       "start_line": 1169,
       "end_line": 1171,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L1169-L1171"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L1169-L1171"
     },
     {
       "path": "contracts/0.8.25/sr/StakingRouter.sol",
       "function": "_getModuleState",
       "start_line": 1099,
       "end_line": 1107,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L1099-L1107"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L1099-L1107"
     },
     {
       "path": "contracts/0.8.25/sr/SRUtils.sol",
       "function": "_requireWCType2",
       "start_line": 41,
       "end_line": 43,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L41-L43"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/SRUtils.sol#L41-L43"
     },
     {
       "path": "contracts/0.8.25/sr/SRUtils.sol",
       "function": "_requireModuleIdExists",
       "start_line": 45,
       "end_line": 47,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/SRUtils.sol#L45-L47"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/SRUtils.sol#L45-L47"
     },
     {
       "path": "contracts/0.8.25/sr/StakingRouter.sol",
       "function": "PUBKEY_LENGTH",
       "start_line": 57,
       "end_line": 57,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/sr/StakingRouter.sol#L57-L57"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/sr/StakingRouter.sol#L57-L57"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "PUBLIC_KEY_LENGTH",
       "start_line": 21,
       "end_line": 21,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L21-L21"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L21-L21"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "MIN_DEPOSIT",
       "start_line": 28,
       "end_line": 28,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L28-L28"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L28-L28"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "withdrawDepositableEther",
       "start_line": 869,
       "end_line": 886,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L869-L886"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L869-L886"
     },
     {
       "path": "contracts/0.8.25/lib/BeaconChainDepositor.sol",
       "function": "makeBeaconChainTopUp",
       "start_line": 66,
       "end_line": 108,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.8.25/lib/BeaconChainDepositor.sol#L66-L108"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.25/lib/BeaconChainDepositor.sol#L66-L108"
     },
     {
       "path": "contracts/0.4.24/Lido.sol",
       "function": "_spendDepositableEther",
       "start_line": 839,
       "end_line": 859,
-      "source_sha": "af095e48bbc1c3841c2c9936219c8461af01056b",
-      "permalink": "https://github.com/lidofinance/core/blob/af095e48bbc1c3841c2c9936219c8461af01056b/contracts/0.4.24/Lido.sol#L839-L859"
+      "source_sha": "17005714f151e5502c559932319a3f2f74ac2436",
+      "permalink": "https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.4.24/Lido.sol#L839-L859"
     }
   ],
   "boundary": {
     "model_not_deployment": [
       "These are proofs about a model, not about a deployed contract.",
-      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b.",
-      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are not deployed.",
+      "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
+      "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
       "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],
