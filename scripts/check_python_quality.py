@@ -211,7 +211,13 @@ def scopes(tree: ast.Module, postponed: bool = False) -> list[tuple[str, ast.AST
                 visit([*type_params(child), child.value], scope)
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
                 record(scope, assigned_name(child), child.value)
-                visit(ast.iter_child_nodes(child.value), scope)
+                # The assigned lambda has just been recorded above, but an
+                # evaluated assignment target can itself contain callable
+                # syntax (for example, ``callbacks[(lambda x: x)] = ...``).
+                # Visit it alongside the RHS's nested syntax so each
+                # independently-owned callable remains inventory-visible.
+                targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+                visit([*targets, *ast.iter_child_nodes(child.value)], scope)
             elif isinstance(child, ast.Lambda):
                 record(scope, f"lambda@{child.lineno}", child)
                 visit(ast.iter_child_nodes(child), scope)

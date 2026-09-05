@@ -79,6 +79,9 @@ def check_ratchet(fixture: Path) -> None:
     expect(False, "zz_dense.py:dense = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("callbacks = [lambda x: " + DENSE_BODY + "]\n", encoding="utf-8")
     expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
+    dense.write_text("callbacks[(lambda x: " + DENSE_BODY + ")] = lambda: None\n",
+                     encoding="utf-8")
+    expect(False, "zz_dense.py:lambda@1#2 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("def f(cb=lambda x: " + DENSE_BODY + "):\n    return cb\n", encoding="utf-8")
     expect(False, "zz_dense.py:f.lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     dense.write_text("chain = lambda x: x" + "".join(f" < {i}" for i in range(24)) + "\n",
