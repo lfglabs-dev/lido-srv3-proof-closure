@@ -12,10 +12,8 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-
 def write(path, value):
     path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
-
 def invoke(root, ok, needle=None, command="generate"):
     result = subprocess.run(
         ["python3", "scripts/audit_metadata.py", command], cwd=root,
@@ -25,7 +23,6 @@ def invoke(root, ok, needle=None, command="generate"):
         raise AssertionError(f"unexpected rc={result.returncode}:\n{result.stdout}")
     if needle and needle not in result.stdout:
         raise AssertionError(f"missing {needle!r}:\n{result.stdout}")
-
 def main():
     with tempfile.TemporaryDirectory(prefix="assurance-v4-mutants-") as tmp:
         fixture = Path(tmp)
@@ -46,8 +43,7 @@ def main():
         shutil.copy2(ROOT / "audit/SOURCE-FIDELITY.md", fixture / "audit/SOURCE-FIDELITY.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
-        shutil.copy2(ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean",
-                     fixture / "LidoSRv3/Audit/Provenance/Deposit.lean")
+        shutil.copy2(ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean", fixture / "LidoSRv3/Audit/Provenance/Deposit.lean")
         for name in (
             "guarantees.yaml", "assumptions.yaml", "artifacts.lock.json",
             "source-map.yaml", "trust-native-decide-allowlist.txt",
@@ -64,10 +60,7 @@ def main():
         subprocess.run(["git", "config", "user.name", "audit metadata test"], cwd=fixture, check=True)
         subprocess.run(["git", "add", "."], cwd=fixture, check=True)
         subprocess.run(["git", "commit", "--quiet", "-m", "R1 review basis"], cwd=fixture, check=True)
-        fixture_review_base = subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=fixture, check=True,
-            text=True, stdout=subprocess.PIPE,
-        ).stdout.strip()
+        fixture_review_base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=fixture, check=True, text=True, stdout=subprocess.PIPE).stdout.strip()
         audit_script = fixture / "scripts/audit_metadata.py"
         audit_source = audit_script.read_text(encoding="utf-8")
         rebased_source, substitutions = re.subn(
@@ -97,13 +90,10 @@ def main():
         invoke(fixture, True, command="check")
 
         source_fidelity = fpath.read_text(encoding="utf-8")
-        fpath.write_text(re.sub(
-            r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.",
-            "all 67 canonical fidelity-gap entries remain.", source_fidelity,
-        ), encoding="utf-8")
-        invoke(fixture, False, "SOURCE-FIDELITY: Stage A must visibly disclose all canonical fidelity gaps")
+        stale = re.sub(r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 67 canonical fidelity-gap entries remain.", source_fidelity)
+        fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure must visibly disclose all canonical fidelity gaps")
+        fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure must visibly disclose all canonical fidelity gaps")
         fpath.write_text(source_fidelity, encoding="utf-8")
-
         # Metadata is untrusted Markdown-table content: a pipe in every
         # family of metadata-derived report cells must remain literal data,
         # including adjacent pipes that would add columns.
@@ -114,7 +104,6 @@ def main():
         def set_abstract_status(row): row["abstract"]["status"] = "left||right"
         def set_verity_status(row): row["verity"]["status"] = "left||right"
         def set_classification(row): row["classification"]["kind"] = "left||right"
-
         cell_families = (
             set_id, set_abstract_status, set_verity_status, set_classification,
         )
@@ -745,6 +734,7 @@ def main():
           "whole table relocated under a trailing appendix and under a later section "
           "rejected, since a gap count a reader reaches only after the CHECKED cells "
           "it was written to qualify no longer qualifies them")
+
 
 
 if __name__ == "__main__":

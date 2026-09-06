@@ -67,6 +67,8 @@ review desktop/mobile. Preserve layout and protocol map. Open reviewable PRs;
 do not merge or deploy. Record derived assumptions, closed gaps and remaining gaps
 for each delivery. Added premises cannot count as unconditional strengthening.
 
+## Stage A disclosure
+
 Stage A changes only two disclosures; all eleven statuses and all 68 canonical fidelity-gap
 entries remain. No assumption is discharged. It adds no executed differential test
 and does not satisfy the source-model completion gates for B–F.

@@ -126,37 +126,24 @@ DEPOSIT_CONSTRUCTOR_SPAN = {
     ),
 }
 
-
 def load(path):
     return json.loads(path.read_text(encoding="utf-8"))
-
-
 def require(condition, message):
     if not condition:
         raise SystemExit(f"audit metadata error: {message}")
-
-
 def markdown_table_cell(value):
     """Render metadata as one Markdown table cell, never as table syntax."""
     return str(value).replace("\\", "\\\\").replace("|", "\\|").replace("\r\n", "<br>").replace("\n", "<br>").replace("\r", "<br>")
-
-
 def canonical_metadata_bytes(value):
     """Ignore JSON whitespace while binding every metadata value and shape."""
     return json.dumps(json.loads(value), sort_keys=True, separators=(",", ":")).encode()
-
-
 def canonical_review_input_bytes(relative, value):
     """Normalize structured review inputs while retaining exact text inputs."""
     if relative.endswith((".yaml", ".json")):
         return canonical_metadata_bytes(value)
     return value
-
-
 def nonempty_strings(value):
     return isinstance(value, list) and all(isinstance(x, str) and x.strip() for x in value)
-
-
 def validate_deposit_constructor_fixture():
     require(DEPOSIT_CONSTRUCTOR_FIXTURE.is_file(), "pinned StakingRouter constructor fixture is missing")
     source = DEPOSIT_CONSTRUCTOR_FIXTURE.read_bytes()
@@ -701,11 +688,10 @@ def validate_readme_fidelity_disclosure(rows):
 def validate_source_fidelity_gap_disclosure(rows):
     """Bind Stage A's public gap-count statement to the canonical registry."""
     total = sum(len(row["fidelity"]["missing"]) for row in rows[:len(CANONICAL_IDS)])
-    visible = markdown_text.rendered_text(SOURCE_FIDELITY.read_text(encoding="utf-8"))
+    disclosure = re.search(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)", SOURCE_FIDELITY.read_text(encoding="utf-8"), re.MULTILINE | re.DOTALL)
+    require(disclosure is not None, "SOURCE-FIDELITY: no Stage A disclosure section")
     required = f"all {total} canonical fidelity-gap entries remain."
-    require(re.search(re.escape(required).replace(r"\ ", r"\s+"), visible),
-            "SOURCE-FIDELITY: Stage A must visibly disclose all canonical fidelity gaps "
-            f"as `{required}`")
+    require(re.search(re.escape(required).replace(r"\ ", r"\s+"), markdown_text.rendered_text(disclosure.group("body"))), f"SOURCE-FIDELITY: Stage A disclosure must visibly disclose all canonical fidelity gaps as `{required}`")
 
 
 def validate():
@@ -878,6 +864,8 @@ def main():
         for name, content in views.items():
             require((AUDIT / name).read_text(encoding="utf-8") == content, f"{name} is stale; run scripts/audit_metadata.py generate")
         print(f"audit metadata v4 ok: {len(CANONICAL_IDS)} canonical guarantees + {len(SUBORDINATE_IDS)} subordinate evidence rows")
+
+
 
 
 if __name__ == "__main__":
