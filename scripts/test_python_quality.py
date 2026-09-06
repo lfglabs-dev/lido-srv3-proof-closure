@@ -111,11 +111,11 @@ def check_ratchet(fixture: Path) -> None:
         dense.write_text("def f():\n" + "".join(f"    type A{n} = int if missing else str\n" for n in range(21)), encoding="utf-8")
         expect(True, "python-quality ok", *args)
         dense.write_text("def f[T: " + DENSE_BODY + "]():\n    pass\n", encoding="utf-8")
-        expect(False, "zz_dense.py:f.T.__bound__ = 24, limit 22, and it is not baseline debt", *args)
+        expect(False, f"zz_dense.py:f.T.__bound__ = {24 + int(check_python_quality.lazy_annotations(ast.parse(DENSE)))}, limit 22, and it is not baseline debt", *args)
         dense.write_text("class K[T: " + DENSE_BODY + "]:\n    pass\n", encoding="utf-8")
-        expect(False, "zz_dense.py:K.T.__bound__ = 24, limit 22, and it is not baseline debt", *args)
+        expect(False, f"zz_dense.py:K.T.__bound__ = {24 + int(check_python_quality.lazy_annotations(ast.parse(DENSE)))}, limit 22, and it is not baseline debt", *args)
         dense.write_text("type A[T: " + DENSE_BODY + "] = int\n", encoding="utf-8")
-        expect(False, "zz_dense.py:A.T.__bound__ = 24, limit 22, and it is not baseline debt", *args)
+        expect(False, f"zz_dense.py:A.T.__bound__ = {24 + int(check_python_quality.lazy_annotations(ast.parse(DENSE)))}, limit 22, and it is not baseline debt", *args)
         dense.write_text("type Callback = (lambda x: " + DENSE_BODY + ")\n", encoding="utf-8")
         expect(False, "zz_dense.py:lambda@1 = 24, limit 22, and it is not baseline debt", *args)
     long = scripts / "zz_long.py"
@@ -298,8 +298,8 @@ def check_deferred_callable_inventory() -> None:
                 for name, node in check_python_quality.scopes(eager, False, False)}
     if measured != {"<module>": 1, "callback": 1, "lambda@1": 24}:
         raise SystemExit(f"eager assignment annotation callables were not inventoried: {measured}")
-    if check_python_quality.lazy_annotations(lazy_lambda, (3, 14)) is not True:
-        raise SystemExit("Python 3.14 annotations were not recognized as lazy")
+    if [check_python_quality.lazy_annotations(lazy_lambda, version) for version in ((3, 12), (3, 13), (3, 14))] != [False, False, True]:
+        raise SystemExit("Python 3.12-3.14 annotation laziness drifted")
     if check_python_quality.lazy_annotations(deferred_assignment, (3, 14)):
         raise SystemExit("future annotations were treated as PEP 649 callables")
 
