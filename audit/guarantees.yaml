@@ -32,13 +32,13 @@
           "module count read from modulesCountSlot and capped by MAX_STAKING_MODULES_COUNT = 32 before binding router indices",
           "packed ModuleStateConfig decoding for moduleAddress, uint16 stakeShareLimit, status, and withdrawalCredentialsType",
           "live source-derived getStakingModuleSummary staticcall with 96-byte returndata guard and ABI decode in exited/deposited/depositable order, plus the distinct WC02-only getTotalModuleStake staticcall (0x0c852f5c) with a fail-closed 32-byte uint256 decode, threaded into BoundModule and the allocation loop under an explicit decoded-row correspondence premise",
-          "summary_field_order_kill_line_refutes_decoder rejects an exited/deposited return-word swap",
-          "Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage"
+          "summary_field_order_kill_line_refutes_decoder rejects an exited/deposited return-word swap"
         ],
         "missing": [
           "unique moduleAddress on addModule",
           "getDepositAllocations / MinFirst fill (see P-ALLOC-2)",
-          "reachable-router CheckedBounds"
+          "reachable-router CheckedBounds",
+          "Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage"
         ]
       },
       "classification": {
