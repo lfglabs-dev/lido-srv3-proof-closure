@@ -686,12 +686,12 @@ def validate_readme_fidelity_disclosure(rows):
 
 
 def validate_source_fidelity_gap_disclosure(rows):
-    """Bind Stage A's public gap-count statement to the canonical registry."""
     total = sum(len(row["fidelity"]["missing"]) for row in rows[:len(CANONICAL_IDS)])
     disclosure = re.search(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)", SOURCE_FIDELITY.read_text(encoding="utf-8"), re.MULTILINE | re.DOTALL)
     require(disclosure is not None, "SOURCE-FIDELITY: no Stage A disclosure section")
+    lead = re.match(r"(?P<paragraph>[^\n]*(?:\n(?!\s*\n)[^\n]*)*)(?:\n\s*\n|\Z)", disclosure.group("body")).group("paragraph")
     required = f"all {total} canonical fidelity-gap entries remain."
-    require(re.search(re.escape(required).replace(r"\ ", r"\s+"), markdown_text.rendered_text(disclosure.group("body"))), f"SOURCE-FIDELITY: Stage A disclosure must visibly disclose all canonical fidelity gaps as `{required}`")
+    require(re.search(re.escape(required).replace(r"\ ", r"\s+"), markdown_text.rendered_text(lead)), f"SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps as `{required}`")
 
 
 def validate():

@@ -91,10 +91,10 @@ def main():
 
         source_fidelity = fpath.read_text(encoding="utf-8")
         stale = re.sub(r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 67 canonical fidelity-gap entries remain.", source_fidelity)
-        fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure must visibly disclose all canonical fidelity gaps")
-        fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure must visibly disclose all canonical fidelity gaps")
-        fpath.write_text(source_fidelity, encoding="utf-8")
-        # Metadata is untrusted Markdown-table content: a pipe in every
+        fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        fpath.write_text(stale + "\nA later Stage A paragraph says all 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        fpath.write_text(source_fidelity, encoding="utf-8"); # Metadata is untrusted Markdown-table content: a pipe in every
         # family of metadata-derived report cells must remain literal data,
         # including adjacent pipes that would add columns.
         spec = importlib.util.spec_from_file_location("fixture_audit_metadata", audit_script)
