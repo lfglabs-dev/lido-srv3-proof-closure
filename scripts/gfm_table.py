@@ -354,6 +354,18 @@ def _literal_lines(lines: list[Row]) -> list[bool]:
     return literal
 
 
+def mask_literal_regions(text: str) -> str:
+    """Blank literal regions, preserving offsets and line endings."""
+    lines = _lines(text)
+    literal = _literal_lines(lines)
+    return "".join(
+        "".join(" " if char not in "\r\n" else char
+                for char in text[row.start:row.end])
+        if hidden else text[row.start:row.end]
+        for row, hidden in zip(lines, literal)
+    )
+
+
 def find_tables(text: str, *, interrupting: bool = False) -> list[Table]:
     """Every block of ``text`` cmark-gfm renders as a table, in source order.
 
