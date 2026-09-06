@@ -96,48 +96,43 @@ def annotation_scope(fields: list[ast.AST]) -> ast.Module:
     return ast.Module(body=[ast.Expr(value=field) for field in fields], type_ignores=[])
 
 
-def assignment_annotation(node: ast.AST, lazy: bool, annotation_owner: bool) -> list[ast.AST]:
+def assignment_annotation(node: ast.AST, postponed: bool, lazy: bool,
+                          annotation_owner: bool) -> list[ast.AST]:
     """The PEP 649 annotation an assignment owner evaluates, if any."""
-    if lazy and annotation_owner and isinstance(node, ast.AnnAssign):
+    if annotation_owner and (lazy or not postponed) and isinstance(node, ast.AnnAssign):
         return [node.annotation]
     return []
 
 
-def annotation_statements(children: list[ast.stmt]) -> list[ast.stmt]:
-    """Project PEP 649 annotation thunks without flattening their branches."""
+def annotation_statements(children: list[ast.stmt], conditional: bool = False) -> list[ast.stmt]:
+    """Project PEP 649 thunks with one membership guard per annotation."""
     projected: list[ast.stmt] = []
     for child in children:
         if isinstance(child, (FUNCTIONS, ast.ClassDef)):
             continue
         if isinstance(child, ast.AnnAssign):
-            projected.append(ast.copy_location(ast.Expr(value=copy.deepcopy(child.annotation)), child))
+            expression = ast.copy_location(ast.Expr(value=copy.deepcopy(child.annotation)), child)
+            if conditional:
+                # CPython's generated thunk checks conditional membership for
+                # every annotation, even when their source shares one block.
+                expression = ast.copy_location(ast.If(test=ast.Constant(value=True),
+                                                      body=[expression], orelse=[]), child)
+            projected.append(expression)
             continue
         if isinstance(child, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith)):
-            clone = copy.copy(child)
-            clone.body = annotation_statements(child.body)
-            if hasattr(child, "orelse"):
-                clone.orelse = annotation_statements(child.orelse)
-            if clone.body or getattr(clone, "orelse", []):
-                projected.append(clone)
+            projected.extend(annotation_statements(child.body, True))
+            projected.extend(annotation_statements(getattr(child, "orelse", []), True))
             continue
         if isinstance(child, (ast.Try, getattr(ast, "TryStar", ast.Try))):
-            clone = copy.copy(child)
-            clone.body = annotation_statements(child.body)
-            clone.orelse = annotation_statements(child.orelse)
-            clone.finalbody = annotation_statements(child.finalbody)
-            clone.handlers = [copy.copy(handler) for handler in child.handlers]
-            for handler in clone.handlers:
-                handler.body = annotation_statements(handler.body)
-            if clone.body or clone.orelse or clone.finalbody or any(handler.body for handler in clone.handlers):
-                projected.append(clone)
+            projected.extend(annotation_statements(child.body, True))
+            projected.extend(annotation_statements(child.orelse, True))
+            projected.extend(annotation_statements(child.finalbody, True))
+            for handler in child.handlers:
+                projected.extend(annotation_statements(handler.body, True))
             continue
         if isinstance(child, ast.Match):
-            clone = copy.copy(child)
-            clone.cases = [copy.copy(case) for case in child.cases]
-            for case in clone.cases:
-                case.body = annotation_statements(case.body)
-            if any(case.body for case in clone.cases):
-                projected.append(clone)
+            for case in child.cases:
+                projected.extend(annotation_statements(case.body, True))
     return projected
 
 
@@ -331,7 +326,7 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                 # independently-owned callable remains inventory-visible.
                 targets = child.targets if isinstance(child, ast.Assign) else [child.target]
                 fields = [*targets, *ast.iter_child_nodes(child.value)]
-                fields.extend(assignment_annotation(child, lazy, annotation_owner))
+                fields.extend(assignment_annotation(child, postponed, lazy, annotation_owner))
                 visit(fields, scope, annotation_owner)
             elif isinstance(child, ast.Lambda):
                 record(scope, f"lambda@{child.lineno}", child)
@@ -341,7 +336,7 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                 # evaluated.  Nor is a PEP 526 annotation local to a function,
                 # on any runtime: the function has no annotation owner.
                 fields = [part for part in (child.target, child.value) if part is not None]
-                fields.extend(assignment_annotation(child, lazy, annotation_owner))
+                fields.extend(assignment_annotation(child, postponed, lazy, annotation_owner))
                 visit(fields, scope, annotation_owner)
             else:
                 visit(ast.iter_child_nodes(child), scope, annotation_owner)

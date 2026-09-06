@@ -289,6 +289,15 @@ def check_deferred_callable_inventory() -> None:
     names = [name for name, _ in check_python_quality.scopes(local, True, True)]
     if names != ["<module>", "f"]:
         raise SystemExit("a function-local annotation created a lazy lambda scope")
+    eager_local = ast.parse("def f():\n    callback: (lambda x: " + DENSE_BODY + ") = None\n")
+    names = [name for name, _ in check_python_quality.scopes(eager_local, False, False)]
+    if names != ["<module>", "f"]:
+        raise SystemExit("an eager function-local annotation created a lambda scope")
+    eager = ast.parse("callback: (lambda x: " + DENSE_BODY + ") = lambda: None\n")
+    measured = {name: check_python_quality.complexity(node)
+                for name, node in check_python_quality.scopes(eager, False, False)}
+    if measured != {"<module>": 1, "callback": 1, "lambda@1": 24}:
+        raise SystemExit(f"eager assignment annotation callables were not inventoried: {measured}")
     if check_python_quality.lazy_annotations(lazy_lambda, (3, 14)) is not True:
         raise SystemExit("Python 3.14 annotations were not recognized as lazy")
     if check_python_quality.lazy_annotations(deferred_assignment, (3, 14)):
@@ -323,6 +332,17 @@ def check_lazy_annotation_thunks() -> None:
                 for name, node in check_python_quality.scopes(guarded, True, True)}
     if measured != {"<module>": 12, "__annotate__": 23}:
         raise SystemExit(f"PEP 649 annotation control flow was flattened: {measured}")
+    many_guarded = ast.parse("if flag:\n" + "".join(
+        f"    callback{number}: int = None\n" for number in range(22)))
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(many_guarded, True, True)}
+    if measured != {"<module>": 2, "__annotate__": 23}:
+        raise SystemExit(f"PEP 649 annotation guards were grouped: {measured}")
+    plain = ast.parse("".join(f"callback{number}: int = None\n" for number in range(22)))
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(plain, True, True)}
+    if measured != {"<module>": 1, "__annotate__": 1}:
+        raise SystemExit(f"unconditional PEP 649 annotations gained guards: {measured}")
     guarded_class = ast.parse("class C:\n" + "".join(
         f"    if enabled{number}:\n        callback{number}: int if selected{number} else str = None\n"
         for number in range(11)))
