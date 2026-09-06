@@ -21,6 +21,7 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
+SOURCE_FIDELITY = AUDIT / "SOURCE-FIDELITY.md"
 R1_REVIEW_BASE = "aed5a18fa059a6907e89de59dbc1bb4434f73670"
 # The report records this commit as its Stage A disclosure input basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
@@ -697,6 +698,16 @@ def validate_readme_fidelity_disclosure(rows):
             "comment or other unrendered markup, does not qualify the table above it")
 
 
+def validate_source_fidelity_gap_disclosure(rows):
+    """Bind Stage A's public gap-count statement to the canonical registry."""
+    total = sum(len(row["fidelity"]["missing"]) for row in rows[:len(CANONICAL_IDS)])
+    visible = markdown_text.rendered_text(SOURCE_FIDELITY.read_text(encoding="utf-8"))
+    required = f"all {total} canonical fidelity-gap entries remain."
+    require(re.search(re.escape(required).replace(r"\ ", r"\s+"), visible),
+            "SOURCE-FIDELITY: Stage A must visibly disclose all canonical fidelity gaps "
+            f"as `{required}`")
+
+
 def validate():
     validate_deposit_constructor_fixture()
     registry = load(AUDIT / "guarantees.yaml")
@@ -710,6 +721,7 @@ def validate():
     validate_global_assumptions(rows, assumptions)
     validate_r1_review_basis()
     validate_readme_fidelity_disclosure(rows)
+    validate_source_fidelity_gap_disclosure(rows)
     return rows
 
 

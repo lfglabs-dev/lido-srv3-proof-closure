@@ -43,6 +43,7 @@ def main():
         # through the shared link-metadata reducer, for the same reason.
         shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
+        shutil.copy2(ROOT / "audit/SOURCE-FIDELITY.md", fixture / "audit/SOURCE-FIDELITY.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
                      fixture / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol")
         shutil.copy2(ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean",
@@ -84,6 +85,7 @@ def main():
         lpath = fixture / "audit/artifacts.lock.json"
         spath = fixture / "audit/source-map.yaml"
         tpath = fixture / "audit/trust-native-decide-allowlist.txt"
+        fpath = fixture / "audit/SOURCE-FIDELITY.md"
         mpath = fixture / "verity/targets/audit-manifest.json"
         guarantees = json.loads(gpath.read_text())
         assumptions = json.loads(apath.read_text())
@@ -93,6 +95,14 @@ def main():
 
         invoke(fixture, True)
         invoke(fixture, True, command="check")
+
+        source_fidelity = fpath.read_text(encoding="utf-8")
+        fpath.write_text(re.sub(
+            r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.",
+            "all 67 canonical fidelity-gap entries remain.", source_fidelity,
+        ), encoding="utf-8")
+        invoke(fixture, False, "SOURCE-FIDELITY: Stage A must visibly disclose all canonical fidelity gaps")
+        fpath.write_text(source_fidelity, encoding="utf-8")
 
         # Metadata is untrusted Markdown-table content: a pipe in every
         # family of metadata-derived report cells must remain literal data,
