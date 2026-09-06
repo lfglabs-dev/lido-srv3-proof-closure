@@ -310,8 +310,13 @@ def check_lazy_annotation_thunks() -> None:
     tree = ast.parse(source)
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(tree, True, True)}
-    if measured != {"<module>": 1, "f": 1, "f.__annotate__": 24}:
+    if measured != {"<module>": 1, "f": 1, "f.__annotate__": 25}:
         raise SystemExit(f"PEP 649 function annotation thunk drifted: {measured}")
+    below_limit = ast.parse("def f(x: " + " if flag else ".join(["int"] * 21) + "):\n    pass\n")
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(below_limit, True, True)}
+    if measured != {"<module>": 1, "f": 1, "f.__annotate__": 22}:
+        raise SystemExit(f"PEP 649 function annotation format guard drifted: {measured}")
     module = ast.parse("callback: " + DENSE_BODY + " = None\n")
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(module, True, True)}
@@ -364,6 +369,12 @@ def check_lazy_module_annotation_guards() -> None:
                 for name, node in check_python_quality.scopes(plain_class, True, True)}
     if measured != {"<module>": 1, "C": 1, "C.__annotate__": 1}:
         raise SystemExit(f"unconditional PEP 649 class annotations gained guards: {measured}")
+    non_simple = ast.parse("".join(
+        f"target.field{number}: int if flag else str\n" for number in range(22)))
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(non_simple, True, True)}
+    if measured != {"<module>": 1}:
+        raise SystemExit(f"non-simple PEP 649 annotations created a thunk: {measured}")
 
 
 def check_lazy_type_parameters() -> None:

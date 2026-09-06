@@ -91,9 +91,15 @@ def annotation_fields(arguments: ast.arguments) -> list[ast.AST]:
     return fields
 
 
-def annotation_scope(fields: list[ast.AST]) -> ast.Module:
+def annotation_scope(fields: list[ast.AST], format_guard: bool = False) -> ast.Module:
     """The executable PEP 649 thunk represented by its annotation expressions."""
-    return ast.Module(body=[ast.Expr(value=field) for field in fields], type_ignores=[])
+    body = [ast.Expr(value=field) for field in fields]
+    if format_guard:
+        # Every function annotation thunk first validates its requested format.
+        # Model that fixed decision so the synthetic scope has the same
+        # cyclomatic floor as CPython's generated ``__annotate__`` function.
+        body.insert(0, ast.If(test=ast.Constant(value=True), body=[], orelse=[]))
+    return ast.Module(body=body, type_ignores=[])
 
 
 def assignment_annotation(node: ast.AST, postponed: bool, lazy: bool,
@@ -111,6 +117,11 @@ def annotation_statements(children: list[ast.stmt], conditional: bool = False) -
         if isinstance(child, (FUNCTIONS, ast.ClassDef)):
             continue
         if isinstance(child, ast.AnnAssign):
+            # PEP 649 stores only simple-name assignment annotations in the
+            # module/class annotation mapping. Attribute and subscript targets
+            # therefore do not create executable annotation-thunk work.
+            if not isinstance(child.target, ast.Name):
+                continue
             expression = ast.copy_location(ast.Expr(value=copy.deepcopy(child.annotation)), child)
             if conditional:
                 # CPython's generated thunk checks conditional membership for
@@ -280,10 +291,13 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
         bound = qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}"
         found.append((bound, node))
         if lazy and isinstance(node, (*FUNCTIONS, ast.ClassDef)):
-            thunk = (annotation_scope(annotation_fields(node.args) +
-                                      ([node.returns] if node.returns is not None else []))
-                     if isinstance(node, FUNCTIONS) else local_annotation_scope(node))
-            if thunk.body:
+            if isinstance(node, FUNCTIONS):
+                fields = annotation_fields(node.args) + (
+                    [node.returns] if node.returns is not None else [])
+                thunk = annotation_scope(fields, format_guard=True) if fields else None
+            else:
+                thunk = local_annotation_scope(node)
+            if thunk is not None and thunk.body:
                 record([bound], "__annotate__", thunk)
 
     def record_type_parameter_evaluators(scope: list[str], node: ast.AST) -> None:
