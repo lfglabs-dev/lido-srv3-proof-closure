@@ -138,7 +138,8 @@ def annotation_statements(children: list[ast.stmt], conditional: bool = False) -
 
 def local_annotation_scope(node: ast.AST) -> ast.Module:
     """PEP 649 module/class thunk, including annotation-membership control flow."""
-    body = annotation_statements(node.body) if isinstance(node, (ast.Module, ast.ClassDef)) else []
+    body = (annotation_statements(node.body, isinstance(node, ast.Module))
+            if isinstance(node, (ast.Module, ast.ClassDef)) else [])
     return ast.Module(body=body, type_ignores=[])
 
 
