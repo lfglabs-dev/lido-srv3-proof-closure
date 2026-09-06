@@ -13,10 +13,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-
 def write(path, value):
     path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
-
 
 def invoke(root, ok, needle=None, command="generate"):
     result = subprocess.run(
@@ -27,7 +25,6 @@ def invoke(root, ok, needle=None, command="generate"):
         raise AssertionError(f"unexpected rc={result.returncode}:\n{result.stdout}")
     if needle and needle not in result.stdout:
         raise AssertionError(f"missing {needle!r}:\n{result.stdout}")
-
 
 def main():
     with tempfile.TemporaryDirectory(prefix="assurance-v4-mutants-") as tmp:
@@ -253,10 +250,8 @@ def main():
         x = copy.deepcopy(guarantees); x["guarantees"][6]["verity"] = {"status":"OPEN", "theorem":None}; x["guarantees"][6]["fidelity"]["missing"] = ["recursive dispatch absent"]; x["guarantees"][6]["classification"] = {"kind":"IMPLEMENTATION_PENDING", "work":"compose the ensemble"}; mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][3]["assumptions"].remove("A-TOPUP-NOWRAP"); mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][0]["next_gate"] = "Refine through generated Yul and EVM."; mutants.append((gpath, x, "canonical assurance detail differs"))
-        x = copy.deepcopy(guarantees)
-        live_rollback_gap = module.P_ALLOC1_LIVE_ROLLBACK_GAP
-        x["guarantees"][0]["fidelity"]["missing"].remove(live_rollback_gap)
-        x["guarantees"][0]["fidelity"]["covered"].append(live_rollback_gap)
+        x = copy.deepcopy(guarantees); live_rollback_gap = module.P_ALLOC1_LIVE_ROLLBACK_GAP
+        x["guarantees"][0]["fidelity"]["missing"].remove(live_rollback_gap); x["guarantees"][0]["fidelity"]["covered"].append(live_rollback_gap)
         mutants.append((gpath, x, "P-ALLOC-1: live rollback exclusion must be an open fidelity gap"))
         x = copy.deepcopy(guarantees); x["guarantees"][0]["special_bindings"] = guarantees["guarantees"][10]["special_bindings"]; mutants.append((gpath, x, "bindings are SSZ-only"))
         x = copy.deepcopy(guarantees); x["guarantees"][10]["special_bindings"]["deployed_yul"]["scope"] = "entire runtime"; mutants.append((gpath, x, "targeted deployed-Yul binding differs"))

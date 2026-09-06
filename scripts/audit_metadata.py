@@ -6,10 +6,8 @@ Verity Executable Contract theorem (or honest partial state), and one actionable
 General Yul/EVM/deployment refinement is deliberately not an assurance lane.
 """
 
-import argparse
-import hashlib
-import json
-import re
+import argparse, hashlib
+import json, re
 import subprocess
 import sys
 from pathlib import Path
@@ -104,10 +102,7 @@ EXPECTED_PRIORITIES = {
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
-P_ALLOC1_LIVE_ROLLBACK_GAP = (
-    "Contract.run rollback after intermediate writes for AllocationTx.allocate; "
-    "the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage"
-)
+P_ALLOC1_LIVE_ROLLBACK_GAP = "Contract.run rollback after intermediate writes for AllocationTx.allocate; the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage"
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
 TRUST_NATIVE_DECIDE_ALLOWLIST = AUDIT / "trust-native-decide-allowlist.txt"
@@ -385,9 +380,7 @@ def validate_guarantees(data, assumption_ids):
         require(isinstance(row["next_gate"], str) and row["next_gate"].strip(), f"{row['id']}: empty next gate")
         require(set(row["reproduction"]) == {"command", "expected"} and all(isinstance(v, str) and v.strip() for v in row["reproduction"].values()), f"{row['id']}: reproduction record is incomplete")
         validate_classification(row, assumption_ids)
-        if row["id"] == "P-ALLOC-1":
-            require(P_ALLOC1_LIVE_ROLLBACK_GAP in row["fidelity"]["missing"],
-                    "P-ALLOC-1: live rollback exclusion must be an open fidelity gap")
+        if row["id"] == "P-ALLOC-1": require(P_ALLOC1_LIVE_ROLLBACK_GAP in row["fidelity"]["missing"], "P-ALLOC-1: live rollback exclusion must be an open fidelity gap")
         if row["id"] in EXPECTED_CANONICAL_CLAIMS:
             require(row.get("roadmap_priority") == EXPECTED_PRIORITIES[row["id"]],
                     f"{row['id']}: roadmap priority differs")
