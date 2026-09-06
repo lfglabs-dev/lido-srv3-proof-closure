@@ -23,7 +23,7 @@ import markdown_text  # noqa: E402  (sibling module, located above)
 
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT = ROOT / "audit"
-R1_REVIEW_BASE = "2af887567c3faa074d30123c09c7f6114ca3589b"
+R1_REVIEW_BASE = "aed5a18fa059a6907e89de59dbc1bb4434f73670"
 # The report records this commit as its Stage A disclosure input basis.  Keep the exact
 # generator inputs bound both to that Git object and to their expected bytes:
 # a changed registry, source map, or Trust allowlist must not be presented as
@@ -32,7 +32,7 @@ R1_REVIEW_BASE = "2af887567c3faa074d30123c09c7f6114ca3589b"
 # report.  A normal regeneration may never pair changed family content with a
 # stale certified basis.
 R1_REPORT_INPUT_SHA256 = {
-    "audit/guarantees.yaml": "19ad54e73791465cb8ebf3321ddb0a5a8338c1a04e9f2587ef3c5d197f0b8495",
+    "audit/guarantees.yaml": "22d2420714906d566f6250ddc5b0b50d0815567f0e8212ce37d4fd1ac34bed30",
     "audit/source-map.yaml": "e592f4e15e9d3ce8ffdcefdc87bb664ac404c6d0b7447e29e35d5c60611eaba6",
     "audit/trust-native-decide-allowlist.txt": "4874951cd0717f16756f3f644c424f06bdbbfcca1561173b32fd134b1fb6730c",
 }
@@ -85,7 +85,7 @@ EXPECTED_CANONICAL_CLAIMS = {
     "P-SSZ-1": ("CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.deposit_root_iff", "CHECKED", "LidoSRv3.Audit.Guarantees.PSsz1.verity_tx_simulates_ssz_encoding", "IMPLEMENTATION_PENDING", ("A-SHA256-FFI", "A-PERFECT-HASH", "A-MULTI-NODE-TRANSPORT", "A-SOLC-TRUSTED", "A-YUL-INTERFACE", "A-RUNTIME-PROVENANCE")),
 }
 EXPECTED_CANONICAL_DETAIL_SHA256 = {
-    "P-ALLOC-1": "0fd2c95fe2d34b7ca586819530f6e6a57a17e4415af068789cc22019fa6ad705",
+    "P-ALLOC-1": "9ad778510fac55548ab9b51cb802743fa33eabcc2908ffdbaae38bb59065a5f3",
     "P-ALLOC-2": "e5955a7a287a477ee8e21da15dabed644676f247d242035be35cf8db5f39f70e",
     "P-DEPOSIT-1": "768e8ca14a82e6185ec6cfaaa87365c708434f9a6281fa265eb332a8a10e8208",
     "P-TOPUP-1": "7097df87332a3b9f4996ae897b5619947c71d4bdc547dad407759174fa62212f",
@@ -104,6 +104,10 @@ EXPECTED_PRIORITIES = {
     "P-ADDRESS-1": "DONE", "P-TOPUP-2": "DONE", "P-CONSOLIDATION-1": "DONE",
     "P-SSZ-1": "DONE",
 }
+P_ALLOC1_LIVE_ROLLBACK_GAP = (
+    "Contract.run rollback after intermediate writes for AllocationTx.allocate; "
+    "the cited revert_restores_snapshot theorem does not cover allocateLiveFromStorage"
+)
 DEPOSIT_CONSTRUCTOR_FIXTURE = ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol"
 DEPOSIT_PROVENANCE_LEAN = ROOT / "LidoSRv3/Audit/Provenance/Deposit.lean"
 TRUST_NATIVE_DECIDE_ALLOWLIST = AUDIT / "trust-native-decide-allowlist.txt"
@@ -381,6 +385,9 @@ def validate_guarantees(data, assumption_ids):
         require(isinstance(row["next_gate"], str) and row["next_gate"].strip(), f"{row['id']}: empty next gate")
         require(set(row["reproduction"]) == {"command", "expected"} and all(isinstance(v, str) and v.strip() for v in row["reproduction"].values()), f"{row['id']}: reproduction record is incomplete")
         validate_classification(row, assumption_ids)
+        if row["id"] == "P-ALLOC-1":
+            require(P_ALLOC1_LIVE_ROLLBACK_GAP in row["fidelity"]["missing"],
+                    "P-ALLOC-1: live rollback exclusion must be an open fidelity gap")
         if row["id"] in EXPECTED_CANONICAL_CLAIMS:
             require(row.get("roadmap_priority") == EXPECTED_PRIORITIES[row["id"]],
                     f"{row['id']}: roadmap priority differs")

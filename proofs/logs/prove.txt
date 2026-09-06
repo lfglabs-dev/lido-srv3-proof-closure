@@ -1,100 +1,7 @@
 verified_source_tree=1f2f245878650a816a8b1fab36ce0a67b139ee10
 lean_version=Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
 proof_targets=LidoSRv3 LidoSRv3Legacy
-✔ [2/45] Built Verity.Core.Address (3.5s)
-✔ [3/49] Built LidoSRv3.Audit.Guarantees.Registry (3.5s)
-✔ [4/57] Built Compiler.CompilationModel.IssueRefs (3.3s)
-✔ [5/73] Built Verity.Core.Model.ProofStatus (3.9s)
-✔ [6/79] Built Verity.Core.Model.Identifier (3.9s)
-✔ [9/101] Built LidoSRv3.Audit.Common.Units (4.9s)
-✔ [10/103] Built Verity.Core.Model.Constants (5.0s)
-✔ [11/103] Built Compiler.CompilationModel.InternalNaming (4.6s)
-✔ [12/109] Built Compiler.Keccak.Circuit (6.6s)
-✔ [13/109] Built Verity.Core.Model.Yul.Ast (7.4s)
-✔ [14/109] Built Compiler.ProofStatus (2.0s)
-✔ [15/109] Built Compiler.Json (4.2s)
-✔ [16/109] Built Batteries.Lean.TagAttribute (2.9s)
-✔ [17/109] Built Verity.Core.Uint256 (8.5s)
-✔ [18/111] Built LidoSRv3.Audit.Spec (4.1s)
-✔ [19/111] Built Batteries.Util.LibraryNote (4.8s)
-✔ [20/111] Built Verity.Core.FiniteSet (6.2s)
-✔ [21/111] Built Batteries.Tactic.Unreachable (5.8s)
-✔ [22/111] Built Compiler.Yul.Ast (3.3s)
-✔ [23/116] Built Verity.Core.Model.ECM (4.0s)
-✔ [24/117] Built Batteries.Tactic.SeqFocus (4.6s)
-✔ [25/117] Built Batteries.Lean.AttributeExtra (3.5s)
-✔ [26/117] Built Verity.Core.Uint16 (3.1s)
-✔ [27/117] Built Verity.EVM.Uint256 (3.5s)
-✔ [28/117] Built Verity.Core.Intrinsics (5.2s)
-✔ [29/117] Built Verity.Core.StorageAttr (14s)
-✔ [30/117] Built Batteries.Tactic.Init (7.9s)
-✔ [31/119] Built Batteries.Classes.Cast (3.2s)
-✔ [32/119] Built Batteries.Lean.Syntax (3.4s)
-✔ [33/122] Built Compiler.ECM (3.1s)
-✔ [34/125] Built Verity.Core.Int256 (5.8s)
-✔ [35/125] Built Batteries.Classes.RatCast (2.0s)
-✔ [36/130] Built Compiler.IR (5.0s)
-✔ [37/131] Built Batteries.Linter.UnreachableTactic (6.5s)
-✔ [38/134] Built Compiler.CompilationModel.DynamicData (5.0s)
-✔ [39/137] Built Batteries.Lean.EStateM (4.2s)
-✔ [40/137] Built Batteries.Lean.Except (4.0s)
-✔ [41/138] Built Batteries.Tactic.Lint.Basic (8.0s)
-✔ [42/140] Built Verity.Core.NarrowTypes (4.5s)
-✔ [43/140] Built Batteries.Linter.UnnecessarySeqFocus (7.3s)
-✔ [44/143] Built Batteries.Lean.Position (5.2s)
-✔ [45/147] Built Batteries.Control.Lemmas (4.2s)
-✔ [47/150] Built Verity.Macro.Syntax (18s)
-✔ [48/157] Built Batteries.Control.ForInStep.Basic (4.3s)
-✔ [49/157] Built Batteries.CodeAction.Attr (6.6s)
-✔ [50/160] Built Batteries.Data.Array.Init.Lemmas (1.8s)
-✔ [51/160] Built Batteries.Linter (2.4s)
-✔ [52/161] Built Batteries.Data.Bool (2.5s)
-✔ [53/161] Built Batteries.Control.ForInStep.Lemmas (2.4s)
-✔ [54/161] Built BatteriesRecycling.MonadSatisfying.Basic (6.2s)
-✔ [55/167] Built Batteries.Tactic.Lint.Misc (6.0s)
-✔ [56/167] Built Batteries.Control.LawfulMonadState (8.3s)
-✔ [57/167] Built Compiler.Keccak.CircuitData (19s)
-✔ [58/167] Built Batteries.CodeAction.Deprecated (9.4s)
-✔ [59/167] Built Batteries.Control.ForInStep (1.8s)
-✔ [60/168] Built Batteries.Data.Array.Merge (6.3s)
-✔ [61/169] Built Batteries.Data.BitVec.Basic (3.8s)
-✔ [62/169] Built Batteries.Classes.SatisfiesM (2.7s)
-✔ [63/178] Built Batteries.Data.Nat.Basic (2.9s)
-✔ [65/178] Built Batteries.Control.OptionT (3.4s)
-✔ [66/180] Built Batteries.CodeAction.Basic (6.2s)
-✔ [67/180] Built Batteries.Data.ByteSlice (2.9s)
-✔ [68/181] Built Batteries.Tactic.Lint.TypeClass (4.0s)
-✔ [69/187] Built Batteries.Data.BinaryHeap.Basic (11s)
-✔ [70/187] Built Compiler.Keccak.Sponge (7.3s)
-✔ [71/190] Built Batteries.Data.ByteArray (6.3s)
-✔ [72/190] Built Batteries.CodeAction.Misc (13s)
-✔ [73/190] Built BatteriesRecycling.MonadSatisfying.Array (10s)
-✔ [74/190] Built Batteries.Control.AlternativeMonad (5.2s)
-✔ [75/191] Built Batteries.Data.FloatArray (2.0s)
-✔ [76/192] Built Batteries.Data.BinaryHeap (3.4s)
-✔ [77/194] Built Batteries.Tactic.Lint.Simp (8.1s)
-✔ [78/194] Built Compiler.Selectors (3.3s)
-✔ [79/194] Built Batteries.Tactic.Lint.Frontend (9.1s)
-✔ [80/197] Built Batteries.Lean.HashMap (2.9s)
-✔ [81/203] Built Batteries.Data.List.ArrayMap (2.3s)
-✔ [82/204] Built Batteries.Data.List.Matcher (2.9s)
-✔ [83/207] Built Verity.Core.Model.CodeData (4.4s)
-✔ [84/207] Built Batteries.Data.Array.Monadic (4.2s)
-✔ [85/210] Built Batteries.Tactic.Lint (2.1s)
-✔ [86/210] Built Batteries.Data.List.Init.Lemmas (3.2s)
-✔ [87/229] Built Batteries.Lean.System.IO (2.6s)
-✔ [88/230] Built Batteries.Util.ProofWanted (16s)
-✔ [89/230] Built BatteriesRecycling.MonadSatisfying.List (3.1s)
-✔ [90/230] Built Batteries.Data.NameSet (1.9s)
-✔ [91/231] Built Batteries.Tactic.Alias (15s)
-✔ [92/232] Built Batteries.Data.Nat.Bitwise.Lemmas (2.9s)
-✔ [93/232] Built Batteries.Data.RunningStats (2.0s)
-✔ [94/232] Built Batteries.Data.MLList.Basic (7.4s)
-✔ [95/232] Built Batteries.Tactic.Trans (12s)
-✔ [96/232] Built Batteries.Data.DList.Basic (4.8s)
-✔ [97/232] Built Batteries.Lean.Float (3.6s)
-✔ [98/232] Built Batteries.Data.List.Monadic (2.1s)
-⚠ [99/232] Built Verity.Core (25s)
+⚠ [11/51] Replayed Verity.Core
 warning: Verity/Core.lean:606:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
@@ -104,602 +11,166 @@ Note: This linter can be disabled with `set_option linter.unnecessarySimpa false
 warning: Verity/Core.lean:1273:2: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-✔ [100/232] Built Batteries.Data.Stream (3.7s)
-✔ [101/233] Built Batteries.Tactic.Basic (4.2s)
-✔ [103/234] Built Batteries.Data.Range.Lemmas (3.2s)
-✔ [104/234] Built Batteries.Data.String.AsciiCasing (1.5s)
-✔ [105/234] Built Batteries.Data.Nat.Gcd (3.8s)
-✔ [106/234] Built Batteries.Data.Random.MersenneTwister (7.1s)
-✔ [107/234] Built Batteries.Data.MLList.IO (1.8s)
-✔ [108/234] Built Batteries.Data.Nat.Bitwise (2.1s)
-✔ [109/234] Built Batteries.Data.HashMap.Basic (4.0s)
-✔ [110/234] Built Batteries.Data.Nat.Lemmas (3.9s)
-✔ [111/234] Built Batteries.Control.Monad (4.5s)
-✔ [112/234] Built Batteries.Data.Rat.Float (2.6s)
-✔ [113/234] Built Batteries.Data.MLList.Heartbeats (3.0s)
-✔ [114/236] Built Batteries.Data.Array.Pairwise (5.6s)
-✔ [115/236] Built Batteries.Control.Nondet.Basic (4.3s)
-✔ [116/236] Built Batteries.Data.DList.Lemmas (4.1s)
-✔ [117/236] Built Batteries.Data.Range (2.8s)
-✔ [118/236] Built Batteries.Data.Random (2.4s)
-✔ [119/236] Built Batteries.Classes.Order (4.6s)
-✔ [120/236] Built Batteries.Data.HashMap (4.8s)
-✔ [121/236] Built Batteries.Data.String.Legacy (5.9s)
-✔ [122/236] Built Verity.Macro.KeccakString (9.5s)
-✔ [124/238] Built Batteries.Data.Rat (3.5s)
-✔ [125/238] Built Verity.Specs.Common (11s)
-✔ [126/238] Built Batteries.Data.Int (6.5s)
-✔ [127/238] Built Batteries.Data.MLList (4.4s)
-✔ [128/238] Built Batteries.Data.Fin.OfBits (6.6s)
-✔ [129/240] Built Verity.Macro.KeccakLit (14s)
-✔ [130/240] Built Batteries.Data.Fin.Basic (9.2s)
-✔ [131/240] Built Batteries.Data.DList (5.4s)
-✔ [132/241] Built Verity.Stdlib.Math (14s)
-✔ [133/241] Built Batteries.Data.Nat.Bisect (14s)
-✔ [134/241] Built Batteries.Data.List.Basic (20s)
-✔ [135/242] Built Batteries.Util.Panic (3.9s)
-✔ [136/242] Built Batteries.Classes.Deprecated (6.9s)
-✔ [137/242] Built Batteries.Data.UInt (8.5s)
-✔ [138/242] Built Batteries.Data.PairingHeap (9.8s)
-✔ [139/242] Built Batteries.Data.Nat (6.3s)
-✔ [140/242] Built Batteries.Data.Fin.Fold (10s)
-✔ [141/242] Built Batteries.Data.BitVec.Lemmas (11s)
-✔ [142/242] Built Batteries.Data.List.Pairwise (6.6s)
-✔ [143/242] Built BatteriesRecycling.RBTree.Basic (18s)
-✔ [144/245] Built Batteries.Data.Fin.Lemmas (13s)
-✔ [145/245] Built LidoSRv3.Audit.Arithmetic (15s)
-✔ [146/245] Built Batteries.CodeAction.Match (9.9s)
-✔ [147/245] Built LidoSRv3.Audit.Model.AllocCapacity (19s)
-✔ [148/246] Built Batteries.Data.BitVec (4.2s)
-✔ [149/247] Built Batteries.Data.AssocList (11s)
-✔ [150/247] Built Batteries.Data.RBMap.Basic (5.4s)
-✔ [151/247] Built BatteriesRecycling.MonadSatisfying.Vector (6.3s)
-✔ [152/247] Built Batteries.CodeAction (6.8s)
-✔ [153/248] Built Batteries.Data.BinomialHeap.Basic (37s)
-✔ [154/248] Built Batteries.Data.String.Lemmas (28s)
-✔ [155/248] Built Batteries.Data.UnionFind.Basic (21s)
-✔ [156/248] Built Batteries.Data.Vector.Basic (19s)
-✔ [157/249] Built Batteries.Lean.HashSet (3.6s)
-✔ [158/249] Built LidoSRv3.Audit.Trace (14s)
-✔ [159/250] Built Batteries.Lean.Expr (5.0s)
-✔ [160/250] Built Batteries.Data.Vector.Monadic (4.2s)
-✔ [161/252] Built Batteries.Lean.IO.Process (3.9s)
-✔ [162/252] Built Batteries.Data.BinomialHeap.Lemmas (4.4s)
-✔ [163/252] Built LidoSRv3.Audit.Source.AllocCapacityCorrespondence (10s)
-✔ [164/255] Built Batteries.Lean.Json (3.6s)
-✔ [165/256] Built Batteries.Lean.LawfulMonad (2.7s)
-✔ [166/257] Built Verity.Core.Model.Types (65s)
-✔ [167/257] Built Batteries.Lean.LawfulMonadLift (3.3s)
-✔ [168/257] Built Batteries.Data.BinomialHeap (3.4s)
-✔ [169/261] Built Batteries.Lean.Meta.Expr (1.6s)
-✔ [170/262] Built Batteries.Data.String (5.5s)
-✔ [171/263] Built Batteries.Lean.Meta.Basic (4.3s)
-✔ [172/263] Built Batteries.Lean.PersistentHashMap (3.2s)
-✔ [173/263] Built Compiler.CompilationModel.Types (2.9s)
-✔ [174/265] Built Batteries.Lean.MonadBacktrack (2.4s)
-✔ [175/266] Built BatteriesRecycling.RBTree.WF (27s)
-✔ [176/266] Built Batteries.Data.UnionFind.Lemmas (9.2s)
-✔ [177/266] Built Batteries.Lean.Meta.Inaccessible (5.1s)
-✔ [178/266] Built Batteries.Lean.PersistentHashSet (2.1s)
-✔ [179/266] Built Batteries.Lean.Meta.UnusedNames (4.4s)
-✔ [180/266] Built Batteries.Data.Array.Basic (29s)
-✔ [181/266] Built Batteries.Lean.NameMapAttribute (4.4s)
-✔ [182/266] Built Batteries.Lean.Meta.InstantiateMVars (3.4s)
-✔ [183/266] Built Batteries.Lean.Meta.Simp (5.6s)
-✔ [184/266] Built Batteries.Lean.Meta.DiscrTree (3.6s)
-✔ [185/266] Built Compiler.CompilationModel.SelectorInteropHelpers (3.8s)
-✔ [186/266] Built Compiler.CompilationModel.LogicalPurity (3.6s)
-✔ [187/266] Built Verity.Macro.SpecGen (52s)
-✔ [188/267] Built Compiler.CompilationModel.AdtStorageLayout (3.9s)
-✔ [189/267] Built Compiler.CompilationModel.YulImporter (6.3s)
-✔ [190/267] Built Compiler.CompilationModel.ReservedScratchNames (6.0s)
-✔ [191/267] Built Compiler.CompilationModel.EcmAxiomCollection (6.8s)
-✔ [192/267] Built Compiler.CompilationModel.AbiHelpers (4.1s)
-✔ [193/267] Built Batteries.Lean.Meta.SavedState (3.7s)
-✔ [194/268] Built Batteries.Data.RBMap.WF (3.4s)
-✔ [195/269] Built BatteriesRecycling.MonadSatisfying.Lean (3.7s)
-✔ [196/269] Built Compiler.CompilationModel.AbiTypeLayout (7.2s)
-✔ [197/269] Built Batteries.Lean.Util.EnvSearch (4.1s)
-✔ [198/270] Built Batteries.Data.RBMap.Alter (5.6s)
-✔ [199/270] Built Batteries.Data.UnionFind (4.9s)
-✔ [200/270] Built Batteries.Lean.SatisfiesM (2.5s)
-✔ [201/270] Built BatteriesRecycling.RBTree.Depth (7.6s)
-✔ [202/270] Built Batteries.Data.List.Lemmas (52s)
-✔ [203/271] Built Batteries.Logic (6.0s)
-✔ [204/271] Built BatteriesRecycling.RBTree.Alter (10s)
-✔ [205/271] Built Compiler.CompilationModel.InternalArgs (5.2s)
-✔ [206/271] Built Batteries.Data.RBMap.Depth (2.5s)
-✔ [207/271] Built Verity.Macro.Types (21s)
-✔ [208/271] Built Batteries.Tactic.Exact (6.9s)
-✔ [209/272] Built Compiler.CompilationModel.ParamLoading (7.4s)
-✔ [210/272] Built Batteries.Tactic.Case (11s)
-✔ [211/273] Built Batteries.Tactic.Congr (12s)
-✔ [212/273] Built Verity.Core.Model.DynamicAbi (10s)
-✔ [213/273] Built Batteries.Data.Char.Basic (6.3s)
-✔ [214/273] Built Compiler.CompilationModel.TrustSurface (18s)
-✔ [215/273] Built Batteries.Data.List.Scan (10s)
-✔ [216/273] Built Batteries.Data.Array.Lemmas (9.9s)
-✔ [217/273] Built Batteries.Data.List.Count (16s)
-✔ [218/273] Built Compiler.CompilationModel.ValidationHelpers (37s)
-✔ [219/274] Built Verity.Macro.Interfaces (12s)
-✔ [220/274] Built Verity.Macro.ExternalCalls (14s)
-✔ [221/274] Built Compiler.CompilationModel.ValidationInterop (33s)
-✔ [222/274] Built Verity.Macro.Functions (12s)
-✔ [223/274] Built Verity.Macro.Executable (15s)
-✔ [224/274] Built Batteries.Tactic.Instances (7.2s)
-✔ [225/274] Built Batteries.Tactic.GeneralizeProofs (24s)
-✔ [226/274] Built Verity.Macro.Storage (20s)
-✔ [227/274] Built Batteries.Data.Char.AsciiCasing (4.5s)
-✔ [228/275] Built BatteriesRecycling.RBTree.Lemmas (25s)
-✔ [229/275] Built Verity.Macro.Internal (11s)
-✔ [230/276] Built Compiler.CompilationModel.MappingWrites (6.0s)
-✔ [231/276] Built Batteries.Data.Char (3.8s)
-✔ [232/276] Built Batteries.Tactic.Lemma (6.8s)
-✔ [233/277] Built Compiler.CompilationModel.LayoutValidation (7.8s)
-✔ [234/278] Built Batteries.Tactic.HelpCmd (17s)
-✔ [235/278] Built Batteries.Data.Array.Scan (12s)
-✔ [236/279] Built Batteries.Data.List.Perm (13s)
-✔ [237/280] Built Batteries.Data.RBMap.Lemmas (5.6s)
-✔ [238/280] Built Batteries.Tactic.PermuteGoals (4.8s)
-✔ [239/280] Built Batteries.Tactic.NoMatch (6.4s)
-✔ [240/280] Built Verity.Core.Model.Denote (22s)
-✔ [241/281] Built Compiler.CompilationModel.LayoutReport (5.4s)
-✔ [242/281] Built Batteries.Data.Array (4.3s)
-✔ [243/281] Built Batteries.Data.List (4.5s)
-✔ [244/282] Built Batteries.Tactic.PrintDependents (7.5s)
-✔ [245/282] Built Batteries.Tactic.PrintOpaques (7.4s)
-✔ [246/283] Built Batteries.Data.RBMap (3.5s)
-✔ [247/283] Built Compiler.CompilationModel.LayoutCompatibilityReport (5.2s)
-✔ [248/285] Built Batteries.Tactic.PrintPrefix (7.6s)
-✔ [249/290] Built Batteries.Tactic.ShowUnused (7.2s)
-✔ [251/291] Built Batteries.Data.Vector.Lemmas (11s)
-✔ [252/315] Built Batteries.Util.Cache (6.2s)
-✔ [253/318] Built Batteries.Data.Fin.Coding (17s)
-✔ [254/318] Built Batteries.Util.Pickle (3.2s)
-✔ [255/318] Built Compiler.CompilationModel.ScopeValidation (48s)
-✔ [256/318] Built Batteries.Util.ExtendedBinder (4.4s)
-✔ [257/318] Built Batteries.Data.Vector (4.2s)
-✔ [258/318] Built Batteries.Data.Fin (3.1s)
-✔ [259/318] Built Verity.Core.Model.DenoteExternalCalls (12s)
-✔ [260/318] Built Verity.Macro.Translate.Parsing (27s)
-✔ [261/318] Built Mathlib.Tactic.Linter.DirectoryDependency (7.2s)
-✔ [274/406] Built Mathlib.Tactic.Linter.Header (2.6s)
-✔ [275/406] Built Batteries.Tactic.SqueezeScope (15s)
-✔ [276/406] Built Mathlib.Tactic.DeclarationNames (1.9s)
-✔ [278/406] Built Mathlib.Tactic.Linter.TacticDocumentation (3.3s)
-✔ [279/406] Built Mathlib.Lean.Environment (4.2s)
-✔ [280/406] Built Mathlib.Util.ParseCommand (5.8s)
-✔ [281/406] Built Mathlib.Tactic.Linter.PrivateModule (6.3s)
-✔ [282/406] Built Mathlib.Tactic.Linter.UnusedTacticExtension (6.3s)
-✔ [283/406] Built Mathlib.Lean.Elab.Tactic.Meta (5.2s)
-✔ [284/406] Built Verity.Core.Model.CallProgramRollback (11s)
-✔ [285/406] Built Mathlib.Tactic.Linter.Whitespace (8.7s)
-✔ [286/406] Built Mathlib.Lean.Expr.Basic (7.0s)
-✔ [287/406] Built Mathlib.Tactic.Linter.OldObtain (5.8s)
-✔ [288/406] Built Mathlib.Tactic.Linter.Multigoal (6.2s)
-✔ [289/406] Built Mathlib.Tactic.Linter.GlobalAttributeIn (6.3s)
-✔ [290/406] Built Mathlib.Tactic.Linter.HashCommandLinter (6.6s)
-✔ [291/406] Built Mathlib.Tactic.Linter.AuxLemma (6.0s)
-✔ [292/406] Built Mathlib.Tactic.Linter.EmptyLine (9.4s)
-✔ [293/406] Built Mathlib.Tactic.Lemma (5.8s)
-✔ [294/406] Built Mathlib.Lean.Linter (4.9s)
-✔ [295/406] Built Mathlib.Tactic.Linter.DocPrime (9.2s)
-✔ [296/406] Built Mathlib.Tactic.Linter.DeprecatedSyntaxLinter (9.2s)
-✔ [298/406] Built Mathlib.Tactic.AdaptationNote (5.7s)
-✔ [299/406] Built Mathlib.Tactic.Linter.FlexibleLinter (12s)
-✔ [300/406] Built Mathlib.Tactic.Linter.DocString (11s)
-✔ [315/436] Built Mathlib.Tactic.TypeStar (3.3s)
-✔ [316/436] Built Batteries (4.8s)
-✔ [317/436] Built Mathlib.Lean.Elab.InfoTree (4.6s)
-✔ [318/436] Built Mathlib.Tactic.Linter.Lint (5.1s)
-✔ [319/436] Built Mathlib.Lean.ContextInfo (4.8s)
-✔ [320/436] Built Mathlib.Tactic.Linter.UnusedTactic (5.4s)
-✔ [455/582] Built Mathlib.Tactic.MinImports (9.4s)
-✔ [471/597] Built Mathlib.Tactic.TacticAnalysis (4.9s)
-✔ [472/597] Built Mathlib.Tactic.Linter.UnusedInstancesInType (5.7s)
-✔ [473/597] Built Mathlib.Tactic.Linter.Style (11s)
-✔ [496/1177] Built Mathlib.Tactic.ExtractGoal (7.0s)
-✔ [497/1195] Built Mathlib.Tactic.Linter.OverlappingInstances (5.9s)
-✔ [498/1221] Built EvmYul.FFI.ffi (3.8s)
-✔ [499/1225] Built EvmYul.PerformIO (3.9s)
-✔ [500/1238] Built EvmYul.SpongeHash.Keccak256 (4.4s)
-✔ [501/1238] Built Mathlib.Data.Ineq (4.9s)
-✔ [502/1238] Built Mathlib.Tactic.Lift (7.7s)
-✔ [503/1238] Built Compiler.Constants (2.7s)
-✔ [504/1248] Built Mathlib.Tactic.Linter.MinImports (9.5s)
-✔ [505/1248] Built EvmYul.Data.Stack (4.6s)
-✔ [506/1249] Built Compiler.Keccak.SpongeProperties (4.1s)
-✔ [507/1267] Built Compiler.Proofs.YulGeneration.LogNames (1.8s)
-✔ [508/1275] Built LidoSRv3.Audit.Allocation (4.3s)
-✔ [509/1277] Built Mathlib.Util.PrintSorries (11s)
-✔ [510/1278] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanSignedArithSpec (3.0s)
-✔ [511/1278] Built Compiler.Proofs.YulGeneration.Calldata (5.7s)
-✔ [512/1359] Built LidoSRv3.Audit.Ssz (2.3s)
-✔ [513/1364] Built LidoSRv3.Audit.Source.GIndexConcatCorrespondence (5.8s)
-✔ [514/1364] Built Compiler.Sha256.Engine (4.2s)
-✔ [515/1364] Built Mathlib.Tactic.TacticAnalysis.Declarations (17s)
-✔ [516/1364] Built Verity.Core.Semantics (16s)
-✔ [517/1364] Built LidoSRv3.Audit.Source.DepositCorrespondence (13s)
-✔ [518/1364] Built LidoSRv3.Audit.Strategy (13s)
-✔ [519/1364] Built LidoSRv3.Audit.Spec.VaultHubScopeChild (6.1s)
-✔ [520/1364] Built LidoSRv3.Audit.AddressEquivariance (10s)
-✔ [521/1364] Built Verity.Core.Model.MultiContract (18s)
-✔ [522/1364] Built LidoSRv3.Audit.Spec.Eip4788AnchorChild (9.1s)
-✔ [523/1364] Built LidoSRv3.Audit.Source.TopupCorrespondence (11s)
-✔ [524/1364] Built Verity.Proofs.Stdlib.Automation (28s)
-✔ [525/1364] Built LidoSRv3.Audit.Source.AddressTransferCorrespondence (6.7s)
-✔ [526/1364] Built Compiler.Proofs.IRGeneration.ExprCore (29s)
-✔ [527/1364] Built LidoSRv3.Audit.Spec.ProductionGindexChild (1.3s)
-✔ [528/1364] Built LidoSRv3.Audit.Common.Bounded (5.2s)
-✔ [529/1364] Built Verity.Core.Model.DenoteMemory (74s)
-✔ [530/1364] Built LidoSRv3.Audit.Common.Trace (2.5s)
-✔ [531/1364] Built LidoSRv3.Audit.Common.Result (4.9s)
-✔ [532/1364] Built LidoSRv3.Audit.Model.ReserveRelational (8.2s)
-✔ [533/1364] Built LidoSRv3.Audit.Source.AccountingCorrespondence (20s)
-✔ [534/1364] Built Verity.Core.Model.DenoteSha256 (9.8s)
-✔ [535/1364] Built LidoSRv3.Audit.Source.VaultEthCorrespondence (11s)
-✔ [536/1364] Built Compiler.CompilationModel.ExpressionCompile (107s)
-✔ [537/1364] Built LidoSRv3.Audit.Source.BeaconRootsCorrespondence (4.4s)
-✔ [538/1364] Built Compiler.CompilationModel.UsageAnalysis (155s)
-✔ [539/1364] Built LidoSRv3.Audit.Source.ConsolidationCorrespondence (24s)
-✔ [540/1364] Built LidoSRv3.Audit.Common.Atomicity (2.3s)
-✔ [541/1364] Built Mathlib.Init (5.9s)
-✔ [542/1364] Built LidoSRv3.Audit.Spec.SszLiveCorrespondence (4.7s)
-✔ [543/1364] Built LidoSRv3.Audit.Source.ReserveRelationalCorrespondence (2.2s)
-✔ [544/1364] Built LidoSRv3.Audit.Source.TopupParentCorrespondence (8.2s)
-✔ [545/1364] Built LidoSRv3.Audit.Verity.BeaconRootsTx (3.1s)
-✔ [546/1364] Built LidoSRv3.Audit.Verity.AddressTransferTx (9.6s)
-✔ [547/1364] Built Verity.Core.Model.DenoteFunctionCalls (12s)
-✔ [548/1364] Built Compiler.CompilationModel.EventAbiHelpers (6.7s)
-✔ [549/1364] Built Compiler.CompilationModel.StorageWrites (7.4s)
-✔ [550/1364] Built LidoSRv3.Audit.Source.MinFirstCorrespondence (13s)
-✔ [551/1364] Built LidoSRv3.Audit.Source.AddressCorrespondence (13s)
-✔ [552/1364] Built LidoSRv3.Audit.StrategyProofs (11s)
-✔ [553/1364] Built LidoSRv3.Audit.Spec.VaultEthCorrespondence (8.9s)
-✔ [554/1364] Built Mathlib.Data.List.Lookmap (5.3s)
-✔ [555/1364] Built Mathlib.Util.ElabWithoutMVars (2.7s)
-✔ [556/1364] Built Mathlib.Data.Finset.Attr (5.1s)
-✔ [557/1364] Built Mathlib.Data.Array.Defs (7.4s)
-✔ [558/1364] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.Datatypes (4.1s)
-✔ [559/1364] Built Compiler.CompilationModel.ValidationCalls (11s)
-✔ [560/1364] Built Mathlib.Tactic.FieldSimp.Attr (4.6s)
-✔ [561/1364] Built Mathlib.Util.SynthesizeUsing (6.3s)
-✔ [562/1364] Built Mathlib.Lean.Meta.Tactic.Rewrite (6.8s)
-✔ [563/1364] Built Mathlib.Control.ULift (7.7s)
-✔ [564/1364] Built Mathlib.Tactic.SetLike (8.3s)
-✔ [565/1364] Built Mathlib.Tactic.TryThis (4.9s)
-✔ [566/1364] Built Mathlib.Util.DischargerAsTactic (7.0s)
-✔ [567/1364] Built Mathlib.Util.Qq (5.1s)
-✔ [568/1364] Built Mathlib.Data.Prod.PProd (1.0s)
-✔ [569/1364] Built Mathlib.Util.PPOptions (4.8s)
-✔ [570/1364] Built Mathlib.Lean.Expr.Rat (6.4s)
-✔ [571/1364] Built Mathlib.Util.AtomM (3.3s)
-✔ [572/1364] Built Mathlib.Tactic.Monotonicity.Attr (4.2s)
-✔ [573/1364] Built Mathlib.Data.Bracket (5.0s)
-✔ [574/1364] Built Mathlib.Tactic.HaveI (7.4s)
-✔ [575/1364] Built LidoSRv3.Audit.Verity.HandleOracleReportTx (20s)
-✔ [576/1364] Built Mathlib.Data.Option.NAry (6.0s)
-✔ [577/1364] Built Mathlib.Logic.OpClass (2.8s)
-✔ [578/1364] Built Mathlib.Util.TransImports (2.5s)
-✔ [579/1364] Built Mathlib.Util.WhatsNew (2.6s)
-✔ [580/1364] Built Mathlib.Tactic.Bound.Init (7.7s)
-✔ [581/1364] Built Mathlib.Data.Option.Defs (5.4s)
-✔ [582/1364] Built Mathlib.Data.List.TFAE (7.4s)
-✔ [583/1364] Built Mathlib.Control.Combinators (5.6s)
-✔ [584/1364] Built Mathlib.Tactic.Finiteness.Attr (8.1s)
-✔ [585/1364] Built Mathlib.Util.CountHeartbeats (4.9s)
-✔ [586/1364] Built Mathlib.Tactic.UnsetOption (3.4s)
-✔ [587/1364] Built Mathlib.Data.Nat.BinaryRec (8.0s)
-✔ [588/1364] Built Mathlib.Data.List.Monad (8.4s)
-✔ [589/1364] Built Mathlib.Tactic.Trace (4.0s)
-✔ [590/1364] Built Mathlib.Lean.GoalsLocation (5.9s)
-✔ [591/1364] Built Mathlib.Tactic.Widget.SelectInsertParamsClass (5.0s)
-✔ [592/1364] Built Mathlib.Tactic.Variable (6.9s)
-✔ [593/1364] Built Mathlib.Lean.Meta.KAbstractPositions (9.1s)
-✔ [594/1364] Built Mathlib.Tactic.SwapVar (6.5s)
-✔ [595/1364] Built Mathlib.Tactic.SuccessIfFailWithMsg (5.8s)
-✔ [596/1364] Built Mathlib.Tactic.SudoSetOption (6.9s)
-✔ [597/1364] Built Mathlib.Util.Tactic (3.8s)
-✔ [598/1364] Built Mathlib.Tactic.SimpIntro (5.5s)
-✔ [599/1364] Built Mathlib.Tactic.OfNat (2.0s)
-✔ [600/1364] Built Mathlib.Tactic.RSuffices (4.5s)
-✔ [601/1364] Built Mathlib.Tactic.Recover (6.3s)
-✔ [602/1364] Built Mathlib.Tactic.Relation.Rfl (7.1s)
-✔ [603/1364] Built Mathlib.Tactic.Rename (9.6s)
-✔ [604/1364] Built Mathlib.Tactic.InferParam (4.0s)
-✔ [605/1364] Built Mathlib.Tactic.NthRewrite (7.4s)
-✔ [606/1364] Built Mathlib.Tactic.Observe (9.5s)
-✔ [607/1364] Built Mathlib.Tactic.HigherOrder (5.3s)
-✔ [608/1364] Built Mathlib.Tactic.Linter.HaveLetLinter (8.3s)
-✔ [609/1364] Built Mathlib.Tactic.Linter.UpstreamableDecl (9.4s)
-✔ [610/1364] Built Mathlib.Tactic.Set (13s)
-✔ [611/1364] Built Mathlib.Tactic.Simproc.ExistsAndEq (15s)
-✔ [612/1364] Built Mathlib.Tactic.GuardHypNums (6.9s)
-✔ [613/1364] Built Mathlib.Tactic.Linter.PPRoundtrip (10s)
-✔ [614/1364] Built Mathlib.Util.TermReduce (10s)
-✔ [615/1364] Built Mathlib.Tactic.GuardGoalNums (7.0s)
-✔ [616/1364] Built Mathlib.Tactic.ExistsI (6.1s)
-✔ [617/1364] Built Mathlib.Tactic.FunProp.Mor (10s)
-✔ [618/1364] Built Mathlib.Lean.Meta.RefinedDiscrTree.Basic (12s)
-✔ [619/1364] Built Mathlib.Tactic.Find (10s)
-✔ [620/1364] Built Mathlib.Tactic.FailIfNoProgress (11s)
-✔ [621/1364] Built Mathlib.Tactic.DSimpPercent (10s)
-✔ [622/1364] Built Mathlib.Tactic.ErwQuestion (11s)
-✔ [623/1364] Built Mathlib.Tactic.DeprecateTo (9.9s)
-✔ [624/1364] Built Mathlib.Tactic.FunProp.Decl (13s)
-✔ [625/1364] Built Mathlib.Tactic.FunProp.ToBatteries (16s)
-✔ [626/1364] Built Mathlib.Tactic.PPWithUniv (2.6s)
-✔ [627/1364] Built Mathlib.Tactic.DefEqTransformations (10s)
-✔ [628/1364] Built Mathlib.Lean.MessageData.Trace (9.8s)
-✔ [629/1364] Built Mathlib.Tactic.ClearExcept (7.2s)
-✔ [630/1364] Built Mathlib.Tactic.Constructor (8.1s)
-✔ [631/1364] Built Mathlib.Tactic.Clear_ (7.5s)
-✔ [632/1364] Built Mathlib.Tactic.CasesM (5.6s)
-✔ [633/1364] Built Mathlib.Logic.Function.ULift (2.4s)
-✔ [634/1364] Built Mathlib.Tactic.ClearExclamation (7.7s)
-✔ [635/1364] Built Mathlib.Tactic.ApplyWith (7.9s)
-✔ [636/1364] Built Mathlib.Tactic.CrossRefAttribute (5.1s)
-✔ [637/1364] Built Mathlib.Tactic.ApplyCongr (6.9s)
-✔ [638/1364] Built Mathlib.Lean.Elab.Term (1.3s)
-✔ [639/1364] Built Mathlib.Util.WithWeakNamespace (4.2s)
-✔ [640/1364] Built Mathlib.Tactic.DepRewrite (21s)
-✔ [641/1364] Built Mathlib.Lean.Meta.Basic (9.3s)
-✔ [642/1364] Built Mathlib.Tactic.Spread (6.8s)
-✔ [643/1364] Built Mathlib.Lean.PrettyPrinter.Delaborator (3.4s)
-✔ [644/1364] Built Mathlib.Tactic.ToExpr (8.3s)
-✔ [645/1364] Built Mathlib.Lean.Name (3.7s)
-✔ [646/1364] Built Mathlib.Tactic.Check (14s)
-✔ [647/1364] Built Mathlib.Tactic.Substs (8.5s)
-✔ [648/1364] Built Mathlib.Tactic.Coe (10s)
-✔ [649/1364] Built Mathlib.Util.AtLocation (2.1s)
-✔ [650/1364] Built Mathlib.Tactic.FastInstance (11s)
-✔ [651/1364] Built Mathlib.Data.Int.DivMod (1.9s)
-✔ [652/1364] Built Mathlib.Tactic.SimpRw (7.9s)
-✔ [653/1364] Built Mathlib.Logic.ExistsUnique (4.4s)
-✔ [654/1364] Built Mathlib.Util.CompileInductive (7.7s)
-✔ [655/1364] Built Mathlib.Lean.Meta (8.7s)
-✔ [656/1364] Built Mathlib.Logic.IsEmpty.Defs (7.8s)
-✔ [657/1364] Built Mathlib.Tactic.Inhabit (7.0s)
-✔ [658/1364] Built Mathlib.Tactic.GCongr.ForwardAttr (4.9s)
-✔ [659/1364] Built Mathlib.Data.String.Defs (3.7s)
-✔ [660/1364] Built Mathlib.Tactic.Translate.UnfoldBoundary (4.5s)
-✔ [661/1364] Built Mathlib.Logic.Nonempty (8.1s)
-✔ [662/1364] Built Mathlib.Tactic.Core (4.3s)
-✔ [663/1364] Built Mathlib.Tactic.Attr.Register (3.2s)
-✔ [664/1364] Built Mathlib.Tactic.Conv (11s)
-✔ [665/1364] Built Mathlib.Tactic.ExtendDoc (5.6s)
-✔ [666/1364] Built Mathlib.Tactic.Eqns (7.9s)
-✔ [667/1364] Built Mathlib.Tactic.Use (15s)
-✔ [668/1364] Built Mathlib.Lean.Meta.Simp (3.6s)
-✔ [669/1364] Built Mathlib.Tactic.Translate.Attributes (8.1s)
-✔ [670/1364] Built Mathlib.Data.Ordering.Basic (6.3s)
-✔ [671/1364] Built Mathlib.Tactic.Simps.NotationClass (9.5s)
-✔ [672/1364] Built LidoSRv3.Audit.Guarantees.PReserveRelational (3.4s)
-✔ [673/1364] Built Mathlib.Tactic.Translate.Reorder (13s)
-✔ [674/1364] Built Mathlib.Data.Nat.Notation (6.0s)
-✔ [675/1364] Built LidoSRv3.Audit.Guarantees.PSszLive1 (4.2s)
-✔ [676/1364] Built Mathlib.Tactic.Push.Attr (9.8s)
-✔ [677/1364] Built Mathlib.Data.Int.Notation (6.2s)
-✔ [678/1364] Built Mathlib.Util.AddRelatedDecl (11s)
-✔ [679/1364] Built Compiler.CompilationModel.ValidationEvents (7.2s)
-✔ [680/1364] Built Compiler.CompilationModel.AbiEncoding (7.5s)
-✔ [681/1364] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.Gauss (5.4s)
-✔ [682/1364] Built Mathlib.Util.AtomM.Recurse (6.2s)
-✔ [683/1364] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.SimplexAlgorithm (7.9s)
-✔ [684/1364] Built Mathlib.Tactic.Linter (4.2s)
-✔ [685/1364] Built LidoSRv3.Audit.Spec.PauseAdmissionCorrespondence (10s)
-✔ [686/1364] Built Mathlib.Tactic.RenameBVar (6.1s)
-✔ [687/1364] Built Mathlib.Tactic.Widget.SelectPanelUtils (8.0s)
-✔ [688/1364] Built LidoSRv3.Audit.Guarantees.PAccount1 (9.9s)
-✔ [689/1364] Built Mathlib.Tactic.Bound.Attribute (10s)
-✔ [690/1364] Built Mathlib.Tactic.ToLevel (6.5s)
-✔ [691/1364] Built Mathlib.Lean.Meta.RefinedDiscrTree.Encode (11s)
-✔ [692/1364] Built Mathlib.Tactic.ApplyAt (7.1s)
-✔ [693/1364] Built Mathlib.Lean.Meta.RefinedDiscrTree.Initialize (12s)
-✔ [694/1364] Built Mathlib.Tactic.FunProp.FunctionData (12s)
-✔ [695/1364] Built Mathlib.Tactic.ScopedNS (12s)
-✔ [696/1364] Built Mathlib.Tactic.DefEqAbuse (14s)
-✔ [697/1364] Built LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTx (27s)
-✔ [698/1364] Built Mathlib.Lean.Meta.CongrTheorems (9.3s)
-✔ [699/1364] Built Mathlib.Tactic.Attr.Core (2.4s)
-✔ [700/1364] Built Mathlib.Tactic.MkIffOfInductiveProp (14s)
-✔ [701/1364] Built Mathlib.Tactic.Translate.GuessName (9.9s)
-✔ [702/1364] Built Verity.Core.Free.IRStepAttr (7.5s)
-✔ [703/1364] Built Mathlib.Tactic.SplitIfs (9.7s)
-✔ [704/1364] Built Mathlib.Logic.Function.Defs (8.3s)
-✔ [705/1364] Built Mathlib.Tactic.FBinop (17s)
-✔ [706/1364] Built Mathlib.Tactic.Basic (6.4s)
-✔ [707/1364] Built Mathlib.Data.PNat.Notation (4.1s)
-✔ [708/1364] Built Mathlib.Data.Tree.Basic (5.5s)
-✔ [709/1364] Built Mathlib.Logic.Nontrivial.Defs (5.3s)
-✔ [710/1364] Built Mathlib.Data.Int.Cast.Pi (5.8s)
-✔ [711/1364] Built Mathlib.Data.Rat.Init (7.2s)
-✔ [712/1364] Built Mathlib.Tactic.IrreducibleDef (14s)
-✔ [713/1364] Built Mathlib.Logic.Basic (15s)
-✔ [714/1364] Built Mathlib.Util.Delaborators (40s)
-✔ [715/1364] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.PositiveVector (8.2s)
-✔ [716/1364] Built Mathlib.Tactic.Widget.Calc (8.4s)
-✔ [717/1364] Built Mathlib.Data.Int.Init (15s)
-✔ [718/1364] Built Mathlib.Data.Nat.Init (13s)
-✔ [719/1364] Built Mathlib.Tactic.TFAE (19s)
-✔ [720/1364] Built Mathlib.Tactic.Widget.CongrM (4.5s)
-✔ [721/1364] Built Compiler.CompilationModel.EventEmission (15s)
-✔ [722/1364] Built Mathlib.Tactic.FunProp.Types (6.3s)
-✔ [723/1364] Built Mathlib.Control.Basic (6.5s)
-✔ [724/1364] Built Compiler.CompilationModel.Validation (21s)
-✔ [725/1364] Built Mathlib.Lean.Meta.RefinedDiscrTree.Lookup (14s)
-✔ [726/1364] Built Mathlib.Tactic.Widget.Conv (19s)
-✔ [727/1364] Built Mathlib.Logic.Relator (8.2s)
-✔ [728/1364] Built Mathlib.Data.SProd (6.7s)
-✔ [729/1364] Built Mathlib.Tactic.Says (7.7s)
-✔ [730/1364] Built Mathlib.Tactic.Hint (7.9s)
-✔ [731/1364] Built LidoSRv3.Audit.Source.SanityEnvelope (18s)
-✔ [732/1364] Built Verity.Core.Free.TypedIR (24s)
-✔ [733/1364] Built Mathlib.Tactic.TermCongr (30s)
-✔ [734/1364] Built Mathlib.Tactic.Subsingleton (13s)
-✔ [735/1368] Built Mathlib.Tactic.Simps.Basic (49s)
-✔ [736/1368] Built Mathlib.Lean.Meta.RefinedDiscrTree (7.1s)
-✔ [737/1379] Built Mathlib.Tactic.Tauto (21s)
-✔ [738/1379] Built Mathlib.Tactic.CongrExclamation (23s)
-✔ [739/1381] Built Mathlib.Tactic.FunProp.Theorems (14s)
-✔ [740/1381] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBridgePredicates (3.8s)
-✔ [741/1384] Built Mathlib.Tactic.Push (21s)
-✔ [742/1385] Built Mathlib.Tactic.FunProp.Attr (4.1s)
-✔ [743/1385] Built Mathlib.Tactic.CongrM (8.5s)
-✔ [744/1385] Built LidoSRv3.Audit.Guarantees.POracleSanity1 (14s)
-✔ [745/1385] Built Compiler.CompilationModel.Compile (27s)
-✔ [746/1385] Built Compiler.Hex (6.8s)
-✔ [747/1385] Built Mathlib.Tactic.Translate.Core (48s)
-✔ [748/1385] Built Mathlib.Tactic.WLOG (7.9s)
-✔ [749/1388] Built Mathlib.Tactic.ToFun (9.4s)
-✔ [750/1388] Built Mathlib.Tactic.Convert (17s)
-✔ [751/1388] Built Mathlib.Tactic.ByContra (9.4s)
-✔ [752/1400] Built Mathlib.Tactic.Widget.LibraryRewrite (19s)
-⚠ [753/1413] Built LidoSRv3.Audit.Verity.ReserveRelationalTx (105s)
-warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
-  memory_writeSlot
+⚠ [1159/1205] Replayed Conform.Wheels
+warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1160/1205] Replayed EvmYul.Pretty
+warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
+
+Note: The updated constant has a different type:
+  {α : Sort u} → (α → α → Prop) → Prop
+instead of
+  (α : Sort u_1) → (α → α → Prop) → Prop
+⚠ [1207/1271] Replayed EvmYul.Semantics
+warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1208/1271] Replayed EvmYul.EVM.Semantics
+warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
+
+import Mathlib.Init
+⚠ [1255/1271] Replayed LidoSRv3.Audit.Verity.DepositNFrameTx
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:299:26: This simp argument is unused:
+  Nat.add_assoc
 
 Hint: Omit it from the simp argument list.
-  simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
+  simp [afterBatches, N̵a̵t̵.̵a̵d̵d̵_̵a̵s̵s̵o̵c̵,̵ ̵Nat.add_comm, Nat.add_left_comm]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [754/1413] Built Mathlib.Tactic.Contrapose (7.5s)
-✔ [755/1413] Built Mathlib.Tactic.ByCases (7.5s)
-✔ [756/1413] Built Mathlib.Util.Notation3 (58s)
-✔ [757/1413] Built Compiler.Yul.PrettyPrint (5.4s)
-✔ [758/1413] Built LidoSRv3.Audit.Source.WithdrawalQueueRequestAmount (3.6s)
-✔ [760/1416] Built LidoSRv3.Audit.Model.EthWorld (7.0s)
-✔ [761/1416] Built Mathlib.Tactic.Translate.ToAdditive (8.5s)
-✔ [762/1416] Built Mathlib.Tactic.Translate.TagUnfoldBoundary (9.4s)
-✔ [763/1416] Built LidoSRv3.Audit.Source.SszVerifierProgram (8.5s)
-✔ [764/1416] Built LidoSRv3.Audit.Verity.PConsolidationEth1RefundTx (9.9s)
-✔ [765/1416] Built LidoSRv3.Audit.Source.WithdrawalQueueSingleRequestControl (3.4s)
-✔ [766/1416] Built LidoSRv3.Audit.Verity.TopupParent (7.2s)
-✔ [767/1416] Built Compiler.Yul.PatchFramework (16s)
-✔ [768/1416] Built LidoSRv3.Audit.Verity.PConsolidationEth1RequestTx (10s)
-✔ [769/1416] Built Mathlib.Tactic.ToAdditive (2.9s)
-✔ [770/1416] Built Mathlib.Tactic.FunProp.Core (29s)
-✔ [771/1416] Built Mathlib.Tactic.Translate.ToDual (4.3s)
-✔ [772/1416] Built Mathlib.Algebra.Notation (6.7s)
-✔ [773/1416] Built Compiler.CompilationModel.Dispatch (20s)
-✔ [774/1416] Built LidoSRv3.Audit.Guarantees.PReserveRelationalVerity (10s)
-✔ [775/1416] Built Mathlib.Algebra.Notation.Defs (5.3s)
-✔ [776/1416] Built Mathlib.Tactic.ToDual (4.1s)
-✔ [777/1416] Built LidoSRv3.Legacy.Model (11s)
-✔ [778/1416] Built Compiler.CompilationModel (3.1s)
-✔ [779/1416] Built Mathlib.Algebra.Regular.Defs (5.8s)
-✔ [780/1416] Built Mathlib.Tactic.FunProp.Elab (12s)
-✔ [781/1416] Built Mathlib.Algebra.Notation.Pi.Defs (8.7s)
-✔ [782/1416] Built LidoSRv3.Audit.Verity.ConsolidationAbstractFlowModel (3.3s)
-✔ [783/1416] Built LidoSRv3.Audit.Verity.OfficialSemantics (10s)
-✔ [784/1416] Built Mathlib.Order.Notation (11s)
-✔ [785/1416] Built Mathlib.Order.Defs.PartialOrder (12s)
-✔ [786/1416] Built Compiler.CodegenCommon (21s)
-✔ [787/1416] Built Mathlib.Data.Set.Defs (15s)
-✔ [788/1416] Built Compiler.Modules.ERC20 (8.5s)
-⚠ [789/1416] Built LidoSRv3.Audit.Verity.ConsolidationFee (16s)
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:5: Variable name `hsize` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:35: Variable name `hdecode` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:447:5: Variable name `hvalue` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:70: This simp argument is unused:
-  hsize
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:448:25: This simp argument is unused:
+  Nat.add_assoc
 
 Hint: Omit it from the simp argument list.
-  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hs̵i̵z̵e̵,̵ ̵h̵decode,
-  ̵  ̵ ̵ ̵hvalue, hkey]
+  simp [afterPushes, N̵a̵t̵.̵a̵d̵d̵_̵a̵s̵s̵o̵c̵,̵ ̵Nat.add_comm, Nat.add_left_comm]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:77: This simp argument is unused:
-  hdecode
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:505:13: This simp argument is unused:
+  Bind.bind
 
 Hint: Omit it from the simp argument list.
-  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hd̵e̵c̵o̵d̵e̵,̵
-  ̵ ̵ ̵ ̵ ̵h̵value, hkey]
+  simp only [B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.bind, hValueGuard, _root_.Verity.require, if_true]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:453:4: This simp argument is unused:
-  hvalue
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:505:24: This simp argument is unused:
+  _root_.Verity.bind
 
 Hint: Omit it from the simp argument list.
-  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
-  ̵  ̵ ̵ ̵hv̵a̵l̵u̵e̵,̵ ̵h̵key]
+  simp only [Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵hValueGuard, _root_.Verity.require, if_true]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:466:5: Variable name `hrequest` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:477:32: This simp argument is unused:
-  hrequest
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:505:57: This simp argument is unused:
+  _root_.Verity.require
 
 Hint: Omit it from the simp argument list.
-  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
-  ̵  ̵ ̵ ̵hbound,
-  ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
+  simp only [Bind.bind, _root_.Verity.bind, hValueGuard, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵ ̵if_true]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [790/1416] Built Compiler.Modules.Oracle (6.3s)
-✔ [791/1416] Built Compiler.Modules.Precompiles (7.4s)
-✔ [792/1416] Built Compiler.Modules.Calls (10s)
-✔ [793/1416] Built Mathlib.Tactic.FunProp (8.2s)
-⚠ [794/1416] Built LidoSRv3.Legacy.SpecProofs (26s)
-warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:507:13: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.bind]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:507:24: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [Bind.bind,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:509:13: This simp argument is unused:
+  Bind.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.bind, DepositParentTx.getState, hClose,
+  ̵  ̵ ̵ ̵beq_self_eq_true,
+  ̲  ̲ ̲ ̲_root_.Verity.require, if_true, committedState, entry, processed, pulled]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:509:24: This simp argument is unused:
+  _root_.Verity.bind
+
+Hint: Omit it from the simp argument list.
+  simp only [Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵DepositParentTx.getState, hClose,
+  ̵  ̵ ̵ ̵beq_self_eq_true, _root_.Verity.require,
+  ̲  ̲ ̲ ̲if_true, committedState, entry, processed, pulled]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:509:44: This simp argument is unused:
+  DepositParentTx.getState
+
+Hint: Omit it from the simp argument list.
+  simp only [Bind.bind, _root_.Verity.bind, D̵e̵p̵o̵s̵i̵t̵P̵a̵r̵e̵n̵t̵T̵x̵.̵g̵e̵t̵S̵t̵a̵t̵e̵,̵ ̵hClose, beq_self_eq_true, _root_.Verity.require,
+  ̲  ̲ ̲ ̲if_true, committedState, entry, processed, pulled]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:510:22: This simp argument is unused:
+  _root_.Verity.require
+
+Hint: Omit it from the simp argument list.
+  simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
+  ̵  ̵ ̵ ̵beq_self_eq_true,
+  ̲ _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵  ̲ ̲if_true, committedState, entry, processed, pulled]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:553:6: This simp argument is unused:
+  List.drop_left
+
+Hint: Omit it from the simp argument list.
+  simp [observe, sourceObservables, committed_balance inputs state h, committed_calls,̵
+  ̵ ̵ ̵ ̵ ̵ ̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵l̵e̵f̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1262/1358] Replayed LidoSRv3.Audit.Verity.MinFirstDistributionTx
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-✔ [796/1416] Built Mathlib.Order.TypeTags (10s)
-✔ [797/1416] Built Mathlib.Algebra.NeZero (7.4s)
-✔ [798/1416] Built Mathlib.Order.Defs.LinearOrder (10s)
-✔ [799/1416] Built LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversal (105s)
-✔ [800/1416] Built Mathlib.Order.Bounds.Defs (5.9s)
-✔ [801/1416] Built LidoSRv3.Audit.Verity.AllocCapacity (12s)
-✔ [802/1416] Built Mathlib.Order.Interval.Set.Defs (9.7s)
-✔ [803/1416] Built Mathlib.Data.Set.CoeSort (5.4s)
-⚠ [804/1416] Built LidoSRv3.Audit.Verity.ConsolidationTx (25s)
-warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:726:36: This simp argument is unused:
-  requestCall
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:22: This simp argument is unused:
+  modelAllocateLoop
 
 Hint: Omit it from the simp argument list.
-  simp [commitObservables,̵ ̵r̵e̵q̵u̵e̵s̵t̵C̵a̵l̵l̵]
+  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:770:53: This simp argument is unused:
-  payload
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:53: This simp argument is unused:
+  hzv
 
 Hint: Omit it from the simp argument list.
-  simp [commitObservables, p̵a̵y̵l̵o̵a̵d̵,̵ ̵hLen]
+  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:930:23: This simp argument is unused:
-  ih
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:25: This simp argument is unused:
+  modelAllocateLoop
 
 Hint: Omit it from the simp argument list.
-  simp ̵[̵i̵h̵]̵
+  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [805/1416] Built Mathlib.Control.Functor (8.4s)
-✔ [806/1416] Built Mathlib.Order.Defs.Unbundled (7.7s)
-✔ [807/1416] Built Mathlib.Data.Bool.Basic (7.5s)
-✔ [808/1416] Built Mathlib.Lean.Expr.ExtraRecognizers (4.0s)
-✔ [809/1416] Built Mathlib.Data.Int.Order.Basic (10s)
-✔ [810/1416] Built Mathlib.Algebra.Group.Defs (26s)
-✔ [811/1416] Built LidoSRv3.Audit.Verity.SszAbstractDigest (12s)
-✔ [812/1416] Built Mathlib.Control.Traversable.Basic (8.1s)
-✔ [813/1416] Built Mathlib.Data.List.Defs (12s)
-✔ [814/1416] Built Mathlib.Algebra.Group.Invertible.Defs (12s)
-⚠ [815/1416] Built LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert (22s)
+warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:44: This simp argument is unused:
+  if_neg hzv
+
+Hint: Omit it from the simp argument list.
+  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1266/1358] Replayed LidoSRv3.Audit.Verity.PConsolidationEth1CompositionTxUniversalRevert
 warning: LidoSRv3/Audit/Verity/PConsolidationEth1CompositionTxUniversalRevert.lean:75:66: This simp argument is unused:
   evalExprList
 
@@ -1174,10 +645,29 @@ Hint: Omit it from the simp argument list.
       hstorageW, mul_ofNat_val, hdiv, hle]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [816/1416] Built Mathlib.Data.Nat.Cast.Defs (17s)
-✔ [817/1416] Built Mathlib.Algebra.Group.Int.Defs (12s)
-✔ [818/1416] Built Mathlib.Logic.Relation (24s)
-⚠ [819/1416] Built LidoSRv3.Audit.Guarantees.PConsolidation1 (29s)
+⚠ [1284/1358] Replayed LidoSRv3.Audit.Verity.ConsolidationTx
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:726:36: This simp argument is unused:
+  requestCall
+
+Hint: Omit it from the simp argument list.
+  simp [commitObservables,̵ ̵r̵e̵q̵u̵e̵s̵t̵C̵a̵l̵l̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:770:53: This simp argument is unused:
+  payload
+
+Hint: Omit it from the simp argument list.
+  simp [commitObservables, p̵a̵y̵l̵o̵a̵d̵,̵ ̵hLen]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationTx.lean:930:23: This simp argument is unused:
+  ih
+
+Hint: Omit it from the simp argument list.
+  simp ̵[̵i̵h̵]̵
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1285/1358] Replayed LidoSRv3.Audit.Guarantees.PConsolidation1
 warning: LidoSRv3/Audit/Guarantees/PConsolidation1.lean:241:41: This simp argument is unused:
   List.mem_nil_iff
 
@@ -1185,544 +675,7 @@ Hint: Omit it from the simp argument list.
   simp [List.mem_cons,̵ ̵L̵i̵s̵t̵.̵m̵e̵m̵_̵n̵i̵l̵_̵i̵f̵f̵] at hx
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [820/1416] Built Mathlib.Logic.Function.Basic (26s)
-✔ [821/1416] Built Mathlib.Algebra.Group.Nat.Defs (14s)
-✔ [822/1416] Built Mathlib.Algebra.GroupWithZero.Defs (24s)
-✔ [823/1416] Built Mathlib.Algebra.Group.Semiconj.Defs (17s)
-✔ [824/1416] Built Mathlib.Algebra.BigOperators.Group.List.Defs (14s)
-✔ [825/1416] Built Mathlib.Data.Nat.Bits (11s)
-✔ [826/1416] Built Mathlib.Data.Nat.Cast.NeZero (9.6s)
-✔ [827/1416] Built Mathlib.Control.Applicative (18s)
-✔ [828/1416] Built Mathlib.Data.List.GetD (20s)
-✔ [829/1416] Built Mathlib.Data.Int.Cast.Defs (12s)
-⚠ [830/1416] Built LidoSRv3.Audit.Verity.SszTxSimulation (23s)
-warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
-
-Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:346:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
-  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
-  exactTxWidths input ∧
-    (digestPreimages input.toInputs).length = 7 ∧
-      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
-        (runVerification input = VerificationOutcome.revertRootMismatch →
-          (transactionObservation input before after attempts trace).committedState = before)
-info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:347:0: LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback (input : Inputs) (adversary : AdversaryModel)
-  (state : CallState) : (DenoteExternalCalls.denote (sha256Calls input) adversary state).snd.world = state.world
-info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationModel.Denote.Sha256.denote_success_compose (oracle : StaticCallOracle)
-  (fipsSha256 : ByteArray → ByteArray) (world : Verity.ContractState) (inputOffset inputSize outputOffset : Nat)
-  (digest : Digest) (sha256_correct : sha256_correct oracle fipsSha256)
-  (hcall : oracle (request world.memory inputOffset inputSize outputOffset) = StaticCallResult.success digest) :
-  Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
-    Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-      (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
-✔ [831/1416] Built Mathlib.Algebra.Notation.Pi.Basic (14s)
-✔ [832/1416] Built LidoSRv3.Audit.Spec.ConsolidationObserveCorrespondence (22s)
-✔ [833/1416] Built Mathlib.Data.Sigma.Basic (15s)
-✔ [834/1416] Built LidoSRv3.Audit.Guarantees.PConsolidationEth1 (33s)
-✔ [835/1416] Built Mathlib.Data.Sum.Basic (16s)
-✔ [836/1416] Built Mathlib.Logic.IsEmpty.Basic (10s)
-✔ [837/1416] Built Mathlib.Tactic.GCongr.Core (63s)
-✔ [838/1416] Built Mathlib.Tactic.Choose (18s)
-✔ [839/1416] Built Mathlib.Algebra.Group.InjSurj (26s)
-✔ [840/1416] Built Mathlib.Data.Subtype (8.5s)
-✔ [841/1416] Built Mathlib.Algebra.GroupWithZero.Regular (1.4s)
-✔ [842/1416] Built Mathlib.Algebra.Group.Commute.Defs (3.4s)
-✔ [843/1416] Built Mathlib.Logic.Unique (8.6s)
-✔ [844/1416] Built Mathlib.Logic.Pairwise (8.3s)
-✔ [845/1416] Built Mathlib.Logic.Function.Conjugate (8.6s)
-✔ [846/1416] Built Mathlib.Algebra.GroupWithZero.NeZero (7.3s)
-✔ [847/1416] Built Mathlib.Algebra.GroupWithZero.Nat (7.5s)
-✔ [848/1416] Built Mathlib.Algebra.CharZero.Defs (6.7s)
-✔ [849/1416] Built Mathlib.Data.Option.Basic (4.2s)
-✔ [850/1416] Built Mathlib.Algebra.Ring.Defs (10s)
-✔ [851/1416] Built LidoSRv3.Audit.Verity.ConsolidationCallFragment (40s)
-✔ [852/1416] Built Mathlib.Tactic.GCongr.CoreAttrs (5.1s)
-✔ [853/1416] Built Mathlib.Data.Nat.Basic (9.1s)
-✔ [854/1416] Built Mathlib.Data.List.Flatten (9.2s)
-✔ [855/1416] Built LidoSRv3.Audit.Spec.EthJournalCorrespondence (13s)
-✔ [856/1416] Built LidoSRv3.Audit.Provenance.ConsolidationRequest (15s)
-✔ [857/1416] Built Mathlib.Data.Set.Operations (8.9s)
-✔ [858/1416] Built Mathlib.Data.FunLike.Basic (8.2s)
-✔ [859/1416] Built Mathlib.Data.List.Pairwise (6.2s)
-✔ [860/1416] Built Mathlib.Algebra.Group.Pi.Basic (13s)
-✔ [861/1416] Built Mathlib.Logic.Function.Iterate (10s)
-✔ [862/1416] Built LidoSRv3.Audit.Verity.AddressAdmission (154s)
-✔ [863/1416] Built Mathlib.Algebra.Ring.Semiconj (9.4s)
-✔ [864/1416] Built LidoSRv3.Audit.Verity.SszEncodingTx (32s)
-✔ [865/1416] Built Mathlib.Data.Quot (17s)
-✔ [866/1416] Built Mathlib.Algebra.GroupWithZero.InjSurj (12s)
-✔ [867/1416] Built Mathlib.Algebra.Field.Defs (7.8s)
-✔ [868/1416] Built Mathlib.Algebra.Group.Units.Defs (22s)
-✔ [869/1416] Built LidoSRv3.Audit.Spec.ConsolidationBridgeGap (5.9s)
-✔ [870/1416] Built Mathlib.Algebra.Ring.Nat (2.6s)
-✔ [871/1416] Built Mathlib.Data.Nat.Find (3.6s)
-✔ [872/1416] Built Mathlib.Tactic.GCongr (7.8s)
-✔ [873/1416] Built Mathlib.Data.Nat.Sqrt (6.3s)
-✔ [874/1416] Built Mathlib.Order.Basic (33s)
-✔ [875/1416] Built Mathlib.Data.FunLike.Embedding (6.3s)
-✔ [876/1416] Built Mathlib.Data.Int.Basic (8.8s)
-✔ [877/1416] Built LidoSRv3.Audit.Spec.ConsolidationDenoteCallsChild (15s)
-✔ [878/1416] Built Mathlib.Data.Set.Notation (11s)
-✔ [879/1416] Built Mathlib.Data.Prod.Basic (6.7s)
-✔ [880/1416] Built Mathlib.Algebra.Group.Nat.Units (5.8s)
-✔ [881/1416] Built Compiler.TypedIRCompiler (148s)
-✔ [882/1416] Built Mathlib.Order.ULift (7.0s)
-✔ [883/1416] Built Mathlib.Data.PNat.Defs (8.6s)
-✔ [884/1416] Built Mathlib.Data.FunLike.Equiv (5.6s)
-✔ [885/1416] Built Mathlib.Logic.Nontrivial.Basic (6.0s)
-✔ [886/1416] Built Mathlib.Algebra.Notation.Prod (8.2s)
-✔ [887/1416] Built Mathlib.Order.Monotone.Defs (14s)
-✔ [888/1416] Built Mathlib.Tactic.GRewrite.Core (51s)
-✔ [889/1416] Built Mathlib.Order.SetNotation (22s)
-✔ [890/1416] Built Mathlib.Tactic.Nontriviality.Core (6.4s)
-✔ [891/1416] Built Mathlib.Algebra.Order.ZeroLEOne (6.6s)
-✔ [892/1416] Built Mathlib.Tactic.Nontriviality (3.8s)
-✔ [893/1416] Built Mathlib.Tactic.GRewrite.Elab (12s)
-✔ [894/1416] Built Mathlib.Algebra.Group.Hom.Defs (31s)
-✔ [895/1416] Built Mathlib.Logic.Equiv.Defs (17s)
-✔ [896/1416] Built Mathlib.Control.EquivFunctor (2.8s)
-✔ [897/1416] Built Mathlib.Algebra.Group.Basic (34s)
-✔ [898/1416] Built Mathlib.Tactic.GRewrite (6.2s)
-✔ [899/1416] Built Mathlib.Data.PNat.Equiv (5.0s)
-✔ [900/1416] Built Mathlib.Data.Finite.Defs (8.2s)
-✔ [901/1416] Built Mathlib.Order.Lex (9.2s)
-✔ [902/1416] Built Mathlib.Order.OrderDual (11s)
-✔ [903/1416] Built Mathlib.Algebra.Opposites (16s)
-✔ [904/1416] Built Mathlib.Algebra.Group.Semiconj.Basic (14s)
-✔ [905/1416] Built Mathlib.Logic.Equiv.Option (17s)
-✔ [906/1416] Built Mathlib.Data.Int.Cast.Basic (16s)
-✔ [907/1416] Built Mathlib.Algebra.Group.Int.Units (16s)
-✔ [908/1416] Built Mathlib.Algebra.Regular.Basic (14s)
-✔ [909/1416] Built Mathlib.Algebra.GroupWithZero.Basic (18s)
-✔ [910/1416] Built Mathlib.Algebra.Group.Torsion (12s)
-✔ [911/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.Defs (10s)
-✔ [912/1416] Built Mathlib.Tactic.Common (8.6s)
-✔ [913/1416] Built Mathlib.Algebra.Group.Equiv.Defs (31s)
-✔ [914/1416] Built Mathlib.Order.Compare (9.9s)
-✔ [915/1416] Built Mathlib.Algebra.Group.Commute.Basic (11s)
-✔ [916/1416] Built Mathlib.Algebra.Ring.Int.Defs (10s)
-✔ [917/1416] Built Mathlib.Algebra.Group.Hom.Basic (22s)
-✔ [918/1416] Built Mathlib.Order.RelClasses (20s)
-✔ [919/1416] Built Mathlib.Algebra.Group.Units.Basic (32s)
-✔ [920/1416] Built Mathlib.Order.Max (15s)
-✔ [921/1416] Built Mathlib.Algebra.Ring.GrindInstances (7.1s)
-✔ [922/1416] Built Mathlib.Algebra.Order.Group.Synonym (26s)
-✔ [923/1416] Built Mathlib.Tactic.Zify (11s)
-✔ [924/1416] Built Mathlib.Algebra.Group.ModEq (11s)
-✔ [925/1416] Built Mathlib.Algebra.Group.TypeTags.Basic (13s)
-✔ [926/1416] Built Mathlib.Algebra.Group.Opposite (14s)
-✔ [927/1416] Built Mathlib.Algebra.Divisibility.Basic (15s)
-✔ [928/1416] Built Mathlib.Algebra.Group.WithOne.Defs (18s)
-✔ [929/1416] Built Mathlib.Algebra.Order.GroupWithZero.Defs (20s)
-✔ [930/1416] Built Mathlib.Data.Int.Sqrt (11s)
-✔ [931/1416] Built Mathlib.Data.Rat.Defs (16s)
-✔ [932/1416] Built Mathlib.Data.Nat.Factorial.Basic (17s)
-✔ [933/1416] Built Mathlib.Algebra.Ring.InjSurj (41s)
-✔ [934/1416] Built Mathlib.Data.Vector.Defs (16s)
-✔ [935/1416] Built Mathlib.Data.List.ProdSigma (11s)
-✔ [936/1416] Built Mathlib.Data.List.Count (11s)
-✔ [937/1416] Built Mathlib.Data.List.InsertIdx (16s)
-✔ [938/1416] Built Mathlib.Data.Int.Cast.Field (10s)
-✔ [939/1416] Built Mathlib.Data.List.Induction (18s)
-✔ [940/1416] Built Mathlib.Algebra.Group.Semiconj.Units (7.0s)
-✔ [941/1416] Built Mathlib.Data.List.TakeDrop (24s)
-✔ [942/1416] Built Mathlib.Algebra.GroupWithZero.Hom (13s)
-✔ [943/1416] Built Mathlib.Logic.Equiv.Prod (86s)
-✔ [944/1416] Built Mathlib.Algebra.Group.Units.Hom (15s)
-✔ [945/1416] Built Mathlib.Algebra.Group.Hom.Instances (19s)
-✔ [946/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.OrderDual (6.1s)
-✔ [947/1416] Built Mathlib.Algebra.Order.GroupWithZero.Synonym (8.9s)
-✔ [948/1416] Built Mathlib.Data.List.Basic (38s)
-✔ [949/1416] Built Mathlib.Order.BoundedOrder.Basic (12s)
-✔ [950/1416] Built Mathlib.Algebra.Group.TypeTags.Hom (11s)
-✔ [951/1416] Built Mathlib.Algebra.GroupWithZero.Units.Basic (17s)
-✔ [952/1416] Built Mathlib.Order.Monotone.Basic (17s)
-✔ [953/1416] Built Mathlib.Algebra.Group.Commute.Units (5.7s)
-✔ [954/1416] Built Mathlib.Algebra.Order.Ring.Synonym (14s)
-✔ [955/1416] Built Mathlib.Algebra.Group.WithOne.Map (6.6s)
-✔ [956/1416] Built Mathlib.Algebra.GroupWithZero.Equiv (4.9s)
-✔ [957/1416] Built Mathlib.Algebra.Divisibility.Units (10s)
-✔ [958/1416] Built Mathlib.Algebra.Divisibility.Hom (10s)
-✔ [959/1416] Built Compiler.TypedIRCompilerCorrectness (122s)
-✔ [960/1416] Built Mathlib.Order.Nat (5.5s)
-✔ [961/1416] Built Mathlib.Data.List.Infix (9.8s)
-✔ [962/1416] Built Mathlib.Data.List.Lex (10s)
-✔ [963/1416] Built Mathlib.Algebra.GroupWithZero.Semiconj (7.4s)
-✔ [964/1416] Built Mathlib.Data.List.Forall2 (10s)
-✔ [965/1416] Built Mathlib.Logic.Equiv.Sum (13s)
-✔ [966/1416] Built Mathlib.Algebra.Group.Nat.Hom (10s)
-✔ [967/1416] Built Mathlib.Algebra.Ring.Basic (13s)
-✔ [968/1416] Built Mathlib.Order.BoundedOrder.Monotone (9.3s)
-✔ [969/1416] Built Mathlib.Data.List.Lattice (16s)
-✔ [970/1416] Built Mathlib.Order.GaloisConnection.Defs (13s)
-✔ [971/1416] Built Mathlib.Algebra.Group.Invertible.Basic (8.3s)
-✔ [972/1416] Built Mathlib.Algebra.GroupWithZero.Divisibility (8.6s)
-✔ [973/1416] Built Mathlib.Algebra.GroupWithZero.Commute (5.2s)
-✔ [974/1416] Built Mathlib.Data.Nat.Log (14s)
-✔ [975/1416] Built LidoSRv3.Audit.Guarantees.PTopup2 (8.8s)
-✔ [976/1416] Built Mathlib.Algebra.Group.Prod (26s)
-✔ [977/1416] Built Mathlib.Data.Int.GCD (15s)
-✔ [978/1416] Built Compiler.Proofs.IRGeneration.SupportedFragment (16s)
-✔ [979/1416] Built Mathlib.Data.List.Perm.Basic (16s)
-✔ [980/1416] Built Mathlib.Algebra.GroupWithZero.WithZero (23s)
-✔ [981/1416] Built Mathlib.Algebra.Ring.Rat (10s)
-✔ [982/1416] Built Mathlib.Algebra.GroupWithZero.Invertible (7.9s)
-✔ [983/1416] Built Mathlib.Data.List.Nodup (17s)
-✔ [984/1416] Built Mathlib.Order.Lattice (30s)
-✔ [985/1416] Built Mathlib.Data.List.Chain (21s)
-✔ [986/1416] Built Mathlib.Algebra.GroupWithZero.Units.Lemmas (9.3s)
-✔ [987/1416] Built LidoSRv3.Audit.MinFirstAllocation (23s)
-✔ [988/1416] Built LidoSRv3.Audit.Spec.Topup2WeiConversionChild (7.8s)
-✔ [989/1416] Built Mathlib.Data.Nat.GCD.Basic (15s)
-✔ [990/1416] Built Mathlib.Data.List.Perm.Subperm (11s)
-✔ [991/1416] Built Mathlib.Logic.Equiv.Basic (24s)
-✔ [992/1416] Built Mathlib.Data.List.Perm.Lattice (7.8s)
-✔ [993/1416] Built Mathlib.Algebra.Ring.Hom.Defs (26s)
-✔ [994/1416] Built Mathlib.Data.List.Duplicate (7.5s)
-✔ [995/1416] Built Mathlib.Data.List.Sigma (10s)
-✔ [996/1416] Built Mathlib.Order.BoundedOrder.Lattice (2.8s)
-✔ [997/1416] Built Mathlib.Algebra.Ring.Invertible (12s)
-✔ [998/1416] Built LidoSRv3.Audit.Source.Topup2Correspondence (19s)
-✔ [999/1416] Built Mathlib.Data.List.Intervals (8.1s)
-✔ [1000/1416] Built Mathlib.Data.List.Range (5.5s)
-✔ [1001/1416] Built Mathlib.Data.List.Dedup (10s)
-✔ [1002/1416] Built Mathlib.Order.MinMax (6.7s)
-✔ [1003/1416] Built Mathlib.Tactic.NormNum.Result (21s)
-✔ [1004/1416] Built LidoSRv3.Audit.Source.MinFirstAmountCorrespondence (10s)
-✔ [1005/1416] Built Mathlib.Data.List.Rotate (21s)
-✔ [1006/1416] Built Mathlib.Data.ULift (7.0s)
-✔ [1007/1416] Built Mathlib.Algebra.BigOperators.Group.List.Basic (32s)
-✔ [1008/1416] Built Mathlib.Algebra.Order.IsBotOne (7.1s)
-✔ [1009/1416] Built Mathlib.Data.Multiset.Defs (17s)
-✔ [1010/1416] Built Mathlib.Data.Fin.Basic (19s)
-✔ [1011/1416] Built Mathlib.Algebra.Ring.Units (13s)
-✔ [1012/1416] Built Mathlib.Data.List.AList (12s)
-✔ [1013/1416] Built Mathlib.Logic.Embedding.Basic (16s)
-✔ [1014/1416] Built Mathlib.Algebra.Group.Equiv.Basic (19s)
-✔ [1015/1416] Built Mathlib.Algebra.Ring.Int.Units (8.6s)
-✔ [1016/1416] Built Mathlib.Algebra.Ring.Commute (8.9s)
-✔ [1017/1416] Built Mathlib.Algebra.BigOperators.Group.List.Lemmas (13s)
-✔ [1018/1416] Built Mathlib.Order.Disjoint (20s)
-✔ [1019/1416] Built LidoSRv3.Audit.Verity.Topup2Tx (21s)
-✔ [1020/1416] Built Mathlib.Tactic.NormNum.Core (19s)
-✔ [1021/1416] Built Mathlib.Data.Multiset.ZeroCons (19s)
-✔ [1022/1416] Built Mathlib.Data.Nat.Cast.Commute (7.1s)
-✔ [1023/1416] Built LidoSRv3.Audit.Verity.Topup2DistributionTx (28s)
-✔ [1024/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.Basic (23s)
-✔ [1025/1416] Built Mathlib.Algebra.Group.Units.Equiv (13s)
-✔ [1026/1416] Built Mathlib.Algebra.Order.Sub.Defs (4.6s)
-✔ [1027/1416] Built Mathlib.Algebra.Group.Equiv.Opposite (18s)
-✔ [1028/1416] Built Mathlib.Algebra.Ring.Divisibility.Basic (20s)
-✔ [1029/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.MinMax (6.5s)
-✔ [1030/1416] Built Mathlib.Order.PropInstances (13s)
-✔ [1031/1416] Built Mathlib.Algebra.Order.Monoid.NatCast (5.2s)
-✔ [1032/1416] Built Mathlib.Order.WithBot (56s)
-✔ [1033/1416] Built Mathlib.Data.Multiset.Count (18s)
-✔ [1034/1416] Built Verity.Macro.Translate.Expr (356s)
-✔ [1035/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.Pow (6.8s)
-✔ [1036/1416] Built Mathlib.Data.Multiset.Basic (18s)
-✔ [1037/1416] Built Mathlib.Order.RelIso.Basic (33s)
-✔ [1038/1416] Built LidoSRv3.Audit.Guarantees.PTopup2Verity (17s)
-✔ [1039/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.ExistsOfLE (9.7s)
-✔ [1040/1416] Built Mathlib.Algebra.GroupWithZero.Units.Equiv (10s)
-✔ [1041/1416] Built Mathlib.Algebra.Order.Monoid.Defs (11s)
-✔ [1042/1416] Built Mathlib.Algebra.Order.Group.Unbundled.Basic (11s)
-✔ [1043/1416] Built Mathlib.Algebra.Order.Monoid.OrderDual (4.7s)
-✔ [1044/1416] Built Mathlib.Algebra.Group.Even (13s)
-✔ [1045/1416] Built Mathlib.Algebra.Field.Basic (32s)
-✔ [1046/1416] Built Mathlib.Algebra.Order.Group.Int (3.7s)
-✔ [1047/1416] Built Mathlib.Data.Set.Basic (16s)
-✔ [1048/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.TypeTags (12s)
-✔ [1049/1416] Built Mathlib.Algebra.Order.Sub.Unbundled.Basic (16s)
-✔ [1050/1416] Built Mathlib.Data.Multiset.AddSub (21s)
-✔ [1051/1416] Built Mathlib.Algebra.Order.Monoid.Canonical.Defs (15s)
-✔ [1052/1416] Built Mathlib.Data.Set.Order (7.7s)
-✔ [1053/1416] Built Mathlib.Algebra.Group.Nat.Even (10s)
-✔ [1054/1416] Built Mathlib.Data.Nat.Cast.Basic (15s)
-✔ [1055/1416] Built Mathlib.Data.Set.Inclusion (10s)
-✔ [1056/1416] Built Mathlib.Algebra.Order.Group.Defs (19s)
-✔ [1057/1416] Built Mathlib.Algebra.Order.Group.Nat (3.0s)
-✔ [1058/1416] Built Mathlib.Data.Set.Disjoint (12s)
-✔ [1059/1416] Built Mathlib.Data.SetLike.Basic (18s)
-✔ [1060/1416] Built Mathlib.Algebra.Order.Monoid.TypeTags (10s)
-✔ [1061/1416] Built Mathlib.Order.Hom.Basic (34s)
-✔ [1062/1416] Built Mathlib.Algebra.Group.Int.Even (5.8s)
-✔ [1063/1416] Built Mathlib.Order.Heyting.Basic (37s)
-✔ [1064/1416] Built Mathlib.Data.Multiset.Replicate (15s)
-✔ [1065/1416] Built Mathlib.Algebra.Order.Monoid.Unbundled.WithTop (37s)
-✔ [1066/1416] Built Mathlib.Algebra.Order.Monoid.Basic (4.0s)
-✔ [1067/1416] Built Mathlib.Data.Nat.Cast.Order.Basic (5.7s)
-✔ [1068/1416] Built Mathlib.Algebra.Order.Group.OrderIso (5.9s)
-✔ [1069/1416] Built Mathlib.Algebra.Order.Sub.Basic (16s)
-✔ [1070/1416] Built Mathlib.Order.BooleanAlgebra.Defs (3.0s)
-✔ [1071/1416] Built Mathlib.Algebra.Order.Monoid.Units (5.7s)
-✔ [1072/1416] Built Mathlib.Algebra.Order.Group.Lattice (5.7s)
-✔ [1073/1416] Built Mathlib.Order.Hom.Lattice (11s)
-✔ [1074/1416] Built Mathlib.Algebra.Order.Monoid.WithTop (10s)
-✔ [1075/1416] Built Mathlib.Algebra.Order.Group.Units (11s)
-✔ [1076/1416] Built Mathlib.Tactic.NormNum.Basic (27s)
-✔ [1077/1416] Built Mathlib.Data.Int.LeastGreatest (16s)
-✔ [1078/1416] Built Mathlib.Order.Antisymmetrization (22s)
-✔ [1079/1416] Built Mathlib.Algebra.Order.Group.Unbundled.Abs (11s)
-✔ [1080/1416] Built Mathlib.Data.Set.Insert (27s)
-✔ [1081/1416] Built Mathlib.Algebra.Ring.Parity (27s)
-✔ [1082/1416] Built Mathlib.Algebra.Order.AddGroupWithTop (15s)
-✔ [1083/1416] Built Mathlib.Algebra.Order.Group.Abs (9.3s)
-✔ [1084/1416] Built Mathlib.Order.BooleanAlgebra.Basic (24s)
-✔ [1085/1416] Built Mathlib.Data.Bool.Set (9.1s)
-✔ [1086/1416] Built Mathlib.Data.Set.Subsingleton (10s)
-✔ [1087/1416] Built Mathlib.Algebra.Order.Group.Unbundled.Int (12s)
-✔ [1088/1416] Built Mathlib.Order.Hom.Bounded (32s)
-✔ [1089/1416] Built Mathlib.Data.Int.Cast.Lemmas (16s)
-✔ [1090/1416] Built Mathlib.Order.SymmDiff (9.8s)
-✔ [1091/1416] Built Mathlib.Algebra.Order.Group.PosPart (22s)
-✔ [1092/1416] Built Mathlib.Algebra.Order.Hom.Basic (13s)
-✔ [1093/1416] Built Mathlib.Data.Part (12s)
-✔ [1094/1416] Built Mathlib.Data.Nat.Bitwise (23s)
-✔ [1095/1416] Built Mathlib.Data.Nat.ModEq (15s)
-✔ [1096/1416] Built Mathlib.Order.BooleanAlgebra.Set (18s)
-✔ [1097/1416] Built Mathlib.Algebra.Ring.Int.Parity (21s)
-✔ [1098/1416] Built Mathlib.Algebra.Order.Ring.Unbundled.Rat (19s)
-✔ [1099/1416] Built Mathlib.Tactic.Abel (34s)
-✔ [1100/1416] Built Mathlib.Data.Set.SymmDiff (4.2s)
-✔ [1101/1416] Built Mathlib.Tactic.NormNum.Pow (14s)
-✔ [1102/1416] Built Mathlib.Data.Rat.Lemmas (8.3s)
-✔ [1103/1416] Built Mathlib.Order.Hom.BoundedLattice (19s)
-✔ [1104/1416] Built Mathlib.Order.Interval.Set.Basic (15s)
-✔ [1105/1416] Built Mathlib.Data.Set.Image (17s)
-✔ [1106/1416] Built Mathlib.Data.Set.List (3.2s)
-✔ [1107/1416] Built Mathlib.Data.Nat.Set (4.9s)
-✔ [1108/1416] Built Mathlib.Data.Set.Restrict (8.3s)
-✔ [1109/1416] Built Mathlib.Order.Directed (8.0s)
-✔ [1110/1416] Built Mathlib.Algebra.Notation.Support (9.2s)
-✔ [1111/1416] Built Mathlib.Order.ConditionallyCompletePartialOrder.Defs (5.4s)
-✔ [1112/1416] Built Mathlib.Order.Interval.Set.LinearOrder (20s)
-✔ [1113/1416] Built Mathlib.Data.Int.CharZero (8.1s)
-✔ [1114/1416] Built Mathlib.Data.Multiset.MapFold (14s)
-✔ [1115/1416] Built Mathlib.Data.Set.Prod (19s)
-✔ [1116/1416] Built Mathlib.Data.Set.NAry (4.5s)
-✔ [1117/1416] Built Mathlib.Order.Bounds.Basic (17s)
-✔ [1118/1416] Built Mathlib.Data.Set.Function (10s)
-✔ [1119/1416] Built Mathlib.Order.CompleteLattice.Defs (10s)
-✔ [1120/1416] Built Mathlib.Order.LatticeIntervals (11s)
-✔ [1121/1416] Built Mathlib.Order.Bounds.Image (12s)
-✔ [1122/1416] Built Mathlib.Data.Set.Monotone (11s)
-✔ [1123/1416] Built Mathlib.Order.WellFounded (11s)
-✔ [1124/1416] Built Mathlib.Order.Interval.Set.Image (11s)
-✔ [1125/1416] Built Mathlib.Data.Set.Pairwise.Basic (12s)
-✔ [1126/1416] Built Mathlib.Data.Multiset.Filter (12s)
-✔ [1127/1416] Built Mathlib.Logic.Equiv.Set (16s)
-✔ [1128/1416] Built Mathlib.Algebra.BigOperators.Group.Multiset.Defs (4.5s)
-✔ [1129/1416] Built Mathlib.Order.ConditionallyCompleteLattice.Defs (6.8s)
-✔ [1130/1416] Built Mathlib.Data.Finset.Defs (8.4s)
-✔ [1131/1416] Built Mathlib.Data.Multiset.UnionInter (12s)
-✔ [1132/1416] Built Mathlib.Order.Interval.Set.UnorderedInterval (16s)
-✔ [1133/1416] Built Mathlib.Data.Finset.Empty (11s)
-✔ [1134/1416] Built Mathlib.Data.Finset.Erase (11s)
-✔ [1135/1416] Built Mathlib.Data.Finset.Attach (12s)
-✔ [1136/1416] Built Mathlib.Data.Multiset.Range (9.1s)
-✔ [1137/1416] Built Mathlib.Algebra.Order.GroupWithZero.Basic (34s)
-✔ [1138/1416] Built Mathlib.Data.Multiset.Dedup (9.9s)
-✔ [1139/1416] Built Mathlib.Order.Hom.Set (19s)
-✔ [1140/1416] Built Mathlib.Data.Finset.Dedup (3.1s)
-✔ [1141/1416] Built Mathlib.Order.Interval.Set.OrderEmbedding (11s)
-✔ [1142/1416] Built Mathlib.Algebra.Ring.Equiv (23s)
-✔ [1143/1416] Built Mathlib.Algebra.Order.GroupWithZero.OrderIso (8.4s)
-✔ [1144/1416] Built Mathlib.Order.Bounds.OrderIso (3.7s)
-✔ [1145/1416] Built Mathlib.Data.Fin.SuccPred (27s)
-✔ [1146/1416] Built Mathlib.Data.Finset.Filter (13s)
-✔ [1147/1416] Built Mathlib.Data.Multiset.Fold (13s)
-✔ [1148/1416] Built Mathlib.Data.Multiset.FinsetOps (13s)
-✔ [1149/1416] Built Mathlib.Order.Preorder.Chain (12s)
-✔ [1150/1416] Built Mathlib.Data.Fin.Rev (10s)
-✔ [1151/1416] Built Mathlib.Data.Vector.Basic (13s)
-✔ [1152/1416] Built Mathlib.Data.Fin.Embedding (14s)
-✔ [1153/1416] Built Mathlib.Tactic.FieldSimp.Lemmas (24s)
-✔ [1154/1416] Built Mathlib.Algebra.Order.Nonneg.Basic (24s)
-✔ [1155/1416] Built Mathlib.Algebra.Order.Ring.Unbundled.Basic (26s)
-✔ [1156/1416] Built Mathlib.Data.Fintype.Defs (13s)
-✔ [1157/1416] Built Mathlib.Algebra.Order.Group.Multiset (13s)
-✔ [1158/1416] Built Mathlib.Data.Multiset.Lattice (8.8s)
-✔ [1159/1416] Built Mathlib.Data.Finset.Lattice.Basic (11s)
-✔ [1160/1416] Built Mathlib.Order.Antichain (10s)
-✔ [1161/1416] Built Mathlib.Algebra.Order.Ring.Defs (7.6s)
-✔ [1162/1416] Built Mathlib.Algebra.Group.Fin.Basic (12s)
-✔ [1163/1416] Built Mathlib.Data.Finset.Insert (20s)
-✔ [1164/1416] Built Mathlib.Order.Fin.Basic (16s)
-✔ [1165/1416] Built Mathlib.Data.Multiset.Sum (8.4s)
-✔ [1166/1416] Built Mathlib.Data.NNRat.Defs (15s)
-✔ [1167/1416] Built Mathlib.Algebra.Order.GroupWithZero.Canonical (41s)
-✔ [1168/1416] Built Mathlib.Algebra.BigOperators.Group.Multiset.Basic (13s)
-✔ [1169/1416] Built Mathlib.Algebra.Order.Ring.InjSurj (8.1s)
-✔ [1170/1416] Built Mathlib.Algebra.Order.Ring.Canonical (10s)
-✔ [1171/1416] Built Mathlib.Algebra.Order.Ring.Rat (7.3s)
-✔ [1172/1416] Built Mathlib.Data.Finset.Lattice.Lemmas (7.2s)
-✔ [1173/1416] Built Mathlib.Algebra.Order.Ring.Int (12s)
-✔ [1174/1416] Built Mathlib.Order.CompleteLattice.Basic (40s)
-✔ [1175/1416] Built Mathlib.Order.Interval.Set.OrdConnected (15s)
-✔ [1176/1416] Built Mathlib.Algebra.Order.Positive.Ring (9.5s)
-✔ [1177/1416] Built Mathlib.Data.Finset.Range (9.7s)
-✔ [1178/1416] Built Mathlib.Data.Finset.SDiff (11s)
-✔ [1179/1416] Built Mathlib.Algebra.Order.Ring.Basic (14s)
-✔ [1180/1416] Built Mathlib.Algebra.Field.Rat (8.2s)
-✔ [1181/1416] Built Mathlib.Tactic.CancelDenoms.Core (19s)
-✔ [1182/1416] Built Mathlib.Algebra.Order.Field.Canonical (8.7s)
-✔ [1183/1416] Built Mathlib.Algebra.Order.Ring.Nat (9.5s)
-✔ [1184/1416] Built Mathlib.Data.Finset.Disjoint (14s)
-✔ [1185/1416] Built Mathlib.Data.Multiset.Bind (13s)
-✔ [1186/1416] Built Mathlib.Order.GaloisConnection.Basic (14s)
-✔ [1187/1416] Built Mathlib.Data.PNat.Basic (6.0s)
-✔ [1188/1416] Built Mathlib.Data.Fin.Tuple.Basic (19s)
-✔ [1189/1416] Built Mathlib.Data.Rat.Cast.Defs (10s)
-✔ [1190/1416] Built Mathlib.Order.CompleteLattice.Lemmas (13s)
-✔ [1191/1416] Built Mathlib.Data.Nat.Cast.Order.Ring (10s)
-✔ [1192/1416] Built Mathlib.Data.Rat.Cast.CharZero (3.6s)
-✔ [1193/1416] Built Mathlib.Data.List.OfFn (4.1s)
-✔ [1194/1416] Built Mathlib.Algebra.Order.Ring.Cast (6.1s)
-✔ [1195/1416] Built Mathlib.Data.List.FinRange (4.2s)
-✔ [1196/1416] Built Mathlib.Tactic.NormNum.Abs (8.1s)
-✔ [1197/1416] Built Mathlib.Algebra.Order.Invertible (10s)
-✔ [1198/1416] Built Mathlib.Data.Finset.Image (17s)
-✔ [1199/1416] Built Mathlib.Tactic.Linarith.Lemmas (13s)
-✔ [1200/1416] Built Mathlib.Data.Finset.Basic (20s)
-✔ [1201/1416] Built Mathlib.Data.Finset.SymmDiff (7.2s)
-✔ [1202/1416] Built Mathlib.Data.Fintype.OfMap (8.1s)
-✔ [1203/1416] Built Mathlib.Algebra.Order.Ring.Abs (21s)
-✔ [1204/1416] Built Mathlib.Algebra.Order.Floor.Defs (16s)
-✔ [1205/1416] Built Mathlib.Tactic.NormNum.Inv (21s)
-✔ [1206/1416] Built Mathlib.Data.Finset.Fold (10s)
-✔ [1207/1416] Built Mathlib.Tactic.Linarith.Datatypes (18s)
-✔ [1208/1416] Built Mathlib.Data.Finset.BooleanAlgebra (17s)
-✔ [1209/1416] Built Mathlib.Data.List.Sort (30s)
-✔ [1210/1416] Built Mathlib.Tactic.NormNum.Eq (15s)
-✔ [1211/1416] Built Mathlib.Algebra.Order.Floor.Semiring (18s)
-✔ [1212/1416] Built Mathlib.Order.CompleteBooleanAlgebra (45s)
-✔ [1213/1416] Built Mathlib.Tactic.Positivity.Core (34s)
-✔ [1214/1416] Built Mathlib.Data.Finset.Union (20s)
-✔ [1215/1416] Built Mathlib.Tactic.Linarith.Parsing (16s)
-✔ [1216/1416] Built Mathlib.Data.Multiset.Sort (8.7s)
-✔ [1217/1416] Built Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm (19s)
-✔ [1218/1416] Built Mathlib.Data.Finset.Card (33s)
-✔ [1219/1416] Built Mathlib.Data.List.NodupEquivFin (13s)
-✔ [1220/1416] Built Mathlib.Data.Fintype.Sets (21s)
-✔ [1221/1416] Built Mathlib.Tactic.Linarith.Preprocessing (25s)
-✔ [1222/1416] Built Mathlib.Data.Set.BooleanAlgebra (13s)
-✔ [1223/1416] Built Mathlib.Data.Finset.Option (8.0s)
-✔ [1224/1416] Built Mathlib.Data.Finset.Sum (8.0s)
-✔ [1225/1416] Built Mathlib.Tactic.FieldSimp.Discharger (13s)
-✔ [1226/1416] Built Mathlib.Data.Fintype.Basic (11s)
-✔ [1227/1416] Built Mathlib.Tactic.Linarith.Verification (20s)
-✔ [1228/1416] Built Mathlib.Tactic.NormNum.Ineq (29s)
-✔ [1229/1416] Built Mathlib.Data.Set.Sigma (18s)
-✔ [1230/1416] Built Mathlib.Data.Fintype.Card (13s)
-✔ [1231/1416] Built Mathlib.Algebra.Order.Field.Basic (33s)
-✔ [1232/1416] Built Mathlib.Data.Set.Lattice (24s)
-✔ [1233/1416] Built Mathlib.Tactic.NormNum.DivMod (11s)
-✔ [1234/1416] Built Mathlib.Data.Fintype.EquivFin (10s)
-✔ [1235/1416] Built Mathlib.Tactic.Positivity.Basic (42s)
-✔ [1236/1416] Built Mathlib.Tactic.Ring.Common (67s)
-✔ [1237/1416] Built Mathlib.Data.Finset.Lattice.Fold (31s)
-✔ [1238/1416] Built Mathlib.Order.ConditionallyCompletePartialOrder.Basic (8.9s)
-✔ [1239/1416] Built Mathlib.Data.ZMod.Defs (4.1s)
-✔ [1240/1416] Built Mathlib.Data.Set.Lattice.Image (14s)
-✔ [1241/1416] Built Mathlib.Data.BitVec (6.0s)
-✔ [1242/1416] Built Mathlib.Data.Nat.Pairing (5.0s)
-✔ [1243/1416] Built Mathlib.Order.CompleteLattice.Finset (12s)
-✔ [1244/1416] Built LidoSRv3.Audit.Source.DepositDataRootCorrespondence (8.6s)
-✔ [1245/1416] Built Mathlib.Tactic.Ring.Basic (21s)
-✔ [1246/1416] Built Mathlib.Order.ConditionallyCompleteLattice.Basic (21s)
-✔ [1247/1416] Built Mathlib.Tactic.FieldSimp (54s)
-⚠ [1248/1416] Built LidoSRv3.Audit.SszDepositEquivalence (4.6s)
-warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
-  Ssz.traverseBranch
-
-Hint: Omit it from the simp argument list.
-  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
-  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:12: This simp argument is unused:
-  sourceWitness
-
-Hint: Omit it from the simp argument list.
-  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:27: This simp argument is unused:
-  structuralWitness
-
-Hint: Omit it from the simp argument list.
-  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [1249/1416] Built LidoSRv3.Audit.Spec.SszCorrespondence (6.7s)
-✔ [1250/1416] Built Mathlib.Data.Finset.Sigma (8.9s)
-✔ [1251/1416] Built Mathlib.Tactic.Ring.PNat (6.8s)
-✔ [1252/1416] Built LidoSRv3.Audit.Spec.HashIdentificationChild (5.7s)
-✔ [1253/1416] Built Mathlib.Tactic.Field (10s)
-✔ [1254/1416] Built Mathlib.Order.CompleteLatticeIntervals (13s)
-✔ [1255/1416] Built Mathlib.Tactic.Ring.RingNF (14s)
-✔ [1256/1416] Built Mathlib.Data.Finmap (8.4s)
-✔ [1257/1416] Built Mathlib.Tactic.Linarith.Frontend (15s)
-✔ [1258/1416] Built LidoSRv3.Audit.Guarantees.PSsz1 (11s)
-✔ [1259/1416] Built Mathlib.Tactic.Ring (1.6s)
-✔ [1260/1416] Built Mathlib.Algebra.Order.Nonneg.Lattice (3.3s)
-✔ [1261/1416] Built Mathlib.Algebra.Order.Nonneg.Ring (2.4s)
-✔ [1262/1416] Built Mathlib.Algebra.Order.Nonneg.Field (2.9s)
-✔ [1263/1416] Built Mathlib.Data.Rat.Cast.Lemmas (1.7s)
-✔ [1264/1416] Built Mathlib.Algebra.Order.Field.Rat (1.9s)
-✔ [1265/1416] Built Mathlib.Tactic.NormNum.OfScientific (2.2s)
-✔ [1266/1416] Built Mathlib.Data.Rat.Cast.Order (6.3s)
-✔ [1267/1416] Built Mathlib.Tactic.NormNum (1.7s)
-✔ [1268/1416] Built Mathlib.Tactic.Linarith (1.5s)
-✔ [1269/1416] Built Verity.Macro.Translate (399s)
-✔ [1270/1416] Built Mathlib.Algebra.Order.Floor.Ring (12s)
-✔ [1271/1416] Built Verity.Macro.Bridge (4.8s)
-✔ [1272/1416] Built EvmYul.UInt256 (5.8s)
-✔ [1273/1416] Built EvmYul.EVM.GasConstants (4.2s)
-✔ [1274/1416] Built Compiler.Proofs.IRGeneration.IRStorageWord (4.1s)
-✔ [1275/1416] Built Verity.Macro.Elaborate (8.6s)
-✔ [1276/1416] Built Verity.Macro (2.3s)
-✔ [1277/1416] Built EvmYul.Wheels (8.1s)
-✔ [1278/1416] Built Compiler.Proofs.IRGeneration.IRRuntimeTypes (7.8s)
-⚠ [1279/1416] Built LidoSRv3.Audit.Verity.DepositLedgerTx (8.6s)
-warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
-
-The binding can be removed (if unused) or named `_` (if used implicitly).
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-✔ [1280/1416] Built EvmYul.State.BlockHeader (8.9s)
-✔ [1281/1416] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanNativeSignedArithLemmas (17s)
-✔ [1282/1416] Built EvmYul.Maps.ByteMap (9.7s)
-✔ [1283/1416] Built EvmYul.State.TrieRoot (11s)
-✔ [1284/1416] Built EvmYul.Yul.Wheels (11s)
-⚠ [1285/1416] Built Conform.Wheels (12s)
-warning: Conform/Wheels.lean:106:47: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-warning: Conform/Wheels.lean:106:70: `IsTotal` has been deprecated: Use `Std.Total` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-✔ [1286/1416] Built EvmYul.Maps.StorageMap (4.2s)
-✔ [1287/1416] Built EvmYul.SHA256 (5.0s)
-✔ [1288/1416] Built EvmYul.MachineState (8.9s)
-✔ [1289/1416] Built EvmYul.RIP160 (7.5s)
-✔ [1290/1416] Built EvmYul.EllipticCurves (10s)
-✔ [1291/1416] Built EvmYul.BN_ADD (10s)
-✔ [1292/1416] Built EvmYul.SNARKV (10s)
-✔ [1293/1416] Built EvmYul.BLAKE2_F (10s)
-✔ [1294/1416] Built EvmYul.PointEval (11s)
-✔ [1295/1416] Built EvmYul.BN_MUL (12s)
-✔ [1296/1416] Built EvmYul.Yul.MachineState (6.8s)
-✔ [1297/1416] Built EvmYul.MachineStateOps (7.7s)
-✔ [1298/1416] Built EvmYul.Operations (10s)
-⚠ [1299/1416] Built LidoSRv3.Audit.Source.ReserveCorrespondence (33s)
+⚠ [1307/1358] Replayed LidoSRv3.Audit.Source.ReserveCorrespondence
 warning: LidoSRv3/Audit/Source/ReserveCorrespondence.lean:410:53: This simp argument is unused:
   setStorage
 
@@ -2120,63 +1073,7 @@ Hint: Omit it from the simp argument list.
   ̲  ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲ ̲hunreserved, hdepositable, henough]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-⚠ [1300/1416] Built EvmYul.Pretty (3.3s)
-warning: EvmYul/Pretty.lean:35:32: `IsAntisymm` has been deprecated: Use `Std.Antisymm` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-warning: EvmYul/Pretty.lean:36:32: `IsTotal` has been deprecated: Use `Std.Total` instead
-
-Note: The updated constant has a different type:
-  {α : Sort u} → (α → α → Prop) → Prop
-instead of
-  (α : Sort u_1) → (α → α → Prop) → Prop
-✔ [1301/1416] Built LidoSRv3.Audit.Guarantees.PReserve1 (2.4s)
-✔ [1302/1416] Built EvmYul.Yul.Ast (6.1s)
-✔ [1303/1416] Built EvmYul.EVM.Instr (9.5s)
-✔ [1304/1416] Built LidoSRv3.Audit.Spec.ReserveQueueCacheChild (5.5s)
-✔ [1305/1416] Built EvmYul.Yul.SizeLemmas (6.1s)
-✔ [1306/1416] Built EvmYul.State.Account (7.2s)
-✔ [1307/1416] Built EvmYul.State.ExecutionEnv (8.2s)
-✔ [1308/1416] Built EvmYul.State.AccountOps (4.8s)
-✔ [1309/1416] Built EvmYul.State.Substate (5.8s)
-✔ [1310/1416] Built EvmYul.Yul.YulNotation (14s)
-✔ [1311/1416] Built EvmYul.Maps.AccountMap (5.2s)
-✔ [1312/1416] Built EvmYul.State.SubstateOps (7.1s)
-✔ [1313/1416] Built EvmYul.State.Transaction (7.1s)
-✔ [1314/1416] Built EvmYul.EVM.Exception (4.7s)
-✔ [1315/1416] Built EvmYul.State.TransactionOps (4.8s)
-✔ [1316/1416] Built EvmYul.State.Withdrawal (5.8s)
-✔ [1317/1416] Built EvmYul.EVM.PrecompiledContracts (8.4s)
-✔ [1318/1416] Built EvmYul.State.Block (6.5s)
-✔ [1319/1416] Built EvmYul.State (2.8s)
-✔ [1320/1416] Built EvmYul.StateOps (2.0s)
-✔ [1321/1416] Built EvmYul.SharedState (4.2s)
-✔ [1322/1416] Built EvmYul.Yul.State (3.9s)
-✔ [1323/1416] Built EvmYul.SharedStateOps (4.3s)
-✔ [1324/1416] Built EvmYul.EVM.State (5.0s)
-✔ [1325/1416] Built EvmYul.Yul.Exception (4.4s)
-✔ [1326/1416] Built EvmYul.EVM.StateOps (4.5s)
-✔ [1327/1416] Built EvmYul.Yul.StateOps (8.9s)
-✔ [1328/1416] Built EvmYul.EVM.PrimOps (5.9s)
-✔ [1329/1416] Built EvmYul.EVM.Gas (10s)
-✔ [1330/1416] Built EvmYul.Yul.PrimOps (5.5s)
-⚠ [1331/1416] Built EvmYul.Semantics (5.1s)
-warning: EvmYul/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
-
-import Mathlib.Init
-⚠ [1332/1416] Built EvmYul.EVM.Semantics (8.4s)
-warning: EvmYul/EVM/Semantics.lean:1:0: 'Mathlib.Data.Array.Defs' has been deprecated: please replace this import by
-
-import Mathlib.Init
-✔ [1333/1416] Built EvmYul.Yul.Interpreter (31s)
-✔ [1334/1416] Built EvmYul (2.4s)
-✔ [1335/1416] Built Compiler.Proofs.KeccakBound (3.4s)
-✔ [1336/1416] Built Compiler.Proofs.MappingSlot (4.0s)
-✔ [1337/1416] Built Contracts.Common (11s)
-⚠ [1338/1416] Built LidoSRv3.Audit.Verity.VaultEthTx (11s)
+⚠ [1318/1358] Replayed LidoSRv3.Audit.Verity.VaultEthTx
 warning: LidoSRv3/Audit/Verity/VaultEthTx.lean:94:23: This simp argument is unused:
   hRoute
 
@@ -2212,171 +1109,7 @@ Hint: Omit it from the simp argument list.
   simp [execute, hR̵o̵u̵t̵e̵,̵ ̵h̵Source, Contract.run] at hExecute
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [1339/1416] Built LidoSRv3.Audit.Verity.MinFirstAmountTx (15s)
-✔ [1340/1416] Built LidoSRv3.Audit.Verity.TopupPackedStorage (19s)
-✔ [1341/1416] Built LidoSRv3.Audit.Verity.TopupTx (21s)
-✔ [1342/1416] Built LidoSRv3.Audit.Verity.ConsolidationValueTx (25s)
-✔ [1343/1416] Built LidoSRv3.Audit.Verity.AddressClaimBatchTx (27s)
-⚠ [1344/1416] Built LidoSRv3.Audit.Verity.TopupHybrid (28s)
-warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
-  _root_.Verity.pure
-
-Hint: Omit it from the simp argument list.
-  simp [executeSource, sourceTx, observeVerity, withCalls, topupCallJournal,
-        TopupTxContract.executeTopup,
-  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executeNoTopup,
-  ̲  ̲ ̲ ̲ ̲ ̲TopupTxContract.executePullRevert,
-  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executePushRevert, _root_.Verity.require,
-        _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
-        _root_.Contracts.linkedCallEntry, _root_.Verity.Contract.run,
-  ̵  ̵ ̵ ̵ ̵ ̵_root_.Verity.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵p̵u̵r̵e̵,̵ ̵Bind.bind,
-  ̲  ̲ ̲ ̲ ̲ ̲Pure.pure,
-  ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [1345/1416] Built LidoSRv3.Audit.Verity.AllocCapacityPhase3 (29s)
-✔ [1346/1416] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanNativeLowering (42s)
-✔ [1347/1416] Built LidoSRv3.Audit.Spec.ConsolidationValueCorrespondence (6.4s)
-⚠ [1348/1416] Built LidoSRv3.Audit.Verity.DepositTx (32s)
-warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
-  Pure.pure
-
-Hint: Omit it from the simp argument list.
-  simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
-      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
-      _root_.Verity.require,
-  ̵  ̵ ̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind,
-  ̵  ̵ ̵ ̵_root_.Verity.pure,
-  ̲  ̲ ̲ ̲Bind.bind, P̵u̵r̵e̵.̵p̵u̵r̵e̵,̵ ̵committedBalances, Nat.sub_add_cancel hFunds,
-  ̵  ̵ ̵ ̵Core.Uint256.ofNat,
-  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [1349/1416] Built LidoSRv3.Audit.Guarantees.PVaultEth1 (21s)
-✔ [1350/1416] Built LidoSRv3.Audit.Verity.DepositParentTx (34s)
-✔ [1351/1416] Built LidoSRv3.Audit.Spec.AddressClaimKeccakSlots (13s)
-✔ [1352/1416] Built LidoSRv3.Audit.Guarantees.PTopup1 (22s)
-✔ [1353/1416] Built LidoSRv3.Audit.Spec.AddressClaimCorrespondence (15s)
-✔ [1354/1416] Built LidoSRv3.Audit.Spec.OracleMintCorrespondence (14s)
-✔ [1355/1416] Built LidoSRv3.Audit.Spec.AddressClaimBatchCorrespondence (17s)
-✔ [1356/1416] Built LidoSRv3.Audit.Spec.AddressClaimFuelCorrespondence (20s)
-✔ [1357/1416] Built LidoSRv3.Audit.Guarantees.PAlloc1Phase3 (17s)
-✔ [1358/1416] Built LidoSRv3.Audit.Verity.AllocationTx (17s)
-✔ [1359/1416] Built LidoSRv3.Audit.Spec.AllocExecCorrespondence (17s)
-⚠ [1360/1416] Built LidoSRv3.Audit.Verity.DepositNFrameTx (11s)
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:299:26: This simp argument is unused:
-  Nat.add_assoc
-
-Hint: Omit it from the simp argument list.
-  simp [afterBatches, N̵a̵t̵.̵a̵d̵d̵_̵a̵s̵s̵o̵c̵,̵ ̵Nat.add_comm, Nat.add_left_comm]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:448:25: This simp argument is unused:
-  Nat.add_assoc
-
-Hint: Omit it from the simp argument list.
-  simp [afterPushes, N̵a̵t̵.̵a̵d̵d̵_̵a̵s̵s̵o̵c̵,̵ ̵Nat.add_comm, Nat.add_left_comm]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:505:13: This simp argument is unused:
-  Bind.bind
-
-Hint: Omit it from the simp argument list.
-  simp only [B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.bind, hValueGuard, _root_.Verity.require, if_true]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:505:24: This simp argument is unused:
-  _root_.Verity.bind
-
-Hint: Omit it from the simp argument list.
-  simp only [Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵hValueGuard, _root_.Verity.require, if_true]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:505:57: This simp argument is unused:
-  _root_.Verity.require
-
-Hint: Omit it from the simp argument list.
-  simp only [Bind.bind, _root_.Verity.bind, hValueGuard, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵ ̵if_true]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:507:13: This simp argument is unused:
-  Bind.bind
-
-Hint: Omit it from the simp argument list.
-  simp only [B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.bind]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:507:24: This simp argument is unused:
-  _root_.Verity.bind
-
-Hint: Omit it from the simp argument list.
-  simp only [Bind.bind,̵ ̵_̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:509:13: This simp argument is unused:
-  Bind.bind
-
-Hint: Omit it from the simp argument list.
-  simp only [B̵i̵n̵d̵.̵b̵i̵n̵d̵,̵ ̵_root_.Verity.bind, DepositParentTx.getState, hClose,
-  ̵  ̵ ̵ ̵beq_self_eq_true,
-  ̲  ̲ ̲ ̲_root_.Verity.require, if_true, committedState, entry, processed, pulled]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:509:24: This simp argument is unused:
-  _root_.Verity.bind
-
-Hint: Omit it from the simp argument list.
-  simp only [Bind.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵b̵i̵n̵d̵,̵ ̵DepositParentTx.getState, hClose,
-  ̵  ̵ ̵ ̵beq_self_eq_true, _root_.Verity.require,
-  ̲  ̲ ̲ ̲if_true, committedState, entry, processed, pulled]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:509:44: This simp argument is unused:
-  DepositParentTx.getState
-
-Hint: Omit it from the simp argument list.
-  simp only [Bind.bind, _root_.Verity.bind, D̵e̵p̵o̵s̵i̵t̵P̵a̵r̵e̵n̵t̵T̵x̵.̵g̵e̵t̵S̵t̵a̵t̵e̵,̵ ̵hClose, beq_self_eq_true, _root_.Verity.require,
-  ̲  ̲ ̲ ̲if_true, committedState, entry, processed, pulled]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:510:22: This simp argument is unused:
-  _root_.Verity.require
-
-Hint: Omit it from the simp argument list.
-  simp only [Bind.bind, _root_.Verity.bind, DepositParentTx.getState, hClose,
-  ̵  ̵ ̵ ̵beq_self_eq_true,
-  ̲ _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵r̵e̵q̵u̵i̵r̵e̵,̵  ̲ ̲if_true, committedState, entry, processed, pulled]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/DepositNFrameTx.lean:553:6: This simp argument is unused:
-  List.drop_left
-
-Hint: Omit it from the simp argument list.
-  simp [observe, sourceObservables, committed_balance inputs state h, committed_calls,̵
-  ̵ ̵ ̵ ̵ ̵ ̵ ̵L̵i̵s̵t̵.̵d̵r̵o̵p̵_̵l̵e̵f̵t̵]
-
-Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [1361/1416] Built LidoSRv3.Audit.Guarantees.PAlloc1 (4.8s)
-✔ [1362/1416] Built LidoSRv3.Audit.Spec.TopupEthJournalCorrespondence (12s)
-✔ [1363/1416] Built LidoSRv3.Audit.Guarantees.PDeposit1 (6.9s)
-✔ [1364/1416] Built LidoSRv3.Audit.Source.SubmitReportFeeCorrespondence (16s)
-✔ [1365/1416] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanPureBuiltinLemmas (30s)
-✔ [1366/1416] Built LidoSRv3.Audit.Spec.AddressClaimUnboundedCorrespondence (16s)
-✔ [1367/1416] Built LidoSRv3.Audit.Guarantees.PAllocExec1 (8.0s)
-✔ [1368/1416] Built LidoSRv3.Audit.Provenance.TopupBeacon (10s)
-✔ [1369/1416] Built LidoSRv3.Audit.Spec.DepositNFrameCorrespondence (14s)
-✔ [1370/1416] Built LidoSRv3.Audit.Provenance.Deposit (14s)
-✔ [1371/1416] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBuiltinSemantics (10s)
-✔ [1372/1416] Built LidoSRv3.Audit.Guarantees.PAddressBatch1 (11s)
-✔ [1373/1416] Built LidoSRv3.Audit.Verity.SubmitReportEntryTx (14s)
-✔ [1374/1416] Built LidoSRv3.Audit.Spec.DepositEthJournalCorrespondence (17s)
-✔ [1375/1416] Built Compiler.Proofs.YulGeneration.Backends.EvmYulLeanBridgeLemmas (7.6s)
-✔ [1376/1416] Built LidoSRv3.Audit.Spec.EthJournalConfinement (7.8s)
-✔ [1377/1416] Built LidoSRv3.Audit.Guarantees.PEthJournal1 (9.9s)
-✔ [1378/1416] Built LidoSRv3.Audit.Verity.ConsolidationOfficialDenoteSuccess (75s)
-✔ [1379/1416] Built LidoSRv3.Audit.Guarantees.PConsolidationValue1 (7.6s)
-✔ [1380/1416] Built Compiler.Proofs.IRGeneration.IRInterpreter (54s)
-⚠ [1381/1416] Built LidoSRv3.Audit.Verity.AddressTx (287s)
+⚠ [1336/1358] Replayed LidoSRv3.Audit.Verity.AddressTx
 warning: LidoSRv3/Audit/Verity/AddressTx.lean:277:34: This simp argument is unused:
   AddressTxContract.paused
 
@@ -3681,69 +2414,151 @@ Hint: Omit it from the simp argument list.
   ̵ ̵ ̵ ̵ ̵ ̵ ̵C̵o̵n̵t̵r̵a̵c̵t̵S̵t̵a̵t̵e̵.̵s̵t̵o̵r̵a̵g̵e̵M̵a̵p̵U̵i̵n̵t̵]̵C̲o̲n̲t̲r̲a̲c̲t̲S̲t̲a̲t̲e̲.̲r̲e̲a̲d̲M̲a̲p̲U̲i̲n̲t̲]̲
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [1382/1416] Built LidoSRv3.Audit.Guarantees.PAddress1 (3.5s)
-✔ [1383/1416] Built LidoSRv3.Audit.Verity.AddressYulInterface (3.1s)
-✔ [1384/1416] Built Compiler.Proofs.IRGeneration.SupportedSpec (152s)
-✔ [1385/1416] Built Compiler.Proofs.IRGeneration.SourceSemantics (57s)
-✔ [1386/1416] Built Compiler.Proofs.IRGeneration.ParamLoading (15s)
-✔ [1387/1416] Built Compiler.Proofs.IRGeneration.DenoteAgreement (37s)
-✔ [1388/1416] Built Compiler.Proofs.IRGeneration.DenoteFunctionAgreement (7.5s)
-✔ [1389/1416] Built Compiler.Proofs.IRGeneration.DenoteEquivalence (2.9s)
-⚠ [1390/1416] Built LidoSRv3.Audit.Verity.MinFirstDistributionTx (31s)
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:142:52: try 'simp' instead of 'simpa'
+⚠ [1340/1358] Replayed LidoSRv3.Audit.SszDepositEquivalence
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:93:4: This simp argument is unused:
+  Ssz.traverseBranch
+
+Hint: Omit it from the simp argument list.
+  simp [structuralEncoding, structuralWitness, structuralCombine, Ssz.validatorRoot,̵
+  ̵ ̵ ̵ ̵ ̵S̵s̵z̵.̵t̵r̵a̵v̵e̵r̵s̵e̵B̵r̵a̵n̵c̵h̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:12: This simp argument is unused:
+  sourceWitness
+
+Hint: Omit it from the simp argument list.
+  simp [̵s̵o̵u̵r̵c̵e̵W̵i̵t̵n̵e̵s̵s̵,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]̵[̲s̲t̲r̲u̲c̲t̲u̲r̲a̲l̲W̲i̲t̲n̲e̲s̲s̲]̲
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/SszDepositEquivalence.lean:213:27: This simp argument is unused:
+  structuralWitness
+
+Hint: Omit it from the simp argument list.
+  simp [sourceWitness,̵ ̵s̵t̵r̵u̵c̵t̵u̵r̵a̵l̵W̵i̵t̵n̵e̵s̵s̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1343/1358] Replayed LidoSRv3.Audit.Verity.SszTxSimulation
+warning: LidoSRv3/Audit/Verity/SszTxSimulation.lean:317:8: try 'simp' instead of 'simpa'
 
 Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:22: This simp argument is unused:
-  modelAllocateLoop
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:346:0: LidoSRv3.Audit.Verity.SszTxSimulation.ssz_tx_simulation_correct {State : Type} (input : TxInputs) (before after : State)
+  (attempts : List CallAttempt) (trace : CommitTrace) (hwidths : exactTxWidths input) :
+  exactTxWidths input ∧
+    (digestPreimages input.toInputs).length = 7 ∧
+      (runVerification input = VerificationOutcome.accept ↔ computedRoot input = input.expectedDepositDataRoot) ∧
+        (runVerification input = VerificationOutcome.revertRootMismatch →
+          (transactionObservation input before after attempts trace).committedState = before)
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:347:0: LidoSRv3.Audit.Verity.SszTxSimulation.sha256_call_world_rollback (input : Inputs) (adversary : AdversaryModel)
+  (state : CallState) : (DenoteExternalCalls.denote (sha256Calls input) adversary state).snd.world = state.world
+info: LidoSRv3/Audit/Verity/SszTxSimulation.lean:348:0: Compiler.CompilationModel.Denote.Sha256.denote_success_compose (oracle : StaticCallOracle)
+  (fipsSha256 : ByteArray → ByteArray) (world : Verity.ContractState) (inputOffset inputSize outputOffset : Nat)
+  (digest : Digest) (sha256_correct : sha256_correct oracle fipsSha256)
+  (hcall : oracle (request world.memory inputOffset inputSize outputOffset) = StaticCallResult.success digest) :
+  Denote.Sha256.denote oracle world inputOffset inputSize outputOffset =
+    Outcome.success (digestWord (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+      (writeDigest world outputOffset (fipsSha256 (memorySlice world.memory inputOffset inputSize)))
+⚠ [1349/1358] Replayed LidoSRv3.Audit.Verity.ReserveRelationalTx
+warning: LidoSRv3/Audit/Verity/ReserveRelationalTx.lean:303:44: This simp argument is unused:
+  memory_writeSlot
 
 Hint: Omit it from the simp argument list.
-  simp [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵hModelStep, hzv]
+  simp [readBatchEnd, arrayState, evalExpr,̵ ̵m̵e̵m̵o̵r̵y̵_̵w̵r̵i̵t̵e̵S̵l̵o̵t̵]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:485:53: This simp argument is unused:
-  hzv
+⚠ [1385/1410] Replayed LidoSRv3.Audit.Verity.TopupHybrid
+warning: LidoSRv3/Audit/Verity/TopupHybrid.lean:157:26: This simp argument is unused:
+  _root_.Verity.pure
 
 Hint: Omit it from the simp argument list.
-  simp [modelAllocateLoop, hModelStep,̵ ̵h̵z̵v̵]
+  simp [executeSource, sourceTx, observeVerity, withCalls, topupCallJournal,
+        TopupTxContract.executeTopup,
+  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executeNoTopup,
+  ̲  ̲ ̲ ̲ ̲ ̲TopupTxContract.executePullRevert,
+  ̵  ̵ ̵ ̵ ̵ ̵TopupTxContract.executePushRevert, _root_.Verity.require,
+        _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+        _root_.Contracts.linkedCallEntry, _root_.Verity.Contract.run,
+  ̵  ̵ ̵ ̵ ̵ ̵_root_.Verity.bind, _̵r̵o̵o̵t̵_̵.̵V̵e̵r̵i̵t̵y̵.̵p̵u̵r̵e̵,̵ ̵Bind.bind,
+  ̲  ̲ ̲ ̲ ̲ ̲Pure.pure,
+  ̵  ̵ ̵ ̵ ̵ ̵Outcome.reverts, Outcome.pulled, Outcome.pushed, hrun] at hconserves ⊢
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:25: This simp argument is unused:
-  modelAllocateLoop
+⚠ [1399/1410] Replayed LidoSRv3.Audit.Verity.ConsolidationFee
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:5: Variable name `hsize` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:446:35: Variable name `hdecode` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:447:5: Variable name `hvalue` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:70: This simp argument is unused:
+  hsize
 
 Hint: Omit it from the simp argument list.
-  simp only [m̵o̵d̵e̵l̵A̵l̵l̵o̵c̵a̵t̵e̵L̵o̵o̵p̵,̵ ̵if_neg hzv, hModelStep, if_neg hav]
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hs̵i̵z̵e̵,̵ ̵h̵decode,
+  ̵  ̵ ̵ ̵hvalue, hkey]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: LidoSRv3/Audit/Verity/MinFirstDistributionTx.lean:492:44: This simp argument is unused:
-  if_neg hzv
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:452:77: This simp argument is unused:
+  hdecode
 
 Hint: Omit it from the simp argument list.
-  simp only [modelAllocateLoop, i̵f̵_̵n̵e̵g̵ ̵h̵z̵v̵,̵ ̵hModelStep, if_neg hav]
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hd̵e̵c̵o̵d̵e̵,̵
+  ̵ ̵ ̵ ̵ ̵h̵value, hkey]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-✔ [1391/1416] Built LidoSRv3.Audit.Guarantees.PAlloc2 (2.9s)
-✔ [1392/1416] Built Compiler.Proofs.IRGeneration.FunctionBody.Base (58s)
-✔ [1393/1416] Built LidoSRv3.Audit.Guarantees.PAlloc1EugeneBound (3.4s)
-✔ [1394/1416] Built LidoSRv3.Audit.Spec.AllocationCorrespondence (5.0s)
-✔ [1395/1416] Built LidoSRv3.Audit.Guarantees.POracleSupply1 (6.5s)
-✔ [1396/1416] Built LidoSRv3.Audit.Spec.OracleFrameCorrespondence (7.0s)
-✔ [1397/1416] Built LidoSRv3.Audit.AllGuarantees (5.9s)
-✔ [1398/1416] Built Compiler.Proofs.IRGeneration.FunctionBody.Stmt (27s)
-✔ [1399/1416] Built Compiler.Proofs.IRGeneration.FunctionBody (2.4s)
-✔ [1400/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.ResultRelation (4.1s)
-✔ [1401/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.InterfaceAssembly (4.0s)
-✔ [1402/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.Scope (18s)
-✔ [1403/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.ExprStmt (3.7s)
-✔ [1404/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.Storage (43s)
-✔ [1405/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.Loops (13s)
-✔ [1406/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.EventBridge (22s)
-✔ [1407/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.Helpers (9.9s)
-✔ [1408/1416] Built Compiler.Proofs.IRGeneration.GenericInduction.Main (4.0s)
-✔ [1409/1416] Built Compiler.Proofs.Storage.SolidityStorage (6.4s)
-✔ [1410/1416] Built Compiler.Proofs.LoopSimulation (3.0s)
-✔ [1411/1416] Built Verity.Proofs.LoopSimulation (2.8s)
-✔ [1412/1416] Built Verity.Core.Model.AllocationExtraction (4.9s)
-✔ [1413/1416] Built LidoSRv3.Audit.Verity.TopupRollback (3.0s)
-✔ [1414/1416] Built LidoSRv3.Audit.Verity.DepositRollback (3.2s)
-✔ [1415/1416] Built LidoSRv3 (2.5s)
-Build completed successfully (1416 jobs).
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:453:4: This simp argument is unused:
+  hvalue
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hv̵a̵l̵u̵e̵,̵ ̵h̵key]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:466:5: Variable name `hrequest` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: LidoSRv3/Audit/Verity/ConsolidationFee.lean:477:32: This simp argument is unused:
+  hrequest
+
+Hint: Omit it from the simp argument list.
+  simp [batchCalls, batchCalls.loop, ObservedCalls, denoteCall, hfee, hsize, hdecode,
+  ̵  ̵ ̵ ̵hbound,
+  ̲  ̲ ̲ ̲hvalid₀, hinvalid₁,̵ ̵h̵r̵e̵q̵u̵e̵s̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1400/1410] Replayed LidoSRv3.Audit.Verity.DepositLedgerTx
+warning: LidoSRv3/Audit/Verity/DepositLedgerTx.lean:140:35: Variable name `n` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+⚠ [1402/1410] Replayed LidoSRv3.Audit.Verity.DepositTx
+warning: LidoSRv3/Audit/Verity/DepositTx.lean:153:35: This simp argument is unused:
+  Pure.pure
+
+Hint: Omit it from the simp argument list.
+  simp [executeOutcome, executeCalls, hRun, observe, DepositTxContract.execute,
+      _root_.Contracts.externalCallBind, _root_.Contracts.externalCallStubSuccess,
+      _root_.Verity.require,
+  ̵  ̵ ̵ ̵_root_.Verity.Contract.run, _root_.Verity.bind,
+  ̵  ̵ ̵ ̵_root_.Verity.pure,
+  ̲  ̲ ̲ ̲Bind.bind, P̵u̵r̵e̵.̵p̵u̵r̵e̵,̵ ̵committedBalances, Nat.sub_add_cancel hFunds,
+  ̵  ̵ ̵ ̵Core.Uint256.ofNat,
+  ̲  ̲ ̲ ̲Nat.mod_eq_of_lt hAmountLt]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [1409/1410] Replayed LidoSRv3.Legacy.SpecProofs
+warning: LidoSRv3/Legacy/SpecProofs.lean:1631:2: try 'simp' instead of 'simpa'
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+Build completed successfully (1410 jobs).

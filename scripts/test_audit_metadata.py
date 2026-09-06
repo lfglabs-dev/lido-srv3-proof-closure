@@ -253,6 +253,11 @@ def main():
         x = copy.deepcopy(guarantees); x["guarantees"][6]["verity"] = {"status":"OPEN", "theorem":None}; x["guarantees"][6]["fidelity"]["missing"] = ["recursive dispatch absent"]; x["guarantees"][6]["classification"] = {"kind":"IMPLEMENTATION_PENDING", "work":"compose the ensemble"}; mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][3]["assumptions"].remove("A-TOPUP-NOWRAP"); mutants.append((gpath, x, "canonical assurance claim differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][0]["next_gate"] = "Refine through generated Yul and EVM."; mutants.append((gpath, x, "canonical assurance detail differs"))
+        x = copy.deepcopy(guarantees)
+        live_rollback_gap = module.P_ALLOC1_LIVE_ROLLBACK_GAP
+        x["guarantees"][0]["fidelity"]["missing"].remove(live_rollback_gap)
+        x["guarantees"][0]["fidelity"]["covered"].append(live_rollback_gap)
+        mutants.append((gpath, x, "P-ALLOC-1: live rollback exclusion must be an open fidelity gap"))
         x = copy.deepcopy(guarantees); x["guarantees"][0]["special_bindings"] = guarantees["guarantees"][10]["special_bindings"]; mutants.append((gpath, x, "bindings are SSZ-only"))
         x = copy.deepcopy(guarantees); x["guarantees"][10]["special_bindings"]["deployed_yul"]["scope"] = "entire runtime"; mutants.append((gpath, x, "targeted deployed-Yul binding differs"))
         x = copy.deepcopy(guarantees); x["guarantees"][5]["fidelity"]["missing"] = ["hidden gap"]; x["guarantees"][5]["classification"] = {"kind":"NONE"}; mutants.append((gpath, x, "NONE is reserved"))
@@ -285,14 +290,14 @@ def main():
         readme_path = fixture / "README.md"
         readme = readme_path.read_text(encoding="utf-8")
         for mutated, needle in (
-            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 3 open |",
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 4 open |",
                             "| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 0 open |"),
              "P-ALLOC-1 discloses 0 fidelity gaps"),
-            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 3 open |",
+            (readme.replace("| 1 | `P-ALLOC-1` | CHECKED | CHECKED | 4 open |",
                             "| 1 | `P-ALLOC-1` | CHECKED | CHECKED |"),
              "P-ALLOC-1 row is missing its `N open` fidelity-gap cell"),
-            (readme.replace("67 in total", "some in total"),
-             "must render the 67 total fidelity gaps as visible text"),
+            (readme.replace("68 in total", "some in total"),
+             "must render the 68 total fidelity gaps as visible text"),
             (readme.replace("not about a deployed contract", "about a deployed contract"),
              "must render the model-vs-deployed boundary as visible text"),
         ):
@@ -415,8 +420,8 @@ def main():
         block = opening.group("block")
         title = readme.split("\n", 1)[0]
         for sentence, muted, needle in (
-            ("67 in total", "counted below",
-             "headline blockquote must render the 67 total fidelity gaps as visible text"),
+            ("68 in total", "counted below",
+             "headline blockquote must render the 68 total fidelity gaps as visible text"),
             ("not about a deployed contract", "about a Lean model",
              "headline blockquote must render the model-vs-deployed boundary as "
              "visible text"),
@@ -495,7 +500,7 @@ def main():
             # Thread r3909320734: a full or collapsed reference link names its
             # definition in a second bracket group, which renders as nothing.
             # Recognising only the `(` form left the whole sentence standing in
-            # `[details][not about a deployed contract; 67 in total]` as if a
+            # `[details][not about a deployed contract; 68 in total]` as if a
             # reader met it.  The definition is appended so the link really does
             # form and CommonMark really does render only "details".
             readme_path.write_text(
@@ -570,7 +575,7 @@ def main():
             readme.replace(title, "# Renamed Heading", 1),
             readme.replace(block, f"{block}> - An extra headline note.\n", 1),
             f"{readme}\n## Appendix\n\nRestated: these are proofs "
-            "not about a deployed contract, with 67 in total.\n",
+            "not about a deployed contract, with 68 in total.\n",
         ):
             if still_qualified == readme:
                 raise AssertionError("headline-block control changed nothing")
@@ -582,7 +587,7 @@ def main():
         # the gate would reject a headline a reader plainly meets and no edit to
         # the README could satisfy it.  Each sentence is muted in place and
         # restated in a form whose rendered characters still spell it exactly.
-        for sentence, muted in (("67 in total", "counted below"),
+        for sentence, muted in (("68 in total", "counted below"),
                                 ("not about a deployed contract", "about a Lean model")):
             muted_block = block.replace(sentence, muted, 1)
             for restated in (

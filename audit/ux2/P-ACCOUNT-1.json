@@ -223,7 +223,7 @@
       "The subject is a Lean model of Staking Router v3, written against pinned source lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436.",
       "No theorem here binds to deployed bytecode, a runtime codehash, a constructor, or a chain address. The SRv3 contracts are deployed on mainnet with lidofinance/core v4.0.0 (2026-07-24; StakingRouter proxy 0xFdDf38947aFB03C621C71b06C9C70bce73f12999, TopUpGateway proxy 0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374); the theorems still speak about the model, not about that deployment.",
       "CHECKED means *the named Lean theorem builds*. It does not mean audited, verified on chain, or closed.",
-      "Every row below still has open fidelity gaps — 67 in total. The last column counts them per row; audit/guarantees.yaml names each one."
+      "Every row below still has open fidelity gaps — 68 in total. The last column counts them per row; audit/guarantees.yaml names each one."
     ],
     "not_covered": [
       "SRStorage membership and unique uint24 module ids",
