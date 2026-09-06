@@ -94,7 +94,15 @@ def main():
         fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         # A matching sentence outside Stage A must not mask a stale lead disclosure.
         fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        fpath.write_text(stale + "\nA later Stage A paragraph says all 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        # Even a correct sentence in a later paragraph of the same Stage A
+        # section cannot qualify its stale lead disclosure.
+        later_stage_a = stale.replace(
+            "and does not satisfy the source-model completion gates for B–F.\n",
+            "and does not satisfy the source-model completion gates for B–F.\n\n"
+            "A later Stage A paragraph says all 68 canonical fidelity-gap entries remain.\n",
+            1,
+        )
+        fpath.write_text(later_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         # A fake heading in non-rendered Markdown must not select an earlier
         # 68-gap paragraph and hide the real, stale Stage A disclosure.
         for hidden in ("```markdown\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n```\n\n",

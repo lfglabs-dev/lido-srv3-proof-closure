@@ -691,13 +691,19 @@ def validate_source_fidelity_gap_disclosure(rows):
     # A heading inside a fenced block or raw HTML comment is not a section a
     # reader sees.  Keep positions while masking it, so the body selected below
     # remains slice-compatible with the original source.
+    masked_source = _mask_non_rendered_markdown(source_fidelity)
     disclosure = re.search(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)",
-                           _mask_non_rendered_markdown(source_fidelity),
+                           masked_source,
                            re.MULTILINE | re.DOTALL)
     require(disclosure is not None, "SOURCE-FIDELITY: no Stage A disclosure section")
-    lead = re.match(r"(?P<paragraph>[^\n]*(?:\n(?!\s*\n)[^\n]*)*)(?:\n\s*\n|\Z)", disclosure.group("body")).group("paragraph")
+    lead = re.match(r"(?P<paragraph>[^\n]*(?:\n(?!\s*\n)[^\n]*)*)(?:\n\s*\n|\Z)",
+                    disclosure.group("body"))
+    require(lead is not None, "SOURCE-FIDELITY: Stage A disclosure has no lead paragraph")
     required = f"all {total} canonical fidelity-gap entries remain."
-    require(re.search(re.escape(required).replace(r"\ ", r"\s+"), markdown_text.rendered_text(lead)), f"SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps as `{required}`")
+    require(re.search(re.escape(required).replace(r"\ ", r"\s+"),
+                      markdown_text.rendered_text(lead.group("paragraph"))),
+            f"SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose "
+            f"all canonical fidelity gaps as `{required}`")
 
 
 def validate():
