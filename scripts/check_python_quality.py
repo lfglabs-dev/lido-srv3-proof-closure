@@ -95,7 +95,7 @@ def annotation_scope(fields: list[ast.AST], format_guard: bool = False) -> ast.M
     """The executable PEP 649 thunk represented by its annotation expressions."""
     body = [ast.Expr(value=field) for field in fields]
     if format_guard:
-        # Every function annotation thunk first validates its requested format.
+        # Every Python 3.14 annotation evaluator first validates its format.
         # Model that fixed decision so the synthetic scope has the same
         # cyclomatic floor as CPython's generated ``__annotate__`` function.
         body.insert(0, ast.If(test=ast.Constant(value=True), body=[], orelse=[]))
@@ -120,7 +120,7 @@ def annotation_statements(children: list[ast.stmt], conditional: bool = False) -
             # PEP 649 stores only simple-name assignment annotations in the
             # module/class annotation mapping. Attribute and subscript targets
             # therefore do not create executable annotation-thunk work.
-            if not isinstance(child.target, ast.Name):
+            if child.simple != 1 or not isinstance(child.target, ast.Name):
                 continue
             expression = ast.copy_location(ast.Expr(value=copy.deepcopy(child.annotation)), child)
             if conditional:
@@ -147,10 +147,14 @@ def annotation_statements(children: list[ast.stmt], conditional: bool = False) -
     return projected
 
 
-def local_annotation_scope(node: ast.AST) -> ast.Module:
+def local_annotation_scope(node: ast.AST, format_guard: bool = False) -> ast.Module:
     """PEP 649 module/class thunk, including annotation-membership control flow."""
     body = (annotation_statements(node.body, isinstance(node, ast.Module))
             if isinstance(node, (ast.Module, ast.ClassDef)) else [])
+    if format_guard and body:
+        # Python 3.14's PEP 649 evaluators reject unsupported formats before
+        # evaluating their payload, including module/class thunks.
+        body.insert(0, ast.If(test=ast.Constant(value=True), body=[], orelse=[]))
     return ast.Module(body=body, type_ignores=[])
 
 
@@ -296,14 +300,14 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                     [node.returns] if node.returns is not None else [])
                 thunk = annotation_scope(fields, format_guard=True) if fields else None
             else:
-                thunk = local_annotation_scope(node)
+                thunk = local_annotation_scope(node, format_guard=True)
             if thunk is not None and thunk.body:
                 record([bound], "__annotate__", thunk)
 
     def record_type_parameter_evaluators(scope: list[str], node: ast.AST) -> None:
         """Give every PEP 695 lazy evaluator an independently ratcheted scope."""
         for name, expression in type_parameter_evaluators(node):
-            record(scope, name, annotation_scope([expression]))
+            record(scope, name, annotation_scope([expression], format_guard=lazy))
 
     def visit(children, scope: list[str], annotation_owner: bool) -> None:
         for child in children:
@@ -329,7 +333,8 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                 # They can nevertheless contain independently owned lambdas,
                 # which are inventory-worthy callable scopes.
                 alias_name = child.name.id if isinstance(child.name, ast.Name) else f"alias@{child.lineno}"
-                record(scope, f"{alias_name}.__value__", annotation_scope([child.value]))
+                record(scope, f"{alias_name}.__value__",
+                       annotation_scope([child.value], format_guard=lazy))
                 record_type_parameter_evaluators([*scope, alias_name], child)
                 visit([*type_params(child), child.value], scope, annotation_owner)
             elif isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Lambda):
@@ -357,7 +362,7 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                 visit(ast.iter_child_nodes(child), scope, annotation_owner)
 
     if lazy:
-        thunk = local_annotation_scope(tree)
+        thunk = local_annotation_scope(tree, format_guard=True)
         if thunk.body:
             record([], "__annotate__", thunk)
     visit(ast.iter_child_nodes(tree), [], True)

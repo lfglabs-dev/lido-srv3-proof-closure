@@ -320,35 +320,35 @@ def check_lazy_annotation_thunks() -> None:
     module = ast.parse("callback: " + DENSE_BODY + " = None\n")
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(module, True, True)}
-    if measured != {"<module>": 1, "__annotate__": 25}:
+    if measured != {"<module>": 1, "__annotate__": 26}:
         raise SystemExit(f"PEP 649 module annotation thunk drifted: {measured}")
     nested = ast.parse("if enabled:\n    callback: " + DENSE_BODY + " = None\n"
                        "class C:\n    if enabled:\n        callback: " + DENSE_BODY + " = None\n"
                        "    def f():\n        callback: " + DENSE_BODY + " = None\n")
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(nested, True, True)}
-    if measured != {"<module>": 2, "__annotate__": 25, "C": 2,
-                    "C.__annotate__": 25, "C.f": 1}:
+    if measured != {"<module>": 2, "__annotate__": 26, "C": 2,
+                    "C.__annotate__": 26, "C.f": 1}:
         raise SystemExit(f"PEP 649 nested annotation thunks drifted: {measured}")
     guarded = ast.parse("".join(
         f"if enabled{number}:\n    callback{number}: int if selected{number} else str = None\n"
         for number in range(11)))
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(guarded, True, True)}
-    if measured != {"<module>": 12, "__annotate__": 23}:
+    if measured != {"<module>": 12, "__annotate__": 24}:
         raise SystemExit(f"PEP 649 annotation control flow was flattened: {measured}")
     many_guarded = ast.parse("if flag:\n" + "".join(
         f"    callback{number}: int = None\n" for number in range(22)))
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(many_guarded, True, True)}
-    if measured != {"<module>": 2, "__annotate__": 23}:
+    if measured != {"<module>": 2, "__annotate__": 24}:
         raise SystemExit(f"PEP 649 annotation guards were grouped: {measured}")
     guarded_class = ast.parse("class C:\n" + "".join(
         f"    if enabled{number}:\n        callback{number}: int if selected{number} else str = None\n"
         for number in range(11)))
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(guarded_class, True, True)}
-    if measured != {"<module>": 1, "C": 12, "C.__annotate__": 23}:
+    if measured != {"<module>": 1, "C": 12, "C.__annotate__": 24}:
         raise SystemExit(f"PEP 649 class annotation control flow was flattened: {measured}")
     stringized = ast.parse("from __future__ import annotations\n" + source)
     names = [name for name, _ in check_python_quality.scopes(stringized, True, False)]
@@ -361,13 +361,13 @@ def check_lazy_module_annotation_guards() -> None:
     plain = ast.parse("".join(f"callback{number}: int = None\n" for number in range(22)))
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(plain, True, True)}
-    if measured != {"<module>": 1, "__annotate__": 23}:
+    if measured != {"<module>": 1, "__annotate__": 24}:
         raise SystemExit(f"PEP 649 module annotations lack membership guards: {measured}")
     plain_class = ast.parse("class C:\n" + "".join(
         f"    callback{number}: int = None\n" for number in range(22)))
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(plain_class, True, True)}
-    if measured != {"<module>": 1, "C": 1, "C.__annotate__": 1}:
+    if measured != {"<module>": 1, "C": 1, "C.__annotate__": 2}:
         raise SystemExit(f"unconditional PEP 649 class annotations gained guards: {measured}")
     non_simple = ast.parse("".join(
         f"target.field{number}: int if flag else str\n" for number in range(22)))
@@ -375,6 +375,41 @@ def check_lazy_module_annotation_guards() -> None:
                 for name, node in check_python_quality.scopes(non_simple, True, True)}
     if measured != {"<module>": 1}:
         raise SystemExit(f"non-simple PEP 649 annotations created a thunk: {measured}")
+    for parenthesized, expected in (("".join(f"(callback{number}): int if flag else str\n" for number in range(22)), {"<module>": 1}),
+                                    ("class C:\n" + "".join(f"    (callback{number}): int if flag else str\n" for number in range(22)), {"<module>": 1, "C": 1})):
+        measured = {name: check_python_quality.complexity(node, True) for name, node in check_python_quality.scopes(ast.parse(parenthesized), True, True)}
+        if measured != expected:
+            raise SystemExit(f"non-simple parenthesized PEP 649 annotations created a thunk: {measured}")
+def check_lazy_annotation_format_guards() -> None:
+    """Every Python 3.14 lazy evaluator includes its format decision."""
+    near_limit = " if flag else ".join(["int"] * 21)
+    measure = lambda source, lazy: {name: check_python_quality.complexity(node, True)
+                                    for name, node in check_python_quality.scopes(ast.parse(source), True, lazy)}
+    for source, expected in (("callback: " + near_limit + " = None\n", {"<module>": 1, "__annotate__": 23}),
+                             ("class C:\n    callback: " + near_limit + " = None\n", {"<module>": 1, "C": 1, "C.__annotate__": 22})):
+        if (measured := measure(source, True)) != expected:
+            raise SystemExit(f"PEP 649 annotation format guard drifted: {measured}")
+    if sys.version_info < (3, 12):
+        return
+    source = ("def f[T: " + near_limit + "]():\n    pass\n"
+              "class K[T: " + near_limit + "]:\n    pass\n"
+              "type A = " + near_limit + "\n")
+    expected = {"<module>": 1, "f": 1, "f.T.__bound__": 22, "K": 1,
+                "K.T.__bound__": 22, "A.__value__": 22}
+    if (measured := measure(source, True)) != expected:
+        raise SystemExit(f"PEP 649 lazy evaluator format guards drifted: {measured}")
+    expected_legacy = {"<module>": 1, "f": 1, "f.T.__bound__": 21, "K": 1,
+                       "K.T.__bound__": 21, "A.__value__": 21}
+    if (legacy := measure(source, False)) != expected_legacy:
+        raise SystemExit(f"Python 3.12-3.13 evaluator format behavior drifted: {legacy}")
+    if sys.version_info >= (3, 13):
+        defaults = ast.parse("def f[T = " + near_limit + "]():\n    pass\n"
+                             "class K[T = " + near_limit + "]:\n    pass\n"
+                             "type A[T = " + near_limit + "] = int\n")
+        expected = {"<module>": 1, "f": 1, "f.T.__default__": 22, "K": 1,
+                    "K.T.__default__": 22, "A.__value__": 2, "A.T.__default__": 22}
+        if (measured := measure(ast.unparse(defaults), True)) != expected:
+            raise SystemExit(f"PEP 649 type-parameter default format guard drifted: {measured}")
 
 
 def check_lazy_type_parameters() -> None:
@@ -454,6 +489,7 @@ check_deferred_surfaces()
 check_deferred_callable_inventory()
 check_lazy_annotation_thunks()
 check_lazy_module_annotation_guards()
+check_lazy_annotation_format_guards()
 check_lazy_type_parameters()
 check_function_local_annotations()
 check_lazy_type_aliases()
