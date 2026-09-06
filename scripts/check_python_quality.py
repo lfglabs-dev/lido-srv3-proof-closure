@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import copy
 import hashlib
 import sys
 from pathlib import Path
@@ -102,27 +103,48 @@ def assignment_annotation(node: ast.AST, lazy: bool, annotation_owner: bool) -> 
     return []
 
 
-def local_annotations(node: ast.AST) -> list[ast.AST]:
-    """Annotations evaluated by a module or class annotation thunk.
+def annotation_statements(children: list[ast.stmt]) -> list[ast.stmt]:
+    """Project PEP 649 annotation thunks without flattening their branches."""
+    projected: list[ast.stmt] = []
+    for child in children:
+        if isinstance(child, (FUNCTIONS, ast.ClassDef)):
+            continue
+        if isinstance(child, ast.AnnAssign):
+            projected.append(ast.copy_location(ast.Expr(value=copy.deepcopy(child.annotation)), child))
+            continue
+        if isinstance(child, (ast.If, ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith)):
+            clone = copy.copy(child)
+            clone.body = annotation_statements(child.body)
+            if hasattr(child, "orelse"):
+                clone.orelse = annotation_statements(child.orelse)
+            if clone.body or getattr(clone, "orelse", []):
+                projected.append(clone)
+            continue
+        if isinstance(child, (ast.Try, getattr(ast, "TryStar", ast.Try))):
+            clone = copy.copy(child)
+            clone.body = annotation_statements(child.body)
+            clone.orelse = annotation_statements(child.orelse)
+            clone.finalbody = annotation_statements(child.finalbody)
+            clone.handlers = [copy.copy(handler) for handler in child.handlers]
+            for handler in clone.handlers:
+                handler.body = annotation_statements(handler.body)
+            if clone.body or clone.orelse or clone.finalbody or any(handler.body for handler in clone.handlers):
+                projected.append(clone)
+            continue
+        if isinstance(child, ast.Match):
+            clone = copy.copy(child)
+            clone.cases = [copy.copy(case) for case in child.cases]
+            for case in clone.cases:
+                case.body = annotation_statements(case.body)
+            if any(case.body for case in clone.cases):
+                projected.append(clone)
+    return projected
 
-    PEP 649's generated thunk covers annotations reached through the owner's
-    control-flow statements, but not annotations belonging to nested lexical
-    function or class scopes.
-    """
-    if not isinstance(node, (ast.Module, ast.ClassDef)):
-        return []
-    found: list[ast.AST] = []
 
-    def visit(children) -> None:
-        for child in children:
-            if isinstance(child, (FUNCTIONS, ast.ClassDef)):
-                continue
-            if isinstance(child, ast.AnnAssign):
-                found.append(child.annotation)
-            visit(ast.iter_child_nodes(child))
-
-    visit(node.body)
-    return found
+def local_annotation_scope(node: ast.AST) -> ast.Module:
+    """PEP 649 module/class thunk, including annotation-membership control flow."""
+    body = annotation_statements(node.body) if isinstance(node, (ast.Module, ast.ClassDef)) else []
+    return ast.Module(body=body, type_ignores=[])
 
 
 def setup_fields(node: ast.AST, postponed: bool) -> list[ast.AST]:
@@ -262,11 +284,11 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
         bound = qualified if seen[qualified] == 1 else f"{qualified}#{seen[qualified]}"
         found.append((bound, node))
         if lazy and isinstance(node, (*FUNCTIONS, ast.ClassDef)):
-            fields = (annotation_fields(node.args) +
-                      ([node.returns] if node.returns is not None else [])
-                      if isinstance(node, FUNCTIONS) else local_annotations(node))
-            if fields:
-                record([bound], "__annotate__", annotation_scope(fields))
+            thunk = (annotation_scope(annotation_fields(node.args) +
+                                      ([node.returns] if node.returns is not None else []))
+                     if isinstance(node, FUNCTIONS) else local_annotation_scope(node))
+            if thunk.body:
+                record([bound], "__annotate__", thunk)
 
     def record_type_parameter_evaluators(scope: list[str], node: ast.AST) -> None:
         """Give every PEP 695 lazy evaluator an independently ratcheted scope."""
@@ -325,9 +347,9 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
                 visit(ast.iter_child_nodes(child), scope, annotation_owner)
 
     if lazy:
-        fields = local_annotations(tree)
-        if fields:
-            record([], "__annotate__", annotation_scope(fields))
+        thunk = local_annotation_scope(tree)
+        if thunk.body:
+            record([], "__annotate__", thunk)
     visit(ast.iter_child_nodes(tree), [], True)
     return found
 

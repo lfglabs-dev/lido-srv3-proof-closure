@@ -313,9 +313,23 @@ def check_lazy_annotation_thunks() -> None:
                        "    def f():\n        callback: " + DENSE_BODY + " = None\n")
     measured = {name: check_python_quality.complexity(node, True)
                 for name, node in check_python_quality.scopes(nested, True, True)}
-    if measured != {"<module>": 2, "__annotate__": 24, "C": 2,
-                    "C.__annotate__": 24, "C.f": 1}:
+    if measured != {"<module>": 2, "__annotate__": 25, "C": 2,
+                    "C.__annotate__": 25, "C.f": 1}:
         raise SystemExit(f"PEP 649 nested annotation thunks drifted: {measured}")
+    guarded = ast.parse("".join(
+        f"if enabled{number}:\n    callback{number}: int if selected{number} else str = None\n"
+        for number in range(11)))
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(guarded, True, True)}
+    if measured != {"<module>": 12, "__annotate__": 23}:
+        raise SystemExit(f"PEP 649 annotation control flow was flattened: {measured}")
+    guarded_class = ast.parse("class C:\n" + "".join(
+        f"    if enabled{number}:\n        callback{number}: int if selected{number} else str = None\n"
+        for number in range(11)))
+    measured = {name: check_python_quality.complexity(node, True)
+                for name, node in check_python_quality.scopes(guarded_class, True, True)}
+    if measured != {"<module>": 1, "C": 12, "C.__annotate__": 23}:
+        raise SystemExit(f"PEP 649 class annotation control flow was flattened: {measured}")
     stringized = ast.parse("from __future__ import annotations\n" + source)
     names = [name for name, _ in check_python_quality.scopes(stringized, True, False)]
     if "f.__annotate__" in names:
