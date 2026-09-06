@@ -314,8 +314,10 @@ def scopes(tree: ast.Module, postponed: bool = False, lazy: bool = False) -> lis
             elif isinstance(child, ast.Lambda):
                 record(scope, f"lambda@{child.lineno}", child)
                 visit(ast.iter_child_nodes(child), scope, annotation_owner)
-            elif postponed and isinstance(child, ast.AnnAssign):
-                # Unlike the assigned value, the annotation is not evaluated.
+            elif isinstance(child, ast.AnnAssign) and (postponed or not annotation_owner):
+                # Unlike the assigned value, a postponed annotation is not
+                # evaluated.  Nor is a PEP 526 annotation local to a function,
+                # on any runtime: the function has no annotation owner.
                 fields = [part for part in (child.target, child.value) if part is not None]
                 fields.extend(assignment_annotation(child, lazy, annotation_owner))
                 visit(fields, scope, annotation_owner)

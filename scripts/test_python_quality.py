@@ -352,6 +352,13 @@ def check_function_local_annotations() -> None:
     local = ast.parse("def f():\n    value: " + DENSE_BODY + " = None\n")
     if check_python_quality.complexity(local.body[0]) != 1:
         raise SystemExit("a function-local annotation was treated as executable control flow")
+    local_lambda = ast.parse("def f():\n    callback: (lambda x: x if x else 0) = None\n")
+    for version in ((3, 10), (3, 11), (3, 12), (3, 13)):
+        postponed = check_python_quality.postponed_annotations(local_lambda, version)
+        lazy = check_python_quality.lazy_annotations(local_lambda, version)
+        names = [name for name, _ in check_python_quality.scopes(local_lambda, postponed, lazy)]
+        if names != ["<module>", "f"]:
+            raise SystemExit(f"Python {version[0]}.{version[1]} inventoried a local annotation lambda: {names}")
     module = ast.parse("value: " + DENSE_BODY + " = None\n")
     if check_python_quality.complexity(module) != 24:
         raise SystemExit("a module annotation stopped owning executable control flow")
