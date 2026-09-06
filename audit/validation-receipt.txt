@@ -1,7 +1,7 @@
 Assurance-contract v4 validation receipt
 base: a57accb1e497894b22741bc243f79150eade8aef
 validation-subject: current tracked tree excluding this receipt
-validated-tree: 8fb314eebe7b14e7a1807f86726f56f5fcb0f4ce
+validated-tree: 456291a15088583f18d898590331256d8903da55
 
 Receipt semantics: `validated-tree` is the Git tree produced from HEAD after
 removing only this receipt. It binds the canonical source-map, validator, and
@@ -5733,3 +5733,18 @@ P-ORACLE-SANITY-1: bounded commit-envelope parent and exact-parent kill-lines
   its ID/order regression still hold. This work only extends `supplemental`.
 - Receipt subject: tracked tree excluding this receipt, recorded as
   `validated-tree`.
+
+P2 Python annotation-scope repair: remote reconciliation (2026-09-06)
+-------------------------------------------------------------------------
+
+- The remote Lean runner completed job `e5fa29b7-285d-48d5-bb4a-b5cbf6a4c80c`
+  successfully: node `old-agent`, exit status `Some(0)`, command
+  `lake build LidoSRv3Test`, toolchain `leanprover/lean4:v4.31.0`, and source
+  bundle digest `none`.
+- The receipt is bound to commit
+  `4b827a1816f3a10f42a8bef6dcb778f6e9a6300d` in
+  `https://github.com/lfglabs-dev/lido-srv3-proof-closure.git`.
+- Before recording this result, PR #241's live head was reconciled through
+  GitHub and was exactly `4b827a1816f3a10f42a8bef6dcb778f6e9a6300d` on
+  `ux2/per-guarantee-display`. The result is therefore a current successful
+  integration gate, not `STALE_SUCCESS`.
