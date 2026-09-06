@@ -487,22 +487,6 @@ README_UNRENDERED = re.compile(
     re.DOTALL | re.IGNORECASE,
 )
 
-# CommonMark type-6 HTML block openers: a line that starts with one of these
-# block-level element names causes everything until the next blank line to be
-# emitted as raw HTML, not parsed as Markdown.  Pipe characters on those
-# interior lines never render as table rows.
-_HTML_BLOCK_TAG = re.compile(
-    r"^ {0,3}</?(?:address|article|aside|base|basefont|blockquote|body|"
-    r"caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|"
-    r"fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|"
-    r"head|header|hr|html|iframe|legend|li|link|main|menu(?:item)?|"
-    r"meta|nav|noframes|ol|optgroup|option|p|param|section|source|"
-    r"summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul)"
-    r"(?:[ \t>]|/>|$)",
-    re.IGNORECASE,
-)
-
-
 def _mask_non_rendered_markdown(text):
     """Position-preserving blank of non-rendered regions in Markdown.
 
@@ -531,39 +515,13 @@ def _mask_non_rendered_markdown(text):
     # Blank the remaining inline HTML constructs, preserving positions.
     masked = README_UNRENDERED.sub(blank, masked)
 
-    # Line-by-line pass: blank code fences and CommonMark type-6 HTML blocks.
-    # Code fences: a closing sequence repeats the opening character at least as
-    # many times; a backtick fence carries no backtick in its info string.
-    # Type-6 HTML blocks: a line whose first non-space token is a block-level
-    # element open/close tag causes everything until the next blank line to be
-    # raw HTML.  The detection uses the original line (before step 1 blanked
-    # the opening tag) so the block-tag pattern fires on the actual characters.
-    lines_m = masked.splitlines(True)   # output lines (positions preserved)
-    lines_o = text.splitlines(True)     # original lines (for HTML-block detection)
-    fence = None
-    html_block = False
-    for i, (ml, ol) in enumerate(zip(lines_m, lines_o)):
-        msk = ml.rstrip("\r\n")
-        orig = ol.rstrip("\r\n")
-        if fence is not None:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})[ \t]*$", msk)
-            if m and m.group("seq")[0] == fence[0] and len(m.group("seq")) >= fence[1]:
-                fence = None
-            lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-        elif html_block:
-            if orig == "":  # blank line ends the HTML block
-                html_block = False
-            else:
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-        else:
-            m = re.match(r"^ {0,3}(?P<seq>`{3,}|~{3,})(?P<info>.*)$", msk)
-            if m and not (m.group("seq")[0] == "`" and "`" in m.group("info")):
-                fence = (m.group("seq")[0], len(m.group("seq")))
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-            elif _HTML_BLOCK_TAG.match(orig):
-                html_block = True
-                lines_m[i] = "".join(" " if c not in "\r\n" else c for c in ml)
-    return "".join(lines_m)
+    # One shared CommonMark reader owns all §4.5 fences and §4.6 HTML block
+    # families (not just type 6).  Run it on the original source: earlier
+    # passes blank tags, which must not prevent their raw block bodies from
+    # being excluded before a disclosure heading is selected.
+    literal = gfm_table.mask_literal_regions(text)
+    return "".join(" " if original != " " and masked_char == " " else original
+                   for original, masked_char in zip(literal, masked))
 
 
 def validate_readme_fidelity_disclosure(rows):

@@ -32,12 +32,9 @@ def main():
         (fixture / "LidoSRv3/Audit/Provenance").mkdir(parents=True)
         (fixture / "fixtures/solidity-reference").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
-        # The generator reads the published table through the shared cmark-gfm
-        # table reader, so the fixture tree must carry it or every mutant would
-        # fail on an import error rather than on the claim it is testing.
+        # The fixture carries the shared cmark-gfm reader used by the generator.
         shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
-        # And it reduces the headline blockquote to the text a reader is shown
-        # through the shared link-metadata reducer, for the same reason.
+        # It also needs the shared visible-text reducer.
         shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "audit/SOURCE-FIDELITY.md", fixture / "audit/SOURCE-FIDELITY.md")
@@ -51,10 +48,7 @@ def main():
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")
 
-        # Give the isolated generator an immutable review-basis object.  The
-        # production script names the real R1 commit; this fixture substitutes
-        # its own baseline solely so its negative mutations can exercise the
-        # same Git-object binding.
+        # Give the fixture an immutable review-basis object for its mutations.
         subprocess.run(["git", "init", "--quiet"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.email", "audit-test@example.invalid"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.name", "audit metadata test"], cwd=fixture, check=True)
@@ -94,8 +88,7 @@ def main():
         fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         # A matching sentence outside Stage A must not mask a stale lead disclosure.
         fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        # Even a correct sentence in a later paragraph of the same Stage A
-        # section cannot qualify its stale lead disclosure.
+        # A later Stage A paragraph cannot qualify its stale lead disclosure.
         later_stage_a = stale.replace(
             "and does not satisfy the source-model completion gates for B–F.\n",
             "and does not satisfy the source-model completion gates for B–F.\n\n"
@@ -103,15 +96,16 @@ def main():
             1,
         )
         fpath.write_text(later_stage_a, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        # A fake heading in non-rendered Markdown must not select an earlier
-        # 68-gap paragraph and hide the real, stale Stage A disclosure.
-        for hidden in ("```markdown\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n```\n\n",
-                       "<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n"):
+        def reject_hidden_stage_a(hidden):
             fpath.write_text(hidden + stale, encoding="utf-8")
             invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        fpath.write_text(source_fidelity, encoding="utf-8"); # Metadata is untrusted Markdown-table content: a pipe in every
-        # family of metadata-derived report cells must remain literal data,
-        # including adjacent pipes that would add columns.
+        reject_hidden_stage_a("```markdown\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n```\n\n")
+        reject_hidden_stage_a("<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n")
+        # A raw-text HTML body likewise cannot select a fake disclosure.
+        hidden_pre = ("<pre>\n## Stage A disclosure\n\n"
+                      "All 68 canonical fidelity-gap entries remain.\n</pre>\n\n")
+        reject_hidden_stage_a(hidden_pre)
+        fpath.write_text(source_fidelity, encoding="utf-8"); # Metadata pipe data stays literal.
         spec = importlib.util.spec_from_file_location("fixture_audit_metadata", audit_script)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -130,10 +124,7 @@ def main():
             if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
                 raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
 
-        # Assumptions, limitations, source and next gate no longer live in table
-        # cells: the acceptance record expands them per claim.  Each must reach
-        # the reader verbatim, outside any table row, so nothing that qualifies a
-        # claim can be truncated or hidden by the index table.
+        # Expanded acceptance-record fields remain visible outside table cells.
         def set_abstract_theorem(row): row["abstract"]["theorem"] = "left||right"
         def set_verity_theorem(row): row["verity"]["theorem"] = "left||right"
         def set_summary(row): row["summary"] = "left||right"
@@ -153,10 +144,7 @@ def main():
                 if line.lstrip().startswith("|"):
                     raise AssertionError(f"qualifying metadata folded back into a table cell:\n{line}")
 
-        # The review-basis language is only valid for the complete structured
-        # report-input family committed at that basis.  These are otherwise-
-        # valid edits, including a simultaneous ordinary update of both
-        # families: regeneration must not silently retain the stale basis.
+        # Valid report-input edits cannot retain a stale review basis.
         x = copy.deepcopy(guarantees)
         x["guarantees"][11]["summary"] += " changed"
         write(gpath, x)
@@ -176,11 +164,7 @@ def main():
         invoke(fixture, False, "R1 review basis input family differs for audit/guarantees.yaml")
         write(gpath, guarantees)
         write(spath, source)
-        # The Trust allowlist is a rendered-report input: it decides the exact
-        # accepted-axiom section.  This mutation is otherwise entirely valid
-        # (unique, test-scoped, correctly native-decision shaped), so only the
-        # basis binding can reject it -- and it must reject `check` too, not
-        # just `generate`, or a widened allowlist would still certify as R1.
+        # A valid widened Trust allowlist must fail the review-basis binding.
         trust_allowlist = tpath.read_text(encoding="utf-8")
         widened = trust_allowlist + (
             "LidoSRv3.Tests.Injected.review_basis_widening"
@@ -192,8 +176,7 @@ def main():
                command="check")
         tpath.write_text(trust_allowlist, encoding="utf-8")
 
-        # A disclosure that is not a native-decision axiom must never reach the
-        # report's exact accepted-axiom section, whatever the review basis says.
+        # Non-native disclosures never reach the accepted-axiom section.
         tpath.write_text(trust_allowlist + "LidoSRv3.Tests.Injected.injected\n", encoding="utf-8")
         invoke(fixture, False, "Trust native-decision allowlist documents a non-native axiom")
         tpath.write_text(trust_allowlist, encoding="utf-8")
@@ -204,8 +187,7 @@ def main():
         invoke(fixture, False, "constructor fixture hash differs")
         constructor_fixture.write_text(constructor_source, encoding="utf-8")
 
-        # Regression: changing both the vendored slice and its local digest used
-        # to pass.  The independently fetched pinned Git blob must still reject it.
+        # The independently fetched pinned blob rejects a changed local slice.
         mutated_constructor = constructor_source.replace("_maxEBType1);", "_maxEBType2);", 1)
         constructor_fixture.write_text(mutated_constructor, encoding="utf-8")
         audit_source = audit_script.read_text(encoding="utf-8")
