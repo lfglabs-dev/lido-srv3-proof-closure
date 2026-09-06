@@ -95,6 +95,12 @@ def main():
         # A matching sentence outside Stage A must not mask a stale lead disclosure.
         fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         fpath.write_text(stale + "\nA later Stage A paragraph says all 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
+        # A fake heading in non-rendered Markdown must not select an earlier
+        # 68-gap paragraph and hide the real, stale Stage A disclosure.
+        for hidden in ("```markdown\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n```\n\n",
+                       "<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n"):
+            fpath.write_text(hidden + stale, encoding="utf-8")
+            invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         fpath.write_text(source_fidelity, encoding="utf-8"); # Metadata is untrusted Markdown-table content: a pipe in every
         # family of metadata-derived report cells must remain literal data,
         # including adjacent pipes that would add columns.

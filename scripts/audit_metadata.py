@@ -503,8 +503,8 @@ _HTML_BLOCK_TAG = re.compile(
 )
 
 
-def _mask_readme(text):
-    """Position-preserving blank of non-rendered regions in the README.
+def _mask_non_rendered_markdown(text):
+    """Position-preserving blank of non-rendered regions in Markdown.
 
     A pipe line inside a code fence or HTML block is printed as raw text,
     not as a table row.  Searching the raw README let a table wrapped in
@@ -582,7 +582,7 @@ def validate_readme_fidelity_disclosure(rows):
     # nothing.  The masked version blanks every non-rendered region character-
     # for-character (preserving newlines), so positions in `masked_readme` are
     # identical to positions in `readme` and stray-row detection remains sound.
-    masked_readme = _mask_readme(readme)
+    masked_readme = _mask_non_rendered_markdown(readme)
     tables = [t for t in gfm_table.find_tables(masked_readme)
               if (t.header.cells[0].strip(), t.header.cells[1].strip(),
                   t.header.cells[-1].strip()) == README_HEADLINE_COLUMNS]
@@ -687,7 +687,13 @@ def validate_readme_fidelity_disclosure(rows):
 
 def validate_source_fidelity_gap_disclosure(rows):
     total = sum(len(row["fidelity"]["missing"]) for row in rows[:len(CANONICAL_IDS)])
-    disclosure = re.search(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)", SOURCE_FIDELITY.read_text(encoding="utf-8"), re.MULTILINE | re.DOTALL)
+    source_fidelity = SOURCE_FIDELITY.read_text(encoding="utf-8")
+    # A heading inside a fenced block or raw HTML comment is not a section a
+    # reader sees.  Keep positions while masking it, so the body selected below
+    # remains slice-compatible with the original source.
+    disclosure = re.search(r"^## Stage A disclosure\s*$\n(?P<body>.*?)(?=^## |\Z)",
+                           _mask_non_rendered_markdown(source_fidelity),
+                           re.MULTILINE | re.DOTALL)
     require(disclosure is not None, "SOURCE-FIDELITY: no Stage A disclosure section")
     lead = re.match(r"(?P<paragraph>[^\n]*(?:\n(?!\s*\n)[^\n]*)*)(?:\n\s*\n|\Z)", disclosure.group("body")).group("paragraph")
     required = f"all {total} canonical fidelity-gap entries remain."
