@@ -1,0 +1,37 @@
+# Python quality debt: executable scopes at or above the complexity limit and
+# scripts at or above the line limit. Rows may only shrink or disappear;
+# deleting a row re-pins BASELINE_BLOB in scripts/check_python_quality.py.
+
+audit_metadata.py 872
+audit_metadata.py:_mask_readme 23
+audit_metadata.py:rendered 30
+audit_metadata.py:validate_pins 22
+check_deployed_code.py:main 39
+check_diagram_taxonomy.py 628
+check_diagram_taxonomy.py:main 74
+check_pinned_source.py:main 57
+check_proof_escapes.py:strip_comments_and_strings 23
+check_report_theorem_inventory.py 634
+check_report_theorem_inventory.py:main 42
+check_source_annotations.py:main 53
+check_trust_axioms.py 609
+check_trust_axioms.py:main 31
+check_verity_provenance.py 823
+check_verity_provenance.py:_strip_html_comments 93
+check_verity_provenance.py:_strip_non_rendered 27
+check_verity_provenance.py:check 26
+generate_ux2.py 1063
+generate_ux2.py:doc_comment 49
+generate_ux2.py:statement_end 31
+gfm_table.py:find_tables 32
+markdown_text.py:_closing_parenthesis 26
+test_audit_metadata.py 741
+test_audit_metadata.py:main 57
+test_diagram_taxonomy.py 965
+test_diagram_taxonomy.py:main 89
+test_report_theorem_inventory.py 1249
+test_report_theorem_inventory.py:main 116
+test_ux2.py 1397
+test_ux2.py:check_lean_scanner 88
+test_verity_provenance.py 882
+test_verity_provenance.py:<module> 28
