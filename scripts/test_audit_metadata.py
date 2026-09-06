@@ -23,6 +23,22 @@ def invoke(root, ok, needle=None, command="generate"):
         raise AssertionError(f"unexpected rc={result.returncode}:\n{result.stdout}")
     if needle and needle not in result.stdout:
         raise AssertionError(f"missing {needle!r}:\n{result.stdout}")
+def reject_html_stage_a_families(reject, module):
+    """A Stage A heading inside any CommonMark HTML block is invisible."""
+    bodies = (
+        "<pre>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n</pre>\n\n",
+        "<?stage-a\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n?>\n\n",
+        "<![CDATA[\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n]]>\n\n",
+        "<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n",
+        "<div>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
+        "<stage-a>\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n\n",
+    )
+    for body in bodies:
+        reject(body)
+        if "## Stage A disclosure" in module._mask_non_rendered_markdown(body):
+            raise AssertionError("HTML block exposed a Stage A heading")
+    if any(char not in " \n" for char in module._mask_non_rendered_markdown("<!DOCTYPE stage-a>\n")):
+        raise AssertionError("HTML block declaration was not fully masked")
 def main():
     with tempfile.TemporaryDirectory(prefix="assurance-v4-mutants-") as tmp:
         fixture = Path(tmp)
@@ -32,9 +48,7 @@ def main():
         (fixture / "LidoSRv3/Audit/Provenance").mkdir(parents=True)
         (fixture / "fixtures/solidity-reference").mkdir(parents=True)
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
-        # The fixture carries the shared cmark-gfm reader used by the generator.
         shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
-        # It also needs the shared visible-text reducer.
         shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "audit/SOURCE-FIDELITY.md", fixture / "audit/SOURCE-FIDELITY.md")
@@ -48,7 +62,6 @@ def main():
             shutil.copy2(ROOT / "audit" / name, fixture / "audit" / name)
         shutil.copy2(ROOT / "verity/targets/audit-manifest.json", fixture / "verity/targets/audit-manifest.json")
 
-        # Give the fixture an immutable review-basis object for its mutations.
         subprocess.run(["git", "init", "--quiet"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.email", "audit-test@example.invalid"], cwd=fixture, check=True)
         subprocess.run(["git", "config", "user.name", "audit metadata test"], cwd=fixture, check=True)
@@ -86,9 +99,7 @@ def main():
         source_fidelity = fpath.read_text(encoding="utf-8")
         stale = re.sub(r"all\s+68\s+canonical\s+fidelity-gap\s+entries\s+remain\.", "all 67 canonical fidelity-gap entries remain.", source_fidelity)
         fpath.write_text(stale, encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        # A matching sentence outside Stage A must not mask a stale lead disclosure.
         fpath.write_text(stale + "\n## Elsewhere\n\nAll 68 canonical fidelity-gap entries remain.\n", encoding="utf-8"); invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
-        # A later Stage A paragraph cannot qualify its stale lead disclosure.
         later_stage_a = stale.replace(
             "and does not satisfy the source-model completion gates for B–F.\n",
             "and does not satisfy the source-model completion gates for B–F.\n\n"
@@ -101,14 +112,11 @@ def main():
             invoke(fixture, False, "SOURCE-FIDELITY: Stage A disclosure lead paragraph must visibly disclose all canonical fidelity gaps")
         reject_hidden_stage_a("```markdown\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n```\n\n")
         reject_hidden_stage_a("<!--\n## Stage A disclosure\n\nAll 68 canonical fidelity-gap entries remain.\n-->\n\n")
-        # A raw-text HTML body likewise cannot select a fake disclosure.
-        hidden_pre = ("<pre>\n## Stage A disclosure\n\n"
-                      "All 68 canonical fidelity-gap entries remain.\n</pre>\n\n")
-        reject_hidden_stage_a(hidden_pre)
-        fpath.write_text(source_fidelity, encoding="utf-8"); # Metadata pipe data stays literal.
         spec = importlib.util.spec_from_file_location("fixture_audit_metadata", audit_script)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+        reject_html_stage_a_families(reject_hidden_stage_a, module)
+        fpath.write_text(source_fidelity, encoding="utf-8"); # Metadata pipe data stays literal.
         def set_id(row): row["id"] = "left||right"
         def set_abstract_status(row): row["abstract"]["status"] = "left||right"
         def set_verity_status(row): row["verity"]["status"] = "left||right"
@@ -275,9 +283,6 @@ def main():
         x = copy.deepcopy(source); x["targets"][0]["spans"][0]["permalink"] = "https://github.com/lidofinance/core/blob/main/x"; write(spath, x); invoke(fixture, False, "permalink is not immutable/exact"); write(spath, source)
         x = copy.deepcopy(source); x["targets"][0]["spans"][0]["source_sha"] = "0" * 40; write(spath, x); invoke(fixture, False, "source span pin differs"); write(spath, source)
 
-        # The README headline table is a published claim surface: every canonical
-        # row reads CHECKED/CHECKED, so the per-row gap count is the only thing
-        # keeping it from reading as finished.  Mutate each way it can be silenced.
         readme_path = fixture / "README.md"
         readme = readme_path.read_text(encoding="utf-8")
         for mutated, needle in (
@@ -297,10 +302,6 @@ def main():
             readme_path.write_text(mutated, encoding="utf-8")
             invoke(fixture, False, needle)
 
-        # A duplicate row is a second published claim, not a harmless echo.  Drive
-        # this from every row the table actually prints so a guarantee added later
-        # arrives with its case already demanded, and cover both orderings plus a
-        # copy filed under another index, which no per-ID position pattern matches.
         rows = re.findall(r"^\| *\d+ *\| *`[^`]+` *\|[^\n|]*\|[^\n|]*\| *\d+ open *\|$",
                           readme, flags=re.MULTILINE)
         if not rows:
@@ -316,13 +317,6 @@ def main():
                 invoke(fixture, False, "headline fidelity rows")
         readme_path.write_text(readme, encoding="utf-8")
 
-        # The disclosure is a claim about one table.  Reading gap rows from
-        # anywhere in the README bound them to nothing in particular, so a row
-        # re-filed into a later table or into loose prose went on satisfying this
-        # gate while the table a reader meets had silently dropped it — the
-        # headline could skip an ID outright.  Every row the table prints is
-        # driven through both relocations and through outright deletion, so a
-        # guarantee added later arrives with its case already demanded.
         header = "| # | ID | Abstract Lean | Verity Executable Contract | Fidelity gaps |"
         if readme.count(header) != 1:
             raise AssertionError("expected exactly one headline table header in README")

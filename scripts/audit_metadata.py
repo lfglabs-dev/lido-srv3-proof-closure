@@ -515,13 +515,12 @@ def _mask_non_rendered_markdown(text):
     # Blank the remaining inline HTML constructs, preserving positions.
     masked = README_UNRENDERED.sub(blank, masked)
 
-    # One shared CommonMark reader owns all §4.5 fences and §4.6 HTML block
-    # families (not just type 6).  Run it on the original source: earlier
-    # passes blank tags, which must not prevent their raw block bodies from
-    # being excluded before a disclosure heading is selected.
+    # Run the shared literal-region reader on the original source.
     literal = gfm_table.mask_literal_regions(text)
-    return "".join(" " if original != " " and masked_char == " " else original
-                   for original, masked_char in zip(literal, masked))
+    # A character hidden by either reader stays hidden.
+    return "".join(" " if original != " " and " " in (literal_char, masked_char) else original
+                   for original, literal_char, masked_char
+                   in zip(text, literal, masked))
 
 
 def validate_readme_fidelity_disclosure(rows):
