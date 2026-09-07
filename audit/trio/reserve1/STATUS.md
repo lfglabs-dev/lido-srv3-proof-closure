@@ -13,7 +13,7 @@ until the withdrawal parent performs transaction rollback.
 retaining the expanded status/lookup relations and bidirectional exact parent
 correspondence. Spending internals and CALL/deployed primitive interpretation remain
 explicit direct boundaries; remaining report/queue writers and full integration
-obligations are unchanged. Immutable validation follows checks. Runtime source is
+obligations are unchanged. At source `f6356dcfdaa54baaf423dc492a5fd241427963c3`, three selected component checks and seven baseline/import checks pass. The other 64 source/olean pairs match earlier successful receipts. See `receipts/tail-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime source is
 unchanged, with prior executions still attributed to their tested commits.
 
 ## Complete locator lookup rules substituted into status and withdrawal
