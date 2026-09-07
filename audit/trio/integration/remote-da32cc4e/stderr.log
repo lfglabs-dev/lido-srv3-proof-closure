@@ -1,0 +1,8 @@
+Cloning into '/workspaces/lido-integration-validation-da32cc4e'...
+From https://github.com/lfglabs-dev/lido-srv3-proof-closure
+ * branch            integration/trio-closure -> FETCH_HEAD
+HEAD is now at da32cc4 Provision checksum-pinned Foundry in private validation checkouts
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake env lean --run audit/trio/integration/RunValidation.lean for da32cc4e297f ...
+remote-lean-build: submitted job 6105449a-c1ba-4013-9e12-ea6959552c4b on node 'dgx-spark'; receipt /root/.local/state/sandboxed-sh/remote-builds/605a1ff5a7673f195c08333ad399bada65eeb1c043aded4573723abad04069fd.json
+remote-lean-build: job 6105449a-c1ba-4013-9e12-ea6959552c4b on node 'dgx-spark' finished: failed (exit 1, 484s)

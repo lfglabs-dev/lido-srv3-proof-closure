@@ -2,6 +2,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Remote source snapshots can omit historical objects used by audit checks.
+# Fetch only the immutable review basis; preserve HEAD and the working tree.
+review_base=$(python3 -c 'from scripts.audit_metadata import R1_REVIEW_BASE; print(R1_REVIEW_BASE)')
+if ! git cat-file -e "$review_base^{commit}" 2>/dev/null; then
+  git fetch --no-tags https://github.com/lfglabs-dev/lido-srv3-proof-closure.git "$review_base"
+fi
+git cat-file -e "$review_base:audit/guarantees.yaml"
+
 # Private checkout-local tooling; no host package or service changes.
 version=v1.3.1
 case "$(uname -m)" in

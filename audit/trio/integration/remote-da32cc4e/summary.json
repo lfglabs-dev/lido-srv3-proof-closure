@@ -1,0 +1,32 @@
+{
+  "sha": "da32cc4e297f234726026050ccaf152b9ef038a8",
+  "remote_job": "6105449a-c1ba-4013-9e12-ea6959552c4b",
+  "status": "failed",
+  "exit_code": 1,
+  "failure": "make test audit metadata check: missing historical review-base Git object eda35b611f08879241411d12f943d011f748e5a4",
+  "parent_comparison": "SOLIDITY_PARENT_VERITY_PASS: 8 cases",
+  "scope": "Parent VM execution and byte/call differential evidence; full validation failed. Protocol 1, not independent protocol 4 certification.",
+  "stdout_scope": "capped terminal tail, not full compiler log",
+  "files": {
+    "receipt.json": {
+      "sha256": "b4fd253597b1e0cd280156da21d384f89a12eef5b7f297a0362acaa84cbf6dc9",
+      "bytes": 67811
+    },
+    "stdout.log": {
+      "sha256": "8bc5a238b4bd7aff69e9d7a14df9aabeb9ee832b8a21ba26c37e73f1228817ff",
+      "bytes": 65536
+    },
+    "stderr.log": {
+      "sha256": "60e2564a1d05434555a3e580503daa5ffce87f9e9b3197f5cc5f6205033b20a3",
+      "bytes": 795
+    },
+    "exit.json": {
+      "sha256": "e79d83859553b2e4d366af1767f56371ef6aa97474a31364b38404667ba555ea",
+      "bytes": 67
+    },
+    "parent-comparison.json": {
+      "sha256": "611e6e0645dc6ba61e28e1c4d37aad2172175b8442d75535b4a4a07e58593782",
+      "bytes": 6597
+    }
+  }
+}

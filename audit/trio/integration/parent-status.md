@@ -35,8 +35,8 @@ layout hashes are instrumentation, not actual keccak evidence.
 Still required: concrete Solidity correspondence beyond the decoded public model;
 exact delegated library call and ABI return/revert bytes; concrete
 allocation/copy/mutation and panic precedence; caller/deployment binding;
-state/balance/event frames and recursive callback interpretation; actual Verity
-differential execution; registered-parent mutants; full gates and independent
+state/balance/event frames and recursive callback interpretation;
+registered-parent mutants; full gates and independent
 certification. The existing byte-memory bridge is a representation theorem, not
 compiler-memory execution evidence. No canonical guarantee is upgraded.
 
@@ -129,3 +129,24 @@ The integration also includes producer checkpoint `4aa9557e`, consumer
 parent array safety and a pure-library Verity runtime adapter, and concrete
 queue/oracle/consensus call binding respectively. Their component receipts do
 not replace final integration validation or independent certification.
+
+## Actual parent VM differential execution
+
+At `da32cc4e297f234726026050ccaf152b9ef038a8`, the remote driver compiled
+the parent VM correspondence and executed six VM checks plus eight differential
+cases. `remote-da32cc4e/receipt.json` contains the terminal service receipt.
+`compare-parent-executions.py` verified the transitive VM source closure against
+that commit, the original Solidity execution provenance and fixture inputs, and
+all eight raw return/revert byte strings and module-call sequences. Its recorded
+result is `SOLIDITY_PARENT_VERITY_PASS`; see `parent-comparison.json` in the same
+directory. These are actual Verity executions, with the library still interpreted
+by the source ABI executor. They do not establish compiler memory, deployed
+DELEGATECALL, or recursive callback/world fidelity.
+
+The full run failed: Foundry's four Solidity tests passed, then `make test`
+stopped because the remote checkout omitted the immutable historical review-base
+Git object required by the audit metadata check. Validation setup now fetches
+that exact object when absent without changing HEAD. This repair still needs a
+fresh remote gate run. The failed receipt remains failed; neither the successful
+parent cases nor the protocol-1 build receipt constitutes independent final
+certification. The log files retain only the runner's capped terminal tail.
