@@ -104,6 +104,7 @@ MODULES = [
     "Tests/TrioReserve1/VaultCases",
     "Tests/TrioReserve1/ReportCases",
     "Tests/TrioReserve1/ReportDifferential",
+    "Tests/TrioReserve1/VaultDifferential",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",
