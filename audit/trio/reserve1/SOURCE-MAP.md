@@ -169,3 +169,13 @@ failures, optional return-word validation and success independently of executors
 and substitutes them into the parent. Reward decoding retains the Lido.sol:40
 return-type requirement. Saved-locator decoding and raw primitive CALL observation
 are the remaining stage boundaries; concrete vault/queue binding is not claimed.
+
+
+## Report primitive observation expansion
+
+`CallDataFlow` gives independent CALL correspondence for full ABI bytes.
+`ReportLookup` relates saved-locator getter results to independent call and typed
+reply decoding rules. `ReportRules.corresponds`/`complete` substitute both through
+the report parent, conditional stages and accounting; the expanded predicate has
+no source stage executor or source CALL. The explicit raw external interpreter
+still requires concrete deployed vault/queue/callback and resource binding.

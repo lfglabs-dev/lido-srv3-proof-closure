@@ -1,16 +1,17 @@
 # Continuation — not a completion claim
 
-Latest increment: OptionalCallSpec/ReportCalls expand all three conditional report
-stages into independent zero-skip, lookup/CALL failure, word-validation and success
-rules. Exact stage correspondence is substituted throughout the report parent,
-retaining exact outcomes/worlds/attempts and root rollback. Rewards validate the
-unused return word; withdrawals/finalization are void-return stages.
-Continue by expanding saved-locator getter decoding and argument-complete CALL
-observations, then concrete callees, entry dispatch, deployment/resource binding
-and remaining writer obligations. Do not reopen the proved conditional sequencing.
-Current evidence: report-calls-summary.json, three selected checks plus 89 unchanged
-source/olean pairs. Report runtime hashes match its sixteen EVM comparisons; no
-rerun is claimed for proof-only additions. Full implementation and remote gates
+Latest increment: CallDataFlow/ReportLookup/ReportRules substitute independent
+full-payload CALL and captured-locator decoding rules throughout the report.
+The expanded report relation has no source stage executor or source CALL, with
+exact bidirectional outcome/world/attempt correspondence and completeness.
+Continue concrete vault/queue/callback implementations and deployed primitive,
+entry/resource/bounded-world binding plus remaining writer obligations. Do not
+reopen discharged report lookup/CALL substitution or call the raw interpreter
+production bytecode evidence.
+Current evidence: report-primitives-summary.json, four selected checks plus 91
+unchanged source/olean pairs. Report runtime hashes match its sixteen EVM
+comparisons; no rerun claimed for proof-only additions. Remote wrapper hash and
+missing dependency transport are unchanged. Full implementation and full gates
 remain open. Previous turn changed source and published evidence.
 
 

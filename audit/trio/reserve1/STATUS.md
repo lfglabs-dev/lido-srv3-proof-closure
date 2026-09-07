@@ -1,5 +1,25 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Fully expanded independent report relation
+
+`CallDataFlow` proves independent high-level CALL correspondence for arbitrary ABI
+payloads, preserving exact supplied bytes and traced/untraced primitive replies.
+`ReportLookup` binds the captured locator's actual reply to independent minimum
+length, first-word decoding and address narrowing rules. `ReportRules` substitutes
+these rules throughout accounting authorization and all conditional report stages.
+Its expanded predicate contains no source report stage executor or source CALL.
+Exact bidirectional root outcome/world/attempt correspondence, completeness,
+original-world failure restoration and successful active-state admission are proved.
+
+The semantic boundary is now the raw external reply interpreter, including vault,
+queue and callback behavior. Concrete implementation/deployment/resource binding,
+other writers/entry paths, full remote gates and independent review remain open.
+At source `2d357ae43ee340d38aa5189f6cab0e40604ab05e`, four selected checks and seven baseline checks pass; 91
+unchanged source/olean pairs and eleven dependency revisions match. Axioms are
+standard. See `receipts/report-primitives-summary.json`. Report runtime hashes are
+unchanged from its sixteen EVM comparisons. The remote wrapper hash is unchanged
+and no dependency-bundle tool was discovered; no new remote job is claimed.
+
 ## Independent conditional report calls
 
 `OptionalCallSpec` independently specifies zero-amount skipping, lookup failure,
