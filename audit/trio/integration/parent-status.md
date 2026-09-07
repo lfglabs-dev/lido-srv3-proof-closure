@@ -98,3 +98,18 @@ complete module transcripts, alongside eleven byte vectors, the original sixteen
 vectors, and four SOURCE parent mutants. The receipt is
 `parent-abi-init-receipt.json`. No canonical guarantee or certification status is
 upgraded. UX2 passed on the earlier ABI integration head `2d8e182e`.
+
+## Allocation primitive bounds
+
+`AllocationExtent.lean` derives the exact nonwrapping end pointer from a
+successful `allocateArray`, including its panic-0x41 checks. Two successful
+equal-length, nonoverlapping allocations after the ABI head imply the canonical
+packet's 64-bit extent bound; gaps are allowed and no fixed module-count bound
+is assumed. The actual compiler schedule-to-producer connection remains open.
+The bounded closure now checks 43 modules. This primitive result alone does not
+discharge `ReachableABIExtent` for the decoded producer.
+
+The full production/test/audit build at earlier `91684800` succeeded on DGX
+Spark (1577 jobs, 455 seconds). `remote-91684800/receipt.json` records its exact
+scope and the runner's capped terminal log tail. It does not certify the newer
+parent ABI, allocation-extent or withdrawal-composition source.
