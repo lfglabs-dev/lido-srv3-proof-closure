@@ -10,6 +10,8 @@ EXPECTED_PARTS = {
         "A-VERITY-SCAFFOLD", "A-YUL-INTERFACE",
     },
     "source-chain": {"A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE"},
+    "deployment-constants": {"A-DEPOSIT-CONTRACT", "A-TOPUP-BEACON-ADDRESS",
+                             "A-CANONICAL-REQUEST-ADDRESS", "A-DEPOSIT-32-ETHER"},
 }
 
 
@@ -18,8 +20,8 @@ def validate(catalog, assumptions, guarantees):
         raise ValueError("unknown assumption presentation schema")
     known = {row["id"] for row in assumptions["assumptions"]}
     groups = catalog["groups"]
-    if [group["id"] for group in groups] != ["model-source", "source-chain"]:
-        raise ValueError("expected model and deployment groups")
+    if [group["id"] for group in groups] != list(EXPECTED_PARTS):
+        raise ValueError("expected model, deployment and configured-value groups")
     seen = set()
     for group in groups:
         parts = group["parts"]
