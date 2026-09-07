@@ -1,45 +1,37 @@
-# Candidate producer/consumer composition
+# Integrated producer/consumer composition
 
-`Composition.lean` is consumer-owned and defines:
+The composition declarations now live in
+`LidoSRv3/Audit/Source/TrioAlloc2/Composition.lean`, inside the production source
+glob. The former staged `Composition.lean` is a compatibility import.
 
-- `producer_success_establishes_consumer_premises`: from the actual successful
-  `TrioAlloc1.produce`, derives equal lengths and a bucket length below 2^256.
-  The latter is obtained from `producer_router_order`, the actual storage count
-  word, and `CapacityOutput.allocations_length`; it is not an assumed memory or
-  arithmetic-success predicate.
-- `producer_then_consumer_succeeds`: passes the actual producer arrays and the
-  same `input.depositsToAllocate` to the consumer, deriving success, demand bound,
-  conservation, and preserved module count.
+The integration branch combines ALLOC-1 `8269ac576cf119975a7e9954459cd4aa04d5cd82`,
+ALLOC-2 `460cc599d9fd350af51db27e4e8d175561f99773` and RESERVE-1
+`7173594e7518cc636fff9099f864fa61b021a7cf` on main
+`bcfbb5f027a5c370594891c1a455fde137709941`. This is local integration, not delivery
+or a merge into GitHub main.
 
-The boundary is explicitly **decoded arrays**. This does not prove byte-memory
-or copied ABI correspondence, the public parent conversion, producer Solidity
-source refinement, adversarial callback realization, or parent effects/rollback.
-Those remain in the original task scope. Producer/consumer agreement was requested
-through the orchestrator; an explicit producer confirmation is still pending.
+The three composition theorems derive consumer array-length premises, successful
+allocation with conservation and demand bounds, and the independent proportional
+distribution relation from actual producer success. They pass the same demand and
+actual output arrays to the consumer. No consumer-success assumption is added.
 
-The candidate depends on exact producer `5f1683eaf753ff73aec6f1e787cb7f68bedcf056`.
-`prepare.py` checks that its interface is byte-identical to accepted v0
-`2a4e9d2a91d257353470677c6101fd91293cf4e4` and materializes its four exact Git blobs
-only in the private verification checkout. No producer-owned path in the
-implementation branch is created or edited. The composition is staged outside
-the production glob while the producer remains an unintegrated candidate; this
-is an outstanding integration obligation, not a substitute for the root build.
+The boundary remains decoded arrays. Compiler memory allocation, byte-memory/ABI
+execution, parent conversion, source refinement, callbacks and rollback remain
+required. The separate +1 algorithm is unchanged.
 
-Preparation from repository root, once the private base checkout exists:
+Bounded reproduction from the repository root (Lean 4.31.0 via elan):
 
-```
-python3 audit/trio/alloc2/composition/prepare.py
+```sh
+python3 audit/trio/integration/check-init-composition.py --output /tmp/trio-composition-check
 ```
 
-From `../temp/alloc2-composition/audit/trio/alloc2/composition`:
+The output directory must not exist. The check elaborates the transitive Init-only
+closure, imposes a 30-second limit per module and records source hashes, compiler,
+commands and exit codes. The initial integration check passed all 23 modules;
+its receipt is in `audit/trio/integration/composition-init-receipt.json`. This is
+not a production/test/trust build, make-prove/test result, or certification.
 
-```
-REMOTE_BUILD_PASSIVE=1 REMOTE_BUILD_ESTIMATED_DISK_GB=2 remote-lean-build lake build
-```
-
-Job `d6b747be-05b7-486a-b03c-bfb97f840ad1`, old-agent, exit 0, 21 jobs,
-compiled the complete producer/consumer source closure. `source-identity.json`
-records the base, producer, accepted interface and all 20 source/config hashes.
-The receipt is in the parent audit directory. Both bridge theorem inspections
-report only propext and Quot.sound. This is implementation evidence, not
-independent certification or full-suite validation.
+`prepare.py`, `source-identity.json` and earlier remote receipts retain the
+historical candidate setup against producer `5f1683eaf753ff73aec6f1e787cb7f68bedcf056`.
+They do not validate the integrated producer. Use the root build for complete
+validation; the bounded command above only checks this decoded composition.
