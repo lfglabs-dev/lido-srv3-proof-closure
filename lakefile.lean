@@ -99,6 +99,8 @@ lean_lib «TrioIntegrationChecks» where
     .one `audit.trio.alloc2.composition.Parent,
     .one `audit.trio.alloc2.composition.ParentErrors,
     .one `audit.trio.alloc2.composition.ParentInversion,
+    .one `audit.trio.alloc2.composition.ProducerMemory,
+    .one `audit.trio.alloc2.composition.ProducerMemoryVectors,
     .one `audit.trio.alloc2.composition.ParentPostconditions,
     .one `audit.trio.alloc2.composition.ParentVectors,
     .one `audit.trio.alloc2.composition.MemoryVectors,

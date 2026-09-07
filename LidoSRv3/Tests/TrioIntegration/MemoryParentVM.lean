@@ -27,20 +27,22 @@ private def check (name : String) (pointer count : Nat) (oracle : StaticOracle)
 
 def runVectors : IO Unit := do
   check "one-row" 128 1 (ParentFixtures.summary 1) none 1
-  check "scratch-before-call" (2^64-512) 1 ParentFixtures.rejects
+  check "scratch-before-call" (2^64-700) 1 ParentFixtures.rejects
     (some (.panic (word 0x41))) 0
-  check "capacity-after-call" (2^64-896) 1 (ParentFixtures.summary 1)
+  check "capacity-after-call" (2^64-1473) 1 (ParentFixtures.summary 1)
     (some (.panic (word 0x41))) 1
-  check "first-pass-before-capacity" (2^64-896) 1
+  check "first-pass-before-capacity" (2^64-1473) 1
     (fun _ _ => .returned (encodeWord (word 2) ++ encodeWord (word 1) ++ encodeWord (word 0)))
     (some (.panic (word 0x11))) 1
-  check "capacity-before-second-pass" (2^64-896) 1 (ParentFixtures.summary (2^256-1))
+  check "capacity-before-second-pass" (2^64-1473) 1 (ParentFixtures.summary (2^256-1))
     (some (.panic (word 0x41))) 1
   check "second-pass-overflow" 128 1 (ParentFixtures.summary (2^256-1))
     (some (.panic (word 0x11))) 1
   check "prefix-before-call" 128 (2^64) ParentFixtures.rejects
     (some (.panic (word 0x41))) 0
   check "two-rows" 128 2 (ParentFixtures.summary 1) none 2
+  check "zero-caller-before-conversion" (2^64-1537) 1 (ParentFixtures.summary 1)
+    (some (.panic (word 0x41))) 1
 
 end LidoSRv3.Tests.TrioIntegration.MemoryParentVM
 

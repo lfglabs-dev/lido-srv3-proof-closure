@@ -81,6 +81,14 @@ try:
     check('audit.trio.alloc2.composition.MemoryVectors')
     check('audit.trio.alloc2.composition.LibraryABIVectors')
     check('audit.trio.integration.IndexedParentBridge')
+    check('LidoSRv3.Tests.TrioIntegration.FinalMemory')
+    check('LidoSRv3.Tests.TrioIntegration.FinalMemoryStoredProducer')
+    check('LidoSRv3.Tests.TrioIntegration.MemoryTransport')
+    check('LidoSRv3.Audit.Source.TrioComposition.MemoryTransportCall')
+    check('LidoSRv3.Audit.Source.TrioComposition.MemoryTransportConversion')
+    check('LidoSRv3.Audit.Source.TrioComposition.LifecycleHistory')
+    check('LidoSRv3.Audit.Source.TrioComposition.CacheRepresentation')
+    check('audit.trio.alloc2.composition.ProducerMemoryVectors')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')

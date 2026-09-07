@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.TrioComposition.MemoryParentCalls
+import LidoSRv3.Audit.Source.TrioComposition.FinalMemoryParent
 import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 
 /-! Actual pinned Verity call-VM execution of the parent call tree. The VM
@@ -48,7 +48,7 @@ def executeWithMemory (pointer : Word) (layout : Layout) (config : Config)
     (amount : Word) (isTopUp : Bool) (adversary : DenoteExternalCalls.AdversaryModel)
     (state : DenoteExternalCalls.CallState) (before : Transcript := []) :=
   DenoteExternalCalls.denote (VerityProducer.translate before
-    (MemoryParentCalls.program pointer layout (VerityProducer.worldStorage state.world)
+    (FinalMemoryParent.program pointer layout (VerityProducer.worldStorage state.world)
       config amount isTopUp)) adversary state
 
 theorem memory_correspondence (pointer : Word) (layout : Layout) (config : Config)
@@ -56,7 +56,7 @@ theorem memory_correspondence (pointer : Word) (layout : Layout) (config : Confi
     (state : DenoteExternalCalls.CallState) (before : Transcript) :
     (executeWithMemory pointer layout config amount isTopUp adversary state before).1 =
       CallTree.evaluate (VerityProducer.sourceOracle adversary state.world)
-        (MemoryParentCalls.program pointer layout (VerityProducer.worldStorage state.world)
+        (FinalMemoryParent.program pointer layout (VerityProducer.worldStorage state.world)
           config amount isTopUp) before ∧
     (executeWithMemory pointer layout config amount isTopUp adversary state before).2.world = state.world :=
   VerityProducer.translation_correspondence _ adversary state before
@@ -66,14 +66,12 @@ theorem memory_public_iff (pointer : Word) (layout : Layout) (config : Config)
     (state : DenoteExternalCalls.CallState) (before after : Transcript)
     (result : Except Failure ParentOutput)
     (countBound : (VerityProducer.worldStorage state.world (countSlot layout)).val ≤ 32)
-    (space : pointer.val+608*(VerityProducer.worldStorage state.world (countSlot layout)).val+320 ≤ 2^32) :
+    (space : pointer.val+1184*(VerityProducer.worldStorage state.world (countSlot layout)).val+704 ≤ 2^32) :
     ParentSpec.Public layout (VerityProducer.worldStorage state.world)
       (VerityProducer.sourceOracle adversary state.world) config amount isTopUp before result after ↔
       (executeWithMemory pointer layout config amount isTopUp adversary state before).1 = (result, after) := by
   rw [(memory_correspondence pointer layout config amount isTopUp adversary state before).1]
-  rw [MemoryParentCalls.correspondence pointer layout _ _ _ _ _ countBound space]
-  exact public_abi_iff _ _ _ _ _ _ _ _ _
-    (MemoryParentCalls.abi_extent pointer layout _ _ _ _ _ before space)
+  exact FinalMemoryParent.public_iff pointer layout _ _ _ _ _ before after result countBound space
 
 #print axioms memory_correspondence
 #print axioms memory_public_iff
