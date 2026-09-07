@@ -26,17 +26,19 @@ def libraryResult (r : TrioAlloc2.Result α) : Except Failure α :=
   | .error .divisionByZero => .error (.panic (word 0x12))
   | .error .arrayBounds => .error (.panic (word 0x32))
 
+/-- Checked access to the next decoded array cell. -/
+def readHead (values : List Word) : Except Failure Word :=
+  match values with
+  | [] => .error (.panic (word 0x32))
+  | value :: _ => .ok value
+
 /-- Count-driven conversion; delta subtraction, delta multiplication and new-total
 multiplication are checked in that order, before moving to the next row. -/
 def convertPositive (unit : Word) : Nat → List Word → List Word → Except Failure (List Word × List Word)
   | 0, _, _ => .ok ([], [])
   | n+1, old, fresh => do
-    let next ← match fresh with
-      | [] => .error (.panic (word 0x32))
-      | value :: _ => .ok value
-    let previous ← match old with
-      | [] => .error (.panic (word 0x32))
-      | value :: _ => .ok value
+    let next ← readHead fresh
+    let previous ← readHead old
     let delta ← checkedSub next.val previous.val
     let deltaWei ← checked (delta.val * unit.val)
     let nextWei ← checked (next.val * unit.val)
@@ -47,9 +49,7 @@ def convertPositive (unit : Word) : Nat → List Word → List Word → Except F
 def convertZero (unit : Word) : Nat → List Word → Except Failure (List Word × List Word)
   | 0, _ => .ok ([], [])
   | n+1, old => do
-    let previous ← match old with
-      | [] => .error (.panic (word 0x32))
-      | value :: _ => .ok value
+    let previous ← readHead old
     let previousWei ← checked (previous.val * unit.val)
     let (deltas, totals) ← convertZero unit n old.tail
     pure (word 0 :: deltas, previousWei :: totals)
@@ -131,7 +131,7 @@ theorem convertPositive_refines (unit : Word) (count : Nat)
       cases fresh with
       | nil => simp at freshLength
       | cons next freshs =>
-        simp only [convertPositive, bind, Except.bind, List.tail_cons, pure, Except.pure] at executed
+        simp only [convertPositive, readHead, bind, Except.bind, List.tail_cons, pure, Except.pure] at executed
         cases subEq : TrioAlloc1.checkedSub next.val previous.val with
         | error error => simp [subEq] at executed
         | ok delta =>
@@ -174,7 +174,7 @@ theorem convertZero_refines (unit : Word) (count : Nat)
     cases old with
     | nil => simp at oldLength
     | cons previous olds =>
-      simp only [convertZero, bind, Except.bind, List.tail_cons, pure, Except.pure] at executed
+      simp only [convertZero, readHead, bind, Except.bind, List.tail_cons, pure, Except.pure] at executed
       cases valueEq : checked (previous.val * unit.val) with
       | error error => simp [valueEq] at executed
       | ok previousWei =>

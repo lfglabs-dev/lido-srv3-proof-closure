@@ -53,3 +53,17 @@ check covers 32 Init-only modules and 16 executed memory/parent cases. See
 `parent-status.md` for exact remaining obligations. UX2 passed on `b5dff873`;
 newer source heads require their own gate. No full or independent certification
 has been claimed, and the original final-delivery scope remains open.
+
+## All-outcome decoded parent and new checkpoints
+
+The decoded wrapper now has an independent deterministic relation and an exact
+return/revert/transcript iff theorem. Its 37-module Init-only closure passes,
+including 16 vectors and four parent mutants. Concrete memory/ABI/world binding,
+full Verity differentials and final certification remain open.
+
+Read-only remote workspace inspection found ALLOC-1 clean at
+`a35ca25a350610ce803dd3a2de019b5a66c80e8c`, matching GitHub. This is a snapshot
+checkpoint, not track completion. ALLOC-2 remains at `4dce12b7` with unpublished
+`composition/LibraryABI.lean`, preparation/config changes and receipts. RESERVE-1
+is at `016052c7` with unpublished `CallResults.lean`, `WithdrawalTail.lean` and
+receipts. Those active workspaces were preserved without mutation.

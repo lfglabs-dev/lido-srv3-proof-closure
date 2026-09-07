@@ -32,7 +32,7 @@ subtraction underflow, failure after an earlier row converted, and short arrays.
 They execute the Lean source model, not Solidity or Verity Contract.run. Test
 layout hashes are instrumentation, not actual keccak evidence.
 
-Still required: full public-wrapper all-outcome independent correspondence;
+Still required: concrete Solidity correspondence beyond the decoded public model;
 exact delegated library call and ABI return/revert bytes; concrete
 allocation/copy/mutation and panic precedence; caller/deployment binding;
 state/balance/event frames and recursive callback interpretation; actual Verity
@@ -54,3 +54,26 @@ checks. `parent-composition-init-receipt.json` records the checked file hashes.
 Metadata, proof-escape and import-DAG checks pass. The UX2 regression also passed
 on the previous committed memory-composition head `b5dff873`; that result is not
 a gate for subsequent parent or row-bound changes.
+
+## Exact decoded parent relation
+
+`ParentRelational.lean` specifies returns, reverts and attempted module-call
+prefixes using independent arithmetic relations, producer relations and the
+independent proportional distribution relation. It derives consumer success from
+actual producer length/bound evidence; no successful-callee or consumer premise
+is added to the public theorem. Row relations retain first-error order.
+
+`ParentDeterminism.lean` proves uniqueness of mathematical distribution, consumer
+outputs and the complete parent relation. `ParentSpec.public_iff` proves exact
+two-way correspondence between that relation and the public SOURCE executor for
+all outcomes. Compiler-memory execution, delegated library ABI and concrete EVM
+world binding remain open. This is not full Solidity/Verity correspondence.
+
+The 37-module Init-only closure passes. Four executed mutants change division
+priority, skip zero-demand module calls, return validator units instead of Ether,
+or erase failure transcripts. All produce mismatches; the generic
+`changed_observation_rejected` theorem links any such discrepancy to rejection by
+`public_iff`. These are SOURCE-parent tests, not canonical registered-parent or
+VM mutants. The original 16 execution vectors also pass. The receipt is
+`parent-iff-init-receipt.json`; all checked source hashes were compared with the
+working tree before recording it.

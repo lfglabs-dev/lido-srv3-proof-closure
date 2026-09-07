@@ -52,7 +52,7 @@ def check(module):
 try:
     check('LidoSRv3.Tests.TrioIntegration.MemoryComposition')
     check('LidoSRv3.Tests.TrioIntegration.Parent')
-    check('LidoSRv3.Audit.Source.TrioComposition.ParentComposition')
+    check('LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')

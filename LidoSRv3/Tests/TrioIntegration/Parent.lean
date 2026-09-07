@@ -1,4 +1,4 @@
-import LidoSRv3.Audit.Source.TrioComposition.Parent
+import LidoSRv3.Audit.Source.TrioComposition.ParentDeterminism
 
 namespace LidoSRv3.Tests.TrioIntegration.Parent
 open LidoSRv3.Audit.Source
@@ -55,4 +55,53 @@ private def checkConversion (actual expected : Except Failure (List Word × List
   (.error (.panic (word 0x11)))
 #eval checkConversion (convertPositive (word 32) 1 [word 0] [])
   (.error (.panic (word 0x32)))
+/-- A changed result or trace cannot satisfy the exact SOURCE parent relation.
+This is a consequence of public_iff, not an independent equality oracle. -/
+theorem changed_observation_rejected
+    (layout : Layout) (storage : Storage) (oracle : StaticOracle)
+    (cfg : Config) (amount : Word) (topup : Bool) (before : Transcript)
+    (result : Except Failure ParentOutput) (after : Transcript)
+    (different : getDepositAllocations layout storage oracle cfg amount topup before ≠ (result, after)) :
+    ¬ ParentSpec.Public layout storage oracle cfg amount topup before result after := by
+  intro specified
+  exact different ((ParentSpec.public_iff layout storage oracle cfg amount topup before after result).mp specified)
+
+private def divisionBeforeEmpty (count status unit amount : Nat) (oracle : StaticOracle) : Execution ParentOutput := do
+  let _ ← liftChecked (checkedDiv (word amount) (word unit))
+  getDepositAllocations layout (storage count status) oracle (config unit) (word amount) false
+
+private def skipZeroDemand (count status unit amount : Nat) (oracle : StaticOracle) : Execution ParentOutput :=
+  if amount = 0 then pure ⟨word 0, [], []⟩
+  else getDepositAllocations layout (storage count status) oracle (config unit) (word amount) false
+
+private def wrongUnits (count status unit amount : Nat) (oracle : StaticOracle) : Execution ParentOutput := do
+  let out ← getDepositAllocations layout (storage count status) oracle (config unit) (word amount) false
+  pure { out with totalAllocated := word (out.totalAllocated.val / unit) }
+
+private def eraseFailureCalls (count status unit amount : Nat) (oracle : StaticOracle) : Execution ParentOutput :=
+  fun before =>
+    let (result, after) := getDepositAllocations layout (storage count status) oracle (config unit) (word amount) false before
+    match result with
+    | .error error => (.error error, before)
+    | .ok out => (.ok out, after)
+
+/-- Each evaluated discrepancy is rejected by changed_observation_rejected. These
+are SOURCE parent mutants; canonical registered-parent and VM mutants remain open. -/
+private def killMutant (count status unit amount : Nat) (oracle : StaticOracle)
+    (mutant : Execution ParentOutput) : IO Unit := do
+  let actual := getDepositAllocations layout (storage count status) oracle (config unit) (word amount) false []
+  let altered := mutant []
+  let sameResult := match actual.1, altered.1 with
+    | .ok a, .ok b => decide (a = b)
+    | .error a, .error b => decide (a = b)
+    | _, _ => false
+  if sameResult && decide (actual.2 = altered.2) then
+    throw (IO.userError "SOURCE parent mutant survived")
+
+#eval killMutant 0 0 0 1 rejects (divisionBeforeEmpty 0 0 0 1 rejects)
+#eval killMutant 1 0 32 0 rejects (skipZeroDemand 1 0 32 0 rejects)
+#eval killMutant 1 0 32 65 (summary 1) (wrongUnits 1 0 32 65 (summary 1))
+#eval killMutant 1 0 32 0 rejects (eraseFailureCalls 1 0 32 0 rejects)
+
+#print axioms changed_observation_rejected
 end LidoSRv3.Tests.TrioIntegration.Parent
