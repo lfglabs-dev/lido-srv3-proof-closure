@@ -16,6 +16,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition
 import LidoSRv3.Audit.Source.TrioReserve1.OracleCalls
 import LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls
 import LidoSRv3.Audit.Source.TrioReserve1.Pipeline
+import LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -144,3 +145,10 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Pipeline.success
 #print axioms Pipeline.rejected
 #print axioms Pipeline.shortage
+
+#print axioms PhysicalReserve.committed_fields
+#print axioms PhysicalReserve.admitted
+#print axioms PhysicalReserve.committed_protection
+#print axioms PhysicalReserve.committed_other_account
+#print axioms PhysicalReserve.committed_queue
+#print axioms PhysicalReserve.success_preserves

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Bounded component elaboration; never a replacement for remote full gates."""
+import argparse
 import datetime
 import hashlib
 import json
@@ -43,6 +44,7 @@ MODULES = [
     "Audit/Source/TrioReserve1/Consensus",
     "Audit/Source/TrioReserve1/ConsensusCalls",
     "Audit/Source/TrioReserve1/Pipeline",
+    "Audit/Source/TrioReserve1/PhysicalReserve",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",
@@ -56,6 +58,11 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--module", action="append", choices=MODULES,
+        help="Check only selected modules, in dependency order; dependencies must already be built")
+    args = parser.parse_args()
+    selected = [m for m in MODULES if args.module is None or m in args.module]
     # Source must be reviewable at the recorded immutable commit. Receipts may
     # be dirty because they are necessarily produced after that source commit.
     for owned in ["LidoSRv3/Audit/Source/TrioReserve1", "LidoSRv3/Tests/TrioReserve1", "solidity/trio-reserve1"]:
@@ -73,9 +80,10 @@ def main():
         "lean_version": subprocess.check_output([str(LEAN), "--version"], text=True).strip(),
         "lean_sha256": sha(LEAN), "lean_path": env["LEAN_PATH"],
         "scope": "Owned component modules using existing dependency oleans; not a clean/full build or certification",
+        "selected_modules": selected,
         "checks": [],
     }
-    for module in MODULES:
+    for module in selected:
         source = Path("LidoSRv3") / (module + ".lean")
         target = ROOT / ".lake/build/lib/lean" / source.with_suffix(".olean")
         command = [str(LEAN), "-o", str(target), str(source)]
