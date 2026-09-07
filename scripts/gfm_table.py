@@ -1,50 +1,10 @@
 #!/usr/bin/env python3
-r"""One cmark-gfm-faithful reader for the Markdown tables the gates read.
+r"""A cmark-gfm-faithful, fail-closed reader for Markdown tables.
 
-Three published surfaces are checked by asking the same two questions of a
-Markdown file: *does this block render as a table at all*, and *which lines are
-the rows inside it*.  Each gate answered them with its own approximation, and
-the approximations agreed on the same mistake: cells were counted by counting
-``|`` characters.
-
-GFM splits a row into cells before any inline parsing, at the pipes that are
-not escaped, and a pipe carried inside a cell is written ``\|``.  So a header
-that prints one escaped pipe declares one cell *fewer* than its character count
-suggests, and GFM renders no table whatsoever when the delimiter row does not
-carry exactly as many cells as the header.  A header with one ``\|`` under a
-delimiter row widened by one column therefore satisfied ``count("|")`` equality
-in every gate while cmark-gfm -- the renderer GitHub runs -- printed the whole
-block as a paragraph of literal text.  The gate reported the rows; the reader
-met none of them.
-
-Escaping here follows cmark-gfm's table scanner rather than CommonMark's
-backslash-parity rule, because the table scanner is what decides where cells
-begin.  Its cell pattern accepts ``\|`` as cell content, so *any* pipe written
-directly after a backslash is content and not a boundary: ``\\|`` renders one
-cell, not two, even though CommonMark inline parsing would read the first
-backslash as escaping the second.  Reading parity here would have counted two
-cells where the renderer counts one -- the same false agreement, one level down.
-
-The same faithfulness applies to where a table stops.  GFM breaks the body at
-the first blank line or at the start of another block-level structure, and
-nowhere else: an ordinary line carrying no pipe is a further row rather than
-the end of the table.  Reading rows from "the section" instead of from the
-table let a row moved below a blank line -- still inside the section, no longer
-inside the table -- go on being counted while the rendered table had dropped it.
-``ends_table`` spells the block starters that really do break a table, so the
-row window a caller gets is the window a reader is shown.
-
-The reader is deliberately one-sided.  Every table it reports is one cmark-gfm
-renders, with the same columns and the same body rows; two forms it cannot read
-faithfully -- a header or delimiter row carrying leading whitespace, and a table
-nested inside a list item or block quote, whose container prefix it does not
-strip -- are declined rather than guessed at.  Declining is the safe direction:
-a gate that cannot see the table it was told to check reports it missing and
-fails closed, while reporting a table that renders as paragraph text is exactly
-the failure this module exists to remove.
-
-Every function here is a reader.  Nothing in this module decides policy; the
-gates that import it do.
+It splits cells with the renderer's scanner, recognizes only rendered table
+blocks, returns their own body rows, and declines unsupported containers rather
+than inventing a table.  Gates import this reader for layout only; policy stays
+with their callers.
 """
 
 from __future__ import annotations
@@ -59,18 +19,17 @@ TAB_STOP = 4
 # An empty cell is not one, so `|     |     |` underlines nothing and the block
 # it sits under renders as paragraph text.
 DELIMITER_CELL = re.compile(r"^[ \t]*:?-+:?[ \t]*$")
-
 _ATX_HEADING = re.compile(r"^ {0,3}#{1,6}(?:[ \t]|$)")
 _THEMATIC_BREAK = re.compile(
     r"^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$")
 _BLOCK_QUOTE = re.compile(r"^ {0,3}>")
 _LIST_ITEM = re.compile(r"^ {0,3}(?:[-+*]|\d{1,9}[.)])(?:[ \t]|$)")
+_LIST_ITEM_PREFIX = re.compile(r"^ {0,3}(?:[-+*]|\d{1,9}[.)])(?P<space>[ \t]+)")
 # A line of `-` or `=` alone underlines the paragraph above it as a setext
 # heading, and cmark-gfm resolves that before it looks for a table: `A` over
 # `---` is an `<h2>`, not a one-column table.  A delimiter row carrying a colon
 # or a pipe is not a setext underline, so a real table keeps rendering.
 _SETEXT_UNDERLINE = re.compile(r"^ {0,3}(?:=+|-+)[ \t]*$")
-
 # CommonMark's seven HTML block start conditions.  A table row is not a
 # paragraph, so condition 7 -- the lone complete tag, which may not interrupt a
 # paragraph -- still starts a block here and still breaks the table; cmark-gfm
@@ -99,7 +58,6 @@ _HTML_BLOCK_START = re.compile(
     rf")",
     re.IGNORECASE,
 )
-
 # The same start conditions again, paired with what closes each region, for the
 # interior scan.  `ends_table` refuses to continue a table across the line that
 # *opens* a literal region; these pairs are what stop a table being read out of
@@ -118,7 +76,6 @@ _HTML_BLOCK_STARTS = (
      _HTML_BLOCK_BLANK_END),
 )
 _HTML_BLOCK_BARE_TAG = re.compile(rf"^ {{0,3}}{_HTML_TAG}[ \t]*$")
-
 # Conditions 1-6 only: the HTML block starts that may interrupt a paragraph.
 # Condition 7 may not, which is why it is tested against the paragraph state in
 # `_literal_lines` rather than listed here.
@@ -131,7 +88,6 @@ _HTML_BLOCK_INTERRUPTING = re.compile(
     rf")",
     re.IGNORECASE,
 )
-
 
 class Row(NamedTuple):
     """One physical line of a rendered table, with its offsets in the source."""
@@ -272,6 +228,37 @@ def _opens_fence(line: str) -> bool:
     opening = _FENCE_OPEN.match(line)
     return bool(opening) and not (opening.group("seq")[0] == "`"
                                   and "`" in opening.group("info"))
+def _opens_table(lines: list[Row], index: int) -> bool:
+    """Whether this line and its successor begin a rendered GFM table."""
+    if index + 1 == len(lines):
+        return False
+    list_header = _LIST_ITEM_PREFIX.match(lines[index].text)
+    def cells(position: int) -> list[str]:
+        line = lines[position].text
+        if list_header is not None:
+            prefix = list_header.end()
+            if position == index or line[:prefix].strip(" \t") == "":
+                return split_cells(line[prefix:])
+        if indent_width(line) < 4:
+            return split_cells(line)
+        for previous in range(position - 1, -1, -1):
+            candidate = lines[previous].text
+            if _LIST_ITEM.match(candidate):
+                return split_cells(line.lstrip(" \t"))
+            if candidate.strip() and not candidate[:1].isspace():
+                break
+        return split_cells(line)
+
+    header, delimiter = cells(index), cells(index + 1)
+    return bool(header and delimiter and is_delimiter_row(delimiter)
+                and len(header) == len(delimiter)
+                and not _SETEXT_UNDERLINE.match(lines[index + 1].text)
+                and not ends_table(lines[index + 1].text))
+def _next_table(table: bool, literal: bool, lines: list[Row], index: int, line: str) -> bool:
+    """Whether table-block state survives this line or begins on it."""
+    if literal or (table and ends_table(line)):
+        return False
+    return table or _opens_table(lines, index)
 
 
 def _closes_paragraph(line: str) -> bool:
@@ -286,12 +273,22 @@ def _closes_paragraph(line: str) -> bool:
     return (
         line.strip(" \t") == ""
         or bool(_ATX_HEADING.match(line))
+        # A setext underline closes its paragraph, so a following complete tag
+        # may open HTML block type 7 rather than remain inline.
+        or bool(_SETEXT_UNDERLINE.match(line))
         or bool(_THEMATIC_BREAK.match(line))
         or bool(_BLOCK_QUOTE.match(line))
         or bool(_LIST_ITEM.match(line))
         or _opens_fence(line)
         or bool(_HTML_BLOCK_INTERRUPTING.match(line))
     )
+
+
+def _continues_paragraph(paragraph: bool, literal: bool, table: bool, line: str) -> bool:
+    """Whether this line leaves a paragraph open for the next line."""
+    return (not literal and not _closes_paragraph(line)
+            and (paragraph or indent_width(line) < 4)
+            and not (table and ends_table(line)))
 
 
 def _lines(text: str) -> list[Row]:
@@ -322,6 +319,7 @@ def _literal_lines(lines: list[Row]) -> list[bool]:
     # content while cmark-gfm opened a raw-HTML block there and printed
     # everything below it verbatim.
     paragraph = False
+    table = False
     for index, row in enumerate(lines):
         line = row.text
         if fence is not None:
@@ -347,11 +345,26 @@ def _literal_lines(lines: list[Row]) -> list[bool]:
                         html_end = None if end.search(line) else end
                         break
                 else:
-                    if not paragraph and _HTML_BLOCK_BARE_TAG.match(line):
+                    if (not paragraph or table) and _HTML_BLOCK_BARE_TAG.match(line):
                         literal[index] = True
                         html_end = _HTML_BLOCK_BLANK_END
-        paragraph = not (literal[index] or ends_table(line))
+        # An indented chunk cannot interrupt an existing paragraph (where it is
+        # a lazy continuation), but after a block boundary it starts its own
+        # block rather than a paragraph.  Keeping the latter as paragraph text
+        # made a following type-7 tag look inline after a table-ended code block.
+        paragraph = _continues_paragraph(paragraph, literal[index], table, line)
+        table = _next_table(table, literal[index], lines, index, line)
     return literal
+def mask_literal_regions(text: str) -> str:
+    """Blank literal regions, preserving offsets and line endings."""
+    lines = _lines(text)
+    literal = _literal_lines(lines)
+    return "".join(
+        "".join(" " if char not in "\r\n" else char
+                for char in text[row.start:row.end])
+        if hidden else text[row.start:row.end]
+        for row, hidden in zip(lines, literal)
+    )
 
 
 def find_tables(text: str, *, interrupting: bool = False) -> list[Table]:

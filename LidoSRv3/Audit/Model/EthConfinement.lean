@@ -19,13 +19,10 @@ function of the inventory and the frozen Spec alone.
 
 `P-ETH-CONFINEMENT-1` is **not** registered here.  It is absent from
 `Guarantees.Id`, from `AllGuarantees.supplemental`, and from
-`audit/guarantees.yaml`.  The canonical registry is frozen to the R1 review
-basis pinned as `R1_REVIEW_BASE` in `scripts/audit_metadata.py`, and the R1
-final auditor report published at that basis states that ETH confinement is
-`NOT YET`.  Adding a registry row would present a changed registry as though
-it carried the R1 review, which is exactly what that pin exists to prevent.
-`audit/P-ETH-CONFINEMENT-1-BRIEF.md` records the blocker and the exact row
-that becomes registerable once the registry reopens.
+`audit/guarantees.yaml`.  Registration is deliberately deferred: this is an inventory/table-agreement
+result, not an execution-level confinement guarantee. The recorded input basis
+may be updated with reviewed metadata; doing so is not an external audit and
+cannot establish the missing source coverage. The brief records those limits.
 
 So the conclusion is a *candidate* parent: the theorem content is complete
 and kernel-checked (`PEthConfinement1.modeled_positive_value_is_confined_or_residual`),
@@ -70,8 +67,8 @@ Every quantifier below ranges over `EthWorld.ValueRoute`, an enumeration of
 eleven modeled hops.  It does **not** range over the ETH-moving sites of the
 pinned Solidity.  A site-by-site read of the fourteen in-scope files at the
 pinned commit (recorded in `audit/P-ETH-CONFINEMENT-1-BRIEF.md`) found three
-defects that this module cannot repair, because repairing them means editing
-the inventory and the registry, both of which are currently frozen:
+limitations of this inventory. Integrating this auxiliary theorem does not
+repair or discharge them:
 
 1. **One unclassified out-of-inventory hop.**
    `contracts/0.8.9/WithdrawalQueueBase.sol:529` (`_sendValue`), reached from
@@ -91,9 +88,8 @@ the inventory and the registry, both of which are currently frozen:
 
 The one solid negative result behind the enumeration: the fourteen in-scope
 files contain no `delegatecall`, `selfdestruct`, `create`/`create2`, inline
-assembly `call`, or `.transfer`/`.send`, so the value-moving surface is
-syntactically enumerable and there are no dynamically dispatched ETH exits
-hiding in the pinned text.
+assembly `call`, or `.transfer`/`.send`, but this syntactic observation does not constrain callee execution, callbacks,
+or dynamically selected call destinations.
 -/
 
 namespace LidoSRv3.Audit.Model.EthConfinement

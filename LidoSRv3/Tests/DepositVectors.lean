@@ -2,7 +2,7 @@ import LidoSRv3.Audit.Guarantees.PDeposit1
 
 /-!
 Executable falsifier vectors for the pinned P-DEPOSIT-1 deposit path
-(`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`).
+(`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`).
 
 Each vector names the source line whose mutation it detects, so the
 correspondence in `LidoSRv3.Audit.Source.DepositCorrespondence` cannot be

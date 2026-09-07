@@ -7,7 +7,7 @@ import Contracts.Common
 
 This module models the pinned
 `WithdrawalQueue.claimWithdrawalsTo(uint256[],uint256[],address)` loop at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
 
 The unstructured-storage constants are the exact keccak positions from
 `WithdrawalQueueBase.sol`. `ContractState.mapUint` is the live keyed

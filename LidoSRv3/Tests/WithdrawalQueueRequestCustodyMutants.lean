@@ -4,7 +4,7 @@ import LidoSRv3.Audit.Source.WithdrawalQueueRequestCustody
 # P-TOKEN-1 exact-parent kill-lines
 
 Each mutant below changes one guard or write of the bounded model mapped to
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b` and refutes the
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436` and refutes the
 **same** `RequestOwnerCustodyInvariant` predicate proved for the honest
 composition, so the parent is not tautological on either leg.
 

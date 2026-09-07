@@ -5,7 +5,7 @@ import Verity.Stdlib.Math
 # P-CONSOLIDATION-ETH-1 fee-leg evidence (former P-CONSOLIDATION-ETH-1b)
 
 Source-shaped `Contract.run` ledger for the inventoried consolidation-fee ETH
-paths at `lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`. These
+paths at `lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`. These
 theorems are parent evidence under `A-CANONICAL-REQUEST-ADDRESS`, not a sibling
 guarantee row.
 
@@ -35,6 +35,9 @@ def vaultSlot : StorageSlot Uint256 := ⟨2⟩
 def withdrawalSlot : StorageSlot Uint256 := ⟨3⟩
 def consolidationSlot : StorageSlot Uint256 := ⟨4⟩
 
+/-- `ConsolidationBus.sol:403  CONSOLIDATION_GATEWAY.addConsolidationRequests{value: msg.value}(groups, msg.sender);`
+as a storage ledger; the frame-dispatch counterpart of the same line is
+`PConsolidationEth1CompositionTx.busFn`. -/
 def busForward (msgValue : Uint256) (gatewayOk : Bool) : Contract Unit := do
   let b ← getStorage busSlot
   let g ← getStorage gatewaySlot

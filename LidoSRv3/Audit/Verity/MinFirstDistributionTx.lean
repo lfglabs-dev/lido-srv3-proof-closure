@@ -7,13 +7,38 @@ import Compiler.Proofs.IRGeneration.DenoteAgreement
 
 This transaction models `MinFirstAllocationStrategy.allocate` /
 `allocateToBestCandidate` from
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 30--107.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`,
+`MinFirstAllocationStrategy.sol:30-107`.
 Unlike the earlier selected-row slice, both input arrays are read through the
 compilation-model denotation of memory-backed `uint256[]` values.  The loop
 is the source `while (allocated < allocationSize)` over
 `allocateToBestCandidate`: scan, count, bound, `ceilDiv`, then
 `buckets[bestCandidateIndex] += allocated`.  Successful buckets persist
 through `writeArray`; totals use `writeSlot`.
+
+## Name table (C4)
+
+| Solidity (`MinFirstAllocationStrategy.sol`)        | Lean                                   |
+|----------------------------------------------------|----------------------------------------|
+| `buckets[i]` / `capacities[i]` (lines 31-32)       | `Source.Row.allocation` / `.capacity`; the row list is `rows` |
+| `allocationSize` (line 33, the total demand)       | `allocationSize` in `allocate`; `fuel` of `allocateLoop` is its `.val` |
+| `allocated` (line 34, running total)               | `total` in `allocateLoop`, slot `allocatedSlot`, `Result.allocated` |
+| `allocationSize - allocated` (line 37)             | `remaining` in `allocateLoop`, slot `remainingSlot` |
+| `allocatedToBestCandidate` (lines 35, 37)          | `amount` in `allocateLoop`             |
+| `bestCandidateIndex` (lines 68, 80)                | `Source.candidate?` result plus `rows.idxOf? best` |
+| `bestCandidatesCount` (lines 70, 81, 84)           | `Source.countBest` inside `Source.checkedAmount` |
+| `allocationSizeUpperBound` (lines 93-98)           | `Source.nextLevel?` inside `Source.checkedAmount` |
+
+## Why three loops
+
+`allocateLoop` is the executable transaction loop, `sourceAllocateLoop` is a
+verbatim copy of the same pinned equations kept as the *source* side of
+`verity_tx_simulates_pinned_source` (so that theorem is a proved equation,
+`sourceAllocateLoop_eq_allocateLoop`, rather than definitional sharing), and
+`modelAllocateLoop` is the unbounded `Nat` proportional model with no checked
+words or `Option` arithmetic, related to the source loop by
+`sourceAllocateLoop_model_correspondence`. None of the three may be merged: the
+duplicates carry the non-vacuity of the refinement theorems.
 -/
 
 namespace LidoSRv3.Audit.Verity.MinFirstDistributionTx
@@ -25,8 +50,12 @@ open LidoSRv3.Audit.MinFirstAllocation
 
 abbrev Word := Source.Word
 
+/-- Memory offsets of the two `uint256[] memory` arguments (`MinFirstAllocationStrategy.sol:31-32`). -/
 def bucketsBase : Nat := 0x1000
 def capacitiesBase : Nat := 0x2000
+/-- Observation slots, no Solidity storage counterpart: the library is `pure`
+and returns `(allocated, buckets)` (`MinFirstAllocationStrategy.sol:43`); the
+model persists them so `observe` can read the committed values. -/
 def bucketsSlot : Nat := 20
 def allocatedSlot : Nat := 21
 def remainingSlot : Nat := 22
@@ -76,7 +105,10 @@ def memoryFor (buckets capacities : List Word) : Nat → Word := fun offset =>
 def stateFor (buckets capacities : List Word) (base : ContractState) : ContractState :=
   { base with memory := memoryFor buckets capacities }
 
-/-- `buckets[bestCandidateIndex] += allocated` (source line 106). -/
+/-! ## MinFirstAllocationStrategy.allocateToBestCandidate (MinFirstAllocationStrategy.sol:63-107) -/
+
+/-- `buckets[bestCandidateIndex] += allocated` (`MinFirstAllocationStrategy.sol:106`);
+`newAlloc` is the already checked sum. -/
 def setAllocation (rows : List Source.Row) (i : Nat) (newAlloc : Word) :
     List Source.Row :=
   match rows[i]? with
@@ -120,15 +152,29 @@ theorem setAllocation_idxOf_eq_replaceFirst
           simpa [setAllocation, List.getElem?_cons_succ, hopt,
             Source.replaceFirst, hr] using congrArg (r :: ·) hih
 
-/-- One `allocateToBestCandidate` step: scan, compute the share, then mutate
-the best index. A zero amount is the Solidity `break`. -/
+/-- `MinFirstAllocationStrategy.sol:63-107 allocateToBestCandidate(uint256[] memory buckets, uint256[] memory capacities, uint256 allocationSize)`
+returning `(buckets', allocated)`. One step: scan, compute the share, then
+mutate the best index. A zero amount is the outer loop's `break` (line 38-40).
+
+Not transcribed: `MinFirstAllocationStrategy.sol:72-74` (`allocationSize == 0`
+early return) is absorbed by the caller `allocateLoop`, which tests
+`remaining = 0` before calling this step.
+
+Added by the model: `rows.idxOf? best` recovers `bestCandidateIndex` from the
+selected row (the `none` branch is unreachable, `candidate?` returns a member). -/
 def allocateToBestCandidate (rows : List Source.Row) (remaining : Word) :
     Option (List Source.Row × Word) :=
+  -- MinFirstAllocationStrategy.sol:76-86  for (i...) { if (buckets[i] >= capacities[i]) continue; else if (bestCandidateAllocation > buckets[i]) {...} }
+  -- `bestCandidatesCount` (lines 81, 84) is recounted by `Source.countBest` inside `Source.checkedAmount`.
   match Source.candidate? rows with
+  -- MinFirstAllocationStrategy.sol:88-90  if (bestCandidatesCount == 0) { return 0; }
   | none => some (rows, 0)
   | some best => do
+      -- MinFirstAllocationStrategy.sol:93-105  allocationSizeUpperBound scan (93-100) and allocated = Math256.min(...) (102-105)
       let amount ← Source.checkedAmount rows remaining best
+      -- MinFirstAllocationStrategy.sol:38-40  if (allocatedToBestCandidate == 0) { break; }  (reported as amount 0)
       if amount = 0 then some (rows, 0) else
+      -- MinFirstAllocationStrategy.sol:106  buckets[bestCandidateIndex] += allocated;  (checked add)
       let updated ← Verity.Stdlib.Math.safeAdd best.allocation amount
       match rows.idxOf? best with
       | none => none
@@ -186,25 +232,52 @@ def modelAllocateLoop : Nat → List Model.Bucket → Nat → Nat →
           if amount = 0 then some (rows, total, remaining)
           else modelAllocateLoop fuel after (remaining - amount) (total + amount)
 
-/-- `while (allocated < allocationSize)` over `allocateToBestCandidate`.
-`fuel` is the initial demand value: positivity of every successful amount
-makes it a sufficient structural bound. -/
+/-! ## MinFirstAllocationStrategy.allocate (MinFirstAllocationStrategy.sol:30-44) -/
+
+/-- `MinFirstAllocationStrategy.sol:35-42`:
+
+```solidity
+uint256 allocatedToBestCandidate = 0;                                                            // 35
+while (allocated < allocationSize) {                                                             // 36
+    allocatedToBestCandidate = allocateToBestCandidate(buckets, capacities, allocationSize - allocated); // 37
+    if (allocatedToBestCandidate == 0) {                                                         // 38
+        break;                                                                                   // 39
+    }                                                                                            // 40
+    allocated += allocatedToBestCandidate;                                                       // 41
+}                                                                                                // 42
+```
+
+Name table: the loop carries `remaining = allocationSize - allocated` (line 37)
+instead of `allocated` alone, and `total = allocated` (line 41). The loop test
+`allocated < allocationSize` (line 36) is therefore `remaining ≠ 0`; the exit
+`remaining = 0` is `allocated == allocationSize`. `fuel` is the initial demand
+value: positivity of every successful amount makes it a sufficient structural
+bound, so the `0` fuel case only returns when the loop would have exited.
+
+Added by the model: the `safeAdd`/`safeSub` steps are the checked arithmetic of
+lines 41 and 37 (Solidity 0.8 panics); a failure is `none`. -/
 def allocateLoop : Nat → List Source.Row → Word → Word →
     Option (List Source.Row × Word × Word)
   | 0, rows, remaining, total => if remaining = 0 then some (rows, total, remaining) else none
   | fuel + 1, rows, remaining, total =>
+      -- MinFirstAllocationStrategy.sol:36  while (allocated < allocationSize) {  (exit when remaining = 0)
       if remaining = 0 then some (rows, total, remaining) else
+      -- MinFirstAllocationStrategy.sol:37  allocatedToBestCandidate = allocateToBestCandidate(buckets, capacities, allocationSize - allocated);
       match allocateToBestCandidate rows remaining with
       | none => none
       | some (after, amount) =>
+          -- MinFirstAllocationStrategy.sol:38-40  if (allocatedToBestCandidate == 0) { break; }
           if amount = 0 then some (rows, total, remaining) else do
+            -- MinFirstAllocationStrategy.sol:41  allocated += allocatedToBestCandidate;
             let newTotal ← Verity.Stdlib.Math.safeAdd total amount
+            -- MinFirstAllocationStrategy.sol:37  allocationSize - allocated  (next iteration's argument)
             let newRemaining ← Verity.Stdlib.Math.safeSub remaining amount
             allocateLoop fuel after newRemaining newTotal
 
-/-- Independently stated source-side loop.  This deliberately copies the
-pinned equations instead of aliasing `allocateLoop`, so transaction/source
-agreement is a proved equation rather than definitional sharing. -/
+/-- Independently stated source-side loop (`MinFirstAllocationStrategy.sol:35-42`
+again).  This deliberately copies the pinned equations instead of aliasing
+`allocateLoop`, so transaction/source agreement is a proved equation rather
+than definitional sharing; see "Why three loops" in the module header. -/
 def sourceAllocateLoop : Nat → List Source.Row → Word → Word →
     Option (List Source.Row × Word × Word)
   | 0, rows, remaining, total =>
@@ -501,19 +574,31 @@ structure Result where
   remaining : Word
   deriving DecidableEq, Repr
 
-/-- Executable transaction. A length mismatch or checked-arithmetic failure
-reverts. `failAfterWrites` is a test hook placed after all bucket writes; it
-proves rollback even after intermediate effects. -/
+/-- `MinFirstAllocationStrategy.sol:30-44 allocate(uint256[] memory buckets, uint256[] memory capacities, uint256 allocationSize)`
+returning `(allocated, buckets)`, as an executable transaction over the two
+memory arrays. A length mismatch or checked-arithmetic failure reverts.
+
+Not transcribed: nothing in the span; Solidity has no length check (an
+out-of-range `capacities[i]` read at line 77 panics instead), the model's
+`"ARRAY_LENGTH_MISMATCH"` guard is that panic made explicit.
+
+Added by the model: revert strings `"ARRAY_LENGTH_MISMATCH"`,
+`"MIN_FIRST_ARITHMETIC"` (any `Panic(0x11)`), `"MEMORY_ARRAY_DECODE"`, the
+persisted observation slots, and `failAfterWrites`, a test hook placed after
+all bucket writes; it proves rollback even after intermediate effects. -/
 def allocate (bucketCount capacityCount : Nat) (allocationSize : Word)
     (failAfterWrites : Bool := false) : Contract Result := fun snapshot =>
   if bucketCount != capacityCount then .revert "ARRAY_LENGTH_MISMATCH" snapshot else
+  -- MinFirstAllocationStrategy.sol:31-32  uint256[] memory buckets, uint256[] memory capacities  (memory-array reads)
   match readArray snapshot "buckets" bucketsBase bucketCount,
       readArray snapshot "capacities" capacitiesBase capacityCount with
   | some buckets, some capacities =>
       let rows := (buckets.zip capacities).map fun p => Source.Row.mk p.1 p.2
+      -- MinFirstAllocationStrategy.sol:35-42  while loop; `allocated` starts at 0 (return variable default)
       match allocateLoop allocationSize.val rows allocationSize 0 with
       | none => .revert "MIN_FIRST_ARITHMETIC" snapshot
       | some (afterRows, total, remaining) =>
+          -- MinFirstAllocationStrategy.sol:43  return (allocated, buckets);
           let after := afterRows.map Source.Row.allocation
           let dirty := persistBuckets after snapshot
           let dirty := (dirty.writeSlot allocatedSlot total).writeSlot remainingSlot remaining

@@ -7,7 +7,7 @@ constructor transaction is pinned by this repository at base
 ## Available source pin
 
 - Repository: `https://github.com/lidofinance/core.git`
-- Commit: `af095e48bbc1c3841c2c9936219c8461af01056b`
+- Commit: `17005714f151e5502c559932319a3f2f74ac2436`
 - `contracts/0.8.25/sr/StakingRouter.sol` blob:
   `b37af8bfc2948f0edd3f80738e2558a90a222093`
 - `contracts/0.8.25/lib/BeaconChainDepositor.sol` blob:

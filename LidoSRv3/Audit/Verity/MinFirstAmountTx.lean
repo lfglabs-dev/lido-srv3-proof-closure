@@ -7,8 +7,9 @@ import Contracts.Common
 # P-ALLOC-2 amounts: Verity transaction plane
 
 `MinFirstAllocationStrategy.allocateToBestCandidate` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 102--106,
-once the best candidate has been selected:
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`,
+`MinFirstAllocationStrategy.sol:102-106`, once the best candidate has been
+selected:
 
 ```solidity
 allocated = Math256.min(
@@ -19,7 +20,7 @@ buckets[bestCandidateIndex] += allocated;
 ```
 
 together with the two accumulator updates of the calling `allocate` loop at
-lines 30--44:
+`MinFirstAllocationStrategy.sol:30-44`:
 
 ```solidity
 allocatedToBestCandidate = allocateToBestCandidate(buckets, capacities, allocationSize - allocated); // 37
@@ -56,21 +57,23 @@ verity_contract MinFirstAllocationTx where
     allocatedActual : Uint256 := slot 2
     remaining : Uint256 := slot 3
 
+  -- `share` is line 103's `bestCandidatesCount > 1 ? ceilDiv(allocationSize, bestCandidatesCount) : allocationSize`,
+  -- `upperBound` is `allocationSizeUpperBound` (lines 93-100); both are source-plane inputs.
   function allocateToBestCandidate (share : Uint256, upperBound : Uint256) : Uint256 := do
-    let b ← getStorage bucket
-    let c ← getStorage capacity
-    let bound := min upperBound c
-    let headroom ← subPanic bound b
-    let amount := min share headroom
-    let newBucket ← addPanic b amount
+    let b ← getStorage bucket                      -- MinFirstAllocationStrategy.sol:104  bestCandidateAllocation  (= buckets[bestCandidateIndex], loaded at line 79)
+    let c ← getStorage capacity                    -- MinFirstAllocationStrategy.sol:104  capacities[bestCandidateIndex]
+    let bound := min upperBound c                  -- MinFirstAllocationStrategy.sol:104  Math256.min(allocationSizeUpperBound, capacities[bestCandidateIndex])
+    let headroom ← subPanic bound b                -- MinFirstAllocationStrategy.sol:104  ... - bestCandidateAllocation  (checked subtraction)
+    let amount := min share headroom               -- MinFirstAllocationStrategy.sol:102-105  allocated = Math256.min(...)  share is the line 103 ternary, headroom the line 104 difference
+    let newBucket ← addPanic b amount              -- MinFirstAllocationStrategy.sol:106  buckets[bestCandidateIndex] += allocated;
     setStorage bucket newBucket
-    let total ← getStorage allocatedActual
-    let newTotal ← addPanic total amount
+    let total ← getStorage allocatedActual         -- MinFirstAllocationStrategy.sol:41  allocated  (outer loop accumulator, declared at line 33)
+    let newTotal ← addPanic total amount           -- MinFirstAllocationStrategy.sol:41  allocated += allocatedToBestCandidate;
     setStorage allocatedActual newTotal
-    let size ← getStorage remaining
-    let newRemaining ← subPanic size amount
+    let size ← getStorage remaining                -- MinFirstAllocationStrategy.sol:37  allocationSize - allocated (this call's allocationSize)
+    let newRemaining ← subPanic size amount        -- MinFirstAllocationStrategy.sol:37  next iteration's allocationSize - allocated
     setStorage remaining newRemaining
-    return amount
+    return amount                                  -- MinFirstAllocationStrategy.sol:67  returns (uint256 allocated)
 
 /-! ## Bridging the typed program to the pinned source words -/
 
@@ -81,7 +84,8 @@ theorem contracts_min_eq_minWord (a b : Source.Word) :
 
 /-- The storage a single `allocateToBestCandidate` step runs against: the best
 candidate's row in slots 0/1, the accumulator in slot 2, the outer loop's
-remaining `allocationSize` in slot 3. -/
+remaining `allocationSize` in slot 3. Observation slots, no Solidity storage
+counterpart: the library is `pure` and works on memory arrays. -/
 def stateFor (best : Source.Row) (total remaining : Source.Word)
     (base : ContractState) : ContractState :=
   (((base.writeSlot 0 best.allocation

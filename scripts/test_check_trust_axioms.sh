@@ -204,7 +204,7 @@ if caught:
     raise SystemExit("fixture is caught lexically, so it does not reproduce the "
                      "claim: " + ", ".join(caught))
 PY
-lean -R "$minted" -o "$minted/LidoSRv3/Tests/Injected.olean" "$minted/LidoSRv3/Tests/Injected.lean"
+lake env lean -R "$minted" -o "$minted/LidoSRv3/Tests/Injected.olean" "$minted/LidoSRv3/Tests/Injected.lean"
 
 probe_names() { printf '%s\n' "$1" > "$minted/names.txt"; }
 probe() {
@@ -276,7 +276,7 @@ mint_axiom_at_genuine_site
 
 end LidoSRv3.Tests.Sited
 LEAN
-lean -R "$sited" -o "$sited/LidoSRv3/Tests/Sited.olean" "$sited/LidoSRv3/Tests/Sited.lean"
+lake env lean -R "$sited" -o "$sited/LidoSRv3/Tests/Sited.olean" "$sited/LidoSRv3/Tests/Sited.lean"
 
 probe_names() { printf '%s\n' "$1" > "$sited/names.txt"; }
 probe() {
@@ -339,7 +339,7 @@ macro "evalExpr" : term => `(LidoSRv3.Tests.ShadowedEval.affirm)
 macro "Lean.Meta.evalExpr" : term => `(LidoSRv3.Tests.ShadowedEval.affirm)
 macro "_root_.Lean.Meta.evalExpr" : term => `(LidoSRv3.Tests.ShadowedEval.affirm)
 LEAN
-lean -R "$shadowed_eval" -o "$shadowed_eval/LidoSRv3/Tests/ShadowedEval.olean" \
+lake env lean -R "$shadowed_eval" -o "$shadowed_eval/LidoSRv3/Tests/ShadowedEval.olean" \
   "$shadowed_eval/LidoSRv3/Tests/ShadowedEval.lean"
 
 probe_names() { printf '%s\n' "$1" > "$shadowed_eval/names.txt"; }
@@ -430,7 +430,7 @@ theorem clean : (2 : Nat) = 2 := rfl
 
 end LidoSRv3.Tests.Spoofed
 LEAN
-lean -R "$spoofed" -o "$spoofed/LidoSRv3/Tests/Spoofed.olean" "$spoofed/LidoSRv3/Tests/Spoofed.lean"
+lake env lean -R "$spoofed" -o "$spoofed/LidoSRv3/Tests/Spoofed.olean" "$spoofed/LidoSRv3/Tests/Spoofed.lean"
 printf '%s\n' 'LidoSRv3.Tests.Spoofed.registered' 'LidoSRv3.Tests.Spoofed.clean' > "$spoofed/names"
 
 confirm() {
@@ -510,7 +510,7 @@ macro "collectAxioms" : term => `(LidoSRv3.Tests.Shadowed.filtered)
 macro "Lean.collectAxioms" : term => `(LidoSRv3.Tests.Shadowed.filtered)
 macro "_root_.Lean.collectAxioms" : term => `(LidoSRv3.Tests.Shadowed.filtered)
 LEAN
-lean -R "$shadowed" -o "$shadowed/LidoSRv3/Tests/Shadowed.olean" \
+lake env lean -R "$shadowed" -o "$shadowed/LidoSRv3/Tests/Shadowed.olean" \
   "$shadowed/LidoSRv3/Tests/Shadowed.lean"
 printf '%s\n' 'LidoSRv3.Tests.Shadowed.registered' 'LidoSRv3.Tests.Shadowed.clean' \
   > "$shadowed/names"
@@ -530,7 +530,11 @@ open Lean in
   let rooted ← _root_.Lean.collectAxioms ``LidoSRv3.Tests.Shadowed.registered
   IO.println s!"SHADOWED\t{bare.size}\t{qualified.size}\t{rooted.size}"
 LEAN
-witness="$(LEAN_PATH="$shadowed${LEAN_PATH:+:$LEAN_PATH}" lean "$shadowed/witness.lean")"
+# `lake env` prepends this project's `.lake/build` to LEAN_PATH.  That tree
+# can contain (or claim) the fixture module before the temporary fixture path,
+# so run Lake's resolved Lean binary directly with the fixture first.
+lean_bin="$(lake env bash -c 'command -v lean')"
+witness="$(LEAN_PATH="$shadowed${LEAN_PATH:+:$LEAN_PATH}" "$lean_bin" "$shadowed/witness.lean")"
 if [[ "$witness" != *"$(printf 'SHADOWED\t0\t0\t0')"* ]]; then
   echo "shadowing witness did not reproduce the bypass: $witness" >&2
   exit 1

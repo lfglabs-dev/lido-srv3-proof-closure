@@ -43,7 +43,7 @@ theorem selects_least_open_bucket
 /--
 Pinned-source selection correspondence for
 `MinFirstAllocationStrategy.allocateToBestCandidate` at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`, lines 76--86.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`, lines 76--86.
 Given router-order and free-space-predicate correspondence, the source-shaped
 candidate loop selects the same next bucket as `MinFirst.candidate?`.
 
@@ -227,6 +227,62 @@ theorem proportional_model_loop_preserves_rows
   Verity.MinFirstDistributionTx.sourceAllocateLoop_model_correspondence
     fuel model source allocationSize 0 after allocated remaining hRows hLen hRun
 
+open LidoSRv3.Audit.MinFirstAllocation in
+/-- "At each step, the module served by the pinned source scan is the one the
+independent model selects (least allocation among the open ones, lowest index
+on ties), and the checked source amount is the model's share of the remaining
+demand: positive, at most the demand, and inside the module's capacity." -/
+abbrev StepMatchesModel : Prop :=
+  ∀ (model : List Model.Bucket)
+    (source : List Source.Row)
+    (best : Source.Row)
+    (allocationSize w : Source.Word),
+    RowsCorrespond model source →
+    Source.candidate? source = some best →
+    Source.hasFreeSpace best = true →
+    source.length < Verity.Core.Uint256.modulus →
+    allocationSize.val ≠ 0 →
+    Source.checkedAmount source allocationSize best = some w →
+    (Option.map (fun b => (b.allocation, b.capacity))
+        (Model.candidate? model) =
+      some (best.allocation.val, best.capacity.val)) ∧
+    Model.amount model allocationSize.val
+      ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
+    0 < w.val ∧ w.val ≤ allocationSize.val ∧
+      best.allocation.val + w.val ≤ best.capacity.val
+
+open LidoSRv3.Audit.MinFirstAllocation in
+/-- "On a full loop, allocated + remaining = the initial demand." -/
+abbrev FullLoopConserves : Prop :=
+  ∀ (fuel : Nat) (rows : List Source.Row)
+    (allocationSize : Source.Word)
+    (after : List Source.Row)
+    (allocated remaining : Source.Word),
+    Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =
+      some (after, allocated, remaining) →
+    allocated.val + remaining.val = allocationSize.val
+
+open LidoSRv3.Audit.MinFirstAllocation in
+/-- "The newly allocated amount is taken into account at the next iteration:
+the independent proportional model loop matches every successful source loop
+run, with equal totals and rows still in correspondence at the end." -/
+abbrev LoopStaysInCorrespondence : Prop :=
+  ∀ (fuel : Nat)
+    (model : List Model.Bucket)
+    (source : List Source.Row)
+    (allocationSize : Source.Word)
+    (after : List Source.Row)
+    (allocated remaining : Source.Word),
+    RowsCorrespond model source →
+    source.length < Verity.Core.Uint256.modulus →
+    Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source allocationSize 0 =
+      some (after, allocated, remaining) →
+    ∃ modelAfter,
+      Verity.MinFirstDistributionTx.modelAllocateLoop fuel model
+          allocationSize.val 0 =
+        some (modelAfter, allocated.val, remaining.val) ∧
+      RowsCorrespond modelAfter after
+
 /-- **Registered P-ALLOC-2 parent.**  This keeps the independent model/source
 candidate and proportional-amount equality from the step theorem load-bearing,
 and adds fuel-bounded conservation for every successful run of the full
@@ -234,45 +290,7 @@ independently stated source allocation loop, plus multi-step row correspondence
 with an independently stated proportional model loop.  It does not identify
 that proportional loop with the separate +1 `MinFirst` child model. -/
 theorem step_correspondence_and_full_loop_conservation :
-    (∀ (model : List MinFirstAllocation.Model.Bucket)
-      (source : List MinFirstAllocation.Source.Row)
-      (best : MinFirstAllocation.Source.Row)
-      (allocationSize w : MinFirstAllocation.Source.Word),
-      MinFirstAllocation.RowsCorrespond model source →
-      MinFirstAllocation.Source.candidate? source = some best →
-      MinFirstAllocation.Source.hasFreeSpace best = true →
-      source.length < Verity.Core.Uint256.modulus →
-      allocationSize.val ≠ 0 →
-      MinFirstAllocation.Source.checkedAmount source allocationSize best = some w →
-      (Option.map (fun b => (b.allocation, b.capacity))
-          (MinFirstAllocation.Model.candidate? model) =
-        some (best.allocation.val, best.capacity.val)) ∧
-      MinFirstAllocation.Model.amount model allocationSize.val
-        ⟨best.allocation.val, best.capacity.val⟩ = w.val ∧
-      0 < w.val ∧ w.val ≤ allocationSize.val ∧
-        best.allocation.val + w.val ≤ best.capacity.val) ∧
-    (∀ (fuel : Nat) (rows : List MinFirstAllocation.Source.Row)
-      (allocationSize : MinFirstAllocation.Source.Word)
-      (after : List MinFirstAllocation.Source.Row)
-      (allocated remaining : MinFirstAllocation.Source.Word),
-      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel rows allocationSize 0 =
-        some (after, allocated, remaining) →
-      allocated.val + remaining.val = allocationSize.val) ∧
-    (∀ (fuel : Nat)
-      (model : List MinFirstAllocation.Model.Bucket)
-      (source : List MinFirstAllocation.Source.Row)
-      (allocationSize : MinFirstAllocation.Source.Word)
-      (after : List MinFirstAllocation.Source.Row)
-      (allocated remaining : MinFirstAllocation.Source.Word),
-      MinFirstAllocation.RowsCorrespond model source →
-      source.length < Verity.Core.Uint256.modulus →
-      Verity.MinFirstDistributionTx.sourceAllocateLoop fuel source allocationSize 0 =
-        some (after, allocated, remaining) →
-      ∃ modelAfter,
-        Verity.MinFirstDistributionTx.modelAllocateLoop fuel model
-            allocationSize.val 0 =
-          some (modelAfter, allocated.val, remaining.val) ∧
-        MinFirstAllocation.RowsCorrespond modelAfter after) :=
+    StepMatchesModel ∧ FullLoopConserves ∧ LoopStaysInCorrespondence :=
   ⟨forall_proportional_step_correspondence_and_bounded,
    source_allocate_loop_conserves_requested,
    proportional_model_loop_preserves_rows⟩

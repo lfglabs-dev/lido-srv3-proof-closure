@@ -6,7 +6,7 @@ import LidoSRv3.Audit.Source.AddressTransferCorrespondence
 
 This module composes the two pinned-source slices that already exist for the
 withdrawal-request surface at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`:
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`:
 
 * the creation prefix `WithdrawalQueue.requestWithdrawals` lines 125--135
   (owner fallback at line 130, two-sided amount check at lines 395--402), and

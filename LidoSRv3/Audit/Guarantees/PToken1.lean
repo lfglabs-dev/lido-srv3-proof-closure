@@ -5,7 +5,7 @@ import LidoSRv3.Audit.Guarantees.Registry
 # P-TOKEN-1 bounded withdrawal-request ownership custody parent
 
 One named conclusion over the pinned WithdrawalQueue request surface at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.  For every
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.  For every
 minting function that binds a fresh request to its created owner, every
 nonzero caller, every supplied owner, every amount, and **every chain of later
 `transferFrom` hops that executed**, the composed slice yields:

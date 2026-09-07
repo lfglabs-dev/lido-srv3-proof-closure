@@ -1,7 +1,7 @@
 # Lido SRv3 architecture diagram
 
 `index.html` maps contracts, mainnet addresses, off-chain actors, and seven
-protocol flows at `lidofinance/core@af095e48`. Edge labels are function calls.
+protocol flows at `lidofinance/core@17005714`. Edge labels are function calls.
 
 Open `index.html` in a browser. No build.
 
@@ -15,12 +15,18 @@ Fonts and falls back offline.
 Exports are not versioned. `archive/legacy-p1-p15/verity-targets/srv3-flow-map.md`
 points here.
 
-Edges were checked against pinned source under `tmp/core-af095e48.../contracts`
+Edges were checked against the pinned source (`lidofinance/core@17005714`, the
+v4.0.0 release merge, in a local `tmp/core-17005714.../contracts` checkout)
 (examples: `DepositSecurityModule.sol:485`, `StakingRouter.sol:983`,
 `TopUpGateway.sol:232`, `AccountingOracle.sol:618`, `Accounting.sol:409`,
 `ConsolidationGateway.sol:220`). Mainnet addresses follow
-docs.lido.fi/deployed-contracts (July 2026). SRv3 contracts are marked
-“not deployed”.
+docs.lido.fi/deployed-contracts (July 2026). The SRv3 contracts were deployed
+with v4.0.0 on 2026-07-24 and carry their mainnet addresses (TopUpGateway proxy
+`0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374`, ConsolidationGateway
+`0x17be979344f2c2cC806229a532D92f8742C10462`, ConsolidationBus proxy
+`0xd907CE33B4Be423823d1CFFe80BD147E8b8554C8`, ConsolidationMigrator proxy
+`0x9Dc70b5A4f4F5E4AF9058C983D560564F031f1D7`, Curated Module v2 proxy
+`0xDa5F930cE326EB5205085D66c72A4E79d60cB8C1`).
 
 ## Taxonomy
 
@@ -65,9 +71,9 @@ Two authority claims in the consolidation pipeline are easy to get backwards
 and are stated here for the record. Adding a CMv1→CMv2 operator pair is
 `ConsolidationMigrator.ALLOW_PAIR_ROLE` (`:118,181-185`), granted only to the
 EasyTrack `EVMScriptExecutor` (`UpgradeTemporaryAdmin.sol:68,91-92`;
-`UpgradeTemplate.sol:339-340`) — an allow-only power. Removing a committed
+`UpgradeTemplate.sol:340-341`) — an allow-only power. Removing a committed
 batch is `ConsolidationBus.REMOVE_ROLE` (`:168,250`), held by the consolidation
-committee (`UpgradeTemporaryAdmin.sol:99`; `UpgradeTemplate.sol:330`), so the
+committee (`UpgradeTemporaryAdmin.sol:99`; `UpgradeTemplate.sol:331`), so the
 Bus execution delay is that committee's veto window and not the DSM guardians'.
 The guardians' only reach into consolidation is the `isDepositsPaused()` flag
 (`DepositSecurityModule.sol:88`) that `ConsolidationGateway` reads

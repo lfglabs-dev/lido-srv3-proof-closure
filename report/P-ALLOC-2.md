@@ -32,7 +32,7 @@ Assumptions: `A-HANDWRITTEN-MINFIRST`, `A-VERITY-SCAFFOLD`. Related (not listed 
 
 ## Intent
 
-Inside a Lido SRv3 staking module, deposits / keys are spread across node-operator “buckets” by `MinFirstAllocationStrategy.allocate` (`lidofinance/core@af095e48`, `contracts/common/lib/MinFirstAllocationStrategy.sol`), after `StakingRouter.getDepositAllocations` has turned share-limit capacities into ETH. The library repeatedly picks a least-filled bucket that still has free space, then gives it a proportional slice of remaining demand (`ceil(remaining / equal-minimum-count)`, capped by the next fill level and by residual capacity). The point is fairness: an operator with more unused room is filled before a fuller one, and ties keep router / array order.
+Inside a Lido SRv3 staking module, deposits / keys are spread across node-operator “buckets” by `MinFirstAllocationStrategy.allocate` (`lidofinance/core@17005714`, `contracts/common/lib/MinFirstAllocationStrategy.sol`), after `StakingRouter.getDepositAllocations` has turned share-limit capacities into ETH. The library repeatedly picks a least-filled bucket that still has free space, then gives it a proportional slice of remaining demand (`ceil(remaining / equal-minimum-count)`, capped by the next fill level and by residual capacity). The point is fairness: an operator with more unused room is filled before a fuller one, and ties keep router / array order.
 
 The guarantee is meant to say the selected bucket is a least-filled open bucket, and that a Verity `Contract.run` of the whole allocate loop matches that source loop.
 

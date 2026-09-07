@@ -5,7 +5,7 @@ import LidoSRv3.Audit.Guarantees.Registry
 # P-ORACLE-SANITY-1 (bounded)
 
 Registered parent for the modeled commit-path guards of
-`OracleReportSanityChecker` at `af095e48`.
+`OracleReportSanityChecker` at `17005714`.
 
 The conclusion is `CommitEnvelope`: fifteen quantitative `Nat` facts about the
 report window and the configured limits. It mentions no `...Accepts` `Bool`,
@@ -30,7 +30,7 @@ open LidoSRv3.Audit.SolidityAccounting.SanityEnvelope
 
 /-- Supplemental bounded parent over the modeled sanity-checker commit path.
 Model layer only: there is no Verity executable transaction for the checker. -/
-def guarantee : Guarantee := ⟨.pOracleSanity1, [.model, .source]⟩
+def guarantee : Guarantee := ⟨.pOracleSanity1, [.model]⟩
 
 /-- P-ORACLE-SANITY-1 parent: an accepted report satisfies the quantitative
 commit envelope.

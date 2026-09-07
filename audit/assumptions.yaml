@@ -7,16 +7,6 @@
   },
   "assumptions": [
     {
-      "id": "A-MODEL-INPUTS",
-      "accepted": true,
-      "risk": "Quantity bounds and units remain model inputs until source refinement is proved.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
       "id": "A-ABSTRACT-TX",
       "accepted": true,
       "risk": "Common success/revert semantics are abstract and are not executable EVM trace semantics.",
@@ -97,29 +87,9 @@
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
-      "id": "A-ALLOC2-TX-BOUNDARY",
-      "accepted": true,
-      "risk": "The P-ALLOC-2 amount transaction executes the checked arithmetic and bucket mutation of MinFirstAllocationStrategy.sol lines 102-106 against a two-slot best-candidate row; the candidate scan, bestCandidatesCount, and allocationSizeUpperBound of lines 76-100 are supplied as source-plane words instead of being read from the buckets/capacities memory arrays, and the accumulator no-overflow bound originates in the calling allocate loop at lines 30-44, outside the pinned allocateToBestCandidate span.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
       "id": "A-VERITY-SCAFFOLD",
       "accepted": true,
       "risk": "The Verity 4.31 scaffold is non-certified.",
-      "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
-      "severity": "MEDIUM",
-      "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
-      "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
-    },
-    {
-      "id": "A-DEV-NOT-CERT",
-      "accepted": true,
-      "risk": "DEV-431-READY is explicitly accepted as not AUDIT-CERT.",
       "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
       "severity": "MEDIUM",
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
@@ -162,8 +132,9 @@
       "risk": "Canonical runtime, codehash, fork configuration, and address provenance are unavailable; Mock-derived evidence is non-production evidence.",
       "justification": "This premise isolates an unproved environment or representation fact instead of hiding it in the theorem.",
       "severity": "MEDIUM",
+      "scope": "global",
       "violation_impact": "Any guarantee linked to this premise must be re-evaluated if the premise is false.",
-      "validation": "Validated by the linked source spans, executable mutants, or explicit reproduction command where available.",
+      "validation": "Applies to every guarantee. scripts/check_deployed_code.py reads each proxy implementation slot, hashes the on-chain bytecode and compares the verified source with the pinned lido-core checkout; PROVENANCE.md explains the procedure.",
       "removal_path": "Replace the premise with a machine-checked correspondence theorem or a narrower proved interface."
     },
     {
@@ -189,9 +160,10 @@
     {
       "id": "A-SOLC-TRUSTED",
       "accepted": true,
-      "risk": "Pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
+      "risk": "Applies to every guarantee: pinned solc compilation is trusted when producing bytecode; the project does not prove solc correct.",
       "justification": "General Yul/EVM correspondence is outside the assurance objective; a pinned compiler is an explicit engineering boundary.",
       "severity": "MEDIUM",
+      "scope": "global",
       "violation_impact": "A solc miscompilation could break properties of the generated artifact despite correct Lean/Verity proofs.",
       "validation": "Pin the solc version/profile and retain reproducible artifact hashes when bytecode is produced.",
       "removal_path": "Adopt a separately verified compiler refinement; not required by the current project objective."

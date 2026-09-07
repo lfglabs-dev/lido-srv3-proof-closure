@@ -7,7 +7,7 @@ import Contracts.Common
 # P-TOPUP-2 packed gateway transaction
 
 This is the executable Verity boundary for the headroom and aggregate-budget
-slice of pinned `TopUpGateway.sol` (`af095e48...`, lines 160--237 and 396--415).
+slice of pinned `TopUpGateway.sol` (`17005714...`, lines 160--237 and 396--415).
 The ERC-7201 namespace and every Solidity packed field are represented below.
 Verity #2249 lowers the narrow `UIntN` declarations sharing a slot to masked
 read/modify/write operations.  The public proofs inspect the generated layout

@@ -163,7 +163,11 @@ theorem aggregate_bounded_by_individual (b : TopupBatch) (cfg : TopupConfig) :
   apply Nat.le_trans (consumeBudget_sum_le_sum _ _)
   exact candidates_sum_le b.validators b.requestedGwei cfg hreq
 
-/-- **Registered P-TOPUP-2 parent.** Leftover-budget consumption of
+/-- **P-TOPUP-2, abstract plane.**  The sum of the top-up amounts allocated in
+a batch is at most the protocol's per-block cap, in gwei, with no hypothesis on
+the batch.
+
+**Registered P-TOPUP-2 parent.** Leftover-budget consumption of
 `min(valueGwei, min(moduleLimit, maxTopUpPerBlock))` is ≤ the per-block
 cap. Validator WC, slash, activation, and `allocations = transition` are
 not used. `A-TOPUP-NOWRAP` is not attached to this row: its recorded

@@ -259,11 +259,17 @@ def lean_probe_output(template: str, label: str, module: str, names: list[str],
         if fixture is None:
             command = ["lake", "env", "lean", str(probe)]
         else:
-            command = ["lean", str(probe)]
+            lean = subprocess.run(
+                ["lake", "env", "bash", "-c", "command -v lean"],
+                cwd=ROOT, text=True, stdout=subprocess.PIPE, check=True,
+            ).stdout.strip()
+            command = [lean, str(probe)]
+            env["PATH"] = os.pathsep.join(
+                [str(Path(lean).parent), *filter(None, [env.get("PATH")])])
             env["LEAN_PATH"] = os.pathsep.join(
                 [str(fixture.resolve()), *filter(None, [env.get("LEAN_PATH")])])
         result = subprocess.run(
-            command, cwd=ROOT, env=env, text=True,
+            command, cwd=fixture or ROOT, env=env, text=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         )
         if result.returncode:

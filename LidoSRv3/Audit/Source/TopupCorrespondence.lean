@@ -2,7 +2,27 @@ import LidoSRv3.Audit.Trace
 
 /-!
 Pinned source correspondence for the SRv3 beacon-chain *top-up* push at
-`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`.
+`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`.
+
+## Name table (C4)
+
+The Solidity local `amount` (`StakingRouter.sol:721`, accumulated at `:732`
+inside the `unchecked` block of `:722`) has two Lean readings:
+
+| Solidity                                             | Lean                                              |
+|------------------------------------------------------|---------------------------------------------------|
+| `amount` as the chain computes it (wrapped mod 2^256) | `accumulated inp` = `allocSumUnchecked inp.allocations` (alias `wrappedTotal`) |
+| `amount` as the exact unbounded sum                   | `totalAllocated inp` = `allocSum inp.allocations` |
+| `allocations[i]` (`:723-732`, pushed at BCD `:106`)  | entries of `inp.allocations`                      |
+| `_topUpLimits[i]` (`:728`)                           | entries of `inp.topUpLimits`                      |
+| `_pubkeys[i].length` (`:778`, BCD `:82`)              | entries of `inp.pubkeyLengths`                    |
+| `smDepositableEthAmountRounded` (`:706`)             | `smDepositableEthAmountRounded cfg inp`           |
+| wei sent by the BCD loop (`:106`)                    | `pushedValue inp` = `loopPushed pubkeyLengths allocations` |
+
+Every guard that the chain evaluates on `amount` (`:737`, `:741`, `Lido.sol:842/873`,
+the `:744` pull, the `:755` assert) reads `accumulated`; `totalAllocated` is the
+exact reading used only under `NoUncheckedWrap`, where the two coincide
+(`totalAllocated_faithful`).
 
 This is the transactionally distinct sibling of the 32-ETH deposit path modelled
 in `LidoSRv3.Audit.Source.DepositCorrespondence`.  Where that path pushes a fixed
@@ -311,17 +331,24 @@ inductive Outcome
   | committedTopUp (keys pulled pushed balanceAfter : Nat)
   deriving Repr, DecidableEq
 
-/-- `maxTopUpPerBlockWei`, source line 696. -/
+/-! ## StakingRouter.topUp (StakingRouter.sol:679-759), pre-allocation arithmetic -/
+
+/-- `maxTopUpPerBlockWei`, `StakingRouter.sol:696`. -/
 def maxTopUpPerBlockWei (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Nat :=
+  -- StakingRouter.sol:696  uint256 maxTopUpPerBlockWei = uint256(SRStorage.getRouterState().maxTopUpPerBlockGwei) * 1 gwei;
   inp.maxTopUpPerBlockGwei * cfg.gwei
 
-/-- `smDepositableEthAmount`, source line 700. -/
+/-- `smDepositableEthAmount`, `StakingRouter.sol:700`. -/
 def smDepositableEthAmount (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Nat :=
+  -- StakingRouter.sol:700  uint256 smDepositableEthAmount = Math.min(_getModuleDepositAllocation(_stakingModuleId, depositableEther, true), maxTopUpPerBlockWei);
   min inp.moduleAllocationEth (maxTopUpPerBlockWei cfg inp)
 
-/-- `smDepositableEthAmountRounded`, source line 706. -/
+/-- `smDepositableEthAmountRounded`, `StakingRouter.sol:706`. -/
 def smDepositableEthAmountRounded (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Nat :=
+  -- StakingRouter.sol:706  uint256 smDepositableEthAmountRounded = smDepositableEthAmount - (smDepositableEthAmount % 1 gwei);
   smDepositableEthAmount cfg inp - smDepositableEthAmount cfg inp % cfg.gwei
+
+/-! ## StakingRouter.topUp (StakingRouter.sol:721-734), the `amount` accumulator -/
 
 /-- `amount`, accumulated by the loop at source lines 722--734 and pulled from
 Lido at source line 744.  This is the loop's own accumulation shape, not a closed
@@ -332,6 +359,7 @@ a `uint256` sum can wrap; the `Nat` reading here is exact.  See the module
 docstring. -/
 def allocSum : List Nat → Nat
   | [] => 0
+  -- StakingRouter.sol:732  amount += allocations[i];  (exact Nat reading)
   | a :: as => a + allocSum as
 
 /-- The exact `Nat` reading of `amount`: the unbounded sum the push loop
@@ -349,6 +377,7 @@ recursion as `allocSum`, but with each `+=` reduced modulo `2 ^ 256` because the
 enclosing block at source line 722 is `unchecked`. -/
 def allocSumUnchecked : List Nat → Nat
   | [] => 0
+  -- StakingRouter.sol:732  amount += allocations[i];  (inside the unchecked block opened at line 722, wraps mod 2^256)
   | a :: as => (a + allocSumUnchecked as) % uint256Modulus
 
 theorem allocSumUnchecked_eq_mod :
@@ -400,8 +429,11 @@ skipping zero amounts.  This is the loop's own accumulation shape, written with
 the skip explicit so that `loopPushed_eq_allocSum` can record that the skip loses
 nothing. -/
 def loopPushed : List Nat → List Nat → Nat
+  -- BeaconChainDepositor.sol:79  for (uint256 i; i < len; ++i) {  (loop exit)
   | [], _ => 0
   | _ :: _, [] => 0
+  -- BeaconChainDepositor.sol:89  if (amount == 0) continue;
+  -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(pk, _withdrawalCredentials, dummySignature, depositDataRoot);
   | _ :: ps, a :: as => (if a = 0 then 0 else a) + loopPushed ps as
 
 /-- The wei pushed to the beacon deposit contract for one `topUp` call. -/
@@ -412,7 +444,10 @@ def pushedValue (inp : SourceTopupInput) : Nat :=
 752: the line 742 snapshot, plus the *wrapped* pull at line 744, minus what the
 loop at `BeaconChainDepositor.sol` lines 79--107 sent out. -/
 def routerBalanceAfter (inp : SourceTopupInput) : Nat :=
+  -- StakingRouter.sol:752  uint256 etherBalanceAfterDeposits = address(this).balance;
   inp.routerBalanceBefore + accumulated inp - pushedValue inp
+
+/-! ## StakingRouter.topUp (StakingRouter.sol:722-734), allocation guard loop -/
 
 /--
 The router's allocation loop, source lines 722--734, as a first-guard-wins
@@ -425,14 +460,22 @@ sits *after* the alignment check at source line 724 for the same index, because
 that is the order the two statements appear in.
 -/
 def allocationLoop (cfg : SourceTopupConfig) : List Nat → List Nat → Option Outcome
+  -- StakingRouter.sol:723  for (uint256 i; i < allocations.length; ++i) {  (loop exit)
   | [], _ => none
   | a :: _, [] =>
+      -- StakingRouter.sol:724-726  if (allocations[i] % 1 gwei != 0) { revert AmountNotAlignedToGwei(); }
       if a % cfg.gwei ≠ 0 then some .revertAmountNotAlignedToGwei
+      -- StakingRouter.sol:728  _topUpLimits[i]  (out-of-bounds read, Panic(0x32))
       else some .revertTopUpLimitIndexOutOfBounds
   | a :: as, l :: ls =>
+      -- StakingRouter.sol:724-726  if (allocations[i] % 1 gwei != 0) { revert AmountNotAlignedToGwei(); }
       if a % cfg.gwei ≠ 0 then some .revertAmountNotAlignedToGwei
+      -- StakingRouter.sol:728-730  if (allocations[i] > _topUpLimits[i]) { revert AllocationExceedsLimit(); }
       else if l < a then some .revertAllocationExceedsLimit
+      -- StakingRouter.sol:732  amount += allocations[i];  (accumulated separately by `allocSumUnchecked`)
       else allocationLoop cfg as ls
+
+/-! ## BeaconChainDepositor.makeBeaconChainTopUp (BeaconChainDepositor.sol:66-108), guard loop -/
 
 /--
 The push loop, `BeaconChainDepositor.sol` lines 79--107, as a first-guard-wins
@@ -442,16 +485,33 @@ why a zero allocation is *not* a `DepositAmountTooLow`.
 
 The second pattern is unreachable: the `ArrayLengthMismatch` guard at
 `BeaconChainDepositor.sol` line 74 has already equalised the two lists.
+
+This is the *guard* loop only (which revert fires, if any); the wei the same
+loop sends is `loopPushed`, and the executable value/journal loop is
+`Verity.TopupTx.pushLoop`, a different definition with the same name.
 -/
 def pushLoop (cfg : SourceTopupConfig) : List Nat → List Nat → Option Outcome
+  -- BeaconChainDepositor.sol:79  for (uint256 i; i < len; ++i) {  (loop exit)
   | [], _ => none
   | _ :: _, [] => none
   | p :: ps, a :: as =>
+      -- BeaconChainDepositor.sol:82-84  if (pk.length != PUBLIC_KEY_LENGTH) { revert InvalidPublicKeysBatchLength(pk.length, PUBLIC_KEY_LENGTH); }
       if p ≠ cfg.publicKeyLength then some .revertInvalidPublicKeyLength
+      -- BeaconChainDepositor.sol:89  if (amount == 0) continue;
       else if a = 0 then pushLoop cfg ps as
+      -- BeaconChainDepositor.sol:92-94  if (amount < MIN_DEPOSIT) { revert DepositAmountTooLow(); }
       else if a < cfg.minDeposit then some .revertDepositAmountTooLow
+      -- BeaconChainDepositor.sol:96-99  uint256 amountGwei = amount / 1 gwei; if (amountGwei > type(uint64).max) { revert AmountTooLarge(); }
       else if cfg.uint64Max < a / cfg.gwei then some .revertAmountTooLarge
+      -- BeaconChainDepositor.sol:106  _depositContract.deposit{value: amount}(...)  (value counted by `loopPushed`)
       else pushLoop cfg ps as
+
+/-- Solidity-facing name, `BeaconChainDepositor.sol:66`
+`makeBeaconChainTopUp(IDepositContract, bytes, bytes[] _publicKeys, uint256[] _amount)`,
+restricted to its guard loop. Proofs unfold `pushLoop`. -/
+abbrev makeBeaconChainTopUp := pushLoop
+
+/-! ## StakingRouter.topUp (StakingRouter.sol:741-756), value-moving tail -/
 
 /--
 The pull-and-push tail of the pinned path, as a first-guard-wins function: the
@@ -473,63 +533,111 @@ line 769 and line 773 guards have already forced `_publicKeys.length = n ≠ 0` 
 the time line 750 is reached, and `committed_pubkeys_nonempty` records that.
 -/
 def runPush (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Outcome :=
+  -- StakingRouter.sol:744  LIDO.withdrawDepositableEther(amount, 0);
+  -- Lido.withdrawDepositableEther (Lido.sol:869-886)
+  -- Lido.sol:870  require(canDeposit(), "CAN_NOT_DEPOSIT");
   if inp.lidoCanDeposit = false then
     .revertLidoCannotDeposit
+  -- Lido.sol:872  _auth(address(stakingRouter));  (not modelled, caller is the router)
+  -- Lido.sol:873  require(_amount != 0, "ZERO_AMOUNT");  (unreachable after StakingRouter.sol:741)
   else if accumulated inp = 0 then
     .revertLidoZeroAmount
+  -- Lido._spendDepositableEther (Lido.sol:839-859), reached from Lido.sol:875
+  -- Lido.sol:842  require(_depositAmount <= depositableEther, "NOT_ENOUGH_ETHER");
   else if inp.lidoDepositableEther < accumulated inp then
     .revertLidoNotEnoughEther
+  -- Lido.sol:885  stakingRouter.receiveDepositableEther.value(_amount)();  (the pull, `Outcome.pulled`)
+  -- StakingRouter.sol:750  BeaconChainDepositor.makeBeaconChainTopUp(DEPOSIT_CONTRACT, wcBytes, _pubkeys, allocations);
+  -- BeaconChainDepositor.makeBeaconChainTopUp (BeaconChainDepositor.sol:66-108)
+  -- BeaconChainDepositor.sol:73  if (len == 0) return;  (absorbed: StakingRouter.sol:769/773 force len = n != 0)
+  -- BeaconChainDepositor.sol:74  if (len != _amount.length) revert ArrayLengthMismatch();
   else if inp.pubkeyLengths.length ≠ inp.allocations.length then
     .revertArrayLengthMismatch
+  -- BeaconChainDepositor.sol:79-107  per-key guard loop
   else match pushLoop cfg inp.pubkeyLengths inp.allocations with
     | some o => o
     | none =>
+      -- BeaconChainDepositor.sol:106  deposit{value: amount}  (a transfer the router cannot fund reverts, EVM not source)
       if inp.routerBalanceBefore + accumulated inp < pushedValue inp then
         .revertInsufficientRouterBalance
+      -- StakingRouter.sol:755  assert(etherBalanceBeforeDeposits == etherBalanceAfterDeposits);  (as pull = push)
       else if accumulated inp ≠ pushedValue inp then
         .revertAssertBalanceUnchanged
       else
         .committedTopUp inp.pubkeyLengths.length (accumulated inp) (pushedValue inp)
           (routerBalanceAfter inp)
 
+/-! ## StakingRouter.topUp (StakingRouter.sol:679-759), entry point -/
+
 /--
+`StakingRouter.sol:679-759 topUp(uint256 _stakingModuleId, uint256[] _keyIndices, uint256[] _operatorIds, bytes[] _pubkeys, uint256[] _topUpLimits)`
+with `_validateTopUpInputs` (`StakingRouter.sol:761-782`) inlined.
+
 The pinned top-up path, as a first-guard-wins function.  The guard order is the
 source order: `_checkAppAuth` at line 686, the `_validateTopUpInputs` guards at
 lines 769/773/778, the module guards at lines 689/691/694, the gwei modulo at
 line 706, the paused-Lido guard at line 713, the allocation-loop guards at lines
 724/728, the over-target guard at line 737, the zero-sum short circuit at line
 741, and then `runPush` for the value-moving tail at lines 742--756.
+
+Not transcribed: `StakingRouter.sol:697` (`LIDO.getDepositableEther()`) and
+`:700`'s `_getModuleDepositAllocation` (supplied as `inp.moduleAllocationEth`,
+P-ALLOC-1), `:717-718` (the `allocateDeposits` call, supplied as
+`inp.allocations`), `:742` (balance snapshot is `inp.routerBalanceBefore`),
+`:746-747` (withdrawal credentials bytes), `:758` (event).
+
+Added by the model: `revertGweiModuloByZero` (totality guard for `Nat` `%`,
+dead in every deployment), `revertTopUpLimitIndexOutOfBounds` and
+`revertInsufficientRouterBalance` as explicit branches for EVM panics.
 -/
 def run (cfg : SourceTopupConfig) (inp : SourceTopupInput) : Outcome :=
+  -- StakingRouter.sol:686  _checkAppAuth(_getTopUpGateway());  (revert NotAuthorized at :1178)
   if inp.callerIsTopUpGateway = false then
     .revertNotAuthorized
+  -- StakingRouter.sol:687  _validateTopUpInputs(_keyIndices, _operatorIds, _topUpLimits, _pubkeys);
+  -- StakingRouter.sol:769-771  if (n == 0) { revert EmptyKeysList(); }  [_validateTopUpInputs]
   else if inp.keyIndicesLength = 0 then
     .revertEmptyKeysList
+  -- StakingRouter.sol:773-775  if (_operatorIds.length != n || _topUpLimits.length != n || _pubkeys.length != n) { revert ArraysLengthMismatch(); }  [_validateTopUpInputs]
   else if inp.operatorIdsLength ≠ inp.keyIndicesLength
       ∨ inp.topUpLimits.length ≠ inp.keyIndicesLength
       ∨ inp.pubkeyLengths.length ≠ inp.keyIndicesLength then
     .revertArraysLengthMismatch
+  -- StakingRouter.sol:777-781  for (i < n) { if (_pubkeys[i].length != PUBKEY_LENGTH) { revert WrongPubkeyLength(); } }  [_validateTopUpInputs]
   else if inp.pubkeyLengths.any (fun l => l != cfg.pubkeyLength) then
     .revertWrongPubkeyLength
+  -- StakingRouter.sol:689  (, ModuleStateConfig storage stateConfig) = _getModuleState(_stakingModuleId);  (revert StakingModuleUnregistered, SRUtils.sol:46)
   else if inp.moduleExists = false then
     .revertStakingModuleUnregistered
+  -- StakingRouter.sol:691  if (stateConfig.status != StakingModuleStatus.Active) revert StakingModuleNotActive();
   else if inp.moduleActive = false then
     .revertStakingModuleNotActive
+  -- StakingRouter.sol:694  SRUtils._requireWCType2(stateConfig.withdrawalCredentialsType);  (revert WrongWithdrawalCredentialsType, SRUtils.sol:42)
   else if inp.wcTypeIsType2 = false then
     .revertWrongWithdrawalCredentialsType
+  -- StakingRouter.sol:706  smDepositableEthAmount % 1 gwei  (Panic(0x12) on a zero modulus; dead, `1 gwei` is a literal)
   else if cfg.gwei = 0 then
     .revertGweiModuloByZero
+  -- StakingRouter.sol:713-715  if (smDepositableEthAmountRounded == 0 && !LIDO.canDeposit()) { revert LidoDepositsPaused(); }
   else if smDepositableEthAmountRounded cfg inp = 0 ∧ inp.lidoCanDeposit = false then
     .revertLidoDepositsPaused
+  -- StakingRouter.sol:717-718  allocations = IStakingModuleV2(stateConfig.moduleAddress).allocateDeposits(...)  (input `inp.allocations`)
+  -- StakingRouter.sol:722-734  unchecked { for (i < allocations.length) { ... amount += allocations[i]; } }
   else match allocationLoop cfg inp.allocations inp.topUpLimits with
     | some o => o
     | none =>
+      -- StakingRouter.sol:737-739  if (amount > smDepositableEthAmountRounded) { revert ModuleReturnExceedTarget(); }
       if smDepositableEthAmountRounded cfg inp < accumulated inp then
         .revertModuleReturnExceedTarget
+      -- StakingRouter.sol:741  if (amount > 0) {  (else branch: fall through to the event at :758)
       else if accumulated inp = 0 then
         .committedNoTopUp
+      -- StakingRouter.sol:742-756  value-moving tail
       else
         runPush cfg inp
+
+/-- Solidity-facing name, `StakingRouter.sol:679`. Proofs unfold `run`. -/
+abbrev topUp := run
 
 /-- Whether the outcome aborts the whole transaction.  The pinned path has no
 `try`/`catch` and no failure-swallowing low-level call, so every `revert*` guard

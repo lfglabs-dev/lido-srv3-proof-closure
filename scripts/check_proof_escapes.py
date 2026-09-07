@@ -21,7 +21,7 @@ LIBRARY_ROOTS = ("LidoSRv3.lean",)
 # by deliberately updating this guard.  The existing uses are separately
 # disclosed by the Trust report's axiom output.
 NATIVE_DECIDE_COUNT = 218
-NATIVE_DECIDE_SHA256 = "187f9bad4a1f96e8919eba8d5feca034ccde6f01b6ce268e26066e57ced14e81"
+NATIVE_DECIDE_SHA256 = "46df09dbc9ae95a3196dc32ed3a6c0a2ea2369b13c3e7e910c78a73b9c701fb7"
 ESCAPES = (
     ("sorry", re.compile(r"\bsorry\b")),
     ("admit", re.compile(r"\badmit\b")),
@@ -31,14 +31,23 @@ ESCAPES = (
     ("unsafe", re.compile(r"\bunsafe\b")),
     ("Lean.ofReduceBool", re.compile(r"\bLean\.ofReduceBool\b")),
 )
+CHAR_LITERAL = re.compile(r"(?<![\w'])'(?:\\.|[^\\'\n])'(?!\w)")
 
 
-def strip_comments_and_strings(source: str) -> str:
-    """Blank comments/strings while preserving positions and newlines."""
+def strip_comments_and_strings(source: str, *, mask_escaped_identifiers: bool = False) -> str:
+    """Blank comments/strings while preserving positions and newlines.
+
+    Lean guillemet-escaped identifiers are code, even when their contents
+    resemble comment or string delimiters (for example, ``«helper /- name»``).
+    Callers that scan for reserved proof-escape words may additionally blank
+    those identifier spans: a word merely spelled inside an escaped name is
+    not a Lean keyword occurrence.
+    """
     out: list[str] = []
     i = 0
     depth = 0
     in_string = False
+    in_escaped_identifier = False
     while i < len(source):
         pair = source[i : i + 2]
         ch = source[i]
@@ -54,6 +63,11 @@ def strip_comments_and_strings(source: str) -> str:
             else:
                 out.append("\n" if ch == "\n" else " ")
                 i += 1
+        elif in_escaped_identifier:
+            out.append("\n" if ch == "\n" else (" " if mask_escaped_identifiers else ch))
+            if ch == "»":
+                in_escaped_identifier = False
+            i += 1
         elif in_string:
             out.append("\n" if ch == "\n" else " ")
             if ch == "\\" and i + 1 < len(source):
@@ -78,6 +92,15 @@ def strip_comments_and_strings(source: str) -> str:
         elif ch == '"':
             in_string = True
             out.append(" ")
+            i += 1
+        elif match := CHAR_LITERAL.match(source, i):
+            # A guillemet inside `'«'` is character data, not the start of an
+            # escaped identifier.  Consume literals before recognizing names.
+            out.extend(" " * len(match.group()))
+            i = match.end()
+        elif ch == "«":
+            in_escaped_identifier = True
+            out.append(" " if mask_escaped_identifiers else ch)
             i += 1
         else:
             out.append(ch)
@@ -112,7 +135,7 @@ def native_decide_sites(root: Path, files: list[Path] | None = None) -> list[tup
         source = path.read_text(encoding="utf-8")
         if "native_decide" not in source:
             continue
-        clean = strip_comments_and_strings(source)
+        clean = strip_comments_and_strings(source, mask_escaped_identifiers=True)
         lines = source.splitlines()
         newlines = [index for index, char in enumerate(clean) if char == "\n"]
         relative = path.relative_to(root).as_posix()
@@ -139,7 +162,7 @@ def main() -> None:
         source = path.read_text(encoding="utf-8")
         if not any(token in source for token in ("sorry", "admit", "axiom", "constant", "unsafe", "Lean.ofReduceBool")):
             continue
-        clean = strip_comments_and_strings(source)
+        clean = strip_comments_and_strings(source, mask_escaped_identifiers=True)
         newlines = [index for index, char in enumerate(clean) if char == "\n"]
         relative = path.relative_to(root).as_posix()
         for name, pattern in ESCAPES:

@@ -20,13 +20,82 @@ open LidoSRv3.Audit.SszDepositEquivalence
 
 def guarantee : Guarantee := ⟨.pSsz1, [.model, .source, .verityTx]⟩
 
+/-! ## Vocabulary
+
+English names used by the registered statements. Every name is an `abbrev`,
+so unfolding recovers exactly the former statement. -/
+
 /-- Re-export the bidirectional structural deposit-root equivalence layer. -/
 abbrev wellFormedDeposit := SszDepositEquivalence.wellFormedDeposit
 abbrev PerfectDepositEncoding := SszDepositEquivalence.PerfectDepositEncoding
 abbrev depositVerified := SszDepositEquivalence.depositVerified
 abbrev depositSszWitness := SszDepositEquivalence.depositSszWitness
 
-/-- Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named
+/-- "Construction binds `sourceWitness` to `sourceNode` at the
+CLValidatorVerifier": the first conjunct of
+`Spec.SszWitness.Correspondence depositSszWitness src`, i.e. the source
+witness of `src` is verified against the source root of `src`. -/
+abbrev Construction (src : SourceDepositDataRootInput) : Prop :=
+  depositSszWitness.verify (depositSszWitness.witnessOf src) (depositSszWitness.encode src)
+
+/-- "Determination recovers that witness from a verified root": the second
+conjunct of `Spec.SszWitness.Correspondence depositSszWitness src`, i.e. any
+witness verified at the source root of `src` is the source witness of `src`. -/
+abbrev Determination (src : SourceDepositDataRootInput) : Prop :=
+  ∀ w r, depositSszWitness.verify w r → r = depositSszWitness.encode src →
+    w = depositSszWitness.witnessOf src
+
+/-- The observation of the Verity `encode` transaction run from `state`. -/
+abbrev observed (input : EncodingInput) (state : Verity.ContractState) :=
+  observe ((encode input).run state)
+
+/-- "observe of the encode transaction equals sourceView". -/
+abbrev ObservesSourceView (input : EncodingInput) (state : Verity.ContractState) : Prop :=
+  observe ((encode input).run state) = sourceView input
+
+/-- "A commit re-exports the structural witness": when the transaction
+commits, the structural check passed, the structural-witness conjunct holds,
+and the persisted observables are the bound, operation word, index word,
+pivot boundary, traversed root, path/branch lengths and path/branch words of
+the input witness. -/
+abbrev CommitPersistsWitnessObservables (input : EncodingInput)
+    (state : Verity.ContractState) : Prop :=
+  (observed input state).status = .committed →
+    structuralOk input = true ∧
+      structuralWitnessConjunct input ∧
+      (observed input state).observables.bound = 1 ∧
+      (observed input state).observables.operation = operationWord input.operation ∧
+      (observed input state).observables.index = indexWord input.witness.index ∧
+      (observed input state).observables.pivotBoundary =
+        nodeWord input.witness.pivotBoundary ∧
+      (observed input state).observables.traversedRoot = nodeWord (traversedRoot input) ∧
+      (observed input state).observables.pathLength = input.witness.path.length ∧
+      (observed input state).observables.branchLength = input.witness.branch.length ∧
+      (observed input state).observables.path = twoWords (input.witness.path.map siblingWord) ∧
+      (observed input state).observables.branch = twoWords (input.witness.branch.map nodeWord)
+
+/-- "GIndex.concat": the source concatenation of the two generalized indices
+matches the spec concatenation. -/
+abbrev ConcatMatchesSpec (input : EncodingInput) : Prop :=
+  sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs
+
+/-- "Seven-call digest": the deposit digest is the exact composition and its
+digest chain has exactly seven calls. -/
+abbrev DigestChainIsExact (input : EncodingInput) : Prop :=
+  ExactDigestComposition input.deposit ∧ (digestChain input.deposit).length = 7
+
+/-- "A revert restores the snapshot": any reverting run of `encode` hands
+back the entry state unchanged. -/
+abbrev RevertRestoresSnapshot (input : EncodingInput) (state : Verity.ContractState) : Prop :=
+  ∀ reason rollback, (encode input).run state = .revert reason rollback → rollback = state
+
+/-- For every well-formed deposit (48/32/96-byte widths), construction binds
+`sourceWitness` to `sourceNode` at the CLValidatorVerifier, and determination
+recovers that witness from a verified root: the conclusion
+`Spec.SszWitness.Correspondence depositSszWitness src` unfolds to
+`Construction src ∧ Determination src`.
+
+Bidirectional P-SSZ-1 equivalence at `.clValidatorVerifier`: the named
 Spec `SszWitness.Correspondence` (construction binds `sourceWitness src` to
 `sourceNode src`; determination recovers that witness). Deposit uniqueness
 is the named `PerfectDepositEncoding` / `A-PERFECT-HASH` child
@@ -594,38 +663,17 @@ theorem verity_tx_one_object_matches_sourceView
       sourceView (txInputFromComposed input) :=
   verity_tx_simulates_pinned_source (txInputFromComposed input) state
 
-/-- `observe` of the handwritten `encode` transaction equals `sourceView`.
-A commit also re-exports the structural-witness conjunct. This is not
-`SSZ.verifyProof` and does not prove SHA-256. -/
+/-- `observe` of the encode transaction equals `sourceView`, and a commit
+re-exports the structural witness, `GIndex.concat`, and seven-call digest
+conjuncts; a revert restores the snapshot. This is not `SSZ.verifyProof` and
+does not prove SHA-256. -/
 theorem verity_tx_simulates_ssz_encoding
     (input : EncodingInput) (state : Verity.ContractState) :
-    observe ((encode input).run state) = sourceView input ∧
-      ((observe ((encode input).run state)).status = .committed →
-        structuralOk input = true ∧
-          structuralWitnessConjunct input ∧
-          (observe ((encode input).run state)).observables.bound = 1 ∧
-          (observe ((encode input).run state)).observables.operation =
-            operationWord input.operation ∧
-          (observe ((encode input).run state)).observables.index =
-            indexWord input.witness.index ∧
-          (observe ((encode input).run state)).observables.pivotBoundary =
-            nodeWord input.witness.pivotBoundary ∧
-          (observe ((encode input).run state)).observables.traversedRoot =
-            nodeWord (traversedRoot input) ∧
-          (observe ((encode input).run state)).observables.pathLength =
-            input.witness.path.length ∧
-          (observe ((encode input).run state)).observables.branchLength =
-            input.witness.branch.length ∧
-          (observe ((encode input).run state)).observables.path =
-            twoWords (input.witness.path.map siblingWord) ∧
-          (observe ((encode input).run state)).observables.branch =
-            twoWords (input.witness.branch.map nodeWord)) ∧
-      sourceConcat input.lhs input.rhs = specConcat input.lhs input.rhs ∧
-      (ExactDigestComposition input.deposit ∧
-        (digestChain input.deposit).length = 7) ∧
-      ∀ reason rollback,
-        (encode input).run state = .revert reason rollback →
-          rollback = state :=
+    ObservesSourceView input state ∧
+      CommitPersistsWitnessObservables input state ∧
+      ConcatMatchesSpec input ∧
+      DigestChainIsExact input ∧
+      RevertRestoresSnapshot input state :=
   ⟨verity_tx_simulates_pinned_source input state,
     encoding_commits_structural_witness input state,
     encoding_uses_source_concat input.lhs input.rhs,

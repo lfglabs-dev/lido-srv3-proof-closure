@@ -9,7 +9,7 @@ is unchanged at eleven guarantees.
 ## Exact source anchors
 
 Pinned upstream source is
-[`lidofinance/core@af095e48bbc1c3841c2c9936219c8461af01056b`](https://github.com/lidofinance/core/tree/af095e48bbc1c3841c2c9936219c8461af01056b).
+[`lidofinance/core@17005714f151e5502c559932319a3f2f74ac2436`](https://github.com/lidofinance/core/blob/17005714f151e5502c559932319a3f2f74ac2436/contracts/0.8.9/WithdrawalQueue.sol):
 
 Creation leg, `contracts/0.8.9/WithdrawalQueue.sol`:
 
@@ -117,3 +117,14 @@ modeled hop may name a recipient such as `2^160` that no Solidity address can,
 and the parent's `final.owner ≠ 0` conjunct is stated on that wider domain.
 The registry row records this as an open fidelity gap; a width-bounded
 admission or an address correspondence proof would close it.
+
+## Ownership-write strengthening (2026-09-07)
+
+`OwnerOperated` now also requires every returned state to install the hop's
+recipient as owner. `ownership_write_drop_kill_line_refutes_exact_parent`
+rejects a mutant that keeps every modeled guard but retains the old owner;
+`ownership_write_mutant_preserves_admission` proves that this mutation leaves
+the decision to accept or reject a hop unchanged. This fifth regression tests
+the ownership write, in addition to the four existing guard regressions.
+The address-width, mint/storage, operator, event and rollback exclusions remain.
+This subordinate result is outside the ALLOC-1/ALLOC-2/RESERVE-1 delivery.

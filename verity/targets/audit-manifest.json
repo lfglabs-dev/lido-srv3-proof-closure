@@ -2,7 +2,7 @@
   "schema": "srv3-audit-manifest-v1",
   "proof_baseline": "31e563b5aa47f649ae5cce5ab80aaddd2e45dec2",
   "source_revisions": {
-    "lido": "af095e48bbc1c3841c2c9936219c8461af01056b",
+    "lido": "17005714f151e5502c559932319a3f2f74ac2436",
     "verity": "e977aaad6e1a9e92e0132d41b3d33a14135a4d46",
     "lean": "v4.31.0"
   },

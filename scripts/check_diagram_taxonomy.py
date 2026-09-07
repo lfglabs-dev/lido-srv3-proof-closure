@@ -92,6 +92,12 @@ IDENTITY = {
     "0x0000BBdDc7CE488642fb579F8B00f3a590007251": (
         "EIP-7251 consolidations", "sys",
         {"canvas": "EIP-7002 · 7251", "notes cards": "EIP-4788 / 7002 / 7251"}),
+    "0x3FC2C71579D80790Aaa3fc7Be8B66ac39dC57374": (
+        "TopUpGateway", "proof",
+        {"canvas": "TopUpGateway", "notes cards": "TopUpGateway"}),
+    "0x17be979344f2c2cC806229a532D92f8742C10462": (
+        "ConsolidationGateway", "proof",
+        {"canvas": "Consolidation pipeline", "notes cards": "ConsolidationGateway"}),
 }
 
 # A missing surface entry would skip the binding for that surface rather than
@@ -121,10 +127,10 @@ TAXONOMY = {
     "Consolidation pipeline": "proof",
 }
 
-# The `proof` boxes are what SRv3 adds and has not deployed, so they carry no
-# address and IDENTITY cannot reach them — yet `proof` is exactly the claim a
-# reader must not see weakened, since it says the box only acts behind a
-# beacon-root proof.  The canvas draws the consolidation path as one combined
+# The `proof` boxes are what SRv3 adds; since v4.0.0 (2026-07-24) they carry a
+# mainnet address and IDENTITY binds them too, but `proof` is still exactly the
+# claim a reader must not see weakened, since it says the box only acts behind
+# a beacon-root proof, and an address rule alone cannot hold a class rule.  The canvas draws the consolidation path as one combined
 # `Consolidation pipeline` box while the notes card names its gateway, so the
 # same entity is spelled differently per surface; pinning one label left the
 # other surface free to be repainted with this gate still reporting success.
@@ -489,9 +495,9 @@ def main():
         drawn_here = {name: kind for name, kind, _ in boxes}
         for label, expected in SURFACE_REQUIRED[surface].items():
             if label not in drawn_here:
-                fail(f"{label!r} is no longer drawn on the {surface}; a proof-gated box "
-                     "carries no address, so its class rule can only be held by the label "
-                     f"it wears on the {surface}")
+                fail(f"{label!r} is no longer drawn on the {surface}; a proof-gated box's "
+                     f"class rule is held by the label it wears on the {surface}, and no "
+                     "address binding can stand in for a box that is gone")
             if drawn_here[label] != expected:
                 fail(f"{label!r} is drawn as {drawn_here[label]!r} on the {surface}, "
                      f"must be {expected!r}")

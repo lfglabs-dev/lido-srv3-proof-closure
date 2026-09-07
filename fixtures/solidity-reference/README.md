@@ -2,8 +2,8 @@
 
 These files are copies, not tests. This repo does not run them.
 
-Source: Lido core PR #1811 commit
-`af095e48bbc1c3841c2c9936219c8461af01056b`.
+Source: Lido core v4.0.0 (PR #1811 merged 2026-07-24) commit
+`17005714f151e5502c559932319a3f2f74ac2436`.
 
 Upstream paths:
 
