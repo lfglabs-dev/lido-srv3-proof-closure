@@ -476,3 +476,20 @@ upstream SHA-256 values for both supported architectures, and the driver exposes
 it on PATH. Both downloaded archives match those checksums locally. This tooling
 change still requires remote execution. The full `f99ab36c` run remains pending
 and predates this tooling correction and the latest writer/caller work.
+
+
+## Published initialization and recursive authorization integration
+
+Merged ALLOC-1 `632cf492` (physical proxy initialization, ACL writer, pinned Cancun
+execution evidence) and RESERVE-1 `37bb1d29` (independent recursive ACL permission
+rules and exhaustive authorized target continuation). The two lossless Cancun
+archives reproduce their recorded uncompressed hashes. Their existing execution
+scope remains explicit; this is not new execution at the integration head.
+
+`proxy-caller-init-receipt.json` covers 90 Init-only modules, including the new
+ALLOC-1 initialization and ACL modules. Metadata, import layering, all 379 project
+Lean proof-escape scans, 769 source citations and Python quality checks pass.
+RESERVE-1's new Verity-dependent composition still requires full remote validation.
+The latest read-only writer checkpoint observed ALLOC-1 local HEAD equal to remote
+with a clean workspace; ALLOC-2 and RESERVE-1 still had unpublished work. No final
+three-writer checkpoint or final certification is claimed.
