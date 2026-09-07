@@ -79,3 +79,50 @@ Both `git rev-parse` interface lookups and `git show --stat --oneline` for the
 reported checkpoint succeeded (exit 0). This update changes only this owned
 note; it does not repin composition, change canonical files, submit builds,
 mutate PRs, or complete the broader ALLOC-2 scope.
+
+## Parameter-writer advance reported 2026-09-07
+
+The user reports published producer checkpoint
+`8691c7881a863715ab5ec9b39631ab41243e7c91`. Local `git cat-file -t`
+confirms the commit exists. `git rev-parse` at this checkpoint and accepted
+`2a4e9d2a91d257353470677c6101fd91293cf4e4` confirms identical Interface.lean
+blob `d6eb95cceeb42421011acd1a5d7f9de7fea4a43d`. The accepted v0 meanings
+remain unchanged; this recording does not repin the consumer bridge.
+
+The producer reports ParameterWriter coverage of the full public
+updateStakingModule/helper guards, fee/enum precedence, packed writes and
+events, and count/share/address invariant preservation through both share and
+parameter writers. Reported validation: 21 Init modules PASS; eight actual
+Solidity parameter cases PASS; remote job
+`78ecbf4e-d80a-4142-ae21-e6d7ab976c37` PASS with 50 jobs and 18 axiom
+inspections; twelve Solidity/Verity comparisons PASS. These are attributed
+reports, not independently reconciled remote receipts or certification.
+
+Read-only inspection confirms this commit adds ParameterWriter.lean,
+WriterInvariant.lean changes and parameter-case evidence. The committed
+implementation-status.md still describes the earlier 49-job closure at
+`4aa9557e288b5ca0d6c4e4c41caffbcd213bdffd`, explicitly excluding
+ParameterWriter. Its solidity-verity-4aa9557.json records twelve comparisons
+of decoded returns/raw errors and ordered top-level calls; compiler memory,
+world preservation and nested callbacks have separate evidence. Those older
+artifacts do not establish the newly reported remote job or a current-head gate.
+The parameter receipt identifies Solidity pin
+`17005714f151e5502c559932319a3f2f74ac2436` and compiler
+`0.8.25+commit.b61c2a91.Emscripten.clang`.
+
+At this observation, `git ls-remote origin refs/pull/245/head` returned
+`f785c7186b40d0cc249f1afe7c27d12d0c816493` (exit 0), different from the
+reported checkpoint. Publication at the live PR head and the reported refreshed
+PR body are therefore not independently confirmed here. Local commit presence
+and interface identity are confirmed; receipt scope remains tied to its exact
+source revision, not inferred from a publication report.
+
+Full admission composition, including compiler string-storage failure/cleanup
+and the final deposit-state event, remains open as reported. The migration
+constraint above remains in force: successful migration/version does not derive
+legacy admission bounds. Writer preservation alone does not close complete
+reachability or producer-to-consumer premises.
+
+All Git inspection commands above exited 0. This update changes only the owned
+coordination note and preserves existing working changes. No canonical edits,
+PR mutations, build submissions, dependency changes or certification occur.
