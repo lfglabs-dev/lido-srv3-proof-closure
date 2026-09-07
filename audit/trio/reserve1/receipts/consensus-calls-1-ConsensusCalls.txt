@@ -1,0 +1,42 @@
+LidoSRv3/Audit/Source/TrioReserve1/ConsensusCalls.lean:61:105: error: unsolved goals
+oracle : Address
+oc : Oracle.Config
+cc : Consensus.Config
+other : StaticCall.External
+w : World
+reference deadline time : Nat
+hc : (w.core.codeSize (consensusAddress oracle w).val).val ≠ 0
+h :
+  Consensus.compute cc w.core.blockTimestamp.val
+      (w.core.readContractSlot (consensusAddress oracle w).val cc.frameSlot).val =
+    Except.ok (reference, deadline)
+ht : Oracle.timestamp oc.genesis.val oc.secondsPerSlot.val reference = OracleSpec.Timestamp.value time
+hr : reference < 2 ^ 64
+hs :
+  StaticCall.call (Consensus.dispatch (consensusAddress oracle w) cc other) oracle
+      (Verity.Core.Address.ofNat (w.core.readContractSlot oracle.val Oracle.consensusSlot).val) 1928829715 w =
+    { outcome := Except.ok (encode 32 reference ++ encode 32 deadline),
+      attempts := [attempt oracle (consensusAddress oracle w) true (encode 32 reference ++ encode 32 deadline)] }
+⊢ (match Oracle.timestamp oc.genesis.val oc.secondsPerSlot.val (word (decode (encode 32 reference))).val with
+    | OracleSpec.Timestamp.overflow =>
+      Reply.rejectedWithTrace Oracle.panic
+        [attempt oracle (consensusAddress oracle w) true (encode 32 reference ++ encode 32 deadline)]
+    | OracleSpec.Timestamp.value time =>
+      Reply.successWithTrace (encode 32 (word (decode (encode 32 reference))).val ++ encode 32 time) w
+        [attempt oracle (consensusAddress oracle w) true (encode 32 reference ++ encode 32 deadline)]) =
+    Reply.successWithTrace (encode 32 reference ++ encode 32 time) w
+      [attempt oracle (consensusAddress oracle w) true (encode 32 reference ++ encode 32 deadline)]
+LidoSRv3/Audit/Source/TrioReserve1/ConsensusCalls.lean:67:27: warning: This simp argument is unused:
+  decode_reference reference deadline hr
+
+Hint: Omit it from the simp argument list.
+  simp [ABI.encode_length, d̵e̵c̵o̵d̵e̵_̵r̵e̵f̵e̵r̵e̵n̵c̵e̵ ̵r̵e̵f̵e̵r̵e̵n̵c̵e̵ ̵d̵e̵a̵d̵l̵i̵n̵e̵ ̵h̵r̵,̵ ̵ht]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ConsensusCalls.lean:67:67: warning: This simp argument is unused:
+  ht
+
+Hint: Omit it from the simp argument list.
+  simp [ABI.encode_length, decode_reference reference deadline hr,̵ ̵h̵t̵]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

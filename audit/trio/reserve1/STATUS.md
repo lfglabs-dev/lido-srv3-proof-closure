@@ -18,8 +18,12 @@ unchanged world, two direct attempts and one nested STATICCALL. Constructor,
 compiler-layout, code/address and primitive binding remain explicit obligations;
 this does not establish full deployment or whole-withdrawal specification closure.
 
-The immutable checker now covers 35 modules. The differential runner remains
-unchanged; these composition additions are validated through Lean elaboration.
+All 35 owned modules passed at `a5492850a01aefb8f188f9f172d7172348de1d38`.
+`receipts/consensus-binding-summary.json` links exact source/toolchain/commands/exits,
+standard-axiom inspection, six baseline checks and import-DAG validation (all 0),
+dependency/wrapper identity and source delta. The differential runner and its
+previously executed source remain unchanged. Full gates still lack terminal
+receipts and supported complete-source/dependency transport.
 
 ## Concrete getter and callee binding
 
