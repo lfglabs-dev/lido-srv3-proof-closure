@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalBalance
 import LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance
 import LidoSRv3.Audit.Source.TrioReserve1.Balance
@@ -376,3 +377,13 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms WithdrawalBalance.pipeline_withdrawal
 #print axioms WithdrawalBalance.target
 #print axioms WithdrawalBalance.rebalance
+
+#print axioms AuthorizationBalance.acl
+#print axioms AuthorizationBalance.decoded
+#print axioms AuthorizationBalance.kernel_permission
+#print axioms AuthorizationBalance.kernel
+#print axioms AuthorizationBalance.external
+#print axioms AuthorizationBalance.permission_call
+#print axioms AuthorizationBalance.can_perform
+#print axioms AuthorizationBalance.set_target
+#print axioms AuthorizationBalance.concrete_target
