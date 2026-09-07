@@ -126,3 +126,57 @@ reachability or producer-to-consumer premises.
 All Git inspection commands above exited 0. This update changes only the owned
 coordination note and preserves existing working changes. No canonical edits,
 PR mutations, build submissions, dependency changes or certification occur.
+
+## Admission storage and corrected push boundary reported 2026-09-07
+
+The user reports published producer head
+`b171b363c5948705894d36d5cdeb414a2bd77c0a`, a receipt/documentation-only
+commit after `43ae5e8face86528e199491fa9954f74a0bddd5b`. Local Git inspection
+confirms these objects and the receipt-only diff. Interface.lean at the new head
+has blob `d6eb95cceeb42421011acd1a5d7f9de7fea4a43d`, byte-identical to
+accepted checkpoint `2a4e9d2a91d257353470677c6101fd91293cf4e4`.
+The v0 agreement remains applicable; this update does not repin composition.
+
+Reported admission coverage now includes name panic/cleanup, parameters,
+last-ID/deposit state, six events and public rollback. The producer reports all
+expanded actual writer tests passing. Inspected committed light-v18.json records
+23 Init module checks with exit 0. scoped-checks-43ae5e8.json records six checks
+with exit 0 at the exact corrected source SHA: proof escapes, annotations,
+inventory, provenance, pinned source and metadata. These are inspected producer
+artifacts, not checks rerun here or independent certification.
+
+The unrestricted storage-array push correction is material: length >= 2^64
+panics with code 0x41, an existing ID is a no-op, and insertion at length
+2^64 - 1 succeeds. Inspected enumeration-boundary.json records panic bytes,
+existingIdNoop=true, lastPermittedLength=18446744073709551615,
+resultingLength=18446744073709551616 and matching element/position, under
+Solidity pin `17005714f151e5502c559932319a3f2f74ac2436`, solc 0.8.25.
+These executed vectors do not replace universal correspondence.
+
+The reported prior 52-job / 21-axiom-inspection / 12 Solidity-Verity comparison
+PASS is scoped to `876649b`, before the correction: STALE_SUCCESS for the new
+source. The committed remote-rejected-43ae5e8.json identifies source
+`43ae5e8face86528e199491fa9954f74a0bddd5b`, durable attempt
+`1b893089-10e0-4e57-b689-e4e4c5ccf96c`, exit 1, and HTTP 422 from ashur:
+80 GiB available versus 2 GiB estimate plus 80 GiB emergency floor. This is
+REMOTE_ADMISSION_REJECTED with no compilation, not a proof failure or passing
+gate. No retry or floor change was performed here.
+
+Read-only `git ls-remote origin refs/pull/245/head` again returned
+`f785c7186b40d0cc249f1afe7c27d12d0c816493` (exit 0). The user reports
+publication and refreshed PR245 text; this checkout's remote observation does
+not independently confirm either at b171b363. Local object and artifact
+verification remain distinct from live publication verification.
+
+Inspected integration-patch.md specifies shared source inventory, source/test/
+audit imports, axiom and execution drivers, coordinated canonical metadata/UX2
+regeneration, and make prove/test on an immutable integrated head. Those
+obligations remain unapplied here. Complete admission/migration reachability,
+universal compiler-memory composition and integration remain open. In particular,
+migration success/version does not establish legacy admission bounds. Typed
+writer inputs do not establish malformed public calldata rejection. The producer
+is not certification-ready, and this update does not certify the consumer bridge.
+
+Coordination recording only: Git inspection and JSON parsing exited 0; existing
+working changes were preserved. No PR mutation, dependency change, canonical
+edit, build submission or broader implementation work was performed.
