@@ -1,4 +1,4 @@
-import audit.trio.alloc2.composition.LibraryABI
+import audit.trio.alloc2.composition.ProducerMemory
 import Verity.Core
 
 /-! Execution in the pinned Verity contract runtime. Bytes are already dispatched
@@ -38,6 +38,22 @@ theorem canonical_outcome (a : LibraryABI.Arguments)
       | .ok data => .success data state
       | .error data => .revert (hex data) state := by
   rw [run_exact, LibraryABI.run_encoded a bound]
+
+/-- Successful executed producer guards establish the ABI bound and decoded
+consumer premises needed by the pinned Verity runtime; no separate length or
+consumer-success premise is supplied by the caller. -/
+theorem producer_success_runtime (l : TrioAlloc1.Layout) (storage : TrioAlloc1.Storage)
+    (oracle : TrioAlloc1.StaticOracle) (input : TrioAlloc1.CapacityInput)
+    (before after : ProducerMemory.State) (out : TrioAlloc1.CapacityOutput)
+    (executed : ProducerMemory.produceM l storage oracle input before = (.ok out, after))
+    (state : _root_.Verity.ContractState) :
+    (execute (LibraryABI.encodeArguments ⟨out.allocations, out.capacities, input.depositsToAllocate⟩)).run state =
+      match LibraryABI.encodeOutcome (allocate out.allocations out.capacities input.depositsToAllocate) with
+      | .ok data => .success data state
+      | .error data => .revert (hex data) state := by
+  rw [run_exact, ProducerMemory.success_byte_execution l storage oracle input before after out executed]
+
+#print axioms producer_success_runtime
 
 #print axioms run_exact
 #print axioms state_preserved
