@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.VaultRules
 import LidoSRv3.Audit.Source.TrioReserve1.Vaults
 import LidoSRv3.Audit.Source.TrioReserve1.ReportRules
 import LidoSRv3.Audit.Source.TrioReserve1.ReportCalls
@@ -445,3 +446,16 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ReportRules.success_active
 
 #print axioms Vaults.reward_amount_bound
+
+#print axioms VaultSpec.capped_iff
+#print axioms VaultSpec.root_failure_restores
+#print axioms VaultRules.call_observations
+#print axioms VaultRules.rewards_of_spec
+#print axioms VaultRules.withdrawals_of_spec
+#print axioms VaultRules.rewards_exists
+#print axioms VaultRules.withdrawals_exists
+#print axioms VaultRules.rewards_corresponds
+#print axioms VaultRules.withdrawals_corresponds
+#print axioms VaultRules.root_corresponds
+#print axioms VaultRules.rewards_root_corresponds
+#print axioms VaultRules.withdrawals_root_corresponds
