@@ -51,6 +51,54 @@ async function main(){
   checks.push({name:test.name,revert:data,status:failed.status,events:failed.logs.length,storageUnchanged:true});
  }
  fs.writeFileSync(path.join(out,'writer-errors.json'),JSON.stringify({pin,compiler:solc.version(),checks},null,2));
+ const manageRole=ethers.id('STAKING_MODULE_MANAGE_ROLE');
+ const manageMember=BigInt(ethers.keccak256(words(BigInt(caller),BigInt(ethers.keccak256(words(BigInt(manageRole),acl))))));
+ const arrayBase=BigInt(ethers.keccak256(words(base+1n)));
+ const config={stakeShareLimit:5000,priorityExitShareThreshold:7000,stakingModuleFee:0,treasuryFee:0,maxDepositsPerBlock:10,minDepositBlockDistance:1,withdrawalCredentialsType:1};
+ const moduleAddress=ethers.getAddress(ethers.toBeHex(41,20));
+ const admissionCases=[
+  {name:'admission-role-first',role:0n,address:ethers.ZeroAddress,nameValue:'',error:selector('AccessControlUnauthorizedAccount(address,bytes32)')+words(BigInt(caller),BigInt(manageRole)).slice(2)},
+  {name:'address-before-name',address:ethers.ZeroAddress,nameValue:'',error:selector('ZeroAddress()')},
+  {name:'name-before-count',nameValue:'',count:32n,error:selector('StakingModuleWrongName()')},
+  {name:'long-name',nameValue:'x'.repeat(32),error:selector('StakingModuleWrongName()')},
+  {name:'count-before-wc',count:32n,config:{withdrawalCredentialsType:3},error:selector('StakingModulesLimitExceeded()')},
+  {name:'wc-before-duplicate',duplicate:true,config:{withdrawalCredentialsType:3},error:selector('WrongWithdrawalCredentialsType()')},
+  {name:'duplicate-before-params',duplicate:true,config:{stakeShareLimit:10001},error:selector('StakingModuleAddressExists()')},
+  {name:'last-id-uint24-overflow',lastId:(1n<<24n)-1n,error:'0x4e487b71'+words(17).slice(2)},
+  {name:'late-share-rollback',config:{stakeShareLimit:10001},late:true,error:selector('InvalidStakeShareLimit()')},
+  {name:'late-threshold-rollback',config:{priorityExitShareThreshold:10001},late:true,error:selector('InvalidPriorityExitShareThreshold()')},
+  {name:'late-fee-overflow-rollback',config:{stakingModuleFee:ethers.MaxUint256,treasuryFee:1},late:true,error:'0x4e487b71'+words(17).slice(2)},
+  {name:'late-fee-sum-rollback',config:{stakingModuleFee:10001},late:true,error:selector('InvalidFeeSum()')},
+  {name:'late-min-distance-rollback',config:{minDepositBlockDistance:0},late:true,error:selector('InvalidMinDepositBlockDistance()')},
+  {name:'late-max-deposits-rollback',config:{maxDepositsPerBlock:0},late:true,error:selector('InvalidMaxDepositPerBlockValue()')}
+ ];
+ const admissionChecks=[];
+ for(const test of admissionCases){
+  await write(manageMember,test.role??1n);await write(base+1n,test.count??(test.duplicate?1n:0n));await write(base+5n,test.lastId??0n);
+  await write(arrayBase,7n);await write(slot,BigInt(moduleAddress));
+  const args=[test.nameValue??'module',test.address??moduleAddress,{...config,...test.config}];
+  let data;try{await h.addStakingModule.staticCall(...args);assert.fail('expected admission revert');}catch(e){data=e.data;}
+  assert.equal(data,test.error,test.name+' raw revert');
+  let failed;try{await(await h.addStakingModule(...args,{gasLimit:2000000})).wait();assert.fail('expected admission transaction revert');}catch(e){failed=e.receipt;}
+  assert(failed);assert.equal(failed.status,0);assert.equal(failed.logs.length,0);
+  const trace=await rpc.request({method:'debug_traceTransaction',params:[failed.hash,{disableMemory:true,disableStorage:true}]});
+  const touched=[...new Set(trace.structLogs.filter(x=>x.op==='SSTORE').map(x=>ethers.toBeHex(BigInt('0x'+x.stack.at(-1)))))];
+  if(test.late)assert(touched.length>0,test.name+' must execute writes before revert');
+  for(const key of touched){
+   const before=await rpc.request({method:'eth_getStorageAt',params:[address,key,ethers.toQuantity(failed.blockNumber-1)]});
+   const after=await rpc.request({method:'eth_getStorageAt',params:[address,key,ethers.toQuantity(failed.blockNumber)]});
+   assert.equal(after,before,test.name+' rollback at '+key);
+  }
+  admissionChecks.push({name:test.name,revert:data,status:failed.status,events:0,attemptedStorageSlots:touched,allAttemptedSlotsRestored:true});
+ }
+ await write(manageMember,1n);await write(base+1n,0n);await write(base+5n,0n);
+ const admitted=await(await h.addStakingModule('module',moduleAddress,config)).wait();
+ const newSlot=BigInt(ethers.keccak256(words(1n,base))),newPosition=BigInt(ethers.keccak256(words(1n,base+2n)));
+ assert.equal(await read(base+1n),1n);assert.equal(await read(arrayBase),1n);assert.equal(await read(newPosition),1n);
+ assert.equal((await read(base+5n))&((1n<<24n)-1n),1n);
+ assert.equal(await read(newSlot),BigInt(moduleAddress)|(5000n<<192n)|(7000n<<208n)|(1n<<232n));
+ admissionChecks.push({name:'successful-first-admission',status:admitted.status,count:1,id:1,position:1,packedConfig:ethers.toBeHex(await read(newSlot),32),events:admitted.logs.map(x=>({topics:x.topics,data:x.data}))});
+ fs.writeFileSync(path.join(out,'admission.json'),JSON.stringify({pin,compiler:solc.version(),checks:admissionChecks},null,2));
  }finally{await rpc.disconnect();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
