@@ -1,0 +1,1 @@
+LidoSRv3/Tests/TrioReserve1/AragonDifferential.lean:30:62: error: unexpected identifier; expected '}'

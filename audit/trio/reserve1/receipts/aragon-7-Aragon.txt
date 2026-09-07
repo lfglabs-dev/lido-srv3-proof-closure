@@ -1,0 +1,13 @@
+LidoSRv3/Audit/Source/TrioReserve1/Aragon.lean:153:2: error: Type mismatch: After simplification, term
+  kernel_reply external ctx bufferReserveManagerRole value w after suffix hi hk hc hr
+ has type
+  canPerform external ctx bufferReserveManagerRole w =
+    { outcome := Except.ok (decide (value.val ≠ 0)), world := after,
+      attempts :=
+        [{
+            request :=
+              { caller := ctx.self, target := kernel ctx w, value := word 0,
+                payload := permissionPayload ctx bufferReserveManagerRole },
+            accepted := true, returned := encode 32 value.val ++ suffix }] }
+but is expected to have type
+  canPerform external ctx bufferReserveManagerRole w = { outcome := Except.ok true, world := after, attempts := ?trace }

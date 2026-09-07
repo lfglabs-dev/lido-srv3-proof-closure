@@ -11,12 +11,19 @@ the original world. Successful permission evaluation retains the callee world;
 the target writer's independent relation starts from that world, so callbacks
 are not silently discarded. `AragonSpec` independently describes the prefix.
 
-Ten draft comparisons against pinned inherited Lido/Aragon bytecode match, covering
+Ten comparisons against pinned inherited Lido/Aragon bytecode match, covering
 all these cases plus noncanonical nonzero bool and trailing return bytes. The
 executed call opcode is CALL. Kernel replies are explicit boundary fixtures;
 this does not implement Kernel.hasPermission, ACL permission evaluation or its
-oracle recursion. Full ACL and callback binding remain required. Immutable
-component and runtime checks follow the source commit.
+oracle recursion. Full ACL and callback binding remain required.
+
+At `5ff24074eb374d5b79287991ece3e5206da95bfc`, all four selected Lean checks,
+all seven baseline/import checks and the fresh ten-case execution pass. The other
+38 modules' source and olean hashes match prior receipts. Only standard axioms
+appear. `receipts/aragon-summary.json` links source/toolchain/commands and terminal
+receipts, including artifact/compiler-input verification. Failed draft elaboration,
+the failed component check at 0ec3353, and the initial fixture-setup execution
+failure are retained. This adds no full remote gate or independent certification.
 
 ## Internal writer and committed withdrawal sequences
 
