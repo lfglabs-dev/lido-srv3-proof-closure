@@ -1,5 +1,35 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete allocation flow and internal withdrawal substitution
+
+`AllocationFlowSpec` independently orders lookup, queue CALL, demand decoding and
+allocation. Buffer/reserve observations are saved before calls. Success uses the
+existing maximal-priority allocation relation; uniqueness connects it to physical
+source allocation, without replacing the specification by the executor's min formula.
+`AllocationFlow` covers every allocation failure and success with exact returned
+world and ordered calls, including arbitrary callee storage changes.
+
+The rules are substituted through spending into `AllocationFlow.Withdrawal`, with
+bidirectional exact parent correspondence. All major internal stage interfaces are
+now expanded into independent control/arithmetic rules and physical projections.
+The remaining source execution boundaries are CALLs: primitive and deployed-callee
+binding, resource/world closure, other writers and full integration gates remain
+open. At source `7d40b232ff75cf8c2d98a046b91af743278d393a`, three selected component checks and seven baseline/import checks pass. The other 70 source/olean pairs match earlier successful receipts. See `receipts/allocation-flow-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime execution source is unchanged.
+
+## Complete frame getter rules substituted through spending
+
+`FrameReadSpec` independently orders oracle lookup, oracle CALL and complete
+64-byte tuple validation. `FrameRead` substitutes physical locator/address rules,
+projects the two actual ABI words and proves bidirectional exact outcome/world/trace
+correspondence. The whole tuple is validated before either field can be returned;
+malformed successful replies retain the returned world until parent rollback.
+
+Frame rules are substituted through spending into `FrameRead.Withdrawal`, preserving
+bidirectional exact parent correspondence. Allocation remains the opaque internal
+interface; CALL/deployed locator/oracle/consensus binding and resource interpretation
+remain explicit. Other writers, integration gates and independent review remain open.
+At source `107c6310d6d917b14e564a33181e630b5521f2d0`, three selected component checks and seven baseline/import checks pass. The other 68 source/olean pairs match earlier successful receipts. See `receipts/frame-read-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime execution source is unchanged.
+
 ## Complete spending rules substituted into withdrawal
 
 `SpendSpec` independently orders allocation, amount admission, prepared accounting,

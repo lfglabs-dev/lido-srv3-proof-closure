@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Source.TrioReserve1.AllocationFlow
+import LidoSRv3.Audit.Source.TrioReserve1.FrameRead
 import LidoSRv3.Audit.Source.TrioReserve1.Spend
 import LidoSRv3.Audit.Source.TrioReserve1.Tail
 import LidoSRv3.Audit.Source.TrioReserve1.Lookup
@@ -306,3 +308,19 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Spend.to_spec
 #print axioms Spend.corresponds
 #print axioms Spend.withdrawal_corresponds
+
+#print axioms FrameRead.of_spec
+#print axioms FrameRead.exists_spec
+#print axioms FrameRead.to_spec
+#print axioms FrameRead.corresponds
+#print axioms FrameRead.spending_corresponds
+#print axioms FrameRead.withdrawal_corresponds
+
+#print axioms AllocationFlow.allocation_spec
+#print axioms AllocationFlow.allocation_unique
+#print axioms AllocationFlow.of_spec
+#print axioms AllocationFlow.exists_spec
+#print axioms AllocationFlow.to_spec
+#print axioms AllocationFlow.corresponds
+#print axioms AllocationFlow.spending_corresponds
+#print axioms AllocationFlow.withdrawal_corresponds

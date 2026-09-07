@@ -1,0 +1,7 @@
+LidoSRv3/Audit/Source/TrioReserve1/AllocationFlow.lean:44:71: warning: This simp argument is unused:
+  pureExec
+
+Hint: Omit it from the simp argument list.
+  simp [getBufferedEtherAllocation, Live.read, bind, bindExec, pure, p̵u̵r̵e̵E̵x̵e̵c̵,̵ ̵withdrawalQueue, hlookup]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
