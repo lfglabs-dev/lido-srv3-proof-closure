@@ -16,12 +16,17 @@ With Lean 4.31.0 available, run from the repository root:
 python3 audit/trio/alloc1/validate-light.py --lean /path/to/lean --output /fresh/output/light
 ```
 
-The script checks the 23 Init-only owned modules (including the interface and test entry)
+The script checks the 24 Init-only owned modules (including the interface and test entry)
 with private oleans, rejects non-Init/non-owned imports, bounds each check to 30
 seconds, and records each source SHA-256, exact command, output and exit status.
 `vectors.json` is produced by actually evaluating `produce`, not by printing expected
 results. Increasing the kernel reduction depth to 4096 in the test module permits
 nested fixed-width byte encodings; no unchecked reduction or new axiom is used.
+
+After a successful light build, `InspectAdmissionAxioms.lean` can be checked with
+the same direct Lean executable and that output's private `olean` directory in
+`LEAN_PATH`. It imports only the Init-based admission proof closure. This local
+inspection does not replace the remote production/Verity/trust build.
 
 ## Executed Solidity and paired SOURCE model
 
