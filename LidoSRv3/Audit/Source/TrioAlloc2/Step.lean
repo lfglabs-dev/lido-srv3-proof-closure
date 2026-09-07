@@ -2,7 +2,7 @@ import LidoSRv3.Audit.Source.TrioAlloc2.Word
 
 /-!
 Decoded candidate step, transcribed from pinned
-contracts/common/lib/MinFirstAllocationStrategy.sol:64–116 at
+contracts/common/lib/MinFirstAllocationStrategy.sol:63–107 at
 17005714f151e5502c559932319a3f2f74ac2436.
 Lists represent decoded arrays. Nat scan positions are ghost traversal indices;
 relating them to bounded Solidity indices and byte memory remains an obligation.

@@ -1,6 +1,7 @@
 {
   "base": "924891ed58bbd9f424f298dae57b8982a82aad24",
   "files": {
+    "LidoSRv3.lean": "0fec9f90a3ee5ffba8b317a2707915df6df96a74c23ca06440d0f631c86d941c",
     "LidoSRv3/Audit/AddressEquivariance.lean": "570701e714cdad6fb68c12d7597d89d36f2cb91b8b9560ea109c07b1805c8612",
     "LidoSRv3/Audit/AllGuarantees.lean": "11bc0ae2aaed67752ef4e98c1863c314aecdde8c175c663b0eb4e5a0ad77ad49",
     "LidoSRv3/Audit/Allocation.lean": "0f64b006da40d44e1ca85946c899cc0c38cea2d1aeebf216b9552bce45ed816f",
@@ -85,7 +86,7 @@
     "LidoSRv3/Audit/Source/TrioAlloc2/Selection.lean": "38cdf79f1564aa022b1084d65b64e5fe627cb04ecc0a89cd496d74cfd7accc60",
     "LidoSRv3/Audit/Source/TrioAlloc2/Spec.lean": "fe3bbee5cc73badac5ac54ad818480ee6f5cea32228d1c6e34e7c07d3ff2dc37",
     "LidoSRv3/Audit/Source/TrioAlloc2/SpecProgress.lean": "a4ec617e036124438832d5822d4a68e80c461ea63b93cd677b40c56c86f10f76",
-    "LidoSRv3/Audit/Source/TrioAlloc2/Step.lean": "6e2e97a6b2fb6279db6654b424d49d14464269f8c709fd3dfb3c11953a4c9d80",
+    "LidoSRv3/Audit/Source/TrioAlloc2/Step.lean": "5ff153803de99ee07f99683c6b657a51c4d85b62b958e3fc726c1b93a4a4ecaf",
     "LidoSRv3/Audit/Source/TrioAlloc2/StepBounds.lean": "20d655b2720753ce76c4d650bd42b89655e2925eb588493d0a628c83bbae147b",
     "LidoSRv3/Audit/Source/TrioAlloc2/StepCorrespondence.lean": "f4a3f68e194a3282fcac20d89e847f6687c9389a0360a270794a555dae701755",
     "LidoSRv3/Audit/Source/TrioAlloc2/Totality.lean": "335759eb0d05c1177705ed588d6341ad143bac8f6070271b18fb780c84cbd653",
@@ -257,7 +258,6 @@
     "LidoSRv3/Tests/WithdrawalQueueSingleRequestControlMutants.lean": "c32fd64063f0009cf2f124b15165e2d47794a4e14eef2811521a0a70a7e60943",
     "lake-manifest.json": "c0fe05acab23cbfc27e79f1fd6983ebe5cc1e25e76be5132205e958f465c6e42",
     "lakefile.lean": "d25db2a8c8f05b32ce6eebc44068260489ac0797e38f49931975cd0972d87ea0",
-    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee",
-    "LidoSRv3.lean": "0fec9f90a3ee5ffba8b317a2707915df6df96a74c23ca06440d0f631c86d941c"
+    "lean-toolchain": "efac0b94923b2d8b6840cd35be9177ad0fc5ab2332f4f4311c98712cee92fdee"
   }
 }
