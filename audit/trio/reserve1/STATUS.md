@@ -12,7 +12,7 @@ Frame rules are substituted through spending into `FrameRead.Withdrawal`, preser
 bidirectional exact parent correspondence. Allocation remains the opaque internal
 interface; CALL/deployed locator/oracle/consensus binding and resource interpretation
 remain explicit. Other writers, integration gates and independent review remain open.
-Immutable validation follows checks. Runtime execution source is unchanged.
+At source `107c6310d6d917b14e564a33181e630b5521f2d0`, three selected component checks and seven baseline/import checks pass. The other 68 source/olean pairs match earlier successful receipts. See `receipts/frame-read-rules-summary.json`; only standard axioms were printed. Eleven dependency revisions match the manifest. These are bounded checks, not full gates. Runtime execution source is unchanged.
 
 ## Complete spending rules substituted into withdrawal
 
