@@ -1,0 +1,50 @@
+[
+  {
+    "case": "empty",
+    "optimized": false,
+    "exit": 1,
+    "error": "ValueError: incomplete case coverage"
+  },
+  {
+    "case": "duplicate",
+    "optimized": false,
+    "exit": 1,
+    "error": "ValueError: case identity/order differs"
+  },
+  {
+    "case": "changed_return",
+    "optimized": false,
+    "exit": 1,
+    "error": "ValueError: differential mismatch: oracle rejection after packed write"
+  },
+  {
+    "case": "missing_mutants",
+    "optimized": false,
+    "exit": 1,
+    "error": "ValueError: incomplete mutation coverage"
+  },
+  {
+    "case": "empty",
+    "optimized": true,
+    "exit": 1,
+    "error": "ValueError: incomplete case coverage"
+  },
+  {
+    "case": "duplicate",
+    "optimized": true,
+    "exit": 1,
+    "error": "ValueError: case identity/order differs"
+  },
+  {
+    "case": "changed_return",
+    "optimized": true,
+    "exit": 1,
+    "error": "ValueError: differential mismatch: oracle rejection after packed write"
+  },
+  {
+    "case": "missing_mutants",
+    "optimized": true,
+    "exit": 1,
+    "error": "ValueError: incomplete mutation coverage"
+  }
+]

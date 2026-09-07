@@ -359,6 +359,11 @@ async function main() {
     path.join(receiptDir,'differential-input.json'),path.join(receiptDir,'differential-verity.json')],
     {cwd:path.resolve(__dirname,'../..'),stdio:'inherit'});
   const actual = JSON.parse(fs.readFileSync(path.join(receiptDir,'differential-verity.json')));
+  assert(expected.length > 0, 'no Solidity differential cases executed');
+  assert.equal(expected.length, vectors.length, 'Solidity/input coverage differs');
+  assert.equal(actual.length, expected.length, 'Verity differential coverage is incomplete');
+  assert.equal(new Set(expected.map(r=>r.name)).size, expected.length, 'duplicate Solidity case names');
+  assert.equal(new Set(actual.map(r=>r.name)).size, actual.length, 'duplicate Verity case names');
   function normalize(r) {
     const f = r.result.fault;
     const returned = !f || f.kind === 'empty' ? [] : f.kind === 'bubbled' ? f.data :
@@ -392,7 +397,9 @@ async function main() {
     path.join(receiptDir,'mutation-input.json'),path.join(receiptDir,'mutation-verity.json')],
     {cwd:path.resolve(__dirname,'../..'),stdio:'inherit'});
   const mutants = JSON.parse(fs.readFileSync(path.join(receiptDir,'mutation-verity.json')));
+  assert.equal(mutants.length, mutationInputs.length, 'Verity mutation coverage is incomplete');
   const kills = mutants.map((r,i)=> {
+    assert.equal(r.name, mutationInputs[i].name, 'Verity mutation identity/order differs');
     const wanted = expected.find(e=>e.name===r.name);
     assert.notDeepEqual(normalize(r),wanted,mutationInputs[i].mutation+' survived');
     return {name:r.name,mutation:mutationInputs[i].mutation,killed:true};

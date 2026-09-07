@@ -143,3 +143,32 @@ The first two published commits are now integrated locally. No private worktree
 was changed and no all-writer clean checkpoint is claimed. Final fidelity,
 registered mutants, final-SHA gates, independent certification, sequential merges
 and aligned delivery artifacts remain required.
+
+## Indexed parent proof and reserve pipeline integration
+
+The integrator proved exact all-outcome equivalence between the indexed ALLOC-2
+parent and the recursive parent, including attempted-call transcripts. The
+independent parent relation and conditional canonical ABI equality now transfer
+to that indexed parent. Its 58-module bounded receipt is
+`indexed-parent-init-receipt.json`; the new full-build target is
+`TrioIntegrationChecks`. Compiler memory and deployed calls remain separate.
+
+Published ALLOC-1 `876649be` (admission stages, short-string storage and public
+rollback) and RESERVE-1 `2baf74c6` (concrete withdrawal pipeline and execution
+records) are integrated. Their publication is not a clean-workspace attestation.
+
+`compare-reserve-records.py` independently checked all 51 recorded reserve
+cases and seven mutants at execution source `4b82879f`, including return/revert
+bytes, ABI event encoding, storage, balances, ordered calls and nested calls. It
+verified recorded source hashes against that commit and current Lean/Solidity
+files; event declarations were read from pinned Solidity and hashed with cast.
+Nine cases use the concrete source pipeline. This is a comparison of recorded
+executions, not a new VM run or universal certification. Eight corrupted-record
+checks were rejected in normal and optimized Python modes.
+
+The original reserve comparison harness could accept truncated VM or mutation
+arrays. It now requires complete counts, unique differential names and matching
+mutation identities. These check-only changes require fresh execution before a
+new harness receipt can be claimed; historical receipts remain tied to their
+original runner hash. The remote full run at `03f17085` is still pending and
+predates all changes in this section.
