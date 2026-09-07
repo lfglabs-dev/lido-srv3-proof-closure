@@ -4,6 +4,13 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+EXPECTED_PARTS = {
+    "model-source": {
+        "A-SOURCE-SHAPED", "A-HANDWRITTEN-MINFIRST", "A-ABSTRACT-TX",
+        "A-VERITY-SCAFFOLD", "A-YUL-INTERFACE",
+    },
+    "source-chain": {"A-SOLC-TRUSTED", "A-RUNTIME-PROVENANCE"},
+}
 
 
 def validate(catalog, assumptions, guarantees):
@@ -18,15 +25,15 @@ def validate(catalog, assumptions, guarantees):
         parts = group["parts"]
         if not parts or not set(parts) <= known or seen.intersection(parts):
             raise ValueError("empty, unknown or repeated assumption parts")
+        if set(parts) != EXPECTED_PARTS[group["id"]]:
+            raise ValueError(f"{group['id']}: incorrect assumption membership")
         seen.update(parts)
         if not all(isinstance(text, str) and text.strip()
                    for text in [group["title"], group["mitigation"], *parts.values()]):
             raise ValueError("empty assumption explanation")
     for row in guarantees["guarantees"]:
-        ids = set(row["assumptions"])
-        grouped = {key for group in groups for key in group["parts"] if key in ids}
-        if grouped | (ids - seen) != ids:
-            raise ValueError(f"{row['id']}: presentation loses assumptions")
+        if not set(row["assumptions"]) <= known:
+            raise ValueError(f"{row['id']}: unknown registry assumption")
 
 
 def main():
