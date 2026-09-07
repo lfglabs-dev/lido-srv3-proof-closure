@@ -56,9 +56,21 @@ structure Request where
   payload : Bytes
   deriving DecidableEq, Repr
 
+/-- A nested observation is outside EVM storage and committed events. Depth is
+relative to the direct Lido call (its callee's call has depth 1). -/
+structure NestedAttempt where
+  request : Request
+  isStatic : Bool
+  accepted : Bool
+  returned : Bytes
+  depth : Nat := 1
+  deriving DecidableEq, Repr
+
 inductive Reply where
   | success (data : Bytes) (world : World)
   | rejected (data : Bytes)
+  | successWithTrace (data : Bytes) (world : World) (nested : List NestedAttempt)
+  | rejectedWithTrace (data : Bytes) (nested : List NestedAttempt)
 
 /-- The callee receives the world AFTER the CALL's value transfer. Rejection
 rolls that transfer and all callee effects back. No successful-call premise. -/
@@ -74,6 +86,7 @@ structure Attempt where
   request : Request
   accepted : Bool
   returned : Bytes
+  nested : List NestedAttempt := []
   deriving DecidableEq, Repr
 
 structure Result (α : Type) where
@@ -135,11 +148,13 @@ def call (external : External) (ctx : Context) (target : Address)
   let req : Request := ⟨ctx.self, target, value, encode 4 selector⟩
   if (w.core.codeSize target.val).val = 0 then ⟨.error .empty, w, []⟩
   else if w.balances ctx.self < value.val then
-    ⟨.error (.bubbled []), w, [⟨req, false, []⟩]⟩
+    ⟨.error (.bubbled []), w, [⟨req, false, [], []⟩]⟩
   else
     match external req (transfer w ctx.self target value.val) with
-    | .rejected data => ⟨.error (.bubbled data), w, [⟨req, false, data⟩]⟩
-    | .success data after => ⟨.ok data, after, [⟨req, true, data⟩]⟩
+    | .rejected data => ⟨.error (.bubbled data), w, [⟨req, false, data, []⟩]⟩
+    | .success data after => ⟨.ok data, after, [⟨req, true, data, []⟩]⟩
+    | .successWithTrace data after nested => ⟨.ok data, after, [⟨req, true, data, nested⟩]⟩
+    | .rejectedWithTrace data nested => ⟨.error (.bubbled data), w, [⟨req, false, data, nested⟩]⟩
 
 /-- Lido.sol:1557-1558: locator occupies low 160 bits of its physical word. -/
 def getLidoLocator (ctx : Context) : Exec Address := do

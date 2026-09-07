@@ -49,4 +49,24 @@ theorem replacing_attempts_preserves_observables (r : Result α) (trace : List A
     (({r with attempts := trace} : Result α).outcome,
       ({r with attempts := trace} : Result α).world) = (r.outcome, r.world) := rfl
 
+/-- Nested call instrumentation is removable from external replies before the
+caller executes, without changing its returned bytes or world effects. -/
+def stripNested : Reply → Reply
+  | .successWithTrace data w _ => .success data w
+  | .rejectedWithTrace data _ => .rejected data
+  | reply => reply
+
+theorem call_nested_erasure (external : External) (ctx : Context)
+    (target : Address) (selector : Nat) (amount : Word) :
+    erase (call external ctx target selector amount) =
+      erase (call (fun req w => stripNested (external req w)) ctx target selector amount) := by
+  funext w
+  unfold erase call
+  split
+  · rfl
+  · split
+    · rfl
+    · cases he : external ⟨ctx.self, target, amount, encode 4 selector⟩
+        (transfer w ctx.self target amount.val) <;> simp [he, stripNested]
+
 end LidoSRv3.Audit.Source.TrioReserve1.Erasure

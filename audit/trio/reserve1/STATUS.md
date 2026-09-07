@@ -1,5 +1,39 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Oracle and nested-call continuation
+
+`Oracle` executes the actual BaseOracle physical consensus-pointer read and
+typed STATICCALL, checks tuple length, and applies checked timestamp arithmetic.
+`Consensus` executes the HashConsensus frame getter from the physical packed
+frame configuration and block timestamp. `OracleSpec` covers timestamp success
+and overflow; `FrameSpec` independently selects slot/epoch/frame by quotient
+intervals, including uint64 projections, and proves uniqueness. The source
+success correspondence and oracle whole-world frame properties are checked.
+
+Nested STATICCALL observations now retain request, relative depth, status and
+returned bytes through outer rollback. `StaticCall` rejects forbidden state
+operations; `Erasure.call_nested_erasure` removes nested instrumentation without
+changing call return/world effects. Arbitrary recursive callback semantics and
+the full withdrawal parent are not discharged by these components.
+
+The 49-case draft run (`oracle-execute-2`, exit 0) matches actual Solidity and
+Lean, including malformed/rejected static tuples, no code, actual SSTORE under
+STATICCALL, initial epoch failure, zero frame length, checked timestamp overflow,
+and a real frame-boundary accounting reset. The first executed failure exposed
+and corrected uint64 frame-span multiplication modeled as uint256; its log is
+retained. The expanded final suite adds cached-frame, static-write-success and
+wide-frame-span mutants to the earlier four negative controls. Exact immutable
+source validation is recorded in the subsequent oracle summary and component
+receipts; do not infer full-gate success from a component description.
+
+Solidity inherits complete pinned AccountingOracle and HashConsensus bodies.
+Raw setup still bypasses production consensus-pointer/frame writer admissions.
+The frame slot comes from compiler storageLayout and is checked against the
+harness's inherited slot query. Vector timestamps are checked against the actual
+transaction block. Full ABI/physical/deployment composition, admission/writer
+and sequence proofs, bounded EVM world relation, canonical integration, remote
+full gates and independent review remain open. No parent completion is claimed.
+
 ## Current source composition work
 
 Immutable validated source: `df5a6b52d561ffa6014d6cf4cdae48481b398a3f`.

@@ -24,12 +24,14 @@ for (const [entry, compilerName, evmVersion] of [
   ['LidoHarness.sol','solc-0424','constantinople'],
   ['QueueHarness.sol','solc-089','istanbul'],
   ['LocatorHarness.sol','solc-089','istanbul'],
+  ['OracleHarness.sol','solc-089','istanbul'],
+  ['ConsensusHarness.sol','solc-089','istanbul'],
 ]) {
   const solc = require(compilerName);
   const name = `solidity/trio-reserve1/${entry}`;
   const input = {language:'Solidity', sources:{[name]:{content:load(name).contents}}, settings:{
     optimizer:{enabled:true,runs:200}, evmVersion,
-    outputSelection:{'*':{'*':['abi','evm.bytecode.object','evm.deployedBytecode.object']}}
+    outputSelection:{'*':{'*':['abi','evm.bytecode.object','evm.deployedBytecode.object','storageLayout']}}
   }};
   const output = JSON.parse(compilerName === 'solc-0424'
     ? solc.compileStandardWrapper(JSON.stringify(input),load)
@@ -40,6 +42,6 @@ for (const [entry, compilerName, evmVersion] of [
   receipts.push({entry,compiler:solc.version(),evmVersion,optimizer:input.settings.optimizer,
     contracts:Object.keys(output.contracts[name]),warnings:(output.errors||[]).map(x=>x.formattedMessage)});
 }
-fs.writeFileSync(path.join(root,'audit/trio/reserve1/receipts/solidity-compilation-with-locator.json'),
+fs.writeFileSync(path.join(root,'audit/trio/reserve1/receipts/solidity-compilation-with-oracle.json'),
   JSON.stringify({pin,node:process.version,receipts,sourceHashes},null,2)+'\n');
-console.log('Compiled inherited pinned Lido (0.4.24), WithdrawalQueueBase and immutable LidoLocator (0.8.9).');
+console.log('Compiled pinned Lido, queue, locator, AccountingOracle and HashConsensus.');

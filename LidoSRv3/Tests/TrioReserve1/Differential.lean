@@ -1,6 +1,9 @@
 import LidoSRv3.Audit.Source.TrioReserve1.Queue
 import LidoSRv3.Audit.Source.TrioReserve1.Router
 import LidoSRv3.Audit.Source.TrioReserve1.Locator
+import LidoSRv3.Audit.Source.TrioReserve1.Oracle
+import LidoSRv3.Audit.Source.TrioReserve1.Consensus
+import LidoSRv3.Tests.TrioReserve1.OracleMutants
 import Lean
 
 /-!
@@ -53,6 +56,10 @@ private def jbytes (b : Bytes) : Json := toJson (b.map UInt8.toNat)
 private def requestJson (r : Attempt) : Json := Json.mkObj [
   ("target", jnat r.request.target.val), ("value", jnat r.request.value.val),
   ("payload", jbytes r.request.payload)]
+private def nestedJson (r : NestedAttempt) : Json := Json.mkObj [
+  ("target", jnat r.request.target.val), ("value", jnat r.request.value.val),
+  ("payload", jbytes r.request.payload), ("isStatic", .bool r.isStatic),
+  ("accepted", .bool r.accepted), ("returned", jbytes r.returned), ("depth", toJson r.depth)]
 private def logJson (r : Log) : Json := Json.mkObj [
   ("emitter", jnat r.emitter.val), ("name", .str r.name),
   ("values", .arr (r.values.map (jnat ∘ (·.val))).toArray)]
@@ -84,10 +91,39 @@ private def execute (j : Json) : Except String Json := do
     | .ok rows => (← list rows).mapM fun v => do
         let config : Locator.Config := ⟨← address v "queue", ← address v "router", ← address v "oracle"⟩
         pure (← address v "locator", config)
+  let sourceOracles ← match j.getObjVal? "sourceOracles" with
+    | .error _ => pure []
+    | .ok rows => (← list rows).mapM fun v => do
+        let genesis ← number v "genesis"
+        let seconds ← number v "secondsPerSlot"
+        if genesis ≥ 2^256 ∨ seconds ≥ 2^256 ∨ seconds = 0 then
+          throw "invalid oracle immutable"
+        let config : Oracle.Config := ⟨word genesis, word seconds⟩
+        pure (← address v "oracle", config)
+  let sourceConsensus ← match j.getObjVal? "sourceConsensus" with
+    | .error _ => pure []
+    | .ok rows => (← list rows).mapM fun v => do
+        let config : Consensus.Config := ⟨← number v "genesis", ← number v "secondsPerSlot",
+          ← number v "slotsPerEpoch", ← number v "frameSlot"⟩
+        if config.genesis ≥ 2^64 ∨ config.secondsPerSlot ≥ 2^64 ∨ config.slotsPerEpoch ≥ 2^64 ∨
+            config.secondsPerSlot = 0 ∨ config.slotsPerEpoch = 0 then
+          throw "invalid consensus immutable uint64"
+        pure (← address v "consensus", config)
+  let staticWriters ← match j.getObjVal? "staticWriters" with
+    | .error _ => pure []
+    | .ok rows => (← list rows).mapM fun v => do
+        let n ← nat v
+        if n ≥ 2^160 then throw "invalid static writer address"
+        pure (Verity.Core.Address.ofNat n)
+  let blockTime ← match j.getObjVal? "blockTimestamp" with
+    | .error _ => pure 0
+    | .ok value => nat value
+  if blockTime ≥ 2^256 then throw "invalid block timestamp"
   let hashes ← (← list (← field j "hashes")).mapM fun v => do
     pure (← bytes (← field v "input"), word (← number v "output"))
   let core := cells.foldl (fun s c => s.writeContractSlot c.account.val c.slot c.value)
     Verity.defaultState
+  let core := { core with blockTimestamp := word blockTime }
   let core := { core with codeSize := fun n => word (((codes.find? (fun x => x.1.val = n)).map (·.2)).getD 0) }
   let before : World := ⟨core, fun a => ((funds.find? (fun x => x.1 = a)).map (·.2)).getD 0, []⟩
   -- Check that the finite hash fixture covers both physical rows actually read.
@@ -103,7 +139,8 @@ private def execute (j : Json) : Except String Json := do
     | some f => if f.reject then .rejected f.returned else .success f.returned w
     | none => if fixtureTargets.contains req.target then .success [] w else .rejected []
   let mutation := (j.getObjValAs? String "mutation").toOption.getD "none"
-  if !(["none", "cached-demand", "omit-rollback", "receiver-no-auth", "receiver-no-event"].contains mutation) then
+  if !(["none", "cached-demand", "omit-rollback", "receiver-no-auth", "receiver-no-event",
+      "cached-frame", "static-write-success", "consensus-wide-span"].contains mutation) then
     throw "unknown mutation"
   let receiverExternal := sourceRouters.foldr (fun (router, lido) other =>
     Router.dispatch router (if mutation = "receiver-no-auth" then ctx.self else lido) other) fixtureExternal
@@ -114,10 +151,28 @@ private def execute (j : Json) : Except String Json := do
             req.payload = encode 4 0x13ae8460 then .success data {after with logs := w.logs}
         else .success data after
       | .rejected data => .rejected data
+      | .successWithTrace data after trace => .successWithTrace data after trace
+      | .rejectedWithTrace data trace => .rejectedWithTrace data trace
     else receiverExternal
   let locatorExternal := sourceLocators.foldr (fun (locator, config) other =>
     Locator.dispatch locator config other) receiverExternal
-  let external := Queue.dispatch keccak queue locatorExternal
+  let staticFixture : StaticCall.External := fun req _ =>
+    if staticWriters.contains req.target then
+      if mutation = "static-write-success" then .success (encode 32 7 ++ encode 32 8)
+      else .forbiddenStateChange
+    else match fixtures.find? (fun f => f.target = req.target ∧ f.payload = req.payload) with
+      | some f => if f.reject then .rejected f.returned else .success f.returned
+      | none => if fixtureTargets.contains req.target then .success [] else .rejected []
+  let staticExternal := sourceConsensus.foldr (fun (consensus, config) other =>
+    if mutation = "consensus-wide-span" then OracleMutants.dispatch consensus config other
+    else Consensus.dispatch consensus config other) staticFixture
+  let staticExternal : StaticCall.External := if mutation = "cached-frame" then
+    fun req w => if req.payload = encode 4 0x72f79b13 then .success (encode 32 11 ++ encode 32 12)
+      else staticExternal req w
+    else staticExternal
+  let oracleExternal := sourceOracles.foldr (fun (oracle, config) other =>
+    Oracle.dispatch oracle config staticExternal other) locatorExternal
+  let external := Queue.dispatch keccak queue oracleExternal
   -- Executed negative control: replace the live queue body by a cached word.
   let external : External := if mutation = "cached-demand" then
     fun req w => if req.payload = encode 4 0xd0fb84e8 then .success (encode 32 50) w
@@ -140,6 +195,7 @@ private def execute (j : Json) : Except String Json := do
     ("balances", .arr (funds.map fun (a, _) => Json.mkObj [
       ("account", jnat a.val), ("value", jnat (r.world.balances a))]).toArray),
     ("calls", .arr (r.attempts.map requestJson).toArray),
+    ("nested", .arr ((r.attempts.flatMap (·.nested)).map nestedJson).toArray),
     ("logs", .arr (r.world.logs.map logJson).toArray)])
 
 end LidoSRv3.Tests.TrioReserve1.Differential

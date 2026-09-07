@@ -15,7 +15,8 @@ No canonical source-map or guarantee entries are changed.
 | queue demand | `contracts/0.8.9/WithdrawalQueueBase.sol:143-146` | `Queue.unfinalized_corresponds` / `QueueSpec` | physical current ids/rows, numeric return/panic relation; cryptographic primitive parameter |
 | bunker getter | `contracts/0.8.9/WithdrawalQueue.sol:346-354` | `Queue.isBunkerModeActive`; inherited Solidity execution | actual timestamp/max sentinel; writer ACL closure open |
 | locator getters | `contracts/0.8.9/LidoLocator.sol:46-56,78-88` | Locator.dispatch/getter proofs; inherited 0.8.9 constructor/getters executed | queue/router/oracle immutable values; deployment binding remains explicit |
-| oracle frame | `contracts/0.8.9/oracle/AccountingOracle.sol:439-442` | external interpreter boundary | BaseOracle consensus/ref-slot/time helpers still to compose |
+| oracle frame | `contracts/0.8.9/oracle/AccountingOracle.sol:439-442,561-563`; `BaseOracle.sol:357-360` | `Oracle.frame_success`, `timestamp_corresponds`, `frame_preserves`; inherited source execution | actual physical consensus pointer, nested STATICCALL, malformed/rejected bytes and checked timestamp; full parent/ABI composition open |
+| consensus frame | `contracts/0.8.9/oracle/HashConsensus.sol:307-312,644-719` | `Consensus.compute_success` / independent `FrameSpec`; compiler-derived physical frame slot | uint64 frame-span multiplication, uint256 remaining arithmetic, initial-epoch and divide-by-zero failures; raw writer setup is not production admission |
 | router receipt | `contracts/0.8.25/sr/StakingRouter.sol:665-669` | Router/RouterSpec auth, event and CALL theorems; inherited 0.8.25 Cancun execution | exact-selector receiver composition; full router parent/bytecode refinement open |
 
 ## Writer inventory requiring composition
@@ -50,9 +51,9 @@ ethers keccak and provided to Lean; missing current-row preimages fail the drive
 The trace is outside contract state; erasure is checked compositionally.
 
 Nested callee traces, reentrancy/callback composition, complete deployment
-binding, actual consensus/oracle interpretation, Aragon ACL and complete
-report/writer composition remain open. Locator getters and router receiver now
-have source implementations and finite composed executions; full withdrawal
+binding, full consensus/oracle writer interpretation, Aragon ACL and complete
+report/writer composition remain open. Locator getters, router receiver, AccountingOracle/BaseOracle and the
+HashConsensus frame getter now have source implementations and finite composed executions; full withdrawal
 correspondence is not implied. World balances
 use Nat. Transfers proves debit/credit, self-call identity, conservation and
 a conditional credit bound from aggregate available ETH. Deriving that aggregate
@@ -65,3 +66,12 @@ Fixtures are finite test data, not successful-callee proof premises.
 Compiler/runtime/primitive correctness are explicit assumptions. Full bytecode,
 gas/deployment-size correctness, cryptographic injectivity, full consensus-state
 truth, and public-chain deployment claims are excluded.
+
+The current oracle suite additionally compares nested STATICCALL target/value/payload,
+relative depth, success status and returned bytes. Every vector timestamp is
+checked against the actual transaction block. The physical frame-config slot
+is checked against compiler storageLayout and the inherited harness slot query.
+An executed failure found and corrected the model's first uint256 treatment of
+`config.epochsPerFrame * SLOTS_PER_EPOCH`: both operands are uint64, so that
+subexpression must panic on uint64 overflow before the following uint256 add.
+A separate case executes uint64 deadline narrowing after a valid span product.

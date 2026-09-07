@@ -26,7 +26,7 @@ const coder = ethers.AbiCoder.defaultAbiCoder();
 const selector = signature => ethers.id(signature).slice(0,10);
 const encode = (types, values) => coder.encode(types, values);
 const artifacts = name => JSON.parse(fs.readFileSync(path.join(__dirname,'artifacts',name+'.sol.json')));
-const receiptDir = path.resolve(__dirname,'../../audit/trio/reserve1/receipts/router-composition');
+const receiptDir = path.resolve(__dirname,'../../audit/trio/reserve1/receipts/oracle-composition');
 async function main() {
   fs.mkdirSync(receiptDir,{recursive:true});
   process.env.HARDHAT_CONFIG = path.join(__dirname,'hardhat.config.cjs');
@@ -82,7 +82,36 @@ async function main() {
     {router:decimal(addresses.sourceRouter),lido:decimal(addresses.lido)},
     {router:decimal(addresses.wrongRouter),lido:decimal(await signer.getAddress())},
   ];
+  const U64 = 1n << 64n, U256 = 1n << 256n;
+  const sourceOracle = await deploy('OracleHarness','OracleHarness',[addresses.locator,12n,0n]);
+  const mulOverflowOracle = await deploy('OracleHarness','OracleHarness',[addresses.locator,U256-1n,0n]);
+  const addOverflowOracle = await deploy('OracleHarness','OracleHarness',[addresses.locator,12n,U256-1n]);
+  const consensus = await deploy('ConsensusHarness','ConsensusHarness',[32n,12n,0n,signer.address,addresses.lido]);
+  const futureConsensus = await deploy('ConsensusHarness','ConsensusHarness',[32n,12n,U64-1n,signer.address,addresses.lido]);
+  const staticWriter = await deploy('ConsensusHarness','StaticWriteFixture');
+  for (const [key, c] of Object.entries({sourceOracle,mulOverflowOracle,addOverflowOracle,consensus,futureConsensus,staticWriter}))
+    addresses[key] = await c.getAddress();
+  const frameSlot = BigInt(artifacts('ConsensusHarness').ConsensusHarness.storageLayout.storage.find(x=>x.label==='_frameConfig').slot);
+  assert.equal(await consensus.fixtureFrameSlot(),frameSlot,'compiler frame layout');
+  const consensusPointer = ethers.id('lido.BaseOracle.consensusContract');
+  const sourceOracles = [
+    {oracle:decimal(addresses.sourceOracle),genesis:'0',secondsPerSlot:'12'},
+    {oracle:decimal(addresses.mulOverflowOracle),genesis:'0',secondsPerSlot:String(U256-1n)},
+    {oracle:decimal(addresses.addOverflowOracle),genesis:String(U256-1n),secondsPerSlot:'12'},
+  ];
+  const sourceConsensus = [
+    {consensus:decimal(addresses.consensus),genesis:'0',secondsPerSlot:'12',slotsPerEpoch:'32',frameSlot:String(frameSlot)},
+    {consensus:decimal(addresses.futureConsensus),genesis:String(U64-1n),secondsPerSlot:'12',slotsPerEpoch:'32',frameSlot:String(frameSlot)},
+  ];
+  const fullLocatorConfig = {...locatorConfig,accountingOracle:addresses.sourceOracle};
+  const fullLocator = await deploy('LocatorHarness','LocatorHarness',[fullLocatorConfig]);
+  addresses.fullLocator = await fullLocator.getAddress();
+  sourceLocators.push({locator:decimal(addresses.fullLocator),queue:decimal(addresses.queue),
+    router:decimal(addresses.sourceRouter),oracle:decimal(addresses.sourceOracle)});
   const send = async tx => (await tx).wait();
+  for (const c of [sourceOracle,mulOverflowOracle,addOverflowOracle])
+    await send(c.fixtureStore(consensusPointer,BigInt(addresses.consensus)));
+  await send(consensus.fixtureStore(ethers.toBeHex(frameSlot,32),1n+8n*U64));
   let fixtureRows = [];
   const configure = async (c, signature, data, reject=false) => {
     await send(c.configure(selector(signature),data,reject));
@@ -113,10 +142,13 @@ async function main() {
   const cases = [], vectors = [], expected = [];
   const rawCell = async (account, slot) => ({account:decimal(account),slot:decimal(slot),
     value:decimal((await backend.request({method:'eth_getStorageAt',params:[account,ethers.toBeHex(BigInt(slot),32),'latest']})).replace(/^0x$/, '0x0'))});
-  async function input(name, amount, seeds, direct, forwarder) {
+  async function input(name, amount, seeds, direct, forwarder, blockTimestamp) {
     const storage = [];
     for (const slot of Object.values(slots)) storage.push(await rawCell(addresses.lido,slot));
     for (const slot of Object.values(queueSlots)) storage.push(await rawCell(addresses.queue,slot));
+    for (const c of sourceOracles) storage.push(await rawCell(ethers.toBeHex(BigInt(c.oracle),20),consensusPointer));
+    for (const c of sourceConsensus) storage.push(await rawCell(ethers.toBeHex(BigInt(c.consensus),20),frameSlot));
+    storage.push(await rawCell(addresses.staticWriter,0n));
     const hashes = [];
     for (const label of ['last','finalized']) {
       const id = (await rawCell(addresses.queue,queueSlots[label])).value;
@@ -131,6 +163,7 @@ async function main() {
       code.push({account:decimal(account),size:String(ethers.getBytes(await provider.getCode(account)).length)});
     }
     return {name,self:decimal(addresses.lido),sender:decimal(direct ? await signer.getAddress() : await forwarder.getAddress()),sourceRouters,sourceLocators,
+      sourceOracles,sourceConsensus,staticWriters:[decimal(addresses.staticWriter)],blockTimestamp:String(blockTimestamp),
       queue:decimal(addresses.queue),storage,balances,code,hashes,fixtures:structuredClone(fixtureRows),
       fixtureTargets:[addresses.locator,addresses.router,addresses.oracle].map(decimal),amount:String(amount),seeds:String(seeds)};
   }
@@ -139,8 +172,11 @@ async function main() {
     const savedFixtures = structuredClone(fixtureRows);
     try {
       await setup();
+      const lastBlock = await backend.request({method:'eth_getBlockByNumber',params:['latest',false]});
+      const blockTimestamp = Number(BigInt(lastBlock.timestamp))+1;
+      await backend.request({method:'evm_setNextBlockTimestamp',params:[blockTimestamp]});
       const before = await observe();
-      const vector = await input(name,amount,seeds,direct,forwarder);
+      const vector = await input(name,amount,seeds,direct,forwarder,blockTimestamp);
       vectors.push(vector);
       const payload = lido.interface.encodeFunctionData('withdrawDepositableEther',[amount,seeds]);
       let receipt;
@@ -150,17 +186,30 @@ async function main() {
         receipt = await tx.wait();
       } catch (e) { if (!e.receipt) throw e; receipt=e.receipt; }
       const success = receipt.status === 1;
+      const executedBlock = await backend.request({method:'eth_getBlockByHash',params:[receipt.blockHash,false]});
+      assert.equal(BigInt(executedBlock.timestamp),BigInt(blockTimestamp),'actual input block timestamp');
       assert.equal(success,expectedSuccess,name);
       const after = await observe();
       if (!success) { assert.deepEqual(after,before,name+' rollback'); assert.equal(receipt.logs.length,0); }
       await check(after,before);
       const trace = await backend.request({method:'debug_traceTransaction',params:[receipt.hash,{disableMemory:false}]});
-      const calls = trace.structLogs.filter(x=>['CALL','STATICCALL','DELEGATECALL'].includes(x.op)).map(x=>{
+      const calls = trace.structLogs.flatMap((x, callIndex)=>{
+        if (!['CALL','STATICCALL','DELEGATECALL'].includes(x.op)) return [];
         const s=x.stack;
         const offset=Number(BigInt('0x'+s[s.length-(x.op==='CALL'?4:3)]));
         const size=Number(BigInt('0x'+s[s.length-(x.op==='CALL'?5:4)]));
         const memory=x.memory.join('');
-        return {op:x.op,depth:x.depth,target:'0x'+s[s.length-2].slice(-40),value:x.op==='CALL'?'0x'+s[s.length-3]:'0x0',payload:'0x'+memory.slice(offset*2,(offset+size)*2)};
+        const resumeIndex = trace.structLogs.findIndex((y,i)=>i>callIndex && y.depth===x.depth);
+        assert.ok(resumeIndex>callIndex,'missing resumed CALL instruction');
+        const accepted = BigInt('0x'+trace.structLogs[resumeIndex].stack.at(-1))!==0n;
+        const terminal = trace.structLogs.slice(callIndex+1,resumeIndex)
+          .filter(y=>y.depth===x.depth+1 && ['RETURN','REVERT','STOP'].includes(y.op)).at(-1);
+        let returned = [];
+        if (terminal && terminal.op!=='STOP') {
+          const begin=Number(BigInt('0x'+terminal.stack.at(-1))), length=Number(BigInt('0x'+terminal.stack.at(-2)));
+          returned=bytes('0x'+terminal.memory.join('').slice(begin*2,(begin+length)*2));
+        }
+        return [{op:x.op,depth:x.depth,target:'0x'+s[s.length-2].slice(-40),value:x.op==='CALL'?'0x'+s[s.length-3]:'0x0',payload:'0x'+memory.slice(offset*2,(offset+size)*2),accepted,returned}];
       });
       const lidoDepth = direct ? 1 : 2;
       const final = trace.structLogs.filter(x => x.depth === lidoDepth && ['RETURN','REVERT','STOP'].includes(x.op)).at(-1);
@@ -175,8 +224,11 @@ async function main() {
       for (const c of vector.balances) actualBalances.push({account:c.account,value:decimal(await backend.request({method:'eth_getBalance',params:[ethers.toBeHex(BigInt(c.account),20),'latest']}))});
       expected.push({name,success,returned,storage:actualStorage,balances:actualBalances,
         calls:calls.filter(c=>c.depth===lidoDepth).map(c=>({target:decimal(c.target),value:decimal(c.value),payload:bytes(c.payload)})),
+        nested:calls.filter(c=>c.depth>lidoDepth).map(c=>({target:decimal(c.target),value:decimal(c.value),
+          payload:bytes(c.payload),isStatic:c.op==='STATICCALL',accepted:c.accepted,returned:c.returned,depth:c.depth-lidoDepth})),
         logs:receipt.logs.map(x=>({emitter:decimal(x.address),topics:x.topics.map(x=>x.toLowerCase()),data:x.data.toLowerCase()}))});
-      cases.push({name,success,before,after,calls,logs:receipt.logs.map(x=>({address:x.address,topics:x.topics,data:x.data}))});
+      cases.push({name,success,transactionHash:receipt.hash,blockHash:receipt.blockHash,blockTimestamp:String(blockTimestamp),
+        before,after,calls,logs:receipt.logs.map(x=>({address:x.address,topics:x.topics,data:x.data}))});
     } finally { await backend.request({method:'evm_revert',params:[snapshot]}); fixtureRows = savedFixtures; }
   }
   const noop=async()=>{};
@@ -250,7 +302,47 @@ async function main() {
   },30n,2n,false,()=>{},false,sourceRouter);
   await run('source locator caller authorization',()=>store('locator',BigInt(addresses.sourceLocator)),
     30n,2n,false);
-  fs.writeFileSync(path.join(receiptDir,'solidity-execution.json'),JSON.stringify({node:process.version,backend:'hardhat 2.26.3 in-process Cancun',scope:'Pinned Solidity with matching Lean/Verity execution. Three cases compose source immutable locator, live queue and router. Oracle and adversarial boundaries remain fixtures. Inherited router receiver/auth/event. Gas excluded; tests are not correspondence proofs.',addresses,locatorConfig,libraries:[...libraries.keys()],cases},null,2)+'\n');
+  const fullSource = ()=>store('locator',BigInt(addresses.fullLocator));
+  const setConsensus = target=>send(sourceOracle.fixtureStore(consensusPointer,BigInt(target)));
+  const sourceRun = (name,setup,success=true,check=()=>{})=>run(name,async()=>{await fullSource();await setup();},30n,2n,success,check,false,sourceRouter);
+  await sourceRun('source oracle consensus frame and receiver compose',noop,true,
+    after=>{assert.equal(after.balances.lido,'70');assert.equal(after.balances.sourceRouter,'30');});
+  await sourceRun('source consensus zero frame length panics',
+    ()=>send(consensus.fixtureStore(ethers.toBeHex(frameSlot,32),1n)),false);
+  await sourceRun('source consensus initial epoch not arrived',
+    ()=>send(consensus.fixtureStore(ethers.toBeHex(frameSlot,32),U64-1n+8n*U64)),false);
+  await sourceRun('source consensus timestamp before genesis panics',()=>setConsensus(addresses.futureConsensus),false);
+  await sourceRun('source consensus uint64 frame span overflow panics',
+    ()=>send(consensus.fixtureStore(ethers.toBeHex(frameSlot,32),1n+(U64-1n)*U64)),false);
+  await sourceRun('source consensus deadline narrows after valid uint64 span',
+    ()=>send(consensus.fixtureStore(ethers.toBeHex(frameSlot,32),2n+((U64-1n)/32n)*U64)));
+  await sourceRun('source oracle malformed STATICCALL tuple',async()=>{
+    await setConsensus(addresses.oracle);await configure(oracle,'getCurrentFrame()','0x1234');
+  },false);
+  await sourceRun('source oracle rejected STATICCALL bubbles bytes',async()=>{
+    await setConsensus(addresses.oracle);await configure(oracle,'getCurrentFrame()','0xdeadbeef',true);
+  },false);
+  await sourceRun('source oracle no-code consensus',()=>setConsensus(ethers.ZeroAddress),false);
+  await sourceRun('source oracle STATICCALL rejects SSTORE',()=>setConsensus(addresses.staticWriter),false);
+  await sourceRun('source oracle accepts trailing consensus bytes',async()=>{
+    await setConsensus(addresses.oracle);await configure(oracle,'getCurrentFrame()',encode(['uint256','uint256','uint256'],[200n,300n,400n]));
+  });
+  for (const [label,c] of [['multiply',mulOverflowOracle],['add',addOverflowOracle]]) {
+    await run(`source oracle timestamp ${label} overflow after accounting`,async()=>{
+      await configure(locator,'stakingRouter()',encode(['address'],[addresses.sourceRouter]));
+      await configure(locator,'accountingOracle()',encode(['address'],[await c.getAddress()]));
+    },30n,2n,false,()=>{},false,sourceRouter);
+  }
+  await run('source frame boundary resets next accounting',async()=>{
+    await fullSource();
+    await send(sourceRouter.forward(addresses.lido,lido.interface.encodeFunctionData('withdrawDepositableEther',[20n,0n])));
+    const block=await backend.request({method:'eth_getBlockByNumber',params:['latest',false]});
+    const epoch=BigInt(block.timestamp)/12n/32n;
+    const nextFrameEpoch=1n+((epoch-1n)/8n+1n)*8n;
+    await backend.request({method:'evm_setNextBlockTimestamp',params:[Number(nextFrameEpoch*32n*12n-1n)]});
+    await backend.request({method:'evm_mine',params:[]});
+  },20n,0n,true,after=>assert.equal(BigInt(after.storage.next)%U128,20n),false,sourceRouter);
+  fs.writeFileSync(path.join(receiptDir,'solidity-execution.json'),JSON.stringify({node:process.version,backend:'hardhat 2.26.3 in-process Cancun',scope:'Pinned Solidity and matching Lean execution compose locator, queue, AccountingOracle, BaseOracle, HashConsensus and receiver. Raw setup and adversarial fixtures remain explicit. Nested STATICCALL status/bytes retained through rollback. Gas and production admission/writer closure excluded.',addresses,locatorConfig,fullLocatorConfig,sourceOracles,sourceConsensus,libraries:[...libraries.keys()],cases},null,2)+'\n');
   console.log(`${cases.length} pinned Solidity cases executed; reverts checked against physical storage, balances and logs.`);
   fs.writeFileSync(path.join(receiptDir,'differential-input.json'),JSON.stringify(vectors,null,2)+'\n');
   fs.writeFileSync(path.join(receiptDir,'differential-solidity.json'),JSON.stringify(expected,null,2)+'\n');
@@ -262,7 +354,7 @@ async function main() {
     const f = r.result.fault;
     const returned = !f || f.kind === 'empty' ? [] : f.kind === 'bubbled' ? f.data :
       bytes(ethers.concat(['0x08c379a0',encode(['string'],[f.reason])]));
-    return {name:r.name,success:r.result.success,returned,storage:r.storage,balances:r.balances,calls:r.calls,
+    return {name:r.name,success:r.result.success,returned,storage:r.storage,balances:r.balances,calls:r.calls,nested:r.nested,
       logs:r.logs.map(l=> {
         const iface = l.name === 'DepositableEthReceived' ? sourceRouter.interface : lido.interface;
         const event = iface.getEvent(l.name);
@@ -281,6 +373,9 @@ async function main() {
     {...vectors.find(v=>v.name==='oracle rejection after packed write'),mutation:'omit-rollback'},
     {...vectors.find(v=>v.name==='source router immutable auth rejects after accounting and seed writes'),mutation:'receiver-no-auth'},
     {...vectors.find(v=>v.name==='source router receives ETH and emits event'),mutation:'receiver-no-event'},
+    {...vectors.find(v=>v.name==='source oracle consensus frame and receiver compose'),mutation:'cached-frame'},
+    {...vectors.find(v=>v.name==='source oracle STATICCALL rejects SSTORE'),mutation:'static-write-success'},
+    {...vectors.find(v=>v.name==='source consensus uint64 frame span overflow panics'),mutation:'consensus-wide-span'},
   ];
   fs.writeFileSync(path.join(receiptDir,'mutation-input.json'),JSON.stringify(mutationInputs,null,2)+'\n');
   cp.execFileSync('lake',['env','lean','--run','LidoSRv3/Tests/TrioReserve1/Differential.lean',

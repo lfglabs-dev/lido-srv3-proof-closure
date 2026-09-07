@@ -6,6 +6,8 @@ import LidoSRv3.Audit.Source.TrioReserve1.Allocation
 import LidoSRv3.Audit.Source.TrioReserve1.Router
 import LidoSRv3.Audit.Source.TrioReserve1.Locator
 import LidoSRv3.Audit.Source.TrioReserve1.Transfers
+import LidoSRv3.Audit.Source.TrioReserve1.Oracle
+import LidoSRv3.Audit.Source.TrioReserve1.Consensus
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -40,3 +42,10 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Transfers.conserves
 #print axioms Transfers.self_transfer_balance
 #print axioms Transfers.credit_bound_from_aggregate
+#print axioms Erasure.call_nested_erasure
+#print axioms StaticCall.state_change_rejected
+#print axioms Oracle.timestamp_corresponds
+#print axioms Oracle.frame_preserves
+#print axioms Oracle.frame_success
+#print axioms Consensus.compute_success
+#print axioms FrameSpec.unique

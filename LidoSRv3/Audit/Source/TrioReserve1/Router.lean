@@ -39,7 +39,11 @@ theorem source_rule (router lido : Address) (req : Request) (w : World) :
     match receiveDepositableEther router lido req w with
     | .success _ _ => RouterSpec.Describes lido.val req.caller.val req.value.val
         (.accepted req.value.val)
+    | .successWithTrace _ _ _ => RouterSpec.Describes lido.val req.caller.val req.value.val
+        (.accepted req.value.val)
     | .rejected _ => RouterSpec.Describes lido.val req.caller.val req.value.val
+        .notAuthorized
+    | .rejectedWithTrace _ _ => RouterSpec.Describes lido.val req.caller.val req.value.val
         .notAuthorized := by
   by_cases h : req.caller = lido
   · simp [receiveDepositableEther, h, RouterSpec.Describes]
@@ -59,7 +63,7 @@ theorem authorized_call (router lido : Address) (other : External) (ctx : Contex
     call (dispatch router lido other) ctx router 0x13ae8460 amount w =
       ⟨.ok [], {transfer w ctx.self router amount.val with
         logs := w.logs ++ [⟨router, "DepositableEthReceived", [amount]⟩]},
-        [⟨⟨ctx.self, router, amount, encode 4 0x13ae8460⟩, true, []⟩]⟩ := by
+        [⟨⟨ctx.self, router, amount, encode 4 0x13ae8460⟩, true, [], []⟩]⟩ := by
   rw [hcaller] at hfunds
   simp [call, dispatch, receiveDepositableEther, hcode, Nat.not_lt.mpr hfunds,
     hcaller, transfer]
@@ -73,7 +77,7 @@ theorem unauthorized_call (router lido : Address) (other : External) (ctx : Cont
     (hfunds : amount.val ≤ w.balances ctx.self) :
     call (dispatch router lido other) ctx router 0x13ae8460 amount w =
       ⟨.error (.bubbled notAuthorized), w,
-        [⟨⟨ctx.self, router, amount, encode 4 0x13ae8460⟩, false, notAuthorized⟩]⟩ := by
+        [⟨⟨ctx.self, router, amount, encode 4 0x13ae8460⟩, false, notAuthorized, []⟩]⟩ := by
   simp [call, dispatch, receiveDepositableEther, hcode, Nat.not_lt.mpr hfunds, hcaller]
 
 end LidoSRv3.Audit.Source.TrioReserve1.Router
