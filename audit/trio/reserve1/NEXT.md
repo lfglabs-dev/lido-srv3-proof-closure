@@ -23,13 +23,17 @@ physical kernel-no-code cases. Remaining target integration includes concrete
 authorization failure/deployment coverage,
 external sequence reachability and deployed primitive binding.
 
+Tail.Withdrawal now substitutes independent seed arithmetic and ordered receiver
+tail rules, covering overflow before a call and every receiver outcome. Spending
+internals and CALL/deployed primitive binding remain the direct boundaries.
+
 1. WithdrawalSpec/WithdrawalParent now cover all eight parent paths with
    bidirectional exact return/world/trace correspondence to actual stage
    observations. Status.Withdrawal now substitutes independent complete
    lookup/CALL/ABI/bunker/post-call pause rules for the status stage. Discharge
    Lookup.Withdrawal now also substitutes physical locator/CALL/ABI/address rules
    for queue and router lookup. Discharge CALL/deployed binding and the remaining
-   spending/tail interfaces with
+   spending interface with
    independent semantics and concrete deployed source across all paths. Complete
    the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied

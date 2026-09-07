@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Tail
 import LidoSRv3.Audit.Source.TrioReserve1.Lookup
 import LidoSRv3.Audit.Source.TrioReserve1.Status
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent
@@ -289,3 +290,11 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Lookup.corresponds
 #print axioms Lookup.status_corresponds
 #print axioms Lookup.withdrawal_corresponds
+
+#print axioms Tail.seed_source
+#print axioms Tail.seed_exists
+#print axioms Tail.of_spec
+#print axioms Tail.exists_spec
+#print axioms Tail.to_spec
+#print axioms Tail.corresponds
+#print axioms Tail.withdrawal_corresponds

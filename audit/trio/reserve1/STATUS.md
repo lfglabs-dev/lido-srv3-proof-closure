@@ -1,5 +1,21 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete seed/receiver tail rules substituted into withdrawal
+
+`TailSpec` independently describes zero seeds, checked seed update and overflow,
+then ordered seed/receiver composition. Seed overflow does not require a receiver
+observation; success discards returned receiver bytes. `Tail` binds seed arithmetic
+to the physical packed update and full-count event projection, and proves exact
+soundness/completeness for every tail outcome/world/trace. Stage worlds are retained
+until the withdrawal parent performs transaction rollback.
+
+`Tail.Withdrawal` replaces the opaque tail observation with these rules while
+retaining the expanded status/lookup relations and bidirectional exact parent
+correspondence. Spending internals and CALL/deployed primitive interpretation remain
+explicit direct boundaries; remaining report/queue writers and full integration
+obligations are unchanged. Immutable validation follows checks. Runtime source is
+unchanged, with prior executions still attributed to their tested commits.
+
 ## Complete locator lookup rules substituted into status and withdrawal
 
 `LookupSpec` independently describes call failure, malformed typed replies and
