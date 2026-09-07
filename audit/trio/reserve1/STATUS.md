@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Aragon target-writer admission
+
+`Aragon` implements the inherited initialization/kernel prefix and the external
+Lido target writer's role check. It reads the physical initialization block and
+kernel pointer, sends exact hasPermission(sender,self,role,empty-bytes) calldata,
+and decodes actual reply bytes. Missing initialization/kernel, missing code,
+denial, short replies and kernel rejection are distinct. Failed admission restores
+the original world. Successful permission evaluation retains the callee world;
+the target writer's independent relation starts from that world, so callbacks
+are not silently discarded. `AragonSpec` independently describes the prefix.
+
+Ten draft comparisons against pinned inherited Lido/Aragon bytecode match, covering
+all these cases plus noncanonical nonzero bool and trailing return bytes. The
+executed call opcode is CALL. Kernel replies are explicit boundary fixtures;
+this does not implement Kernel.hasPermission, ACL permission evaluation or its
+oracle recursion. Full ACL and callback binding remain required. Immutable
+component and runtime checks follow the source commit.
+
 ## Internal writer and committed withdrawal sequences
 
 `SequenceSpec` independently distinguishes target min, rebalance max, and admitted

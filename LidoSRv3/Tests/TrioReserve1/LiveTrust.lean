@@ -18,6 +18,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.ConsensusCalls
 import LidoSRv3.Audit.Source.TrioReserve1.Pipeline
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalReserve
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalSequence
+import LidoSRv3.Audit.Source.TrioReserve1.Aragon
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -163,3 +164,16 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms PhysicalSequence.other_account
 #print axioms PhysicalSequence.queue_preserved
 #print axioms PhysicalSequence.concrete_success_step
+
+#print axioms AragonSpec.exclusive
+#print axioms Aragon.prefix_corresponds
+#print axioms Aragon.uninitialized
+#print axioms Aragon.absent_kernel
+#print axioms Aragon.kernel_reply
+#print axioms Aragon.kernel_rejection
+#print axioms Aragon.kernel_no_code
+#print axioms Aragon.kernel_short_reply
+#print axioms Aragon.denied
+#print axioms Aragon.permission_failure
+#print axioms Aragon.allowed
+#print axioms Aragon.target_from_kernel_reply

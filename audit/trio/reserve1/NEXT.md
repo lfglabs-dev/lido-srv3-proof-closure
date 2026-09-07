@@ -66,7 +66,12 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    early-failure rollback/trace. Complete recursive callback/static-call
    interpretation and source admission at all other enclosing surfaces. Source frame getters are read-only, but this does
    not establish that arbitrary caller callbacks preserve invariants.
-4. Complete Aragon canPerform admission, report/reward/withdrawal finalization,
+4. Aragon.canPerform now executes physical initialization/kernel checks, exact
+   role query calldata and reply decoding before the external target writer.
+   Ten boundary-fixture bytecode comparisons cover denial, no code, malformed
+   replies, rejection and success. Complete concrete Kernel.hasPermission and
+   ACL permission/parameter/oracle evaluation, including callback binding; do not
+   treat the boundary fixture as the source ACL. Complete report/reward/withdrawal finalization,
    initialization/migration, submissions and rebalance writer composition. Derive
    untruncated bounds as needed; never assume reserve <= buffer or monotone
    arbitrary queue rows. Prove actual queue/rebalance/spend sequences using their
