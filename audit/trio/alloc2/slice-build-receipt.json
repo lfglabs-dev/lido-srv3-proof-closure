@@ -1,0 +1,29 @@
+{
+  "job_id": "39933a63-072a-4e60-b2ec-18a32e6a6097",
+  "node_id": "old-agent",
+  "state": "succeeded",
+  "receipt_state": "succeeded",
+  "exit_code": 0,
+  "created_at": "2026-09-07T09:18:19.115756909+00:00",
+  "started_at": "2026-09-07T09:18:19.153632562+00:00",
+  "finished_at": "2026-09-07T09:18:20.979251467+00:00",
+  "error": null,
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving .lake/\nRemoving LidoSRv3/Audit/Source/TrioReserve1/\nsource bundle verified sha256=67b8a683dff67383c7b02c7202c539fc958c789969061c7f34360a869aabe5fd files=5 bytes=9030\ninfo: trioAlloc2Slice: no previous manifest, creating one from scratch\ninfo: toolchain not updated; no toolchain information found\n\u2714 [2/6] Built LidoSRv3.Audit.Source.TrioAlloc2.Word (284ms)\n\u2714 [3/6] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (305ms)\n\u2714 [4/6] Built LidoSRv3.Audit.Source.TrioAlloc2.Step (351ms)\n\u2714 [5/6] Built LidoSRv3.Tests.TrioAlloc2.Step (249ms)\nBuild completed successfully (6 jobs).\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "2364c7fb8b7e8666ca3fda5c937eac6014f2176a6cdb496094481161ddd0ac06",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}
