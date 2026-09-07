@@ -1,6 +1,6 @@
 {
   "scope": "six actual Solidity mutants rejected by the parent differential; finite tests, not universal correctness",
-  "receiptSha256": "b3322d86d74c0ea8c570dcb82b19277c47700aee1083389323afa42c17056246",
+  "receiptSha256": "d84a0648935f5d3c9d4aa1db4459ad1fc1ec07ac7d714eace0e82281d96c9898",
   "runnerSha256": "6e9b6ed23fcfed928ee24a7794052c239d3bbc039a758d9993ce821b8e01ffeb",
   "mutationsSha256": "8ed87166d5237444614a82d6746f386b0397cc3245d9ecdcebb7523506caa707",
   "results": [
@@ -9,42 +9,42 @@
       "test": "normal",
       "rejection": "normal return/revert bytes",
       "artifact": "audit/trio/alloc2/parent-mutant-skip-total-scaling.json",
-      "artifactSha256": "ad666945619e7eccbbc6e53ea08e1e43e4df607169292b7477f84e5d42523b93"
+      "artifactSha256": "2575498e2ac704d191dd120871f5aac2f7ec7e813130a1595328c6e8260358e6"
     },
     {
       "name": "alias-original-array",
       "test": "normal",
       "rejection": "normal return/revert bytes",
       "artifact": "audit/trio/alloc2/parent-mutant-alias-original-array.json",
-      "artifactSha256": "ced2662fdd30caf17a46e8e3345099a73dd42e745d8fde13e9db808d4bfba2bf"
+      "artifactSha256": "e546e1327497453b539876fe70c5745279909bb2807dbcaa443a4f5fdf5b8636"
     },
     {
       "name": "skip-zero-conversion",
       "test": "zero-demand",
       "rejection": "zero-demand return/revert bytes",
       "artifact": "audit/trio/alloc2/parent-mutant-skip-zero-conversion.json",
-      "artifactSha256": "69a8fe7603436fe9f9842861ec88deaa727d33dce6c407651ba5cf50b76c24e7"
+      "artifactSha256": "e9307746f55bd80d09f43aa9a94c2bc237563058881c0d00bed53a9385c2128a"
     },
     {
       "name": "unchecked-zero-multiply",
       "test": "zero-demand-overflow",
       "rejection": "zero-demand-overflow return/revert bytes",
       "artifact": "audit/trio/alloc2/parent-mutant-unchecked-zero-multiply.json",
-      "artifactSha256": "c0d5af7a9b4ddef4d5ad2387ab03c568803c56ff39429984b139d70d29004586"
+      "artifactSha256": "a6f82d7109b1ea80d225198b125b5e41e25a02626f6427320739004443c32d46"
     },
     {
       "name": "division-before-empty",
       "test": "empty-zero-divisor",
       "rejection": "empty-zero-divisor return/revert bytes",
       "artifact": "audit/trio/alloc2/parent-mutant-division-before-empty.json",
-      "artifactSha256": "974984c4f7cb3717853ba47f764d91f319d0f942fe2854bb1e839946c6440115"
+      "artifactSha256": "f76f776a68ef52a7b963fb25ced3dc4a4b47c2ee36873764ef27ef76da9b5317"
     },
     {
       "name": "swallow-parent-revert",
       "test": "late-second-row-overflow",
       "rejection": "late-second-row-overflow return/revert bytes",
       "artifact": "audit/trio/alloc2/parent-mutant-swallow-parent-revert.json",
-      "artifactSha256": "04631024f13e01024911f23268c61395ff6c0fa1d70cf183265c868d92ee3277"
+      "artifactSha256": "39cda48ed6eaf1b8561f8a207d55fa21a3bdfc36fc50902dbfa5bc7ea7b0622b"
     }
   ]
 }

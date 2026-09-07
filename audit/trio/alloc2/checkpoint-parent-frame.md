@@ -29,9 +29,9 @@ Reproduction from the repository root (after installing the existing locked
 parent dependencies):
 
 ```sh
-node solidity/trio-alloc2/parent/run.cjs audit/trio/alloc2/receipt-0447c927-a354-4b9e-a2c5-7cb43847e95a.json
-node solidity/trio-alloc2/parent/run.cjs audit/trio/alloc2/receipt-0447c927-a354-4b9e-a2c5-7cb43847e95a.json --frame
-node solidity/trio-alloc2/parent/test-mutants.cjs audit/trio/alloc2/receipt-0447c927-a354-4b9e-a2c5-7cb43847e95a.json
+node solidity/trio-alloc2/parent/run.cjs audit/trio/alloc2/receipt-e4079b62-cb45-4f69-819c-739ca3496339.json
+node solidity/trio-alloc2/parent/run.cjs audit/trio/alloc2/receipt-e4079b62-cb45-4f69-819c-739ca3496339.json --frame
+node solidity/trio-alloc2/parent/test-mutants.cjs audit/trio/alloc2/receipt-e4079b62-cb45-4f69-819c-739ca3496339.json
 ```
 
 This is concrete compiled Solidity transaction evidence, not a universal Lean
