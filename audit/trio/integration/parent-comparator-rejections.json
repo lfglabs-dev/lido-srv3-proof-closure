@@ -1,0 +1,38 @@
+[
+  {
+    "case": "running",
+    "optimized": false,
+    "exit_code": 1,
+    "reason": "VM job must have an authoritative terminal result"
+  },
+  {
+    "case": "failed-parent-gate",
+    "optimized": false,
+    "exit_code": 1,
+    "reason": "parent VM gate did not pass"
+  },
+  {
+    "case": "empty-completed-parent",
+    "optimized": false,
+    "exit_code": 1,
+    "reason": "VERITY_PARENT_DIFFERENTIAL_VECTOR: missing or truncated vectors"
+  },
+  {
+    "case": "running",
+    "optimized": true,
+    "exit_code": 1,
+    "reason": "VM job must have an authoritative terminal result"
+  },
+  {
+    "case": "failed-parent-gate",
+    "optimized": true,
+    "exit_code": 1,
+    "reason": "parent VM gate did not pass"
+  },
+  {
+    "case": "empty-completed-parent",
+    "optimized": true,
+    "exit_code": 1,
+    "reason": "VERITY_PARENT_DIFFERENTIAL_VECTOR: missing or truncated vectors"
+  }
+]
