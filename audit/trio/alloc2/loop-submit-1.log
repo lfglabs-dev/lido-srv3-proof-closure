@@ -1,0 +1,4 @@
+remote-lean-build: pinned tree contains submodules; using legacy runner fetch
+remote-lean-build: dispatching lake build for 3afa83de834c in audit/trio/alloc2 ...
+remote-lean-build: submitted job edbef81c-8f7a-4ad9-a64b-ecc082addc2b on node 'old-agent'; receipt /workspaces/mission-44053c4f/.local/state/sandboxed-sh/remote-builds/349a712ad9d7716bedfc054eb50d09bbdd1b8dc3912475299c78ec70bf53f174.json
+remote-lean-build: job edbef81c-8f7a-4ad9-a64b-ecc082addc2b on node 'old-agent' is running; not polling (REMOTE_BUILD_PASSIVE=1). The mission is woken when it ends — re-run this exact command to collect the result.

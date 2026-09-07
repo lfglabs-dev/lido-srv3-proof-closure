@@ -55,4 +55,26 @@ theorem step_length (rows : List Row) (demand : Nat) :
   · rfl
   · simp
 
+/-- Independent complete distribution relation. Its rules use mathematical
+selection and row updates only. No executable-source success or fuel premise.
+Existence and correspondence to the word loop remain separate obligations. -/
+inductive Distributes : List Row → Nat → Nat → List Row → Prop where
+  | stopped (rows : List Row) (demand : Nat) (h : choose rows demand = none) :
+      Distributes rows demand 0 rows
+  | advance (rows : List Row) (demand : Nat) (choice : Choice)
+      (spent : Nat) (final : List Row)
+      (selected : choose rows demand = some choice)
+      (rest : Distributes (step rows demand).2 (demand - choice.amount) spent final) :
+      Distributes rows demand (choice.amount + spent) final
+
+theorem Distributes.preserves_length (h : Distributes rows demand spent final) :
+    final.length = rows.length := by
+  induction h with
+  | stopped => rfl
+  | advance rows demand choice spent final selected rest ih =>
+    exact ih.trans (step_length rows demand)
+
+theorem distributes_zero (rows : List Row) : Distributes rows 0 0 rows :=
+  .stopped rows 0 (choose_zero rows)
+
 end LidoSRv3.Audit.Source.TrioAlloc2.Spec

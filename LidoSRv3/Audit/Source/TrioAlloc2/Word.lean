@@ -64,4 +64,44 @@ theorem checkedMul_value (a b out : Word) (h : checkedMul a b = .ok out) :
 theorem ceilDiv_zero_numerator (b : Word) : ceilDiv zero b = .ok zero := by
   rfl
 
+theorem checkedSub_value (a b out : Word) (h : checkedSub a b = .ok out) :
+    out.val = a.val - b.val := by
+  unfold checkedSub at h
+  split at h
+  · cases h; rfl
+  · cases h
+
+theorem checkedDiv_value (a b out : Word) (h : checkedDiv a b = .ok out) :
+    out.val = a.val / b.val := by
+  unfold checkedDiv at h
+  split at h
+  · cases h
+  · cases h; rfl
+
+theorem minWord_le_left (a b : Word) : (minWord a b).val ≤ a.val := by
+  unfold minWord
+  split <;> simp_all <;> omega
+
+theorem ceilDiv_le_numerator (a b out : Word) (h : ceilDiv a b = .ok out) :
+    out.val ≤ a.val := by
+  unfold ceilDiv at h
+  by_cases hz : a.val = 0
+  · simp [hz] at h
+    cases h
+    exact Nat.zero_le _
+  · simp only [hz, ↓reduceIte] at h
+    cases hs : checkedSub a one with
+    | error e => simp [hs, bind, Except.bind, pure, Except.pure] at h
+    | ok decremented =>
+      cases hd : checkedDiv decremented b with
+      | error e => simp [hs, hd, bind, Except.bind, pure, Except.pure] at h
+      | ok quotient =>
+        have hadd : checkedAdd quotient one = .ok out := by simpa [hs, hd, bind, Except.bind, pure, Except.pure] using h
+        have subValue := checkedSub_value a one decremented hs
+        have divValue := checkedDiv_value decremented b quotient hd
+        have addValue := checkedAdd_value quotient one out hadd
+        have divBound := Nat.div_le_self decremented.val b.val
+        simp only [one] at *
+        omega
+
 end LidoSRv3.Audit.Source.TrioAlloc2

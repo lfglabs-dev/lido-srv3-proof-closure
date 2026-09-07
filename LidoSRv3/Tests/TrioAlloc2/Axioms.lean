@@ -1,0 +1,15 @@
+import LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds
+import LidoSRv3.Audit.Source.TrioAlloc2.Spec
+
+/- Supplemental owned-slice inspection. This does not replace the shared
+LidoSRv3Audit trust target or authorize any additional assumptions. -/
+open LidoSRv3.Audit.Source.TrioAlloc2
+
+#print axioms allocateLoop
+#print axioms allocate_zero_demand
+#print axioms step_invariants
+#print axioms allocateLoop_amount_between
+#print axioms allocate_amount_le_demand
+#print axioms allocateLoop_preserves_length
+#print axioms allocate_preserves_length
+#print axioms Spec.Distributes.preserves_length

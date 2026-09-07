@@ -1,0 +1,29 @@
+{
+  "job_id": "a2d3d2ac-ecd2-442f-9142-1d44f3ed876c",
+  "node_id": "old-agent",
+  "state": "failed",
+  "receipt_state": "failed",
+  "exit_code": 1,
+  "created_at": "2026-09-07T09:23:52.605635906+00:00",
+  "started_at": "2026-09-07T09:23:52.646672990+00:00",
+  "finished_at": "2026-09-07T09:23:53.897292267+00:00",
+  "error": "command exited with Some(1)",
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving LidoSRv3/Audit/Source/TrioAlloc2/\nRemoving LidoSRv3/Tests/TrioAlloc2/\nRemoving audit/trio/\nsource bundle verified sha256=b388e7e2066d9c99d2d2b81139d0282e96eec7dd5187e5374a26b7674e34b55d files=6 bytes=12487\ninfo: trioAlloc2Slice: no previous manifest, creating one from scratch\ninfo: toolchain not updated; no toolchain information found\n\u2716 [2/7] Building LidoSRv3.Audit.Source.TrioAlloc2.Word (339ms)\ntrace: .> LEAN_PATH=/var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/lib/lean /var/lib/sandboxed-node/work/caches/elan/toolchains/leanprover--lean4---v4.31.0/bin/lean /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean -o /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioAlloc2/Word.olean -i /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/lib/lean/LidoSRv3/Audit/Source/TrioAlloc2/Word.ilean -c /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/ir/LidoSRv3/Audit/Source/TrioAlloc2/Word.c --setup /var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/audit/trio/alloc2/.lake/build/ir/LidoSRv3/Audit/Source/TrioAlloc2/Word.setup.json --json\nerror: ../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean:94:14: unsolved goals\ncase neg.error\na b out : Word\nhz : \u00ac\u2191a = 0\ne : Panic\nhs : checkedSub a one = Except.error e\nh :\n  (do\n      let decremented \u2190 Except.error e\n      let quotient \u2190 checkedDiv decremented b\n      checkedAdd quotient one) =\n    Except.ok out\n\u22a2 \u2191out \u2264 \u2191a\nerror: ../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean:97:16: unsolved goals\ncase neg.ok.error\na b out : Word\nhz : \u00ac\u2191a = 0\ndecremented : Word\nhs : checkedSub a one = Except.ok decremented\ne : Panic\nhd : checkedDiv decremented b = Except.error e\nh :\n  (do\n      let decremented \u2190 Except.ok decremented\n      let quotient \u2190 checkedDiv decremented b\n      checkedAdd quotient one) =\n    Except.ok out\n\u22a2 \u2191out \u2264 \u2191a\nerror: ../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean:99:60: Type mismatch: After simplification, term\n  h\n has type\n  (do\n      let decremented \u2190 Except.ok decremented\n      let quotient \u2190 checkedDiv decremented b\n      checkedAdd quotient one) =\n    Except.ok out\nbut is expected to have type\n  checkedAdd quotient one = Except.ok out\nwarning: ../../../LidoSRv3/Audit/Source/TrioAlloc2/Word.lean:97:29: This simp argument is unused:\n  hd\n\nHint: Omit it from the simp argument list.\n  simp [hs,\u0335 \u0335h\u0335d\u0335] at h\n\nNote: This linter can be disabled with `set_option linter.unusedSimpArgs false`\nerror: Lean exited with code 1\n\u2714 [4/7] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (303ms)\nSome required targets logged failures:\n- LidoSRv3.Audit.Source.TrioAlloc2.Word\nerror: build failed\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "72d790eaa9c94b248f379386ab3cb5acda80defe4ac3d12aac2cc8eba9efe798",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}
