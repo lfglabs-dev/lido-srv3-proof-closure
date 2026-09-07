@@ -21,7 +21,12 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    and frame executions for the former successful-spending premise. Assemble
    the complete independent parent return/revert relation and close concrete
    callee/input/deployment binding; do not equate forward composition with full
-   source specification coverage. ABI.decode_encode and word/tuple decoding are now checked. Compose them
+   source specification coverage.
+   QueueCalls now discharges concrete status/allocation getters from physical
+   queue state; CallResults covers all immutable lookups. OracleCalls binds
+   actual oracle frame success/rejection and nested traces through the caller.
+   Use these in the composed parent, discharge concrete consensus/input and
+   deployment/address/code obligations, and retain failure alternatives. ABI.decode_encode and word/tuple decoding are now checked. Compose them
    with actual callee outputs and source inputs rather than assuming decoded replies.
 2. The source callee path now contains immutable Locator, live Queue,
    AccountingOracle/BaseOracle and HashConsensus frame getters, and the router

@@ -13,6 +13,7 @@ import LidoSRv3.Audit.Source.TrioReserve1.ABI
 import LidoSRv3.Audit.Source.TrioReserve1.CallResults
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalTail
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalComposition
+import LidoSRv3.Audit.Source.TrioReserve1.OracleCalls
 
 /-! Owned inspection, pending coordinated canonical Trust registration. -/
 open LidoSRv3.Audit.Source.TrioReserve1
@@ -97,3 +98,18 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms WithdrawalComposition.after_frame
 #print axioms WithdrawalComposition.late_failure
 #print axioms WithdrawalComposition.spending_failure
+
+#print axioms CallResults.router_lookup
+#print axioms CallResults.oracle_lookup
+#print axioms QueueCalls.bunker_call
+#print axioms QueueCalls.status
+#print axioms QueueCalls.demand_call
+#print axioms QueueCalls.demand_panic
+#print axioms QueueCalls.demand_bound
+#print axioms QueueCalls.allocation_success
+#print axioms QueueCalls.allocation_panic
+#print axioms QueueCalls.live_allocation_spec
+#print axioms OracleCalls.frame_call
+#print axioms OracleCalls.frame_rejection
+#print axioms OracleCalls.current_frame
+#print axioms OracleCalls.current_frame_rejection

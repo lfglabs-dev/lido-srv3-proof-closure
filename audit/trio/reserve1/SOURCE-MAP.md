@@ -92,3 +92,11 @@ actual_receiver and tail_failure_rolls_back cover its concrete effects.
 overflow without assuming uint128 output bounds. `WithdrawalComposition.after_frame`
 composes actual allocation/frame executions through spending into the tail;
 spending_failure and late_failure retain full rollback and ordered traces.
+
+`QueueCalls.status`, `allocation_success` and `allocation_panic` compose the
+physical pointer and actual queue dispatch through returned bytes. `live_allocation_spec`
+uses the identical physical Queue.StateRel. CallResults covers router/oracle
+lookups too. OracleCalls binds Oracle.frame through the concrete dispatch chain
+to getCurrentFrame success or bubbled rejection, including nested attempts.
+Code-presence/address-separation and complete consensus/deployment bindings remain
+explicit obligations; no arbitrary successful-callee premise is substituted.

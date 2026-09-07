@@ -1,5 +1,26 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Concrete getter and callee binding
+
+`CallResults` now proves all three immutable locator lookups through physical
+pointer read, code guard, CALL, byte decoding and address cast. `QueueCalls`
+composes locator and actual queue source dispatch: status uses physical bunker/
+pause state; demand success and panic are exact; allocation receives the live
+physical row difference through ABI decoding. Successful demand is bounded by
+uint128 from physical extraction. The independent LiveDescribes relation uses
+the same physically related queue state, without cached-demand or monotone-row
+premises. These getters preserve the full world and exact direct-call trace.
+
+`OracleCalls` composes locator/queue/oracle dispatch and binds actual Oracle.frame
+success/rejection to the enclosing current-frame getter. Successful tuple decoding,
+bubbled failures and nested STATICCALL attempts are exact. Code presence and
+relevant address separation are explicit input/deployment obligations. Oracle.frame
+still takes the read-only consensus interpreter: complete concrete consensus
+input/deployment binding and independent whole-parent coverage remain open.
+
+The component checker now contains 34 modules. Validation follows at an immutable
+source SHA; these additions do not change the historical differential runner.
+
 ## Spending specification and parent composition
 
 `SpendingSpec` independently relates admitted allocation to untruncated buffer,
