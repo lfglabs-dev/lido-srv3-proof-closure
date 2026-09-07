@@ -1,3 +1,5 @@
+import LidoSRv3.Audit.Guarantees.PEthConfinement1
+import LidoSRv3.Tests.EthConfinementMutants
 import LidoSRv3.Audit.Verity.MinFirstSourceEntry
 import LidoSRv3.Audit.Allocation
 import LidoSRv3.Audit.StrategyProofs
@@ -564,6 +566,7 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Common.revert_rolls_back_state_and_committed_effects
 #print axioms LidoSRv3.Audit.Common.success_exposes_exact_committed_effects
 
+#print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.modeled_positive_value_is_confined_or_residual
 #print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.zero_demand
 #print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.short_capacity
 #print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.success_preserves_state
@@ -572,3 +575,9 @@ list, there are no undisclosed project-level assumptions or proof escapes.
 #print axioms LidoSRv3.Audit.Verity.AllocationTx.live_revert_restores_snapshot
 
 #print axioms LidoSRv3.Audit.Verity.MinFirstSourceEntry.eager_guard_disagrees_on_zero_demand
+
+#print axioms LidoSRv3.Audit.Guarantees.PEthConfinement1.modeled_inventory_matches_exact_assignments
+#print axioms LidoSRv3.Tests.EthConfinementMutants.swaps_preserve_presence
+#print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_parent_swap
+#print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_approval_swap
+#print axioms LidoSRv3.Tests.EthConfinementMutants.kill_exact_assignment_destination_swap
