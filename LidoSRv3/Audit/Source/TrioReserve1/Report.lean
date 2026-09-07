@@ -46,8 +46,10 @@ def collect (external : External) (ctx : Context) (input : Inputs) : Exec Unit :
   require (ctx.sender = accounting) (.reason "APP_AUTH_FAILED")
   if input.rewards.val > 0 then
     let vault ← lookup external ctx locator 0xe441d25f
-    let _ ← CallData.invoke external ctx vault
+    let data ← CallData.invoke external ctx vault
       (encode 4 0x9342c8f4 ++ encode 32 input.rewards.val)
+    -- ILidoExecutionLayerRewardsVault returns uint256 even though this body ignores it.
+    let _ ← decodeWord data
     pure ()
   if input.withdrawals.val > 0 then
     let vault ← lookup external ctx locator 0x69d42148

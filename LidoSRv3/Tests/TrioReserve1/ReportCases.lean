@@ -26,7 +26,7 @@ def replies : External := fun req w =>
     else if req.payload = encode 4 0x37d5fe99 then .success (encode 32 6) w
     else .rejected [255]
   else if req.target = address 4 ∧ req.payload = encode 4 0x9342c8f4 ++ encode 32 20 then
-    .success [] {w with core := w.core.writeContractSlot 1 bufferSlot (pack 500 8)}
+    .success (encode 32 999) {w with core := w.core.writeContractSlot 1 bufferSlot (pack 500 8)}
   else if req.target = address 5 ∧ req.payload = encode 4 0x3194528a ++ encode 32 30 then
     .success [] {w with core := w.core.writeContractSlot 1 bufferSlot (pack 700 9)}
   else if req.target = address 6 ∧ req.payload = encode 4 0xb6013cef ++ encode 32 14 ++ encode 32 15 then
