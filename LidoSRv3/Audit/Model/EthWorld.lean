@@ -3,15 +3,15 @@ import LidoSRv3.Audit.Spec
 /-!
 # E1 ETH-world inventory model
 
-Complete inventory of every modeled in-scope positive-value route
-in the Lido SRv3 audit scope at `lidofinance/core@17005714`.
+Inventory of eleven modeled positive-value routes, with source analogues
+at `lidofinance/core@17005714`. This is not a complete inventory of Solidity calls.
 
-This model classifies all value-bearing external calls into modeled routes
-covered by existing ETH parents and explicitly names the routes that remain
-outside the audit scope.  It does not register P-ETH-CONFINEMENT-1 and does
+This model classifies its enumerated routes using existing ETH parents and
+names selected unsupported classes. The queue claim payout is absent from both
+enumerations; see `audit/P-ETH-CONFINEMENT-1-BRIEF.md`.  It does not register P-ETH-CONFINEMENT-1 and does
 not widen any existing parent theorem.
 
-## Pinned source routes
+## Inspected source analogues (not executable correspondence)
 
 | #  | ValueRoute              | Evidence                                                     |
 |----|-------------------------|--------------------------------------------------------------|
@@ -25,7 +25,7 @@ not widen any existing parent theorem.
 |  8 | vaultConsolidationCall  | WithdrawalVaultEIP7685._callAddConsolidationRequest (L113–121)|
 |  9 | vaultWithdrawalCall     | WithdrawalVaultEIP7685._callAddWithdrawalRequest (L103–111)  |
 | 10 | vaultToLido             | WithdrawalVault → Lido.receiveWithdrawals (source-shaped; runtime endpoint) |
-| 11 | vaultToWithdrawalQueue  | Vault → WithdrawalQueue (source-shaped; runtime endpoint)   |
+| 11 | vaultToWithdrawalQueue  | Lido → WithdrawalQueue (L1099–1101; legacy route name)   |
 
 ## Covering parents
 
@@ -56,7 +56,7 @@ Six of nine destinations map onto `Spec.ApprovedDestination`.  Three do
 not: the withdrawal-request predeploy (EIP-7002, not covered by any
 registered parent), the ConsolidationGateway (intermediate Bus→Gateway
 hop), and the WithdrawalVault (intermediate Gateway→Vault hop).  These
-three are documented scope boundaries, not gaps.
+three are explicit residual coverage gaps.
 -/
 
 namespace LidoSRv3.Audit.Model.EthWorld
