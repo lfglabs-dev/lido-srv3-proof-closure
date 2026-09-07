@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ReportParent
 import LidoSRv3.Audit.Source.TrioReserve1.ReportAccounting
 import LidoSRv3.Audit.Source.TrioReserve1.Report
 import LidoSRv3.Audit.Source.TrioReserve1.AuthorizationBalance
@@ -402,3 +403,14 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ReportAccounting.complete
 #print axioms ReportAccounting.failure_restores
 #print axioms ReportAccounting.committed_balances
+
+#print axioms ReportStages.source_decomposition
+#print axioms ReportSpec.failure_restores
+#print axioms ReportSpec.success_active
+#print axioms ReportParent.accounting_observations
+#print axioms ReportParent.of_spec
+#print axioms ReportParent.exists_spec
+#print axioms ReportParent.to_spec
+#print axioms ReportParent.corresponds
+#print axioms ReportParent.complete
+#print axioms ReportParent.failure_restores
