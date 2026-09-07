@@ -59,6 +59,7 @@ try:
     check('LidoSRv3.Audit.Source.TrioComposition.AllocationExtent')
     check('LidoSRv3.Audit.Source.TrioComposition.ParentCalls')
     check('LidoSRv3.Audit.Source.TrioComposition.WriterExtent')
+    check('LidoSRv3.Audit.Source.TrioAlloc2.ParentValues')
     receipt['classification'] = 'PASS_INIT_ONLY_COMPOSITION'
 finally:
     (out / 'receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')

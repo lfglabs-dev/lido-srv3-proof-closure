@@ -116,3 +116,30 @@ Spark is running at `c2f9f0fc`, under durable handle
 `4deb4669-060e-5552-a2df-01fe34d79680`. It executes the full build, make
 prove, make test and actual producer Verity vectors. The earlier full build at
 `91684800` succeeded; its checked receipt is `remote-91684800/receipt.json`.
+
+## Checkpoint at 13:57 UTC and parent runtime evidence
+
+The eight actual parent VM differential cases now match the executed Solidity
+records; see `remote-da32cc4e/parent-comparison.json`. The full run remains failed
+because the remote snapshot lacked a historical audit review-base Git object.
+Foundry bootstrap and all four Solidity tests passed. The setup repair fetches
+that immutable object and is running in full remote job
+`c285693a-5b5a-495f-8751-031e9ef7caed` on Nippur, under durable job
+`d26ab5d7-cb61-51f3-991e-6f4d9fe6aae4`, at `03f170850b5b`. Bootstrap has
+succeeded; the full build remains pending. This run predates the newest writer
+integrations. Earlier `c2f9f0fc` validation ended with missing Foundry, and its
+failed receipt is preserved separately.
+
+Read-only workspace inspection found:
+
+- ALLOC-1 local/upstream `8691c788`, with unpublished string-storage code,
+  writer-harness edits and additional execution receipts.
+- ALLOC-2 local/upstream `2bb0a7dc`, with unpublished memory-prefix/extent code,
+  isolated build configuration edits and a failed component receipt.
+- RESERVE-1 local `4b82879f`, upstream still `f27b39d8`, with two unpublished
+  pipeline commits and untracked pipeline validation artifacts.
+
+The first two published commits are now integrated locally. No private worktree
+was changed and no all-writer clean checkpoint is claimed. Final fidelity,
+registered mutants, final-SHA gates, independent certification, sequential merges
+and aligned delivery artifacts remain required.

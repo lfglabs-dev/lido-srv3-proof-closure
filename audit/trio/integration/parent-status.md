@@ -150,3 +150,19 @@ that exact object when absent without changing HEAD. This repair still needs a
 fresh remote gate run. The failed receipt remains failed; neither the successful
 parent cases nor the protocol-1 build receipt constitutes independent final
 certification. The log files retain only the runner's capped terminal tail.
+
+## Parameter writer and parent values integration
+
+Published ALLOC-1 `8691c788` and ALLOC-2 `2bb0a7dc` are integrated.
+`parameter_writer_abi_extent` now transfers the public parameter writer's
+physical invariant preservation to the parent's numeric ABI obligation, retaining
+the initial invariant and slot-separation premises. The bounded checker also
+checks ALLOC-2's new per-index parent value theorems. All 54 Init-only modules
+pass; `parameter-parent-values-init-receipt.json` records the exact source hashes.
+The theorem trust output uses only standard Lean axioms. This is not a full
+project build or all-writer reachability proof.
+
+The validation driver now repeats all gate outcomes at the end, allowing capped
+remote logs to retain the complete gate summary. It elaborates locally. The
+active full run at earlier `03f170850b5b` predates these writer integrations and
+the summary change; its result cannot certify this newer source.

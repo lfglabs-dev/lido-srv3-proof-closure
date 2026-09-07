@@ -15,6 +15,7 @@ def main : IO Unit := do
     ("lake", #["env", "lean", "--run", "audit/trio/integration/RunVerityParent.lean"])
   ]
   let mut failures : Array String := #[]
+  let mut results : Array String := #[]
   for (cmd, args) in commands do
     IO.println s!"INTEGRATION_GATE_START {cmd} {String.intercalate " " args.toList}"
     let child ← IO.Process.spawn {
@@ -26,7 +27,11 @@ def main : IO Unit := do
     }
     let status ← child.wait
     IO.println s!"INTEGRATION_GATE_EXIT {status} {cmd} {String.intercalate " " args.toList}"
+    results := results.push s!"INTEGRATION_GATE_SUMMARY {status} {cmd} {String.intercalate " " args.toList}"
     if status != 0 then
       failures := failures.push s!"{cmd} {String.intercalate " " args.toList}: exit {status}"
+  -- Repeat every gate outcome at the end so capped remote tails retain them.
+  for result in results do
+    IO.println result
   if !failures.isEmpty then
     throw (IO.userError s!"integration gates failed: {String.intercalate "; " failures.toList}")

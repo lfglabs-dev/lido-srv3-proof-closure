@@ -45,4 +45,18 @@ theorem share_writer_abi_extent (layout : Layout) (storage : Storage)
     (WriterInvariant.share_writer_preserves layout storage input invariant countSeparate idsSeparate)
 
 #print axioms share_writer_abi_extent
+
+/-- Public parameter updates preserve the same parent extent obligation. This
+uses the executed writer's physical invariant theorem for every outcome. -/
+theorem parameter_writer_abi_extent (layout : Layout) (storage : Storage)
+    (input : ParameterWriter.Input) (oracle : StaticOracle) (config : Config)
+    (amount : Word) (isTopUp : Bool) (before : Transcript)
+    (invariant : WriterInvariant.Holds layout storage)
+    (separate : WriterInvariant.ParameterSeparation layout storage input) :
+    ReachableABIExtent layout (ParameterWriter.execute layout storage input).storage
+      oracle config amount isTopUp before :=
+  writer_invariant_abi_extent layout _ oracle config amount isTopUp before
+    (WriterInvariant.parameter_writer_preserves layout storage input invariant separate)
+
+#print axioms parameter_writer_abi_extent
 end LidoSRv3.Audit.Source.TrioComposition
