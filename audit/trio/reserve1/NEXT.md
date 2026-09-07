@@ -1,17 +1,16 @@
 # Continuation — not a completion claim
 
-Latest increment: ReportAccountingSpec/ReportAccounting prove the complete
-post-call arithmetic/write/event tail against independent ordered rules. Exact
-bidirectional correspondence covers all failures and success; failures precede
-writes/events and success preserves packed companion and full event amount.
-Continue with independent enclosing report sequencing, conditional calls/reward
-decoding and concrete vault/queue finalization. Do not reopen the proved arithmetic
-tail or treat boundary fixtures as deployed callees.
-Current evidence: report-accounting-summary.json, three selected checks plus 84
-unchanged source/olean pairs. Report executable source hashes match the sixteen
-EVM comparisons at 4f2b6867518337bc12acd8806fb1b463ff19c516; no rerun needed for
-these proof-only additions. Historical/executable-extension receipt fields remain
-separate. Full implementation and remote gates remain open. Previous turn was progress.
+Latest increment: ReportSpec/ReportStages/ReportParent establish independent
+whole-report ordering and exact bidirectional root result/world/attempt
+correspondence, including all early exits and transaction rollback. The original
+locator stays captured and accounting uses its independent arithmetic/write rules.
+Continue by expanding conditional reward/withdrawal/finalization stage observations
+and accounting lookup into independent CALL/decoding rules, then concrete callees,
+entry dispatch, deployment/resource binding and remaining writer obligations.
+Current evidence: report-parent-summary.json, four selected checks plus 86 unchanged
+source/olean pairs. Report runtime hashes still match its sixteen EVM comparisons.
+No new runtime run is claimed for proof-only additions. Full implementation and
+remote gates remain open. Previous turn changed source and published evidence.
 
 
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous

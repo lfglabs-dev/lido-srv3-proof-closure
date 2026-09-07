@@ -149,3 +149,13 @@ physical world of `Report.afterCalls` (Lido.sol:1103-1119 and its packed/rebalan
 helpers). `failure_restores` is a stage-failure property before any tail write;
 root rollback of earlier external effects belongs to the enclosing report relation.
 See report-accounting-summary.json for immutable component and trust evidence.
+
+
+## Independent enclosing report order
+
+`ReportStages.source_decomposition` factors Lido.sol:1072-1119 without changing the
+captured locator or reward-return validation order. `ReportSpec.Executes` states
+executor-independent parent transaction rules. `ReportParent.corresponds` and
+`complete` bind every source outcome/world/ordered attempt list to those rules,
+using independent report accounting. Conditional callee-stage internals remain
+explicit source observations for subsequent independent expansion.

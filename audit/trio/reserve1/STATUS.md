@@ -1,5 +1,27 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent enclosing report sequence
+
+`ReportSpec.Executes` independently orders the physical pause guard, accounting
+lookup/address authorization, reward stage, withdrawal stage, queue-finalization
+stage and accounting tail. Unvisited stages need no observations. Every failure
+restores the original transaction world while preserving all visited attempts in
+order. `ReportStages.source_decomposition` retains one captured locator across
+all later getters and keeps reward return decoding before subsequent stages.
+
+`ReportParent` proves exact bidirectional outcome/world/attempt correspondence and
+completeness for the whole modeled report. Its accounting observation is replaced
+with ReportAccounting's independent rules. Conditional external-stage internals
+still use explicit source observations; their independent expansion and concrete
+callee/deployment binding remain open.
+
+At source `043a845b5db3ef538eff0cf4e6328f400375ccc8`, four selected checks and seven baseline/import checks pass.
+The other 86 source/olean pairs and eleven dependency revisions match, with only
+standard axioms. See `receipts/report-parent-summary.json`. Report executable
+source hashes are unchanged from its sixteen EVM comparisons, which remain tied
+to their original source SHA. Full implementation, remote gates and independent
+review remain incomplete.
+
 ## Independent report accounting correspondence
 
 `ReportAccountingSpec` states ordered reward-add overflow, withdrawal-add overflow,
