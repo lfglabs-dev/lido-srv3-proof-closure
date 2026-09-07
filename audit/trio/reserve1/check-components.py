@@ -68,6 +68,8 @@ MODULES = [
     "Audit/Source/TrioReserve1/WithdrawalParent",
     "Audit/Source/TrioReserve1/StatusSpec",
     "Audit/Source/TrioReserve1/Status",
+    "Audit/Source/TrioReserve1/LookupSpec",
+    "Audit/Source/TrioReserve1/Lookup",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",

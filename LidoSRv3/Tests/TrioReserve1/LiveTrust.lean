@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.Lookup
 import LidoSRv3.Audit.Source.TrioReserve1.Status
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalParent
 import LidoSRv3.Audit.Source.TrioReserve1.Target
@@ -280,3 +281,11 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Status.withdrawal_denied
 #print axioms Status.withdrawal_failure
 #print axioms Status.withdrawal_corresponds
+
+#print axioms Lookup.address_narrowing
+#print axioms Lookup.of_spec
+#print axioms Lookup.exists_spec
+#print axioms Lookup.to_spec
+#print axioms Lookup.corresponds
+#print axioms Lookup.status_corresponds
+#print axioms Lookup.withdrawal_corresponds

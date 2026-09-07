@@ -27,7 +27,9 @@ external sequence reachability and deployed primitive binding.
    bidirectional exact return/world/trace correspondence to actual stage
    observations. Status.Withdrawal now substitutes independent complete
    lookup/CALL/ABI/bunker/post-call pause rules for the status stage. Discharge
-   lookup/CALL deployed binding and the remaining router/spending/tail interfaces with
+   Lookup.Withdrawal now also substitutes physical locator/CALL/ABI/address rules
+   for queue and router lookup. Discharge CALL/deployed binding and the remaining
+   spending/tail interfaces with
    independent semantics and concrete deployed source across all paths. Complete
    the independent withdrawal interaction specification and full
    return/revert/world/ordered-call/event correspondence. Allocation is now tied

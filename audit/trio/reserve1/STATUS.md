@@ -1,5 +1,19 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete locator lookup rules substituted into status and withdrawal
+
+`LookupSpec` independently describes call failure, malformed typed replies and
+successful first-word decoding. `Lookup` binds these rules to the physical low-160
+locator pointer and explicit first-word/address narrowing, with bidirectional exact
+outcome/world/trace correspondence. Successful replies may contain trailing bytes;
+malformed replies retain the callee world until the parent performs rollback.
+
+`Lookup.Status` replaces queue lookup with these rules. `Lookup.Withdrawal` replaces
+both queue/status and router observations, with bidirectional parent correspondence.
+CALL/deployed locator and bunker binding remain explicit boundaries; spending/tail
+internals, report/queue writers, deployment/resource closure and full remote gates
+remain open. Immutable validation follows checks. Runtime source is unchanged.
+
 ## Complete status-stage rules substituted into withdrawal
 
 `StatusSpec` independently covers lookup/call failure, malformed ABI data, nonzero
