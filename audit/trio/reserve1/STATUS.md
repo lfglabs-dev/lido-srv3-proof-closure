@@ -1,5 +1,75 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Independent ACL logic control
+
+`ACLLogicSpec` gives a total, unique control relation after the first child:
+finish immediately, or visit exactly one selected child with an explicit bool
+negation. It covers NOT, AND/OR short-circuiting, XOR and IF_ELSE, plus the source
+fallback behavior for other valid enum values used as logic operators. It imports
+no executor. `ACLLogic.corresponds` relates that independent control decision to
+the exact physical source node, remaining evaluation and concatenated oracle trace.
+Unselected children have no execution premises and contribute no attempts.
+
+Separate proofs cover out-of-bounds parameter indices, invalid logic opcodes before
+any child evaluation, and propagation of first-child failure with its trace.
+These are logic-node correspondence rules; recursive whole-tree and independent
+leaf/primitive/resource correspondence remain required. Runtime code is unchanged.
+At `bd6f7edb93070e808bda4f45fda54a86c93b8db5`, both new modules and
+updated LiveTrust pass, along with all seven baseline/import checks. The other
+48 modules' source and olean hashes match prior receipts; inspected axioms are
+standard. `receipts/acl-logic-summary.json` links exact evidence. Runtime sources
+are unchanged; no fresh execution or full remote gate is claimed.
+
+## ACL capacity stability
+
+`ACLBounds` proves that increasing the evaluator's recursion depth preserves
+any completed result, including invalid-opcode failure and the entire ordered
+oracle trace. The proof covers parameter evaluation, specific/wildcard permission
+selection and the externally visible ACL dispatch reply. Two completed runs at
+arbitrary bounds must agree, by extending both to a common capacity. Host
+exhaustion stays distinct from denial and source failure throughout.
+
+This closes capacity stability and completed-result uniqueness, not termination
+for arbitrary cyclic storage, independent parameter-tree correspondence, or the
+relation between host depth and EVM gas/stack resources. Runtime implementations
+are unchanged; the 28-case source execution remains tied to its original commit.
+At `0e632f4a369f23b918b832be62821cd9a86a8ce5`, ACLBounds and updated
+LiveTrust pass, along with all seven baseline/import checks. The other 47 modules'
+source and olean hashes match prior receipts; inspected axioms are standard.
+`receipts/acl-bounds-summary.json` links exact evidence and confirms runtime
+sources are unchanged. No new execution, full remote gate or certification is claimed.
+
+## Physical ACL evaluation and source composition
+
+`ACL` reads specific/wildcard permission hashes and packed parameter arrays from
+physical mappings. It implements comparison/RET operators, block/time/constants,
+uint240 parameter narrowing, short-circuit NOT/AND/OR/XOR/IF_ELSE, invalid enum
+failure and raw oracle STATICCALL. Oracle failures and return lengths other than
+exactly 32 deny; raw calls have no high-level code guard. Wildcard evaluation
+passes ANY_ENTITY to the oracle. Kernel lifts oracle trace depths through its
+nested call. `ACLSpec` independently states comparison and grant rules;
+`grants_corresponds` relates successful source parameter evaluations to selection.
+
+The recursive evaluator has an explicit depth bound. Exhaustion is a distinct
+host result delegated separately, not a source denial or a claim about EVM gas.
+The differential runner rejects exhausted evaluations. Relational parameter-tree
+correspondence and termination/resource binding still require proof. `ACLCalls`
+composes a terminating source ACL evaluation through Kernel and Aragon; its
+unconditional-specific theorem derives admission solely from physical/configuration
+conditions, without a supplied ACL or kernel reply.
+
+At `c5858d1f0af9e2132982cce5067f4eceed42857c`, 28 fresh comparisons against
+actual inherited ACL/Kernel/Aragon/Lido code pass, including physical layout,
+logic short-circuiting, wildcard oracle arguments, malformed oracle replies,
+static writes and invalid enum values. Six selected Lean checks, seven baseline/
+import checks and pinned ACL compilation pass. The other 42 modules' source and
+olean hashes match prior receipts; inspected axioms are standard.
+`receipts/acl-summary.json` links exact component/compiler/toolchain/runtime
+receipts. Large traces are losslessly archived with verified decompressed hashes;
+draft failures and the earlier draft execution remain preserved. This does not
+close ACL mutation admission, proxy/deployment/primitive binding, recursive
+callback interpretation, all writer sequences or the exhaustive parent relation.
+
 ## Concrete Kernel permission forwarding
 
 `Kernel` reads the installed ACL through KernelStorage.apps' two physical
@@ -11,9 +81,9 @@ and deeper trace depths. Callee world effects remain explicit.
 
 `aragon_from_acl` and `target_from_acl` compose that source behavior through the
 Lido role decoder and external target writer. The kernel response is derived;
-ACL evaluation remains the explicit boundary. This is specialized to the complete
-argument tuple sent by Lido._auth, with other calls delegated. Concrete ACL
-permission rows, parameter logic and oracle recursion still require implementation.
+ACL evaluation is an explicit interpreter boundary in this component, now filled
+by ACLCalls for the source path above. The dispatcher is specialized to the complete
+argument tuple sent by Lido._auth, with other calls delegated.
 At `4917545c7aad3093bfdd6ddfa1dda4ff2cae2618`, ten fresh pinned
 Kernel/Aragon/Lido comparisons pass, checking the physical mapping against
 Kernel.acl(), final storage/events and direct/nested targets, values, payloads,
@@ -39,8 +109,9 @@ are not silently discarded. `AragonSpec` independently describes the prefix.
 Ten comparisons against pinned inherited Lido/Aragon bytecode match, covering
 all these cases plus noncanonical nonzero bool and trailing return bytes. The
 executed call opcode is CALL. Kernel replies are explicit boundary fixtures;
-this does not implement Kernel.hasPermission, ACL permission evaluation or its
-oracle recursion. Full ACL and callback binding remain required.
+these historical ten cases do not cover Kernel/ACL source evaluation. The new
+ACLCalls composition and 28-case suite above supply that implementation coverage;
+parameter-tree/resource, deployment and callback correspondence remain required.
 
 At `5ff24074eb374d5b79287991ece3e5206da95bfc`, all four selected Lean checks,
 all seven baseline/import checks and the fresh ten-case execution pass. The other

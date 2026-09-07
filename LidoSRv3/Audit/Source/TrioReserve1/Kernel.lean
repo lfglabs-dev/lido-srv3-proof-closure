@@ -132,4 +132,40 @@ theorem target_from_acl (k : Queue.Keccak) (aclExternal other : External) (ctx :
   simpa [hv] using aragon_from_acl k aclExternal other ctx Aragon.bufferReserveManagerRole
     value w after suffix hi hk hkc ha hac hr
 
+theorem acl_reply_traced (k : Queue.Keccak) (external : External) (self : Address)
+    (ctx : Context) (role value : Word) (w after : World) (suffix : Bytes) (children : List NestedAttempt)
+    (h : (acl k self w).val ≠ 0) (hc : (w.core.codeSize (acl k self w).val).val ≠ 0)
+    (hr : external ⟨self, acl k self w, word 0, Aragon.permissionPayload ctx role⟩ w =
+      .successWithTrace (encode 32 value.val ++ suffix) after children) :
+    hasPermission k external self ctx role w =
+      .successWithTrace (encode 32 (if value.val ≠ 0 then 1 else 0)) after
+        (attempted ⟨self, acl k self w, word 0, Aragon.permissionPayload ctx role⟩ true
+          (encode 32 value.val ++ suffix) children) := by
+  simp only [hasPermission, h, hc, ite_false, hr, decoded_word]
+
+theorem aragon_from_acl_traced (k : Queue.Keccak) (aclExternal other : External) (ctx : Context)
+    (role value : Word) (w after : World) (suffix : Bytes) (children : List NestedAttempt)
+    (hi : Aragon.initialized ctx w = true) (hk : (Aragon.kernel ctx w).val ≠ 0)
+    (hkc : (w.core.codeSize (Aragon.kernel ctx w).val).val ≠ 0)
+    (ha : (acl k (Aragon.kernel ctx w) w).val ≠ 0)
+    (hac : (w.core.codeSize (acl k (Aragon.kernel ctx w) w).val).val ≠ 0)
+    (hr : aclExternal ⟨Aragon.kernel ctx w, acl k (Aragon.kernel ctx w) w, word 0,
+      Aragon.permissionPayload ctx role⟩ w = .successWithTrace (encode 32 value.val ++ suffix) after children) :
+    Aragon.canPerform (dispatch k (Aragon.kernel ctx w) ctx role aclExternal other) ctx role w =
+      ⟨.ok (decide (value.val ≠ 0)), after,
+        [⟨⟨ctx.self, Aragon.kernel ctx w, word 0, Aragon.permissionPayload ctx role⟩,
+          true, encode 32 (if value.val ≠ 0 then 1 else 0),
+          attempted ⟨Aragon.kernel ctx w, acl k (Aragon.kernel ctx w) w, word 0,
+            Aragon.permissionPayload ctx role⟩ true (encode 32 value.val ++ suffix) children⟩]⟩ := by
+  have hr' := acl_reply_traced k aclExternal (Aragon.kernel ctx w) ctx role value w after suffix children ha hac hr
+  have hd0 := ABI.decode_word 0 [] after
+  have hd1 := ABI.decode_word 1 [] after
+  have hz : (word 0).val = 0 := rfl
+  have ho : (word 1).val = 1 := rfl
+  simp only [List.append_nil] at hd0 hd1
+  by_cases hv : value.val = 0 <;>
+    simp [Aragon.canPerform, hi, hk, bind, bindExec, Aragon.permissionCall, hkc,
+      dispatch, hr', hv, hd0, hd1, hz, ho, pure, pureExec]
+
+
 end LidoSRv3.Audit.Source.TrioReserve1.Kernel

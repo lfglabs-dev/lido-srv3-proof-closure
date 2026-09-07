@@ -72,8 +72,19 @@ or duplicate the old terminal remote job. The old local full-gate handle is abse
    replies, rejection and success. Kernel now resolves its physical nested ACL
    mapping and forwards exact role-query bytes with nested CALL observations;
    aragon_from_acl/target_from_acl derive the kernel response through Lido.
-   Complete ACL permission/parameter/oracle evaluation, including callback binding; do not
-   treat the boundary fixture as the source ACL. Complete report/reward/withdrawal finalization,
+   ACL now executes physical specific/wildcard rows, packed parameter arrays,
+   comparison and logic operators, and raw oracle STATICCALL. ACLCalls composes
+   terminating evaluation through Kernel/Aragon and proves unconditional source
+   admission from physical storage. 28 draft full-source comparisons pass.
+   ACLBounds now proves completed-result/trace stability under increased depth,
+   full dispatcher stability, and uniqueness across any completed capacities.
+   ACLLogicSpec/ACLLogic now give independent total/unique next-child control,
+   exact source short-circuit/trace correspondence, and early logic failure rules.
+   Compose those node rules recursively and bind independent leaf/oracle rules.
+   Complete independent parameter-tree correspondence and termination/resource
+   binding: recursion exhaustion is a host limit, never source denial. Complete
+   ACL mutation admission, deployment/proxy/primitive and callback binding; oracle
+   interpreter fixtures still require binding to actual deployed source. Complete report/reward/withdrawal finalization,
    initialization/migration, submissions and rebalance writer composition. Derive
    untruncated bounds as needed; never assume reserve <= buffer or monotone
    arbitrary queue rows. Prove actual queue/rebalance/spend sequences using their

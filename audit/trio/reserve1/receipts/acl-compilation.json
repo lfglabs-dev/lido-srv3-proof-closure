@@ -1,0 +1,52 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "node": "v22.15.0",
+  "receipts": [
+    {
+      "entry": "ACLHarness.sol",
+      "compiler": "0.4.24+commit.e67f0147.Emscripten.clang",
+      "evmVersion": "constantinople",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "contracts": [
+        "ACLHarness",
+        "ACLWritingOracle"
+      ],
+      "warnings": [
+        "@aragon/os/contracts/acl/IACL.sol:13:5: Warning: Functions in interfaces should be declared external.\n    function hasPermission(address who, address where, bytes32 what, bytes how) public view returns (bool);\n    ^-----------------------------------------------------------------------------------------------------^\n",
+        "@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol:24:5: Warning: Functions in interfaces should be declared external.\n    function getScriptExecutor(bytes script) public view returns (IEVMScriptExecutor);\n    ^--------------------------------------------------------------------------------^\n",
+        "@aragon/os/contracts/common/VaultRecoverable.sol:49:34: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.\n    function allowRecoverability(address token) public view returns (bool) {\n                                 ^-----------^\n"
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "solidity/trio-reserve1/ACLHarness.sol": "ee81826b714501a3dbf0fd15e76d6813c98c4ac25e740ec170c7f80b617c3f22",
+    "@aragon/os/contracts/acl/ACL.sol": "986bc7dd043f1f39fefb512cbe7fd165d6d2dc84c1e363beb0b284e212aa7f5c",
+    "@aragon/os/contracts/apps/AragonApp.sol": "613d5cb8af90c0d2e1f7b6f2908495a46e9be81cf4417095c543bc43a27d27c2",
+    "@aragon/os/contracts/common/ConversionHelpers.sol": "4d4fb3e35f192c6005f2146867f094433d575179415769127fd1869d7e86bc06",
+    "@aragon/os/contracts/common/TimeHelpers.sol": "09242e7e0f60a92d40a37c787a4d24c239c31eaf9ccbebf92bfc37e1d05e78a7",
+    "@aragon/os/contracts/acl/ACLSyntaxSugar.sol": "8a16dec5bd7ce42d05e8fda25202864995db194b648d671525b9a7b54d7eee67",
+    "@aragon/os/contracts/acl/IACL.sol": "0d6092f108df51af376d55c64e482d514182a0fc1933f354c4afbd7a82160c01",
+    "@aragon/os/contracts/acl/IACLOracle.sol": "9a06d0ec553e1efec118c006a51af96ce99b1be480772e2f1cc75b05d95490ac",
+    "@aragon/os/contracts/apps/AppStorage.sol": "8e91fc929525676dd70fb9770499e93d148d27a97664d53f96c635d41783a7b1",
+    "@aragon/os/contracts/common/Autopetrified.sol": "03548b960ee4bd0743da2c371c34910a6d736ca4b30ba30a23a1e2d3dfff7ee8",
+    "@aragon/os/contracts/common/ReentrancyGuard.sol": "c377f4d240a679b485ff16d44f6c61552ccc76f5d17e3885154c294da89371ab",
+    "@aragon/os/contracts/common/VaultRecoverable.sol": "5072a07438a6d55dd98f24c5c9e391be897990c750f4301fd4f9ddab5e253e78",
+    "@aragon/os/contracts/evmscript/EVMScriptRunner.sol": "e2aae282297c55d9c72e0dd5ad30102e196fe4d8f34eb3eb74153f90dc62650d",
+    "@aragon/os/contracts/common/Uint256Helpers.sol": "5b545ff91be8d1d3a5f1c6b4fd45c6db4bc901cb6c503ad754361a475dce0d38",
+    "@aragon/os/contracts/common/UnstructuredStorage.sol": "6bbbb8fb3d32ba56d6f967f0eb437941aedae143c6dcedecac87d81a81ffd000",
+    "@aragon/os/contracts/kernel/IKernel.sol": "d626355aef13b741acf2b0f51bfb03eefe2dce9517e28623dafcf5478f43e255",
+    "@aragon/os/contracts/common/Petrifiable.sol": "e565fd0513d66f4657d9a445ad76d63e6785dece37382ce12661bcc5f126e2cd",
+    "@aragon/os/contracts/lib/token/ERC20.sol": "1db31dfde01bcdf4c253010a0a46491a7a8ab698d20e8bdd5bc12cc743deec7d",
+    "@aragon/os/contracts/common/EtherTokenConstant.sol": "630cece2f24d3b9072d3743570d01029cafaa6fab5abbee0015c81abfd92fc8f",
+    "@aragon/os/contracts/common/IsContract.sol": "209acf5e2e50d9dae4f53b1f96febd03c48ed8ef5b3b88085010db628be7cdc2",
+    "@aragon/os/contracts/common/IVaultRecoverable.sol": "780ce73c985b926a7e9bcf956060572c78ef8d55b545fc546325dc865291e479",
+    "@aragon/os/contracts/common/SafeERC20.sol": "022bdbc71e31f0a2042f33ede9b340efc04abf972a2c26f6677c0bf70aff2893",
+    "@aragon/os/contracts/evmscript/IEVMScriptExecutor.sol": "cdc198208cd2765e5b287b56bfa8bd790998412b880aad6234476c5660c0f06f",
+    "@aragon/os/contracts/evmscript/IEVMScriptRegistry.sol": "f2f3b2f5b30d7b8c77b4b79ab34b8945be27a9f2c42de75bd2e2e02d4ee58550",
+    "@aragon/os/contracts/kernel/KernelConstants.sol": "4c154c4e292dfcdcdc0b1ad0738c29769d7db1b129f6b135ea6a713b975223b3",
+    "@aragon/os/contracts/common/Initializable.sol": "9b6f2892b7ddafee6c4c6ff41d6314e0cfa8a3090cd764a815bcf72a3f764318"
+  }
+}

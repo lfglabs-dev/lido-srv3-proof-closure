@@ -1,0 +1,341 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLBounds.lean:45:14: error: unexpected token '<;>'; expected ')', ',' or ':'
+LidoSRv3/Audit/Source/TrioReserve1/ACLBounds.lean:37:17: error: unsolved goals
+case succ
+k : Queue.Keccak
+external : StaticCall.External
+self : Address
+hash : Word
+who where_ : Address
+role : Word
+how : List Word
+w : World
+fuel : Nat
+ih :
+  ∀ (index : Nat),
+    Extends (eval k external self hash who where_ role how w fuel index)
+      (eval k external self hash who where_ role how w (fuel + 1) index)
+index : Nat
+⊢ Extends
+    (if index ≥ (w.core.readContractSlot self.val (paramsSlot k hash)).val then pure false
+    else do
+      pure PUnit.unit
+      if (param k self hash index w).id = 204 then
+          if (param k self hash index w).op > 12 then do
+            let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+            pure __do_lift
+          else do
+            pure PUnit.unit
+            let r1 ← eval k external self hash who where_ role how w fuel ((param k self hash index w).value % 2 ^ 32)
+            if (param k self hash index w).op = 12 then do
+                let __do_lift ←
+                  eval k external self hash who where_ role how w fuel
+                      (if r1 = true then (param k self hash index w).value / 2 ^ 32 % 2 ^ 32
+                      else (param k self hash index w).value / 2 ^ 64 % 2 ^ 32)
+                pure __do_lift
+              else do
+                pure PUnit.unit
+                if (param k self hash index w).op = 8 then pure !r1
+                  else do
+                    pure PUnit.unit
+                    if (r1 && decide ((param k self hash index w).op = 10)) = true then pure true
+                      else do
+                        pure PUnit.unit
+                        if (!r1 && decide ((param k self hash index w).op = 9)) = true then pure false
+                          else do
+                            pure PUnit.unit
+                            let r2 ←
+                              eval k external self hash who where_ role how w fuel
+                                  ((param k self hash index w).value / 2 ^ 32 % 2 ^ 32)
+                            pure (if (param k self hash index w).op = 11 then r1 != r2 else r2)
+        else
+          if (param k self hash index w).id = 203 then do
+            let result ←
+              oracle external self (Verity.Core.Address.ofNat (param k self hash index w).value) who where_ role how w
+            let y ← pure (if result = true then 1 else 0)
+            if
+                  (param k self hash index w).id ≠ 203 ∧
+                    (param k self hash index w).id ≠ 200 ∧
+                      (param k self hash index w).id ≠ 201 ∧
+                        (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                pure false
+              else do
+                pure PUnit.unit
+                if (param k self hash index w).op > 12 then do
+                    let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                    pure __do_lift
+                  else do
+                    pure PUnit.unit
+                    pure
+                        (if (param k self hash index w).op = 7 then decide (y > 0)
+                        else
+                          ACL.compare (param k self hash index w).op y
+                            (if (param k self hash index w).id = 203 then 1 else (param k self hash index w).value))
+          else
+            if (param k self hash index w).id = 200 then do
+              let y ← pure w.core.blockNumber.val
+              if
+                    (param k self hash index w).id ≠ 203 ∧
+                      (param k self hash index w).id ≠ 200 ∧
+                        (param k self hash index w).id ≠ 201 ∧
+                          (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                  pure false
+                else do
+                  pure PUnit.unit
+                  if (param k self hash index w).op > 12 then do
+                      let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                      pure __do_lift
+                    else do
+                      pure PUnit.unit
+                      pure
+                          (if (param k self hash index w).op = 7 then decide (y > 0)
+                          else
+                            ACL.compare (param k self hash index w).op y
+                              (if (param k self hash index w).id = 203 then 1 else (param k self hash index w).value))
+            else
+              if (param k self hash index w).id = 201 then do
+                let y ← pure w.core.blockTimestamp.val
+                if
+                      (param k self hash index w).id ≠ 203 ∧
+                        (param k self hash index w).id ≠ 200 ∧
+                          (param k self hash index w).id ≠ 201 ∧
+                            (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                    pure false
+                  else do
+                    pure PUnit.unit
+                    if (param k self hash index w).op > 12 then do
+                        let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                        pure __do_lift
+                      else do
+                        pure PUnit.unit
+                        pure
+                            (if (param k self hash index w).op = 7 then decide (y > 0)
+                            else
+                              ACL.compare (param k self hash index w).op y
+                                (if (param k self hash index w).id = 203 then 1 else (param k self hash index w).value))
+              else
+                if (param k self hash index w).id = 205 then do
+                  let y ← pure (param k self hash index w).value
+                  if
+                        (param k self hash index w).id ≠ 203 ∧
+                          (param k self hash index w).id ≠ 200 ∧
+                            (param k self hash index w).id ≠ 201 ∧
+                              (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                      pure false
+                    else do
+                      pure PUnit.unit
+                      if (param k self hash index w).op > 12 then do
+                          let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                          pure __do_lift
+                        else do
+                          pure PUnit.unit
+                          pure
+                              (if (param k self hash index w).op = 7 then decide (y > 0)
+                              else
+                                ACL.compare (param k self hash index w).op y
+                                  (if (param k self hash index w).id = 203 then 1
+                                  else (param k self hash index w).value))
+                else
+                  if (param k self hash index w).id ≥ how.length then do
+                    let y ← pure 0
+                    if
+                          (param k self hash index w).id ≠ 203 ∧
+                            (param k self hash index w).id ≠ 200 ∧
+                              (param k self hash index w).id ≠ 201 ∧
+                                (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                        pure false
+                      else do
+                        pure PUnit.unit
+                        if (param k self hash index w).op > 12 then do
+                            let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                            pure __do_lift
+                          else do
+                            pure PUnit.unit
+                            pure
+                                (if (param k self hash index w).op = 7 then decide (y > 0)
+                                else
+                                  ACL.compare (param k self hash index w).op y
+                                    (if (param k self hash index w).id = 203 then 1
+                                    else (param k self hash index w).value))
+                  else do
+                    let y ← pure (how[(param k self hash index w).id]!.val % 2 ^ 240)
+                    if
+                          (param k self hash index w).id ≠ 203 ∧
+                            (param k self hash index w).id ≠ 200 ∧
+                              (param k self hash index w).id ≠ 201 ∧
+                                (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                        pure false
+                      else do
+                        pure PUnit.unit
+                        if (param k self hash index w).op > 12 then do
+                            let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                            pure __do_lift
+                          else do
+                            pure PUnit.unit
+                            pure
+                                (if (param k self hash index w).op = 7 then decide (y > 0)
+                                else
+                                  ACL.compare (param k self hash index w).op y
+                                    (if (param k self hash index w).id = 203 then 1
+                                    else (param k self hash index w).value)))
+    (if index ≥ (w.core.readContractSlot self.val (paramsSlot k hash)).val then pure false
+    else do
+      pure PUnit.unit
+      if (param k self hash index w).id = 204 then
+          if (param k self hash index w).op > 12 then do
+            let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+            pure __do_lift
+          else do
+            pure PUnit.unit
+            let r1 ←
+              eval k external self hash who where_ role how w (fuel + 1) ((param k self hash index w).value % 2 ^ 32)
+            if (param k self hash index w).op = 12 then do
+                let __do_lift ←
+                  eval k external self hash who where_ role how w (fuel + 1)
+                      (if r1 = true then (param k self hash index w).value / 2 ^ 32 % 2 ^ 32
+                      else (param k self hash index w).value / 2 ^ 64 % 2 ^ 32)
+                pure __do_lift
+              else do
+                pure PUnit.unit
+                if (param k self hash index w).op = 8 then pure !r1
+                  else do
+                    pure PUnit.unit
+                    if (r1 && decide ((param k self hash index w).op = 10)) = true then pure true
+                      else do
+                        pure PUnit.unit
+                        if (!r1 && decide ((param k self hash index w).op = 9)) = true then pure false
+                          else do
+                            pure PUnit.unit
+                            let r2 ←
+                              eval k external self hash who where_ role how w (fuel + 1)
+                                  ((param k self hash index w).value / 2 ^ 32 % 2 ^ 32)
+                            pure (if (param k self hash index w).op = 11 then r1 != r2 else r2)
+        else
+          if (param k self hash index w).id = 203 then do
+            let result ←
+              oracle external self (Verity.Core.Address.ofNat (param k self hash index w).value) who where_ role how w
+            let y ← pure (if result = true then 1 else 0)
+            if
+                  (param k self hash index w).id ≠ 203 ∧
+                    (param k self hash index w).id ≠ 200 ∧
+                      (param k self hash index w).id ≠ 201 ∧
+                        (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                pure false
+              else do
+                pure PUnit.unit
+                if (param k self hash index w).op > 12 then do
+                    let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                    pure __do_lift
+                  else do
+                    pure PUnit.unit
+                    pure
+                        (if (param k self hash index w).op = 7 then decide (y > 0)
+                        else
+                          ACL.compare (param k self hash index w).op y
+                            (if (param k self hash index w).id = 203 then 1 else (param k self hash index w).value))
+          else
+            if (param k self hash index w).id = 200 then do
+              let y ← pure w.core.blockNumber.val
+              if
+                    (param k self hash index w).id ≠ 203 ∧
+                      (param k self hash index w).id ≠ 200 ∧
+                        (param k self hash index w).id ≠ 201 ∧
+                          (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                  pure false
+                else do
+                  pure PUnit.unit
+                  if (param k self hash index w).op > 12 then do
+                      let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                      pure __do_lift
+                    else do
+                      pure PUnit.unit
+                      pure
+                          (if (param k self hash index w).op = 7 then decide (y > 0)
+                          else
+                            ACL.compare (param k self hash index w).op y
+                              (if (param k self hash index w).id = 203 then 1 else (param k self hash index w).value))
+            else
+              if (param k self hash index w).id = 201 then do
+                let y ← pure w.core.blockTimestamp.val
+                if
+                      (param k self hash index w).id ≠ 203 ∧
+                        (param k self hash index w).id ≠ 200 ∧
+                          (param k self hash index w).id ≠ 201 ∧
+                            (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                    pure false
+                  else do
+                    pure PUnit.unit
+                    if (param k self hash index w).op > 12 then do
+                        let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                        pure __do_lift
+                      else do
+                        pure PUnit.unit
+                        pure
+                            (if (param k self hash index w).op = 7 then decide (y > 0)
+                            else
+                              ACL.compare (param k self hash index w).op y
+                                (if (param k self hash index w).id = 203 then 1 else (param k self hash index w).value))
+              else
+                if (param k self hash index w).id = 205 then do
+                  let y ← pure (param k self hash index w).value
+                  if
+                        (param k self hash index w).id ≠ 203 ∧
+                          (param k self hash index w).id ≠ 200 ∧
+                            (param k self hash index w).id ≠ 201 ∧
+                              (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                      pure false
+                    else do
+                      pure PUnit.unit
+                      if (param k self hash index w).op > 12 then do
+                          let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                          pure __do_lift
+                        else do
+                          pure PUnit.unit
+                          pure
+                              (if (param k self hash index w).op = 7 then decide (y > 0)
+                              else
+                                ACL.compare (param k self hash index w).op y
+                                  (if (param k self hash index w).id = 203 then 1
+                                  else (param k self hash index w).value))
+                else
+                  if (param k self hash index w).id ≥ how.length then do
+                    let y ← pure 0
+                    if
+                          (param k self hash index w).id ≠ 203 ∧
+                            (param k self hash index w).id ≠ 200 ∧
+                              (param k self hash index w).id ≠ 201 ∧
+                                (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                        pure false
+                      else do
+                        pure PUnit.unit
+                        if (param k self hash index w).op > 12 then do
+                            let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                            pure __do_lift
+                          else do
+                            pure PUnit.unit
+                            pure
+                                (if (param k self hash index w).op = 7 then decide (y > 0)
+                                else
+                                  ACL.compare (param k self hash index w).op y
+                                    (if (param k self hash index w).id = 203 then 1
+                                    else (param k self hash index w).value))
+                  else do
+                    let y ← pure (how[(param k self hash index w).id]!.val % 2 ^ 240)
+                    if
+                          (param k self hash index w).id ≠ 203 ∧
+                            (param k self hash index w).id ≠ 200 ∧
+                              (param k self hash index w).id ≠ 201 ∧
+                                (param k self hash index w).id ≠ 205 ∧ (param k self hash index w).id ≥ how.length then
+                        pure false
+                      else do
+                        pure PUnit.unit
+                        if (param k self hash index w).op > 12 then do
+                            let __do_lift ← { outcome := Except.error Halt.invalidOpcode }
+                            pure __do_lift
+                          else do
+                            pure PUnit.unit
+                            pure
+                                (if (param k self hash index w).op = 7 then decide (y > 0)
+                                else
+                                  ACL.compare (param k self hash index w).op y
+                                    (if (param k self hash index w).id = 203 then 1
+                                    else (param k self hash index w).value)))

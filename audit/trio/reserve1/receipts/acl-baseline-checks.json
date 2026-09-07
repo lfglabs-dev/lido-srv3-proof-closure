@@ -1,0 +1,80 @@
+{
+  "source_commit": "c5858d1f0af9e2132982cce5067f4eceed42857c",
+  "time": "2026-09-07T14:53:04.422801+00:00",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit": 0,
+      "log": "acl-check_proof_escapes.txt",
+      "log_sha256": "59e77dc7d86e63b1e343939bb9f3cf4a3a1aa1e49e728d883581f12b934163d7"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_source_annotations.py"
+      ],
+      "exit": 0,
+      "log": "acl-check_source_annotations.txt",
+      "log_sha256": "622a896f4b1fc0e561f2130003aecd57f1349be4fe608d6bd52afc98b88e1ecf"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit": 0,
+      "log": "acl-check_report_theorem_inventory.txt",
+      "log_sha256": "24496dab715f87ca62d387da3938cf4794d4a3b2790fdd904c31112f394f5858"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_verity_provenance.py"
+      ],
+      "exit": 0,
+      "log": "acl-check_verity_provenance.txt",
+      "log_sha256": "aea2cb071c02ac6bdfa43b976fe9edcf4af79ffd59be32bdafdc08b6085e50a6"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_pinned_source.py"
+      ],
+      "exit": 0,
+      "log": "acl-check_pinned_source.txt",
+      "log_sha256": "aa140a8cf076eba2334937213edee9c97b6d6ca3830f1c8b844a39573927e00d"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_metadata.py",
+        "check"
+      ],
+      "exit": 0,
+      "log": "acl-audit_metadata.txt",
+      "log_sha256": "36235c9e5d4b905de075f273253bf4fef1b64715c32a42a6d15310a62e5a1254"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_import_dag.py"
+      ],
+      "exit": 0,
+      "log": "acl-import-dag.txt",
+      "log_sha256": "45c3eaadcb1b9c3c68618893e3f1c2bd725c9ce8e7515e59d638783a5f561a63"
+    },
+    {
+      "argv": [
+        "solidity/trio-reserve1/.tools/node-v22.15.0-linux-x64/bin/node",
+        "solidity/trio-reserve1/compile-acl.cjs"
+      ],
+      "exit": 0,
+      "log": "acl-compile.txt",
+      "log_sha256": "305dc634d38687411c3ff6f32d820bba0f112ffa1a9a360da201e6b7fbb67337"
+    }
+  ],
+  "scope": "Seven baseline/import checks and pinned ACL compilation; not full gates"
+}

@@ -50,11 +50,18 @@ MODULES = [
     "Audit/Source/TrioReserve1/AragonSpec",
     "Audit/Source/TrioReserve1/Aragon",
     "Audit/Source/TrioReserve1/Kernel",
+    "Audit/Source/TrioReserve1/ACLSpec",
+    "Audit/Source/TrioReserve1/ACL",
+    "Audit/Source/TrioReserve1/ACLCalls",
+    "Audit/Source/TrioReserve1/ACLBounds",
+    "Audit/Source/TrioReserve1/ACLLogicSpec",
+    "Audit/Source/TrioReserve1/ACLLogic",
     "Tests/TrioReserve1/Foundations",
     "Tests/TrioReserve1/OracleMutants",
     "Tests/TrioReserve1/Differential",
     "Tests/TrioReserve1/AragonDifferential",
     "Tests/TrioReserve1/KernelDifferential",
+    "Tests/TrioReserve1/ACLDifferential",
     "Tests/TrioReserve1/LiveTrust",
 ]
 

@@ -1,0 +1,72 @@
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:31:33: warning: This simp argument is unused:
+  Nat.not_lt.mpr hv
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, N̵a̵t̵.̵n̵o̵t̵_̵l̵t̵.̵m̵p̵r̵ ̵h̵v̵,̵ ̵hc, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:34:33: warning: This simp argument is unused:
+  Nat.not_lt.mpr hv
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, N̵a̵t̵.̵n̵o̵t̵_̵l̵t̵.̵m̵p̵r̵ ̵h̵v̵,̵ ̵hc, hn, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:34:52: warning: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, Nat.not_lt.mpr hv, hc̵,̵ ̵h̵n, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:39:33: warning: This simp argument is unused:
+  Nat.not_lt.mpr hv
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, N̵a̵t̵.̵n̵o̵t̵_̵l̵t̵.̵m̵p̵r̵ ̵h̵v̵,̵ ̵hc, hn, ho, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:39:52: warning: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, Nat.not_lt.mpr hv, hc̵,̵ ̵h̵n, ho, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:39:56: warning: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, Nat.not_lt.mpr hv, hc, hn̵,̵ ̵h̵o, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:44:33: warning: This simp argument is unused:
+  Nat.not_lt.mpr hv
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, N̵a̵t̵.̵n̵o̵t̵_̵l̵t̵.̵m̵p̵r̵ ̵h̵v̵,̵ ̵hc, hn, ha, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:44:52: warning: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, Nat.not_lt.mpr hv, hc̵,̵ ̵h̵n, ha, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:44:56: warning: This simp argument is unused:
+  hn
+
+Hint: Omit it from the simp argument list.
+  simp [Nat.not_le.mpr hb, hl, Nat.not_lt.mpr hv, hc, hn̵,̵ ̵h̵a, hf, bind, ACL.bindResult, pure, follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/ACLLogic.lean:46:49: warning: This simp argument is unused:
+  hl
+
+Hint: Omit it from the simp argument list.
+  simp_all [Nat.not_le.mpr hb, h̵l̵,̵ ̵Nat.not_lt.mpr hv,
+  ̵  ̵ ̵ ̵ ̵ ̵bind, ACL.bindResult, pure,
+  ̲  ̲ ̲ ̲ ̲ ̲follow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
