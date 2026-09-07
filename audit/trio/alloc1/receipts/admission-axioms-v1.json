@@ -1,0 +1,13 @@
+{
+  "classification": "INIT_ONLY_AXIOM_INSPECTION_PASS",
+  "scope": "AdmissionFacts closure only; not remote production/Verity/trust validation.",
+  "command": "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean audit/trio/alloc1/InspectAdmissionAxioms.lean",
+  "exit_code": 0,
+  "job_id": "f2d91f6b-d21f-4a44-a7a5-7f5a1c0e7372",
+  "stderr": "",
+  "stdout": "'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_witness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_count_bound' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.successful_record_freshness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n",
+  "source_sha256": {
+    "LidoSRv3/Audit/Source/TrioAlloc1/AdmissionFacts.lean": "4bb1c7417286083439023eb69988eba504aa2d8719636de6c255ff70e94a9f7a",
+    "audit/trio/alloc1/InspectAdmissionAxioms.lean": "8ce522c6c4d3c5ad037e35e019d6e5d8cc7337e9ef6f0dbfd74ad0b4f2cdd58b"
+  }
+}

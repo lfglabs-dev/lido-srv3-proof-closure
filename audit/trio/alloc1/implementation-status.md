@@ -46,11 +46,21 @@ count truncation or assumed callee success is introduced.
   with wrapped range endpoints, uint24 ID, parameter helper, last-deposit fields,
   and public-entry rollback. Successful execution derives entry count and freshness.
   Reachable-state invariant induction through this transition remains open.
+- `AdmissionFacts`: derives actual intermediate successful states, final stored
+  share bound and ID range, count growth/bound, old-row preservation and the new
+  address. The full public admission preserves count/share/unique-address under
+  finite layout and `FreshRecords` storage obligations. `FreshRecords` derives
+  absent-ID/fresh-name from checked next-ID and holds in zero storage; preservation
+  of this stronger predicate across the lifecycle is still required. No proposed
+  address freshness, successful parameter helper or final bound is assumed.
 - `AllocationMemory`: exact word rounding, oversized-array panic 0x41, allocation
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty-three Init-only modules are included in the fresh light validation driver.
+Twenty-four Init-only modules are included in the fresh light validation driver.
+All pass in `receipts/light-v20.json`. The five selected AdmissionFacts theorems
+use only propext, Classical.choice and Quot.sound (`admission-axioms-v1.json`).
+These new conditional invariant proofs have not received remote closure validation.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
 `3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on nippur. This is **STALE_SUCCESS** for
@@ -130,3 +140,10 @@ critical theorems (only propext, Classical.choice, Quot.sound), and reran all tw
 Verity fixtures. The independently executed Solidity comparison passed again.
 Receipts: verity-trust-876649b.json and solidity-verity-876649b.json. This closure
 predates the unrestricted array-push correction and does not replace current-head full-suite validation.
+
+The corrected implementation at 43ae5e8face86528e199491fa9954f74a0bddd5b passes
+23 fresh Init checks, all executed writer cases and six refreshed static gates.
+Its remote request was rejected before compilation: ashur reported 80 GiB free,
+2 GiB estimated plus the unchanged 80 GiB floor (HTTP 422). No remote success is
+claimed for the correction. Exact receipt: remote-rejected-43ae5e8.json; static
+gates: scoped-checks-43ae5e8.json. Integration requirements are in integration-patch.md.

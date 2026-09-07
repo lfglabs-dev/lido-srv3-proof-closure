@@ -12,6 +12,7 @@ def main : IO Unit := do
       "LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks",
       "LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter",
       "LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter",
+      "LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts",
       "LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory",
       "LidoSRv3.Tests.TrioAlloc1.Correspondence"] }
   (← IO.getStderr).putStr build.stdout

@@ -3,6 +3,11 @@
 These are implementation receipts, not independent certification. The full original
 scope is tracked in `implementation-status.md` and remains open.
 
+Latest remote admission attempt at corrected source 43ae5e8face86528e199491fa9954f74a0bddd5b
+was rejected with HTTP 422: `insufficient node disk: 80 GiB available, 2 GiB estimated
+plus 80 GiB emergency floor`. Durable wrapper 1b893089-10e0-4e57-b689-e4e4c5ccf96c
+exited without compiling. The floor was not lowered; no heavy local fallback was used.
+
 ## Lightweight Lean
 
 With Lean 4.31.0 available, run from the repository root:
@@ -11,12 +16,17 @@ With Lean 4.31.0 available, run from the repository root:
 python3 audit/trio/alloc1/validate-light.py --lean /path/to/lean --output /fresh/output/light
 ```
 
-The script checks the 23 Init-only owned modules (including the interface and test entry)
+The script checks the 24 Init-only owned modules (including the interface and test entry)
 with private oleans, rejects non-Init/non-owned imports, bounds each check to 30
 seconds, and records each source SHA-256, exact command, output and exit status.
 `vectors.json` is produced by actually evaluating `produce`, not by printing expected
 results. Increasing the kernel reduction depth to 4096 in the test module permits
 nested fixed-width byte encodings; no unchecked reduction or new axiom is used.
+
+After a successful light build, `InspectAdmissionAxioms.lean` can be checked with
+the same direct Lean executable and that output's private `olean` directory in
+`LEAN_PATH`. It imports only the Init-based admission proof closure. This local
+inspection does not replace the remote production/Verity/trust build.
 
 ## Executed Solidity and paired SOURCE model
 

@@ -6,6 +6,7 @@ import LidoSRv3.Audit.Source.TrioAlloc1.WriterInvariant
 import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks
 import LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter
 import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter
+import LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts
 import LidoSRv3.Audit.Source.TrioAlloc1.AllocationMemory
 import LidoSRv3.Audit.Source.TrioAlloc1.VerityProducer
 import LidoSRv3.Tests.TrioAlloc1.Correspondence
@@ -25,6 +26,8 @@ import LidoSRv3.Tests.TrioAlloc1.Correspondence
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.check_success
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionChecks.nextId_success
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.revert_restores
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share
+#print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.AdmissionWriter.successful_entry_bound_and_freshness
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.StringStorage.writeShort_stored
 #print axioms LidoSRv3.Audit.Source.TrioAlloc1.EnumerationWriter.insertion_preserves_consistency

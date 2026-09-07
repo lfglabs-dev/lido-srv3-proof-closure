@@ -1,0 +1,326 @@
+{
+  "compiler": "Lean (version 4.31.0, x86_64-unknown-linux-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)",
+  "started_at": 1788791496.1186166,
+  "checks": [
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Interface.lean",
+      "source_sha256": "17e1a11514fbe170f9b6402f2bc2edc24c853389e9b34add24c51305e3b4f674",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Interface.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Interface.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Storage.lean",
+      "source_sha256": "f964606f020150deaeed389ce2605ee23d89a64ebc31967baf300e9149ba4496",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Storage.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Storage.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Execution.lean",
+      "source_sha256": "83ba3e3ad07068ef841ee743e2a975bc7bdb57e3f1855f535ada7c4426f64b11",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Execution.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Execution.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Properties.lean",
+      "source_sha256": "53729f579147896741da3ef532c67682a96a77c68b0b3127d95721751b54e64a",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Properties.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Properties.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.lean",
+      "source_sha256": "7005ebf63953d0bbc4c708885cc3572645e89c5ec0ee333b91a69ed7bea11131",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/CapacitySpec.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean",
+      "source_sha256": "80807f4a9a7894bf9bef06339eb7a50e59e715e2d77d508f07e19c847b70e5fb",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Bytes.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Bytes.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Memory.lean",
+      "source_sha256": "955ddb2b118d7b47c12fd4ec0e6c54a197125d92f613316667ed1865fa0be52a",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Memory.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Memory.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/FirstPass.lean",
+      "source_sha256": "b32afeb9ebf468345ee7d61ff3030069b57e58eba621cd0b4976a567d359f11d",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/FirstPass.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/FirstPass.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Relational.lean",
+      "source_sha256": "aa86140523302f6ab219150899f274d040993626e8d2b594329b1fbe3ff74d8a",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Relational.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Relational.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/Determinism.lean",
+      "source_sha256": "704f5b83e6474a7146e459ec58476d160484f8f0a85e1ec4153c5d94b9ec8b34",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/Determinism.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/Determinism.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/ShareWriter.lean",
+      "source_sha256": "5e41fd84413510e8db5f4fe21880c3f1de6558020076f34f2d44f4f2fbb3be69",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/ShareWriter.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/ShareWriter.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/AdmissionChecks.lean",
+      "source_sha256": "9b82209e4b13faca23350d5b225215861ca534b66f3c4dd8ded2ae4ad0d8dd40",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/AdmissionChecks.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/AdmissionChecks.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/ParameterWriter.lean",
+      "source_sha256": "dda88c048ea32fbad6fc9590cf92da100c95246eca498e0167a2d18e35b7e319",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/ParameterWriter.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/ParameterWriter.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/WriterInvariant.lean",
+      "source_sha256": "dab16c4c5700355b78e0028dc638acb1240b90a07749e949e00d466750be26fc",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/WriterInvariant.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/WriterInvariant.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/EnumerationWriter.lean",
+      "source_sha256": "20aeb5682d7f01b2b6c969c4005a9898d15566389f8a09283d05adaa638dd3dd",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/EnumerationWriter.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/EnumerationWriter.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/StringStorage.lean",
+      "source_sha256": "79b8fd858deb4f48a3064a30aaf54d5a7c27314cd9f9dbdbb6bc367683153519",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/StringStorage.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/StringStorage.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/AdmissionWriter.lean",
+      "source_sha256": "888b6709dca5727be6ba902255329be9e471aa7add1cfe9a0b13127f5e13067e",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/AdmissionWriter.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/AdmissionWriter.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/AdmissionFacts.lean",
+      "source_sha256": "4bb1c7417286083439023eb69988eba504aa2d8719636de6c255ff70e94a9f7a",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/AdmissionFacts.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/AdmissionFacts.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/CallTree.lean",
+      "source_sha256": "32b92a35172709d2d6523ccd3ce8b9008fc935db96380a9d9bdc74bfa09358a4",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/CallTree.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/CallTree.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Audit/Source/TrioAlloc1/AllocationMemory.lean",
+      "source_sha256": "4c5a39cc5f93c6057e31b06803d463a5594b26610bb58a458e1542c8f387b573",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Audit/Source/TrioAlloc1/AllocationMemory.olean",
+        "LidoSRv3/Audit/Source/TrioAlloc1/AllocationMemory.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioAlloc1/Execution.lean",
+      "source_sha256": "72573a4838ddc4d0f1f839dfbaa16bdd137cd3e658125bcf387a47d940c19d22",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Tests/TrioAlloc1/Execution.olean",
+        "LidoSRv3/Tests/TrioAlloc1/Execution.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioAlloc1/VectorCases.lean",
+      "source_sha256": "bfb7f8b665667147c38cd5183f621aa6a10f227bbe186bcc6be46a9f178041f3",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Tests/TrioAlloc1/VectorCases.olean",
+        "LidoSRv3/Tests/TrioAlloc1/VectorCases.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioAlloc1/SolidityVectors.lean",
+      "source_sha256": "1a1330c6645b319be6c45e10068493e7c9cc6ab4c32b1c62478a5287cabfa6a6",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Tests/TrioAlloc1/SolidityVectors.olean",
+        "LidoSRv3/Tests/TrioAlloc1/SolidityVectors.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "source": "LidoSRv3/Tests/TrioAlloc1/Correspondence.lean",
+      "source_sha256": "5eed9df1a7abf72e2363bb5936b6fb8e763dea29b345033fb202a805937b8462",
+      "command": [
+        "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+        "-o",
+        "/workspaces/mission-c01b16cf/output/light-v20/olean/LidoSRv3/Tests/TrioAlloc1/Correspondence.olean",
+        "LidoSRv3/Tests/TrioAlloc1/Correspondence.lean"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "classification": "LIGHT_INIT_ONLY_PASS",
+  "vector_command": [
+    "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+    "--run",
+    "LidoSRv3/Tests/TrioAlloc1/SolidityVectors.lean"
+  ],
+  "vectors_sha256": "eaac1882ec16fe743d11fd4b2309910896fcffe7d285f72a33a697c373c4ecde",
+  "finished_at": 1788791567.4530504
+}

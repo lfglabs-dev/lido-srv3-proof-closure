@@ -37,7 +37,9 @@ updateStakingModule -> _updateModuleParams/_requireConsistentFeeSum
 name storage, _updateModuleParams, last-ID, _updateModuleLastDepositState
 (AdmissionChecks, EnumerationWriter, StringStorage, AdmissionWriter).
 Their role/membership guards read physical storage. WriterInvariant covers the
-share and parameter updates; complete admission reachability induction is pending.
+share and parameter updates. AdmissionFacts covers public admission invariant
+preservation under finite layout and the FreshRecords storage predicate; the
+lifecycle induction establishing and preserving FreshRecords is pending.
 
 Migration `_migrateStorage`, all-fee updates, status/credential updates, and writes
 to adjacent packed/accounting/deposit fields still need their frame/reachability
