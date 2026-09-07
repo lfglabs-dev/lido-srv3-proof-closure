@@ -1,5 +1,25 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Finite aggregate balance preservation
+
+`BalanceSpec` defines a duplicate-free finite account support, zero balances outside
+that support and a strict aggregate bound. Its conservation theorem sums the
+independent pointwise CALL balance rule, including aliased sender/recipient.
+Support can grow to include previously absent accounts without changing initial
+mass. `Balance` applies these rules to every funded provisional source transfer:
+total balance is preserved, and every resulting account is below the aggregate
+limit. With limit UINT256_MODULUS, this justifies unsaturated receiver credit,
+including fresh recipients and self-transfers.
+
+This is conditional on an explicit incoming aggregate invariant. Derivation from
+EVM state, preservation through arbitrary callees and complete bounded-world
+closure remain open. No transfer implementation or runtime fixture changed.
+At source `103b65e5a730e0f46676c5646f94832b124e0697`, three selected component checks and seven baseline/import
+checks pass; the other 75 source/olean pairs match prior receipts. All eleven
+dependency revisions match the manifest and printed axioms are standard.
+See `receipts/balance-support-rules-summary.json`. These bounded component checks
+are not a clean/full build, canonical registration or independent certification.
+
 ## CALL rules substituted throughout withdrawal
 
 `WithdrawalCalls` threads a relational CALL observer through every locator lookup,

@@ -1,5 +1,14 @@
 # Continuation — not a completion claim
 
+Latest increment: BalanceSpec/Balance prove finite aggregate support preservation
+and per-account uint256 bounds for funded provisional transfers, including fresh
+recipients and self-aliases. Continue by deriving the incoming aggregate invariant
+from the EVM world and proving callee preservation; do not treat the explicit
+invariant premise as established deployment reachability. Current evidence is
+balance-support-rules-summary.json, with three selected checks and 75 revalidated
+unchanged source/olean pairs. Full implementation and remote gates remain open.
+
+
 Read STATUS, current git HEAD, and admission/ABI plus oracle/component receipts first. The previous
 goal turn was progress: source-callee implementations, checked specifications
 and executed differential receipts changed authoritative state. The installed

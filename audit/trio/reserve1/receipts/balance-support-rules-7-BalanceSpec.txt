@@ -1,0 +1,8 @@
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:81:14: error: Application type mismatch: The argument
+  rfl
+has type
+  ?m.27 = ?m.27
+but is expected to have type
+  True
+in the application
+  ⟨h, rfl⟩

@@ -1,0 +1,75 @@
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:52:41: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b - c + d ≤ -1
+  a ≥ 0
+  a + b ≥ 0
+where
+ a := ↑(mass before rest)
+ b := ↑amount
+ c := ↑(before sender)
+ d := ↑(after sender)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:52:41: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  e ≥ 0
+  d ≥ 0
+  c ≥ 0
+  b ≥ 0
+  b + c - d - e ≥ 1
+  a ≥ 0
+where
+ a := ↑(mass before rest)
+ b := ↑(before sender)
+ c := ↑(if recipient = sender then amount else 0)
+ d := ↑(after sender)
+ e := ↑amount
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:52:41: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 1
+  c ≥ 0
+  b ≥ 0
+  b + c ≥ 0
+  a ≥ 0
+where
+ a := ↑(mass before rest)
+ b := ↑(before recipient)
+ c := ↑amount
+ d := ↑(if sender = recipient then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:52:41: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 1
+  c ≥ 0
+  b ≥ 0
+  a ≥ 0
+  a - b ≤ 0
+where
+ a := ↑amount
+ b := ↑(mass before rest)
+ c := ↑(before account)
+ d := ↑(if recipient = account then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:52:41: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 1
+  c ≥ 0
+  b ≥ 0
+  a ≥ 0
+  a + b ≥ 0
+where
+ a := ↑(mass before rest)
+ b := ↑amount
+ c := ↑(before account)
+ d := ↑(if sender = account then amount else 0)
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:52:41: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  c - d ≥ 1
+  b ≥ 0
+  a ≥ 0
+where
+ a := ↑(mass before rest)
+ b := ↑(before account)
+ c := ↑(if recipient = account then amount else 0)
+ d := ↑(if sender = account then amount else 0)

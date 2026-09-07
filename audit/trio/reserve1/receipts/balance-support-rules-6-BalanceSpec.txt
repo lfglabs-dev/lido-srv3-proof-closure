@@ -1,0 +1,36 @@
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:80:37: error: don't know how to synthesize implicit argument `b`
+  @And.intro (Bounded balances accounts limit) (?m.27 = ?m.27) h rfl
+context:
+Address : Type
+inst✝ : DecidableEq Address
+balances : Address → Nat
+account : Address
+accounts : List Address
+limit : Nat
+h : Bounded balances accounts limit
+hm : account ∈ accounts
+⊢ Prop
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:80:49: error: don't know how to synthesize implicit argument `a`
+  @rfl ?m.26 ?m.27
+context:
+Address : Type
+inst✝ : DecidableEq Address
+balances : Address → Nat
+account : Address
+accounts : List Address
+limit : Nat
+h : Bounded balances accounts limit
+hm : account ∈ accounts
+⊢ ?m.26
+LidoSRv3/Audit/Source/TrioReserve1/BalanceSpec.lean:80:49: error: don't know how to synthesize implicit argument `α`
+  @rfl ?m.26 ?m.27
+context:
+Address : Type
+inst✝ : DecidableEq Address
+balances : Address → Nat
+account : Address
+accounts : List Address
+limit : Nat
+h : Bounded balances accounts limit
+hm : account ∈ accounts
+⊢ Sort ?u.19
