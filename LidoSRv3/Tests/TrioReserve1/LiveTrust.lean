@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.ACLLeaf
 import LidoSRv3.Audit.Source.TrioReserve1.Queue
 import LidoSRv3.Audit.Source.TrioReserve1.Erasure
 import LidoSRv3.Audit.Source.TrioReserve1.PhysicalPacking
@@ -223,3 +224,13 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms ACLTree.derivations_agree
 #print axioms ACLTree.to_spec
 #print axioms ACLTree.corresponds
+
+#print axioms ACLLeafSpec.input_exists
+#print axioms ACLLeaf.finish_corresponds
+#print axioms ACLLeaf.input_source
+#print axioms ACLLeaf.nonoracle_corresponds
+#print axioms ACLLeaf.oracle_reply_source
+#print axioms ACLLeaf.oracle_corresponds
+#print axioms ACLLeaf.describes_source
+#print axioms ACLLeaf.describes_complete
+#print axioms ACLLeaf.tree_corresponds

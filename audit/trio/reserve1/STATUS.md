@@ -1,5 +1,23 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Atomic ACL rules and recursive leaf discharge
+
+`ACLLeafSpec` independently describes block/timestamp/constant/uint240 argument
+selection, missing-argument denial before enum conversion, RET/comparison/invalid
+enum outcomes, and raw oracle acceptance. It imports no source evaluator.
+`ACLLeaf` proves both non-oracle and oracle atomic correspondence, including the
+oracle attempt before a later invalid enum and exact trace preservation.
+Its physical `Describes` projection invokes only the explicit static-call primitive,
+never `ACL.eval`. Soundness, existence and completeness discharge both atomic
+premises of `ACLTree.corresponds`; `ACLLeaf.tree_corresponds` now relates the full
+finite graph specification to completed source evaluations without a supplied
+leaf soundness/completeness assumption. Host exhaustion remains distinct.
+
+This is a proof-only extension. Deployed oracle/primitive interpretation, EVM gas,
+full parent coverage and the remaining writer/admission/integration obligations
+are still open. Current immutable receipts are recorded below after validation.
+The older conditional tree theorem and historical receipts remain valid.
+
 ## Recursive ACL graph correspondence
 
 `ACLTreeSpec` defines finite evaluation of an indexed graph without a fuel
