@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.FinalizeEntry
 import LidoSRv3.Audit.Source.TrioReserve1.FinalizeRules
 import LidoSRv3.Audit.Source.TrioReserve1.ReportVaults
 import LidoSRv3.Audit.Source.TrioReserve1.EntryRules
@@ -499,3 +500,9 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms FinalizeRules.complete
 #print axioms FinalizeRules.corresponds
 #print axioms FinalizeRules.root_corresponds
+
+#print axioms FinalizeEntry.corresponds
+#print axioms FinalizeEntry.complete
+#print axioms FinalizeEntry.root_corresponds
+#print axioms FinalizeEntry.replies_corresponds
+#print axioms FinalizeEntry.dispatch_corresponds
