@@ -1,0 +1,1 @@
+Compiled inherited pinned StakingRouter receiver with solc 0.8.25, viaIR, Cancun.

@@ -1,0 +1,12 @@
+[
+  {
+    "name": "queue grows before spend",
+    "mutation": "cached-demand",
+    "killed": true
+  },
+  {
+    "name": "oracle rejection after packed write",
+    "mutation": "omit-rollback",
+    "killed": true
+  }
+]

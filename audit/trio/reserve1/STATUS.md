@@ -2,6 +2,14 @@
 
 ## Current source composition work
 
+Immutable validated source: `df5a6b52d561ffa6014d6cf4cdae48481b398a3f`.
+`source-composition-summary.json` records eight component checks (all exit 0),
+35 matching Cancun executions (exit 0), and four executed mutant kills.
+An out-of-range account-balance input is rejected with expected exit 1. Source,
+artifact and compiler-input hashes were rechecked against the immutable source.
+The exact-head remote full-source attempt again exits 2 before submission;
+node/job/bundle identities are absent because encoding never completed.
+
 `Allocation.successful_queue_observation` now connects the independent maximal
 allocation relation to the actual locator result, queue CALL, first ABI word and
 saved pre-call physical buffer/reserve locals. Arbitrary callee effects are
