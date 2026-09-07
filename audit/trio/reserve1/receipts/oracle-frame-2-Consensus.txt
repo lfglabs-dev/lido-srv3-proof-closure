@@ -1,0 +1,127 @@
+LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean:107:2: error: unsolved goals
+case pos
+c : Config
+time packed reference deadline : Nat
+h✝² :
+  (do
+      let elapsed ← sub time c.genesis
+      let slot ← divide elapsed c.secondsPerSlot
+      let epoch ← divide slot c.slotsPerEpoch
+      if epoch < packed % 2 ^ 64 then do
+          throw initialEpochNotArrived
+          let difference ← sub epoch (packed % 2 ^ 64)
+          let index ← divide difference (packed / 2 ^ 64 % 2 ^ 64)
+          let offset ← mul index (packed / 2 ^ 64 % 2 ^ 64)
+          let startEpoch ← add (packed % 2 ^ 64) offset
+          let startSlot ← mul startEpoch c.slotsPerEpoch
+          let frameSlots ← mul (packed / 2 ^ 64 % 2 ^ 64) c.slotsPerEpoch
+          let nextSlot ← add startSlot frameSlots
+          let reference ← sub startSlot 1
+          let deadline ← sub nextSlot 1
+          pure (reference % 2 ^ 64, deadline % 2 ^ 64)
+        else do
+          pure PUnit.unit
+          let difference ← sub epoch (packed % 2 ^ 64)
+          let index ← divide difference (packed / 2 ^ 64 % 2 ^ 64)
+          let offset ← mul index (packed / 2 ^ 64 % 2 ^ 64)
+          let startEpoch ← add (packed % 2 ^ 64) offset
+          let startSlot ← mul startEpoch c.slotsPerEpoch
+          let frameSlots ← mul (packed / 2 ^ 64 % 2 ^ 64) c.slotsPerEpoch
+          let nextSlot ← add startSlot frameSlots
+          let reference ← sub startSlot 1
+          let deadline ← sub nextSlot 1
+          pure (reference % 2 ^ 64, deadline % 2 ^ 64)) =
+    Except.ok (reference, deadline)
+elapsed : Nat
+he : sub time c.genesis = Except.ok elapsed
+h✝¹ :
+  (do
+      let slot ← divide elapsed c.secondsPerSlot
+      let epoch ← divide slot c.slotsPerEpoch
+      if epoch < packed % 2 ^ 64 then do
+          throw initialEpochNotArrived
+          let difference ← sub epoch (packed % 2 ^ 64)
+          let index ← divide difference (packed / 2 ^ 64 % 2 ^ 64)
+          let offset ← mul index (packed / 2 ^ 64 % 2 ^ 64)
+          let startEpoch ← add (packed % 2 ^ 64) offset
+          let startSlot ← mul startEpoch c.slotsPerEpoch
+          let frameSlots ← mul (packed / 2 ^ 64 % 2 ^ 64) c.slotsPerEpoch
+          let nextSlot ← add startSlot frameSlots
+          let reference ← sub startSlot 1
+          let deadline ← sub nextSlot 1
+          pure (reference % 2 ^ 64, deadline % 2 ^ 64)
+        else do
+          pure PUnit.unit
+          let difference ← sub epoch (packed % 2 ^ 64)
+          let index ← divide difference (packed / 2 ^ 64 % 2 ^ 64)
+          let offset ← mul index (packed / 2 ^ 64 % 2 ^ 64)
+          let startEpoch ← add (packed % 2 ^ 64) offset
+          let startSlot ← mul startEpoch c.slotsPerEpoch
+          let frameSlots ← mul (packed / 2 ^ 64 % 2 ^ 64) c.slotsPerEpoch
+          let nextSlot ← add startSlot frameSlots
+          let reference ← sub startSlot 1
+          let deadline ← sub nextSlot 1
+          pure (reference % 2 ^ 64, deadline % 2 ^ 64)) =
+    Except.ok (reference, deadline)
+slot : Nat
+hs : divide elapsed c.secondsPerSlot = Except.ok slot
+h✝ :
+  (do
+      let epoch ← divide slot c.slotsPerEpoch
+      if epoch < packed % 2 ^ 64 then do
+          throw initialEpochNotArrived
+          let difference ← sub epoch (packed % 2 ^ 64)
+          let index ← divide difference (packed / 2 ^ 64 % 2 ^ 64)
+          let offset ← mul index (packed / 2 ^ 64 % 2 ^ 64)
+          let startEpoch ← add (packed % 2 ^ 64) offset
+          let startSlot ← mul startEpoch c.slotsPerEpoch
+          let frameSlots ← mul (packed / 2 ^ 64 % 2 ^ 64) c.slotsPerEpoch
+          let nextSlot ← add startSlot frameSlots
+          let reference ← sub startSlot 1
+          let deadline ← sub nextSlot 1
+          pure (reference % 2 ^ 64, deadline % 2 ^ 64)
+        else do
+          pure PUnit.unit
+          let difference ← sub epoch (packed % 2 ^ 64)
+          let index ← divide difference (packed / 2 ^ 64 % 2 ^ 64)
+          let offset ← mul index (packed / 2 ^ 64 % 2 ^ 64)
+          let startEpoch ← add (packed % 2 ^ 64) offset
+          let startSlot ← mul startEpoch c.slotsPerEpoch
+          let frameSlots ← mul (packed / 2 ^ 64 % 2 ^ 64) c.slotsPerEpoch
+          let nextSlot ← add startSlot frameSlots
+          let reference ← sub startSlot 1
+          let deadline ← sub nextSlot 1
+          pure (reference % 2 ^ 64, deadline % 2 ^ 64)) =
+    Except.ok (reference, deadline)
+epoch : Nat
+hep : divide slot c.slotsPerEpoch = Except.ok epoch
+hinit : epoch < packed % 2 ^ 64
+h :
+  (do
+      throw initialEpochNotArrived
+      let difference ← sub epoch (packed % 18446744073709551616)
+      let index ← divide difference (packed / 18446744073709551616 % 18446744073709551616)
+      let offset ← mul index (packed / 18446744073709551616 % 18446744073709551616)
+      let startEpoch ← add (packed % 18446744073709551616) offset
+      let startSlot ← mul startEpoch c.slotsPerEpoch
+      let frameSlots ← mul (packed / 18446744073709551616 % 18446744073709551616) c.slotsPerEpoch
+      let nextSlot ← add startSlot frameSlots
+      let reference ← sub startSlot 1
+      (fun a => (reference % 18446744073709551616, a % 18446744073709551616)) <$> sub nextSlot 1) =
+    Except.ok (reference, deadline)
+⊢ FrameSpec.Describes time c.genesis c.secondsPerSlot c.slotsPerEpoch (packed % 2 ^ 64) (packed / 2 ^ 64 % 2 ^ 64)
+    reference deadline
+LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean:130:15: warning: This simp argument is unused:
+  pure
+
+Hint: Omit it from the simp argument list.
+  simp only [p̵u̵r̵e̵,̵ ̵Except.pure, Except.ok.injEq, Prod.mk.injEq] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LidoSRv3/Audit/Source/TrioReserve1/Consensus.lean:130:21: warning: This simp argument is unused:
+  Except.pure
+
+Hint: Omit it from the simp argument list.
+  simp only [pure, Except.p̵u̵r̵e̵,̵ ̵E̵x̵c̵e̵p̵t̵.̵ok.injEq, Prod.mk.injEq] at h
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

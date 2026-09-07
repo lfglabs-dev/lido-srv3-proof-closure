@@ -1,0 +1,20 @@
+LidoSRv3/Audit/Source/TrioReserve1/FrameSpec.lean:19:5: error: unknown tactic
+LidoSRv3/Audit/Source/TrioReserve1/FrameSpec.lean:18:22: error: unsolved goals
+n d a b : Nat
+left✝¹ : 0 < d
+haLo : a * d ≤ n
+haHi : n < (a + 1) * d
+left✝ : 0 < d
+hbLo : b * d ≤ n
+hbHi : n < (b + 1) * d
+⊢ a ≤ b
+LidoSRv3/Audit/Source/TrioReserve1/FrameSpec.lean:15:95: error: unsolved goals
+n d a b : Nat
+left✝¹ : 0 < d
+haLo : a * d ≤ n
+haHi : n < (a + 1) * d
+left✝ : 0 < d
+hbLo : b * d ≤ n
+hbHi : n < (b + 1) * d
+hab : a ≤ b
+⊢ a = b

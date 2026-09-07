@@ -1,0 +1,312 @@
+LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:70:52: error: Tactic `rfl` failed: The left-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match external req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+is not definitionally equal to the right-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+
+case isFalse.isFalse.success
+external : External
+ctx : Context
+target : Address
+selector : Nat
+amount : Word
+w : World
+h✝¹ : ¬(w.core.codeSize target.val).val = 0
+h✝ : ¬w.balances ctx.self < amount.val
+data✝ : Bytes
+world✝ : World
+⊢ (have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match external req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)) =
+    have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)
+LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:70:52: error: Tactic `rfl` failed: The left-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match external req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+is not definitionally equal to the right-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+
+case isFalse.isFalse.rejected
+external : External
+ctx : Context
+target : Address
+selector : Nat
+amount : Word
+w : World
+h✝¹ : ¬(w.core.codeSize target.val).val = 0
+h✝ : ¬w.balances ctx.self < amount.val
+data✝ : Bytes
+⊢ (have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match external req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)) =
+    have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)
+LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:70:52: error: Tactic `rfl` failed: The left-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match external req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+is not definitionally equal to the right-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+
+case isFalse.isFalse.successWithTrace
+external : External
+ctx : Context
+target : Address
+selector : Nat
+amount : Word
+w : World
+h✝¹ : ¬(w.core.codeSize target.val).val = 0
+h✝ : ¬w.balances ctx.self < amount.val
+data✝ : Bytes
+world✝ : World
+nested✝ : List NestedAttempt
+⊢ (have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match external req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)) =
+    have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)
+LidoSRv3/Audit/Source/TrioReserve1/Erasure.lean:70:52: error: Tactic `rfl` failed: The left-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match external req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+is not definitionally equal to the right-hand side
+  have r :=
+    have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+    match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+    | Reply.rejected data =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data }] }
+    | Reply.success data after =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data }] }
+    | Reply.successWithTrace data after nested =>
+      { outcome := Except.ok data, world := after,
+        attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+    | Reply.rejectedWithTrace data nested =>
+      { outcome := Except.error (Fault.bubbled data), world := w,
+        attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+  (r.outcome, r.world)
+
+case isFalse.isFalse.rejectedWithTrace
+external : External
+ctx : Context
+target : Address
+selector : Nat
+amount : Word
+w : World
+h✝¹ : ¬(w.core.codeSize target.val).val = 0
+h✝ : ¬w.balances ctx.self < amount.val
+data✝ : Bytes
+nested✝ : List NestedAttempt
+⊢ (have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match external req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)) =
+    have r :=
+      have req := { caller := ctx.self, target := target, value := amount, payload := encode 4 selector };
+      match (fun req w => stripNested (external req w)) req (transfer w ctx.self target amount.val) with
+      | Reply.rejected data =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data }] }
+      | Reply.success data after =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data }] }
+      | Reply.successWithTrace data after nested =>
+        { outcome := Except.ok data, world := after,
+          attempts := [{ request := req, accepted := true, returned := data, nested := nested }] }
+      | Reply.rejectedWithTrace data nested =>
+        { outcome := Except.error (Fault.bubbled data), world := w,
+          attempts := [{ request := req, accepted := false, returned := data, nested := nested }] };
+    (r.outcome, r.world)

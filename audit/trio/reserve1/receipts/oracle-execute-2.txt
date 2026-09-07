@@ -1,0 +1,2 @@
+49 pinned Solidity cases executed; reverts checked against physical storage, balances and logs.
+49 matching Solidity/Verity cases passed; 4 executed mutants rejected.

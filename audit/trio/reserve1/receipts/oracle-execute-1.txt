@@ -1,0 +1,12 @@
+AssertionError [ERR_ASSERTION]: source consensus deadline narrows to uint64
+
+false !== true
+
+    at run (/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/execute.cjs:189:14)
+    at async main (/workspaces/mission-f19a12b3/reserve1-private/solidity/trio-reserve1/execute.cjs:312:3) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual'
+}

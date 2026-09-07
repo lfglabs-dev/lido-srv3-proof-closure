@@ -1,0 +1,133 @@
+{
+  "source_commit": "0fde6481707ba16f63ff324547bc2761e1d7b136",
+  "finished_utc": "2026-09-07T12:22:28.768128+00:00",
+  "previous_goal_turn": "progress: source locator/router and allocation correspondence pushed with immutable receipts",
+  "this_goal_turn": "progress: actual AccountingOracle/BaseOracle/HashConsensus source composition, nested static-call observations, independent frame/timestamp specifications and checked source theorems",
+  "source_and_artifact_hashes_rechecked": true,
+  "compiler_inputs": [
+    {
+      "inventory": "router-compilation.json",
+      "sha256": "77edbf8ffbbb824cf90d0afbaa280703e87eaf7919174ce8b63293f50ba3d63f",
+      "all_compiler_input_hashes_match": true
+    },
+    {
+      "inventory": "solidity-compilation-with-oracle.json",
+      "sha256": "ac4ad8406a7074b65e2c6adcfc54d61dc177a5790054acc642acc65502d72a0c",
+      "all_compiler_input_hashes_match": true
+    }
+  ],
+  "components": 24,
+  "components_exit": 0,
+  "matching_cases": 49,
+  "execution_exit": 0,
+  "mutants": [
+    {
+      "name": "queue grows before spend",
+      "mutation": "cached-demand",
+      "killed": true
+    },
+    {
+      "name": "oracle rejection after packed write",
+      "mutation": "omit-rollback",
+      "killed": true
+    },
+    {
+      "name": "source router immutable auth rejects after accounting and seed writes",
+      "mutation": "receiver-no-auth",
+      "killed": true
+    },
+    {
+      "name": "source router receives ETH and emits event",
+      "mutation": "receiver-no-event",
+      "killed": true
+    },
+    {
+      "name": "source oracle consensus frame and receiver compose",
+      "mutation": "cached-frame",
+      "killed": true
+    },
+    {
+      "name": "source oracle STATICCALL rejects SSTORE",
+      "mutation": "static-write-success",
+      "killed": true
+    },
+    {
+      "name": "source consensus uint64 frame span overflow panics",
+      "mutation": "consensus-wide-span",
+      "killed": true
+    }
+  ],
+  "baseline_checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/check_proof_escapes.py"
+      ],
+      "exit": 0,
+      "log": "oracle-check_proof_escapes.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_source_annotations.py"
+      ],
+      "exit": 0,
+      "log": "oracle-check_source_annotations.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_report_theorem_inventory.py"
+      ],
+      "exit": 0,
+      "log": "oracle-check_report_theorem_inventory.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_verity_provenance.py"
+      ],
+      "exit": 0,
+      "log": "oracle-check_verity_provenance.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/check_pinned_source.py"
+      ],
+      "exit": 0,
+      "log": "oracle-check_pinned_source.txt"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/audit_metadata.py",
+        "check"
+      ],
+      "exit": 0,
+      "log": "oracle-audit_metadata.txt"
+    }
+  ],
+  "import_dag_exit": 0,
+  "observed_model_correction": {
+    "failure_log": "oracle-execute-1.txt",
+    "correction": "HashConsensus epochsPerFrame * SLOTS_PER_EPOCH is checked uint64 multiplication, not uint256",
+    "regressions": [
+      "source consensus uint64 frame span overflow panics",
+      "source consensus deadline narrows after valid uint64 span"
+    ]
+  },
+  "remote": {
+    "command": "REMOTE_BUILD_SOURCE_MODE=full remote-lean-build lake build LidoSRv3 LidoSRv3Test LidoSRv3Audit",
+    "job_id": null,
+    "node_id": null,
+    "bundle_digest": null,
+    "exit": 2,
+    "diagnostic": "source bundle path must be a regular file, not a symlink: lido-core; failed to encode request"
+  },
+  "full_gates": "missing",
+  "full_withdrawal_and_writer_correspondence": "open",
+  "canonical_registration": "missing",
+  "independent_certification": false,
+  "goal_complete": false
+}

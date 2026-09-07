@@ -2,6 +2,15 @@
 
 ## Oracle and nested-call continuation
 
+Validated implementation source: `0fde6481707ba16f63ff324547bc2761e1d7b136`.
+`receipts/oracle-summary.json` records all 24 owned modules (exit 0), 49 matching
+executions (exit 0), seven executed mutant kills, six baseline checks (all 0)
+and the import-DAG check (0). `component-checks/<source SHA>/receipt.json` and
+`oracle-execution-context.json` bind the commands, source/artifact hashes, toolchain
+and dependency identities. Compiler input hashes were rechecked after execution.
+The exact-source remote full attempt exits 2 while encoding the gitlink; no
+remote job, node or completed bundle digest exists for that attempt.
+
 `Oracle` executes the actual BaseOracle physical consensus-pointer read and
 typed STATICCALL, checks tuple length, and applies checked timestamp arithmetic.
 `Consensus` executes the HashConsensus frame getter from the physical packed

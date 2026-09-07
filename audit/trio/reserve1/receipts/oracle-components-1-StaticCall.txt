@@ -1,0 +1,15 @@
+LidoSRv3/Audit/Source/TrioReserve1/StaticCall.lean:33:68: error: unsolved goals
+external : External
+caller target : Address
+selector : Nat
+w : World
+h :
+  external { caller := caller, target := target, value := word 0, payload := encode 4 selector } w =
+    Reply.forbiddenStateChange
+⊢ (if (w.core.codeSize target.val).val = 0 then { outcome := Except.error [], attempts := [] }
+      else
+        { outcome := Except.error [],
+          attempts :=
+            [{ request := { caller := caller, target := target, value := word 0, payload := encode 4 selector },
+                isStatic := true, accepted := false, returned := [] }] }).outcome =
+    Except.error []
