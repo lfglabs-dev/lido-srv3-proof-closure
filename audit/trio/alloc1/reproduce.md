@@ -11,7 +11,7 @@ With Lean 4.31.0 available, run from the repository root:
 python3 audit/trio/alloc1/validate-light.py --lean /path/to/lean --output /fresh/output/light
 ```
 
-The script checks the 21 Init-only owned modules (including the interface and test entry)
+The script checks the 23 Init-only owned modules (including the interface and test entry)
 with private oleans, rejects non-Init/non-owned imports, bounds each check to 30
 seconds, and records each source SHA-256, exact command, output and exit status.
 `vectors.json` is produced by actually evaluating `produce`, not by printing expected
@@ -119,6 +119,13 @@ transaction. Six late failures must execute writes before reverting. Eight publi
 parameter-update cases additionally check error/enum precedence, two packed words,
 and the four event ABIs (`parameters.json`). These writer vectors do not establish
 all-writer reachability.
+
+The writer command also emits optimized `writer.ir` and `library.ir`, checks
+malformed old name storage and long-name cleanup, and validates the final deposit
+state/event (`admission-name.json`). The storage reader treats Ganache's bare
+`0x` response as zero. Source/output hashes for the final rerun are recorded in
+`receipts/writer-validation.json`; `receipts/string-storage.ir` is the relevant
+compiler excerpt, with full IR hash in that receipt.
 
 Current differential receipt: `receipts/solidity-verity-comparison.json`. Recheck
 the independently produced outputs without reevaluating either model:
