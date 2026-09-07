@@ -1,5 +1,21 @@
 # P-RESERVE-1 — incomplete additive delivery
 
+## Complete status-stage rules substituted into withdrawal
+
+`StatusSpec` independently covers lookup/call failure, malformed ABI data, nonzero
+bunker denial, post-call pause denial and allowance. `Status` projects actual bytes
+and physical pause storage into these rules and proves soundness, completeness and
+bidirectional exact status outcome/world/trace correspondence. The active word is
+observed after the bunker call, and bunker denial requires no pause premise.
+Failures are stage failures retaining the actual returned world until root rollback.
+
+`Status.Withdrawal` replaces the parent's opaque status observation with these
+independent rules; `withdrawal_corresponds` retains bidirectional exact parent
+correspondence. Status denial/failure have explicit parent rollback corollaries.
+Lookup/CALL primitive and deployed callee binding remain explicit, as do remaining
+router/spending/tail interfaces, other writers and full remote integration gates.
+Immutable validation follows checks. Runtime execution source is unchanged.
+
 ## Exhaustive withdrawal parent control relation
 
 `WithdrawalSpec.Executes` is independent of source executors. Its eight ordered
