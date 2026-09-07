@@ -70,6 +70,7 @@ def main():
         shutil.copy2(ROOT / "scripts/audit_metadata.py", fixture / "scripts/audit_metadata.py")
         shutil.copy2(ROOT / "scripts/gfm_table.py", fixture / "scripts/gfm_table.py")
         shutil.copy2(ROOT / "scripts/markdown_text.py", fixture / "scripts/markdown_text.py")
+        shutil.copy2(ROOT / "scripts/trio_report.py", fixture / "scripts/trio_report.py")
         shutil.copy2(ROOT / "README.md", fixture / "README.md")
         shutil.copy2(ROOT / "audit/SOURCE-FIDELITY.md", fixture / "audit/SOURCE-FIDELITY.md")
         shutil.copy2(ROOT / "fixtures/solidity-reference/StakingRouter.constructor.L88-L106.sol",
@@ -156,7 +157,6 @@ def main():
             escaped_row = next(line for line in report.splitlines() if "left\\|\\|right" in line)
             if len(re.findall(r"(?<!\\)\|", escaped_row)) != 6:
                 raise AssertionError(f"metadata pipe escaped into table structure:\n{escaped_row}")
-
         # Expanded acceptance-record fields remain visible outside table cells.
         def set_abstract_theorem(row): row["abstract"]["theorem"] = "left||right"
         def set_verity_theorem(row): row["verity"]["theorem"] = "left||right"
