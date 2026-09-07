@@ -9,7 +9,7 @@ inductive Input (id stored blockNumber timestamp count : Nat) (argument : Nat �
     Option Nat → Prop where
   | block (h : id = 200) : Input id stored blockNumber timestamp count argument (some blockNumber)
   | time (h : id = 201) : Input id stored blockNumber timestamp count argument (some timestamp)
-  | constant (h : id = 205) : Input id stored blockNumber timestamp count argument (some stored)
+  | stored_value (h : id = 205) : Input id stored blockNumber timestamp count argument (some stored)
   | argument (hb : id ≠ 200) (ht : id ≠ 201) (hc : id ≠ 205) (hi : id < count) :
       Input id stored blockNumber timestamp count argument (some (argument id % 2^240))
   | missing (hb : id ≠ 200) (ht : id ≠ 201) (hc : id ≠ 205) (hi : count ≤ id) :
@@ -22,7 +22,7 @@ theorem input_exists (id stored blockNumber timestamp count : Nat) (argument : N
   · by_cases ht : id = 201
     · exact ⟨_, .time ht⟩
     · by_cases hc : id = 205
-      · exact ⟨_, .constant hc⟩
+      · exact ⟨_, .stored_value hc⟩
       · by_cases hi : id < count
         · exact ⟨_, .argument hb ht hc hi⟩
         · exact ⟨_, .missing hb ht hc (by omega)⟩
