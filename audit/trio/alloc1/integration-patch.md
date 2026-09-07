@@ -76,3 +76,18 @@ withdrawal credentials plus notification callbacks (1036-1043; SRLib 903-920),
 and inherited ACL/initialization writes. Each requires actual packed-field or
 other-slot preservation, including callback and rejection composition where
 present. A text assignment inventory is not a source-correspondence theorem.
+
+ACLWriter now covers inherited public grantRole and the internal initialization
+grant, using the vendored upgradeable namespace and actual EnumerableSet push
+semantics. Initialization covers the reinitializer and router body, with explicit
+notification execution and empty-loop count derivation. The nonempty notification
+iteration, ACL revoke/renounce and proxy-deployment/lifecycle composition
+remain pending; FreshRecords preservation through empty-enumeration initialization is now proved,
+but these modules do not establish the complete lifecycle by themselves.
+
+Add ProxyGenesis to the owned production closure during integration. Its physical
+implementation-slot prefix removes the zero-storage-only starting-state restriction
+from the initializer invariant lemma; it does not complete proxy constructor
+semantics, ordinary-writer closure, migration or consumer composition. The
+remote-only RunFullValidation driver enumerates required build/test/static gates
+without modifying shared source roots in this branch.

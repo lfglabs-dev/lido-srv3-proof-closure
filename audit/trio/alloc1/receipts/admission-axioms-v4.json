@@ -1,0 +1,17 @@
+{
+  "classification": "INIT_ONLY_AXIOM_INSPECTION_PASS",
+  "scope": "Fourteen selected admission/history/status/ACL/initialization theorems; not remote production/Verity/trust validation.",
+  "command": [
+    "/root/.elan/toolchains/leanprover--lean4---v4.31.0/bin/lean",
+    "audit/trio/alloc1/InspectAdmissionAxioms.lean"
+  ],
+  "exit_code": 0,
+  "stdout": "'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_witness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_stored_share' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.success_count_bound' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.successful_record_freshness' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.AdmissionFacts.public_preserves' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.RecordInvariant.history_invariants' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.history_invariants' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.StatusWriter.revert_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_preserves' depends on axioms: [propext, Classical.choice, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_hasRole' depends on axioms: [propext, Classical.choice, Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.ACLWriter.grant_revert_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.revert_restores' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_from_empty' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n'LidoSRv3.Audit.Source.TrioAlloc1.Initialization.execute_records' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\n",
+  "stderr": "",
+  "source_sha256": {
+    "LidoSRv3/Audit/Source/TrioAlloc1/ACLWriter.lean": "c84687c49c602f609a3371202c2b89b6f9d6bed90586c6e3baaf74961a5127d8",
+    "LidoSRv3/Audit/Source/TrioAlloc1/Initialization.lean": "b6020e00dd0899d6682fc8f15aac2e64d4b607c291c195d006cc3b20451015ca",
+    "audit/trio/alloc1/InspectAdmissionAxioms.lean": "8589acfd2c15cd9eeba11b704e7ae489b2347e9d856cad7ee912b40a3c1c331f"
+  },
+  "job_id": "68864018-1e5b-437b-8560-09beea90e390"
+}

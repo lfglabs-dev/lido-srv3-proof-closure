@@ -171,3 +171,49 @@ only). The full Solidity writer suite passes again, including four status
 rejection cases and a packed byte/event success (`status.json`); exact source
 and output hashes are in `status-writer-validation.json`. Existing earlier
 writer receipts remain tied to their earlier command source hashes.
+
+ACL and initialization now pass 28 fresh Init checks (`light-v25.json`) and
+14 selected standard-axiom inspections (`admission-axioms-v4.json`). The complete
+Solidity writer suite passes with ACL cases and six initialization rejections
+plus one success (`initialization-validation.json`). Initializer, ACL and
+credential writes are observed before late failures and restored by rollback.
+The first initialization run failed in test seeding at a 24,388-gas transaction;
+test storage writes now use an explicit budget. This is not a router-code change.
+
+A separate fresh deployment test compiles original OssifiableProxy with solc
+0.8.9/OZ 4.4.1 and original StakingRouter with solc 0.8.25. It executes proxy
+constructor initialization, public role grants, two admissions, share/status
+updates and duplicate rejection without test storage writes. Source hashes for
+both compiler closures and outputs are in `proxy-initialization.json`; runner
+hash and terminal job are in `proxy-initialization-validation.json`. Reproduce:
+
+```sh
+npm install --prefix /fresh/proxy-tools --no-audit --no-fund --save-exact \
+  solc@0.8.9 @openzeppelin/contracts-v4.4@npm:@openzeppelin/contracts@4.4.1
+NODE_PATH=/path/to/solidity-tools/node_modules node \
+  solidity/trio-alloc1/check-proxy-initialization.cjs /fresh/proxy-output /fresh/proxy-tools
+```
+
+The first proxy-run attempt failed before compilation on a root-source JSON key
+(`contents` instead of `content`); the complete corrected rerun passed. The
+source-level initializer assignments may be combined by the optimizer into one
+SSTORE; the model does not claim equality of per-instruction write traces.
+
+## Production Cancun executions and proxy storage prefix
+
+See `cancun-validation.md` and the owned `validate-cancun.py` driver. Historical
+Shanghai receipts remain valid for their exact inputs and target. The new backend
+is Hardhat2.26.3 with Cancun and normal contract-size limits. Full compiler
+closures, creation/runtime objects, actual deployed code and each command's exit
+code are retained. Verity comparison to876649b reuses that older executed output.
+The new physical proxy-prefix proof passes 29 Init checks (`light-v26.json`) and
+fifteen selected axiom checks (`proxy-genesis-axioms.json`); this is not full remote
+production/trust validation.
+
+`RunFullValidation.lean` is a remote-only driver for the original four build
+roots plus the new producer/test closure, actual Verity execution, axiom inspection,
+make prove/test and static source gates. Invoke with the reviewed full-source
+wrapper only after checking no identical full build is live. It records all exits
+and fails if any gate fails. It must not run locally or overwrite the writer's
+canonical proof-report files. The local `make test` recheck still exits2 at
+`audit/ux2/index.json`; the owner/integrator must resolve this shared artifact.

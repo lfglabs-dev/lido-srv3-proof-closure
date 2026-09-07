@@ -1,0 +1,83 @@
+{
+  "pin": "17005714f151e5502c559932319a3f2f74ac2436",
+  "compiler": "0.8.25+commit.b61c2a91.Emscripten.clang",
+  "scope": "Actual inherited initialize from adversarial test-written storage, not proxy deployment",
+  "checks": [
+    {
+      "name": "initializing-before-zero-admin",
+      "revert": "0xf92ee8a9",
+      "attemptedWrites": 0,
+      "storageRestored": true,
+      "events": 0
+    },
+    {
+      "name": "version-four-before-zero-admin",
+      "revert": "0xf92ee8a9",
+      "attemptedWrites": 0,
+      "storageRestored": true,
+      "events": 0
+    },
+    {
+      "name": "zero-admin",
+      "revert": "0xd92e233d",
+      "attemptedWrites": 1,
+      "storageRestored": true,
+      "events": 0
+    },
+    {
+      "name": "zero-wc-address-after-grant",
+      "revert": "0xd92e233d",
+      "attemptedWrites": 5,
+      "storageRestored": true,
+      "events": 0
+    },
+    {
+      "name": "invalid-wc-type-after-grant",
+      "revert": "0x2e5c948c",
+      "attemptedWrites": 5,
+      "storageRestored": true,
+      "events": 0
+    },
+    {
+      "name": "invalid-cap-after-credentials",
+      "revert": "0x913b835c",
+      "attemptedWrites": 6,
+      "storageRestored": true,
+      "events": 0
+    }
+  ],
+  "initializedWord": "0x0000000000000000000000000000000000000000abcdef000000000000000004",
+  "adminGranted": true,
+  "zeroModuleCount": true,
+  "credentials": "0x0100000000000000000000000000000000000000000000000000000000000020",
+  "capWord": "0x000000000000000000000000000000000000000000000000000000002a000000",
+  "events": [
+    {
+      "topics": [
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x000000000000000000000000000000000000000000000000000000000000001d",
+        "0x00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+      ],
+      "data": "0x"
+    },
+    {
+      "topics": [
+        "0x82e72df77173eab89b00556d791a407a78f4605c5c2f0694967c8c429dd43c7c"
+      ],
+      "data": "0x010000000000000000000000000000000000000000000000000000000000002000000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+    },
+    {
+      "topics": [
+        "0xa69c8fece5e4cc84d598b744ca7199fc1f5fa21f37af55e17892b397f6067f14"
+      ],
+      "data": "0x000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000090f8bf6a479f320ead074411a4b0e7944ea8c9c1"
+    },
+    {
+      "topics": [
+        "0xc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d2"
+      ],
+      "data": "0x0000000000000000000000000000000000000000000000000000000000000004"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "old": "audit/trio/alloc1/receipts/cancun-suite.tar.gz",
+    "old_bytes": 1276336,
+    "new": "audit/trio/alloc1/receipts/cancun-suite.tar.xz",
+    "new_bytes": 314988,
+    "uncompressed_tar_sha256": "fe95554c6577455ff6c6a46eb642610c5d3997a6169422bdc5da9db4059482c1"
+  },
+  {
+    "old": "audit/trio/alloc1/receipts/cancun-proxy-istanbul.tar.gz",
+    "old_bytes": 277743,
+    "new": "audit/trio/alloc1/receipts/cancun-proxy-istanbul.tar.xz",
+    "new_bytes": 136784,
+    "uncompressed_tar_sha256": "bbab1e146ba6c1e9019a56c24bcd2e05436779aa700a0326aa80812696bdf2fc"
+  }
+]

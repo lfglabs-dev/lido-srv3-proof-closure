@@ -63,19 +63,38 @@ count truncation or assumed callee success is introduced.
   rollback and both invariant predicates preserved, and extends the history
   induction to four public writer families. ABI decoding of malformed input is
   outside the typed entry relation.
+- `ACLWriter`: vendored upgradeable OZ role/member/admin slot formulas, public
+  `grantRole`, internal grant used by initialization, packed bool, enumerable
+  insertion and four-topic event. It proves other-slot preservation, grant
+  rejection rollback and router invariant preservation under explicit finite
+  separation. Successful grant derives membership when the member slot is
+  separate from the actual set writes. Initialization composition remains open.
+- `Initialization`: models the vendored reinitializer version/flag writes and
+  outer rollback, plus the ordered router body through an explicit notification
+  execution. It derives empty enumeration through the grant, credentials and
+  cap writes; the source loop control executes zero iterations on that state,
+  for every iteration implementation. `execute_from_empty` proves the capacity
+  invariant under finite slot separation; `execute_records` preserves FreshRecords
+  through the same empty-enumeration initialization. Full notification iteration
+  and proxy-deployment/lifecycle composition remain open.
 - `AllocationMemory`: exact word rounding, oversized-array panic 0x41, allocation
   monotonicity/limit on success, and a bounded allocation lemma. Integration of
   these primitives into the entire compiler execution remains open.
 
-Twenty-six Init-only modules are included in the fresh light validation driver.
-All pass in `receipts/light-v22.json`.
+Twenty-nine Init-only modules are included in the fresh light validation driver.
+All pass in `receipts/light-v26.json`. Fifteen selected axiom checks, including
+`ProxyGenesis.initialization_invariants`, pass with only propext, Classical.choice
+and Quot.sound (`proxy-genesis-axioms.json`).
 The earlier five selected AdmissionFacts theorems use only propext, Classical.choice
 and Quot.sound (`admission-axioms-v1.json`).
 The six selected admission/history theorems use the same standard axioms
 (`admission-axioms-v2.json`). Eight selected theorems including status history and
 rollback pass in `admission-axioms-v3.json`; the full Solidity writer suite with
-five status cases passes in `status-writer-validation.json`. These new invariant proofs have not received remote
-closure validation.
+five status cases passes in `status-writer-validation.json`. Fourteen selected
+theorems including ACL and initialization pass in `admission-axioms-v4.json`,
+with only the same standard axioms. The expanded writer suite passes in
+`initialization-validation.json`. These new invariant proofs have not received
+remote closure validation.
 The full production/test/audit-trust/legacy build passed 1,505 jobs at
 `8269ac576cf119975a7e9954459cd4aa04d5cd82`, remote job
 `3ca9d1e4-e496-43f7-87f2-a5925a9bd083` on nippur. This is **STALE_SUCCESS** for
@@ -117,8 +136,11 @@ Pinned solc 0.8.25 via-IR/optimizer-200 Shanghai execution also checked:
 - Actual compiler storage layout and two executed parent-shaped mutants, plus
   formal witness theorems refuting the corresponding independent specification.
 
-The test harness uses Shanghai because its Ganache engine lacks Cancun support;
-these are pinned-source executions, not a production Cancun bytecode receipt.
+The preserved historical runs used Shanghai because Ganache lacks Cancun support.
+The added Hardhat 2.26.3 backend executes the production Cancun compiler target with
+normal contract-size limits. See `cancun-validation.md` for compiler/deployment
+receipts and the exact comparison boundary. Historical Shanghai evidence remains
+separate; Cancun execution does not close universal memory correspondence.
 
 ## Interface and coordination
 
@@ -168,3 +190,29 @@ proxy initialization proof: zero storage also has no authorized role members.
 The unconditional transition-preservation lemmas cover nonzero entry states
 satisfying their stated predicates; connecting those states to actual deployment
 and ACL initialization is still required.
+
+Fresh pinned proxy deployment also passes without test storage seeding
+(`proxy-initialization-validation.json`): constructor initialization grants admin,
+then public grantRole/addStakingModule/updateModuleShares/setStakingModuleStatus
+reach a two-module state with checked physical identities/shares; duplicate
+admission rejects. This is actual reachable-state execution evidence, not the
+universal proxy-genesis/lifecycle theorem that remains required.
+
+`ProxyGenesis` now proves that the physical constructor implementation-slot prefix
+preserves empty enumeration and FreshRecords, and composes that state with
+initialization to derive both invariant predicates. It retains finite slot
+separation and excludes code-existence/dispatch/final-admin/lifecycle obligations.
+Those exclusions do not remove them from the original scope.
+
+Cancun source execution now passes the twelve capacity/error/memory vectors,
+nested callback case, complete public writer suite and both executed mutants
+(`cancun-suite.json`, archive `cancun-suite.tar.xz`). Hardhat2.26.3 enforces normal
+contract-size limits. The independent comparison reuses the exact Verity876649b
+outputs; it is not current-head full Lean validation. Compiler inputs/outputs and
+actual deployment code are included, with raw-byte deployment hashes.
+
+The fresh proxy lifecycle also passes with the pinned production compiler settings:
+solc0.8.9 Istanbul for OssifiableProxy and solc0.8.25 via-IR/optimizer200 Cancun for
+the router, both executed under Cancun with normal size limits. Exact source,
+compiler and deployed-bytecode receipts: `cancun-proxy-istanbul.json` and its archive.
+The earlier London proxy compatibility run is retained separately.
