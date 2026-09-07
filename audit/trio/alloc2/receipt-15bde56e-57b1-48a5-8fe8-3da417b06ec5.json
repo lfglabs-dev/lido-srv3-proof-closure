@@ -1,0 +1,29 @@
+{
+  "job_id": "15bde56e-57b1-48a5-8fe8-3da417b06ec5",
+  "node_id": "ashur",
+  "state": "succeeded",
+  "receipt_state": "succeeded",
+  "exit_code": 0,
+  "created_at": "2026-09-07T09:42:15.298484216+00:00",
+  "started_at": "2026-09-07T09:42:15.309403854+00:00",
+  "finished_at": "2026-09-07T09:42:19.064653701+00:00",
+  "error": null,
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving LidoSRv3/Audit/Source/TrioAlloc2/\nRemoving LidoSRv3/Tests/TrioAlloc2/\nRemoving audit/trio/\nsource bundle verified sha256=9f1af88e2895ecfa4ea68c21b3ca3372e8535e4cc7e4820431261e55895cd5b2 files=11 bytes=27616\ninfo: trioAlloc2Slice: no previous manifest, creating one from scratch\ninfo: toolchain not updated; no toolchain information found\n\u2714 [2/12] Built LidoSRv3.Audit.Source.TrioAlloc2.Word (331ms)\n\u2714 [3/12] Built LidoSRv3.Audit.Source.TrioAlloc2.Spec (307ms)\n\u2714 [4/12] Built LidoSRv3.Audit.Source.TrioAlloc2.Step (337ms)\n\u2714 [5/12] Built LidoSRv3.Tests.TrioAlloc2.Step (238ms)\n\u2714 [6/12] Built LidoSRv3.Audit.Source.TrioAlloc2.StepBounds (351ms)\n\u2714 [7/12] Built LidoSRv3.Audit.Source.TrioAlloc2.Loop (287ms)\n\u2714 [8/12] Built LidoSRv3.Audit.Source.TrioAlloc2.LoopBounds (376ms)\n\u2714 [9/12] Built LidoSRv3.Tests.TrioAlloc2.Loop (247ms)\n\u2714 [10/12] Built LidoSRv3.Audit.Source.TrioAlloc2.Conservation (477ms)\n\u2139 [11/12] Built LidoSRv3.Tests.TrioAlloc2.Axioms (178ms)\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:8:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:9:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_zero_demand' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:10:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_invariants' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:11:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_amount_between' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:12:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_amount_le_demand' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:13:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_preserves_length' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:14:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_preserves_length' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:15:0: 'LidoSRv3.Audit.Source.TrioAlloc2.Spec.Distributes.preserves_length' depends on axioms: [propext]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:17:0: 'LidoSRv3.Audit.Source.TrioAlloc2.bucketTotal_set' depends on axioms: [propext]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:18:0: 'LidoSRv3.Audit.Source.TrioAlloc2.step_conserves' depends on axioms: [propext]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:19:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocateLoop_conserves' depends on axioms: [propext, Quot.sound]\ninfo: ../../../LidoSRv3/Tests/TrioAlloc2/Axioms.lean:20:0: 'LidoSRv3.Audit.Source.TrioAlloc2.allocate_conserves' depends on axioms: [propext, Quot.sound]\nBuild completed successfully (12 jobs).\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "cwd_rel": "audit/trio/alloc2",
+    "command": [
+      "lake",
+      "build"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "b1170cb91121870cc605ecadbca79dc90b5fb631532bb568e199b6e0608e7306",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}

@@ -1,0 +1,3 @@
+audit metadata v4 ok: 11 canonical guarantees + 18 subordinate evidence rows
+ux2 artifact error: audit/ux2/index.json differs from the registry and Lean sources; run `scripts/generate_ux2.py generate`
+make: *** [Makefile:26: audit-check] Error 1

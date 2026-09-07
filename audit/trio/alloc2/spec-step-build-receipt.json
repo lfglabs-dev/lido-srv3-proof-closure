@@ -1,0 +1,31 @@
+{
+  "job_id": "813c19ce-2892-4553-ba52-1d44ca3227bc",
+  "node_id": "old-agent",
+  "state": "failed",
+  "receipt_state": "failed",
+  "exit_code": 1,
+  "created_at": "2026-09-07T09:16:37.927661706+00:00",
+  "started_at": "2026-09-07T09:16:37.966447032+00:00",
+  "finished_at": "2026-09-07T09:16:39.224556083+00:00",
+  "error": "command exited with Some(1)",
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving .lake/\nRemoving LidoSRv3/Audit/Source/TrioAlloc2/\nRemoving LidoSRv3/Tests/TrioAlloc2/\nsource bundle verified sha256=b0f120a890307169facb73a420f0ca6a2ae962604c3847cfd015c9dcd046cfb3 files=4 bytes=8539\ninfo: verity: cloning https://github.com/lfglabs-dev/verity.git\ninfo: stderr:\nCloning into '/var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/.lake/packages/verity'...\nfatal: could not read Username for 'https://github.com': No such device or address\nfatal: expected flush after ref listing\nerror: external command 'git' exited with code 128\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "command": [
+      "lake",
+      "build",
+      "LidoSRv3.Audit.Source.TrioAlloc2.Spec",
+      "LidoSRv3.Audit.Source.TrioAlloc2.Step",
+      "LidoSRv3.Tests.TrioAlloc2.Step"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "14c0f8c46f062782cdbf1fa6cac19024dfbb2ff14f52524f8e0c799b303845ea",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}

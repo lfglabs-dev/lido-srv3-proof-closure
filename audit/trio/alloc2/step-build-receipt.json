@@ -1,0 +1,30 @@
+{
+  "job_id": "eca803cd-d77b-4d8a-968a-b3b02f8c8dd7",
+  "node_id": "old-agent",
+  "state": "failed",
+  "receipt_state": "failed",
+  "exit_code": 1,
+  "created_at": "2026-09-07T09:15:30.522708039+00:00",
+  "started_at": "2026-09-07T09:15:30.563204012+00:00",
+  "finished_at": "2026-09-07T09:16:13.243336123+00:00",
+  "error": "command exited with Some(1)",
+  "log_tail": "HEAD is now at c7adae0 audit: scope allocation rollback and single-call top-up claims (#242)\nRemoving .lake/\nRemoving LidoSRv3/Audit/Source/TrioAlloc2/\nRemoving LidoSRv3/Tests/TrioAlloc2/\nsource bundle verified sha256=56390ad7c66369a3ad3bd6fe4ebc7ed8f91ace75862ebf9e91d7c3ac8089a833 files=3 bytes=6404\ninfo: verity: cloning https://github.com/lfglabs-dev/verity.git\ninfo: verity: checking out revision 'e977aaad6e1a9e92e0132d41b3d33a14135a4d46'\ninfo: evmyul: cloning https://github.com/lfglabs-dev/EVMYulLean.git\ninfo: evmyul: checking out revision 'f7e4ee0dc8f8d5265ce822a937ab5be771f182e9'\ninfo: mathlib: cloning https://github.com/leanprover-community/mathlib4.git\ninfo: mathlib: checking out revision 'fabf563a7c95a166b8d7b6efca11c8b4dc9d911f'\ninfo: plausible: cloning https://github.com/leanprover-community/plausible\ninfo: stderr:\nCloning into '/var/lib/sandboxed-node/work/checkouts/9acda983bdcdf557/c7adae04416704a839d56333efad003f0a0f46b7/.lake/packages/plausible'...\nfatal: could not read Username for 'https://github.com': No such device or address\nfatal: expected flush after ref listing\nerror: external command 'git' exited with code 128\n",
+  "validation": {
+    "version": 1,
+    "repository": "https://github.com/lfglabs-dev/lido-srv3-proof-closure.git",
+    "commit": "c7adae04416704a839d56333efad003f0a0f46b7",
+    "base_tree_sha": "27834bd59a19f789b2fb9d06f9de01b47af123c2",
+    "cwd_rel_known": true,
+    "command": [
+      "lake",
+      "build",
+      "LidoSRv3.Audit.Source.TrioAlloc2.Step",
+      "LidoSRv3.Tests.TrioAlloc2.Step"
+    ],
+    "toolchain": "leanprover/lean4:v4.31.0",
+    "source_bundle_digest": "28374e81f5790b61dfa35bc6433113f4e4bb117487945b3fb9fc23f5f4603fce",
+    "build_protocol_version": "1",
+    "behavior_env_digest": "5b1af58c836ef0ad4de34ca130e20bdfc5157798a31ea83af1873f0264d65b87"
+  },
+  "artifacts": []
+}
