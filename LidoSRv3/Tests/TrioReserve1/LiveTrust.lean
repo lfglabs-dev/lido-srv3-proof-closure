@@ -1,3 +1,4 @@
+import LidoSRv3.Audit.Source.TrioReserve1.CalleeBalance
 import LidoSRv3.Audit.Source.TrioReserve1.Balance
 import LidoSRv3.Audit.Source.TrioReserve1.WithdrawalCalls
 import LidoSRv3.Audit.Source.TrioReserve1.CallFlow
@@ -354,3 +355,13 @@ open LidoSRv3.Audit.Source.TrioReserve1
 #print axioms Balance.transfer_uint256
 #print axioms Balance.transfer_finite
 #print axioms Balance.transfer_finite_uint256
+
+#print axioms CalleeBalance.locator
+#print axioms CalleeBalance.queue
+#print axioms CalleeBalance.router
+#print axioms CalleeBalance.oracle_frame
+#print axioms CalleeBalance.oracle
+#print axioms CalleeBalance.pipeline
+#print axioms CalleeBalance.call_conserves
+#print axioms CalleeBalance.call_uint256
+#print axioms CalleeBalance.pipeline_call_uint256
